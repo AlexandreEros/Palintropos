@@ -1,5 +1,8 @@
 # Williamson test case 5 — Aeolus vs the MRI-JMA reference (2026-07-30)
 
+> **Project name:** Aeolus is now Palintropos. The historical model name,
+> pinned commits, and artifact filenames below are retained for provenance.
+
 **Status: accepted.** Aeolus integrates the corrected canonical Williamson-5
 initial-value problem, passes the day-zero physical contract at T42 and T63,
 completes 15 simulated days at both resolutions with excellent mass and energy
@@ -45,7 +48,7 @@ that Aeolus's pre-2026-07-29 initial condition prescribed the same field as
 *thickness*, i.e. a physically different initial-value problem — is recorded in
 [notebooks/W5_MRI_SEMANTIC_AUDIT.md](../../notebooks/W5_MRI_SEMANTIC_AUDIT.md).
 The correction is commit
-[`668e6c9a`](https://github.com/AlexandreEros/Aeolus/commit/668e6c9a5735b2d7200dcc121eb0f7c40450ae08),
+[`668e6c9a`](https://github.com/AlexandreEros/Palintropos/commit/668e6c9a5735b2d7200dcc121eb0f7c40450ae08),
 *fix(swe): canonicalize Williamson-5 initial state*.
 
 **Field contract.** Both sides are reduced to the same physical fields on the

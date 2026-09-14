@@ -1,6 +1,6 @@
 # Known Limitations
 
-Aeolus is research software. This page states its current scope honestly and
+Palintropos is research software. This page states its current scope honestly and
 lists what would have to change before it could claim more.
 
 For the full audit trail — severity ratings, evidence, fix logs, and remaining
@@ -11,7 +11,7 @@ paragraph conflicts with the implementation.
 
 ## Solver scope
 
-Aeolus solves the **non-divergent barotropic vorticity equation**; since the
+Palintropos solves the **non-divergent barotropic vorticity equation**; since the
 `feat/shallow-water` milestone, the **inviscid rotating shallow-water equations
 with optional fixed analytic bottom topography**
 ([SHALLOW_WATER.md](SHALLOW_WATER.md)); and an early **dry hydrostatic

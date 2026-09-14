@@ -1,11 +1,14 @@
-# Aeolus
+# Palintropos
 
 **A GPU-resident spectral laboratory for circulation on a rotating sphere.**
+
+Formerly **Aeolus**. The command-line interface remains `aeolus`; the Python
+package remains `planetary_sandbox` (distribution: `planetary-sandbox`).
 
 A thin layer of fluid on a spinning sphere does not stay smooth. Rotation,
 curvature, and the poleward variation of the Coriolis parameter organize it:
 energy collects at preferred scales, flow gathers into jets and long-lived
-vortices, and disturbances travel as planetary-scale waves. Aeolus is a
+vortices, and disturbances travel as planetary-scale waves. Palintropos is a
 numerical laboratory for watching that organization arise from the equations
 themselves — from a discretized dynamical core and its spectral transforms,
 not from structure imposed on the output.
@@ -17,18 +20,18 @@ redistributed across scales**: a conservative run can begin in essentially one
 low-order mode and, through mode coupling alone, spread its energy over a broad
 harmonic spectrum, raising the mean wavenumber and the effective number of
 occupied modes, while mass, energy, and potential enstrophy stay controlled to
-one part in 10⁵ or better. No explicit dissipation is applied; what broadens dramatically is the coarse-grained spectral description of the flow, while the principal invariants remain nearly unchanged. The figure below measures exactly that. Aeolus is early, though: varying
+one part in 10⁵ or better. No explicit dissipation is applied; what broadens dramatically is the coarse-grained spectral description of the flow, while the principal invariants remain nearly unchanged. The figure below measures exactly that. Palintropos is early, though: varying
 planetary parameters to see when the **spectral character** of a circulation
 changes — and eventually letting such differences act on the transport of
 heat, mass, and momentum — needs models it does not have yet. What exists today is the spectral machinery, the
 conservation diagnostics, and the run provenance that would make those
 comparisons worth believing.
 
-![Aeolus Williamson Test Case 5 T63 shallow-water validation](docs/validation/williamson_5/overview.png)
+![Palintropos Williamson Test Case 5 T63 shallow-water validation](docs/validation/williamson_5/overview.png)
 
-*Aeolus solving Williamson Test Case 5 at T63 (96×192 Gauss–Legendre grid, ℓ ≤ 63): an initially axisymmetric zonal flow over an isolated conical mountain sheds a global, mountain-forced wave train over 15 simulated days, while layer mass stays bit-identical to day 0 and total energy and potential enstrophy drift by less than one part in 10⁵. The right-hand column tracks that reorganization spectrally, in the rotational/divergent modes the solver already carries: the flow starts as essentially one low-order mode (mean degree ⟨ℓ⟩ = 1, mean zonal wavenumber ⟨|m|⟩ = 0) and spreads to ⟨ℓ⟩ ≈ 2.7 and about 4.4 effective occupied modes by day 15 — the visual complexity is real dynamics, not a loss of the conserved quantities. [See the Williamson-5 validation evidence and reference comparison →](docs/validation/williamson5_mri_2026-07-30.md)*
+*Palintropos solving Williamson Test Case 5 at T63 (96×192 Gauss–Legendre grid, ℓ ≤ 63): an initially axisymmetric zonal flow over an isolated conical mountain sheds a global, mountain-forced wave train over 15 simulated days, while layer mass stays bit-identical to day 0 and total energy and potential enstrophy drift by less than one part in 10⁵. The right-hand column tracks that reorganization spectrally, in the rotational/divergent modes the solver already carries: the flow starts as essentially one low-order mode (mean degree ⟨ℓ⟩ = 1, mean zonal wavenumber ⟨|m|⟩ = 0) and spreads to ⟨ℓ⟩ ≈ 2.7 and about 4.4 effective occupied modes by day 15 — the visual complexity is real dynamics, not a loss of the conserved quantities. [See the Williamson-5 validation evidence and reference comparison →](docs/validation/williamson5_mri_2026-07-30.md)*
 
-Aeolus advances the non-divergent barotropic vorticity equation (BVE) and the
+Palintropos advances the non-divergent barotropic vorticity equation (BVE) and the
 rotating shallow-water equations with spherical harmonics — with an early dry
 hydrostatic primitive-equation core beginning to add vertical structure — and
 can run the same models and operators on either an icosahedral geodesic point
@@ -46,7 +49,7 @@ controlled conservation evidence is in [docs/VALIDATION.md](docs/VALIDATION.md),
 and the full 40-character configuration is in the tracked
 [figure provenance](docs/assets/provenance.json).*
 
-## What Aeolus is
+## What Palintropos is
 
 - A rotating-sphere **barotropic-vorticity solver** with RK4 and optional
   Laplacian viscosity, prognostic in relative vorticity.
@@ -72,9 +75,9 @@ and the full 40-character configuration is in the tracked
   provenance, per-step diagnostics, spectra, saved states, and plots.
 - Rossby–Haurwitz wavenumber-4 (`rh4`) validation and backend-parity tests.
 
-## What Aeolus is not
+## What Palintropos is not
 
-Aeolus is **not** a GCM or weather model. The primitive-equation core is an
+Palintropos is **not** a GCM or weather model. The primitive-equation core is an
 ignition path, not a climate model: no forcing, moisture, hyperdiffusion,
 semi-implicit or adaptive stepping, no CFL controller, no total-energy
 conservation diagnostic, and nothing longer than short fixed-step
@@ -92,8 +95,8 @@ and Git. Tested on Windows/PowerShell with Python 3.12.12, CuPy 13.4.0, and
 CUDA 11.8.
 
 ```powershell
-git clone https://github.com/AlexandreEros/Aeolus.git
-cd Aeolus
+git clone https://github.com/AlexandreEros/Palintropos.git
+cd Palintropos
 py -3.12 -m venv venv
 .\venv\Scripts\Activate.ps1
 pip install -r requirements.txt
@@ -262,7 +265,7 @@ and orientation/rotation-equivalence tests are in
 
 ### Williamson test case 5
 
-Aeolus integrates the corrected canonical Williamson-5 initial-value problem
+Palintropos integrates the corrected canonical Williamson-5 initial-value problem
 (the case-2 height field prescribed as the **free surface**, over the canonical
 conical mountain), passed the day-zero physical contract at both T42 and T63,
 completed 15-day runs at both resolutions with excellent mass and energy
@@ -271,10 +274,10 @@ reference solution. All runs are at commit `668e6c9a` with a clean worktree, on
 the Gauss lat–lon backend, inviscid and with no hyperdiffusion.
 
 This is a **numerical-model intercomparison**, not a comparison against an
-analytic truth solution — Williamson 5 has none. Aeolus is not claimed to match
+analytic truth solution — Williamson 5 has none. Palintropos is not claimed to match
 truth, to reproduce MRI identically, or to demonstrate a formal convergence
 order (two truncations cannot measure one). The large raw `layer_depth`
-difference is dominated by Aeolus's band-limited cone versus the reference's
+difference is dominated by Palintropos's band-limited cone versus the reference's
 analytic cone, not by dynamics.
 
 Full report, figures, provenance, and checksums:
