@@ -120,7 +120,7 @@ parent escapes as an unhandled exception. The manifest records the
 actual backend, grid, transform, product sampling, `l_max`, environment,
 GPU, command, and Git provenance. A fresh failed run never publishes
 `latest_run.txt`. Before overwriting the run currently referenced by that
-pointer, Aeolus strictly clears the pointer and transitions the capsule away
+pointer, Palintropos strictly clears the pointer and transitions the capsule away
 from `completed`; cleanup or execution failure then persists `failed` and
 leaves the pointer absent. Successful publication validates a matching
 `status='completed'` manifest and atomically replaces `latest_run.txt`, so

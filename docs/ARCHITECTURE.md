@@ -1,6 +1,6 @@
 # Architecture
 
-This document describes how Aeolus is put together today: package layout, the
+This document describes how Palintropos is put together today: package layout, the
 two grid backends, the spectral transform flow, the run-capsule/provenance
 model, and how to add or compare a backend.
 

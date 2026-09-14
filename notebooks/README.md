@@ -1,5 +1,8 @@
 # Williamson Test Case 5 — MRI-JMA vs Aeolus validation notebooks
 
+> **Project name:** Aeolus is now Palintropos. The historical model name,
+> pinned commits, and artifact filenames below are retained for provenance.
+
 Two small, self-contained Colab notebooks that answer one question:
 
 > Does Aeolus reproduce the MRI-JMA Williamson test-case-5 solution when both

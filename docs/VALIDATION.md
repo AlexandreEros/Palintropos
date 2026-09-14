@@ -1,6 +1,6 @@
 # Validation
 
-This document collects Aeolus's current validation evidence: the Rossby–Haurwitz
+This document collects Palintropos's current validation evidence: the Rossby–Haurwitz
 backend comparison, the Williamson-5 shallow-water intercomparison against an
 external reference model, conservation diagnostics, the geodesic-vs-Gauss
 quadrature discussion, orientation/rotation-equivalence tests, and the known
@@ -86,9 +86,9 @@ lat–lon backend, inviscid and with no hyperdiffusion:
 Reading these numbers correctly matters:
 
 - The reference is **another discrete model**, not an analytic solution. These
-  are model-to-model differences, not Aeolus's error.
+  are model-to-model differences, not Palintropos's error.
 - The raw `layer_depth` difference is much larger (`87 m` / `36 m` peak) and is
-  **dominated by terrain representation** — Aeolus carries a band-limited cone,
+  **dominated by terrain representation** — Palintropos carries a band-limited cone,
   the reference an analytic one. Removing that static term returns the
   free-surface difference *identically* (verified to `9×10⁻¹³ m`), so the
   free-surface rows above are the dynamical comparison.
