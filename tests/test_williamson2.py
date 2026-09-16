@@ -45,7 +45,7 @@ DAY_HOURS = 2.0 * math.pi / OMEGA / 3600.0   # sidereal day giving Omega
 
 def _make_planet(grid_type="latlon", nlat=32, nlon=64, l_max=15,
                  resolution=3):
-    from planetary_sandbox.planet import Planet, PlanetaryParameters
+    from tropoi.planet import Planet, PlanetaryParameters
     return Planet.generate(
         params=PlanetaryParameters.from_earth_like(day_hours=DAY_HOURS),
         grid_type=grid_type, nlat=nlat, nlon=nlon, l_max=l_max,
@@ -55,7 +55,7 @@ def _make_planet(grid_type="latlon", nlat=32, nlon=64, l_max=15,
 def make_williamson2(planet):
     """Return (model, state, refs) for the Williamson-2 steady solution."""
     import cupy as cp
-    from planetary_sandbox.physics.shallow_water import (
+    from tropoi.physics.shallow_water import (
         ShallowWaterModel, ShallowWaterState)
 
     a = float(planet.params.radius)
@@ -137,7 +137,7 @@ def test_w2_initial_tendencies_small_geodesic():
 def _integrate_fixed_cfl(planet, model, state, days):
     """RK4-integrate for `days` at the initial advective+gravity-wave CFL dt."""
     import math as _math
-    from planetary_sandbox.run.engine import (advective_cfl_timestep,
+    from tropoi.run.engine import (advective_cfl_timestep,
                                               rk4_step_array)
 
     length_scale = getattr(planet.grid, "cfl_length_scale", None)
@@ -164,7 +164,7 @@ def _grid_height_error(planet, model, y, y0):
 
 def _total_energy_mass(planet, model, y):
     import cupy as cp
-    from planetary_sandbox.physics.shallow_water import ShallowWaterState
+    from tropoi.physics.shallow_water import ShallowWaterState
     fields = model.characteristic_fields(ShallowWaterState(y))
     w = cp.asarray(planet.sh.weights) * planet.params.radius**2
     phi_t = fields["phi_total"]
@@ -175,7 +175,7 @@ def _total_energy_mass(planet, model, y):
 
 def test_w2_one_day_steady_latlon():
     import cupy as cp
-    from planetary_sandbox.physics.shallow_water import ShallowWaterState
+    from tropoi.physics.shallow_water import ShallowWaterState
 
     planet = _make_planet()
     model, state, refs = make_williamson2(planet)
@@ -208,7 +208,7 @@ def test_w2_one_day_steady_latlon():
 
 def test_w2_six_hours_stable_geodesic():
     import cupy as cp
-    from planetary_sandbox.physics.shallow_water import ShallowWaterState
+    from tropoi.physics.shallow_water import ShallowWaterState
 
     planet = _make_planet(grid_type="geodesic", resolution=3, l_max=10)
     model, state, refs = make_williamson2(planet)

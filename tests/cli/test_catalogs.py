@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import pytest
 
-from planetary_sandbox.cli.main import PRESETS, SCENARIOS, main
+from tropoi.cli.main import PRESETS, SCENARIOS, main
 
 
 def test_list_presets_output(capsys):
@@ -23,5 +23,5 @@ def test_list_scenarios_output(capsys):
 
 def test_scenario_choices_match_initial_conditions():
     pytest.importorskip("cupy")
-    from planetary_sandbox.run.bve.initial_conditions import INITIAL_CONDITIONS
+    from tropoi.run.bve.initial_conditions import INITIAL_CONDITIONS
     assert set(SCENARIOS) == set(INITIAL_CONDITIONS)

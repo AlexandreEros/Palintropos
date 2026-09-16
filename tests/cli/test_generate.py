@@ -1,20 +1,20 @@
-"""aeolus gen / psx-gen parsing, paths, and dispatch."""
+"""tropoi gen / psx-gen parsing, paths, and dispatch."""
 from __future__ import annotations
 
 import pathlib
 
-from planetary_sandbox.cli.main import main
+from tropoi.cli.main import main
 
 
 def test_gen_grid_resolution_is_an_int_not_a_list():
-    from planetary_sandbox.cli.generate_planet import build_parser
+    from tropoi.cli.generate_planet import build_parser
 
     args = build_parser().parse_args(["--grid-resolution", "4"])
     assert args.grid_resolution == 4
 
 
 def test_gen_legacy_radius_spelling_still_accepted():
-    from planetary_sandbox.cli.generate_planet import build_parser
+    from tropoi.cli.generate_planet import build_parser
 
     args = build_parser().parse_args(["--eq_radius-earth_units", "2.0"])
     assert args.radius_earth_units == 2.0
@@ -23,7 +23,7 @@ def test_gen_legacy_radius_spelling_still_accepted():
 
 
 def test_gen_creates_output_directory(tmp_path, monkeypatch):
-    from planetary_sandbox.cli.generate_planet import resolve_output_path
+    from tropoi.cli.generate_planet import resolve_output_path
 
     monkeypatch.chdir(tmp_path)
     out_path = resolve_output_path("planet_summary.png")
@@ -35,7 +35,7 @@ def test_gen_creates_output_directory(tmp_path, monkeypatch):
 
 
 def test_gen_dispatch_via_mocked_run(monkeypatch):
-    import planetary_sandbox.cli.generate_planet as gen_module
+    import tropoi.cli.generate_planet as gen_module
 
     captured = {}
     monkeypatch.setattr(

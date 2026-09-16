@@ -14,7 +14,7 @@ import math
 import numpy as np
 import pytest
 
-from planetary_sandbox.physics.sigma_coordinate import (
+from tropoi.physics.sigma_coordinate import (
     SigmaGrid, SigmaGridError, column_energy_conversion,
     column_mass_tendency, column_pressure_work, energy_exchange,
     hydrostatic_geopotential, interface_mean, interface_sigma_dot,

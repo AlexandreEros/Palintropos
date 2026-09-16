@@ -1,7 +1,15 @@
 # Williamson Test Case 5 — MRI-JMA vs Aeolus validation notebooks
 
-> **Project name:** Aeolus is now Palintropos. The historical model name,
+> **Project name:** Aeolus is now Palintropos (distribution `palintropos`,
+> import package `tropoi`, command `tropoi`). The historical model name,
 > pinned commits, and artifact filenames below are retained for provenance.
+> Notebook B is deliberately *not* migrated: it clones the pinned pre-rename
+> commit `668e6c9a` and therefore keeps `AEOLUS_REPO_URL`, its
+> `planetary_sandbox.*` imports, and `python -m planetary_sandbox.cli.main`.
+> Those names describe that commit, not this checkout. GitHub redirects the
+> old `AlexandreEros/Aeolus` URL to `AlexandreEros/Palintropos`, so the clone
+> still resolves; re-pointing the notebook at a post-rename commit means
+> switching it to `tropoi.*` at the same time.
 
 Two small, self-contained Colab notebooks that answer one question:
 

@@ -11,10 +11,10 @@ import types
 
 import pytest
 
-import planetary_sandbox.cli.bve as bve
-import planetary_sandbox.run.bve.io as io
-from planetary_sandbox.run.bve.config import BVERunConfig
-from planetary_sandbox.run.bve.io import (
+import tropoi.cli.bve as bve
+import tropoi.run.bve.io as io
+from tropoi.run.bve.config import BVERunConfig
+from tropoi.run.bve.io import (
     RUN_STATUS_COMPLETED,
     RUN_STATUS_FAILED,
     RUN_STATUS_RUNNING,
@@ -125,9 +125,9 @@ def test_latest_pointer_publish_requires_matching_completed_manifest(
 
 def test_execute_run_forwards_snapshot_mode_to_runner(monkeypatch, tmp_path):
     """psx-bve interval config must arrive at run_bve as snapshot_mode='interval'."""
-    import planetary_sandbox.planet as planet_mod
-    import planetary_sandbox.run.bve.initial_conditions as ic_mod
-    import planetary_sandbox.run.bve.runner as runner_mod
+    import tropoi.planet as planet_mod
+    import tropoi.run.bve.initial_conditions as ic_mod
+    import tropoi.run.bve.runner as runner_mod
 
     captured = {}
     fake_planet = types.SimpleNamespace(
@@ -156,9 +156,9 @@ def test_execute_run_forwards_snapshot_mode_to_runner(monkeypatch, tmp_path):
 
 
 def test_execute_run_forwards_count_mode_to_runner(monkeypatch, tmp_path):
-    import planetary_sandbox.planet as planet_mod
-    import planetary_sandbox.run.bve.initial_conditions as ic_mod
-    import planetary_sandbox.run.bve.runner as runner_mod
+    import tropoi.planet as planet_mod
+    import tropoi.run.bve.initial_conditions as ic_mod
+    import tropoi.run.bve.runner as runner_mod
 
     captured = {}
     fake_planet = types.SimpleNamespace(

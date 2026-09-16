@@ -25,7 +25,7 @@ def _has_cuda():
 # ---------------------------------------------------------------------------
 
 def test_swe_config_defaults():
-    from planetary_sandbox.run.swe.config import SWERunConfig
+    from tropoi.run.swe.config import SWERunConfig
 
     cfg = SWERunConfig.resolve({})
     assert cfg.scenario == "williamson2"
@@ -41,7 +41,7 @@ def test_swe_config_defaults():
 
 
 def test_swe_config_rejects_bad_values():
-    from planetary_sandbox.run.swe.config import SWERunConfig
+    from tropoi.run.swe.config import SWERunConfig
 
     with pytest.raises(ValueError, match="gravity"):
         SWERunConfig.resolve({"gravity": -1.0})
@@ -60,7 +60,7 @@ def test_swe_config_rejects_bad_values():
 
 
 def test_swe_plot_selection_is_deduplicated_and_canonical():
-    from planetary_sandbox.run.swe.config import SWERunConfig
+    from tropoi.run.swe.config import SWERunConfig
 
     cfg = SWERunConfig.resolve({
         "plots": ["summary", "snapshots", "snapshots"]})
@@ -70,8 +70,8 @@ def test_swe_plot_selection_is_deduplicated_and_canonical():
 
 
 def test_swe_config_dict_feeds_run_id():
-    from planetary_sandbox.run.bve.io import make_run_id
-    from planetary_sandbox.run.swe.config import SWERunConfig
+    from tropoi.run.bve.io import make_run_id
+    from tropoi.run.swe.config import SWERunConfig
 
     cfg = SWERunConfig.resolve({"grid": "gauss-latlon", "nlat": 16,
                                 "nlon": 32, "lmax": 7})
@@ -89,7 +89,7 @@ def test_swe_config_dict_feeds_run_id():
 
 
 def test_swe_cli_help_and_parse_errors(capsys):
-    from planetary_sandbox.cli.main import main
+    from tropoi.cli.main import main
 
     with pytest.raises(SystemExit) as exc:
         main(["run", "swe", "--help"])
@@ -111,8 +111,8 @@ def test_swe_interval_run_ids_disambiguate_physics():
     legacy BVE id format — configs differing only in physics (e.g. gravity)
     must get distinct ids."""
     from datetime import datetime, timezone
-    from planetary_sandbox.run.bve.io import make_run_id
-    from planetary_sandbox.run.swe.config import SWERunConfig
+    from tropoi.run.bve.io import make_run_id
+    from tropoi.run.swe.config import SWERunConfig
 
     now = datetime(2026, 1, 1, tzinfo=timezone.utc)
     ids = []
@@ -140,11 +140,11 @@ def test_swe_interval_run_ids_disambiguate_physics():
 @pytest.mark.skipif(not _has_cuda(), reason="CUDA/CuPy not available")
 def test_swe_runner_end_to_end(tmp_path):
     import numpy as np
-    from planetary_sandbox.planet import Planet, PlanetaryParameters
-    from planetary_sandbox.physics.shallow_water import ShallowWaterModel
-    from planetary_sandbox.run.engine import count_snapshot_times
-    from planetary_sandbox.run.swe.initial_conditions import make_swe_ic
-    from planetary_sandbox.run.swe.runner import run_swe
+    from tropoi.planet import Planet, PlanetaryParameters
+    from tropoi.physics.shallow_water import ShallowWaterModel
+    from tropoi.run.engine import count_snapshot_times
+    from tropoi.run.swe.initial_conditions import make_swe_ic
+    from tropoi.run.swe.runner import run_swe
 
     planet = Planet.generate(
         params=PlanetaryParameters.from_earth_like(day_hours=23.9345),
@@ -187,11 +187,11 @@ def test_swe_runner_end_to_end(tmp_path):
 @pytest.mark.skipif(not _has_cuda(), reason="CUDA/CuPy not available")
 def test_swe_runner_generates_final_summary_from_persisted_state(tmp_path):
     import matplotlib.image as mpimg
-    from planetary_sandbox.planet import Planet, PlanetaryParameters
-    from planetary_sandbox.physics.shallow_water import ShallowWaterModel
-    from planetary_sandbox.run.engine import count_snapshot_times
-    from planetary_sandbox.run.swe.initial_conditions import make_swe_ic
-    from planetary_sandbox.run.swe.runner import run_swe
+    from tropoi.planet import Planet, PlanetaryParameters
+    from tropoi.physics.shallow_water import ShallowWaterModel
+    from tropoi.run.engine import count_snapshot_times
+    from tropoi.run.swe.initial_conditions import make_swe_ic
+    from tropoi.run.swe.runner import run_swe
 
     planet = Planet.generate(
         params=PlanetaryParameters.from_earth_like(day_hours=23.9345),
@@ -217,11 +217,11 @@ def test_swe_geodesic_mass_diagnostic_exactly_conserved(tmp_path):
     """Audit finding 5: total_mass is the spectrally computed conserved
     quantity, so it must be exactly constant even on the geodesic backend
     (whose grid quadrature would show spurious ~1e-7 drift)."""
-    from planetary_sandbox.planet import Planet, PlanetaryParameters
-    from planetary_sandbox.physics.shallow_water import ShallowWaterModel
-    from planetary_sandbox.run.engine import count_snapshot_times
-    from planetary_sandbox.run.swe.initial_conditions import make_swe_ic
-    from planetary_sandbox.run.swe.runner import run_swe
+    from tropoi.planet import Planet, PlanetaryParameters
+    from tropoi.physics.shallow_water import ShallowWaterModel
+    from tropoi.run.engine import count_snapshot_times
+    from tropoi.run.swe.initial_conditions import make_swe_ic
+    from tropoi.run.swe.runner import run_swe
 
     planet = Planet.generate(
         params=PlanetaryParameters.from_earth_like(day_hours=23.9345),
@@ -245,7 +245,7 @@ def test_swe_geodesic_mass_diagnostic_exactly_conserved(tmp_path):
 
 @pytest.mark.skipif(not _has_cuda(), reason="CUDA/CuPy not available")
 def test_swe_cli_end_to_end(tmp_path, capsys):
-    from planetary_sandbox.cli.main import main
+    from tropoi.cli.main import main
 
     rc = main(["run", "swe", "--backend", "gauss-latlon", "--nlat", "16",
                "--nlon", "32", "--l-max", "7", "--days", "0.01",
@@ -270,7 +270,7 @@ def test_swe_cli_end_to_end(tmp_path, capsys):
 
 
 def test_swe_overwrite_cleanup_removes_snapshot_product(tmp_path):
-    from planetary_sandbox.cli import swe
+    from tropoi.cli import swe
 
     snapshots = tmp_path / "snapshots" / "physical"
     snapshots.mkdir(parents=True)

@@ -12,7 +12,7 @@ import math
 
 import pytest
 
-from planetary_sandbox.run.pe.initial_conditions import (
+from tropoi.run.pe.initial_conditions import (
     PE_INITIAL_CONDITIONS, THERMAL_WAVE_DEGREE, THERMAL_WAVE_ORDER, make_pe_ic)
 
 T0 = 260.0
@@ -35,10 +35,10 @@ pytestmark = pytest.mark.skipif(not _has_cuda(),
 
 def _make_model(grid_type="latlon", nlat=32, nlon=64, l_max=15, resolution=3,
                 nlev=5):
-    from planetary_sandbox.planet import Planet, PlanetaryParameters
-    from planetary_sandbox.physics.primitive_equations import (
+    from tropoi.planet import Planet, PlanetaryParameters
+    from tropoi.physics.primitive_equations import (
         PrimitiveEquationsModel)
-    from planetary_sandbox.physics.sigma_coordinate import SigmaGrid
+    from tropoi.physics.sigma_coordinate import SigmaGrid
     planet = Planet.generate(
         params=PlanetaryParameters.from_earth_like(day_hours=24.0),
         grid_type=grid_type, nlat=nlat, nlon=nlon, l_max=l_max,
@@ -70,7 +70,7 @@ def test_registry_has_exactly_the_known_presets():
     assert set(PE_INITIAL_CONDITIONS) == {
         "isothermal_rest", "thermal_wave", "orographic_isothermal_rest"}
     # And the import-light scenario catalog stays in sync with it.
-    from planetary_sandbox.run.pe.config import PE_SCENARIOS
+    from tropoi.run.pe.config import PE_SCENARIOS
     assert set(PE_SCENARIOS) == set(PE_INITIAL_CONDITIONS)
 
 

@@ -13,7 +13,7 @@ All statements marked **[measured]** were verified numerically during the audit
 ## 1. Governing equation
 
 The dynamical core intends to solve the **barotropic vorticity equation (BVE)** on a
-rotating sphere ([barotropic_vorticity.py](../src/planetary_sandbox/run/bve/barotropic_vorticity.py)):
+rotating sphere ([barotropic_vorticity.py](../src/tropoi/run/bve/barotropic_vorticity.py)):
 
 ```
 ∂ζ/∂t + J(ψ, ζ + f) = ν ∇²ζ + F
@@ -69,11 +69,11 @@ Y_l^m(θ, λ) = N_l^m · P_l^m(cos θ) · e^{imλ},      N_l^m = sqrt( (2l+1)/(4
 
 - `θ` = **colatitude** (0 at north pole), `λ` = longitude, m ≥ 0 only.
 - The Condon–Shortley factor `(−1)^m` is folded into the associated Legendre functions
-  inside the CUDA kernels ([legendre.cu](../src/planetary_sandbox/numerics/cuda/legendre.cu),
-  [sh_matrix.cu](../src/planetary_sandbox/numerics/cuda/sh_matrix.cu)) via the seed
+  inside the CUDA kernels ([legendre.cu](../src/tropoi/numerics/cuda/legendre.cu),
+  [sh_matrix.cu](../src/tropoi/numerics/cuda/sh_matrix.cu)) via the seed
   `P_m^m = (−1)^m (2m−1)!! (1−x²)^{m/2}`; the Python-side normalization deliberately does
   *not* apply it a second time (the "FIX" comments in
-  [spherical_harmonics.py](../src/planetary_sandbox/numerics/spherical_harmonics.py) record a
+  [spherical_harmonics.py](../src/tropoi/numerics/spherical_harmonics.py) record a
   past double-phase bug).
 - Orthonormality means `∫ Y_l^m (Y_{l'}^{m'})* dΩ = δ_ll' δ_mm'`, so a constant field maps to
   `a_00 = sqrt(4π) · c`. **[measured]**: the geodesic transform reproduces `a_00 = sqrt(4π)`
@@ -127,7 +127,7 @@ represented.
 
 ### 3.1 Geodesic grid (operational)
 
-[geodesic_grid.py](../src/planetary_sandbox/numerics/geodesic_grid.py): icosahedron subdivided
+[geodesic_grid.py](../src/tropoi/numerics/geodesic_grid.py): icosahedron subdivided
 `resolution` times (each level splits every triangle in four; vertices projected to the
 sphere), giving `n_points = 10·4^res + 2` (642 at res 3, 2562 at res 4, 10242 at res 5).
 The base icosahedron is **rotated by 0.01 rad about x** ("anti-singularity rotation") so no
@@ -140,7 +140,7 @@ latent) local finite-difference operators and the CFL estimate.
 
 ### 3.2 Latitude–longitude grid (legacy baseline)
 
-[grid.py](../src/planetary_sandbox/numerics/grid.py): uniform colatitude including both poles,
+[grid.py](../src/tropoi/numerics/grid.py): uniform colatitude including both poles,
 uniform longitude with `endpoint=False`; forced to odd point counts for Simpson quadrature.
 Used only by tests/diagnostic scripts and the interpolation utilities, not by the BVE.
 
@@ -190,14 +190,14 @@ engine is used as the reference in two test scripts, which weakens those tests.
 
 ### 4.3 Grid-to-grid interpolation
 
-[grid_interpolation.py](../src/planetary_sandbox/numerics/grid_interpolation.py) round-trips
+[grid_interpolation.py](../src/tropoi/numerics/grid_interpolation.py) round-trips
 geodesic ↔ lat–lon via `scipy.interpolate.griddata` (CPU). Used for plotting only.
 
 ---
 
 ## 5. Derivative operators (spectral)
 
-Implemented in [spectral_operators.py](../src/planetary_sandbox/numerics/spectral_operators.py),
+Implemented in [spectral_operators.py](../src/tropoi/numerics/spectral_operators.py),
 all acting on the dense (l, m) coefficient array:
 
 - **Laplacian**: diagonal, `∇²Y_l^m = −l(l+1)/R² · Y_l^m`. Exact.
@@ -232,7 +232,7 @@ all acting on the dense (l, m) coefficient array:
   verified operators above. **[measured] correct** — but currently *unused* by the model.
 
 A completely separate **local (non-spectral) operator family**,
-[differential_operators_spherical.py](../src/planetary_sandbox/numerics/differential_operators_spherical.py),
+[differential_operators_spherical.py](../src/tropoi/numerics/differential_operators_spherical.py),
 builds sparse least-squares gradient/divergence/curl matrices from the mesh adjacency and a
 **graph Laplacian** (`D − W`, which is *not* a consistent discretization of the surface
 Laplacian — no area/metric scaling). It is instantiated lazily by `SpectralOperators
@@ -265,12 +265,12 @@ per evaluation, eight per RK4 step.
 ## 7. Time integration
 
 - **Scheme**: classical explicit **RK4** on the spectral vorticity coefficients
-  ([runner.py](../src/planetary_sandbox/run/bve/runner.py) `rk4_step`), diffusion included
+  ([runner.py](../src/tropoi/run/bve/runner.py) `rk4_step`), diffusion included
   explicitly (no integrating factor / implicit treatment).
 - **Step-size policy**: a **state-adaptive advective CFL ceiling**. The ceiling
   `dt_cfl = 0.5 · cfl_length_scale / max|u|` (falls back to 600 s if degenerate; the sole
   implementation is `advective_cfl_timestep` in
-  [config.py](../src/planetary_sandbox/run/bve/config.py)) is formed from the *initial*
+  [config.py](../src/tropoi/run/bve/config.py)) is formed from the *initial*
   state for the first step and then **recomputed from every accepted state** — the runner
   drives it with the `max_speed_ms` already produced by the per-step diagnostics record, so
   no extra velocity reconstruction is added. A run in which the maximum speed grows (a smoke

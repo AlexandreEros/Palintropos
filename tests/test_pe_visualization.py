@@ -29,10 +29,10 @@ pytestmark = pytest.mark.skipif(not _has_cuda(),
 
 def _make_model(grid_type="latlon", nlat=32, nlon=64, l_max=12, resolution=3,
                 nlev=5):
-    from planetary_sandbox.planet import Planet, PlanetaryParameters
-    from planetary_sandbox.physics.primitive_equations import (
+    from tropoi.planet import Planet, PlanetaryParameters
+    from tropoi.physics.primitive_equations import (
         PrimitiveEquationsModel)
-    from planetary_sandbox.physics.sigma_coordinate import SigmaGrid
+    from tropoi.physics.sigma_coordinate import SigmaGrid
     planet = Planet.generate(
         params=PlanetaryParameters.from_earth_like(day_hours=24.0),
         grid_type=grid_type, nlat=nlat, nlon=nlon, l_max=l_max,
@@ -41,9 +41,9 @@ def _make_model(grid_type="latlon", nlat=32, nlon=64, l_max=12, resolution=3,
 
 
 def _run_capsule(model, out_dir):
-    from planetary_sandbox.run.engine import count_snapshot_times
-    from planetary_sandbox.run.pe.initial_conditions import make_pe_ic
-    from planetary_sandbox.run.pe.runner import run_pe
+    from tropoi.run.engine import count_snapshot_times
+    from tropoi.run.pe.initial_conditions import make_pe_ic
+    from tropoi.run.pe.runner import run_pe
     state = make_pe_ic("thermal_wave", model, temperature=T0,
                        surface_pressure=PS0, thermal_amplitude=AMP)
     times = count_snapshot_times(2, 900.0)
@@ -54,7 +54,7 @@ def _run_capsule(model, out_dir):
 
 
 def test_summary_spec_has_four_labelled_panels(tmp_path):
-    from planetary_sandbox.run.pe.visualization import build_pe_summary_spec
+    from tropoi.run.pe.visualization import build_pe_summary_spec
     model = _make_model()
     _run_capsule(model, tmp_path)
     spec = build_pe_summary_spec(model, tmp_path)
@@ -70,7 +70,7 @@ def test_summary_spec_has_four_labelled_panels(tmp_path):
 
 
 def test_render_summary_writes_nonempty_png(tmp_path):
-    from planetary_sandbox.run.pe.visualization import (PE_SUMMARY_FILENAME,
+    from tropoi.run.pe.visualization import (PE_SUMMARY_FILENAME,
                                                        render_pe_summary)
     model = _make_model()
     _run_capsule(model, tmp_path)
@@ -80,7 +80,7 @@ def test_render_summary_writes_nonempty_png(tmp_path):
 
 
 def test_render_summary_works_on_geodesic_backend(tmp_path):
-    from planetary_sandbox.run.pe.visualization import render_pe_summary
+    from tropoi.run.pe.visualization import render_pe_summary
     model = _make_model(grid_type="geodesic", l_max=10)
     _run_capsule(model, tmp_path)
     out = render_pe_summary(model, tmp_path)

@@ -14,7 +14,7 @@ import math
 
 import pytest
 
-from planetary_sandbox.run.pe.config import (PE_PLOT_TYPES, PE_SCENARIOS,
+from tropoi.run.pe.config import (PE_PLOT_TYPES, PE_SCENARIOS,
                                              PERunConfig)
 
 

@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import json
 
-from planetary_sandbox.cli.main import main
+from tropoi.cli.main import main
 
 
 def _write_manifest(run_dir, run_id):

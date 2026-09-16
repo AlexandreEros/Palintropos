@@ -10,7 +10,7 @@ This checks if the geodesic grid plus Voronoi weights is approximately orthogona
 import numpy as np
 import cupy as cp
 
-from planetary_sandbox.numerics import GeodesicGridGeometry, GeodesicSphericalHarmonics
+from tropoi.numerics import GeodesicGridGeometry, GeodesicSphericalHarmonics
 
 
 def test_basis_orthogonality(l_max=5, resolution=4):

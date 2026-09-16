@@ -2,7 +2,7 @@ import time
 import numpy as np
 import cupy as cp
 
-from planetary_sandbox.numerics import (
+from tropoi.numerics import (
     LatLonSphericalHarmonics, 
     PointSetSphericalHarmonics,
 )

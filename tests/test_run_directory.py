@@ -6,7 +6,7 @@ from datetime import datetime, timedelta, timezone
 
 import pytest
 
-from planetary_sandbox.run.bve.io import (
+from tropoi.run.bve.io import (
     RUN_STATUS_COMPLETED,
     RunDirectory,
     create_run_dir,

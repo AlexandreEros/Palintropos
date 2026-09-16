@@ -1,7 +1,7 @@
 import cupy as cp
 import numpy as np
 
-from planetary_sandbox.numerics import (
+from tropoi.numerics import (
     LatLonSphericalHarmonics,
     PointSetSphericalHarmonics,
 )
@@ -71,7 +71,7 @@ if diff_between_methods < 0.1:
 else:
     print("\n>> WARNING: Methods diverge significantly.")
     import matplotlib.pyplot as plt
-    from planetary_sandbox.viz.planet_viewer import PlanetViewer
+    from tropoi.viz.planet_viewer import PlanetViewer
 
     fig, axes = plt.subplots(1, 2, figsize=(12, 5))
     PlanetViewer.plot_coefficient_complex_visualization(c_recovered_old, axes[0], fig)

@@ -1,8 +1,8 @@
 import unittest
 import numpy as np
 
-from planetary_sandbox.numerics import LatLonGridGeometry, GeodesicGridGeometry
-from planetary_sandbox.numerics.grid_interpolation import (
+from tropoi.numerics import LatLonGridGeometry, GeodesicGridGeometry
+from tropoi.numerics.grid_interpolation import (
     latlon_to_geodesic_grid,
     geodesic_to_latlon_grid,
 )

@@ -12,9 +12,9 @@ except Exception:  # pragma: no cover - import guard
 pytestmark = pytest.mark.skipif(not _HAS_CUDA, reason="CUDA/CuPy not available")
 
 if _HAS_CUDA:
-    from planetary_sandbox.planet import Planet, PlanetaryParameters
-    from planetary_sandbox.run.bve.initial_conditions import make_ic
-    from planetary_sandbox.run.bve.runner import run_bve
+    from tropoi.planet import Planet, PlanetaryParameters
+    from tropoi.run.bve.initial_conditions import make_ic
+    from tropoi.run.bve.runner import run_bve
 
 
 def test_run_bve_completes_on_latlon(tmp_path):

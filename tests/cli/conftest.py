@@ -1,4 +1,4 @@
-"""Shared fixtures/helpers for the CPU-safe aeolus CLI test modules.
+"""Shared fixtures/helpers for the CPU-safe tropoi CLI test modules.
 
 Anything imported from here must remain import-light (stdlib + first-party
 only) so the CLI CPU-safety subprocess tests stay meaningful.
@@ -24,16 +24,16 @@ ADDITIVE_CONFIG_KEYS = {"snapshot_mode", "n_snapshots", "snapshot_times", "plots
 #: touched CUDA or matplotlib. All of these must stay unimported for the
 #: CPU-safety subprocess tests to pass.
 HEAVY_MODULES = ("cupy", "cupyx", "matplotlib",
-                 "planetary_sandbox.planet.planet",
-                 "planetary_sandbox.run.bve.runner",
-                 "planetary_sandbox.run.pe.runner",
-                 "planetary_sandbox.viz")
+                 "tropoi.planet.planet",
+                 "tropoi.run.bve.runner",
+                 "tropoi.run.pe.runner",
+                 "tropoi.viz")
 
 
 @pytest.fixture
 def stub_execute_run(monkeypatch):
     """Replace cli.bve.execute_run with a capturing stub; return the captured cfg."""
-    import planetary_sandbox.cli.bve as bve_module
+    import tropoi.cli.bve as bve_module
 
     captured = {}
 
@@ -45,14 +45,14 @@ def stub_execute_run(monkeypatch):
     return captured
 
 
-def run_aeolus_stubbed(argv, captured):
-    from planetary_sandbox.cli.main import main
+def run_tropoi_stubbed(argv, captured):
+    from tropoi.cli.main import main
     assert main(argv) == 0
     return captured["cfg"]
 
 
 def run_psx_bve_stubbed(argv, captured, monkeypatch):
-    import planetary_sandbox.cli.bve as bve_module
+    import tropoi.cli.bve as bve_module
     monkeypatch.setattr(sys, "argv", ["psx-bve", *argv])
     assert bve_module.main() == 0
     return captured["cfg"]

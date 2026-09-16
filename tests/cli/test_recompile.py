@@ -1,4 +1,4 @@
-"""aeolus recompile / psx-recompile behavior without real CUDA work."""
+"""tropoi recompile / psx-recompile behavior without real CUDA work."""
 from __future__ import annotations
 
 import pathlib
@@ -15,7 +15,7 @@ def _fake_cupy():
 
 def test_recompile_clears_cache_with_ascii_output(
         tmp_path, monkeypatch, capsys):
-    from planetary_sandbox.cli import clear_cache
+    from tropoi.cli import clear_cache
 
     cache_dir = tmp_path / ".cupy" / "kernel_cache"
     cache_dir.mkdir(parents=True)
@@ -33,7 +33,7 @@ def test_recompile_clears_cache_with_ascii_output(
 
 
 def test_recompile_friendly_error_without_cupy(monkeypatch, capsys):
-    from planetary_sandbox.cli import clear_cache
+    from tropoi.cli import clear_cache
 
     monkeypatch.setitem(sys.modules, "cupy", None)
     rc = clear_cache.run(clear_cache.build_parser().parse_args([]))

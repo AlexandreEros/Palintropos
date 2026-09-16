@@ -5,9 +5,9 @@ from datetime import datetime, timezone
 
 import pytest
 
-from planetary_sandbox.run.bve.io import make_run_id
+from tropoi.run.bve.io import make_run_id
 
-from .conftest import run_aeolus_stubbed, run_psx_bve_stubbed
+from .conftest import run_tropoi_stubbed, run_psx_bve_stubbed
 
 
 _NOW = datetime(2026, 7, 15, 0, 0, 0, tzinfo=timezone.utc)
@@ -15,7 +15,7 @@ _NOW = datetime(2026, 7, 15, 0, 0, 0, tzinfo=timezone.utc)
 
 def _run_id_for(argv, captured, monkeypatch, legacy=False):
     cfg = (run_psx_bve_stubbed(argv, captured, monkeypatch) if legacy
-           else run_aeolus_stubbed(["run", "bve", *argv], captured))
+           else run_tropoi_stubbed(["run", "bve", *argv], captured))
     return make_run_id(cfg.to_run_config_dict(), now=_NOW, commit=None)
 
 

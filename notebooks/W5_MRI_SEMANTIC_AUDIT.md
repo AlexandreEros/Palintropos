@@ -1,5 +1,11 @@
 # Semantic audit — MRI–JMA Williamson Test Case 5 vs Aeolus
 
+> **Project name:** Aeolus is now Palintropos, and the import package
+> `planetary_sandbox` is now `tropoi`. This audit is dated evidence: the
+> model name and the `src/planetary_sandbox/...` source citations below are
+> the paths as they stood at `580c566a` and are left unchanged. Read them as
+> `src/tropoi/...` in the current tree.
+
 **Date:** 2026-07-29 · **Branch:** `feat/w5-mri-reference-clean` @ `580c566a`
 **Question:** Does Aeolus's `williamson5` scenario describe the same physical
 initial-value problem as the MRI–JMA (Yoshimura) Williamson Test Case 5

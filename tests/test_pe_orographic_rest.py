@@ -103,8 +103,8 @@ GEODESIC_MASS_TOL = 2e-9
 # ---------------------------------------------------------------------------
 
 def test_pe_topography_vocabulary_mirrors_swe():
-    from planetary_sandbox.run.pe.config import PE_TOPOGRAPHIES
-    from planetary_sandbox.run.swe.config import SWE_TOPOGRAPHIES
+    from tropoi.run.pe.config import PE_TOPOGRAPHIES
+    from tropoi.run.swe.config import SWE_TOPOGRAPHIES
 
     assert sorted(PE_TOPOGRAPHIES) == sorted(SWE_TOPOGRAPHIES)
 
@@ -114,8 +114,8 @@ def test_flat_pe_config_keeps_historical_schema_and_hash():
     topography keys), so existing scientific hashes and run ids remain
     valid for every configuration that does not request topography."""
     from datetime import datetime, timezone
-    from planetary_sandbox.run.bve.io import make_run_id
-    from planetary_sandbox.run.pe.config import PERunConfig
+    from tropoi.run.bve.io import make_run_id
+    from tropoi.run.pe.config import PERunConfig
 
     cfg = PERunConfig.resolve({})
     assert cfg.topography == "flat"
@@ -144,7 +144,7 @@ def test_flat_pe_config_keeps_historical_schema_and_hash():
 
 
 def test_orographic_scenario_is_registered():
-    from planetary_sandbox.run.pe.config import PE_SCENARIOS, PERunConfig
+    from tropoi.run.pe.config import PE_SCENARIOS, PERunConfig
 
     assert "orographic_isothermal_rest" in PE_SCENARIOS
     cfg = PERunConfig.resolve({"scenario": "orographic_isothermal_rest",
@@ -160,8 +160,8 @@ def test_orographic_scenario_is_registered():
 
 def test_mountain_pe_config_resolution_and_identity():
     from datetime import datetime, timezone
-    from planetary_sandbox.run.bve.io import make_run_id
-    from planetary_sandbox.run.pe.config import PERunConfig
+    from tropoi.run.bve.io import make_run_id
+    from tropoi.run.pe.config import PERunConfig
 
     cfg = PERunConfig.resolve({"topography": "mountain"})
     assert cfg.mountain_height_m == 2000.0
@@ -195,7 +195,7 @@ def test_mountain_pe_config_resolution_and_identity():
 
 
 def test_pe_config_rejects_invalid_topography_settings():
-    from planetary_sandbox.run.pe.config import PERunConfig
+    from tropoi.run.pe.config import PERunConfig
 
     with pytest.raises(ValueError, match="unknown topography"):
         PERunConfig.resolve({"topography": "everest"})
@@ -218,7 +218,7 @@ def test_pe_config_rejects_invalid_topography_settings():
 
 
 def test_pe_cli_topography_parse_contracts(capsys):
-    from planetary_sandbox.cli.main import main
+    from tropoi.cli.main import main
 
     with pytest.raises(SystemExit) as exc:
         main(["run", "pe", "--help"])
@@ -242,7 +242,7 @@ def test_pe_cli_topography_parse_contracts(capsys):
 
 
 def test_inspect_shows_pe_topography(tmp_path, capsys):
-    from planetary_sandbox.cli.main import main
+    from tropoi.cli.main import main
 
     def write_manifest(run_dir, run_config):
         run_dir.mkdir(parents=True)
@@ -278,7 +278,7 @@ def test_inspect_shows_pe_topography(tmp_path, capsys):
 
 def _make_planet(grid_type="latlon", nlat=32, nlon=64, l_max=15,
                  resolution=3, day_hours=24.0):
-    from planetary_sandbox.planet import Planet, PlanetaryParameters
+    from tropoi.planet import Planet, PlanetaryParameters
     return Planet.generate(
         params=PlanetaryParameters.from_earth_like(day_hours=day_hours),
         grid_type=grid_type, nlat=nlat, nlon=nlon, l_max=l_max,
@@ -300,17 +300,17 @@ def geodesic_planet():
 
 
 def _flat_model(planet, nlev=NLEV):
-    from planetary_sandbox.physics.primitive_equations import (
+    from tropoi.physics.primitive_equations import (
         PrimitiveEquationsModel)
-    from planetary_sandbox.physics.sigma_coordinate import SigmaGrid
+    from tropoi.physics.sigma_coordinate import SigmaGrid
     return PrimitiveEquationsModel(planet, SigmaGrid.uniform(nlev))
 
 
 def _terrain_model(planet, nlev=NLEV):
-    from planetary_sandbox.physics.primitive_equations import (
+    from tropoi.physics.primitive_equations import (
         PrimitiveEquationsModel, product_truncation_cut)
-    from planetary_sandbox.physics.sigma_coordinate import SigmaGrid
-    from planetary_sandbox.physics.topography import Topography
+    from tropoi.physics.sigma_coordinate import SigmaGrid
+    from tropoi.physics.topography import Topography
     # PE terrain is band-limited at the dealiased product-truncation cut
     # (the same construction the CLI performs; see cli/pe.py).
     topo = Topography.mountain(
@@ -322,7 +322,7 @@ def _terrain_model(planet, nlev=NLEV):
 
 
 def _orographic_state(model):
-    from planetary_sandbox.run.pe.initial_conditions import make_pe_ic
+    from tropoi.run.pe.initial_conditions import make_pe_ic
     return make_pe_ic("orographic_isothermal_rest", model,
                       temperature=T0, surface_pressure=PS0)
 
@@ -368,9 +368,9 @@ def test_terrain_reaches_model_unchanged(latlon_planet, geodesic_planet):
 @requires_cuda
 def test_invalid_surface_geopotential_is_rejected(latlon_planet):
     import cupy as cp
-    from planetary_sandbox.physics.primitive_equations import (
+    from tropoi.physics.primitive_equations import (
         PrimitiveEquationsModel)
-    from planetary_sandbox.physics.sigma_coordinate import SigmaGrid
+    from tropoi.physics.sigma_coordinate import SigmaGrid
     n = latlon_planet.sh.l_max + 1
     with pytest.raises(ValueError, match="shape"):
         PrimitiveEquationsModel(
@@ -390,10 +390,10 @@ def test_super_cut_terrain_is_rejected_loudly(latlon_planet):
     scientifically unsupported by the full-T PE tendency (its
     pressure-gradient force could never cancel there) and must be
     rejected loudly, never silently accepted or truncated."""
-    from planetary_sandbox.physics.primitive_equations import (
+    from tropoi.physics.primitive_equations import (
         PrimitiveEquationsModel)
-    from planetary_sandbox.physics.sigma_coordinate import SigmaGrid
-    from planetary_sandbox.physics.topography import Topography
+    from tropoi.physics.sigma_coordinate import SigmaGrid
+    from tropoi.physics.topography import Topography
     topo = Topography.mountain(latlon_planet, **MOUNTAIN)  # full l_max
     phi_full = topo.surface_geopotential_lm(GRAVITY)
     with pytest.raises(ValueError, match="dealiased product truncation"):
@@ -526,8 +526,8 @@ def test_orographic_imbalance_localizes_to_momentum_blocks(latlon_planet):
 
 def _run_orographic(model, out_dir, *, n_steps=5, n_snapshots=6):
     import pathlib
-    from planetary_sandbox.run.engine import count_snapshot_times
-    from planetary_sandbox.run.pe.runner import run_pe
+    from tropoi.run.engine import count_snapshot_times
+    from tropoi.run.pe.runner import run_pe
     state = _orographic_state(model)
     t_end = n_steps * DT
     times = count_snapshot_times(n_snapshots, t_end)
@@ -628,7 +628,7 @@ def test_zero_terrain_reduces_to_isothermal_rest(latlon_planet,
     isothermal_rest state, so every existing exact-rest guarantee
     transfers unchanged."""
     import cupy as cp
-    from planetary_sandbox.run.pe.initial_conditions import make_pe_ic
+    from tropoi.run.pe.initial_conditions import make_pe_ic
     for planet in (latlon_planet, geodesic_planet):
         model = _flat_model(planet)
         orographic = make_pe_ic("orographic_isothermal_rest", model,
@@ -645,7 +645,7 @@ def test_snapshot_header_terrain_note(latlon_planet):
     """The per-snapshot figure header gains one terrain-context line for
     non-flat runs (derived from the model's own resolved Phi_s); flat
     runs keep the historical header byte-for-byte (note is None)."""
-    from planetary_sandbox.run.pe.snapshot_visualization import _terrain_note
+    from tropoi.run.pe.snapshot_visualization import _terrain_note
     model, _, _ = _terrain_model(latlon_planet)
     note = _terrain_note(model)
     assert note is not None and "Phi_s" in note
@@ -658,7 +658,7 @@ def test_snapshot_header_terrain_note(latlon_planet):
 
 @requires_cuda
 def test_pe_cli_orographic_end_to_end(tmp_path, capsys):
-    from planetary_sandbox.cli.main import main
+    from tropoi.cli.main import main
 
     rc = main(["run", "pe", "--backend", "gauss-latlon", "--nlat", "32",
                "--nlon", "64", "--l-max", "15", "--levels", str(NLEV),

@@ -5,8 +5,8 @@ import math
 
 import pytest
 
-from planetary_sandbox.cli.main import build_parser
-from planetary_sandbox.run.bve.config import (
+from tropoi.cli.main import build_parser
+from tropoi.run.bve.config import (
     SECONDS_PER_DAY,
     BVERunConfig,
     IntegrationScheduler,
@@ -17,7 +17,7 @@ from planetary_sandbox.run.bve.config import (
     interval_snapshot_times,
 )
 
-from .conftest import run_aeolus_stubbed
+from .conftest import run_tropoi_stubbed
 
 
 # ---------------------------------------------------------------------------
@@ -424,13 +424,13 @@ def test_nonpositive_interval_rejected():
 
 
 def test_n0_and_n1_modes(stub_execute_run):
-    cfg0 = run_aeolus_stubbed(
+    cfg0 = run_tropoi_stubbed(
         ["run", "bve", "--n-snapshots", "0"], stub_execute_run)
     assert cfg0.snapshot_times_seconds() == []
     assert cfg0.dt_snapshots is None
     assert cfg0.to_run_config_dict()["dt_snapshots"] is None
 
-    cfg1 = run_aeolus_stubbed(
+    cfg1 = run_tropoi_stubbed(
         ["run", "bve", "--n-snapshots", "1"], stub_execute_run)
     assert cfg1.snapshot_times_seconds() == [SECONDS_PER_DAY]
     assert cfg1.dt_snapshots is None

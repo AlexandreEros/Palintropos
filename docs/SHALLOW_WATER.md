@@ -329,7 +329,7 @@ Canonical 15-day benchmark (Gauss–Legendre primary path, day-0/5/10/15
 snapshots):
 
 ```powershell
-aeolus run swe --scenario williamson5 --backend gauss-latlon `
+tropoi run swe --scenario williamson5 --backend gauss-latlon `
                --nlat 64 --nlon 128 --l-max 42 --days 15 --n-snapshots 4
 ```
 
@@ -361,16 +361,16 @@ external mirror are given in the report).
 ```powershell
 # Default: Williamson-2 steady flow, geodesic res 4, l_max 21, 1 day,
 # 5 stored states, a normalized snapshot timeline, diagnostics, and a summary.
-aeolus run swe
+tropoi run swe
 
 # Gauss lat-lon backend, gravity-wave test on a non-rotating planet:
-aeolus run swe --backend gauss-latlon --nlat 32 --nlon 64 --l-max 15 `
+tropoi run swe --backend gauss-latlon --nlat 32 --nlon 64 --l-max 15 `
                --scenario gravity_wave --day-hours inf --mean-depth 1000
 
 # Mountain-flow demonstration: the Williamson-2 zonal jet impinging on a
 # 2000 m Gaussian mountain (default position lat 30, lon 90, width 20 deg).
 # Deterministic, inviscid, positive-depth; fits comfortably on the MX110.
-aeolus run swe --topography mountain --mean-depth 5960 --days 2
+tropoi run swe --topography mountain --mean-depth 5960 --days 2
 ```
 
 Options: `--gravity`, `--mean-depth`, `--day-hours`, `--radius-earth-units`,
@@ -383,7 +383,7 @@ with `--mountain-height-m`, `--mountain-lat-deg`, `--mountain-lon-deg`,
 historical config schema (no topography keys are emitted), and therefore
 preserves every existing flat-bottom run identity; non-flat terrain
 parameters participate fully in the scientific hash and are shown by
-`aeolus inspect`. Run capsules carry the same provenance as BVE
+`tropoi inspect`. Run capsules carry the same provenance as BVE
 runs (`config.json`, `manifest.json` with status lifecycle,
 `latest_run.txt`); stored artifacts are `swe_coeffs.npy`
 (`(N, 3, l_max+1, l_max+1)` spectral snapshots), `swe_snapshot_times.npy`,

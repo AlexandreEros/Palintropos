@@ -3,18 +3,18 @@ from __future__ import annotations
 
 import pytest
 
-from planetary_sandbox.cli.main import PRESETS
-from planetary_sandbox.run.bve.config import BASE_DEFAULTS, SECONDS_PER_DAY
+from tropoi.cli.main import PRESETS
+from tropoi.run.bve.config import BASE_DEFAULTS, SECONDS_PER_DAY
 
 from .conftest import (
     ADDITIVE_CONFIG_KEYS,
     LEGACY_CONFIG_KEYS,
-    run_aeolus_stubbed,
+    run_tropoi_stubbed,
 )
 
 
 def test_preset_value_beats_ordinary_default(stub_execute_run):
-    cfg = run_aeolus_stubbed(
+    cfg = run_tropoi_stubbed(
         ["run", "bve", "--preset", "two-vortices-quick"], stub_execute_run)
     assert cfg.lmax == 8
     assert cfg.duration_days == 0.02
@@ -25,7 +25,7 @@ def test_preset_value_beats_ordinary_default(stub_execute_run):
 
 
 def test_explicit_flag_beats_preset(stub_execute_run):
-    cfg = run_aeolus_stubbed(
+    cfg = run_tropoi_stubbed(
         ["run", "bve", "--preset", "two-vortices-quick", "--l-max", "10"],
         stub_execute_run)
     assert cfg.lmax == 10
@@ -33,12 +33,12 @@ def test_explicit_flag_beats_preset(stub_execute_run):
 
 
 def test_ordinary_default_without_preset(stub_execute_run):
-    cfg = run_aeolus_stubbed(["run", "bve"], stub_execute_run)
+    cfg = run_tropoi_stubbed(["run", "bve"], stub_execute_run)
     assert cfg.lmax == BASE_DEFAULTS["lmax"] == 21
 
 
 def test_explicit_snapshot_count_silences_preset_interval(stub_execute_run):
-    cfg = run_aeolus_stubbed(
+    cfg = run_tropoi_stubbed(
         ["run", "bve", "--preset", "two-vortices-quick",
          "--n-snapshots", "5"],
         stub_execute_run)
@@ -47,7 +47,7 @@ def test_explicit_snapshot_count_silences_preset_interval(stub_execute_run):
 
 
 def test_preset_rh4_matches_documented_configuration(stub_execute_run):
-    cfg = run_aeolus_stubbed(
+    cfg = run_tropoi_stubbed(
         ["run", "bve", "--preset", "rh4"], stub_execute_run)
     assert cfg.scenario == "rh4"
     assert cfg.lmax == 21 and cfg.resolution == 4
@@ -58,6 +58,6 @@ def test_preset_rh4_matches_documented_configuration(stub_execute_run):
 
 @pytest.mark.parametrize("name", sorted(PRESETS))
 def test_every_preset_resolves(name, stub_execute_run):
-    cfg = run_aeolus_stubbed(
+    cfg = run_tropoi_stubbed(
         ["run", "bve", "--preset", name], stub_execute_run)
     assert set(cfg.to_run_config_dict()) == LEGACY_CONFIG_KEYS | ADDITIVE_CONFIG_KEYS

@@ -27,11 +27,11 @@ import matplotlib.pyplot as plt
 import numpy as np
 from scipy.interpolate import griddata
 
-from planetary_sandbox.numerics.geodesic_grid import GeodesicGridGeometry
-from planetary_sandbox.numerics.latlon_grid import GaussLatLonGridGeometry
-from planetary_sandbox.planet import Planet, PlanetaryParameters
-from planetary_sandbox.run.bve.io import create_run_dir, write_run_manifest
-from planetary_sandbox.run.bve.runner import run_bve
+from tropoi.numerics.geodesic_grid import GeodesicGridGeometry
+from tropoi.numerics.latlon_grid import GaussLatLonGridGeometry
+from tropoi.planet import Planet, PlanetaryParameters
+from tropoi.run.bve.io import create_run_dir, write_run_manifest
+from tropoi.run.bve.runner import run_bve
 
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
@@ -212,7 +212,7 @@ def _plot_backend_comparison(geodesic: pathlib.Path, latlon: pathlib.Path,
     fig.colorbar(im, ax=axes, label="relative vorticity (s⁻¹)")
     fig.suptitle("RH4 backend comparison — identical physics, "
                  "backend-native state-adaptive advective CFL timesteps")
-    fig.savefig(target, dpi=180, metadata={"Software": "planetary-sandbox"})
+    fig.savefig(target, dpi=180, metadata={"Software": "palintropos"})
     plt.close(fig)
 
 
@@ -247,7 +247,7 @@ def _plot_vortex_evolution(run: pathlib.Path, target: pathlib.Path) -> None:
         bbox={"facecolor": "white", "alpha": 0.8, "edgecolor": "none"})
     fig.colorbar(im, ax=axes, label="relative vorticity (s⁻¹)")
     fig.suptitle("Two vortices evolving on a rotating sphere")
-    fig.savefig(target, dpi=180, metadata={"Software": "planetary-sandbox"})
+    fig.savefig(target, dpi=180, metadata={"Software": "palintropos"})
     plt.close(fig)
 
 
@@ -296,7 +296,7 @@ def _plot_rotations(runs: dict[str, pathlib.Path], target: pathlib.Path) -> None
                                xlim=(0, 360), ylim=(-90, 90))
     fig.colorbar(im, ax=axes, label="relative vorticity (s⁻¹)")
     fig.suptitle("Rotation-equivalent antipodal vortex pairs on the geodesic backend")
-    fig.savefig(target, dpi=180, metadata={"Software": "planetary-sandbox"})
+    fig.savefig(target, dpi=180, metadata={"Software": "palintropos"})
     plt.close(fig)
 
 
@@ -367,7 +367,7 @@ def _plot_rotating_streamlines(runs: dict[str, pathlib.Path],
                  label="wind speed (m s⁻¹)")
     fig.suptitle(
         "Wind evolution on a 24-hour rotating sphere — the rotation axis breaks orientation symmetry")
-    fig.savefig(target, dpi=180, metadata={"Software": "planetary-sandbox"})
+    fig.savefig(target, dpi=180, metadata={"Software": "palintropos"})
     plt.close(fig)
 
 

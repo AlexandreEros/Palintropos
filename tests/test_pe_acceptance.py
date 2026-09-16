@@ -43,10 +43,10 @@ _BACKENDS = {
 
 
 def _make_model(spec, nlev=5):
-    from planetary_sandbox.planet import Planet, PlanetaryParameters
-    from planetary_sandbox.physics.primitive_equations import (
+    from tropoi.planet import Planet, PlanetaryParameters
+    from tropoi.physics.primitive_equations import (
         PrimitiveEquationsModel)
-    from planetary_sandbox.physics.sigma_coordinate import SigmaGrid
+    from tropoi.physics.sigma_coordinate import SigmaGrid
     planet = Planet.generate(
         params=PlanetaryParameters.from_earth_like(day_hours=24.0),
         grid_type=spec["grid_type"], nlat=spec["nlat"], nlon=spec["nlon"],
@@ -60,9 +60,9 @@ def model(request):
 
 
 def _run(model, out_dir, scenario, *, t_end_s, n_snapshots, amplitude=0.0):
-    from planetary_sandbox.run.engine import count_snapshot_times
-    from planetary_sandbox.run.pe.initial_conditions import make_pe_ic
-    from planetary_sandbox.run.pe.runner import run_pe
+    from tropoi.run.engine import count_snapshot_times
+    from tropoi.run.pe.initial_conditions import make_pe_ic
+    from tropoi.run.pe.runner import run_pe
     state = make_pe_ic(scenario, model, temperature=T0, surface_pressure=PS0,
                        thermal_amplitude=amplitude)
     times = count_snapshot_times(n_snapshots, t_end_s)
@@ -86,7 +86,7 @@ def _diag(out_dir):
 
 def test_exact_rest_is_bitwise_preserved(model, tmp_path):
     import cupy as cp
-    from planetary_sandbox.run.pe.initial_conditions import make_pe_ic
+    from tropoi.run.pe.initial_conditions import make_pe_ic
     # Five fixed steps, all snapshot times exact multiples of dt.
     times = _run(model, tmp_path, "isothermal_rest", t_end_s=5 * DT,
                  n_snapshots=6)

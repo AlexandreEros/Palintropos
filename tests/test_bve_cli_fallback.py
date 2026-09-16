@@ -3,9 +3,10 @@ from __future__ import annotations
 
 import pathlib
 
-import planetary_sandbox.cli.bve as bve_cli
+import tropoi.cli.bve as bve_cli
 
-# Repo root: .../PlanetarySandbox/src/planetary_sandbox/cli/bve.py -> parents[3].
+# Repo root: <checkout>/src/tropoi/cli/bve.py -> parents[3]. Derived from the
+# module location, so it does not depend on the checkout directory's name.
 REPO_ROOT = pathlib.Path(bve_cli.__file__).resolve().parents[3]
 
 

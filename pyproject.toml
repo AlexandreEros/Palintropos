@@ -3,9 +3,9 @@ requires = ["setuptools>=64", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "planetary-sandbox"
+name = "palintropos"
 version = "0.1.0"
-description = "Core spectral / spherical-harmonics engine for Planetary Sandbox"
+description = "Core spectral / spherical-harmonics engine for Palintropos"
 readme = "README.md"
 requires-python = ">=3.12"
 authors = [
@@ -25,25 +25,27 @@ dev = [
 ]
 
 # This creates CLI commands in the project venv.
-# `aeolus` is the canonical interface; the psx-* commands are kept as
-# compatibility aliases (psx-bve == aeolus run bve, psx-gen == aeolus gen,
-# psx-recompile == aeolus recompile).
+# `tropoi` is the canonical interface. `aeolus` (the former canonical name)
+# and the psx-* commands are kept as compatibility entry points bound to the
+# very same callables: aeolus == tropoi, psx-bve == tropoi run bve,
+# psx-gen == tropoi gen, psx-recompile == tropoi recompile.
 [project.scripts]
-aeolus = "planetary_sandbox.cli.main:main"
-psx-gen = "planetary_sandbox.cli.generate_planet:main"
-psx-bve = "planetary_sandbox.cli.bve:main"
-psx-recompile = "planetary_sandbox.cli.clear_cache:main"
+tropoi = "tropoi.cli.main:main"
+aeolus = "tropoi.cli.main:main"
+psx-gen = "tropoi.cli.generate_planet:main"
+psx-bve = "tropoi.cli.bve:main"
+psx-recompile = "tropoi.cli.clear_cache:main"
 
 [tool.setuptools]
 package-dir = {"" = "src"}
 
 [tool.setuptools.packages.find]
 where = ["src"]
-include = ["planetary_sandbox*"]
+include = ["tropoi*"]
 
-# Make sure CUDA kernels under planetary_sandbox/numerics/cuda/ are included
+# Make sure CUDA kernels under tropoi/numerics/cuda/ are included
 [tool.setuptools.package-data]
-"planetary_sandbox.numerics.cuda" = ["*.cu"]
+"tropoi.numerics.cuda" = ["*.cu"]
 
 [tool.deptry]
 # Treat the "dev" PEP 621 optional-dependency group as development-only.

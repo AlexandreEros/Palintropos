@@ -5,19 +5,19 @@ or construction; dashed arrows show selected data passed into a later stage.
 
 ## Entry points and planet construction
 
-`aeolus` (cli/main.py) is the canonical executable; its `run bve`, `gen`, and
-`recompile` subcommands share implementations with the `psx-*` compatibility
-entry points. `aeolus list` and `aeolus inspect` are pure-stdlib and never
+`tropoi` (cli/main.py) is the canonical executable; `aeolus` is bound to the
+same callable, and its `run bve`, `gen`, and `recompile` subcommands share
+implementations with the `psx-*` compatibility entry points. `tropoi list` and `tropoi inspect` are pure-stdlib and never
 reach the assembly stage below.
 
 ```mermaid
 flowchart LR
     subgraph cli["CLI entry points"]
         scripts["pyproject.toml scripts"]
-        aeolus["aeolus<br/>main.main()"]
-        gen["psx-gen / aeolus gen<br/>generate_planet"]
-        bve["psx-bve / aeolus run bve<br/>bve.execute_run()"]
-        cache["psx-recompile / aeolus recompile<br/>clear_cache"]
+        tropoi["tropoi / aeolus<br/>main.main()"]
+        gen["psx-gen / tropoi gen<br/>generate_planet"]
+        bve["psx-bve / tropoi run bve<br/>bve.execute_run()"]
+        cache["psx-recompile / tropoi recompile<br/>clear_cache"]
     end
 
     subgraph assembly["Planet assembly"]
@@ -43,10 +43,10 @@ flowchart LR
         png["out/&lt;output&gt;.png"]
     end
 
-    scripts --> aeolus
-    aeolus --> gen
-    aeolus --> bve
-    aeolus --> cache
+    scripts --> tropoi
+    tropoi --> gen
+    tropoi --> bve
+    tropoi --> cache
     scripts --> gen
     scripts --> bve
     scripts --> cache
@@ -78,7 +78,7 @@ dense GPU point-set transform. `SpectralOperators` receives the selected
 backend, which owns nonlinear-product sampling. A fine product space is built
 once on first use and then cached.
 
-## `aeolus run bve` setup and provenance
+## `tropoi run bve` setup and provenance
 
 Parsing and configuration resolution happen before any CuPy import:
 `BVERunConfig.resolve()` (run/bve/config.py) layers explicit flags over the

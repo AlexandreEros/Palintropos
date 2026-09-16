@@ -1,7 +1,12 @@
 # Williamson test case 5 — Aeolus vs the MRI-JMA reference (2026-07-30)
 
-> **Project name:** Aeolus is now Palintropos. The historical model name,
-> pinned commits, and artifact filenames below are retained for provenance.
+> **Project name:** Aeolus is now Palintropos (distribution `palintropos`,
+> import package `tropoi`, command `tropoi`). The historical model name,
+> pinned commits, artifact filenames, and the `aeolus run swe` command lines
+> below are retained for provenance: they record what was actually executed
+> at commit `668e6c9a`, before the rename. The equivalent command today is
+> `tropoi run swe` with identical flags, and `aeolus` remains installed as a
+> compatibility alias.
 
 **Status: accepted.** Aeolus integrates the corrected canonical Williamson-5
 initial-value problem, passes the day-zero physical contract at T42 and T63,

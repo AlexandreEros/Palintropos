@@ -27,6 +27,10 @@ tmp_codex_out/
 tests/*.png
 *.egg-info/
 
+# Local sdist/wheel builds (setuptools writes build/ next to pyproject.toml)
+build/
+dist/
+
 *.bak
 
 # W5 / MRI validation: locally generated or downloaded evidence.

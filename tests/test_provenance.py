@@ -29,7 +29,7 @@ REQUIRED_NUMERICS_KEYS = {
 
 @requires_cuda
 def test_geodesic_backend_describe():
-    from planetary_sandbox.numerics import (
+    from tropoi.numerics import (
         GeodesicBackend, GeodesicGridGeometry, GeodesicSphericalHarmonics)
     grid = GeodesicGridGeometry(resolution=3, radius=1.0)
     sh = GeodesicSphericalHarmonics(grid, 5, weights="voronoi")
@@ -46,7 +46,7 @@ def test_geodesic_backend_describe():
 
 @requires_cuda
 def test_latlon_backend_describe():
-    from planetary_sandbox.numerics import (
+    from tropoi.numerics import (
         GaussLatLonGridGeometry, GaussLatLonSphericalHarmonics, LatLonBackend)
     grid = GaussLatLonGridGeometry(12, 24, radius=1.0)
     sh = GaussLatLonSphericalHarmonics(grid, 5)
@@ -63,8 +63,8 @@ def test_latlon_backend_describe():
 
 @requires_cuda
 def test_planet_generate_latlon_backend():
-    from planetary_sandbox.numerics import LatLonBackend
-    from planetary_sandbox.planet import Planet, PlanetaryParameters
+    from tropoi.numerics import LatLonBackend
+    from tropoi.planet import Planet, PlanetaryParameters
     planet = Planet.generate(
         params=PlanetaryParameters.from_earth_like(),
         grid_type="latlon", nlat=16, nlon=32, l_max=7)
@@ -80,7 +80,7 @@ def test_planet_generate_latlon_backend():
 
 @requires_cuda
 def test_planet_generate_unknown_grid_type_raises():
-    from planetary_sandbox.planet import Planet, PlanetaryParameters
+    from tropoi.planet import Planet, PlanetaryParameters
     with pytest.raises(ValueError, match="grid_type"):
         Planet.generate(params=PlanetaryParameters.from_earth_like(),
                         grid_type="cubed-sphere", l_max=5)
@@ -91,7 +91,7 @@ def test_planet_generate_unknown_grid_type_raises():
 # ---------------------------------------------------------------------------
 
 def test_cli_exposes_grid_choice():
-    from planetary_sandbox.cli.bve import build_parser
+    from tropoi.cli.bve import build_parser
     parser = build_parser()
     args = parser.parse_args([])
     assert vars(args)["grid"] == "geodesic"
@@ -101,7 +101,7 @@ def test_cli_exposes_grid_choice():
 
 
 def test_manifest_records_numerics_section(tmp_path):
-    from planetary_sandbox.run.bve.io import write_run_manifest
+    from tropoi.run.bve.io import write_run_manifest
     numerics = {
         "backend": "LatLonBackend",
         "grid": "GaussLatLonGridGeometry",

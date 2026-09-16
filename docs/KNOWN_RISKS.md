@@ -37,7 +37,7 @@ Severity scale: **S1** invalidates results · **S2** materially degrades results
 ### R-1. The Jacobian used by the BVE tendency computes −cos φ·J(ψ,η) instead of J(ψ,η)  — ✅ FIXED (branch `fix/s1-jacobian-and-envelope`)
 
 `SpectralOperators.jacobian_pseudospectral`
-([spectral_operators.py:344](../src/planetary_sandbox/numerics/spectral_operators.py)) forms
+([spectral_operators.py:344](../src/tropoi/numerics/spectral_operators.py)) forms
 
 ```
 J_code = (a_λ·(sinθ b_θ) − (sinθ a_θ)·b_λ) / (R² cos φ)
@@ -187,7 +187,7 @@ and recomputes the ceiling for the next step — genuine state-dependent advecti
 stepping. Structure:
 
 - `advective_cfl_timestep(length_scale, max_speed, *, cfl_number=0.5, fallback=600.0)` in
-  [config.py](../src/planetary_sandbox/run/bve/config.py) is the sole ceiling arithmetic
+  [config.py](../src/tropoi/run/bve/config.py) is the sole ceiling arithmetic
   (validates NaN/inf/negative inputs and non-finite/non-positive results; 600 s fallback
   for a missing length scale or a motionless state).
 - `IntegrationScheduler.next_event(dt_cfl)` replaces the precomputed fixed-ceiling plan: it
@@ -364,7 +364,7 @@ these clearly as experimental or delete them.
 - `_random_low_l` writes coefficients into invalid m > l slots (harmlessly ignored) and
   non-zero imaginary parts on m = 0 (silently dropped by synthesis).
 - `pyproject.toml` declares `dependencies = []` ("dependency hell" comment) while the
-  package hard-requires numpy/scipy/cupy/matplotlib — `pip install planetary-sandbox`
+  package hard-requires numpy/scipy/cupy/matplotlib — `pip install palintropos`
   would produce a broken install; `requirements.txt` is the real manifest.
 - Typo `ovarall_step` (runner); docstrings claiming "real basis" where the basis is
   complex (`terrain_spectral`, `LatLonSphericalHarmonics.inv_transform`); stale

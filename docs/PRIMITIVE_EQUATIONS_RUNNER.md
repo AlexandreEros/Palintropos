@@ -78,7 +78,7 @@ and evaluate `T_k = T_ref(sigma_k p_s(lambda, phi))`.
 ## Surface topography
 
 `--topography mountain` (with the same `--mountain-*` parameters as
-`aeolus run swe`) prescribes one band-limited Gaussian mountain; the flat
+`tropoi run swe`) prescribes one band-limited Gaussian mountain; the flat
 default is exactly zero `Phi_s`, bit-for-bit the historical model.
 Terrain is fixed model data, independent of the chosen scenario: any PE
 scenario runs over it (`orographic_isothermal_rest` is merely the first
@@ -144,30 +144,30 @@ diagnostic Courant number is recorded (derived from the model's validated
 
 ```powershell
 # Tiny default demonstration (thermal_wave, coarse geodesic, fixed 300 s step)
-aeolus run pe
+tropoi run pe
 
 # Verify the exact-rest property
-aeolus run pe --scenario isothermal_rest
+tropoi run pe --scenario isothermal_rest
 
 # Gauss–Legendre lat-lon backend
-aeolus run pe --backend gauss-latlon --nlat 32 --nlon 64 --l-max 15
+tropoi run pe --backend gauss-latlon --nlat 32 --nlon 64 --l-max 15
 
 # Explicit control of levels, step, duration, and storage
-aeolus run pe --levels 12 --dt-seconds 200 --days 0.05 --n-snapshots 4
+tropoi run pe --levels 12 --dt-seconds 200 --days 0.05 --n-snapshots 4
 
 # Explicit (non-uniform) sigma interfaces
-aeolus run pe --sigma-interfaces 0,0.25,0.6,1.0 --temperature 250
+tropoi run pe --sigma-interfaces 0,0.25,0.6,1.0 --temperature 250
 
 # Balanced resting atmosphere over a Gaussian mountain (exact equilibrium
 # benchmark; needs l-max high enough for the mountain at the dealiased cut)
-aeolus run pe --backend gauss-latlon --nlat 32 --nlon 64 --l-max 15 `
+tropoi run pe --backend gauss-latlon --nlat 32 --nlon 64 --l-max 15 `
   --scenario orographic_isothermal_rest --topography mountain `
   --mountain-height-m 1500 --mountain-width-deg 25
 ```
 
-`aeolus run pe --help` lists every option. The command prints the run
+`tropoi run pe --help` lists every option. The command prints the run
 directory, backend/resolution, level count, timestep and duration, the stored
-snapshot count, and the final diagnostic summary; `aeolus inspect runs` (or a
+snapshot count, and the final diagnostic summary; `tropoi inspect runs` (or a
 run directory) summarizes a finished capsule from its manifest.
 
 ## Stored capsule

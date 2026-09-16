@@ -2,8 +2,14 @@
 
 **A GPU-resident spectral laboratory for circulation on a rotating sphere.**
 
-Formerly **Aeolus**. The command-line interface remains `aeolus`; the Python
-package remains `planetary_sandbox` (distribution: `planetary-sandbox`).
+Formerly **Aeolus**. Names now line up as: the project and repository are
+**Palintropos**, the installable distribution is `palintropos`, the Python
+import package is `tropoi`, and the command is `tropoi`. The former `aeolus`
+command and the `psx-*` commands survive as compatibility entry points; the
+old `planetary_sandbox` import package does **not** — `import tropoi` is the
+only supported spelling. Old names are kept only where they identify a
+compatibility interface or record what was actually run (dated validation
+reports, run manifests, artifact filenames, pinned-commit notebooks).
 
 A thin layer of fluid on a spinning sphere does not stay smooth. Rotation,
 curvature, and the poleward variation of the Coriolis parameter organize it:
@@ -61,7 +67,7 @@ and the full 40-character configuration is in the tracked
   case 5** against an external high-resolution reference model
   ([report](docs/validation/williamson5_mri_2026-07-30.md)).
 - An early **dry hydrostatic primitive-equation core** in sigma coordinates
-  with a first runnable fixed-step experiment (`aeolus run pe`): exact rest,
+  with a first runnable fixed-step experiment (`tropoi run pe`): exact rest,
   smooth evolution, and analytic orographic balance over fixed band-limited
   terrain are verified, but there is no forcing, moisture, hyperdiffusion,
   adaptive stepping, or energy-conservation claim
@@ -109,12 +115,12 @@ install exactly one CuPy package. Confirm the GPU is visible:
 
 ```powershell
 python -c "import cupy as cp; print(cp.cuda.runtime.getDeviceProperties(0)['name'])"
-aeolus --help
+tropoi --help
 ```
 
-`aeolus` is the canonical command-line interface. The `psx-bve`, `psx-gen`,
-and `psx-recompile` commands remain available as compatibility entry points
-(see below). Entry points are created at install time, so rerun
+`tropoi` is the canonical command-line interface. The former `aeolus`
+command and the `psx-bve`, `psx-gen`, and `psx-recompile` commands remain
+available as compatibility entry points (see below). Entry points are created at install time, so rerun
 `pip install -e .` after pulling a change that touches them.
 
 If PowerShell blocks venv activation, allow it for the current process only
@@ -128,7 +134,7 @@ Short two-vortex smoke run (the README quickstart configuration, packaged as
 a preset):
 
 ```powershell
-aeolus run bve --preset two-vortices-quick
+tropoi run bve --preset two-vortices-quick
 ```
 
 The same quickstart on the Gauss lat–lon backend (the `12 × 24` state grid is
@@ -136,37 +142,37 @@ adequate for `l_max=8`; fine products are evaluated on the required `13 × 25`
 grid):
 
 ```powershell
-aeolus run bve --preset two-vortices-quick --backend gauss-latlon
+tropoi run bve --preset two-vortices-quick --backend gauss-latlon
 ```
 
 One-day RH4 validation run at the production default envelope:
 
 ```powershell
-aeolus run bve --preset rh4
+tropoi run bve --preset rh4
 ```
 
 which is shorthand for:
 
 ```powershell
-aeolus run bve --backend geodesic --resolution 4 --l-max 21 --scenario rh4 --day-hours 24 --days 1 --snapshot-interval-seconds 21600 --product-quadrature fine --viscosity 0 --experiment validation-rh4
+tropoi run bve --backend geodesic --resolution 4 --l-max 21 --scenario rh4 --day-hours 24 --days 1 --snapshot-interval-seconds 21600 --product-quadrature fine --viscosity 0 --experiment validation-rh4
 ```
 
 Explicit flags always override preset values. The CLI prints the resolved
 configuration and the absolute run directory, and updates
-`runs/latest_run.txt`. `aeolus run bve --help` is the complete, current
-source of truth for options; `aeolus list presets` and
-`aeolus list scenarios` enumerate the available presets and initial
-conditions, and `aeolus inspect runs` summarizes the latest run capsule.
+`runs/latest_run.txt`. `tropoi run bve --help` is the complete, current
+source of truth for options; `tropoi list presets` and
+`tropoi list scenarios` enumerate the available presets and initial
+conditions, and `tropoi inspect runs` summarizes the latest run capsule.
 
 One-day shallow-water run of Williamson test case 2 (steady nonlinear zonal
 geostrophic flow) with default settings, and the same on the Gauss backend:
 
 ```powershell
-aeolus run swe
-aeolus run swe --backend gauss-latlon --nlat 32 --nlon 64 --l-max 15
+tropoi run swe
+tropoi run swe --backend gauss-latlon --nlat 32 --nlon 64 --l-max 15
 ```
 
-`aeolus run swe --help` lists the (deliberately minimal) shallow-water
+`tropoi run swe --help` lists the (deliberately minimal) shallow-water
 options — gravity, mean depth, rotation, radius, resolution, duration, and
 the snapshot schedule, plus optional fixed Gaussian-mountain topography; the
 model and its verification are documented in
@@ -177,12 +183,12 @@ sigma-coordinate, fixed-step RK4; no forcing, diffusion, or semi-implicit
 terms) is exposed the same way:
 
 ```powershell
-aeolus run pe                                  # tiny thermal_wave demo
-aeolus run pe --scenario isothermal_rest       # verify the exact-rest property
-aeolus run pe --backend gauss-latlon --nlat 32 --nlon 64 --l-max 15
+tropoi run pe                                  # tiny thermal_wave demo
+tropoi run pe --scenario isothermal_rest       # verify the exact-rest property
+tropoi run pe --backend gauss-latlon --nlat 32 --nlon 64 --l-max 15
 ```
 
-`aeolus run pe --help` lists the options — backend/resolution, `--levels` or
+`tropoi run pe --help` lists the options — backend/resolution, `--levels` or
 explicit `--sigma-interfaces`, the dry gas constants, the initial-condition
 preset and its temperature/pressure/amplitude, the **fixed** `--dt-seconds`
 step, duration, and the snapshot schedule; the runner is documented in
@@ -223,8 +229,9 @@ Field-state storage and image generation are controlled independently:
 
 ### Compatibility entry points
 
-`psx-bve`, `psx-gen`, and `psx-recompile` delegate to the same
-implementations as `aeolus run bve`, `aeolus gen`, and `aeolus recompile`.
+`aeolus` is bound to the same callable as `tropoi`, and `psx-bve`,
+`psx-gen`, and `psx-recompile` delegate to the same implementations as
+`tropoi run bve`, `tropoi gen`, and `tropoi recompile`.
 Existing option spellings (`--lmax`, `--grid`, `--duration-days`,
 `--dt-snapshots`) remain accepted everywhere as aliases of the canonical
 names, and legacy interval-based invocations keep their historical run-id

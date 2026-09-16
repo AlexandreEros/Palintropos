@@ -8,11 +8,11 @@ after accepted step ``n`` determines the CFL ceiling used to size step
 """
 from __future__ import annotations
 
-from planetary_sandbox.run.bve.config import (
+from tropoi.run.bve.config import (
     IntegrationScheduler,
     advective_cfl_timestep,
 )
-from planetary_sandbox.run.bve.runner import _integrate
+from tropoi.run.bve.runner import _integrate
 
 
 def test_speed_after_step_n_sets_ceiling_for_step_n_plus_1():

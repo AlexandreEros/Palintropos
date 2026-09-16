@@ -543,7 +543,7 @@ the linear gravity-wave terms is the documented escape hatch, deferred.
   `config.json`/`manifest.json`, and the shared `cli/run_lifecycle.py`
   machinery are reused as-is. The sigma-interface list is part of run
   identity (it changes the science), exactly like `snapshot_times`.
-* **CLI**: `aeolus run pe` is **not** added in this milestone — there is
+* **CLI**: `tropoi run pe` is **not** added in this milestone — there is
   nothing to run without a tendency. Dispatch will follow the existing
   `run bve` / `run swe` pattern.
 * **Backends**: all horizontal machinery is per-level reuse of the existing
@@ -555,7 +555,7 @@ the linear gravity-wave terms is the documented escape hatch, deferred.
 
 Deferred (in intended order):
 
-1. `PERunConfig` / PE runner / `aeolus run pe` CLI, run capsules and
+1. `PERunConfig` / PE runner / `tropoi run pe` CLI, run capsules and
    diagnostics recording;
 2. semi-implicit gravity-wave treatment and the `T_ref(sigma)` profile;
 3. scale-selective hyperdiffusion (same `nabla^4` machinery as the SWE);

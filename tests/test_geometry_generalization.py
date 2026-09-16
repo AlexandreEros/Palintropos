@@ -19,13 +19,13 @@ except Exception:  # pragma: no cover - import guard
 pytestmark = pytest.mark.skipif(not _HAS_CUDA, reason="CUDA/CuPy not available")
 
 if _HAS_CUDA:
-    from planetary_sandbox.numerics import (
+    from tropoi.numerics import (
         GeodesicGridGeometry,
         GeodesicSphericalHarmonics,
         PointSetSphericalHarmonics,
         SpectralOperators,
     )
-    from planetary_sandbox.numerics.grid_base import GridGeometry
+    from tropoi.numerics.grid_base import GridGeometry
 
 R = 6.371e6
 OMEGA = 1e-5

@@ -25,18 +25,18 @@ except Exception:  # pragma: no cover - import guard
 pytestmark = pytest.mark.skipif(not _HAS_CUDA, reason="CUDA/CuPy not available")
 
 if _HAS_CUDA:
-    from planetary_sandbox.numerics import (
+    from tropoi.numerics import (
         GeodesicGridGeometry,
         GeodesicSphericalHarmonics,
         SpectralOperators,
     )
-    from planetary_sandbox.planet import Planet, PlanetaryParameters
-    from planetary_sandbox.run.bve.barotropic_vorticity import (
+    from tropoi.planet import Planet, PlanetaryParameters
+    from tropoi.run.bve.barotropic_vorticity import (
         BarotropicState,
         BarotropicVorticity,
     )
-    from planetary_sandbox.run.bve.runner import rk4_step
-    from planetary_sandbox.run.bve.diagnostics import spectral_diagnostics
+    from tropoi.run.bve.runner import rk4_step
+    from tropoi.run.bve.diagnostics import spectral_diagnostics
 
 RES, L_MAX = 4, 21
 CUT = (2 * L_MAX) // 3
@@ -132,7 +132,7 @@ def test_invalid_product_quadrature_rejected(planet):
 
 def test_no_silent_fallback_on_unsupported_grid(planet):
     """'fine' on a non-geodesic grid must raise, never fall back to 'coarse'."""
-    from planetary_sandbox.numerics import LatLonGridGeometry
+    from tropoi.numerics import LatLonGridGeometry
     latlon = LatLonGridGeometry.create((9, 17))
     with pytest.raises(ValueError):
         SpectralOperators(planet.sh, planet.params.radius, latlon,
@@ -142,7 +142,7 @@ def test_no_silent_fallback_on_unsupported_grid(planet):
 def test_cli_exposes_and_defaults_product_quadrature():
     """--product-quadrature is a CLI option, defaults to 'fine', and lands in
     the args dict that config.json and manifest.json serialize."""
-    from planetary_sandbox.cli.bve import build_parser
+    from tropoi.cli.bve import build_parser
     parser = build_parser()
     args = parser.parse_args([])
     assert vars(args)["product_quadrature"] == "fine"

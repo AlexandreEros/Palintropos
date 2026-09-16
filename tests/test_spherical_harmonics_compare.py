@@ -3,9 +3,9 @@ import numpy as np
 import cupy as cp
 from pathlib import Path
 
-from planetary_sandbox.numerics import LatLonGridGeometry, GeodesicGridGeometry
-from planetary_sandbox.numerics.spherical_harmonics import LatLonSphericalHarmonics
-from planetary_sandbox.numerics import GeodesicSphericalHarmonics
+from tropoi.numerics import LatLonGridGeometry, GeodesicGridGeometry
+from tropoi.numerics.spherical_harmonics import LatLonSphericalHarmonics
+from tropoi.numerics import GeodesicSphericalHarmonics
 
 
 def _has_cuda_cupy() -> bool:
@@ -65,7 +65,7 @@ class TestSphericalHarmonicsAgreement(unittest.TestCase):
         if rel_l2 >= 0.6:
             try:
                 import matplotlib.pyplot as plt
-                from planetary_sandbox.viz.planet_viewer import PlanetViewer
+                from tropoi.viz.planet_viewer import PlanetViewer
 
                 fig, axes = plt.subplots(2, 2, figsize=(12, 10))
                 PlanetViewer.plot_scalar(values_latlon, latlon_grid,

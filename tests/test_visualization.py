@@ -8,18 +8,18 @@ import matplotlib.image as mpimg
 import numpy as np
 import pytest
 
-from planetary_sandbox.viz.fields import (ScalarGridField,
+from tropoi.viz.fields import (ScalarGridField,
                                            SphericalHarmonicField)
-from planetary_sandbox.viz.matplotlib_renderer import MatplotlibRenderer
-from planetary_sandbox.viz.normalization import (NormalizationKind,
+from tropoi.viz.matplotlib_renderer import MatplotlibRenderer
+from tropoi.viz.normalization import (NormalizationKind,
                                                   NormalizationPolicy)
-from planetary_sandbox.viz.specs import (ScalarMapSpec,
+from tropoi.viz.specs import (ScalarMapSpec,
                                          SpectralCoefficientMapSpec,
                                          SpectralEncoding,
                                          FigureSpec, PanelGroupSpec,
                                          PanelPlacement, StreamlineMapSpec,
                                          TextPanelSpec)
-from planetary_sandbox.viz.timeline import (FigureFrame, FigureTimeline,
+from tropoi.viz.timeline import (FigureFrame, FigureTimeline,
                                              render_figure_timeline,
                                              render_snapshot_product,
                                              select_representative_frame_indices)
@@ -441,7 +441,7 @@ def test_snapshot_product_publication_failure_rolls_back_directory(
     old.parent.mkdir(parents=True)
     old.write_bytes(b"old-product")
 
-    from planetary_sandbox.viz import timeline as timeline_module
+    from tropoi.viz import timeline as timeline_module
     real_replace = timeline_module.os.replace
 
     def fail_final_directory_publish(source, destination):
@@ -495,7 +495,7 @@ def _write_fake_swe_artifacts(path):
 
 
 def test_swe_summary_titles_units_shape_and_nonempty_image(tmp_path):
-    from planetary_sandbox.run.swe.visualization import (
+    from tropoi.run.swe.visualization import (
         build_swe_summary_spec, render_swe_summary)
 
     _write_fake_swe_artifacts(tmp_path)
@@ -523,7 +523,7 @@ def test_swe_summary_titles_units_shape_and_nonempty_image(tmp_path):
 
 
 def test_swe_snapshot_timeline_uses_persisted_times_and_shared_limits(tmp_path):
-    from planetary_sandbox.run.swe.visualization import (
+    from tropoi.run.swe.visualization import (
         build_swe_snapshot_timeline, build_swe_snapshot_timelines,
         render_swe_snapshots)
 
@@ -607,7 +607,7 @@ class _FakeBVEPlanet:
 
 
 def test_bve_snapshot_timeline_reloads_persisted_artifacts(tmp_path):
-    from planetary_sandbox.run.bve.visualization import (
+    from tropoi.run.bve.visualization import (
         BVE_SNAPSHOT_TIMES_FILENAME, build_bve_snapshot_timeline,
         build_bve_snapshot_timelines, render_bve_snapshots)
 
@@ -656,9 +656,9 @@ def test_bve_snapshot_timeline_reloads_persisted_artifacts(tmp_path):
 
 def test_swe_visualization_failure_prevents_completion_and_publication(
         tmp_path, monkeypatch):
-    from planetary_sandbox.cli import swe
-    from planetary_sandbox.run.swe.config import SWERunConfig
-    from planetary_sandbox.run.swe.visualization import render_swe_summary
+    from tropoi.cli import swe
+    from tropoi.run.swe.config import SWERunConfig
+    from tropoi.run.swe.visualization import render_swe_summary
 
     class FailingRenderer:
         def render_figure(self, specification, output_path, *, metadata=None):

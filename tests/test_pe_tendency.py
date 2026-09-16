@@ -41,7 +41,7 @@ SQRT4PI = math.sqrt(4.0 * math.pi)
 
 def _make_planet(day_hours=24.0, grid_type="latlon", nlat=32, nlon=64,
                  l_max=15, resolution=3):
-    from planetary_sandbox.planet import Planet, PlanetaryParameters
+    from tropoi.planet import Planet, PlanetaryParameters
     return Planet.generate(
         params=PlanetaryParameters.from_earth_like(day_hours=day_hours),
         grid_type=grid_type, nlat=nlat, nlon=nlon, l_max=l_max,
@@ -61,14 +61,14 @@ def geodesic_planet():
 
 
 def _make_model(planet, nlev=5, **kwargs):
-    from planetary_sandbox.physics.primitive_equations import (
+    from tropoi.physics.primitive_equations import (
         PrimitiveEquationsModel)
-    from planetary_sandbox.physics.sigma_coordinate import SigmaGrid
+    from tropoi.physics.sigma_coordinate import SigmaGrid
     return PrimitiveEquationsModel(planet, SigmaGrid.uniform(nlev), **kwargs)
 
 
 def _rest_state(model):
-    from planetary_sandbox.physics.primitive_equations import (
+    from tropoi.physics.primitive_equations import (
         isothermal_rest_state)
     return isothermal_rest_state(model.l_max, model.nlev,
                                  temperature=T0, surface_pressure=PS0)
@@ -117,7 +117,7 @@ def test_hydrostatic_on_spectral_coefficients_matches_grid_path(latlon_planet):
     reconstruction followed by reanalysis in the exact band-limited Gauss
     case (handoff Section 1.2: complex input was untested before this)."""
     import cupy as cp
-    from planetary_sandbox.physics.sigma_coordinate import (
+    from tropoi.physics.sigma_coordinate import (
         hydrostatic_geopotential)
 
     n = latlon_planet.sh.l_max + 1
@@ -219,7 +219,7 @@ def test_product_continuity_structural_and_closure(latlon_planet):
     """Structural sigma_dot impermeability and round-off layer closure hold
     for the PRODUCT-grid G exactly as they do on the state grid."""
     import cupy as cp
-    from planetary_sandbox.physics.sigma_coordinate import (
+    from tropoi.physics.sigma_coordinate import (
         layer_mass_residual)
     model = _make_model(latlon_planet)
     state = _band_limited_state(model, seed=11)
@@ -240,7 +240,7 @@ def test_product_phi_matches_spectral_hydrostatics(latlon_planet):
     exact case — the guarantee that lets the delta equation use the exact
     spectral -lap(Phi) while the grid nonlinearities use product Phi."""
     import cupy as cp
-    from planetary_sandbox.physics.sigma_coordinate import (
+    from tropoi.physics.sigma_coordinate import (
         hydrostatic_geopotential)
     model = _make_model(latlon_planet)
     state = _band_limited_state(model, seed=13)
@@ -804,9 +804,9 @@ def _bve_degeneracy_errors(planet, nlev=4):
     BVE tendency for delta = 0, per-level horizontally uniform T, uniform
     ln p_s (sigma_dot = 0). Returns (err, scale, max |extra| rows)."""
     import cupy as cp
-    from planetary_sandbox.physics.barotropic import (
+    from tropoi.physics.barotropic import (
         BarotropicState, BarotropicVorticity)
-    from planetary_sandbox.run.bve.initial_conditions import make_ic
+    from tropoi.run.bve.initial_conditions import make_ic
 
     model = _make_model(planet, nlev=nlev)
     zeta_lm = planet.sh.transform(make_ic("rh4", planet))
@@ -852,7 +852,7 @@ def test_zero_flow_structured_T_gives_hydrostatic_pgf_divergence(
     pressure-gradient response, verified against an independent spectral
     hydrostatic reconstruction in the test."""
     import cupy as cp
-    from planetary_sandbox.physics.sigma_coordinate import (
+    from tropoi.physics.sigma_coordinate import (
         hydrostatic_geopotential)
     model = _make_model(latlon_planet)
     state = _rest_state(model)
@@ -938,9 +938,9 @@ def test_full_tendency_equals_assembled_parts(latlon_planet):
 
 def _bve_degeneracy_public(planet, nlev=4):
     import cupy as cp
-    from planetary_sandbox.physics.barotropic import (
+    from tropoi.physics.barotropic import (
         BarotropicState, BarotropicVorticity)
-    from planetary_sandbox.run.bve.initial_conditions import make_ic
+    from tropoi.run.bve.initial_conditions import make_ic
 
     model = _make_model(planet, nlev=nlev)
     zeta_lm = planet.sh.transform(make_ic("rh4", planet))
@@ -996,9 +996,9 @@ def test_rk4_rest_state_is_bitwise_stationary(latlon_planet):
     """An exact resting atmosphere is a bitwise fixed point of RK4 with
     the model tendency and validate_state as the stage validator."""
     import cupy as cp
-    from planetary_sandbox.physics.primitive_equations import (
+    from tropoi.physics.primitive_equations import (
         PrimitiveEquationsState)
-    from planetary_sandbox.run.engine import rk4_step_array
+    from tropoi.run.engine import rk4_step_array
     model = _make_model(latlon_planet)
     state = _rest_state(model)
 
@@ -1018,9 +1018,9 @@ def test_rk4_small_perturbation_stays_finite_and_valid(latlon_planet):
     small RK4 steps with stage validation; every accepted state passes
     the hard validator and the tendency stays genuinely nonzero."""
     import cupy as cp
-    from planetary_sandbox.physics.primitive_equations import (
+    from tropoi.physics.primitive_equations import (
         PrimitiveEquationsState)
-    from planetary_sandbox.run.engine import rk4_step_array
+    from tropoi.run.engine import rk4_step_array
     model = _make_model(latlon_planet)
     state = _band_limited_state(model, seed=67)
     model.validate_state(state, context="initial perturbed state")
@@ -1042,9 +1042,9 @@ def test_rk4_small_perturbation_stays_finite_and_valid(latlon_planet):
 
 def test_rk4_small_perturbation_geodesic(geodesic_planet):
     import cupy as cp
-    from planetary_sandbox.physics.primitive_equations import (
+    from tropoi.physics.primitive_equations import (
         PrimitiveEquationsState)
-    from planetary_sandbox.run.engine import rk4_step_array
+    from tropoi.run.engine import rk4_step_array
     model = _make_model(geodesic_planet)
     state = _band_limited_state(model, seed=71)
     model.validate_state(state, context="initial perturbed state")
@@ -1064,7 +1064,7 @@ def test_rk4_small_perturbation_geodesic(geodesic_planet):
 
 def test_tendency_state_wrapper(latlon_planet):
     import cupy as cp
-    from planetary_sandbox.physics.primitive_equations import (
+    from tropoi.physics.primitive_equations import (
         PrimitiveEquationsState)
     model = _make_model(latlon_planet)
     state = _band_limited_state(model, seed=73)
@@ -1084,7 +1084,7 @@ def _probe_vertical_structure_matrices(model):
     formulas): H (Phi' = R_d H T'), M ((omega/p)' = M delta'), and
     w (d ln p_s/dt = -w^T delta')."""
     import numpy as np
-    from planetary_sandbox.physics.sigma_coordinate import (
+    from tropoi.physics.sigma_coordinate import (
         column_mass_tendency, hydrostatic_geopotential, omega_over_p)
     K = model.nlev
     H = np.zeros((K, K))
@@ -1197,7 +1197,7 @@ def test_product_fields_on_geodesic_are_finite_and_structural(geodesic_planet):
     """The same reconstruction runs on the geodesic backend: finite fields,
     structural sigma_dot zeros, round-off layer closure."""
     import cupy as cp
-    from planetary_sandbox.physics.sigma_coordinate import (
+    from tropoi.physics.sigma_coordinate import (
         layer_mass_residual)
     model = _make_model(geodesic_planet)
     state = _band_limited_state(model, seed=19)

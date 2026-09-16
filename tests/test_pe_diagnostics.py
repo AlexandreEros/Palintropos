@@ -24,10 +24,10 @@ pytestmark = pytest.mark.skipif(not _has_cuda(),
 
 
 def _make_model(l_max=12, nlev=5, day_hours=24.0):
-    from planetary_sandbox.planet import Planet, PlanetaryParameters
-    from planetary_sandbox.physics.primitive_equations import (
+    from tropoi.planet import Planet, PlanetaryParameters
+    from tropoi.physics.primitive_equations import (
         PrimitiveEquationsModel)
-    from planetary_sandbox.physics.sigma_coordinate import SigmaGrid
+    from tropoi.physics.sigma_coordinate import SigmaGrid
     planet = Planet.generate(
         params=PlanetaryParameters.from_earth_like(day_hours=day_hours),
         grid_type="latlon", nlat=32, nlon=64, l_max=l_max, grid_resolution=3)
@@ -40,19 +40,19 @@ def model():
 
 
 def _rest(model):
-    from planetary_sandbox.run.pe.initial_conditions import make_pe_ic
+    from tropoi.run.pe.initial_conditions import make_pe_ic
     return make_pe_ic("isothermal_rest", model, temperature=T0,
                       surface_pressure=PS0)
 
 
 def _wave(model):
-    from planetary_sandbox.run.pe.initial_conditions import make_pe_ic
+    from tropoi.run.pe.initial_conditions import make_pe_ic
     return make_pe_ic("thermal_wave", model, temperature=T0,
                       surface_pressure=PS0, thermal_amplitude=AMP)
 
 
 def test_columns_present_and_csv_written(model, tmp_path):
-    from planetary_sandbox.run.pe.diagnostics import (PE_CSV_COLUMNS,
+    from tropoi.run.pe.diagnostics import (PE_CSV_COLUMNS,
                                                       PEDiagnosticsRecorder)
     rec = PEDiagnosticsRecorder(model, tmp_path)
     row = rec.record(0.0, _rest(model), dt=0.0, step=0)
@@ -66,7 +66,7 @@ def test_columns_present_and_csv_written(model, tmp_path):
 
 
 def test_rest_state_is_quiescent(model, tmp_path):
-    from planetary_sandbox.run.pe.diagnostics import PEDiagnosticsRecorder
+    from tropoi.run.pe.diagnostics import PEDiagnosticsRecorder
     rec = PEDiagnosticsRecorder(model, tmp_path)
     row = rec.record(0.0, _rest(model), dt=0.0, step=0)
     rec.close()
@@ -81,7 +81,7 @@ def test_rest_state_is_quiescent(model, tmp_path):
 
 
 def test_mass_drift_zero_when_state_unchanged(model, tmp_path):
-    from planetary_sandbox.run.pe.diagnostics import PEDiagnosticsRecorder
+    from tropoi.run.pe.diagnostics import PEDiagnosticsRecorder
     rec = PEDiagnosticsRecorder(model, tmp_path)
     rec.record(0.0, _rest(model), dt=0.0, step=0)
     row2 = rec.record(300.0, _rest(model), dt=300.0, step=1)
@@ -91,7 +91,7 @@ def test_mass_drift_zero_when_state_unchanged(model, tmp_path):
 
 
 def test_courant_matches_validated_characteristic_speed(model, tmp_path):
-    from planetary_sandbox.run.pe.diagnostics import PEDiagnosticsRecorder
+    from tropoi.run.pe.diagnostics import PEDiagnosticsRecorder
     rec = PEDiagnosticsRecorder(model, tmp_path)
     state = _rest(model)
     row = rec.record(0.0, state, dt=600.0, step=1)
@@ -104,7 +104,7 @@ def test_courant_matches_validated_characteristic_speed(model, tmp_path):
 
 
 def test_thermal_wave_diagnostics_are_finite_and_positive(model, tmp_path):
-    from planetary_sandbox.run.pe.diagnostics import PEDiagnosticsRecorder
+    from tropoi.run.pe.diagnostics import PEDiagnosticsRecorder
     rec = PEDiagnosticsRecorder(model, tmp_path)
     row = rec.record(0.0, _wave(model), dt=300.0, step=0)
     rec.close()

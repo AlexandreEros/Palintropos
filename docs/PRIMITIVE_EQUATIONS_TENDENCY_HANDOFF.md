@@ -204,7 +204,7 @@ per-level monopoles, T > 0 envelope, finite exp(ln p_s)).
 5. Full `tendency()` wiring into `rk4_step_array` + stage validation;
    resting-atmosphere multi-step bit-stability test.
 6. Normal-mode test (invariant 3) and short-run drift report (invariant 4).
-7. `PERunConfig` / runner / diagnostics recorder / `aeolus run pe` CLI —
+7. `PERunConfig` / runner / diagnostics recorder / `tropoi run pe` CLI —
    mirror `run/swe/*` and the shared `cli/run_lifecycle.py`; sigma
    interfaces join the run-identity config dict.
 

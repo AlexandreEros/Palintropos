@@ -6,15 +6,15 @@ import warnings
 import numpy as np
 from matplotlib.colors import hsv_to_rgb
 
-from planetary_sandbox.viz import (FigureFrame, FigureTimeline,
+from tropoi.viz import (FigureFrame, FigureTimeline,
                                     NormalizationKind, NormalizationPolicy,
                                     PHASE_DOMAIN, SphericalHarmonicField,
                                     SpectralCoefficientMapSpec,
                                     SpectralEncoding, phase_hue,
                                     phase_magnitude_hsv,
                                     relative_magnitude_db)
-from planetary_sandbox.viz.matplotlib_renderer import MatplotlibRenderer
-from planetary_sandbox.viz.specs import FigureSpec, PanelPlacement
+from tropoi.viz.matplotlib_renderer import MatplotlibRenderer
+from tropoi.viz.specs import FigureSpec, PanelPlacement
 
 
 def _fixed_policy() -> NormalizationPolicy:

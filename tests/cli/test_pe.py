@@ -1,22 +1,22 @@
-"""`aeolus run pe` parsing, resolution, and CPU-safety (import-light).
+"""`tropoi run pe` parsing, resolution, and CPU-safety (import-light).
 
 These never touch CUDA: they stub the heavy executor and assert the parser
 resolves a PERunConfig correctly, and a subprocess probe proves that
-`aeolus run pe --help` / `--no-plots` parsing imports neither CuPy nor the PE
+`tropoi run pe --help` / `--no-plots` parsing imports neither CuPy nor the PE
 runner/visualization modules.
 """
 from __future__ import annotations
 
 import pytest
 
-from planetary_sandbox.cli.main import main
+from tropoi.cli.main import main
 
 from .conftest import assert_probe_passes
 
 
 @pytest.fixture
 def stub_pe_execute_run(monkeypatch):
-    import planetary_sandbox.cli.pe as pe_module
+    import tropoi.cli.pe as pe_module
 
     captured = {}
 
@@ -107,5 +107,5 @@ def test_list_scenarios_includes_pe(capsys):
 
 def test_run_pe_help_is_cpu_safe():
     assert_probe_passes(
-        "from planetary_sandbox.cli.main import main",
+        "from tropoi.cli.main import main",
         "main(['run', 'pe', '--help'])")

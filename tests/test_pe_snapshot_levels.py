@@ -9,8 +9,8 @@ from __future__ import annotations
 
 import pytest
 
-from planetary_sandbox.physics.sigma_coordinate import SigmaGrid
-from planetary_sandbox.run.pe.snapshot_visualization import (
+from tropoi.physics.sigma_coordinate import SigmaGrid
+from tropoi.run.pe.snapshot_visualization import (
     select_snapshot_levels)
 
 

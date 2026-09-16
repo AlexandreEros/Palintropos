@@ -7,11 +7,11 @@ from __future__ import annotations
 
 import pytest
 
-from planetary_sandbox.cli.main import main
+from tropoi.cli.main import main
 
 from .conftest import assert_probe_passes
 
-AEOLUS_HELP_INVOCATIONS = [
+TROPOI_HELP_INVOCATIONS = [
     ["--help"],
     ["run", "--help"],
     ["run", "bve", "--help"],
@@ -24,17 +24,17 @@ AEOLUS_HELP_INVOCATIONS = [
 ]
 
 
-@pytest.mark.parametrize("argv", AEOLUS_HELP_INVOCATIONS,
+@pytest.mark.parametrize("argv", TROPOI_HELP_INVOCATIONS,
                          ids=lambda a: " ".join(a))
-def test_aeolus_help_and_list_are_cpu_safe(argv):
-    assert_probe_passes("from planetary_sandbox.cli.main import main",
+def test_tropoi_help_and_list_are_cpu_safe(argv):
+    assert_probe_passes("from tropoi.cli.main import main",
                         f"main({argv!r})")
 
 
 @pytest.mark.parametrize("module,name", [
-    ("planetary_sandbox.cli.bve", "psx-bve"),
-    ("planetary_sandbox.cli.generate_planet", "psx-gen"),
-    ("planetary_sandbox.cli.clear_cache", "psx-recompile"),
+    ("tropoi.cli.bve", "psx-bve"),
+    ("tropoi.cli.generate_planet", "psx-gen"),
+    ("tropoi.cli.clear_cache", "psx-recompile"),
 ])
 def test_psx_help_is_cpu_safe(module, name):
     assert_probe_passes(
@@ -42,6 +42,6 @@ def test_psx_help_is_cpu_safe(module, name):
         "m.main()")
 
 
-def test_bare_aeolus_prints_help(capsys):
+def test_bare_tropoi_prints_help(capsys):
     assert main([]) == 0
-    assert "aeolus" in capsys.readouterr().out
+    assert "tropoi" in capsys.readouterr().out

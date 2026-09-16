@@ -26,15 +26,15 @@ except Exception:  # pragma: no cover - import guard
 pytestmark = pytest.mark.skipif(not _HAS_CUDA, reason="CUDA/CuPy not available")
 
 if _HAS_CUDA:
-    from planetary_sandbox.numerics import SpectralOperators
-    from planetary_sandbox.planet import Planet, PlanetaryParameters
-    from planetary_sandbox.run.bve.barotropic_vorticity import (
+    from tropoi.numerics import SpectralOperators
+    from tropoi.planet import Planet, PlanetaryParameters
+    from tropoi.run.bve.barotropic_vorticity import (
         BarotropicState,
         BarotropicVorticity,
     )
-    from planetary_sandbox.run.bve.initial_conditions import make_ic
-    from planetary_sandbox.run.bve.runner import rk4_step
-    from planetary_sandbox.run.bve.diagnostics import spectral_diagnostics
+    from tropoi.run.bve.initial_conditions import make_ic
+    from tropoi.run.bve.runner import rk4_step
+    from tropoi.run.bve.diagnostics import spectral_diagnostics
 
 RES, L_MAX = 4, 21
 

@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import pytest
 
-from planetary_sandbox.cli.main import main
+from tropoi.cli.main import main
 
 
 @pytest.mark.parametrize("argv", [

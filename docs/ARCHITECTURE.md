@@ -15,10 +15,10 @@ model, and how to add or compare a backend.
 ## Package layout
 
 ```text
-src/planetary_sandbox/
+src/tropoi/
 ├── numerics/        grids, transforms, backends, product spaces, operators
 ├── run/bve/         equation, RK4 runner, run config resolution, ICs, diagnostics, I/O
-├── cli/             aeolus (main.py); psx-bve/psx-gen/psx-recompile compatibility entry points
+├── cli/             tropoi (main.py); aeolus/psx-bve/psx-gen/psx-recompile compatibility entry points
 ├── planet/          planet assembly and decorative terrain
 └── viz/             maps and run visualizations
 tests/               asserting GPU tests plus standalone audit scripts
@@ -116,7 +116,7 @@ detailed in [MATHEMATICAL_MODEL.md](MATHEMATICAL_MODEL.md).
 
 User-facing configuration is fully validated *before* CuPy is imported or
 CUDA is initialized: the CLI parses with all defaults set to `None`, and
-[`BVERunConfig.resolve`](../src/planetary_sandbox/run/bve/config.py) layers
+[`BVERunConfig.resolve`](../src/tropoi/run/bve/config.py) layers
 explicit values over the selected preset over ordinary defaults, checks
 finiteness/domains, and resolves the snapshot schedule and plot selection.
 Ordinary user errors (invalid backend, negative viscosity, NaN duration,
@@ -305,7 +305,7 @@ Diagnostic plots can be regenerated from the saved authoritative CSV/NPZ data
 without rerunning the model:
 
 ```powershell
-python -c "from pathlib import Path; from planetary_sandbox.run.bve.diagnostics import plot_diagnostics; r=Path('runs'); plot_diagnostics(r/(r/'latest_run.txt').read_text().strip())"
+python -c "from pathlib import Path; from tropoi.run.bve.diagnostics import plot_diagnostics; r=Path('runs'); plot_diagnostics(r/(r/'latest_run.txt').read_text().strip())"
 ```
 
 ## How to add or compare a backend

@@ -2,9 +2,9 @@
 import numpy as np
 import cupy as cp
 
-from planetary_sandbox.numerics import GeodesicGridGeometry, LatLonGridGeometry
-from planetary_sandbox.numerics import GeodesicSphericalHarmonics
-from planetary_sandbox.numerics.spherical_harmonics import LatLonSphericalHarmonics
+from tropoi.numerics import GeodesicGridGeometry, LatLonGridGeometry
+from tropoi.numerics import GeodesicSphericalHarmonics
+from tropoi.numerics.spherical_harmonics import LatLonSphericalHarmonics
 
 
 def test_y10(lat, lon):

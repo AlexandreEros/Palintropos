@@ -37,7 +37,7 @@ SQRT4PI = math.sqrt(4.0 * math.pi)
 
 def _make_planet(day_hours=24.0, grid_type="latlon", nlat=32, nlon=64,
                  l_max=15, resolution=3):
-    from planetary_sandbox.planet import Planet, PlanetaryParameters
+    from tropoi.planet import Planet, PlanetaryParameters
     return Planet.generate(
         params=PlanetaryParameters.from_earth_like(day_hours=day_hours),
         grid_type=grid_type, nlat=nlat, nlon=nlon, l_max=l_max,
@@ -55,14 +55,14 @@ def geodesic_planet():
 
 
 def _make_model(planet, nlev=5, **kwargs):
-    from planetary_sandbox.physics.primitive_equations import (
+    from tropoi.physics.primitive_equations import (
         PrimitiveEquationsModel)
-    from planetary_sandbox.physics.sigma_coordinate import SigmaGrid
+    from tropoi.physics.sigma_coordinate import SigmaGrid
     return PrimitiveEquationsModel(planet, SigmaGrid.uniform(nlev), **kwargs)
 
 
 def _rest_state(model):
-    from planetary_sandbox.physics.primitive_equations import (
+    from tropoi.physics.primitive_equations import (
         isothermal_rest_state)
     return isothermal_rest_state(model.l_max, model.nlev,
                                  temperature=T0, surface_pressure=PS0)
@@ -74,7 +74,7 @@ def _rest_state(model):
 
 def test_state_layout_and_views(latlon_planet):
     import cupy as cp
-    from planetary_sandbox.physics.primitive_equations import (
+    from tropoi.physics.primitive_equations import (
         PrimitiveEquationsState)
 
     l_max, nlev = latlon_planet.sh.l_max, 4
@@ -97,7 +97,7 @@ def test_state_layout_and_views(latlon_planet):
 
 def test_state_rejects_bad_shapes():
     import cupy as cp
-    from planetary_sandbox.physics.primitive_equations import (
+    from tropoi.physics.primitive_equations import (
         PrimitiveEquationsState, PrimitiveEquationsStateError)
 
     for shape in [(3, 16, 16),      # 3K+1 cannot be 3
@@ -426,7 +426,7 @@ def test_structured_temperature_transport_is_finite_and_nonzero(latlon_planet):
 # ---------------------------------------------------------------------------
 
 def test_characteristic_speed_of_rest_state_is_lamb_bound(latlon_planet):
-    from planetary_sandbox.physics.primitive_equations import (
+    from tropoi.physics.primitive_equations import (
         GAMMA_DRY, R_DRY)
     model = _make_model(latlon_planet)
     state = _rest_state(model)
@@ -445,7 +445,7 @@ def test_characteristic_speed_of_rest_state_is_lamb_bound(latlon_planet):
 
 def test_validation_rejects_invalid_states(latlon_planet):
     import cupy as cp
-    from planetary_sandbox.physics.primitive_equations import (
+    from tropoi.physics.primitive_equations import (
         PrimitiveEquationsState, PrimitiveEquationsStateError)
     model = _make_model(latlon_planet)
 
@@ -521,7 +521,7 @@ def test_state_stack_plugs_into_rk4_step_array(latlon_planet):
     factor is applied to every row of the (3K+1, n, n) stack.
     """
     import cupy as cp
-    from planetary_sandbox.run.engine import rk4_step_array
+    from tropoi.run.engine import rk4_step_array
     model = _make_model(latlon_planet)
     state = _divergent_state(model)
 
