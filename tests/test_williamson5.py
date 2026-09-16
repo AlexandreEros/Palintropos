@@ -886,9 +886,9 @@ def test_potential_enstrophy_matches_analytic_rest_value():
 # ===========================================================================
 
 @requires_cuda
-@pytest.mark.skipif(not os.environ.get("AEOLUS_W5_ACCEPTANCE"),
+@pytest.mark.skipif(not os.environ.get("TROPOI_W5_ACCEPTANCE"),
                     reason="15-day canonical W5 acceptance run (~3 h on the "
-                           "MX110); set AEOLUS_W5_ACCEPTANCE=1 to enable")
+                           "MX110); set TROPOI_W5_ACCEPTANCE=1 to enable")
 def test_w5_fifteen_day_canonical_acceptance(tmp_path):
     """The canonical benchmark through the real CLI (GL 64x128, l_max=42,
     RK4, inviscid), gated by loose structural envelopes only.
