@@ -53,9 +53,9 @@ $labels = @(
     @{ name = 'engine:shallow-water';        color = '1F77B4'; desc = 'Rotating shallow-water core (run/swe, physics/shallow_water.py)' },
     @{ name = 'engine:primitive-equations';  color = '5DA2DC'; desc = 'Dry hydrostatic primitive-equation core in sigma coordinates (run/pe)' },
 
-    # Grid backend: the repo's sharpest numerical dividing line.
-    @{ name = 'backend:geodesic';     color = '6B4FBB'; desc = 'Icosahedral geodesic grid backend: approximate, orientation-dependent Voronoi quadrature' },
-    @{ name = 'backend:gauss-latlon'; color = 'A18AE0'; desc = 'Gauss-Legendre latitude-longitude backend: exact quadrature reference path' },
+    # Grid backend: where an issue occurs, when it is backend-specific.
+    @{ name = 'backend:geodesic';     color = '6B4FBB'; desc = 'Issues specific to the icosahedral geodesic grid backend (GeodesicBackend)' },
+    @{ name = 'backend:gauss-latlon'; color = 'A18AE0'; desc = 'Issues specific to the Gauss-Legendre latitude-longitude backend (LatLonBackend)' },
 
     # Numerical subsystems that generate work independently of any one engine.
     @{ name = 'numerics:spectral-transforms'; color = '0E8A6E'; desc = 'SH basis, analysis/synthesis, quadrature weights, resolution envelope, spectral operators' },
@@ -64,7 +64,7 @@ $labels = @(
 
     # Cross-cutting concerns.
     @{ name = 'area:validation';      color = 'B08900'; desc = 'Benchmarks, analytic test cases, conservation diagnostics, VALIDATION.md evidence' },
-    @{ name = 'area:performance';     color = 'C96A00'; desc = 'Runtime cost, throughput, scaling, memory footprint of the numerical path' },
+    @{ name = 'area:performance';     color = 'C96A00'; desc = 'Runtime cost, throughput, scaling, memory and allocation anywhere, including I/O and plots' },
     @{ name = 'area:reproducibility'; color = '8B5E3C'; desc = 'Run capsules, manifests/provenance, determinism, seeds, archived artifacts' },
     @{ name = 'area:visualization';   color = 'D95F9A'; desc = 'Field/spectral plots, comparison figures, normalization, legibility, visualization semantics' },
     @{ name = 'area:cuda';            color = '76B900'; desc = 'GPU-specific behavior: CUDA kernels, CuPy/CUDA versions, driver/TDR limits, device memory' },

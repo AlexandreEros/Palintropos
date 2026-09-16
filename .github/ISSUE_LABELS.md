@@ -23,11 +23,11 @@ describe the *kind* of item; they are a separate dimension from the ones above.
 
 A few boundaries worth stating once:
 
-- **`backend:` vs `numerics:spectral-transforms`.** Quadrature exactness is a
-  property of the backend, so quadrature issues usually take a `backend:` label;
-  `numerics:spectral-transforms` is for the transform machinery itself (basis,
-  analysis/synthesis, resolution envelope, spectral operators) regardless of
-  backend. Backend-parity work takes both `backend:` labels.
+- **`backend:` vs `numerics:`.** `backend:` says *where* a problem occurs: use
+  it when the problem is specific to one backend, or when the issue is
+  explicitly about comparing them (a parity issue may take both). `numerics:`
+  says which mechanism is involved. A generic numerical issue needs no
+  `backend:` label.
 - **`area:cuda` vs `area:performance`.** `area:cuda` is for behavior that is
   specific to the GPU/toolchain (kernels, CuPy/CUDA versions, driver-TDR limits,
   device memory, the absence of a CPU path). `area:performance` is for cost,
@@ -65,10 +65,9 @@ particular, do not create one label per prognostic variable or diagnostic
 (`field:vorticity`, `diagnostic:energy`, …) — the issue title states that far
 better than a label can.
 
-Things deliberately left out for now, to be revisited only if real issue volume
-appears: `numerics:vertical-discretization` (today it would duplicate
-`engine:primitive-equations`), `numerics:quadrature` (today it duplicates
-`backend:geodesic`), and `area:diagnostics`.
+Postponed for now, to be revisited once there is a demonstrated need to filter
+for them: `numerics:quadrature`, `numerics:vertical-discretization`, and
+`area:diagnostics`.
 
 ## Labels vs commit prefixes
 
