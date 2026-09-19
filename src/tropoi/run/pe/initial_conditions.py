@@ -55,6 +55,7 @@ from __future__ import annotations
 
 from tropoi.physics.primitive_equations import (
     PrimitiveEquationsModel, PrimitiveEquationsState, isothermal_rest_state)
+from .config import require_thermal_wave_support
 
 #: The thermal-wave perturbation lives on this single real spherical-harmonic
 #: mode (degree 2, order 2): a sectoral, longitude-varying, low-degree mode
@@ -126,6 +127,12 @@ def make_pe_ic(name: str, model: PrimitiveEquationsModel, *,
         raise ValueError(
             f"Unknown pe initial condition: {name}. "
             f"Available: {sorted(PE_INITIAL_CONDITIONS)}")
+    if name == "thermal_wave":
+        # Same contract as the CPU config layer (run/pe/config.
+        # require_thermal_wave_support): storage lmax >= 2 always, and
+        # degree 2 inside the product cut for a nonzero amplitude. Direct
+        # low-level state construction stays available for characterization.
+        require_thermal_wave_support(model.l_max, thermal_amplitude)
     return PE_INITIAL_CONDITIONS[name](
         model, temperature=temperature, surface_pressure=surface_pressure,
         thermal_amplitude=thermal_amplitude)

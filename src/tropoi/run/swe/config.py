@@ -30,6 +30,7 @@ from ..engine import (SECONDS_PER_DAY, _require_finite_number,
                       interval_snapshot_times)
 from ..bve.config import (GRID_TYPES, MIN_NLAT, MIN_NLON,
                           scientific_config_subset)
+from tropoi.support import product_truncation_cut
 
 #: Image products in deterministic execution order.  The summary requires at
 #: least one persisted state; diagnostics remain available for N=0 runs.
@@ -69,6 +70,57 @@ SWE_SCENARIOS = {
                    "explicit overrides are honored but labeled "
                    "noncanonical.",
 }
+
+#: Preset support contract, measured in
+#: docs/validation/preset_support_characterization.md: ``(min_lmax,
+#: min_retained_degree)``. ``min_lmax`` is the stored capacity the preset's
+#: literal coefficients need; ``min_retained_degree`` (or None) is the
+#: degree the preset's advertised behavior needs INSIDE the 2/3 product cut
+#: (``product_truncation_cut(lmax) >= value``). Williamson 2's steady state
+#: needs the degree-2 curl/kinetic-energy products to cancel its pressure
+#: term (lost at lmax=2); gravity_wave's Y_4^2 mode is advanced by the
+#: exact linear pair above the cut, so it needs storage only; Williamson 5
+#: needs degree-2 storage and keeps its benchmark policy unchanged.
+SWE_SCENARIO_SUPPORT = {
+    "rest": (1, None),
+    "gravity_wave": (4, None),
+    "williamson2": (2, 2),
+    "williamson5": (2, None),
+}
+
+
+def _min_lmax_retaining(degree: int) -> int:
+    lmax = degree
+    while product_truncation_cut(lmax) < degree:
+        lmax += 1
+    return lmax
+
+
+def require_scenario_support(scenario: str, lmax: int) -> None:
+    """Raise ValueError unless ``lmax`` supports ``scenario``.
+
+    Shared by the CPU configuration layer and the CUDA initial-condition
+    factory so both boundaries enforce the same contract. Unknown scenarios
+    are the caller's concern (reported separately).
+    """
+    support = SWE_SCENARIO_SUPPORT.get(scenario)
+    if support is None:
+        return
+    min_lmax, min_retained = support
+    lmax = int(lmax)
+    if lmax < min_lmax:
+        raise ValueError(
+            f"scenario {scenario!r} needs lmax >= {min_lmax} to store its "
+            f"initial coefficients, got lmax={lmax}")
+    if min_retained is not None and product_truncation_cut(lmax) < min_retained:
+        raise ValueError(
+            f"scenario {scenario!r} needs the 2/3 product cut to retain "
+            f"degree {min_retained} (product_truncation_cut(lmax) >= "
+            f"{min_retained}, i.e. lmax >= {_min_lmax_retaining(min_retained)}); "
+            f"lmax={lmax} retains only degrees <= "
+            f"{product_truncation_cut(lmax)}. See docs/validation/"
+            "preset_support_characterization.md.")
+
 
 # ---------------------------------------------------------------------------
 # Williamson et al. (1992) test case 5: canonical constants.
@@ -257,6 +309,7 @@ class SWERunConfig:
             raise ValueError(
                 f"unknown swe scenario {self.scenario!r}; choose from "
                 f"{', '.join(sorted(SWE_SCENARIOS))}")
+        require_scenario_support(self.scenario, self.lmax)
 
         if self.topography == W5_TOPOGRAPHY:
             # Benchmark-owned terrain: only the williamson5 scenario may

@@ -281,3 +281,71 @@ def test_swe_overwrite_cleanup_removes_snapshot_product(tmp_path):
 
     assert not (tmp_path / "snapshots").exists()
     assert (tmp_path / "custom.png").read_bytes() == b"user"
+
+
+# ---------------------------------------------------------------------------
+# Scenario support boundaries (docs/validation/
+# preset_support_characterization.md): the CPU config layer and the CUDA
+# factory enforce the same SWE_SCENARIO_SUPPORT contract.
+# ---------------------------------------------------------------------------
+
+SUPPORT_CASES = [
+    # (scenario, lmax, accepted)
+    ("rest", 1, True),
+    ("gravity_wave", 3, False),      # below storage of the (4, 2) mode
+    ("gravity_wave", 4, True),       # at storage: upper pair exactly linear
+    ("gravity_wave", 5, True),
+    ("williamson2", 1, False),       # below storage of the (2, 0) mode
+    ("williamson2", 2, False),       # stored, but cut 1 loses the balance
+    ("williamson2", 3, True),        # first capacity retaining degree 2
+    ("williamson2", 4, True),
+    ("williamson5", 1, False),       # below storage
+    ("williamson5", 2, True),        # capacity only; benchmark policy intact
+    ("williamson5", 3, True),
+]
+
+
+@pytest.mark.parametrize("scenario,lmax,accepted", SUPPORT_CASES)
+def test_swe_config_scenario_support_boundary(scenario, lmax, accepted):
+    from tropoi.run.swe.config import SWERunConfig
+    if accepted:
+        cfg = SWERunConfig.resolve({"scenario": scenario, "lmax": lmax})
+        assert cfg.lmax == lmax
+    else:
+        with pytest.raises(ValueError, match=scenario):
+            SWERunConfig.resolve({"scenario": scenario, "lmax": lmax})
+
+
+def test_swe_support_table_covers_every_scenario():
+    from tropoi.run.swe.config import SWE_SCENARIOS, SWE_SCENARIO_SUPPORT
+    assert set(SWE_SCENARIO_SUPPORT) == set(SWE_SCENARIOS)
+
+
+def test_swe_williamson2_retained_degree_message_names_the_remedy():
+    from tropoi.run.swe.config import SWERunConfig
+    with pytest.raises(ValueError, match="lmax >= 3"):
+        SWERunConfig.resolve({"scenario": "williamson2", "lmax": 2})
+
+
+@pytest.mark.skipif(not _has_cuda(), reason="CUDA/CuPy not available")
+@pytest.mark.parametrize("scenario,lmax,accepted", SUPPORT_CASES)
+def test_swe_factory_mirrors_the_config_support_boundary(scenario, lmax,
+                                                         accepted):
+    from tropoi.physics.shallow_water import ShallowWaterModel
+    from tropoi.planet import Planet, PlanetaryParameters
+    from tropoi.run.swe.initial_conditions import make_swe_ic
+
+    planet = Planet.generate(
+        params=PlanetaryParameters.from_earth_like(day_hours=23.9345),
+        grid_type="latlon", nlat=32, nlon=64, l_max=lmax, grid_resolution=3)
+    # Flat bottom for every scenario, including williamson5's documented
+    # terrain-less defensive path: the cone's own representability gate
+    # (Topography.williamson5_cone) is benchmark policy, tested elsewhere,
+    # and would fire first at these tiny capacities.
+    model = ShallowWaterModel(planet, mean_depth=3000.0)
+    if accepted:
+        state = make_swe_ic(scenario, model)
+        assert state.coeffs.shape == (3, lmax + 1, lmax + 1)
+    else:
+        with pytest.raises(ValueError, match=scenario):
+            make_swe_ic(scenario, model)

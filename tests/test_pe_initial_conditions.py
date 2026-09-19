@@ -213,3 +213,32 @@ def test_thermal_wave_keeps_temperature_positive(latlon_model, geodesic_model):
                            surface_pressure=PS0, thermal_amplitude=AMP)
         t_min, _ = model.temperature_extrema(state)
         assert t_min > 0.0
+
+
+# ---------------------------------------------------------------------------
+# thermal_wave support boundary at the factory (mirrors run/pe/config;
+# docs/validation/preset_support_characterization.md)
+# ---------------------------------------------------------------------------
+
+@pytest.mark.parametrize("l_max,amplitude,accepted", [
+    (1, 0.0, False), (2, 0.0, True), (2, 1.0, False), (3, 1.0, True),
+    (3, 0.0, True), (4, 1.0, True),
+])
+def test_thermal_wave_factory_support_boundary(l_max, amplitude, accepted):
+    model = _make_model(l_max=l_max, nlev=2)
+    if accepted:
+        state = make_pe_ic("thermal_wave", model, temperature=T0,
+                           surface_pressure=PS0, thermal_amplitude=amplitude)
+        assert state.coeffs.shape == (3 * 2 + 1, l_max + 1, l_max + 1)
+        assert float(abs(state.temperature[0, 2, 2])) == amplitude
+    else:
+        with pytest.raises(ValueError, match="thermal_wave"):
+            make_pe_ic("thermal_wave", model, temperature=T0,
+                       surface_pressure=PS0, thermal_amplitude=amplitude)
+
+
+def test_rest_presets_keep_the_storage_only_boundary():
+    model = _make_model(l_max=1, nlev=2)
+    for name in ("isothermal_rest", "orographic_isothermal_rest"):
+        state = make_pe_ic(name, model, temperature=T0, surface_pressure=PS0)
+        assert state.coeffs.shape == (7, 2, 2)

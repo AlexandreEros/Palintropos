@@ -180,3 +180,46 @@ def test_summary_lines_are_plain_strings():
 def test_plot_types_exposed():
     assert "summary" in PE_PLOT_TYPES
     assert "diagnostics" in PE_PLOT_TYPES
+
+
+# ---------------------------------------------------------------------------
+# thermal_wave support boundary (docs/validation/
+# preset_support_characterization.md): storage lmax >= 2 always; a nonzero
+# amplitude also needs degree 2 inside the 2/3 product cut (lmax >= 3).
+# ---------------------------------------------------------------------------
+
+@pytest.mark.parametrize("lmax,amplitude,accepted", [
+    (1, 0.0, False),   # below storage
+    (1, 1.0, False),
+    (2, 0.0, True),    # at storage, zero amplitude: exact rest, accepted
+    (2, 1.0, False),   # at storage, nonzero: degree 2 not retained (cut 1)
+    (3, 1.0, True),    # first retained-degree-2 capacity (cut 2)
+    (3, 0.0, True),
+    (4, 1.0, True),    # above
+])
+def test_thermal_wave_support_boundary(lmax, amplitude, accepted):
+    if accepted:
+        cfg = _resolve(scenario="thermal_wave", lmax=lmax,
+                       thermal_amplitude=amplitude)
+        assert cfg.lmax == lmax and cfg.thermal_amplitude == amplitude
+    else:
+        with pytest.raises(ValueError, match="thermal_wave"):
+            _resolve(scenario="thermal_wave", lmax=lmax,
+                     thermal_amplitude=amplitude)
+
+
+def test_thermal_wave_retained_degree_message_names_the_remedy():
+    with pytest.raises(ValueError, match="lmax >= 3"):
+        _resolve(scenario="thermal_wave", lmax=2, thermal_amplitude=1.0)
+
+
+def test_other_scenarios_keep_the_storage_only_boundary():
+    assert _resolve(scenario="isothermal_rest", lmax=1).lmax == 1
+    assert _resolve(scenario="orographic_isothermal_rest", lmax=1).lmax == 1
+
+
+def test_support_guard_adds_no_config_keys():
+    # The guard is validation only: the resolved config dict (and hence the
+    # scientific hash / run id) of a supported run is unchanged.
+    cfg = _resolve(scenario="thermal_wave", lmax=3)
+    assert "support" not in " ".join(cfg.to_run_config_dict())

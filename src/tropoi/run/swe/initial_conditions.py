@@ -35,7 +35,7 @@ import cupy as cp
 
 from tropoi.physics.shallow_water import (ShallowWaterModel,
                                                      ShallowWaterState)
-from .config import W5_U0_MS
+from .config import W5_U0_MS, require_scenario_support
 
 
 def _rest(model: ShallowWaterModel) -> ShallowWaterState:
@@ -177,4 +177,8 @@ def make_swe_ic(name: str, model: ShallowWaterModel) -> ShallowWaterState:
         raise ValueError(
             f"Unknown swe initial condition: {name}. "
             f"Available: {sorted(SWE_INITIAL_CONDITIONS)}")
+    # Same contract as the CPU config layer (run/swe/config.
+    # SWE_SCENARIO_SUPPORT); direct low-level state construction stays
+    # available for characterization at any capacity.
+    require_scenario_support(name, model.l_max)
     return SWE_INITIAL_CONDITIONS[name](model)
