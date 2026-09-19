@@ -21,10 +21,17 @@ src/tropoi/
 ├── run/bve/         equation, RK4 runner, run config resolution, ICs, diagnostics, I/O
 ├── cli/             tropoi (main.py); aeolus/psx-bve/psx-gen/psx-recompile compatibility entry points
 ├── planet/          planet assembly and decorative terrain
-└── viz/             maps and run visualizations
+├── viz/             maps and run visualizations
+├── spatial/         immutable field specifications and read-only host coefficient views
+├── temporal/        read-only Simulation / Snapshot over a small storage protocol
+└── representation/  archive/ (open_simulation, versioned state schema) and visual/ (lazy plot adapter)
 tests/               asserting GPU tests plus standalone audit scripts
 docs/                architecture, validation records, and tracked README assets
 ```
+
+The saved-run interface (`spatial`, `temporal`, `representation.archive`)
+is import-light and CPU-only; `representation.visual` is imported only by
+an explicit `Snapshot.plot`. It is documented in [SAVED_RUNS.md](SAVED_RUNS.md).
 
 Numerical conventions matter more than style (there is no configured formatter
 or linter yet): use SI units; keep live arrays on the GPU as CuPy arrays;
@@ -296,6 +303,15 @@ useful for visual inspection but is not the scientific invariant record.
 contains plotting snapshots; and `bve_snapshot_times.npy` is their
 authoritative time axis in seconds. BVE and SWE timeline frames can be
 regenerated from these persisted arrays without rerunning either model.
+
+New manifests also carry two additive, versioned blocks derived from the
+resolved configuration: `state_schema` (the stored fields' row layout,
+dimensions, units, conventions, support, geometry, vertical coordinates and
+environment provenance) and `diagnostic_definitions` (the CSV column
+meanings, including the structured `high_l_enstrophy_frac` definition). They
+are descriptive only — never part of `run_config` or the scientific hash —
+and `open_simulation` reads them, inferring the known historical layouts for
+older capsules and saying so ([SAVED_RUNS.md](SAVED_RUNS.md)).
 
 A capsule is reproducible only to the extent recorded by its manifest. Runs from
 a dirty tree require the uncommitted patch as well as the commit, and the
