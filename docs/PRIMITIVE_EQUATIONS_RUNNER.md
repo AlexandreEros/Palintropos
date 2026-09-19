@@ -48,6 +48,19 @@ pressure stays uniform and the initial winds stay zero, so the state is
 deliberately *unbalanced* — it exists to show the model launches a smooth,
 finite response (a nonzero divergence field), not a balanced flow.
 
+**Supported resolution.** `lmax >= 2` stores the `(2, 2)` mode, but a nonzero
+`--thermal-amplitude` additionally requires `lmax >= 3` so that degree 2 lies
+inside the 2/3 product cut (`product_truncation_cut(lmax) >= 2`,
+`tropoi.support`). At `lmax = 2` the cut is 1: the temperature perturbation
+is then frozen for all time (its nonlinear products are discarded and the dry
+core applies no other term to it) while only the divergence responds to the
+exact hydrostatic forcing, which is not the advertised smooth response
+(measured with flat terrain). `--thermal-amplitude 0` is exact rest and keeps
+the `lmax >= 2` storage boundary. The CPU config layer and the initial-
+condition factory enforce the same rule
+(`run/pe/config.require_thermal_wave_support`); measurements in
+[validation/preset_support_characterization.md](validation/preset_support_characterization.md).
+
 ### `orographic_isothermal_rest`
 
 An analytically balanced resting isothermal atmosphere over the configured

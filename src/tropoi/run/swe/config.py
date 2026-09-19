@@ -78,9 +78,12 @@ SWE_SCENARIOS = {
 #: degree the preset's advertised behavior needs INSIDE the 2/3 product cut
 #: (``product_truncation_cut(lmax) >= value``). Williamson 2's steady state
 #: needs the degree-2 curl/kinetic-energy products to cancel its pressure
-#: term (lost at lmax=2); gravity_wave's Y_4^2 mode is advanced by the
-#: exact linear pair above the cut, so it needs storage only; Williamson 5
-#: needs degree-2 storage and keeps its benchmark policy unchanged.
+#: term (lost at lmax=2); gravity_wave's Y_4^2 mode needs storage only,
+#: because above the cut its delta/phi pair receives no product term (the
+#: exact linear pressure pair, plus any hyperdiffusion, still acts there);
+#: Williamson 5's value is the initial-state storage requirement only: the
+#: cone/topography representability gate and the benchmark policy are
+#: separate and unchanged.
 SWE_SCENARIO_SUPPORT = {
     "rest": (1, None),
     "gravity_wave": (4, None),

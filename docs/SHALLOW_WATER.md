@@ -252,6 +252,25 @@ is well-defined relative to the lake-at-rest state.
 | `williamson2` | Williamson et al. (1992) case 2 (α = 0) wind/free-surface pair: `u = u₀ cos φ_lat`, `u₀ = 2πa/(12 days)`, `φ_fs' = C(1/3 − sin²φ_lat)`, `C = aΩu₀ + u₀²/2`. Over a flat bottom: the exact steady solution for any positive mean depth (canonical `g·h₀ = 2.94×10⁴ m²/s²` ↔ mean depth `(2.94×10⁴ − C/3)/g`). Over a mountain: the same wind and free surface launched above the terrain — a smooth mountain-flow experiment (NOT steady, and NOT Williamson case 5, whose mountain is conical and whose `u₀` is 20 m/s). |
 | `williamson5` | Williamson et al. (1992) case 5: the W2-shaped wind/**free-surface** pair with `u₀ = 20 m/s`, `h₀ = 5960 m` over the canonical conical mountain (`hs0 = 2000 m`, `R0 = π/9`, center 30 N / −90 E); the fluid-layer depth carries a cone-shaped depression, `h* = η − h_s`. Owns its terrain; canonical constants resolved automatically. See the dedicated section below. |
 
+Each scenario has a **supported resolution boundary**, enforced identically by
+the CPU configuration layer (`SWE_SCENARIO_SUPPORT` in `run/swe/config.py`)
+and the CUDA factory; the measurements behind it are in
+[validation/preset_support_characterization.md](validation/preset_support_characterization.md).
+Coefficients are stored through `lmax`, but analyzed nonlinear products retain
+only degrees `<= product_truncation_cut(lmax) = 2*lmax//3`
+(`tropoi.support`); degrees above that cut receive no analyzed
+nonlinear-product contribution, while the core's other terms (the exact
+linear pressure pair, hyperdiffusion, the fixed topographic term) still act
+there. Stored capacity, nonlinear-product support, and those other terms are
+three different things.
+
+| Scenario | Minimum `lmax` | Why |
+|---|---|---|
+| `rest` | 1 | no literal modes |
+| `gravity_wave` | 4 | stores the `(4, 2)` mode. At `lmax = 4, 5` the mode lies above the cut, so (with flat terrain and `nu4 = 0`, as measured) its divergence/geopotential pair is *exactly* the linear pressure pair and the dispersion relation holds; the retained lower band is still fed nonlinearly by it, so the system as a whole is not linear. |
+| `williamson2` | 3 | stores `(1, 0)` and `(2, 0)` (needs `lmax >= 2`) **and** needs degree 2 inside the cut: at `lmax = 2` the degree-2 curl/kinetic-energy products that balance the pressure term are discarded and the "steady" state has a residual divergence tendency equal to `-∇²φ` (measured). |
+| `williamson5` | 2 | initial-state storage/capacity only (`(1, 0)`, `(2, 0)`). It does not supersede the cone/topography representability gate, which rejects the cone at small `lmax`, and it does not claim W5 is a useful benchmark at such resolutions; the benchmark policy is unchanged. |
+
 All scenarios are built spectrally (no grid round trip), so they are exactly
 monopole-free and band-limited, and each validates its state before
 returning (protruding terrain fails here, before integration).

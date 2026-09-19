@@ -12,9 +12,12 @@ preset_support_characterization.md):
 * **stored capacity** ``l_max``: the triangular ``0 <= m <= l <= l_max``
   coefficient extent every prognostic array carries;
 * **product truncation cut** :func:`product_truncation_cut`: the highest
-  degree an analyzed nonlinear product retains (the 2/3 rule). Degrees
-  ``cut < l <= l_max`` are stored and advanced by the exact *linear*
-  spectral operators, but receive no nonlinear tendency.
+  degree an analyzed nonlinear product retains (the 2/3 rule). The shared
+  contract is only that analyzed nonlinear-product contributions are
+  zeroed for ``cut < l <= l_max`` (and ``m > cut``); which OTHER terms act
+  on those stored degrees (exact linear spectral operators, forcing,
+  hyperdiffusion or viscosity, prescribed topographic terms) is decided by
+  each core, not by this module.
 """
 from __future__ import annotations
 
@@ -25,7 +28,8 @@ def product_truncation_cut(l_max: int) -> int:
     """The 2/3-rule truncation degree for analyzed nonlinear products.
 
     ``cut = floor(2 * l_max / 3)``: an analyzed product keeps degrees and
-    orders ``<= cut`` and zeroes ``cut < l <= l_max`` (and ``m > cut``).
+    orders ``<= cut`` and zeroes ``cut < l <= l_max`` (and ``m > cut``);
+    it says nothing about the non-product terms a core applies there.
     Pinned values: ``1->0, 2->1, 3->2, 4->2, 5->3, 6->4, 10->6, 15->10,
     21->14, 42->28, 63->42``. This is the single production definition;
     every operator, core, and diagnostic band derives from it.

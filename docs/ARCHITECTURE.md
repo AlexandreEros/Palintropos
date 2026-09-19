@@ -16,6 +16,7 @@ model, and how to add or compare a backend.
 
 ```text
 src/tropoi/
+├── support.py       import-light spectral support contract (the single 2/3 product cut)
 ├── numerics/        grids, transforms, backends, product spaces, operators
 ├── run/bve/         equation, RK4 runner, run config resolution, ICs, diagnostics, I/O
 ├── cli/             tropoi (main.py); aeolus/psx-bve/psx-gen/psx-recompile compatibility entry points
