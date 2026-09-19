@@ -34,7 +34,7 @@ _GENERATED_RESULT_DIRS: tuple[str, ...] = (
 
 _SNAPSHOT_FRAME_RE = re.compile(r".+_t\d{13}\.\d{9}s\.png\Z")
 
-def _w5_planet_params(run_config: Mapping):
+def _w5_planet_params(run_config):
     """Exact canonical-planet parameters for the Williamson-5 scenario.
 
     The Williamson (1992) suite prescribes a PERFECT SPHERE of radius
@@ -50,9 +50,17 @@ def _w5_planet_params(run_config: Mapping):
     from tropoi.planet import PlanetaryParameters
     from tropoi.run.swe.config import W5_RADIUS_M
 
+    # Accept the resolved SWERunConfig (historical callers/tests) as well as
+    # the plain run-configuration mapping the saved-run interface passes.
+    if isinstance(run_config, Mapping):
+        radius_units = float(run_config["radius_earth_units"])
+        day_hours = float(run_config["day_hours"])
+    else:
+        radius_units = float(run_config.radius_earth_units)
+        day_hours = float(run_config.day_hours)
     return PlanetaryParameters.ideal_sphere(
-        radius_m=float(run_config["radius_earth_units"]) * W5_RADIUS_M,
-        sidereal_day_s=float(run_config["day_hours"]) * 3600.0)
+        radius_m=radius_units * W5_RADIUS_M,
+        sidereal_day_s=day_hours * 3600.0)
 
 
 def build_swe_model(run_config: Mapping):
