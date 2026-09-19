@@ -5,8 +5,6 @@ import pathlib
 
 import numpy as np
 
-from tropoi.physics.shallow_water import (DELTA, PHI, ZETA,
-                                                       ShallowWaterState)
 from tropoi.viz.fields import (ScalarGridField,
                                            SphericalHarmonicField)
 from tropoi.viz.grid_adapter import map_to_uniform_latlon
@@ -21,6 +19,11 @@ from tropoi.viz.timeline import (FigureFrame, FigureTimeline,
 
 SWE_SUMMARY_FILENAME = "swe_summary.png"
 SWE_SNAPSHOT_TIMES_FILENAME = "swe_snapshot_times.npy"
+#: Stack indices of the persisted SWE prognostics. They mirror
+#: ``physics.shallow_water.{ZETA, DELTA, PHI}`` (kept equal by a test) and
+#: are restated here so the coefficient-space (host-only) composition never
+#: imports the CuPy-bound core.
+ZETA, DELTA, PHI = 0, 1, 2
 _SPECTRAL_NORMALIZATION = "orthonormal-complex-m>=0-real-field"
 
 
@@ -45,6 +48,15 @@ def _load_swe_fields(
     out_dir = pathlib.Path(out_dir)
     coefficients = np.load(out_dir / "swe_coeffs.npy")
     times = np.load(out_dir / SWE_SNAPSHOT_TIMES_FILENAME)
+    return _swe_fields_from_arrays(coefficients, times)
+
+
+def _swe_fields_from_arrays(
+        coefficients, times
+        ) -> tuple[tuple[SphericalHarmonicField, ...], np.ndarray]:
+    """The same validation and field construction from in-memory arrays."""
+    coefficients = _host(coefficients)
+    times = _host(times).astype(np.float64, copy=False)
     if coefficients.ndim != 4 or coefficients.shape[1] != 3:
         raise ValueError(
             "swe_coeffs.npy must have shape (time, 3, l, m), got "
@@ -156,6 +168,8 @@ def _extract_swe_winds(
         ) -> tuple[np.ndarray, np.ndarray,
                    tuple[tuple[np.ndarray, np.ndarray], ...]]:
     """Derive instantaneous state-grid winds from each persisted SWE state."""
+    from tropoi.physics.shallow_water import ShallowWaterState
+
     winds = []
     view_grid = None
     for index in range(spectral_fields[0].state_count):
@@ -383,6 +397,34 @@ def build_swe_snapshot_timelines(
     }
 
 
+def build_swe_snapshot_timelines_from_data(
+        model, coefficients, times_seconds, *, scenario: str = "swe",
+        representations: tuple[str, ...] = ("physical", "spectral")
+        ) -> dict[str, FigureTimeline]:
+    """The same physical/spectral compositions from already-loaded arrays.
+
+    ``coefficients`` is the ``(time, 3, l, m)`` stack and ``times_seconds``
+    its time axis, exactly as persisted; the saved-run interface passes
+    its read-only views here so the composition, interpolation, palettes
+    and cross-frame normalization are those of the in-run product. The
+    spectral view needs no model (host-only); ``model`` may be None when
+    only ``"spectral"`` is requested.
+    """
+    spectral_fields, times = _swe_fields_from_arrays(coefficients,
+                                                     times_seconds)
+    timelines: dict[str, FigureTimeline] = {}
+    for name in representations:
+        if name == "physical":
+            timelines[name] = _build_swe_physical_timeline(
+                model, spectral_fields, times, scenario=scenario)
+        elif name == "spectral":
+            timelines[name] = _build_swe_spectral_timeline(
+                spectral_fields, times, scenario=scenario)
+        else:
+            raise ValueError(f"unknown SWE snapshot representation {name!r}")
+    return timelines
+
+
 def render_swe_snapshots(
         model, out_dir: pathlib.Path | str, *, scenario: str = "swe",
         metadata: dict | None = None, renderer=None
@@ -417,6 +459,7 @@ __all__ = [
     "SWE_SNAPSHOT_TIMES_FILENAME",
     "SWE_SUMMARY_FILENAME",
     "build_swe_snapshot_timelines",
+    "build_swe_snapshot_timelines_from_data",
     "build_swe_snapshot_timeline",
     "build_swe_spectral_snapshot_timeline",
     "build_swe_summary_spec",

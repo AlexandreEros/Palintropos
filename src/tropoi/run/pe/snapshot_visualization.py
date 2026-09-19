@@ -386,9 +386,31 @@ def build_pe_snapshot_timeline(model, out_dir: pathlib.Path | str, *,
     complete time x level x lat x lon dataset is stacked on the device.
     """
     from .visualization import _load_pe_coeffs
-    from tropoi.viz.timeline import FigureFrame, FigureTimeline
 
     coeffs, times = _load_pe_coeffs(out_dir, model.nlev)
+    return build_pe_snapshot_timeline_from_data(
+        model, coeffs, times, scenario=scenario, run_id=run_id,
+        upper_index=upper_index, lower_index=lower_index)
+
+
+def build_pe_snapshot_timeline_from_data(model, coefficients, times_seconds,
+                                         *, scenario: str | None = None,
+                                         run_id: str | None = None,
+                                         upper_index: int | None = None,
+                                         lower_index: int | None = None):
+    """The same per-snapshot composition from already-loaded arrays.
+
+    ``coefficients`` is the ``(time, 3*nlev+1, l, m)`` stack and
+    ``times_seconds`` its time axis, exactly as persisted; the saved-run
+    interface passes its read-only views here so the level selection,
+    synthesis, view mapping, layout and run-wide normalization are those of
+    the in-run product.
+    """
+    from .visualization import _validate_pe_coeffs
+    from tropoi.viz.timeline import FigureFrame, FigureTimeline
+
+    coeffs, times = _validate_pe_coeffs(coefficients, times_seconds,
+                                        model.nlev)
     levels = select_snapshot_levels(model.sigma, upper_index=upper_index,
                                     lower_index=lower_index)
     backend_label = _backend_label(model)
@@ -442,6 +464,7 @@ __all__ = [
     "SelectedLevels",
     "build_pe_snapshot_figure",
     "build_pe_snapshot_timeline",
+    "build_pe_snapshot_timeline_from_data",
     "prepare_pe_snapshot_fields",
     "render_pe_snapshots",
     "select_snapshot_levels",

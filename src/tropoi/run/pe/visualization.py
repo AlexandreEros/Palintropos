@@ -44,6 +44,14 @@ def _load_pe_coeffs(out_dir: pathlib.Path | str,
     out_dir = pathlib.Path(out_dir)
     coeffs = np.load(out_dir / PE_COEFFS_FILENAME)
     times = np.load(out_dir / PE_SNAPSHOT_TIMES_FILENAME)
+    return _validate_pe_coeffs(coeffs, times, nlev)
+
+
+def _validate_pe_coeffs(coeffs, times, nlev: int
+                        ) -> tuple[np.ndarray, np.ndarray]:
+    """The same stack/time-axis validation for already-loaded arrays."""
+    coeffs = _host(coeffs)
+    times = _host(times)
     if coeffs.ndim != 4 or coeffs.shape[1] != 3 * nlev + 1:
         raise ValueError(
             f"pe_coeffs.npy must have shape (time, 3*nlev+1, l, m) with "

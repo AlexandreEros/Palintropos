@@ -206,6 +206,19 @@ def test_monopole_tolerance_matches_the_cores():
     assert PrimitiveEquationsModel._MONOPOLE_RTOL == ZERO_MEAN_MONOPOLE_RTOL
 
 
+@pytest.mark.skipif(not _cupy_available(),
+                    reason="physics cores import CuPy at import time")
+def test_swe_stack_indices_match_the_core_everywhere():
+    from tropoi.physics import shallow_water
+    from tropoi.run.swe import visualization
+    assert (visualization.ZETA, visualization.DELTA, visualization.PHI) ==         (shallow_water.ZETA, shallow_water.DELTA, shallow_water.PHI)
+    schema = state_schema_for("swe", SWERunConfig.resolve(
+        {"scenario": "williamson2"}).to_run_config_dict())
+    rows = {spec.name: spec.rows[0] for spec in schema.fields}
+    assert rows == {"zeta": shallow_water.ZETA, "delta": shallow_water.DELTA,
+                    "phi": shallow_water.PHI}
+
+
 def test_reference_radii_match_their_sources():
     from tropoi.run.swe.config import W5_RADIUS_M as source_w5
     from tropoi.planet.planetary_parameters import PlanetaryParameters

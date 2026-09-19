@@ -349,6 +349,18 @@ class CapsuleStorage:
             }
         return self._metadata
 
+    def stored_array(self, filename: str) -> np.ndarray:
+        """Another persisted array of this capsule, read-only (memory-mapped).
+
+        Used by the rendering adapter for companion arrays such as the
+        BVE plotting grid (``vorticity_grid.npy``); the coefficient array
+        itself is :attr:`coefficients`.
+        """
+        if pathlib.Path(filename).name != filename:
+            raise CapsuleError(f"stored array name must be a plain filename, "
+                               f"got {filename!r}")
+        return _open_array(self.run_dir / filename, mmap=self._mmap)
+
     def frame(self, index: int) -> np.ndarray:
         index = int(index)
         if not 0 <= index < self.frame_count:
