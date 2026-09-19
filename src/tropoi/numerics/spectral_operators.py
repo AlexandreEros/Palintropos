@@ -4,6 +4,7 @@ from .differential_operators_spherical import DifferentialOperatorsSpherical
 from .geodesic_grid import GeodesicGridGeometry
 # from .spherical_harmonics import LatLonSphericalHarmonics as SphericalHarmonics
 from .optimized_geodesic_sh import GeodesicSphericalHarmonics
+from tropoi.support import product_truncation_cut
 
 # class SpectralOperators:
 #     def __init__(self, sh, radius: float):
@@ -328,7 +329,7 @@ class SpectralOperators:
 
     def _truncate_product(self, coeffs: cp.ndarray) -> cp.ndarray:
         """2/3-rule truncation of an analyzed product (in place)."""
-        cut = (2 * self.l_max) // 3
+        cut = product_truncation_cut(self.l_max)
         coeffs[cut + 1:, :] = 0.0
         coeffs[:, cut + 1:] = 0.0
         return coeffs
@@ -579,7 +580,7 @@ class SpectralOperators:
 
         if dealias:
             L = self.l_max
-            cut = (2 * L) // 3
+            cut = product_truncation_cut(L)
             adv_lm[cut+1:, :] = 0.0
             adv_lm[:, cut+1:] = 0.0
 
@@ -649,7 +650,7 @@ class SpectralOperators:
 
         if dealias:
             # Spectral truncation (2/3 rule), applied exactly once.
-            cut = (2 * self.l_max) // 3
+            cut = product_truncation_cut(self.l_max)
             J_lm[cut + 1:, :] = 0.0
             J_lm[:, cut + 1:] = 0.0
 

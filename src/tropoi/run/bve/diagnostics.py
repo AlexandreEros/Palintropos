@@ -31,6 +31,8 @@ import pathlib
 import numpy as np
 import cupy as cp
 
+from tropoi.support import product_truncation_cut
+
 CSV_COLUMNS = [
     "time_s",
     "dt_s",
@@ -82,7 +84,7 @@ def spectral_diagnostics(zeta_lm: cp.ndarray, radius: float, omega: float) -> di
     Z_abs = float(0.5 * R**2 * _mode_power(q_lm).sum())
 
     Z_total = float(Z_l.sum())
-    cut = (2 * l_max) // 3
+    cut = product_truncation_cut(l_max)
     high_frac = float(Z_l[cut + 1:].sum()) / Z_total if Z_total > 0 else 0.0
 
     return {

@@ -90,6 +90,7 @@ import cupy as cp
 
 from tropoi.physics.topography import Topography
 from tropoi.planet import Planet
+from tropoi.support import product_truncation_cut
 
 #: Standard gravity used by the Williamson et al. (1992) test suite (m/s^2).
 WILLIAMSON_GRAVITY = 9.80616
@@ -220,7 +221,7 @@ class ShallowWaterModel:
             coslat = cp.cos(cp.asarray(self.grid.point_latitudes))
         self._state_coslat = cp.maximum(cp.asarray(coslat, cp.float64), 1e-8)
 
-        self._trunc_cut = (2 * self.l_max) // 3
+        self._trunc_cut = product_truncation_cut(self.l_max)
 
         # ------------------------------------------------------------------
         # Fixed bottom topography (see module docstring). Everything the

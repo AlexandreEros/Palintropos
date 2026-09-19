@@ -42,6 +42,7 @@ from dataclasses import dataclass
 import cupy as cp
 
 from tropoi.planet import Planet
+from tropoi.support import product_truncation_cut as _product_truncation_cut
 from .sigma_coordinate import (SigmaGrid, column_energy_conversion,
                                column_mass_tendency, column_pressure_work,
                                hydrostatic_geopotential,
@@ -58,14 +59,14 @@ GAMMA_DRY = CP_DRY / (CP_DRY - R_DRY)
 PROGNOSTICS = ("zeta", "delta", "temperature", "ln_ps")
 
 
-def product_truncation_cut(l_max: int) -> int:
-    """The 2/3-rule truncation degree for analyzed nonlinear products.
-
-    One definition shared by the model's per-product truncation and by the
-    topography coupling: surface geopotential supplied to the model must be
-    band-limited at this cut (see PrimitiveEquationsModel.__init__).
-    """
-    return (2 * int(l_max)) // 3
+#: The 2/3-rule truncation degree for analyzed nonlinear products.
+#: Re-exported from :mod:`tropoi.support` (the single production
+#: definition, shared with the spectral operators, the shallow-water core
+#: and the BVE diagnostic band) and kept at this historical import path:
+#: the model's per-product truncation and the topography coupling (surface
+#: geopotential must be band-limited at this cut, see
+#: PrimitiveEquationsModel.__init__) both use it.
+product_truncation_cut = _product_truncation_cut
 
 
 class PrimitiveEquationsStateError(ValueError):
