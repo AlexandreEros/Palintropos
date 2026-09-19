@@ -77,17 +77,23 @@ def execute_with_provenance(cfg, *,
                             solver: Callable,
                             clean_artifacts: Callable[[pathlib.Path], None],
                             resolve_base_dir: Callable,
-                            notes: Optional[dict] = None) -> int:
+                            notes: Optional[dict] = None,
+                            solver_name: Optional[str] = None) -> int:
     """Execute one resolved run inside the full provenance lifecycle.
 
     ``cfg`` must expose ``out``, ``experiment``, ``overwrite``, and
     ``to_run_config_dict()``. ``notes`` overrides the manifest's descriptive
-    notes block (None keeps the historical BVE notes).
+    notes block (None keeps the historical BVE notes). ``solver_name``
+    (``"bve"``, ``"swe"``, ``"pe"``) selects the additive ``state_schema``
+    / ``diagnostic_definitions`` manifest blocks derived from the resolved
+    run configuration; None writes a manifest without them (legacy
+    callers). The blocks never touch ``run_config`` or the run id.
     """
     from tropoi.run.bve.io import (
         RUN_STATUS_COMPLETED, RUN_STATUS_FAILED, RUN_STATUS_RUNNING,
         RunProvenanceError, atomic_write_text, create_run_dir, failure_record,
         update_manifest_status, write_run_manifest)
+    from tropoi.representation.archive.schema import provenance_blocks
 
     base_dir, used_fallback = resolve_base_dir(cfg.out)
     if used_fallback:
@@ -136,9 +142,11 @@ def execute_with_provenance(cfg, *,
     # Write initial provenance so an interrupted or failing run leaves a
     # traceable capsule marked 'running' / 'failed', not a silent hole.
     atomic_write_text(out_dir / "config.json", json.dumps(run_config, indent=2))
+    blocks = (provenance_blocks(solver_name, run_config)
+              if solver_name is not None else {})
     write_run_manifest(out_dir, run_config,
                        run_id=run_dir.run_id, experiment=cfg.experiment,
-                       status=RUN_STATUS_RUNNING, notes=notes)
+                       status=RUN_STATUS_RUNNING, notes=notes, **blocks)
 
     try:
         solver(cfg, run_dir, run_config)

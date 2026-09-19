@@ -426,6 +426,8 @@ def write_run_manifest(
     status: str = RUN_STATUS_RUNNING,
     error: Optional[dict] = None,
     notes: Optional[dict] = None,
+    state_schema: Optional[dict] = None,
+    diagnostic_definitions: Optional[dict] = None,
 ) -> pathlib.Path:
     """Write a ``manifest.json`` capturing everything needed to reproduce.
 
@@ -434,7 +436,12 @@ def write_run_manifest(
     run finishes. ``error`` holds ``{type, message}`` for failed runs so
     an operator can see at a glance why a capsule is incomplete. ``notes``
     replaces the descriptive notes block (None keeps the historical BVE
-    notes, preserving every existing call site).
+    notes, preserving every existing call site). ``state_schema`` and
+    ``diagnostic_definitions`` are the ADDITIVE, versioned provenance
+    blocks (``representation.archive.schema.provenance_blocks``) that let
+    a reader interpret the stored coefficient array and the diagnostics
+    CSV; they are descriptive only and never enter ``run_config`` or the
+    scientific configuration hash. Omitted blocks are not written.
     """
     versions = {"python": sys.version.split()[0]}
     for mod in ("numpy", "scipy", "cupy", "matplotlib"):
@@ -471,6 +478,10 @@ def write_run_manifest(
         "gpu": gpu,
         "notes": dict(_DEFAULT_MANIFEST_NOTES) if notes is None else dict(notes),
     }
+    if state_schema is not None:
+        manifest["state_schema"] = dict(state_schema)
+    if diagnostic_definitions is not None:
+        manifest["diagnostic_definitions"] = dict(diagnostic_definitions)
     if error is not None:
         manifest["error"] = error
 

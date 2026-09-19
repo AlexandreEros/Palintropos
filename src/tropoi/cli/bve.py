@@ -10,7 +10,7 @@ from __future__ import annotations
 import pathlib
 import re
 import shutil
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Mapping
 
 from tropoi.cli.run_lifecycle import (execute_with_provenance,
                                                  resolve_writable_base_dir)
@@ -123,6 +123,31 @@ def _clean_overwrite_artifacts(out_dir: pathlib.Path) -> None:
             f"of {out_dir}: " + "; ".join(failures))
 
 
+def build_planet(run_config: Mapping):
+    """The BVE run's Planet (grid, transform, backend, operators).
+
+    Built from the resolved run configuration dict, so the same resources
+    can be reconstructed later from a saved capsule's ``config.json`` (the
+    saved-run interface does this lazily for plotting). Legacy capsules
+    predating the ``grid`` / ``product_quadrature`` keys use the only
+    backend and the ``Planet.generate`` default that existed then.
+    Imports CuPy through Planet; call only after validation.
+    """
+    from tropoi.planet import Planet, PlanetaryParameters
+
+    return Planet.generate(
+        params=PlanetaryParameters.from_earth_like(
+            day_hours=float(run_config["day_hours"]),
+            radius_earth_units=float(run_config["radius_earth_units"])),
+        grid_resolution=int(run_config["resolution"]),
+        l_max=int(run_config["lmax"]),
+        product_quadrature=run_config.get("product_quadrature", "fine"),
+        grid_type=run_config.get("grid", "geodesic"),
+        nlat=int(run_config["nlat"]),
+        nlon=int(run_config["nlon"]),
+    )
+
+
 def _execute_solver(cfg: "BVERunConfig", run_dir, run_config: dict) -> None:
     """Heavy numerical portion of a run: build the planet and drive the solver.
 
@@ -131,23 +156,13 @@ def _execute_solver(cfg: "BVERunConfig", run_dir, run_config: dict) -> None:
     without CUDA — tests replace this with a stub that succeeds or raises.
     Imports CuPy/matplotlib only here, after all user-error validation.
     """
-    from tropoi.planet import Planet, PlanetaryParameters
     from tropoi.run.bve.io import RUN_STATUS_RUNNING, write_run_manifest
     from tropoi.run.bve.runner import run_bve
     from tropoi.run.bve.initial_conditions import make_ic
+    from tropoi.representation.archive.schema import provenance_blocks
 
     out_dir = run_dir.path
-    planet = Planet.generate(
-        params=PlanetaryParameters.from_earth_like(
-            day_hours=cfg.day_hours,
-            radius_earth_units=cfg.radius_earth_units),
-        grid_resolution=cfg.resolution,
-        l_max=cfg.lmax,
-        product_quadrature=cfg.product_quadrature,
-        grid_type=cfg.grid,
-        nlat=cfg.nlat,
-        nlon=cfg.nlon,
-    )
+    planet = build_planet(run_config)
 
     # Initial condition on grid, then transform -> spectral ζ_lm
     zeta0_grid = make_ic(cfg.scenario, planet)
@@ -158,7 +173,8 @@ def _execute_solver(cfg: "BVERunConfig", run_dir, run_config: dict) -> None:
     write_run_manifest(out_dir, run_config,
                        run_id=run_dir.run_id, experiment=cfg.experiment,
                        numerics=planet.so.backend.describe(cfg.product_quadrature),
-                       status=RUN_STATUS_RUNNING)
+                       status=RUN_STATUS_RUNNING,
+                       **provenance_blocks("bve", run_config))
 
     run_bve(planet=planet,
             zeta0_lm=zeta0_lm,
@@ -187,7 +203,8 @@ def execute_run(cfg: "BVERunConfig") -> int:
         solver=lambda c, run_dir, run_config: _execute_solver(
             c, run_dir, run_config),
         clean_artifacts=lambda out_dir: _clean_overwrite_artifacts(out_dir),
-        resolve_base_dir=lambda out: _resolve_writable_base_dir(out))
+        resolve_base_dir=lambda out: _resolve_writable_base_dir(out),
+        solver_name="bve")
 
 
 def main() -> int:

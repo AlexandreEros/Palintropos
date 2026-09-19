@@ -9,7 +9,7 @@ from __future__ import annotations
 import pathlib
 import re
 import shutil
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Mapping
 
 from tropoi.cli.run_lifecycle import (execute_with_provenance,
                                                  resolve_writable_base_dir)
@@ -34,7 +34,7 @@ _GENERATED_RESULT_DIRS: tuple[str, ...] = (
 
 _SNAPSHOT_FRAME_RE = re.compile(r".+_t\d{13}\.\d{9}s\.png\Z")
 
-def _w5_planet_params(cfg: "SWERunConfig"):
+def _w5_planet_params(run_config: Mapping):
     """Exact canonical-planet parameters for the Williamson-5 scenario.
 
     The Williamson (1992) suite prescribes a PERFECT SPHERE of radius
@@ -51,8 +51,63 @@ def _w5_planet_params(cfg: "SWERunConfig"):
     from tropoi.run.swe.config import W5_RADIUS_M
 
     return PlanetaryParameters.ideal_sphere(
-        radius_m=cfg.radius_earth_units * W5_RADIUS_M,
-        sidereal_day_s=cfg.day_hours * 3600.0)
+        radius_m=float(run_config["radius_earth_units"]) * W5_RADIUS_M,
+        sidereal_day_s=float(run_config["day_hours"]) * 3600.0)
+
+
+def build_swe_model(run_config: Mapping):
+    """The shallow-water model (planet + terrain + core) of a run.
+
+    Built from the resolved run configuration dict — exactly the values
+    ``config.json`` persists — so a saved capsule's model can be
+    reconstructed later without re-running preset validation (legacy
+    capsules are never re-validated by newer preset guards). Topography is
+    reconstructed deterministically from the same keys the scientific
+    hash covers. Imports CuPy; call only after validation.
+    """
+    from tropoi.planet import Planet, PlanetaryParameters
+    from tropoi.physics.shallow_water import ShallowWaterModel
+    from tropoi.physics.topography import Topography
+
+    if run_config.get("scenario") == "williamson5":
+        # Benchmark planets are exact ideal spheres (see _w5_planet_params).
+        params = _w5_planet_params(run_config)
+    else:
+        params = PlanetaryParameters.from_earth_like(
+            day_hours=float(run_config["day_hours"]),
+            radius_earth_units=float(run_config["radius_earth_units"]))
+    planet = Planet.generate(
+        params=params,
+        grid_resolution=int(run_config["resolution"]),
+        l_max=int(run_config["lmax"]),
+        product_quadrature="fine",
+        grid_type=run_config.get("grid", "geodesic"),
+        nlat=int(run_config["nlat"]),
+        nlon=int(run_config["nlon"]),
+    )
+    # Topography is reconstructed deterministically from the resolved
+    # configuration (which participates in the scientific hash), so no
+    # terrain arrays need to be persisted with the run. Manifests without
+    # a topography key are flat runs.
+    topography_kind = run_config.get("topography", "flat")
+    if topography_kind == "mountain":
+        topography = Topography.mountain(
+            planet,
+            height_m=float(run_config["mountain_height_m"]),
+            lat_deg=float(run_config["mountain_lat_deg"]),
+            lon_deg=float(run_config["mountain_lon_deg"]),
+            width_deg=float(run_config["mountain_width_deg"]))
+    elif topography_kind == "williamson5_cone":
+        topography = Topography.williamson5_cone(planet)
+    elif topography_kind == "flat":
+        topography = None
+    else:
+        raise ValueError(
+            f"unknown topography {topography_kind!r} in the run configuration")
+    model = ShallowWaterModel(planet, gravity=float(run_config["gravity"]),
+                              mean_depth=float(run_config["mean_depth_m"]),
+                              topography=topography)
+    return model
 
 
 def _manifest_notes(cfg: "SWERunConfig", topography=None) -> dict:
@@ -137,48 +192,16 @@ def _clean_overwrite_artifacts(out_dir: pathlib.Path) -> None:
 
 def _execute_solver(cfg: "SWERunConfig", run_dir, run_config: dict) -> None:
     """Heavy numerical portion of a run: build planet + model, drive the solver."""
-    from tropoi.planet import Planet, PlanetaryParameters
-    from tropoi.physics.shallow_water import ShallowWaterModel
-    from tropoi.physics.topography import Topography
     from tropoi.run.bve.io import (RUN_STATUS_RUNNING,
                                               write_run_manifest)
     from tropoi.run.swe.initial_conditions import make_swe_ic
     from tropoi.run.swe.runner import run_swe
+    from tropoi.representation.archive.schema import provenance_blocks
 
     out_dir = run_dir.path
-    if cfg.scenario == "williamson5":
-        # Benchmark planets are exact ideal spheres (see _w5_planet_params).
-        params = _w5_planet_params(cfg)
-    else:
-        params = PlanetaryParameters.from_earth_like(
-            day_hours=cfg.day_hours,
-            radius_earth_units=cfg.radius_earth_units)
-    planet = Planet.generate(
-        params=params,
-        grid_resolution=cfg.resolution,
-        l_max=cfg.lmax,
-        product_quadrature="fine",
-        grid_type=cfg.grid,
-        nlat=cfg.nlat,
-        nlon=cfg.nlon,
-    )
-    # Topography is reconstructed deterministically from the resolved
-    # configuration (which participates in the scientific hash), so no
-    # terrain arrays need to be persisted with the run.
-    if cfg.topography == "mountain":
-        topography = Topography.mountain(
-            planet,
-            height_m=cfg.mountain_height_m,
-            lat_deg=cfg.mountain_lat_deg,
-            lon_deg=cfg.mountain_lon_deg,
-            width_deg=cfg.mountain_width_deg)
-    elif cfg.topography == "williamson5_cone":
-        topography = Topography.williamson5_cone(planet)
-    else:
-        topography = None
-    model = ShallowWaterModel(planet, gravity=cfg.gravity,
-                              mean_depth=cfg.mean_depth_m,
-                              topography=topography)
+    model = build_swe_model(run_config)
+    planet = model.planet
+    topography = model.topography if model.has_topography else None
     state0 = make_swe_ic(cfg.scenario, model)
 
     # Rewrite manifest now that we know the backend/product-sampling
@@ -188,7 +211,8 @@ def _execute_solver(cfg: "SWERunConfig", run_dir, run_config: dict) -> None:
                        run_id=run_dir.run_id, experiment=cfg.experiment,
                        numerics=planet.so.backend.describe("fine"),
                        status=RUN_STATUS_RUNNING,
-                       notes=_manifest_notes(cfg, topography))
+                       notes=_manifest_notes(cfg, topography),
+                       **provenance_blocks("swe", run_config))
 
     run_swe(model=model,
             state0=state0,
@@ -210,4 +234,5 @@ def execute_run(cfg: "SWERunConfig") -> int:
             c, run_dir, run_config),
         clean_artifacts=lambda out_dir: _clean_overwrite_artifacts(out_dir),
         resolve_base_dir=lambda out: _resolve_writable_base_dir(out),
-        notes=_manifest_notes(cfg))
+        notes=_manifest_notes(cfg),
+        solver_name="swe")
