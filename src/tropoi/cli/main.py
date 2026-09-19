@@ -669,9 +669,44 @@ def _resolve_inspect_target(target):
     return None, None
 
 
+def _describe_state_fields(manifest: dict, run_config: dict):
+    """One-line field summary from the manifest/config schema (no arrays).
+
+    Returns None when the solver or schema cannot be determined, so
+    ordinary inspection of unknown or incomplete capsules is unaffected.
+    """
+    from tropoi.representation.archive.schema import (
+        SchemaError, StateSchema, state_schema_for)
+
+    try:
+        block = manifest.get("state_schema")
+        if block is not None:
+            schema = StateSchema.from_manifest_dict(block)
+            source = ""
+        else:
+            solver = run_config.get("solver")
+            if solver is None:
+                if "viscosity" in run_config:
+                    solver = "bve"
+                else:
+                    return None
+            schema = state_schema_for(solver, run_config)
+            source = " (inferred: no state_schema block)"
+    except (SchemaError, KeyError, TypeError, ValueError):
+        return None
+    parts = []
+    for spec in schema.fields:
+        extent = f"[{schema.nlev} levels]" if spec.levels else ""
+        parts.append(f"{spec.name}{extent} ({spec.units})")
+    return ", ".join(parts) + f"; l_max={schema.l_max}" + source
+
+
 def _cmd_inspect(args: argparse.Namespace) -> int:
     import json
 
+    if getattr(args, "field", None) is not None and \
+            getattr(args, "snapshot", None) is None:
+        return _error("--field requires --snapshot INDEX")
     run_dir, note = _resolve_inspect_target(args.run_path)
     if run_dir is None:
         return _error(
@@ -790,6 +825,7 @@ def _cmd_inspect(args: argparse.Namespace) -> int:
         show("plots", ", ".join(plots) if plots else "none")
 
     show("viscosity", run_config.get("viscosity"))
+    show("state fields", _describe_state_fields(manifest, run_config))
     numerics = manifest.get("numerics") or {}
     show("backend", numerics.get("backend"))
     show("product sampling", numerics.get("product_sampling"))
@@ -802,6 +838,82 @@ def _cmd_inspect(args: argparse.Namespace) -> int:
                    for p in run_dir.iterdir())
     if files:
         show("output files", ", ".join(files))
+
+    if getattr(args, "snapshot", None) is not None:
+        return _inspect_snapshot(run_dir, args.snapshot,
+                                 getattr(args, "field", None))
+    return 0
+
+
+def _inspect_snapshot(run_dir, index: int, field_name) -> int:
+    """Describe one stored snapshot (and optionally one field) on the host.
+
+    Uses the saved-run interface (import-light: NumPy memory maps, no
+    CUDA, no visualization). Ordinary metadata inspection above has
+    already succeeded; only this optional section needs the stored arrays.
+    """
+    from tropoi.representation.archive import (CapsuleError, SchemaError,
+                                               open_simulation)
+    from tropoi.spatial.modes import SpectralConventionError
+
+    try:
+        sim = open_simulation(run_dir)
+    except (CapsuleError, SchemaError) as err:
+        return _error(f"cannot open the saved run under {run_dir}: {err}")
+    try:
+        snapshot = sim[index]
+        state = snapshot.state
+    except IndexError as err:
+        return _error(str(err))
+    except SchemaError as err:
+        return _error(f"cannot interpret the stored state: {err}")
+    if field_name is not None and field_name not in state:
+        return _error(
+            f"unknown field {field_name!r} for solver {sim.solver!r}; "
+            f"this run stores: {', '.join(state)}")
+
+    provenance = sim.metadata["provenance"]
+    time_axis = provenance["time_axis"]
+    schema_prov = provenance["schema"]
+    storage_kind = ("memory-mapped read-only" if provenance["memory_mapped"]
+                    else "loaded read-only")
+    print(f"Snapshot {snapshot.index} of {len(sim)} (solver {sim.solver}):")
+    time_note = ""
+    if time_axis.get("source") == "inferred":
+        time_note = f"  [time axis inferred: {time_axis.get('rule')}]"
+    print(f"  time              {snapshot.time:g} s "
+          f"({snapshot.time / 3600.0:g} h){time_note}")
+    schema_note = ""
+    if schema_prov.get("reason"):
+        schema_note = f" ({schema_prov['reason']})"
+    print(f"  schema            {schema_prov.get('source')}{schema_note}")
+    print(f"  stored array      {provenance['coefficient_file']} "
+          f"{storage_kind}")
+    names = [field_name] if field_name is not None else list(state)
+    for name in names:
+        view = state[name]
+        summary = view.summary()
+        try:
+            view.validate()
+            convention = "conventions ok"
+        except SpectralConventionError as err:
+            convention = f"INVALID: {err}"
+        shape = "x".join(str(n) for n in view.shape)
+        dims = ",".join(view.dimensions)
+        levels = ""
+        if view.level_values is not None:
+            sigma = ", ".join(f"{v:.4g}" for v in view.level_values)
+            levels = f"; {view.nlev} level(s), sigma={sigma}"
+        monopoles = ", ".join(f"{v:.6g}" for v in summary["monopole_real"])
+        print(f"  field {name}")
+        print(f"    meaning         {view.description}")
+        print(f"    units           {view.units}")
+        print(f"    shape           {shape} ({dims}); l_max={view.l_max}"
+              f"{levels}")
+        print(f"    monopole rule   {view.spec.monopole}; Re a_00 = "
+              f"{monopoles}")
+        print(f"    coefficients    max|a| = {summary['max_abs']:.6g}, "
+              f"nonzero = {summary['nonzero']}, {convention}")
     return 0
 
 
@@ -903,6 +1015,18 @@ def build_parser() -> argparse.ArgumentParser:
         "run_path",
         help="A run directory, an experiment directory, or a base directory "
              "containing latest_run.txt (e.g. 'runs').")
+    inspect_parser.add_argument(
+        "--snapshot", type=int, default=None, metavar="INDEX",
+        help="Also describe one stored snapshot by saved output index "
+             "(negative indices count from the end): its time and the "
+             "stored fields' interpretation, shapes, and coefficient "
+             "summaries. Read from the saved arrays on the host; never "
+             "initializes CUDA.")
+    inspect_parser.add_argument(
+        "--field", default=None, metavar="NAME",
+        help="With --snapshot: restrict the snapshot description to one "
+             "stored field (e.g. zeta, delta, phi, temperature, ln_ps). "
+             "The field must belong to the run's solver.")
     inspect_parser.set_defaults(_handler=_cmd_inspect)
 
     # tropoi gen
