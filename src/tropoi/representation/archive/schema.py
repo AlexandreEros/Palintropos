@@ -20,6 +20,7 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 from dataclasses import dataclass, field
+import math
 
 from tropoi.spatial.modes import (COEFFICIENT_LAYOUT,
                                   COEFFICIENT_NORMALIZATION, FieldSpec)
@@ -70,6 +71,10 @@ class UnknownSchemaVersionError(SchemaError):
     """The manifest carries a schema version this reader does not know."""
 
 
+class UnsupportedConventionError(SchemaError):
+    """The manifest declares a coefficient/time convention not supported."""
+
+
 @dataclass(frozen=True)
 class StateSchema:
     """Structured interpretation of one capsule's stored prognostic state."""
@@ -87,6 +92,107 @@ class StateSchema:
     environment: dict = field(default_factory=dict)
     provenance: dict = field(default_factory=dict)
     version: int = STATE_SCHEMA_VERSION
+
+    def __post_init__(self) -> None:
+        self.check_consistency()
+
+    def check_consistency(self) -> None:
+        """Reject schemas the reader could not interpret unambiguously.
+
+        Both the manifest block and the inferred schema pass through here,
+        so inspection and plotting interpret the same stored data
+        identically or fail identically: unsupported coefficient
+        conventions, conflicting/overlapping field rows, rows outside the
+        packed frame, and inconsistent PE vertical coordinates are
+        SchemaErrors at open (typed access is refused; metadata stays
+        readable).
+        """
+        if self.solver not in SOLVERS:
+            raise SchemaError(f"unknown solver {self.solver!r}")
+        if not self.fields:
+            raise SchemaError("state_schema declares no fields")
+        if int(self.l_max) < 0:
+            raise SchemaError(f"l_max must be >= 0, got {self.l_max}")
+        names = [spec.name for spec in self.fields]
+        if len(set(names)) != len(names):
+            raise SchemaError(f"state_schema repeats field names: {names}")
+        for spec in self.fields:
+            if spec.normalization != COEFFICIENT_NORMALIZATION:
+                raise SchemaError(
+                    f"field {spec.name!r} declares normalization "
+                    f"{spec.normalization!r}; this reader supports only "
+                    f"{COEFFICIENT_NORMALIZATION!r}")
+            if spec.layout != COEFFICIENT_LAYOUT:
+                raise SchemaError(
+                    f"field {spec.name!r} declares layout {spec.layout!r}; "
+                    f"this reader supports only {COEFFICIENT_LAYOUT!r}")
+        if self.rows is None:
+            if len(self.fields) != 1 or self.fields[0].rows is not None:
+                raise SchemaError(
+                    "a schema without a row axis must declare exactly one "
+                    "field spanning the whole (l, m) frame")
+        else:
+            rows = int(self.rows)
+            if rows < 1:
+                raise SchemaError(f"rows must be >= 1, got {rows}")
+            occupied: list[tuple[int, int, str]] = []
+            for spec in self.fields:
+                if spec.rows is None:
+                    raise SchemaError(
+                        f"field {spec.name!r} has no row range but the "
+                        f"frame has {rows} row(s)")
+                start, stop = spec.rows
+                if stop > rows:
+                    raise SchemaError(
+                        f"field {spec.name!r} rows [{start}, {stop}) exceed "
+                        f"the {rows} stored row(s)")
+                for o_start, o_stop, o_name in occupied:
+                    if start < o_stop and o_start < stop:
+                        raise SchemaError(
+                            f"fields {o_name!r} and {spec.name!r} claim "
+                            "overlapping rows "
+                            f"[{o_start}, {o_stop}) and [{start}, {stop})")
+                occupied.append((start, stop, spec.name))
+            covered = sum(stop - start for start, stop, _ in occupied)
+            if covered != rows:
+                raise SchemaError(
+                    f"fields cover {covered} of the {rows} stored row(s); "
+                    "the row layout is ambiguous")
+        levelled = [spec for spec in self.fields if spec.levels]
+        if levelled or self.nlev is not None or self.vertical is not None:
+            if self.nlev is None or self.vertical is None:
+                raise SchemaError(
+                    "levelled fields require both nlev and the vertical "
+                    "coordinate block")
+            nlev = int(self.nlev)
+            for spec in levelled:
+                if spec.nlev != nlev:
+                    raise SchemaError(
+                        f"field {spec.name!r} spans {spec.nlev} level(s) "
+                        f"but the schema declares nlev={nlev}")
+            try:
+                interfaces = [float(v) for v in self.vertical["interfaces"]]
+                full = [float(v) for v in self.vertical["full_levels"]]
+            except (KeyError, TypeError, ValueError) as err:
+                raise SchemaError(
+                    f"malformed vertical coordinate block: {err}") from err
+            if len(interfaces) != nlev + 1 or len(full) != nlev:
+                raise SchemaError(
+                    f"vertical block has {len(interfaces)} interfaces and "
+                    f"{len(full)} full levels for nlev={nlev}")
+            if (not all(math.isfinite(v) for v in interfaces)
+                    or interfaces[0] != 0.0 or interfaces[-1] != 1.0
+                    or any(interfaces[k] >= interfaces[k + 1]
+                           for k in range(nlev))):
+                raise SchemaError(
+                    "sigma interfaces must be finite, strictly increasing "
+                    f"from exactly 0.0 to exactly 1.0, got {interfaces}")
+            expected = [0.5 * (interfaces[k] + interfaces[k + 1])
+                        for k in range(nlev)]
+            if any(abs(a - b) > 1e-12 for a, b in zip(full, expected)):
+                raise SchemaError(
+                    "full levels are not the interface midpoints: "
+                    f"{full} vs {expected}")
 
     @property
     def field_names(self) -> tuple[str, ...]:
@@ -158,6 +264,18 @@ class StateSchema:
             raise SchemaError(f"malformed state_schema: {err}") from err
         if not fields:
             raise SchemaError("state_schema declares no fields")
+        time_units = data.get("time_units", TIME_UNITS)
+        if time_units != TIME_UNITS:
+            raise UnsupportedConventionError(
+                f"state_schema time_units {time_units!r} is not supported; "
+                f"this reader interprets {TIME_UNITS!r} only")
+        for key, supported in (("normalization", COEFFICIENT_NORMALIZATION),
+                               ("layout", COEFFICIENT_LAYOUT)):
+            declared = data.get(key, supported)
+            if declared != supported:
+                raise UnsupportedConventionError(
+                    f"state_schema {key} {declared!r} is not supported; this "
+                    f"reader interprets {supported!r} only")
         rows = data.get("rows")
         return cls(
             solver=solver, fields=fields, l_max=l_max,
@@ -540,6 +658,7 @@ __all__ = [
     "StateSchema",
     "TIME_FILES",
     "UnknownSchemaVersionError",
+    "UnsupportedConventionError",
     "diagnostic_definitions_for",
     "high_l_enstrophy_fraction_definition",
     "infer_solver",

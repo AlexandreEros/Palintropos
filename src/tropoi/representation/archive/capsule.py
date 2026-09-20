@@ -5,10 +5,11 @@ determines the solver and the stored-state schema (from the manifest's
 ``state_schema`` block, or by inference for the known historical formats),
 memory-maps the coefficient array read-only, loads the authoritative time
 axis, and validates headers, layout, dtype, and the time axis at open.
-Coefficient VALUES are never scanned at open: convention checks (finite,
-triangular, real ``a_l0``, monopole rule) run when a field is accessed
-through ``Snapshot.state[...]`` (they are also available explicitly through
-``SpectralModes.validate``), and nothing is ever repaired.
+Coefficient VALUES are never scanned at open, and field access through
+``Snapshot.state[...]`` is a plain read-only view: the convention checks
+(finite, triangular padding, real ``a_l0``, monopole rule) are an explicit
+operation, ``SpectralModes.validate()`` (``tropoi inspect --snapshot``
+calls it and reports the result), and nothing is ever repaired.
 
 Everything here is import-light (NumPy + stdlib): CUDA, Matplotlib, the
 numerical cores, and the visualization adapters are never imported by
@@ -134,10 +135,15 @@ def _open_array(path: pathlib.Path, *, mmap: bool) -> np.ndarray:
     if not isinstance(array, np.ndarray):
         raise CapsuleLayoutError(
             f"stored file did not decode to an array: {path}")
-    if not mmap:
-        array = array.view()
+    # Freeze the OWNING array (a read-only memmap already is): a view of a
+    # writeable owner could regain write access with setflags(write=True)
+    # and mutate every snapshot sharing the storage, so the owner itself
+    # must be non-writeable before any public view exists.
     array.flags.writeable = False
-    return array
+    # Hand out a VIEW of the frozen owner: NumPy refuses setflags(write=True)
+    # on a view whose base is read-only, but an owning array may always
+    # re-enable its own flag, so the owner itself is never exposed.
+    return array.view()
 
 
 def _validate_coefficients_layout(array: np.ndarray, schema: StateSchema,
@@ -176,7 +182,7 @@ def _validate_times(times: np.ndarray, frame_count: int,
     if times.size > 1 and not np.all(np.diff(times) > 0.0):
         raise CapsuleLayoutError(f"{label} must be strictly increasing")
     times.flags.writeable = False
-    return times
+    return times.view()          # same rule: expose a view of the frozen owner
 
 
 # ---------------------------------------------------------------------------
@@ -246,10 +252,11 @@ class CapsuleStorage:
             times = _open_array(path, mmap=False)
             self._time_provenance = {"source": "stored", "file": time_file}
             return _validate_times(np.array(times), frames, path.name)
-        if self.solver == "bve" and self.run_config.get("dt_snapshots"):
+        if self._is_legacy_interval_bve_capsule():
             # The only known capsule without a stored time axis: the
-            # historical psx-bve interval mode stored t = 0 and every
-            # interval boundary in order.
+            # historical psx-bve interval mode (no solver / snapshot_mode /
+            # snapshot_times keys) stored t = 0 and every interval boundary
+            # in order.
             dt = float(self.run_config["dt_snapshots"])
             times = dt * np.arange(frames, dtype=np.float64)
             self._time_provenance = {
@@ -260,9 +267,25 @@ class CapsuleStorage:
             }
             return _validate_times(times, frames, "inferred time axis")
         raise CapsuleLayoutError(
-            f"stored time axis {time_file} is missing under {self.run_dir} "
-            "and the capsule is not a known legacy layout with an inferable "
-            "schedule")
+            f"stored time axis {time_file} is missing under {self.run_dir}; "
+            "only the historical psx-bve interval capsule (no 'solver', "
+            "'snapshot_mode' or 'snapshot_times' keys, positive "
+            "'dt_snapshots') has an inferable schedule, and this capsule is "
+            "not one. Timestamps are never fabricated")
+
+    def _is_legacy_interval_bve_capsule(self) -> bool:
+        """The one pre-time-axis format: psx-bve before count mode existed."""
+        rc = self.run_config
+        if self.solver != "bve" or "solver" in rc:
+            return False
+        if "snapshot_mode" in rc or "snapshot_times" in rc or \
+                "n_snapshots" in rc:
+            return False
+        dt = rc.get("dt_snapshots")
+        try:
+            return dt is not None and float(dt) > 0.0
+        except (TypeError, ValueError):
+            return False
 
     # -- SnapshotStorage protocol ---------------------------------------
 

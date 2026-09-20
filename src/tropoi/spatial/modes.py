@@ -158,7 +158,13 @@ class FieldSpec:
 
 
 def _read_only(array: np.ndarray) -> np.ndarray:
-    """A non-writeable view sharing memory with ``array``."""
+    """A non-writeable view sharing memory with ``array``.
+
+    NumPy lets a view regain write access with ``setflags(write=True)``
+    when its owner is writeable, so callers that must guarantee immutability
+    (the capsule storage) freeze the owning array itself; this helper only
+    removes the flag on the view it hands out.
+    """
     view = array.view()
     view.flags.writeable = False
     return view
