@@ -1,7 +1,7 @@
 """Dry primitive-equation run driver: integrate (fixed step), validate, persist.
 
 Mirrors ``run/swe/runner.py`` on top of the shared integration engine
-(``run.engine``) with ONE deliberate difference: the timestep is a
+(``temporal.integration``) with ONE deliberate difference: the timestep is a
 user-supplied **fixed** value, not the state-adaptive advective-CFL ceiling
 the BVE/SWE runners use. This first runnable PE experiment makes no CFL
 controller claim — it drives the existing :class:`IntegrationScheduler` (count

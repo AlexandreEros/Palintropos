@@ -49,7 +49,7 @@ from dataclasses import dataclass
 from typing import Mapping, Optional, Sequence
 
 # The scheduling / adaptive-timestep engine is model-independent and lives in
-# run/engine.py (shared with the shallow-water core). Every name below is
+# temporal/integration.py (shared with the shallow-water core). Every name below is
 # re-exported here unchanged to preserve this module's historical import
 # surface.
 from tropoi.temporal.integration import (  # noqa: F401  (re-exports)

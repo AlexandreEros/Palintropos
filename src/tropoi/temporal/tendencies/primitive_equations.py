@@ -29,7 +29,7 @@ column continuity with structural top/bottom impermeability.
 State layout: ONE complex (3K+1, l_max+1, l_max+1) coefficient stack,
 rows ``[zeta_1..zeta_K, delta_1..delta_K, T_1..T_K, ln p_s]`` top to
 bottom, so RK4 stage arithmetic will be the plain array expression
-``run.engine.rk4_step_array`` already implements. Coefficients follow the
+``temporal.integration.rk4_step_array`` already implements. Coefficients follow the
 repository convention: complex orthonormal spherical harmonics, axis 0 =
 degree l, axis 1 = order m >= 0; a constant field c has a_{00} =
 c * sqrt(4*pi).
@@ -79,7 +79,7 @@ class PrimitiveEquationsModel:
     hydrostatic and continuity column operators).
 
     The Helmholtz/derivative helpers intentionally mirror
-    ``physics.shallow_water.ShallowWaterModel`` (same conventions, same
+    ``temporal.tendencies.shallow_water.ShallowWaterModel`` (same conventions, same
     metric identities) rather than importing them: the SWE core is frozen
     by its A/B guarantees and must not grow shared-code coupling in this
     milestone.
@@ -244,7 +244,7 @@ class PrimitiveEquationsModel:
         Computes G_k = delta_k + V_k . grad(ln p_s) pointwise per level
         (the same metric identity the SWE advection uses:
         u.grad(q) = (u q_lam - v q_snt)/cos(lat)), then the column
-        operators of ``physics.sigma_coordinate``:
+        operators of ``spatial.sigma_coordinate``:
 
         * ``dlnps_dt``       d(ln p_s)/dt grid field (s^-1)
         * ``sigma_dot``      (nlev+1, ...) interface sigma-velocity, top
@@ -642,7 +642,7 @@ class PrimitiveEquationsModel:
         ``[zeta_1..zeta_K, delta_1..delta_K, T_1..T_K, ln p_s]``.
 
         Takes and returns raw coefficient stacks so it plugs directly
-        into ``run.engine.rk4_step_array`` (use ``validate_state`` wrapped
+        into ``temporal.integration.rk4_step_array`` (use ``validate_state`` wrapped
         as the ``stage_validator``, as ``run/swe/runner.py`` does).
 
         All nonlinear terms are evaluated on the backend product sampling

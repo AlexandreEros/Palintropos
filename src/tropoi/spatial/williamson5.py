@@ -13,7 +13,7 @@ import math
 # Williamson et al. (1992) test case 5: canonical constants.
 #
 # This module stays import-light, so the cone geometry constants are
-# duplicated from physics/topography.py (kept in sync by a test). The
+# duplicated from spatial/terrain/topography.py (kept in sync by a test). The
 # fluid/planet constants are the published case-5 values. Case 5 prescribes
 # the case-2 field as the FREE SURFACE, eta = h0 - (C/g) sin^2(lat), and
 # the fluid-layer depth as eta - h_s (Williamson et al. 1992, Sect. 2 +

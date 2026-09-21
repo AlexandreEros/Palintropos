@@ -15,7 +15,7 @@ Phi0: the perturbation monopole ``phi_00`` is pinned to zero, exactly like
 the BVE pins circulation, so the global-mean thickness is exactly H at all
 times. Over a flat bottom the thickness geopotential and the free-surface
 geopotential coincide; with bottom topography they differ by the fixed
-surface geopotential ``phi_s = g * h_s`` (see ``physics/topography.py``):
+surface geopotential ``phi_s = g * h_s`` (see ``spatial/terrain/topography.py``):
 
     free-surface geopotential = Phi0 + phi + phi_s
 
@@ -116,7 +116,7 @@ class ShallowWaterModel:
         topography the phi component damps the free-surface anomaly
         ``phi + phi_s'`` (module docstring), preserving the resting state.
     topography : Topography, optional
-        Fixed bottom topography (``physics/topography.py``), band-limited
+        Fixed bottom topography (``spatial/terrain/topography.py``), band-limited
         at the model truncation. ``None`` (default) and an explicitly flat
         topography are bit-for-bit identical: the topographic term is only
         ever formed when at least one elevation coefficient is nonzero.
@@ -304,7 +304,7 @@ class ShallowWaterModel:
         """d/dt of the (3, l_max+1, l_max+1) prognostic stack.
 
         Takes and returns the raw coefficient stack (not the dataclass) so it
-        plugs directly into ``run.engine.rk4_step_array``.
+        plugs directly into ``temporal.integration.rk4_step_array``.
         """
         zeta_c = coeffs[ZETA]
         delta_c = coeffs[DELTA]
@@ -428,7 +428,7 @@ class ShallowWaterModel:
 
         This — not sqrt(phi) of the perturbation — is the model's
         characteristic-speed estimate handed to the model-independent
-        adaptive-timestep controller (run.engine.advective_cfl_timestep).
+        adaptive-timestep controller (temporal.integration.advective_cfl_timestep).
         The gravity-wave term uses the total-geopotential maximum over the
         state AND product samplings (the same envelope validate_state
         checks), and the sum-of-maxima form is conservative. The maximum is

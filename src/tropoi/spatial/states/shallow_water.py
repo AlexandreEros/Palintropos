@@ -27,7 +27,7 @@ class ShallowWaterState:
 
     Index 0 = zeta, 1 = delta, 2 = phi (PERTURBATION geopotential). Keeping
     the three prognostics in a single array makes the RK4 stage arithmetic a
-    plain array expression (see ``run.engine.rk4_step_array``).
+    plain array expression (see ``temporal.integration.rk4_step_array``).
     """
 
     coeffs: cp.ndarray

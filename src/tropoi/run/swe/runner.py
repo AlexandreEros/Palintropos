@@ -1,7 +1,7 @@
 """Shallow-water run driver: integrate, validate, persist, plot.
 
 Mirrors ``run/bve/runner.py`` on top of the shared integration engine
-(``run.engine``): the scheduler owns the step/store contract, the ceiling is
+(``temporal.integration``): the scheduler owns the step/store contract, the ceiling is
 the state-adaptive advective+gravity-wave CFL (recomputed from every
 accepted state's ``max_char_speed_ms``), and diagnostics rows are recorded
 after every accepted step. After each accepted step the state is validated

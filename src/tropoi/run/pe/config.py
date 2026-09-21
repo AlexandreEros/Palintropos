@@ -64,7 +64,7 @@ from tropoi.run.swe.config import (DEFAULT_GRAVITY, DEFAULT_MOUNTAIN_HEIGHT_M,
 PE_PLOT_TYPES = ("diagnostics", "summary")
 _PE_PLOTS_REQUIRING_SNAPSHOTS = ("summary",)
 
-#: Dry-air constants mirrored from ``physics.primitive_equations`` (imported
+#: Dry-air constants mirrored from ``temporal.tendencies.primitive_equations`` (imported
 #: literally here, not from that module, so the config stays CuPy-free). The
 #: model rejects a run whose r_dry/cp_dry disagree with these unless the user
 #: deliberately overrides them; the values are the documented dry defaults.
@@ -77,7 +77,7 @@ DEFAULT_TEMPERATURE = 260.0     # K
 DEFAULT_SURFACE_PRESSURE = 101325.0  # Pa
 
 #: Default thermal-wave perturbation amplitude: the spectral coefficient
-#: placed on the degree-2 mode (see run.pe.initial_conditions). ~1 K keeps
+#: placed on the degree-2 mode (see spatial.initialization.pe). ~1 K keeps
 #: the perturbed temperature positive everywhere.
 DEFAULT_THERMAL_AMPLITUDE = 1.0  # K
 
@@ -91,7 +91,7 @@ DEFAULT_N_SNAPSHOTS = 3
 _MAX_T_END_SECONDS = 1e12
 
 #: Available initial-condition presets (must match
-#: run.pe.initial_conditions.PE_INITIAL_CONDITIONS; kept as a plain mapping
+#: spatial.initialization.pe.PE_INITIAL_CONDITIONS; kept as a plain mapping
 #: here because that module imports CuPy at import time).
 PE_SCENARIOS = {
     "isothermal_rest": "Exactly resting, horizontally uniform isothermal "
@@ -105,7 +105,7 @@ PE_SCENARIOS = {
 }
 
 #: Available surface-topography presets for the PE solver. Same vocabulary
-#: and meaning as the shallow-water config (and physics/topography.
+#: and meaning as the shallow-water config (and spatial/terrain/topography.
 #: TOPOGRAPHY_PRESETS): terrain is a fixed band-limited surface *elevation*
 #: h_s in metres; the PE model consumes the derived surface geopotential
 #: Phi_s = gravity * h_s (m^2/s^2), which enters the hydrostatic

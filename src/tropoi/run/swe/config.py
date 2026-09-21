@@ -8,7 +8,7 @@ files. Import-light (stdlib only) so ``--help`` and validation never touch
 CuPy.
 
 Snapshot semantics are shared with the BVE (count mode canonical, interval
-mode supported); the schedule machinery lives in ``run.engine``.
+mode supported); the schedule machinery lives in ``temporal.integration``.
 
 Topography config schema (additive)
 -----------------------------------
@@ -83,7 +83,7 @@ SWE_SCENARIOS = {
 
 
 #: Available bottom-topography presets (must match
-#: physics/topography.TOPOGRAPHY_PRESETS; duplicated here because that
+#: spatial/terrain/topography.TOPOGRAPHY_PRESETS; duplicated here because that
 #: module imports CuPy at import time).
 SWE_TOPOGRAPHIES = {
     "flat": "Flat bottom (canonical default; identical to the historical "
@@ -99,9 +99,9 @@ DEFAULT_MOUNTAIN_LAT_DEG = 30.0
 DEFAULT_MOUNTAIN_LON_DEG = 90.0
 DEFAULT_MOUNTAIN_WIDTH_DEG = 20.0
 
-#: Physical sanity cap shared with physics/topography.py. This module stays
+#: Physical sanity cap shared with spatial/terrain/topography.py. This module stays
 #: import-light so CLI validation and --help never import CuPy; keep the plain
-#: numeric constant synchronized with physics.topography.MAX_MOUNTAIN_HEIGHT_M.
+#: numeric constant synchronized with spatial.terrain.topography.MAX_MOUNTAIN_HEIGHT_M.
 MAX_MOUNTAIN_HEIGHT_M = 1.0e5
 
 _MOUNTAIN_PARAM_FIELDS = ("mountain_height_m", "mountain_lat_deg",

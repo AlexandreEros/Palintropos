@@ -16,7 +16,7 @@ model's own transforms — no interpolation, no per-step host-device traffic.
 :meth:`Topography.surface_geopotential_lm` returns ``g * elevation_lm``,
 which is byte-layout compatible with the ``surface_geopotential_lm``
 argument the primitive-equations core already reserves
-(``physics/primitive_equations.py``). No PE coupling exists yet; this only
+(``temporal/tendencies/primitive_equations.py``). No PE coupling exists yet; this only
 means a later PE integration is a data change, not a schema change.
 
 Presets
