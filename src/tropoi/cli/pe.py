@@ -181,7 +181,7 @@ def _execute_solver(cfg: "PERunConfig", run_dir, run_config: dict) -> None:
     """Heavy numerical portion: build planet + PE model, drive the solver."""
     from tropoi.run.bve.io import (RUN_STATUS_RUNNING,
                                               write_run_manifest)
-    from tropoi.run.pe.initial_conditions import make_pe_ic
+    from tropoi.spatial.initialization.pe import make_pe_ic
     from tropoi.run.pe.runner import run_pe
     from tropoi.representation.archive.schema import provenance_blocks
 

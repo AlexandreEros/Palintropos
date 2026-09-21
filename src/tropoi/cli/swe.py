@@ -203,7 +203,7 @@ def _execute_solver(cfg: "SWERunConfig", run_dir, run_config: dict) -> None:
     """Heavy numerical portion of a run: build planet + model, drive the solver."""
     from tropoi.run.bve.io import (RUN_STATUS_RUNNING,
                                               write_run_manifest)
-    from tropoi.run.swe.initial_conditions import make_swe_ic
+    from tropoi.spatial.initialization.swe import make_swe_ic
     from tropoi.run.swe.runner import run_swe
     from tropoi.representation.archive.schema import provenance_blocks
 

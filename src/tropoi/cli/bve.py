@@ -159,7 +159,7 @@ def _execute_solver(cfg: "BVERunConfig", run_dir, run_config: dict) -> None:
     """
     from tropoi.run.bve.io import RUN_STATUS_RUNNING, write_run_manifest
     from tropoi.run.bve.runner import run_bve
-    from tropoi.run.bve.initial_conditions import make_ic
+    from tropoi.spatial.initialization.bve import make_ic
     from tropoi.representation.archive.schema import provenance_blocks
 
     out_dir = run_dir.path
