@@ -157,7 +157,7 @@ def _execute_solver(cfg: "BVERunConfig", run_dir, run_config: dict) -> None:
     without CUDA — tests replace this with a stub that succeeds or raises.
     Imports CuPy/matplotlib only here, after all user-error validation.
     """
-    from tropoi.run.bve.io import RUN_STATUS_RUNNING, write_run_manifest
+    from tropoi.representation.archive.writer import RUN_STATUS_RUNNING, write_run_manifest
     from tropoi.run.bve.runner import run_bve
     from tropoi.spatial.initialization.bve import make_ic
     from tropoi.representation.archive.schema import provenance_blocks

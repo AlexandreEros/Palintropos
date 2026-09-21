@@ -179,7 +179,7 @@ def build_pe_model(run_config: Mapping):
 
 def _execute_solver(cfg: "PERunConfig", run_dir, run_config: dict) -> None:
     """Heavy numerical portion: build planet + PE model, drive the solver."""
-    from tropoi.run.bve.io import (RUN_STATUS_RUNNING,
+    from tropoi.representation.archive.writer import (RUN_STATUS_RUNNING,
                                               write_run_manifest)
     from tropoi.spatial.initialization.pe import make_pe_ic
     from tropoi.run.pe.runner import run_pe

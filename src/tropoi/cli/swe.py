@@ -201,7 +201,7 @@ def _clean_overwrite_artifacts(out_dir: pathlib.Path) -> None:
 
 def _execute_solver(cfg: "SWERunConfig", run_dir, run_config: dict) -> None:
     """Heavy numerical portion of a run: build planet + model, drive the solver."""
-    from tropoi.run.bve.io import (RUN_STATUS_RUNNING,
+    from tropoi.representation.archive.writer import (RUN_STATUS_RUNNING,
                                               write_run_manifest)
     from tropoi.spatial.initialization.swe import make_swe_ic
     from tropoi.run.swe.runner import run_swe

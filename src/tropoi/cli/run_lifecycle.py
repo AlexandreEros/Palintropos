@@ -89,7 +89,7 @@ def execute_with_provenance(cfg, *,
     run configuration; None writes a manifest without them (legacy
     callers). The blocks never touch ``run_config`` or the run id.
     """
-    from tropoi.run.bve.io import (
+    from tropoi.representation.archive.writer import (
         RUN_STATUS_COMPLETED, RUN_STATUS_FAILED, RUN_STATUS_RUNNING,
         RunProvenanceError, atomic_write_text, create_run_dir, failure_record,
         update_manifest_status, write_run_manifest)

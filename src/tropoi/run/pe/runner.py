@@ -49,7 +49,7 @@ from tropoi.temporal.tendencies.primitive_equations import (
     PrimitiveEquationsModel, PrimitiveEquationsState)
 from tropoi.temporal.integration import IntegrationScheduler, rk4_step_array
 from tropoi.run.pe.config import PE_PLOT_TYPES
-from tropoi.run.pe.diagnostics import PEDiagnosticsRecorder, plot_pe_diagnostics
+from tropoi.representation.diagnostics.pe import PEDiagnosticsRecorder, plot_pe_diagnostics
 
 
 def run_pe(model: PrimitiveEquationsModel,
