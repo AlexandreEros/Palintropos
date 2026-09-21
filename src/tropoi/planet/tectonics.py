@@ -8,8 +8,8 @@ import cupy as cp
 # for type hints only
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from tropoi.numerics import GeodesicSphericalHarmonics
-    from tropoi.numerics.spectral_operators import SpectralOperators
+    from tropoi.spatial.transforms.optimized_geodesic_sh import GeodesicSphericalHarmonics
+    from tropoi.spatial.operators.spectral_operators import SpectralOperators
 
 
 @dataclass

@@ -43,9 +43,12 @@ package-dir = {"" = "src"}
 where = ["src"]
 include = ["tropoi*"]
 
-# Make sure CUDA kernels under tropoi/numerics/cuda/ are included
+# Make sure the CUDA kernel sources are included. They live beside the
+# transforms that compile them (tropoi/spatial/transforms/cuda/) and are
+# located at run time through importlib.resources, so an installed
+# distribution needs no source checkout.
 [tool.setuptools.package-data]
-"tropoi.numerics.cuda" = ["*.cu"]
+"tropoi.spatial.transforms.cuda" = ["*.cu"]
 
 [tool.deptry]
 # Treat the "dev" PEP 621 optional-dependency group as development-only.

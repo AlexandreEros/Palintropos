@@ -8,8 +8,8 @@ from dataclasses import dataclass
 # Import as TYPE_CHECKING to avoid circular imports at runtime if needed
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    # from tropoi.numerics.spherical_harmonics import LatLonSphericalHarmonics
-    from tropoi.numerics.optimized_geodesic_sh import GeodesicSphericalHarmonics
+    # from tropoi.spatial.transforms.spherical_harmonics import LatLonSphericalHarmonics
+    from tropoi.spatial.transforms.optimized_geodesic_sh import GeodesicSphericalHarmonics
 
 
 @dataclass

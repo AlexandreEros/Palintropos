@@ -8,12 +8,10 @@ from tropoi.viz.complex_encoding import phase_magnitude_hsv
 from tropoi.viz.fields import SphericalHarmonicField
 from tropoi.viz.normalization import NormalizationPolicy
 from tropoi.planet import Planet
-from tropoi.numerics import (
-    SpectralOperators,
-    GridGeometryBase,
-    LatLonGridGeometry,
-    geodesic_to_latlon_grid,
-)
+from tropoi.spatial.operators.spectral_operators import SpectralOperators
+from tropoi.spatial.grids.grid_base import GridGeometry as GridGeometryBase
+from tropoi.spatial.grids.grid import LatLonGridGeometry
+from tropoi.spatial.grids.grid_interpolation import geodesic_to_latlon_grid
 
 class PlanetViewer:
     def __init__(self, planet: Planet):

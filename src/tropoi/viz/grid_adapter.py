@@ -8,7 +8,7 @@ import numpy as np
 from tropoi.viz.fields import ScalarGridField
 
 if TYPE_CHECKING:
-    from tropoi.numerics import LatLonGridGeometry
+    from tropoi.spatial.grids.grid import LatLonGridGeometry
 
 
 def _host(values) -> np.ndarray:
@@ -22,12 +22,13 @@ def map_to_uniform_latlon(values, source_grid, *,
                           ) -> "tuple[LatLonGridGeometry, np.ndarray]":
     """Map any repository state sampling to the standard 91x181 view grid.
 
-    The grid/interpolation machinery (``tropoi.numerics``, which imports
+    The grid/interpolation machinery (``tropoi.spatial.grids``, which imports
     CuPy) is imported here, on use, so host-only compositions that never
     map a field (coefficient-space frames) keep this module importable
     without CUDA.
     """
-    from tropoi.numerics import LatLonGridGeometry, geodesic_to_latlon_grid
+    from tropoi.spatial.grids.grid import LatLonGridGeometry
+    from tropoi.spatial.grids.grid_interpolation import geodesic_to_latlon_grid
 
     target = target_grid or LatLonGridGeometry.create((91, 181))
     values = _host(values)

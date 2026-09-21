@@ -5,7 +5,8 @@ import cupy as cp
 
 from tropoi.viz.maps import plot_velocity_streamlines
 from tropoi.planet import Planet
-from tropoi.numerics import LatLonGridGeometry, geodesic_to_latlon_grid
+from tropoi.spatial.grids.grid import LatLonGridGeometry
+from tropoi.spatial.grids.grid_interpolation import geodesic_to_latlon_grid
 
 class VorticityViewer:
     @staticmethod
