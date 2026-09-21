@@ -23,7 +23,7 @@ from tropoi.temporal.integration import (IntegrationScheduler, advective_cfl_tim
                       integrate, rk4_step_array, validate_snapshot_schedule)
 from tropoi.run.swe.config import SWE_PLOT_TYPES
 from tropoi.representation.diagnostics.swe import SWEDiagnosticsRecorder, plot_swe_diagnostics
-from tropoi.run.swe.visualization import render_swe_snapshots, render_swe_summary
+from tropoi.representation.visual.swe import render_swe_snapshots, render_swe_summary
 
 
 def run_swe(model: ShallowWaterModel,

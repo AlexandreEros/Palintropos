@@ -164,8 +164,8 @@ def run_pe(model: PrimitiveEquationsModel,
         # lifecycle marks the run failed and never publishes it as complete.
         # The single-level summary and the per-snapshot upper/lower figures are
         # rendered together from the just-persisted coefficient stack.
-        from tropoi.run.pe.visualization import render_pe_summary
-        from tropoi.run.pe.snapshot_visualization import render_pe_snapshots
+        from tropoi.representation.visual.pe import render_pe_summary
+        from tropoi.representation.visual.pe_snapshots import render_pe_snapshots
         render_pe_summary(model, out_dir, metadata=figure_metadata)
         render_pe_snapshots(model, out_dir, metadata=figure_metadata,
                             scenario=scenario)

@@ -63,7 +63,7 @@ def run(args: argparse.Namespace) -> int:
     from tropoi.spatial.planet import Planet
     from tropoi.spatial.terrain.terrain_spectral import SpectralTerrainParams
     from tropoi.spatial.terrain.tectonics import TectonicParams
-    from tropoi.viz import PlanetViewer
+    from tropoi.representation.visual.planet_viewer import PlanetViewer
 
     params = PlanetaryParameters.from_earth_like(
         day_hours=args.day_hours,

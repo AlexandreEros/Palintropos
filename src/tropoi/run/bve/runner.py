@@ -13,10 +13,10 @@ from tropoi.run.bve.config import (PLOT_TYPES, IntegrationScheduler, advective_c
 # is kept as this module's historical name for it (tests import it here).
 from tropoi.temporal.integration import integrate as _integrate
 from tropoi.representation.diagnostics.bve import DiagnosticsRecorder, plot_diagnostics
-from tropoi.run.bve.visualization import (BVE_SNAPSHOT_TIMES_FILENAME,
+from tropoi.representation.visual.bve import (BVE_SNAPSHOT_TIMES_FILENAME,
                             render_bve_snapshots)
-from tropoi.viz.vorticity_viewer import VorticityViewer
-from tropoi.viz.renderers import get_default_renderer
+from tropoi.representation.visual.vorticity_viewer import VorticityViewer
+from tropoi.representation.visual.renderers import get_default_renderer
 
 
 def _empty_coeffs_stack(zeta0_lm: cp.ndarray) -> np.ndarray:
