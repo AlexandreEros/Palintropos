@@ -158,6 +158,7 @@ class StateSchema:
                 raise SchemaError(
                     f"fields cover {covered} of the {rows} stored row(s); "
                     "the row layout is ambiguous")
+        self._check_canonical_layout()
         levelled = [spec for spec in self.fields if spec.levels]
         if levelled or self.nlev is not None or self.vertical is not None:
             if self.nlev is None or self.vertical is None:
@@ -193,6 +194,36 @@ class StateSchema:
                 raise SchemaError(
                     "full levels are not the interface midpoints: "
                     f"{full} vs {expected}")
+
+    def _check_canonical_layout(self) -> None:
+        """Each named field must map to the rows the solver/renderer use.
+
+        The renderers and cores interpret the packed array with ONE fixed
+        layout per solver (run/*/runner.py); a manifest describing a
+        structurally valid but permuted mapping would make typed access
+        disagree with plotting, so it is refused. Field-list ordering is
+        free; names, row ranges and level axes are not.
+        """
+        if self.storage_axes != STORAGE_AXES[self.solver]:
+            raise UnsupportedConventionError(
+                f"storage_axes {list(self.storage_axes)} differ from the "
+                f"persisted {list(STORAGE_AXES[self.solver])} for solver "
+                f"{self.solver!r}; axis permutations are not supported")
+        canonical = canonical_field_layout(self.solver, self.nlev)
+        declared = {spec.name: (spec.rows, spec.levels) for spec in self.fields}
+        if set(declared) != set(canonical):
+            raise SchemaError(
+                f"solver {self.solver!r} stores fields "
+                f"{sorted(canonical)}, but the schema declares "
+                f"{sorted(declared)}")
+        for name, (rows, levels) in canonical.items():
+            if declared[name] != (rows, levels):
+                raise SchemaError(
+                    f"field {name!r} must map to rows {rows} "
+                    f"({'levelled' if levels else 'level-free'}) for solver "
+                    f"{self.solver!r}, but the schema declares rows "
+                    f"{declared[name][0]} "
+                    f"({'levelled' if declared[name][1] else 'level-free'})")
 
     @property
     def field_names(self) -> tuple[str, ...]:
@@ -276,6 +307,22 @@ class StateSchema:
                 raise UnsupportedConventionError(
                     f"state_schema {key} {declared!r} is not supported; this "
                     f"reader interprets {supported!r} only")
+        reality = data.get("reality", REALITY_CONVENTION)
+        if reality != REALITY_CONVENTION:
+            raise UnsupportedConventionError(
+                f"state_schema reality convention {reality!r} is not "
+                f"supported; this reader assumes {REALITY_CONVENTION!r}")
+        support = data.get("support") or {}
+        expected_cut = product_truncation_cut(l_max)
+        if "product_truncation_cut" in support and                 int(support["product_truncation_cut"]) != expected_cut:
+            raise SchemaError(
+                f"state_schema support declares product_truncation_cut="
+                f"{support['product_truncation_cut']} but l_max={l_max} "
+                f"implies {expected_cut}")
+        if "triangle" in support and                 support["triangle"] != "0 <= m <= l <= l_max":
+            raise UnsupportedConventionError(
+                f"state_schema support triangle {support['triangle']!r} is "
+                "not the stored '0 <= m <= l <= l_max' extent")
         rows = data.get("rows")
         return cls(
             solver=solver, fields=fields, l_max=l_max,
@@ -297,6 +344,28 @@ class StateSchema:
 # ---------------------------------------------------------------------------
 # Field definitions (scientific meanings; see the physics module docstrings)
 # ---------------------------------------------------------------------------
+
+def canonical_field_layout(solver: str, nlev: int | None
+                           ) -> dict[str, tuple[tuple[int, int] | None, bool]]:
+    """``name -> (rows, levelled)`` as persisted by each runner.
+
+    BVE: one whole-frame ``zeta``; SWE: ``[zeta, delta, phi]`` rows 0..2;
+    PE: ``[zeta_1..K, delta_1..K, T_1..K, ln_ps]`` for ``K = nlev``.
+    """
+    if solver == "bve":
+        return {"zeta": (None, False)}
+    if solver == "swe":
+        return {"zeta": ((0, 1), False), "delta": ((1, 2), False),
+                "phi": ((2, 3), False)}
+    if solver == "pe":
+        if nlev is None:
+            raise SchemaError("a PE schema needs nlev for its row layout")
+        K = int(nlev)
+        return {"zeta": ((0, K), True), "delta": ((K, 2 * K), True),
+                "temperature": ((2 * K, 3 * K), True),
+                "ln_ps": ((3 * K, 3 * K + 1), False)}
+    raise SchemaError(f"unknown solver {solver!r}")
+
 
 def _bve_fields() -> tuple[FieldSpec, ...]:
     return (FieldSpec(
@@ -659,6 +728,7 @@ __all__ = [
     "TIME_FILES",
     "UnknownSchemaVersionError",
     "UnsupportedConventionError",
+    "canonical_field_layout",
     "diagnostic_definitions_for",
     "high_l_enstrophy_fraction_definition",
     "infer_solver",

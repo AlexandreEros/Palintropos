@@ -163,7 +163,7 @@ def test_inconsistent_pe_vertical_coordinates_are_refused(vertical, message):
 
 
 def test_pe_nlev_must_match_levelled_fields_and_vertical_block():
-    with pytest.raises(SchemaError, match="declares nlev=4"):
+    with pytest.raises(SchemaError, match="declares nlev=4|must map to rows"):
         StateSchema.from_manifest_dict(_block("pe", nlev=4))
     with pytest.raises(SchemaError, match="require both nlev"):
         StateSchema.from_manifest_dict(_block("pe", vertical=None))
@@ -277,3 +277,90 @@ def test_field_access_is_a_plain_view_and_validate_is_explicit(tmp_path):
     assert view.coeffs[0, 2] == 1.0
     with pytest.raises(ValueError, match="padding"):
         view.validate()
+
+
+# ---------------------------------------------------------------------------
+# 4. Canonical solver layout: permutations and axis/convention contradictions
+# ---------------------------------------------------------------------------
+
+def _permuted_swe_block() -> dict:
+    block = _block("swe")
+    for spec in block["fields"]:
+        spec["rows"] = {"zeta": [1, 2], "delta": [0, 1], "phi": [2, 3]}[spec["name"]]
+    return block
+
+
+def _permuted_pe_block() -> dict:
+    block = _block("pe")
+    K = NLEV
+    for spec in block["fields"]:
+        spec["rows"] = {"zeta": [K, 2 * K], "delta": [2 * K, 3 * K],
+                        "temperature": [0, K],
+                        "ln_ps": [3 * K, 3 * K + 1]}[spec["name"]]
+    return block
+
+
+@pytest.mark.parametrize("solver,block,message", [
+    ("swe", _permuted_swe_block, "field 'zeta' must map to rows"),
+    ("pe", _permuted_pe_block, "field 'zeta' must map to rows"),
+    ("swe", lambda: _block("swe", storage_axes=["time", "l", "m", "field"]),
+     "storage_axes"),
+    ("pe", lambda: _block("pe", storage_axes=["time", "l", "m", "row"]),
+     "storage_axes"),
+    ("bve", lambda: _block("bve", storage_axes=["time", "m", "l"]),
+     "storage_axes"),
+    ("swe", lambda: _block("swe", reality="complex field, m in [-l, l]"),
+     "reality"),
+    ("swe", lambda: _block("swe", support={"l_max": L_MAX,
+                                           "product_truncation_cut": 3,
+                                           "triangle": "0 <= m <= l <= l_max"}),
+     "product_truncation_cut"),
+    ("swe", lambda: _block("swe", support={"l_max": L_MAX,
+                                           "product_truncation_cut": 2,
+                                           "triangle": "full square"}),
+     "triangle"),
+])
+def test_noncanonical_layouts_are_refused_everywhere(tmp_path, capsys, solver,
+                                                     block, message):
+    block = block()
+    with pytest.raises(SchemaError, match=message):
+        StateSchema.from_manifest_dict(block)
+    root = _capsule(tmp_path / solver, solver, schema_block=block)
+    # Ordinary metadata inspection still works.
+    sim = open_simulation(root)
+    assert sim.metadata["solver"] == solver and len(sim) == 2
+    assert sim.metadata["provenance"]["schema"]["source"] == "unavailable"
+    assert main(["inspect", str(root)]) == 0
+    assert "state fields" not in capsys.readouterr().out
+    # Typed access, the CLI snapshot view, and plotting refuse identically.
+    with pytest.raises(SchemaError, match=message):
+        sim[0].state
+    assert main(["inspect", str(root), "--snapshot", "0"]) == 2
+    assert message.split("'")[0].strip() in capsys.readouterr().err
+    with pytest.raises(SchemaError, match=message):
+        sim[0].plot(tmp_path / "x.png")
+    with pytest.raises(SchemaError, match=message):
+        sim[0].plot(tmp_path / "x.png", representation="spectral")
+    assert not (tmp_path / "x.png").exists()
+
+
+def test_field_list_order_is_free_but_mapping_is_fixed():
+    block = _block("pe")
+    block["fields"].reverse()                     # cosmetic reordering
+    schema = StateSchema.from_manifest_dict(block)
+    assert schema.field_names == ("ln_ps", "temperature", "delta", "zeta")
+    assert dict((s.name, s.rows) for s in schema.fields)["temperature"] == \
+        (2 * NLEV, 3 * NLEV)
+    # Renaming a field breaks the canonical name set.
+    block = _block("swe")
+    block["fields"][2]["name"] = "geopotential"
+    with pytest.raises(SchemaError, match="stores fields"):
+        StateSchema.from_manifest_dict(block)
+
+
+def test_canonical_layout_matches_the_written_schemas():
+    from tropoi.representation.archive.schema import canonical_field_layout
+    for solver in ("bve", "swe", "pe"):
+        schema = state_schema_for(solver, _config(solver))
+        assert {s.name: (s.rows, s.levels) for s in schema.fields} == \
+            canonical_field_layout(solver, schema.nlev)
