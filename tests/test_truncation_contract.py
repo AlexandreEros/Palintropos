@@ -45,7 +45,14 @@ def test_cut_never_exceeds_capacity_and_is_monotone():
 
 def test_support_module_has_no_package_dependencies():
     import tropoi.support as support
-    assert support.__all__ == ["product_truncation_cut"]
+    import tropoi.spatial.truncation as truncation
+    assert support is truncation              # legacy path aliases the module
+    # The cut plus the preset support guards relocated from the SWE/PE
+    # configuration modules (which re-export the same objects).
+    assert support.__all__ == ["product_truncation_cut", "SWE_SCENARIO_SUPPORT",
+                               "require_scenario_support",
+                               "THERMAL_WAVE_MIN_RETAINED_DEGREE",
+                               "require_thermal_wave_support"]
     # Neutral module: no imports of tropoi subpackages, numpy, cupy, or
     # matplotlib (its import must stay CPU-safe; see tests/cli).
     import inspect

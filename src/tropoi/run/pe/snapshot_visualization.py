@@ -50,7 +50,7 @@ import pathlib
 
 import numpy as np
 
-from tropoi.physics.sigma_coordinate import SigmaGrid
+from tropoi.spatial.sigma_coordinate import SigmaGrid
 
 
 # The per-snapshot product is a capsule-root ``snapshots/`` directory with one

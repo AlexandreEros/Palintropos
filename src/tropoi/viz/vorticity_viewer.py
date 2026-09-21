@@ -4,7 +4,7 @@ import numpy as np
 import cupy as cp
 
 from tropoi.viz.maps import plot_velocity_streamlines
-from tropoi.planet import Planet
+from tropoi.spatial.planet import Planet
 from tropoi.spatial.grids.grid import LatLonGridGeometry
 from tropoi.spatial.grids.grid_interpolation import geodesic_to_latlon_grid
 

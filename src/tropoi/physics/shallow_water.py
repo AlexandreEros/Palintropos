@@ -88,9 +88,9 @@ from dataclasses import dataclass
 
 import cupy as cp
 
-from tropoi.physics.topography import Topography
-from tropoi.planet import Planet
-from tropoi.support import product_truncation_cut
+from tropoi.spatial.terrain.topography import Topography
+from tropoi.spatial.planet import Planet
+from tropoi.spatial.truncation import product_truncation_cut
 
 #: Standard gravity used by the Williamson et al. (1992) test suite (m/s^2).
 WILLIAMSON_GRAVITY = 9.80616

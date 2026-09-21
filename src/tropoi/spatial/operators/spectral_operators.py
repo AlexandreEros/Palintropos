@@ -4,7 +4,7 @@ from tropoi.spatial.operators.differential_operators_spherical import Differenti
 from tropoi.spatial.grids.geodesic_grid import GeodesicGridGeometry
 # from .spherical_harmonics import LatLonSphericalHarmonics as SphericalHarmonics
 from tropoi.spatial.transforms.optimized_geodesic_sh import GeodesicSphericalHarmonics
-from tropoi.support import product_truncation_cut
+from tropoi.spatial.truncation import product_truncation_cut
 
 # class SpectralOperators:
 #     def __init__(self, sh, radius: float):

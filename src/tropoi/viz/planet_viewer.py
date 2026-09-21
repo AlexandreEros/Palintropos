@@ -7,7 +7,7 @@ from matplotlib.colors import hsv_to_rgb
 from tropoi.viz.complex_encoding import phase_magnitude_hsv
 from tropoi.viz.fields import SphericalHarmonicField
 from tropoi.viz.normalization import NormalizationPolicy
-from tropoi.planet import Planet
+from tropoi.spatial.planet import Planet
 from tropoi.spatial.operators.spectral_operators import SpectralOperators
 from tropoi.spatial.grids.grid_base import GridGeometry as GridGeometryBase
 from tropoi.spatial.grids.grid import LatLonGridGeometry

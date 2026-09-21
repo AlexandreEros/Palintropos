@@ -133,7 +133,8 @@ def build_planet(run_config: Mapping):
     backend and the ``Planet.generate`` default that existed then.
     Imports CuPy through Planet; call only after validation.
     """
-    from tropoi.planet import Planet, PlanetaryParameters
+    from tropoi.spatial.environment import PlanetaryParameters
+    from tropoi.spatial.planet import Planet
 
     return Planet.generate(
         params=PlanetaryParameters.from_earth_like(

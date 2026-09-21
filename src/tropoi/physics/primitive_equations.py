@@ -41,9 +41,9 @@ from dataclasses import dataclass
 
 import cupy as cp
 
-from tropoi.planet import Planet
-from tropoi.support import product_truncation_cut as _product_truncation_cut
-from tropoi.physics.sigma_coordinate import (SigmaGrid, column_energy_conversion,
+from tropoi.spatial.planet import Planet
+from tropoi.spatial.truncation import product_truncation_cut as _product_truncation_cut
+from tropoi.spatial.sigma_coordinate import (SigmaGrid, column_energy_conversion,
                                column_mass_tendency, column_pressure_work,
                                hydrostatic_geopotential,
                                interface_sigma_dot, layer_mass_residual,
@@ -60,7 +60,7 @@ PROGNOSTICS = ("zeta", "delta", "temperature", "ln_ps")
 
 
 #: The 2/3-rule truncation degree for analyzed nonlinear products.
-#: Re-exported from :mod:`tropoi.support` (the single production
+#: Re-exported from :mod:`tropoi.spatial.truncation` (the single production
 #: definition, shared with the spectral operators, the shallow-water core
 #: and the BVE diagnostic band) and kept at this historical import path:
 #: the model's per-product truncation and the topography coupling (surface
@@ -168,7 +168,7 @@ class PrimitiveEquationsModel:
     Owns the horizontal machinery (per-level Helmholtz velocity
     reconstruction and spectral derivatives, on the same backend seams the
     BVE/SWE use) and the vertical machinery (a validated
-    :class:`~tropoi.physics.sigma_coordinate.SigmaGrid` plus the
+    :class:`~tropoi.spatial.sigma_coordinate.SigmaGrid` plus the
     hydrostatic and continuity column operators).
 
     The Helmholtz/derivative helpers intentionally mirror

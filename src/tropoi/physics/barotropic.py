@@ -3,7 +3,7 @@ from dataclasses import dataclass
 
 import cupy as cp
 
-from tropoi.planet import Planet
+from tropoi.spatial.planet import Planet
 
 @dataclass
 class BarotropicState:

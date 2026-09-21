@@ -47,7 +47,7 @@ def _w5_planet_params(run_config):
     reproduces Omega = 7.292e-5 exactly (2*pi/(day_hours*3600) round-trips
     bitwise; pinned by tests).
     """
-    from tropoi.planet import PlanetaryParameters
+    from tropoi.spatial.environment import PlanetaryParameters
     from tropoi.run.swe.config import W5_RADIUS_M
 
     # Accept the resolved SWERunConfig (historical callers/tests) as well as
@@ -73,9 +73,10 @@ def build_swe_model(run_config: Mapping):
     reconstructed deterministically from the same keys the scientific
     hash covers. Imports CuPy; call only after validation.
     """
-    from tropoi.planet import Planet, PlanetaryParameters
+    from tropoi.spatial.environment import PlanetaryParameters
+    from tropoi.spatial.planet import Planet
     from tropoi.physics.shallow_water import ShallowWaterModel
-    from tropoi.physics.topography import Topography
+    from tropoi.spatial.terrain.topography import Topography
 
     if run_config.get("scenario") == "williamson5":
         # Benchmark planets are exact ideal spheres (see _w5_planet_params).

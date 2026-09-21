@@ -22,12 +22,13 @@ ADDITIVE_CONFIG_KEYS = {"snapshot_mode", "n_snapshots", "snapshot_times", "plots
 
 #: Modules whose presence in a fresh interpreter proves CLI help/list/inspect
 #: touched CUDA or matplotlib. All of these must stay unimported for the
-#: CPU-safety subprocess tests to pass.
+#: CPU-safety subprocess tests to pass. Legacy module paths are aliases, so
+#: heavy modules are listed under their canonical names as well.
 HEAVY_MODULES = ("cupy", "cupyx", "matplotlib",
-                 "tropoi.planet.planet",
+                 "tropoi.planet.planet", "tropoi.spatial.planet",
                  "tropoi.run.bve.runner",
                  "tropoi.run.pe.runner",
-                 "tropoi.viz")
+                 "tropoi.viz", "tropoi.representation.visual")
 
 
 @pytest.fixture

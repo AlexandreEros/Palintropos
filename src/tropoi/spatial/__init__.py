@@ -1,6 +1,14 @@
-"""Spatial representations: immutable field specifications and host views.
+"""Spatial layer: what a state is and how it is discretized on the sphere.
 
-Import-light by design (NumPy only): the CLI, archive inspection, and host
-coefficient access depend on this package, so it must never import CuPy,
-Matplotlib, or the numerical cores.
+Prescribed world descriptions (``environment``, ``williamson5``,
+``terrain``, the ``planet`` facade), the discretization (``grids``,
+``transforms`` with their CUDA kernels, ``spherical_backend``,
+``operators``, ``sigma_coordinate``), state descriptions (``states``,
+``modes``), initialization, and the truncation policy (``truncation``).
+
+This initializer imports nothing: ``modes``, ``truncation``,
+``environment`` and ``williamson5`` are CPU-only and are consumed by the
+CLI and by archive inspection; the discretization modules import CuPy and
+are loaded only by the code that uses them. The spatial layer never imports
+``tropoi.temporal``, ``tropoi.representation``, ``tropoi.run`` or the CLI.
 """

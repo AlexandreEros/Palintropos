@@ -31,7 +31,7 @@ import pathlib
 import numpy as np
 import cupy as cp
 
-from tropoi.support import product_truncation_cut
+from tropoi.spatial.truncation import product_truncation_cut
 
 CSV_COLUMNS = [
     "time_s",

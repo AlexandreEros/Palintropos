@@ -20,20 +20,36 @@ def test_importing_support_is_cpu_safe():
         "0 if product_truncation_cut(21) == 14 else 1")
 
 
-def test_support_import_loads_only_the_support_module():
-    # Stronger than the banned-module check: importing tropoi.support must
-    # not drag in ANY other tropoi subpackage (it is the neutral module).
+def _assert_loads_exactly(import_stmt: str, expected: list[str]) -> None:
     code = (
         "import sys\n"
-        "import tropoi.support\n"
+        f"{import_stmt}\n"
         "loaded = sorted(m for m in sys.modules if m.startswith('tropoi'))\n"
-        "assert loaded == ['tropoi', 'tropoi.support'], loaded\n"
+        f"assert loaded == {sorted(expected)!r}, loaded\n"
         f"banned = [m for m in {HEAVY_MODULES!r} if m in sys.modules]\n"
         "assert not banned, banned\n"
     )
     result = subprocess.run([sys.executable, "-c", code],
                             capture_output=True, text=True, timeout=120)
     assert result.returncode == 0, result.stdout + result.stderr
+
+
+def test_truncation_import_loads_only_the_truncation_module():
+    # Stronger than the banned-module check: the canonical cutoff module
+    # must not drag in ANY other tropoi subpackage (it is the neutral
+    # module; tropoi.spatial's initializer is docstring-only).
+    _assert_loads_exactly(
+        "import tropoi.spatial.truncation",
+        ["tropoi", "tropoi.spatial", "tropoi.spatial.truncation"])
+
+
+def test_legacy_support_import_adds_only_the_alias():
+    # tropoi.support (the Sprint 1 path) aliases the canonical module: it
+    # may add only itself and the stdlib-only alias helper.
+    _assert_loads_exactly(
+        "import tropoi.support",
+        ["tropoi", "tropoi._compat", "tropoi.spatial",
+         "tropoi.spatial.truncation", "tropoi.support"])
 
 
 def test_config_resolution_using_the_cut_is_cpu_safe():

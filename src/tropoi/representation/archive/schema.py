@@ -24,7 +24,7 @@ import math
 
 from tropoi.spatial.modes import (COEFFICIENT_LAYOUT,
                                   COEFFICIENT_NORMALIZATION, FieldSpec)
-from tropoi.support import product_truncation_cut
+from tropoi.spatial.truncation import product_truncation_cut
 
 #: Version of the ``state_schema`` manifest block this module writes/reads.
 STATE_SCHEMA_VERSION = 1

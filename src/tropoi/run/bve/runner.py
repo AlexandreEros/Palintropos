@@ -5,7 +5,7 @@ import cupy as cp
 import pathlib
 from typing import Sequence
 
-from tropoi.planet import Planet
+from tropoi.spatial.planet import Planet
 from tropoi.run.bve.barotropic_vorticity import BarotropicVorticity, BarotropicState
 from tropoi.run.bve.config import (PLOT_TYPES, IntegrationScheduler, advective_cfl_timestep,
                      validate_snapshot_schedule)

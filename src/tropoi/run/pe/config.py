@@ -10,7 +10,7 @@ parameters the primitive-equation core needs:
   ``run.pe.runner``);
 * the vertical grid, given either as a uniform-sigma ``nlev`` level count or
   as explicit ``sigma_interfaces`` (validated through
-  :class:`~tropoi.physics.sigma_coordinate.SigmaGrid`);
+  :class:`~tropoi.spatial.sigma_coordinate.SigmaGrid`);
 * the configurable dry gas constants ``r_dry`` / ``cp_dry``;
 * the initial-condition thermodynamic parameters ``temperature`` /
   ``surface_pressure`` (and, for ``thermal_wave``, ``thermal_amplitude``).
@@ -46,8 +46,10 @@ import math
 from dataclasses import dataclass
 from typing import Mapping, Optional, Sequence
 
-from tropoi.physics.sigma_coordinate import SigmaGrid
-from tropoi.support import product_truncation_cut
+from tropoi.spatial.sigma_coordinate import SigmaGrid
+from tropoi.spatial.truncation import (  # noqa: F401  (re-exports)
+    THERMAL_WAVE_MIN_RETAINED_DEGREE, product_truncation_cut,
+    require_thermal_wave_support)
 from tropoi.run.bve.config import (GRID_TYPES, MIN_NLAT, MIN_NLON,
                           scientific_config_subset)
 from tropoi.run.engine import (SECONDS_PER_DAY, _require_finite_number,
@@ -125,37 +127,6 @@ _TERRAIN_PARAM_FIELDS = ("mountain_height_m", "mountain_lat_deg",
 
 #: Presets that require a resolvable degree-2 harmonic.
 _SCENARIOS_NEEDING_L2 = ("thermal_wave",)
-
-#: thermal_wave places its perturbation on the (2, 2) mode; a NONZERO
-#: amplitude additionally needs degree 2 inside the 2/3 product cut, or the
-#: temperature perturbation is frozen for all time while only divergence
-#: responds (measured at lmax=2, docs/validation/
-#: preset_support_characterization.md). Zero amplitude is exact rest and
-#: keeps the storage boundary only.
-THERMAL_WAVE_MIN_RETAINED_DEGREE = 2
-
-
-def require_thermal_wave_support(lmax: int, thermal_amplitude: float) -> None:
-    """Raise ValueError unless ``lmax`` supports thermal_wave at this amplitude.
-
-    Shared by the CPU configuration layer and the CUDA initial-condition
-    factory. Storage (``lmax >= 2``) is always required; the retained-degree
-    requirement applies only to a nonzero amplitude.
-    """
-    lmax = int(lmax)
-    if lmax < 2:
-        raise ValueError(
-            f"scenario 'thermal_wave' needs lmax >= 2 for its degree-2 "
-            f"perturbation, got {lmax}")
-    if float(thermal_amplitude) != 0.0 and \
-            product_truncation_cut(lmax) < THERMAL_WAVE_MIN_RETAINED_DEGREE:
-        raise ValueError(
-            "scenario 'thermal_wave' with a nonzero thermal_amplitude needs "
-            "the 2/3 product cut to retain degree 2 (lmax >= 3); "
-            f"lmax={lmax} retains only degrees <= "
-            f"{product_truncation_cut(lmax)}, which freezes the temperature "
-            "perturbation. Use lmax >= 3, or thermal_amplitude=0 for exact "
-            "rest. See docs/validation/preset_support_characterization.md.")
 
 PE_BASE_DEFAULTS: dict = {
     "lmax": 10,

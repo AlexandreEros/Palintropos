@@ -130,11 +130,12 @@ def build_pe_model(run_config: Mapping):
     used and fails loudly when the mountain is too narrow for the cut.
     Imports CuPy; call only after validation.
     """
-    from tropoi.planet import Planet, PlanetaryParameters
+    from tropoi.spatial.environment import PlanetaryParameters
+    from tropoi.spatial.planet import Planet
     from tropoi.physics.primitive_equations import (
         PrimitiveEquationsModel)
-    from tropoi.physics.sigma_coordinate import SigmaGrid
-    from tropoi.physics.topography import Topography
+    from tropoi.spatial.sigma_coordinate import SigmaGrid
+    from tropoi.spatial.terrain.topography import Topography
 
     planet = Planet.generate(
         params=PlanetaryParameters.from_earth_like(
