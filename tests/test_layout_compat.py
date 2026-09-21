@@ -280,6 +280,35 @@ def test_layer_dependency_direction(layer):
     assert not violations, violations
 
 
+def test_documented_cpu_only_modules_import_without_cupy_or_matplotlib():
+    # docs/ARCHITECTURE.md "CPU and GPU requirements": these canonical
+    # modules (and their legacy aliases) must load with CuPy blocked.
+    modules = ["tropoi.spatial.truncation", "tropoi.spatial.environment",
+               "tropoi.spatial.williamson5", "tropoi.spatial.modes",
+               "tropoi.spatial.sigma_coordinate",
+               "tropoi.temporal.integration", "tropoi.temporal.simulation",
+               "tropoi.representation.archive",
+               "tropoi.representation.archive.writer",
+               "tropoi.run.bve.config", "tropoi.run.swe.config",
+               "tropoi.run.pe.config", "tropoi.support", "tropoi.run.engine"]
+    # (Not the legacy tropoi.planet.* paths: the tropoi.planet package
+    # initializer has always imported the CUDA Planet facade.)
+    probe = (
+        "import importlib, sys\n"
+        "sys.modules['cupy'] = None\n"
+        f"for name in {modules!r}:\n"
+        "    importlib.import_module(name)\n"
+        "banned = [m for m in ('cupy', 'cupyx', 'matplotlib') "
+        "if sys.modules.get(m) is not None]\n"
+        "assert not banned, banned\n"
+        "from tropoi.spatial.environment import PlanetaryParameters\n"
+        "assert PlanetaryParameters.from_earth_like().radius > 0\n"
+    )
+    result = subprocess.run([sys.executable, "-c", probe], capture_output=True,
+                            text=True, timeout=120)
+    assert result.returncode == 0, result.stdout + result.stderr
+
+
 def test_cuda_kernel_sources_are_package_resources():
     sources = importlib.resources.files("tropoi.spatial.transforms.cuda")
     names = {entry.name for entry in sources.iterdir()}
