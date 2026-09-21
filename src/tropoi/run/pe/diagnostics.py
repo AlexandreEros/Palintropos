@@ -39,7 +39,7 @@ import pathlib
 
 import cupy as cp
 
-from tropoi.physics.primitive_equations import (
+from tropoi.temporal.tendencies.primitive_equations import (
     PrimitiveEquationsModel, PrimitiveEquationsState)
 
 PE_CSV_COLUMNS = [

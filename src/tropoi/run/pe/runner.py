@@ -45,9 +45,9 @@ from typing import Sequence
 import numpy as np
 import cupy as cp
 
-from tropoi.physics.primitive_equations import (
+from tropoi.temporal.tendencies.primitive_equations import (
     PrimitiveEquationsModel, PrimitiveEquationsState)
-from tropoi.run.engine import IntegrationScheduler, rk4_step_array
+from tropoi.temporal.integration import IntegrationScheduler, rk4_step_array
 from tropoi.run.pe.config import PE_PLOT_TYPES
 from tropoi.run.pe.diagnostics import PEDiagnosticsRecorder, plot_pe_diagnostics
 

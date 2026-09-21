@@ -33,7 +33,7 @@ import math
 
 import cupy as cp
 
-from tropoi.physics.shallow_water import (ShallowWaterModel,
+from tropoi.temporal.tendencies.shallow_water import (ShallowWaterModel,
                                                      ShallowWaterState)
 from tropoi.run.swe.config import W5_U0_MS, require_scenario_support
 

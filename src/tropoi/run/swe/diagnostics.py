@@ -48,7 +48,7 @@ import pathlib
 import numpy as np
 import cupy as cp
 
-from tropoi.physics.shallow_water import (ShallowWaterModel,
+from tropoi.temporal.tendencies.shallow_water import (ShallowWaterModel,
                                                      ShallowWaterState)
 from tropoi.run.bve.diagnostics import _mode_power
 

@@ -17,9 +17,9 @@ from typing import Sequence
 import numpy as np
 import cupy as cp
 
-from tropoi.physics.shallow_water import (ShallowWaterModel,
+from tropoi.temporal.tendencies.shallow_water import (ShallowWaterModel,
                                                      ShallowWaterState)
-from tropoi.run.engine import (IntegrationScheduler, advective_cfl_timestep,
+from tropoi.temporal.integration import (IntegrationScheduler, advective_cfl_timestep,
                       integrate, rk4_step_array, validate_snapshot_schedule)
 from tropoi.run.swe.config import SWE_PLOT_TYPES
 from tropoi.run.swe.diagnostics import SWEDiagnosticsRecorder, plot_swe_diagnostics

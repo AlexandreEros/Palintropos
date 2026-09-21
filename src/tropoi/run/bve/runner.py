@@ -11,7 +11,7 @@ from tropoi.run.bve.config import (PLOT_TYPES, IntegrationScheduler, advective_c
                      validate_snapshot_schedule)
 # The physics-agnostic driver loop lives in the shared engine; `_integrate`
 # is kept as this module's historical name for it (tests import it here).
-from tropoi.run.engine import integrate as _integrate
+from tropoi.temporal.integration import integrate as _integrate
 from tropoi.run.bve.diagnostics import DiagnosticsRecorder, plot_diagnostics
 from tropoi.run.bve.visualization import (BVE_SNAPSHOT_TIMES_FILENAME,
                             render_bve_snapshots)

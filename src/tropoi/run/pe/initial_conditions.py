@@ -53,7 +53,7 @@ band-limited (no grid round trip).
 """
 from __future__ import annotations
 
-from tropoi.physics.primitive_equations import (
+from tropoi.temporal.tendencies.primitive_equations import (
     PrimitiveEquationsModel, PrimitiveEquationsState, isothermal_rest_state)
 from tropoi.run.pe.config import require_thermal_wave_support
 

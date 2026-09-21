@@ -132,7 +132,7 @@ def build_pe_model(run_config: Mapping):
     """
     from tropoi.spatial.environment import PlanetaryParameters
     from tropoi.spatial.planet import Planet
-    from tropoi.physics.primitive_equations import (
+    from tropoi.temporal.tendencies.primitive_equations import (
         PrimitiveEquationsModel)
     from tropoi.spatial.sigma_coordinate import SigmaGrid
     from tropoi.spatial.terrain.topography import Topography
@@ -150,7 +150,7 @@ def build_pe_model(run_config: Mapping):
     )
     topography_kind = run_config.get("topography", "flat")
     if topography_kind == "mountain":
-        from tropoi.physics.primitive_equations import (
+        from tropoi.temporal.tendencies.primitive_equations import (
             product_truncation_cut)
         topography = Topography.mountain(
             planet,

@@ -25,7 +25,7 @@ import math
 from dataclasses import dataclass
 from typing import Mapping, Optional
 
-from tropoi.run.engine import (SECONDS_PER_DAY, _require_finite_number,
+from tropoi.temporal.integration import (SECONDS_PER_DAY, _require_finite_number,
                       _require_finite_positive, count_snapshot_times,
                       interval_snapshot_times)
 from tropoi.run.bve.config import (GRID_TYPES, MIN_NLAT, MIN_NLON,

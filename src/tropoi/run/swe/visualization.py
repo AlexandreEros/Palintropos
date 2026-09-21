@@ -168,7 +168,7 @@ def _extract_swe_winds(
         ) -> tuple[np.ndarray, np.ndarray,
                    tuple[tuple[np.ndarray, np.ndarray], ...]]:
     """Derive instantaneous state-grid winds from each persisted SWE state."""
-    from tropoi.physics.shallow_water import ShallowWaterState
+    from tropoi.temporal.tendencies.shallow_water import ShallowWaterState
 
     winds = []
     view_grid = None

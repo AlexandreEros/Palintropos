@@ -75,7 +75,7 @@ def build_swe_model(run_config: Mapping):
     """
     from tropoi.spatial.environment import PlanetaryParameters
     from tropoi.spatial.planet import Planet
-    from tropoi.physics.shallow_water import ShallowWaterModel
+    from tropoi.temporal.tendencies.shallow_water import ShallowWaterModel
     from tropoi.spatial.terrain.topography import Topography
 
     if run_config.get("scenario") == "williamson5":

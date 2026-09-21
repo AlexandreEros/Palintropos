@@ -52,7 +52,7 @@ from tropoi.spatial.truncation import (  # noqa: F401  (re-exports)
     require_thermal_wave_support)
 from tropoi.run.bve.config import (GRID_TYPES, MIN_NLAT, MIN_NLON,
                           scientific_config_subset)
-from tropoi.run.engine import (SECONDS_PER_DAY, _require_finite_number,
+from tropoi.temporal.integration import (SECONDS_PER_DAY, _require_finite_number,
                       _require_finite_positive, count_snapshot_times,
                       interval_snapshot_times)
 from tropoi.run.swe.config import (DEFAULT_GRAVITY, DEFAULT_MOUNTAIN_HEIGHT_M,
