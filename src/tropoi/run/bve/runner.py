@@ -6,7 +6,8 @@ import pathlib
 from typing import Sequence
 
 from tropoi.spatial.planet import Planet
-from tropoi.run.bve.barotropic_vorticity import BarotropicVorticity, BarotropicState
+from tropoi.spatial.states.barotropic import BarotropicState
+from tropoi.temporal.tendencies.barotropic import BarotropicVorticity
 from tropoi.run.bve.config import (PLOT_TYPES, IntegrationScheduler, advective_cfl_timestep,
                      validate_snapshot_schedule)
 # The physics-agnostic driver loop lives in the shared engine; `_integrate`

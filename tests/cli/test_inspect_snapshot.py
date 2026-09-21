@@ -99,6 +99,10 @@ def test_inspect_snapshot_is_cpu_safe_in_fresh_interpreter(tmp_path, solver,
         "assert not banned, banned\n"
         "assert 'tropoi.numerics' not in sys.modules\n"
         "assert 'tropoi.representation.visual.snapshot' not in sys.modules\n"
+        # canonical homes of the numerics and cores (legacy names are aliases)
+        "assert not [m for m in sys.modules if m.startswith(("
+        "'tropoi.spatial.grids', 'tropoi.spatial.transforms', "
+        "'tropoi.spatial.operators', 'tropoi.temporal.tendencies'))]\n"
     )
     result = subprocess.run([sys.executable, "-c", code], capture_output=True,
                             text=True, timeout=120)

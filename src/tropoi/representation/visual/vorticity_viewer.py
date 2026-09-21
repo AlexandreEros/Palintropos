@@ -190,7 +190,7 @@ class VorticityViewer:
         if out_dir is None:
             out_dir = pathlib.Path(".")
 
-        from tropoi.run.bve.barotropic_vorticity import BarotropicVorticity
+        from tropoi.temporal.tendencies.barotropic import BarotropicVorticity
         bve = BarotropicVorticity(self.planet)
 
         nsnap = len(self.snapshots)
