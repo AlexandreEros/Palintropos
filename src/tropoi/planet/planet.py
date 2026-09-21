@@ -2,11 +2,11 @@ import numpy as np
 import cupy as cp
 
 from typing import Optional, Tuple
-from ..numerics import SpectralOperators, GeodesicSphericalHarmonics, GridGeometryBase, GeodesicGridGeometry
-from .planetary_parameters import PlanetaryParameters
-from .elevation_data import ElevationData
-from .terrain_spectral import generate_spectral_terrain_gpu, SpectralTerrainParams
-from .tectonics import TectonicParams, tectonic_update_step
+from tropoi.numerics import SpectralOperators, GeodesicSphericalHarmonics, GridGeometryBase, GeodesicGridGeometry
+from tropoi.planet.planetary_parameters import PlanetaryParameters
+from tropoi.planet.elevation_data import ElevationData
+from tropoi.planet.terrain_spectral import generate_spectral_terrain_gpu, SpectralTerrainParams
+from tropoi.planet.tectonics import TectonicParams, tectonic_update_step
 
 class Planet:
     """
@@ -185,8 +185,8 @@ class Planet:
 
         # Grid geometry, SH transform, and their pairing (the backend, which
         # owns product-quadrature policy) are three separate objects.
-        from ..numerics.spherical_backend import GeodesicBackend, LatLonBackend
-        from ..numerics.latlon_grid import (
+        from tropoi.numerics.spherical_backend import GeodesicBackend, LatLonBackend
+        from tropoi.numerics.latlon_grid import (
             GaussLatLonGridGeometry, GaussLatLonSphericalHarmonics)
 
         if grid_type == "geodesic":

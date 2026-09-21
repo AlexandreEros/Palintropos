@@ -4,7 +4,7 @@ from __future__ import annotations
 import pathlib
 from typing import Protocol, runtime_checkable
 
-from .specs import (FigureSpec, ScalarMapSpec, SpectralCoefficientMapSpec,
+from tropoi.viz.specs import (FigureSpec, ScalarMapSpec, SpectralCoefficientMapSpec,
                     StreamlineMapSpec)
 
 
@@ -38,5 +38,5 @@ class Renderer(Protocol):
 
 def get_default_renderer() -> Renderer:
     """Return the configured initial backend without exposing it to models."""
-    from .matplotlib_renderer import MatplotlibRenderer
+    from tropoi.viz.matplotlib_renderer import MatplotlibRenderer
     return MatplotlibRenderer()

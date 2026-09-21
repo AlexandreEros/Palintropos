@@ -34,8 +34,8 @@ import warnings
 import numpy as np
 import cupy as cp
 
-from .grid_base import GridGeometry
-from .fast_geodesic_sh import PointSetSphericalHarmonics
+from tropoi.numerics.grid_base import GridGeometry
+from tropoi.numerics.fast_geodesic_sh import PointSetSphericalHarmonics
 
 __all__ = ["GaussLatLonGridGeometry", "GaussLatLonSphericalHarmonics"]
 

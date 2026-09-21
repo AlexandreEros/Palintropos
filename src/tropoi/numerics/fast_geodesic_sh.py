@@ -1,6 +1,6 @@
 import cupy as cp
 
-from .cuda.cuda_utils import raw_module_from_cuda
+from tropoi.numerics.cuda.cuda_utils import raw_module_from_cuda
 
 __all__ = ["PointSetSphericalHarmonics"]
 

@@ -27,7 +27,7 @@ import numpy as np
 
 from tropoi.spatial.modes import FieldSpec, SpectralConventionError
 from tropoi.temporal.simulation import Simulation, SnapshotStorage
-from .schema import (SchemaError, StateSchema, UnknownSchemaVersionError,
+from tropoi.representation.archive.schema import (SchemaError, StateSchema, UnknownSchemaVersionError,
                      COEFFICIENT_FILES, TIME_FILES, infer_solver,
                      infer_state_schema, diagnostic_definitions_for)
 

@@ -52,7 +52,7 @@ from typing import Mapping, Optional, Sequence
 # run/engine.py (shared with the shallow-water core). Every name below is
 # re-exported here unchanged to preserve this module's historical import
 # surface.
-from ..engine import (  # noqa: F401  (re-exports)
+from tropoi.run.engine import (  # noqa: F401  (re-exports)
     CFL_NUMBER, DEFAULT_CFL_FALLBACK_SECONDS, SECONDS_PER_DAY,
     IntegrationScheduler, _count_events, _count_step, _interval_events,
     _require_finite_nonneg, _require_finite_number, _require_finite_positive,

@@ -1,8 +1,8 @@
 import numpy as np
 import cupy as cp
 
-from .integration import simpson_2d
-from .cuda.cuda_utils import raw_module_from_cuda
+from tropoi.numerics.integration import simpson_2d
+from tropoi.numerics.cuda.cuda_utils import raw_module_from_cuda
 
 class LatLonSphericalHarmonics:
     """GPU-accelerated spherical harmonics using custom CUDA kernels (Iterative)."""

@@ -13,9 +13,9 @@ Public entry point::
 
 See docs/SAVED_RUNS.md.
 """
-from .capsule import (CapsuleError, CapsuleLayoutError, CapsuleStorage,
+from tropoi.representation.archive.capsule import (CapsuleError, CapsuleLayoutError, CapsuleStorage,
                       open_simulation, resolve_run_directory)
-from .schema import (STATE_SCHEMA_VERSION, SchemaError, StateSchema,
+from tropoi.representation.archive.schema import (STATE_SCHEMA_VERSION, SchemaError, StateSchema,
                      UnknownSchemaVersionError)
 
 __all__ = [

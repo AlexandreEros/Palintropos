@@ -34,10 +34,10 @@ from typing import Any
 
 import cupy as cp
 
-from .geodesic_grid import GeodesicGridGeometry
-from .grid_base import GridGeometry
-from .latlon_grid import GaussLatLonGridGeometry, GaussLatLonSphericalHarmonics
-from .optimized_geodesic_sh import GeodesicSphericalHarmonics
+from tropoi.numerics.geodesic_grid import GeodesicGridGeometry
+from tropoi.numerics.grid_base import GridGeometry
+from tropoi.numerics.latlon_grid import GaussLatLonGridGeometry, GaussLatLonSphericalHarmonics
+from tropoi.numerics.optimized_geodesic_sh import GeodesicSphericalHarmonics
 
 
 @dataclass(frozen=True)

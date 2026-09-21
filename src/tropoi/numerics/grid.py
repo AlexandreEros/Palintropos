@@ -1,7 +1,7 @@
 import numpy as np
 from typing import Tuple
 
-from .grid_base import GridGeometry
+from tropoi.numerics.grid_base import GridGeometry
 
 class LatLonGridGeometry(GridGeometry):
     """Grid information for the planet surface."""

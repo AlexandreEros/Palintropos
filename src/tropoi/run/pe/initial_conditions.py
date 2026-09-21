@@ -55,7 +55,7 @@ from __future__ import annotations
 
 from tropoi.physics.primitive_equations import (
     PrimitiveEquationsModel, PrimitiveEquationsState, isothermal_rest_state)
-from .config import require_thermal_wave_support
+from tropoi.run.pe.config import require_thermal_wave_support
 
 #: The thermal-wave perturbation lives on this single real spherical-harmonic
 #: mode (degree 2, order 2): a sectoral, longitude-varying, low-degree mode

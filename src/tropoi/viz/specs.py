@@ -8,8 +8,8 @@ from typing import TypeAlias
 
 import numpy as np
 
-from .fields import ScalarGridField, SphericalHarmonicField
-from .normalization import NormalizationPolicy
+from tropoi.viz.fields import ScalarGridField, SphericalHarmonicField
+from tropoi.viz.normalization import NormalizationPolicy
 
 
 class SpectralEncoding(str, Enum):

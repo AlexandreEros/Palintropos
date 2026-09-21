@@ -47,9 +47,9 @@ import cupy as cp
 
 from tropoi.physics.primitive_equations import (
     PrimitiveEquationsModel, PrimitiveEquationsState)
-from ..engine import IntegrationScheduler, rk4_step_array
-from .config import PE_PLOT_TYPES
-from .diagnostics import PEDiagnosticsRecorder, plot_pe_diagnostics
+from tropoi.run.engine import IntegrationScheduler, rk4_step_array
+from tropoi.run.pe.config import PE_PLOT_TYPES
+from tropoi.run.pe.diagnostics import PEDiagnosticsRecorder, plot_pe_diagnostics
 
 
 def run_pe(model: PrimitiveEquationsModel,
@@ -164,8 +164,8 @@ def run_pe(model: PrimitiveEquationsModel,
         # lifecycle marks the run failed and never publishes it as complete.
         # The single-level summary and the per-snapshot upper/lower figures are
         # rendered together from the just-persisted coefficient stack.
-        from .visualization import render_pe_summary
-        from .snapshot_visualization import render_pe_snapshots
+        from tropoi.run.pe.visualization import render_pe_summary
+        from tropoi.run.pe.snapshot_visualization import render_pe_snapshots
         render_pe_summary(model, out_dir, metadata=figure_metadata)
         render_pe_snapshots(model, out_dir, metadata=figure_metadata,
                             scenario=scenario)

@@ -5,7 +5,7 @@ import math
 
 import numpy as np
 
-from .normalization import NormalizationPolicy
+from tropoi.viz.normalization import NormalizationPolicy
 
 
 PHASE_DOMAIN = (-math.pi, math.pi)

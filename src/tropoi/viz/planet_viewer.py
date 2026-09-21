@@ -4,11 +4,11 @@ import matplotlib.pyplot as plt
 import matplotlib.tri as mtri
 from matplotlib.colors import hsv_to_rgb
 
-from .complex_encoding import phase_magnitude_hsv
-from .fields import SphericalHarmonicField
-from .normalization import NormalizationPolicy
-from ..planet import Planet
-from ..numerics import (
+from tropoi.viz.complex_encoding import phase_magnitude_hsv
+from tropoi.viz.fields import SphericalHarmonicField
+from tropoi.viz.normalization import NormalizationPolicy
+from tropoi.planet import Planet
+from tropoi.numerics import (
     SpectralOperators,
     GridGeometryBase,
     LatLonGridGeometry,

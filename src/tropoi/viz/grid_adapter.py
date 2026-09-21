@@ -5,10 +5,10 @@ from typing import TYPE_CHECKING
 
 import numpy as np
 
-from .fields import ScalarGridField
+from tropoi.viz.fields import ScalarGridField
 
 if TYPE_CHECKING:
-    from ..numerics import LatLonGridGeometry
+    from tropoi.numerics import LatLonGridGeometry
 
 
 def _host(values) -> np.ndarray:
@@ -27,7 +27,7 @@ def map_to_uniform_latlon(values, source_grid, *,
     map a field (coefficient-space frames) keep this module importable
     without CUDA.
     """
-    from ..numerics import LatLonGridGeometry, geodesic_to_latlon_grid
+    from tropoi.numerics import LatLonGridGeometry, geodesic_to_latlon_grid
 
     target = target_grid or LatLonGridGeometry.create((91, 181))
     values = _host(values)

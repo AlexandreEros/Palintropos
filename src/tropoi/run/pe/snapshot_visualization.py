@@ -195,7 +195,7 @@ def _surface_pressure_anomaly(model, lnps_coeffs_2d) -> np.ndarray:
     honored — the ln p_s monopole is NOT the mean of p_s), subtracts the
     area-weighted horizontal mean, and converts Pa -> hPa for a readable scale.
     """
-    from .visualization import _synthesize
+    from tropoi.run.pe.visualization import _synthesize
     lnps = _synthesize(model, lnps_coeffs_2d, subtract_mean=False)
     ps = np.exp(lnps)
     mean = _area_weighted_mean(model, ps)
@@ -214,7 +214,7 @@ def prepare_pe_snapshot_fields(model, coeffs_2d, *, index: int, total: int,
     de-meaned physically. Only the two selected levels are transferred and
     synthesized — never the whole column.
     """
-    from .visualization import _synthesize
+    from tropoi.run.pe.visualization import _synthesize
     K = model.nlev
     up, lo = levels.upper_index, levels.lower_index
     return PESnapshotFields(
@@ -317,7 +317,7 @@ def build_pe_snapshot_figure(model, fields: PESnapshotFields, *,
     group name, so when the timeline resolves normalizations they receive ONE
     shared symmetric scale spanning all stored times and both levels.
     """
-    from .visualization import _view_field
+    from tropoi.run.pe.visualization import _view_field
     from tropoi.viz.normalization import NormalizationPolicy
     from tropoi.viz.specs import (FigureSpec, PanelPlacement,
                                              ScalarMapSpec, TextPanelSpec)
@@ -385,7 +385,7 @@ def build_pe_snapshot_timeline(model, out_dir: pathlib.Path | str, *,
     Each snapshot's two selected levels are synthesized independently, so no
     complete time x level x lat x lon dataset is stacked on the device.
     """
-    from .visualization import _load_pe_coeffs
+    from tropoi.run.pe.visualization import _load_pe_coeffs
 
     coeffs, times = _load_pe_coeffs(out_dir, model.nlev)
     return build_pe_snapshot_timeline_from_data(
@@ -406,7 +406,7 @@ def build_pe_snapshot_timeline_from_data(model, coefficients, times_seconds,
     synthesis, view mapping, layout and run-wide normalization are those of
     the in-run product.
     """
-    from .visualization import _validate_pe_coeffs
+    from tropoi.run.pe.visualization import _validate_pe_coeffs
     from tropoi.viz.timeline import FigureFrame, FigureTimeline
 
     coeffs, times = _validate_pe_coeffs(coefficients, times_seconds,

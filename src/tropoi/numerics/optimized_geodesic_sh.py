@@ -11,8 +11,8 @@ from pathlib import Path
 import pickle
 from scipy.optimize import lsq_linear
 
-from .geodesic_grid import GeodesicGridGeometry
-from .fast_geodesic_sh import PointSetSphericalHarmonics
+from tropoi.numerics.geodesic_grid import GeodesicGridGeometry
+from tropoi.numerics.fast_geodesic_sh import PointSetSphericalHarmonics
 
 __all__ = ["GeodesicSphericalHarmonics", "OptimizedGeodesicSH"]
 

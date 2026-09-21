@@ -1,6 +1,6 @@
 import numpy as np
 from typing import Tuple
-from ..planet import Planet
+from tropoi.planet import Planet
 
 def plot_velocity_streamlines(U: Tuple[np.ndarray, np.ndarray],
                               planet: Planet,

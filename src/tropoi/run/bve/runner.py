@@ -6,17 +6,17 @@ import pathlib
 from typing import Sequence
 
 from tropoi.planet import Planet
-from .barotropic_vorticity import BarotropicVorticity, BarotropicState
-from .config import (PLOT_TYPES, IntegrationScheduler, advective_cfl_timestep,
+from tropoi.run.bve.barotropic_vorticity import BarotropicVorticity, BarotropicState
+from tropoi.run.bve.config import (PLOT_TYPES, IntegrationScheduler, advective_cfl_timestep,
                      validate_snapshot_schedule)
 # The physics-agnostic driver loop lives in the shared engine; `_integrate`
 # is kept as this module's historical name for it (tests import it here).
-from ..engine import integrate as _integrate
-from .diagnostics import DiagnosticsRecorder, plot_diagnostics
-from .visualization import (BVE_SNAPSHOT_TIMES_FILENAME,
+from tropoi.run.engine import integrate as _integrate
+from tropoi.run.bve.diagnostics import DiagnosticsRecorder, plot_diagnostics
+from tropoi.run.bve.visualization import (BVE_SNAPSHOT_TIMES_FILENAME,
                             render_bve_snapshots)
-from ...viz.vorticity_viewer import VorticityViewer
-from ...viz.renderers import get_default_renderer
+from tropoi.viz.vorticity_viewer import VorticityViewer
+from tropoi.viz.renderers import get_default_renderer
 
 
 def _empty_coeffs_stack(zeta0_lm: cp.ndarray) -> np.ndarray:

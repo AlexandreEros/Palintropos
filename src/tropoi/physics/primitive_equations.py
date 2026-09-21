@@ -43,7 +43,7 @@ import cupy as cp
 
 from tropoi.planet import Planet
 from tropoi.support import product_truncation_cut as _product_truncation_cut
-from .sigma_coordinate import (SigmaGrid, column_energy_conversion,
+from tropoi.physics.sigma_coordinate import (SigmaGrid, column_energy_conversion,
                                column_mass_tendency, column_pressure_work,
                                hydrostatic_geopotential,
                                interface_sigma_dot, layer_mass_residual,

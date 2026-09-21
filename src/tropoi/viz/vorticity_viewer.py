@@ -3,9 +3,9 @@ from __future__ import annotations
 import numpy as np
 import cupy as cp
 
-from ..viz.maps import plot_velocity_streamlines
-from ..planet import Planet
-from ..numerics import LatLonGridGeometry, geodesic_to_latlon_grid
+from tropoi.viz.maps import plot_velocity_streamlines
+from tropoi.planet import Planet
+from tropoi.numerics import LatLonGridGeometry, geodesic_to_latlon_grid
 
 class VorticityViewer:
     @staticmethod
@@ -163,9 +163,9 @@ class VorticityViewer:
         """
         import pathlib
 
-        from ..run.bve.visualization import (
+        from tropoi.run.bve.visualization import (
             build_bve_snapshot_timeline_from_data)
-        from .timeline import render_figure_timeline
+        from tropoi.viz.timeline import render_figure_timeline
 
         destination = pathlib.Path(".") if out_dir is None else pathlib.Path(out_dir)
         timeline = build_bve_snapshot_timeline_from_data(
@@ -189,7 +189,7 @@ class VorticityViewer:
         if out_dir is None:
             out_dir = pathlib.Path(".")
 
-        from ..run.bve.barotropic_vorticity import BarotropicVorticity
+        from tropoi.run.bve.barotropic_vorticity import BarotropicVorticity
         bve = BarotropicVorticity(self.planet)
 
         nsnap = len(self.snapshots)
@@ -308,5 +308,5 @@ class VorticityViewer:
 
     def summary_spec(self):
         """Return the backend-neutral specification for the BVE summary."""
-        from ..run.bve.visualization import build_bve_summary_spec
+        from tropoi.run.bve.visualization import build_bve_summary_spec
         return build_bve_summary_spec(self)

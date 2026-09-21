@@ -8,9 +8,9 @@ import uuid
 
 import numpy as np
 
-from .complex_encoding import phase_magnitude_hsv
-from .normalization import NormalizationKind
-from .specs import (FigureSpec, LinePanelSpec, PanelPlacement, ScalarMapSpec,
+from tropoi.viz.complex_encoding import phase_magnitude_hsv
+from tropoi.viz.normalization import NormalizationKind
+from tropoi.viz.specs import (FigureSpec, LinePanelSpec, PanelPlacement, ScalarMapSpec,
                     SpectralCoefficientMapSpec, SpectralEncoding,
                     StreamlineMapSpec,
                     TextPanelSpec)

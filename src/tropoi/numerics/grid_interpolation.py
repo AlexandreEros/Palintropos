@@ -3,8 +3,8 @@ import cupy as cp
 from typing import Literal
 from scipy.interpolate import griddata
 
-from .geodesic_grid import GeodesicGridGeometry
-from .grid import LatLonGridGeometry
+from tropoi.numerics.geodesic_grid import GeodesicGridGeometry
+from tropoi.numerics.grid import LatLonGridGeometry
 
 
 def _wrap_longitudes(longitudes: np.ndarray, target_min: float, target_max: float) -> np.ndarray:

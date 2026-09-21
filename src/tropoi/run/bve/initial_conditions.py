@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import cupy as cp
 
-from ...planet.planet import Planet
+from tropoi.planet.planet import Planet
 
 def _grid_point_latlon(planet: Planet) -> tuple[cp.ndarray, cp.ndarray]:
     lat = cp.asarray(planet.grid.point_latitudes)

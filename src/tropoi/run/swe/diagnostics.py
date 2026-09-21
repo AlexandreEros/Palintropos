@@ -50,7 +50,7 @@ import cupy as cp
 
 from tropoi.physics.shallow_water import (ShallowWaterModel,
                                                      ShallowWaterState)
-from ..bve.diagnostics import _mode_power
+from tropoi.run.bve.diagnostics import _mode_power
 
 SWE_CSV_COLUMNS = [
     "time_s",

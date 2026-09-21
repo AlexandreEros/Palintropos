@@ -1,9 +1,9 @@
 import cupy as cp
 
-from .differential_operators_spherical import DifferentialOperatorsSpherical
-from .geodesic_grid import GeodesicGridGeometry
+from tropoi.numerics.differential_operators_spherical import DifferentialOperatorsSpherical
+from tropoi.numerics.geodesic_grid import GeodesicGridGeometry
 # from .spherical_harmonics import LatLonSphericalHarmonics as SphericalHarmonics
-from .optimized_geodesic_sh import GeodesicSphericalHarmonics
+from tropoi.numerics.optimized_geodesic_sh import GeodesicSphericalHarmonics
 from tropoi.support import product_truncation_cut
 
 # class SpectralOperators:
@@ -87,7 +87,7 @@ class SpectralOperators:
             Inferred from `grid` when omitted (GeodesicBackend for geodesic
             geometries, coarse-only PointSetBackend otherwise).
         """
-        from .spherical_backend import make_backend
+        from tropoi.numerics.spherical_backend import make_backend
 
         self.sh = sh
         self.R = float(radius)
@@ -485,7 +485,7 @@ class SpectralOperators:
         extended degree.
         """
         if self._vector_analysis_cache is None:
-            from .fast_geodesic_sh import PointSetSphericalHarmonics
+            from tropoi.numerics.fast_geodesic_sh import PointSetSphericalHarmonics
             sh_p = self._product_space.sh
             sh_ext = PointSetSphericalHarmonics(
                 sh_p.latitudes, sh_p.longitudes, self.l_max + 1,

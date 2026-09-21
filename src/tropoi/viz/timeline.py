@@ -19,9 +19,9 @@ from typing import Mapping
 
 import numpy as np
 
-from .normalization import NormalizationPolicy
-from .renderers import Renderer, get_default_renderer
-from .specs import (FigureSpec, PanelPlacement, ScalarMapSpec,
+from tropoi.viz.normalization import NormalizationPolicy
+from tropoi.viz.renderers import Renderer, get_default_renderer
+from tropoi.viz.specs import (FigureSpec, PanelPlacement, ScalarMapSpec,
                     SpectralCoefficientMapSpec, StreamlineMapSpec,
                     TextPanelSpec)
 

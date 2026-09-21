@@ -48,12 +48,12 @@ from typing import Mapping, Optional, Sequence
 
 from tropoi.physics.sigma_coordinate import SigmaGrid
 from tropoi.support import product_truncation_cut
-from ..bve.config import (GRID_TYPES, MIN_NLAT, MIN_NLON,
+from tropoi.run.bve.config import (GRID_TYPES, MIN_NLAT, MIN_NLON,
                           scientific_config_subset)
-from ..engine import (SECONDS_PER_DAY, _require_finite_number,
+from tropoi.run.engine import (SECONDS_PER_DAY, _require_finite_number,
                       _require_finite_positive, count_snapshot_times,
                       interval_snapshot_times)
-from ..swe.config import (DEFAULT_GRAVITY, DEFAULT_MOUNTAIN_HEIGHT_M,
+from tropoi.run.swe.config import (DEFAULT_GRAVITY, DEFAULT_MOUNTAIN_HEIGHT_M,
                           DEFAULT_MOUNTAIN_LAT_DEG, DEFAULT_MOUNTAIN_LON_DEG,
                           DEFAULT_MOUNTAIN_WIDTH_DEG, MAX_MOUNTAIN_HEIGHT_M)
 

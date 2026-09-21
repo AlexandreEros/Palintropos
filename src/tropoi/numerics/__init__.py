@@ -1,13 +1,13 @@
-from .grid_base import GridGeometry as GridGeometryBase
-from .grid import LatLonGridGeometry
-from .geodesic_grid import GeodesicGridGeometry
+from tropoi.numerics.grid_base import GridGeometry as GridGeometryBase
+from tropoi.numerics.grid import LatLonGridGeometry
+from tropoi.numerics.geodesic_grid import GeodesicGridGeometry
 GridGeometry = GeodesicGridGeometry
-from .integration import simpson_2d
-from .spherical_harmonics import LatLonSphericalHarmonics
-from .latlon_grid import GaussLatLonGridGeometry, GaussLatLonSphericalHarmonics
-from .fast_geodesic_sh import PointSetSphericalHarmonics
-from .optimized_geodesic_sh import GeodesicSphericalHarmonics, OptimizedGeodesicSH
-from .spherical_backend import (
+from tropoi.numerics.integration import simpson_2d
+from tropoi.numerics.spherical_harmonics import LatLonSphericalHarmonics
+from tropoi.numerics.latlon_grid import GaussLatLonGridGeometry, GaussLatLonSphericalHarmonics
+from tropoi.numerics.fast_geodesic_sh import PointSetSphericalHarmonics
+from tropoi.numerics.optimized_geodesic_sh import GeodesicSphericalHarmonics, OptimizedGeodesicSH
+from tropoi.numerics.spherical_backend import (
     GeodesicBackend,
     LatLonBackend,
     PointSetBackend,
@@ -15,8 +15,8 @@ from .spherical_backend import (
     SphericalGridBackend,
     make_backend,
 )
-from .spectral_operators import SpectralOperators
-from .grid_interpolation import geodesic_to_latlon_grid, latlon_to_geodesic_grid
+from tropoi.numerics.spectral_operators import SpectralOperators
+from tropoi.numerics.grid_interpolation import geodesic_to_latlon_grid, latlon_to_geodesic_grid
 
 __all__ = [
     "GridGeometryBase",

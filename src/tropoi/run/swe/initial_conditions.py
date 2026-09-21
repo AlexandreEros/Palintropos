@@ -35,7 +35,7 @@ import cupy as cp
 
 from tropoi.physics.shallow_water import (ShallowWaterModel,
                                                      ShallowWaterState)
-from .config import W5_U0_MS, require_scenario_support
+from tropoi.run.swe.config import W5_U0_MS, require_scenario_support
 
 
 def _rest(model: ShallowWaterModel) -> ShallowWaterState:

@@ -3,8 +3,8 @@ import cupy as cp
 from scipy import sparse
 from scipy.spatial.transform import Rotation
 
-from .cartesian_to_spherical import cartesian_to_spherical
-from .grid_base import GridGeometry
+from tropoi.numerics.cartesian_to_spherical import cartesian_to_spherical
+from tropoi.numerics.grid_base import GridGeometry
 
 normalize = lambda vec: vec / np.linalg.norm(vec, axis=-1)[..., None]
 

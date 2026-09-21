@@ -19,11 +19,11 @@ import cupy as cp
 
 from tropoi.physics.shallow_water import (ShallowWaterModel,
                                                      ShallowWaterState)
-from ..engine import (IntegrationScheduler, advective_cfl_timestep,
+from tropoi.run.engine import (IntegrationScheduler, advective_cfl_timestep,
                       integrate, rk4_step_array, validate_snapshot_schedule)
-from .config import SWE_PLOT_TYPES
-from .diagnostics import SWEDiagnosticsRecorder, plot_swe_diagnostics
-from .visualization import render_swe_snapshots, render_swe_summary
+from tropoi.run.swe.config import SWE_PLOT_TYPES
+from tropoi.run.swe.diagnostics import SWEDiagnosticsRecorder, plot_swe_diagnostics
+from tropoi.run.swe.visualization import render_swe_snapshots, render_swe_summary
 
 
 def run_swe(model: ShallowWaterModel,
