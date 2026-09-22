@@ -22,6 +22,9 @@ dependencies = { file = ["requirements.txt"] }
 dev = [
   "pytest",
   "ipykernel",
+  # tools/architecture only (pinned: they determine the generated graphs)
+  "grimp==3.17",
+  "networkx==3.7",
 ]
 
 # This creates CLI commands in the project venv.
@@ -50,6 +53,10 @@ include = ["tropoi*"]
 [tool.deptry]
 # Treat the "dev" PEP 621 optional-dependency group as development-only.
 optional_dependencies_dev_groups = ["dev"]
+
+# tools/ is repository tooling, not part of the installed package; its
+# imports of dev-only dependencies (grimp, networkx) are intentional.
+extend_exclude = ["tools"]
 
 [tool.deptry.package_module_name_map]
 cupy-cuda11x = ["cupy", "cupyx", "cupy_backends"]
