@@ -1,4 +1,4 @@
-# Architecture metrics: current
+# Architecture metrics: post-Sprint-3
 
 Descriptive graph measurements. No value is ranked as better or worse. Definitions are at the end; machine-readable values are in `metrics.json`.
 

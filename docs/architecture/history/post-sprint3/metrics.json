@@ -730,12 +730,12 @@
     }
   },
   "source": {
-    "commit": null,
+    "commit": "47dec90a28d59114bb9f35dff8bd5e857d0e679f",
     "package": "tropoi",
     "src": "src"
   },
   "tool": {
-    "generator_commit": null,
+    "generator_commit": "295ba8a349854253466ba790ccdb3c54fb181043",
     "grimp": "3.17",
     "name": "tools.architecture",
     "networkx": "3.7",
