@@ -1,0 +1,3 @@
+# Generated architecture documentation (tools/architecture) is written with
+# LF line endings; keep it LF on checkout so `--check` compares byte for byte.
+docs/architecture/** text eol=lf

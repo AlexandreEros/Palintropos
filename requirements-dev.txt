@@ -2,3 +2,8 @@
 -e .
 pytest
 ipykernel
+
+# Architecture-analysis tooling (tools/architecture), development only.
+# Pinned because they determine the generated graphs byte for byte.
+grimp==3.17
+networkx==3.7

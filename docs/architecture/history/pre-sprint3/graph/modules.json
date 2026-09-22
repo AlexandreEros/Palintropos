@@ -1,0 +1,2768 @@
+{
+  "edges": [
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.cli.bve",
+      "target": "tropoi.cli.main"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.cli.bve",
+      "target": "tropoi.cli.run_lifecycle"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.cli.bve",
+      "target": "tropoi.planet"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.cli.bve",
+      "target": "tropoi.representation.archive.schema"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "type_checking"
+      ],
+      "source": "tropoi.cli.bve",
+      "target": "tropoi.run.bve.config"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.cli.bve",
+      "target": "tropoi.run.bve.initial_conditions"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.cli.bve",
+      "target": "tropoi.run.bve.io"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.cli.bve",
+      "target": "tropoi.run.bve.runner"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.cli.clear_cache",
+      "target": "tropoi.numerics.cuda.cuda_utils"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.cli.generate_planet",
+      "target": "tropoi.planet"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.cli.generate_planet",
+      "target": "tropoi.planet.tectonics"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.cli.generate_planet",
+      "target": "tropoi.planet.terrain_spectral"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.cli.generate_planet",
+      "target": "tropoi.viz"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.cli.main",
+      "target": "tropoi.cli.bve"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.cli.main",
+      "target": "tropoi.cli.clear_cache"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.cli.main",
+      "target": "tropoi.cli.generate_planet"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.cli.main",
+      "target": "tropoi.cli.pe"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.cli.main",
+      "target": "tropoi.cli.swe"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.cli.main",
+      "target": "tropoi.representation.archive"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.cli.main",
+      "target": "tropoi.representation.archive.schema"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.cli.main",
+      "target": "tropoi.run.bve.config"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.cli.main",
+      "target": "tropoi.run.pe.config"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.cli.main",
+      "target": "tropoi.run.swe.config"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.cli.main",
+      "target": "tropoi.spatial.modes"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.cli.pe",
+      "target": "tropoi.cli.bve"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.cli.pe",
+      "target": "tropoi.cli.run_lifecycle"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.cli.pe",
+      "target": "tropoi.physics.primitive_equations"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.cli.pe",
+      "target": "tropoi.physics.sigma_coordinate"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.cli.pe",
+      "target": "tropoi.physics.topography"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.cli.pe",
+      "target": "tropoi.planet"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.cli.pe",
+      "target": "tropoi.representation.archive.schema"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.cli.pe",
+      "target": "tropoi.run.bve.io"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "type_checking"
+      ],
+      "source": "tropoi.cli.pe",
+      "target": "tropoi.run.pe.config"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.cli.pe",
+      "target": "tropoi.run.pe.initial_conditions"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.cli.pe",
+      "target": "tropoi.run.pe.runner"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.cli.run_lifecycle",
+      "target": "tropoi.representation.archive.schema"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.cli.run_lifecycle",
+      "target": "tropoi.run.bve.io"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.cli.swe",
+      "target": "tropoi.cli.bve"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.cli.swe",
+      "target": "tropoi.cli.run_lifecycle"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.cli.swe",
+      "target": "tropoi.physics.shallow_water"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.cli.swe",
+      "target": "tropoi.physics.topography"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.cli.swe",
+      "target": "tropoi.planet"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.cli.swe",
+      "target": "tropoi.representation.archive.schema"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.cli.swe",
+      "target": "tropoi.run.bve.io"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function",
+        "type_checking"
+      ],
+      "source": "tropoi.cli.swe",
+      "target": "tropoi.run.swe.config"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.cli.swe",
+      "target": "tropoi.run.swe.initial_conditions"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.cli.swe",
+      "target": "tropoi.run.swe.runner"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.numerics",
+      "target": "tropoi.numerics.fast_geodesic_sh"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.numerics",
+      "target": "tropoi.numerics.geodesic_grid"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.numerics",
+      "target": "tropoi.numerics.grid"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.numerics",
+      "target": "tropoi.numerics.grid_base"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.numerics",
+      "target": "tropoi.numerics.grid_interpolation"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.numerics",
+      "target": "tropoi.numerics.integration"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.numerics",
+      "target": "tropoi.numerics.latlon_grid"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.numerics",
+      "target": "tropoi.numerics.optimized_geodesic_sh"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.numerics",
+      "target": "tropoi.numerics.spectral_operators"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.numerics",
+      "target": "tropoi.numerics.spherical_backend"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.numerics",
+      "target": "tropoi.numerics.spherical_harmonics"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.numerics.compute_optimal_weights",
+      "target": "tropoi.numerics"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.numerics.compute_optimal_weights",
+      "target": "tropoi.numerics.fast_geodesic_sh"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.numerics.fast_geodesic_sh",
+      "target": "tropoi.numerics.cuda.cuda_utils"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.numerics.geodesic_grid",
+      "target": "tropoi.numerics.cartesian_to_spherical"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.numerics.geodesic_grid",
+      "target": "tropoi.numerics.grid_base"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.numerics.grid",
+      "target": "tropoi.numerics.grid_base"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.numerics.grid_interpolation",
+      "target": "tropoi.numerics.geodesic_grid"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.numerics.grid_interpolation",
+      "target": "tropoi.numerics.grid"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.numerics.latlon_grid",
+      "target": "tropoi.numerics.fast_geodesic_sh"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.numerics.latlon_grid",
+      "target": "tropoi.numerics.grid_base"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.numerics.optimized_geodesic_sh",
+      "target": "tropoi.numerics"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function",
+        "module"
+      ],
+      "source": "tropoi.numerics.optimized_geodesic_sh",
+      "target": "tropoi.numerics.fast_geodesic_sh"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.numerics.optimized_geodesic_sh",
+      "target": "tropoi.numerics.geodesic_grid"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.numerics.spectral_operators",
+      "target": "tropoi.numerics.differential_operators_spherical"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.numerics.spectral_operators",
+      "target": "tropoi.numerics.fast_geodesic_sh"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.numerics.spectral_operators",
+      "target": "tropoi.numerics.geodesic_grid"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.numerics.spectral_operators",
+      "target": "tropoi.numerics.optimized_geodesic_sh"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.numerics.spectral_operators",
+      "target": "tropoi.numerics.spherical_backend"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.numerics.spectral_operators",
+      "target": "tropoi.support"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.numerics.spherical_backend",
+      "target": "tropoi.numerics.geodesic_grid"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.numerics.spherical_backend",
+      "target": "tropoi.numerics.grid_base"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.numerics.spherical_backend",
+      "target": "tropoi.numerics.latlon_grid"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.numerics.spherical_backend",
+      "target": "tropoi.numerics.optimized_geodesic_sh"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.numerics.spherical_harmonics",
+      "target": "tropoi.numerics.cuda.cuda_utils"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.numerics.spherical_harmonics",
+      "target": "tropoi.numerics.integration"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.physics.barotropic",
+      "target": "tropoi.planet"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.physics.primitive_equations",
+      "target": "tropoi.physics.sigma_coordinate"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.physics.primitive_equations",
+      "target": "tropoi.planet"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.physics.primitive_equations",
+      "target": "tropoi.support"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.physics.shallow_water",
+      "target": "tropoi.physics.topography"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.physics.shallow_water",
+      "target": "tropoi.planet"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.physics.shallow_water",
+      "target": "tropoi.support"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.planet",
+      "target": "tropoi.planet.elevation_data"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.planet",
+      "target": "tropoi.planet.planet"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.planet",
+      "target": "tropoi.planet.planetary_parameters"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.planet.planet",
+      "target": "tropoi.numerics"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.planet.planet",
+      "target": "tropoi.numerics.latlon_grid"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.planet.planet",
+      "target": "tropoi.numerics.spherical_backend"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.planet.planet",
+      "target": "tropoi.planet.elevation_data"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.planet.planet",
+      "target": "tropoi.planet.planetary_parameters"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.planet.planet",
+      "target": "tropoi.planet.tectonics"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.planet.planet",
+      "target": "tropoi.planet.terrain_spectral"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "type_checking"
+      ],
+      "source": "tropoi.planet.tectonics",
+      "target": "tropoi.numerics"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "type_checking"
+      ],
+      "source": "tropoi.planet.tectonics",
+      "target": "tropoi.numerics.spectral_operators"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "type_checking"
+      ],
+      "source": "tropoi.planet.terrain_spectral",
+      "target": "tropoi.numerics.optimized_geodesic_sh"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.representation.archive",
+      "target": "tropoi.representation.archive.capsule"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.representation.archive",
+      "target": "tropoi.representation.archive.schema"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.representation.archive.capsule",
+      "target": "tropoi.representation.archive.schema"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.representation.archive.capsule",
+      "target": "tropoi.representation.visual.snapshot"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.representation.archive.capsule",
+      "target": "tropoi.spatial.modes"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.representation.archive.capsule",
+      "target": "tropoi.temporal.simulation"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.representation.archive.schema",
+      "target": "tropoi.spatial.modes"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.representation.archive.schema",
+      "target": "tropoi.support"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.representation.visual.snapshot",
+      "target": "tropoi.cli.bve"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.representation.visual.snapshot",
+      "target": "tropoi.cli.pe"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.representation.visual.snapshot",
+      "target": "tropoi.cli.swe"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.representation.visual.snapshot",
+      "target": "tropoi.run.bve.visualization"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.representation.visual.snapshot",
+      "target": "tropoi.run.pe.snapshot_visualization"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.representation.visual.snapshot",
+      "target": "tropoi.run.swe.visualization"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.representation.visual.snapshot",
+      "target": "tropoi.viz.renderers"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.run.bve.barotropic_vorticity",
+      "target": "tropoi.physics.barotropic"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.run.bve.config",
+      "target": "tropoi.run.engine"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.run.bve.diagnostics",
+      "target": "tropoi.support"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.run.bve.initial_conditions",
+      "target": "tropoi.planet.planet"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.run.bve.io",
+      "target": "tropoi.run.bve.config"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.run.bve.runner",
+      "target": "tropoi.planet"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.run.bve.runner",
+      "target": "tropoi.run.bve.barotropic_vorticity"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.run.bve.runner",
+      "target": "tropoi.run.bve.config"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.run.bve.runner",
+      "target": "tropoi.run.bve.diagnostics"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.run.bve.runner",
+      "target": "tropoi.run.bve.visualization"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.run.bve.runner",
+      "target": "tropoi.run.engine"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.run.bve.runner",
+      "target": "tropoi.viz.renderers"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.run.bve.runner",
+      "target": "tropoi.viz.vorticity_viewer"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.run.bve.visualization",
+      "target": "tropoi.viz.fields"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.run.bve.visualization",
+      "target": "tropoi.viz.grid_adapter"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.run.bve.visualization",
+      "target": "tropoi.viz.normalization"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.run.bve.visualization",
+      "target": "tropoi.viz.renderers"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.run.bve.visualization",
+      "target": "tropoi.viz.specs"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.run.bve.visualization",
+      "target": "tropoi.viz.timeline"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.run.pe.config",
+      "target": "tropoi.physics.sigma_coordinate"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.run.pe.config",
+      "target": "tropoi.run.bve.config"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.run.pe.config",
+      "target": "tropoi.run.engine"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.run.pe.config",
+      "target": "tropoi.run.swe.config"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.run.pe.config",
+      "target": "tropoi.support"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.run.pe.diagnostics",
+      "target": "tropoi.physics.primitive_equations"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.run.pe.initial_conditions",
+      "target": "tropoi.physics.primitive_equations"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.run.pe.initial_conditions",
+      "target": "tropoi.run.pe.config"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.run.pe.runner",
+      "target": "tropoi.physics.primitive_equations"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.run.pe.runner",
+      "target": "tropoi.run.engine"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.run.pe.runner",
+      "target": "tropoi.run.pe.config"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.run.pe.runner",
+      "target": "tropoi.run.pe.diagnostics"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.run.pe.runner",
+      "target": "tropoi.run.pe.snapshot_visualization"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.run.pe.runner",
+      "target": "tropoi.run.pe.visualization"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.run.pe.snapshot_visualization",
+      "target": "tropoi.physics.sigma_coordinate"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.run.pe.snapshot_visualization",
+      "target": "tropoi.run.pe.visualization"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.run.pe.snapshot_visualization",
+      "target": "tropoi.viz.normalization"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.run.pe.snapshot_visualization",
+      "target": "tropoi.viz.renderers"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.run.pe.snapshot_visualization",
+      "target": "tropoi.viz.specs"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.run.pe.snapshot_visualization",
+      "target": "tropoi.viz.timeline"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.run.pe.visualization",
+      "target": "tropoi.viz.fields"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.run.pe.visualization",
+      "target": "tropoi.viz.grid_adapter"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.run.pe.visualization",
+      "target": "tropoi.viz.normalization"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.run.pe.visualization",
+      "target": "tropoi.viz.renderers"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.run.pe.visualization",
+      "target": "tropoi.viz.specs"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.run.swe.config",
+      "target": "tropoi.run.bve.config"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.run.swe.config",
+      "target": "tropoi.run.engine"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.run.swe.config",
+      "target": "tropoi.support"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.run.swe.diagnostics",
+      "target": "tropoi.physics.shallow_water"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.run.swe.diagnostics",
+      "target": "tropoi.run.bve.diagnostics"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.run.swe.initial_conditions",
+      "target": "tropoi.physics.shallow_water"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.run.swe.initial_conditions",
+      "target": "tropoi.run.swe.config"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.run.swe.runner",
+      "target": "tropoi.physics.shallow_water"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.run.swe.runner",
+      "target": "tropoi.run.engine"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.run.swe.runner",
+      "target": "tropoi.run.swe.config"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.run.swe.runner",
+      "target": "tropoi.run.swe.diagnostics"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.run.swe.runner",
+      "target": "tropoi.run.swe.visualization"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.run.swe.visualization",
+      "target": "tropoi.physics.shallow_water"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.run.swe.visualization",
+      "target": "tropoi.viz.fields"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.run.swe.visualization",
+      "target": "tropoi.viz.grid_adapter"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.run.swe.visualization",
+      "target": "tropoi.viz.normalization"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.run.swe.visualization",
+      "target": "tropoi.viz.renderers"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.run.swe.visualization",
+      "target": "tropoi.viz.specs"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.run.swe.visualization",
+      "target": "tropoi.viz.timeline"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.temporal.simulation",
+      "target": "tropoi.spatial.modes"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.viz",
+      "target": "tropoi.viz.complex_encoding"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.viz",
+      "target": "tropoi.viz.fields"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.viz",
+      "target": "tropoi.viz.normalization"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.viz",
+      "target": "tropoi.viz.planet_viewer"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.viz",
+      "target": "tropoi.viz.renderers"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.viz",
+      "target": "tropoi.viz.specs"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.viz",
+      "target": "tropoi.viz.timeline"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.viz.complex_encoding",
+      "target": "tropoi.viz.normalization"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function",
+        "type_checking"
+      ],
+      "source": "tropoi.viz.grid_adapter",
+      "target": "tropoi.numerics"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.viz.grid_adapter",
+      "target": "tropoi.viz.fields"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.viz.maps",
+      "target": "tropoi.planet"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.viz.matplotlib_renderer",
+      "target": "tropoi.viz.complex_encoding"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.viz.matplotlib_renderer",
+      "target": "tropoi.viz.normalization"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.viz.matplotlib_renderer",
+      "target": "tropoi.viz.specs"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.viz.planet_viewer",
+      "target": "tropoi.numerics"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.viz.planet_viewer",
+      "target": "tropoi.planet"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.viz.planet_viewer",
+      "target": "tropoi.viz.complex_encoding"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.viz.planet_viewer",
+      "target": "tropoi.viz.fields"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.viz.planet_viewer",
+      "target": "tropoi.viz.normalization"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.viz.renderers",
+      "target": "tropoi.viz.matplotlib_renderer"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.viz.renderers",
+      "target": "tropoi.viz.specs"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.viz.specs",
+      "target": "tropoi.viz.fields"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.viz.specs",
+      "target": "tropoi.viz.normalization"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.viz.timeline",
+      "target": "tropoi.viz.normalization"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.viz.timeline",
+      "target": "tropoi.viz.renderers"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.viz.timeline",
+      "target": "tropoi.viz.specs"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.viz.vorticity_viewer",
+      "target": "tropoi.numerics"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.viz.vorticity_viewer",
+      "target": "tropoi.planet"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.viz.vorticity_viewer",
+      "target": "tropoi.run.bve.barotropic_vorticity"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.viz.vorticity_viewer",
+      "target": "tropoi.run.bve.visualization"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.viz.vorticity_viewer",
+      "target": "tropoi.viz.maps"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.viz.vorticity_viewer",
+      "target": "tropoi.viz.timeline"
+    }
+  ],
+  "name": "modules",
+  "nodes": [
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.cli.bve",
+      "is_package": false,
+      "path": "tropoi/cli/bve.py",
+      "stdlib_imports": [
+        "__future__",
+        "pathlib",
+        "re",
+        "shutil",
+        "sys",
+        "typing"
+      ],
+      "third_party_imports": []
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.cli.clear_cache",
+      "is_package": false,
+      "path": "tropoi/cli/clear_cache.py",
+      "stdlib_imports": [
+        "__future__",
+        "argparse",
+        "pathlib",
+        "shutil"
+      ],
+      "third_party_imports": [
+        "cupy"
+      ]
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.cli.generate_planet",
+      "is_package": false,
+      "path": "tropoi/cli/generate_planet.py",
+      "stdlib_imports": [
+        "__future__",
+        "argparse",
+        "pathlib"
+      ],
+      "third_party_imports": []
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.cli.main",
+      "is_package": false,
+      "path": "tropoi/cli/main.py",
+      "stdlib_imports": [
+        "__future__",
+        "argparse",
+        "json",
+        "pathlib",
+        "sys",
+        "typing"
+      ],
+      "third_party_imports": []
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.cli.pe",
+      "is_package": false,
+      "path": "tropoi/cli/pe.py",
+      "stdlib_imports": [
+        "__future__",
+        "pathlib",
+        "shutil",
+        "typing"
+      ],
+      "third_party_imports": []
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.cli.run_lifecycle",
+      "is_package": false,
+      "path": "tropoi/cli/run_lifecycle.py",
+      "stdlib_imports": [
+        "__future__",
+        "contextlib",
+        "json",
+        "pathlib",
+        "tempfile",
+        "typing"
+      ],
+      "third_party_imports": []
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.cli.swe",
+      "is_package": false,
+      "path": "tropoi/cli/swe.py",
+      "stdlib_imports": [
+        "__future__",
+        "pathlib",
+        "re",
+        "shutil",
+        "typing"
+      ],
+      "third_party_imports": []
+    },
+    {
+      "category": "reexport",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.numerics",
+      "is_package": true,
+      "path": "tropoi/numerics/__init__.py",
+      "stdlib_imports": [],
+      "third_party_imports": []
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.numerics.cartesian_to_spherical",
+      "is_package": false,
+      "path": "tropoi/numerics/cartesian_to_spherical.py",
+      "stdlib_imports": [],
+      "third_party_imports": [
+        "numpy"
+      ]
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.numerics.compute_optimal_weights",
+      "is_package": false,
+      "path": "tropoi/numerics/compute_optimal_weights.py",
+      "stdlib_imports": [],
+      "third_party_imports": [
+        "cupy",
+        "numpy",
+        "scipy"
+      ]
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.numerics.cuda.cuda_utils",
+      "is_package": false,
+      "path": "tropoi/numerics/cuda/cuda_utils.py",
+      "stdlib_imports": [
+        "importlib"
+      ],
+      "third_party_imports": [
+        "cupy"
+      ]
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.numerics.differential_operators_spherical",
+      "is_package": false,
+      "path": "tropoi/numerics/differential_operators_spherical.py",
+      "stdlib_imports": [],
+      "third_party_imports": [
+        "cupy",
+        "cupyx"
+      ]
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.numerics.fast_geodesic_sh",
+      "is_package": false,
+      "path": "tropoi/numerics/fast_geodesic_sh.py",
+      "stdlib_imports": [],
+      "third_party_imports": [
+        "cupy"
+      ]
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.numerics.geodesic_grid",
+      "is_package": false,
+      "path": "tropoi/numerics/geodesic_grid.py",
+      "stdlib_imports": [],
+      "third_party_imports": [
+        "cupy",
+        "numpy",
+        "scipy"
+      ]
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.numerics.grid",
+      "is_package": false,
+      "path": "tropoi/numerics/grid.py",
+      "stdlib_imports": [
+        "typing"
+      ],
+      "third_party_imports": [
+        "numpy"
+      ]
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.numerics.grid_base",
+      "is_package": false,
+      "path": "tropoi/numerics/grid_base.py",
+      "stdlib_imports": [
+        "abc"
+      ],
+      "third_party_imports": [
+        "cupy"
+      ]
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.numerics.grid_interpolation",
+      "is_package": false,
+      "path": "tropoi/numerics/grid_interpolation.py",
+      "stdlib_imports": [
+        "typing"
+      ],
+      "third_party_imports": [
+        "cupy",
+        "numpy",
+        "scipy"
+      ]
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.numerics.integration",
+      "is_package": false,
+      "path": "tropoi/numerics/integration.py",
+      "stdlib_imports": [],
+      "third_party_imports": [
+        "cupy"
+      ]
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.numerics.latlon_grid",
+      "is_package": false,
+      "path": "tropoi/numerics/latlon_grid.py",
+      "stdlib_imports": [
+        "__future__",
+        "warnings"
+      ],
+      "third_party_imports": [
+        "cupy",
+        "numpy"
+      ]
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.numerics.optimized_geodesic_sh",
+      "is_package": false,
+      "path": "tropoi/numerics/optimized_geodesic_sh.py",
+      "stdlib_imports": [
+        "pathlib",
+        "pickle",
+        "warnings"
+      ],
+      "third_party_imports": [
+        "cupy",
+        "numpy",
+        "scipy"
+      ]
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.numerics.spectral_operators",
+      "is_package": false,
+      "path": "tropoi/numerics/spectral_operators.py",
+      "stdlib_imports": [],
+      "third_party_imports": [
+        "cupy"
+      ]
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.numerics.spherical_backend",
+      "is_package": false,
+      "path": "tropoi/numerics/spherical_backend.py",
+      "stdlib_imports": [
+        "__future__",
+        "abc",
+        "dataclasses",
+        "typing"
+      ],
+      "third_party_imports": [
+        "cupy"
+      ]
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.numerics.spherical_harmonics",
+      "is_package": false,
+      "path": "tropoi/numerics/spherical_harmonics.py",
+      "stdlib_imports": [],
+      "third_party_imports": [
+        "cupy",
+        "numpy"
+      ]
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.physics.barotropic",
+      "is_package": false,
+      "path": "tropoi/physics/barotropic.py",
+      "stdlib_imports": [
+        "__future__",
+        "dataclasses"
+      ],
+      "third_party_imports": [
+        "cupy"
+      ]
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.physics.primitive_equations",
+      "is_package": false,
+      "path": "tropoi/physics/primitive_equations.py",
+      "stdlib_imports": [
+        "__future__",
+        "dataclasses",
+        "math"
+      ],
+      "third_party_imports": [
+        "cupy"
+      ]
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.physics.shallow_water",
+      "is_package": false,
+      "path": "tropoi/physics/shallow_water.py",
+      "stdlib_imports": [
+        "__future__",
+        "dataclasses",
+        "math"
+      ],
+      "third_party_imports": [
+        "cupy"
+      ]
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.physics.sigma_coordinate",
+      "is_package": false,
+      "path": "tropoi/physics/sigma_coordinate.py",
+      "stdlib_imports": [
+        "__future__",
+        "dataclasses",
+        "functools",
+        "math"
+      ],
+      "third_party_imports": [
+        "numpy"
+      ]
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.physics.topography",
+      "is_package": false,
+      "path": "tropoi/physics/topography.py",
+      "stdlib_imports": [
+        "__future__",
+        "math"
+      ],
+      "third_party_imports": [
+        "cupy"
+      ]
+    },
+    {
+      "category": "reexport",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.planet",
+      "is_package": true,
+      "path": "tropoi/planet/__init__.py",
+      "stdlib_imports": [],
+      "third_party_imports": []
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.planet.elevation_data",
+      "is_package": false,
+      "path": "tropoi/planet/elevation_data.py",
+      "stdlib_imports": [
+        "dataclasses",
+        "typing"
+      ],
+      "third_party_imports": [
+        "cupy",
+        "numpy"
+      ]
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.planet.planet",
+      "is_package": false,
+      "path": "tropoi/planet/planet.py",
+      "stdlib_imports": [
+        "typing"
+      ],
+      "third_party_imports": [
+        "cupy",
+        "numpy"
+      ]
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.planet.planetary_parameters",
+      "is_package": false,
+      "path": "tropoi/planet/planetary_parameters.py",
+      "stdlib_imports": [
+        "dataclasses"
+      ],
+      "third_party_imports": [
+        "numpy",
+        "scipy"
+      ]
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.planet.tectonics",
+      "is_package": false,
+      "path": "tropoi/planet/tectonics.py",
+      "stdlib_imports": [
+        "__future__",
+        "dataclasses",
+        "typing"
+      ],
+      "third_party_imports": [
+        "cupy"
+      ]
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.planet.terrain_spectral",
+      "is_package": false,
+      "path": "tropoi/planet/terrain_spectral.py",
+      "stdlib_imports": [
+        "__future__",
+        "dataclasses",
+        "typing"
+      ],
+      "third_party_imports": [
+        "cupy",
+        "numpy"
+      ]
+    },
+    {
+      "category": "reexport",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.representation.archive",
+      "is_package": true,
+      "path": "tropoi/representation/archive/__init__.py",
+      "stdlib_imports": [],
+      "third_party_imports": []
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.representation.archive.capsule",
+      "is_package": false,
+      "path": "tropoi/representation/archive/capsule.py",
+      "stdlib_imports": [
+        "__future__",
+        "collections",
+        "json",
+        "pathlib",
+        "typing"
+      ],
+      "third_party_imports": [
+        "numpy"
+      ]
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.representation.archive.schema",
+      "is_package": false,
+      "path": "tropoi/representation/archive/schema.py",
+      "stdlib_imports": [
+        "__future__",
+        "collections",
+        "dataclasses",
+        "math"
+      ],
+      "third_party_imports": []
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.representation.visual.snapshot",
+      "is_package": false,
+      "path": "tropoi/representation/visual/snapshot.py",
+      "stdlib_imports": [
+        "__future__",
+        "dataclasses",
+        "pathlib",
+        "typing"
+      ],
+      "third_party_imports": [
+        "numpy"
+      ]
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 1,
+      "id": "tropoi.run.bve",
+      "is_package": true,
+      "path": "tropoi/run/bve/__init__.py",
+      "stdlib_imports": [
+        "importlib"
+      ],
+      "third_party_imports": []
+    },
+    {
+      "category": "reexport",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.run.bve.barotropic_vorticity",
+      "is_package": false,
+      "path": "tropoi/run/bve/barotropic_vorticity.py",
+      "stdlib_imports": [],
+      "third_party_imports": []
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.run.bve.config",
+      "is_package": false,
+      "path": "tropoi/run/bve/config.py",
+      "stdlib_imports": [
+        "__future__",
+        "dataclasses",
+        "math",
+        "typing"
+      ],
+      "third_party_imports": []
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.run.bve.diagnostics",
+      "is_package": false,
+      "path": "tropoi/run/bve/diagnostics.py",
+      "stdlib_imports": [
+        "__future__",
+        "csv",
+        "pathlib"
+      ],
+      "third_party_imports": [
+        "cupy",
+        "matplotlib",
+        "numpy"
+      ]
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.run.bve.initial_conditions",
+      "is_package": false,
+      "path": "tropoi/run/bve/initial_conditions.py",
+      "stdlib_imports": [
+        "__future__"
+      ],
+      "third_party_imports": [
+        "cupy"
+      ]
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 1,
+      "id": "tropoi.run.bve.io",
+      "is_package": false,
+      "path": "tropoi/run/bve/io.py",
+      "stdlib_imports": [
+        "__future__",
+        "contextlib",
+        "dataclasses",
+        "datetime",
+        "hashlib",
+        "json",
+        "math",
+        "os",
+        "pathlib",
+        "subprocess",
+        "sys",
+        "traceback",
+        "typing",
+        "uuid"
+      ],
+      "third_party_imports": [
+        "cupy"
+      ]
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.run.bve.runner",
+      "is_package": false,
+      "path": "tropoi/run/bve/runner.py",
+      "stdlib_imports": [
+        "__future__",
+        "pathlib",
+        "typing"
+      ],
+      "third_party_imports": [
+        "cupy",
+        "numpy"
+      ]
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.run.bve.visualization",
+      "is_package": false,
+      "path": "tropoi/run/bve/visualization.py",
+      "stdlib_imports": [
+        "__future__",
+        "pathlib"
+      ],
+      "third_party_imports": [
+        "cupy",
+        "numpy"
+      ]
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.run.engine",
+      "is_package": false,
+      "path": "tropoi/run/engine.py",
+      "stdlib_imports": [
+        "__future__",
+        "math",
+        "typing"
+      ],
+      "third_party_imports": []
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.run.pe.config",
+      "is_package": false,
+      "path": "tropoi/run/pe/config.py",
+      "stdlib_imports": [
+        "__future__",
+        "dataclasses",
+        "math",
+        "typing"
+      ],
+      "third_party_imports": []
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.run.pe.diagnostics",
+      "is_package": false,
+      "path": "tropoi/run/pe/diagnostics.py",
+      "stdlib_imports": [
+        "__future__",
+        "csv",
+        "pathlib"
+      ],
+      "third_party_imports": [
+        "cupy",
+        "matplotlib",
+        "numpy"
+      ]
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.run.pe.initial_conditions",
+      "is_package": false,
+      "path": "tropoi/run/pe/initial_conditions.py",
+      "stdlib_imports": [
+        "__future__"
+      ],
+      "third_party_imports": []
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.run.pe.runner",
+      "is_package": false,
+      "path": "tropoi/run/pe/runner.py",
+      "stdlib_imports": [
+        "__future__",
+        "math",
+        "pathlib",
+        "typing"
+      ],
+      "third_party_imports": [
+        "cupy",
+        "numpy"
+      ]
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.run.pe.snapshot_visualization",
+      "is_package": false,
+      "path": "tropoi/run/pe/snapshot_visualization.py",
+      "stdlib_imports": [
+        "__future__",
+        "dataclasses",
+        "math",
+        "pathlib"
+      ],
+      "third_party_imports": [
+        "cupy",
+        "numpy"
+      ]
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.run.pe.visualization",
+      "is_package": false,
+      "path": "tropoi/run/pe/visualization.py",
+      "stdlib_imports": [
+        "__future__",
+        "pathlib"
+      ],
+      "third_party_imports": [
+        "cupy",
+        "numpy"
+      ]
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.run.swe.config",
+      "is_package": false,
+      "path": "tropoi/run/swe/config.py",
+      "stdlib_imports": [
+        "__future__",
+        "dataclasses",
+        "math",
+        "typing"
+      ],
+      "third_party_imports": []
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.run.swe.diagnostics",
+      "is_package": false,
+      "path": "tropoi/run/swe/diagnostics.py",
+      "stdlib_imports": [
+        "__future__",
+        "csv",
+        "pathlib"
+      ],
+      "third_party_imports": [
+        "cupy",
+        "matplotlib",
+        "numpy"
+      ]
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.run.swe.initial_conditions",
+      "is_package": false,
+      "path": "tropoi/run/swe/initial_conditions.py",
+      "stdlib_imports": [
+        "__future__",
+        "math"
+      ],
+      "third_party_imports": [
+        "cupy"
+      ]
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.run.swe.runner",
+      "is_package": false,
+      "path": "tropoi/run/swe/runner.py",
+      "stdlib_imports": [
+        "__future__",
+        "pathlib",
+        "typing"
+      ],
+      "third_party_imports": [
+        "cupy",
+        "numpy"
+      ]
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.run.swe.visualization",
+      "is_package": false,
+      "path": "tropoi/run/swe/visualization.py",
+      "stdlib_imports": [
+        "__future__",
+        "pathlib"
+      ],
+      "third_party_imports": [
+        "cupy",
+        "numpy"
+      ]
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.spatial.modes",
+      "is_package": false,
+      "path": "tropoi/spatial/modes.py",
+      "stdlib_imports": [
+        "__future__",
+        "collections",
+        "dataclasses"
+      ],
+      "third_party_imports": [
+        "numpy"
+      ]
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.support",
+      "is_package": false,
+      "path": "tropoi/support.py",
+      "stdlib_imports": [
+        "__future__"
+      ],
+      "third_party_imports": []
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.temporal.simulation",
+      "is_package": false,
+      "path": "tropoi/temporal/simulation.py",
+      "stdlib_imports": [
+        "__future__",
+        "collections",
+        "pathlib",
+        "typing"
+      ],
+      "third_party_imports": [
+        "numpy"
+      ]
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.viz",
+      "is_package": true,
+      "path": "tropoi/viz/__init__.py",
+      "stdlib_imports": [],
+      "third_party_imports": []
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.viz.complex_encoding",
+      "is_package": false,
+      "path": "tropoi/viz/complex_encoding.py",
+      "stdlib_imports": [
+        "__future__",
+        "math"
+      ],
+      "third_party_imports": [
+        "numpy"
+      ]
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.viz.fields",
+      "is_package": false,
+      "path": "tropoi/viz/fields.py",
+      "stdlib_imports": [
+        "__future__",
+        "dataclasses"
+      ],
+      "third_party_imports": [
+        "numpy"
+      ]
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.viz.grid_adapter",
+      "is_package": false,
+      "path": "tropoi/viz/grid_adapter.py",
+      "stdlib_imports": [
+        "__future__",
+        "typing"
+      ],
+      "third_party_imports": [
+        "numpy"
+      ]
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.viz.maps",
+      "is_package": false,
+      "path": "tropoi/viz/maps.py",
+      "stdlib_imports": [
+        "typing"
+      ],
+      "third_party_imports": [
+        "cupy",
+        "matplotlib",
+        "numpy"
+      ]
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.viz.matplotlib_renderer",
+      "is_package": false,
+      "path": "tropoi/viz/matplotlib_renderer.py",
+      "stdlib_imports": [
+        "__future__",
+        "contextlib",
+        "os",
+        "pathlib",
+        "uuid"
+      ],
+      "third_party_imports": [
+        "matplotlib",
+        "numpy"
+      ]
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.viz.normalization",
+      "is_package": false,
+      "path": "tropoi/viz/normalization.py",
+      "stdlib_imports": [
+        "__future__",
+        "dataclasses",
+        "enum"
+      ],
+      "third_party_imports": [
+        "numpy"
+      ]
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.viz.planet_viewer",
+      "is_package": false,
+      "path": "tropoi/viz/planet_viewer.py",
+      "stdlib_imports": [],
+      "third_party_imports": [
+        "cupy",
+        "matplotlib",
+        "numpy"
+      ]
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.viz.renderers",
+      "is_package": false,
+      "path": "tropoi/viz/renderers.py",
+      "stdlib_imports": [
+        "__future__",
+        "pathlib",
+        "typing"
+      ],
+      "third_party_imports": []
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.viz.specs",
+      "is_package": false,
+      "path": "tropoi/viz/specs.py",
+      "stdlib_imports": [
+        "__future__",
+        "dataclasses",
+        "enum",
+        "math",
+        "typing"
+      ],
+      "third_party_imports": [
+        "numpy"
+      ]
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.viz.timeline",
+      "is_package": false,
+      "path": "tropoi/viz/timeline.py",
+      "stdlib_imports": [
+        "__future__",
+        "contextlib",
+        "dataclasses",
+        "os",
+        "pathlib",
+        "re",
+        "shutil",
+        "tempfile",
+        "typing"
+      ],
+      "third_party_imports": [
+        "numpy"
+      ]
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.viz.vorticity_viewer",
+      "is_package": false,
+      "path": "tropoi/viz/vorticity_viewer.py",
+      "stdlib_imports": [
+        "__future__",
+        "pathlib"
+      ],
+      "third_party_imports": [
+        "cupy",
+        "matplotlib",
+        "numpy"
+      ]
+    }
+  ]
+}

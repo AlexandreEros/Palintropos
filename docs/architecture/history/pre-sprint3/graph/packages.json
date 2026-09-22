@@ -1,0 +1,340 @@
+{
+  "edges": [
+    {
+      "kind": "imports",
+      "module_edges": 1,
+      "source": "tropoi.cli",
+      "target": "tropoi.numerics.cuda"
+    },
+    {
+      "kind": "imports",
+      "module_edges": 5,
+      "source": "tropoi.cli",
+      "target": "tropoi.physics"
+    },
+    {
+      "kind": "imports",
+      "module_edges": 6,
+      "source": "tropoi.cli",
+      "target": "tropoi.planet"
+    },
+    {
+      "kind": "imports",
+      "module_edges": 6,
+      "source": "tropoi.cli",
+      "target": "tropoi.representation.archive"
+    },
+    {
+      "kind": "imports",
+      "module_edges": 8,
+      "source": "tropoi.cli",
+      "target": "tropoi.run.bve"
+    },
+    {
+      "kind": "imports",
+      "module_edges": 4,
+      "source": "tropoi.cli",
+      "target": "tropoi.run.pe"
+    },
+    {
+      "kind": "imports",
+      "module_edges": 4,
+      "source": "tropoi.cli",
+      "target": "tropoi.run.swe"
+    },
+    {
+      "kind": "imports",
+      "module_edges": 1,
+      "source": "tropoi.cli",
+      "target": "tropoi.spatial"
+    },
+    {
+      "kind": "imports",
+      "module_edges": 1,
+      "source": "tropoi.cli",
+      "target": "tropoi.viz"
+    },
+    {
+      "kind": "imports",
+      "module_edges": 1,
+      "source": "tropoi.numerics",
+      "target": "tropoi"
+    },
+    {
+      "kind": "imports",
+      "module_edges": 2,
+      "source": "tropoi.numerics",
+      "target": "tropoi.numerics.cuda"
+    },
+    {
+      "kind": "imports",
+      "module_edges": 2,
+      "source": "tropoi.physics",
+      "target": "tropoi"
+    },
+    {
+      "kind": "imports",
+      "module_edges": 3,
+      "source": "tropoi.physics",
+      "target": "tropoi.planet"
+    },
+    {
+      "kind": "imports",
+      "module_edges": 6,
+      "source": "tropoi.planet",
+      "target": "tropoi.numerics"
+    },
+    {
+      "kind": "imports",
+      "module_edges": 1,
+      "source": "tropoi.representation.archive",
+      "target": "tropoi"
+    },
+    {
+      "kind": "imports",
+      "module_edges": 1,
+      "source": "tropoi.representation.archive",
+      "target": "tropoi.representation.visual"
+    },
+    {
+      "kind": "imports",
+      "module_edges": 2,
+      "source": "tropoi.representation.archive",
+      "target": "tropoi.spatial"
+    },
+    {
+      "kind": "imports",
+      "module_edges": 1,
+      "source": "tropoi.representation.archive",
+      "target": "tropoi.temporal"
+    },
+    {
+      "kind": "imports",
+      "module_edges": 3,
+      "source": "tropoi.representation.visual",
+      "target": "tropoi.cli"
+    },
+    {
+      "kind": "imports",
+      "module_edges": 1,
+      "source": "tropoi.representation.visual",
+      "target": "tropoi.run.bve"
+    },
+    {
+      "kind": "imports",
+      "module_edges": 1,
+      "source": "tropoi.representation.visual",
+      "target": "tropoi.run.pe"
+    },
+    {
+      "kind": "imports",
+      "module_edges": 1,
+      "source": "tropoi.representation.visual",
+      "target": "tropoi.run.swe"
+    },
+    {
+      "kind": "imports",
+      "module_edges": 1,
+      "source": "tropoi.representation.visual",
+      "target": "tropoi.viz"
+    },
+    {
+      "kind": "imports",
+      "module_edges": 1,
+      "source": "tropoi.run.bve",
+      "target": "tropoi"
+    },
+    {
+      "kind": "imports",
+      "module_edges": 1,
+      "source": "tropoi.run.bve",
+      "target": "tropoi.physics"
+    },
+    {
+      "kind": "imports",
+      "module_edges": 2,
+      "source": "tropoi.run.bve",
+      "target": "tropoi.planet"
+    },
+    {
+      "kind": "imports",
+      "module_edges": 2,
+      "source": "tropoi.run.bve",
+      "target": "tropoi.run"
+    },
+    {
+      "kind": "imports",
+      "module_edges": 8,
+      "source": "tropoi.run.bve",
+      "target": "tropoi.viz"
+    },
+    {
+      "kind": "imports",
+      "module_edges": 1,
+      "source": "tropoi.run.pe",
+      "target": "tropoi"
+    },
+    {
+      "kind": "imports",
+      "module_edges": 5,
+      "source": "tropoi.run.pe",
+      "target": "tropoi.physics"
+    },
+    {
+      "kind": "imports",
+      "module_edges": 2,
+      "source": "tropoi.run.pe",
+      "target": "tropoi.run"
+    },
+    {
+      "kind": "imports",
+      "module_edges": 1,
+      "source": "tropoi.run.pe",
+      "target": "tropoi.run.bve"
+    },
+    {
+      "kind": "imports",
+      "module_edges": 1,
+      "source": "tropoi.run.pe",
+      "target": "tropoi.run.swe"
+    },
+    {
+      "kind": "imports",
+      "module_edges": 9,
+      "source": "tropoi.run.pe",
+      "target": "tropoi.viz"
+    },
+    {
+      "kind": "imports",
+      "module_edges": 1,
+      "source": "tropoi.run.swe",
+      "target": "tropoi"
+    },
+    {
+      "kind": "imports",
+      "module_edges": 4,
+      "source": "tropoi.run.swe",
+      "target": "tropoi.physics"
+    },
+    {
+      "kind": "imports",
+      "module_edges": 2,
+      "source": "tropoi.run.swe",
+      "target": "tropoi.run"
+    },
+    {
+      "kind": "imports",
+      "module_edges": 2,
+      "source": "tropoi.run.swe",
+      "target": "tropoi.run.bve"
+    },
+    {
+      "kind": "imports",
+      "module_edges": 6,
+      "source": "tropoi.run.swe",
+      "target": "tropoi.viz"
+    },
+    {
+      "kind": "imports",
+      "module_edges": 1,
+      "source": "tropoi.temporal",
+      "target": "tropoi.spatial"
+    },
+    {
+      "kind": "imports",
+      "module_edges": 3,
+      "source": "tropoi.viz",
+      "target": "tropoi.numerics"
+    },
+    {
+      "kind": "imports",
+      "module_edges": 3,
+      "source": "tropoi.viz",
+      "target": "tropoi.planet"
+    },
+    {
+      "kind": "imports",
+      "module_edges": 2,
+      "source": "tropoi.viz",
+      "target": "tropoi.run.bve"
+    }
+  ],
+  "name": "packages",
+  "nodes": [
+    {
+      "id": "tropoi",
+      "internal_edges": 0,
+      "modules": 1
+    },
+    {
+      "id": "tropoi.cli",
+      "internal_edges": 11,
+      "modules": 7
+    },
+    {
+      "id": "tropoi.numerics",
+      "internal_edges": 33,
+      "modules": 15
+    },
+    {
+      "id": "tropoi.numerics.cuda",
+      "internal_edges": 0,
+      "modules": 1
+    },
+    {
+      "id": "tropoi.physics",
+      "internal_edges": 2,
+      "modules": 5
+    },
+    {
+      "id": "tropoi.planet",
+      "internal_edges": 7,
+      "modules": 6
+    },
+    {
+      "id": "tropoi.representation.archive",
+      "internal_edges": 3,
+      "modules": 3
+    },
+    {
+      "id": "tropoi.representation.visual",
+      "internal_edges": 0,
+      "modules": 1
+    },
+    {
+      "id": "tropoi.run",
+      "internal_edges": 0,
+      "modules": 1
+    },
+    {
+      "id": "tropoi.run.bve",
+      "internal_edges": 5,
+      "modules": 8
+    },
+    {
+      "id": "tropoi.run.pe",
+      "internal_edges": 6,
+      "modules": 6
+    },
+    {
+      "id": "tropoi.run.swe",
+      "internal_edges": 4,
+      "modules": 5
+    },
+    {
+      "id": "tropoi.spatial",
+      "internal_edges": 0,
+      "modules": 1
+    },
+    {
+      "id": "tropoi.temporal",
+      "internal_edges": 0,
+      "modules": 1
+    },
+    {
+      "id": "tropoi.viz",
+      "internal_edges": 24,
+      "modules": 12
+    }
+  ]
+}
