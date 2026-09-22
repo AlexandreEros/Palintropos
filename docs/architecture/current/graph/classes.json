@@ -1,0 +1,2506 @@
+{
+  "edges": [
+    {
+      "kind": "inherits",
+      "position": 0,
+      "source": "tropoi.representation.archive.capsule.CapsuleLayoutError",
+      "target": "tropoi.representation.archive.capsule.CapsuleError"
+    },
+    {
+      "kind": "inherits",
+      "position": 0,
+      "source": "tropoi.representation.archive.schema.UnknownSchemaVersionError",
+      "target": "tropoi.representation.archive.schema.SchemaError"
+    },
+    {
+      "kind": "inherits",
+      "position": 0,
+      "source": "tropoi.representation.archive.schema.UnsupportedConventionError",
+      "target": "tropoi.representation.archive.schema.SchemaError"
+    },
+    {
+      "kind": "inherits",
+      "position": 0,
+      "source": "tropoi.spatial.grids.geodesic_grid.GeodesicGridGeometry",
+      "target": "tropoi.spatial.grids.grid_base.GridGeometry"
+    },
+    {
+      "kind": "inherits",
+      "position": 0,
+      "source": "tropoi.spatial.grids.grid.LatLonGridGeometry",
+      "target": "tropoi.spatial.grids.grid_base.GridGeometry"
+    },
+    {
+      "kind": "inherits",
+      "position": 0,
+      "source": "tropoi.spatial.grids.latlon_grid.GaussLatLonGridGeometry",
+      "target": "tropoi.spatial.grids.grid_base.GridGeometry"
+    },
+    {
+      "kind": "inherits",
+      "position": 0,
+      "source": "tropoi.spatial.spherical_backend.GeodesicBackend",
+      "target": "tropoi.spatial.spherical_backend.SphericalGridBackend"
+    },
+    {
+      "kind": "inherits",
+      "position": 0,
+      "source": "tropoi.spatial.spherical_backend.LatLonBackend",
+      "target": "tropoi.spatial.spherical_backend.SphericalGridBackend"
+    },
+    {
+      "kind": "inherits",
+      "position": 0,
+      "source": "tropoi.spatial.spherical_backend.PointSetBackend",
+      "target": "tropoi.spatial.spherical_backend.SphericalGridBackend"
+    }
+  ],
+  "name": "classes",
+  "nodes": [
+    {
+      "decorators": [],
+      "external_bases": [
+        "RuntimeError"
+      ],
+      "id": "tropoi.cli.bve.OverwriteCleanupError",
+      "members": [],
+      "module": "tropoi.cli.bve",
+      "qualname": "OverwriteCleanupError"
+    },
+    {
+      "decorators": [],
+      "external_bases": [
+        "ValueError"
+      ],
+      "id": "tropoi.representation.archive.capsule.CapsuleError",
+      "members": [],
+      "module": "tropoi.representation.archive.capsule",
+      "qualname": "CapsuleError"
+    },
+    {
+      "decorators": [],
+      "external_bases": [],
+      "id": "tropoi.representation.archive.capsule.CapsuleLayoutError",
+      "members": [],
+      "module": "tropoi.representation.archive.capsule",
+      "qualname": "CapsuleLayoutError"
+    },
+    {
+      "decorators": [],
+      "external_bases": [],
+      "id": "tropoi.representation.archive.capsule.CapsuleStorage",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__init__"
+        },
+        {
+          "kind": "method",
+          "name": "__repr__"
+        },
+        {
+          "kind": "method",
+          "name": "_is_legacy_interval_bve_capsule"
+        },
+        {
+          "kind": "method",
+          "name": "_load_times"
+        },
+        {
+          "kind": "property",
+          "name": "coefficients"
+        },
+        {
+          "kind": "property",
+          "name": "field_specs"
+        },
+        {
+          "kind": "method",
+          "name": "frame"
+        },
+        {
+          "kind": "property",
+          "name": "frame_count"
+        },
+        {
+          "kind": "property",
+          "name": "level_values"
+        },
+        {
+          "kind": "property",
+          "name": "metadata"
+        },
+        {
+          "kind": "method",
+          "name": "plot_snapshot"
+        },
+        {
+          "kind": "property",
+          "name": "resource_builds"
+        },
+        {
+          "kind": "method",
+          "name": "resources"
+        },
+        {
+          "kind": "property",
+          "name": "schema"
+        },
+        {
+          "kind": "property",
+          "name": "schema_error"
+        },
+        {
+          "kind": "method",
+          "name": "stored_array"
+        },
+        {
+          "kind": "property",
+          "name": "time_provenance"
+        },
+        {
+          "kind": "property",
+          "name": "times"
+        }
+      ],
+      "module": "tropoi.representation.archive.capsule",
+      "qualname": "CapsuleStorage"
+    },
+    {
+      "decorators": [],
+      "external_bases": [
+        "ValueError"
+      ],
+      "id": "tropoi.representation.archive.schema.SchemaError",
+      "members": [],
+      "module": "tropoi.representation.archive.schema",
+      "qualname": "SchemaError"
+    },
+    {
+      "decorators": [
+        "dataclass(frozen=True)"
+      ],
+      "external_bases": [],
+      "id": "tropoi.representation.archive.schema.StateSchema",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__post_init__"
+        },
+        {
+          "kind": "method",
+          "name": "_check_canonical_layout"
+        },
+        {
+          "kind": "method",
+          "name": "check_consistency"
+        },
+        {
+          "kind": "property",
+          "name": "field_names"
+        },
+        {
+          "kind": "property",
+          "name": "frame_shape"
+        },
+        {
+          "kind": "classmethod",
+          "name": "from_manifest_dict"
+        },
+        {
+          "kind": "property",
+          "name": "inferred"
+        },
+        {
+          "kind": "property",
+          "name": "level_values"
+        },
+        {
+          "kind": "property",
+          "name": "support"
+        },
+        {
+          "kind": "method",
+          "name": "to_manifest_dict"
+        }
+      ],
+      "module": "tropoi.representation.archive.schema",
+      "qualname": "StateSchema"
+    },
+    {
+      "decorators": [],
+      "external_bases": [],
+      "id": "tropoi.representation.archive.schema.UnknownSchemaVersionError",
+      "members": [],
+      "module": "tropoi.representation.archive.schema",
+      "qualname": "UnknownSchemaVersionError"
+    },
+    {
+      "decorators": [],
+      "external_bases": [],
+      "id": "tropoi.representation.archive.schema.UnsupportedConventionError",
+      "members": [],
+      "module": "tropoi.representation.archive.schema",
+      "qualname": "UnsupportedConventionError"
+    },
+    {
+      "decorators": [
+        "dataclass"
+      ],
+      "external_bases": [],
+      "id": "tropoi.representation.archive.writer.RunDirectory",
+      "members": [
+        {
+          "kind": "method",
+          "name": "_pointer_content"
+        },
+        {
+          "kind": "method",
+          "name": "_pointer_path"
+        },
+        {
+          "kind": "method",
+          "name": "_validate_completed_manifest"
+        },
+        {
+          "kind": "method",
+          "name": "clear_latest_pointer_if_matches"
+        },
+        {
+          "kind": "method",
+          "name": "figure_metadata"
+        },
+        {
+          "kind": "method",
+          "name": "update_latest_pointer"
+        }
+      ],
+      "module": "tropoi.representation.archive.writer",
+      "qualname": "RunDirectory"
+    },
+    {
+      "decorators": [],
+      "external_bases": [
+        "RuntimeError"
+      ],
+      "id": "tropoi.representation.archive.writer.RunProvenanceError",
+      "members": [],
+      "module": "tropoi.representation.archive.writer",
+      "qualname": "RunProvenanceError"
+    },
+    {
+      "decorators": [],
+      "external_bases": [],
+      "id": "tropoi.representation.diagnostics.bve.DiagnosticsRecorder",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__enter__"
+        },
+        {
+          "kind": "method",
+          "name": "__exit__"
+        },
+        {
+          "kind": "method",
+          "name": "__init__"
+        },
+        {
+          "kind": "method",
+          "name": "close"
+        },
+        {
+          "kind": "method",
+          "name": "record"
+        }
+      ],
+      "module": "tropoi.representation.diagnostics.bve",
+      "qualname": "DiagnosticsRecorder"
+    },
+    {
+      "decorators": [],
+      "external_bases": [],
+      "id": "tropoi.representation.diagnostics.pe.PEDiagnosticsRecorder",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__enter__"
+        },
+        {
+          "kind": "method",
+          "name": "__exit__"
+        },
+        {
+          "kind": "method",
+          "name": "__init__"
+        },
+        {
+          "kind": "method",
+          "name": "close"
+        },
+        {
+          "kind": "method",
+          "name": "record"
+        }
+      ],
+      "module": "tropoi.representation.diagnostics.pe",
+      "qualname": "PEDiagnosticsRecorder"
+    },
+    {
+      "decorators": [],
+      "external_bases": [],
+      "id": "tropoi.representation.diagnostics.swe.SWEDiagnosticsRecorder",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__enter__"
+        },
+        {
+          "kind": "method",
+          "name": "__exit__"
+        },
+        {
+          "kind": "method",
+          "name": "__init__"
+        },
+        {
+          "kind": "method",
+          "name": "close"
+        },
+        {
+          "kind": "method",
+          "name": "record"
+        }
+      ],
+      "module": "tropoi.representation.diagnostics.swe",
+      "qualname": "SWEDiagnosticsRecorder"
+    },
+    {
+      "decorators": [
+        "dataclass(frozen=True)"
+      ],
+      "external_bases": [],
+      "id": "tropoi.representation.visual.fields.ScalarGridField",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__post_init__"
+        },
+        {
+          "kind": "method",
+          "name": "select_time"
+        },
+        {
+          "kind": "property",
+          "name": "state_count"
+        },
+        {
+          "kind": "method",
+          "name": "values_at"
+        }
+      ],
+      "module": "tropoi.representation.visual.fields",
+      "qualname": "ScalarGridField"
+    },
+    {
+      "decorators": [
+        "dataclass(frozen=True)"
+      ],
+      "external_bases": [],
+      "id": "tropoi.representation.visual.fields.SphericalHarmonicField",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__post_init__"
+        },
+        {
+          "kind": "method",
+          "name": "coefficients_at"
+        },
+        {
+          "kind": "property",
+          "name": "l_max"
+        },
+        {
+          "kind": "method",
+          "name": "select_time"
+        },
+        {
+          "kind": "property",
+          "name": "state_count"
+        },
+        {
+          "kind": "property",
+          "name": "valid_mask"
+        }
+      ],
+      "module": "tropoi.representation.visual.fields",
+      "qualname": "SphericalHarmonicField"
+    },
+    {
+      "decorators": [],
+      "external_bases": [],
+      "id": "tropoi.representation.visual.matplotlib_renderer.MatplotlibRenderer",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__init__"
+        },
+        {
+          "kind": "staticmethod",
+          "name": "_color_map"
+        },
+        {
+          "kind": "staticmethod",
+          "name": "_label_spectral_axes"
+        },
+        {
+          "kind": "staticmethod",
+          "name": "_mpl_normalization"
+        },
+        {
+          "kind": "staticmethod",
+          "name": "_render_line_panel"
+        },
+        {
+          "kind": "method",
+          "name": "_render_panel"
+        },
+        {
+          "kind": "staticmethod",
+          "name": "_render_panel_groups"
+        },
+        {
+          "kind": "staticmethod",
+          "name": "_render_phase_legend"
+        },
+        {
+          "kind": "method",
+          "name": "_render_scalar_panel"
+        },
+        {
+          "kind": "method",
+          "name": "_render_spectral_panel"
+        },
+        {
+          "kind": "method",
+          "name": "_render_streamline_panel"
+        },
+        {
+          "kind": "staticmethod",
+          "name": "_save_atomic"
+        },
+        {
+          "kind": "method",
+          "name": "render_figure"
+        },
+        {
+          "kind": "method",
+          "name": "render_scalar_map"
+        },
+        {
+          "kind": "method",
+          "name": "render_spectral_coefficient_map"
+        },
+        {
+          "kind": "method",
+          "name": "render_streamline_map"
+        }
+      ],
+      "module": "tropoi.representation.visual.matplotlib_renderer",
+      "qualname": "MatplotlibRenderer"
+    },
+    {
+      "decorators": [],
+      "external_bases": [
+        "str",
+        "enum.Enum"
+      ],
+      "id": "tropoi.representation.visual.normalization.NormalizationKind",
+      "members": [],
+      "module": "tropoi.representation.visual.normalization",
+      "qualname": "NormalizationKind"
+    },
+    {
+      "decorators": [
+        "dataclass(frozen=True)"
+      ],
+      "external_bases": [],
+      "id": "tropoi.representation.visual.normalization.NormalizationPolicy",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__post_init__"
+        },
+        {
+          "kind": "classmethod",
+          "name": "automatic"
+        },
+        {
+          "kind": "classmethod",
+          "name": "fixed"
+        },
+        {
+          "kind": "classmethod",
+          "name": "from_resolved"
+        },
+        {
+          "kind": "classmethod",
+          "name": "logarithmic_magnitude"
+        },
+        {
+          "kind": "method",
+          "name": "resolve"
+        },
+        {
+          "kind": "classmethod",
+          "name": "symmetric"
+        }
+      ],
+      "module": "tropoi.representation.visual.normalization",
+      "qualname": "NormalizationPolicy"
+    },
+    {
+      "decorators": [
+        "dataclass(frozen=True)"
+      ],
+      "external_bases": [],
+      "id": "tropoi.representation.visual.normalization.ResolvedNormalization",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__post_init__"
+        }
+      ],
+      "module": "tropoi.representation.visual.normalization",
+      "qualname": "ResolvedNormalization"
+    },
+    {
+      "decorators": [
+        "dataclass(frozen=True)"
+      ],
+      "external_bases": [],
+      "id": "tropoi.representation.visual.pe_snapshots.PESnapshotFields",
+      "members": [],
+      "module": "tropoi.representation.visual.pe_snapshots",
+      "qualname": "PESnapshotFields"
+    },
+    {
+      "decorators": [
+        "dataclass(frozen=True)"
+      ],
+      "external_bases": [],
+      "id": "tropoi.representation.visual.pe_snapshots.SelectedLevels",
+      "members": [],
+      "module": "tropoi.representation.visual.pe_snapshots",
+      "qualname": "SelectedLevels"
+    },
+    {
+      "decorators": [],
+      "external_bases": [],
+      "id": "tropoi.representation.visual.planet_viewer.PlanetViewer",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__init__"
+        },
+        {
+          "kind": "staticmethod",
+          "name": "plot_coefficient_complex_visualization"
+        },
+        {
+          "kind": "staticmethod",
+          "name": "plot_scalar"
+        },
+        {
+          "kind": "method",
+          "name": "plot_summary"
+        }
+      ],
+      "module": "tropoi.representation.visual.planet_viewer",
+      "qualname": "PlanetViewer"
+    },
+    {
+      "decorators": [
+        "runtime_checkable"
+      ],
+      "external_bases": [
+        "typing.Protocol"
+      ],
+      "id": "tropoi.representation.visual.renderers.Renderer",
+      "members": [
+        {
+          "kind": "method",
+          "name": "render_figure"
+        },
+        {
+          "kind": "method",
+          "name": "render_scalar_map"
+        },
+        {
+          "kind": "method",
+          "name": "render_spectral_coefficient_map"
+        },
+        {
+          "kind": "method",
+          "name": "render_streamline_map"
+        }
+      ],
+      "module": "tropoi.representation.visual.renderers",
+      "qualname": "Renderer"
+    },
+    {
+      "decorators": [],
+      "external_bases": [
+        "RuntimeError"
+      ],
+      "id": "tropoi.representation.visual.snapshot.PlotUnavailableError",
+      "members": [],
+      "module": "tropoi.representation.visual.snapshot",
+      "qualname": "PlotUnavailableError"
+    },
+    {
+      "decorators": [
+        "dataclass(frozen=True)"
+      ],
+      "external_bases": [],
+      "id": "tropoi.representation.visual.snapshot.SnapshotResources",
+      "members": [
+        {
+          "kind": "property",
+          "name": "grid"
+        },
+        {
+          "kind": "property",
+          "name": "transform"
+        }
+      ],
+      "module": "tropoi.representation.visual.snapshot",
+      "qualname": "SnapshotResources"
+    },
+    {
+      "decorators": [
+        "dataclass(frozen=True)"
+      ],
+      "external_bases": [],
+      "id": "tropoi.representation.visual.specs.FigureSpec",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__post_init__"
+        }
+      ],
+      "module": "tropoi.representation.visual.specs",
+      "qualname": "FigureSpec"
+    },
+    {
+      "decorators": [
+        "dataclass(frozen=True)"
+      ],
+      "external_bases": [],
+      "id": "tropoi.representation.visual.specs.LinePanelSpec",
+      "members": [],
+      "module": "tropoi.representation.visual.specs",
+      "qualname": "LinePanelSpec"
+    },
+    {
+      "decorators": [
+        "dataclass(frozen=True)"
+      ],
+      "external_bases": [],
+      "id": "tropoi.representation.visual.specs.LineSeriesSpec",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__post_init__"
+        }
+      ],
+      "module": "tropoi.representation.visual.specs",
+      "qualname": "LineSeriesSpec"
+    },
+    {
+      "decorators": [
+        "dataclass(frozen=True)"
+      ],
+      "external_bases": [],
+      "id": "tropoi.representation.visual.specs.PanelGroupSpec",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__post_init__"
+        },
+        {
+          "kind": "method",
+          "name": "contains"
+        }
+      ],
+      "module": "tropoi.representation.visual.specs",
+      "qualname": "PanelGroupSpec"
+    },
+    {
+      "decorators": [
+        "dataclass(frozen=True)"
+      ],
+      "external_bases": [],
+      "id": "tropoi.representation.visual.specs.PanelPlacement",
+      "members": [],
+      "module": "tropoi.representation.visual.specs",
+      "qualname": "PanelPlacement"
+    },
+    {
+      "decorators": [
+        "dataclass(frozen=True)"
+      ],
+      "external_bases": [],
+      "id": "tropoi.representation.visual.specs.ScalarMapSpec",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__post_init__"
+        },
+        {
+          "kind": "property",
+          "name": "display_units"
+        }
+      ],
+      "module": "tropoi.representation.visual.specs",
+      "qualname": "ScalarMapSpec"
+    },
+    {
+      "decorators": [
+        "dataclass(frozen=True)"
+      ],
+      "external_bases": [],
+      "id": "tropoi.representation.visual.specs.SpectralCoefficientMapSpec",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__post_init__"
+        },
+        {
+          "kind": "property",
+          "name": "convention_metadata"
+        },
+        {
+          "kind": "property",
+          "name": "display_units"
+        },
+        {
+          "kind": "property",
+          "name": "encoding_label"
+        }
+      ],
+      "module": "tropoi.representation.visual.specs",
+      "qualname": "SpectralCoefficientMapSpec"
+    },
+    {
+      "decorators": [],
+      "external_bases": [
+        "str",
+        "enum.Enum"
+      ],
+      "id": "tropoi.representation.visual.specs.SpectralEncoding",
+      "members": [],
+      "module": "tropoi.representation.visual.specs",
+      "qualname": "SpectralEncoding"
+    },
+    {
+      "decorators": [
+        "dataclass(frozen=True)"
+      ],
+      "external_bases": [],
+      "id": "tropoi.representation.visual.specs.StreamlineMapSpec",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__post_init__"
+        }
+      ],
+      "module": "tropoi.representation.visual.specs",
+      "qualname": "StreamlineMapSpec"
+    },
+    {
+      "decorators": [
+        "dataclass(frozen=True)"
+      ],
+      "external_bases": [],
+      "id": "tropoi.representation.visual.specs.TextPanelSpec",
+      "members": [],
+      "module": "tropoi.representation.visual.specs",
+      "qualname": "TextPanelSpec"
+    },
+    {
+      "decorators": [
+        "dataclass(frozen=True)"
+      ],
+      "external_bases": [],
+      "id": "tropoi.representation.visual.timeline.FigureFrame",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__post_init__"
+        }
+      ],
+      "module": "tropoi.representation.visual.timeline",
+      "qualname": "FigureFrame"
+    },
+    {
+      "decorators": [
+        "dataclass(frozen=True)"
+      ],
+      "external_bases": [],
+      "id": "tropoi.representation.visual.timeline.FigureTimeline",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__post_init__"
+        },
+        {
+          "kind": "method",
+          "name": "filename_for"
+        },
+        {
+          "kind": "classmethod",
+          "name": "from_figures"
+        },
+        {
+          "kind": "method",
+          "name": "matches_filename"
+        },
+        {
+          "kind": "method",
+          "name": "overview_specification"
+        },
+        {
+          "kind": "method",
+          "name": "representative_indices"
+        },
+        {
+          "kind": "method",
+          "name": "resolve_normalizations"
+        },
+        {
+          "kind": "property",
+          "name": "specifications"
+        },
+        {
+          "kind": "property",
+          "name": "times_seconds"
+        }
+      ],
+      "module": "tropoi.representation.visual.timeline",
+      "qualname": "FigureTimeline"
+    },
+    {
+      "decorators": [],
+      "external_bases": [],
+      "id": "tropoi.representation.visual.vorticity_viewer.VorticityViewer",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__init__"
+        },
+        {
+          "kind": "staticmethod",
+          "name": "_build_summary_text"
+        },
+        {
+          "kind": "method",
+          "name": "_map_scalar_to_view"
+        },
+        {
+          "kind": "method",
+          "name": "_map_vector_to_view"
+        },
+        {
+          "kind": "method",
+          "name": "_plot_all_snapshots_legacy"
+        },
+        {
+          "kind": "method",
+          "name": "plot_all_snapshots"
+        },
+        {
+          "kind": "method",
+          "name": "summary_spec"
+        }
+      ],
+      "module": "tropoi.representation.visual.vorticity_viewer",
+      "qualname": "VorticityViewer"
+    },
+    {
+      "decorators": [
+        "dataclass(frozen=True)"
+      ],
+      "external_bases": [],
+      "id": "tropoi.run.bve.config.BVERunConfig",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__post_init__"
+        },
+        {
+          "kind": "staticmethod",
+          "name": "_resolve_plots"
+        },
+        {
+          "kind": "property",
+          "name": "includes_final_state"
+        },
+        {
+          "kind": "classmethod",
+          "name": "resolve"
+        },
+        {
+          "kind": "method",
+          "name": "scientific_config_dict"
+        },
+        {
+          "kind": "method",
+          "name": "snapshot_times_seconds"
+        },
+        {
+          "kind": "method",
+          "name": "summary_lines"
+        },
+        {
+          "kind": "method",
+          "name": "to_run_config_dict"
+        }
+      ],
+      "module": "tropoi.run.bve.config",
+      "qualname": "BVERunConfig"
+    },
+    {
+      "decorators": [
+        "dataclass(frozen=True)"
+      ],
+      "external_bases": [],
+      "id": "tropoi.run.pe.config.PERunConfig",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__post_init__"
+        },
+        {
+          "kind": "staticmethod",
+          "name": "_resolve_plots"
+        },
+        {
+          "kind": "method",
+          "name": "_validate_snapshot_controls"
+        },
+        {
+          "kind": "method",
+          "name": "_validate_topography"
+        },
+        {
+          "kind": "classmethod",
+          "name": "resolve"
+        },
+        {
+          "kind": "method",
+          "name": "scientific_config_dict"
+        },
+        {
+          "kind": "method",
+          "name": "sigma_interfaces_resolved"
+        },
+        {
+          "kind": "method",
+          "name": "snapshot_times_seconds"
+        },
+        {
+          "kind": "method",
+          "name": "summary_lines"
+        },
+        {
+          "kind": "method",
+          "name": "to_run_config_dict"
+        }
+      ],
+      "module": "tropoi.run.pe.config",
+      "qualname": "PERunConfig"
+    },
+    {
+      "decorators": [
+        "dataclass(frozen=True)"
+      ],
+      "external_bases": [],
+      "id": "tropoi.run.swe.config.SWERunConfig",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__post_init__"
+        },
+        {
+          "kind": "staticmethod",
+          "name": "_resolve_plots"
+        },
+        {
+          "kind": "classmethod",
+          "name": "resolve"
+        },
+        {
+          "kind": "method",
+          "name": "scientific_config_dict"
+        },
+        {
+          "kind": "method",
+          "name": "snapshot_times_seconds"
+        },
+        {
+          "kind": "method",
+          "name": "summary_lines"
+        },
+        {
+          "kind": "method",
+          "name": "to_run_config_dict"
+        },
+        {
+          "kind": "method",
+          "name": "w5_canonical"
+        }
+      ],
+      "module": "tropoi.run.swe.config",
+      "qualname": "SWERunConfig"
+    },
+    {
+      "decorators": [
+        "dataclass"
+      ],
+      "external_bases": [],
+      "id": "tropoi.spatial.environment.PlanetaryParameters",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__post_init__"
+        },
+        {
+          "kind": "method",
+          "name": "_calculate_oblateness"
+        },
+        {
+          "kind": "classmethod",
+          "name": "from_earth_like"
+        },
+        {
+          "kind": "classmethod",
+          "name": "from_si"
+        },
+        {
+          "kind": "classmethod",
+          "name": "ideal_sphere"
+        }
+      ],
+      "module": "tropoi.spatial.environment",
+      "qualname": "PlanetaryParameters"
+    },
+    {
+      "decorators": [],
+      "external_bases": [],
+      "id": "tropoi.spatial.grids.geodesic_grid.GeodesicGridGeometry",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__init__"
+        },
+        {
+          "kind": "method",
+          "name": "_compute_voronoi_areas"
+        },
+        {
+          "kind": "staticmethod",
+          "name": "_get_midpoint_index"
+        },
+        {
+          "kind": "method",
+          "name": "build_adjacency_matrix"
+        },
+        {
+          "kind": "property",
+          "name": "cell_areas"
+        },
+        {
+          "kind": "property",
+          "name": "cfl_length_scale"
+        },
+        {
+          "kind": "method",
+          "name": "geodesic_subdivide"
+        },
+        {
+          "kind": "property",
+          "name": "latitudes"
+        },
+        {
+          "kind": "property",
+          "name": "longitudes"
+        },
+        {
+          "kind": "property",
+          "name": "n_points"
+        },
+        {
+          "kind": "property",
+          "name": "point_latitudes"
+        },
+        {
+          "kind": "property",
+          "name": "point_longitudes"
+        },
+        {
+          "kind": "method",
+          "name": "points_latlon"
+        }
+      ],
+      "module": "tropoi.spatial.grids.geodesic_grid",
+      "qualname": "GeodesicGridGeometry"
+    },
+    {
+      "decorators": [],
+      "external_bases": [],
+      "id": "tropoi.spatial.grids.grid.LatLonGridGeometry",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__init__"
+        },
+        {
+          "kind": "property",
+          "name": "colat_grid"
+        },
+        {
+          "kind": "property",
+          "name": "colatitudes"
+        },
+        {
+          "kind": "classmethod",
+          "name": "create"
+        },
+        {
+          "kind": "property",
+          "name": "grid_shape"
+        },
+        {
+          "kind": "property",
+          "name": "lat_grid"
+        },
+        {
+          "kind": "property",
+          "name": "latitudes"
+        },
+        {
+          "kind": "property",
+          "name": "lon_grid"
+        },
+        {
+          "kind": "property",
+          "name": "longitudes"
+        },
+        {
+          "kind": "property",
+          "name": "n_points"
+        },
+        {
+          "kind": "property",
+          "name": "point_latitudes"
+        },
+        {
+          "kind": "property",
+          "name": "point_longitudes"
+        },
+        {
+          "kind": "method",
+          "name": "points_latlon"
+        }
+      ],
+      "module": "tropoi.spatial.grids.grid",
+      "qualname": "LatLonGridGeometry"
+    },
+    {
+      "decorators": [],
+      "external_bases": [
+        "abc.ABC"
+      ],
+      "id": "tropoi.spatial.grids.grid_base.GridGeometry",
+      "members": [
+        {
+          "kind": "property",
+          "name": "cfl_length_scale"
+        },
+        {
+          "kind": "property",
+          "name": "colatitudes"
+        },
+        {
+          "kind": "property",
+          "name": "grid_shape"
+        },
+        {
+          "kind": "property",
+          "name": "is_structured"
+        },
+        {
+          "kind": "property",
+          "name": "latitudes"
+        },
+        {
+          "kind": "property",
+          "name": "longitudes"
+        },
+        {
+          "kind": "property",
+          "name": "n_points"
+        },
+        {
+          "kind": "property",
+          "name": "point_latitudes"
+        },
+        {
+          "kind": "property",
+          "name": "point_longitudes"
+        },
+        {
+          "kind": "method",
+          "name": "points_latlon"
+        }
+      ],
+      "module": "tropoi.spatial.grids.grid_base",
+      "qualname": "GridGeometry"
+    },
+    {
+      "decorators": [],
+      "external_bases": [],
+      "id": "tropoi.spatial.grids.latlon_grid.GaussLatLonGridGeometry",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__init__"
+        },
+        {
+          "kind": "property",
+          "name": "cell_areas"
+        },
+        {
+          "kind": "property",
+          "name": "cfl_length_scale"
+        },
+        {
+          "kind": "property",
+          "name": "grid_shape"
+        },
+        {
+          "kind": "property",
+          "name": "latitudes"
+        },
+        {
+          "kind": "property",
+          "name": "longitudes"
+        },
+        {
+          "kind": "property",
+          "name": "n_points"
+        },
+        {
+          "kind": "property",
+          "name": "point_latitudes"
+        },
+        {
+          "kind": "property",
+          "name": "point_longitudes"
+        },
+        {
+          "kind": "method",
+          "name": "points_latlon"
+        }
+      ],
+      "module": "tropoi.spatial.grids.latlon_grid",
+      "qualname": "GaussLatLonGridGeometry"
+    },
+    {
+      "decorators": [],
+      "external_bases": [],
+      "id": "tropoi.spatial.grids.latlon_grid.GaussLatLonSphericalHarmonics",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__getattr__"
+        },
+        {
+          "kind": "method",
+          "name": "__init__"
+        },
+        {
+          "kind": "method",
+          "name": "inv_transform"
+        },
+        {
+          "kind": "method",
+          "name": "inverse_transform"
+        },
+        {
+          "kind": "method",
+          "name": "transform"
+        }
+      ],
+      "module": "tropoi.spatial.grids.latlon_grid",
+      "qualname": "GaussLatLonSphericalHarmonics"
+    },
+    {
+      "decorators": [
+        "dataclass(frozen=True)"
+      ],
+      "external_bases": [],
+      "id": "tropoi.spatial.modes.FieldSpec",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__post_init__"
+        },
+        {
+          "kind": "property",
+          "name": "dimensions"
+        },
+        {
+          "kind": "classmethod",
+          "name": "from_dict"
+        },
+        {
+          "kind": "property",
+          "name": "nlev"
+        },
+        {
+          "kind": "method",
+          "name": "select"
+        },
+        {
+          "kind": "method",
+          "name": "to_dict"
+        }
+      ],
+      "module": "tropoi.spatial.modes",
+      "qualname": "FieldSpec"
+    },
+    {
+      "decorators": [],
+      "external_bases": [
+        "ValueError"
+      ],
+      "id": "tropoi.spatial.modes.SpectralConventionError",
+      "members": [],
+      "module": "tropoi.spatial.modes",
+      "qualname": "SpectralConventionError"
+    },
+    {
+      "decorators": [
+        "dataclass(frozen=True)"
+      ],
+      "external_bases": [],
+      "id": "tropoi.spatial.modes.SpectralModes",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__post_init__"
+        },
+        {
+          "kind": "property",
+          "name": "description"
+        },
+        {
+          "kind": "property",
+          "name": "dimensions"
+        },
+        {
+          "kind": "property",
+          "name": "l_max"
+        },
+        {
+          "kind": "method",
+          "name": "level"
+        },
+        {
+          "kind": "property",
+          "name": "name"
+        },
+        {
+          "kind": "property",
+          "name": "nlev"
+        },
+        {
+          "kind": "property",
+          "name": "shape"
+        },
+        {
+          "kind": "method",
+          "name": "summary"
+        },
+        {
+          "kind": "property",
+          "name": "units"
+        },
+        {
+          "kind": "property",
+          "name": "valid_mask"
+        },
+        {
+          "kind": "method",
+          "name": "validate"
+        }
+      ],
+      "module": "tropoi.spatial.modes",
+      "qualname": "SpectralModes"
+    },
+    {
+      "decorators": [],
+      "external_bases": [
+        "collections.abc.Mapping"
+      ],
+      "id": "tropoi.spatial.modes.SpectralState",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__getitem__"
+        },
+        {
+          "kind": "method",
+          "name": "__init__"
+        },
+        {
+          "kind": "method",
+          "name": "__iter__"
+        },
+        {
+          "kind": "method",
+          "name": "__len__"
+        },
+        {
+          "kind": "method",
+          "name": "__repr__"
+        },
+        {
+          "kind": "property",
+          "name": "packed"
+        },
+        {
+          "kind": "property",
+          "name": "specs"
+        }
+      ],
+      "module": "tropoi.spatial.modes",
+      "qualname": "SpectralState"
+    },
+    {
+      "decorators": [],
+      "external_bases": [],
+      "id": "tropoi.spatial.operators.differential_operators_spherical.DifferentialOperatorsSpherical",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__init__"
+        },
+        {
+          "kind": "staticmethod",
+          "name": "_looks_like_degrees"
+        },
+        {
+          "kind": "method",
+          "name": "build_laplacian_matrix"
+        },
+        {
+          "kind": "method",
+          "name": "build_partial_derivative_operators"
+        },
+        {
+          "kind": "method",
+          "name": "build_spherical_laplacian_operator"
+        },
+        {
+          "kind": "method",
+          "name": "calculate_curl"
+        },
+        {
+          "kind": "method",
+          "name": "calculate_divergence"
+        },
+        {
+          "kind": "method",
+          "name": "calculate_gradient"
+        },
+        {
+          "kind": "method",
+          "name": "calculate_laplacian"
+        },
+        {
+          "kind": "method",
+          "name": "calculate_vector_gradient"
+        },
+        {
+          "kind": "classmethod",
+          "name": "from_geodesic_grid"
+        }
+      ],
+      "module": "tropoi.spatial.operators.differential_operators_spherical",
+      "qualname": "DifferentialOperatorsSpherical"
+    },
+    {
+      "decorators": [],
+      "external_bases": [],
+      "id": "tropoi.spatial.operators.spectral_operators.SpectralOperators",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__init__"
+        },
+        {
+          "kind": "method",
+          "name": "_get_differential_ops"
+        },
+        {
+          "kind": "staticmethod",
+          "name": "_is_geodesic_grid"
+        },
+        {
+          "kind": "staticmethod",
+          "name": "_is_latlon_grid"
+        },
+        {
+          "kind": "method",
+          "name": "_precompute_sin_theta_d_theta_coeffs"
+        },
+        {
+          "kind": "method",
+          "name": "_truncate_product"
+        },
+        {
+          "kind": "method",
+          "name": "_vector_analysis_pieces"
+        },
+        {
+          "kind": "method",
+          "name": "adjoint_sin_theta_d_theta_coeffs"
+        },
+        {
+          "kind": "method",
+          "name": "advect_scalar_by_streamfunction"
+        },
+        {
+          "kind": "method",
+          "name": "d_lambda_coeffs"
+        },
+        {
+          "kind": "method",
+          "name": "d_lambda_field"
+        },
+        {
+          "kind": "method",
+          "name": "grad_from_scalar"
+        },
+        {
+          "kind": "method",
+          "name": "inv_d_lambda"
+        },
+        {
+          "kind": "method",
+          "name": "inv_laplacian"
+        },
+        {
+          "kind": "method",
+          "name": "jacobian_pseudospectral"
+        },
+        {
+          "kind": "method",
+          "name": "laplacian_coeffs"
+        },
+        {
+          "kind": "method",
+          "name": "laplacian_field"
+        },
+        {
+          "kind": "method",
+          "name": "sin_theta_d_theta_coeffs"
+        },
+        {
+          "kind": "method",
+          "name": "sin_theta_d_theta_field"
+        },
+        {
+          "kind": "method",
+          "name": "vector_curl_div_roundtrip"
+        },
+        {
+          "kind": "method",
+          "name": "vector_curl_div_spectral"
+        },
+        {
+          "kind": "method",
+          "name": "velocity_from_streamfunction"
+        }
+      ],
+      "module": "tropoi.spatial.operators.spectral_operators",
+      "qualname": "SpectralOperators"
+    },
+    {
+      "decorators": [],
+      "external_bases": [],
+      "id": "tropoi.spatial.planet.Planet",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__init__"
+        },
+        {
+          "kind": "method",
+          "name": "__repr__"
+        },
+        {
+          "kind": "staticmethod",
+          "name": "_calculate_radial_distances"
+        },
+        {
+          "kind": "staticmethod",
+          "name": "_compute_power_spectrum"
+        },
+        {
+          "kind": "classmethod",
+          "name": "generate"
+        },
+        {
+          "kind": "method",
+          "name": "reconstruct_surface"
+        }
+      ],
+      "module": "tropoi.spatial.planet",
+      "qualname": "Planet"
+    },
+    {
+      "decorators": [
+        "dataclass(frozen=True)"
+      ],
+      "external_bases": [],
+      "id": "tropoi.spatial.sigma_coordinate.SigmaGrid",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__post_init__"
+        },
+        {
+          "kind": "method",
+          "name": "alpha"
+        },
+        {
+          "kind": "method",
+          "name": "full_levels"
+        },
+        {
+          "kind": "method",
+          "name": "full_levels_array"
+        },
+        {
+          "kind": "method",
+          "name": "interface_log_ratios"
+        },
+        {
+          "kind": "method",
+          "name": "interfaces_array"
+        },
+        {
+          "kind": "property",
+          "name": "nlev"
+        },
+        {
+          "kind": "method",
+          "name": "thickness"
+        },
+        {
+          "kind": "method",
+          "name": "thickness_array"
+        },
+        {
+          "kind": "classmethod",
+          "name": "uniform"
+        }
+      ],
+      "module": "tropoi.spatial.sigma_coordinate",
+      "qualname": "SigmaGrid"
+    },
+    {
+      "decorators": [],
+      "external_bases": [
+        "ValueError"
+      ],
+      "id": "tropoi.spatial.sigma_coordinate.SigmaGridError",
+      "members": [],
+      "module": "tropoi.spatial.sigma_coordinate",
+      "qualname": "SigmaGridError"
+    },
+    {
+      "decorators": [],
+      "external_bases": [],
+      "id": "tropoi.spatial.spherical_backend.GeodesicBackend",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__init__"
+        },
+        {
+          "kind": "method",
+          "name": "_build_product_space"
+        },
+        {
+          "kind": "method",
+          "name": "supported_product_quadratures"
+        }
+      ],
+      "module": "tropoi.spatial.spherical_backend",
+      "qualname": "GeodesicBackend"
+    },
+    {
+      "decorators": [],
+      "external_bases": [],
+      "id": "tropoi.spatial.spherical_backend.LatLonBackend",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__init__"
+        },
+        {
+          "kind": "method",
+          "name": "_build_product_space"
+        },
+        {
+          "kind": "method",
+          "name": "supported_product_quadratures"
+        }
+      ],
+      "module": "tropoi.spatial.spherical_backend",
+      "qualname": "LatLonBackend"
+    },
+    {
+      "decorators": [],
+      "external_bases": [],
+      "id": "tropoi.spatial.spherical_backend.PointSetBackend",
+      "members": [
+        {
+          "kind": "method",
+          "name": "_build_product_space"
+        },
+        {
+          "kind": "method",
+          "name": "supported_product_quadratures"
+        }
+      ],
+      "module": "tropoi.spatial.spherical_backend",
+      "qualname": "PointSetBackend"
+    },
+    {
+      "decorators": [
+        "dataclass(frozen=True)"
+      ],
+      "external_bases": [],
+      "id": "tropoi.spatial.spherical_backend.ProductSpace",
+      "members": [],
+      "module": "tropoi.spatial.spherical_backend",
+      "qualname": "ProductSpace"
+    },
+    {
+      "decorators": [],
+      "external_bases": [
+        "abc.ABC"
+      ],
+      "id": "tropoi.spatial.spherical_backend.SphericalGridBackend",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__init__"
+        },
+        {
+          "kind": "method",
+          "name": "_build_product_space"
+        },
+        {
+          "kind": "method",
+          "name": "_coarse_coslat"
+        },
+        {
+          "kind": "method",
+          "name": "describe"
+        },
+        {
+          "kind": "method",
+          "name": "product_space"
+        },
+        {
+          "kind": "method",
+          "name": "supported_product_quadratures"
+        }
+      ],
+      "module": "tropoi.spatial.spherical_backend",
+      "qualname": "SphericalGridBackend"
+    },
+    {
+      "decorators": [
+        "dataclass"
+      ],
+      "external_bases": [],
+      "id": "tropoi.spatial.states.barotropic.BarotropicState",
+      "members": [],
+      "module": "tropoi.spatial.states.barotropic",
+      "qualname": "BarotropicState"
+    },
+    {
+      "decorators": [
+        "dataclass"
+      ],
+      "external_bases": [],
+      "id": "tropoi.spatial.states.primitive_equations.PrimitiveEquationsState",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__post_init__"
+        },
+        {
+          "kind": "property",
+          "name": "delta"
+        },
+        {
+          "kind": "classmethod",
+          "name": "from_fields"
+        },
+        {
+          "kind": "property",
+          "name": "ln_ps"
+        },
+        {
+          "kind": "property",
+          "name": "nlev"
+        },
+        {
+          "kind": "property",
+          "name": "temperature"
+        },
+        {
+          "kind": "classmethod",
+          "name": "zeros"
+        },
+        {
+          "kind": "property",
+          "name": "zeta"
+        }
+      ],
+      "module": "tropoi.spatial.states.primitive_equations",
+      "qualname": "PrimitiveEquationsState"
+    },
+    {
+      "decorators": [],
+      "external_bases": [
+        "ValueError"
+      ],
+      "id": "tropoi.spatial.states.primitive_equations.PrimitiveEquationsStateError",
+      "members": [],
+      "module": "tropoi.spatial.states.primitive_equations",
+      "qualname": "PrimitiveEquationsStateError"
+    },
+    {
+      "decorators": [
+        "dataclass"
+      ],
+      "external_bases": [],
+      "id": "tropoi.spatial.states.shallow_water.ShallowWaterState",
+      "members": [
+        {
+          "kind": "property",
+          "name": "delta"
+        },
+        {
+          "kind": "classmethod",
+          "name": "from_fields"
+        },
+        {
+          "kind": "property",
+          "name": "phi"
+        },
+        {
+          "kind": "classmethod",
+          "name": "zeros"
+        },
+        {
+          "kind": "property",
+          "name": "zeta"
+        }
+      ],
+      "module": "tropoi.spatial.states.shallow_water",
+      "qualname": "ShallowWaterState"
+    },
+    {
+      "decorators": [],
+      "external_bases": [
+        "ValueError"
+      ],
+      "id": "tropoi.spatial.states.shallow_water.ShallowWaterStateError",
+      "members": [],
+      "module": "tropoi.spatial.states.shallow_water",
+      "qualname": "ShallowWaterStateError"
+    },
+    {
+      "decorators": [
+        "dataclass"
+      ],
+      "external_bases": [],
+      "id": "tropoi.spatial.terrain.elevation_data.ElevationData",
+      "members": [
+        {
+          "kind": "method",
+          "name": "get_j2"
+        },
+        {
+          "kind": "property",
+          "name": "max_degree"
+        },
+        {
+          "kind": "property",
+          "name": "oblateness_from_sh"
+        }
+      ],
+      "module": "tropoi.spatial.terrain.elevation_data",
+      "qualname": "ElevationData"
+    },
+    {
+      "decorators": [
+        "dataclass"
+      ],
+      "external_bases": [],
+      "id": "tropoi.spatial.terrain.tectonics.TectonicParams",
+      "members": [],
+      "module": "tropoi.spatial.terrain.tectonics",
+      "qualname": "TectonicParams"
+    },
+    {
+      "decorators": [
+        "dataclass"
+      ],
+      "external_bases": [],
+      "id": "tropoi.spatial.terrain.terrain_spectral.SpectralTerrainParams",
+      "members": [],
+      "module": "tropoi.spatial.terrain.terrain_spectral",
+      "qualname": "SpectralTerrainParams"
+    },
+    {
+      "decorators": [],
+      "external_bases": [],
+      "id": "tropoi.spatial.terrain.topography.Topography",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__init__"
+        },
+        {
+          "kind": "method",
+          "name": "describe"
+        },
+        {
+          "kind": "property",
+          "name": "elevation_lm"
+        },
+        {
+          "kind": "method",
+          "name": "elevation_on"
+        },
+        {
+          "kind": "classmethod",
+          "name": "flat"
+        },
+        {
+          "kind": "property",
+          "name": "is_flat"
+        },
+        {
+          "kind": "property",
+          "name": "l_max"
+        },
+        {
+          "kind": "property",
+          "name": "mean_elevation_m"
+        },
+        {
+          "kind": "classmethod",
+          "name": "mountain"
+        },
+        {
+          "kind": "property",
+          "name": "parameters"
+        },
+        {
+          "kind": "property",
+          "name": "preset"
+        },
+        {
+          "kind": "method",
+          "name": "surface_geopotential_lm"
+        },
+        {
+          "kind": "classmethod",
+          "name": "williamson5_cone"
+        }
+      ],
+      "module": "tropoi.spatial.terrain.topography",
+      "qualname": "Topography"
+    },
+    {
+      "decorators": [],
+      "external_bases": [
+        "ValueError"
+      ],
+      "id": "tropoi.spatial.terrain.topography.TopographyError",
+      "members": [],
+      "module": "tropoi.spatial.terrain.topography",
+      "qualname": "TopographyError"
+    },
+    {
+      "decorators": [],
+      "external_bases": [],
+      "id": "tropoi.spatial.transforms.fast_geodesic_sh.PointSetSphericalHarmonics",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__init__"
+        },
+        {
+          "kind": "method",
+          "name": "inv_transform"
+        },
+        {
+          "kind": "method",
+          "name": "inverse_transform"
+        },
+        {
+          "kind": "method",
+          "name": "transform"
+        }
+      ],
+      "module": "tropoi.spatial.transforms.fast_geodesic_sh",
+      "qualname": "PointSetSphericalHarmonics"
+    },
+    {
+      "decorators": [],
+      "external_bases": [],
+      "id": "tropoi.spatial.transforms.optimized_geodesic_sh.GeodesicSphericalHarmonics",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__getattr__"
+        },
+        {
+          "kind": "method",
+          "name": "__init__"
+        },
+        {
+          "kind": "staticmethod",
+          "name": "_compute_optimal_weights"
+        },
+        {
+          "kind": "method",
+          "name": "_get_cache_filename"
+        },
+        {
+          "kind": "method",
+          "name": "_load_cached_weights"
+        },
+        {
+          "kind": "method",
+          "name": "_save_cached_weights"
+        },
+        {
+          "kind": "method",
+          "name": "inv_transform"
+        },
+        {
+          "kind": "method",
+          "name": "inverse_transform"
+        },
+        {
+          "kind": "method",
+          "name": "transform"
+        }
+      ],
+      "module": "tropoi.spatial.transforms.optimized_geodesic_sh",
+      "qualname": "GeodesicSphericalHarmonics"
+    },
+    {
+      "decorators": [],
+      "external_bases": [],
+      "id": "tropoi.spatial.transforms.spherical_harmonics.LatLonSphericalHarmonics",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__init__"
+        },
+        {
+          "kind": "method",
+          "name": "_factorial"
+        },
+        {
+          "kind": "method",
+          "name": "_normalization_factor"
+        },
+        {
+          "kind": "method",
+          "name": "compute_legendre"
+        },
+        {
+          "kind": "method",
+          "name": "inv_transform"
+        },
+        {
+          "kind": "method",
+          "name": "set_grid"
+        },
+        {
+          "kind": "method",
+          "name": "transform"
+        }
+      ],
+      "module": "tropoi.spatial.transforms.spherical_harmonics",
+      "qualname": "LatLonSphericalHarmonics"
+    },
+    {
+      "decorators": [],
+      "external_bases": [],
+      "id": "tropoi.temporal.integration.IntegrationScheduler",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__init__"
+        },
+        {
+          "kind": "method",
+          "name": "next_event"
+        }
+      ],
+      "module": "tropoi.temporal.integration",
+      "qualname": "IntegrationScheduler"
+    },
+    {
+      "decorators": [],
+      "external_bases": [],
+      "id": "tropoi.temporal.simulation.Simulation",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__getitem__"
+        },
+        {
+          "kind": "method",
+          "name": "__init__"
+        },
+        {
+          "kind": "method",
+          "name": "__iter__"
+        },
+        {
+          "kind": "method",
+          "name": "__len__"
+        },
+        {
+          "kind": "method",
+          "name": "__repr__"
+        },
+        {
+          "kind": "property",
+          "name": "field_names"
+        },
+        {
+          "kind": "property",
+          "name": "metadata"
+        },
+        {
+          "kind": "method",
+          "name": "snapshot"
+        },
+        {
+          "kind": "property",
+          "name": "solver"
+        },
+        {
+          "kind": "property",
+          "name": "storage"
+        },
+        {
+          "kind": "property",
+          "name": "times"
+        }
+      ],
+      "module": "tropoi.temporal.simulation",
+      "qualname": "Simulation"
+    },
+    {
+      "decorators": [],
+      "external_bases": [],
+      "id": "tropoi.temporal.simulation.Snapshot",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__init__"
+        },
+        {
+          "kind": "method",
+          "name": "__repr__"
+        },
+        {
+          "kind": "property",
+          "name": "index"
+        },
+        {
+          "kind": "property",
+          "name": "metadata"
+        },
+        {
+          "kind": "property",
+          "name": "packed"
+        },
+        {
+          "kind": "method",
+          "name": "plot"
+        },
+        {
+          "kind": "property",
+          "name": "solver"
+        },
+        {
+          "kind": "property",
+          "name": "state"
+        },
+        {
+          "kind": "property",
+          "name": "time"
+        }
+      ],
+      "module": "tropoi.temporal.simulation",
+      "qualname": "Snapshot"
+    },
+    {
+      "decorators": [
+        "runtime_checkable"
+      ],
+      "external_bases": [
+        "typing.Protocol"
+      ],
+      "id": "tropoi.temporal.simulation.SnapshotStorage",
+      "members": [
+        {
+          "kind": "property",
+          "name": "field_specs"
+        },
+        {
+          "kind": "method",
+          "name": "frame"
+        },
+        {
+          "kind": "property",
+          "name": "level_values"
+        },
+        {
+          "kind": "property",
+          "name": "metadata"
+        },
+        {
+          "kind": "method",
+          "name": "plot_snapshot"
+        },
+        {
+          "kind": "property",
+          "name": "solver"
+        },
+        {
+          "kind": "property",
+          "name": "times"
+        }
+      ],
+      "module": "tropoi.temporal.simulation",
+      "qualname": "SnapshotStorage"
+    },
+    {
+      "decorators": [],
+      "external_bases": [],
+      "id": "tropoi.temporal.tendencies.barotropic.BarotropicVorticity",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__init__"
+        },
+        {
+          "kind": "method",
+          "name": "step_leapfrog"
+        },
+        {
+          "kind": "method",
+          "name": "streamfunction_to_vorticity"
+        },
+        {
+          "kind": "method",
+          "name": "tendency"
+        },
+        {
+          "kind": "method",
+          "name": "vorticity_to_streamfunction"
+        }
+      ],
+      "module": "tropoi.temporal.tendencies.barotropic",
+      "qualname": "BarotropicVorticity"
+    },
+    {
+      "decorators": [],
+      "external_bases": [],
+      "id": "tropoi.temporal.tendencies.primitive_equations.PrimitiveEquationsModel",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__init__"
+        },
+        {
+          "kind": "method",
+          "name": "_deriv_fields"
+        },
+        {
+          "kind": "method",
+          "name": "_inv_laplacian"
+        },
+        {
+          "kind": "method",
+          "name": "_momentum_tendencies"
+        },
+        {
+          "kind": "method",
+          "name": "_tendency_product_fields"
+        },
+        {
+          "kind": "method",
+          "name": "_thermo_mass_tendencies"
+        },
+        {
+          "kind": "method",
+          "name": "_truncate"
+        },
+        {
+          "kind": "method",
+          "name": "_wind_from"
+        },
+        {
+          "kind": "method",
+          "name": "continuity_diagnostics"
+        },
+        {
+          "kind": "method",
+          "name": "energy_exchange_diagnostics"
+        },
+        {
+          "kind": "method",
+          "name": "geopotential_fields"
+        },
+        {
+          "kind": "method",
+          "name": "max_characteristic_speed"
+        },
+        {
+          "kind": "method",
+          "name": "surface_pressure_on_state_grid"
+        },
+        {
+          "kind": "method",
+          "name": "temperature_extrema"
+        },
+        {
+          "kind": "method",
+          "name": "temperature_on_state_grid"
+        },
+        {
+          "kind": "method",
+          "name": "tendency"
+        },
+        {
+          "kind": "method",
+          "name": "tendency_state"
+        },
+        {
+          "kind": "method",
+          "name": "validate_state"
+        },
+        {
+          "kind": "method",
+          "name": "vertical_transport_diagnostics"
+        },
+        {
+          "kind": "method",
+          "name": "wind_on_state_grid"
+        }
+      ],
+      "module": "tropoi.temporal.tendencies.primitive_equations",
+      "qualname": "PrimitiveEquationsModel"
+    },
+    {
+      "decorators": [],
+      "external_bases": [],
+      "id": "tropoi.temporal.tendencies.shallow_water.ShallowWaterModel",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__init__"
+        },
+        {
+          "kind": "method",
+          "name": "_deriv_fields"
+        },
+        {
+          "kind": "method",
+          "name": "_inv_laplacian"
+        },
+        {
+          "kind": "method",
+          "name": "_truncate"
+        },
+        {
+          "kind": "method",
+          "name": "_wind_from"
+        },
+        {
+          "kind": "method",
+          "name": "characteristic_fields"
+        },
+        {
+          "kind": "method",
+          "name": "helmholtz"
+        },
+        {
+          "kind": "method",
+          "name": "max_characteristic_speed"
+        },
+        {
+          "kind": "method",
+          "name": "surface_geopotential_on_state_grid"
+        },
+        {
+          "kind": "method",
+          "name": "tendency"
+        },
+        {
+          "kind": "method",
+          "name": "tendency_state"
+        },
+        {
+          "kind": "method",
+          "name": "total_geopotential_extrema"
+        },
+        {
+          "kind": "method",
+          "name": "validate_state"
+        },
+        {
+          "kind": "method",
+          "name": "wind_on_state_grid"
+        }
+      ],
+      "module": "tropoi.temporal.tendencies.shallow_water",
+      "qualname": "ShallowWaterModel"
+    }
+  ]
+}
