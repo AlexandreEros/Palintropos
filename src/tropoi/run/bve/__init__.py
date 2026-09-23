@@ -1,7 +1,7 @@
 """Barotropic vorticity equation run package.
 
 Re-exports are lazy (PEP 562) so that configuration-only imports
-(``tropoi.run.bve.config``, ``tropoi.run.bve.io``)
+(``tropoi.run.bve.config``, ``tropoi.representation.archive.writer``)
 do not pull in CuPy. ``from tropoi.run.bve import run_bve``
 keeps working exactly as before.
 """

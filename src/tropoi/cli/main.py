@@ -47,7 +47,7 @@ from tropoi.run.bve.config import (  # import-light (stdlib only)
 # ---------------------------------------------------------------------------
 
 #: Initial-condition scenarios. Must match INITIAL_CONDITIONS in
-#: run/bve/initial_conditions.py (kept as a plain mapping here because that
+#: spatial/initialization/bve.py (kept as a plain mapping here because that
 #: module imports CuPy at import time; parity is enforced by a test).
 SCENARIOS = {
     "two_vortices": "Two opposite-signed Gaussian vortices at +/-33 deg latitude.",

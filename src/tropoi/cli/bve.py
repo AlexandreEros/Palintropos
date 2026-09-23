@@ -133,7 +133,8 @@ def build_planet(run_config: Mapping):
     backend and the ``Planet.generate`` default that existed then.
     Imports CuPy through Planet; call only after validation.
     """
-    from tropoi.planet import Planet, PlanetaryParameters
+    from tropoi.spatial.environment import PlanetaryParameters
+    from tropoi.spatial.planet import Planet
 
     return Planet.generate(
         params=PlanetaryParameters.from_earth_like(
@@ -156,9 +157,9 @@ def _execute_solver(cfg: "BVERunConfig", run_dir, run_config: dict) -> None:
     without CUDA — tests replace this with a stub that succeeds or raises.
     Imports CuPy/matplotlib only here, after all user-error validation.
     """
-    from tropoi.run.bve.io import RUN_STATUS_RUNNING, write_run_manifest
+    from tropoi.representation.archive.writer import RUN_STATUS_RUNNING, write_run_manifest
     from tropoi.run.bve.runner import run_bve
-    from tropoi.run.bve.initial_conditions import make_ic
+    from tropoi.spatial.initialization.bve import make_ic
     from tropoi.representation.archive.schema import provenance_blocks
 
     out_dir = run_dir.path

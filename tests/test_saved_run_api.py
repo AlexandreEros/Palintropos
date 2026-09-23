@@ -604,6 +604,11 @@ def test_open_and_inspect_in_fresh_interpreter_is_cpu_safe(pe_capsule):
         "assert not banned, banned\n"
         "assert 'tropoi.numerics' not in sys.modules\n"
         "assert 'tropoi.physics.primitive_equations' not in sys.modules\n"
+        # canonical homes of the numerics and cores (legacy names are aliases)
+        "assert not [m for m in sys.modules if m.startswith(("
+        "'tropoi.spatial.grids', 'tropoi.spatial.transforms', "
+        "'tropoi.spatial.operators', 'tropoi.spatial.states', "
+        "'tropoi.temporal.tendencies'))]\n"
     )
     result = subprocess.run([sys.executable, "-c", code], capture_output=True,
                             text=True, timeout=120)

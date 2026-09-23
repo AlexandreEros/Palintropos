@@ -8,10 +8,10 @@ functions.
 
 What is reused, not rebuilt:
 
-* the per-core compositions — ``run.bve.visualization`` (physical and
-  spectral BVE frames), ``run.swe.visualization`` (physical and spectral
+* the per-core compositions — ``representation.visual.bve`` (physical and
+  spectral BVE frames), ``representation.visual.swe`` (physical and spectral
   SWE frames, topography panels included) and
-  ``run.pe.snapshot_visualization`` (upper/lower-level PE frames) — fed
+  ``representation.visual.pe_snapshots`` (upper/lower-level PE frames) — fed
   with the capsule's stored arrays through their ``*_from_data`` entry
   points, so layouts, palettes, view interpolation and the timeline's
   cross-frame normalization are exactly those of the in-run
@@ -173,7 +173,7 @@ def build_snapshot_timeline(storage, representation: str, *,
     host_only = (solver, representation) in _HOST_ONLY
 
     if solver == "bve":
-        from tropoi.run.bve.visualization import (
+        from tropoi.representation.visual.bve import (
             build_bve_snapshot_timeline_from_data,
             build_bve_spectral_snapshot_timeline_from_data)
         if host_only:
@@ -185,14 +185,14 @@ def build_snapshot_timeline(storage, representation: str, *,
             resources.planet, grids, times, scenario=scenario,
             coefficients=coefficients)
     if solver == "swe":
-        from tropoi.run.swe.visualization import (
+        from tropoi.representation.visual.swe import (
             build_swe_snapshot_timelines_from_data)
         model = None if host_only else storage.resources().model
         return build_swe_snapshot_timelines_from_data(
             model, coefficients, times, scenario=scenario,
             representations=(representation,))[representation]
     if solver == "pe":
-        from tropoi.run.pe.snapshot_visualization import (
+        from tropoi.representation.visual.pe_snapshots import (
             build_pe_snapshot_timeline_from_data)
         run_id = storage.metadata.get("run_id")
         return build_pe_snapshot_timeline_from_data(
@@ -238,7 +238,7 @@ def render_snapshot(storage, index: int, output_path, *,
             "internal error: the composed frame does not carry the "
             "selected snapshot's time")
 
-    from tropoi.viz.renderers import get_default_renderer
+    from tropoi.representation.visual.renderers import get_default_renderer
     backend = renderer or get_default_renderer()
     output_path = pathlib.Path(output_path)
     output_path.parent.mkdir(parents=True, exist_ok=True)

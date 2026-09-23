@@ -14,24 +14,157 @@ model, and how to add or compare a backend.
 
 ## Package layout
 
+The implementation is organized by responsibility into three layers, plus
+the orchestration that wires them together:
+
 ```text
 src/tropoi/
-├── support.py       import-light spectral support contract (the single 2/3 product cut)
-├── numerics/        grids, transforms, backends, product spaces, operators
-├── run/bve/         equation, RK4 runner, run config resolution, ICs, diagnostics, I/O
-├── cli/             tropoi (main.py); aeolus/psx-bve/psx-gen/psx-recompile compatibility entry points
-├── planet/          planet assembly and decorative terrain
-├── viz/             maps and run visualizations
-├── spatial/         immutable field specifications and read-only host coefficient views
-├── temporal/        read-only Simulation / Snapshot over a small storage protocol
-└── representation/  archive/ (open_simulation, versioned state schema) and visual/ (lazy plot adapter)
-tests/               asserting GPU tests plus standalone audit scripts
-docs/                architecture, validation records, and tracked README assets
+├── spatial/             what a state is and how it is discretized
+│   ├── environment.py       PlanetaryParameters: the prescribed environment (CPU-only)
+│   ├── williamson5.py       Williamson (1992) case-5 prescribed world constants (stdlib)
+│   ├── planet.py            Planet facade: environment + discretization resources + decorative elevation
+│   ├── terrain/             model topography (Topography) and decorative terrain generation
+│   ├── grids/               geodesic, uniform and Gauss lat-lon geometries, quadrature, interpolation
+│   ├── transforms/          spherical-harmonic transforms; cuda/ holds the .cu kernel sources
+│   ├── spherical_backend.py backends and the ProductSpace nonlinear-product sampling
+│   ├── operators/           SpectralOperators (Laplacian, derivatives, velocity, Jacobian)
+│   ├── sigma_coordinate.py  PE vertical coordinate and column operators
+│   ├── states/              BVE / SWE / PE state dataclasses over packed coefficient stacks
+│   ├── modes.py             immutable field specifications and read-only host coefficient views
+│   ├── initialization/      named preset initial states (bve, swe, pe)
+│   └── truncation.py        the 2/3 product cut and the preset support guards (stdlib)
+├── temporal/            how states evolve, and how a saved evolution is read
+│   ├── integration.py       IntegrationScheduler, advective CFL arithmetic, RK4, driver loop (stdlib)
+│   ├── tendencies/          BVE, SWE and PE tendency implementations (coupled dissipation included)
+│   └── simulation.py        read-only Simulation / Snapshot over a small storage protocol
+├── representation/      what is recorded and shown
+│   ├── diagnostics/         per-core recorders, CSV/NPZ records and diagnostic figures
+│   ├── archive/             capsule reader (open_simulation), versioned schema, run-capsule writer
+│   └── visual/              figure fields/specs/timelines/renderers, per-core compositions, Snapshot.plot adapter
+├── run/{bve,swe,pe}/    orchestration: resolved run configuration and the runners
+├── cli/                 tropoi (main.py); aeolus/psx-bve/psx-gen/psx-recompile compatibility entry points
+└── numerics/ physics/ planet/ viz/ support.py
+                         compatibility import paths only (see "Compatibility paths")
+tests/                   asserting GPU tests plus standalone audit scripts
+docs/                    architecture, validation records, and tracked README assets
 ```
 
-The saved-run interface (`spatial`, `temporal`, `representation.archive`)
-is import-light and CPU-only; `representation.visual` is imported only by
-an explicit `Snapshot.plot`. It is documented in [SAVED_RUNS.md](SAVED_RUNS.md).
+The saved-run interface (`spatial.modes`, `temporal.simulation`,
+`representation.archive`) is CPU-only; `representation.visual` is imported
+only by an explicit `Snapshot.plot` or by a runner rendering its products.
+It is documented in [SAVED_RUNS.md](SAVED_RUNS.md).
+
+### Dependency direction
+
+`spatial` imports only `spatial`; `temporal` imports `spatial` and
+`temporal`; `representation` imports all three layers. Orchestration
+(`run`, `cli`) sits above them. Mathematical helpers stay below their
+consumers: the product cut lives in `spatial.truncation`, which the
+operators, the tendencies, the diagnostics and the configuration layer all
+consume, so no spatial operation depends on a tendency implementation. The
+initializers receive a model object but reference its class only for type
+annotations. `tests/test_layout_compat.py` enforces this direction by
+parsing every import, with exactly two documented exceptions:
+
+- `representation.archive.writer` (the run-capsule writer) imports
+  `scientific_config_subset` from the stdlib-only `run.bve.config`: the
+  run-id hash is defined by the configuration layer's scientific subset.
+- `representation.visual.snapshot` lazily imports the solver modules'
+  model builders (`cli.bve.build_planet`, `cli.swe.build_swe_model`,
+  `cli.pe.build_pe_model`) when `Snapshot.plot` must reconstruct model
+  resources from a persisted configuration.
+
+Prescribed environment and discretization are separate objects.
+`PlanetaryParameters` (radius, rotation, mass) is importable without CuPy
+from `spatial.environment` (the legacy `tropoi.planet` paths still load the
+CUDA facade through that package's initializer, as they always did); grids, transforms, backends and their cached
+`ProductSpace`s are discretization resources built from it and shared by
+every field and snapshot. `Planet` remains the facade that bundles them
+for the cores. Radius, gravity and rotation defaults are unchanged.
+
+### Canonical imports
+
+New code imports from the layer modules, for example:
+
+```python
+from tropoi.spatial.environment import PlanetaryParameters
+from tropoi.spatial.planet import Planet
+from tropoi.spatial.truncation import product_truncation_cut
+from tropoi.spatial.states.shallow_water import ShallowWaterState
+from tropoi.spatial.initialization.swe import make_swe_ic
+from tropoi.temporal.tendencies.shallow_water import ShallowWaterModel
+from tropoi.temporal.integration import rk4_step_array
+from tropoi.representation.archive import open_simulation
+from tropoi.representation.diagnostics.bve import plot_diagnostics
+```
+
+The initializers of `spatial`, `temporal`, `representation` and their
+subpackages import nothing, so importing one module never drags in CuPy or
+Matplotlib through a parent package. The one exception is
+`representation.archive`, whose initializer exposes the CPU-only reader
+API (`open_simulation`, the schema types).
+
+### Compatibility paths
+
+Every pre-reorganization module path still imports, for the remainder of
+the 0.1 series; removing one requires an explicit release decision. Each
+old module file calls `tropoi._compat.alias_module`, which binds the old
+name to the canonical module object in `sys.modules`: there is one
+implementation, `old.Class is new.Class`, module state is shared, and
+monkeypatching either name patches both. Canonical modules never import
+these paths. The legacy package initializers `tropoi.numerics`,
+`tropoi.planet` and `tropoi.viz` keep their historical re-exports (the same
+objects), and names that moved out of a module remain importable from it
+(the state classes from the tendency modules, the preset guards and
+Williamson-5 constants from `run.swe.config` / `run.pe.config`).
+
+| Legacy path | Canonical module |
+| --- | --- |
+| `tropoi.support` | `tropoi.spatial.truncation` |
+| `tropoi.planet.planetary_parameters` | `tropoi.spatial.environment` |
+| `tropoi.planet.planet` | `tropoi.spatial.planet` |
+| `tropoi.planet.{elevation_data,terrain_spectral,tectonics}` | `tropoi.spatial.terrain.*` |
+| `tropoi.physics.topography` | `tropoi.spatial.terrain.topography` |
+| `tropoi.physics.sigma_coordinate` | `tropoi.spatial.sigma_coordinate` |
+| `tropoi.numerics.{grid_base,grid,geodesic_grid,latlon_grid,cartesian_to_spherical,integration,grid_interpolation}` | `tropoi.spatial.grids.*` |
+| `tropoi.numerics.{spherical_harmonics,fast_geodesic_sh,optimized_geodesic_sh,compute_optimal_weights}` | `tropoi.spatial.transforms.*` |
+| `tropoi.numerics.cuda.cuda_utils` | `tropoi.spatial.transforms.cuda.cuda_utils` |
+| `tropoi.numerics.spherical_backend` | `tropoi.spatial.spherical_backend` |
+| `tropoi.numerics.{spectral_operators,differential_operators_spherical}` | `tropoi.spatial.operators.*` |
+| `tropoi.run.{bve,swe,pe}.initial_conditions` | `tropoi.spatial.initialization.{bve,swe,pe}` |
+| `tropoi.run.engine` | `tropoi.temporal.integration` |
+| `tropoi.physics.{barotropic,shallow_water,primitive_equations}` | `tropoi.temporal.tendencies.*` (states in `tropoi.spatial.states.*`) |
+| `tropoi.run.{bve,swe,pe}.diagnostics` | `tropoi.representation.diagnostics.{bve,swe,pe}` |
+| `tropoi.run.bve.io` | `tropoi.representation.archive.writer` |
+| `tropoi.run.{bve,swe,pe}.visualization` | `tropoi.representation.visual.{bve,swe,pe}` |
+| `tropoi.run.pe.snapshot_visualization` | `tropoi.representation.visual.pe_snapshots` |
+| `tropoi.viz.*` | `tropoi.representation.visual.*` |
+
+`tropoi.run.bve.barotropic_vorticity` remains the older re-export module
+for the BVE core and state. Dated records (audits, handoffs, validation
+reports) and descriptive strings already written into manifests keep the
+paths of their time; read them through this table. The package, the
+distribution and every command (`tropoi`, `aeolus`, `psx-bve`, `psx-gen`,
+`psx-recompile`) are unchanged.
+
+### CPU and GPU requirements
+
+- **CPU only** (no CuPy import, no CUDA initialization, no Matplotlib):
+  CLI help, `list`, configuration resolution and validation,
+  `tropoi inspect` with or without `--snapshot/--field`, `open_simulation`
+  and host coefficient views, `spatial.truncation`,
+  `spatial.environment`, `spatial.williamson5`, `spatial.modes`,
+  `temporal.integration`, `temporal.simulation`, and coefficient-space
+  (`"spectral"`) BVE/SWE snapshot plots. Fresh-interpreter tests enforce
+  these boundaries.
+- **CUDA required**: running any solver; anything that builds grids,
+  transforms, backends, operators, states, initial conditions or
+  tendencies; the per-step diagnostics recorders; and every physical-space
+  plot (fields are synthesized through the run's own transform).
+- **Packaged CUDA sources**: the kernels are package data of
+  `tropoi.spatial.transforms.cuda` and are read through
+  `importlib.resources`, so an installed wheel compiles them without a
+  source checkout.
 
 Numerical conventions matter more than style (there is no configured formatter
 or linter yet): use SI units; keep live arrays on the GPU as CuPy arrays;
@@ -68,8 +201,10 @@ Runner / Diagnostics
   and is the sole authority on nonlinear-product sampling.
 - `SpectralOperators` contains Laplacian, derivative recurrence, velocity, and
   pseudospectral Jacobian operations without branching on grid family.
-- `BarotropicVorticity` owns the equation and exact spectral Coriolis mode; the
-  runner owns RK4, snapshot storage, capsules, and diagnostics.
+- `BarotropicVorticity` (`temporal/tendencies/barotropic.py`) owns the equation
+  and exact spectral Coriolis mode; the runner (`run/bve/runner.py`) drives
+  `temporal/integration.py` and owns snapshot storage, capsules, and
+  diagnostics recording.
 - `run/bve/config.py` (`BVERunConfig`) owns configuration resolution for the
   CLI: preset layering (explicit flag > preset > ordinary default), snapshot
   scheduling, and plot selection — all validated before CUDA initialization.
@@ -174,7 +309,7 @@ state grid is under-resolved.
 
 ## Output capsules and provenance
 
-Visualization data and rendering are separated under `viz/`: `fields.py`
+Visualization data and rendering are separated under `representation/visual/`: `fields.py`
 represents latitude-longitude scalar fields and unpacked triangular
 spherical-harmonic fields; `normalization.py` and `specs.py` describe numeric
 scaling, scalar maps, streamline maps, complex-coefficient maps, and generic
@@ -182,8 +317,8 @@ panel groups without plotting objects; `renderers.py` is the
 small backend protocol; `timeline.py` owns timestamped figure sequences,
 cross-frame normalization, representative-frame selection, deterministic
 filenames, and transactional whole-product publication; and
-`matplotlib_renderer.py` is the initial backend. BVE and SWE
-adapters choose their own physical fields, labels, panels, and layouts and
+`matplotlib_renderer.py` is the initial backend. The per-core
+adapters (`bve.py`, `swe.py`, `pe.py`, `pe_snapshots.py`) choose their own physical fields, labels, panels, and layouts and
 reconstruct frames from persisted run arrays. PNGs are written to
 same-directory temporary siblings and atomically replaced, so only complete
 images can become run artifacts.
@@ -322,7 +457,7 @@ Diagnostic plots can be regenerated from the saved authoritative CSV/NPZ data
 without rerunning the model:
 
 ```powershell
-python -c "from pathlib import Path; from tropoi.run.bve.diagnostics import plot_diagnostics; r=Path('runs'); plot_diagnostics(r/(r/'latest_run.txt').read_text().strip())"
+python -c "from pathlib import Path; from tropoi.representation.diagnostics.bve import plot_diagnostics; r=Path('runs'); plot_diagnostics(r/(r/'latest_run.txt').read_text().strip())"
 ```
 
 ## How to add or compare a backend
@@ -333,7 +468,8 @@ python -c "from pathlib import Path; from tropoi.run.bve.diagnostics import plot
    `l_max`, producing the shared dense coefficient layout.
 3. Subclass `SphericalGridBackend`; define supported quadrature names and
    construct/cache each `ProductSpace` with a provenance label.
-4. Register the pairing in `make_backend` and in `Planet.generate`/the CLI if it
+4. Register the pairing in `make_backend` (`spatial/spherical_backend.py`) and in
+   `Planet.generate` (`spatial/planet.py`)/the CLI if it
    is a user-facing grid.
 5. Run the same transform, Jacobian, velocity, diagnostics, RH4, provenance, and
    end-to-end tests used for both current backends.

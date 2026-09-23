@@ -8,7 +8,7 @@ files. Import-light (stdlib only) so ``--help`` and validation never touch
 CuPy.
 
 Snapshot semantics are shared with the BVE (count mode canonical, interval
-mode supported); the schedule machinery lives in ``run.engine``.
+mode supported); the schedule machinery lives in ``temporal.integration``.
 
 Topography config schema (additive)
 -----------------------------------
@@ -25,12 +25,21 @@ import math
 from dataclasses import dataclass
 from typing import Mapping, Optional
 
-from ..engine import (SECONDS_PER_DAY, _require_finite_number,
+from tropoi.temporal.integration import (SECONDS_PER_DAY, _require_finite_number,
                       _require_finite_positive, count_snapshot_times,
                       interval_snapshot_times)
-from ..bve.config import (GRID_TYPES, MIN_NLAT, MIN_NLON,
+from tropoi.run.bve.config import (GRID_TYPES, MIN_NLAT, MIN_NLON,
                           scientific_config_subset)
-from tropoi.support import product_truncation_cut
+from tropoi.spatial.truncation import (  # noqa: F401  (re-exports)
+    SWE_SCENARIO_SUPPORT, _min_lmax_retaining, product_truncation_cut,
+    require_scenario_support)
+# The Williamson (1992) case-5 constants are the benchmark's prescribed
+# world; they live (verbatim, stdlib-only) in tropoi.spatial.williamson5.
+from tropoi.spatial.williamson5 import (  # noqa: F401  (re-exports)
+    W5_C, W5_CONE_HEIGHT_M, W5_CONE_LAT_DEG, W5_CONE_LON_DEG,
+    W5_CONE_MEAN_HEIGHT_M, W5_CONE_RADIUS_RAD, W5_DAY_HOURS, W5_GRAVITY,
+    W5_H0_M, W5_MEAN_DEPTH_M, W5_OMEGA, W5_PROJECTION_POLICY, W5_RADIUS_M,
+    W5_TOPOGRAPHY, W5_U0_MS, _w5_cone_mean_height_m)
 
 #: Image products in deterministic execution order.  The summary requires at
 #: least one persisted state; diagnostics remain available for N=0 runs.
@@ -71,150 +80,10 @@ SWE_SCENARIOS = {
                    "noncanonical.",
 }
 
-#: Preset support contract, measured in
-#: docs/validation/preset_support_characterization.md: ``(min_lmax,
-#: min_retained_degree)``. ``min_lmax`` is the stored capacity the preset's
-#: literal coefficients need; ``min_retained_degree`` (or None) is the
-#: degree the preset's advertised behavior needs INSIDE the 2/3 product cut
-#: (``product_truncation_cut(lmax) >= value``). Williamson 2's steady state
-#: needs the degree-2 curl/kinetic-energy products to cancel its pressure
-#: term (lost at lmax=2); gravity_wave's Y_4^2 mode needs storage only,
-#: because above the cut its delta/phi pair receives no product term (the
-#: exact linear pressure pair, plus any hyperdiffusion, still acts there);
-#: Williamson 5's value is the initial-state storage requirement only: the
-#: cone/topography representability gate and the benchmark policy are
-#: separate and unchanged.
-SWE_SCENARIO_SUPPORT = {
-    "rest": (1, None),
-    "gravity_wave": (4, None),
-    "williamson2": (2, 2),
-    "williamson5": (2, None),
-}
 
-
-def _min_lmax_retaining(degree: int) -> int:
-    lmax = degree
-    while product_truncation_cut(lmax) < degree:
-        lmax += 1
-    return lmax
-
-
-def require_scenario_support(scenario: str, lmax: int) -> None:
-    """Raise ValueError unless ``lmax`` supports ``scenario``.
-
-    Shared by the CPU configuration layer and the CUDA initial-condition
-    factory so both boundaries enforce the same contract. Unknown scenarios
-    are the caller's concern (reported separately).
-    """
-    support = SWE_SCENARIO_SUPPORT.get(scenario)
-    if support is None:
-        return
-    min_lmax, min_retained = support
-    lmax = int(lmax)
-    if lmax < min_lmax:
-        raise ValueError(
-            f"scenario {scenario!r} needs lmax >= {min_lmax} to store its "
-            f"initial coefficients, got lmax={lmax}")
-    if min_retained is not None and product_truncation_cut(lmax) < min_retained:
-        raise ValueError(
-            f"scenario {scenario!r} needs the 2/3 product cut to retain "
-            f"degree {min_retained} (product_truncation_cut(lmax) >= "
-            f"{min_retained}, i.e. lmax >= {_min_lmax_retaining(min_retained)}); "
-            f"lmax={lmax} retains only degrees <= "
-            f"{product_truncation_cut(lmax)}. See docs/validation/"
-            "preset_support_characterization.md.")
-
-
-# ---------------------------------------------------------------------------
-# Williamson et al. (1992) test case 5: canonical constants.
-#
-# This module stays import-light, so the cone geometry constants are
-# duplicated from physics/topography.py (kept in sync by a test). The
-# fluid/planet constants are the published case-5 values. Case 5 prescribes
-# the case-2 field as the FREE SURFACE, eta = h0 - (C/g) sin^2(lat), and
-# the fluid-layer depth as eta - h_s (Williamson et al. 1992, Sect. 2 +
-# Sect. 3.5; derivation in notebooks/W5_MRI_SEMANTIC_AUDIT.md). Because the
-# model carries the mean thickness in Phi0 = g*H with the prognostic phi
-# monopole pinned to zero, the canonical mean depth must absorb the cone's
-# spherical mean (global mean of sin^2(lat) is 1/3):
-#
-#     H = mean(eta - h_s) = h0 - C/(3g) - mean(h_s)
-#
-# All expressions are the exact float forms shared with the
-# initial-condition builder, so config, hash, and model agree bitwise.
-# ---------------------------------------------------------------------------
-W5_GRAVITY = 9.80616                      # m/s^2
-W5_RADIUS_M = 6.37122e6                   # m (perfect sphere)
-W5_OMEGA = 7.292e-5                       # s^-1
-#: Day length whose 2*pi/(day_hours*3600) round-trips to exactly W5_OMEGA
-#: (verified float identity, pinned by tests).
-W5_DAY_HOURS = 2.0 * math.pi / W5_OMEGA / 3600.0
-W5_U0_MS = 20.0                           # m/s
-W5_H0_M = 5960.0                          # m (canonical free-surface h0)
-W5_C = W5_RADIUS_M * W5_OMEGA * W5_U0_MS + 0.5 * W5_U0_MS * W5_U0_MS
-W5_CONE_HEIGHT_M = 2000.0                 # m
-W5_CONE_RADIUS_RAD = math.pi / 9.0        # rad (coordinate-plane distance)
-W5_CONE_LAT_DEG = 30.0
-W5_CONE_LON_DEG = -90.0
-
-
-def _w5_cone_mean_height_m() -> float:
-    """Exact spherical mean of the analytic Williamson-5 cone (metres).
-
-    hbar = (1/4pi) * integral of hs0*(1 - r/R0)*cos(lat) over the
-    coordinate-plane disk r = sqrt(dlon^2 + dlat^2) <= R0 centered at
-    (lat_c, lon_c). Substituting lat = lat_c + y, lon = lon_c + x and
-    dropping the odd sin(y) part of cos(lat_c + y) (disk and cone are even
-    in y) leaves, via the Bessel identity
-    integral_0^2pi cos(r sin(a)) da = 2*pi*J0(r):
-
-        hbar = (hs0 * cos(lat_c) / 2) * I
-        I    = integral_0^R0 (1 - r/R0) * J0(r) * r dr
-             = sum_k (-1)^k R0^(2k+2) / (4^k (k!)^2 (2k+2)(2k+3))
-
-    The alternating series converges superexponentially for R0 = pi/9
-    (each term falls by ~300x) and is summed to float64 exhaustion, so the
-    constant is bitwise deterministic. Cross-checked by tests against a
-    brute-force numerical quadrature of the cone, and consistent with the
-    MRI-JMA reference model's logged initial global mean of mass,
-    5619.9259 m (STDOUT of Williamson5/N959_1920x960/sh; see
-    notebooks/W5_MRI_SEMANTIC_AUDIT.md).
-    """
-    r0sq = W5_CONE_RADIUS_RAD * W5_CONE_RADIUS_RAD
-    total = 0.0
-    k = 0
-    power = r0sq            # R0^(2k+2)
-    factorial = 1.0         # k!
-    while True:
-        term = power / ((4.0 ** k) * factorial * factorial
-                        * (2 * k + 2) * (2 * k + 3))
-        new_total = total + (term if k % 2 == 0 else -term)
-        if new_total == total:
-            break
-        total = new_total
-        k += 1
-        power *= r0sq
-        factorial *= k
-    return 0.5 * W5_CONE_HEIGHT_M * math.cos(
-        math.radians(W5_CONE_LAT_DEG)) * total
-
-
-#: Exact spherical mean of the analytic cone (~17.427 m): the terrain
-#: monopole the canonical mean depth must absorb.
-W5_CONE_MEAN_HEIGHT_M = _w5_cone_mean_height_m()
-#: Canonical mean fluid depth H = h0 - C/(3g) - mean(h_s): the spherical
-#: mean of the canonical layer depth eta - h_s.
-W5_MEAN_DEPTH_M = (W5_H0_M - W5_C / (3.0 * W5_GRAVITY)
-                   - W5_CONE_MEAN_HEIGHT_M)
-#: The benchmark-owned topography token recorded in W5 run identities.
-W5_TOPOGRAPHY = "williamson5_cone"
-#: Spectral representation policy for the cone (hashed): the analytic cone
-#: is analyzed once on the backend's state sampling and kept at the full
-#: model truncation (no extra cut); see Topography.williamson5_cone.
-W5_PROJECTION_POLICY = "state-grid-analysis-full-truncation"
 
 #: Available bottom-topography presets (must match
-#: physics/topography.TOPOGRAPHY_PRESETS; duplicated here because that
+#: spatial/terrain/topography.TOPOGRAPHY_PRESETS; duplicated here because that
 #: module imports CuPy at import time).
 SWE_TOPOGRAPHIES = {
     "flat": "Flat bottom (canonical default; identical to the historical "
@@ -230,9 +99,9 @@ DEFAULT_MOUNTAIN_LAT_DEG = 30.0
 DEFAULT_MOUNTAIN_LON_DEG = 90.0
 DEFAULT_MOUNTAIN_WIDTH_DEG = 20.0
 
-#: Physical sanity cap shared with physics/topography.py. This module stays
+#: Physical sanity cap shared with spatial/terrain/topography.py. This module stays
 #: import-light so CLI validation and --help never import CuPy; keep the plain
-#: numeric constant synchronized with physics.topography.MAX_MOUNTAIN_HEIGHT_M.
+#: numeric constant synchronized with spatial.terrain.topography.MAX_MOUNTAIN_HEIGHT_M.
 MAX_MOUNTAIN_HEIGHT_M = 1.0e5
 
 _MOUNTAIN_PARAM_FIELDS = ("mountain_height_m", "mountain_lat_deg",

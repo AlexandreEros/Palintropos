@@ -94,8 +94,10 @@ through newer preset guards and their arrays are never projected on load.
 
 Opening, `sim.times`, `snapshot.metadata`, `snapshot.state[...]`, and
 `tropoi inspect` (with or without `--snapshot`) never import CuPy,
-Matplotlib, the numerical cores, or the visualization package; this is
-enforced by fresh-interpreter tests. Opening memory-maps the coefficient
+Matplotlib, the numerical cores (`tropoi.temporal.tendencies`), the
+discretization (`tropoi.spatial` grids, transforms, operators), or the
+visualization package (`tropoi.representation.visual`); this is enforced by
+fresh-interpreter tests. Opening memory-maps the coefficient
 array read-only, so its cost does not scale with the total payload
 (`open_simulation(path, mmap=False)` loads it into host memory instead,
 still read-only).
@@ -137,6 +139,31 @@ time: same panels, interpolation, palettes, and layout.
 
 The PNG metadata records `Representation` and `Normalization`, so an image's
 provenance is inspectable after the fact.
+
+## Where the implementation lives
+
+The interface follows the package's spatial / temporal / representation
+layout ([ARCHITECTURE.md](ARCHITECTURE.md), "Package layout"):
+
+| Piece | Module | Needs |
+| --- | --- | --- |
+| `open_simulation`, capsule layout, legacy inference | `tropoi.representation.archive` (`capsule.py`) | CPU |
+| `state_schema` / `diagnostic_definitions` (read and written) | `tropoi.representation.archive.schema` | CPU |
+| run ids, run directories, manifests (the writer) | `tropoi.representation.archive.writer` | CPU |
+| `Simulation`, `Snapshot`, the `SnapshotStorage` protocol | `tropoi.temporal.simulation` | CPU |
+| `FieldSpec`, `SpectralModes`, `SpectralState` host views | `tropoi.spatial.modes` | CPU |
+| `Snapshot.plot` adapter | `tropoi.representation.visual.snapshot` | per the table above |
+| per-core figure compositions | `tropoi.representation.visual.{bve,swe,pe_snapshots}` | per the table above |
+| model resources a physical plot rebuilds | `tropoi.spatial` (planet, grids, transforms, terrain, sigma grid), via the CLI solver modules' builders | CUDA |
+
+`Simulation` depends only on the storage protocol; the capsule format is one
+implementation of it, outside the temporal layer. Capsules written before
+this layout (including those from earlier 0.1 builds and the historical
+`psx-bve` format) are read unchanged; the reorganization did not alter any stored
+array, schema block, or file name. Descriptive paths that older manifests
+record (for example `run/bve/diagnostics.py` in `diagnostic_definitions`)
+name the modules of their time, which remain importable as compatibility
+aliases.
 
 ## What this interface does not do
 

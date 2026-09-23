@@ -130,11 +130,12 @@ def build_pe_model(run_config: Mapping):
     used and fails loudly when the mountain is too narrow for the cut.
     Imports CuPy; call only after validation.
     """
-    from tropoi.planet import Planet, PlanetaryParameters
-    from tropoi.physics.primitive_equations import (
+    from tropoi.spatial.environment import PlanetaryParameters
+    from tropoi.spatial.planet import Planet
+    from tropoi.temporal.tendencies.primitive_equations import (
         PrimitiveEquationsModel)
-    from tropoi.physics.sigma_coordinate import SigmaGrid
-    from tropoi.physics.topography import Topography
+    from tropoi.spatial.sigma_coordinate import SigmaGrid
+    from tropoi.spatial.terrain.topography import Topography
 
     planet = Planet.generate(
         params=PlanetaryParameters.from_earth_like(
@@ -149,7 +150,7 @@ def build_pe_model(run_config: Mapping):
     )
     topography_kind = run_config.get("topography", "flat")
     if topography_kind == "mountain":
-        from tropoi.physics.primitive_equations import (
+        from tropoi.temporal.tendencies.primitive_equations import (
             product_truncation_cut)
         topography = Topography.mountain(
             planet,
@@ -178,9 +179,9 @@ def build_pe_model(run_config: Mapping):
 
 def _execute_solver(cfg: "PERunConfig", run_dir, run_config: dict) -> None:
     """Heavy numerical portion: build planet + PE model, drive the solver."""
-    from tropoi.run.bve.io import (RUN_STATUS_RUNNING,
+    from tropoi.representation.archive.writer import (RUN_STATUS_RUNNING,
                                               write_run_manifest)
-    from tropoi.run.pe.initial_conditions import make_pe_ic
+    from tropoi.spatial.initialization.pe import make_pe_ic
     from tropoi.run.pe.runner import run_pe
     from tropoi.representation.archive.schema import provenance_blocks
 

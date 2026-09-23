@@ -1,7 +1,7 @@
 """Shallow-water run driver: integrate, validate, persist, plot.
 
 Mirrors ``run/bve/runner.py`` on top of the shared integration engine
-(``run.engine``): the scheduler owns the step/store contract, the ceiling is
+(``temporal.integration``): the scheduler owns the step/store contract, the ceiling is
 the state-adaptive advective+gravity-wave CFL (recomputed from every
 accepted state's ``max_char_speed_ms``), and diagnostics rows are recorded
 after every accepted step. After each accepted step the state is validated
@@ -17,13 +17,13 @@ from typing import Sequence
 import numpy as np
 import cupy as cp
 
-from tropoi.physics.shallow_water import (ShallowWaterModel,
+from tropoi.temporal.tendencies.shallow_water import (ShallowWaterModel,
                                                      ShallowWaterState)
-from ..engine import (IntegrationScheduler, advective_cfl_timestep,
+from tropoi.temporal.integration import (IntegrationScheduler, advective_cfl_timestep,
                       integrate, rk4_step_array, validate_snapshot_schedule)
-from .config import SWE_PLOT_TYPES
-from .diagnostics import SWEDiagnosticsRecorder, plot_swe_diagnostics
-from .visualization import render_swe_snapshots, render_swe_summary
+from tropoi.run.swe.config import SWE_PLOT_TYPES
+from tropoi.representation.diagnostics.swe import SWEDiagnosticsRecorder, plot_swe_diagnostics
+from tropoi.representation.visual.swe import render_swe_snapshots, render_swe_summary
 
 
 def run_swe(model: ShallowWaterModel,

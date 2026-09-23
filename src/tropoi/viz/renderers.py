@@ -1,42 +1,8 @@
-"""Minimal visualization-backend boundary."""
-from __future__ import annotations
+"""Compatibility import path; the implementation lives in :mod:`tropoi.representation.visual.renderers`.
 
-import pathlib
-from typing import Protocol, runtime_checkable
+This module object IS ``tropoi.representation.visual.renderers`` (aliased in ``sys.modules``), so
+classes, functions and module state are identical under both names.
+"""
+from tropoi._compat import alias_module
 
-from .specs import (FigureSpec, ScalarMapSpec, SpectralCoefficientMapSpec,
-                    StreamlineMapSpec)
-
-
-@runtime_checkable
-class Renderer(Protocol):
-    """Render declarative specifications without exposing backend objects."""
-
-    def render_scalar_map(self, specification: ScalarMapSpec,
-                          output_path: pathlib.Path | str, *,
-                          metadata: dict | None = None,
-                          dpi: int = 200) -> pathlib.Path:
-        ...
-
-    def render_spectral_coefficient_map(
-            self, specification: SpectralCoefficientMapSpec,
-            output_path: pathlib.Path | str, *, metadata: dict | None = None,
-            dpi: int = 200) -> pathlib.Path:
-        ...
-
-    def render_streamline_map(
-            self, specification: StreamlineMapSpec,
-            output_path: pathlib.Path | str, *, metadata: dict | None = None,
-            dpi: int = 200) -> pathlib.Path:
-        ...
-
-    def render_figure(self, specification: FigureSpec,
-                      output_path: pathlib.Path | str, *,
-                      metadata: dict | None = None) -> pathlib.Path:
-        ...
-
-
-def get_default_renderer() -> Renderer:
-    """Return the configured initial backend without exposing it to models."""
-    from .matplotlib_renderer import MatplotlibRenderer
-    return MatplotlibRenderer()
+alias_module(__name__, "tropoi.representation.visual.renderers")

@@ -12,7 +12,7 @@ The same definitions serve two consumers:
   result says so (``provenance.source == "inferred"``).
 
 Everything is derived from the resolved ``run_config`` and the shared
-definitions in the physics/diagnostics modules' docstrings, never from
+definitions in the tendency/diagnostics modules' docstrings, never from
 array contents, so the writer needs no model object and the reader needs
 no CUDA. Import-light (stdlib + NumPy-free): consumed by the CLI.
 """
@@ -24,7 +24,7 @@ import math
 
 from tropoi.spatial.modes import (COEFFICIENT_LAYOUT,
                                   COEFFICIENT_NORMALIZATION, FieldSpec)
-from tropoi.support import product_truncation_cut
+from tropoi.spatial.truncation import product_truncation_cut
 
 #: Version of the ``state_schema`` manifest block this module writes/reads.
 STATE_SCHEMA_VERSION = 1
@@ -56,7 +56,7 @@ REALITY_CONVENTION = ("real field implied: coefficients stored for m >= 0 "
 TIME_UNITS = "s"
 
 #: Earth radius and rotation used by ``PlanetaryParameters.from_earth_like``
-#: (planet/planetary_parameters.py) and the Williamson (1992) perfect sphere
+#: (spatial/environment.py) and the Williamson (1992) perfect sphere
 #: (run/swe/config.py). Duplicated here so the schema stays import-light; a
 #: test keeps them synchronized with their sources.
 EARTH_RADIUS_M = 6.371e6
@@ -651,7 +651,7 @@ _PE_COLUMN_MEANINGS = {
 def high_l_enstrophy_fraction_definition(l_max: int) -> dict:
     """Structured definition of the BVE ``high_l_enstrophy_frac`` column.
 
-    Mirrors ``run/bve/diagnostics.spectral_diagnostics`` exactly: the
+    Mirrors ``representation/diagnostics/bve.spectral_diagnostics`` exactly: the
     per-degree enstrophy ``Z_l = 1/2 R^2 sum_m P_lm`` is summed over the
     triangular domain ``0 <= m <= l <= l_max`` with positive-order
     multiplicity (``P_l0 = Re(a_l0)^2``, ``P_lm = 2 |a_lm|^2`` for m > 0);

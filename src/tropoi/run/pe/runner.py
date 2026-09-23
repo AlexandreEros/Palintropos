@@ -1,7 +1,7 @@
 """Dry primitive-equation run driver: integrate (fixed step), validate, persist.
 
 Mirrors ``run/swe/runner.py`` on top of the shared integration engine
-(``run.engine``) with ONE deliberate difference: the timestep is a
+(``temporal.integration``) with ONE deliberate difference: the timestep is a
 user-supplied **fixed** value, not the state-adaptive advective-CFL ceiling
 the BVE/SWE runners use. This first runnable PE experiment makes no CFL
 controller claim — it drives the existing :class:`IntegrationScheduler` (count
@@ -45,11 +45,11 @@ from typing import Sequence
 import numpy as np
 import cupy as cp
 
-from tropoi.physics.primitive_equations import (
+from tropoi.temporal.tendencies.primitive_equations import (
     PrimitiveEquationsModel, PrimitiveEquationsState)
-from ..engine import IntegrationScheduler, rk4_step_array
-from .config import PE_PLOT_TYPES
-from .diagnostics import PEDiagnosticsRecorder, plot_pe_diagnostics
+from tropoi.temporal.integration import IntegrationScheduler, rk4_step_array
+from tropoi.run.pe.config import PE_PLOT_TYPES
+from tropoi.representation.diagnostics.pe import PEDiagnosticsRecorder, plot_pe_diagnostics
 
 
 def run_pe(model: PrimitiveEquationsModel,
@@ -164,8 +164,8 @@ def run_pe(model: PrimitiveEquationsModel,
         # lifecycle marks the run failed and never publishes it as complete.
         # The single-level summary and the per-snapshot upper/lower figures are
         # rendered together from the just-persisted coefficient stack.
-        from .visualization import render_pe_summary
-        from .snapshot_visualization import render_pe_snapshots
+        from tropoi.representation.visual.pe import render_pe_summary
+        from tropoi.representation.visual.pe_snapshots import render_pe_snapshots
         render_pe_summary(model, out_dir, metadata=figure_metadata)
         render_pe_snapshots(model, out_dir, metadata=figure_metadata,
                             scenario=scenario)

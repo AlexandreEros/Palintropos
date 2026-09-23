@@ -10,7 +10,7 @@ parameters the primitive-equation core needs:
   ``run.pe.runner``);
 * the vertical grid, given either as a uniform-sigma ``nlev`` level count or
   as explicit ``sigma_interfaces`` (validated through
-  :class:`~tropoi.physics.sigma_coordinate.SigmaGrid`);
+  :class:`~tropoi.spatial.sigma_coordinate.SigmaGrid`);
 * the configurable dry gas constants ``r_dry`` / ``cp_dry``;
 * the initial-condition thermodynamic parameters ``temperature`` /
   ``surface_pressure`` (and, for ``thermal_wave``, ``thermal_amplitude``).
@@ -46,14 +46,16 @@ import math
 from dataclasses import dataclass
 from typing import Mapping, Optional, Sequence
 
-from tropoi.physics.sigma_coordinate import SigmaGrid
-from tropoi.support import product_truncation_cut
-from ..bve.config import (GRID_TYPES, MIN_NLAT, MIN_NLON,
+from tropoi.spatial.sigma_coordinate import SigmaGrid
+from tropoi.spatial.truncation import (  # noqa: F401  (re-exports)
+    THERMAL_WAVE_MIN_RETAINED_DEGREE, product_truncation_cut,
+    require_thermal_wave_support)
+from tropoi.run.bve.config import (GRID_TYPES, MIN_NLAT, MIN_NLON,
                           scientific_config_subset)
-from ..engine import (SECONDS_PER_DAY, _require_finite_number,
+from tropoi.temporal.integration import (SECONDS_PER_DAY, _require_finite_number,
                       _require_finite_positive, count_snapshot_times,
                       interval_snapshot_times)
-from ..swe.config import (DEFAULT_GRAVITY, DEFAULT_MOUNTAIN_HEIGHT_M,
+from tropoi.run.swe.config import (DEFAULT_GRAVITY, DEFAULT_MOUNTAIN_HEIGHT_M,
                           DEFAULT_MOUNTAIN_LAT_DEG, DEFAULT_MOUNTAIN_LON_DEG,
                           DEFAULT_MOUNTAIN_WIDTH_DEG, MAX_MOUNTAIN_HEIGHT_M)
 
@@ -62,7 +64,7 @@ from ..swe.config import (DEFAULT_GRAVITY, DEFAULT_MOUNTAIN_HEIGHT_M,
 PE_PLOT_TYPES = ("diagnostics", "summary")
 _PE_PLOTS_REQUIRING_SNAPSHOTS = ("summary",)
 
-#: Dry-air constants mirrored from ``physics.primitive_equations`` (imported
+#: Dry-air constants mirrored from ``temporal.tendencies.primitive_equations`` (imported
 #: literally here, not from that module, so the config stays CuPy-free). The
 #: model rejects a run whose r_dry/cp_dry disagree with these unless the user
 #: deliberately overrides them; the values are the documented dry defaults.
@@ -75,7 +77,7 @@ DEFAULT_TEMPERATURE = 260.0     # K
 DEFAULT_SURFACE_PRESSURE = 101325.0  # Pa
 
 #: Default thermal-wave perturbation amplitude: the spectral coefficient
-#: placed on the degree-2 mode (see run.pe.initial_conditions). ~1 K keeps
+#: placed on the degree-2 mode (see spatial.initialization.pe). ~1 K keeps
 #: the perturbed temperature positive everywhere.
 DEFAULT_THERMAL_AMPLITUDE = 1.0  # K
 
@@ -89,7 +91,7 @@ DEFAULT_N_SNAPSHOTS = 3
 _MAX_T_END_SECONDS = 1e12
 
 #: Available initial-condition presets (must match
-#: run.pe.initial_conditions.PE_INITIAL_CONDITIONS; kept as a plain mapping
+#: spatial.initialization.pe.PE_INITIAL_CONDITIONS; kept as a plain mapping
 #: here because that module imports CuPy at import time).
 PE_SCENARIOS = {
     "isothermal_rest": "Exactly resting, horizontally uniform isothermal "
@@ -103,7 +105,7 @@ PE_SCENARIOS = {
 }
 
 #: Available surface-topography presets for the PE solver. Same vocabulary
-#: and meaning as the shallow-water config (and physics/topography.
+#: and meaning as the shallow-water config (and spatial/terrain/topography.
 #: TOPOGRAPHY_PRESETS): terrain is a fixed band-limited surface *elevation*
 #: h_s in metres; the PE model consumes the derived surface geopotential
 #: Phi_s = gravity * h_s (m^2/s^2), which enters the hydrostatic
@@ -125,37 +127,6 @@ _TERRAIN_PARAM_FIELDS = ("mountain_height_m", "mountain_lat_deg",
 
 #: Presets that require a resolvable degree-2 harmonic.
 _SCENARIOS_NEEDING_L2 = ("thermal_wave",)
-
-#: thermal_wave places its perturbation on the (2, 2) mode; a NONZERO
-#: amplitude additionally needs degree 2 inside the 2/3 product cut, or the
-#: temperature perturbation is frozen for all time while only divergence
-#: responds (measured at lmax=2, docs/validation/
-#: preset_support_characterization.md). Zero amplitude is exact rest and
-#: keeps the storage boundary only.
-THERMAL_WAVE_MIN_RETAINED_DEGREE = 2
-
-
-def require_thermal_wave_support(lmax: int, thermal_amplitude: float) -> None:
-    """Raise ValueError unless ``lmax`` supports thermal_wave at this amplitude.
-
-    Shared by the CPU configuration layer and the CUDA initial-condition
-    factory. Storage (``lmax >= 2``) is always required; the retained-degree
-    requirement applies only to a nonzero amplitude.
-    """
-    lmax = int(lmax)
-    if lmax < 2:
-        raise ValueError(
-            f"scenario 'thermal_wave' needs lmax >= 2 for its degree-2 "
-            f"perturbation, got {lmax}")
-    if float(thermal_amplitude) != 0.0 and \
-            product_truncation_cut(lmax) < THERMAL_WAVE_MIN_RETAINED_DEGREE:
-        raise ValueError(
-            "scenario 'thermal_wave' with a nonzero thermal_amplitude needs "
-            "the 2/3 product cut to retain degree 2 (lmax >= 3); "
-            f"lmax={lmax} retains only degrees <= "
-            f"{product_truncation_cut(lmax)}, which freezes the temperature "
-            "perturbation. Use lmax >= 3, or thermal_amplitude=0 for exact "
-            "rest. See docs/validation/preset_support_characterization.md.")
 
 PE_BASE_DEFAULTS: dict = {
     "lmax": 10,

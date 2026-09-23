@@ -46,7 +46,7 @@ def clear_cupy_cache(cp) -> None:
 
 def verify_kernel_source(cp):
     """Recompile the sh_matrix kernel and sanity-check its output."""
-    from tropoi.numerics.cuda.cuda_utils import raw_module_from_cuda
+    from tropoi.spatial.transforms.cuda.cuda_utils import raw_module_from_cuda
 
     print("\nRecompiling sh_matrix kernel...")
     module = raw_module_from_cuda("sh_matrix")

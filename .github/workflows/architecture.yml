@@ -1,0 +1,48 @@
+# Keeps docs/architecture/current in step with src/.
+#
+# The generated graphs are committed alongside the source change that alters
+# them. This job re-renders them from the pushed tree and fails if the
+# committed files differ. On failure, the freshly generated directory is
+# attached to the run as the `architecture-current` artifact.
+# See docs/architecture/README.md.
+name: architecture
+
+on:
+  push:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  current-snapshot:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # The Python minor version is part of the recorded toolchain and can
+      # change the output; keep it equal to the one in the snapshot READMEs.
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      # The generator never imports tropoi, so only the pinned analysis
+      # packages are needed (not requirements.txt / CuPy). The pins are read
+      # from requirements-dev.txt so they have a single source.
+      - name: Install pinned analysis tooling
+        run: |
+          grep -E '^(grimp|networkx)==' requirements-dev.txt > architecture-pins.txt
+          python -m pip install -r architecture-pins.txt
+
+      - name: Check docs/architecture/current is up to date
+        run: python -m tools.architecture.generate --check
+
+      - name: Regenerate for download
+        if: failure()
+        run: python -m tools.architecture.generate
+
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: architecture-current
+          path: docs/architecture/current
