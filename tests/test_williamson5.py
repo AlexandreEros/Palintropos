@@ -144,7 +144,7 @@ def _make_w5_model(planet, *, cone=True, mean_depth=MEAN_DEPTH_CANON):
 # ===========================================================================
 
 def test_ideal_sphere_parameters_are_exact():
-    from tropoi.planet import PlanetaryParameters
+    from tropoi.spatial.environment import PlanetaryParameters
 
     p = PlanetaryParameters.ideal_sphere(
         radius_m=A_CANON, sidereal_day_s=DAY_HOURS_CANON * 3600.0)

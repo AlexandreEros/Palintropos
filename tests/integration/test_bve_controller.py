@@ -8,6 +8,11 @@ after accepted step ``n`` determines the CFL ceiling used to size step
 """
 from __future__ import annotations
 
+import pytest
+
+pytest.importorskip(
+    "cupy", reason="tropoi.run.bve.runner imports CuPy at module scope")
+
 from tropoi.run.bve.config import (
     IntegrationScheduler,
     advective_cfl_timestep,

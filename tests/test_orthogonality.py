@@ -8,6 +8,10 @@ For a proper quadrature scheme with weights w_i:
 This checks if the geodesic grid plus Voronoi weights is approximately orthogonal.
 """
 import numpy as np
+import pytest
+
+pytest.importorskip("cupy", reason="CUDA/CuPy not available")
+
 import cupy as cp
 
 from tropoi.numerics import GeodesicGridGeometry, GeodesicSphericalHarmonics

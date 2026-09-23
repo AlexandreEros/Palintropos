@@ -12,6 +12,10 @@ import math
 
 import pytest
 
+# The module import below needs CuPy; pytestmark further down cannot skip
+# a module that fails to import.
+pytest.importorskip("cupy", reason="CUDA/CuPy not available")
+
 from tropoi.run.pe.initial_conditions import (
     PE_INITIAL_CONDITIONS, THERMAL_WAVE_DEGREE, THERMAL_WAVE_ORDER, make_pe_ic)
 

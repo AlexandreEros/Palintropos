@@ -1,5 +1,9 @@
 import unittest
 import numpy as np
+import pytest
+
+pytest.importorskip("cupy", reason="CUDA/CuPy not available")
+
 import cupy as cp
 from pathlib import Path
 
