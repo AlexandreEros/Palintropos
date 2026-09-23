@@ -14,19 +14,23 @@ separate and are not replaced by these files.
 
 | Path | Status |
 |---|---|
-| `history/pre-sprint3/` | **Frozen.** Source commit `f879851`, immediately before the spatial/temporal/representation refactor. Never regenerated; `--check` verifies it (see its README). |
-| `history/post-sprint3/` | **Frozen.** Source commit `47dec90`, the completed spatial/temporal/representation refactor. Never regenerated; `--check` verifies it (see its README). |
+| `history/numerics-physics-layout/` | **Frozen.** Source commit `f879851`: the original layout, with implementation modules in `tropoi.numerics`, `tropoi.physics`, `tropoi.planet`, and `tropoi.viz`. Never regenerated; `--check` verifies it (see its README). |
+| `history/spatial-temporal-representation-layout/` | **Frozen.** Source commit `47dec90`: the same code reorganized into `tropoi.spatial`, `tropoi.temporal`, and `tropoi.representation`, with the old paths kept as aliases (see *Compatibility paths* in `docs/ARCHITECTURE.md`). Never regenerated; `--check` verifies it (see its README). |
 | `current/` | **Live.** Default output of the generator; always describes the committed `src/tropoi`. CI fails any push where it is stale (see *Automated generation*). |
 
-`current/` and `history/post-sprint3/` hold identical graphs when they are
-introduced, because `src/` has not changed since `47dec90`. They differ only in
-the README and metrics provenance. The first source change after that updates
-`current/` and leaves `post-sprint3/` as it is.
+`current/` and `history/spatial-temporal-representation-layout/` hold identical
+graphs when `current/` is introduced, because `src/` has not changed since
+`47dec90`. They differ only in the README and metrics provenance. The first
+source change after that updates `current/` and leaves the frozen snapshot as
+it is.
+
+Snapshots are named after what they capture, here the package layout, rather
+than after the work that produced them.
 
 ### Adding a frozen snapshot
 
 To record a milestone, render a committed source commit into a new
-`history/` directory:
+`history/` directory. Name it after what the snapshot captures:
 
 ```bash
 python -m tools.architecture.generate --out docs/architecture/history/<name> --title <Title> --source-commit <rev> --freeze

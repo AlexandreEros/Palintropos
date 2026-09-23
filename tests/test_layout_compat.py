@@ -1,12 +1,13 @@
 """The spatial / temporal / representation layout and its compatibility paths.
 
-Sprint 3 moved every implementation module under ``tropoi.spatial``,
-``tropoi.temporal`` or ``tropoi.representation``. The pre-move import paths
-remain valid for the 0.1 series as ``sys.modules`` aliases: the old name IS
-the new module object, so classes, functions, module state and monkeypatch
-targets are identical under both names. These tests pin that contract, the
-dependency direction between the three layers, and the packaged CUDA
-sources. Import-only identity checks need CuPy importable, not a device.
+The layout refactor moved every implementation module under
+``tropoi.spatial``, ``tropoi.temporal`` or ``tropoi.representation``. The
+pre-move import paths remain valid for the 0.1 series as ``sys.modules``
+aliases: the old name IS the new module object, so classes, functions,
+module state and monkeypatch targets are identical under both names. These
+tests pin that contract, the dependency direction between the three layers,
+and the packaged CUDA sources. Import-only identity checks need CuPy
+importable, not a device.
 """
 from __future__ import annotations
 

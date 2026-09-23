@@ -1,7 +1,7 @@
 """Preset support characterization at the product-truncation boundaries.
 
 Measured record: docs/validation/preset_support_characterization.md
-(Sprint 1, 2026-09-18). Each preset stores coefficients through ``l_max``
+(2026-09-18). Each preset stores coefficients through ``l_max``
 but analyzed nonlinear products retain only degrees ``<= cut = 2*l_max//3``.
 Degrees above the cut are advanced by the exact *linear* spectral
 operators only. This file pins that behavior on both backends at the

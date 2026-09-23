@@ -13,8 +13,8 @@ Pipeline::
 The extractors record generic structural facts only (A imports B, class A
 inherits from B, function f has a statically resolvable call to g). They carry
 no knowledge of, or expectations about, any particular layering of the analysed
-package. See ``docs/architecture/history/pre-sprint3/README.md`` for the
-extraction rules and metric definitions as rendered for a snapshot.
+package. See ``docs/architecture/current/README.md`` for the extraction
+rules and metric definitions as rendered for a snapshot.
 
 ``grimp`` and ``networkx`` are development-only dependencies
 (``requirements-dev.txt``); nothing in ``src/`` imports this package.

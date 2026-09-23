@@ -44,8 +44,9 @@ def test_truncation_import_loads_only_the_truncation_module():
 
 
 def test_legacy_support_import_adds_only_the_alias():
-    # tropoi.support (the Sprint 1 path) aliases the canonical module: it
-    # may add only itself and the stdlib-only alias helper.
+    # tropoi.support (its home before the layout refactor) aliases the
+    # canonical module: it may add only itself and the stdlib-only alias
+    # helper.
     _assert_loads_exactly(
         "import tropoi.support",
         ["tropoi", "tropoi._compat", "tropoi.spatial",

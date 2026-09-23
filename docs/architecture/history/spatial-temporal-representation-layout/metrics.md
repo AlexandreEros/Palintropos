@@ -1,4 +1,4 @@
-# Architecture metrics: post-Sprint-3
+# Architecture metrics: spatial/temporal/representation layout
 
 Descriptive graph measurements. No value is ranked as better or worse. Definitions are at the end; machine-readable values are in `metrics.json`.
 

@@ -1,6 +1,6 @@
 # Preset support characterization at the product-truncation boundaries
 
-**Sprint 1 record, 2026-09-18.** Branch `feat/support-contracts`, starting
+**Measurement record, 2026-09-18.** Branch `feat/support-contracts`, starting
 revision `fd0ddff` (main). Measurements taken on the GeForce MX110 with
 `venv/Scripts/python.exe` (Python 3.12, CuPy 13.4) on both backends: the
 Gauss lat-lon backend (`nlat=32, nlon=64`) and the geodesic backend
@@ -32,12 +32,12 @@ Pinned cut values: `1->0, 2->1, 3->2, 4->2, 5->3, 6->4, 10->6, 15->10,
 
 ## Source facts (revision `fd0ddff`)
 
-| Preset | Construction | Literal indices | Minimum storage | Guard before this sprint | Terms that must be active for the advertised behavior |
+| Preset | Construction | Literal indices | Minimum storage | Guard before `feat/support-contracts` | Terms that must be active for the advertised behavior |
 | --- | --- | --- | --- | --- | --- |
 | PE `thermal_wave` | `isothermal_rest_state` + one real coefficient `T[:, 2, 2] = amplitude` at every level | `(l, m) = (2, 2)` | `l_max >= 2` | config `lmax >= 2` (`_SCENARIOS_NEEDING_L2`); factory `l_max >= 2` | "smooth finite response": thermodynamic products at degree 2 (advection, adiabatic heating) plus the linear hydrostatic forcing of divergence |
 | SWE `gravity_wave` | `phi[4, 2] += 1e-3 * phi0` on the rest state | `(4, 2)` | `l_max >= 4` | factory `l_max >= 4` only; config accepted `lmax = 3` | linear pressure pair `delta_dot = -lap(phi)`, `phi_dot = -phi0 * delta` (exact spectral operations) |
 | SWE `williamson2` | `zeta[1, 0]`, `phi[2, 0]` (flat bottom) | `(1, 0)`, `(2, 0)` | `l_max >= 2` | none (config accepted `lmax = 1`; factory would raise `IndexError`) | steady state needs the degree-2 curl and kinetic-energy products to cancel `-lap(phi)` |
-| SWE `williamson5` | same wind/free-surface pair as W2 minus the cone anomaly `phi_s'` | `(1, 0)`, `(2, 0)` + cone | `l_max >= 2` | none (config accepted `lmax = 1`; factory would raise `IndexError`) | benchmark policy unchanged; no integration in this sprint |
+| SWE `williamson5` | same wind/free-surface pair as W2 minus the cone anomaly `phi_s'` | `(1, 0)`, `(2, 0)` + cone | `l_max >= 2` | none (config accepted `lmax = 1`; factory would raise `IndexError`) | benchmark policy unchanged; not integrated on `feat/support-contracts` |
 
 The six production cut formulas were: three `SpectralOperators` sites
 (`_truncate_product`, `advection_pseudospectral`, `jacobian_pseudospectral`),

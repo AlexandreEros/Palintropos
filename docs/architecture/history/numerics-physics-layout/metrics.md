@@ -1,4 +1,4 @@
-# Architecture metrics: pre-Sprint-3
+# Architecture metrics: numerics/physics layout
 
 Descriptive graph measurements. No value is ranked as better or worse. Definitions are at the end; machine-readable values are in `metrics.json`.
 
