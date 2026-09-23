@@ -221,7 +221,7 @@ def test_swe_stack_indices_match_the_core_everywhere():
 
 def test_reference_radii_match_their_sources():
     from tropoi.run.swe.config import W5_RADIUS_M as source_w5
-    from tropoi.planet.planetary_parameters import PlanetaryParameters
+    from tropoi.spatial.environment import PlanetaryParameters
     assert W5_RADIUS_M == source_w5
     assert PlanetaryParameters.from_earth_like().equatorial_radius == \
         EARTH_RADIUS_M

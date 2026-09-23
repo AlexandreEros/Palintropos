@@ -125,6 +125,8 @@ def test_latest_pointer_publish_requires_matching_completed_manifest(
 
 def test_execute_run_forwards_snapshot_mode_to_runner(monkeypatch, tmp_path):
     """psx-bve interval config must arrive at run_bve as snapshot_mode='interval'."""
+    pytest.importorskip("cupy", reason="tropoi.spatial.planet and "
+                        "tropoi.run.bve.runner import CuPy at module scope")
     # the CLI resolves Planet from its canonical module (the legacy
     # tropoi.planet package re-exports the same class)
     import tropoi.spatial.planet as planet_mod
@@ -158,6 +160,8 @@ def test_execute_run_forwards_snapshot_mode_to_runner(monkeypatch, tmp_path):
 
 
 def test_execute_run_forwards_count_mode_to_runner(monkeypatch, tmp_path):
+    pytest.importorskip("cupy", reason="tropoi.spatial.planet and "
+                        "tropoi.run.bve.runner import CuPy at module scope")
     # the CLI resolves Planet from its canonical module (the legacy
     # tropoi.planet package re-exports the same class)
     import tropoi.spatial.planet as planet_mod

@@ -1,3 +1,7 @@
+import pytest
+
+pytest.importorskip("cupy", reason="CUDA/CuPy not available")
+
 import cupy as cp
 import numpy as np
 

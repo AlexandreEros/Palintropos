@@ -1,0 +1,38 @@
+# Runs the CPU part of the test suite on every push.
+#
+# GitHub-hosted runners have no GPU, so CuPy is not installed: tests that need
+# CUDA skip themselves (pytest.importorskip / cupy.is_available() guards) and
+# everything that runs on the host is exercised. The full suite, including the
+# GPU tests, is still run locally before merging. See "Tests" in
+# docs/ARCHITECTURE.md.
+name: tests
+
+on:
+  push:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  cpu:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      # The runtime pins minus CuPy, plus the architecture-tool pins so its
+      # tests run too. The package is installed without dependencies so pip
+      # does not pull CuPy back in through requirements.txt.
+      - name: Install pinned CPU dependencies
+        run: |
+          grep -viE '^cupy' requirements.txt > ci-requirements.txt
+          grep -E '^(grimp|networkx)==' requirements-dev.txt >> ci-requirements.txt
+          python -m pip install -r ci-requirements.txt pytest
+          python -m pip install --no-deps -e .
+
+      - name: Run the CPU test suite
+        run: python -m pytest -q

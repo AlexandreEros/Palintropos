@@ -1,5 +1,9 @@
 import unittest
 import numpy as np
+import pytest
+
+pytest.importorskip(
+    "cupy", reason="tropoi.spatial.grids imports CuPy at module scope")
 
 from tropoi.numerics import LatLonGridGeometry, GeodesicGridGeometry
 from tropoi.numerics.grid_interpolation import (

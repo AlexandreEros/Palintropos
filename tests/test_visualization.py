@@ -462,6 +462,11 @@ def test_snapshot_product_publication_failure_rolls_back_directory(
     assert not list(tmp_path.glob(".snapshots.product-*"))
 
 
+# The fake models below already produce view-grid values, but
+# map_to_uniform_latlon still builds LatLonGridGeometry to compare shapes.
+_MAP_VIEW_NEEDS_CUPY = "tropoi.spatial.grids imports CuPy at module scope"
+
+
 class _FakeTransform:
     def inv_transform(self, coefficients):
         marker = int(round(float(np.real(coefficients[1, 0]))))
@@ -495,6 +500,7 @@ def _write_fake_swe_artifacts(path):
 
 
 def test_swe_summary_titles_units_shape_and_nonempty_image(tmp_path):
+    pytest.importorskip("cupy", reason=_MAP_VIEW_NEEDS_CUPY)
     from tropoi.run.swe.visualization import (
         build_swe_summary_spec, render_swe_summary)
 
@@ -523,6 +529,7 @@ def test_swe_summary_titles_units_shape_and_nonempty_image(tmp_path):
 
 
 def test_swe_snapshot_timeline_uses_persisted_times_and_shared_limits(tmp_path):
+    pytest.importorskip("cupy", reason=_MAP_VIEW_NEEDS_CUPY)
     from tropoi.run.swe.visualization import (
         build_swe_snapshot_timeline, build_swe_snapshot_timelines,
         render_swe_snapshots)
@@ -607,6 +614,7 @@ class _FakeBVEPlanet:
 
 
 def test_bve_snapshot_timeline_reloads_persisted_artifacts(tmp_path):
+    pytest.importorskip("cupy", reason=_MAP_VIEW_NEEDS_CUPY)
     from tropoi.run.bve.visualization import (
         BVE_SNAPSHOT_TIMES_FILENAME, build_bve_snapshot_timeline,
         build_bve_snapshot_timelines, render_bve_snapshots)
@@ -656,6 +664,7 @@ def test_bve_snapshot_timeline_reloads_persisted_artifacts(tmp_path):
 
 def test_swe_visualization_failure_prevents_completion_and_publication(
         tmp_path, monkeypatch):
+    pytest.importorskip("cupy", reason=_MAP_VIEW_NEEDS_CUPY)
     from tropoi.cli import swe
     from tropoi.run.swe.config import SWERunConfig
     from tropoi.run.swe.visualization import render_swe_summary
