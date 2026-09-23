@@ -480,8 +480,10 @@ python -c "from pathlib import Path; from tropoi.representation.diagnostics.bve 
 pytest
 ```
 
-The suite requires a working CUDA GPU. On a Windows machine whose global pytest
-temp directory has stale ACLs, use a workspace-local directory:
+The full suite needs a working CUDA GPU. Without CuPy or a GPU, the tests that
+need CUDA skip themselves and the host-only tests still run. On a Windows
+machine whose global pytest temp directory has stale ACLs, use a
+workspace-local directory:
 
 ```powershell
 pytest --basetemp .pytest-tmp
@@ -489,6 +491,29 @@ pytest --basetemp .pytest-tmp
 
 `requirements-dev.txt` includes the runtime pins, an editable package install,
 pytest, and ipykernel.
+
+#### Continuous integration
+
+`.github/workflows/tests.yml` runs the suite on every push, on `ubuntu-latest`
+with Python 3.12 and without CuPy, since GitHub-hosted runners have no GPU. It
+installs the runtime pins minus CuPy and the architecture-tool pins, then
+installs the package with `--no-deps` so CuPy is not pulled back in. CI
+therefore covers the host-only tests: configuration, CLI, run capsules,
+saved-run API, provenance, layout, and the architecture tool. It does not run
+the CUDA numerics (transforms, tendencies, runners, benchmarks). Run the full suite
+locally on a GPU before merging.
+
+A test that needs CuPy must skip without it, not fail:
+
+- If its module imports CuPy, directly or through `src`, call
+  `pytest.importorskip("cupy", reason=...)` before those imports. A
+  `pytestmark` can't skip a module whose imports fail.
+- If only one test needs CuPy, make the same call its first line.
+- If it needs a GPU, not just an importable CuPy, add the file's `_has_cuda()`
+  guard (`cupy.is_available()`).
+
+`.github/workflows/architecture.yml` checks the generated architecture graphs;
+see [docs/architecture/README.md](architecture/README.md).
 
 ### Benchmarks and audits
 
