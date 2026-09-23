@@ -1,104 +1,84 @@
 # Palintropos
 
-**A GPU-resident spectral laboratory for circulation on a rotating sphere.**
+**A GPU spectral laboratory for idealized flow on a rotating sphere.**
 
-Formerly **Aeolus**. Names now line up as: the project and repository are
-**Palintropos**, the installable distribution is `palintropos`, the Python
-import package is `tropoi`, and the command is `tropoi`. The former `aeolus`
-command and the `psx-*` commands survive as compatibility entry points; the
-old `planetary_sandbox` import package does **not** — `import tropoi` is the
-only supported spelling. Old names are kept only where they identify a
-compatibility interface or record what was actually run (dated validation
-reports, run manifests, artifact filenames, pinned-commit notebooks).
+Put a thin layer of fluid on a spinning sphere and it does not stay smooth.
+Rotation, curvature, and the variation of the Coriolis parameter with latitude
+organize it into jets, long-lived vortices, and planetary-scale waves.
+Palintropos is research software for watching that organization come out of
+the equations themselves: idealized dynamical cores written in spherical
+harmonics, with conservation diagnostics and run provenance, so each claim can
+be traced back to a recorded run.
 
-A thin layer of fluid on a spinning sphere does not stay smooth. Rotation,
-curvature, and the poleward variation of the Coriolis parameter organize it:
-energy collects at preferred scales, flow gathers into jets and long-lived
-vortices, and disturbances travel as planetary-scale waves. Palintropos is a
-numerical laboratory for watching that organization arise from the equations
-themselves — from a discretized dynamical core and its spectral transforms,
-not from structure imposed on the output.
+It is **not** a climate or weather model. Its solvers are idealized: no forcing,
+no moisture, no radiation, no real or data-driven terrain. They do not model any
+particular planet, real or fictional.
 
-That makes two kinds of question askable. **What patterns emerge** — which
-dominant scales, which harmonic structure, which coherent structures a given
-rotation rate, radius, and mean layer depth select. And **how organized flow is
-redistributed across scales**: a conservative run can begin in essentially one
-low-order mode and, through mode coupling alone, spread its energy over a broad
-harmonic spectrum, raising the mean wavenumber and the effective number of
-occupied modes, while mass, energy, and potential enstrophy stay controlled to
-one part in 10⁵ or better. No explicit dissipation is applied; what broadens dramatically is the coarse-grained spectral description of the flow, while the principal invariants remain nearly unchanged. The figure below measures exactly that. Palintropos is early, though: varying
-planetary parameters to see when the **spectral character** of a circulation
-changes — and eventually letting such differences act on the transport of
-heat, mass, and momentum — needs models it does not have yet. What exists today is the spectral machinery, the
-conservation diagnostics, and the run provenance that would make those
-comparisons worth believing.
+![Williamson test case 5 at T63: free-surface height and velocity at days 0, 5, 10 and 15, with conservation and spectral-complexity panels](docs/validation/williamson_5/overview.png)
 
-![Palintropos Williamson Test Case 5 T63 shallow-water validation](docs/validation/williamson_5/overview.png)
+*Williamson test case 5, flow over an isolated mountain, from the canonical T63
+run (Gauss–Legendre grid 96 × 192, ℓ ≤ 63, inviscid; commit `668e6c9a`,
+2026-07-30, one GPU run). A zonal jet hits a conical mountain and sets up a
+global wave train over 15 days. Layer mass stays bit-identical to day 0. Total
+energy drifts by −7.9 × 10⁻⁷ and potential enstrophy by −8.5 × 10⁻⁶. In
+kinetic-energy mode space, the flow starts as a single mode (mean degree
+⟨ℓ⟩ = 1) and spreads to ⟨ℓ⟩ ≈ 2.7 and about 4.4 effective modes by day 15.
+The figure's labels use the project's former name, Aeolus.
+[Definitions and full evidence →](docs/validation/williamson5_mri_2026-07-30.md#41-spectral-complexity-of-the-t63-snapshots)*
 
-*Palintropos solving Williamson Test Case 5 at T63 (96×192 Gauss–Legendre grid, ℓ ≤ 63): an initially axisymmetric zonal flow over an isolated conical mountain sheds a global, mountain-forced wave train over 15 simulated days, while layer mass stays bit-identical to day 0 and total energy and potential enstrophy drift by less than one part in 10⁵. The right-hand column tracks that reorganization spectrally, in the rotational/divergent modes the solver already carries: the flow starts as essentially one low-order mode (mean degree ⟨ℓ⟩ = 1, mean zonal wavenumber ⟨|m|⟩ = 0) and spreads to ⟨ℓ⟩ ≈ 2.7 and about 4.4 effective occupied modes by day 15 — the visual complexity is real dynamics, not a loss of the conserved quantities. [See the Williamson-5 validation evidence and reference comparison →](docs/validation/williamson5_mri_2026-07-30.md)*
+## What you can study with it today
 
-Palintropos advances the non-divergent barotropic vorticity equation (BVE) and the
-rotating shallow-water equations with spherical harmonics — with an early dry
-hydrostatic primitive-equation core beginning to add vertical structure — and
-can run the same models and operators on either an icosahedral geodesic point
-set or a Gauss–Legendre latitude–longitude grid. It is research software for
-people interested in spherical spectral methods, backend parity, conservation
-diagnostics, and reproducible numerical experiments — **not** a general
-circulation model.
+- **How rotating flow organizes itself.** Vortex interaction, Rossby–Haurwitz
+  waves, and mountain-forced wave trains, all measured against the
+  invariants the continuous equations conserve.
+- **How energy moves between scales.** Every run records spectra and per-step
+  diagnostics, so you can watch energy spread from a few modes to many while
+  mass, energy, and enstrophy drift stays small.
+- **How much the grid itself affects the result.** The same model can run on
+  two grids that share one spectral layout, which exposes quadrature and
+  grid-orientation error that a single grid would hide.
 
-![Two vortices evolving over ten days](docs/assets/two_vortices_evolution.png)
+Palintropos cannot yet answer questions about climate, heat transport, or how
+circulation changes with the planet's parameters. Those need forcing,
+dissipation, and validated long integrations. The foundations are the spectral
+machinery, the diagnostics, and the provenance.
 
-*A visibly evolving BVE run: two compact vortices stretch into filaments and
-broader planetary-scale structure over ten days (geodesic res 4, `lmax=21`,
-24 h rotation, inviscid). This is a qualitative dynamics showcase — the
-controlled conservation evidence is in [docs/VALIDATION.md](docs/VALIDATION.md),
-and the full 40-character configuration is in the tracked
-[figure provenance](docs/assets/provenance.json).*
+## Model cores
 
-## What Palintropos is
+All three cores are spectral (spherical harmonics, `float64`/`complex128`) and
+use explicit RK4 time stepping.
 
-- A rotating-sphere **barotropic-vorticity solver** with RK4 and optional
-  Laplacian viscosity, prognostic in relative vorticity.
-- An inviscid **rotating shallow-water solver** with optional fixed analytic
-  bottom topography, prognostic in vorticity, divergence, and perturbation
-  thickness geopotential, verified against the linear gravity-wave dispersion
-  relation, Williamson test case 2, exact lake-at-rest balance over terrain
-  (see [docs/SHALLOW_WATER.md](docs/SHALLOW_WATER.md)), and **Williamson test
-  case 5** against an external high-resolution reference model
-  ([report](docs/validation/williamson5_mri_2026-07-30.md)).
-- An early **dry hydrostatic primitive-equation core** in sigma coordinates
-  with a first runnable fixed-step experiment (`tropoi run pe`): exact rest,
-  smooth evolution, and analytic orographic balance over fixed band-limited
-  terrain are verified, but there is no forcing, moisture, hyperdiffusion,
-  adaptive stepping, or energy-conservation claim
-  ([docs/PRIMITIVE_EQUATIONS_RUNNER.md](docs/PRIMITIVE_EQUATIONS_RUNNER.md)).
-- GPU spherical-harmonic analysis/synthesis in `float64`/`complex128` using
-  CuPy, custom CUDA basis kernels, and dense GPU matrix products.
-- **Two interchangeable grid backends** — icosahedral geodesic and
-  Gauss–Legendre lat–lon — sharing one `(l,m)` coefficient layout, so a run can
-  be reproduced on either grid to expose grid-orientation and quadrature errors.
-- **Immutable run capsules** carrying command/configuration, Git and GPU
-  provenance, per-step diagnostics, spectra, saved states, and plots.
-- Rossby–Haurwitz wavenumber-4 (`rh4`) validation and backend-parity tests.
+| Core | Command | Prognostic state | Evidence so far | Limits |
+|---|---|---|---|---|
+| **Barotropic vorticity (BVE)** | `tropoi run bve` | relative vorticity | RH4 traveling wave on both grids; conservation and rotation-equivalence tests | Single layer, non-divergent. Optional Laplacian viscosity has no stability control of its own |
+| **Rotating shallow water (SWE)** | `tropoi run swe` | vorticity, divergence, perturbation thickness geopotential | Linear gravity-wave dispersion, Williamson 2, exact lake at rest over terrain, Williamson 5 compared with an external model | Inviscid, single layer. Terrain is either one analytic Gaussian mountain or the benchmark cone |
+| **Dry hydrostatic primitive equations (PE)** | `tropoi run pe` | per-level vorticity, divergence, temperature; ln surface pressure | Exact rest; smooth short evolution; analytic orographic balance (to roundoff on the Gauss grid) | Early work. Fixed user-chosen step, no CFL controller, no forcing or hyperdiffusion, no energy-conservation claim, short demonstrations only |
 
-## What Palintropos is not
+BVE and SWE pick their time step adaptively from an advective CFL limit that
+is recomputed after every accepted step. The PE runner uses a fixed step.
+Details: [SHALLOW_WATER.md](docs/SHALLOW_WATER.md),
+[PRIMITIVE_EQUATIONS_RUNNER.md](docs/PRIMITIVE_EQUATIONS_RUNNER.md),
+[MATHEMATICAL_MODEL.md](docs/MATHEMATICAL_MODEL.md).
 
-Palintropos is **not** a GCM or weather model. The primitive-equation core is an
-ignition path, not a climate model: no forcing, moisture, hyperdiffusion,
-semi-implicit or adaptive stepping, no CFL controller, no total-energy
-conservation diagnostic, and nothing longer than short fixed-step
-demonstrations. The BVE and shallow-water cores have no vertical structure at
-all, and the shallow-water core is inviscid. Every solver takes only fixed
-analytic bottom topography — `flat` or one Gaussian mountain, plus the
-benchmark-owned cone that the `williamson5` scenario supplies — and the
-separate terrain generated by `Planet.generate` remains decorative. See
-[docs/KNOWN_LIMITATIONS.md](docs/KNOWN_LIMITATIONS.md).
+**Two grids, one coefficient layout.** Every core runs on either grid, chosen
+with `--backend`:
 
-## Quick start
+- **`gauss-latlon`: the reference grid.** A Gauss–Legendre latitude–longitude
+  grid. It transforms band-limited fields exactly to floating-point precision:
+  in one measured round trip at `L = 21`, the relative L2 residual was
+  ≈ 7 × 10⁻¹⁵.
+- **`geodesic` (default): experimental.** An icosahedral grid. Its quadrature
+  is approximate and depends on how the grid is oriented: the same round trip
+  left a residual of ≈ 1 × 10⁻².
 
-Requires Python 3.12, an NVIDIA CUDA-capable GPU, a compatible driver/toolkit,
-and Git. Tested on Windows/PowerShell with Python 3.12.12, CuPy 13.4.0, and
-CUDA 11.8.
+## Install
+
+You need Python 3.12, Git, and an NVIDIA GPU with a working CUDA driver and
+toolkit. **There is no production CPU solver.** Without CUDA you can still
+open, inspect, and read saved runs, but you cannot run a model.
+
+The validated environment is Windows, Python 3.12.12, CuPy 13.4.0, CUDA 11.8,
+and an NVIDIA GeForce MX110. The commands below are for PowerShell.
 
 ```powershell
 git clone https://github.com/AlexandreEros/Palintropos.git
@@ -107,229 +87,181 @@ py -3.12 -m venv venv
 .\venv\Scripts\Activate.ps1
 pip install -r requirements.txt
 pip install -e .
-```
-
-`requirements.txt` pins the known-good environment (`cupy-cuda11x==13.4.0` for
-CUDA 11.x). For CUDA 12.x, replace that one pin with `cupy-cuda12x==13.4.0`;
-install exactly one CuPy package. Confirm the GPU is visible:
-
-```powershell
-python -c "import cupy as cp; print(cp.cuda.runtime.getDeviceProperties(0)['name'])"
 tropoi --help
 ```
 
-`tropoi` is the canonical command-line interface. The former `aeolus`
-command and the `psx-bve`, `psx-gen`, and `psx-recompile` commands remain
-available as compatibility entry points (see below). Entry points are created at install time, so rerun
-`pip install -e .` after pulling a change that touches them.
+`requirements.txt` pins `cupy-cuda11x==13.4.0`. For CUDA 12.x, swap that one
+line for `cupy-cuda12x==13.4.0`, and install only one CuPy package. CUDA 12 has
+not been validated by this repository's benchmarks. If PowerShell blocks venv
+activation, run `Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass`,
+which applies to the current session only, and activate again.
 
-If PowerShell blocks venv activation, allow it for the current process only
-(`Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass`) and activate
-again. See [docs/KNOWN_LIMITATIONS.md](docs/KNOWN_LIMITATIONS.md) for the CUDA/
-CuPy compatibility notes.
+Package names:
 
-## Minimal run examples
+| What | Name |
+|---|---|
+| Distribution | `palintropos` |
+| Python import | `tropoi` |
+| Command-line tool | `tropoi` |
 
-Short two-vortex smoke run (the README quickstart configuration, packaged as
-a preset):
+`aeolus`, `psx-bve`, `psx-gen`, and `psx-recompile` still work as
+compatibility commands from the project's time as *Aeolus*. The old
+`planetary_sandbox` import path does not.
+
+## Quick start
+
+This runs a short two-vortex BVE smoke test: `l_max = 8`, about half an hour of
+simulated time.
 
 ```powershell
 tropoi run bve --preset two-vortices-quick
 ```
 
-The same quickstart on the Gauss lat–lon backend (the `12 × 24` state grid is
-adequate for `l_max=8`; fine products are evaluated on the required `13 × 25`
-grid):
+On an MX110 the whole run took about 30 s (measured 2026-09-23). The command
+prints the absolute path of the run it wrote under `runs/` and updates
+`runs/latest_run.txt`.
+
+Other ready-made runs:
 
 ```powershell
-tropoi run bve --preset two-vortices-quick --backend gauss-latlon
+tropoi run bve --preset two-vortices-quick --backend gauss-latlon   # same run, reference grid
+tropoi run bve --preset rh4          # one-day Rossby–Haurwitz wave-4 validation configuration
+tropoi run swe                       # one-day Williamson 2 (steady zonal flow)
+tropoi run pe                        # tiny dry primitive-equation thermal-wave demo
+tropoi list presets
+tropoi list scenarios
 ```
 
-One-day RH4 validation run at the production default envelope:
+`tropoi run <bve|swe|pe> --help` lists every option. Flags you pass explicitly
+override the preset's values.
+
+## Outputs and saved runs
+
+Each run writes a self-contained directory containing:
+
+- `manifest.json` and `config.json`: the full configuration plus provenance
+  (Git commit and worktree state, GPU, library versions).
+- `diagnostics/timeseries.csv`: the conservation diagnostics, one row per
+  accepted step.
+- `diagnostics/spectra.npz`: the spectra.
+- Saved spectral states, their time axis, and figures.
+
+How many states are saved is controlled by `--n-snapshots N` (default 5,
+including `t = 0` and the end). `--plot` and `--no-plots` control which figures
+are rendered. States and diagnostics are written even with `--no-plots`.
+
+Each solver saves its states under its own file names:
+
+| Solver | Spectral states | Time axis | Also saved |
+|---|---|---|---|
+| BVE | `vorticity_coeffs.npy` | `bve_snapshot_times.npy` | `vorticity_grid.npy` (gridded vorticity) |
+| SWE | `swe_coeffs.npy` | `swe_snapshot_times.npy` | |
+| PE | `pe_coeffs.npy` | `pe_snapshot_times.npy` | |
+
+**Inspect a run from the shell.** This works without a GPU and never
+initializes CUDA:
 
 ```powershell
-tropoi run bve --preset rh4
+tropoi inspect runs                              # summary of the latest run
+tropoi inspect runs --snapshot -1 --field zeta   # one saved state: time, units, shape, convention checks
 ```
 
-which is shorthand for:
+**Read a run from Python.** The Simulation/Snapshot API is read-only. Opening a
+run memory-maps its arrays without CUDA:
 
-```powershell
-tropoi run bve --backend geodesic --resolution 4 --l-max 21 --scenario rh4 --day-hours 24 --days 1 --snapshot-interval-seconds 21600 --product-quadrature fine --viscosity 0 --experiment validation-rh4
+```python
+from tropoi.representation.archive import open_simulation
+
+sim = open_simulation("runs")                # a run directory, or a base dir with latest_run.txt
+sim.times                                    # saved times in seconds
+snap = sim[-1]                               # index of a saved output, not a time
+snap.state["zeta"].coeffs                    # read-only (l, m) coefficient view
+snap.plot(output_path="zeta_last.png")       # renders the same figure the run produced
 ```
 
-Explicit flags always override preset values. The CLI prints the resolved
-configuration and the absolute run directory, and updates
-`runs/latest_run.txt`. `tropoi run bve --help` is the complete, current
-source of truth for options; `tropoi list presets` and
-`tropoi list scenarios` enumerate the available presets and initial
-conditions, and `tropoi inspect runs` summarizes the latest run capsule.
+- The fields are `zeta` (BVE), `zeta`/`delta`/`phi` (SWE), and
+  `zeta`/`delta`/`temperature`/`ln_ps` (PE).
+- `Snapshot.plot` builds nothing until you call it. The default `"physical"`
+  representation needs CUDA. `representation="spectral"` renders on the CPU,
+  for BVE and SWE only.
+- The API does not interpolate in time or restart runs.
 
-One-day shallow-water run of Williamson test case 2 (steady nonlinear zonal
-geostrophic flow) with default settings, and the same on the Gauss backend:
+Full reference: [docs/SAVED_RUNS.md](docs/SAVED_RUNS.md).
 
-```powershell
-tropoi run swe
-tropoi run swe --backend gauss-latlon --nlat 32 --nlon 64 --l-max 15
-```
+![Two opposite-signed vortices on a rotating sphere at days 0, 2, 5 and 10](docs/assets/two_vortices_evolution.png)
 
-`tropoi run swe --help` lists the (deliberately minimal) shallow-water
-options — gravity, mean depth, rotation, radius, resolution, duration, and
-the snapshot schedule, plus optional fixed Gaussian-mountain topography; the
-model and its verification are documented in
-[docs/SHALLOW_WATER.md](docs/SHALLOW_WATER.md).
+*A qualitative BVE example: two compact vortices stretch into filaments and
+planetary-scale structure over ten days. Setup: experimental geodesic grid at
+resolution 4, `l_max = 21`, 24 h rotation, inviscid. It was run at commit
+`4a840226` with uncommitted local changes. Over the ten days, energy drops by
+3.7 % (printed on the day-10 panel), so treat this as an illustration, not
+conservation evidence. Full configuration:
+[figure provenance](docs/assets/provenance.json).*
 
-The first runnable dry **primitive-equation** experiment (hydrostatic,
-sigma-coordinate, fixed-step RK4; no forcing, diffusion, or semi-implicit
-terms) is exposed the same way:
+## Validation: measured, not guaranteed
 
-```powershell
-tropoi run pe                                  # tiny thermal_wave demo
-tropoi run pe --scenario isothermal_rest       # verify the exact-rest property
-tropoi run pe --backend gauss-latlon --nlat 32 --nlon 64 --l-max 15
-```
+The numbers below are measurements of the discrete solvers in specific
+configurations. They are not analytic guarantees. Conservation is measured, not
+proven: the saved state keeps modes above the cut at which nonlinear tendencies
+are truncated.
 
-`tropoi run pe --help` lists the options — backend/resolution, `--levels` or
-explicit `--sigma-interfaces`, the dry gas constants, the initial-condition
-preset and its temperature/pressure/amplitude, the **fixed** `--dt-seconds`
-step, duration, and the snapshot schedule; the runner is documented in
-[docs/PRIMITIVE_EQUATIONS_RUNNER.md](docs/PRIMITIVE_EQUATIONS_RUNNER.md).
+| Evidence | Result | When and where |
+|---|---|---|
+| Williamson 5 vs the MRI-JMA reference model, day-0 check with tolerances fixed in advance (T42, T63) | **passed** by 3–4 orders of magnitude | commit `668e6c9a`, 2026-07-30; Gauss grid; NVIDIA RTX PRO 6000 Blackwell on Google Colab |
+| Williamson 5, 15-day inviscid runs (T42, T63) | completed; mass drift **0.0** (bit-identical); energy drift **+3.4 × 10⁻⁷ / −7.9 × 10⁻⁷** | same |
+| Williamson 5, day-15 free surface vs MRI-JMA | weighted RMS difference **5.6 m / 4.7 m**, on a layer about 5620 m deep | same |
+| RH4, 5 days, matched timestep | relative energy drift: geodesic **−4.46 × 10⁻⁴**, Gauss **−1.34 × 10⁻¹⁰** | `feat/latlon-grid` review, 2026-07-12; MX110 |
 
-### Snapshots and plots
+**Williamson 5 is a comparison between two numerical models.** Williamson 5
+has no exact solution: the reference is another model's high-resolution
+output, which has its own discretization error. The results do not claim
+agreement with truth, identical agreement with MRI-JMA, or a convergence
+order (two resolutions cannot measure one).
+[Full report →](docs/validation/williamson5_mri_2026-07-30.md)
 
-Field-state storage and image generation are controlled independently:
+**Tests.** GitHub CI and local GPU runs cover different tests, so their counts
+should not be added together:
 
-- `--n-snapshots N` (canonical, default `5`) stores `N` evenly spaced states
-  **including both `t=0` and `t_end`**. `N=0` stores no field snapshots;
-  `N=1` stores only the final state. For the default one-day run, `N=5`
-  reproduces the historical 0 h / 6 h / 12 h / 18 h / 24 h states.
-- `--snapshot-interval-seconds S` (compatibility alias `--dt-snapshots`)
-  keeps the historical interval semantics instead: `t=0` and every interval
-  boundary are stored, and the final state is stored **only** when the
-  duration is a multiple of the interval. The two controls are mutually
-  exclusive. Legacy `psx-bve` invocations default to a 21600 s interval, so
-  existing commands behave exactly as before.
-- `--plot TYPE` (repeatable: `diagnostics`, `snapshots`, `summary`, or
-  `all`) selects which image products to render; `--no-plots` renders none.
-  The `snapshots` product is published as one staged directory containing
-  `physical/` and `spectral/` frames plus a representative `timeline.png` in
-  each representation. Both views use the persisted snapshot time axis and
-  the same full-sequence normalization as their complete frame sets. Physical
-  frames visibly separate prognostic state from instantaneous diagnostic
-  fields; BVE diagnostics include streamfunction and velocity streamlines,
-  while SWE derives velocity and `h' = Phi'/g` from each persisted state.
-  Spectral coefficient frames use cyclic hue for phase and timeline-wide
-  relative amplitude in decibels for saturation (default `[-60, 0] dB`),
-  with valid zeros white and the invalid `m > l` triangle gray.
-  Field snapshots (`vorticity_coeffs.npy` / `vorticity_grid.npy`), their
-  authoritative `bve_snapshot_times.npy` time axis, and the
-  per-step numerical diagnostics CSV are always written regardless of plot
-  selection, so `--n-snapshots 20 --no-plots` saves twenty states without
-  rendering a single figure, and `--n-snapshots 0` still yields a
-  diagnostics-only run.
+| Where | What runs | Result at `8892ee6` (2026-09-23) |
+|---|---|---|
+| GitHub Actions ([`tests.yml`](.github/workflows/tests.yml)) | `ubuntu-latest`, Python 3.12, **no CuPy, no GPU**: only the CPU tests (configuration, CLI, run directories, saved-run API, provenance, layout) | 530 passed, 400 skipped (the tests that need CUDA skip themselves) |
+| Local, full suite | Windows, Python 3.12.12, CuPy 13.4.0, NVIDIA GeForce MX110 | 951 passed, 1 skipped (the opt-in 15-day Williamson-5 acceptance run, `TROPOI_W5_ACCEPTANCE=1`); took 9 min |
 
-### Compatibility entry points
+GitHub CI **does not run** the CUDA numerics. The full suite runs locally on a
+GPU before each merge. See [ARCHITECTURE.md § Tests](docs/ARCHITECTURE.md#tests).
 
-`aeolus` is bound to the same callable as `tropoi`, and `psx-bve`,
-`psx-gen`, and `psx-recompile` delegate to the same implementations as
-`tropoi run bve`, `tropoi gen`, and `tropoi recompile`.
-Existing option spellings (`--lmax`, `--grid`, `--duration-days`,
-`--dt-snapshots`) remain accepted everywhere as aliases of the canonical
-names, and legacy interval-based invocations keep their historical run-id
-format, `config.json` keys, and output behavior. `config.json` additionally
-records `snapshot_mode`, `n_snapshots`, `snapshot_times`, and `plots`
-(additive keys only).
+## Limitations
 
-## Example outputs
+- No forcing, moisture, radiation, or real or time-varying terrain in any
+  solver. The terrain from `Planet.generate` is decorative only.
+- BVE and SWE are single-layer. The PE core has only been run in short,
+  fixed-step demonstrations.
+- There is no semi-implicit time stepping. There is no stability control for
+  explicit viscosity. The PE core has no CFL control.
+- The geodesic grid's quadrature is approximate and depends on how the grid is
+  oriented. The Gauss grid is the reference.
+- The code runs on GPU only, and results depend on one GPU implementation:
+  there is no independent CPU core to cross-check against.
+- The default dense transforms limit resolution on small GPUs. Windows display
+  GPUs can hit driver timeouts (TDR) on large kernels.
 
-![Geodesic and Gauss lat–lon RH4 comparison](docs/assets/rh4_geodesic_vs_latlon.png)
+Details: [KNOWN_LIMITATIONS.md](docs/KNOWN_LIMITATIONS.md) and
+[KNOWN_RISKS.md](docs/KNOWN_RISKS.md).
 
-*One-day RH4 comparison across both backends (commit `4a840226`, `L=21`, 24 h
-rotation, inviscid). RH4 is a shape-preserving traveling wave: success means the
-pattern translates at the analytic phase speed without deforming. Full figure
-discussion and provenance are in [docs/VALIDATION.md](docs/VALIDATION.md).*
+## Further reading
 
-## Validation snapshot
-
-> The **Gauss lat–lon backend is the stronger quadrature reference**; the
-> **geodesic backend is experimental** — its Voronoi quadrature is approximate
-> and orientation-dependent. The numbers below are measurements of the discrete
-> solver, not analytic guarantees.
-
-| Evidence | Result |
-|---|---|
-| RH4 geodesic, 5 days (res-4 state, res-5 fine product grid) | relative energy drift **−4.4555×10⁻⁴** |
-| RH4 Gauss lat–lon, matched timestep (`32 × 64`) | energy drift **−1.34×10⁻¹⁰** |
-| Transform round trip, `L=21` (geodesic vs Gauss) | relative L2 residual **1.04×10⁻²** vs **6.84×10⁻¹⁵** |
-| **Williamson 5 vs MRI-JMA**, day-zero physical contract (T42 and T63) | **passed** — free surface `1.4×10⁻⁶` / `8.4×10⁻⁷` rel L2, winds `≈2.6×10⁻⁵ m/s` |
-| **Williamson 5**, 15-day inviscid runs (T42 `64 × 128`, T63 `96 × 192`) | both **completed**; mass drift **0.0** (bit-identical), energy drift **+3.4×10⁻⁷** / **−7.9×10⁻⁷** |
-| **Williamson 5**, day-15 free-surface difference vs MRI-JMA | wRMS **5.6 m** (T42) / **4.7 m** (T63) on a `~5620 m` layer |
-| Test suite (Python 3.12.12, CuPy 13.4.0, MX110; GPU-guarded tests skipped without CUDA) | **626 passed, 1 skipped** in 318 s (the skip is the env-gated 15-day W5 acceptance run) |
-
-The five-day geodesic energy number is locked by
-`test_prediction_p1_5day_energy_drift`. Full tables, conservation diagnostics,
-and orientation/rotation-equivalence tests are in
-[docs/VALIDATION.md](docs/VALIDATION.md).
-
-### Williamson test case 5
-
-Palintropos integrates the corrected canonical Williamson-5 initial-value problem
-(the case-2 height field prescribed as the **free surface**, over the canonical
-conical mountain), passed the day-zero physical contract at both T42 and T63,
-completed 15-day runs at both resolutions with excellent mass and energy
-conservation, and was compared against the high-resolution MRI-JMA/Yoshimura
-reference solution. All runs are at commit `668e6c9a` with a clean worktree, on
-the Gauss lat–lon backend, inviscid and with no hyperdiffusion.
-
-This is a **numerical-model intercomparison**, not a comparison against an
-analytic truth solution — Williamson 5 has none. Palintropos is not claimed to match
-truth, to reproduce MRI identically, or to demonstrate a formal convergence
-order (two truncations cannot measure one). The large raw `layer_depth`
-difference is dominated by Palintropos's band-limited cone versus the reference's
-analytic cone, not by dynamics.
-
-Full report, figures, provenance, and checksums:
-[**docs/validation/williamson5_mri_2026-07-30.md**](docs/validation/williamson5_mri_2026-07-30.md).
-
-## Documentation
-
-- [docs/VALIDATION.md](docs/VALIDATION.md) — RH4 backend comparison, the
-  Williamson-5 intercomparison summary, conservation diagnostics,
-  geodesic-vs-Gauss discussion, rotation tests.
-- [docs/validation/williamson5_mri_2026-07-30.md](docs/validation/williamson5_mri_2026-07-30.md)
-  — the accepted Williamson test case 5 result against the MRI-JMA reference:
-  day-zero contract, 15-day T42/T63 conservation, comparison tables, figures,
-  and full provenance.
-- [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) — package layout, backends,
-  spectral transform flow, output capsules/provenance, adding a backend.
-- [docs/KNOWN_LIMITATIONS.md](docs/KNOWN_LIMITATIONS.md) — current solver
-  scope, CUDA/CuPy assumptions, quadrature limits.
-- [docs/MATHEMATICAL_MODEL.md](docs/MATHEMATICAL_MODEL.md) — equations and conventions.
-- [docs/SHALLOW_WATER.md](docs/SHALLOW_WATER.md) — the rotating shallow-water
-  core: prognostics, discretization, CFL, scenarios, verification status.
-- [docs/PRIMITIVE_EQUATIONS_DESIGN.md](docs/PRIMITIVE_EQUATIONS_DESIGN.md) and
-  [docs/PRIMITIVE_EQUATIONS_RUNNER.md](docs/PRIMITIVE_EQUATIONS_RUNNER.md) —
-  the dry hydrostatic primitive-equation core and its first runnable
-  fixed-step experiment (presets, capsule schema, diagnostics, results).
-- Deeper audit records: [docs/KNOWN_RISKS.md](docs/KNOWN_RISKS.md),
-  [docs/VALIDATION_PLAN.md](docs/VALIDATION_PLAN.md),
-  [docs/validation/](docs/validation/), and the current mermaid
-  [class](docs/class-structure.md) / [call](docs/call-structure.md) diagrams.
-
-## Current limitations
-
-- Fixed analytic topography only, in every solver: no time-dependent or
-  data-driven terrain, and no forcing anywhere. The BVE and shallow-water
-  cores are single-layer; the dry primitive-equation core has vertical
-  structure but no moisture and no validated long integrations.
-- GPU/CuPy only: no production CPU fallback or CPU CI path.
-- The advective CFL ceiling is recomputed from every accepted state (genuine
-  state-adaptive advective stepping), but explicit-viscosity (`ν∇²`) stability
-  is not controlled, and the state band extends above the nonlinear tendency
-  cut, so conservation is measured, not guaranteed.
-- The geodesic transform and product quadrature remain approximate; the Gauss
-  backend is the stronger quadrature reference.
-
-Full detail — with severity, evidence, and open items — is in
-[docs/KNOWN_LIMITATIONS.md](docs/KNOWN_LIMITATIONS.md),
-[docs/KNOWN_RISKS.md](docs/KNOWN_RISKS.md), and
-[docs/VALIDATION_PLAN.md](docs/VALIDATION_PLAN.md).
+- [VALIDATION.md](docs/VALIDATION.md): RH4 grid comparison (with figure),
+  Williamson-5 summary, conservation and rotation-equivalence tests.
+- [Williamson 5 vs MRI-JMA, 2026-07-30](docs/validation/williamson5_mri_2026-07-30.md):
+  the full report, figures, provenance, and checksums.
+- [ARCHITECTURE.md](docs/ARCHITECTURE.md): package layout, grids, transform
+  flow, run directories, CPU/GPU boundaries, and tests.
+- [SAVED_RUNS.md](docs/SAVED_RUNS.md): the read-only saved-run interface.
+- [SHALLOW_WATER.md](docs/SHALLOW_WATER.md),
+  [PRIMITIVE_EQUATIONS_DESIGN.md](docs/PRIMITIVE_EQUATIONS_DESIGN.md),
+  [PRIMITIVE_EQUATIONS_RUNNER.md](docs/PRIMITIVE_EQUATIONS_RUNNER.md), and
+  [MATHEMATICAL_MODEL.md](docs/MATHEMATICAL_MODEL.md): equations and
+  conventions.
+- [VALIDATION_PLAN.md](docs/VALIDATION_PLAN.md) and
+  [docs/validation/](docs/validation/): the planned benchmarks and the dated
+  audit records.
