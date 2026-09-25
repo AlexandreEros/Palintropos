@@ -946,6 +946,26 @@
       "target": "tropoi.representation.diagnostics.pe.PEDiagnosticsRecorder.close"
     },
     {
+      "kind": "call",
+      "source": "tropoi.representation.diagnostics.spectral.kinetic_energy_modes",
+      "target": "tropoi.representation.diagnostics.spectral.mode_power"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.diagnostics.spectral.mode_power",
+      "target": "tropoi.representation.diagnostics.spectral._coefficients"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.representation.diagnostics.spectral.spectral_complexity",
+      "target": "tropoi.representation.diagnostics.spectral.SpectralComplexity"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.representation.diagnostics.spectral.spectral_complexity",
+      "target": "tropoi.representation.diagnostics.spectral.ZeroKineticEnergyError"
+    },
+    {
       "kind": "constructor",
       "source": "tropoi.representation.diagnostics.swe.SWEDiagnosticsRecorder",
       "target": "tropoi.representation.diagnostics.swe.SWEDiagnosticsRecorder.__init__"
@@ -5065,6 +5085,55 @@
       "kind": "function",
       "module": "tropoi.representation.diagnostics.pe",
       "qualname": "plot_pe_diagnostics",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.diagnostics.spectral.SpectralComplexity",
+      "kind": "class",
+      "module": "tropoi.representation.diagnostics.spectral",
+      "qualname": "SpectralComplexity",
+      "type": "class"
+    },
+    {
+      "id": "tropoi.representation.diagnostics.spectral.SpectralComplexity.as_dict",
+      "kind": "method",
+      "module": "tropoi.representation.diagnostics.spectral",
+      "qualname": "SpectralComplexity.as_dict",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.diagnostics.spectral.ZeroKineticEnergyError",
+      "kind": "class",
+      "module": "tropoi.representation.diagnostics.spectral",
+      "qualname": "ZeroKineticEnergyError",
+      "type": "class"
+    },
+    {
+      "id": "tropoi.representation.diagnostics.spectral._coefficients",
+      "kind": "function",
+      "module": "tropoi.representation.diagnostics.spectral",
+      "qualname": "_coefficients",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.diagnostics.spectral.kinetic_energy_modes",
+      "kind": "function",
+      "module": "tropoi.representation.diagnostics.spectral",
+      "qualname": "kinetic_energy_modes",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.diagnostics.spectral.mode_power",
+      "kind": "function",
+      "module": "tropoi.representation.diagnostics.spectral",
+      "qualname": "mode_power",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.diagnostics.spectral.spectral_complexity",
+      "kind": "function",
+      "module": "tropoi.representation.diagnostics.spectral",
+      "qualname": "spectral_complexity",
       "type": "function"
     },
     {

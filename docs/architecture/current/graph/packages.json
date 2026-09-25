@@ -491,7 +491,7 @@
     {
       "id": "tropoi.representation.diagnostics",
       "internal_edges": 1,
-      "modules": 3
+      "modules": 4
     },
     {
       "id": "tropoi.representation.visual",

@@ -347,6 +347,31 @@
       "qualname": "PEDiagnosticsRecorder"
     },
     {
+      "decorators": [
+        "dataclass(frozen=True)"
+      ],
+      "external_bases": [],
+      "id": "tropoi.representation.diagnostics.spectral.SpectralComplexity",
+      "members": [
+        {
+          "kind": "method",
+          "name": "as_dict"
+        }
+      ],
+      "module": "tropoi.representation.diagnostics.spectral",
+      "qualname": "SpectralComplexity"
+    },
+    {
+      "decorators": [],
+      "external_bases": [
+        "ValueError"
+      ],
+      "id": "tropoi.representation.diagnostics.spectral.ZeroKineticEnergyError",
+      "members": [],
+      "module": "tropoi.representation.diagnostics.spectral",
+      "qualname": "ZeroKineticEnergyError"
+    },
+    {
       "decorators": [],
       "external_bases": [],
       "id": "tropoi.representation.diagnostics.swe.SWEDiagnosticsRecorder",

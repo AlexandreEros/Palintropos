@@ -2737,6 +2737,20 @@
     {
       "category": "code",
       "dynamic_import_calls": 0,
+      "id": "tropoi.representation.diagnostics.spectral",
+      "is_package": false,
+      "path": "tropoi/representation/diagnostics/spectral.py",
+      "stdlib_imports": [
+        "__future__",
+        "dataclasses"
+      ],
+      "third_party_imports": [
+        "numpy"
+      ]
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
       "id": "tropoi.representation.diagnostics.swe",
       "is_package": false,
       "path": "tropoi/representation/diagnostics/swe.py",
