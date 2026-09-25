@@ -1312,6 +1312,151 @@
     },
     {
       "kind": "self",
+      "source": "tropoi.representation.visual.matplotlib_renderer.MatplotlibRenderer._draw_arrows",
+      "target": "tropoi.representation.visual.matplotlib_renderer.MatplotlibRenderer._color_map"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.representation.visual.matplotlib_renderer.MatplotlibRenderer._draw_arrows",
+      "target": "tropoi.representation.visual.matplotlib_renderer.MatplotlibRenderer._mpl_normalization"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.representation.visual.matplotlib_renderer.MatplotlibRenderer._draw_arrows",
+      "target": "tropoi.representation.visual.matplotlib_renderer.MatplotlibRenderer._vector_scale"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.matplotlib_renderer.MatplotlibRenderer._draw_arrows",
+      "target": "tropoi.representation.visual.matplotlib_renderer._map_direction"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.matplotlib_renderer.MatplotlibRenderer._draw_arrows",
+      "target": "tropoi.representation.visual.matplotlib_renderer._uniform_south_to_north_vectors"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.representation.visual.matplotlib_renderer.MatplotlibRenderer._draw_background",
+      "target": "tropoi.representation.visual.matplotlib_renderer.MatplotlibRenderer._color_map"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.representation.visual.matplotlib_renderer.MatplotlibRenderer._draw_background",
+      "target": "tropoi.representation.visual.matplotlib_renderer.MatplotlibRenderer._mpl_normalization"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.matplotlib_renderer.MatplotlibRenderer._draw_background",
+      "target": "tropoi.representation.visual.matplotlib_renderer._closed_south_to_north"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.matplotlib_renderer.MatplotlibRenderer._draw_background",
+      "target": "tropoi.representation.visual.matplotlib_renderer._latitude_edges"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.matplotlib_renderer.MatplotlibRenderer._draw_background",
+      "target": "tropoi.representation.visual.matplotlib_renderer._longitude_edges"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.matplotlib_renderer.MatplotlibRenderer._draw_contours",
+      "target": "tropoi.representation.visual.matplotlib_renderer._closed_south_to_north"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.representation.visual.matplotlib_renderer.MatplotlibRenderer._draw_streamlines",
+      "target": "tropoi.representation.visual.matplotlib_renderer.MatplotlibRenderer._color_map"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.representation.visual.matplotlib_renderer.MatplotlibRenderer._draw_streamlines",
+      "target": "tropoi.representation.visual.matplotlib_renderer.MatplotlibRenderer._mpl_normalization"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.representation.visual.matplotlib_renderer.MatplotlibRenderer._draw_streamlines",
+      "target": "tropoi.representation.visual.matplotlib_renderer.MatplotlibRenderer._vector_scale"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.matplotlib_renderer.MatplotlibRenderer._draw_streamlines",
+      "target": "tropoi.representation.visual.matplotlib_renderer._map_direction"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.matplotlib_renderer.MatplotlibRenderer._draw_streamlines",
+      "target": "tropoi.representation.visual.matplotlib_renderer._r2_seed_points"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.matplotlib_renderer.MatplotlibRenderer._draw_streamlines",
+      "target": "tropoi.representation.visual.matplotlib_renderer._uniform_south_to_north_vectors"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.representation.visual.matplotlib_renderer.MatplotlibRenderer._render_color_key",
+      "target": "tropoi.representation.visual.matplotlib_renderer.MatplotlibRenderer._color_map"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.representation.visual.matplotlib_renderer.MatplotlibRenderer._render_figure",
+      "target": "tropoi.representation.visual.matplotlib_renderer.MatplotlibRenderer._render_panel"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.representation.visual.matplotlib_renderer.MatplotlibRenderer._render_figure",
+      "target": "tropoi.representation.visual.matplotlib_renderer.MatplotlibRenderer._render_panel_groups"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.representation.visual.matplotlib_renderer.MatplotlibRenderer._render_figure",
+      "target": "tropoi.representation.visual.matplotlib_renderer.MatplotlibRenderer._render_phase_legend"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.representation.visual.matplotlib_renderer.MatplotlibRenderer._render_figure",
+      "target": "tropoi.representation.visual.matplotlib_renderer.MatplotlibRenderer._save_atomic"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.representation.visual.matplotlib_renderer.MatplotlibRenderer._render_layered_map",
+      "target": "tropoi.representation.visual.matplotlib_renderer.MatplotlibRenderer._draw_arrows"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.representation.visual.matplotlib_renderer.MatplotlibRenderer._render_layered_map",
+      "target": "tropoi.representation.visual.matplotlib_renderer.MatplotlibRenderer._draw_background"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.representation.visual.matplotlib_renderer.MatplotlibRenderer._render_layered_map",
+      "target": "tropoi.representation.visual.matplotlib_renderer.MatplotlibRenderer._draw_contours"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.representation.visual.matplotlib_renderer.MatplotlibRenderer._render_layered_map",
+      "target": "tropoi.representation.visual.matplotlib_renderer.MatplotlibRenderer._draw_streamlines"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.matplotlib_renderer.MatplotlibRenderer._render_layered_map",
+      "target": "tropoi.representation.visual.matplotlib_renderer._format_map_axes"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.representation.visual.matplotlib_renderer.MatplotlibRenderer._render_panel",
+      "target": "tropoi.representation.visual.matplotlib_renderer.MatplotlibRenderer._render_color_key"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.representation.visual.matplotlib_renderer.MatplotlibRenderer._render_panel",
+      "target": "tropoi.representation.visual.matplotlib_renderer.MatplotlibRenderer._render_layered_map"
+    },
+    {
+      "kind": "self",
       "source": "tropoi.representation.visual.matplotlib_renderer.MatplotlibRenderer._render_panel",
       "target": "tropoi.representation.visual.matplotlib_renderer.MatplotlibRenderer._render_line_panel"
     },
@@ -1329,6 +1474,11 @@
       "kind": "self",
       "source": "tropoi.representation.visual.matplotlib_renderer.MatplotlibRenderer._render_panel",
       "target": "tropoi.representation.visual.matplotlib_renderer.MatplotlibRenderer._render_streamline_panel"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.representation.visual.matplotlib_renderer.MatplotlibRenderer._render_panel",
+      "target": "tropoi.representation.visual.matplotlib_renderer.MatplotlibRenderer._render_width_key"
     },
     {
       "kind": "self",
@@ -1368,22 +1518,12 @@
     {
       "kind": "self",
       "source": "tropoi.representation.visual.matplotlib_renderer.MatplotlibRenderer.render_figure",
-      "target": "tropoi.representation.visual.matplotlib_renderer.MatplotlibRenderer._render_panel"
+      "target": "tropoi.representation.visual.matplotlib_renderer.MatplotlibRenderer._render_figure"
     },
     {
-      "kind": "self",
+      "kind": "call",
       "source": "tropoi.representation.visual.matplotlib_renderer.MatplotlibRenderer.render_figure",
-      "target": "tropoi.representation.visual.matplotlib_renderer.MatplotlibRenderer._render_panel_groups"
-    },
-    {
-      "kind": "self",
-      "source": "tropoi.representation.visual.matplotlib_renderer.MatplotlibRenderer.render_figure",
-      "target": "tropoi.representation.visual.matplotlib_renderer.MatplotlibRenderer._render_phase_legend"
-    },
-    {
-      "kind": "self",
-      "source": "tropoi.representation.visual.matplotlib_renderer.MatplotlibRenderer.render_figure",
-      "target": "tropoi.representation.visual.matplotlib_renderer.MatplotlibRenderer._save_atomic"
+      "target": "tropoi.representation.visual.matplotlib_renderer._font_rc"
     },
     {
       "kind": "self",
@@ -1786,9 +1926,29 @@
       "target": "tropoi.representation.visual.snapshot.build_snapshot_timeline"
     },
     {
+      "kind": "call",
+      "source": "tropoi.representation.visual.specs.ColorKeySpec.__post_init__",
+      "target": "tropoi.representation.visual.specs._check_group"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.specs.LineWidthKeySpec.__post_init__",
+      "target": "tropoi.representation.visual.specs._check_group"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.specs.ScalarLayer.__post_init__",
+      "target": "tropoi.representation.visual.specs._check_group"
+    },
+    {
       "kind": "instantiate",
       "source": "tropoi.representation.visual.specs.SpectralCoefficientMapSpec.__post_init__",
       "target": "tropoi.representation.visual.specs.SpectralEncoding"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.specs.VectorLayer.__post_init__",
+      "target": "tropoi.representation.visual.specs._check_group"
     },
     {
       "kind": "call",
@@ -2143,12 +2303,7 @@
     {
       "kind": "call",
       "source": "tropoi.representation.visual.timeline.FigureTimeline.resolve_normalizations",
-      "target": "tropoi.representation.visual.normalization.NormalizationPolicy.from_resolved"
-    },
-    {
-      "kind": "call",
-      "source": "tropoi.representation.visual.timeline.FigureTimeline.resolve_normalizations",
-      "target": "tropoi.representation.visual.timeline._normalizable_values"
+      "target": "tropoi.representation.visual.timeline._resolve_panel_normalizations"
     },
     {
       "kind": "instantiate",
@@ -2172,6 +2327,26 @@
     },
     {
       "kind": "call",
+      "source": "tropoi.representation.visual.timeline._normalization_slots",
+      "target": "tropoi.representation.visual.timeline._normalizable_values"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.timeline._resolve_panel_normalizations",
+      "target": "tropoi.representation.visual.normalization.NormalizationPolicy.from_resolved"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.timeline._resolve_panel_normalizations",
+      "target": "tropoi.representation.visual.timeline._normalization_slots"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.timeline._resolve_panel_normalizations",
+      "target": "tropoi.representation.visual.timeline._with_normalization"
+    },
+    {
+      "kind": "call",
       "source": "tropoi.representation.visual.timeline.render_figure_timeline",
       "target": "tropoi.representation.visual.renderers.get_default_renderer"
     },
@@ -2189,6 +2364,11 @@
       "kind": "call",
       "source": "tropoi.representation.visual.timeline.render_snapshot_product",
       "target": "tropoi.representation.visual.timeline.render_figure_timeline"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.timeline.resolve_figure_normalizations",
+      "target": "tropoi.representation.visual.timeline._resolve_panel_normalizations"
     },
     {
       "kind": "constructor",
@@ -5459,6 +5639,34 @@
       "type": "function"
     },
     {
+      "id": "tropoi.representation.visual.matplotlib_renderer.MatplotlibRenderer._draw_arrows",
+      "kind": "method",
+      "module": "tropoi.representation.visual.matplotlib_renderer",
+      "qualname": "MatplotlibRenderer._draw_arrows",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.matplotlib_renderer.MatplotlibRenderer._draw_background",
+      "kind": "method",
+      "module": "tropoi.representation.visual.matplotlib_renderer",
+      "qualname": "MatplotlibRenderer._draw_background",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.matplotlib_renderer.MatplotlibRenderer._draw_contours",
+      "kind": "staticmethod",
+      "module": "tropoi.representation.visual.matplotlib_renderer",
+      "qualname": "MatplotlibRenderer._draw_contours",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.matplotlib_renderer.MatplotlibRenderer._draw_streamlines",
+      "kind": "method",
+      "module": "tropoi.representation.visual.matplotlib_renderer",
+      "qualname": "MatplotlibRenderer._draw_streamlines",
+      "type": "function"
+    },
+    {
       "id": "tropoi.representation.visual.matplotlib_renderer.MatplotlibRenderer._label_spectral_axes",
       "kind": "staticmethod",
       "module": "tropoi.representation.visual.matplotlib_renderer",
@@ -5470,6 +5678,27 @@
       "kind": "staticmethod",
       "module": "tropoi.representation.visual.matplotlib_renderer",
       "qualname": "MatplotlibRenderer._mpl_normalization",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.matplotlib_renderer.MatplotlibRenderer._render_color_key",
+      "kind": "method",
+      "module": "tropoi.representation.visual.matplotlib_renderer",
+      "qualname": "MatplotlibRenderer._render_color_key",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.matplotlib_renderer.MatplotlibRenderer._render_figure",
+      "kind": "method",
+      "module": "tropoi.representation.visual.matplotlib_renderer",
+      "qualname": "MatplotlibRenderer._render_figure",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.matplotlib_renderer.MatplotlibRenderer._render_layered_map",
+      "kind": "method",
+      "module": "tropoi.representation.visual.matplotlib_renderer",
+      "qualname": "MatplotlibRenderer._render_layered_map",
       "type": "function"
     },
     {
@@ -5522,10 +5751,24 @@
       "type": "function"
     },
     {
+      "id": "tropoi.representation.visual.matplotlib_renderer.MatplotlibRenderer._render_width_key",
+      "kind": "method",
+      "module": "tropoi.representation.visual.matplotlib_renderer",
+      "qualname": "MatplotlibRenderer._render_width_key",
+      "type": "function"
+    },
+    {
       "id": "tropoi.representation.visual.matplotlib_renderer.MatplotlibRenderer._save_atomic",
       "kind": "staticmethod",
       "module": "tropoi.representation.visual.matplotlib_renderer",
       "qualname": "MatplotlibRenderer._save_atomic",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.matplotlib_renderer.MatplotlibRenderer._vector_scale",
+      "kind": "method",
+      "module": "tropoi.representation.visual.matplotlib_renderer",
+      "qualname": "MatplotlibRenderer._vector_scale",
       "type": "function"
     },
     {
@@ -5554,6 +5797,62 @@
       "kind": "method",
       "module": "tropoi.representation.visual.matplotlib_renderer",
       "qualname": "MatplotlibRenderer.render_streamline_map",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.matplotlib_renderer._closed_south_to_north",
+      "kind": "function",
+      "module": "tropoi.representation.visual.matplotlib_renderer",
+      "qualname": "_closed_south_to_north",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.matplotlib_renderer._font_rc",
+      "kind": "function",
+      "module": "tropoi.representation.visual.matplotlib_renderer",
+      "qualname": "_font_rc",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.matplotlib_renderer._format_map_axes",
+      "kind": "function",
+      "module": "tropoi.representation.visual.matplotlib_renderer",
+      "qualname": "_format_map_axes",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.matplotlib_renderer._latitude_edges",
+      "kind": "function",
+      "module": "tropoi.representation.visual.matplotlib_renderer",
+      "qualname": "_latitude_edges",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.matplotlib_renderer._longitude_edges",
+      "kind": "function",
+      "module": "tropoi.representation.visual.matplotlib_renderer",
+      "qualname": "_longitude_edges",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.matplotlib_renderer._map_direction",
+      "kind": "function",
+      "module": "tropoi.representation.visual.matplotlib_renderer",
+      "qualname": "_map_direction",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.matplotlib_renderer._r2_seed_points",
+      "kind": "function",
+      "module": "tropoi.representation.visual.matplotlib_renderer",
+      "qualname": "_r2_seed_points",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.matplotlib_renderer._uniform_south_to_north_vectors",
+      "kind": "function",
+      "module": "tropoi.representation.visual.matplotlib_renderer",
+      "qualname": "_uniform_south_to_north_vectors",
       "type": "function"
     },
     {
@@ -5949,6 +6248,34 @@
       "type": "function"
     },
     {
+      "id": "tropoi.representation.visual.specs.ColorKeySpec",
+      "kind": "class",
+      "module": "tropoi.representation.visual.specs",
+      "qualname": "ColorKeySpec",
+      "type": "class"
+    },
+    {
+      "id": "tropoi.representation.visual.specs.ColorKeySpec.__post_init__",
+      "kind": "method",
+      "module": "tropoi.representation.visual.specs",
+      "qualname": "ColorKeySpec.__post_init__",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.specs.ContourLayer",
+      "kind": "class",
+      "module": "tropoi.representation.visual.specs",
+      "qualname": "ContourLayer",
+      "type": "class"
+    },
+    {
+      "id": "tropoi.representation.visual.specs.ContourLayer.__post_init__",
+      "kind": "method",
+      "module": "tropoi.representation.visual.specs",
+      "qualname": "ContourLayer.__post_init__",
+      "type": "function"
+    },
+    {
       "id": "tropoi.representation.visual.specs.FigureSpec",
       "kind": "class",
       "module": "tropoi.representation.visual.specs",
@@ -5963,11 +6290,32 @@
       "type": "function"
     },
     {
+      "id": "tropoi.representation.visual.specs.LayeredMapSpec",
+      "kind": "class",
+      "module": "tropoi.representation.visual.specs",
+      "qualname": "LayeredMapSpec",
+      "type": "class"
+    },
+    {
+      "id": "tropoi.representation.visual.specs.LayeredMapSpec.__post_init__",
+      "kind": "method",
+      "module": "tropoi.representation.visual.specs",
+      "qualname": "LayeredMapSpec.__post_init__",
+      "type": "function"
+    },
+    {
       "id": "tropoi.representation.visual.specs.LinePanelSpec",
       "kind": "class",
       "module": "tropoi.representation.visual.specs",
       "qualname": "LinePanelSpec",
       "type": "class"
+    },
+    {
+      "id": "tropoi.representation.visual.specs.LinePanelSpec.__post_init__",
+      "kind": "method",
+      "module": "tropoi.representation.visual.specs",
+      "qualname": "LinePanelSpec.__post_init__",
+      "type": "function"
     },
     {
       "id": "tropoi.representation.visual.specs.LineSeriesSpec",
@@ -5981,6 +6329,20 @@
       "kind": "method",
       "module": "tropoi.representation.visual.specs",
       "qualname": "LineSeriesSpec.__post_init__",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.specs.LineWidthKeySpec",
+      "kind": "class",
+      "module": "tropoi.representation.visual.specs",
+      "qualname": "LineWidthKeySpec",
+      "type": "class"
+    },
+    {
+      "id": "tropoi.representation.visual.specs.LineWidthKeySpec.__post_init__",
+      "kind": "method",
+      "module": "tropoi.representation.visual.specs",
+      "qualname": "LineWidthKeySpec.__post_init__",
       "type": "function"
     },
     {
@@ -6010,6 +6372,27 @@
       "module": "tropoi.representation.visual.specs",
       "qualname": "PanelPlacement",
       "type": "class"
+    },
+    {
+      "id": "tropoi.representation.visual.specs.ScalarLayer",
+      "kind": "class",
+      "module": "tropoi.representation.visual.specs",
+      "qualname": "ScalarLayer",
+      "type": "class"
+    },
+    {
+      "id": "tropoi.representation.visual.specs.ScalarLayer.__post_init__",
+      "kind": "method",
+      "module": "tropoi.representation.visual.specs",
+      "qualname": "ScalarLayer.__post_init__",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.specs.ScalarLayer.display_label",
+      "kind": "property",
+      "module": "tropoi.representation.visual.specs",
+      "qualname": "ScalarLayer.display_label",
+      "type": "function"
     },
     {
       "id": "tropoi.representation.visual.specs.ScalarMapSpec",
@@ -6094,6 +6477,34 @@
       "module": "tropoi.representation.visual.specs",
       "qualname": "TextPanelSpec",
       "type": "class"
+    },
+    {
+      "id": "tropoi.representation.visual.specs.VectorLayer",
+      "kind": "class",
+      "module": "tropoi.representation.visual.specs",
+      "qualname": "VectorLayer",
+      "type": "class"
+    },
+    {
+      "id": "tropoi.representation.visual.specs.VectorLayer.__post_init__",
+      "kind": "method",
+      "module": "tropoi.representation.visual.specs",
+      "qualname": "VectorLayer.__post_init__",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.specs.VectorLayer.speed",
+      "kind": "property",
+      "module": "tropoi.representation.visual.specs",
+      "qualname": "VectorLayer.speed",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.specs._check_group",
+      "kind": "function",
+      "module": "tropoi.representation.visual.specs",
+      "qualname": "_check_group",
+      "type": "function"
     },
     {
       "id": "tropoi.representation.visual.swe._backend_array",
@@ -6348,10 +6759,31 @@
       "type": "function"
     },
     {
+      "id": "tropoi.representation.visual.timeline._normalization_slots",
+      "kind": "function",
+      "module": "tropoi.representation.visual.timeline",
+      "qualname": "_normalization_slots",
+      "type": "function"
+    },
+    {
       "id": "tropoi.representation.visual.timeline._physical_time_label",
       "kind": "function",
       "module": "tropoi.representation.visual.timeline",
       "qualname": "_physical_time_label",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.timeline._resolve_panel_normalizations",
+      "kind": "function",
+      "module": "tropoi.representation.visual.timeline",
+      "qualname": "_resolve_panel_normalizations",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.timeline._with_normalization",
+      "kind": "function",
+      "module": "tropoi.representation.visual.timeline",
+      "qualname": "_with_normalization",
       "type": "function"
     },
     {
@@ -6373,6 +6805,13 @@
       "kind": "function",
       "module": "tropoi.representation.visual.timeline",
       "qualname": "render_snapshot_product",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.timeline.resolve_figure_normalizations",
+      "kind": "function",
+      "module": "tropoi.representation.visual.timeline",
+      "qualname": "resolve_figure_normalizations",
       "type": "function"
     },
     {

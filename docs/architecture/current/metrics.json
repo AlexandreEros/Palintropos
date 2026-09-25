@@ -1,20 +1,20 @@
 {
   "call_graph": {
     "call_sites": {
-      "builtin": 1353,
-      "external": 977,
-      "internal": 1073,
-      "unresolved": 1384
+      "builtin": 1419,
+      "external": 1060,
+      "internal": 1109,
+      "unresolved": 1450
     },
     "edges_by_kind": {
-      "call": 442,
+      "call": 461,
       "constructor": 29,
       "instantiate": 186,
       "override": 6,
-      "self": 146,
+      "self": 163,
       "super": 2
     },
-    "nodes": 757,
+    "nodes": 794,
     "scoped": {
       "cli-gen": {
         "edges": 28,
@@ -69,7 +69,7 @@
     }
   },
   "class_graph": {
-    "classes": 83,
+    "classes": 89,
     "external_bases": {
       "RuntimeError": 3,
       "ValueError": 8,

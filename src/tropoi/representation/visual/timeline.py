@@ -21,9 +21,10 @@ import numpy as np
 
 from tropoi.representation.visual.normalization import NormalizationPolicy
 from tropoi.representation.visual.renderers import Renderer, get_default_renderer
-from tropoi.representation.visual.specs import (FigureSpec, PanelPlacement, ScalarMapSpec,
-                    SpectralCoefficientMapSpec, StreamlineMapSpec,
-                    TextPanelSpec)
+from tropoi.representation.visual.specs import (
+    ColorKeySpec, FigureSpec, LayeredMapSpec, LineWidthKeySpec,
+    PanelPlacement, ScalarMapSpec, SpectralCoefficientMapSpec,
+    StreamlineMapSpec, TextPanelSpec)
 
 
 _TIME_DECIMAL_PLACES = 9
@@ -139,48 +140,13 @@ class FigureTimeline:
 
     def resolve_normalizations(self) -> "FigureTimeline":
         """Return a copy with every cross-frame normalization frozen."""
-        grouped: dict[tuple, list[tuple[int, int, object, np.ndarray]]] = {}
-        for frame_index, frame in enumerate(self.frames):
-            for panel_index, placement in enumerate(frame.specification.panels):
-                panel = placement.panel
-                values = _normalizable_values(panel)
-                if values is None:
-                    continue
-                group = getattr(panel, "normalization_group", None)
-                key = (("named", group) if group is not None else
-                       ("placement", type(panel), placement.row,
-                        placement.column, placement.row_span,
-                        placement.column_span))
-                grouped.setdefault(key, []).append(
-                    (frame_index, panel_index, panel, values))
-
-        replacements: dict[tuple[int, int], object] = {}
-        for key, members in grouped.items():
-            policies = [member[2].normalization for member in members]
-            signature = {(policy.kind, policy.vmin, policy.vmax)
-                         for policy in policies}
-            if len(signature) != 1:
-                raise ValueError(
-                    f"normalization group {key!r} uses inconsistent policies")
-            combined = np.concatenate(
-                [np.asarray(member[3]).reshape(-1) for member in members])
-            resolved = policies[0].resolve(combined)
-            frozen = NormalizationPolicy.from_resolved(resolved)
-            for frame_index, panel_index, panel, _ in members:
-                replacements[(frame_index, panel_index)] = replace(
-                    panel, normalization=frozen)
-
-        frames = []
-        for frame_index, frame in enumerate(self.frames):
-            placements = tuple(
-                replace(placement, panel=replacements.get(
-                    (frame_index, panel_index), placement.panel))
-                for panel_index, placement in enumerate(
-                    frame.specification.panels))
-            frames.append(replace(
-                frame, specification=replace(
-                    frame.specification, panels=placements)))
-        return replace(self, frames=tuple(frames))
+        resolved = _resolve_panel_normalizations(
+            [frame.specification.panels for frame in self.frames])
+        frames = tuple(
+            replace(frame, specification=replace(
+                frame.specification, panels=panels))
+            for frame, panels in zip(self.frames, resolved))
+        return replace(self, frames=frames)
 
     def matches_filename(self, filename: str) -> bool:
         """Whether ``filename`` belongs to this timeline's generated set."""
@@ -324,6 +290,103 @@ def build_timeline_overview(
         timeline: FigureTimeline, *, max_frames: int = 5) -> FigureSpec | None:
     """Build a generic representative overview from a complete timeline."""
     return timeline.overview_specification(max_frames=max_frames)
+
+
+def resolve_figure_normalizations(specification: FigureSpec) -> FigureSpec:
+    """Freeze every normalization group of one figure.
+
+    Panels that name the same ``normalization_group`` share one resolved
+    scale, and colour or line-width keys naming that group show it.
+    """
+    (panels,) = _resolve_panel_normalizations([specification.panels])
+    return replace(specification, panels=panels)
+
+
+def _normalization_slots(panel):
+    """Yield ``(slot, group, policy, values)`` for each scale in a panel.
+
+    Keys contribute no values; they only receive their group's scale.
+    Historical panel types keep their single ``"self"`` slot so their
+    grouping (named or by placement) is exactly what it always was.
+    """
+    if isinstance(panel, LayeredMapSpec):
+        if panel.background is not None:
+            layer = panel.background
+            yield ("background", layer.normalization_group,
+                   layer.normalization,
+                   np.asarray(layer.field.values_at(layer.time_index)))
+        if panel.vectors is not None and (
+                panel.vectors.color_by or panel.vectors.width_by):
+            yield ("vectors", panel.vectors.normalization_group,
+                   panel.vectors.normalization, panel.vectors.speed)
+        return
+    if isinstance(panel, (ColorKeySpec, LineWidthKeySpec)):
+        yield ("key", panel.normalization_group, panel.normalization, None)
+        return
+    values = _normalizable_values(panel)
+    if values is not None:
+        yield ("self", getattr(panel, "normalization_group", None),
+               panel.normalization, values)
+
+
+def _with_normalization(panel, slot: str, frozen: NormalizationPolicy):
+    if slot == "background":
+        return replace(panel, background=replace(
+            panel.background, normalization=frozen))
+    if slot == "vectors":
+        return replace(panel, vectors=replace(
+            panel.vectors, normalization=frozen))
+    return replace(panel, normalization=frozen)
+
+
+def _resolve_panel_normalizations(frames_panels):
+    """Resolve normalization groups across a sequence of panel tuples."""
+    grouped: dict[tuple, list] = {}
+    for frame_index, placements in enumerate(frames_panels):
+        for panel_index, placement in enumerate(placements):
+            for slot, group, policy, values in _normalization_slots(
+                    placement.panel):
+                if group is not None:
+                    key = ("named", group)
+                elif slot == "self":
+                    key = ("placement", type(placement.panel), placement.row,
+                           placement.column, placement.row_span,
+                           placement.column_span)
+                else:
+                    key = ("placement", type(placement.panel), slot,
+                           placement.row, placement.column,
+                           placement.row_span, placement.column_span)
+                grouped.setdefault(key, []).append(
+                    (frame_index, panel_index, slot, policy, values))
+
+    frozen_by_slot: dict[tuple[int, int, str], NormalizationPolicy] = {}
+    for key, members in grouped.items():
+        signature = {(member[3].kind, member[3].vmin, member[3].vmax)
+                     for member in members}
+        if len(signature) != 1:
+            raise ValueError(
+                f"normalization group {key!r} uses inconsistent policies")
+        arrays = [np.asarray(member[4]).reshape(-1) for member in members
+                  if member[4] is not None]
+        if not arrays:
+            raise ValueError(
+                f"normalization group {key!r} has a key but no panel data")
+        resolved = members[0][3].resolve(np.concatenate(arrays))
+        frozen = NormalizationPolicy.from_resolved(resolved)
+        for frame_index, panel_index, slot, _, _ in members:
+            frozen_by_slot[(frame_index, panel_index, slot)] = frozen
+
+    resolved_frames = []
+    for frame_index, placements in enumerate(frames_panels):
+        updated = []
+        for panel_index, placement in enumerate(placements):
+            panel = placement.panel
+            for (f_index, p_index, slot), frozen in frozen_by_slot.items():
+                if f_index == frame_index and p_index == panel_index:
+                    panel = _with_normalization(panel, slot, frozen)
+            updated.append(replace(placement, panel=panel))
+        resolved_frames.append(tuple(updated))
+    return resolved_frames
 
 
 def _normalizable_values(panel) -> np.ndarray | None:
@@ -514,6 +577,7 @@ render_timeline = render_figure_timeline
 
 __all__ = [
     "build_timeline_overview",
+    "resolve_figure_normalizations",
     "FigureFrame",
     "FigureTimeline",
     "TimelineFrame",

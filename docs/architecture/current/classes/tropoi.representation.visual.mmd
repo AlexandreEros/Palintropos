@@ -17,8 +17,15 @@ classDiagram
     class c_tropoi_orepresentation_ovisual_omatplotlib__renderer_oMatplotlibRenderer["MatplotlibRenderer (representation.visual.matplotlib_renderer)"]
     c_tropoi_orepresentation_ovisual_omatplotlib__renderer_oMatplotlibRenderer : +#95;#95;init#95;#95;()
     c_tropoi_orepresentation_ovisual_omatplotlib__renderer_oMatplotlibRenderer : +#95;color#95;map()$
+    c_tropoi_orepresentation_ovisual_omatplotlib__renderer_oMatplotlibRenderer : +#95;draw#95;arrows()
+    c_tropoi_orepresentation_ovisual_omatplotlib__renderer_oMatplotlibRenderer : +#95;draw#95;background()
+    c_tropoi_orepresentation_ovisual_omatplotlib__renderer_oMatplotlibRenderer : +#95;draw#95;contours()$
+    c_tropoi_orepresentation_ovisual_omatplotlib__renderer_oMatplotlibRenderer : +#95;draw#95;streamlines()
     c_tropoi_orepresentation_ovisual_omatplotlib__renderer_oMatplotlibRenderer : +#95;label#95;spectral#95;axes()$
     c_tropoi_orepresentation_ovisual_omatplotlib__renderer_oMatplotlibRenderer : +#95;mpl#95;normalization()$
+    c_tropoi_orepresentation_ovisual_omatplotlib__renderer_oMatplotlibRenderer : +#95;render#95;color#95;key()
+    c_tropoi_orepresentation_ovisual_omatplotlib__renderer_oMatplotlibRenderer : +#95;render#95;figure()
+    c_tropoi_orepresentation_ovisual_omatplotlib__renderer_oMatplotlibRenderer : +#95;render#95;layered#95;map()
     c_tropoi_orepresentation_ovisual_omatplotlib__renderer_oMatplotlibRenderer : +#95;render#95;line#95;panel()$
     c_tropoi_orepresentation_ovisual_omatplotlib__renderer_oMatplotlibRenderer : +#95;render#95;panel()
     c_tropoi_orepresentation_ovisual_omatplotlib__renderer_oMatplotlibRenderer : +#95;render#95;panel#95;groups()$
@@ -26,7 +33,9 @@ classDiagram
     c_tropoi_orepresentation_ovisual_omatplotlib__renderer_oMatplotlibRenderer : +#95;render#95;scalar#95;panel()
     c_tropoi_orepresentation_ovisual_omatplotlib__renderer_oMatplotlibRenderer : +#95;render#95;spectral#95;panel()
     c_tropoi_orepresentation_ovisual_omatplotlib__renderer_oMatplotlibRenderer : +#95;render#95;streamline#95;panel()
+    c_tropoi_orepresentation_ovisual_omatplotlib__renderer_oMatplotlibRenderer : +#95;render#95;width#95;key()
     c_tropoi_orepresentation_ovisual_omatplotlib__renderer_oMatplotlibRenderer : +#95;save#95;atomic()$
+    c_tropoi_orepresentation_ovisual_omatplotlib__renderer_oMatplotlibRenderer : +#95;vector#95;scale()
     c_tropoi_orepresentation_ovisual_omatplotlib__renderer_oMatplotlibRenderer : +render#95;figure()
     c_tropoi_orepresentation_ovisual_omatplotlib__renderer_oMatplotlibRenderer : +render#95;scalar#95;map()
     c_tropoi_orepresentation_ovisual_omatplotlib__renderer_oMatplotlibRenderer : +render#95;spectral#95;coefficient#95;map()
@@ -62,15 +71,27 @@ classDiagram
     class c_tropoi_orepresentation_ovisual_osnapshot_oSnapshotResources["SnapshotResources (representation.visual.snapshot)"]
     c_tropoi_orepresentation_ovisual_osnapshot_oSnapshotResources : +grid
     c_tropoi_orepresentation_ovisual_osnapshot_oSnapshotResources : +transform
+    class c_tropoi_orepresentation_ovisual_ospecs_oColorKeySpec["ColorKeySpec (representation.visual.specs)"]
+    c_tropoi_orepresentation_ovisual_ospecs_oColorKeySpec : +#95;#95;post#95;init#95;#95;()
+    class c_tropoi_orepresentation_ovisual_ospecs_oContourLayer["ContourLayer (representation.visual.specs)"]
+    c_tropoi_orepresentation_ovisual_ospecs_oContourLayer : +#95;#95;post#95;init#95;#95;()
     class c_tropoi_orepresentation_ovisual_ospecs_oFigureSpec["FigureSpec (representation.visual.specs)"]
     c_tropoi_orepresentation_ovisual_ospecs_oFigureSpec : +#95;#95;post#95;init#95;#95;()
+    class c_tropoi_orepresentation_ovisual_ospecs_oLayeredMapSpec["LayeredMapSpec (representation.visual.specs)"]
+    c_tropoi_orepresentation_ovisual_ospecs_oLayeredMapSpec : +#95;#95;post#95;init#95;#95;()
     class c_tropoi_orepresentation_ovisual_ospecs_oLinePanelSpec["LinePanelSpec (representation.visual.specs)"]
+    c_tropoi_orepresentation_ovisual_ospecs_oLinePanelSpec : +#95;#95;post#95;init#95;#95;()
     class c_tropoi_orepresentation_ovisual_ospecs_oLineSeriesSpec["LineSeriesSpec (representation.visual.specs)"]
     c_tropoi_orepresentation_ovisual_ospecs_oLineSeriesSpec : +#95;#95;post#95;init#95;#95;()
+    class c_tropoi_orepresentation_ovisual_ospecs_oLineWidthKeySpec["LineWidthKeySpec (representation.visual.specs)"]
+    c_tropoi_orepresentation_ovisual_ospecs_oLineWidthKeySpec : +#95;#95;post#95;init#95;#95;()
     class c_tropoi_orepresentation_ovisual_ospecs_oPanelGroupSpec["PanelGroupSpec (representation.visual.specs)"]
     c_tropoi_orepresentation_ovisual_ospecs_oPanelGroupSpec : +#95;#95;post#95;init#95;#95;()
     c_tropoi_orepresentation_ovisual_ospecs_oPanelGroupSpec : +contains()
     class c_tropoi_orepresentation_ovisual_ospecs_oPanelPlacement["PanelPlacement (representation.visual.specs)"]
+    class c_tropoi_orepresentation_ovisual_ospecs_oScalarLayer["ScalarLayer (representation.visual.specs)"]
+    c_tropoi_orepresentation_ovisual_ospecs_oScalarLayer : +#95;#95;post#95;init#95;#95;()
+    c_tropoi_orepresentation_ovisual_ospecs_oScalarLayer : +display#95;label
     class c_tropoi_orepresentation_ovisual_ospecs_oScalarMapSpec["ScalarMapSpec (representation.visual.specs)"]
     c_tropoi_orepresentation_ovisual_ospecs_oScalarMapSpec : +#95;#95;post#95;init#95;#95;()
     c_tropoi_orepresentation_ovisual_ospecs_oScalarMapSpec : +display#95;units
@@ -85,6 +106,9 @@ classDiagram
     class c_tropoi_orepresentation_ovisual_ospecs_oStreamlineMapSpec["StreamlineMapSpec (representation.visual.specs)"]
     c_tropoi_orepresentation_ovisual_ospecs_oStreamlineMapSpec : +#95;#95;post#95;init#95;#95;()
     class c_tropoi_orepresentation_ovisual_ospecs_oTextPanelSpec["TextPanelSpec (representation.visual.specs)"]
+    class c_tropoi_orepresentation_ovisual_ospecs_oVectorLayer["VectorLayer (representation.visual.specs)"]
+    c_tropoi_orepresentation_ovisual_ospecs_oVectorLayer : +#95;#95;post#95;init#95;#95;()
+    c_tropoi_orepresentation_ovisual_ospecs_oVectorLayer : +speed
     class c_tropoi_orepresentation_ovisual_otimeline_oFigureFrame["FigureFrame (representation.visual.timeline)"]
     c_tropoi_orepresentation_ovisual_otimeline_oFigureFrame : +#95;#95;post#95;init#95;#95;()
     class c_tropoi_orepresentation_ovisual_otimeline_oFigureTimeline["FigureTimeline (representation.visual.timeline)"]

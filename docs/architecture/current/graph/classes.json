@@ -476,12 +476,40 @@
           "name": "_color_map"
         },
         {
+          "kind": "method",
+          "name": "_draw_arrows"
+        },
+        {
+          "kind": "method",
+          "name": "_draw_background"
+        },
+        {
+          "kind": "staticmethod",
+          "name": "_draw_contours"
+        },
+        {
+          "kind": "method",
+          "name": "_draw_streamlines"
+        },
+        {
           "kind": "staticmethod",
           "name": "_label_spectral_axes"
         },
         {
           "kind": "staticmethod",
           "name": "_mpl_normalization"
+        },
+        {
+          "kind": "method",
+          "name": "_render_color_key"
+        },
+        {
+          "kind": "method",
+          "name": "_render_figure"
+        },
+        {
+          "kind": "method",
+          "name": "_render_layered_map"
         },
         {
           "kind": "staticmethod",
@@ -512,8 +540,16 @@
           "name": "_render_streamline_panel"
         },
         {
+          "kind": "method",
+          "name": "_render_width_key"
+        },
+        {
           "kind": "staticmethod",
           "name": "_save_atomic"
+        },
+        {
+          "kind": "method",
+          "name": "_vector_scale"
         },
         {
           "kind": "method",
@@ -708,6 +744,36 @@
         "dataclass(frozen=True)"
       ],
       "external_bases": [],
+      "id": "tropoi.representation.visual.specs.ColorKeySpec",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__post_init__"
+        }
+      ],
+      "module": "tropoi.representation.visual.specs",
+      "qualname": "ColorKeySpec"
+    },
+    {
+      "decorators": [
+        "dataclass(frozen=True)"
+      ],
+      "external_bases": [],
+      "id": "tropoi.representation.visual.specs.ContourLayer",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__post_init__"
+        }
+      ],
+      "module": "tropoi.representation.visual.specs",
+      "qualname": "ContourLayer"
+    },
+    {
+      "decorators": [
+        "dataclass(frozen=True)"
+      ],
+      "external_bases": [],
       "id": "tropoi.representation.visual.specs.FigureSpec",
       "members": [
         {
@@ -723,8 +789,28 @@
         "dataclass(frozen=True)"
       ],
       "external_bases": [],
+      "id": "tropoi.representation.visual.specs.LayeredMapSpec",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__post_init__"
+        }
+      ],
+      "module": "tropoi.representation.visual.specs",
+      "qualname": "LayeredMapSpec"
+    },
+    {
+      "decorators": [
+        "dataclass(frozen=True)"
+      ],
+      "external_bases": [],
       "id": "tropoi.representation.visual.specs.LinePanelSpec",
-      "members": [],
+      "members": [
+        {
+          "kind": "method",
+          "name": "__post_init__"
+        }
+      ],
       "module": "tropoi.representation.visual.specs",
       "qualname": "LinePanelSpec"
     },
@@ -742,6 +828,21 @@
       ],
       "module": "tropoi.representation.visual.specs",
       "qualname": "LineSeriesSpec"
+    },
+    {
+      "decorators": [
+        "dataclass(frozen=True)"
+      ],
+      "external_bases": [],
+      "id": "tropoi.representation.visual.specs.LineWidthKeySpec",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__post_init__"
+        }
+      ],
+      "module": "tropoi.representation.visual.specs",
+      "qualname": "LineWidthKeySpec"
     },
     {
       "decorators": [
@@ -771,6 +872,25 @@
       "members": [],
       "module": "tropoi.representation.visual.specs",
       "qualname": "PanelPlacement"
+    },
+    {
+      "decorators": [
+        "dataclass(frozen=True)"
+      ],
+      "external_bases": [],
+      "id": "tropoi.representation.visual.specs.ScalarLayer",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__post_init__"
+        },
+        {
+          "kind": "property",
+          "name": "display_label"
+        }
+      ],
+      "module": "tropoi.representation.visual.specs",
+      "qualname": "ScalarLayer"
     },
     {
       "decorators": [
@@ -853,6 +973,25 @@
       "members": [],
       "module": "tropoi.representation.visual.specs",
       "qualname": "TextPanelSpec"
+    },
+    {
+      "decorators": [
+        "dataclass(frozen=True)"
+      ],
+      "external_bases": [],
+      "id": "tropoi.representation.visual.specs.VectorLayer",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__post_init__"
+        },
+        {
+          "kind": "property",
+          "name": "speed"
+        }
+      ],
+      "module": "tropoi.representation.visual.specs",
+      "qualname": "VectorLayer"
     },
     {
       "decorators": [

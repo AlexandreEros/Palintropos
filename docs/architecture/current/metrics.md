@@ -153,16 +153,16 @@ Every module is mapped to its containing package (a package's `__init__` to the 
 
 ## Class graph
 
-* Classes: 83
+* Classes: 89
 * `inherits` edges between analysed classes: 9
 * `nests` edges (class defined in a class body): 0
 * Bases outside the analysed package: `RuntimeError` x3, `ValueError` x8, `abc.ABC` x2, `collections.abc.Mapping` x1, `enum.Enum` x2, `str` x2, `typing.Protocol` x2
 
 ## Call graph
 
-* Nodes (functions, methods, classes): 757
-* Edges by kind: `call` 442, `constructor` 29, `instantiate` 186, `override` 6, `self` 146, `super` 2
-* Call sites by resolution outcome: builtin 1353, external 977, internal 1073, unresolved 1384
+* Nodes (functions, methods, classes): 794
+* Edges by kind: `call` 461, `constructor` 29, `instantiate` 186, `override` 6, `self` 163, `super` 2
+* Call sites by resolution outcome: builtin 1419, external 1060, internal 1109, unresolved 1450
 
 | Scoped graph | Roots | Depth | Nodes | Edges | Truncated nodes | Reachable (unbounded) |
 |---|---|---|---|---|---|---|
