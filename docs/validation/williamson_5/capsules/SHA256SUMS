@@ -1,0 +1,19 @@
+# Canonical Williamson-5 T63 run capsule (commit 668e6c9a, 2026-07-30).
+#
+# Byte-identical copies of the capsule inside w5-mri-canonical-validation.zip
+# (sha256 a041f2dc99072dca5a76ece42c8a357dc236b84717db19d550356ec8f0b140f4,
+# recorded in ../../williamson5_mri_2026-07-30/CHECKSUMS.txt). Independent
+# cross-checks, verified 2026-09-25:
+#   * swe_coeffs.npy matches the CoefficientsSHA256 embedded in
+#     ../overview.png;
+#   * diagnostics/timeseries.csv is byte-identical to ../aeolus_t63_timeseries.csv;
+#   * manifest.json parses equal to
+#     ../../williamson5_mri_2026-07-30/aeolus_t63_run_manifest.json.
+#
+# Verify from this directory with: sha256sum -c SHA256SUMS
+# (tests/test_w5_canonical_capsule.py checks the same sums on every CI run).
+0cc1d77152870ee4411060144e259153df9dab77af54c126256db331c3fdcb24  t63/20260730T011700Z_williamson5_rot23p93h_r4_l63_dt120h_45406d82_668e6c9a/config.json
+3d8c8cb422c46b09876ac8874d526c0b70018ccfdabce3aded6a40a0111f272b  t63/20260730T011700Z_williamson5_rot23p93h_r4_l63_dt120h_45406d82_668e6c9a/diagnostics/timeseries.csv
+5d952a66f219811ab8be6f1161f455713d6bd16cea0d11f2ae84d2cb12597229  t63/20260730T011700Z_williamson5_rot23p93h_r4_l63_dt120h_45406d82_668e6c9a/manifest.json
+dd28eff96795c93d8b15b199be8d3494838ecd763ffa2808b13bb951b60fb1a7  t63/20260730T011700Z_williamson5_rot23p93h_r4_l63_dt120h_45406d82_668e6c9a/swe_coeffs.npy
+5ac48e3b281b91a684e3d31dc9973b17b02fd38290b624aa10e3e45aec9ca72b  t63/20260730T011700Z_williamson5_rot23p93h_r4_l63_dt120h_45406d82_668e6c9a/swe_snapshot_times.npy
