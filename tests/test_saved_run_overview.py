@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 import pathlib
 import subprocess
 import sys
@@ -175,7 +176,12 @@ def _release_gpu() -> None:
 
 @pytest.fixture(scope="class")
 def sim():
-    """One shared canonical Simulation: its model is built exactly once."""
+    """One shared canonical Simulation: its model is built exactly once.
+
+    The T63 model needs about 1.8 GB; blocks pooled by earlier test modules
+    are returned first so it fits on a 2 GB card.
+    """
+    _release_gpu()
     simulation = open_simulation(CANONICAL)
     before = _tree_digest(CANONICAL)
     yield simulation
@@ -185,7 +191,30 @@ def sim():
     _release_gpu()
 
 
+#: Set in the child process that runs the canonical T63 checks.
+_FRESH_CONTEXT = "TROPOI_T63_FRESH_CUDA_CONTEXT"
+
+
 @cuda
+def test_canonical_t63_checks_run_in_a_fresh_cuda_context():
+    """The T63 model needs ~1.8 GB of a 2 GB card: earlier test modules in
+    the same process still hold device memory, so the canonical checks run
+    in a child interpreter with its own CUDA context."""
+    if os.environ.get(_FRESH_CONTEXT):
+        pytest.skip("already inside the child process")
+    result = subprocess.run(
+        [sys.executable, "-m", "pytest", "-q", "-p", "no:cacheprovider",
+         f"{__file__}::TestCanonicalRunOnGPU"],
+        env={**os.environ, _FRESH_CONTEXT: "1"}, cwd=ROOT,
+        capture_output=True, text=True)
+    assert result.returncode == 0, result.stdout[-6000:] + result.stderr[-2000:]
+    assert "4 passed" in result.stdout, result.stdout[-2000:]
+
+
+@cuda
+@pytest.mark.skipif(not os.environ.get(_FRESH_CONTEXT),
+                    reason="run through "
+                           "test_canonical_t63_checks_run_in_a_fresh_cuda_context")
 class TestCanonicalRunOnGPU:
     """Canonical T63 checks sharing one model build (see ``sim``)."""
 
