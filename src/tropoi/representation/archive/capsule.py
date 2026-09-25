@@ -418,6 +418,25 @@ class CapsuleStorage:
         from tropoi.representation.visual.snapshot import render_snapshot
         return render_snapshot(self, int(index), output_path, **options)
 
+    def plot_simulation(self, output_path, view=None, *,
+                        snapshot: int | None = None, sidecar: bool = False,
+                        renderer=None) -> pathlib.Path:
+        from tropoi.representation.visual.compose import render_view
+        return render_view(self, view, output_path, snapshot=snapshot,
+                           sidecar=sidecar, renderer=renderer)
+
+    def quantities(self) -> list[dict]:
+        from tropoi.representation.visual.quantities import (
+            available_quantities)
+        definitions = self.metadata.get("diagnostic_definitions") or {}
+        return available_quantities(
+            self.solver, run_config=self.run_config,
+            diagnostic_columns=[
+                column for column in definitions.get("columns", ())
+                if column["name"] not in ("time_s", "dt_s", "step")],
+            diagnostics_present=(
+                self.run_dir / "diagnostics" / "timeseries.csv").is_file())
+
     def __repr__(self) -> str:
         return (f"CapsuleStorage({str(self.run_dir)!r}, solver={self.solver!r}, "
                 f"frames={self.frame_count})")

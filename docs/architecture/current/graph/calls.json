@@ -577,8 +577,18 @@
     },
     {
       "kind": "call",
+      "source": "tropoi.representation.archive.capsule.CapsuleStorage.plot_simulation",
+      "target": "tropoi.representation.visual.compose.render_view"
+    },
+    {
+      "kind": "call",
       "source": "tropoi.representation.archive.capsule.CapsuleStorage.plot_snapshot",
       "target": "tropoi.representation.visual.snapshot.render_snapshot"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.archive.capsule.CapsuleStorage.quantities",
+      "target": "tropoi.representation.visual.quantities.available_quantities"
     },
     {
       "kind": "call",
@@ -1209,6 +1219,781 @@
       "kind": "call",
       "source": "tropoi.representation.visual.complex_encoding.phase_magnitude_hsv",
       "target": "tropoi.representation.visual.complex_encoding.phase_hue"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.representation.visual.compose._auto_diagnostics",
+      "target": "tropoi.representation.visual.views.Complexity"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.representation.visual.compose._auto_diagnostics",
+      "target": "tropoi.representation.visual.views.Drift"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.representation.visual.compose._complexity_panel",
+      "target": "tropoi.representation.visual.specs.LinePanelSpec"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.representation.visual.compose._complexity_panel",
+      "target": "tropoi.representation.visual.specs.LineSeriesSpec"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.representation.visual.compose._complexity_panel",
+      "target": "tropoi.representation.visual.specs.TextPanelSpec"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.compose._compose_grid",
+      "target": "tropoi.representation.visual.compose._complexity_panel"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.compose._compose_grid",
+      "target": "tropoi.representation.visual.compose._drift_panel"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.compose._compose_grid",
+      "target": "tropoi.representation.visual.compose._header"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.compose._compose_grid",
+      "target": "tropoi.representation.visual.compose._level_label"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.compose._compose_grid",
+      "target": "tropoi.representation.visual.compose._map_panel"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.compose._compose_grid",
+      "target": "tropoi.representation.visual.compose._record_base"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.compose._compose_grid",
+      "target": "tropoi.representation.visual.compose._snapshot_statistics"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.compose._compose_grid",
+      "target": "tropoi.representation.visual.compose._time_axis"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.compose._compose_grid",
+      "target": "tropoi.representation.visual.compose._time_label"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.compose._compose_grid",
+      "target": "tropoi.representation.visual.compose.resolve_level"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.compose._compose_grid",
+      "target": "tropoi.representation.visual.compose.resolve_snapshots"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.compose._compose_grid",
+      "target": "tropoi.representation.visual.quantities.quantity"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.representation.visual.compose._compose_grid",
+      "target": "tropoi.representation.visual.specs.FigureSpec"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.representation.visual.compose._compose_grid",
+      "target": "tropoi.representation.visual.specs.PanelPlacement"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.representation.visual.compose._compose_grid",
+      "target": "tropoi.representation.visual.specs.TextPanelSpec"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.compose._compose_grid",
+      "target": "tropoi.representation.visual.timeline.resolve_figure_normalizations"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.compose._compose_overview",
+      "target": "tropoi.representation.visual.compose._auto_diagnostics"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.compose._compose_overview",
+      "target": "tropoi.representation.visual.compose._color_policy"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.compose._compose_overview",
+      "target": "tropoi.representation.visual.compose._complexity_panel"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.compose._compose_overview",
+      "target": "tropoi.representation.visual.compose._drift_panel"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.compose._compose_overview",
+      "target": "tropoi.representation.visual.compose._header"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.compose._compose_overview",
+      "target": "tropoi.representation.visual.compose._level_for"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.compose._compose_overview",
+      "target": "tropoi.representation.visual.compose._level_label"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.compose._compose_overview",
+      "target": "tropoi.representation.visual.compose._map_panel"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.compose._compose_overview",
+      "target": "tropoi.representation.visual.compose._nice_speeds"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.compose._compose_overview",
+      "target": "tropoi.representation.visual.compose._normalization"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.compose._compose_overview",
+      "target": "tropoi.representation.visual.compose._record_base"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.compose._compose_overview",
+      "target": "tropoi.representation.visual.compose._snapshot_statistics"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.compose._compose_overview",
+      "target": "tropoi.representation.visual.compose._time_axis"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.compose._compose_overview",
+      "target": "tropoi.representation.visual.compose._time_label"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.compose._compose_overview",
+      "target": "tropoi.representation.visual.compose.pretty_units"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.compose._compose_overview",
+      "target": "tropoi.representation.visual.compose.resolve_level"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.compose._compose_overview",
+      "target": "tropoi.representation.visual.compose.resolve_snapshots"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.compose._compose_overview",
+      "target": "tropoi.representation.visual.quantities.quantity"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.representation.visual.compose._compose_overview",
+      "target": "tropoi.representation.visual.specs.ColorKeySpec"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.representation.visual.compose._compose_overview",
+      "target": "tropoi.representation.visual.specs.FigureSpec"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.representation.visual.compose._compose_overview",
+      "target": "tropoi.representation.visual.specs.LineWidthKeySpec"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.representation.visual.compose._compose_overview",
+      "target": "tropoi.representation.visual.specs.PanelPlacement"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.representation.visual.compose._compose_overview",
+      "target": "tropoi.representation.visual.specs.TextPanelSpec"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.compose._compose_overview",
+      "target": "tropoi.representation.visual.timeline.resolve_figure_normalizations"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.representation.visual.compose._compose_overview",
+      "target": "tropoi.representation.visual.views.Map"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.representation.visual.compose._drift_panel",
+      "target": "tropoi.representation.visual.quantities.QuantityUnavailableError"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.representation.visual.compose._drift_panel",
+      "target": "tropoi.representation.visual.specs.LinePanelSpec"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.representation.visual.compose._drift_panel",
+      "target": "tropoi.representation.visual.specs.LineSeriesSpec"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.representation.visual.compose._level_for",
+      "target": "tropoi.representation.visual.quantities.QuantityUnavailableError"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.compose._level_for",
+      "target": "tropoi.representation.visual.quantities.quantity"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.compose._map_panel",
+      "target": "tropoi.representation.visual.compose._color_policy"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.compose._map_panel",
+      "target": "tropoi.representation.visual.compose._level_for"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.compose._map_panel",
+      "target": "tropoi.representation.visual.compose._normalization"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.compose._map_panel",
+      "target": "tropoi.representation.visual.compose.pretty_units"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.representation.visual.compose._map_panel",
+      "target": "tropoi.representation.visual.quantities.QuantityUnavailableError"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.compose._map_panel",
+      "target": "tropoi.representation.visual.quantities.quantity"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.representation.visual.compose._map_panel",
+      "target": "tropoi.representation.visual.specs.ContourLayer"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.representation.visual.compose._map_panel",
+      "target": "tropoi.representation.visual.specs.LayeredMapSpec"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.representation.visual.compose._map_panel",
+      "target": "tropoi.representation.visual.specs.ScalarLayer"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.representation.visual.compose._map_panel",
+      "target": "tropoi.representation.visual.specs.VectorLayer"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.compose._normalization",
+      "target": "tropoi.representation.visual.normalization.NormalizationPolicy.automatic"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.compose._normalization",
+      "target": "tropoi.representation.visual.normalization.NormalizationPolicy.fixed"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.compose._normalization",
+      "target": "tropoi.representation.visual.normalization.NormalizationPolicy.symmetric"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.compose._record_base",
+      "target": "tropoi.representation.visual.compose._sha256"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.compose._record_base",
+      "target": "tropoi.representation.visual.views.describe"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.compose._snapshot_statistics",
+      "target": "tropoi.representation.visual.compose._level_for"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.compose._snapshot_statistics",
+      "target": "tropoi.representation.visual.quantities.quantity"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.compose.compose_view",
+      "target": "tropoi.representation.visual.compose._compose_grid"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.compose.compose_view",
+      "target": "tropoi.representation.visual.compose._compose_overview"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.representation.visual.compose.compose_view",
+      "target": "tropoi.representation.visual.views.Grid"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.representation.visual.compose.compose_view",
+      "target": "tropoi.representation.visual.views.Overview"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.compose.default_view",
+      "target": "tropoi.representation.visual.pe_snapshots.select_snapshot_levels"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.representation.visual.compose.default_view",
+      "target": "tropoi.representation.visual.views.Contours"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.representation.visual.compose.default_view",
+      "target": "tropoi.representation.visual.views.Map"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.representation.visual.compose.default_view",
+      "target": "tropoi.representation.visual.views.Overview"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.representation.visual.compose.default_view",
+      "target": "tropoi.representation.visual.views.Streamlines"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.representation.visual.compose.default_view",
+      "target": "tropoi.spatial.sigma_coordinate.SigmaGrid"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.compose.default_view",
+      "target": "tropoi.spatial.sigma_coordinate.SigmaGrid.uniform"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.compose.render_view",
+      "target": "tropoi.representation.visual.compose._png_metadata"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.compose.render_view",
+      "target": "tropoi.representation.visual.compose.compose_view"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.compose.render_view",
+      "target": "tropoi.representation.visual.compose.default_view"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.representation.visual.compose.render_view",
+      "target": "tropoi.representation.visual.evaluate.RunFields"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.compose.render_view",
+      "target": "tropoi.representation.visual.renderers.get_default_renderer"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.representation.visual.compose.resolve_level",
+      "target": "tropoi.representation.visual.quantities.QuantityUnavailableError"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.compose.resolve_snapshots",
+      "target": "tropoi.representation.visual.compose._time_axis"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.representation.visual.compose.resolve_snapshots",
+      "target": "tropoi.representation.visual.quantities.QuantityUnavailableError"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.compose.resolve_snapshots",
+      "target": "tropoi.representation.visual.timeline.select_representative_frame_indices"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.compose.resolve_snapshots",
+      "target": "tropoi.representation.visual.views.parse_time"
+    },
+    {
+      "kind": "constructor",
+      "source": "tropoi.representation.visual.evaluate.RunFields",
+      "target": "tropoi.representation.visual.evaluate.RunFields.__init__"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.representation.visual.evaluate.RunFields._check",
+      "target": "tropoi.representation.visual.quantities.QuantityUnavailableError"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.evaluate.RunFields._check",
+      "target": "tropoi.representation.visual.quantities.quantity"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.representation.visual.evaluate.RunFields._display",
+      "target": "tropoi.representation.visual.evaluate.RunFields._grid"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.evaluate.RunFields._display",
+      "target": "tropoi.representation.visual.evaluate._host"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.evaluate.RunFields._display",
+      "target": "tropoi.representation.visual.grid_adapter.map_to_uniform_latlon"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.evaluate.RunFields._energy_modes",
+      "target": "tropoi.representation.diagnostics.spectral.kinetic_energy_modes"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.representation.visual.evaluate.RunFields._energy_modes",
+      "target": "tropoi.representation.visual.evaluate.RunFields._frame"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.representation.visual.evaluate.RunFields._grid",
+      "target": "tropoi.representation.visual.evaluate.RunFields._resources"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.representation.visual.evaluate.RunFields._model",
+      "target": "tropoi.representation.visual.evaluate.RunFields._resources"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.representation.visual.evaluate.RunFields._synthesize",
+      "target": "tropoi.representation.visual.evaluate.RunFields._transform"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.evaluate.RunFields._synthesize",
+      "target": "tropoi.representation.visual.evaluate._host"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.representation.visual.evaluate.RunFields._table",
+      "target": "tropoi.representation.visual.quantities.QuantityUnavailableError"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.representation.visual.evaluate.RunFields._terrain_state",
+      "target": "tropoi.representation.visual.evaluate.RunFields._model"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.representation.visual.evaluate.RunFields._terrain_state",
+      "target": "tropoi.representation.visual.evaluate.RunFields._synthesize"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.evaluate.RunFields._terrain_state",
+      "target": "tropoi.representation.visual.evaluate._host"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.representation.visual.evaluate.RunFields._terrain_state",
+      "target": "tropoi.representation.visual.quantities.QuantityUnavailableError"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.representation.visual.evaluate.RunFields._transform",
+      "target": "tropoi.representation.visual.evaluate.RunFields._resources"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.representation.visual.evaluate.RunFields.area_mean",
+      "target": "tropoi.representation.visual.evaluate.RunFields.state_values"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.representation.visual.evaluate.RunFields.area_mean",
+      "target": "tropoi.representation.visual.evaluate.RunFields.state_weights"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.representation.visual.evaluate.RunFields.display_is_native",
+      "target": "tropoi.representation.visual.evaluate.RunFields._grid"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.representation.visual.evaluate.RunFields.display_wind",
+      "target": "tropoi.representation.visual.evaluate.DisplayVectors"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.representation.visual.evaluate.RunFields.display_wind",
+      "target": "tropoi.representation.visual.evaluate.RunFields._display"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.representation.visual.evaluate.RunFields.display_wind",
+      "target": "tropoi.representation.visual.evaluate.RunFields.state_wind"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.evaluate.RunFields.potential_enstrophy",
+      "target": "tropoi.representation.diagnostics.swe.potential_enstrophy"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.representation.visual.evaluate.RunFields.potential_enstrophy",
+      "target": "tropoi.representation.visual.evaluate.RunFields._check"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.representation.visual.evaluate.RunFields.potential_enstrophy",
+      "target": "tropoi.representation.visual.evaluate.RunFields._frame"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.representation.visual.evaluate.RunFields.potential_enstrophy",
+      "target": "tropoi.representation.visual.evaluate.RunFields._model"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.representation.visual.evaluate.RunFields.potential_enstrophy",
+      "target": "tropoi.spatial.states.shallow_water.ShallowWaterState"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.representation.visual.evaluate.RunFields.radius",
+      "target": "tropoi.representation.visual.evaluate.RunFields._model"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.representation.visual.evaluate.RunFields.radius",
+      "target": "tropoi.representation.visual.evaluate.RunFields._resources"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.representation.visual.evaluate.RunFields.recorded",
+      "target": "tropoi.representation.visual.evaluate.RunFields._table"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.representation.visual.evaluate.RunFields.recorded",
+      "target": "tropoi.representation.visual.evaluate.SeriesData"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.representation.visual.evaluate.RunFields.recorded",
+      "target": "tropoi.representation.visual.quantities.QuantityUnavailableError"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.representation.visual.evaluate.RunFields.recorded_at_snapshots",
+      "target": "tropoi.representation.visual.evaluate.RunFields.recorded"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.representation.visual.evaluate.RunFields.rms_speed",
+      "target": "tropoi.representation.visual.evaluate.RunFields._check"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.representation.visual.evaluate.RunFields.rms_speed",
+      "target": "tropoi.representation.visual.evaluate.RunFields._energy_modes"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.representation.visual.evaluate.RunFields.scalar_field",
+      "target": "tropoi.representation.visual.evaluate.RunFields._display"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.representation.visual.evaluate.RunFields.scalar_field",
+      "target": "tropoi.representation.visual.evaluate.RunFields._terrain_state"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.representation.visual.evaluate.RunFields.scalar_field",
+      "target": "tropoi.representation.visual.evaluate.RunFields.state_values"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.representation.visual.evaluate.RunFields.scalar_field",
+      "target": "tropoi.representation.visual.fields.ScalarGridField"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.evaluate.RunFields.scalar_field",
+      "target": "tropoi.representation.visual.quantities.quantity"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.representation.visual.evaluate.RunFields.spectral_complexity",
+      "target": "tropoi.representation.diagnostics.spectral.ZeroKineticEnergyError"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.evaluate.RunFields.spectral_complexity",
+      "target": "tropoi.representation.diagnostics.spectral.spectral_complexity"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.representation.visual.evaluate.RunFields.spectral_complexity",
+      "target": "tropoi.representation.visual.evaluate.RunFields._check"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.representation.visual.evaluate.RunFields.spectral_complexity",
+      "target": "tropoi.representation.visual.evaluate.RunFields._energy_modes"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.representation.visual.evaluate.RunFields.spectral_complexity",
+      "target": "tropoi.representation.visual.evaluate.RunFields.rms_speed"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.representation.visual.evaluate.RunFields.state_values",
+      "target": "tropoi.representation.visual.evaluate.RunFields._check"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.representation.visual.evaluate.RunFields.state_values",
+      "target": "tropoi.representation.visual.evaluate.RunFields._frame"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.representation.visual.evaluate.RunFields.state_values",
+      "target": "tropoi.representation.visual.evaluate.RunFields._inverse_laplacian"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.representation.visual.evaluate.RunFields.state_values",
+      "target": "tropoi.representation.visual.evaluate.RunFields._model"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.representation.visual.evaluate.RunFields.state_values",
+      "target": "tropoi.representation.visual.evaluate.RunFields._synthesize"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.representation.visual.evaluate.RunFields.state_values",
+      "target": "tropoi.representation.visual.evaluate.RunFields._terrain_state"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.representation.visual.evaluate.RunFields.state_values",
+      "target": "tropoi.representation.visual.evaluate.RunFields.state_values"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.representation.visual.evaluate.RunFields.state_values",
+      "target": "tropoi.representation.visual.evaluate.RunFields.state_weights"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.representation.visual.evaluate.RunFields.state_values",
+      "target": "tropoi.representation.visual.evaluate.RunFields.state_wind"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.representation.visual.evaluate.RunFields.state_values",
+      "target": "tropoi.representation.visual.quantities.QuantityUnavailableError"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.representation.visual.evaluate.RunFields.state_weights",
+      "target": "tropoi.representation.visual.evaluate.RunFields._transform"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.evaluate.RunFields.state_weights",
+      "target": "tropoi.representation.visual.evaluate._host"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.representation.visual.evaluate.RunFields.state_wind",
+      "target": "tropoi.representation.visual.evaluate.RunFields._check"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.representation.visual.evaluate.RunFields.state_wind",
+      "target": "tropoi.representation.visual.evaluate.RunFields._frame"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.representation.visual.evaluate.RunFields.state_wind",
+      "target": "tropoi.representation.visual.evaluate.RunFields._model"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.representation.visual.evaluate.RunFields.state_wind",
+      "target": "tropoi.representation.visual.evaluate.RunFields._resources"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.evaluate.RunFields.state_wind",
+      "target": "tropoi.representation.visual.evaluate._host"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.representation.visual.evaluate.RunFields.state_wind",
+      "target": "tropoi.spatial.states.primitive_equations.PrimitiveEquationsState"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.representation.visual.evaluate.RunFields.state_wind",
+      "target": "tropoi.spatial.states.shallow_water.ShallowWaterState"
     },
     {
       "kind": "call",
@@ -1849,6 +2634,16 @@
       "kind": "call",
       "source": "tropoi.representation.visual.planet_viewer.PlanetViewer.plot_summary",
       "target": "tropoi.spatial.grids.grid_interpolation.geodesic_to_latlon_grid"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.representation.visual.quantities.Quantity.check_solver",
+      "target": "tropoi.representation.visual.quantities.QuantityUnavailableError"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.representation.visual.quantities.quantity",
+      "target": "tropoi.representation.visual.quantities.QuantityUnavailableError"
     },
     {
       "kind": "instantiate",
@@ -4715,10 +5510,24 @@
       "type": "function"
     },
     {
+      "id": "tropoi.representation.archive.capsule.CapsuleStorage.plot_simulation",
+      "kind": "method",
+      "module": "tropoi.representation.archive.capsule",
+      "qualname": "CapsuleStorage.plot_simulation",
+      "type": "function"
+    },
+    {
       "id": "tropoi.representation.archive.capsule.CapsuleStorage.plot_snapshot",
       "kind": "method",
       "module": "tropoi.representation.archive.capsule",
       "qualname": "CapsuleStorage.plot_snapshot",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.archive.capsule.CapsuleStorage.quantities",
+      "kind": "method",
+      "module": "tropoi.representation.archive.capsule",
+      "qualname": "CapsuleStorage.quantities",
       "type": "function"
     },
     {
@@ -5485,6 +6294,447 @@
       "type": "function"
     },
     {
+      "id": "tropoi.representation.visual.compose._auto_diagnostics",
+      "kind": "function",
+      "module": "tropoi.representation.visual.compose",
+      "qualname": "_auto_diagnostics",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.compose._color_policy",
+      "kind": "function",
+      "module": "tropoi.representation.visual.compose",
+      "qualname": "_color_policy",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.compose._complexity_panel",
+      "kind": "function",
+      "module": "tropoi.representation.visual.compose",
+      "qualname": "_complexity_panel",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.compose._compose_grid",
+      "kind": "function",
+      "module": "tropoi.representation.visual.compose",
+      "qualname": "_compose_grid",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.compose._compose_overview",
+      "kind": "function",
+      "module": "tropoi.representation.visual.compose",
+      "qualname": "_compose_overview",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.compose._drift_panel",
+      "kind": "function",
+      "module": "tropoi.representation.visual.compose",
+      "qualname": "_drift_panel",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.compose._header",
+      "kind": "function",
+      "module": "tropoi.representation.visual.compose",
+      "qualname": "_header",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.compose._level_for",
+      "kind": "function",
+      "module": "tropoi.representation.visual.compose",
+      "qualname": "_level_for",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.compose._level_label",
+      "kind": "function",
+      "module": "tropoi.representation.visual.compose",
+      "qualname": "_level_label",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.compose._map_panel",
+      "kind": "function",
+      "module": "tropoi.representation.visual.compose",
+      "qualname": "_map_panel",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.compose._nice_speeds",
+      "kind": "function",
+      "module": "tropoi.representation.visual.compose",
+      "qualname": "_nice_speeds",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.compose._normalization",
+      "kind": "function",
+      "module": "tropoi.representation.visual.compose",
+      "qualname": "_normalization",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.compose._png_metadata",
+      "kind": "function",
+      "module": "tropoi.representation.visual.compose",
+      "qualname": "_png_metadata",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.compose._record_base",
+      "kind": "function",
+      "module": "tropoi.representation.visual.compose",
+      "qualname": "_record_base",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.compose._sha256",
+      "kind": "function",
+      "module": "tropoi.representation.visual.compose",
+      "qualname": "_sha256",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.compose._snapshot_statistics",
+      "kind": "function",
+      "module": "tropoi.representation.visual.compose",
+      "qualname": "_snapshot_statistics",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.compose._time_axis",
+      "kind": "function",
+      "module": "tropoi.representation.visual.compose",
+      "qualname": "_time_axis",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.compose._time_label",
+      "kind": "function",
+      "module": "tropoi.representation.visual.compose",
+      "qualname": "_time_label",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.compose.compose_view",
+      "kind": "function",
+      "module": "tropoi.representation.visual.compose",
+      "qualname": "compose_view",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.compose.default_view",
+      "kind": "function",
+      "module": "tropoi.representation.visual.compose",
+      "qualname": "default_view",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.compose.pretty_units",
+      "kind": "function",
+      "module": "tropoi.representation.visual.compose",
+      "qualname": "pretty_units",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.compose.render_view",
+      "kind": "function",
+      "module": "tropoi.representation.visual.compose",
+      "qualname": "render_view",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.compose.resolve_level",
+      "kind": "function",
+      "module": "tropoi.representation.visual.compose",
+      "qualname": "resolve_level",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.compose.resolve_snapshots",
+      "kind": "function",
+      "module": "tropoi.representation.visual.compose",
+      "qualname": "resolve_snapshots",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.evaluate.DisplayVectors",
+      "kind": "class",
+      "module": "tropoi.representation.visual.evaluate",
+      "qualname": "DisplayVectors",
+      "type": "class"
+    },
+    {
+      "id": "tropoi.representation.visual.evaluate.RunFields",
+      "kind": "class",
+      "module": "tropoi.representation.visual.evaluate",
+      "qualname": "RunFields",
+      "type": "class"
+    },
+    {
+      "id": "tropoi.representation.visual.evaluate.RunFields.__init__",
+      "kind": "method",
+      "module": "tropoi.representation.visual.evaluate",
+      "qualname": "RunFields.__init__",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.evaluate.RunFields._check",
+      "kind": "method",
+      "module": "tropoi.representation.visual.evaluate",
+      "qualname": "RunFields._check",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.evaluate.RunFields._display",
+      "kind": "method",
+      "module": "tropoi.representation.visual.evaluate",
+      "qualname": "RunFields._display",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.evaluate.RunFields._energy_modes",
+      "kind": "method",
+      "module": "tropoi.representation.visual.evaluate",
+      "qualname": "RunFields._energy_modes",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.evaluate.RunFields._frame",
+      "kind": "method",
+      "module": "tropoi.representation.visual.evaluate",
+      "qualname": "RunFields._frame",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.evaluate.RunFields._grid",
+      "kind": "method",
+      "module": "tropoi.representation.visual.evaluate",
+      "qualname": "RunFields._grid",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.evaluate.RunFields._inverse_laplacian",
+      "kind": "method",
+      "module": "tropoi.representation.visual.evaluate",
+      "qualname": "RunFields._inverse_laplacian",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.evaluate.RunFields._model",
+      "kind": "method",
+      "module": "tropoi.representation.visual.evaluate",
+      "qualname": "RunFields._model",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.evaluate.RunFields._resources",
+      "kind": "method",
+      "module": "tropoi.representation.visual.evaluate",
+      "qualname": "RunFields._resources",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.evaluate.RunFields._synthesize",
+      "kind": "method",
+      "module": "tropoi.representation.visual.evaluate",
+      "qualname": "RunFields._synthesize",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.evaluate.RunFields._table",
+      "kind": "method",
+      "module": "tropoi.representation.visual.evaluate",
+      "qualname": "RunFields._table",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.evaluate.RunFields._terrain_state",
+      "kind": "method",
+      "module": "tropoi.representation.visual.evaluate",
+      "qualname": "RunFields._terrain_state",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.evaluate.RunFields._transform",
+      "kind": "method",
+      "module": "tropoi.representation.visual.evaluate",
+      "qualname": "RunFields._transform",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.evaluate.RunFields.area_mean",
+      "kind": "method",
+      "module": "tropoi.representation.visual.evaluate",
+      "qualname": "RunFields.area_mean",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.evaluate.RunFields.diagnostics_path",
+      "kind": "property",
+      "module": "tropoi.representation.visual.evaluate",
+      "qualname": "RunFields.diagnostics_path",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.evaluate.RunFields.display_is_native",
+      "kind": "property",
+      "module": "tropoi.representation.visual.evaluate",
+      "qualname": "RunFields.display_is_native",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.evaluate.RunFields.display_wind",
+      "kind": "method",
+      "module": "tropoi.representation.visual.evaluate",
+      "qualname": "RunFields.display_wind",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.evaluate.RunFields.has_terrain",
+      "kind": "property",
+      "module": "tropoi.representation.visual.evaluate",
+      "qualname": "RunFields.has_terrain",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.evaluate.RunFields.host_radius_estimate",
+      "kind": "property",
+      "module": "tropoi.representation.visual.evaluate",
+      "qualname": "RunFields.host_radius_estimate",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.evaluate.RunFields.nlev",
+      "kind": "property",
+      "module": "tropoi.representation.visual.evaluate",
+      "qualname": "RunFields.nlev",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.evaluate.RunFields.potential_enstrophy",
+      "kind": "method",
+      "module": "tropoi.representation.visual.evaluate",
+      "qualname": "RunFields.potential_enstrophy",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.evaluate.RunFields.radius",
+      "kind": "property",
+      "module": "tropoi.representation.visual.evaluate",
+      "qualname": "RunFields.radius",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.evaluate.RunFields.recorded",
+      "kind": "method",
+      "module": "tropoi.representation.visual.evaluate",
+      "qualname": "RunFields.recorded",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.evaluate.RunFields.recorded_at_snapshots",
+      "kind": "method",
+      "module": "tropoi.representation.visual.evaluate",
+      "qualname": "RunFields.recorded_at_snapshots",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.evaluate.RunFields.rms_speed",
+      "kind": "method",
+      "module": "tropoi.representation.visual.evaluate",
+      "qualname": "RunFields.rms_speed",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.evaluate.RunFields.run_config",
+      "kind": "property",
+      "module": "tropoi.representation.visual.evaluate",
+      "qualname": "RunFields.run_config",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.evaluate.RunFields.scalar_field",
+      "kind": "method",
+      "module": "tropoi.representation.visual.evaluate",
+      "qualname": "RunFields.scalar_field",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.evaluate.RunFields.sigma_levels",
+      "kind": "property",
+      "module": "tropoi.representation.visual.evaluate",
+      "qualname": "RunFields.sigma_levels",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.evaluate.RunFields.solver",
+      "kind": "property",
+      "module": "tropoi.representation.visual.evaluate",
+      "qualname": "RunFields.solver",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.evaluate.RunFields.spectral_complexity",
+      "kind": "method",
+      "module": "tropoi.representation.visual.evaluate",
+      "qualname": "RunFields.spectral_complexity",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.evaluate.RunFields.state_values",
+      "kind": "method",
+      "module": "tropoi.representation.visual.evaluate",
+      "qualname": "RunFields.state_values",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.evaluate.RunFields.state_weights",
+      "kind": "method",
+      "module": "tropoi.representation.visual.evaluate",
+      "qualname": "RunFields.state_weights",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.evaluate.RunFields.state_wind",
+      "kind": "method",
+      "module": "tropoi.representation.visual.evaluate",
+      "qualname": "RunFields.state_wind",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.evaluate.RunFields.storage",
+      "kind": "property",
+      "module": "tropoi.representation.visual.evaluate",
+      "qualname": "RunFields.storage",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.evaluate.RunFields.times",
+      "kind": "property",
+      "module": "tropoi.representation.visual.evaluate",
+      "qualname": "RunFields.times",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.evaluate.SeriesData",
+      "kind": "class",
+      "module": "tropoi.representation.visual.evaluate",
+      "qualname": "SeriesData",
+      "type": "class"
+    },
+    {
+      "id": "tropoi.representation.visual.evaluate._host",
+      "kind": "function",
+      "module": "tropoi.representation.visual.evaluate",
+      "qualname": "_host",
+      "type": "function"
+    },
+    {
       "id": "tropoi.representation.visual.fields.ScalarGridField",
       "kind": "class",
       "module": "tropoi.representation.visual.fields",
@@ -6140,6 +7390,48 @@
       "kind": "method",
       "module": "tropoi.representation.visual.planet_viewer",
       "qualname": "PlanetViewer.plot_summary",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.quantities.Quantity",
+      "kind": "class",
+      "module": "tropoi.representation.visual.quantities",
+      "qualname": "Quantity",
+      "type": "class"
+    },
+    {
+      "id": "tropoi.representation.visual.quantities.Quantity.__post_init__",
+      "kind": "method",
+      "module": "tropoi.representation.visual.quantities",
+      "qualname": "Quantity.__post_init__",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.quantities.Quantity.check_solver",
+      "kind": "method",
+      "module": "tropoi.representation.visual.quantities",
+      "qualname": "Quantity.check_solver",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.quantities.QuantityUnavailableError",
+      "kind": "class",
+      "module": "tropoi.representation.visual.quantities",
+      "qualname": "QuantityUnavailableError",
+      "type": "class"
+    },
+    {
+      "id": "tropoi.representation.visual.quantities.available_quantities",
+      "kind": "function",
+      "module": "tropoi.representation.visual.quantities",
+      "qualname": "available_quantities",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.quantities.quantity",
+      "kind": "function",
+      "module": "tropoi.representation.visual.quantities",
+      "qualname": "quantity",
       "type": "function"
     },
     {
@@ -6819,6 +8111,118 @@
       "kind": "function",
       "module": "tropoi.representation.visual.timeline",
       "qualname": "select_representative_frame_indices",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.views.Arrows",
+      "kind": "class",
+      "module": "tropoi.representation.visual.views",
+      "qualname": "Arrows",
+      "type": "class"
+    },
+    {
+      "id": "tropoi.representation.visual.views.Complexity",
+      "kind": "class",
+      "module": "tropoi.representation.visual.views",
+      "qualname": "Complexity",
+      "type": "class"
+    },
+    {
+      "id": "tropoi.representation.visual.views.Contours",
+      "kind": "class",
+      "module": "tropoi.representation.visual.views",
+      "qualname": "Contours",
+      "type": "class"
+    },
+    {
+      "id": "tropoi.representation.visual.views.Drift",
+      "kind": "class",
+      "module": "tropoi.representation.visual.views",
+      "qualname": "Drift",
+      "type": "class"
+    },
+    {
+      "id": "tropoi.representation.visual.views.Grid",
+      "kind": "class",
+      "module": "tropoi.representation.visual.views",
+      "qualname": "Grid",
+      "type": "class"
+    },
+    {
+      "id": "tropoi.representation.visual.views.Grid.__post_init__",
+      "kind": "method",
+      "module": "tropoi.representation.visual.views",
+      "qualname": "Grid.__post_init__",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.views.Map",
+      "kind": "class",
+      "module": "tropoi.representation.visual.views",
+      "qualname": "Map",
+      "type": "class"
+    },
+    {
+      "id": "tropoi.representation.visual.views.Map.__post_init__",
+      "kind": "method",
+      "module": "tropoi.representation.visual.views",
+      "qualname": "Map.__post_init__",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.views.Overview",
+      "kind": "class",
+      "module": "tropoi.representation.visual.views",
+      "qualname": "Overview",
+      "type": "class"
+    },
+    {
+      "id": "tropoi.representation.visual.views.Overview.__post_init__",
+      "kind": "method",
+      "module": "tropoi.representation.visual.views",
+      "qualname": "Overview.__post_init__",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.views.Sigma",
+      "kind": "class",
+      "module": "tropoi.representation.visual.views",
+      "qualname": "Sigma",
+      "type": "class"
+    },
+    {
+      "id": "tropoi.representation.visual.views.Sigma.__post_init__",
+      "kind": "method",
+      "module": "tropoi.representation.visual.views",
+      "qualname": "Sigma.__post_init__",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.views.Streamlines",
+      "kind": "class",
+      "module": "tropoi.representation.visual.views",
+      "qualname": "Streamlines",
+      "type": "class"
+    },
+    {
+      "id": "tropoi.representation.visual.views.Style",
+      "kind": "class",
+      "module": "tropoi.representation.visual.views",
+      "qualname": "Style",
+      "type": "class"
+    },
+    {
+      "id": "tropoi.representation.visual.views.describe",
+      "kind": "function",
+      "module": "tropoi.representation.visual.views",
+      "qualname": "describe",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.views.parse_time",
+      "kind": "function",
+      "module": "tropoi.representation.visual.views",
+      "qualname": "parse_time",
       "type": "function"
     },
     {
@@ -9335,6 +10739,20 @@
       "type": "function"
     },
     {
+      "id": "tropoi.temporal.simulation.Simulation.plot",
+      "kind": "method",
+      "module": "tropoi.temporal.simulation",
+      "qualname": "Simulation.plot",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.temporal.simulation.Simulation.quantities",
+      "kind": "method",
+      "module": "tropoi.temporal.simulation",
+      "qualname": "Simulation.quantities",
+      "type": "function"
+    },
+    {
       "id": "tropoi.temporal.simulation.Simulation.snapshot",
       "kind": "method",
       "module": "tropoi.temporal.simulation",
@@ -9468,10 +10886,24 @@
       "type": "function"
     },
     {
+      "id": "tropoi.temporal.simulation.SnapshotStorage.plot_simulation",
+      "kind": "method",
+      "module": "tropoi.temporal.simulation",
+      "qualname": "SnapshotStorage.plot_simulation",
+      "type": "function"
+    },
+    {
       "id": "tropoi.temporal.simulation.SnapshotStorage.plot_snapshot",
       "kind": "method",
       "module": "tropoi.temporal.simulation",
       "qualname": "SnapshotStorage.plot_snapshot",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.temporal.simulation.SnapshotStorage.quantities",
+      "kind": "method",
+      "module": "tropoi.temporal.simulation",
+      "qualname": "SnapshotStorage.quantities",
       "type": "function"
     },
     {

@@ -751,6 +751,22 @@
         "function"
       ],
       "source": "tropoi.representation.archive.capsule",
+      "target": "tropoi.representation.visual.compose"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.representation.archive.capsule",
+      "target": "tropoi.representation.visual.quantities"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.representation.archive.capsule",
       "target": "tropoi.representation.visual.snapshot"
     },
     {
@@ -880,6 +896,150 @@
       ],
       "source": "tropoi.representation.visual.complex_encoding",
       "target": "tropoi.representation.visual.normalization"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.representation.visual.compose",
+      "target": "tropoi.representation.diagnostics.spectral"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.representation.visual.compose",
+      "target": "tropoi.representation.visual.evaluate"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.representation.visual.compose",
+      "target": "tropoi.representation.visual.normalization"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.representation.visual.compose",
+      "target": "tropoi.representation.visual.pe_snapshots"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.representation.visual.compose",
+      "target": "tropoi.representation.visual.quantities"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.representation.visual.compose",
+      "target": "tropoi.representation.visual.renderers"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.representation.visual.compose",
+      "target": "tropoi.representation.visual.specs"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.representation.visual.compose",
+      "target": "tropoi.representation.visual.timeline"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.representation.visual.compose",
+      "target": "tropoi.representation.visual.views"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.representation.visual.compose",
+      "target": "tropoi.spatial.sigma_coordinate"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.representation.visual.evaluate",
+      "target": "tropoi.representation.diagnostics.spectral"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.representation.visual.evaluate",
+      "target": "tropoi.representation.diagnostics.swe"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.representation.visual.evaluate",
+      "target": "tropoi.representation.visual.fields"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.representation.visual.evaluate",
+      "target": "tropoi.representation.visual.grid_adapter"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.representation.visual.evaluate",
+      "target": "tropoi.representation.visual.quantities"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.representation.visual.evaluate",
+      "target": "tropoi.spatial.grids.latlon_grid"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.representation.visual.evaluate",
+      "target": "tropoi.spatial.states.primitive_equations"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.representation.visual.evaluate",
+      "target": "tropoi.temporal.tendencies.shallow_water"
     },
     {
       "kind": "imports",
@@ -2797,6 +2957,40 @@
     {
       "category": "code",
       "dynamic_import_calls": 0,
+      "id": "tropoi.representation.visual.compose",
+      "is_package": false,
+      "path": "tropoi/representation/visual/compose.py",
+      "stdlib_imports": [
+        "__future__",
+        "dataclasses",
+        "hashlib",
+        "json",
+        "math",
+        "pathlib"
+      ],
+      "third_party_imports": [
+        "numpy"
+      ]
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.representation.visual.evaluate",
+      "is_package": false,
+      "path": "tropoi/representation/visual/evaluate.py",
+      "stdlib_imports": [
+        "__future__",
+        "dataclasses",
+        "pathlib"
+      ],
+      "third_party_imports": [
+        "cupy",
+        "numpy"
+      ]
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
       "id": "tropoi.representation.visual.fields",
       "is_package": false,
       "path": "tropoi/representation/visual/fields.py",
@@ -2919,6 +3113,18 @@
     {
       "category": "code",
       "dynamic_import_calls": 0,
+      "id": "tropoi.representation.visual.quantities",
+      "is_package": false,
+      "path": "tropoi/representation/visual/quantities.py",
+      "stdlib_imports": [
+        "__future__",
+        "dataclasses"
+      ],
+      "third_party_imports": []
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
       "id": "tropoi.representation.visual.renderers",
       "is_package": false,
       "path": "tropoi/representation/visual/renderers.py",
@@ -2997,6 +3203,19 @@
       "third_party_imports": [
         "numpy"
       ]
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.representation.visual.views",
+      "is_package": false,
+      "path": "tropoi/representation/visual/views.py",
+      "stdlib_imports": [
+        "__future__",
+        "dataclasses",
+        "re"
+      ],
+      "third_party_imports": []
     },
     {
       "category": "code",

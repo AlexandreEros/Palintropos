@@ -2,6 +2,44 @@
 %% All classes defined in package tropoi.representation.visual.
 classDiagram
     direction LR
+    class c_tropoi_orepresentation_ovisual_oevaluate_oDisplayVectors["DisplayVectors (representation.visual.evaluate)"]
+    class c_tropoi_orepresentation_ovisual_oevaluate_oRunFields["RunFields (representation.visual.evaluate)"]
+    c_tropoi_orepresentation_ovisual_oevaluate_oRunFields : +#95;#95;init#95;#95;()
+    c_tropoi_orepresentation_ovisual_oevaluate_oRunFields : +#95;check()
+    c_tropoi_orepresentation_ovisual_oevaluate_oRunFields : +#95;display()
+    c_tropoi_orepresentation_ovisual_oevaluate_oRunFields : +#95;energy#95;modes()
+    c_tropoi_orepresentation_ovisual_oevaluate_oRunFields : +#95;frame()
+    c_tropoi_orepresentation_ovisual_oevaluate_oRunFields : +#95;grid()
+    c_tropoi_orepresentation_ovisual_oevaluate_oRunFields : +#95;inverse#95;laplacian()
+    c_tropoi_orepresentation_ovisual_oevaluate_oRunFields : +#95;model()
+    c_tropoi_orepresentation_ovisual_oevaluate_oRunFields : +#95;resources()
+    c_tropoi_orepresentation_ovisual_oevaluate_oRunFields : +#95;synthesize()
+    c_tropoi_orepresentation_ovisual_oevaluate_oRunFields : +#95;table()
+    c_tropoi_orepresentation_ovisual_oevaluate_oRunFields : +#95;terrain#95;state()
+    c_tropoi_orepresentation_ovisual_oevaluate_oRunFields : +#95;transform()
+    c_tropoi_orepresentation_ovisual_oevaluate_oRunFields : +area#95;mean()
+    c_tropoi_orepresentation_ovisual_oevaluate_oRunFields : +diagnostics#95;path
+    c_tropoi_orepresentation_ovisual_oevaluate_oRunFields : +display#95;is#95;native
+    c_tropoi_orepresentation_ovisual_oevaluate_oRunFields : +display#95;wind()
+    c_tropoi_orepresentation_ovisual_oevaluate_oRunFields : +has#95;terrain
+    c_tropoi_orepresentation_ovisual_oevaluate_oRunFields : +host#95;radius#95;estimate
+    c_tropoi_orepresentation_ovisual_oevaluate_oRunFields : +nlev
+    c_tropoi_orepresentation_ovisual_oevaluate_oRunFields : +potential#95;enstrophy()
+    c_tropoi_orepresentation_ovisual_oevaluate_oRunFields : +radius
+    c_tropoi_orepresentation_ovisual_oevaluate_oRunFields : +recorded()
+    c_tropoi_orepresentation_ovisual_oevaluate_oRunFields : +recorded#95;at#95;snapshots()
+    c_tropoi_orepresentation_ovisual_oevaluate_oRunFields : +rms#95;speed()
+    c_tropoi_orepresentation_ovisual_oevaluate_oRunFields : +run#95;config
+    c_tropoi_orepresentation_ovisual_oevaluate_oRunFields : +scalar#95;field()
+    c_tropoi_orepresentation_ovisual_oevaluate_oRunFields : +sigma#95;levels
+    c_tropoi_orepresentation_ovisual_oevaluate_oRunFields : +solver
+    c_tropoi_orepresentation_ovisual_oevaluate_oRunFields : +spectral#95;complexity()
+    c_tropoi_orepresentation_ovisual_oevaluate_oRunFields : +state#95;values()
+    c_tropoi_orepresentation_ovisual_oevaluate_oRunFields : +state#95;weights()
+    c_tropoi_orepresentation_ovisual_oevaluate_oRunFields : +state#95;wind()
+    c_tropoi_orepresentation_ovisual_oevaluate_oRunFields : +storage
+    c_tropoi_orepresentation_ovisual_oevaluate_oRunFields : +times
+    class c_tropoi_orepresentation_ovisual_oevaluate_oSeriesData["SeriesData (representation.visual.evaluate)"]
     class c_tropoi_orepresentation_ovisual_ofields_oScalarGridField["ScalarGridField (representation.visual.fields)"]
     c_tropoi_orepresentation_ovisual_ofields_oScalarGridField : +#95;#95;post#95;init#95;#95;()
     c_tropoi_orepresentation_ovisual_ofields_oScalarGridField : +select#95;time()
@@ -60,6 +98,11 @@ classDiagram
     c_tropoi_orepresentation_ovisual_oplanet__viewer_oPlanetViewer : +plot#95;coefficient#95;complex#95;visualization()$
     c_tropoi_orepresentation_ovisual_oplanet__viewer_oPlanetViewer : +plot#95;scalar()$
     c_tropoi_orepresentation_ovisual_oplanet__viewer_oPlanetViewer : +plot#95;summary()
+    class c_tropoi_orepresentation_ovisual_oquantities_oQuantity["Quantity (representation.visual.quantities)"]
+    c_tropoi_orepresentation_ovisual_oquantities_oQuantity : +#95;#95;post#95;init#95;#95;()
+    c_tropoi_orepresentation_ovisual_oquantities_oQuantity : +check#95;solver()
+    class c_tropoi_orepresentation_ovisual_oquantities_oQuantityUnavailableError["QuantityUnavailableError (representation.visual.quantities)"]
+    c_tropoi_orepresentation_ovisual_oquantities_oQuantityUnavailableError : external base ValueError
     class c_tropoi_orepresentation_ovisual_orenderers_oRenderer["Renderer (representation.visual.renderers)"]
     c_tropoi_orepresentation_ovisual_orenderers_oRenderer : +render#95;figure()
     c_tropoi_orepresentation_ovisual_orenderers_oRenderer : +render#95;scalar#95;map()
@@ -121,6 +164,20 @@ classDiagram
     c_tropoi_orepresentation_ovisual_otimeline_oFigureTimeline : +resolve#95;normalizations()
     c_tropoi_orepresentation_ovisual_otimeline_oFigureTimeline : +specifications
     c_tropoi_orepresentation_ovisual_otimeline_oFigureTimeline : +times#95;seconds
+    class c_tropoi_orepresentation_ovisual_oviews_oArrows["Arrows (representation.visual.views)"]
+    class c_tropoi_orepresentation_ovisual_oviews_oComplexity["Complexity (representation.visual.views)"]
+    class c_tropoi_orepresentation_ovisual_oviews_oContours["Contours (representation.visual.views)"]
+    class c_tropoi_orepresentation_ovisual_oviews_oDrift["Drift (representation.visual.views)"]
+    class c_tropoi_orepresentation_ovisual_oviews_oGrid["Grid (representation.visual.views)"]
+    c_tropoi_orepresentation_ovisual_oviews_oGrid : +#95;#95;post#95;init#95;#95;()
+    class c_tropoi_orepresentation_ovisual_oviews_oMap["Map (representation.visual.views)"]
+    c_tropoi_orepresentation_ovisual_oviews_oMap : +#95;#95;post#95;init#95;#95;()
+    class c_tropoi_orepresentation_ovisual_oviews_oOverview["Overview (representation.visual.views)"]
+    c_tropoi_orepresentation_ovisual_oviews_oOverview : +#95;#95;post#95;init#95;#95;()
+    class c_tropoi_orepresentation_ovisual_oviews_oSigma["Sigma (representation.visual.views)"]
+    c_tropoi_orepresentation_ovisual_oviews_oSigma : +#95;#95;post#95;init#95;#95;()
+    class c_tropoi_orepresentation_ovisual_oviews_oStreamlines["Streamlines (representation.visual.views)"]
+    class c_tropoi_orepresentation_ovisual_oviews_oStyle["Style (representation.visual.views)"]
     class c_tropoi_orepresentation_ovisual_ovorticity__viewer_oVorticityViewer["VorticityViewer (representation.visual.vorticity_viewer)"]
     c_tropoi_orepresentation_ovisual_ovorticity__viewer_oVorticityViewer : +#95;#95;init#95;#95;()
     c_tropoi_orepresentation_ovisual_ovorticity__viewer_oVorticityViewer : +#95;build#95;summary#95;text()$

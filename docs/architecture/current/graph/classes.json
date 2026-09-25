@@ -132,7 +132,15 @@
         },
         {
           "kind": "method",
+          "name": "plot_simulation"
+        },
+        {
+          "kind": "method",
           "name": "plot_snapshot"
+        },
+        {
+          "kind": "method",
+          "name": "quantities"
         },
         {
           "kind": "property",
@@ -399,6 +407,175 @@
       ],
       "module": "tropoi.representation.diagnostics.swe",
       "qualname": "SWEDiagnosticsRecorder"
+    },
+    {
+      "decorators": [
+        "dataclass(frozen=True)"
+      ],
+      "external_bases": [],
+      "id": "tropoi.representation.visual.evaluate.DisplayVectors",
+      "members": [],
+      "module": "tropoi.representation.visual.evaluate",
+      "qualname": "DisplayVectors"
+    },
+    {
+      "decorators": [],
+      "external_bases": [],
+      "id": "tropoi.representation.visual.evaluate.RunFields",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__init__"
+        },
+        {
+          "kind": "method",
+          "name": "_check"
+        },
+        {
+          "kind": "method",
+          "name": "_display"
+        },
+        {
+          "kind": "method",
+          "name": "_energy_modes"
+        },
+        {
+          "kind": "method",
+          "name": "_frame"
+        },
+        {
+          "kind": "method",
+          "name": "_grid"
+        },
+        {
+          "kind": "method",
+          "name": "_inverse_laplacian"
+        },
+        {
+          "kind": "method",
+          "name": "_model"
+        },
+        {
+          "kind": "method",
+          "name": "_resources"
+        },
+        {
+          "kind": "method",
+          "name": "_synthesize"
+        },
+        {
+          "kind": "method",
+          "name": "_table"
+        },
+        {
+          "kind": "method",
+          "name": "_terrain_state"
+        },
+        {
+          "kind": "method",
+          "name": "_transform"
+        },
+        {
+          "kind": "method",
+          "name": "area_mean"
+        },
+        {
+          "kind": "property",
+          "name": "diagnostics_path"
+        },
+        {
+          "kind": "property",
+          "name": "display_is_native"
+        },
+        {
+          "kind": "method",
+          "name": "display_wind"
+        },
+        {
+          "kind": "property",
+          "name": "has_terrain"
+        },
+        {
+          "kind": "property",
+          "name": "host_radius_estimate"
+        },
+        {
+          "kind": "property",
+          "name": "nlev"
+        },
+        {
+          "kind": "method",
+          "name": "potential_enstrophy"
+        },
+        {
+          "kind": "property",
+          "name": "radius"
+        },
+        {
+          "kind": "method",
+          "name": "recorded"
+        },
+        {
+          "kind": "method",
+          "name": "recorded_at_snapshots"
+        },
+        {
+          "kind": "method",
+          "name": "rms_speed"
+        },
+        {
+          "kind": "property",
+          "name": "run_config"
+        },
+        {
+          "kind": "method",
+          "name": "scalar_field"
+        },
+        {
+          "kind": "property",
+          "name": "sigma_levels"
+        },
+        {
+          "kind": "property",
+          "name": "solver"
+        },
+        {
+          "kind": "method",
+          "name": "spectral_complexity"
+        },
+        {
+          "kind": "method",
+          "name": "state_values"
+        },
+        {
+          "kind": "method",
+          "name": "state_weights"
+        },
+        {
+          "kind": "method",
+          "name": "state_wind"
+        },
+        {
+          "kind": "property",
+          "name": "storage"
+        },
+        {
+          "kind": "property",
+          "name": "times"
+        }
+      ],
+      "module": "tropoi.representation.visual.evaluate",
+      "qualname": "RunFields"
+    },
+    {
+      "decorators": [
+        "dataclass(frozen=True)"
+      ],
+      "external_bases": [],
+      "id": "tropoi.representation.visual.evaluate.SeriesData",
+      "members": [],
+      "module": "tropoi.representation.visual.evaluate",
+      "qualname": "SeriesData"
     },
     {
       "decorators": [
@@ -680,6 +857,35 @@
       ],
       "module": "tropoi.representation.visual.planet_viewer",
       "qualname": "PlanetViewer"
+    },
+    {
+      "decorators": [
+        "dataclass(frozen=True)"
+      ],
+      "external_bases": [],
+      "id": "tropoi.representation.visual.quantities.Quantity",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__post_init__"
+        },
+        {
+          "kind": "method",
+          "name": "check_solver"
+        }
+      ],
+      "module": "tropoi.representation.visual.quantities",
+      "qualname": "Quantity"
+    },
+    {
+      "decorators": [],
+      "external_bases": [
+        "ValueError"
+      ],
+      "id": "tropoi.representation.visual.quantities.QuantityUnavailableError",
+      "members": [],
+      "module": "tropoi.representation.visual.quantities",
+      "qualname": "QuantityUnavailableError"
     },
     {
       "decorators": [
@@ -1054,6 +1260,126 @@
       ],
       "module": "tropoi.representation.visual.timeline",
       "qualname": "FigureTimeline"
+    },
+    {
+      "decorators": [
+        "dataclass(frozen=True)"
+      ],
+      "external_bases": [],
+      "id": "tropoi.representation.visual.views.Arrows",
+      "members": [],
+      "module": "tropoi.representation.visual.views",
+      "qualname": "Arrows"
+    },
+    {
+      "decorators": [
+        "dataclass(frozen=True)"
+      ],
+      "external_bases": [],
+      "id": "tropoi.representation.visual.views.Complexity",
+      "members": [],
+      "module": "tropoi.representation.visual.views",
+      "qualname": "Complexity"
+    },
+    {
+      "decorators": [
+        "dataclass(frozen=True)"
+      ],
+      "external_bases": [],
+      "id": "tropoi.representation.visual.views.Contours",
+      "members": [],
+      "module": "tropoi.representation.visual.views",
+      "qualname": "Contours"
+    },
+    {
+      "decorators": [
+        "dataclass(frozen=True)"
+      ],
+      "external_bases": [],
+      "id": "tropoi.representation.visual.views.Drift",
+      "members": [],
+      "module": "tropoi.representation.visual.views",
+      "qualname": "Drift"
+    },
+    {
+      "decorators": [
+        "dataclass(frozen=True)"
+      ],
+      "external_bases": [],
+      "id": "tropoi.representation.visual.views.Grid",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__post_init__"
+        }
+      ],
+      "module": "tropoi.representation.visual.views",
+      "qualname": "Grid"
+    },
+    {
+      "decorators": [
+        "dataclass(frozen=True)"
+      ],
+      "external_bases": [],
+      "id": "tropoi.representation.visual.views.Map",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__post_init__"
+        }
+      ],
+      "module": "tropoi.representation.visual.views",
+      "qualname": "Map"
+    },
+    {
+      "decorators": [
+        "dataclass(frozen=True)"
+      ],
+      "external_bases": [],
+      "id": "tropoi.representation.visual.views.Overview",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__post_init__"
+        }
+      ],
+      "module": "tropoi.representation.visual.views",
+      "qualname": "Overview"
+    },
+    {
+      "decorators": [
+        "dataclass(frozen=True)"
+      ],
+      "external_bases": [],
+      "id": "tropoi.representation.visual.views.Sigma",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__post_init__"
+        }
+      ],
+      "module": "tropoi.representation.visual.views",
+      "qualname": "Sigma"
+    },
+    {
+      "decorators": [
+        "dataclass(frozen=True)"
+      ],
+      "external_bases": [],
+      "id": "tropoi.representation.visual.views.Streamlines",
+      "members": [],
+      "module": "tropoi.representation.visual.views",
+      "qualname": "Streamlines"
+    },
+    {
+      "decorators": [
+        "dataclass(frozen=True)"
+      ],
+      "external_bases": [],
+      "id": "tropoi.representation.visual.views.Style",
+      "members": [],
+      "module": "tropoi.representation.visual.views",
+      "qualname": "Style"
     },
     {
       "decorators": [],
@@ -2379,6 +2705,14 @@
         },
         {
           "kind": "method",
+          "name": "plot"
+        },
+        {
+          "kind": "method",
+          "name": "quantities"
+        },
+        {
+          "kind": "method",
           "name": "snapshot"
         },
         {
@@ -2469,7 +2803,15 @@
         },
         {
           "kind": "method",
+          "name": "plot_simulation"
+        },
+        {
+          "kind": "method",
           "name": "plot_snapshot"
+        },
+        {
+          "kind": "method",
+          "name": "quantities"
         },
         {
           "kind": "property",

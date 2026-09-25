@@ -53,6 +53,15 @@ class SnapshotStorage(Protocol):
         """Render the stored frame explicitly; may require CUDA."""
         ...
 
+    def plot_simulation(self, output_path, view=None, **options
+                        ) -> pathlib.Path:
+        """Render a view of the saved run explicitly; may require CUDA."""
+        ...
+
+    def quantities(self) -> list[dict]:
+        """What this run can plot (host only, evaluates nothing)."""
+        ...
+
 
 def _normalize_index(index, size: int) -> int:
     if isinstance(index, bool) or not isinstance(index, (int, np.integer)):
@@ -127,17 +136,25 @@ class Snapshot:
             self._metadata = base
         return self._metadata
 
-    def plot(self, output_path, **options) -> pathlib.Path:
-        """Render this snapshot with the existing scientific composition.
+    def plot(self, output_path, view=None, **options) -> pathlib.Path:
+        """Render this snapshot; returns the written image path.
+
+        Without ``view``: the run's own snapshot product, exactly as the
+        runner renders it (options: ``representation``, ``normalization``;
+        see ``tropoi.representation.visual.snapshot``).
+
+        With ``view`` (a ``Map`` or ``Grid`` from
+        ``tropoi.representation.visual.views``): that view at this saved
+        state, e.g. ``Map(None, vectors=Streamlines())`` for streamlines
+        alone (options: ``sidecar``, ``renderer``).
 
         Explicit and lazy: nothing is synthesized or imported until called.
-        Options are forwarded to the storage's renderer (for capsules:
-        ``representation`` and ``normalization``; see
-        ``tropoi.representation.visual.snapshot``). Returns the written
-        image path.
         """
-        return self._storage.plot_snapshot(self._index, output_path,
-                                           **options)
+        if view is None:
+            return self._storage.plot_snapshot(self._index, output_path,
+                                               **options)
+        return self._storage.plot_simulation(output_path, view,
+                                             snapshot=self._index, **options)
 
     def __repr__(self) -> str:
         return (f"Snapshot(solver={self.solver!r}, index={self._index}, "
@@ -175,6 +192,29 @@ class Simulation:
     @property
     def field_names(self) -> tuple[str, ...]:
         return tuple(spec.name for spec in self._storage.field_specs)
+
+    def plot(self, output_path, view=None, **options) -> pathlib.Path:
+        """Render a view of the whole saved run; returns the image path.
+
+        ``view=None`` draws the solver's default overview: one map at up to
+        four saved times with shared scales, static terrain when the run
+        has it, and conservation and spectral-complexity panels. Pass an
+        ``Overview``, ``Map`` or ``Grid`` from
+        ``tropoi.representation.visual.views`` to choose quantities,
+        overlays, times and panels. Options: ``sidecar=True`` also writes
+        every number shown to ``<output>.json``; ``renderer``.
+
+        Explicit and lazy, and never writes inside the run directory.
+        Drawing physical fields rebuilds the run's model once (CUDA).
+        """
+        return self._storage.plot_simulation(output_path, view, **options)
+
+    def quantities(self) -> list[dict]:
+        """What this run can plot: meaning, units, cadence, availability.
+
+        Host only; evaluates nothing and never initializes CUDA.
+        """
+        return self._storage.quantities()
 
     def __len__(self) -> int:
         return int(self._times.shape[0])
