@@ -174,7 +174,55 @@
         "function"
       ],
       "source": "tropoi.cli.main",
+      "target": "tropoi.representation.archive.capsule"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.cli.main",
       "target": "tropoi.representation.archive.schema"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.cli.main",
+      "target": "tropoi.representation.visual.compose"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.cli.main",
+      "target": "tropoi.representation.visual.evaluate"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.cli.main",
+      "target": "tropoi.representation.visual.quantities"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.cli.main",
+      "target": "tropoi.representation.visual.snapshot"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.cli.main",
+      "target": "tropoi.representation.visual.views"
     },
     {
       "kind": "imports",
@@ -2499,6 +2547,7 @@
       "stdlib_imports": [
         "__future__",
         "argparse",
+        "dataclasses",
         "json",
         "pathlib",
         "sys",

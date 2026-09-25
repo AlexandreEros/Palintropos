@@ -2,13 +2,13 @@
   "edges": [
     {
       "kind": "imports",
-      "module_edges": 10,
+      "module_edges": 11,
       "source": "tropoi.cli",
       "target": "tropoi.representation.archive"
     },
     {
       "kind": "imports",
-      "module_edges": 1,
+      "module_edges": 6,
       "source": "tropoi.cli",
       "target": "tropoi.representation.visual"
     },

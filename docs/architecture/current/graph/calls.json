@@ -187,6 +187,41 @@
     },
     {
       "kind": "call",
+      "source": "tropoi.cli.main._cmd_plot",
+      "target": "tropoi.cli.main._error"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.cli.main._cmd_plot",
+      "target": "tropoi.cli.main._plot_view"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.cli.main._cmd_plot",
+      "target": "tropoi.cli.main._print_quantities"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.cli.main._cmd_plot",
+      "target": "tropoi.cli.main._resolve_inspect_target"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.cli.main._cmd_plot",
+      "target": "tropoi.representation.archive.capsule.open_simulation"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.cli.main._cmd_plot",
+      "target": "tropoi.representation.visual.compose.resolve_snapshots"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.cli.main._cmd_plot",
+      "target": "tropoi.representation.visual.evaluate.RunFields"
+    },
+    {
+      "kind": "call",
       "source": "tropoi.cli.main._cmd_recompile",
       "target": "tropoi.cli.clear_cache.run"
     },
@@ -234,6 +269,56 @@
       "kind": "call",
       "source": "tropoi.cli.main._inspect_snapshot",
       "target": "tropoi.representation.archive.capsule.open_simulation"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.cli.main._parse_contours",
+      "target": "tropoi.representation.visual.views.Contours"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.cli.main._plot_view",
+      "target": "tropoi.cli.main._parse_contours"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.cli.main._plot_view",
+      "target": "tropoi.cli.main._parse_selection"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.cli.main._plot_view",
+      "target": "tropoi.representation.visual.compose.default_view"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.cli.main._plot_view",
+      "target": "tropoi.representation.visual.evaluate.RunFields"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.cli.main._plot_view",
+      "target": "tropoi.representation.visual.views.Arrows"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.cli.main._plot_view",
+      "target": "tropoi.representation.visual.views.Map"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.cli.main._plot_view",
+      "target": "tropoi.representation.visual.views.Overview"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.cli.main._plot_view",
+      "target": "tropoi.representation.visual.views.Sigma"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.cli.main._plot_view",
+      "target": "tropoi.representation.visual.views.Streamlines"
     },
     {
       "kind": "call",
@@ -5219,6 +5304,13 @@
       "type": "function"
     },
     {
+      "id": "tropoi.cli.main._cmd_plot",
+      "kind": "function",
+      "module": "tropoi.cli.main",
+      "qualname": "_cmd_plot",
+      "type": "function"
+    },
+    {
       "id": "tropoi.cli.main._cmd_recompile",
       "kind": "function",
       "module": "tropoi.cli.main",
@@ -5268,10 +5360,38 @@
       "type": "function"
     },
     {
+      "id": "tropoi.cli.main._parse_contours",
+      "kind": "function",
+      "module": "tropoi.cli.main",
+      "qualname": "_parse_contours",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.cli.main._parse_selection",
+      "kind": "function",
+      "module": "tropoi.cli.main",
+      "qualname": "_parse_selection",
+      "type": "function"
+    },
+    {
       "id": "tropoi.cli.main._parse_sigma_interfaces",
       "kind": "function",
       "module": "tropoi.cli.main",
       "qualname": "_parse_sigma_interfaces",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.cli.main._plot_view",
+      "kind": "function",
+      "module": "tropoi.cli.main",
+      "qualname": "_plot_view",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.cli.main._print_quantities",
+      "kind": "function",
+      "module": "tropoi.cli.main",
+      "qualname": "_print_quantities",
       "type": "function"
     },
     {

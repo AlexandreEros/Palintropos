@@ -8,6 +8,7 @@ Command tree::
     tropoi list presets         named run configurations
     tropoi list scenarios       initial-condition scenarios
     tropoi inspect RUN_PATH     summarize a finished run from its manifest
+    tropoi plot RUN_PATH        draw a saved run (maps, overlays, diagnostics)
     tropoi gen [...]            demo planet + summary plot (psx-gen)
     tropoi recompile [...]      clear/verify the CuPy kernel cache (psx-recompile)
 
@@ -21,7 +22,8 @@ points and delegate to the same implementations.
 
 Design rules for this module:
 
-- Import-light: parsing, ``--help``, ``list``, and ``inspect`` must never
+- Import-light: parsing, ``--help``, ``list``, ``inspect`` and
+  ``plot --list-quantities`` must never
   import CuPy, matplotlib, Planet, the runner, or visualization modules.
   Heavy imports happen inside command handlers, after validation.
 - Every run-bve option parses with a ``None`` default so that explicit
@@ -921,6 +923,176 @@ def _inspect_snapshot(run_dir, index: int, field_name) -> int:
 # gen / recompile
 # ---------------------------------------------------------------------------
 
+# ---------------------------------------------------------------------------
+# plot
+# ---------------------------------------------------------------------------
+
+_PLOT_EXAMPLES = """\
+examples:
+  tropoi plot runs                                   default overview of the latest run
+  tropoi plot RUN --list-quantities                  what this run can draw (no GPU)
+  tropoi plot RUN --map vorticity                    vorticity + streamlines at up to 4 times
+  tropoi plot RUN --at -1 --map none                 streamlines alone, last saved state
+  tropoi plot RUN --at 5d --map wind_speed --vectors arrows
+  tropoi plot RUN --map free_surface_height --contours terrain:500,1000,1500
+  tropoi plot RUN --map temperature_anomaly --sigma 0.75 --snapshots 0,-1
+"""
+
+
+def _parse_selection(text: str) -> tuple:
+    items = []
+    for part in text.split(","):
+        part = part.strip()
+        if not part:
+            continue
+        try:
+            items.append(int(part))
+        except ValueError:
+            items.append(part)
+    return tuple(items)
+
+
+def _parse_contours(texts) -> tuple:
+    from tropoi.representation.visual.views import Contours
+    contours = []
+    for text in texts or ():
+        name, _, levels = text.partition(":")
+        if not levels:
+            raise ValueError(
+                f"--contours {text!r}: give explicit levels, e.g. "
+                "terrain:500,1000,1500")
+        contours.append(Contours(name.strip(), tuple(
+            float(level) for level in levels.split(","))))
+    return tuple(contours)
+
+
+def _plot_view(args, storage):
+    """The view the options describe (host only; evaluates nothing)."""
+    from dataclasses import replace
+
+    from tropoi.representation.visual.compose import default_view
+    from tropoi.representation.visual.evaluate import RunFields
+    from tropoi.representation.visual.views import (
+        Arrows, Map, Overview, Sigma, Streamlines)
+
+    customised = any(value is not None for value in (
+        args.map, args.contours, args.vectors, args.level, args.sigma,
+        args.limits, args.cmap))
+    default = default_view(RunFields(storage))
+    if customised:
+        base = default.map
+        background = base.background if args.map is None else (
+            None if args.map == "none" else args.map)
+        vectors = {"streamlines": Streamlines(), "arrows": Arrows(),
+                   "none": None, None: base.vectors}[args.vectors]
+        level = base.level
+        if args.level is not None:
+            level = args.level
+        elif args.sigma is not None:
+            level = Sigma(args.sigma)
+        contours = (base.contours if args.contours is None
+                    else _parse_contours(args.contours))
+        if args.map is not None and args.contours is None:
+            # A different background keeps terrain outlines only.
+            contours = tuple(c for c in base.contours
+                             if c.quantity == "terrain")
+        limits = None
+        if args.limits is not None:
+            low, high = (float(v) for v in args.limits.split(","))
+            limits = (low, high)
+        map_view = Map(background, level=level, contours=contours,
+                       vectors=vectors, color_policy=args.cmap,
+                       limits=limits)
+    else:
+        map_view = default.map
+    if args.at is not None:
+        return map_view, _parse_selection(args.at)[0]
+    overview = Overview(map=map_view)
+    if args.snapshots is not None:
+        overview = replace(overview, snapshots=_parse_selection(
+            args.snapshots))
+    if args.max_maps is not None:
+        overview = replace(overview, max_maps=args.max_maps)
+    if args.no_static:
+        overview = replace(overview, static=None)
+    if args.no_diagnostics:
+        overview = replace(overview, diagnostics=())
+    return overview, None
+
+
+def _print_quantities(rows) -> None:
+    derived = [row for row in rows if row["kind"] != "recorded"]
+    recorded = [row for row in rows if row["kind"] == "recorded"]
+    print(f"  {'quantity':<26}{'units':<11}{'kind':<12}{'needs':<6}"
+          f"{'levels':<8}available")
+    for row in derived:
+        mark = "yes" if row["available"] else f"no ({row['note']})"
+        print(f"  {row['id']:<26}{row['units']:<11}{row['kind']:<12}"
+              f"{row['needs']:<6}{'per σ' if row['levels'] else '':<8}{mark}")
+    if recorded:
+        state = ("recorded every step in diagnostics/timeseries.csv"
+                 if recorded[0]["available"] else recorded[0]["note"])
+        print(f"\n  per-step columns ({state}):")
+        for row in recorded:
+            print(f"  {row['id']:<26}{row['long_name']}")
+
+
+def _cmd_plot(args: argparse.Namespace) -> int:
+    import pathlib
+
+    if args.at is not None and args.snapshots is not None:
+        return _error("--at draws one saved state; --snapshots selects the "
+                      "times of an overview. Use one of them.")
+    if args.level is not None and args.sigma is not None:
+        return _error("use --level or --sigma, not both")
+    run_dir, note = _resolve_inspect_target(args.run_path)
+    if run_dir is None:
+        return _error(
+            f"no run found under: {args.run_path} (expected a run directory, "
+            "an experiment directory, or a base directory with latest_run.txt)")
+    from tropoi.representation.archive import open_simulation
+    from tropoi.representation.archive.capsule import CapsuleError
+    try:
+        sim = open_simulation(run_dir)
+    except (CapsuleError, ValueError) as err:
+        return _error(f"cannot open {run_dir}: {err}")
+    if note:
+        print(note)
+    if args.list_quantities:
+        print(f"Run directory: {run_dir}  ({sim.solver.upper()}, "
+              f"{len(sim)} saved states)")
+        _print_quantities(sim.quantities())
+        return 0
+
+    from tropoi.representation.visual.quantities import (
+        QuantityUnavailableError)
+    from tropoi.representation.visual.snapshot import PlotUnavailableError
+    try:
+        view, at = _plot_view(args, sim.storage)
+        output = args.output
+        if output is None:
+            run_id = sim.metadata.get("run_id") or run_dir.name
+            suffix = "overview" if at is None else f"at-{args.at}"
+            output = pathlib.Path.cwd() / f"{run_id}-{suffix}.png"
+        if at is None:
+            written = sim.plot(output, view, sidecar=args.sidecar)
+        else:
+            index = at
+            if isinstance(at, str):
+                from tropoi.representation.visual.compose import (
+                    resolve_snapshots)
+                from tropoi.representation.visual.evaluate import RunFields
+                (index,) = resolve_snapshots(RunFields(sim.storage), (at,), 1)
+            written = sim[index].plot(output, view, sidecar=args.sidecar)
+    except (QuantityUnavailableError, PlotUnavailableError, IndexError,
+            ValueError) as err:
+        return _error(str(err))
+    print(f"Wrote {written}")
+    if args.sidecar:
+        print(f"Wrote {pathlib.Path(written).with_suffix('.json')}")
+    return 0
+
+
 def _cmd_gen(args: argparse.Namespace) -> int:
     return generate_planet.run(args)
 
@@ -1028,6 +1200,78 @@ def build_parser() -> argparse.ArgumentParser:
              "stored field (e.g. zeta, delta, phi, temperature, ln_ps). "
              "The field must belong to the run's solver.")
     inspect_parser.set_defaults(_handler=_cmd_inspect)
+
+    # tropoi plot RUN_PATH
+    plot_parser = commands.add_parser(
+        "plot", help="Draw a saved run: maps, overlays and diagnostics.",
+        description="Draw a saved run without modifying it. Without map "
+                    "options this is the solver's default overview: one map "
+                    "at up to four saved times with shared scales, static "
+                    "terrain when present, and conservation and "
+                    "spectral-complexity panels. Maps need CUDA (the run's "
+                    "model is rebuilt once); --list-quantities does not.",
+        epilog=_PLOT_EXAMPLES,
+        formatter_class=argparse.RawDescriptionHelpFormatter)
+    plot_parser.add_argument(
+        "run_path",
+        help="A run directory, an experiment directory, or a base directory "
+             "containing latest_run.txt (e.g. 'runs').")
+    plot_parser.add_argument(
+        "-o", "--output", default=None, metavar="PATH",
+        help="Image to write (PNG) [default: <run-id>-overview.png in the "
+             "current directory]. Never inside the run directory.")
+    plot_parser.add_argument(
+        "--list-quantities", action="store_true",
+        help="List what this run can draw (meaning, units, cadence, whether "
+             "CUDA is needed) and exit. Never initializes CUDA.")
+    plot_parser.add_argument(
+        "--map", default=None, metavar="QUANTITY",
+        help="Filled quantity of every map, or 'none' for vectors alone "
+             "(e.g. vorticity, free_surface_height, temperature_anomaly).")
+    plot_parser.add_argument(
+        "--contours", action="append", default=None, metavar="Q:LEVELS",
+        help="Contour lines at explicit levels, e.g. terrain:500,1000,1500 "
+             "(repeatable).")
+    plot_parser.add_argument(
+        "--vectors", choices=("streamlines", "arrows", "none"), default=None,
+        help="Wind overlay [default: streamlines]. Streamlines are "
+             "instantaneous, not particle trajectories.")
+    level = plot_parser.add_mutually_exclusive_group()
+    level.add_argument(
+        "--level", type=int, default=None, metavar="K",
+        help="PE full level, 0-based from the top.")
+    level.add_argument(
+        "--sigma", type=float, default=None, metavar="S",
+        help="PE: the full level with sigma nearest S (sigma = p/p_s; not "
+             "pressure or height).")
+    plot_parser.add_argument(
+        "--limits", default=None, metavar="LOW,HIGH",
+        help="Fixed colour range for the filled quantity.")
+    plot_parser.add_argument(
+        "--cmap", default=None, metavar="NAME",
+        help="Matplotlib colour map (optionally NAME:LOW:HIGH to use part "
+             "of it).")
+    when = plot_parser.add_mutually_exclusive_group()
+    when.add_argument(
+        "--snapshots", default=None, metavar="LIST",
+        help="Overview times: saved indices or exact saved times, e.g. "
+             "0,-1 or 0d,5d,10d. Runs are never interpolated in time.")
+    when.add_argument(
+        "--at", default=None, metavar="SNAPSHOT",
+        help="Draw one map at this saved index or exact time (e.g. -1, 5d).")
+    plot_parser.add_argument(
+        "--max-maps", type=int, default=None, metavar="N",
+        help="Overview: at most N maps spread evenly in time [default: 4].")
+    plot_parser.add_argument(
+        "--no-static", action="store_true",
+        help="Overview: omit the static terrain map.")
+    plot_parser.add_argument(
+        "--no-diagnostics", action="store_true",
+        help="Overview: omit the conservation and complexity panels.")
+    plot_parser.add_argument(
+        "--sidecar", action="store_true",
+        help="Also write every number the figure shows to <output>.json.")
+    plot_parser.set_defaults(_handler=_cmd_plot)
 
     # tropoi gen
     gen_parser = commands.add_parser(
