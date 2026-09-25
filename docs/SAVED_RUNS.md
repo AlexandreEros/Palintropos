@@ -16,12 +16,14 @@ snapshot.time                            # seconds
 snapshot.metadata                        # schema, units, environment, provenance, run config
 snapshot.state["temperature"].coeffs     # PE host view, shape (nlev, l_max+1, l_max+1)
 snapshot.plot(output_path=path)          # explicit, lazy; returns pathlib.Path
+sim.plot(path)                           # overview of the whole run (see "Drawing views")
 ```
 
 The same information is available from the shell without Python:
 
 ```bash
 tropoi inspect RUN_PATH --snapshot 137 --field temperature
+tropoi plot RUN_PATH                     # the overview; --list-quantities needs no GPU
 ```
 
 ## What a snapshot exposes
@@ -102,8 +104,9 @@ array read-only, so its cost does not scale with the total payload
 (`open_simulation(path, mmap=False)` loads it into host memory instead,
 still read-only).
 
-`snapshot.plot(...)` is the only operation that may need a GPU, and it
-imports what it needs on the call:
+`snapshot.plot(...)` and `sim.plot(...)` are the only operations that may
+need a GPU, and they import what they need on the call. Without a view,
+`snapshot.plot` needs:
 
 | Representation | BVE | SWE | PE |
 | --- | --- | --- | --- |
@@ -122,9 +125,10 @@ sigma grid) are reconstructed once per opened capsule from its persisted
 configuration through the solver modules' own builders, then shared by every
 snapshot, representation, and field; they are never built per field.
 
-## Plotting: what is rendered and how it is normalized
+## Plotting the run's own snapshot figure
 
-`snapshot.plot` reuses the existing per-core figure builders and the
+Without a view, `snapshot.plot` reuses the existing per-core figure builders
+and the
 existing atomic PNG renderer; no second renderer exists. The image is the
 frame the run's `snapshots/<representation>/` product would contain for that
 time: same panels, interpolation, palettes, and layout.
@@ -140,6 +144,82 @@ time: same panels, interpolation, palettes, and layout.
 The PNG metadata records `Representation` and `Normalization`, so an image's
 provenance is inspectable after the fact.
 
+## Drawing views: `Simulation.plot` and `tropoi plot`
+
+`sim.plot(path, view=None)` draws a view of the whole run, and
+`snapshot.plot(path, view)` draws one at a single saved state. The same
+views are available from the shell as `tropoi plot RUN_PATH` (see
+`tropoi plot --help`). A view says what to draw and holds no data:
+
+```python
+from tropoi.representation.visual.views import (
+    Complexity, Contours, Drift, Grid, Map, Overview, Sigma, Streamlines)
+
+sim.plot("overview.png")                                  # solver default
+sim.plot("h.png", Overview(map=Map("free_surface_height",
+                                   contours=(Contours("terrain", (500.0, 1000.0)),),
+                                   vectors=Streamlines()),
+                           snapshots=(0, "5d", -1)))
+sim[-1].plot("flow.png", Map(None, vectors=Streamlines()))   # streamlines alone
+sim[2].plot("grid.png", Grid(((Map("vorticity"), Map("divergence")),
+                              (Drift(("total_energy",)), Complexity()))))
+sim.plot("pe.png", Overview(map=Map("temperature_anomaly", level=Sigma(0.75),
+                                    vectors=Streamlines())))
+```
+
+- **Default overviews.** BVE: vorticity with streamlines. SWE: free-surface
+  height with streamlines, plus terrain contours and a static terrain map when
+  the run has terrain. PE: temperature anomaly with streamlines at the full
+  level nearest σ = 0.75. Each overview adds a conservation panel (per-step
+  columns of `diagnostics/timeseries.csv`, and for SWE the potential
+  enstrophy at the saved states) and a kinetic-energy spectral-complexity
+  panel. Parts a run cannot provide are omitted from a default and listed in
+  the sidecar. The same parts requested explicitly raise
+  `QuantityUnavailableError` with the reason.
+- **Quantities.** `sim.quantities()` (or `tropoi plot RUN --list-quantities`)
+  lists each quantity's meaning, units, kind (prognostic, derived, static,
+  recorded), cadence, and whether it needs CUDA, with the reason when this run
+  cannot provide it. For example, BVE has no divergence or velocity potential:
+  both are identically zero by construction. This listing never imports CuPy
+  or Matplotlib. In SWE and PE the streamfunction is the rotational part of
+  the flow only; `wind` is the full flow.
+- **Levels.** PE maps take `level=K` (0-based from the top) or `Sigma(s)`, the
+  full level nearest `s`. Labels always show the level's actual σ = p/p_s,
+  never pressure or height.
+- **Shared scales.** The maps of an overview share one colour scale, and their
+  winds share one speed scale. A single colour key and a single line-width key
+  show exactly those scales. Grid panels each have their own.
+- **Where numbers come from.** Fields are evaluated once per (quantity, saved
+  state, level) through the run's model, which is built once per opened
+  capsule. Statistics (ranges, area means, peak speeds, potential enstrophy)
+  are computed on the state grid with its quadrature weights. Gauss-grid runs
+  are drawn on their own samples with no interpolation. Geodesic runs are
+  interpolated onto the shared 91 × 181 view grid for drawing only.
+- **Cadence.** Per-step columns are drawn as lines. Values that exist only at
+  saved states (potential enstrophy, spectral complexity) are drawn as
+  unconnected markers, and their labels say so. Snapshot times are matched to
+  CSV rows exactly, and never by nearest time.
+- **Rest.** Winds whose largest speed (or, for the spectrum, whose rms speed)
+  is below 1e-9 m/s are treated as rest. They are not drawn, and no
+  kinetic-energy distribution is reported for them: a state at rest carries
+  roundoff of about 1e-15 m/s, whose "spectrum" means nothing. Fields that are
+  identically zero are labelled as such.
+- **Streamlines** are instantaneous curves tangent to one saved wind; they are
+  not particle trajectories, which sparse saved states cannot provide. On the
+  map, the direction of motion is (u / cos φ, v), for streamlines and arrows
+  alike.
+- **Provenance.** PNG metadata records the run id, solver, commit, the
+  SHA-256 of the coefficient file and of `diagnostics/timeseries.csv`, and the
+  full view. With `sidecar=True` (or `--sidecar`), every number shown is also
+  written to `<output>.json`. Plotting refuses to write inside the run
+  directory.
+
+Figures meant to stay fixed should spell out every field of every view
+object, as the README figure's recipe does
+(`docs/figures/williamson5_t63_overview.py`, enforced by
+`tests/test_readme_figure_recipe.py`), so that a later change of a default
+cannot alter them silently.
+
 ## Where the implementation lives
 
 The interface follows the package's spatial / temporal / representation
@@ -152,7 +232,13 @@ layout ([ARCHITECTURE.md](ARCHITECTURE.md), "Package layout"):
 | run ids, run directories, manifests (the writer) | `tropoi.representation.archive.writer` | CPU |
 | `Simulation`, `Snapshot`, the `SnapshotStorage` protocol | `tropoi.temporal.simulation` | CPU |
 | `FieldSpec`, `SpectralModes`, `SpectralState` host views | `tropoi.spatial.modes` | CPU |
-| `Snapshot.plot` adapter | `tropoi.representation.visual.snapshot` | per the table above |
+| `Snapshot.plot` adapter (no view) | `tropoi.representation.visual.snapshot` | per the table above |
+| view objects | `tropoi.representation.visual.views` | CPU |
+| quantity catalogue | `tropoi.representation.visual.quantities` | CPU |
+| field evaluation and caching | `tropoi.representation.visual.evaluate` | CUDA for fields |
+| view composition, `render_view` | `tropoi.representation.visual.compose` | CUDA for fields |
+| layered maps, keys, renderer | `tropoi.representation.visual.{specs,timeline,matplotlib_renderer}` | CPU |
+| kinetic-energy spectral complexity | `tropoi.representation.diagnostics.spectral` | CPU |
 | per-core figure compositions | `tropoi.representation.visual.{bve,swe,pe_snapshots}` | per the table above |
 | model resources a physical plot rebuilds | `tropoi.spatial` (planet, grids, transforms, terrain, sigma grid), via the CLI solver modules' builders | CUDA |
 
@@ -169,5 +255,9 @@ aliases.
 
 No interpolation in time (`sim[i]` is a saved output index, never a time),
 no arbitrary initial conditions, no temporal spectra, no restart
-checkpoints, no codecs, and no new plotting framework. Diagnostic time
-series remain in `diagnostics/timeseries.csv` with their documented meanings.
+checkpoints, and no codecs. Plotting draws horizontal maps and diagnostic
+series only: no particle trajectories, and no vertical profiles or sections,
+zonal means, or interpolation to pressure or height yet. These would be new
+samplings of the same per-level state-grid fields in
+`tropoi.representation.visual.evaluate`. Diagnostic time series remain in
+`diagnostics/timeseries.csv` with their documented meanings.

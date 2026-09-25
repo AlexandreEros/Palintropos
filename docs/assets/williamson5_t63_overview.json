@@ -1,0 +1,246 @@
+{
+  "drift": {
+    "potential_enstrophy": {
+      "cadence": "saved states",
+      "relative_drift": [
+        0.0,
+        4.9083928921334063e-08,
+        -1.4580485065973647e-06,
+        -8.521384259219111e-06
+      ],
+      "values": [
+        367.5003275942018,
+        367.50034563256173,
+        367.49979176089795,
+        367.49719598269496
+      ]
+    },
+    "total_energy": {
+      "cadence": "every step",
+      "relative_drift_at_saved_states": [
+        0.0,
+        -4.848421331082875e-09,
+        -1.8109130339727386e-07,
+        -7.920610254341653e-07
+      ],
+      "saved_states_without_exact_row": []
+    },
+    "total_mass": {
+      "cadence": "every step",
+      "relative_drift_at_saved_states": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "saved_states_without_exact_row": []
+    }
+  },
+  "level": null,
+  "map_titles": [
+    "day 0",
+    "day 5",
+    "day 10",
+    "day 15"
+  ],
+  "maps": [
+    {
+      "free_surface_height": {
+        "area_mean": 5637.356958338992,
+        "max": 5959.747618951652,
+        "min": 4992.663749758608,
+        "units": "m"
+      },
+      "index": 0,
+      "time_s": 0.0,
+      "wind_speed": {
+        "area_mean": 15.707972434417075,
+        "max": 19.99735050027479,
+        "units": "m s^-1"
+      }
+    },
+    {
+      "free_surface_height": {
+        "area_mean": 5637.356958338992,
+        "max": 5973.552308883299,
+        "min": 4992.239669020999,
+        "units": "m"
+      },
+      "index": 1,
+      "time_s": 432000.0,
+      "wind_speed": {
+        "area_mean": 15.614905794491994,
+        "max": 38.92059250610899,
+        "units": "m s^-1"
+      }
+    },
+    {
+      "free_surface_height": {
+        "area_mean": 5637.356958338992,
+        "max": 5974.166255174521,
+        "min": 5009.862925133911,
+        "units": "m"
+      },
+      "index": 2,
+      "time_s": 864000.0,
+      "wind_speed": {
+        "area_mean": 15.646342857486786,
+        "max": 42.35276716243412,
+        "units": "m s^-1"
+      }
+    },
+    {
+      "free_surface_height": {
+        "area_mean": 5637.356958338993,
+        "max": 5953.901688624805,
+        "min": 5031.3936139315565,
+        "units": "m"
+      },
+      "index": 3,
+      "time_s": 1296000.0,
+      "wind_speed": {
+        "area_mean": 15.98535937055596,
+        "max": 40.34719936292083,
+        "units": "m s^-1"
+      }
+    }
+  ],
+  "omitted": [],
+  "run": {
+    "coefficients_sha256": "dd28eff96795c93d8b15b199be8d3494838ecd763ffa2808b13bb951b60fb1a7",
+    "diagnostics_sha256": "3d8c8cb422c46b09876ac8874d526c0b70018ccfdabce3aded6a40a0111f272b",
+    "git": {
+      "branch": "HEAD",
+      "commit": "668e6c9a5735b2d7200dcc121eb0f7c40450ae08",
+      "dirty": false
+    },
+    "run_id": "20260730T011700Z_williamson5_rot23p93h_r4_l63_dt120h_45406d82_668e6c9a",
+    "solver": "swe"
+  },
+  "spectral_complexity": {
+    "cadence": "saved states",
+    "effective_modes": [
+      1.0,
+      1.8866285054484508,
+      3.0417925171371603,
+      4.418275370120114
+    ],
+    "entropy": [
+      0.0,
+      0.6347913765483102,
+      1.1124469854416519,
+      1.4857494321909266
+    ],
+    "level": null,
+    "mean_degree": [
+      1.0,
+      1.5626321130924579,
+      2.1486875097154763,
+      2.6627801773402773
+    ],
+    "mean_order": [
+      0.0,
+      0.466835657732003,
+      0.8838788241232031,
+      1.2075110730250476
+    ],
+    "times_s": [
+      0.0,
+      432000.0,
+      864000.0,
+      1296000.0
+    ],
+    "undefined_at_s": []
+  },
+  "synthesis_count": 12,
+  "view": {
+    "diagnostics": [
+      {
+        "at_snapshots": [
+          "potential_enstrophy"
+        ],
+        "linear_threshold": 1e-09,
+        "recorded": [
+          "total_mass",
+          "total_energy"
+        ],
+        "type": "Drift"
+      },
+      {
+        "level": null,
+        "measures": [
+          "mean_degree",
+          "mean_order",
+          "effective_modes"
+        ],
+        "type": "Complexity"
+      }
+    ],
+    "map": {
+      "background": "free_surface_height",
+      "color_policy": "cividis:0.35:1.0",
+      "contours": [
+        {
+          "color": "#3b3b3b",
+          "levels": [
+            500.0,
+            1000.0,
+            1500.0
+          ],
+          "line_style": "solid",
+          "line_width": 0.6,
+          "quantity": "terrain",
+          "type": "Contours"
+        }
+      ],
+      "level": null,
+      "limits": null,
+      "symmetric": false,
+      "type": "Map",
+      "vectors": {
+        "arrow_size": 0.7,
+        "color": "black",
+        "color_by": null,
+        "density": 1.0,
+        "line_width_range": [
+          0.25,
+          1.6
+        ],
+        "max_length": 0.35,
+        "seed_count": 220,
+        "type": "Streamlines",
+        "vector": "wind",
+        "width_by": "speed"
+      }
+    },
+    "max_maps": 4,
+    "snapshots": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "static": {
+      "background": "terrain",
+      "color_policy": "YlOrBr:0.0:0.85",
+      "contours": [],
+      "level": null,
+      "limits": null,
+      "symmetric": false,
+      "type": "Map",
+      "vectors": null
+    },
+    "style": {
+      "base_font_size": 8.0,
+      "diagnostics_height_inches": 2.45,
+      "dpi": 250,
+      "map_columns": 2,
+      "map_row_height_inches": 1.85,
+      "static_height_inches": 1.6,
+      "type": "Style",
+      "width_inches": 7.2
+    },
+    "title": "Williamson test case 5: flow over an isolated mountain \u00b7 shallow-water core",
+    "type": "Overview"
+  }
+}

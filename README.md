@@ -14,17 +14,32 @@ It is **not** a climate or weather model. Its solvers are idealized: no forcing,
 no moisture, no radiation, no real or data-driven terrain. They do not model any
 particular planet, real or fictional.
 
-![Williamson test case 5 at T63: free-surface height and velocity at days 0, 5, 10 and 15, with conservation and spectral-complexity panels](docs/validation/williamson_5/overview.png)
+![Williamson test case 5 at T63: static terrain; free-surface height with streamlines at days 0, 5, 10 and 15 on one colour scale; conservation drift and kinetic-energy spectral complexity](docs/assets/williamson5_t63_overview.png)
 
 *Williamson test case 5, flow over an isolated mountain, from the canonical T63
 run (Gauss–Legendre grid 96 × 192, ℓ ≤ 63, inviscid; commit `668e6c9a`,
-2026-07-30, one GPU run). A zonal jet hits a conical mountain and sets up a
-global wave train over 15 days. Layer mass stays bit-identical to day 0. Total
-energy drifts by −7.9 × 10⁻⁷ and potential enstrophy by −8.5 × 10⁻⁶. In
+2026-07-30, one GPU run). A zonal jet meets a conical mountain (top left: the
+band-limited terrain) and sets up a global wave train over 15 days. The maps
+share one free-surface-height scale; streamlines are instantaneous, with width
+proportional to wind speed, and the circles are the terrain at 500, 1000 and
+1500 m. Layer mass stays bit-identical to day 0 at every step. Over 15 days,
+total energy drifts by −7.9 × 10⁻⁷ (recorded every step) and potential
+enstrophy by −8.5 × 10⁻⁶ (evaluated at the four saved states only). In
 kinetic-energy mode space, the flow starts as a single mode (mean degree
 ⟨ℓ⟩ = 1) and spreads to ⟨ℓ⟩ ≈ 2.7 and about 4.4 effective modes by day 15.
-The figure's labels use the project's former name, Aeolus.
 [Definitions and full evidence →](docs/validation/williamson5_mri_2026-07-30.md#41-spectral-complexity-of-the-t63-snapshots)*
+
+The figure is drawn from the run capsule committed under
+[docs/validation/williamson_5/capsules](docs/validation/williamson_5/capsules)
+by a pinned recipe, and every number it shows is in
+[williamson5_t63_overview.json](docs/assets/williamson5_t63_overview.json).
+To redraw it (needs CUDA), or to draw the same kind of overview for any saved
+run:
+
+```powershell
+python docs/figures/williamson5_t63_overview.py   # this figure, from its recipe
+tropoi plot RUN_PATH                               # default overview of any saved run
+```
 
 ## What you can study with it today
 
@@ -143,7 +158,8 @@ Each run writes a self-contained directory containing:
   (Git commit and worktree state, GPU, library versions).
 - `diagnostics/timeseries.csv`: the conservation diagnostics, one row per
   accepted step.
-- `diagnostics/spectra.npz`: the spectra.
+- `diagnostics/spectra.npz` (BVE runs only): degree spectra of energy and
+  enstrophy, every tenth recorded step.
 - Saved spectral states, their time axis, and figures.
 
 How many states are saved is controlled by `--n-snapshots N` (default 5,
@@ -179,11 +195,32 @@ snap.state["zeta"].coeffs                    # read-only (l, m) coefficient view
 snap.plot(output_path="zeta_last.png")       # renders the same figure the run produced
 ```
 
+**Draw a run.** `Simulation.plot` and `tropoi plot` draw any saved BVE, SWE or
+PE run; you choose the filled quantity, contours, the wind overlay, the saved
+times and the diagnostics panels:
+
+```python
+from tropoi.representation.visual.views import Map, Streamlines
+
+sim.plot("overview.png")                     # default: maps at up to 4 times, shared scales, diagnostics
+sim[-1].plot("flow.png", Map(None, vectors=Streamlines()))   # streamlines alone
+sim.quantities()                             # what this run can draw: meaning, units, cadence
+```
+
+```powershell
+tropoi plot runs --list-quantities                          # no GPU needed
+tropoi plot runs --map vorticity --vectors arrows --snapshots 0,-1
+```
+
 - The fields are `zeta` (BVE), `zeta`/`delta`/`phi` (SWE), and
   `zeta`/`delta`/`temperature`/`ln_ps` (PE).
-- `Snapshot.plot` builds nothing until you call it. The default `"physical"`
-  representation needs CUDA. `representation="spectral"` renders on the CPU,
-  for BVE and SWE only.
+- `Snapshot.plot` and `Simulation.plot` build nothing until you call them.
+  Maps of physical fields need CUDA: the run's model is rebuilt once. Without a
+  view, `Snapshot.plot` draws the run's own snapshot figure;
+  `representation="spectral"` renders that on the CPU, for BVE and SWE only.
+- Plotting never writes inside a run directory. Values that exist only at saved
+  states, such as potential enstrophy, are drawn as markers, never as a
+  per-step line.
 - The API does not interpolate in time or restart runs.
 
 Full reference: [docs/SAVED_RUNS.md](docs/SAVED_RUNS.md).
