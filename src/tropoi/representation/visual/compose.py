@@ -659,6 +659,27 @@ def _compose_overview(fields: RunFields, view: Overview
     return resolve_figure_normalizations(figure), record
 
 
+def _vector_caption(fields: RunFields, panel: Map, index: int,
+                    level: int | None) -> str:
+    """A second title line saying how a single map encodes the wind."""
+    vectors = panel.vectors
+    if vectors is None:
+        return ""
+    u, v = fields.state_wind(index, _level_for(fields, "wind", level))
+    peak = float(np.hypot(u, v).max())
+    if peak < REST_SPEED_MS:
+        return ""
+    style = ("streamlines" if isinstance(vectors, Streamlines)
+             else "arrows")
+    if isinstance(vectors, Streamlines) and vectors.width_by == "speed":
+        return (chr(10) + f"{style}: width ∝ wind speed, "
+                f"max {peak:.3g} m s⁻¹")
+    if isinstance(vectors, Arrows):
+        return (chr(10) + f"{style}: length ∝ wind speed, "
+                f"max {peak:.3g} m s⁻¹")
+    return chr(10) + f"{style} (max wind {peak:.3g} m s⁻¹)"
+
+
 def _compose_grid(fields: RunFields, view: Grid) -> tuple[FigureSpec, dict]:
     style = view.style
     record = _record_base(fields, view)
@@ -686,11 +707,10 @@ def _compose_grid(fields: RunFields, view: Grid) -> tuple[FigureSpec, dict]:
                 level = resolve_level(fields, panel.level)
                 entry = (quantity(panel.background)
                          if panel.background else None)
-                title = (f"{entry.long_name}" if entry else "wind")
-                if panel.vectors is not None and entry is not None:
-                    title += " + wind"
+                title = entry.long_name if entry else "wind"
                 if level is not None:
                     title += f", {_level_label(fields, level)}"
+                title += _vector_caption(fields, panel, index, level)
                 groups = {"background": f"grid-{r}-{c}-background",
                           "speed": f"grid-{r}-{c}-speed"}
                 spec = _map_panel(fields, panel, index, level, title=title,
@@ -707,7 +727,7 @@ def _compose_grid(fields: RunFields, view: Grid) -> tuple[FigureSpec, dict]:
                 raise TypeError(f"unsupported grid panel {panel!r}")
             panels.append(PanelPlacement(spec, r, c))
         width = style.width_inches / columns
-        heights.append(max(width * 0.62, 1.4) if is_map_row
+        heights.append(max(width * 0.58, 1.4) if is_map_row
                        else style.diagnostics_height_inches)
     figure = FigureSpec(
         panels=tuple(panels), rows=2 + len(view.rows), columns=columns,

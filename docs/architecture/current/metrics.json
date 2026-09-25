@@ -1,20 +1,20 @@
 {
   "call_graph": {
     "call_sites": {
-      "builtin": 1585,
-      "external": 1124,
-      "internal": 1323,
-      "unresolved": 1600
+      "builtin": 1592,
+      "external": 1125,
+      "internal": 1325,
+      "unresolved": 1602
     },
     "edges_by_kind": {
-      "call": 530,
+      "call": 532,
       "constructor": 30,
       "instantiate": 233,
       "override": 6,
       "self": 205,
       "super": 2
     },
-    "nodes": 885,
+    "nodes": 886,
     "scoped": {
       "cli-gen": {
         "edges": 28,

@@ -1293,6 +1293,11 @@
     {
       "kind": "call",
       "source": "tropoi.representation.visual.compose._compose_grid",
+      "target": "tropoi.representation.visual.compose._vector_caption"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.compose._compose_grid",
       "target": "tropoi.representation.visual.compose.resolve_level"
     },
     {
@@ -1559,6 +1564,11 @@
       "kind": "call",
       "source": "tropoi.representation.visual.compose._snapshot_statistics",
       "target": "tropoi.representation.visual.quantities.quantity"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.compose._vector_caption",
+      "target": "tropoi.representation.visual.compose._level_for"
     },
     {
       "kind": "call",
@@ -6417,6 +6427,13 @@
       "kind": "function",
       "module": "tropoi.representation.visual.compose",
       "qualname": "_time_label",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.compose._vector_caption",
+      "kind": "function",
+      "module": "tropoi.representation.visual.compose",
+      "qualname": "_vector_caption",
       "type": "function"
     },
     {
