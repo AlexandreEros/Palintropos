@@ -202,12 +202,13 @@ times and the diagnostics panels:
 ```python
 from tropoi.representation.visual.views import Map, Streamlines
 
-sim.plot("overview.png")                     # default: maps at up to 4 times, shared scales, diagnostics
+sim.plot()                                   # default overview -> RUN/assets/overview.png
 sim[-1].plot("flow.png", Map(None, vectors=Streamlines()))   # streamlines alone
 sim.quantities()                             # what this run can draw: meaning, units, cadence
 ```
 
 ```powershell
+tropoi plot runs                                            # -> <latest run>/assets/overview.png
 tropoi plot runs --list-quantities                          # no GPU needed
 tropoi plot runs --map vorticity --vectors arrows --snapshots 0,-1
 ```
@@ -218,9 +219,12 @@ tropoi plot runs --map vorticity --vectors arrows --snapshots 0,-1
   Maps of physical fields need CUDA: the run's model is rebuilt once. Without a
   view, `Snapshot.plot` draws the run's own snapshot figure;
   `representation="spectral"` renders that on the CPU, for BVE and SWE only.
-- Plotting never writes inside a run directory. Values that exist only at saved
-  states, such as potential enstrophy, are drawn as markers, never as a
-  per-step line.
+- Figures belong to their run: by default they go to `RUN/assets/`, the only
+  place inside a run that plotting writes. `assets/` holds derived,
+  reproducible products; it is not part of the run's evidence, identity or
+  checksums. `-o PATH` writes elsewhere.
+- Values that exist only at saved states, such as potential enstrophy, are
+  drawn as markers, never as a per-step line.
 - The API does not interpolate in time or restart runs.
 
 Full reference: [docs/SAVED_RUNS.md](docs/SAVED_RUNS.md).

@@ -41,6 +41,22 @@ def test_plot_without_a_run_is_an_error(tmp_path, capsys):
     assert "no run found" in capsys.readouterr().err
 
 
+def test_default_file_names_live_in_assets_and_spell_out_options():
+    from tropoi.cli.main import _asset_name, build_parser
+    parser = build_parser()
+
+    def name(*argv):
+        args = parser.parse_args(["plot", "RUN", *argv])
+        return _asset_name(args, args.at)
+
+    assert name() == "overview.png"
+    assert name("--at", "5d", "--map", "none") == "snapshot-5d_map-none.png"
+    assert name("--map", "vorticity", "--vectors", "arrows",
+                "--snapshots", "0,5d") == (
+        "overview_map-vorticity_vectors-arrows_snapshots-0,5d.png")
+    assert name("--no-static") == "overview_no-static.png"
+
+
 def test_cli_options_build_the_described_views():
     from tropoi.cli.main import build_parser, _plot_view
     from tropoi.representation.archive import open_simulation

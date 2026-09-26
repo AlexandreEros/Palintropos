@@ -211,8 +211,14 @@ sim.plot("pe.png", Overview(map=Map("temperature_anomaly", level=Sigma(0.75),
 - **Provenance.** PNG metadata records the run id, solver, commit, the
   SHA-256 of the coefficient file and of `diagnostics/timeseries.csv`, and the
   full view. With `sidecar=True` (or `--sidecar`), every number shown is also
-  written to `<output>.json`. Plotting refuses to write inside the run
-  directory.
+  written to `<output>.json`.
+- **Where figures go.** `sim.plot()` and `tropoi plot RUN` write
+  `RUN/assets/overview.png` (with `--sidecar`, also `overview.json`); other
+  views from the command get a name spelling out their options, and `-o`
+  chooses any path. `RUN/assets/` holds derived, reproducible products. It is
+  the only place inside a run that plotting writes, it never enters the run
+  id, the completion status, or a published run's `SHA256SUMS`, and
+  `--overwrite` sweeps it with the replaced run's other generated results.
 
 Figures meant to stay fixed should spell out every field of every view
 object, as the README figure's recipe does

@@ -418,7 +418,7 @@ class CapsuleStorage:
         from tropoi.representation.visual.snapshot import render_snapshot
         return render_snapshot(self, int(index), output_path, **options)
 
-    def plot_simulation(self, output_path, view=None, *,
+    def plot_simulation(self, output_path=None, view=None, *,
                         snapshot: int | None = None, sidecar: bool = False,
                         renderer=None) -> pathlib.Path:
         from tropoi.representation.visual.compose import render_view

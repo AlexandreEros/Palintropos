@@ -365,14 +365,17 @@ def _make_generated_outputs(run_path, scenario="two_vortices"):
         snapshot_dir.mkdir(parents=True, exist_ok=True)
         (snapshot_dir / "timeline.png").write_bytes(b"png")
         (snapshot_dir / "t000000s.png").write_bytes(b"png")
+    # Post-run figures (tropoi plot) derived from the run being replaced.
+    (run_path / "assets").mkdir(exist_ok=True)
+    (run_path / "assets" / "overview.png").write_bytes(b"png")
 
 
 def test_clean_removes_known_generated_artifacts(tmp_path):
     _make_generated_outputs(tmp_path)
     bve._clean_overwrite_artifacts(tmp_path)
-    for name in ("diagnostics", "figures", "snapshots", "vorticity_coeffs.npy",
-                 "vorticity_grid.npy", "bve_snapshot_times.npy",
-                 "bve_summary.png"):
+    for name in ("diagnostics", "figures", "snapshots", "assets",
+                 "vorticity_coeffs.npy", "vorticity_grid.npy",
+                 "bve_snapshot_times.npy", "bve_summary.png"):
         assert not (tmp_path / name).exists()
     assert not list(tmp_path.glob("*_t*h-*h-*h.png"))
     assert not list(tmp_path.glob("*_t*s.png"))

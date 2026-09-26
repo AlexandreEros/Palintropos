@@ -31,6 +31,7 @@ _GENERATED_RESULT_DIRS: tuple[str, ...] = (
     "diagnostics",
     "figures",
     "snapshots",
+    "assets",       # post-run figures (tropoi plot) of the replaced run
 )
 
 #: Manifest notes describing the dry primitive-equation solver and the exact

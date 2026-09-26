@@ -53,7 +53,7 @@ class SnapshotStorage(Protocol):
         """Render the stored frame explicitly; may require CUDA."""
         ...
 
-    def plot_simulation(self, output_path, view=None, **options
+    def plot_simulation(self, output_path=None, view=None, **options
                         ) -> pathlib.Path:
         """Render a view of the saved run explicitly; may require CUDA."""
         ...
@@ -193,7 +193,7 @@ class Simulation:
     def field_names(self) -> tuple[str, ...]:
         return tuple(spec.name for spec in self._storage.field_specs)
 
-    def plot(self, output_path, view=None, **options) -> pathlib.Path:
+    def plot(self, output_path=None, view=None, **options) -> pathlib.Path:
         """Render a view of the whole saved run; returns the image path.
 
         ``view=None`` draws the solver's default overview: one map at up to
@@ -204,8 +204,11 @@ class Simulation:
         overlays, times and panels. Options: ``sidecar=True`` also writes
         every number shown to ``<output>.json``; ``renderer``.
 
-        Explicit and lazy, and never writes inside the run directory.
-        Drawing physical fields rebuilds the run's model once (CUDA).
+        ``output_path=None`` writes the default overview to
+        ``RUN/assets/overview.png``. Figures are derived products of the
+        run: inside the run directory only ``assets/`` is ever written, and
+        nothing there is part of the run's evidence. Explicit and lazy;
+        drawing physical fields rebuilds the run's model once (CUDA).
         """
         return self._storage.plot_simulation(output_path, view, **options)
 

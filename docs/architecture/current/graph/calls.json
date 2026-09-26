@@ -188,6 +188,11 @@
     {
       "kind": "call",
       "source": "tropoi.cli.main._cmd_plot",
+      "target": "tropoi.cli.main._asset_name"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.cli.main._cmd_plot",
       "target": "tropoi.cli.main._error"
     },
     {
@@ -209,6 +214,11 @@
       "kind": "call",
       "source": "tropoi.cli.main._cmd_plot",
       "target": "tropoi.representation.archive.capsule.open_simulation"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.cli.main._cmd_plot",
+      "target": "tropoi.representation.visual.compose.default_output_path"
     },
     {
       "kind": "call",
@@ -1719,6 +1729,11 @@
       "kind": "call",
       "source": "tropoi.representation.visual.compose.render_view",
       "target": "tropoi.representation.visual.compose.compose_view"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.compose.render_view",
+      "target": "tropoi.representation.visual.compose.default_output_path"
     },
     {
       "kind": "call",
@@ -5276,6 +5291,13 @@
       "type": "function"
     },
     {
+      "id": "tropoi.cli.main._asset_name",
+      "kind": "function",
+      "module": "tropoi.cli.main",
+      "qualname": "_asset_name",
+      "type": "function"
+    },
+    {
       "id": "tropoi.cli.main._cmd_gen",
       "kind": "function",
       "module": "tropoi.cli.main",
@@ -6561,6 +6583,13 @@
       "kind": "function",
       "module": "tropoi.representation.visual.compose",
       "qualname": "compose_view",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.compose.default_output_path",
+      "kind": "function",
+      "module": "tropoi.representation.visual.compose",
+      "qualname": "default_output_path",
       "type": "function"
     },
     {

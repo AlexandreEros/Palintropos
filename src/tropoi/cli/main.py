@@ -1042,6 +1042,29 @@ def _print_quantities(rows) -> None:
             print(f"  {row['id']:<26}{row['long_name']}")
 
 
+def _asset_name(args, at) -> str:
+    """Deterministic ``RUN/assets`` file name for the chosen options.
+
+    The default overview is ``overview.png``; every option that changes
+    the figure is spelled into the name, so variants never overwrite it.
+    """
+    import re
+    parts = ["overview" if at is None else f"snapshot-{args.at}"]
+    for flag, value in (("map", args.map),
+                        ("contours", "+".join(args.contours or ()) or None),
+                        ("vectors", args.vectors), ("level", args.level),
+                        ("sigma", args.sigma), ("limits", args.limits),
+                        ("cmap", args.cmap), ("snapshots", args.snapshots),
+                        ("max-maps", args.max_maps)):
+        if value is not None:
+            parts.append(f"{flag}-{value}")
+    if args.no_static:
+        parts.append("no-static")
+    if args.no_diagnostics:
+        parts.append("no-diagnostics")
+    return re.sub(r"[^A-Za-z0-9_.,+=-]", "-", "_".join(parts)) + ".png"
+
+
 def _cmd_plot(args: argparse.Namespace) -> int:
     import pathlib
 
@@ -1076,9 +1099,9 @@ def _cmd_plot(args: argparse.Namespace) -> int:
         view, at = _plot_view(args, sim.storage)
         output = args.output
         if output is None:
-            run_id = sim.metadata.get("run_id") or run_dir.name
-            suffix = "overview" if at is None else f"at-{args.at}"
-            output = pathlib.Path.cwd() / f"{run_id}-{suffix}.png"
+            from tropoi.representation.visual.compose import (
+                default_output_path)
+            output = default_output_path(sim.storage, _asset_name(args, at))
         if at is None:
             written = sim.plot(output, view, sidecar=args.sidecar)
         else:
@@ -1209,7 +1232,8 @@ def build_parser() -> argparse.ArgumentParser:
     # tropoi plot RUN_PATH
     plot_parser = commands.add_parser(
         "plot", help="Draw a saved run: maps, overlays and diagnostics.",
-        description="Draw a saved run without modifying it. Without map "
+        description="Draw a saved run into RUN/assets/ without touching its "
+                    "primary files. Without map "
                     "options this is the solver's default overview: one map "
                     "at up to four saved times with shared scales, static "
                     "terrain when present, and conservation and "
@@ -1223,8 +1247,10 @@ def build_parser() -> argparse.ArgumentParser:
              "containing latest_run.txt (e.g. 'runs').")
     plot_parser.add_argument(
         "-o", "--output", default=None, metavar="PATH",
-        help="Image to write (PNG) [default: <run-id>-overview.png in the "
-             "current directory]. Never inside the run directory.")
+        help="Image to write (PNG) [default: RUN/assets/overview.png, or a "
+             "name spelling out the chosen options]. Inside the run only "
+             "assets/ is ever written; it is derived output, not run "
+             "evidence.")
     plot_parser.add_argument(
         "--list-quantities", action="store_true",
         help="List what this run can draw (meaning, units, cadence, whether "

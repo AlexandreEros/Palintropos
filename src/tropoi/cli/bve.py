@@ -45,6 +45,7 @@ _GENERATED_RESULT_DIRS: tuple[str, ...] = (
     "diagnostics",
     "figures",
     "snapshots",
+    "assets",       # post-run figures (tropoi plot) of the replaced run
 )
 
 #: Snapshot image names: the legacy viewer montage followed by current

@@ -30,6 +30,7 @@ _GENERATED_RESULT_DIRS: tuple[str, ...] = (
     "diagnostics",
     "figures",
     "snapshots",
+    "assets",       # post-run figures (tropoi plot) of the replaced run
 )
 
 _SNAPSHOT_FRAME_RE = re.compile(r".+_t\d{13}\.\d{9}s\.png\Z")

@@ -16,7 +16,9 @@ Rules kept here:
   unconnected markers, and each label says which;
 * ``"auto"`` parts of a view are omitted (and the omission recorded) when a
   run cannot provide them; explicitly requested parts raise instead;
-* nothing is ever written inside the run directory.
+* figures belong to the run: by default they go to ``RUN/assets/``, and
+  nothing is ever written anywhere else inside the run directory, so the
+  primary run files stay untouched.
 """
 from __future__ import annotations
 
@@ -42,7 +44,14 @@ from tropoi.representation.visual.views import (
     Arrows, Complexity, Contours, Drift, Grid, Map, Overview, Sigma,
     Streamlines, Style, describe, parse_time)
 
-__all__ = ["compose_view", "default_view", "render_view"]
+__all__ = ["ASSETS_DIRNAME", "compose_view", "default_output_path",
+           "default_view", "render_view"]
+
+#: Sub-directory of a run that holds its derived, reproducible products
+#: (figures, sidecars). Nothing in it is run evidence: it never enters the
+#: run id, the completion status or a published run's SHA256SUMS, and
+#: ``--overwrite`` sweeps it with the other generated results.
+ASSETS_DIRNAME = "assets"
 
 #: How each quantity is drawn when a Map does not say otherwise:
 #: (colour policy, symmetric about zero).
@@ -751,21 +760,40 @@ def _png_metadata(fields: RunFields, record: dict) -> dict:
     }
 
 
-def render_view(storage, view, output_path, *, snapshot: int | None = None,
-                sidecar: bool = False, renderer=None) -> pathlib.Path:
-    """Render ``view`` for a saved run to ``output_path`` (a new file).
+def default_output_path(storage, name: str = "overview.png"
+                        ) -> pathlib.Path:
+    """``RUN/assets/<name>``: where a run's derived figures live."""
+    return pathlib.Path(storage.run_dir) / ASSETS_DIRNAME / name
+
+
+def render_view(storage, view, output_path=None, *,
+                snapshot: int | None = None, sidecar: bool = False,
+                renderer=None) -> pathlib.Path:
+    """Render ``view`` for a saved run and return the written image path.
 
     ``view=None`` draws the solver's default overview. ``snapshot`` (an
     index) turns a single :class:`Map` into a one-panel figure at that
-    saved state. With ``sidecar=True`` every number the figure shows is
-    also written to ``<output>.json``.
+    saved state. ``output_path=None`` writes the default overview to
+    ``RUN/assets/overview.png``; any other view needs an explicit path.
+    Inside the run directory only ``assets/`` may be written. With
+    ``sidecar=True`` every number the figure shows is also written to
+    ``<output>.json``.
     """
+    if output_path is None:
+        if view is not None or snapshot is not None:
+            raise ValueError(
+                "give an output path for a custom view; only the default "
+                "overview has a default location (RUN/assets/overview.png)")
+        output_path = default_output_path(storage)
     output = pathlib.Path(output_path).resolve()
     run_dir = pathlib.Path(storage.run_dir).resolve()
-    if output == run_dir or run_dir in output.parents:
+    assets = run_dir / ASSETS_DIRNAME
+    if (output == run_dir or run_dir in output.parents) and (
+            assets not in output.parents):
         raise ValueError(
-            f"refusing to write {output} inside the saved run {run_dir}; "
-            "saved runs are immutable")
+            f"refusing to write {output}: inside the saved run {run_dir} "
+            f"only {ASSETS_DIRNAME}/ holds derived figures, and the primary "
+            "run files are never modified")
     fields = RunFields(storage)
     if view is None:
         view = default_view(fields)

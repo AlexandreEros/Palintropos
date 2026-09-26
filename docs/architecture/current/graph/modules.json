@@ -2550,6 +2550,7 @@
         "dataclasses",
         "json",
         "pathlib",
+        "re",
         "sys",
         "typing"
       ],

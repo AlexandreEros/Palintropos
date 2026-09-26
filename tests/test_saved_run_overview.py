@@ -147,12 +147,20 @@ def test_nice_speed_key_values():
     assert _nice_speeds(1.0) == (0.25, 0.5, 1.0)
 
 
-def test_writing_inside_the_run_is_refused_before_anything_is_built(tmp_path):
+def test_only_the_runs_assets_directory_may_be_written():
+    from tropoi.representation.visual.compose import default_output_path
     sim = open_simulation(CANONICAL)
-    with pytest.raises(ValueError, match="immutable"):
-        sim.plot(CANONICAL / "overview.png")
+    assert default_output_path(sim.storage) == (
+        CANONICAL / "assets" / "overview.png")
+    for target in (CANONICAL / "overview.png",
+                   CANONICAL / "diagnostics" / "overview.png"):
+        with pytest.raises(ValueError, match="only assets/"):
+            sim.plot(target)
+        assert not target.exists()
+    # A custom view has no default location: the caller names the file.
+    with pytest.raises(ValueError, match="output path"):
+        sim.plot(None, Map("vorticity"))
     assert sim.storage.resource_builds == 0
-    assert not (CANONICAL / "overview.png").exists()
 
 
 # ---------------------------------------------------------------------------
@@ -319,6 +327,30 @@ class TestCanonicalRunOnGPU:
         with Image.open(path) as image:
             assert image.info["Representation"] == "physical"
             assert image.info["Normalization"].startswith("timeline")
+
+
+SMOKE = next((W5 / "smoke" / "smoke").iterdir())
+
+
+@cuda
+def test_default_plot_goes_to_the_runs_assets_and_touches_nothing_else(
+        tmp_path):
+    import shutil
+    run = tmp_path / SMOKE.name
+    shutil.copytree(SMOKE, run)
+    before = _tree_digest(run)
+    try:
+        sim = open_simulation(run)
+        written = sim.plot(sidecar=True)
+    finally:
+        _release_gpu()
+    assert written == run / "assets" / "overview.png"
+    assert (run / "assets" / "overview.json").is_file()
+    after = _tree_digest(run)
+    assert {k: v for k, v in after.items()
+            if not k.startswith("assets/")} == before
+    # The run still opens identically: assets/ is not run evidence.
+    assert open_simulation(run).metadata["run_id"] == SMOKE.name
 
 
 @cuda
