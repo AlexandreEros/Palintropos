@@ -62,10 +62,15 @@ from pathlib import Path
 import csv
 import hashlib
 root = Path(__file__).resolve().parent
+# Since 2026-09-25 the run capsule is published in docs/runs/, and this
+# figure is one of that run's assets (it was first written beside this
+# script as overview.png).
+published_run = (root.parents[1] / "runs" /
+                 "20260730T011700Z_williamson5_rot23p93h_r4_l63_dt120h_"
+                 "45406d82_668e6c9a")
 
 source = root / "aeolus_w5_t63.npz"
-capsule = (root / "runs" / "t63" / "w5-mri" /
-           "20260730T011700Z_williamson5_rot23p93h_r4_l63_dt120h_45406d82_668e6c9a")
+capsule = published_run      # read from runs/t63/w5-mri/ until 2026-09-25
 coeff_source = capsule / "swe_coeffs.npy"
 coeff_times_source = capsule / "swe_snapshot_times.npy"
 conservation_source = capsule / "diagnostics" / "timeseries.csv"
@@ -457,7 +462,7 @@ for index in range(4):
     cursor = diagnostic_entry(diagnostics, cursor, "Effective modes Nₑ",
                               f"{effective_modes[index]:.2f}")
 
-output = root / "overview.png"
+output = published_run / "assets" / "overview_2026-07-30.png"
 fig.savefig(output, dpi=300, facecolor="white",
             metadata={"SourceSHA256": source_hash,
                       "CoefficientsSHA256": coeff_hash,

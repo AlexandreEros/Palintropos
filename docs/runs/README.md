@@ -43,10 +43,8 @@ run compared with MRI-JMA in
   recorded in
   [CHECKSUMS.txt](../validation/williamson5_mri_2026-07-30/CHECKSUMS.txt).
   `swe_coeffs.npy` also matches the coefficient hash embedded in the
-  2026-07-30 figure
-  [`../validation/williamson_5/overview.png`](../validation/williamson_5/overview.png),
-  and `manifest.json` parses equal to the report's receipt
-  `aeolus_t63_run_manifest.json`.
+  2026-07-30 figure `assets/overview_2026-07-30.png`, and `manifest.json`
+  parses equal to the report's receipt `aeolus_t63_run_manifest.json`.
 - **Assets:** `overview.png` and `overview.json` are the README figure and its
   numbers, drawn by the pinned recipe
   [docs/figures/williamson5_t63_overview.py](../figures/williamson5_t63_overview.py).
@@ -55,3 +53,9 @@ run compared with MRI-JMA in
   were measured between processes. The fields, streamline seeds and computed
   streamline segments are bitwise identical from run to run; the variation
   arises when Matplotlib rasterizes the streamline layer.
+- `overview_2026-07-30.png`: the previous README figure, cited by the
+  validation report. It was drawn by
+  [plot_swe_holistic.py](../validation/williamson_5/plot_swe_holistic.py)
+  from this run's coefficients and diagnostics and from `aeolus_w5_t63.npz`,
+  the grid package the validation notebook wrote from this same run. Its PNG
+  metadata records the SHA-256 of all three.

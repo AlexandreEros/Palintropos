@@ -1,7 +1,11 @@
-"""Reproduce the scientific figures embedded in README.md.
+"""Reproduce the legacy BVE and RH4 figures kept in ``docs/assets/``.
 
-The source run capsules remain under the ignored ``runs/`` tree.  The rendered
-PNGs and a compact provenance record are written to tracked ``docs/assets/``.
+Legacy: these figures are drawn from local runs under the ignored ``runs/``
+tree, and the committed ones came from runs with uncommitted changes (see
+docs/assets/README.md). New figures of a run are drawn with ``tropoi plot``
+into that run's ``assets/``. The README's Williamson-5 figure has its own
+recipe, docs/figures/williamson5_t63_overview.py. The rendered PNGs and a
+compact provenance record are written to tracked ``docs/assets/``.
 
 Examples (from the repository root)::
 

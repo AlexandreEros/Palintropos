@@ -133,7 +133,7 @@ predicted in `SHALLOW_WATER.md` as `-0.0086 m` at `l_max=42` and `+0.0041 m` at
 The initial meridional wind agrees to `2e-17 m/s`: both models start from
 `v = 0` to floating-point roundoff.
 
-![Day-zero T42 comparison](../assets/validation/w5_mri/compare_t42_day00.png)
+![Day-zero T42 comparison](williamson_5/figures/compare_t42_day00.png)
 
 *Day 0, T42. Rows: free surface, layer depth, wind speed; columns: MRI, Aeolus,
 signed difference. The free-surface and wind differences are at the `1e-2 m` and
@@ -168,7 +168,8 @@ thousands of steps, and total energy drifts by under one part in `10^6` on an
 The conservation figures above say the run holds its invariants; they say
 nothing about how much *structure* the flow has acquired. The holistic T63
 figure
-([williamson_5/overview.png](williamson_5/overview.png), produced by
+([overview_2026-07-30.png](../runs/20260730T011700Z_williamson5_rot23p93h_r4_l63_dt120h_45406d82_668e6c9a/assets/overview_2026-07-30.png),
+an asset of the published run, produced by
 [williamson_5/plot_swe_holistic.py](williamson_5/plot_swe_holistic.py))
 therefore carries a small per-snapshot spectral block alongside the drifts.
 Everything in it comes from artifacts already saved by the canonical T63 run —
@@ -269,19 +270,19 @@ At day 15 the free-surface fields agree to a weighted RMS of **5.6 m (T42)** and
 The winds agree to a weighted RMS of `0.44 m/s` and `0.21 m/s` in `u` against
 peak winds above `40 m/s`.
 
-![Day-15 T63 comparison](../assets/validation/w5_mri/compare_t63_day15.png)
+![Day-15 T63 comparison](williamson_5/figures/compare_t63_day15.png)
 
 *Day 15, T63. After 15 days of inviscid nonlinear evolution the Rossby wave
 train shed by the mountain is reproduced in phase and amplitude; the signed
 differences are small-scale and an order of magnitude below the features
 themselves.*
 
-![Day-15 T42 comparison](../assets/validation/w5_mri/compare_t42_day15.png)
+![Day-15 T42 comparison](williamson_5/figures/compare_t42_day15.png)
 
 *Day 15, T42. The same structures at the coarser truncation, with visibly larger
 small-scale residuals — consistent with the resolution sensitivity in § 6.*
 
-![Day-zero T63 comparison](../assets/validation/w5_mri/compare_t63_day00.png)
+![Day-zero T63 comparison](williamson_5/figures/compare_t63_day00.png)
 
 *Day 0, T63. The terrain-representation ring is roughly halved relative to T42
 (`87.4 m` → `36.5 m` peak), matching the drop in the cone projection residual
