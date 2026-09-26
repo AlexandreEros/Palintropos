@@ -395,6 +395,12 @@ and [aeolus_t42_COMPLETE.json](williamson5_mri_2026-07-30/aeolus_t42_COMPLETE.js
 / [aeolus_t63_COMPLETE.json](williamson5_mri_2026-07-30/aeolus_t63_COMPLETE.json),
 so the archive can be checked against Git without trusting either copy alone.
 
+*Update, 2026-09-25:* the T63 run capsule (1.9 MB) is now also in Git as a
+published run:
+[docs/runs/20260730T011700Z_williamson5_rot23p93h_r4_l63_dt120h_45406d82_668e6c9a](../runs/README.md).
+It is byte-identical to the copy in `w5-mri-canonical-validation.zip` and
+carries its own `SHA256SUMS` receipt. The T42 capsule remains on Drive only.
+
 **Superseded material.** Every W5 trajectory, measured envelope, and acceptance
 capsule produced before the 2026-07-29 initial-condition correction is
 superseded, including the `archive/w5-mri-v2-invalid` branch (`42bcc38c`). Only

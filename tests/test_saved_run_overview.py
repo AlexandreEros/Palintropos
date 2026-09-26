@@ -32,7 +32,7 @@ from tropoi.representation.visual.views import (
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 W5 = ROOT / "docs" / "validation" / "williamson_5"
-CANONICAL = (W5 / "capsules" / "t63" /
+CANONICAL = (ROOT / "docs" / "runs" /
              "20260730T011700Z_williamson5_rot23p93h_r4_l63_dt120h_45406d82_"
              "668e6c9a")
 RUNS = ROOT / "runs"

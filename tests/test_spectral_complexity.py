@@ -1,6 +1,6 @@
 """Host spectral kinetic-energy modes and complexity measures. CPU only.
 
-The canonical checks use the committed Williamson-5 T63 capsule and the
+The canonical checks use the published Williamson-5 T63 run and the
 tracked grid package ``aeolus_w5_t63.npz`` written by the same run, so the
 modal sum is compared with an independent grid quadrature of the saved winds.
 """
@@ -17,7 +17,7 @@ from tropoi.representation.diagnostics.spectral import (
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 W5 = ROOT / "docs" / "validation" / "williamson_5"
-CAPSULE = (W5 / "capsules" / "t63" /
+CAPSULE = (ROOT / "docs" / "runs" /
            "20260730T011700Z_williamson5_rot23p93h_r4_l63_dt120h_45406d82_"
            "668e6c9a")
 W5_RADIUS_M = 6.37122e6

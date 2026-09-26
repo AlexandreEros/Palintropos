@@ -14,7 +14,7 @@ It is **not** a climate or weather model. Its solvers are idealized: no forcing,
 no moisture, no radiation, no real or data-driven terrain. They do not model any
 particular planet, real or fictional.
 
-![Williamson test case 5 at T63: static terrain; free-surface height with streamlines at days 0, 5, 10 and 15 on one colour scale; conservation drift and kinetic-energy spectral complexity](docs/assets/williamson5_t63_overview.png)
+![Williamson test case 5 at T63: static terrain; free-surface height with streamlines at days 0, 5, 10 and 15 on one colour scale; conservation drift and kinetic-energy spectral complexity](docs/runs/20260730T011700Z_williamson5_rot23p93h_r4_l63_dt120h_45406d82_668e6c9a/assets/overview.png)
 
 *Williamson test case 5, flow over an isolated mountain, from the canonical T63
 run (Gauss–Legendre grid 96 × 192, ℓ ≤ 63, inviscid; commit `668e6c9a`,
@@ -29,10 +29,10 @@ kinetic-energy mode space, the flow starts as a single mode (mean degree
 ⟨ℓ⟩ = 1) and spreads to ⟨ℓ⟩ ≈ 2.7 and about 4.4 effective modes by day 15.
 [Definitions and full evidence →](docs/validation/williamson5_mri_2026-07-30.md#41-spectral-complexity-of-the-t63-snapshots)*
 
-The figure is drawn from the run capsule committed under
-[docs/validation/williamson_5/capsules](docs/validation/williamson_5/capsules)
-by a pinned recipe, and every number it shows is in
-[williamson5_t63_overview.json](docs/assets/williamson5_t63_overview.json).
+The figure is an asset of the run it draws, which is published with a
+checksum receipt in [docs/runs](docs/runs/README.md). It is drawn by a
+pinned recipe, and every number it shows is in
+[overview.json](docs/runs/20260730T011700Z_williamson5_rot23p93h_r4_l63_dt120h_45406d82_668e6c9a/assets/overview.json).
 To redraw it (needs CUDA), or to draw the same kind of overview for any saved
 run:
 

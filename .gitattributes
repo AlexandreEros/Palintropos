@@ -2,6 +2,6 @@
 # LF line endings; keep it LF on checkout so `--check` compares byte for byte.
 docs/architecture/** text eol=lf
 
-# Committed run capsules are byte-exact evidence (their SHA-256 sums are
-# recorded next to them); never convert line endings.
-docs/validation/williamson_5/capsules/** -text
+# Published runs are byte-exact evidence (each carries a SHA256SUMS
+# receipt); never convert their line endings.
+docs/runs/** -text

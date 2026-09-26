@@ -11,8 +11,8 @@ import sys
 import pytest
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
-CANONICAL = (ROOT / "docs" / "validation" / "williamson_5" / "capsules" /
-             "t63" / "20260730T011700Z_williamson5_rot23p93h_r4_l63_dt120h_"
+CANONICAL = (ROOT / "docs" / "runs" /
+             "20260730T011700Z_williamson5_rot23p93h_r4_l63_dt120h_"
              "45406d82_668e6c9a")
 
 

@@ -25,7 +25,10 @@ from tropoi.representation.visual.views import describe
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 RECIPE_PATH = ROOT / "docs" / "figures" / "williamson5_t63_overview.py"
-FIGURE = ROOT / "docs" / "assets" / "williamson5_t63_overview.png"
+RUN = (ROOT / "docs" / "runs" /
+       "20260730T011700Z_williamson5_rot23p93h_r4_l63_dt120h_45406d82_"
+       "668e6c9a")
+FIGURE = RUN / "assets" / "overview.png"
 SIDECAR = FIGURE.with_suffix(".json")
 W5 = ROOT / "docs" / "validation" / "williamson_5"
 
@@ -63,14 +66,13 @@ def test_committed_figure_was_made_by_this_recipe_from_the_committed_capsule():
         info = dict(image.info)
         assert image.size[0] == 1800
     assert json.loads(info["View"]) == describe(recipe.RECIPE)
-    sums = {}
-    for line in (W5 / "capsules" / "SHA256SUMS").read_text().splitlines():
-        if line and not line.startswith("#"):
-            digest, name = line.split(maxsplit=1)
-            sums[pathlib.PurePosixPath(name).name] = digest
+    sums = dict(reversed(line.split(maxsplit=1)) for line in
+                (RUN / "SHA256SUMS").read_text().splitlines())
     assert info["CoefficientsSHA256"] == sums["swe_coeffs.npy"]
-    assert info["DiagnosticsSHA256"] == sums["timeseries.csv"]
-    assert info["RunId"] == recipe.CAPSULE.name
+    assert info["DiagnosticsSHA256"] == sums["diagnostics/timeseries.csv"]
+    assert info["RunId"] == recipe.CAPSULE.name == RUN.name
+    # The figure is an asset of the run it draws.
+    assert recipe.OUTPUT == FIGURE
 
 
 def test_committed_sidecar_agrees_with_numbers_recomputed_here():

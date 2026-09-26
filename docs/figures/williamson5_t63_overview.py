@@ -4,14 +4,14 @@ Run from the repository root (needs CUDA; about 10 s on an MX110)::
 
     python docs/figures/williamson5_t63_overview.py
 
-It draws the committed canonical run capsule through the public plotting
-interface (``Simulation.plot``) and writes
+It draws the published canonical run (``docs/runs/<run-id>/``) through the
+public plotting interface (``Simulation.plot``) and writes the run's assets
 
-* ``docs/assets/williamson5_t63_overview.png``: the figure, whose PNG
-  metadata records the run id, the SHA-256 of the coefficients and the
-  per-step diagnostics it read, and this recipe;
-* ``docs/assets/williamson5_t63_overview.json``: every number the figure
-  shows (drifts, spectral-complexity measures, per-map ranges and speeds).
+* ``assets/overview.png``: the figure, whose PNG metadata records the run
+  id, the SHA-256 of the coefficients and the per-step diagnostics it read,
+  and this recipe;
+* ``assets/overview.json``: every number the figure shows (drifts,
+  spectral-complexity measures, per-map ranges and speeds).
 
 Every field of every view object is written out below, never left to a
 default, so later changes to the defaults of ``Simulation.plot`` or
@@ -28,10 +28,10 @@ from tropoi.representation.visual.views import (
     Complexity, Contours, Drift, Map, Overview, Streamlines, Style)
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
-CAPSULE = (ROOT / "docs" / "validation" / "williamson_5" / "capsules" /
-           "t63" / "20260730T011700Z_williamson5_rot23p93h_r4_l63_dt120h_"
+CAPSULE = (ROOT / "docs" / "runs" /
+           "20260730T011700Z_williamson5_rot23p93h_r4_l63_dt120h_"
            "45406d82_668e6c9a")
-OUTPUT = ROOT / "docs" / "assets" / "williamson5_t63_overview.png"
+OUTPUT = CAPSULE / "assets" / "overview.png"
 
 RECIPE = Overview(
     map=Map(
