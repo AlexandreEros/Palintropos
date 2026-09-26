@@ -45,7 +45,7 @@ from tropoi.representation.visual.views import (
     Streamlines, Style, describe, parse_time)
 
 __all__ = ["ASSETS_DIRNAME", "compose_view", "default_output_path",
-           "default_view", "render_view"]
+           "default_view", "elapsed_label", "render_view"]
 
 #: Sub-directory of a run that holds its derived, reproducible products
 #: (figures, sidecars). Nothing in it is run evidence: it never enters the
@@ -115,10 +115,49 @@ def _time_axis(times: np.ndarray) -> tuple[float, str]:
     return 1.0, "s"
 
 
-def _time_label(seconds: float, divisor: float, unit: str) -> str:
-    value = seconds / divisor
-    text = f"{value:.4g}"
-    return f"day {text}" if unit == "day" else f"t = {text} {unit}"
+def elapsed_label(seconds: float, span: float | None = None) -> str:
+    """Elapsed physical time in plain words: ``Day 5, 3 h 17 min``.
+
+    Elapsed simulation time, not a date. Zero components are omitted;
+    seconds appear only when the stored time is not a whole minute, and
+    fractions of a second only when present (to the millisecond, the
+    precision the label claims). Whole days read ``Day N``; shorter times
+    read ``18 h``, ``42 min``, ``7.5 s``. Zero takes the largest unit the
+    run reaches (``span``): ``Day 0`` for a multi-day run, ``0 h`` for an
+    hours-long one.
+    """
+    millis = int(round(float(seconds) * 1000.0))
+    if millis < 0:
+        raise ValueError("elapsed time must be nonnegative")
+    days, millis = divmod(millis, 86_400_000)
+    hours, millis = divmod(millis, 3_600_000)
+    minutes, millis = divmod(millis, 60_000)
+    parts = []
+    if hours:
+        parts.append(f"{hours} h")
+    if minutes:
+        parts.append(f"{minutes} min")
+    if millis:
+        whole, frac = divmod(millis, 1000)
+        parts.append(f"{whole} s" if not frac else
+                     f"{whole}.{frac:03d}".rstrip("0") + " s")
+    rest = " ".join(parts)
+    if days:
+        return f"Day {days}" + (f", {rest}" if rest else "")
+    if rest:
+        return rest
+    span = 0.0 if span is None else float(span)
+    if span >= 86400.0:
+        return "Day 0"
+    if span >= 3600.0:
+        return "0 h"
+    if span >= 60.0:
+        return "0 min"
+    return "0 s"
+
+
+def _time_label(seconds: float, times: np.ndarray) -> str:
+    return elapsed_label(seconds, float(times[-1]) if times.size else 0.0)
 
 
 def _level_label(fields: RunFields, level: int | None) -> str:
@@ -627,7 +666,7 @@ def _compose_overview(fields: RunFields, view: Overview
 
     map_titles = []
     for position, index in enumerate(indices):
-        title = _time_label(fields.times[index], divisor, unit)
+        title = _time_label(fields.times[index], fields.times)
         map_titles.append(title)
         r, c = divmod(position, columns)
         panels.append(PanelPlacement(_map_panel(
@@ -698,7 +737,7 @@ def _compose_grid(fields: RunFields, view: Grid) -> tuple[FigureSpec, dict]:
     panels: list[PanelPlacement] = []
     heights: list[float] = []
     heading, provenance = _header(fields, view.title)
-    heading += f" · {_time_label(fields.times[index], divisor, unit)}"
+    heading += f" · {_time_label(fields.times[index], fields.times)}"
     panels.append(PanelPlacement(TextPanelSpec(
         heading, font_family="sans-serif", font_size=style.base_font_size + 1,
         horizontal_alignment="left", font_weight="semibold"), 0, 0,

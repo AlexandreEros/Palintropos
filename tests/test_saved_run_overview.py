@@ -140,6 +140,25 @@ def test_rest_threshold_uses_the_host_kinetic_energy_spectrum():
     assert round(measures.effective_modes, 2) == 4.42
 
 
+def test_elapsed_time_labels_read_naturally():
+    from tropoi.representation.visual.compose import elapsed_label
+    day = 86400.0
+    assert elapsed_label(0.0, 15 * day) == "Day 0"
+    assert elapsed_label(5 * day, 15 * day) == "Day 5"
+    assert elapsed_label(5 * day + 3 * 3600, 15 * day) == "Day 5, 3 h"
+    assert elapsed_label(5 * day + 3 * 3600 + 17 * 60) == "Day 5, 3 h 17 min"
+    assert elapsed_label(18 * 3600) == "18 h"
+    assert elapsed_label(42 * 60) == "42 min"
+    assert elapsed_label(900.0) == "15 min"
+    assert elapsed_label(7.5) == "7.5 s"
+    assert elapsed_label(0.0, 1800.0) == "0 min"
+    assert elapsed_label(0.0, 5 * 3600.0) == "0 h"
+    # Roundoff in a stored time never becomes a spurious component.
+    assert elapsed_label(5 * day + 1e-7) == "Day 5"
+    with pytest.raises(ValueError):
+        elapsed_label(-1.0)
+
+
 def test_nice_speed_key_values():
     from tropoi.representation.visual.compose import _nice_speeds
     assert _nice_speeds(42.35) == (10.0, 20.0, 40.0)
