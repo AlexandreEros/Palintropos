@@ -12,7 +12,6 @@ Examples (from the repository root)::
     python docs/readme_figures.py rotation-runs
     python docs/readme_figures.py render \
         --dynamic-run runs/readme-dynamic/<run-id> \
-        --rh4-run runs/validation-rh4/<run-id> \
         --geodesic-run runs/validation-rh4/<run-id> \
         --latlon-run runs/validation-rh4-latlon/<run-id> \
         --rotating-rotation-root runs/readme-rotations-rot24h
@@ -24,7 +23,6 @@ import csv
 import json
 import math
 import pathlib
-import shutil
 
 import cupy as cp
 import matplotlib.pyplot as plt
@@ -408,8 +406,6 @@ def render(args) -> None:
         raise RuntimeError(
             "rotating rotation run set is incomplete; run rotation-runs with --day-hours 24")
 
-    rh4_target = assets / "rh4_simulation_summary.png"
-    shutil.copy2(args.rh4_run.resolve() / "bve_summary.png", rh4_target)
     _plot_vortex_evolution(
         args.dynamic_run.resolve(), assets / "two_vortices_evolution.png")
     _plot_backend_comparison(
@@ -422,7 +418,6 @@ def render(args) -> None:
     provenance = {
         "two_vortices_evolution.png": [
             _provenance_entry(args.dynamic_run.resolve())],
-        "rh4_simulation_summary.png": [_provenance_entry(args.rh4_run.resolve())],
         "rh4_geodesic_vs_latlon.png": [
             _provenance_entry(args.geodesic_run.resolve()),
             _provenance_entry(args.latlon_run.resolve()),
@@ -452,7 +447,6 @@ def build_parser() -> argparse.ArgumentParser:
     rotations.add_argument("--dt-snapshots", type=float, default=43200.0)
     render_parser = commands.add_parser("render")
     render_parser.add_argument("--dynamic-run", type=pathlib.Path, required=True)
-    render_parser.add_argument("--rh4-run", type=pathlib.Path, required=True)
     render_parser.add_argument("--geodesic-run", type=pathlib.Path, required=True)
     render_parser.add_argument("--latlon-run", type=pathlib.Path, required=True)
     render_parser.add_argument("--rotation-root", type=pathlib.Path,

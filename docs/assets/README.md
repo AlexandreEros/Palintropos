@@ -29,5 +29,4 @@ and stay here until each is replaced by a figure drawn from a published run.
 | `two_vortices_rotation_comparison.png` | VALIDATION.md | several BVE runs | a validation-study figure from published runs |
 | `two_vortices_rotating_streamlines.png` | VALIDATION.md | several BVE runs | as above |
 | `rh4_geodesic_vs_latlon.png` | VALIDATION.md | two RH4 runs (geodesic, Gauss) | as above |
-| `rh4_simulation_summary.png` | nothing | one RH4 run | none; obsolete, proposed for deletion |
 | `provenance.json` | the figures above | | removed with the last of them |

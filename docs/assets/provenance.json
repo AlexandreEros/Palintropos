@@ -33,40 +33,6 @@
       }
     }
   ],
-  "rh4_simulation_summary.png": [
-    {
-      "run_id": "20260713T022542Z_rh4_rot24h_r4_l21_dt6h_4a840226",
-      "commit": "4a84022651b6b37752a168a2d8ef660359df945c",
-      "dirty": true,
-      "config": {
-        "lmax": 21,
-        "grid": "geodesic",
-        "resolution": 4,
-        "nlat": 128,
-        "nlon": 256,
-        "day_hours": 24.0,
-        "radius_earth_units": 1.0,
-        "duration_days": 1.0,
-        "dt_snapshots": 21600.0,
-        "scenario": "rh4",
-        "viscosity": 0.0,
-        "product_quadrature": "fine",
-        "out": "runs",
-        "experiment": "validation-rh4",
-        "overwrite": false,
-        "run_id": "20260713T022542Z_rh4_rot24h_r4_l21_dt6h_4a840226"
-      },
-      "numerics": {
-        "backend": "GeodesicBackend",
-        "grid": "GeodesicGridGeometry",
-        "state_sampling": "geodesic-res4-state",
-        "product_quadrature": "fine",
-        "product_sampling": "geodesic-res5-voronoi",
-        "transform": "GeodesicSphericalHarmonics",
-        "l_max": 21
-      }
-    }
-  ],
   "rh4_geodesic_vs_latlon.png": [
     {
       "run_id": "20260713T022542Z_rh4_rot24h_r4_l21_dt6h_4a840226",
