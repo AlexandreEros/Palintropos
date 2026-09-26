@@ -33,8 +33,8 @@ Stored artifacts:
 * ``figures/``               rendered when 'diagnostics' in ``plots``.
 * ``pe_summary.png``         rendered when 'summary' in ``plots``.
 * ``snapshots/physical/``    per-snapshot upper/lower figures + timeline.png,
-                             rendered alongside the summary (same BVE/SWE
-                             capsule-root snapshot-product layout).
+                             rendered when 'snapshots' in ``plots`` (same
+                             BVE/SWE capsule-root snapshot-product layout).
 """
 from __future__ import annotations
 
@@ -48,7 +48,7 @@ import cupy as cp
 from tropoi.temporal.tendencies.primitive_equations import (
     PrimitiveEquationsModel, PrimitiveEquationsState)
 from tropoi.temporal.integration import IntegrationScheduler, rk4_step_array
-from tropoi.run.pe.config import PE_PLOT_TYPES
+from tropoi.run.pe.config import PE_DEFAULT_PLOTS
 from tropoi.representation.diagnostics.pe import PEDiagnosticsRecorder, plot_pe_diagnostics
 
 
@@ -70,7 +70,7 @@ def run_pe(model: PrimitiveEquationsModel,
         raise ValueError(f"dt_seconds must be finite and > 0, got {dt_seconds}")
     if snapshot_mode not in ("count", "interval"):
         raise ValueError(f"unknown snapshot_mode: {snapshot_mode!r}")
-    plots = tuple(PE_PLOT_TYPES) if plots is None else tuple(plots)
+    plots = tuple(PE_DEFAULT_PLOTS) if plots is None else tuple(plots)
 
     model.validate_state(state0, context="initial state")
     state = PrimitiveEquationsState(cp.array(state0.coeffs, copy=True))
@@ -159,15 +159,15 @@ def run_pe(model: PrimitiveEquationsModel,
             # Plotting must never take down a finished run; the CSV survives.
             print(f"Diagnostics plotting failed (data preserved): {err}")
 
-    if "summary" in plots:
-        # Part of the selected run product: a failure propagates so the shared
-        # lifecycle marks the run failed and never publishes it as complete.
-        # The single-level summary and the per-snapshot upper/lower figures are
-        # rendered together from the just-persisted coefficient stack.
-        from tropoi.representation.visual.pe import render_pe_summary
+    # Selected run products: a failure propagates so the shared lifecycle
+    # marks the run failed and never publishes it as complete. Both render
+    # from the just-persisted coefficient stack.
+    if "snapshots" in plots:
         from tropoi.representation.visual.pe_snapshots import render_pe_snapshots
-        render_pe_summary(model, out_dir, metadata=figure_metadata)
         render_pe_snapshots(model, out_dir, metadata=figure_metadata,
                             scenario=scenario)
+    if "summary" in plots:
+        from tropoi.representation.visual.pe import render_pe_summary
+        render_pe_summary(model, out_dir, metadata=figure_metadata)
 
     return 0

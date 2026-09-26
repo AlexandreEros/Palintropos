@@ -61,8 +61,13 @@ from tropoi.run.swe.config import (DEFAULT_GRAVITY, DEFAULT_MOUNTAIN_HEIGHT_M,
 
 #: Image products in deterministic execution order. ``summary`` needs at
 #: least one persisted state; ``diagnostics`` remains available for N=0 runs.
-PE_PLOT_TYPES = ("diagnostics", "summary")
-_PE_PLOTS_REQUIRING_SNAPSHOTS = ("summary",)
+PE_PLOT_TYPES = ("diagnostics", "snapshots", "summary")
+_PE_PLOTS_REQUIRING_SNAPSHOTS = ("snapshots", "summary")
+#: Products rendered when no plot option is given. The per-state
+#: ``summary`` figure is the historical, slow product; it is rendered only
+#: on request (``--plot summary`` / ``--plot all``). Post-run figures are
+#: drawn from the saved run with ``tropoi plot`` / ``Simulation.plot``.
+PE_DEFAULT_PLOTS = ("diagnostics", "snapshots")
 
 #: Dry-air constants mirrored from ``temporal.tendencies.primitive_equations`` (imported
 #: literally here, not from that module, so the config stays CuPy-free). The
@@ -188,7 +193,7 @@ class PERunConfig:
     dt_snapshots: Optional[float] = None
     snapshot_mode: str = "count"
     n_snapshots: Optional[int] = DEFAULT_N_SNAPSHOTS
-    plots: tuple[str, ...] = PE_PLOT_TYPES
+    plots: tuple[str, ...] = PE_DEFAULT_PLOTS
     out: str = "runs"
     experiment: Optional[str] = None
     overwrite: bool = False
@@ -445,11 +450,9 @@ class PERunConfig:
         if no_plots:
             return ()
         if requested is None:
-            if has_snapshots:
-                return PE_PLOT_TYPES
             return tuple(
-                plot for plot in PE_PLOT_TYPES
-                if plot not in _PE_PLOTS_REQUIRING_SNAPSHOTS)
+                plot for plot in PE_DEFAULT_PLOTS if has_snapshots
+                or plot not in _PE_PLOTS_REQUIRING_SNAPSHOTS)
         selected = set()
         for name in requested:
             if name == "all":

@@ -82,6 +82,11 @@ MIN_NLON = 4
 #: stored state).
 PLOT_TYPES = ("diagnostics", "snapshots", "summary")
 _PLOTS_REQUIRING_SNAPSHOTS = ("snapshots", "summary")
+#: Products rendered when no plot option is given. The per-state
+#: ``summary`` figure is the historical, slow product; it is rendered only
+#: on request (``--plot summary`` / ``--plot all``). Post-run figures are
+#: drawn from the saved run with ``tropoi plot`` / ``Simulation.plot``.
+DEFAULT_PLOTS = ("diagnostics", "snapshots")
 
 #: Ordinary defaults for run-bve settings, identical to the historical
 #: psx-bve argparse defaults. Snapshot and plot controls are deliberately
@@ -160,7 +165,7 @@ class BVERunConfig:
     overwrite: bool = False
     snapshot_mode: str = "interval"
     n_snapshots: Optional[int] = None
-    plots: tuple[str, ...] = PLOT_TYPES
+    plots: tuple[str, ...] = DEFAULT_PLOTS
 
     def __post_init__(self) -> None:
         if self.grid not in GRID_TYPES:
@@ -338,8 +343,8 @@ class BVERunConfig:
     def _resolve_plots(requested, no_plots, *, has_snapshots: bool) -> tuple[str, ...]:
         """Resolve --plot/--no-plots into a deterministic plot tuple.
 
-        No selection: current default behavior — every product the schedule
-        supports. Explicit selection: exactly that set (deduplicated, in
+        No selection: ``DEFAULT_PLOTS`` that the schedule supports (no
+        summary). Explicit selection: exactly that set (deduplicated, in
         canonical order); incompatibility with the schedule is an error,
         raised later by __post_init__.
         """
@@ -348,10 +353,8 @@ class BVERunConfig:
         if no_plots:
             return ()
         if requested is None:
-            if has_snapshots:
-                return PLOT_TYPES
-            return tuple(p for p in PLOT_TYPES
-                         if p not in _PLOTS_REQUIRING_SNAPSHOTS)
+            return tuple(p for p in DEFAULT_PLOTS if has_snapshots
+                         or p not in _PLOTS_REQUIRING_SNAPSHOTS)
         selected = set()
         for name in requested:
             if name == "all":

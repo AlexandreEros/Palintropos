@@ -355,7 +355,8 @@ def test_runner_auto_generates_snapshots_with_summary_plot(latlon_model,
     times = count_snapshot_times(3, 900.0)
     run_pe(latlon_model, state, dt_seconds=300.0, t_end_days=900.0 / 86400.0,
            out_dir=tmp_path, snapshot_times=times, snapshot_mode="count",
-           dt_snapshots=450.0, plots=("summary",), scenario="thermal_wave")
+           dt_snapshots=450.0, plots=("snapshots", "summary"),
+           scenario="thermal_wave")
     snap_dir = tmp_path / PE_SNAPSHOTS_DIRNAME / PE_SNAPSHOTS_REPRESENTATION
     assert len(_frame_names(snap_dir)) == len(times)
     assert (snap_dir / "timeline.png").exists()

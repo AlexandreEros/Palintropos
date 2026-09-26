@@ -21,7 +21,7 @@ from tropoi.temporal.tendencies.shallow_water import (ShallowWaterModel,
                                                      ShallowWaterState)
 from tropoi.temporal.integration import (IntegrationScheduler, advective_cfl_timestep,
                       integrate, rk4_step_array, validate_snapshot_schedule)
-from tropoi.run.swe.config import SWE_PLOT_TYPES
+from tropoi.run.swe.config import SWE_DEFAULT_PLOTS
 from tropoi.representation.diagnostics.swe import SWEDiagnosticsRecorder, plot_swe_diagnostics
 from tropoi.representation.visual.swe import render_swe_snapshots, render_swe_summary
 
@@ -63,7 +63,7 @@ def run_swe(model: ShallowWaterModel,
     else:
         if dt_snapshots is None:
             raise ValueError("interval mode requires dt_snapshots")
-    plots = tuple(SWE_PLOT_TYPES) if plots is None else tuple(plots)
+    plots = tuple(SWE_DEFAULT_PLOTS) if plots is None else tuple(plots)
 
     model.validate_state(state0, context="initial state")
     state = ShallowWaterState(cp.array(state0.coeffs, copy=True))

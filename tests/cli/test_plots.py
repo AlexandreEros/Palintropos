@@ -1,14 +1,20 @@
 """Plot-selection resolution independently of state persistence."""
 from __future__ import annotations
 
-from tropoi.run.bve.config import PLOT_TYPES, SECONDS_PER_DAY
+from tropoi.run.bve.config import DEFAULT_PLOTS, PLOT_TYPES, SECONDS_PER_DAY
 
 from .conftest import run_tropoi_stubbed
 
 
-def test_default_plots_reproduce_current_behavior(stub_execute_run):
+def test_default_plots_omit_the_summary_figure(stub_execute_run):
     cfg = run_tropoi_stubbed(["run", "bve"], stub_execute_run)
-    assert cfg.plots == PLOT_TYPES
+    assert cfg.plots == DEFAULT_PLOTS == ("diagnostics", "snapshots")
+
+
+def test_summary_stays_available_on_request(stub_execute_run):
+    cfg = run_tropoi_stubbed(["run", "bve", "--plot", "summary"],
+                             stub_execute_run)
+    assert cfg.plots == ("summary",)
 
 
 def test_default_plots_degrade_when_no_snapshots(stub_execute_run):

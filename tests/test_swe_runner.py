@@ -34,7 +34,8 @@ def test_swe_config_defaults():
     assert cfg.gravity == pytest.approx(9.80616)
     assert cfg.mean_depth_m == 3000.0
     assert cfg.day_hours == pytest.approx(23.9345)
-    assert cfg.plots == ("diagnostics", "snapshots", "summary")
+    # The summary figure is rendered only on request.
+    assert cfg.plots == ("diagnostics", "snapshots")
     assert SWERunConfig.resolve({"n_snapshots": 0}).plots == ("diagnostics",)
     times = cfg.snapshot_times_seconds()
     assert len(times) == 5 and times[0] == 0.0 and times[-1] == 86400.0

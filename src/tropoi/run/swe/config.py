@@ -45,6 +45,11 @@ from tropoi.spatial.williamson5 import (  # noqa: F401  (re-exports)
 #: least one persisted state; diagnostics remain available for N=0 runs.
 SWE_PLOT_TYPES = ("diagnostics", "snapshots", "summary")
 _SWE_PLOTS_REQUIRING_SNAPSHOTS = ("snapshots", "summary")
+#: Products rendered when no plot option is given. The per-state
+#: ``summary`` figure is the historical, slow product; it is rendered only
+#: on request (``--plot summary`` / ``--plot all``). Post-run figures are
+#: drawn from the saved run with ``tropoi plot`` / ``Simulation.plot``.
+SWE_DEFAULT_PLOTS = ("diagnostics", "snapshots")
 
 #: Default sidereal day (hours): 2*pi / 7.292e-5 s^-1, i.e. Earth's rotation
 #: rate. Unlike the BVE (whose historical default is non-rotating), the
@@ -155,7 +160,7 @@ class SWERunConfig:
     dt_snapshots: Optional[float] = None
     snapshot_mode: str = "count"
     n_snapshots: Optional[int] = DEFAULT_N_SNAPSHOTS
-    plots: tuple[str, ...] = SWE_PLOT_TYPES
+    plots: tuple[str, ...] = SWE_DEFAULT_PLOTS
     out: str = "runs"
     experiment: Optional[str] = None
     overwrite: bool = False
@@ -385,11 +390,9 @@ class SWERunConfig:
         if no_plots:
             return ()
         if requested is None:
-            if has_snapshots:
-                return SWE_PLOT_TYPES
             return tuple(
-                plot for plot in SWE_PLOT_TYPES
-                if plot not in _SWE_PLOTS_REQUIRING_SNAPSHOTS)
+                plot for plot in SWE_DEFAULT_PLOTS if has_snapshots
+                or plot not in _SWE_PLOTS_REQUIRING_SNAPSHOTS)
         selected = set()
         for name in requested:
             if name == "all":

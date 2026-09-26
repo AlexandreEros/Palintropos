@@ -8,7 +8,7 @@ from typing import Sequence
 from tropoi.spatial.planet import Planet
 from tropoi.spatial.states.barotropic import BarotropicState
 from tropoi.temporal.tendencies.barotropic import BarotropicVorticity
-from tropoi.run.bve.config import (PLOT_TYPES, IntegrationScheduler, advective_cfl_timestep,
+from tropoi.run.bve.config import (DEFAULT_PLOTS, PLOT_TYPES, IntegrationScheduler, advective_cfl_timestep,
                      validate_snapshot_schedule)
 # The physics-agnostic driver loop lives in the shared engine; `_integrate`
 # is kept as this module's historical name for it (tests import it here).
@@ -81,7 +81,7 @@ def run_bve(planet: Planet,
     else:  # interval
         if dt_snapshots is None:
             raise ValueError("interval mode requires dt_snapshots")
-    plots = tuple(PLOT_TYPES) if plots is None else tuple(plots)
+    plots = tuple(DEFAULT_PLOTS) if plots is None else tuple(plots)
 
     # Geometry-owned CFL length scale (geodesic: min edge length; lat-lon: min
     # meridional spacing — see the geometry's cfl_length_scale docstring).

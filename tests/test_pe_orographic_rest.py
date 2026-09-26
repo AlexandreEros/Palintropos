@@ -668,6 +668,7 @@ def test_pe_cli_orographic_end_to_end(tmp_path, capsys):
                "--mountain-lon-deg", "60", "--mountain-width-deg", "25",
                "--dt-seconds", "100", "--days", "0.005",
                "--n-snapshots", "2", "--plot", "summary",
+               "--plot", "snapshots",
                "--out", str(tmp_path / "runs")])
     assert rc == 0
     out = capsys.readouterr().out

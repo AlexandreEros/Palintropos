@@ -27,7 +27,8 @@ def test_run_bve_completes_on_latlon(tmp_path):
 
     rc = run_bve(planet=planet, zeta0_lm=zeta0_lm,
                  dt_snapshots=1800.0, t_end_days=0.02,
-                 out_dir=tmp_path, viscosity=0.0, scenario="rh4")
+                 out_dir=tmp_path, viscosity=0.0, scenario="rh4",
+                 plots=("diagnostics", "snapshots", "summary"))
 
     assert rc == 0
     assert (tmp_path / "vorticity_coeffs.npy").exists()
