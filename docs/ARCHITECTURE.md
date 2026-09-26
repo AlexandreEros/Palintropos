@@ -323,6 +323,17 @@ reconstruct frames from persisted run arrays. PNGs are written to
 same-directory temporary siblings and atomically replaced, so only complete
 images can become run artifacts.
 
+A run directory holds its evidence (configuration and manifest, saved
+states, time axis, `diagnostics/`), the image products the runner renders
+(by default the diagnostics figures and the per-snapshot product; the
+summary figure only with `--plot summary`), and `assets/`. `assets/` holds
+figures and sidecars drawn later from the saved run (`tropoi plot`,
+`Simulation.plot`, via `representation/visual/compose.py`). It is the only
+place post-run plotting writes inside a run. It never enters the run id or
+the completion status, and `--overwrite` sweeps it. Runs committed on
+purpose live in `docs/runs/<run-id>/` with a `SHA256SUMS` receipt that
+covers the evidence only, never `assets/` ([docs/runs/README.md](runs/README.md)).
+
 Physical snapshot frames use backend-neutral panel-group metadata to display
 `Prognostic state` and `Diagnostic fields` headings with a subtle separator;
 the renderer knows only group geometry and styling. BVE places relative
@@ -529,6 +540,8 @@ python tests/audit_r5_mechanism.py
 
 `audit_r3_product.py res5` and fine-product configurations can require much more
 GPU memory than the default run. Read each script's header before running it.
-The README figures can be reproduced from run capsules with
-[`readme_figures.py`](readme_figures.py); their portable scientific provenance is
-tracked separately from the ignored raw runs.
+The README's Williamson-5 figure is an asset of its published run, drawn by
+the pinned recipe [`figures/williamson5_t63_overview.py`](figures/williamson5_t63_overview.py).
+The legacy BVE and RH4 figures in `docs/assets/` come from
+[`readme_figures.py`](readme_figures.py) and ignored local runs
+([docs/assets/README.md](assets/README.md)).
