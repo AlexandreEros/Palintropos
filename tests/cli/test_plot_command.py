@@ -84,3 +84,50 @@ def test_cli_options_build_the_described_views():
     assert view.map.background == "wind_speed"
     assert isinstance(view.map.vectors, Arrows)
     assert view.map.contours[0].levels == (1000.0,)
+
+
+def test_viewer_policy_is_conservative(monkeypatch):
+    import sys as _sys
+    from tropoi.cli import main as cli
+    monkeypatch.setattr(_sys.stdout, "isatty", lambda: True, raising=False)
+    for key in ("CI", "SSH_CONNECTION", "SSH_TTY"):
+        monkeypatch.delenv(key, raising=False)
+    monkeypatch.setattr(_sys, "platform", "win32")
+    assert cli._can_open_viewer()
+    monkeypatch.setenv("CI", "true")
+    assert not cli._can_open_viewer()
+    monkeypatch.delenv("CI")
+    monkeypatch.setenv("SSH_CONNECTION", "1.2.3.4 1 5.6.7.8 22")
+    assert not cli._can_open_viewer()
+    monkeypatch.delenv("SSH_CONNECTION")
+    monkeypatch.setattr(_sys, "platform", "linux")
+    monkeypatch.delenv("DISPLAY", raising=False)
+    monkeypatch.delenv("WAYLAND_DISPLAY", raising=False)
+    assert not cli._can_open_viewer()
+    monkeypatch.setenv("DISPLAY", ":0")
+    assert cli._can_open_viewer()
+    monkeypatch.setattr(_sys.stdout, "isatty", lambda: False, raising=False)
+    assert not cli._can_open_viewer()
+
+
+def test_a_viewer_failure_never_fails_plotting(monkeypatch, capsys, tmp_path):
+    import os
+    import sys as _sys
+    from tropoi.cli import main as cli
+    monkeypatch.setattr(_sys, "platform", "win32")
+
+    def broken(path):
+        raise OSError("no association")
+    monkeypatch.setattr(os, "startfile", broken, raising=False)
+    cli._open_in_viewer(tmp_path / "x.png")
+    assert "could not open" in capsys.readouterr().out
+
+
+def test_open_flags_parse():
+    from tropoi.cli.main import build_parser
+    parser = build_parser()
+    assert parser.parse_args(["plot", "R"]).open is None
+    assert parser.parse_args(["plot", "R", "--open"]).open is True
+    assert parser.parse_args(["plot", "R", "--no-open"]).open is False
+    with pytest.raises(SystemExit):
+        parser.parse_args(["plot", "R", "--open", "--no-open"])

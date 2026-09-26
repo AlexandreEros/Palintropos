@@ -1115,7 +1115,46 @@ def _cmd_plot(args: argparse.Namespace) -> int:
     print(f"Wrote {written}")
     if args.sidecar:
         print(f"Wrote {pathlib.Path(written).with_suffix('.json')}")
+    if args.open is True or (args.open is None and _can_open_viewer()):
+        _open_in_viewer(pathlib.Path(written))
     return 0
+
+
+def _can_open_viewer() -> bool:
+    """Whether to show the image automatically (a conservative policy).
+
+    Only in an interactive terminal (stdout is a TTY) outside CI, and not
+    over SSH. On Windows and macOS a local session always has a desktop;
+    elsewhere a DISPLAY or WAYLAND_DISPLAY must be set.
+    """
+    import os
+    import sys
+    if not sys.stdout.isatty():
+        return False
+    env = os.environ
+    if env.get("CI") or env.get("SSH_CONNECTION") or env.get("SSH_TTY"):
+        return False
+    if sys.platform in ("win32", "darwin"):
+        return True
+    return bool(env.get("DISPLAY") or env.get("WAYLAND_DISPLAY"))
+
+
+def _open_in_viewer(path) -> None:
+    """Open ``path`` with the OS default viewer; never raises."""
+    import os
+    import subprocess
+    import sys
+    try:
+        if sys.platform == "win32":
+            os.startfile(str(path))          # noqa: S606 - user's own file
+        elif sys.platform == "darwin":
+            subprocess.Popen(["open", str(path)])
+        else:
+            subprocess.Popen(["xdg-open", str(path)],
+                             stdout=subprocess.DEVNULL,
+                             stderr=subprocess.DEVNULL)
+    except Exception as err:  # noqa: BLE001 - viewing is best effort
+        print(f"(could not open an image viewer: {err})")
 
 
 def _cmd_gen(args: argparse.Namespace) -> int:
@@ -1299,6 +1338,17 @@ def build_parser() -> argparse.ArgumentParser:
     plot_parser.add_argument(
         "--sidecar", action="store_true",
         help="Also write every number the figure shows to <output>.json.")
+    viewer = plot_parser.add_mutually_exclusive_group()
+    viewer.add_argument(
+        "--open", dest="open", action="store_const", const=True,
+        default=None,
+        help="Open the image in the default viewer even where it would not "
+             "be opened automatically.")
+    viewer.add_argument(
+        "--no-open", dest="open", action="store_const", const=False,
+        help="Do not open the image. By default it opens in an interactive "
+             "local desktop session, never under CI or SSH or without a "
+             "display; a viewer failure never fails the command.")
     plot_parser.set_defaults(_handler=_cmd_plot)
 
     # tropoi gen
