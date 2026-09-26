@@ -329,8 +329,8 @@ class VectorLayer:
     max_length: float = 4.0
     #: Seed streamlines from this many points of a fixed low-discrepancy
     #: (R2) sequence instead of Matplotlib's regular grid. With a short
-    #: ``max_length`` this staggers the direction arrows; the sequence is
-    #: deterministic, so renders are reproducible. ``None``: grid seeding.
+    #: ``max_length`` this staggers the direction arrows. The seeds, and
+    #: so the streamline geometry, are deterministic. ``None``: grid seeding.
     seed_count: int | None = None
     #: Streamlines are not integrated poleward of this latitude (degrees),
     #: where the map metric 1/cos(lat) is singular.

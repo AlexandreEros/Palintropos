@@ -345,7 +345,8 @@ def test_default_plot_goes_to_the_runs_assets_and_touches_nothing_else(
     finally:
         _release_gpu()
     assert written == run / "assets" / "overview.png"
-    assert (run / "assets" / "overview.json").is_file()
+    # LF on every platform: the sidecar's bytes do not depend on the OS.
+    assert b"\r\n" not in (run / "assets" / "overview.json").read_bytes()
     after = _tree_digest(run)
     assert {k: v for k, v in after.items()
             if not k.startswith("assets/")} == before

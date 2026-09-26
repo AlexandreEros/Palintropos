@@ -806,6 +806,7 @@ def render_view(storage, view, output_path=None, *,
     record["synthesis_count"] = fields.synthesis_count
     if sidecar:
         side = written.with_suffix(".json")
+        # LF on every platform, so the sidecar's bytes do not depend on the OS.
         side.write_text(json.dumps(record, indent=2, sort_keys=True) + "\n",
-                        encoding="utf-8")
+                        encoding="utf-8", newline="\n")
     return written

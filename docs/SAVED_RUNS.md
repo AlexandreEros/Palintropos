@@ -211,7 +211,10 @@ sim.plot("pe.png", Overview(map=Map("temperature_anomaly", level=Sigma(0.75),
 - **Provenance.** PNG metadata records the run id, solver, commit, the
   SHA-256 of the coefficient file and of `diagnostics/timeseries.csv`, and the
   full view. With `sidecar=True` (or `--sidecar`), every number shown is also
-  written to `<output>.json`.
+  written to `<output>.json`. The sidecar is reproducible byte for byte. The
+  image is not guaranteed to be: with streamlines, Matplotlib's
+  rasterization varies between processes by a few antialiased pixels,
+  although the streamline geometry itself is identical.
 - **Where figures go.** `sim.plot()` and `tropoi plot RUN` write
   `RUN/assets/overview.png` (with `--sidecar`, also `overview.json`); other
   views from the command get a name spelling out their options, and `-o`
