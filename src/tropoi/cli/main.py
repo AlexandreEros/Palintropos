@@ -191,12 +191,10 @@ def add_bve_arguments(parser: argparse.ArgumentParser) -> None:
         choices=list(PLOT_TYPES) + ["all"], default=None,
         help="Generate only the named image product; repeatable "
              f"({', '.join(PLOT_TYPES)}, or 'all'). Duplicates are ignored "
-             "and execution order is fixed. Without any plot option, the "
-             "diagnostics and snapshots products the schedule supports are "
-             "generated; the slower summary figure only on request. Field "
-             "snapshots and numerical diagnostics are always written "
-             "regardless of plot selection. Draw more later with "
-             "'tropoi plot RUN'.")
+             "and execution order is fixed. Without any plot option no "
+             "image is rendered: a run writes only its evidence (states, "
+             "times, numerical diagnostics, manifest). Draw figures later "
+             "with 'tropoi plot RUN'.")
     plot_group.add_argument(
         "--no-plots", action="store_true", default=None,
         help="Generate no image files (field snapshots and numerical "
@@ -377,8 +375,8 @@ def add_swe_arguments(parser: argparse.ArgumentParser) -> None:
         choices=list(SWE_PLOT_TYPES) + ["all"], default=None,
         help="Generate only the named image product; repeatable "
              f"({', '.join(SWE_PLOT_TYPES)}, or 'all'). Duplicates are "
-             "ignored and execution order is fixed. Default: diagnostics "
-             "and snapshots; the summary figure only on request.")
+             "ignored and execution order is fixed. Default: no images; "
+             "draw figures later with 'tropoi plot RUN'.")
     plot_group.add_argument(
         "--no-plots", action="store_true", default=None,
         help="Generate no image files (spectral snapshots and numerical "
@@ -567,9 +565,8 @@ def add_pe_arguments(parser: argparse.ArgumentParser) -> None:
         "--plot", dest="plots", action="append", metavar="TYPE",
         choices=list(PE_PLOT_TYPES) + ["all"], default=None,
         help="Generate only the named image product; repeatable "
-             f"({', '.join(PE_PLOT_TYPES)}, or 'all'). Default: "
-             "diagnostics and snapshots; the summary figure only on "
-             "request.")
+             f"({', '.join(PE_PLOT_TYPES)}, or 'all'). Default: no "
+             "images; draw figures later with 'tropoi plot RUN'.")
     plot_group.add_argument(
         "--no-plots", action="store_true", default=None,
         help="Generate no image files (spectral snapshots and numerical "

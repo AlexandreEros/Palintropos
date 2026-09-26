@@ -179,7 +179,7 @@ def test_summary_lines_are_plain_strings():
 
 def test_plot_types_exposed():
     assert PE_PLOT_TYPES == ("diagnostics", "snapshots", "summary")
-    assert PERunConfig.resolve({}).plots == ("diagnostics", "snapshots")
+    assert PERunConfig.resolve({}).plots == ()
     assert PERunConfig.resolve({"plots": ["summary"]}).plots == ("summary",)
 
 

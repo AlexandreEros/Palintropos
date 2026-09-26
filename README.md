@@ -160,11 +160,15 @@ Each run writes a self-contained directory containing:
   accepted step.
 - `diagnostics/spectra.npz` (BVE runs only): degree spectra of energy and
   enstrophy, every tenth recorded step.
-- Saved spectral states, their time axis, and figures.
+- Saved spectral states and their time axis.
+
+A run renders no images. Draw them afterwards with `tropoi plot RUN`
+(written to `RUN/assets/`), or ask the run for its older image products with
+`--plot diagnostics`, `--plot snapshots`, `--plot summary` or `--plot all`.
 
 How many states are saved is controlled by `--n-snapshots N` (default 5,
-including `t = 0` and the end). `--plot` and `--no-plots` control which figures
-are rendered. States and diagnostics are written even with `--no-plots`.
+including `t = 0` and the end). States and diagnostics are always written,
+whatever `--plot` selects.
 
 Each solver saves its states under its own file names:
 

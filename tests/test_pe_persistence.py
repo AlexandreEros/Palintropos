@@ -161,6 +161,5 @@ def test_end_to_end_capsule_is_complete_and_loadable(tmp_path):
     times = np.load(run_dir / "pe_snapshot_times.npy")
     assert coeffs.shape == (2, 3 * 3 + 1, 9, 9)
     assert np.array_equal(times, np.array([0.0, 600.0]))
-    # Default products: the per-snapshot figures, never the summary.
-    assert (run_dir / "snapshots" / "physical" / "timeline.png").exists()
-    assert not (run_dir / "pe_summary.png").exists()
+    # A default run is evidence only: no image anywhere in the capsule.
+    assert not list(run_dir.rglob("*.png"))

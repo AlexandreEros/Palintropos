@@ -6,9 +6,15 @@ from tropoi.run.bve.config import DEFAULT_PLOTS, PLOT_TYPES, SECONDS_PER_DAY
 from .conftest import run_tropoi_stubbed
 
 
-def test_default_plots_omit_the_summary_figure(stub_execute_run):
+def test_default_run_renders_no_images(stub_execute_run):
     cfg = run_tropoi_stubbed(["run", "bve"], stub_execute_run)
-    assert cfg.plots == DEFAULT_PLOTS == ("diagnostics", "snapshots")
+    assert cfg.plots == DEFAULT_PLOTS == ()
+
+
+def test_every_image_product_stays_requestable(stub_execute_run):
+    cfg = run_tropoi_stubbed(["run", "bve", "--plot", "snapshots",
+                              "--plot", "diagnostics"], stub_execute_run)
+    assert cfg.plots == ("diagnostics", "snapshots")
 
 
 def test_summary_stays_available_on_request(stub_execute_run):
@@ -20,7 +26,7 @@ def test_summary_stays_available_on_request(stub_execute_run):
 def test_default_plots_degrade_when_no_snapshots(stub_execute_run):
     cfg = run_tropoi_stubbed(
         ["run", "bve", "--n-snapshots", "0"], stub_execute_run)
-    assert cfg.plots == ("diagnostics",)
+    assert cfg.plots == ()
     assert cfg.snapshot_times_seconds() == []
 
 

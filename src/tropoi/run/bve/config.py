@@ -82,11 +82,12 @@ MIN_NLON = 4
 #: stored state).
 PLOT_TYPES = ("diagnostics", "snapshots", "summary")
 _PLOTS_REQUIRING_SNAPSHOTS = ("snapshots", "summary")
-#: Products rendered when no plot option is given. The per-state
-#: ``summary`` figure is the historical, slow product; it is rendered only
-#: on request (``--plot summary`` / ``--plot all``). Post-run figures are
-#: drawn from the saved run with ``tropoi plot`` / ``Simulation.plot``.
-DEFAULT_PLOTS = ("diagnostics", "snapshots")
+#: Products rendered when no plot option is given: none. A run writes its
+#: evidence (config, manifest, states, times, numerical diagnostics); every
+#: image product is postprocessing, rendered only on request (``--plot
+#: diagnostics|snapshots|summary|all``) or later from the saved run with
+#: ``tropoi plot`` / ``Simulation.plot``.
+DEFAULT_PLOTS: tuple[str, ...] = ()
 
 #: Ordinary defaults for run-bve settings, identical to the historical
 #: psx-bve argparse defaults. Snapshot and plot controls are deliberately

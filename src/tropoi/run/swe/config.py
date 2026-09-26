@@ -45,11 +45,12 @@ from tropoi.spatial.williamson5 import (  # noqa: F401  (re-exports)
 #: least one persisted state; diagnostics remain available for N=0 runs.
 SWE_PLOT_TYPES = ("diagnostics", "snapshots", "summary")
 _SWE_PLOTS_REQUIRING_SNAPSHOTS = ("snapshots", "summary")
-#: Products rendered when no plot option is given. The per-state
-#: ``summary`` figure is the historical, slow product; it is rendered only
-#: on request (``--plot summary`` / ``--plot all``). Post-run figures are
-#: drawn from the saved run with ``tropoi plot`` / ``Simulation.plot``.
-SWE_DEFAULT_PLOTS = ("diagnostics", "snapshots")
+#: Products rendered when no plot option is given: none. A run writes its
+#: evidence (config, manifest, states, times, numerical diagnostics); every
+#: image product is postprocessing, rendered only on request (``--plot
+#: diagnostics|snapshots|summary|all``) or later from the saved run with
+#: ``tropoi plot`` / ``Simulation.plot``.
+SWE_DEFAULT_PLOTS: tuple[str, ...] = ()
 
 #: Default sidereal day (hours): 2*pi / 7.292e-5 s^-1, i.e. Earth's rotation
 #: rate. Unlike the BVE (whose historical default is non-rotating), the

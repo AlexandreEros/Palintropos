@@ -324,9 +324,8 @@ same-directory temporary siblings and atomically replaced, so only complete
 images can become run artifacts.
 
 A run directory holds its evidence (configuration and manifest, saved
-states, time axis, `diagnostics/`), the image products the runner renders
-(by default the diagnostics figures and the per-snapshot product; the
-summary figure only with `--plot summary`), and `assets/`. `assets/` holds
+states, time axis, `diagnostics/`), any image products explicitly requested
+from the runner with `--plot` (none by default), and `assets/`. `assets/` holds
 figures and sidecars drawn later from the saved run (`tropoi plot`,
 `Simulation.plot`, via `representation/visual/compose.py`). It is the only
 place post-run plotting writes inside a run. It never enters the run id or
