@@ -193,7 +193,17 @@
     {
       "kind": "call",
       "source": "tropoi.cli.main._cmd_plot",
+      "target": "tropoi.cli.main._can_open_viewer"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.cli.main._cmd_plot",
       "target": "tropoi.cli.main._error"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.cli.main._cmd_plot",
+      "target": "tropoi.cli.main._open_in_viewer"
     },
     {
       "kind": "call",
@@ -1659,6 +1669,11 @@
       "kind": "call",
       "source": "tropoi.representation.visual.compose._snapshot_statistics",
       "target": "tropoi.representation.visual.quantities.quantity"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.compose._time_label",
+      "target": "tropoi.representation.visual.compose.elapsed_label"
     },
     {
       "kind": "call",
@@ -5298,6 +5313,13 @@
       "type": "function"
     },
     {
+      "id": "tropoi.cli.main._can_open_viewer",
+      "kind": "function",
+      "module": "tropoi.cli.main",
+      "qualname": "_can_open_viewer",
+      "type": "function"
+    },
+    {
       "id": "tropoi.cli.main._cmd_gen",
       "kind": "function",
       "module": "tropoi.cli.main",
@@ -5379,6 +5401,13 @@
       "kind": "function",
       "module": "tropoi.cli.main",
       "qualname": "_inspect_snapshot",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.cli.main._open_in_viewer",
+      "kind": "function",
+      "module": "tropoi.cli.main",
+      "qualname": "_open_in_viewer",
       "type": "function"
     },
     {
@@ -6597,6 +6626,13 @@
       "kind": "function",
       "module": "tropoi.representation.visual.compose",
       "qualname": "default_view",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.compose.elapsed_label",
+      "kind": "function",
+      "module": "tropoi.representation.visual.compose",
+      "qualname": "elapsed_label",
       "type": "function"
     },
     {
