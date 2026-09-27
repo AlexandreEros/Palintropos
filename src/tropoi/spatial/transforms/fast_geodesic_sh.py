@@ -109,3 +109,43 @@ class PointSetSphericalHarmonics:
     def inverse_transform(self, coeffs):
         """Alias for inv_transform."""
         return self.inv_transform(coeffs)
+
+    # ------------------------------------------------------------------
+    # Level-batched transforms (opt-in; the scalar paths above are frozen
+    # because pinned run hashes depend on their exact arithmetic)
+    # ------------------------------------------------------------------
+
+    def transform_batch(self, values: cp.ndarray) -> cp.ndarray:
+        """Analyze a stack of K real fields with one GEMM.
+
+        ``values`` has shape (K, n_points) (or (K,) + grid_shape). Returns
+        (K, l_max+1, l_max+1). Uses ``conj((f*w) @ Y)`` — identical to
+        ``Y^H (f*w)`` for real ``f*w`` — so no conjugate copy of ``Y`` is
+        ever materialized (the scalar path re-copies ``Y.conj().T`` on
+        every call, which dominated the PE tendency cost).
+        """
+        K = values.shape[0]
+        vals = values.reshape(K, -1)
+        weighted = vals * self.weights
+        flat = cp.dot(weighted, self.Y_matrix).conj()        # (K, n_basis)
+        out = cp.zeros((K, self.l_max + 1, self.l_max + 1), dtype=cp.complex128)
+        out[:, self.l_indices, self.m_indices] = flat
+        return out
+
+    def inv_transform_batch(self, coeffs: cp.ndarray) -> cp.ndarray:
+        """Synthesize a stack of K coefficient grids with one GEMM.
+
+        ``coeffs`` has shape (K, l_max+1, l_max+1). Returns (K, n_points)
+        (or (K,) + grid_shape). Same real-field reconstruction as
+        :meth:`inv_transform`: ``2 Re(Y a) - Re(Y a_m0)``, with the two
+        products stacked into one GEMM.
+        """
+        K = coeffs.shape[0]
+        flat = coeffs[:, self.l_indices, self.m_indices]       # (K, n_basis)
+        mask_m0 = (self.m_indices == 0)
+        both = cp.concatenate([flat, flat * mask_m0], axis=0)  # (2K, n_basis)
+        prod = cp.dot(both, self.Y_matrix.T)                   # (2K, n_points)
+        result = 2.0 * prod[:K].real - prod[K:].real
+        if self.grid_shape is not None:
+            return result.reshape((K,) + tuple(self.grid_shape))
+        return result

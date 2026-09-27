@@ -195,5 +195,13 @@ class GaussLatLonSphericalHarmonics:
         """Alias for inv_transform."""
         return self.inv_transform(coeffs)
 
+    def transform_batch(self, values) -> cp.ndarray:
+        """Batched analysis of (K, n_points) fields -> (K, l+1, l+1)."""
+        return self.sh.transform_batch(values)
+
+    def inv_transform_batch(self, coeffs) -> cp.ndarray:
+        """Batched synthesis of (K, l+1, l+1) -> (K, n_points)."""
+        return self.sh.inv_transform_batch(coeffs)
+
     def __getattr__(self, name):
         return getattr(self.sh, name)

@@ -474,6 +474,43 @@ class SpectralOperators:
             self._truncate_product(div_lm)
         return curl_lm, div_lm
 
+    def vector_curl_div_spectral_batch(self, f_east: cp.ndarray,
+                                       f_north: cp.ndarray, *,
+                                       truncate: bool = True
+                                       ) -> tuple[cp.ndarray, cp.ndarray]:
+        """Level-batched :meth:`vector_curl_div_spectral`.
+
+        ``f_east``/``f_north`` have shape (K, n_product). Returns
+        ``(curl_lm, div_lm)`` each (K, l_max+1, l_max+1). Same weak form;
+        the two extended analyses of all K levels run as one batched
+        transform each, and the O(n^2) adjoint coupling loops per level.
+        Agrees with the per-level method to round-off (tested).
+        """
+        coslat = self._product_space.coslat
+        sh_ext, c_plus_true = self._vector_analysis_pieces()
+        n = self.l_max + 1
+        K = f_east.shape[0]
+        a = sh_ext.transform_batch(f_east / coslat)     # (K, n+1, n+1)
+        b = sh_ext.transform_batch(f_north / coslat)
+
+        def _adjoint_ext(c_ext: cp.ndarray) -> cp.ndarray:
+            out = c_plus_true * c_ext[1:n + 1, :n]
+            out[1:, :] += self._C_minus[1:, :] * c_ext[:n - 1, :n]
+            return out
+
+        curls, divs = [], []
+        for k in range(K):
+            a_r = a[k, :n, :n]
+            b_r = b[k, :n, :n]
+            div_lm = self.d_lambda_coeffs(a_r) + _adjoint_ext(b[k]) / self.R
+            curl_lm = self.d_lambda_coeffs(b_r) - _adjoint_ext(a[k]) / self.R
+            if truncate:
+                self._truncate_product(curl_lm)
+                self._truncate_product(div_lm)
+            curls.append(curl_lm)
+            divs.append(div_lm)
+        return cp.stack(curls), cp.stack(divs)
+
     def _vector_analysis_pieces(self):
         """(extended transform, true C+) for the vector weak form, cached.
 

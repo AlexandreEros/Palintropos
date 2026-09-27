@@ -87,7 +87,8 @@ class PrimitiveEquationsModel:
 
     def __init__(self, planet: Planet, sigma: SigmaGrid, *,
                  r_dry: float = R_DRY, cp_dry: float = CP_DRY,
-                 surface_geopotential_lm: cp.ndarray | None = None):
+                 surface_geopotential_lm: cp.ndarray | None = None,
+                 batched_transforms: bool = False):
         if not (math.isfinite(r_dry) and r_dry > 0):
             raise ValueError(f"r_dry must be finite and > 0, got {r_dry}")
         if not (math.isfinite(cp_dry) and cp_dry > r_dry):
@@ -166,6 +167,12 @@ class PrimitiveEquationsModel:
         # 2/3-rule truncation cut for analyzed nonlinear products (the
         # SWE policy, applied once per combined quantity).
         self._trunc_cut = product_truncation_cut(self.l_max)
+
+        # Opt-in level-batched tendency path (one GEMM per transform
+        # direction instead of one mat-vec per level and quantity). The
+        # per-level path stays the default: existing runs and pinned
+        # hashes are byte-identical only through it.
+        self.batched_transforms = bool(batched_transforms)
 
     # ------------------------------------------------------------------
     # Per-level horizontal helpers (SWE conventions, level-looped)
@@ -654,9 +661,121 @@ class PrimitiveEquationsModel:
         tendency per level; zeta/delta monopole rows are bitwise zero;
         T and ln p_s monopoles evolve freely.
         """
+        if self.batched_transforms:
+            return self._tendency_batched(coeffs)
         fields = self._tendency_product_fields(coeffs)
         t_dot, lnps_dot = self._thermo_mass_tendencies(coeffs, fields)
         zeta_dot, delta_dot = self._momentum_tendencies(coeffs, fields)
+        return cp.concatenate(
+            [zeta_dot, delta_dot, t_dot, lnps_dot[None]], axis=0)
+
+    # ------------------------------------------------------------------
+    # Level-batched tendency (same terms, same truncation policy; every
+    # synthesis in ONE GEMM, every analysis in ONE GEMM, the weak-form
+    # vector analyses in one batched extended GEMM each)
+    # ------------------------------------------------------------------
+
+    def _stack_derivs(self, coeffs: cp.ndarray) -> tuple[cp.ndarray, cp.ndarray]:
+        """Per-level spectral (d/dlambda, sin(theta) d/dtheta) of a (K,n,n) stack."""
+        lam = cp.stack([self.so.d_lambda_coeffs(c) for c in coeffs])
+        snt = cp.stack([self.so.sin_theta_d_theta_coeffs(c) for c in coeffs])
+        return lam, snt
+
+    def _tendency_batched(self, coeffs: cp.ndarray) -> cp.ndarray:
+        K = self.nlev
+        zeta_c = coeffs[0:K]
+        delta_c = coeffs[K:2 * K]
+        temp_c = coeffs[2 * K:3 * K]
+        lnps_c = coeffs[3 * K]
+        sh_p = self._ps.sh
+        coslat = self._ps.coslat
+        R = self.R
+
+        # ---- one synthesis GEMM for every product-grid field -------------
+        psi_c = self._inv_laplacian(zeta_c)
+        chi_c = self._inv_laplacian(delta_c)
+        psi_lam_c, psi_snt_c = self._stack_derivs(psi_c)
+        chi_lam_c, chi_snt_c = self._stack_derivs(chi_c)
+        eta_c = zeta_c + self.f_lm[None]
+        eta_lam_c, eta_snt_c = self._stack_derivs(eta_c)
+        t_lam_c, t_snt_c = self._stack_derivs(temp_c)
+        lnps_lam_c = self.so.d_lambda_coeffs(lnps_c)
+        lnps_snt_c = self.so.sin_theta_d_theta_coeffs(lnps_c)
+        synth_in = cp.concatenate([
+            psi_lam_c, psi_snt_c, chi_lam_c, chi_snt_c,      # 4K
+            zeta_c, delta_c, temp_c,                         # 3K
+            eta_lam_c, eta_snt_c, eta_c,                     # 3K
+            t_lam_c, t_snt_c,                                # 2K
+            lnps_lam_c[None], lnps_snt_c[None], lnps_c[None],
+            self.phi_surface_lm[None]], axis=0)
+        g = sh_p.inv_transform_batch(synth_in)
+        blk = lambda i: g[i * K:(i + 1) * K]
+        psi_lam, psi_snt = blk(0), blk(1) / R
+        chi_lam, chi_snt = blk(2), blk(3) / R
+        zeta_g, delta_g, temperature = blk(4), blk(5), blk(6)
+        eta_lam, eta_snt, eta_g = blk(7), blk(8) / R, blk(9)
+        t_lam, t_snt = blk(10), blk(11) / R
+        lnps_lam = g[12 * K]
+        lnps_snt = g[12 * K + 1] / R
+        phi_surface = g[12 * K + 3]
+
+        u = (psi_snt + chi_lam) / coslat
+        v = (psi_lam - chi_snt) / coslat
+        v_grad_lnps = (u * lnps_lam - v * lnps_snt) / coslat
+        g_full = delta_g + v_grad_lnps
+        dlnps_dt = column_mass_tendency(self.sigma, g_full)
+        sigma_dot = interface_sigma_dot(self.sigma, g_full)
+        wp = omega_over_p(self.sigma, g_full, v_grad_lnps)
+        sd_u = vertical_advection(self.sigma, sigma_dot, u)
+        sd_v = vertical_advection(self.sigma, sigma_dot, v)
+        sd_t = vertical_advection(self.sigma, sigma_dot, temperature)
+        grad_lnps_u = lnps_lam / coslat
+        grad_lnps_v = -lnps_snt / coslat
+
+        # ---- thermodynamic + mass grid tendencies ------------------------
+        adv_t = (u * t_lam - v * t_snt) / coslat
+        t_dot_g = -adv_t - sd_t + self.kappa * temperature * wp
+
+        # ---- momentum grid quantities ------------------------------------
+        adv_eta = (u * eta_lam - v * eta_snt) / coslat
+        div_eta_v = adv_eta + eta_g * delta_g
+        curl_eta_v = eta_g * zeta_g + (v * eta_lam + u * eta_snt) / coslat
+        rt = self.r_dry * temperature
+        z_east = sd_u + rt * grad_lnps_u
+        z_north = sd_v + rt * grad_lnps_v
+        kinetic_g = 0.5 * (u * u + v * v)
+
+        # ---- one analysis GEMM (+ one batched weak-form vector analysis) --
+        ana_in = cp.concatenate([t_dot_g, -div_eta_v, curl_eta_v, kinetic_g,
+                                 dlnps_dt[None]], axis=0)
+        A = sh_p.transform_batch(ana_in)
+        t_dot = A[0:K]
+        neg_div_c = A[K:2 * K]
+        curl_c = A[2 * K:3 * K]
+        kinetic_c = A[3 * K:4 * K]
+        lnps_dot = A[4 * K]
+        curl_z, div_z = self.so.vector_curl_div_spectral_batch(
+            z_east, z_north, truncate=False)
+
+        # Exact spectral hydrostatic Phi from spectral T (linear).
+        phi_full_lm, _ = hydrostatic_geopotential(
+            self.sigma, temp_c, self.phi_surface_lm, self.r_dry)
+
+        cut = self._trunc_cut
+
+        def trunc(c):
+            c[..., cut + 1:, :] = 0.0
+            c[..., :, cut + 1:] = 0.0
+            return c
+
+        t_dot = trunc(t_dot)
+        lnps_dot = trunc(lnps_dot)
+        kinetic_c = trunc(kinetic_c)
+        zeta_dot = trunc(neg_div_c - curl_z)
+        delta_dot = trunc(curl_c - div_z) \
+            - self.lap_eigs[None, :, None] * (kinetic_c + phi_full_lm)
+        zeta_dot[:, 0, :] = 0.0
+        delta_dot[:, 0, :] = 0.0
         return cp.concatenate(
             [zeta_dot, delta_dot, t_dot, lnps_dot[None]], axis=0)
 

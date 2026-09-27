@@ -4427,6 +4427,21 @@
     },
     {
       "kind": "self",
+      "source": "tropoi.spatial.operators.spectral_operators.SpectralOperators.vector_curl_div_spectral_batch",
+      "target": "tropoi.spatial.operators.spectral_operators.SpectralOperators._truncate_product"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.spatial.operators.spectral_operators.SpectralOperators.vector_curl_div_spectral_batch",
+      "target": "tropoi.spatial.operators.spectral_operators.SpectralOperators._vector_analysis_pieces"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.spatial.operators.spectral_operators.SpectralOperators.vector_curl_div_spectral_batch",
+      "target": "tropoi.spatial.operators.spectral_operators.SpectralOperators.d_lambda_coeffs"
+    },
+    {
+      "kind": "self",
       "source": "tropoi.spatial.operators.spectral_operators.SpectralOperators.velocity_from_streamfunction",
       "target": "tropoi.spatial.operators.spectral_operators.SpectralOperators.d_lambda_coeffs"
     },
@@ -5147,6 +5162,41 @@
     },
     {
       "kind": "call",
+      "source": "tropoi.temporal.tendencies.primitive_equations.PrimitiveEquationsModel._tendency_batched",
+      "target": "tropoi.spatial.sigma_coordinate.column_mass_tendency"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.temporal.tendencies.primitive_equations.PrimitiveEquationsModel._tendency_batched",
+      "target": "tropoi.spatial.sigma_coordinate.hydrostatic_geopotential"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.temporal.tendencies.primitive_equations.PrimitiveEquationsModel._tendency_batched",
+      "target": "tropoi.spatial.sigma_coordinate.interface_sigma_dot"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.temporal.tendencies.primitive_equations.PrimitiveEquationsModel._tendency_batched",
+      "target": "tropoi.spatial.sigma_coordinate.omega_over_p"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.temporal.tendencies.primitive_equations.PrimitiveEquationsModel._tendency_batched",
+      "target": "tropoi.spatial.sigma_coordinate.vertical_advection"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.temporal.tendencies.primitive_equations.PrimitiveEquationsModel._tendency_batched",
+      "target": "tropoi.temporal.tendencies.primitive_equations.PrimitiveEquationsModel._inv_laplacian"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.temporal.tendencies.primitive_equations.PrimitiveEquationsModel._tendency_batched",
+      "target": "tropoi.temporal.tendencies.primitive_equations.PrimitiveEquationsModel._stack_derivs"
+    },
+    {
+      "kind": "call",
       "source": "tropoi.temporal.tendencies.primitive_equations.PrimitiveEquationsModel._tendency_product_fields",
       "target": "tropoi.spatial.sigma_coordinate.column_mass_tendency"
     },
@@ -5279,6 +5329,11 @@
       "kind": "self",
       "source": "tropoi.temporal.tendencies.primitive_equations.PrimitiveEquationsModel.tendency",
       "target": "tropoi.temporal.tendencies.primitive_equations.PrimitiveEquationsModel._momentum_tendencies"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.temporal.tendencies.primitive_equations.PrimitiveEquationsModel.tendency",
+      "target": "tropoi.temporal.tendencies.primitive_equations.PrimitiveEquationsModel._tendency_batched"
     },
     {
       "kind": "self",
@@ -9686,6 +9741,13 @@
       "type": "function"
     },
     {
+      "id": "tropoi.spatial.grids.latlon_grid.GaussLatLonSphericalHarmonics.inv_transform_batch",
+      "kind": "method",
+      "module": "tropoi.spatial.grids.latlon_grid",
+      "qualname": "GaussLatLonSphericalHarmonics.inv_transform_batch",
+      "type": "function"
+    },
+    {
       "id": "tropoi.spatial.grids.latlon_grid.GaussLatLonSphericalHarmonics.inverse_transform",
       "kind": "method",
       "module": "tropoi.spatial.grids.latlon_grid",
@@ -9697,6 +9759,13 @@
       "kind": "method",
       "module": "tropoi.spatial.grids.latlon_grid",
       "qualname": "GaussLatLonSphericalHarmonics.transform",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.spatial.grids.latlon_grid.GaussLatLonSphericalHarmonics.transform_batch",
+      "kind": "method",
+      "module": "tropoi.spatial.grids.latlon_grid",
+      "qualname": "GaussLatLonSphericalHarmonics.transform_batch",
       "type": "function"
     },
     {
@@ -10292,6 +10361,13 @@
       "kind": "method",
       "module": "tropoi.spatial.operators.spectral_operators",
       "qualname": "SpectralOperators.vector_curl_div_spectral",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.spatial.operators.spectral_operators.SpectralOperators.vector_curl_div_spectral_batch",
+      "kind": "method",
+      "module": "tropoi.spatial.operators.spectral_operators",
+      "qualname": "SpectralOperators.vector_curl_div_spectral_batch",
       "type": "function"
     },
     {
@@ -11058,6 +11134,13 @@
       "type": "function"
     },
     {
+      "id": "tropoi.spatial.transforms.fast_geodesic_sh.PointSetSphericalHarmonics.inv_transform_batch",
+      "kind": "method",
+      "module": "tropoi.spatial.transforms.fast_geodesic_sh",
+      "qualname": "PointSetSphericalHarmonics.inv_transform_batch",
+      "type": "function"
+    },
+    {
       "id": "tropoi.spatial.transforms.fast_geodesic_sh.PointSetSphericalHarmonics.inverse_transform",
       "kind": "method",
       "module": "tropoi.spatial.transforms.fast_geodesic_sh",
@@ -11069,6 +11152,13 @@
       "kind": "method",
       "module": "tropoi.spatial.transforms.fast_geodesic_sh",
       "qualname": "PointSetSphericalHarmonics.transform",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.spatial.transforms.fast_geodesic_sh.PointSetSphericalHarmonics.transform_batch",
+      "kind": "method",
+      "module": "tropoi.spatial.transforms.fast_geodesic_sh",
+      "qualname": "PointSetSphericalHarmonics.transform_batch",
       "type": "function"
     },
     {
@@ -11804,6 +11894,20 @@
       "kind": "method",
       "module": "tropoi.temporal.tendencies.primitive_equations",
       "qualname": "PrimitiveEquationsModel._momentum_tendencies",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.temporal.tendencies.primitive_equations.PrimitiveEquationsModel._stack_derivs",
+      "kind": "method",
+      "module": "tropoi.temporal.tendencies.primitive_equations",
+      "qualname": "PrimitiveEquationsModel._stack_derivs",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.temporal.tendencies.primitive_equations.PrimitiveEquationsModel._tendency_batched",
+      "kind": "method",
+      "module": "tropoi.temporal.tendencies.primitive_equations",
+      "qualname": "PrimitiveEquationsModel._tendency_batched",
       "type": "function"
     },
     {

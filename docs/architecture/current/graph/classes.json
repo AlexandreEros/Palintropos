@@ -1908,11 +1908,19 @@
         },
         {
           "kind": "method",
+          "name": "inv_transform_batch"
+        },
+        {
+          "kind": "method",
           "name": "inverse_transform"
         },
         {
           "kind": "method",
           "name": "transform"
+        },
+        {
+          "kind": "method",
+          "name": "transform_batch"
         }
       ],
       "module": "tropoi.spatial.grids.latlon_grid",
@@ -2202,6 +2210,10 @@
         {
           "kind": "method",
           "name": "vector_curl_div_spectral"
+        },
+        {
+          "kind": "method",
+          "name": "vector_curl_div_spectral_batch"
         },
         {
           "kind": "method",
@@ -2642,11 +2654,19 @@
         },
         {
           "kind": "method",
+          "name": "inv_transform_batch"
+        },
+        {
+          "kind": "method",
           "name": "inverse_transform"
         },
         {
           "kind": "method",
           "name": "transform"
+        },
+        {
+          "kind": "method",
+          "name": "transform_batch"
         }
       ],
       "module": "tropoi.spatial.transforms.fast_geodesic_sh",
@@ -3037,6 +3057,14 @@
         {
           "kind": "method",
           "name": "_momentum_tendencies"
+        },
+        {
+          "kind": "method",
+          "name": "_stack_derivs"
+        },
+        {
+          "kind": "method",
+          "name": "_tendency_batched"
         },
         {
           "kind": "method",

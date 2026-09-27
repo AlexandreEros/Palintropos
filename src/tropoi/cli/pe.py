@@ -172,10 +172,14 @@ def build_pe_model(run_config: Mapping):
         sigma = SigmaGrid.uniform(int(run_config["nlev"]))
     else:
         sigma = SigmaGrid(tuple(float(s) for s in interfaces))
+    # Level-batched transforms are an opt-in model setting (not part of the
+    # persisted run configuration or run identity): the default per-level
+    # path is what every saved capsule's hash was produced with.
     return PrimitiveEquationsModel(
         planet, sigma, r_dry=float(run_config["r_dry"]),
         cp_dry=float(run_config["cp_dry"]),
-        surface_geopotential_lm=surface_geopotential_lm)
+        surface_geopotential_lm=surface_geopotential_lm,
+        batched_transforms=bool(run_config.get("batched_transforms", False)))
 
 
 def _execute_solver(cfg: "PERunConfig", run_dir, run_config: dict) -> None:
