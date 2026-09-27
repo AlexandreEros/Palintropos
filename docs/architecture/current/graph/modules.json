@@ -1679,6 +1679,86 @@
       "scopes": [
         "module"
       ],
+      "source": "tropoi.run.held_suarez.config",
+      "target": "tropoi.spatial.truncation"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.run.held_suarez.config",
+      "target": "tropoi.temporal.tendencies.held_suarez"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.run.held_suarez.model",
+      "target": "tropoi.run.held_suarez.config"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.run.held_suarez.model",
+      "target": "tropoi.spatial.environment"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.run.held_suarez.model",
+      "target": "tropoi.spatial.planet"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.run.held_suarez.model",
+      "target": "tropoi.spatial.sigma_coordinate"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.run.held_suarez.model",
+      "target": "tropoi.spatial.states.primitive_equations"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.run.held_suarez.model",
+      "target": "tropoi.temporal.semi_implicit"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.run.held_suarez.model",
+      "target": "tropoi.temporal.tendencies.held_suarez"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.run.held_suarez.model",
+      "target": "tropoi.temporal.tendencies.primitive_equations"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
       "source": "tropoi.run.pe.config",
       "target": "tropoi.run.bve.config"
     },
@@ -2290,6 +2370,14 @@
         "module"
       ],
       "source": "tropoi.temporal.semi_implicit",
+      "target": "tropoi.temporal.hooks"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.temporal.semi_implicit",
       "target": "tropoi.temporal.integration"
     },
     {
@@ -2323,6 +2411,14 @@
       ],
       "source": "tropoi.temporal.tendencies.barotropic",
       "target": "tropoi.spatial.states.barotropic"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.temporal.tendencies.held_suarez",
+      "target": "tropoi.temporal.hooks"
     },
     {
       "kind": "imports",
@@ -3439,6 +3535,38 @@
     {
       "category": "code",
       "dynamic_import_calls": 0,
+      "id": "tropoi.run.held_suarez.config",
+      "is_package": false,
+      "path": "tropoi/run/held_suarez/config.py",
+      "stdlib_imports": [
+        "__future__",
+        "dataclasses",
+        "hashlib",
+        "json",
+        "math",
+        "typing"
+      ],
+      "third_party_imports": []
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.run.held_suarez.model",
+      "is_package": false,
+      "path": "tropoi/run/held_suarez/model.py",
+      "stdlib_imports": [
+        "__future__",
+        "math",
+        "typing"
+      ],
+      "third_party_imports": [
+        "cupy",
+        "numpy"
+      ]
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
       "id": "tropoi.run.pe.config",
       "is_package": false,
       "path": "tropoi/run/pe/config.py",
@@ -3993,6 +4121,22 @@
     {
       "category": "code",
       "dynamic_import_calls": 0,
+      "id": "tropoi.temporal.hooks",
+      "is_package": false,
+      "path": "tropoi/temporal/hooks.py",
+      "stdlib_imports": [
+        "__future__",
+        "hashlib",
+        "typing"
+      ],
+      "third_party_imports": [
+        "cupy",
+        "numpy"
+      ]
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
       "id": "tropoi.temporal.integration",
       "is_package": false,
       "path": "tropoi/temporal/integration.py",
@@ -4058,6 +4202,22 @@
       ],
       "third_party_imports": [
         "cupy"
+      ]
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.temporal.tendencies.held_suarez",
+      "is_package": false,
+      "path": "tropoi/temporal/tendencies/held_suarez.py",
+      "stdlib_imports": [
+        "__future__",
+        "dataclasses",
+        "math"
+      ],
+      "third_party_imports": [
+        "cupy",
+        "numpy"
       ]
     },
     {

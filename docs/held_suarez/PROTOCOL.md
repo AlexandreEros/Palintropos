@@ -79,14 +79,14 @@ between hemispheres estimates sampling error.
 | item | value | status |
 |---|---|---|
 | dynamics | dry hydrostatic PE, σ (Lorenz, Simmons–Burridge 1981), ζ–δ–T–ln p_s | fixed by the core |
-| horizontal | T42 triangular on the 64×128 Gaussian grid (`grid=latlon`) | choice; the paper's T63 is not affordable in the window |
+| horizontal | T42 triangular on the 64×128 Gaussian grid (`grid=latlon`) | choice; the paper's T63 is not affordable in the window. **Open (DEVLOG S4):** the core truncates every analyzed product at the 2/3 cut, so l_max = 42 evolves only l ≤ 28 (effective T28); matching Dinosaur's retained T42 needs l_max = 63 (cut 42) — user decision before launch |
 | vertical | 20 equally spaced σ levels, top at σ = 0 | matches paper and Dinosaur |
 | constants | R = 286.857 (= 2/7 · 1004), c_p = 1004, Ω = 7.292e−5, a = 6.371e6, g = 9.8, p0 = 1e5 | paper values |
 | forcing | §1.1 exactly | fixed |
-| ∇⁸ on ζ, δ, T′ | e-folding 0.1 day at l = 42 (paper's rule applied at our truncation) | choice, frozen at launch |
+| ∇⁸ on ζ, δ, T′ | e-folding 0.1 day at l = 42 (paper's rule applied at our truncation) | choice, frozen at launch. **Open:** with the effective truncation 28 this gives 2.45 days at the smallest evolving wave; HS94's rule would put 0.1 day at l = 28 (or keep 42 with l_max = 63) |
 | ln p_s | not diffused | matches GFDL practice |
 | time scheme | SI leapfrog (T_ref = 300 K isothermal) + RAW filter (ν = 0.1, α = 0.53) | choice, frozen at launch |
-| Δt | fixed at the S8 benchmark gate from the S4b stability margin; candidate 1200 s | frozen at launch |
+| Δt | 900 s (S4b: RAW-filtered explicit advection bound, DEVLOG); the S8 gate projects its cost | frozen at launch |
 | initial state | isothermal 300 K (matches the SI T_ref), p_s = p0 flat, seeded random ζ perturbation of amplitude 1e−6 s⁻¹ in degrees 1–8 (seed recorded) | choice |
 | length | 1200 days; statistics over days 200–1200 in five 200-day blocks | paper |
 | output | zonal/time-mean accumulators online; scalar series daily; full state every 10 days; checkpoints every 10 days (keep 3) | choice |

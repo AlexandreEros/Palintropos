@@ -12,6 +12,7 @@ flowchart LR
     n_tropoi_orepresentation_ovisual["representation.visual (20 modules)"]
     n_tropoi_orun["run (1 module)"]
     n_tropoi_orun_obve["run.bve (8 modules)"]
+    n_tropoi_orun_oheld__suarez["run.held_suarez (2 modules)"]
     n_tropoi_orun_ope["run.pe (6 modules)"]
     n_tropoi_orun_oswe["run.swe (5 modules)"]
     n_tropoi_ospatial["spatial (7 modules)"]
@@ -22,8 +23,8 @@ flowchart LR
     n_tropoi_ospatial_oterrain["spatial.terrain (4 modules)"]
     n_tropoi_ospatial_otransforms["spatial.transforms (4 modules)"]
     n_tropoi_ospatial_otransforms_ocuda["spatial.transforms.cuda (1 module)"]
-    n_tropoi_otemporal["temporal (4 modules)"]
-    n_tropoi_otemporal_otendencies["temporal.tendencies (3 modules)"]
+    n_tropoi_otemporal["temporal (5 modules)"]
+    n_tropoi_otemporal_otendencies["temporal.tendencies (4 modules)"]
     n_tropoi_oviz["viz (12 modules)"]
     n_tropoi_ocli -->|11| n_tropoi_orepresentation_oarchive
     n_tropoi_ocli -->|6| n_tropoi_orepresentation_ovisual
@@ -67,6 +68,10 @@ flowchart LR
     n_tropoi_orun_obve -->|2| n_tropoi_ospatial_ostates
     n_tropoi_orun_obve -->|2| n_tropoi_otemporal
     n_tropoi_orun_obve -->|2| n_tropoi_otemporal_otendencies
+    n_tropoi_orun_oheld__suarez -->|4| n_tropoi_ospatial
+    n_tropoi_orun_oheld__suarez -->|1| n_tropoi_ospatial_ostates
+    n_tropoi_orun_oheld__suarez -->|1| n_tropoi_otemporal
+    n_tropoi_orun_oheld__suarez -->|3| n_tropoi_otemporal_otendencies
     n_tropoi_orun_ope -->|4| n_tropoi
     n_tropoi_orun_ope -->|1| n_tropoi_orepresentation_odiagnostics
     n_tropoi_orun_ope -->|2| n_tropoi_orepresentation_ovisual
@@ -101,5 +106,6 @@ flowchart LR
     n_tropoi_otemporal_otendencies -->|6| n_tropoi_ospatial
     n_tropoi_otemporal_otendencies -->|3| n_tropoi_ospatial_ostates
     n_tropoi_otemporal_otendencies -->|1| n_tropoi_ospatial_oterrain
+    n_tropoi_otemporal_otendencies -->|1| n_tropoi_otemporal
     n_tropoi_oviz -->|11| n_tropoi
     n_tropoi_oviz -->|7| n_tropoi_orepresentation_ovisual

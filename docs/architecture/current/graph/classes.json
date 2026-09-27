@@ -1547,6 +1547,65 @@
         "dataclass(frozen=True)"
       ],
       "external_bases": [],
+      "id": "tropoi.run.held_suarez.config.HeldSuarezConfig",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__post_init__"
+        },
+        {
+          "kind": "method",
+          "name": "canonical_json"
+        },
+        {
+          "kind": "classmethod",
+          "name": "from_dict"
+        },
+        {
+          "kind": "property",
+          "name": "hyperdiffusion_degree"
+        },
+        {
+          "kind": "property",
+          "name": "n_blocks"
+        },
+        {
+          "kind": "property",
+          "name": "product_cut"
+        },
+        {
+          "kind": "property",
+          "name": "r_dry"
+        },
+        {
+          "kind": "method",
+          "name": "sha256"
+        },
+        {
+          "kind": "property",
+          "name": "steps_per_day"
+        },
+        {
+          "kind": "method",
+          "name": "to_dict"
+        },
+        {
+          "kind": "property",
+          "name": "total_steps"
+        },
+        {
+          "kind": "method",
+          "name": "with_"
+        }
+      ],
+      "module": "tropoi.run.held_suarez.config",
+      "qualname": "HeldSuarezConfig"
+    },
+    {
+      "decorators": [
+        "dataclass(frozen=True)"
+      ],
+      "external_bases": [],
       "id": "tropoi.run.pe.config.PERunConfig",
       "members": [
         {
@@ -2757,6 +2816,47 @@
     {
       "decorators": [],
       "external_bases": [],
+      "id": "tropoi.temporal.hooks.DiagonalDamping",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__init__"
+        },
+        {
+          "kind": "method",
+          "name": "_check"
+        },
+        {
+          "kind": "method",
+          "name": "_table"
+        },
+        {
+          "kind": "method",
+          "name": "apply_implicit"
+        },
+        {
+          "kind": "method",
+          "name": "factor"
+        },
+        {
+          "kind": "property",
+          "name": "max_rate"
+        },
+        {
+          "kind": "method",
+          "name": "signature"
+        },
+        {
+          "kind": "method",
+          "name": "tendency"
+        }
+      ],
+      "module": "tropoi.temporal.hooks",
+      "qualname": "DiagonalDamping"
+    },
+    {
+      "decorators": [],
+      "external_bases": [],
       "id": "tropoi.temporal.integration.IntegrationScheduler",
       "members": [
         {
@@ -3171,6 +3271,50 @@
       ],
       "module": "tropoi.temporal.tendencies.barotropic",
       "qualname": "BarotropicVorticity"
+    },
+    {
+      "decorators": [
+        "dataclass(frozen=True)"
+      ],
+      "external_bases": [],
+      "id": "tropoi.temporal.tendencies.held_suarez.HeldSuarezParameters",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__post_init__"
+        },
+        {
+          "kind": "method",
+          "name": "as_dict"
+        }
+      ],
+      "module": "tropoi.temporal.tendencies.held_suarez",
+      "qualname": "HeldSuarezParameters"
+    },
+    {
+      "decorators": [],
+      "external_bases": [],
+      "id": "tropoi.temporal.tendencies.held_suarez.NewtonianRelaxation",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__call__"
+        },
+        {
+          "kind": "method",
+          "name": "__init__"
+        },
+        {
+          "kind": "method",
+          "name": "grid_fields"
+        },
+        {
+          "kind": "method",
+          "name": "signature"
+        }
+      ],
+      "module": "tropoi.temporal.tendencies.held_suarez",
+      "qualname": "NewtonianRelaxation"
     },
     {
       "decorators": [],

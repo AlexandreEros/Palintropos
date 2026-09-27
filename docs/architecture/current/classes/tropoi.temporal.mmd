@@ -2,6 +2,15 @@
 %% All classes defined in package tropoi.temporal.
 classDiagram
     direction LR
+    class c_tropoi_otemporal_ohooks_oDiagonalDamping["DiagonalDamping (temporal.hooks)"]
+    c_tropoi_otemporal_ohooks_oDiagonalDamping : +#95;#95;init#95;#95;()
+    c_tropoi_otemporal_ohooks_oDiagonalDamping : +#95;check()
+    c_tropoi_otemporal_ohooks_oDiagonalDamping : +#95;table()
+    c_tropoi_otemporal_ohooks_oDiagonalDamping : +apply#95;implicit()
+    c_tropoi_otemporal_ohooks_oDiagonalDamping : +factor()
+    c_tropoi_otemporal_ohooks_oDiagonalDamping : +max#95;rate
+    c_tropoi_otemporal_ohooks_oDiagonalDamping : +signature()
+    c_tropoi_otemporal_ohooks_oDiagonalDamping : +tendency()
     class c_tropoi_otemporal_ointegration_oIntegrationScheduler["IntegrationScheduler (temporal.integration)"]
     c_tropoi_otemporal_ointegration_oIntegrationScheduler : +#95;#95;init#95;#95;()
     c_tropoi_otemporal_ointegration_oIntegrationScheduler : +next#95;event()

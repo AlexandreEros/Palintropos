@@ -3771,6 +3771,111 @@
       "target": "tropoi.temporal.tendencies.barotropic.BarotropicVorticity"
     },
     {
+      "kind": "call",
+      "source": "tropoi.run.held_suarez.config.HeldSuarezConfig.__post_init__",
+      "target": "tropoi.spatial.truncation.product_truncation_cut"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.run.held_suarez.config.HeldSuarezConfig.__post_init__",
+      "target": "tropoi.temporal.tendencies.held_suarez.HeldSuarezParameters"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.run.held_suarez.config.HeldSuarezConfig.canonical_json",
+      "target": "tropoi.run.held_suarez.config.HeldSuarezConfig.to_dict"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.run.held_suarez.config.HeldSuarezConfig.from_dict",
+      "target": "tropoi.temporal.tendencies.held_suarez.HeldSuarezParameters"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.held_suarez.config.HeldSuarezConfig.product_cut",
+      "target": "tropoi.spatial.truncation.product_truncation_cut"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.run.held_suarez.config.HeldSuarezConfig.sha256",
+      "target": "tropoi.run.held_suarez.config.HeldSuarezConfig.canonical_json"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.run.held_suarez.config.development_config",
+      "target": "tropoi.run.held_suarez.config.HeldSuarezConfig"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.run.held_suarez.config.production_config",
+      "target": "tropoi.run.held_suarez.config.HeldSuarezConfig"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.held_suarez.config.smoke_config",
+      "target": "tropoi.run.held_suarez.config.development_config"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.held_suarez.model.build_model",
+      "target": "tropoi.spatial.environment.PlanetaryParameters.ideal_sphere"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.held_suarez.model.build_model",
+      "target": "tropoi.spatial.planet.Planet.generate"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.held_suarez.model.build_model",
+      "target": "tropoi.spatial.sigma_coordinate.SigmaGrid.uniform"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.run.held_suarez.model.build_model",
+      "target": "tropoi.temporal.tendencies.primitive_equations.PrimitiveEquationsModel"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.run.held_suarez.model.build_physics",
+      "target": "tropoi.temporal.tendencies.held_suarez.NewtonianRelaxation"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.held_suarez.model.build_physics",
+      "target": "tropoi.temporal.tendencies.held_suarez.hyperdiffusion_damping"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.held_suarez.model.build_physics",
+      "target": "tropoi.temporal.tendencies.held_suarez.rayleigh_drag_damping"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.held_suarez.model.build_stepper",
+      "target": "tropoi.run.held_suarez.model.build_physics"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.run.held_suarez.model.build_stepper",
+      "target": "tropoi.temporal.semi_implicit.SemiImplicitLeapfrogStepper"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.held_suarez.model.build_stepper",
+      "target": "tropoi.temporal.semi_implicit.SemiImplicitOperator.from_model"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.held_suarez.model.initial_state",
+      "target": "tropoi.run.held_suarez.model.perturbation_coefficients"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.held_suarez.model.initial_state",
+      "target": "tropoi.spatial.states.primitive_equations.isothermal_rest_state"
+    },
+    {
       "kind": "self",
       "source": "tropoi.run.pe.config.PERunConfig.__post_init__",
       "target": "tropoi.run.pe.config.PERunConfig._validate_snapshot_controls"
@@ -5032,6 +5137,46 @@
     },
     {
       "kind": "constructor",
+      "source": "tropoi.temporal.hooks.DiagonalDamping",
+      "target": "tropoi.temporal.hooks.DiagonalDamping.__init__"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.temporal.hooks.DiagonalDamping._table",
+      "target": "tropoi.temporal.hooks.DiagonalDamping.factor"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.temporal.hooks.DiagonalDamping.apply_implicit",
+      "target": "tropoi.temporal.hooks.DiagonalDamping._check"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.temporal.hooks.DiagonalDamping.apply_implicit",
+      "target": "tropoi.temporal.hooks.DiagonalDamping._table"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.temporal.hooks.DiagonalDamping.apply_implicit",
+      "target": "tropoi.temporal.hooks._array_module"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.temporal.hooks.DiagonalDamping.tendency",
+      "target": "tropoi.temporal.hooks.DiagonalDamping._check"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.temporal.hooks.DiagonalDamping.tendency",
+      "target": "tropoi.temporal.hooks.DiagonalDamping._table"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.temporal.hooks.DiagonalDamping.tendency",
+      "target": "tropoi.temporal.hooks._array_module"
+    },
+    {
+      "kind": "constructor",
       "source": "tropoi.temporal.integration.IntegrationScheduler",
       "target": "tropoi.temporal.integration.IntegrationScheduler.__init__"
     },
@@ -5081,6 +5226,11 @@
       "target": "tropoi.temporal.semi_implicit.SemiImplicitLeapfrogStepper.__init__"
     },
     {
+      "kind": "call",
+      "source": "tropoi.temporal.semi_implicit.SemiImplicitLeapfrogStepper.__init__",
+      "target": "tropoi.temporal.hooks.complete_tendency"
+    },
+    {
       "kind": "self",
       "source": "tropoi.temporal.semi_implicit.SemiImplicitLeapfrogStepper.__init__",
       "target": "tropoi.temporal.semi_implicit.SemiImplicitLeapfrogStepper._stable_startup_substeps"
@@ -5093,12 +5243,27 @@
     {
       "kind": "call",
       "source": "tropoi.temporal.semi_implicit.SemiImplicitLeapfrogStepper._stable_startup_substeps",
+      "target": "tropoi.temporal.semi_implicit.rk4_gain"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.temporal.semi_implicit.SemiImplicitLeapfrogStepper._stable_startup_substeps",
       "target": "tropoi.temporal.semi_implicit.rk4_imaginary_axis_gain"
     },
     {
       "kind": "call",
       "source": "tropoi.temporal.semi_implicit.SemiImplicitLeapfrogStepper._startup",
       "target": "tropoi.temporal.integration.rk4_step_array"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.temporal.semi_implicit.SemiImplicitLeapfrogStepper.load_state_dict",
+      "target": "tropoi.temporal.hooks.hook_signatures"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.temporal.semi_implicit.SemiImplicitLeapfrogStepper.state_dict",
+      "target": "tropoi.temporal.hooks.hook_signatures"
     },
     {
       "kind": "self",
@@ -5229,6 +5394,101 @@
       "kind": "self",
       "source": "tropoi.temporal.tendencies.barotropic.BarotropicVorticity.tendency",
       "target": "tropoi.temporal.tendencies.barotropic.BarotropicVorticity.vorticity_to_streamfunction"
+    },
+    {
+      "kind": "constructor",
+      "source": "tropoi.temporal.tendencies.held_suarez.NewtonianRelaxation",
+      "target": "tropoi.temporal.tendencies.held_suarez.NewtonianRelaxation.__init__"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.temporal.tendencies.held_suarez.NewtonianRelaxation.__call__",
+      "target": "tropoi.temporal.tendencies.held_suarez.NewtonianRelaxation.grid_fields"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.temporal.tendencies.held_suarez.NewtonianRelaxation.__call__",
+      "target": "tropoi.temporal.tendencies.held_suarez._xp"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.temporal.tendencies.held_suarez.NewtonianRelaxation.__call__",
+      "target": "tropoi.temporal.tendencies.held_suarez.newtonian_tendency_grid"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.temporal.tendencies.held_suarez.NewtonianRelaxation.__init__",
+      "target": "tropoi.temporal.tendencies.held_suarez._xp"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.temporal.tendencies.held_suarez.NewtonianRelaxation.__init__",
+      "target": "tropoi.temporal.tendencies.held_suarez.newtonian_rate"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.temporal.tendencies.held_suarez.NewtonianRelaxation.grid_fields",
+      "target": "tropoi.temporal.tendencies.held_suarez._xp"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.temporal.tendencies.held_suarez.equilibrium_temperature",
+      "target": "tropoi.temporal.tendencies.held_suarez._xp"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.temporal.tendencies.held_suarez.hyperdiffusion_damping",
+      "target": "tropoi.temporal.hooks.DiagonalDamping"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.temporal.tendencies.held_suarez.hyperdiffusion_damping",
+      "target": "tropoi.temporal.tendencies.held_suarez.hyperdiffusion_coefficient"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.temporal.tendencies.held_suarez.newtonian_rate",
+      "target": "tropoi.temporal.tendencies.held_suarez._sigma_ramp"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.temporal.tendencies.held_suarez.newtonian_rate",
+      "target": "tropoi.temporal.tendencies.held_suarez._xp"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.temporal.tendencies.held_suarez.newtonian_tendency_grid",
+      "target": "tropoi.temporal.tendencies.held_suarez._xp"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.temporal.tendencies.held_suarez.newtonian_tendency_grid",
+      "target": "tropoi.temporal.tendencies.held_suarez.equilibrium_temperature"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.temporal.tendencies.held_suarez.newtonian_tendency_grid",
+      "target": "tropoi.temporal.tendencies.held_suarez.newtonian_rate"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.temporal.tendencies.held_suarez.rayleigh_drag_damping",
+      "target": "tropoi.temporal.hooks.DiagonalDamping"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.temporal.tendencies.held_suarez.rayleigh_drag_damping",
+      "target": "tropoi.temporal.tendencies.held_suarez.rayleigh_rate"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.temporal.tendencies.held_suarez.rayleigh_rate",
+      "target": "tropoi.temporal.tendencies.held_suarez._sigma_ramp"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.temporal.tendencies.held_suarez.rayleigh_rate",
+      "target": "tropoi.temporal.tendencies.held_suarez._xp"
     },
     {
       "kind": "constructor",
@@ -9227,6 +9487,153 @@
       "type": "function"
     },
     {
+      "id": "tropoi.run.held_suarez.config.HeldSuarezConfig",
+      "kind": "class",
+      "module": "tropoi.run.held_suarez.config",
+      "qualname": "HeldSuarezConfig",
+      "type": "class"
+    },
+    {
+      "id": "tropoi.run.held_suarez.config.HeldSuarezConfig.__post_init__",
+      "kind": "method",
+      "module": "tropoi.run.held_suarez.config",
+      "qualname": "HeldSuarezConfig.__post_init__",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.held_suarez.config.HeldSuarezConfig.canonical_json",
+      "kind": "method",
+      "module": "tropoi.run.held_suarez.config",
+      "qualname": "HeldSuarezConfig.canonical_json",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.held_suarez.config.HeldSuarezConfig.from_dict",
+      "kind": "classmethod",
+      "module": "tropoi.run.held_suarez.config",
+      "qualname": "HeldSuarezConfig.from_dict",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.held_suarez.config.HeldSuarezConfig.hyperdiffusion_degree",
+      "kind": "property",
+      "module": "tropoi.run.held_suarez.config",
+      "qualname": "HeldSuarezConfig.hyperdiffusion_degree",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.held_suarez.config.HeldSuarezConfig.n_blocks",
+      "kind": "property",
+      "module": "tropoi.run.held_suarez.config",
+      "qualname": "HeldSuarezConfig.n_blocks",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.held_suarez.config.HeldSuarezConfig.product_cut",
+      "kind": "property",
+      "module": "tropoi.run.held_suarez.config",
+      "qualname": "HeldSuarezConfig.product_cut",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.held_suarez.config.HeldSuarezConfig.r_dry",
+      "kind": "property",
+      "module": "tropoi.run.held_suarez.config",
+      "qualname": "HeldSuarezConfig.r_dry",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.held_suarez.config.HeldSuarezConfig.sha256",
+      "kind": "method",
+      "module": "tropoi.run.held_suarez.config",
+      "qualname": "HeldSuarezConfig.sha256",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.held_suarez.config.HeldSuarezConfig.steps_per_day",
+      "kind": "property",
+      "module": "tropoi.run.held_suarez.config",
+      "qualname": "HeldSuarezConfig.steps_per_day",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.held_suarez.config.HeldSuarezConfig.to_dict",
+      "kind": "method",
+      "module": "tropoi.run.held_suarez.config",
+      "qualname": "HeldSuarezConfig.to_dict",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.held_suarez.config.HeldSuarezConfig.total_steps",
+      "kind": "property",
+      "module": "tropoi.run.held_suarez.config",
+      "qualname": "HeldSuarezConfig.total_steps",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.held_suarez.config.HeldSuarezConfig.with_",
+      "kind": "method",
+      "module": "tropoi.run.held_suarez.config",
+      "qualname": "HeldSuarezConfig.with_",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.held_suarez.config.development_config",
+      "kind": "function",
+      "module": "tropoi.run.held_suarez.config",
+      "qualname": "development_config",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.held_suarez.config.production_config",
+      "kind": "function",
+      "module": "tropoi.run.held_suarez.config",
+      "qualname": "production_config",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.held_suarez.config.smoke_config",
+      "kind": "function",
+      "module": "tropoi.run.held_suarez.config",
+      "qualname": "smoke_config",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.held_suarez.model.build_model",
+      "kind": "function",
+      "module": "tropoi.run.held_suarez.model",
+      "qualname": "build_model",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.held_suarez.model.build_physics",
+      "kind": "function",
+      "module": "tropoi.run.held_suarez.model",
+      "qualname": "build_physics",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.held_suarez.model.build_stepper",
+      "kind": "function",
+      "module": "tropoi.run.held_suarez.model",
+      "qualname": "build_stepper",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.held_suarez.model.initial_state",
+      "kind": "function",
+      "module": "tropoi.run.held_suarez.model",
+      "qualname": "initial_state",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.held_suarez.model.perturbation_coefficients",
+      "kind": "function",
+      "module": "tropoi.run.held_suarez.model",
+      "qualname": "perturbation_coefficients",
+      "type": "function"
+    },
+    {
       "id": "tropoi.run.pe.config.PERunConfig",
       "kind": "class",
       "module": "tropoi.run.pe.config",
@@ -11432,6 +11839,97 @@
       "type": "function"
     },
     {
+      "id": "tropoi.temporal.hooks.DiagonalDamping",
+      "kind": "class",
+      "module": "tropoi.temporal.hooks",
+      "qualname": "DiagonalDamping",
+      "type": "class"
+    },
+    {
+      "id": "tropoi.temporal.hooks.DiagonalDamping.__init__",
+      "kind": "method",
+      "module": "tropoi.temporal.hooks",
+      "qualname": "DiagonalDamping.__init__",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.temporal.hooks.DiagonalDamping._check",
+      "kind": "method",
+      "module": "tropoi.temporal.hooks",
+      "qualname": "DiagonalDamping._check",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.temporal.hooks.DiagonalDamping._table",
+      "kind": "method",
+      "module": "tropoi.temporal.hooks",
+      "qualname": "DiagonalDamping._table",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.temporal.hooks.DiagonalDamping.apply_implicit",
+      "kind": "method",
+      "module": "tropoi.temporal.hooks",
+      "qualname": "DiagonalDamping.apply_implicit",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.temporal.hooks.DiagonalDamping.factor",
+      "kind": "method",
+      "module": "tropoi.temporal.hooks",
+      "qualname": "DiagonalDamping.factor",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.temporal.hooks.DiagonalDamping.max_rate",
+      "kind": "property",
+      "module": "tropoi.temporal.hooks",
+      "qualname": "DiagonalDamping.max_rate",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.temporal.hooks.DiagonalDamping.signature",
+      "kind": "method",
+      "module": "tropoi.temporal.hooks",
+      "qualname": "DiagonalDamping.signature",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.temporal.hooks.DiagonalDamping.tendency",
+      "kind": "method",
+      "module": "tropoi.temporal.hooks",
+      "qualname": "DiagonalDamping.tendency",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.temporal.hooks._array_module",
+      "kind": "function",
+      "module": "tropoi.temporal.hooks",
+      "qualname": "_array_module",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.temporal.hooks.complete_tendency",
+      "kind": "function",
+      "module": "tropoi.temporal.hooks",
+      "qualname": "complete_tendency",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.temporal.hooks.hook_signatures",
+      "kind": "function",
+      "module": "tropoi.temporal.hooks",
+      "qualname": "hook_signatures",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.temporal.hooks.rk4_real_axis_limit",
+      "kind": "function",
+      "module": "tropoi.temporal.hooks",
+      "qualname": "rk4_real_axis_limit",
+      "type": "function"
+    },
+    {
       "id": "tropoi.temporal.integration.IntegrationScheduler",
       "kind": "class",
       "module": "tropoi.temporal.integration",
@@ -11765,6 +12263,13 @@
       "kind": "function",
       "module": "tropoi.temporal.semi_implicit",
       "qualname": "_array_module",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.temporal.semi_implicit.rk4_gain",
+      "kind": "function",
+      "module": "tropoi.temporal.semi_implicit",
+      "qualname": "rk4_gain",
       "type": "function"
     },
     {
@@ -12178,6 +12683,125 @@
       "kind": "method",
       "module": "tropoi.temporal.tendencies.barotropic",
       "qualname": "BarotropicVorticity.vorticity_to_streamfunction",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.temporal.tendencies.held_suarez.HeldSuarezParameters",
+      "kind": "class",
+      "module": "tropoi.temporal.tendencies.held_suarez",
+      "qualname": "HeldSuarezParameters",
+      "type": "class"
+    },
+    {
+      "id": "tropoi.temporal.tendencies.held_suarez.HeldSuarezParameters.__post_init__",
+      "kind": "method",
+      "module": "tropoi.temporal.tendencies.held_suarez",
+      "qualname": "HeldSuarezParameters.__post_init__",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.temporal.tendencies.held_suarez.HeldSuarezParameters.as_dict",
+      "kind": "method",
+      "module": "tropoi.temporal.tendencies.held_suarez",
+      "qualname": "HeldSuarezParameters.as_dict",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.temporal.tendencies.held_suarez.NewtonianRelaxation",
+      "kind": "class",
+      "module": "tropoi.temporal.tendencies.held_suarez",
+      "qualname": "NewtonianRelaxation",
+      "type": "class"
+    },
+    {
+      "id": "tropoi.temporal.tendencies.held_suarez.NewtonianRelaxation.__call__",
+      "kind": "method",
+      "module": "tropoi.temporal.tendencies.held_suarez",
+      "qualname": "NewtonianRelaxation.__call__",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.temporal.tendencies.held_suarez.NewtonianRelaxation.__init__",
+      "kind": "method",
+      "module": "tropoi.temporal.tendencies.held_suarez",
+      "qualname": "NewtonianRelaxation.__init__",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.temporal.tendencies.held_suarez.NewtonianRelaxation.grid_fields",
+      "kind": "method",
+      "module": "tropoi.temporal.tendencies.held_suarez",
+      "qualname": "NewtonianRelaxation.grid_fields",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.temporal.tendencies.held_suarez.NewtonianRelaxation.signature",
+      "kind": "method",
+      "module": "tropoi.temporal.tendencies.held_suarez",
+      "qualname": "NewtonianRelaxation.signature",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.temporal.tendencies.held_suarez._sigma_ramp",
+      "kind": "function",
+      "module": "tropoi.temporal.tendencies.held_suarez",
+      "qualname": "_sigma_ramp",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.temporal.tendencies.held_suarez._xp",
+      "kind": "function",
+      "module": "tropoi.temporal.tendencies.held_suarez",
+      "qualname": "_xp",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.temporal.tendencies.held_suarez.equilibrium_temperature",
+      "kind": "function",
+      "module": "tropoi.temporal.tendencies.held_suarez",
+      "qualname": "equilibrium_temperature",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.temporal.tendencies.held_suarez.hyperdiffusion_coefficient",
+      "kind": "function",
+      "module": "tropoi.temporal.tendencies.held_suarez",
+      "qualname": "hyperdiffusion_coefficient",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.temporal.tendencies.held_suarez.hyperdiffusion_damping",
+      "kind": "function",
+      "module": "tropoi.temporal.tendencies.held_suarez",
+      "qualname": "hyperdiffusion_damping",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.temporal.tendencies.held_suarez.newtonian_rate",
+      "kind": "function",
+      "module": "tropoi.temporal.tendencies.held_suarez",
+      "qualname": "newtonian_rate",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.temporal.tendencies.held_suarez.newtonian_tendency_grid",
+      "kind": "function",
+      "module": "tropoi.temporal.tendencies.held_suarez",
+      "qualname": "newtonian_tendency_grid",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.temporal.tendencies.held_suarez.rayleigh_drag_damping",
+      "kind": "function",
+      "module": "tropoi.temporal.tendencies.held_suarez",
+      "qualname": "rayleigh_drag_damping",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.temporal.tendencies.held_suarez.rayleigh_rate",
+      "kind": "function",
+      "module": "tropoi.temporal.tendencies.held_suarez",
+      "qualname": "rayleigh_rate",
       "type": "function"
     },
     {

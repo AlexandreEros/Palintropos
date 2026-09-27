@@ -42,14 +42,24 @@ Time filter: the RAW filter (Williams 2009) in the plan's normalisation,
 ``d = nu_raw (X^{n-1}_f - 2 X^n + X^{n+1})``, ``X^n_f = X^n + alpha d``,
 ``X^{n+1} -= (1 - alpha) d`` (plan/PROTOCOL: nu_raw = 0.1, alpha = 0.53;
 Williams' own ``nu/2`` convention would call this nu = 0.2). ``raw_nu =
-0`` disables it exactly. Hyperdiffusion, drag and forcing are NOT here
-(stage S4 adds them as stepper hooks).
+0`` disables it exactly.
+
+Hooks (stage S4, :mod:`tropoi.temporal.hooks`): ``explicit_terms`` are
+added to ``N(X^n)`` (e.g. Newtonian relaxation); ``dampers`` are
+:class:`~tropoi.temporal.hooks.DiagonalDamping` objects applied to
+``X^{n+1}`` with the backward-Euler factor ``1 / (1 + 2 dt r)`` after the
+SI solve and before the RAW filter (e.g. Rayleigh drag, del^8
+hyperdiffusion). With no hooks every operation is the S3 one, bit for bit.
 
 Startup: X^1 is produced by RK4 over one interval dt in ``n_sub``
-substeps, where ``n_sub`` is the smallest count for which the RK4
-stability polynomial ``|R_4(i omega dt / n_sub)| <= 1`` holds for every
-discrete gravity-wave frequency ``omega = sqrt(c_l lambda_k(B))`` of L —
-measured from the assembled operator, not assumed from sqrt(R T).
+substeps of the COMPLETE right-hand side (tendency + explicit terms +
+the dampers' explicit form ``-r X``), where ``n_sub`` is the smallest count
+for which the RK4 stability polynomial ``|R_4(z dt / n_sub)| <= 1`` holds
+for ``z = -r_l + i omega`` at every degree: ``omega = sqrt(c_l
+lambda_k(B))`` the discrete gravity-wave frequencies of L — measured from
+the assembled operator, not assumed from sqrt(R T) — and ``r_l`` the
+summed damping rates at that degree (zero without hooks, which recovers
+the S3 imaginary-axis rule exactly).
 
 Import-light: NumPy only. Coefficient arrays may be NumPy or CuPy; the
 small per-degree matrices are mirrored into the array module of the
@@ -60,17 +70,18 @@ T_1..K, ln p_s]`` and axes (degree l, order m).
 from __future__ import annotations
 
 import math
-from typing import Any, Callable, Optional
+from typing import Any, Callable, Optional, Sequence
 
 import numpy as np
 
 from tropoi.spatial.sigma_coordinate import (SigmaGrid, hydrostatic_geopotential,
                                              omega_over_p)
 from tropoi.spatial.truncation import product_truncation_cut
+from tropoi.temporal.hooks import complete_tendency, hook_signatures
 from tropoi.temporal.integration import rk4_step_array
 
 __all__ = ["SemiImplicitOperator", "SemiImplicitSolver",
-           "SemiImplicitLeapfrogStepper", "rk4_imaginary_axis_gain"]
+           "SemiImplicitLeapfrogStepper", "rk4_imaginary_axis_gain", "rk4_gain"]
 
 _RK4_IMAGINARY_LIMIT = 2.0 * math.sqrt(2.0)
 
@@ -86,6 +97,12 @@ def _array_module(a):
 def rk4_imaginary_axis_gain(y: float) -> float:
     """|R_4(i y)| for the classical RK4 stability polynomial R_4."""
     z = 1j * float(y)
+    return abs(1.0 + z + z**2 / 2.0 + z**3 / 6.0 + z**4 / 24.0)
+
+
+def rk4_gain(z: complex) -> float:
+    """|R_4(z)| for the classical RK4 stability polynomial R_4."""
+    z = complex(z)
     return abs(1.0 + z + z**2 / 2.0 + z**3 / 6.0 + z**4 / 24.0)
 
 
@@ -324,6 +341,12 @@ class SemiImplicitLeapfrogStepper:
     ``step()`` after ``initialize`` is the RK4 startup (``X^0 -> X^1``);
     every later step is one leapfrog step. ``state_dict()`` carries both
     levels, so a restored stepper never redoes the startup.
+
+    ``explicit_terms`` (callables ``X -> dX/dt`` with ``signature()``, and
+    optionally ``max_rate`` for the startup rule) are added to ``N(X^n)``;
+    ``dampers`` (:class:`~tropoi.temporal.hooks.DiagonalDamping`) multiply
+    ``X^{n+1}`` by ``1 / (1 + 2 dt r)`` after the SI solve, in order, before
+    the RAW filter. The startup integrates the complete right-hand side.
     """
 
     scheme = "si_leapfrog"
@@ -331,7 +354,9 @@ class SemiImplicitLeapfrogStepper:
     def __init__(self, tendency: Callable, operator: SemiImplicitOperator,
                  dt: float, *, raw_nu: float = 0.1, raw_alpha: float = 0.53,
                  startup_substeps: Optional[int] = None,
-                 stage_validator: Optional[Callable] = None):
+                 stage_validator: Optional[Callable] = None,
+                 explicit_terms: Sequence[Callable] = (),
+                 dampers: Sequence[Any] = ()):
         if not (math.isfinite(dt) and dt > 0):
             raise ValueError(f"dt must be finite and > 0, got {dt}")
         if not (0.0 <= raw_nu < 1.0):
@@ -344,6 +369,10 @@ class SemiImplicitLeapfrogStepper:
         self.raw_nu = float(raw_nu)
         self.raw_alpha = float(raw_alpha)
         self.stage_validator = stage_validator
+        self.explicit_terms = tuple(explicit_terms)
+        self.dampers = tuple(dampers)
+        self._startup_tendency = complete_tendency(
+            tendency, self.explicit_terms, self.dampers)
         self.solver = SemiImplicitSolver(operator, self.dt)
         if startup_substeps is None:
             startup_substeps = self._stable_startup_substeps()
@@ -357,10 +386,22 @@ class SemiImplicitLeapfrogStepper:
         self._n = 0
 
     def _stable_startup_substeps(self) -> int:
-        """Smallest n_sub with |R_4(i omega_max dt / n_sub)| <= 1."""
+        """Smallest n_sub with |R_4(i omega_max dt / n_sub)| <= 1 and, with
+        hooks, |R_4((-r_l + i omega) dt / n_sub)| <= 1 at every degree."""
         omega_max = self.operator.max_frequency()
         n_sub = max(1, math.ceil(omega_max * self.dt / _RK4_IMAGINARY_LIMIT - 1e-12))
         while rk4_imaginary_axis_gain(omega_max * self.dt / n_sub) > 1.0 + 1e-12:
+            n_sub += 1
+        if not (self.explicit_terms or self.dampers):
+            return n_sub
+        op = self.operator
+        r_l = np.zeros(op.n)
+        for d in self.dampers:
+            r_l += d.rates.max(axis=0)
+        r_l += sum(float(getattr(t, "max_rate", 0.0)) for t in self.explicit_terms)
+        z = [complex(-r_l[l], w) for l in range(op.n)
+             for w in (0.0, *op.frequencies(l))]
+        while max(rk4_gain(zz * self.dt / n_sub) for zz in z) > 1.0 + 1e-12:
             n_sub += 1
         return n_sub
 
@@ -387,7 +428,7 @@ class SemiImplicitLeapfrogStepper:
         h = self.dt / self.startup_substeps
         t = self._t
         for _ in range(self.startup_substeps):
-            y = rk4_step_array(self.tendency, y, t, h,
+            y = rk4_step_array(self._startup_tendency, y, t, h,
                                stage_validator=self.stage_validator)
             t += h
         self._x_prev = self._x_curr
@@ -396,8 +437,13 @@ class SemiImplicitLeapfrogStepper:
     def _leapfrog(self) -> None:
         x_prev = self._x_prev
         x_curr = self._x_curr
-        explicit = self.tendency(x_curr) - self.operator.apply(x_curr)
+        explicit = self.tendency(x_curr)
+        for term in self.explicit_terms:
+            explicit = explicit + term(x_curr)
+        explicit = explicit - self.operator.apply(x_curr)
         x_next = self.solver.advance(x_prev, explicit)
+        for damper in self.dampers:
+            x_next = damper.apply_implicit(x_next, 2.0 * self.dt)
         if self.raw_nu != 0.0:
             d = self.raw_nu * (x_prev - 2.0 * x_curr + x_next)
             x_curr_f = x_curr + self.raw_alpha * d
@@ -431,6 +477,7 @@ class SemiImplicitLeapfrogStepper:
                 "t_ref": self.operator.t_ref,
                 "operator": self.operator.signature(),
                 "startup_substeps": self.startup_substeps,
+                "hooks": hook_signatures(self.explicit_terms, self.dampers),
                 "x_prev": None if self._x_prev is None else self._x_prev.copy(),
                 "x_curr": None if self._x_curr is None else self._x_curr.copy()}
 
@@ -453,6 +500,11 @@ class SemiImplicitLeapfrogStepper:
             raise ValueError(
                 "state dict was produced with a different semi-implicit operator "
                 f"({d.get('operator')}) than this stepper's ({mine_sig})")
+        mine_hooks = hook_signatures(self.explicit_terms, self.dampers)
+        if d.get("hooks", []) != mine_hooks:
+            raise ValueError(
+                "state dict was produced with different stepper hooks "
+                f"({d.get('hooks', [])}) than this stepper's ({mine_hooks})")
         step = int(d["step"])
         if d["x_curr"] is None:
             raise ValueError("state dict has no current state")

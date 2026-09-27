@@ -8,6 +8,14 @@ classDiagram
     c_tropoi_otemporal_otendencies_obarotropic_oBarotropicVorticity : +streamfunction#95;to#95;vorticity()
     c_tropoi_otemporal_otendencies_obarotropic_oBarotropicVorticity : +tendency()
     c_tropoi_otemporal_otendencies_obarotropic_oBarotropicVorticity : +vorticity#95;to#95;streamfunction()
+    class c_tropoi_otemporal_otendencies_oheld__suarez_oHeldSuarezParameters["HeldSuarezParameters (temporal.tendencies.held_suarez)"]
+    c_tropoi_otemporal_otendencies_oheld__suarez_oHeldSuarezParameters : +#95;#95;post#95;init#95;#95;()
+    c_tropoi_otemporal_otendencies_oheld__suarez_oHeldSuarezParameters : +as#95;dict()
+    class c_tropoi_otemporal_otendencies_oheld__suarez_oNewtonianRelaxation["NewtonianRelaxation (temporal.tendencies.held_suarez)"]
+    c_tropoi_otemporal_otendencies_oheld__suarez_oNewtonianRelaxation : +#95;#95;call#95;#95;()
+    c_tropoi_otemporal_otendencies_oheld__suarez_oNewtonianRelaxation : +#95;#95;init#95;#95;()
+    c_tropoi_otemporal_otendencies_oheld__suarez_oNewtonianRelaxation : +grid#95;fields()
+    c_tropoi_otemporal_otendencies_oheld__suarez_oNewtonianRelaxation : +signature()
     class c_tropoi_otemporal_otendencies_oprimitive__equations_oPrimitiveEquationsModel["PrimitiveEquationsModel (temporal.tendencies.primitive_equations)"]
     c_tropoi_otemporal_otendencies_oprimitive__equations_oPrimitiveEquationsModel : +#95;#95;init#95;#95;()
     c_tropoi_otemporal_otendencies_oprimitive__equations_oPrimitiveEquationsModel : +#95;deriv#95;fields()

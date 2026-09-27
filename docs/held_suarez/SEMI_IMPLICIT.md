@@ -4,8 +4,8 @@ Status: implemented on `feat/held-suarez` (module `tropoi.temporal.semi_implicit
 `tests/test_semi_implicit.py`). This document expands plan §3
 (`docs/superpowers/plans/2026-09-27-held-suarez-24h-plan.md`) into the discrete algebra the code
 actually executes, and records the S3 verification numbers. Hyperdiffusion, Rayleigh drag and
-Newtonian relaxation are stage S4 and are **not** part of this stepper yet; their places in the
-step are marked below.
+Newtonian relaxation (stage S4) enter through generic stepper hooks described in §8; with no
+hooks the step is exactly the S3 step described in §§1–7.
 
 ## 1. State, operators, notation
 
@@ -108,8 +108,8 @@ startup, the SI steps and the RAW filter (tested, also with T_ref ≠ T).
 
 ## 4. RAW filter
 
-After X^{n+1} is formed (S4 will insert the implicit ∇⁸ and Rayleigh factors here, before the
-filter), Williams (2009) in the plan's normalisation:
+After X^{n+1} is formed (and, since S4, multiplied by the implicit Rayleigh and ∇⁸ factors,
+§8), Williams (2009) in the plan's normalisation:
 
     d = ν_raw ( X^{n−1}_f − 2 X^n + X^{n+1} )
     X^n_f   = X^n + α d
@@ -184,3 +184,45 @@ code finding (the resume check above) is fixed and tested.
   T42, so advection, not gravity waves, will set the production Δt.
 - Perturbations above the dealiasing cut are outside the verified linearization (see §2); the S5
   experiment must seed its perturbation inside the cut (PROTOCOL: degrees 1–8).
+
+## 8. Held–Suarez forcing and dissipation in the step (stage S4)
+
+Generic hooks (`tropoi.temporal.hooks`; the stepper knows nothing about HS):
+
+- **explicit terms** `term(X) -> dX/dt` are added to N(X^n):
+  N = tendency(X^n) + Σ term(X^n) − L X^n (then the reduced solve of §3, unchanged);
+- **`DiagonalDamping`** (rate r per row and degree) multiplies X^{n+1} by the backward-Euler
+  factor 1/(1 + 2Δt r) **after** `SemiImplicitSolver.advance` and **before** the RAW filter,
+  in the order given; its explicit form −r X is used by explicit schemes;
+- the RK4 startup integrates the **complete** right-hand side (tendency + terms + −r X). Its
+  substep count keeps |R₄(z h)| ≤ 1 for z = −r_l + iω at every degree (ω the gravity-wave
+  frequencies of L, r_l the summed damping rates at l plus the terms' `max_rate`); with no hooks
+  this is the §5 rule exactly;
+- with no hooks the step performs exactly the S3 operations (tested bitwise); hook signatures are
+  in `state_dict()` and a mismatch refuses to resume.
+
+Held–Suarez instances (`tropoi.temporal.tendencies.held_suarez`; PROTOCOL §1.1):
+
+| term | where | discretisation |
+|---|---|---|
+| Newtonian relaxation −k_T(φ,σ_k)(T_k − T_eq(φ, σ_k p_s)) | explicit term (N) | evaluated on the product grid with the instantaneous p_s, analyzed, truncated at the product cut like every analyzed product (so band-limited states stay band-limited and L stays the exact linearization) |
+| Rayleigh drag −k_v(σ_k) V | damper on ζ_k, δ_k (all degrees) | ζ, δ ×= 1/(1 + 2Δt k_v,k); exact equivalence because k_v is horizontally uniform |
+| ∇⁸ on ζ, δ, T | damper, per degree | ×= 1/(1 + 2Δt K₈ c_l⁴), K₈ = 1/(τ₈ c_ref⁴), τ₈ = 0.1 d, ref = l_max by default (PROTOCOL §2); c_0 = 0 so the global-mean T (T′ only) is untouched; ln p_s not diffused |
+
+No other numerical treatment is applied (no divergence damping, clipping or extra filtering).
+The factors are backward Euler, not exponential. More important than the factor's form is its
+placement: multiplying X^{n+1} evaluates the damping at n+1 instead of centred at n, a local error
+−rΔt Ẋ, so the damped part of the scheme is **first order** in time (an exponential factor has
+the same leading term: S4b measured identical 2-day errors to 3 digits). Together with RAW at
+α = 0.53 (a small first-order term of its own), the complete scheme converges at first order
+asymptotically; without the dampers and RAW it is second order (S4b (b), DEVLOG). A centred
+treatment would have to enter the reduced SI system; this is a pre-launch decision (STATUS.md).
+
+S4 evidence (`tests/test_held_suarez_forcing.py`): T_eq, k_T, k_v against Wolfram-computed hand
+values at 11 points including σ = σ_b, σ = 1, both poles and both sides of the 200 K floor (worst
+relative difference 2.1e−16); forcing exactly 0 at T = T_eq, V = 0; pointwise relaxation follows
+exp(−k_T t) to 2e−14 over 10 days (rate/k_T = 1 ± 1e−12); the spectral hook decays at k_a where k_T
+is uniform (4e−15) and matches an independent product-grid evaluation with non-uniform p_s
+(1.5e−15); drag and ∇⁸ factors equal 1/(1 + 2Δt k) degree by degree (0 ulp for ∇⁸); isothermal rest
+is preserved bitwise through startup + SI + drag + ∇⁸ + RAW; a resting, horizontally uniform T_eq
+profile stays at rest under the full forcing (|ζ, δ| ≤ 2.6e−21 s⁻¹, |ΔT| ≤ 1.1e−14 K after 1 day).
