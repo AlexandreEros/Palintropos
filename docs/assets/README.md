@@ -29,7 +29,6 @@ and stay here until each is replaced by a figure drawn from a published run.
 
 | File | Used by | Source runs | Replacement |
 | --- | --- | --- | --- |
-| `two_vortices_evolution.png` | README | one BVE run (`two_vortices`, 10 days) | the overview of a clean, published two-vortex run |
 | `two_vortices_rotation_comparison.png` | VALIDATION.md | several BVE runs | a validation-study figure from published runs |
 | `two_vortices_rotating_streamlines.png` | VALIDATION.md | several BVE runs | as above |
 | `rh4_geodesic_vs_latlon.png` | VALIDATION.md | two RH4 runs (geodesic, Gauss) | as above |

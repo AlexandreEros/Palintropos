@@ -11,7 +11,6 @@ Examples (from the repository root)::
 
     python docs/readme_figures.py rotation-runs
     python docs/readme_figures.py render \
-        --dynamic-run runs/readme-dynamic/<run-id> \
         --geodesic-run runs/validation-rh4/<run-id> \
         --latlon-run runs/validation-rh4-latlon/<run-id> \
         --rotating-rotation-root runs/readme-rotations-rot24h
@@ -218,41 +217,6 @@ def _plot_backend_comparison(geodesic: pathlib.Path, latlon: pathlib.Path,
     plt.close(fig)
 
 
-def _plot_vortex_evolution(run: pathlib.Path, target: pathlib.Path) -> None:
-    """Show actual evolution, rather than an invariant-dominated summary."""
-    lon, lat = _view_mesh()
-    snapshots = np.load(run / "vorticity_grid.npy")
-    # The tracked hero run has daily snapshots over ten days.  Express the
-    # selection as fractions so the renderer remains useful for similar runs.
-    indices = [0, round(0.2 * (len(snapshots) - 1)),
-               round(0.5 * (len(snapshots) - 1)), len(snapshots) - 1]
-    config = _manifest(run)["run_config"]
-    duration_days = float(config["duration_days"])
-    mapped = [_map_to_view(run, snapshots[index], lon, lat) for index in indices]
-    vmax = max(float(np.max(np.abs(field))) for field in mapped)
-    e, z = _drifts(run)
-
-    fig, axes = plt.subplots(2, 2, figsize=(12, 7), constrained_layout=True,
-                             sharex=True, sharey=True)
-    for ax, index, field in zip(axes.flat, indices, mapped):
-        day = duration_days * index / (len(snapshots) - 1)
-        im = ax.pcolormesh(np.rad2deg(lon), np.rad2deg(lat), field,
-                           shading="auto", cmap="RdBu_r",
-                           vmin=-vmax, vmax=vmax)
-        ax.set_title(f"day {day:g}")
-        ax.set(xlabel="longitude (deg)", ylabel="latitude (deg)",
-               xlim=(0, 360), ylim=(-90, 90))
-    axes[-1, -1].text(
-        0.02, 0.04,
-        f"{duration_days:g}-day ΔE/E={e:+.2%}   ΔZabs/Zabs={z:+.2e}",
-        transform=axes[-1, -1].transAxes, fontsize=9,
-        bbox={"facecolor": "white", "alpha": 0.8, "edgecolor": "none"})
-    fig.colorbar(im, ax=axes, label="relative vorticity (s⁻¹)")
-    fig.suptitle("Two vortices evolving on a rotating sphere")
-    fig.savefig(target, dpi=180, metadata={"Software": "palintropos"})
-    plt.close(fig)
-
-
 def _rotation_run_map(root: pathlib.Path) -> dict[str, pathlib.Path]:
     result = {}
     for manifest_path in root.glob("*/manifest.json"):
@@ -406,8 +370,6 @@ def render(args) -> None:
         raise RuntimeError(
             "rotating rotation run set is incomplete; run rotation-runs with --day-hours 24")
 
-    _plot_vortex_evolution(
-        args.dynamic_run.resolve(), assets / "two_vortices_evolution.png")
     _plot_backend_comparison(
         args.geodesic_run.resolve(), args.latlon_run.resolve(),
         assets / "rh4_geodesic_vs_latlon.png")
@@ -416,8 +378,6 @@ def render(args) -> None:
         rotating_runs, assets / "two_vortices_rotating_streamlines.png")
 
     provenance = {
-        "two_vortices_evolution.png": [
-            _provenance_entry(args.dynamic_run.resolve())],
         "rh4_geodesic_vs_latlon.png": [
             _provenance_entry(args.geodesic_run.resolve()),
             _provenance_entry(args.latlon_run.resolve()),
@@ -446,7 +406,6 @@ def build_parser() -> argparse.ArgumentParser:
     rotations.add_argument("--duration-days", type=float, default=1.0)
     rotations.add_argument("--dt-snapshots", type=float, default=43200.0)
     render_parser = commands.add_parser("render")
-    render_parser.add_argument("--dynamic-run", type=pathlib.Path, required=True)
     render_parser.add_argument("--geodesic-run", type=pathlib.Path, required=True)
     render_parser.add_argument("--latlon-run", type=pathlib.Path, required=True)
     render_parser.add_argument("--rotation-root", type=pathlib.Path,
