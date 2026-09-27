@@ -7,7 +7,10 @@ immutable, so a figure recipe (for example the README's) can be written out
 in full and pinned by a test: a later change of any default cannot alter a
 recipe that spells out every field.
 
-* :class:`Map`: one map (background quantity, contours, vectors).
+* :class:`Map`: one map (background quantity, contours, and a wind overlay:
+  :class:`StreamfunctionContours`, :class:`Streamlines`, :class:`Arrows`,
+  or :class:`AutoVectors`, which picks psi contours or streamlines from the
+  divergent share of the flow drawn).
 * :class:`Overview`: one :class:`Map` repeated over saved times with shared
   colour and speed scales, an optional static map (terrain), and
   diagnostics panels (:class:`Drift`, :class:`Complexity`).
@@ -23,6 +26,7 @@ import re
 
 __all__ = [
     "Arrows",
+    "AutoVectors",
     "Complexity",
     "Contours",
     "Drift",
@@ -30,6 +34,7 @@ __all__ = [
     "Map",
     "Overview",
     "Sigma",
+    "StreamfunctionContours",
     "Streamlines",
     "Style",
     "describe",
@@ -54,21 +59,86 @@ class Sigma:
 
 @dataclass(frozen=True)
 class Streamlines:
-    """Instantaneous streamlines of a horizontal wind (not trajectories)."""
+    """Instantaneous streamlines of the full horizontal wind (not trajectories).
+
+    The lines are integrated from seed points (by default a fixed, evenly
+    spread set). Their density on the map says nothing about flux; with
+    ``width_by="speed"`` only the line width encodes speed. For non-divergent flow prefer
+    :class:`StreamfunctionContours`, whose line spacing is exact.
+    """
 
     vector: str = "wind"
     color_by: str | None = None          # None or "speed"
-    color: str = "black"
+    color: str = "#303030"
     width_by: str | None = "speed"       # None or "speed"
-    line_width_range: tuple[float, float] = (0.25, 1.6)
+    line_width_range: tuple[float, float] = (0.2, 0.9)
     density: float = 1.0
-    arrow_size: float = 0.7
+    arrow_size: float = 0.55
     #: Longest single streamline in axes units, and the number of fixed,
     #: evenly spread seed points (``None``: Matplotlib's grid seeding).
     #: Short streamlines from staggered seeds spread the direction arrows
     #: instead of stacking them where long straight lines have midpoints.
     max_length: float = 0.35
     seed_count: int | None = 220
+
+
+@dataclass(frozen=True)
+class StreamfunctionContours:
+    """Streamlines drawn as evenly spaced contours of the streamfunction psi.
+
+    In non-divergent flow (BVE) ``u = k x grad(psi)`` exactly, so these
+    contours are the streamlines, and the flow between neighbouring lines is
+    the same everywhere: their spacing is ``interval / speed``. Closed orbits
+    close by themselves; nothing is seeded or cut off. In SWE and PE, psi
+    carries only the rotational part of the wind, and figures say so.
+
+    ``interval``: the psi step between lines (m^2/s); ``None`` picks a round
+    step giving about ``level_count`` steps across the range of psi in the
+    maps shown (one step for all of them, so spacing means the same speed in
+    every map).
+    """
+
+    interval: float | None = None
+    level_count: int = 20
+    color: str = "#262626"
+    line_width: float = 0.45
+    alpha: float = 0.85
+    arrow_size: float = 0.65
+    arrow_spacing: float = 80.0
+
+    def __post_init__(self) -> None:
+        if self.interval is not None and not float(self.interval) > 0.0:
+            raise ValueError("streamfunction interval must be positive")
+        if self.level_count < 2:
+            raise ValueError("level_count must be at least 2")
+
+
+@dataclass(frozen=True)
+class AutoVectors:
+    """Choose the wind overlay from the flow drawn.
+
+    ``streamfunction`` (psi contours) when the divergent wind carries a
+    negligible share of the kinetic energy in every map shown,
+    ``f_div = E_div / (E_rot + E_div) <= divergent_threshold``; otherwise
+    ``streamlines`` of the full wind, so a divergent flow never silently
+    loses its divergent part. The largest share over the maps decides, once
+    for the whole figure: a single quiet snapshot of a divergent flow does
+    not switch the style. States at rest are ignored; if every state is at
+    rest, ``streamlines`` is kept (nothing is drawn either way).
+
+    The default 1 % means an rms divergent wind of at most about a tenth of
+    the rotational one, ``sqrt(f / (1 - f))``. Figures record the choice,
+    the threshold and the measured shares.
+    """
+
+    divergent_threshold: float = 0.01
+    streamfunction: StreamfunctionContours = field(
+        default_factory=StreamfunctionContours)
+    streamlines: Streamlines = field(default_factory=Streamlines)
+
+    def __post_init__(self) -> None:
+        if not 0.0 <= float(self.divergent_threshold) < 1.0:
+            raise ValueError("divergent_threshold must lie in [0, 1)")
 
 
 @dataclass(frozen=True)
@@ -104,7 +174,8 @@ class Map:
     background: str | None
     level: int | Sigma | None = None
     contours: tuple[Contours, ...] = ()
-    vectors: Streamlines | Arrows | None = None
+    vectors: (StreamfunctionContours | Streamlines | Arrows | AutoVectors
+              | None) = None
     color_policy: str | None = None
     symmetric: bool | None = None
     limits: tuple[float, float] | None = None

@@ -384,13 +384,57 @@ class VectorLayer:
 
 
 @dataclass(frozen=True)
+class StreamfunctionLayer:
+    """Streamlines of a rotational wind drawn as evenly spaced contours of psi.
+
+    For the wind ``u = k x grad(psi)`` the streamlines are exactly the level
+    sets of ``psi``. Contours at every multiple of ``interval`` (m^2/s) are
+    drawn with one uniform line, so the flow between two neighbouring lines is
+    ``interval`` everywhere and their spacing is ``interval / |u|``: closer
+    lines mean faster flow. Closed orbits close by themselves, and no line is
+    forced through a saddle point.
+
+    Direction arrowheads follow ``k x grad(psi)``, i.e. the flow keeps
+    larger ``psi`` on its right. On the equirectangular map that direction is
+    ``(-d psi/d lat, d psi/d lon)``, the same as ``(u / cos(lat), v)``.
+    """
+
+    field: ScalarGridField
+    interval: float
+    time_index: int = 0
+    color: str = "#262626"
+    line_width: float = 0.45
+    alpha: float = 0.85
+    arrow_size: float = 0.65
+    #: Map length (degrees along the line) between direction arrowheads;
+    #: lines shorter than a quarter of it carry none.
+    arrow_spacing: float = 80.0
+
+    def __post_init__(self) -> None:
+        self.field.values_at(self.time_index)
+        if not (np.isfinite(self.interval) and self.interval > 0.0):
+            raise ValueError("streamfunction interval must be finite and > 0")
+        if not 0.0 < self.alpha <= 1.0:
+            raise ValueError("alpha must lie in (0, 1]")
+        if self.line_width <= 0.0 or self.arrow_spacing <= 0.0:
+            raise ValueError("line width and arrow spacing must be positive")
+
+    def levels(self) -> tuple[float, ...]:
+        """Every multiple of ``interval`` inside the field's range."""
+        values = np.asarray(self.field.values_at(self.time_index))
+        low = math.ceil(float(values.min()) / self.interval)
+        high = math.floor(float(values.max()) / self.interval)
+        return tuple(k * self.interval for k in range(low, high + 1))
+
+
+@dataclass(frozen=True)
 class LayeredMapSpec:
     """One equirectangular map: optional background, contours and vectors."""
 
     title: str
     background: ScalarLayer | None = None
     contours: tuple[ContourLayer, ...] = ()
-    vectors: VectorLayer | None = None
+    vectors: VectorLayer | StreamfunctionLayer | None = None
     #: Draw a colour bar for the background beside this panel. Figures that
     #: share one key across panels use a :class:`ColorKeySpec` instead.
     colorbar: bool = True
@@ -446,6 +490,8 @@ class LineWidthKeySpec:
     color: str = "k"
     normalization: NormalizationPolicy = field(
         default_factory=NormalizationPolicy.automatic)
+    #: Smaller text under the sample lines (e.g. why these lines were chosen).
+    note: str = ""
 
     def __post_init__(self) -> None:
         if not isinstance(self.normalization_group, str):

@@ -2,7 +2,9 @@
 
 CPU only: synthetic fields on a Gauss latitude grid exercise cell
 registration, seam closure, vector geometry, key resolution and a full
-render (Agg), including the minimum on-screen text size at README width.
+render (Agg), including the minimum on-screen text size at README width;
+analytic streamfunctions check that psi contours close, stay solid and
+carry arrowheads along k x grad(psi).
 """
 from __future__ import annotations
 
@@ -17,7 +19,7 @@ from tropoi.representation.visual.normalization import (NormalizationKind,
 from tropoi.representation.visual.specs import (
     ColorKeySpec, ContourLayer, FigureSpec, LayeredMapSpec, LinePanelSpec,
     LineSeriesSpec, LineWidthKeySpec, PanelPlacement, ScalarLayer,
-    TextPanelSpec, VectorLayer)
+    StreamfunctionLayer, TextPanelSpec, VectorLayer)
 from tropoi.representation.visual.timeline import (
     resolve_figure_normalizations)
 
@@ -223,3 +225,98 @@ def test_legacy_panels_keep_their_normalization_grouping():
         policy = frame.specification.panels[0].panel.normalization
         assert policy.kind is NormalizationKind.SYMMETRIC
         assert (policy.vmin, policy.vmax) == (-3.0, 3.0)
+
+
+# -- streamlines as streamfunction contours ---------------------------------
+
+def _psi_layer(psi_of, *, interval, nlat=46, nlon=90):
+    """A streamfunction layer on an even 4-degree grid, north to south."""
+    lat = np.deg2rad(np.linspace(88.0, -88.0, nlat))
+    lon = np.linspace(0.0, 2.0 * np.pi, nlon, endpoint=False)
+    lat_grid, lon_grid = np.meshgrid(lat, lon, indexing="ij")
+    field = ScalarGridField(psi_of(lat_grid, lon_grid), lat, lon,
+                            "streamfunction", "m^2 s^-1")
+    return StreamfunctionLayer(field, interval)
+
+
+def _drawn(layer):
+    """Draw ``layer`` on a real Agg axes; return (contours, arrow stations)."""
+    import matplotlib
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+    from matplotlib.contour import ContourSet
+    figure, axes = plt.subplots()
+    try:
+        MatplotlibRenderer._draw_streamfunction(axes, layer)
+        (contours,) = [c for c in axes.collections
+                       if isinstance(c, ContourSet)]
+        lat, lon, closed = mpl._closed_south_to_north(
+            layer.field.latitudes, layer.field.longitudes,
+            layer.field.values_at(0))
+        stations = mpl._flow_arrow_stations(
+            contours.allsegs, lat, lon, closed, spacing=layer.arrow_spacing)
+        assert len(axes.patches) == len(stations)
+        return contours, np.array(stations)
+    finally:
+        plt.close(figure)
+
+
+def test_streamfunction_levels_are_every_multiple_of_one_interval():
+    layer = _psi_layer(lambda lat, lon: 1.0e7 * np.sin(lat), interval=2.0e6)
+    levels = layer.levels()
+    np.testing.assert_allclose(np.diff(levels), 2.0e6)
+    assert all(abs(level / 2.0e6 - round(level / 2.0e6)) < 1e-12
+               for level in levels)
+    assert min(levels) >= -1.0e7 and max(levels) <= 1.0e7
+    for bad in (0.0, -1.0, np.inf):
+        with pytest.raises(ValueError):
+            StreamfunctionLayer(layer.field, bad)
+
+
+def test_every_streamfunction_level_is_solid():
+    # psi's sign depends on its gauge (the l = 0 mode): Matplotlib's default
+    # of dashing negative levels would suggest a meaning it does not have.
+    layer = _psi_layer(lambda lat, lon: 1.0e7 * np.sin(lat), interval=2.0e6)
+    contours, _ = _drawn(layer)
+    assert min(layer.levels()) < 0.0
+    assert all(dashes is None for _, dashes in contours.get_linestyles())
+
+
+def test_arrows_follow_k_cross_grad_psi_for_solid_body_rotation():
+    # psi = -Omega R^2 sin(lat) gives u = -(1/R) dpsi/dlat = Omega R cos(lat):
+    # eastward everywhere, along every latitude circle.
+    layer = _psi_layer(lambda lat, lon: -1.0e7 * np.sin(lat), interval=1.0e6)
+    _, stations = _drawn(layer)
+    assert len(stations) > 20
+    assert np.all(stations[:, 2] > 0.0)
+    np.testing.assert_allclose(stations[:, 3], 0.0, atol=1e-9)
+
+
+def test_arrows_turn_counterclockwise_around_a_psi_minimum():
+    # A psi minimum has zeta = laplacian(psi) > 0: counterclockwise flow.
+    # Centred on the equator, where the map is locally undistorted.
+    def vortex(lat, lon):
+        r2 = (np.rad2deg(lat) ** 2 + (np.rad2deg(lon) - 180.0) ** 2) / 20.0 ** 2
+        return -1.0e7 * np.exp(-r2)
+    layer = _psi_layer(vortex, interval=1.0e6)
+    contours, stations = _drawn(layer)
+    # Its level sets are closed loops: nothing seeded, nothing cut off.
+    loops = [points for segments in contours.allsegs for points in segments
+             if np.hypot(*(points - [180.0, 0.0]).T).max() < 40.0]
+    assert loops and all(np.allclose(p[0], p[-1]) for p in loops)
+    near = np.hypot(stations[:, 0] - 180.0, stations[:, 1]) < 40.0
+    assert near.sum() >= 4
+    offset = stations[near, :2] - [180.0, 0.0]
+    cross = offset[:, 0] * stations[near, 3] - offset[:, 1] * stations[near, 2]
+    assert np.all(cross > 0.0)
+
+
+def test_a_streamfunction_map_renders(tmp_path):
+    layer = _psi_layer(lambda lat, lon: 1.0e7 * np.sin(2.0 * lon)
+                       * np.cos(lat) ** 2, interval=1.0e6)
+    spec = FigureSpec((PanelPlacement(LayeredMapSpec(
+        "psi", vectors=layer, colorbar=False), 0, 0),), rows=1, columns=1,
+        size_inches=(4.0, 2.2), dpi=60)
+    path = MatplotlibRenderer().render_figure(
+        resolve_figure_normalizations(spec), tmp_path / "psi.png")
+    assert path.stat().st_size > 0

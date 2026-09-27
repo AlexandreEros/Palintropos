@@ -55,25 +55,29 @@ def test_default_file_names_live_in_assets_and_spell_out_options():
                 "--snapshots", "0,5d") == (
         "overview_map-vorticity_vectors-arrows_snapshots-0,5d.png")
     assert name("--no-static") == "overview_no-static.png"
+    assert name("--vectors", "streamfunction") == (
+        "overview_vectors-streamfunction.png")
 
 
 def test_cli_options_build_the_described_views():
     from tropoi.cli.main import build_parser, _plot_view
     from tropoi.representation.archive import open_simulation
-    from tropoi.representation.visual.views import (Arrows, Map, Overview,
-                                                    Streamlines)
+    from tropoi.representation.visual.views import (
+        Arrows, AutoVectors, Map, Overview, StreamfunctionContours,
+        Streamlines)
     storage = open_simulation(CANONICAL).storage
     parser = build_parser()
 
     view, at = _plot_view(parser.parse_args(["plot", str(CANONICAL)]),
                           storage)
     assert isinstance(view, Overview) and at is None
-    assert view.map.background == "free_surface_height"
+    assert view.map.background == "free_surface_perturbation"
+    assert view.map.vectors == AutoVectors()
 
     view, at = _plot_view(parser.parse_args(
         ["plot", str(CANONICAL), "--at", "-1", "--map", "none"]), storage)
     assert at == -1
-    assert view == Map(None, vectors=Streamlines(),
+    assert view == Map(None, vectors=AutoVectors(),
                        contours=view.contours)
 
     view, at = _plot_view(parser.parse_args(
@@ -84,6 +88,16 @@ def test_cli_options_build_the_described_views():
     assert view.map.background == "wind_speed"
     assert isinstance(view.map.vectors, Arrows)
     assert view.map.contours[0].levels == (1000.0,)
+
+    # SWE chooses the overlay from the flow by default; an explicit style
+    # is never second-guessed.
+    for option, expected in (("streamfunction", StreamfunctionContours()),
+                             ("streamlines", Streamlines()),
+                             ("auto", AutoVectors())):
+        view, _ = _plot_view(parser.parse_args(
+            ["plot", str(CANONICAL), "--vectors", option]), storage)
+        assert view.map.vectors == expected
+        assert view.map.background == "free_surface_perturbation"
 
 
 def test_viewer_policy_is_conservative(monkeypatch):

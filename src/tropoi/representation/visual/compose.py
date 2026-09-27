@@ -37,12 +37,12 @@ from tropoi.representation.visual.quantities import (
 from tropoi.representation.visual.specs import (
     ColorKeySpec, ContourLayer, FigureSpec, LayeredMapSpec, LinePanelSpec,
     LineSeriesSpec, LineWidthKeySpec, PanelPlacement, ScalarLayer,
-    TextPanelSpec, VectorLayer)
+    StreamfunctionLayer, TextPanelSpec, VectorLayer)
 from tropoi.representation.visual.timeline import (
     resolve_figure_normalizations, select_representative_frame_indices)
 from tropoi.representation.visual.views import (
-    Arrows, Complexity, Contours, Drift, Grid, Map, Overview, Sigma,
-    Streamlines, Style, describe, parse_time)
+    Arrows, AutoVectors, Complexity, Contours, Drift, Grid, Map, Overview,
+    Sigma, StreamfunctionContours, Streamlines, Style, describe, parse_time)
 
 __all__ = ["ASSETS_DIRNAME", "compose_view", "default_output_path",
            "default_view", "elapsed_label", "render_view"]
@@ -63,6 +63,9 @@ DISPLAY_DEFAULTS = {
     "temperature_anomaly": ("RdBu_r", True),
     "surface_pressure_anomaly": ("RdBu_r", True),
     "free_surface_height": ("cividis:0.35:1.0", False),
+    # White at the resting level, blue above it, red below: reads like
+    # water, and fades to white where the surface is level.
+    "free_surface_perturbation": ("RdBu", True),
     "layer_depth": ("cividis:0.35:1.0", False),
     "wind_speed": ("YlGnBu:0.0:0.75", False),
     "temperature": ("inferno:0.25:1.0", False),
@@ -259,6 +262,156 @@ def _nice_speeds(vmax: float) -> tuple[float, ...]:
     return tuple(float(f"{value:.3g}") for value in values)
 
 
+def _nice_step(raw: float) -> float:
+    """The smallest of 1, 2, 2.5, 5 x 10^k that is at least ``raw``."""
+    base = 10.0 ** math.floor(math.log10(raw))
+    step = next(factor * base for factor in (1.0, 2.0, 2.5, 5.0, 10.0)
+                if factor * base >= raw * (1.0 - 1e-12))
+    return float(f"{step:.3g}")
+
+
+def _scientific(value: float) -> str:
+    """``2.5e6`` -> ``2.5 × 10⁶``; moderate values stay plain."""
+    mantissa, exponent = f"{value:.2e}".split("e")
+    exponent = int(exponent)
+    if -2 <= exponent <= 3:
+        return f"{value:g}"
+    mantissa = mantissa.rstrip("0").rstrip(".")
+    power = "10" + str(exponent).translate(str.maketrans(
+        "-0123456789", "⁻⁰¹²³⁴⁵⁶⁷⁸⁹"))
+    return power if mantissa == "1" else f"{mantissa} × {power}"
+
+
+def _rotational_indices(fields: RunFields, indices, level) -> list[int]:
+    """Saved states whose rotational wind is not at rest."""
+    return [i for i in indices
+            if fields.helmholtz_rms_speeds(i, level)[0] >= REST_SPEED_MS]
+
+
+def _psi_interval(fields: RunFields, view: StreamfunctionContours, indices,
+                  level) -> float:
+    """One psi step for every map shown: the view's, or a round step giving
+    about ``level_count`` steps across the range of psi in those maps."""
+    if view.interval is not None:
+        return float(view.interval)
+    low = min(float(fields.state_values("streamfunction", i, level).min())
+              for i in indices)
+    high = max(float(fields.state_values("streamfunction", i, level).max())
+               for i in indices)
+    return _nice_step((high - low) / view.level_count)
+
+
+def _percent(fraction: float) -> str:
+    """A kinetic-energy share as a percentage: ``0.08``, ``27``, ``10⁻⁶``."""
+    value = 100.0 * float(fraction)
+    if value == 0.0:
+        return "0"
+    if value >= 10.0:
+        return f"{value:.0f}"
+    if value >= 0.01:
+        return f"{value:.2g}"
+    return _scientific(float(f"{value:.2g}"))
+
+
+def _largest_share(fields: RunFields, indices, level) -> float | None:
+    """The largest divergent kinetic-energy share over the saved states
+    ``indices``; states at rest are skipped (``None`` if all are)."""
+    shares = [fields.divergent_fraction(i, level) for i in indices]
+    shares = [share for share in shares if share is not None]
+    return max(shares) if shares else None
+
+
+def _resolve_vectors(fields: RunFields, map_view: Map, indices, level
+                     ) -> tuple[Map, dict | None]:
+    """Replace an :class:`AutoVectors` overlay by the style it selects for
+    the maps at ``indices``; return the map and the record of the choice
+    (``None`` when the overlay was given explicitly)."""
+    policy = map_view.vectors
+    if not isinstance(policy, AutoVectors):
+        return map_view, None
+    wind_level = _level_for(fields, "wind", level)
+    shares = [fields.divergent_fraction(i, wind_level) for i in indices]
+    largest = _largest_share(fields, indices, wind_level)
+    contours = (largest is not None
+                and largest <= policy.divergent_threshold)
+    chosen = policy.streamfunction if contours else policy.streamlines
+    choice = {
+        "policy": "automatic",
+        "selected": type(chosen).__name__,
+        "divergent_threshold": float(policy.divergent_threshold),
+        "max_divergent_kinetic_energy_fraction": largest,
+        "divergent_kinetic_energy_fraction": shares,
+        "rule": "StreamfunctionContours when the largest E_div / (E_rot + "
+                "E_div) over the maps shown is at most the threshold, else "
+                "Streamlines of the full wind; states at rest (rms wind "
+                f"below {REST_SPEED_MS:g} m/s, null share) are skipped",
+    }
+    return replace(map_view, vectors=chosen), choice
+
+
+def _divergent_share(fields: RunFields, index: int, level) -> float | None:
+    """Fraction of the kinetic energy carried by the divergent wind."""
+    return fields.divergent_fraction(index, level)
+
+
+def _streamfunction_description(fields: RunFields, interval: float,
+                                peak_speed: float, level, indices,
+                                threshold: float | None = None
+                                ) -> list[str]:
+    """Key or caption lines saying how psi contours encode the wind.
+
+    ``threshold``: the automatic limit that selected psi contours, if any.
+    """
+    rotational_only = fields.solver != "bve"
+    head = "rotational-wind streamlines" if rotational_only else "streamlines"
+    lines = [f"{head}: ψ contours every {_scientific(interval)} m² s⁻¹"]
+    speed = _nice_speeds(peak_speed)[-1]
+    arc = math.degrees(interval / speed / fields.radius)
+    lines.append(f"closer = faster: {arc:.2g}° apart at {speed:g} m s⁻¹ "
+                 f"(max {peak_speed:.3g})")
+    if rotational_only:
+        share = _largest_share(fields, indices, level) or 0.0
+        line = (f"divergent wind not drawn: ≤ {_percent(share)} % of "
+                "kinetic energy")
+        if threshold is not None:
+            line += f" (auto limit {_percent(threshold)} %)"
+        lines.append(line)
+    return lines
+
+
+def _full_wind_note(choice: dict | None) -> str:
+    """Why an automatic choice kept streamlines of the full wind (two
+    short lines; empty when the style was not chosen automatically)."""
+    if choice is None or choice["selected"] != "Streamlines":
+        return ""
+    share = choice["max_divergent_kinetic_energy_fraction"]
+    limit = _percent(choice["divergent_threshold"])
+    if share is None:
+        return "full wind: every state at rest"
+    return (f"full wind drawn: divergent part up to {_percent(share)} %"
+            + chr(10) + f"of kinetic energy (ψ contours need ≤ {limit} %)")
+
+
+def _level_surface_scale(fields: RunFields, map_view: Map, indices,
+                         largest: float) -> tuple[Map, str]:
+    """Key note for free-surface perturbation maps, and the map to draw.
+
+    The note names the reference level. A perturbation within roundoff of
+    the level (every ``|eta'| <= 1e-12 H_ref``, the relative tolerance at
+    which a colour scale of H itself is flat) is drawn on a fixed +-1 m
+    scale, so a lake at rest stays white instead of stretching noise.
+    """
+    references = [fields.free_surface_reference(i) for i in indices]
+    low, high = min(references), max(references)
+    level = (f"{low:.0f} m" if f"{low:.0f}" == f"{high:.0f}"
+             else f"{low:.0f}–{high:.0f} m")
+    note = f"\nη′ = H − H̄;  H̄ = {level}, the level at rest"
+    if largest <= 1e-12 * max(abs(high), 1.0) and map_view.limits is None:
+        note += f"\n(level to roundoff: |η′| ≤ {largest:.1e} m; ±1 m shown)"
+        map_view = replace(map_view, limits=(-1.0, 1.0))
+    return map_view, note
+
+
 # ---------------------------------------------------------------------------
 # panel builders
 # ---------------------------------------------------------------------------
@@ -266,7 +419,9 @@ def _nice_speeds(vmax: float) -> tuple[float, ...]:
 def _map_panel(fields: RunFields, view: Map, index: int | None,
                level: int | None, *, title: str, groups: dict | None,
                colorbar: bool, label_longitudes: bool = True,
-               label_latitudes: bool = True) -> LayeredMapSpec:
+               label_latitudes: bool = True,
+               psi_interval: float | None = None,
+               background_note: str = "") -> LayeredMapSpec:
     background, corner = None, None
     if view.background is not None:
         entry = quantity(view.background)
@@ -274,7 +429,8 @@ def _map_panel(fields: RunFields, view: Map, index: int | None,
         field_index = None if entry.cadence == "static" else index
         grid_field = fields.scalar_field(view.background, field_index,
                                          bg_level)
-        label = f"{entry.long_name} ({pretty_units(entry.units)})"
+        label = (f"{entry.long_name} ({pretty_units(entry.units)})"
+                 + background_note)
         background = ScalarLayer(
             grid_field, normalization=_normalization(entry.id, view),
             normalization_group=None if groups is None else groups[
@@ -294,37 +450,52 @@ def _map_panel(fields: RunFields, view: Map, index: int | None,
                   f"{pretty_units(entry.units)}"))
     vectors = None
     if view.vectors is not None:
-        if view.vectors.vector != "wind":
+        vector = getattr(view.vectors, "vector", "wind")
+        if vector != "wind":
             raise QuantityUnavailableError(
-                f"unknown vector quantity {view.vectors.vector!r}; "
-                "available: wind")
+                f"unknown vector quantity {vector!r}; available: wind")
         if index is None:
             raise QuantityUnavailableError("a static map cannot carry winds")
         wind_level = _level_for(fields, "wind", level)
         state_u, state_v = fields.state_wind(index, wind_level)
-        at_rest = float(np.hypot(state_u, state_v).max()) < REST_SPEED_MS
-        wind = fields.display_wind(index, wind_level)
-        common = dict(
-            latitudes=wind.latitudes, longitudes=wind.longitudes,
-            zonal=wind.zonal, meridional=wind.meridional, radius=wind.radius,
-            color_by=view.vectors.color_by, color=view.vectors.color,
-            normalization_group=None if groups is None else groups["speed"],
-            color_policy="YlGnBu:0.25:1.0")
-        if isinstance(view.vectors, Streamlines):
-            vectors = VectorLayer(
-                style="streamlines", width_by=view.vectors.width_by,
-                line_width_range=view.vectors.line_width_range,
-                density=view.vectors.density,
-                arrow_size=view.vectors.arrow_size,
-                max_length=view.vectors.max_length,
-                seed_count=view.vectors.seed_count, **common)
-        else:
-            vectors = VectorLayer(style="arrows", width_by=None,
-                                  arrow_stride=view.vectors.stride, **common)
-        if at_rest:
+        if float(np.hypot(state_u, state_v).max()) < REST_SPEED_MS:
             # Roundoff-level winds have no direction worth drawing.
-            vectors = None
             corner = f"wind below {REST_SPEED_MS:g} m/s: at rest, not drawn"
+        elif isinstance(view.vectors, StreamfunctionContours):
+            if not _rotational_indices(fields, (index,), wind_level):
+                corner = (f"rotational wind below {REST_SPEED_MS:g} m/s: "
+                          "no streamfunction contours")
+            else:
+                psi_view = view.vectors
+                vectors = StreamfunctionLayer(
+                    fields.display_streamfunction(index, wind_level),
+                    psi_interval or _psi_interval(fields, psi_view, (index,),
+                                                  wind_level),
+                    color=psi_view.color, line_width=psi_view.line_width,
+                    alpha=psi_view.alpha, arrow_size=psi_view.arrow_size,
+                    arrow_spacing=psi_view.arrow_spacing)
+        else:
+            wind = fields.display_wind(index, wind_level)
+            common = dict(
+                latitudes=wind.latitudes, longitudes=wind.longitudes,
+                zonal=wind.zonal, meridional=wind.meridional,
+                radius=wind.radius, color_by=view.vectors.color_by,
+                color=view.vectors.color,
+                normalization_group=None if groups is None else groups[
+                    "speed"],
+                color_policy="YlGnBu:0.25:1.0")
+            if isinstance(view.vectors, Streamlines):
+                vectors = VectorLayer(
+                    style="streamlines", width_by=view.vectors.width_by,
+                    line_width_range=view.vectors.line_width_range,
+                    density=view.vectors.density,
+                    arrow_size=view.vectors.arrow_size,
+                    max_length=view.vectors.max_length,
+                    seed_count=view.vectors.seed_count, **common)
+            else:
+                vectors = VectorLayer(style="arrows", width_by=None,
+                                      arrow_stride=view.vectors.stride,
+                                      **common)
     if background is None and not contours and vectors is None:
         # Keep an empty, labelled map rather than failing on a rest state.
         background = ScalarLayer(
@@ -445,12 +616,16 @@ def default_view(fields: RunFields) -> Overview:
     """The solver's default overview for this run."""
     solver = fields.solver
     if solver == "bve":
-        return Overview(map=Map("vorticity", vectors=Streamlines()))
+        # Non-divergent flow: psi contours are its exact streamlines.
+        return Overview(map=Map("vorticity",
+                                vectors=StreamfunctionContours()))
+    # SWE and PE: psi contours when the divergent wind is negligible in the
+    # maps shown, streamlines of the full wind otherwise (AutoVectors).
     if solver == "swe":
         contours = ((Contours("terrain", (500.0, 1000.0, 1500.0)),)
                     if fields.has_terrain else ())
-        return Overview(map=Map("free_surface_height", contours=contours,
-                                vectors=Streamlines()))
+        return Overview(map=Map("free_surface_perturbation",
+                                contours=contours, vectors=AutoVectors()))
     from tropoi.representation.visual.pe_snapshots import (
         select_snapshot_levels)
     from tropoi.spatial.sigma_coordinate import SigmaGrid
@@ -459,7 +634,7 @@ def default_view(fields: RunFields) -> Overview:
              else SigmaGrid(tuple(float(s) for s in interfaces)))
     level = select_snapshot_levels(sigma).lower_index
     return Overview(map=Map("temperature_anomaly", level=level,
-                            vectors=Streamlines()))
+                            vectors=AutoVectors()))
 
 
 def _auto_diagnostics(fields: RunFields, level, omitted: list):
@@ -560,6 +735,9 @@ def _snapshot_statistics(fields: RunFields, view_map: Map, index: int,
                            "area_mean": float(np.sum(
                                fields.state_weights() * values)),
                            "units": entry.units}
+        if entry.id == "free_surface_perturbation":
+            stats[entry.id]["reference_m"] = fields.free_surface_reference(
+                index)
     if view_map.vectors is not None:
         u, v = fields.state_wind(index, _level_for(fields, "wind", level))
         speed = np.hypot(u, v)
@@ -567,6 +745,17 @@ def _snapshot_statistics(fields: RunFields, view_map: Map, index: int,
                                "area_mean": float(np.sum(
                                    fields.state_weights() * speed)),
                                "units": "m s^-1"}
+        if isinstance(view_map.vectors, StreamfunctionContours):
+            wind_level = _level_for(fields, "wind", level)
+            psi = fields.state_values("streamfunction", index, wind_level)
+            rotational, divergent = fields.helmholtz_rms_speeds(
+                index, wind_level)
+            stats["streamfunction"] = {"min": float(psi.min()),
+                                       "max": float(psi.max()),
+                                       "units": "m^2 s^-1"}
+            stats["rms_speed"] = {"rotational": rotational,
+                                  "divergent": divergent,
+                                  "units": "m s^-1"}
     return stats
 
 
@@ -577,6 +766,9 @@ def _compose_overview(fields: RunFields, view: Overview
     level = resolve_level(fields, view.map.level)
     indices = resolve_snapshots(fields, view.snapshots, view.max_maps)
     divisor, unit = _time_axis(fields.times)
+    map_view, choice = _resolve_vectors(fields, view.map, indices, level)
+    if choice is not None:
+        record["vector_choice"] = choice
 
     static = view.static
     if static == "auto":
@@ -604,33 +796,63 @@ def _compose_overview(fields: RunFields, view: Overview
 
     groups = {"background": "overview-background", "speed": "overview-speed"}
     keys = []
-    if indices and view.map.background is not None:
-        entry = quantity(view.map.background)
+    if indices and map_view.background is not None:
+        entry = quantity(map_view.background)
         label = f"{entry.long_name} ({pretty_units(entry.units)})"
         bg_level = _level_for(fields, entry.id, level)
         if bg_level is not None:
             label += f", {_level_label(fields, bg_level)}"
         magnitudes = [float(np.max(np.abs(fields.state_values(
             entry.id, i, bg_level)))) for i in indices]
-        if max(magnitudes) == 0.0:
+        if entry.id == "free_surface_perturbation":
+            map_view, note = _level_surface_scale(fields, map_view, indices,
+                                                  max(magnitudes))
+            label += note
+        elif max(magnitudes) == 0.0:
             label += "\n(identically zero in every map)"
         elif max(magnitudes) <= 1e-12 and _normalization(
-                entry.id, view.map).kind.value == "symmetric":
+                entry.id, map_view).kind.value == "symmetric":
             label += (f"\n(every |value| ≤ {max(magnitudes):.1e}; "
                       "scale shown ±1)")
         keys.append(ColorKeySpec(
             groups["background"], label,
-            color_policy=_color_policy(entry.id, view.map),
-            normalization=_normalization(entry.id, view.map)))
-    vectors = view.map.vectors
-    speed_scale = None
+            color_policy=_color_policy(entry.id, map_view),
+            normalization=_normalization(entry.id, map_view)))
+    vectors = map_view.vectors
+    speed_scale, psi_interval = None, None
     if indices and vectors is not None:
-        speeds = [np.hypot(*fields.state_wind(
-            i, _level_for(fields, "wind", level))).max() for i in indices]
+        wind_level = _level_for(fields, "wind", level)
+        speeds = [np.hypot(*fields.state_wind(i, wind_level)).max()
+                  for i in indices]
         speed_scale = float(max(speeds))
+        rotational = (_rotational_indices(fields, indices, wind_level)
+                      if isinstance(vectors, StreamfunctionContours) else [])
         if speed_scale < REST_SPEED_MS:
             record["omitted"].append(
                 f"speed key: every wind is below {REST_SPEED_MS:g} m/s")
+        elif isinstance(vectors, StreamfunctionContours) and not rotational:
+            record["omitted"].append(
+                "streamfunction key: every rotational wind is below "
+                f"{REST_SPEED_MS:g} m/s")
+        elif isinstance(vectors, StreamfunctionContours):
+            # One psi step for every map, so spacing means one speed.
+            psi_interval = _psi_interval(fields, vectors, rotational,
+                                         wind_level)
+            keys.append(TextPanelSpec(
+                chr(10).join(_streamfunction_description(
+                    fields, psi_interval, speed_scale, wind_level,
+                    rotational, threshold=None if choice is None else
+                    choice["divergent_threshold"])),
+                font_family="sans-serif",
+                font_size=style.base_font_size - 0.5, color="#222222"))
+            record["streamfunction"] = {
+                "interval_m2_s": psi_interval,
+                "definition": "psi_lm = -R^2 zeta_lm / (l(l+1)), l = 0 set "
+                              "to 0; lines at every multiple of the interval",
+                "rotational_part_only": fields.solver != "bve",
+                "divergent_kinetic_energy_fraction": [
+                    _divergent_share(fields, i, wind_level)
+                    for i in indices]}
         elif vectors.color_by == "speed":
             keys.append(ColorKeySpec(groups["speed"],
                                      "wind speed (m s⁻¹)",
@@ -642,7 +864,7 @@ def _compose_overview(fields: RunFields, view: Overview
                 f"max {speed_scale:.3g}",
                 _nice_speeds(speed_scale),
                 line_width_range=vectors.line_width_range,
-                color=vectors.color))
+                color=vectors.color, note=_full_wind_note(choice)))
 
     if static is not None:
         static_level = (_level_for(fields, static.background, level)
@@ -670,9 +892,9 @@ def _compose_overview(fields: RunFields, view: Overview
         map_titles.append(title)
         r, c = divmod(position, columns)
         panels.append(PanelPlacement(_map_panel(
-            fields, view.map, index, level, title=title, groups=groups,
+            fields, map_view, index, level, title=title, groups=groups,
             colorbar=False, label_longitudes=r == map_rows - 1,
-            label_latitudes=c == 0), row + r, c))
+            label_latitudes=c == 0, psi_interval=psi_interval), row + r, c))
     heights += [style.map_row_height_inches] * map_rows
     row += map_rows
     if not indices:
@@ -694,7 +916,7 @@ def _compose_overview(fields: RunFields, view: Overview
         heights.append(style.diagnostics_height_inches)
         row += 1
 
-    record["maps"] = [_snapshot_statistics(fields, view.map, i, level)
+    record["maps"] = [_snapshot_statistics(fields, map_view, i, level)
                       for i in indices]
     record["map_titles"] = map_titles
     record["level"] = None if level is None else {
@@ -708,8 +930,11 @@ def _compose_overview(fields: RunFields, view: Overview
 
 
 def _vector_caption(fields: RunFields, panel: Map, index: int,
-                    level: int | None) -> str:
-    """A second title line saying how a single map encodes the wind."""
+                    level: int | None, choice: dict | None = None) -> str:
+    """A second title line saying how a single map encodes the wind.
+
+    ``choice``: the record of an automatic choice that produced ``panel``.
+    """
     vectors = panel.vectors
     if vectors is None:
         return ""
@@ -717,11 +942,21 @@ def _vector_caption(fields: RunFields, panel: Map, index: int,
     peak = float(np.hypot(u, v).max())
     if peak < REST_SPEED_MS:
         return ""
+    if isinstance(vectors, StreamfunctionContours):
+        wind_level = _level_for(fields, "wind", level)
+        if not _rotational_indices(fields, (index,), wind_level):
+            return ""
+        interval = _psi_interval(fields, vectors, (index,), wind_level)
+        return chr(10) + chr(10).join(_streamfunction_description(
+            fields, interval, peak, wind_level, (index,),
+            threshold=None if choice is None else
+            choice["divergent_threshold"]))
     style = ("streamlines" if isinstance(vectors, Streamlines)
              else "arrows")
     if isinstance(vectors, Streamlines) and vectors.width_by == "speed":
+        note = _full_wind_note(choice)
         return (chr(10) + f"{style}: width ∝ wind speed, "
-                f"max {peak:.3g} m s⁻¹")
+                f"max {peak:.3g} m s⁻¹" + (chr(10) + note if note else ""))
     if isinstance(vectors, Arrows):
         return (chr(10) + f"{style}: length ∝ wind speed, "
                 f"max {peak:.3g} m s⁻¹")
@@ -753,18 +988,30 @@ def _compose_grid(fields: RunFields, view: Grid) -> tuple[FigureSpec, dict]:
         for c, panel in enumerate(row_panels):
             if isinstance(panel, Map):
                 level = resolve_level(fields, panel.level)
+                panel, choice = _resolve_vectors(fields, panel, (index,),
+                                                 level)
                 entry = (quantity(panel.background)
                          if panel.background else None)
                 title = entry.long_name if entry else "wind"
                 if level is not None:
                     title += f", {_level_label(fields, level)}"
-                title += _vector_caption(fields, panel, index, level)
+                title += _vector_caption(fields, panel, index, level, choice)
+                note = ""
+                if entry is not None and entry.id == (
+                        "free_surface_perturbation"):
+                    largest = float(np.max(np.abs(fields.state_values(
+                        entry.id, index))))
+                    panel, note = _level_surface_scale(fields, panel,
+                                                       (index,), largest)
                 groups = {"background": f"grid-{r}-{c}-background",
                           "speed": f"grid-{r}-{c}-speed"}
                 spec = _map_panel(fields, panel, index, level, title=title,
-                                  groups=groups, colorbar=True)
-                record["maps"].append(
-                    _snapshot_statistics(fields, panel, index, level))
+                                  groups=groups, colorbar=True,
+                                  background_note=note)
+                stats = _snapshot_statistics(fields, panel, index, level)
+                if choice is not None:
+                    stats["vector_choice"] = choice
+                record["maps"].append(stats)
             elif isinstance(panel, Drift):
                 spec = _drift_panel(fields, panel, divisor, unit, record)
             elif isinstance(panel, Complexity):

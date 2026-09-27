@@ -933,8 +933,10 @@ _PLOT_EXAMPLES = """\
 examples:
   tropoi plot runs                                   default overview of the latest run
   tropoi plot RUN --list-quantities                  what this run can draw (no GPU)
-  tropoi plot RUN --map vorticity                    vorticity + streamlines at up to 4 times
-  tropoi plot RUN --at -1 --map none                 streamlines alone, last saved state
+  tropoi plot RUN --map vorticity                    vorticity + the default wind overlay
+  tropoi plot RUN --at -1 --map none                 wind overlay alone, last saved state
+  tropoi plot RUN --vectors streamfunction           streamlines as evenly spaced psi contours
+  tropoi plot RUN --vectors streamlines              full-wind streamlines, even if psi would do
   tropoi plot RUN --at 5d --map wind_speed --vectors arrows
   tropoi plot RUN --map free_surface_height --contours terrain:500,1000,1500
   tropoi plot RUN --map temperature_anomaly --sigma 0.75 --snapshots 0,-1
@@ -975,7 +977,8 @@ def _plot_view(args, storage):
     from tropoi.representation.visual.compose import default_view
     from tropoi.representation.visual.evaluate import RunFields
     from tropoi.representation.visual.views import (
-        Arrows, Map, Overview, Sigma, Streamlines)
+        Arrows, AutoVectors, Map, Overview, Sigma, StreamfunctionContours,
+        Streamlines)
 
     customised = any(value is not None for value in (
         args.map, args.contours, args.vectors, args.level, args.sigma,
@@ -985,7 +988,9 @@ def _plot_view(args, storage):
         base = default.map
         background = base.background if args.map is None else (
             None if args.map == "none" else args.map)
-        vectors = {"streamlines": Streamlines(), "arrows": Arrows(),
+        vectors = {"auto": AutoVectors(),
+                   "streamfunction": StreamfunctionContours(),
+                   "streamlines": Streamlines(), "arrows": Arrows(),
                    "none": None, None: base.vectors}[args.vectors]
         level = base.level
         if args.level is not None:
@@ -1294,15 +1299,24 @@ def build_parser() -> argparse.ArgumentParser:
     plot_parser.add_argument(
         "--map", default=None, metavar="QUANTITY",
         help="Filled quantity of every map, or 'none' for vectors alone "
-             "(e.g. vorticity, free_surface_height, temperature_anomaly).")
+             "(e.g. vorticity, free_surface_perturbation, temperature_anomaly).")
     plot_parser.add_argument(
         "--contours", action="append", default=None, metavar="Q:LEVELS",
         help="Contour lines at explicit levels, e.g. terrain:500,1000,1500 "
              "(repeatable).")
     plot_parser.add_argument(
-        "--vectors", choices=("streamlines", "arrows", "none"), default=None,
-        help="Wind overlay [default: streamlines]. Streamlines are "
-             "instantaneous, not particle trajectories.")
+        "--vectors", choices=("auto", "streamfunction", "streamlines",
+                              "arrows", "none"), default=None,
+        help="Wind overlay [default: streamfunction for BVE, auto for SWE "
+             "and PE]. 'streamfunction': contours of psi at one fixed step, "
+             "the exact streamlines of non-divergent flow, spaced inversely "
+             "to speed (in SWE and PE the rotational wind only). "
+             "'streamlines': lines integrated through the full wind from "
+             "fixed seeds, width by speed. 'auto': streamfunction when the "
+             "divergent wind holds at most 1%% of the kinetic energy in "
+             "every map shown, else streamlines; the key and the sidecar "
+             "record the choice. All are instantaneous, not particle "
+             "trajectories.")
     level = plot_parser.add_mutually_exclusive_group()
     level.add_argument(
         "--level", type=int, default=None, metavar="K",

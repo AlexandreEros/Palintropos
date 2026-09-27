@@ -95,6 +95,11 @@ QUANTITIES: dict[str, Quantity] = {q.id: q for q in (
              "scalar", ("swe",),
              "H = h + h_s: layer depth plus band-limited terrain height (equal "
              "to the layer depth over a flat bottom)"),
+    Quantity("free_surface_perturbation", "free-surface perturbation", "m",
+             "derived", "scalar", ("swe",),
+             "eta' = H - H_ref, H_ref = area mean of H at the same saved time: "
+             "the level surface the same fluid volume has at rest over this "
+             "terrain (lake at rest: eta' = 0)"),
     Quantity("terrain", "terrain height", "m", "static", "scalar",
              ("swe", "pe"),
              "h_s = Phi_s / g, the band-limited surface elevation "

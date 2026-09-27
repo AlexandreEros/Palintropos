@@ -217,6 +217,9 @@ class RunFields:
                 depth = self.state_values("layer_depth", index)
                 values = depth + (self._terrain_state() if self.has_terrain
                                   else 0.0)
+            elif identifier == "free_surface_perturbation":
+                values = (self.state_values("free_surface_height", index)
+                          - self.free_surface_reference(index))
             elif identifier == "temperature_anomaly":
                 row = np.array(frame[2 * K + k], copy=True)
                 row[0, 0] = 0.0     # the (0,0) mode is the exact area mean
@@ -294,11 +297,48 @@ class RunFields:
                     np.asarray(flat_values).reshape(grid.nlat, grid.nlon))
         from tropoi.representation.visual.grid_adapter import (
             map_to_uniform_latlon)
-        target = self._cache.get(("view-grid",))
         target, mapped = map_to_uniform_latlon(flat_values, grid,
-                                               target_grid=target)
-        self._cache[("view-grid",)] = target
+                                               target_grid=self._view_grid())
         return _host(target.latitudes), _host(target.longitudes), mapped
+
+    def _view_grid(self):
+        """The shared 91 x 181 view grid (geodesic runs are drawn on it)."""
+        key = ("view-grid",)
+        if key not in self._cache:
+            from tropoi.spatial.grids.grid import LatLonGridGeometry
+            self._cache[key] = LatLonGridGeometry.create((91, 181))
+        return self._cache[key]
+
+    def _view_synthesis(self, coefficients) -> np.ndarray:
+        """Evaluate a spectral field exactly at the view-grid nodes.
+
+        The basis is the one every backend synthesizes with
+        (``PointSetSphericalHarmonics``): ``Y_lm = N_lm P_lm e^{i m lon}``
+        with the ``m >= 0`` layout, so ``f = sum_m w_m Re(e^{i m lon}
+        sum_l Y_lm(lat, 0) a_lm)``, ``w_0 = 1``, ``w_m = 2``. Only the
+        latitude factors are tabulated (by the same basis kernel, at
+        longitude 0); the longitude sum runs on the host.
+        """
+        coefficients = np.asarray(coefficients)
+        target = self._view_grid()
+        lat, lon = _host(target.latitudes), _host(target.longitudes)
+        size = coefficients.shape[0]
+        key = ("view-legendre", size)
+        if key not in self._cache:
+            from tropoi.spatial.transforms.fast_geodesic_sh import (
+                PointSetSphericalHarmonics)
+            basis = PointSetSphericalHarmonics(lat, np.zeros_like(lat),
+                                               size - 1)
+            table = np.zeros((lat.size, size, size))
+            table[:, _host(basis.l_indices), _host(basis.m_indices)] = (
+                _host(basis.Y_matrix).real)
+            self._cache[key] = table
+        by_order = np.einsum("ilm,lm->im", self._cache[key], coefficients)
+        order = np.arange(size)
+        weight = np.where(order == 0, 1.0, 2.0)
+        phase = np.exp(1j * np.outer(order, lon))
+        self.synthesis_count += 1
+        return ((by_order * weight) @ phase).real
 
     @property
     def display_is_native(self) -> bool:
@@ -318,6 +358,31 @@ class RunFields:
                                name=name or entry.long_name,
                                units=entry.units, times=times)
 
+    def display_streamfunction(self, index: int, level: int | None = None
+                               ) -> ScalarGridField:
+        """psi on the display grid, for contouring.
+
+        Gauss runs: the state-grid samples, as for any scalar. Geodesic
+        runs: psi's spectral expansion evaluated exactly at the view-grid
+        nodes (:meth:`_view_synthesis`) rather than interpolated from the
+        geodesic samples, whose piecewise-linear interpolation would put
+        kinks and spurious small loops into contour lines where psi is
+        flat, notably near the poles.
+        """
+        if self.display_is_native:
+            return self.scalar_field("streamfunction", index, level)
+        entry = self._check("streamfunction", level)
+        key = ("view-streamfunction", int(index), level)
+        if key not in self._cache:
+            zeta, _ = self._vorticity_divergence(index, level)
+            self._cache[key] = self._view_synthesis(
+                self._inverse_laplacian(zeta))
+        target = self._view_grid()
+        return ScalarGridField(
+            self._cache[key], _host(target.latitudes),
+            _host(target.longitudes), name=entry.long_name,
+            units=entry.units, times=self.times[int(index):int(index) + 1])
+
     def display_wind(self, index: int, level: int | None = None
                      ) -> DisplayVectors:
         u, v = self.state_wind(index, level)
@@ -331,6 +396,17 @@ class RunFields:
                   level: int | None = None) -> float:
         values = self.state_values(identifier, index, level)
         return float(np.sum(self.state_weights() * values))
+
+    def free_surface_reference(self, index: int) -> float:
+        """H_ref (m): area mean of the free surface H at a saved state.
+
+        A fluid at rest over this terrain has a level surface (the lake at
+        rest), and holding the same volume V puts that level at
+        ``V / A + mean(h_s) = mean(h + h_s)``. The volume is conserved, so
+        H_ref is the same at every saved time up to the run's mass drift.
+        """
+        self._check("free_surface_perturbation", None)
+        return self.area_mean("free_surface_height", index)
 
     def potential_enstrophy(self, index: int) -> float:
         self._check("potential_enstrophy", None)
@@ -355,18 +431,72 @@ class RunFields:
         reference = float(geometry.get("reference_radius_m") or 6.371e6)
         return reference * float(geometry.get("radius_earth_units") or 1.0)
 
+    def _vorticity_divergence(self, index: int, level):
+        """Stored (zeta_lm, delta_lm) of one level; delta is None in BVE."""
+        frame = self._frame(index)
+        if self.solver == "bve":
+            return frame, None
+        if self.solver == "swe":
+            return frame[0], frame[1]
+        return frame[level], frame[self.nlev + level]
+
     def _energy_modes(self, index: int, level):
         from tropoi.representation.diagnostics.spectral import (
             kinetic_energy_modes)
-        frame = self._frame(index)
-        if self.solver == "bve":
-            zeta, delta = frame, None
-        elif self.solver == "swe":
-            zeta, delta = frame[0], frame[1]
-        else:
-            zeta, delta = frame[level], frame[self.nlev + level]
+        zeta, delta = self._vorticity_divergence(index, level)
         return kinetic_energy_modes(zeta, delta,
                                     radius=self.host_radius_estimate)
+
+    def helmholtz_rms_speeds(self, index: int, level: int | None = None
+                             ) -> tuple[float, float]:
+        """Area-rms speeds of the rotational and the divergent wind.
+
+        The parts ``k x grad(psi)`` and ``grad(chi)`` are orthogonal in the
+        energy integral over the sphere, so their kinetic energies add; each
+        follows from its own coefficients (zeta for psi, delta for chi) with
+        no synthesis. The divergent part of a BVE wind is exactly 0. Uses
+        the model's radius, so the speeds are exact (the fraction of each
+        part does not depend on the radius).
+        """
+        from tropoi.representation.diagnostics.spectral import (
+            kinetic_energy_modes)
+        self._check("wind", level)
+        radius = self.radius
+        zeta, delta = self._vorticity_divergence(index, level)
+        area = 4.0 * np.pi * radius ** 2
+
+        def rms(coefficients) -> float:
+            if coefficients is None:
+                return 0.0
+            energy = float(kinetic_energy_modes(coefficients,
+                                                radius=radius).sum())
+            return float(np.sqrt(2.0 * energy / area))
+        return rms(zeta), rms(delta)
+
+    def divergent_fraction(self, index: int, level: int | None = None
+                           ) -> float | None:
+        """``E_div / (E_rot + E_div)``: the divergent wind's kinetic-energy
+        share at a saved state (host only).
+
+        The two Helmholtz parts are orthogonal in the energy integral, so
+        each energy follows from its own coefficients (delta for the
+        divergent part, zeta for the rotational one) with no synthesis. The
+        share does not depend on the radius. Exactly 0 in BVE. ``None`` for
+        a state at rest (rms wind below :data:`REST_SPEED_MS`), whose
+        roundoff winds have no meaningful split.
+        """
+        from tropoi.representation.diagnostics.spectral import (
+            kinetic_energy_modes)
+        self._check("wind", level)
+        zeta, delta = self._vorticity_divergence(index, level)
+        radius = self.host_radius_estimate
+        rotational = float(kinetic_energy_modes(zeta, radius=radius).sum())
+        divergent = 0.0 if delta is None else float(
+            kinetic_energy_modes(delta, radius=radius).sum())
+        total = rotational + divergent
+        if np.sqrt(2.0 * total / (4.0 * np.pi * radius ** 2)) < REST_SPEED_MS:
+            return None
+        return divergent / total
 
     def rms_speed(self, index: int, level: int | None = None) -> float:
         """Area-rms wind speed from the kinetic-energy spectrum (host)."""

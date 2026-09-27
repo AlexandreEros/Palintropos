@@ -24,7 +24,7 @@ from tropoi.representation.visual.renderers import Renderer, get_default_rendere
 from tropoi.representation.visual.specs import (
     ColorKeySpec, FigureSpec, LayeredMapSpec, LineWidthKeySpec,
     PanelPlacement, ScalarMapSpec, SpectralCoefficientMapSpec,
-    StreamlineMapSpec, TextPanelSpec)
+    StreamlineMapSpec, TextPanelSpec, VectorLayer)
 
 
 _TIME_DECIMAL_PLACES = 9
@@ -315,7 +315,9 @@ def _normalization_slots(panel):
             yield ("background", layer.normalization_group,
                    layer.normalization,
                    np.asarray(layer.field.values_at(layer.time_index)))
-        if panel.vectors is not None and (
+        # A streamfunction layer has no speed scale: its fixed contour
+        # interval is its scale, shared by construction.
+        if isinstance(panel.vectors, VectorLayer) and (
                 panel.vectors.color_by or panel.vectors.width_by):
             yield ("vectors", panel.vectors.normalization_group,
                    panel.vectors.normalization, panel.vectors.speed)

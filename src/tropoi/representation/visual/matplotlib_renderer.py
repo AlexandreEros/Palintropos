@@ -13,8 +13,8 @@ from tropoi.representation.visual.normalization import NormalizationKind
 from tropoi.representation.visual.specs import (
     ColorKeySpec, ContourLayer, FigureSpec, LayeredMapSpec, LinePanelSpec,
     LineWidthKeySpec, PanelPlacement, ScalarLayer, ScalarMapSpec,
-    SpectralCoefficientMapSpec, SpectralEncoding, StreamlineMapSpec,
-    TextPanelSpec, VectorLayer)
+    SpectralCoefficientMapSpec, SpectralEncoding, StreamfunctionLayer,
+    StreamlineMapSpec, TextPanelSpec, VectorLayer)
 
 
 _SEMANTIC_COLORS = {
@@ -427,7 +427,9 @@ class MatplotlibRenderer:
             mesh = self._draw_background(axes, spec.background)
         for layer in spec.contours:
             self._draw_contours(axes, layer)
-        if spec.vectors is not None:
+        if isinstance(spec.vectors, StreamfunctionLayer):
+            self._draw_streamfunction(axes, spec.vectors)
+        elif spec.vectors is not None:
             if spec.vectors.style == "streamlines":
                 self._draw_streamlines(axes, spec.vectors)
             else:
@@ -477,6 +479,36 @@ class MatplotlibRenderer:
             axes.contour(lon_closed, lat_s2n, closed, levels=layer.levels,
                          colors=layer.color, linewidths=layer.line_width,
                          linestyles=layer.line_style, zorder=3)
+
+    @staticmethod
+    def _draw_streamfunction(axes, layer: StreamfunctionLayer) -> None:
+        import warnings
+
+        from matplotlib.patches import FancyArrowPatch
+
+        levels = layer.levels()
+        if not levels:
+            return
+        field = layer.field
+        values = np.asarray(field.values_at(layer.time_index), dtype=np.float64)
+        lat, lon, closed = _closed_south_to_north(
+            field.latitudes, field.longitudes, values)
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", UserWarning)
+            # Every level solid: the sign of psi depends on its gauge (the
+            # l = 0 mode), so dashing negative levels would mean nothing.
+            contours = axes.contour(
+                lon, lat, closed, levels=levels, colors=layer.color,
+                linewidths=layer.line_width, linestyles="solid",
+                alpha=layer.alpha, zorder=4)
+        for x, y, dx, dy in _flow_arrow_stations(
+                contours.allsegs, lat, lon, closed,
+                spacing=layer.arrow_spacing):
+            axes.add_patch(FancyArrowPatch(
+                (x - dx, y - dy), (x, y), arrowstyle="-|>",
+                mutation_scale=10.0 * layer.arrow_size, shrinkA=0.0,
+                shrinkB=0.0, linewidth=0.0, color=layer.color,
+                alpha=layer.alpha, zorder=4))
 
     def _vector_scale(self, layer: VectorLayer) -> float:
         resolved = layer.normalization.resolve(layer.speed)
@@ -572,6 +604,9 @@ class MatplotlibRenderer:
                       linewidth=width, solid_capstyle="butt")
             axes.text(x0 + 0.14, 0.45, f"{value:g}", va="center",
                       ha="left", fontsize="small")
+        if spec.note:
+            axes.text(0.5, 0.22, spec.note, ha="center", va="top",
+                      fontsize="small", transform=axes.transAxes)
 
     @staticmethod
     def _save_atomic(figure, output: pathlib.Path, *, dpi: int,
@@ -670,6 +705,64 @@ def _r2_seed_points(count: int, polar_limit: float) -> np.ndarray:
     unit = (0.5 + n * alpha) % 1.0
     return np.column_stack([360.0 * unit[:, 0],
                             polar_limit * (2.0 * unit[:, 1] - 1.0)])
+
+
+def _bilinear(lat, lon, values, y, x):
+    """Bilinear value of a (lat, lon) grid at map point (x, y), clamped."""
+    i = int(np.clip(np.searchsorted(lat, y) - 1, 0, lat.size - 2))
+    j = int(np.clip(np.searchsorted(lon, x) - 1, 0, lon.size - 2))
+    ty = float(np.clip((y - lat[i]) / (lat[i + 1] - lat[i]), 0.0, 1.0))
+    tx = float(np.clip((x - lon[j]) / (lon[j + 1] - lon[j]), 0.0, 1.0))
+    return ((1 - ty) * ((1 - tx) * values[i, j] + tx * values[i, j + 1])
+            + ty * ((1 - tx) * values[i + 1, j] + tx * values[i + 1, j + 1]))
+
+
+def _flow_arrow_stations(segments_by_level, lat, lon, psi, *, spacing,
+                         head=0.5):
+    """Direction arrowheads along streamfunction contours, in map degrees.
+
+    Returns ``(x, y, dx, dy)`` rows: an arrowhead tip and its direction
+    scaled to ``head`` degrees. Along each line arrows are about ``spacing``
+    degrees apart; the first one's position is staggered from line to line
+    (golden-ratio offsets), so arrows on neighbouring lines do not stack
+    into columns. Lines shorter than ``spacing / 4`` carry none.
+
+    The direction is the line's tangent oriented along ``k x grad(psi)``:
+    on the equirectangular map the flow of ``u = k x grad(psi)`` points
+    along ``(-d psi/d lat, d psi/d lon)`` (both components share the
+    positive factor ``1 / (R cos lat)``), so larger psi stays on its right.
+    """
+    lat = np.asarray(lat, dtype=np.float64)
+    lon = np.asarray(lon, dtype=np.float64)
+    d_lat, d_lon = np.gradient(np.asarray(psi, dtype=np.float64), lat, lon)
+    stations, line = [], 0
+    for segments in segments_by_level:
+        for points in segments:
+            points = np.asarray(points, dtype=np.float64)
+            if len(points) < 2:
+                continue
+            steps = np.hypot(*np.diff(points, axis=0).T)
+            points = points[np.concatenate([[True], steps > 0.0])]
+            steps = steps[steps > 0.0]
+            total = float(steps.sum())
+            if total < spacing / 4.0:
+                continue
+            line += 1
+            count = max(1, int(round(total / spacing)))
+            offset = 0.15 + 0.7 * ((line * 0.6180339887498949) % 1.0)
+            cumulative = np.concatenate([[0.0], np.cumsum(steps)])
+            for k in range(count):
+                s = (k + offset) * total / count
+                i = int(np.clip(np.searchsorted(cumulative, s) - 1, 0,
+                                steps.size - 1))
+                tangent = (points[i + 1] - points[i]) / steps[i]
+                x, y = points[i] + (s - cumulative[i]) * tangent
+                flow = (-_bilinear(lat, lon, d_lat, y, x),
+                        _bilinear(lat, lon, d_lon, y, x))
+                sign = 1.0 if tangent @ np.asarray(flow) >= 0.0 else -1.0
+                stations.append((x, y, sign * head * tangent[0],
+                                 sign * head * tangent[1]))
+    return stations
 
 
 def _map_direction(lat_degrees, u, v, radius):

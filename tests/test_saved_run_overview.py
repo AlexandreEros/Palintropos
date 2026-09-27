@@ -27,8 +27,8 @@ from tropoi.representation.archive import open_simulation
 from tropoi.representation.visual.quantities import (
     QuantityUnavailableError, quantity)
 from tropoi.representation.visual.views import (
-    Complexity, Contours, Drift, Grid, Map, Overview, Sigma, Streamlines,
-    describe, parse_time)
+    AutoVectors, Complexity, Contours, Drift, Grid, Map, Overview, Sigma,
+    StreamfunctionContours, Streamlines, describe, parse_time)
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 W5 = ROOT / "docs" / "validation" / "williamson_5"
@@ -78,6 +78,14 @@ def test_views_validate_their_arguments():
     assert parse_time("3600") == 3600.0
     with pytest.raises(ValueError):
         parse_time("five days")
+    with pytest.raises(ValueError):
+        StreamfunctionContours(interval=0.0)
+    with pytest.raises(ValueError):
+        StreamfunctionContours(level_count=1)
+    with pytest.raises(ValueError):
+        AutoVectors(divergent_threshold=1.0)
+    # The automatic policy spells out both styles it can choose.
+    assert describe(AutoVectors())["streamlines"]["type"] == "Streamlines"
     # A view description is plain JSON (it is embedded in every figure).
     json.dumps(describe(Overview(map=Map(
         "free_surface_height", contours=(Contours("terrain", (500.0,)),),
@@ -105,7 +113,8 @@ def test_discovery_is_host_only_and_reports_this_runs_availability():
                             capture_output=True, text=True, check=True)
     loaded, available = output.stdout.splitlines()
     assert loaded == "0 0"
-    for name in ("free_surface_height", "terrain", "potential_enstrophy",
+    for name in ("free_surface_height", "free_surface_perturbation",
+                 "terrain", "potential_enstrophy",
                  "spectral_complexity", "total_energy", "total_mass"):
         assert f"'{name}'" in available
     assert "'temperature'" not in available
@@ -125,10 +134,122 @@ def test_snapshots_are_saved_states_never_interpolated_times():
 
 def test_default_view_is_host_only_and_matches_the_run():
     from tropoi.representation.visual.compose import default_view
-    view = default_view(_fields())
-    assert view.map.background == "free_surface_height"
+    fields = _fields()
+    view = default_view(fields)
+    assert view.map.background == "free_surface_perturbation"
     assert view.map.contours == (Contours("terrain", (500.0, 1000.0, 1500.0)),)
-    assert isinstance(view.map.vectors, Streamlines)
+    assert view.map.vectors == AutoVectors()
+    assert fields.storage.resource_builds == 0
+
+
+def test_automatic_vectors_follow_the_divergent_share_of_the_maps_shown():
+    from tropoi.representation.visual.compose import _resolve_vectors
+    fields = _fields()
+    # E_div / (E_rot + E_div) from the stored coefficients alone (no
+    # model): exactly 0 for the solid-body start, then <= 0.08 %.
+    shares = [fields.divergent_fraction(i) for i in range(4)]
+    assert shares[0] == 0.0
+    assert [round(v, 6) for v in shares[1:]] == [0.000457, 0.000795,
+                                                 0.000713]
+    chosen, choice = _resolve_vectors(fields, Map("free_surface_perturbation",
+                                                  vectors=AutoVectors()),
+                                      [0, 1, 2, 3], None)
+    assert chosen.vectors == StreamfunctionContours()
+    assert choice["selected"] == "StreamfunctionContours"
+    assert choice["divergent_threshold"] == 0.01
+    assert choice["max_divergent_kinetic_energy_fraction"] == shares[2]
+    assert choice["divergent_kinetic_energy_fraction"] == shares
+    # A stricter limit keeps the full wind, with the styles given.
+    thin = Streamlines(density=0.5)
+    chosen, choice = _resolve_vectors(
+        fields, Map("vorticity", vectors=AutoVectors(
+            divergent_threshold=5e-4, streamlines=thin)), [0, 1, 2, 3], None)
+    assert chosen.vectors == thin and choice["selected"] == "Streamlines"
+    # The share of a map not shown does not count.
+    chosen, _ = _resolve_vectors(fields, Map("vorticity", vectors=AutoVectors(
+        divergent_threshold=5e-4)), [0, 1], None)
+    assert chosen.vectors == StreamfunctionContours()
+    # An explicit style is never replaced.
+    explicit = Map("vorticity", vectors=Streamlines())
+    assert _resolve_vectors(fields, explicit, [0], None) == (explicit, None)
+    assert fields.storage.resource_builds == 0
+
+
+def test_the_largest_share_decides_and_states_at_rest_are_skipped():
+    from types import SimpleNamespace
+    from tropoi.representation.visual.compose import _resolve_vectors
+    def fake(shares):
+        return SimpleNamespace(solver="swe",
+                               divergent_fraction=lambda i, level: shares[i])
+    view = Map("vorticity", vectors=AutoVectors())
+    # A divergent flow with one quiet snapshot keeps its full wind.
+    chosen, choice = _resolve_vectors(fake([None, 0.006, 0.74]), view,
+                                      [0, 1, 2], None)
+    assert chosen.vectors == Streamlines()
+    assert choice["max_divergent_kinetic_energy_fraction"] == 0.74
+    assert choice["divergent_kinetic_energy_fraction"] == [None, 0.006, 0.74]
+    chosen, _ = _resolve_vectors(fake([None, 0.006]), view, [0, 1], None)
+    assert chosen.vectors == StreamfunctionContours()
+    # At the threshold psi contours still apply; above it they do not.
+    chosen, _ = _resolve_vectors(fake([0.01]), view, [0], None)
+    assert chosen.vectors == StreamfunctionContours()
+    chosen, _ = _resolve_vectors(fake([0.0101]), view, [0], None)
+    assert chosen.vectors == Streamlines()
+    # Nothing moves: no evidence either way, the full wind is kept.
+    chosen, choice = _resolve_vectors(fake([None, None]), view, [0, 1], None)
+    assert chosen.vectors == Streamlines()
+    assert choice["max_divergent_kinetic_energy_fraction"] is None
+
+
+def test_kinetic_energy_shares_read_as_percentages():
+    from tropoi.representation.visual.compose import _full_wind_note, _percent
+    assert _percent(0.0007954) == "0.08"
+    assert _percent(0.01) == "1"
+    assert _percent(0.2717) == "27"
+    assert _percent(0.99964) == "100"
+    assert _percent(1.27e-8) == "1.3 × 10⁻⁶"
+    assert _percent(0.0) == "0"
+    note = _full_wind_note({"selected": "Streamlines",
+                            "max_divergent_kinetic_energy_fraction": 0.74,
+                            "divergent_threshold": 0.01})
+    assert note == ("full wind drawn: divergent part up to 74 %\n"
+                    "of kinetic energy (ψ contours need ≤ 1 %)")
+    assert _full_wind_note(None) == ""
+
+
+def test_a_level_free_surface_is_drawn_white_not_as_stretched_roundoff():
+    from types import SimpleNamespace
+    from tropoi.representation.visual.compose import _level_surface_scale
+    fields = SimpleNamespace(free_surface_reference=lambda i: 3059.69)
+    view = Map("free_surface_perturbation")
+    level, note = _level_surface_scale(fields, view, [0, 1], 9.1e-13)
+    assert level.limits == (-1.0, 1.0)
+    assert "H̄ = 3060 m" in note and "roundoff" in note
+    moving, note = _level_surface_scale(fields, view, [0, 1], 0.4)
+    assert moving == view and "roundoff" not in note
+
+
+def test_bve_streamlines_default_to_streamfunction_contours():
+    # Non-divergent flow: psi contours are its exact streamlines. SWE and PE
+    # keep streamlines of the full wind, whose divergent part psi omits.
+    from types import SimpleNamespace
+    from tropoi.representation.visual.compose import default_view
+    view = default_view(SimpleNamespace(solver="bve"))
+    assert view.map.background == "vorticity"
+    assert view.map.vectors == StreamfunctionContours()
+
+
+def test_psi_steps_are_round_and_labels_readable():
+    from tropoi.representation.visual.compose import _nice_step, _scientific
+    assert _nice_step(1.1e6) == 2.0e6
+    assert _nice_step(2.0e6) == 2.0e6
+    assert _nice_step(2.2e6) == 2.5e6
+    assert _nice_step(9.9e6) == 1.0e7
+    assert _nice_step(3.0e-3) == 5.0e-3
+    assert _scientific(2.5e7) == "2.5 × 10⁷"
+    assert _scientific(1.0e7) == "10⁷"
+    assert _scientific(2.0e-5) == "2 × 10⁻⁵"
+    assert _scientific(250.0) == "250"
 
 
 def test_rest_threshold_uses_the_host_kinetic_energy_spectrum():
@@ -288,12 +409,27 @@ class TestCanonicalRunOnGPU:
             15.71, 15.61, 15.65, 15.99]
         assert [round(m["wind_speed"]["max"], 2) for m in maps] == [
             20.0, 38.92, 42.35, 40.35]
-        assert [(round(m["free_surface_height"]["min"]),
-                 round(m["free_surface_height"]["max"])) for m in maps] == [
+        # eta' = H - H_ref: H_ref is the level of the same volume at rest,
+        # the same at every saved time (mass drift exactly 0), and adding
+        # it back gives the published free-surface range.
+        perturbation = [m["free_surface_perturbation"] for m in maps]
+        assert {round(p["reference_m"], 6) for p in perturbation} == {
+            5637.356958}
+        assert [(round(p["min"] + p["reference_m"]),
+                 round(p["max"] + p["reference_m"]))
+                for p in perturbation] == [
             (4993, 5960), (4992, 5974), (5010, 5974), (5031, 5954)]
+        assert all(abs(p["area_mean"]) < 1e-9 for p in perturbation)
+        # Divergent wind <= 0.08 % of kinetic energy: psi contours chosen.
+        choice = record["vector_choice"]
+        assert choice["selected"] == "StreamfunctionContours"
+        assert round(choice["max_divergent_kinetic_energy_fraction"],
+                     6) == 0.000795
+        assert record["streamfunction"]["interval_m2_s"] == 2.0e7
         assert record["run"]["coefficients_sha256"].startswith("dd28eff9")
-        # A fresh evaluator per figure: 4 layer depths + 4 wind pairs.
-        assert record["synthesis_count"] == 12
+        # A fresh evaluator per figure: 4 layer depths + 4 wind pairs + 4
+        # streamfunctions.
+        assert record["synthesis_count"] == 16
         # Readable at an 880 px README column: at least 11 CSS px.
         assert (captured["smallest"] * 880.0 /
                 (72.0 * captured["width"])) >= 11.0
@@ -373,6 +509,120 @@ def test_default_plot_goes_to_the_runs_assets_and_touches_nothing_else(
     assert open_simulation(run).metadata["run_id"] == SMOKE.name
 
 
+def _arrows_against_the_wind(fields, layer, index, level=None):
+    """Dot products of each psi-contour arrowhead with the model's wind.
+
+    The model's (u, v) is interpolated to each arrowhead and turned into the
+    map direction (u / cos(lat), v); returns (dot / |u|, speed / max speed).
+    """
+    import matplotlib
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+    from tropoi.representation.visual import matplotlib_renderer as mpl
+    field = layer.field
+    lat, lon, psi = mpl._closed_south_to_north(
+        field.latitudes, field.longitudes, field.values_at(0))
+    figure, axes = plt.subplots()
+    try:
+        contours = axes.contour(lon, lat, psi, levels=layer.levels())
+        stations = mpl._flow_arrow_stations(contours.allsegs, lat, lon, psi,
+                                            spacing=layer.arrow_spacing)
+    finally:
+        plt.close(figure)
+    wind = fields.display_wind(index, level)
+    _, _, u = mpl._closed_south_to_north(wind.latitudes, wind.longitudes,
+                                         wind.zonal)
+    _, _, v = mpl._closed_south_to_north(wind.latitudes, wind.longitudes,
+                                         wind.meridional)
+    peak = float(np.hypot(u, v).max())
+    dots, speeds = [], []
+    for x, y, dx, dy in stations:
+        ue, vn = mpl._bilinear(lat, lon, u, y, x), mpl._bilinear(
+            lat, lon, v, y, x)
+        east = ue / np.cos(np.deg2rad(y))
+        dots.append((east * dx + vn * dy) / (np.hypot(east, vn) *
+                                             np.hypot(dx, dy)))
+        speeds.append(np.hypot(ue, vn) / peak)
+    return np.array(dots), np.array(speeds)
+
+
+@cuda
+def test_psi_contours_of_a_swe_run_share_one_step_and_name_what_they_omit():
+    from tropoi.representation.visual.compose import compose_view
+    from tropoi.representation.visual.evaluate import RunFields
+    from tropoi.representation.visual.specs import (
+        LayeredMapSpec, StreamfunctionLayer, TextPanelSpec)
+    try:
+        fields = RunFields(open_simulation(SMOKE).storage)
+        view = Overview(map=Map("free_surface_height",
+                                vectors=StreamfunctionContours()),
+                        static=None, diagnostics=())
+        figure, record = compose_view(fields, view)
+        layers = [p.panel.vectors for p in figure.panels
+                  if isinstance(p.panel, LayeredMapSpec)]
+        assert len(layers) == 2 and all(
+            isinstance(layer, StreamfunctionLayer) for layer in layers)
+        interval = record["streamfunction"]["interval_m2_s"]
+        assert {layer.interval for layer in layers} == {interval}
+        span = (max(m["streamfunction"]["max"] for m in record["maps"]) -
+                min(m["streamfunction"]["min"] for m in record["maps"]))
+        assert 8 <= span / interval <= 20
+        assert record["streamfunction"]["rotational_part_only"] is True
+        key = next(p.panel.text for p in figure.panels
+                   if isinstance(p.panel, TextPanelSpec)
+                   and "ψ contours" in p.panel.text)
+        assert key.startswith("rotational-wind streamlines")
+        assert "divergent wind not drawn" in key
+        weights = fields.state_weights()
+        for index, stats in enumerate(record["maps"]):
+            # The Helmholtz split adds up to the wind the model computes:
+            # rotational^2 + divergent^2 = area mean of |u|^2 (Gauss grid,
+            # exact quadrature for this band-limited product).
+            u, v = fields.state_wind(index)
+            rms = stats["rms_speed"]
+            assert rms["rotational"] ** 2 + rms["divergent"] ** 2 == (
+                pytest.approx(float(np.sum(weights * (u * u + v * v))),
+                              rel=1e-10))
+            share = record["streamfunction"][
+                "divergent_kinetic_energy_fraction"][index]
+            assert share == pytest.approx(
+                rms["divergent"] ** 2 / (rms["rotational"] ** 2 +
+                                         rms["divergent"] ** 2))
+            dots, speeds = _arrows_against_the_wind(fields, layers[index],
+                                                    index)
+            assert np.all(dots[speeds > 0.05] > 0.9)
+    finally:
+        _release_gpu()
+
+
+@cuda
+def test_psi_for_contours_is_synthesized_exactly_on_the_view_grid(
+        monkeypatch):
+    # Geodesic runs draw on the 91 x 181 view grid. psi must be evaluated
+    # there from its coefficients, not interpolated from the state samples.
+    import cupy
+    from tropoi.representation.visual.evaluate import RunFields
+    from tropoi.spatial.transforms.fast_geodesic_sh import (
+        PointSetSphericalHarmonics)
+    try:
+        fields = RunFields(open_simulation(SMOKE).storage)
+        monkeypatch.setattr(RunFields, "display_is_native", False)
+        psi = fields.display_streamfunction(1)
+        assert psi.values_at(0).shape == (91, 181)
+        lat, lon = np.meshgrid(psi.latitudes, psi.longitudes, indexing="ij")
+        zeta = np.asarray(open_simulation(SMOKE).storage.frame(1))[0]
+        direct = PointSetSphericalHarmonics(
+            lat.ravel(), lon.ravel(), zeta.shape[0] - 1).inv_transform(
+            cupy.asarray(fields._inverse_laplacian(zeta))).get()
+        values = psi.values_at(0)
+        np.testing.assert_allclose(values.ravel(), direct, rtol=0.0,
+                                   atol=1e-13 * np.abs(direct).max())
+        # A pole is one point: its row holds one value.
+        assert np.ptp(values[0]) == 0.0 and np.ptp(values[-1]) == 0.0
+    finally:
+        _release_gpu()
+
+
 @cuda
 @pytest.mark.parametrize("name", sorted(REAL))
 def test_default_overviews_of_every_core_render(tmp_path, name):
@@ -393,9 +643,39 @@ def test_default_overviews_of_every_core_render(tmp_path, name):
             assert len(complexity["undefined_at_s"]) == len(sim)
         if name in ("pe", "pe_rest"):
             assert record["level"]["sigma"] == pytest.approx(0.6875)
+        if name == "pe":
+            # A divergent thermal wave keeps the full wind.
+            assert record["vector_choice"]["selected"] == "Streamlines"
+            assert record["vector_choice"][
+                "max_divergent_kinetic_energy_fraction"] > 0.5
+        if name == "w2":
+            # Steady geostrophic flow: divergence at roundoff level.
+            assert record["vector_choice"]["selected"] == (
+                "StreamfunctionContours")
+            assert record["vector_choice"][
+                "max_divergent_kinetic_energy_fraction"] < 1e-6
+            assert "streamfunction" in record
         if name == "bve":
             with pytest.raises(QuantityUnavailableError,
                                match="non-divergent"):
                 sim[-1].plot(tmp_path / "div.png", Map("divergence"))
+            # psi contours are the whole wind: nothing divergent is omitted.
+            psi = record["streamfunction"]
+            assert psi["rotational_part_only"] is False
+            assert psi["divergent_kinetic_energy_fraction"] == [0.0] * len(
+                record["maps"])
+            from tropoi.representation.visual.compose import compose_view
+            from tropoi.representation.visual.evaluate import RunFields
+            from tropoi.representation.visual.specs import LayeredMapSpec
+            fields = RunFields(sim.storage)
+            last = Overview(map=Map("vorticity",
+                                    vectors=StreamfunctionContours()),
+                            snapshots=(-1,), static=None, diagnostics=())
+            figure, _ = compose_view(fields, last)
+            (layer,) = [p.panel.vectors for p in figure.panels
+                        if isinstance(p.panel, LayeredMapSpec)]
+            dots, speeds = _arrows_against_the_wind(fields, layer,
+                                                    len(sim) - 1)
+            assert np.all(dots[speeds > 0.05] > 0.9)
     finally:
         _release_gpu()

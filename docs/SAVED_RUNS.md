@@ -153,24 +153,26 @@ views are available from the shell as `tropoi plot RUN_PATH` (see
 
 ```python
 from tropoi.representation.visual.views import (
-    Complexity, Contours, Drift, Grid, Map, Overview, Sigma, Streamlines)
+    AutoVectors, Complexity, Contours, Drift, Grid, Map, Overview, Sigma,
+    StreamfunctionContours, Streamlines)
 
 sim.plot("overview.png")                                  # solver default
 sim.plot("h.png", Overview(map=Map("free_surface_height",
                                    contours=(Contours("terrain", (500.0, 1000.0)),),
                                    vectors=Streamlines()),
                            snapshots=(0, "5d", -1)))
-sim[-1].plot("flow.png", Map(None, vectors=Streamlines()))   # streamlines alone
+sim[-1].plot("flow.png", Map(None, vectors=StreamfunctionContours()))  # psi contours alone
 sim[2].plot("grid.png", Grid(((Map("vorticity"), Map("divergence")),
                               (Drift(("total_energy",)), Complexity()))))
 sim.plot("pe.png", Overview(map=Map("temperature_anomaly", level=Sigma(0.75),
-                                    vectors=Streamlines())))
+                                    vectors=AutoVectors(divergent_threshold=0.005))))
 ```
 
-- **Default overviews.** BVE: vorticity with streamlines. SWE: free-surface
-  height with streamlines, plus terrain contours and a static terrain map when
-  the run has terrain. PE: temperature anomaly with streamlines at the full
-  level nearest σ = 0.75. Each overview adds a conservation panel (per-step
+- **Default overviews.** BVE: vorticity with streamfunction contours. SWE:
+  free-surface perturbation η′ with the automatic wind overlay
+  (`AutoVectors`, below), plus terrain contours and a static terrain map
+  when the run has terrain. PE: temperature anomaly with the automatic wind
+  overlay at the full level nearest σ = 0.75. Each overview adds a conservation panel (per-step
   columns of `diagnostics/timeseries.csv`, and for SWE the potential
   enstrophy at the saved states) and a kinetic-energy spectral-complexity
   panel. Parts a run cannot provide are omitted from a default and listed in
@@ -183,12 +185,25 @@ sim.plot("pe.png", Overview(map=Map("temperature_anomaly", level=Sigma(0.75),
   both are identically zero by construction. This listing never imports CuPy
   or Matplotlib. In SWE and PE the streamfunction is the rotational part of
   the flow only; `wind` is the full flow.
+- **Free-surface perturbation.** `free_surface_perturbation` is
+  η′ = H − H̄, where H = h + h_s is the free-surface height and H̄ its area
+  mean at the same saved time. H̄ is the level surface that the same fluid
+  volume has at rest over the same terrain (the lake at rest), so η′ = 0
+  for a lake at rest. The volume is conserved, so H̄ is the same at every
+  saved time up to the run's mass drift. The colour map is white at 0,
+  blue where the surface stands above the resting level and red where it
+  lies below; in Williamson case 5 the blue band is the equatorial bulge of
+  the balanced westerly flow. The key names H̄, and the sidecar records it
+  per map (`reference_m`). A surface level to roundoff (every
+  |η′| ≤ 10⁻¹² H̄, the tolerance at which a colour scale of H itself is
+  flat) is drawn on a fixed ±1 m scale and stays white. The absolute
+  `free_surface_height` H remains available.
 - **Levels.** PE maps take `level=K` (0-based from the top) or `Sigma(s)`, the
   full level nearest `s`. Labels always show the level's actual σ = p/p_s,
   never pressure or height.
 - **Shared scales.** The maps of an overview share one colour scale, and their
-  winds share one speed scale. A single colour key and a single line-width key
-  show exactly those scales. Grid panels each have their own.
+  winds share one speed scale (or one ψ step). A single colour key and a single
+  wind key show exactly those scales. Grid panels each have their own.
 - **Where numbers come from.** Fields are evaluated once per (quantity, saved
   state, level) through the run's model, which is built once per opened
   capsule. Statistics (ranges, area means, peak speeds, potential enstrophy)
@@ -206,8 +221,8 @@ sim.plot("pe.png", Overview(map=Map("temperature_anomaly", level=Sigma(0.75),
   identically zero are labelled as such.
 - **Streamlines** are instantaneous curves tangent to one saved wind; they are
   not particle trajectories, which sparse saved states cannot provide. On the
-  map, the direction of motion is (u / cos φ, v), for streamlines and arrows
-  alike.
+  map, the direction of motion is (u / cos φ, v), for every wind overlay.
+  How each overlay encodes the wind is described in the next section.
 - **Provenance.** PNG metadata records the run id, solver, commit, the
   SHA-256 of the coefficient file and of `diagnostics/timeseries.csv`, and the
   full view. With `sidecar=True` (or `--sidecar`), every number shown is also
@@ -222,6 +237,73 @@ sim.plot("pe.png", Overview(map=Map("temperature_anomaly", level=Sigma(0.75),
   the only place inside a run that plotting writes, it never enters the run
   id, the completion status, or a published run's `SHA256SUMS`, and
   `--overwrite` sweeps it with the replaced run's other generated results.
+
+### How winds are drawn
+
+- **`StreamfunctionContours`** (BVE default, `--vectors streamfunction`)
+  draws contours of ψ at every multiple of one step Δψ. The step is shared by
+  every map of an overview and is shown in the key.
+  - In non-divergent flow, u = k̂ × ∇ψ exactly, so these contours *are* the
+    streamlines. Nothing is seeded, integrated or cut off.
+  - Closed orbits close by themselves. No line is forced through a saddle
+    point: a separatrix shows up as the pattern the neighbouring levels
+    make around it.
+  - The flow between two neighbouring lines is Δψ everywhere, so their
+    spacing is Δψ / |u|: closer lines mean faster flow. Only the meridional
+    spacing reads at true scale on this map; zonal distances are stretched
+    by 1 / cos φ.
+  - Every level is drawn with one solid line, because the sign of ψ depends
+    on its gauge (the ℓ = 0 mode is zero).
+  - Arrowheads point along k̂ × ∇ψ, so larger ψ lies to the right of the flow.
+  - On geodesic runs ψ is evaluated exactly at the view-grid nodes from its
+    coefficients, not interpolated from the state samples. Interpolation
+    left kinks in the contours and pole rows that did not hold a single
+    value.
+- **In SWE and PE, ψ is the rotational wind only.** The key says so and
+  gives the largest share of the kinetic energy that the divergent wind
+  carries in the maps shown. The sidecar records both parts' rms speeds
+  per map.
+- **`Streamlines`** (`--vectors streamlines`) integrates lines through the
+  full wind from fixed, evenly spread seed points.
+  - How dense the lines are depends on the seeding, not on the flux, so
+    only line width encodes speed. Colour stays with the background field.
+  - Lines can end short of closing, because integration stops at the
+    density and length limits.
+- **`AutoVectors`** (SWE and PE default, `--vectors auto`) chooses between
+  the two from the flow drawn. It uses ψ contours when the divergent
+  kinetic-energy share f_div = E_div / (E_rot + E_div) is at most
+  `divergent_threshold` (default 1 %) in every map shown. Otherwise it uses
+  streamlines of the full wind, so a divergent flow never silently loses
+  its divergent wind.
+  - E_rot and E_div come from the ζ and δ coefficients alone (the two
+    Helmholtz parts are orthogonal in the energy integral). No synthesis
+    and no GPU are needed, and the share does not depend on the radius.
+  - The largest share over the maps decides, once per figure. A single
+    quiet snapshot of a divergent flow does not switch the style. States at
+    rest are skipped, and if every state is at rest, streamlines are kept.
+  - 1 % means an rms divergent wind of at most about a tenth of the
+    rotational one (√(f / (1 − f))). Measured on the local runs (2026-09-26),
+    shares cluster far from it: Williamson 2 below 2 × 10⁻⁸, Williamson 5
+    at T63 at most 0.08 %; the linear gravity wave 100 %, the PE thermal
+    waves above 99 % at the drawn level. One thermal-wave level passes 0.59 %
+    at one snapshot and 74 % at the next, which is why the largest share
+    decides.
+  - The key says which style was chosen and why: "divergent wind not drawn:
+    ≤ 0.08 % of kinetic energy (auto limit 1 %)", or, under streamlines,
+    "full wind drawn: divergent part up to 100 % of kinetic energy". The
+    sidecar's `vector_choice` records the selected style, the threshold,
+    the largest share and the share at each map (`null` at rest). A
+    single-snapshot map records its own choice in its `maps` entry.
+  - An explicit `StreamfunctionContours` or `Streamlines` is always drawn as
+    given.
+- **Recommended next step for divergent flow:** draw ψ contours (solid) and
+  χ contours (dashed) at the same step. Their spacings then give the speeds
+  of the rotational and the divergent wind. Divergent flow leaves χ minima
+  (δ > 0) and converges into χ maxima (δ < 0), and the sources and sinks
+  balance, because δ integrates to zero over the sphere.
+  - Do not use opacity driven by the local ratio |u_χ| / |u|. It is
+    undefined at stagnation points and hard to read over a coloured
+    background.
 
 Figures meant to stay fixed should spell out every field of every view
 object, as the README figure's recipe does
