@@ -100,3 +100,18 @@ def test_notebook_smoke_path_executes_through_the_real_entrypoint(tmp_path, monk
     print("smoke report tiers:", verdicts)
     assert verdicts["B"] == "INCOMPLETE" or verdicts["B"] == "PASS"
     assert verdicts["A"] == "INCOMPLETE"
+    # Fresh-VM resume: the local run directory is gone; the restore cell must
+    # bring back the newest Drive backup that verifies, skipping a corrupt one.
+    import shutil
+    backup_ckpts = sorted((ns["BACKUP_DIR"] / "checkpoints").glob("checkpoint-s*.npz"))
+    assert len(backup_ckpts) >= 2
+    assert (ns["BACKUP_DIR"] / "states" / "state-d00001.npy").exists()
+    raw = bytearray(backup_ckpts[-1].read_bytes())
+    raw[len(raw) // 2] ^= 0xFF
+    backup_ckpts[-1].write_bytes(bytes(raw))
+    shutil.rmtree(run_dir)
+    restore = next(src for src, c in cells if src.startswith("# ---- 6. restore"))
+    exec(compile(restore, "<notebook restore cell>", "exec"), ns)
+    restored = sorted((run_dir / "checkpoints").glob("checkpoint-s*.npz"))
+    print("restored after corrupting the newest backup:", [p.name for p in restored])
+    assert [p.name for p in restored] == [backup_ckpts[-2].name]

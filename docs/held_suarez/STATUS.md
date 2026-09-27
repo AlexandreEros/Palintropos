@@ -61,7 +61,7 @@ or incomplete data, byte-deterministic.
 
 `notebooks/held_suarez_colab.ipynb`: pinned SOLVER_COMMIT, GPU/float64 hard check, Drive mount,
 reference hash check, 200-step benchmark gate with projection and automatic stop, restore from
-backup, resumable run loop (backup every 10 days, keep 3), report. SOLVER_COMMIT = f529c6b (S5;
+backup, resumable run loop (backup every 10 days, keep 3), report. SOLVER_COMMIT = e47a582 (S5 + review fix;
 must be pushed). Smoke path executed locally through the same entrypoint
 (`tests/test_held_suarez_notebook.py`): benchmark 0.147 s/step (T21 L10, MX110), forced stop at day
 1 + resume in a fresh process, backups, report. T42 timing is Colab-only (MX110 TDR).
