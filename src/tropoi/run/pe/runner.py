@@ -47,7 +47,8 @@ import cupy as cp
 
 from tropoi.temporal.tendencies.primitive_equations import (
     PrimitiveEquationsModel, PrimitiveEquationsState)
-from tropoi.temporal.integration import IntegrationScheduler, rk4_step_array
+from tropoi.temporal.integration import IntegrationScheduler
+from tropoi.temporal.steppers import RK4Stepper
 from tropoi.run.pe.config import PE_DEFAULT_PLOTS
 from tropoi.representation.diagnostics.pe import PEDiagnosticsRecorder, plot_pe_diagnostics
 
@@ -97,12 +98,19 @@ def run_pe(model: PrimitiveEquationsModel,
         model.validate_state(PrimitiveEquationsState(y_stage),
                              context=f"in an RK4 stage after step {step}")
 
+    # The stepper owns the RK4 arithmetic (bit-identical to the historical
+    # rk4_step_array call); the loop below still owns time and the step size
+    # because count mode may clip the final step to land on an output time.
+    stepper = RK4Stepper(model.tendency, dt_seconds,
+                         stage_validator=validate_stage)
+
     def do_step(t_before: float, t_after: float, dt_step: float,
                 step_index: int) -> None:
         nonlocal state, step, last_row
-        state = PrimitiveEquationsState(
-            rk4_step_array(model.tendency, state.coeffs, t_before, dt_step,
-                           stage_validator=validate_stage))
+        stepper.dt = dt_step
+        stepper.initialize(state.coeffs, t_before)
+        stepper.step()
+        state = PrimitiveEquationsState(stepper.state)
         step = step_index
         # Hard validation after every accepted step: NaN/Inf, monopole
         # conservation, positive temperature, finite p_s — loud, not silent.

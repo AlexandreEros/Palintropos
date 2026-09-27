@@ -80,7 +80,9 @@ flowchart LR
         n_tropoi_otemporal_ointegration_oIntegrationScheduler{{"IntegrationScheduler"}}
         n_tropoi_otemporal_ointegration_o__require__finite__number["_require_finite_number()"]
         n_tropoi_otemporal_ointegration_o__require__finite__positive["_require_finite_positive()"]
-        n_tropoi_otemporal_ointegration_ork4__step__array["rk4_step_array()"]
+    end
+    subgraph g_tropoi_otemporal_osteppers["temporal.steppers"]
+        n_tropoi_otemporal_osteppers_oRK4Stepper{{"RK4Stepper"}}
     end
     subgraph g_tropoi_otemporal_otendencies_oprimitive__equations["temporal.tendencies.primitive_equations"]
         n_tropoi_otemporal_otendencies_oprimitive__equations_oPrimitiveEquationsModel{{"PrimitiveEquationsModel"}}
@@ -131,7 +133,7 @@ flowchart LR
     n_tropoi_orun_ope_orunner_orun__pe --> n_tropoi_orepresentation_ovisual_ope__snapshots_orender__pe__snapshots
     n_tropoi_orun_ope_orunner_orun__pe -->|instantiate| n_tropoi_ospatial_ostates_oprimitive__equations_oPrimitiveEquationsState
     n_tropoi_orun_ope_orunner_orun__pe -->|instantiate| n_tropoi_otemporal_ointegration_oIntegrationScheduler
-    n_tropoi_orun_ope_orunner_orun__pe --> n_tropoi_otemporal_ointegration_ork4__step__array
+    n_tropoi_orun_ope_orunner_orun__pe -->|instantiate| n_tropoi_otemporal_osteppers_oRK4Stepper
     n_tropoi_ospatial_oinitialization_ope_omake__pe__ic --> n_tropoi_ospatial_otruncation_orequire__thermal__wave__support
     n_tropoi_ospatial_otruncation_orequire__thermal__wave__support --> n_tropoi_ospatial_otruncation_oproduct__truncation__cut
     n_tropoi_otemporal_ointegration_o__require__finite__positive --> n_tropoi_otemporal_ointegration_o__require__finite__number
@@ -148,4 +150,5 @@ flowchart LR
     class n_tropoi_ospatial_osigma__coordinate_oSigmaGrid_ouniform truncated
     class n_tropoi_ospatial_oterrain_otopography_oTopography_omountain truncated
     class n_tropoi_otemporal_ointegration_oIntegrationScheduler truncated
+    class n_tropoi_otemporal_osteppers_oRK4Stepper truncated
     class n_tropoi_otemporal_otendencies_oprimitive__equations_oPrimitiveEquationsModel truncated

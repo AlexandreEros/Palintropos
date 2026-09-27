@@ -1776,6 +1776,14 @@
         "module"
       ],
       "source": "tropoi.run.pe.runner",
+      "target": "tropoi.temporal.steppers"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.run.pe.runner",
       "target": "tropoi.temporal.tendencies.primitive_equations"
     },
     {
@@ -2267,6 +2275,14 @@
       ],
       "source": "tropoi.temporal.simulation",
       "target": "tropoi.spatial.modes"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.temporal.steppers",
+      "target": "tropoi.temporal.integration"
     },
     {
       "kind": "imports",
@@ -3978,6 +3994,18 @@
       "third_party_imports": [
         "numpy"
       ]
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.temporal.steppers",
+      "is_package": false,
+      "path": "tropoi/temporal/steppers.py",
+      "stdlib_imports": [
+        "__future__",
+        "typing"
+      ],
+      "third_party_imports": []
     },
     {
       "category": "code",

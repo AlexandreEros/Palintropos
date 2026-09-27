@@ -3901,9 +3901,9 @@
       "target": "tropoi.temporal.integration.IntegrationScheduler"
     },
     {
-      "kind": "call",
+      "kind": "instantiate",
       "source": "tropoi.run.pe.runner.run_pe",
-      "target": "tropoi.temporal.integration.rk4_step_array"
+      "target": "tropoi.temporal.steppers.RK4Stepper"
     },
     {
       "kind": "call",
@@ -5089,6 +5089,16 @@
       "kind": "instantiate",
       "source": "tropoi.temporal.simulation.Snapshot.state",
       "target": "tropoi.spatial.modes.SpectralState"
+    },
+    {
+      "kind": "constructor",
+      "source": "tropoi.temporal.steppers.RK4Stepper",
+      "target": "tropoi.temporal.steppers.RK4Stepper.__init__"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.temporal.steppers.RK4Stepper.step",
+      "target": "tropoi.temporal.integration.rk4_step_array"
     },
     {
       "kind": "constructor",
@@ -11598,6 +11608,125 @@
       "kind": "function",
       "module": "tropoi.temporal.simulation",
       "qualname": "_normalize_index",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.temporal.steppers.RK4Stepper",
+      "kind": "class",
+      "module": "tropoi.temporal.steppers",
+      "qualname": "RK4Stepper",
+      "type": "class"
+    },
+    {
+      "id": "tropoi.temporal.steppers.RK4Stepper.__init__",
+      "kind": "method",
+      "module": "tropoi.temporal.steppers",
+      "qualname": "RK4Stepper.__init__",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.temporal.steppers.RK4Stepper.initialize",
+      "kind": "method",
+      "module": "tropoi.temporal.steppers",
+      "qualname": "RK4Stepper.initialize",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.temporal.steppers.RK4Stepper.load_state_dict",
+      "kind": "method",
+      "module": "tropoi.temporal.steppers",
+      "qualname": "RK4Stepper.load_state_dict",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.temporal.steppers.RK4Stepper.state",
+      "kind": "property",
+      "module": "tropoi.temporal.steppers",
+      "qualname": "RK4Stepper.state",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.temporal.steppers.RK4Stepper.state_dict",
+      "kind": "method",
+      "module": "tropoi.temporal.steppers",
+      "qualname": "RK4Stepper.state_dict",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.temporal.steppers.RK4Stepper.step",
+      "kind": "method",
+      "module": "tropoi.temporal.steppers",
+      "qualname": "RK4Stepper.step",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.temporal.steppers.RK4Stepper.step_count",
+      "kind": "property",
+      "module": "tropoi.temporal.steppers",
+      "qualname": "RK4Stepper.step_count",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.temporal.steppers.RK4Stepper.t",
+      "kind": "property",
+      "module": "tropoi.temporal.steppers",
+      "qualname": "RK4Stepper.t",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.temporal.steppers.TimeStepper",
+      "kind": "class",
+      "module": "tropoi.temporal.steppers",
+      "qualname": "TimeStepper",
+      "type": "class"
+    },
+    {
+      "id": "tropoi.temporal.steppers.TimeStepper.initialize",
+      "kind": "method",
+      "module": "tropoi.temporal.steppers",
+      "qualname": "TimeStepper.initialize",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.temporal.steppers.TimeStepper.load_state_dict",
+      "kind": "method",
+      "module": "tropoi.temporal.steppers",
+      "qualname": "TimeStepper.load_state_dict",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.temporal.steppers.TimeStepper.state",
+      "kind": "property",
+      "module": "tropoi.temporal.steppers",
+      "qualname": "TimeStepper.state",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.temporal.steppers.TimeStepper.state_dict",
+      "kind": "method",
+      "module": "tropoi.temporal.steppers",
+      "qualname": "TimeStepper.state_dict",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.temporal.steppers.TimeStepper.step",
+      "kind": "method",
+      "module": "tropoi.temporal.steppers",
+      "qualname": "TimeStepper.step",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.temporal.steppers.TimeStepper.step_count",
+      "kind": "property",
+      "module": "tropoi.temporal.steppers",
+      "qualname": "TimeStepper.step_count",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.temporal.steppers.TimeStepper.t",
+      "kind": "property",
+      "module": "tropoi.temporal.steppers",
+      "qualname": "TimeStepper.t",
       "type": "function"
     },
     {

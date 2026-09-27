@@ -2909,6 +2909,88 @@
     {
       "decorators": [],
       "external_bases": [],
+      "id": "tropoi.temporal.steppers.RK4Stepper",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__init__"
+        },
+        {
+          "kind": "method",
+          "name": "initialize"
+        },
+        {
+          "kind": "method",
+          "name": "load_state_dict"
+        },
+        {
+          "kind": "property",
+          "name": "state"
+        },
+        {
+          "kind": "method",
+          "name": "state_dict"
+        },
+        {
+          "kind": "method",
+          "name": "step"
+        },
+        {
+          "kind": "property",
+          "name": "step_count"
+        },
+        {
+          "kind": "property",
+          "name": "t"
+        }
+      ],
+      "module": "tropoi.temporal.steppers",
+      "qualname": "RK4Stepper"
+    },
+    {
+      "decorators": [
+        "runtime_checkable"
+      ],
+      "external_bases": [
+        "typing.Protocol"
+      ],
+      "id": "tropoi.temporal.steppers.TimeStepper",
+      "members": [
+        {
+          "kind": "method",
+          "name": "initialize"
+        },
+        {
+          "kind": "method",
+          "name": "load_state_dict"
+        },
+        {
+          "kind": "property",
+          "name": "state"
+        },
+        {
+          "kind": "method",
+          "name": "state_dict"
+        },
+        {
+          "kind": "method",
+          "name": "step"
+        },
+        {
+          "kind": "property",
+          "name": "step_count"
+        },
+        {
+          "kind": "property",
+          "name": "t"
+        }
+      ],
+      "module": "tropoi.temporal.steppers",
+      "qualname": "TimeStepper"
+    },
+    {
+      "decorators": [],
+      "external_bases": [],
       "id": "tropoi.temporal.tendencies.barotropic.BarotropicVorticity",
       "members": [
         {

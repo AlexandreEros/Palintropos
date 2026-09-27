@@ -22,7 +22,7 @@ flowchart LR
     n_tropoi_ospatial_oterrain["spatial.terrain (4 modules)"]
     n_tropoi_ospatial_otransforms["spatial.transforms (4 modules)"]
     n_tropoi_ospatial_otransforms_ocuda["spatial.transforms.cuda (1 module)"]
-    n_tropoi_otemporal["temporal (2 modules)"]
+    n_tropoi_otemporal["temporal (3 modules)"]
     n_tropoi_otemporal_otendencies["temporal.tendencies (3 modules)"]
     n_tropoi_oviz["viz (12 modules)"]
     n_tropoi_ocli -->|11| n_tropoi_orepresentation_oarchive
@@ -73,7 +73,7 @@ flowchart LR
     n_tropoi_orun_ope -->|1| n_tropoi_orun_obve
     n_tropoi_orun_ope -->|1| n_tropoi_orun_oswe
     n_tropoi_orun_ope -->|2| n_tropoi_ospatial
-    n_tropoi_orun_ope -->|2| n_tropoi_otemporal
+    n_tropoi_orun_ope -->|3| n_tropoi_otemporal
     n_tropoi_orun_ope -->|1| n_tropoi_otemporal_otendencies
     n_tropoi_orun_oswe -->|3| n_tropoi
     n_tropoi_orun_oswe -->|1| n_tropoi_orepresentation_odiagnostics

@@ -40,3 +40,21 @@ classDiagram
     c_tropoi_otemporal_osimulation_oSnapshotStorage : +solver
     c_tropoi_otemporal_osimulation_oSnapshotStorage : +times
     c_tropoi_otemporal_osimulation_oSnapshotStorage : external base typing.Protocol
+    class c_tropoi_otemporal_osteppers_oRK4Stepper["RK4Stepper (temporal.steppers)"]
+    c_tropoi_otemporal_osteppers_oRK4Stepper : +#95;#95;init#95;#95;()
+    c_tropoi_otemporal_osteppers_oRK4Stepper : +initialize()
+    c_tropoi_otemporal_osteppers_oRK4Stepper : +load#95;state#95;dict()
+    c_tropoi_otemporal_osteppers_oRK4Stepper : +state
+    c_tropoi_otemporal_osteppers_oRK4Stepper : +state#95;dict()
+    c_tropoi_otemporal_osteppers_oRK4Stepper : +step()
+    c_tropoi_otemporal_osteppers_oRK4Stepper : +step#95;count
+    c_tropoi_otemporal_osteppers_oRK4Stepper : +t
+    class c_tropoi_otemporal_osteppers_oTimeStepper["TimeStepper (temporal.steppers)"]
+    c_tropoi_otemporal_osteppers_oTimeStepper : +initialize()
+    c_tropoi_otemporal_osteppers_oTimeStepper : +load#95;state#95;dict()
+    c_tropoi_otemporal_osteppers_oTimeStepper : +state
+    c_tropoi_otemporal_osteppers_oTimeStepper : +state#95;dict()
+    c_tropoi_otemporal_osteppers_oTimeStepper : +step()
+    c_tropoi_otemporal_osteppers_oTimeStepper : +step#95;count
+    c_tropoi_otemporal_osteppers_oTimeStepper : +t
+    c_tropoi_otemporal_osteppers_oTimeStepper : external base typing.Protocol

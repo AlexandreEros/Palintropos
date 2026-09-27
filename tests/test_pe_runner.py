@@ -159,3 +159,24 @@ def test_invalid_initial_state_fails_loudly(model, tmp_path):
                t_end_days=600.0 / 86400.0, out_dir=pathlib.Path(tmp_path),
                snapshot_times=times, snapshot_mode="count",
                dt_snapshots=600.0, plots=())
+
+
+def test_run_pe_matches_hand_rolled_rk4_step_array_bitwise(model, tmp_path):
+    """The runner's stepping is exactly rk4_step_array at the fixed dt.
+
+    Characterization for the TimeStepper adoption: whatever object drives
+    the steps, the stored coefficients must stay byte-identical to a plain
+    rk4_step_array loop.
+    """
+    import cupy as cp
+    from tropoi.temporal.integration import rk4_step_array
+    state0 = _ic(model, "thermal_wave", amplitude=AMP)
+    out = tmp_path / "hand"
+    out.mkdir()
+    _run(model, out, "thermal_wave", dt_seconds=300.0, t_end_s=900.0,
+         n_snapshots=2, plots=())
+    stored = np.load(out / "pe_coeffs.npy")
+    y = cp.array(state0.coeffs, copy=True)
+    for _ in range(3):
+        y = rk4_step_array(model.tendency, y, 0.0, 300.0)
+    assert stored[-1].tobytes() == cp.asnumpy(y).tobytes()
