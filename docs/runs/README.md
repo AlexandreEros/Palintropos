@@ -57,10 +57,11 @@ run compared with MRI-JMA in
   numbers, drawn by the pinned recipe
   [docs/figures/williamson5_t63_overview.py](../figures/williamson5_t63_overview.py).
   Redrawing reproduces `overview.json` byte for byte. The PNG can differ from
-  the committed one in a handful of antialiased pixels: 7–19 of 3.8 million
-  were measured between processes. The fields, streamline seeds and computed
-  streamline segments are bitwise identical from run to run; the variation
-  arises when Matplotlib rasterizes the streamline layer.
+  the committed one in a few antialiased pixels (7–19 of 3.8 million were
+  measured between processes for the earlier streamline figure). Since
+  2026-09-26 the figure colours the free-surface perturbation η′ = H − H̄
+  and draws ψ contours, chosen automatically because the divergent wind
+  carries at most 0.08 % of the kinetic energy.
 - `overview_2026-07-30.png`: the previous README figure, cited by the
   validation report. It was drawn by
   [plot_swe_holistic.py](../validation/williamson_5/plot_swe_holistic.py)

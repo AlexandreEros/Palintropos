@@ -14,14 +14,17 @@ It is **not** a climate or weather model. Its solvers are idealized: no forcing,
 no moisture, no radiation, no real or data-driven terrain. They do not model any
 particular planet, real or fictional.
 
-![Williamson test case 5 at T63: static terrain; free-surface height with streamlines at days 0, 5, 10 and 15 on one colour scale; conservation drift and kinetic-energy spectral complexity](docs/runs/20260730T011700Z_williamson5_rot23p93h_r4_l63_dt120h_45406d82_668e6c9a/assets/overview.png)
+![Williamson test case 5 at T63: static terrain; free-surface perturbation with streamfunction contours at days 0, 5, 10 and 15 on one colour scale; conservation drift and kinetic-energy spectral complexity](docs/runs/20260730T011700Z_williamson5_rot23p93h_r4_l63_dt120h_45406d82_668e6c9a/assets/overview.png)
 
 *Williamson test case 5, flow over an isolated mountain, from the canonical T63
 run (Gauss–Legendre grid 96 × 192, ℓ ≤ 63, inviscid; commit `668e6c9a`,
 2026-07-30, one GPU run). A zonal jet meets a conical mountain (top left: the
 band-limited terrain) and sets up a global wave train over 15 days. The maps
-share one free-surface-height scale; streamlines are instantaneous, with width
-proportional to wind speed, and the circles are the terrain at 500, 1000 and
+share one colour scale for the free-surface perturbation η′ = H − H̄ (blue
+above the resting level H̄ = 5637 m, red below; the blue band is the
+equatorial bulge of the balanced jet). The lines are evenly spaced contours of
+the streamfunction ψ, closer where the flow is faster; they omit the divergent
+wind, which carries at most 0.08 % of the kinetic energy. The circles are the terrain at 500, 1000 and
 1500 m. Layer mass stays bit-identical to day 0 at every step. Over 15 days,
 total energy drifts by −7.9 × 10⁻⁷ (recorded every step) and potential
 enstrophy by −8.5 × 10⁻⁶ (evaluated at the four saved states only). In
@@ -204,10 +207,10 @@ PE run; you choose the filled quantity, contours, the wind overlay, the saved
 times and the diagnostics panels:
 
 ```python
-from tropoi.representation.visual.views import Map, Streamlines
+from tropoi.representation.visual.views import Map, StreamfunctionContours
 
 sim.plot()                                   # default overview -> RUN/assets/overview.png
-sim[-1].plot("flow.png", Map(None, vectors=Streamlines()))   # streamlines alone
+sim[-1].plot("flow.png", Map(None, vectors=StreamfunctionContours()))  # streamlines alone
 sim.quantities()                             # what this run can draw: meaning, units, cadence
 ```
 
@@ -215,6 +218,7 @@ sim.quantities()                             # what this run can draw: meaning, 
 tropoi plot runs                                            # -> <latest run>/assets/overview.png
 tropoi plot runs --list-quantities                          # no GPU needed
 tropoi plot runs --map vorticity --vectors arrows --snapshots 0,-1
+tropoi plot runs --vectors streamfunction                   # psi contours (SWE/PE: rotational wind)
 ```
 
 - The fields are `zeta` (BVE), `zeta`/`delta`/`phi` (SWE), and
@@ -229,6 +233,14 @@ tropoi plot runs --map vorticity --vectors arrows --snapshots 0,-1
   checksums. `-o PATH` writes elsewhere.
 - Values that exist only at saved states, such as potential enstrophy, are
   drawn as markers, never as a per-step line.
+- BVE winds are drawn as evenly spaced contours of the streamfunction ψ. They
+  are the exact streamlines, and closer lines mean faster flow. SWE and PE
+  overviews use ψ contours too when the divergent wind carries at most 1 %
+  of the kinetic energy in every map shown. Otherwise they draw streamlines
+  integrated through the full wind, where line width, not line density,
+  shows speed. The key states which was chosen and why.
+- SWE overviews colour the free-surface perturbation η′ = H − H̄: white at
+  the level the same volume would have at rest, blue above it, red below.
 - The API does not interpolate in time or restart runs.
 
 Full reference: [docs/SAVED_RUNS.md](docs/SAVED_RUNS.md).

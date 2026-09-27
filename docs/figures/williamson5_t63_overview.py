@@ -25,7 +25,8 @@ import pathlib
 
 from tropoi.representation.archive import open_simulation
 from tropoi.representation.visual.views import (
-    Complexity, Contours, Drift, Map, Overview, Streamlines, Style)
+    AutoVectors, Complexity, Contours, Drift, Map, Overview,
+    StreamfunctionContours, Streamlines, Style)
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 CAPSULE = (ROOT / "docs" / "runs" /
@@ -35,18 +36,24 @@ OUTPUT = CAPSULE / "assets" / "overview.png"
 
 RECIPE = Overview(
     map=Map(
-        background="free_surface_height",
+        background="free_surface_perturbation",
         level=None,
         contours=(Contours(quantity="terrain",
                            levels=(500.0, 1000.0, 1500.0),
                            color="#3b3b3b", line_width=0.6,
                            line_style="solid"),),
-        vectors=Streamlines(vector="wind", color_by=None, color="black",
-                            width_by="speed", line_width_range=(0.25, 1.6),
-                            density=1.0, arrow_size=0.7, max_length=0.35,
-                            seed_count=220),
-        color_policy="cividis:0.35:1.0",
-        symmetric=False,
+        vectors=AutoVectors(
+            divergent_threshold=0.01,
+            streamfunction=StreamfunctionContours(
+                interval=None, level_count=20, color="#262626",
+                line_width=0.45, alpha=0.85, arrow_size=0.65,
+                arrow_spacing=80.0),
+            streamlines=Streamlines(
+                vector="wind", color_by=None, color="#303030",
+                width_by="speed", line_width_range=(0.2, 0.9), density=1.0,
+                arrow_size=0.55, max_length=0.35, seed_count=220)),
+        color_policy="RdBu",
+        symmetric=True,
         limits=None),
     snapshots=(0, 1, 2, 3),
     max_maps=4,

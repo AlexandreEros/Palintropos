@@ -45,13 +45,24 @@
   ],
   "maps": [
     {
-      "free_surface_height": {
-        "area_mean": 5637.356958338992,
-        "max": 5959.747618951652,
-        "min": 4992.663749758608,
+      "free_surface_perturbation": {
+        "area_mean": 6.288303211476887e-13,
+        "max": 322.3906606126602,
+        "min": -644.6932085803837,
+        "reference_m": 5637.356958338992,
         "units": "m"
       },
       "index": 0,
+      "rms_speed": {
+        "divergent": 0.0,
+        "rotational": 16.32993161855452,
+        "units": "m s^-1"
+      },
+      "streamfunction": {
+        "max": 127384835.21861835,
+        "min": -127384835.21861835,
+        "units": "m^2 s^-1"
+      },
       "time_s": 0.0,
       "wind_speed": {
         "area_mean": 15.707972434417075,
@@ -60,13 +71,24 @@
       }
     },
     {
-      "free_surface_height": {
-        "area_mean": 5637.356958338992,
-        "max": 5973.552308883299,
-        "min": 4992.239669020999,
+      "free_surface_perturbation": {
+        "area_mean": 6.572520305780927e-13,
+        "max": 336.1953505443071,
+        "min": -645.1172893179928,
+        "reference_m": 5637.356958338992,
         "units": "m"
       },
       "index": 1,
+      "rms_speed": {
+        "divergent": 0.35289647229319926,
+        "rotational": 16.495522160714938,
+        "units": "m s^-1"
+      },
+      "streamfunction": {
+        "max": 124112728.1733587,
+        "min": -123600248.17493792,
+        "units": "m^2 s^-1"
+      },
       "time_s": 432000.0,
       "wind_speed": {
         "area_mean": 15.614905794491994,
@@ -75,13 +97,24 @@
       }
     },
     {
-      "free_surface_height": {
-        "area_mean": 5637.356958338992,
-        "max": 5974.166255174521,
-        "min": 5009.862925133911,
+      "free_surface_perturbation": {
+        "area_mean": 6.856737400084967e-13,
+        "max": 336.8092968355295,
+        "min": -627.494033205081,
+        "reference_m": 5637.356958338992,
         "units": "m"
       },
       "index": 2,
+      "rms_speed": {
+        "divergent": 0.47406216679279983,
+        "rotational": 16.801769191360947,
+        "units": "m s^-1"
+      },
+      "streamfunction": {
+        "max": 119841257.3833182,
+        "min": -118856151.86287619,
+        "units": "m^2 s^-1"
+      },
       "time_s": 864000.0,
       "wind_speed": {
         "area_mean": 15.646342857486786,
@@ -90,13 +123,24 @@
       }
     },
     {
-      "free_surface_height": {
-        "area_mean": 5637.356958338993,
-        "max": 5953.901688624805,
-        "min": 5031.3936139315565,
+      "free_surface_perturbation": {
+        "area_mean": -1.3500311979441904e-13,
+        "max": 316.54473028581197,
+        "min": -605.9633444074361,
+        "reference_m": 5637.356958338993,
         "units": "m"
       },
       "index": 3,
+      "rms_speed": {
+        "divergent": 0.4606418147107493,
+        "rotational": 17.243935681757353,
+        "units": "m s^-1"
+      },
+      "streamfunction": {
+        "max": 115059906.04617336,
+        "min": -115844282.1274008,
+        "units": "m^2 s^-1"
+      },
       "time_s": 1296000.0,
       "wind_speed": {
         "area_mean": 15.98535937055596,
@@ -152,7 +196,31 @@
     ],
     "undefined_at_s": []
   },
-  "synthesis_count": 12,
+  "streamfunction": {
+    "definition": "psi_lm = -R^2 zeta_lm / (l(l+1)), l = 0 set to 0; lines at every multiple of the interval",
+    "divergent_kinetic_energy_fraction": [
+      0.0,
+      0.00045747121877199443,
+      0.0007954538109950725,
+      0.0007130896400012388
+    ],
+    "interval_m2_s": 20000000.0,
+    "rotational_part_only": true
+  },
+  "synthesis_count": 16,
+  "vector_choice": {
+    "divergent_kinetic_energy_fraction": [
+      0.0,
+      0.00045747121877199443,
+      0.0007954538109950725,
+      0.0007130896400012388
+    ],
+    "divergent_threshold": 0.01,
+    "max_divergent_kinetic_energy_fraction": 0.0007954538109950725,
+    "policy": "automatic",
+    "rule": "StreamfunctionContours when the largest E_div / (E_rot + E_div) over the maps shown is at most the threshold, else Streamlines of the full wind; states at rest (rms wind below 1e-09 m/s, null share) are skipped",
+    "selected": "StreamfunctionContours"
+  },
   "view": {
     "diagnostics": [
       {
@@ -177,8 +245,8 @@
       }
     ],
     "map": {
-      "background": "free_surface_height",
-      "color_policy": "cividis:0.35:1.0",
+      "background": "free_surface_perturbation",
+      "color_policy": "RdBu",
       "contours": [
         {
           "color": "#3b3b3b",
@@ -195,22 +263,36 @@
       ],
       "level": null,
       "limits": null,
-      "symmetric": false,
+      "symmetric": true,
       "type": "Map",
       "vectors": {
-        "arrow_size": 0.7,
-        "color": "black",
-        "color_by": null,
-        "density": 1.0,
-        "line_width_range": [
-          0.25,
-          1.6
-        ],
-        "max_length": 0.35,
-        "seed_count": 220,
-        "type": "Streamlines",
-        "vector": "wind",
-        "width_by": "speed"
+        "divergent_threshold": 0.01,
+        "streamfunction": {
+          "alpha": 0.85,
+          "arrow_size": 0.65,
+          "arrow_spacing": 80.0,
+          "color": "#262626",
+          "interval": null,
+          "level_count": 20,
+          "line_width": 0.45,
+          "type": "StreamfunctionContours"
+        },
+        "streamlines": {
+          "arrow_size": 0.55,
+          "color": "#303030",
+          "color_by": null,
+          "density": 1.0,
+          "line_width_range": [
+            0.2,
+            0.9
+          ],
+          "max_length": 0.35,
+          "seed_count": 220,
+          "type": "Streamlines",
+          "vector": "wind",
+          "width_by": "speed"
+        },
+        "type": "AutoVectors"
       }
     },
     "max_maps": 4,
