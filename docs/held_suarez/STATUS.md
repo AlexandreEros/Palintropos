@@ -3,17 +3,17 @@
 Plan: docs/superpowers/plans/2026-09-27-held-suarez-24h-plan.md (r3). T0 = 2026-09-27 04:25 −03:00
 (07:25 UTC), the approval commit f52ae5b. Budget is elapsed time. Branch:
 `feat/semi-implicit-integration` (the plan's `feat/held-suarez`; renamed by the user).
-**Handoff point: S0–S4b done; S5 next.**
+**Handoff point: S0–S5 done; S6 next.**
 
 | stage | state | evidence |
 |---|---|---|
-| S0 protocol + reference | DONE | PROTOCOL.md, REFERENCE_CONFIG.json, DEVLOG.md; Dinosaur T42L20 float64 reference **COMPLETE, 1200 days** in `runs/hs-reference-dinosaur-T42L20-001/` (`series.npz` sha256 `baa7cffd…c4663`). The earlier B2 claim rests on mean ln p_s, which is not a mass diagnostic; S5 recomputes it from exp(ln p_s). |
+| S0 protocol + reference | DONE | PROTOCOL.md, REFERENCE_CONFIG.json, DEVLOG.md; Dinosaur T42L20 float64 reference **COMPLETE, 1200 days** in `runs/hs-reference-dinosaur-T42L20-001/` (`series.npz` sha256 `baa7cffd…c4663`). **B2 corrected in S5**: the global mean of p_s = exp(ln p_s) changes by 3.23e−4 between day 0 (rebuilt initial state) and day 1200 (stored state) → reference B2 PASS *at the endpoints only*; daily ⟨p_s⟩ was not retained and cannot be established (DEVLOG, `REFERENCE_B2.json`). The earlier claim from mean ln p_s is withdrawn. |
 | S1 stepper interface | DONE (c9817a1) | tests/test_steppers.py |
 | S2 batched transforms | DONE (7125ddd) | tests/test_batched_transforms.py |
 | S3 SI stepper | DONE (7dc40e2, f443efd) | tests/test_semi_implicit.py, SEMI_IMPLICIT.md §§1–7 |
 | S4 forcing + ∇⁸ | DONE | §S4 below |
 | S4b complete-scheme checks | DONE, with a finding | §S4b below |
-| S5 experiment module | NOT STARTED | |
+| S5 experiment module | DONE | §S5 below |
 | S6 notebook | NOT STARTED | |
 
 ## S4 — HS forcing, Rayleigh drag, ∇⁸ (generic stepper hooks)
@@ -44,6 +44,19 @@ a day), no-hook path bitwise S3. SEMI_IMPLICIT.md §8.
 - (d) startup: n_sub = 1 from L + damping + k_T; with the complete tendency X^1 converges at
   fourth order in n_sub (δ ratios 16.5); no early growth.
 
+## S5 — experiment, checkpoints, statistics, report
+
+`tropoi.run.held_suarez` (`config`, `model`, `statistics`, `checkpoint`, `experiment`, `report`,
+`__main__`). Stepper initialized once, fixed Δt, both leapfrog levels in every checkpoint.
+Checkpoint = npz without pickle + JSON metadata (stepper state, RNG state, accumulators, config and
+sha256, protocol sha256, commit/dirty, CuPy/CUDA/device) + SHA-256 of every array and of the
+metadata; tmp + fsync + rename. Resume refuses config, commit, scheme/Δt/operator/hooks,
+schema, protocol changes, orphaned checkpoints, foreign backup dirs; hash failures stop.
+Evidence: forced stop at day 1 and at mid-day step 100, resumed in a fresh driver, final state
+**bit-identical** (sha256 `486752c9…`); one RK4 startup; online block means = offline to 0.0
+(2 samples per block); report on synthetic fixtures produces every verdict, never PASS on missing
+or incomplete data, byte-deterministic.
+
 ## DECISION NEEDED before launch (plan §6.1, §6.3-type numerics questions)
 
 1. **Effective truncation.** The core truncates analyzed products at 2/3, so l_max = 42 evolves
@@ -58,3 +71,4 @@ a day), no-hook path bitwise S3. SEMI_IMPLICIT.md §8.
    and/or α = 0.5 (second order, but slightly amplifies explicit oscillations).
 3. **Δt = 900 s** (proposed from S4b); 1200 s is below the reference's typical peak jet speeds by
    the RAW/advection bound.
+4. Push `feat/semi-implicit-integration` so SOLVER_COMMIT is fetchable by Colab (A4).

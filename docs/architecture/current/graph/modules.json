@@ -1677,6 +1677,46 @@
     {
       "kind": "imports",
       "scopes": [
+        "function"
+      ],
+      "source": "tropoi.run.held_suarez.__main__",
+      "target": "tropoi.run.held_suarez.checkpoint"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.run.held_suarez.__main__",
+      "target": "tropoi.run.held_suarez.config"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.run.held_suarez.__main__",
+      "target": "tropoi.run.held_suarez.experiment"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.run.held_suarez.__main__",
+      "target": "tropoi.run.held_suarez.report"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.run.held_suarez.__main__",
+      "target": "tropoi.spatial.states.primitive_equations"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
         "module"
       ],
       "source": "tropoi.run.held_suarez.config",
@@ -1689,6 +1729,46 @@
       ],
       "source": "tropoi.run.held_suarez.config",
       "target": "tropoi.temporal.tendencies.held_suarez"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.run.held_suarez.experiment",
+      "target": "tropoi.run.held_suarez.checkpoint"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.run.held_suarez.experiment",
+      "target": "tropoi.run.held_suarez.config"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.run.held_suarez.experiment",
+      "target": "tropoi.run.held_suarez.model"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.run.held_suarez.experiment",
+      "target": "tropoi.run.held_suarez.statistics"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.run.held_suarez.experiment",
+      "target": "tropoi.spatial.states.primitive_equations"
     },
     {
       "kind": "imports",
@@ -3535,6 +3615,42 @@
     {
       "category": "code",
       "dynamic_import_calls": 0,
+      "id": "tropoi.run.held_suarez.__main__",
+      "is_package": false,
+      "path": "tropoi/run/held_suarez/__main__.py",
+      "stdlib_imports": [
+        "__future__",
+        "argparse",
+        "json",
+        "pathlib",
+        "sys"
+      ],
+      "third_party_imports": []
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.run.held_suarez.checkpoint",
+      "is_package": false,
+      "path": "tropoi/run/held_suarez/checkpoint.py",
+      "stdlib_imports": [
+        "__future__",
+        "hashlib",
+        "io",
+        "json",
+        "os",
+        "pathlib",
+        "re",
+        "shutil",
+        "typing"
+      ],
+      "third_party_imports": [
+        "numpy"
+      ]
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
       "id": "tropoi.run.held_suarez.config",
       "is_package": false,
       "path": "tropoi/run/held_suarez/config.py",
@@ -3551,6 +3667,33 @@
     {
       "category": "code",
       "dynamic_import_calls": 0,
+      "id": "tropoi.run.held_suarez.experiment",
+      "is_package": false,
+      "path": "tropoi/run/held_suarez/experiment.py",
+      "stdlib_imports": [
+        "__future__",
+        "datetime",
+        "hashlib",
+        "io",
+        "json",
+        "math",
+        "os",
+        "pathlib",
+        "platform",
+        "shutil",
+        "subprocess",
+        "sys",
+        "time",
+        "typing"
+      ],
+      "third_party_imports": [
+        "cupy",
+        "numpy"
+      ]
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
       "id": "tropoi.run.held_suarez.model",
       "is_package": false,
       "path": "tropoi/run/held_suarez/model.py",
@@ -3561,6 +3704,38 @@
       ],
       "third_party_imports": [
         "cupy",
+        "numpy"
+      ]
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.run.held_suarez.report",
+      "is_package": false,
+      "path": "tropoi/run/held_suarez/report.py",
+      "stdlib_imports": [
+        "__future__",
+        "json",
+        "math",
+        "pathlib",
+        "re",
+        "typing"
+      ],
+      "third_party_imports": [
+        "numpy"
+      ]
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.run.held_suarez.statistics",
+      "is_package": false,
+      "path": "tropoi/run/held_suarez/statistics.py",
+      "stdlib_imports": [
+        "__future__",
+        "typing"
+      ],
+      "third_party_imports": [
         "numpy"
       ]
     },

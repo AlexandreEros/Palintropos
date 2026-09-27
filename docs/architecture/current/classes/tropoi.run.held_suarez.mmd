@@ -2,6 +2,8 @@
 %% All classes defined in package tropoi.run.held_suarez.
 classDiagram
     direction LR
+    class c_tropoi_orun_oheld__suarez_ocheckpoint_oCheckpointError["CheckpointError (run.held_suarez.checkpoint)"]
+    c_tropoi_orun_oheld__suarez_ocheckpoint_oCheckpointError : external base RuntimeError
     class c_tropoi_orun_oheld__suarez_oconfig_oHeldSuarezConfig["HeldSuarezConfig (run.held_suarez.config)"]
     c_tropoi_orun_oheld__suarez_oconfig_oHeldSuarezConfig : +#95;#95;post#95;init#95;#95;()
     c_tropoi_orun_oheld__suarez_oconfig_oHeldSuarezConfig : +canonical#95;json()
@@ -15,3 +17,31 @@ classDiagram
     c_tropoi_orun_oheld__suarez_oconfig_oHeldSuarezConfig : +to#95;dict()
     c_tropoi_orun_oheld__suarez_oconfig_oHeldSuarezConfig : +total#95;steps
     c_tropoi_orun_oheld__suarez_oconfig_oHeldSuarezConfig : +with#95;()
+    class c_tropoi_orun_oheld__suarez_oexperiment_oHeldSuarezRun["HeldSuarezRun (run.held_suarez.experiment)"]
+    c_tropoi_orun_oheld__suarez_oexperiment_oHeldSuarezRun : +#95;#95;init#95;#95;()
+    c_tropoi_orun_oheld__suarez_oexperiment_oHeldSuarezRun : +#95;backup()
+    c_tropoi_orun_oheld__suarez_oexperiment_oHeldSuarezRun : +#95;check#95;backup#95;dir()
+    c_tropoi_orun_oheld__suarez_oexperiment_oHeldSuarezRun : +#95;event()
+    c_tropoi_orun_oheld__suarez_oexperiment_oHeldSuarezRun : +#95;export()
+    c_tropoi_orun_oheld__suarez_oexperiment_oHeldSuarezRun : +#95;open()
+    c_tropoi_orun_oheld__suarez_oexperiment_oHeldSuarezRun : +#95;progress()
+    c_tropoi_orun_oheld__suarez_oexperiment_oHeldSuarezRun : +#95;resume()
+    c_tropoi_orun_oheld__suarez_oexperiment_oHeldSuarezRun : +#95;sample()
+    c_tropoi_orun_oheld__suarez_oexperiment_oHeldSuarezRun : +#95;write#95;checkpoint()
+    c_tropoi_orun_oheld__suarez_oexperiment_oHeldSuarezRun : +day
+    c_tropoi_orun_oheld__suarez_oexperiment_oHeldSuarezRun : +events()
+    c_tropoi_orun_oheld__suarez_oexperiment_oHeldSuarezRun : +run()
+    c_tropoi_orun_oheld__suarez_oexperiment_oHeldSuarezRun : +step
+    class c_tropoi_orun_oheld__suarez_oexperiment_oRunError["RunError (run.held_suarez.experiment)"]
+    c_tropoi_orun_oheld__suarez_oexperiment_oRunError : external base RuntimeError
+    class c_tropoi_orun_oheld__suarez_ostatistics_oOnlineStatistics["OnlineStatistics (run.held_suarez.statistics)"]
+    c_tropoi_orun_oheld__suarez_ostatistics_oOnlineStatistics : +#95;#95;init#95;#95;()
+    c_tropoi_orun_oheld__suarez_ostatistics_oOnlineStatistics : +add()
+    c_tropoi_orun_oheld__suarez_ostatistics_oOnlineStatistics : +block#95;means()
+    c_tropoi_orun_oheld__suarez_ostatistics_oOnlineStatistics : +block#95;of()
+    c_tropoi_orun_oheld__suarez_ostatistics_oOnlineStatistics : +for#95;config()$
+    c_tropoi_orun_oheld__suarez_ostatistics_oOnlineStatistics : +from#95;arrays()$
+    c_tropoi_orun_oheld__suarez_ostatistics_oOnlineStatistics : +last#95;day
+    c_tropoi_orun_oheld__suarez_ostatistics_oOnlineStatistics : +meta()
+    c_tropoi_orun_oheld__suarez_ostatistics_oOnlineStatistics : +series#95;arrays()
+    c_tropoi_orun_oheld__suarez_ostatistics_oOnlineStatistics : +to#95;arrays()

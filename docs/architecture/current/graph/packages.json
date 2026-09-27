@@ -260,7 +260,7 @@
     },
     {
       "kind": "imports",
-      "module_edges": 1,
+      "module_edges": 3,
       "source": "tropoi.run.held_suarez",
       "target": "tropoi.spatial.states"
     },
@@ -558,8 +558,8 @@
     },
     {
       "id": "tropoi.run.held_suarez",
-      "internal_edges": 1,
-      "modules": 2
+      "internal_edges": 9,
+      "modules": 7
     },
     {
       "id": "tropoi.run.pe",

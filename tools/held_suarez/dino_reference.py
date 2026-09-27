@@ -29,7 +29,7 @@ REPO = HERE.parents[2]
 CONFIG = REPO / "docs" / "held_suarez" / "REFERENCE_CONFIG.json"
 
 ZONAL_KEYS = ("u", "v", "T", "TsTs", "usus", "vsTs", "usvs")
-SCALAR_KEYS = ("day", "mean_lnps", "mean_T", "ke_mass_weighted", "max_abs_u")
+SCALAR_KEYS = ("day", "mean_lnps", "mean_T", "ke_mass_weighted", "max_abs_u", "mean_ps")
 
 
 def _atomic_write(path: pathlib.Path, data: bytes) -> None:
@@ -97,7 +97,9 @@ def diagnostics(dinosaur, coords, ps, ref_temps, state) -> tuple[dict, dict]:
     dsig = np.diff(np.asarray(coords.vertical.boundaries))
     area = lambda f: float((f.mean(axis=0) * w).sum())  # f: (lon, lat)
     ke_col = 0.5 * ((u * u + v * v) * dsig[:, None, None]).sum(axis=0)
-    scalars = {"mean_lnps": area(lnps), "mean_T": area((T * dsig[:, None, None]).sum(axis=0)),
+    # B2 needs <exp(ln p_s)>, not <ln p_s> (Jensen): record the mass directly (Pa).
+    p_s = np.asarray(ps.dimensionalize(np.exp(lnps), units.pascal))
+    scalars = {"mean_ps": area(p_s), "mean_lnps": area(lnps), "mean_T": area((T * dsig[:, None, None]).sum(axis=0)),
                "ke_mass_weighted": area(ke_col), "max_abs_u": float(np.abs(u).max())}
     # store level-major -> (lat, level) for the report
     zm = {k: np.ascontiguousarray(a.T) for k, a in zm.items()}
@@ -130,6 +132,7 @@ def main(argv=None) -> int:
         day = int(saved["day"])
         zonal = saved["zonal"]
         scalars = saved["scalars"]
+        scalars.setdefault("mean_ps", [])     # runs started before mean_ps was recorded
         print(f"resumed at day {day} from {ckpt}")
     else:
         state = init_fn(jax.random.PRNGKey(args.seed))

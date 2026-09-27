@@ -104,3 +104,31 @@ PROTOCOL.md). One entry per decision, newest last.
   DECISION NEEDED item in STATUS.md. Size at the production Δt: the lag term is ≈ k_v Δt ≈ 1 %
   of the damped response at 900 s (ζ error vs RK4 at 900 s ≈ 2–2.5 % of the 2-day change, of which
   ≈ 1.4 % first-order), small against the tier-C tolerances but not second order.
+- 2026-09-27 S5 (B2 correction): STATUS previously cited the Dinosaur reference's mean ln p_s
+  drift (−3.69e−4) as B2 evidence. That is not a mass diagnostic (⟨ln p_s⟩ ≤ ln⟨p_s⟩, and the gap
+  grows with eddy p_s variance). `tools/held_suarez/dino_b2.py` (Dinosaur venv) computes the
+  Gaussian-weighted global mean of p_s = exp(ln p_s): day 0 (initial state rebuilt with the same
+  code, config and seed; not stored) 100000.000 Pa, day 1200 (stored final state) 99967.740 Pa,
+  relative change 3.23e−4 ≤ 1e−3 → reference B2 PASS **at the endpoints only**; daily ⟨p_s⟩ cannot
+  be established for this run (only daily ⟨ln p_s⟩ and zonal means were kept). Repair: the
+  driver now records daily `mean_ps` for future runs; the evidence is
+  `docs/held_suarez/REFERENCE_B2.json`. Our own driver records daily ⟨p_s⟩ from exp(ln p_s).
+- 2026-09-27 S5: the HS driver (`tropoi.run.held_suarez.experiment`) initializes the SI stepper
+  once and only calls `step()` (the PE runner's per-step re-initialization is not used), so the
+  RK4 startup runs exactly once per experiment (tested with a counting patch across a mid-day
+  stop/resume). Checkpoints are uncompressed npz read with `allow_pickle=False` plus a JSON
+  metadata block; every array and the metadata itself carry SHA-256; writes are tmp (unique per
+  pid) + fsync + `os.replace` (+ directory fsync on POSIX). The daily statistics follow the
+  Dinosaur driver's definitions (instantaneous zonal-deviation eddy products, σ-weighted KE and
+  T, Gaussian area weights) so tier C compares like with like; ⟨p_s⟩ is computed from
+  exp(ln p_s) daily. The report's computable readings of B2–B4 and C are stated in the
+  `report` module docstring (B4 uses the effective truncation L = 28 at l_max = 42).
+- 2026-09-27 S5: an independent read-only review of the driver/report found two defects, fixed and
+  tested: (1) any exception (e.g. a Drive I/O error while backing up) was logged as "aborted",
+  which would FAIL B1 permanently — now only NaN/validation failures are "aborted", other errors
+  "interrupted", and backup failures are logged and the run continues; (2) the configuration
+  check compared the ∇⁸ reference degree only with the reference's truncation — it now also
+  requires it to equal our effective truncation. Also added: metadata SHA-256, refusal to start
+  over orphaned checkpoints or into another experiment's backup directory, refusal on PROTOCOL.md
+  changes and on unknown commits, untracked files under src/ count as dirty, a missing event log
+  or unverified reference B2 can never yield PASS, the grid is part of the reference match.

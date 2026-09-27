@@ -3772,6 +3772,126 @@
     },
     {
       "kind": "call",
+      "source": "tropoi.run.held_suarez.__main__._config",
+      "target": "tropoi.run.held_suarez.config.HeldSuarezConfig.from_dict"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.held_suarez.__main__.main",
+      "target": "tropoi.run.held_suarez.__main__._add_cfg"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.held_suarez.__main__.main",
+      "target": "tropoi.run.held_suarez.__main__._config"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.held_suarez.__main__.main",
+      "target": "tropoi.run.held_suarez.checkpoint.list_checkpoints"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.held_suarez.__main__.main",
+      "target": "tropoi.run.held_suarez.checkpoint.read_checkpoint"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.run.held_suarez.__main__.main",
+      "target": "tropoi.run.held_suarez.experiment.HeldSuarezRun"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.held_suarez.__main__.main",
+      "target": "tropoi.run.held_suarez.experiment.benchmark"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.held_suarez.__main__.main",
+      "target": "tropoi.run.held_suarez.report.build_report"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.held_suarez.__main__.main",
+      "target": "tropoi.run.held_suarez.report.write_report"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.held_suarez.checkpoint.atomic_copy",
+      "target": "tropoi.run.held_suarez.checkpoint._fsync_dir"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.held_suarez.checkpoint.atomic_copy",
+      "target": "tropoi.run.held_suarez.checkpoint._tmp_name"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.held_suarez.checkpoint.atomic_write_bytes",
+      "target": "tropoi.run.held_suarez.checkpoint._fsync_dir"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.held_suarez.checkpoint.atomic_write_bytes",
+      "target": "tropoi.run.held_suarez.checkpoint._tmp_name"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.held_suarez.checkpoint.backup_files",
+      "target": "tropoi.run.held_suarez.checkpoint.atomic_copy"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.held_suarez.checkpoint.backup_files",
+      "target": "tropoi.run.held_suarez.checkpoint.prune_checkpoints"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.held_suarez.checkpoint.backup_files",
+      "target": "tropoi.run.held_suarez.checkpoint.read_checkpoint"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.held_suarez.checkpoint.prune_checkpoints",
+      "target": "tropoi.run.held_suarez.checkpoint.list_checkpoints"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.run.held_suarez.checkpoint.read_checkpoint",
+      "target": "tropoi.run.held_suarez.checkpoint.CheckpointError"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.held_suarez.checkpoint.read_checkpoint",
+      "target": "tropoi.run.held_suarez.checkpoint._meta_digest"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.held_suarez.checkpoint.read_checkpoint",
+      "target": "tropoi.run.held_suarez.checkpoint.array_sha256"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.held_suarez.checkpoint.write_checkpoint",
+      "target": "tropoi.run.held_suarez.checkpoint._meta_digest"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.held_suarez.checkpoint.write_checkpoint",
+      "target": "tropoi.run.held_suarez.checkpoint.array_sha256"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.held_suarez.checkpoint.write_checkpoint",
+      "target": "tropoi.run.held_suarez.checkpoint.atomic_write_bytes"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.held_suarez.checkpoint.write_checkpoint",
+      "target": "tropoi.run.held_suarez.checkpoint.checkpoint_name"
+    },
+    {
+      "kind": "call",
       "source": "tropoi.run.held_suarez.config.HeldSuarezConfig.__post_init__",
       "target": "tropoi.spatial.truncation.product_truncation_cut"
     },
@@ -3814,6 +3934,291 @@
       "kind": "call",
       "source": "tropoi.run.held_suarez.config.smoke_config",
       "target": "tropoi.run.held_suarez.config.development_config"
+    },
+    {
+      "kind": "constructor",
+      "source": "tropoi.run.held_suarez.experiment.HeldSuarezRun",
+      "target": "tropoi.run.held_suarez.experiment.HeldSuarezRun.__init__"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.run.held_suarez.experiment.HeldSuarezRun.__init__",
+      "target": "tropoi.run.held_suarez.experiment.HeldSuarezRun._check_backup_dir"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.run.held_suarez.experiment.HeldSuarezRun.__init__",
+      "target": "tropoi.run.held_suarez.experiment.HeldSuarezRun._open"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.run.held_suarez.experiment.HeldSuarezRun.__init__",
+      "target": "tropoi.run.held_suarez.experiment.RunError"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.held_suarez.experiment.HeldSuarezRun.__init__",
+      "target": "tropoi.run.held_suarez.experiment.code_identity"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.held_suarez.experiment.HeldSuarezRun._backup",
+      "target": "tropoi.run.held_suarez.checkpoint.backup_files"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.run.held_suarez.experiment.HeldSuarezRun._backup",
+      "target": "tropoi.run.held_suarez.experiment.HeldSuarezRun._check_backup_dir"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.run.held_suarez.experiment.HeldSuarezRun._backup",
+      "target": "tropoi.run.held_suarez.experiment.HeldSuarezRun._event"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.run.held_suarez.experiment.HeldSuarezRun._check_backup_dir",
+      "target": "tropoi.run.held_suarez.experiment.RunError"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.held_suarez.experiment.HeldSuarezRun._event",
+      "target": "tropoi.run.held_suarez.experiment._now"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.held_suarez.experiment.HeldSuarezRun._export",
+      "target": "tropoi.run.held_suarez.checkpoint.atomic_write_bytes"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.held_suarez.experiment.HeldSuarezRun._open",
+      "target": "tropoi.run.held_suarez.checkpoint.array_sha256"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.held_suarez.experiment.HeldSuarezRun._open",
+      "target": "tropoi.run.held_suarez.checkpoint.atomic_write_bytes"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.held_suarez.experiment.HeldSuarezRun._open",
+      "target": "tropoi.run.held_suarez.checkpoint.list_checkpoints"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.run.held_suarez.experiment.HeldSuarezRun._open",
+      "target": "tropoi.run.held_suarez.experiment.HeldSuarezRun._event"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.run.held_suarez.experiment.HeldSuarezRun._open",
+      "target": "tropoi.run.held_suarez.experiment.HeldSuarezRun._resume"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.run.held_suarez.experiment.HeldSuarezRun._open",
+      "target": "tropoi.run.held_suarez.experiment.HeldSuarezRun._sample"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.run.held_suarez.experiment.HeldSuarezRun._open",
+      "target": "tropoi.run.held_suarez.experiment.HeldSuarezRun._write_checkpoint"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.run.held_suarez.experiment.HeldSuarezRun._open",
+      "target": "tropoi.run.held_suarez.experiment.HeldSuarezRun.events"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.run.held_suarez.experiment.HeldSuarezRun._open",
+      "target": "tropoi.run.held_suarez.experiment.RunError"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.held_suarez.experiment.HeldSuarezRun._open",
+      "target": "tropoi.run.held_suarez.experiment._now"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.held_suarez.experiment.HeldSuarezRun._open",
+      "target": "tropoi.run.held_suarez.experiment.environment_identity"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.held_suarez.experiment.HeldSuarezRun._open",
+      "target": "tropoi.run.held_suarez.experiment.protocol_sha256"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.held_suarez.experiment.HeldSuarezRun._open",
+      "target": "tropoi.run.held_suarez.model.build_model"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.held_suarez.experiment.HeldSuarezRun._open",
+      "target": "tropoi.run.held_suarez.model.build_stepper"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.held_suarez.experiment.HeldSuarezRun._open",
+      "target": "tropoi.run.held_suarez.model.initial_state"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.held_suarez.experiment.HeldSuarezRun._open",
+      "target": "tropoi.run.held_suarez.statistics.OnlineStatistics.for_config"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.run.held_suarez.experiment.HeldSuarezRun._open",
+      "target": "tropoi.spatial.states.primitive_equations.PrimitiveEquationsState"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.held_suarez.experiment.HeldSuarezRun._progress",
+      "target": "tropoi.run.held_suarez.checkpoint.atomic_write_bytes"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.held_suarez.experiment.HeldSuarezRun._progress",
+      "target": "tropoi.run.held_suarez.experiment._now"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.held_suarez.experiment.HeldSuarezRun._resume",
+      "target": "tropoi.run.held_suarez.checkpoint.read_checkpoint"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.run.held_suarez.experiment.HeldSuarezRun._resume",
+      "target": "tropoi.run.held_suarez.experiment.HeldSuarezRun._event"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.run.held_suarez.experiment.HeldSuarezRun._resume",
+      "target": "tropoi.run.held_suarez.experiment.RunError"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.held_suarez.experiment.HeldSuarezRun._resume",
+      "target": "tropoi.run.held_suarez.experiment.environment_identity"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.held_suarez.experiment.HeldSuarezRun._resume",
+      "target": "tropoi.run.held_suarez.experiment.protocol_sha256"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.held_suarez.experiment.HeldSuarezRun._resume",
+      "target": "tropoi.run.held_suarez.statistics.OnlineStatistics.from_arrays"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.held_suarez.experiment.HeldSuarezRun._sample",
+      "target": "tropoi.run.held_suarez.experiment.daily_sample"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.held_suarez.experiment.HeldSuarezRun._write_checkpoint",
+      "target": "tropoi.run.held_suarez.checkpoint.array_sha256"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.held_suarez.experiment.HeldSuarezRun._write_checkpoint",
+      "target": "tropoi.run.held_suarez.checkpoint.prune_checkpoints"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.held_suarez.experiment.HeldSuarezRun._write_checkpoint",
+      "target": "tropoi.run.held_suarez.checkpoint.write_checkpoint"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.run.held_suarez.experiment.HeldSuarezRun._write_checkpoint",
+      "target": "tropoi.run.held_suarez.experiment.HeldSuarezRun._event"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.run.held_suarez.experiment.HeldSuarezRun._write_checkpoint",
+      "target": "tropoi.run.held_suarez.experiment.HeldSuarezRun._export"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.held_suarez.experiment.HeldSuarezRun._write_checkpoint",
+      "target": "tropoi.run.held_suarez.experiment.environment_identity"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.held_suarez.experiment.HeldSuarezRun._write_checkpoint",
+      "target": "tropoi.run.held_suarez.experiment.protocol_sha256"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.held_suarez.experiment.HeldSuarezRun.run",
+      "target": "tropoi.run.held_suarez.checkpoint.atomic_write_bytes"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.run.held_suarez.experiment.HeldSuarezRun.run",
+      "target": "tropoi.run.held_suarez.experiment.HeldSuarezRun._backup"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.run.held_suarez.experiment.HeldSuarezRun.run",
+      "target": "tropoi.run.held_suarez.experiment.HeldSuarezRun._event"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.run.held_suarez.experiment.HeldSuarezRun.run",
+      "target": "tropoi.run.held_suarez.experiment.HeldSuarezRun._progress"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.run.held_suarez.experiment.HeldSuarezRun.run",
+      "target": "tropoi.run.held_suarez.experiment.HeldSuarezRun._sample"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.run.held_suarez.experiment.HeldSuarezRun.run",
+      "target": "tropoi.run.held_suarez.experiment.HeldSuarezRun._write_checkpoint"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.run.held_suarez.experiment.HeldSuarezRun.run",
+      "target": "tropoi.spatial.states.primitive_equations.PrimitiveEquationsState"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.run.held_suarez.experiment.HeldSuarezRun.run",
+      "target": "tropoi.spatial.states.primitive_equations.PrimitiveEquationsStateError"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.held_suarez.experiment.benchmark",
+      "target": "tropoi.run.held_suarez.checkpoint.atomic_write_bytes"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.run.held_suarez.experiment.benchmark",
+      "target": "tropoi.run.held_suarez.experiment.HeldSuarezRun"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.held_suarez.experiment.benchmark",
+      "target": "tropoi.run.held_suarez.experiment.daily_sample"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.held_suarez.experiment.benchmark",
+      "target": "tropoi.run.held_suarez.experiment.environment_identity"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.run.held_suarez.experiment.daily_sample",
+      "target": "tropoi.spatial.states.primitive_equations.PrimitiveEquationsState"
     },
     {
       "kind": "call",
@@ -3874,6 +4279,196 @@
       "kind": "call",
       "source": "tropoi.run.held_suarez.model.initial_state",
       "target": "tropoi.spatial.states.primitive_equations.isothermal_rest_state"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.held_suarez.report._clean",
+      "target": "tropoi.run.held_suarez.report._clean"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.held_suarez.report._crit",
+      "target": "tropoi.run.held_suarez.report._clean"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.held_suarez.report._fmt",
+      "target": "tropoi.run.held_suarez.report._fmt"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.held_suarez.report._tier",
+      "target": "tropoi.run.held_suarez.report.worst"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.held_suarez.report.build_report",
+      "target": "tropoi.run.held_suarez.report._clean"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.held_suarez.report.build_report",
+      "target": "tropoi.run.held_suarez.report._effective_truncation"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.held_suarez.report.build_report",
+      "target": "tropoi.run.held_suarez.report.load_run"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.held_suarez.report.build_report",
+      "target": "tropoi.run.held_suarez.report.reference_tier_b"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.held_suarez.report.build_report",
+      "target": "tropoi.run.held_suarez.report.tier_a"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.held_suarez.report.build_report",
+      "target": "tropoi.run.held_suarez.report.tier_b"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.held_suarez.report.build_report",
+      "target": "tropoi.run.held_suarez.report.tier_c"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.held_suarez.report.config_mismatches",
+      "target": "tropoi.run.held_suarez.report._effective_truncation"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.held_suarez.report.reference_tier_b",
+      "target": "tropoi.run.held_suarez.report._lsq_slope"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.held_suarez.report.reference_tier_b",
+      "target": "tropoi.run.held_suarez.report._series_blocks"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.held_suarez.report.render_markdown",
+      "target": "tropoi.run.held_suarez.report._fmt"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.held_suarez.report.tier_a",
+      "target": "tropoi.run.held_suarez.report._crit"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.held_suarez.report.tier_a",
+      "target": "tropoi.run.held_suarez.report._tier"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.held_suarez.report.tier_b",
+      "target": "tropoi.run.held_suarez.report._crit"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.held_suarez.report.tier_b",
+      "target": "tropoi.run.held_suarez.report._effective_truncation"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.held_suarez.report.tier_b",
+      "target": "tropoi.run.held_suarez.report._lsq_slope"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.held_suarez.report.tier_b",
+      "target": "tropoi.run.held_suarez.report._series_blocks"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.held_suarez.report.tier_b",
+      "target": "tropoi.run.held_suarez.report._tier"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.held_suarez.report.tier_c",
+      "target": "tropoi.run.held_suarez.report._crit"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.held_suarez.report.tier_c",
+      "target": "tropoi.run.held_suarez.report._field_verdict"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.held_suarez.report.tier_c",
+      "target": "tropoi.run.held_suarez.report._gauss_weights"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.held_suarez.report.tier_c",
+      "target": "tropoi.run.held_suarez.report._jet"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.held_suarez.report.tier_c",
+      "target": "tropoi.run.held_suarez.report._ours_summary"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.held_suarez.report.tier_c",
+      "target": "tropoi.run.held_suarez.report._peak"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.held_suarez.report.tier_c",
+      "target": "tropoi.run.held_suarez.report._scalar_verdict"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.held_suarez.report.tier_c",
+      "target": "tropoi.run.held_suarez.report._tier"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.held_suarez.report.tier_c",
+      "target": "tropoi.run.held_suarez.report._wstats"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.held_suarez.report.tier_c",
+      "target": "tropoi.run.held_suarez.report.config_mismatches"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.held_suarez.report.tier_c",
+      "target": "tropoi.run.held_suarez.report.reference_summary"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.held_suarez.report.tier_c",
+      "target": "tropoi.run.held_suarez.report.worst"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.held_suarez.report.write_report",
+      "target": "tropoi.run.held_suarez.report.render_markdown"
+    },
+    {
+      "kind": "constructor",
+      "source": "tropoi.run.held_suarez.statistics.OnlineStatistics",
+      "target": "tropoi.run.held_suarez.statistics.OnlineStatistics.__init__"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.run.held_suarez.statistics.OnlineStatistics.add",
+      "target": "tropoi.run.held_suarez.statistics.OnlineStatistics.block_of"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.run.held_suarez.statistics.OnlineStatistics.to_arrays",
+      "target": "tropoi.run.held_suarez.statistics.OnlineStatistics.series_arrays"
     },
     {
       "kind": "self",
@@ -9487,6 +10082,118 @@
       "type": "function"
     },
     {
+      "id": "tropoi.run.held_suarez.__main__._add_cfg",
+      "kind": "function",
+      "module": "tropoi.run.held_suarez.__main__",
+      "qualname": "_add_cfg",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.held_suarez.__main__._config",
+      "kind": "function",
+      "module": "tropoi.run.held_suarez.__main__",
+      "qualname": "_config",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.held_suarez.__main__.main",
+      "kind": "function",
+      "module": "tropoi.run.held_suarez.__main__",
+      "qualname": "main",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.held_suarez.checkpoint.CheckpointError",
+      "kind": "class",
+      "module": "tropoi.run.held_suarez.checkpoint",
+      "qualname": "CheckpointError",
+      "type": "class"
+    },
+    {
+      "id": "tropoi.run.held_suarez.checkpoint._fsync_dir",
+      "kind": "function",
+      "module": "tropoi.run.held_suarez.checkpoint",
+      "qualname": "_fsync_dir",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.held_suarez.checkpoint._meta_digest",
+      "kind": "function",
+      "module": "tropoi.run.held_suarez.checkpoint",
+      "qualname": "_meta_digest",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.held_suarez.checkpoint._tmp_name",
+      "kind": "function",
+      "module": "tropoi.run.held_suarez.checkpoint",
+      "qualname": "_tmp_name",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.held_suarez.checkpoint.array_sha256",
+      "kind": "function",
+      "module": "tropoi.run.held_suarez.checkpoint",
+      "qualname": "array_sha256",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.held_suarez.checkpoint.atomic_copy",
+      "kind": "function",
+      "module": "tropoi.run.held_suarez.checkpoint",
+      "qualname": "atomic_copy",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.held_suarez.checkpoint.atomic_write_bytes",
+      "kind": "function",
+      "module": "tropoi.run.held_suarez.checkpoint",
+      "qualname": "atomic_write_bytes",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.held_suarez.checkpoint.backup_files",
+      "kind": "function",
+      "module": "tropoi.run.held_suarez.checkpoint",
+      "qualname": "backup_files",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.held_suarez.checkpoint.checkpoint_name",
+      "kind": "function",
+      "module": "tropoi.run.held_suarez.checkpoint",
+      "qualname": "checkpoint_name",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.held_suarez.checkpoint.list_checkpoints",
+      "kind": "function",
+      "module": "tropoi.run.held_suarez.checkpoint",
+      "qualname": "list_checkpoints",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.held_suarez.checkpoint.prune_checkpoints",
+      "kind": "function",
+      "module": "tropoi.run.held_suarez.checkpoint",
+      "qualname": "prune_checkpoints",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.held_suarez.checkpoint.read_checkpoint",
+      "kind": "function",
+      "module": "tropoi.run.held_suarez.checkpoint",
+      "qualname": "read_checkpoint",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.held_suarez.checkpoint.write_checkpoint",
+      "kind": "function",
+      "module": "tropoi.run.held_suarez.checkpoint",
+      "qualname": "write_checkpoint",
+      "type": "function"
+    },
+    {
       "id": "tropoi.run.held_suarez.config.HeldSuarezConfig",
       "kind": "class",
       "module": "tropoi.run.held_suarez.config",
@@ -9599,6 +10306,160 @@
       "type": "function"
     },
     {
+      "id": "tropoi.run.held_suarez.experiment.HeldSuarezRun",
+      "kind": "class",
+      "module": "tropoi.run.held_suarez.experiment",
+      "qualname": "HeldSuarezRun",
+      "type": "class"
+    },
+    {
+      "id": "tropoi.run.held_suarez.experiment.HeldSuarezRun.__init__",
+      "kind": "method",
+      "module": "tropoi.run.held_suarez.experiment",
+      "qualname": "HeldSuarezRun.__init__",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.held_suarez.experiment.HeldSuarezRun._backup",
+      "kind": "method",
+      "module": "tropoi.run.held_suarez.experiment",
+      "qualname": "HeldSuarezRun._backup",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.held_suarez.experiment.HeldSuarezRun._check_backup_dir",
+      "kind": "method",
+      "module": "tropoi.run.held_suarez.experiment",
+      "qualname": "HeldSuarezRun._check_backup_dir",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.held_suarez.experiment.HeldSuarezRun._event",
+      "kind": "method",
+      "module": "tropoi.run.held_suarez.experiment",
+      "qualname": "HeldSuarezRun._event",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.held_suarez.experiment.HeldSuarezRun._export",
+      "kind": "method",
+      "module": "tropoi.run.held_suarez.experiment",
+      "qualname": "HeldSuarezRun._export",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.held_suarez.experiment.HeldSuarezRun._open",
+      "kind": "method",
+      "module": "tropoi.run.held_suarez.experiment",
+      "qualname": "HeldSuarezRun._open",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.held_suarez.experiment.HeldSuarezRun._progress",
+      "kind": "method",
+      "module": "tropoi.run.held_suarez.experiment",
+      "qualname": "HeldSuarezRun._progress",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.held_suarez.experiment.HeldSuarezRun._resume",
+      "kind": "method",
+      "module": "tropoi.run.held_suarez.experiment",
+      "qualname": "HeldSuarezRun._resume",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.held_suarez.experiment.HeldSuarezRun._sample",
+      "kind": "method",
+      "module": "tropoi.run.held_suarez.experiment",
+      "qualname": "HeldSuarezRun._sample",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.held_suarez.experiment.HeldSuarezRun._write_checkpoint",
+      "kind": "method",
+      "module": "tropoi.run.held_suarez.experiment",
+      "qualname": "HeldSuarezRun._write_checkpoint",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.held_suarez.experiment.HeldSuarezRun.day",
+      "kind": "property",
+      "module": "tropoi.run.held_suarez.experiment",
+      "qualname": "HeldSuarezRun.day",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.held_suarez.experiment.HeldSuarezRun.events",
+      "kind": "method",
+      "module": "tropoi.run.held_suarez.experiment",
+      "qualname": "HeldSuarezRun.events",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.held_suarez.experiment.HeldSuarezRun.run",
+      "kind": "method",
+      "module": "tropoi.run.held_suarez.experiment",
+      "qualname": "HeldSuarezRun.run",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.held_suarez.experiment.HeldSuarezRun.step",
+      "kind": "property",
+      "module": "tropoi.run.held_suarez.experiment",
+      "qualname": "HeldSuarezRun.step",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.held_suarez.experiment.RunError",
+      "kind": "class",
+      "module": "tropoi.run.held_suarez.experiment",
+      "qualname": "RunError",
+      "type": "class"
+    },
+    {
+      "id": "tropoi.run.held_suarez.experiment._now",
+      "kind": "function",
+      "module": "tropoi.run.held_suarez.experiment",
+      "qualname": "_now",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.held_suarez.experiment.benchmark",
+      "kind": "function",
+      "module": "tropoi.run.held_suarez.experiment",
+      "qualname": "benchmark",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.held_suarez.experiment.code_identity",
+      "kind": "function",
+      "module": "tropoi.run.held_suarez.experiment",
+      "qualname": "code_identity",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.held_suarez.experiment.daily_sample",
+      "kind": "function",
+      "module": "tropoi.run.held_suarez.experiment",
+      "qualname": "daily_sample",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.held_suarez.experiment.environment_identity",
+      "kind": "function",
+      "module": "tropoi.run.held_suarez.experiment",
+      "qualname": "environment_identity",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.held_suarez.experiment.protocol_sha256",
+      "kind": "function",
+      "module": "tropoi.run.held_suarez.experiment",
+      "qualname": "protocol_sha256",
+      "type": "function"
+    },
+    {
       "id": "tropoi.run.held_suarez.model.build_model",
       "kind": "function",
       "module": "tropoi.run.held_suarez.model",
@@ -9631,6 +10492,258 @@
       "kind": "function",
       "module": "tropoi.run.held_suarez.model",
       "qualname": "perturbation_coefficients",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.held_suarez.report._clean",
+      "kind": "function",
+      "module": "tropoi.run.held_suarez.report",
+      "qualname": "_clean",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.held_suarez.report._crit",
+      "kind": "function",
+      "module": "tropoi.run.held_suarez.report",
+      "qualname": "_crit",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.held_suarez.report._effective_truncation",
+      "kind": "function",
+      "module": "tropoi.run.held_suarez.report",
+      "qualname": "_effective_truncation",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.held_suarez.report._field_verdict",
+      "kind": "function",
+      "module": "tropoi.run.held_suarez.report",
+      "qualname": "_field_verdict",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.held_suarez.report._fmt",
+      "kind": "function",
+      "module": "tropoi.run.held_suarez.report",
+      "qualname": "_fmt",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.held_suarez.report._gauss_weights",
+      "kind": "function",
+      "module": "tropoi.run.held_suarez.report",
+      "qualname": "_gauss_weights",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.held_suarez.report._jet",
+      "kind": "function",
+      "module": "tropoi.run.held_suarez.report",
+      "qualname": "_jet",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.held_suarez.report._lsq_slope",
+      "kind": "function",
+      "module": "tropoi.run.held_suarez.report",
+      "qualname": "_lsq_slope",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.held_suarez.report._ours_summary",
+      "kind": "function",
+      "module": "tropoi.run.held_suarez.report",
+      "qualname": "_ours_summary",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.held_suarez.report._peak",
+      "kind": "function",
+      "module": "tropoi.run.held_suarez.report",
+      "qualname": "_peak",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.held_suarez.report._scalar_verdict",
+      "kind": "function",
+      "module": "tropoi.run.held_suarez.report",
+      "qualname": "_scalar_verdict",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.held_suarez.report._series_blocks",
+      "kind": "function",
+      "module": "tropoi.run.held_suarez.report",
+      "qualname": "_series_blocks",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.held_suarez.report._tier",
+      "kind": "function",
+      "module": "tropoi.run.held_suarez.report",
+      "qualname": "_tier",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.held_suarez.report._wstats",
+      "kind": "function",
+      "module": "tropoi.run.held_suarez.report",
+      "qualname": "_wstats",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.held_suarez.report.build_report",
+      "kind": "function",
+      "module": "tropoi.run.held_suarez.report",
+      "qualname": "build_report",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.held_suarez.report.config_mismatches",
+      "kind": "function",
+      "module": "tropoi.run.held_suarez.report",
+      "qualname": "config_mismatches",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.held_suarez.report.load_run",
+      "kind": "function",
+      "module": "tropoi.run.held_suarez.report",
+      "qualname": "load_run",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.held_suarez.report.reference_summary",
+      "kind": "function",
+      "module": "tropoi.run.held_suarez.report",
+      "qualname": "reference_summary",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.held_suarez.report.reference_tier_b",
+      "kind": "function",
+      "module": "tropoi.run.held_suarez.report",
+      "qualname": "reference_tier_b",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.held_suarez.report.render_markdown",
+      "kind": "function",
+      "module": "tropoi.run.held_suarez.report",
+      "qualname": "render_markdown",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.held_suarez.report.tier_a",
+      "kind": "function",
+      "module": "tropoi.run.held_suarez.report",
+      "qualname": "tier_a",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.held_suarez.report.tier_b",
+      "kind": "function",
+      "module": "tropoi.run.held_suarez.report",
+      "qualname": "tier_b",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.held_suarez.report.tier_c",
+      "kind": "function",
+      "module": "tropoi.run.held_suarez.report",
+      "qualname": "tier_c",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.held_suarez.report.worst",
+      "kind": "function",
+      "module": "tropoi.run.held_suarez.report",
+      "qualname": "worst",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.held_suarez.report.write_report",
+      "kind": "function",
+      "module": "tropoi.run.held_suarez.report",
+      "qualname": "write_report",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.held_suarez.statistics.OnlineStatistics",
+      "kind": "class",
+      "module": "tropoi.run.held_suarez.statistics",
+      "qualname": "OnlineStatistics",
+      "type": "class"
+    },
+    {
+      "id": "tropoi.run.held_suarez.statistics.OnlineStatistics.__init__",
+      "kind": "method",
+      "module": "tropoi.run.held_suarez.statistics",
+      "qualname": "OnlineStatistics.__init__",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.held_suarez.statistics.OnlineStatistics.add",
+      "kind": "method",
+      "module": "tropoi.run.held_suarez.statistics",
+      "qualname": "OnlineStatistics.add",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.held_suarez.statistics.OnlineStatistics.block_means",
+      "kind": "method",
+      "module": "tropoi.run.held_suarez.statistics",
+      "qualname": "OnlineStatistics.block_means",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.held_suarez.statistics.OnlineStatistics.block_of",
+      "kind": "method",
+      "module": "tropoi.run.held_suarez.statistics",
+      "qualname": "OnlineStatistics.block_of",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.held_suarez.statistics.OnlineStatistics.for_config",
+      "kind": "classmethod",
+      "module": "tropoi.run.held_suarez.statistics",
+      "qualname": "OnlineStatistics.for_config",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.held_suarez.statistics.OnlineStatistics.from_arrays",
+      "kind": "classmethod",
+      "module": "tropoi.run.held_suarez.statistics",
+      "qualname": "OnlineStatistics.from_arrays",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.held_suarez.statistics.OnlineStatistics.last_day",
+      "kind": "property",
+      "module": "tropoi.run.held_suarez.statistics",
+      "qualname": "OnlineStatistics.last_day",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.held_suarez.statistics.OnlineStatistics.meta",
+      "kind": "method",
+      "module": "tropoi.run.held_suarez.statistics",
+      "qualname": "OnlineStatistics.meta",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.held_suarez.statistics.OnlineStatistics.series_arrays",
+      "kind": "method",
+      "module": "tropoi.run.held_suarez.statistics",
+      "qualname": "OnlineStatistics.series_arrays",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.held_suarez.statistics.OnlineStatistics.to_arrays",
+      "kind": "method",
+      "module": "tropoi.run.held_suarez.statistics",
+      "qualname": "OnlineStatistics.to_arrays",
       "type": "function"
     },
     {

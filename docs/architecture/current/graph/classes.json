@@ -1543,6 +1543,16 @@
       "qualname": "BVERunConfig"
     },
     {
+      "decorators": [],
+      "external_bases": [
+        "RuntimeError"
+      ],
+      "id": "tropoi.run.held_suarez.checkpoint.CheckpointError",
+      "members": [],
+      "module": "tropoi.run.held_suarez.checkpoint",
+      "qualname": "CheckpointError"
+    },
+    {
       "decorators": [
         "dataclass(frozen=True)"
       ],
@@ -1600,6 +1610,130 @@
       ],
       "module": "tropoi.run.held_suarez.config",
       "qualname": "HeldSuarezConfig"
+    },
+    {
+      "decorators": [],
+      "external_bases": [],
+      "id": "tropoi.run.held_suarez.experiment.HeldSuarezRun",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__init__"
+        },
+        {
+          "kind": "method",
+          "name": "_backup"
+        },
+        {
+          "kind": "method",
+          "name": "_check_backup_dir"
+        },
+        {
+          "kind": "method",
+          "name": "_event"
+        },
+        {
+          "kind": "method",
+          "name": "_export"
+        },
+        {
+          "kind": "method",
+          "name": "_open"
+        },
+        {
+          "kind": "method",
+          "name": "_progress"
+        },
+        {
+          "kind": "method",
+          "name": "_resume"
+        },
+        {
+          "kind": "method",
+          "name": "_sample"
+        },
+        {
+          "kind": "method",
+          "name": "_write_checkpoint"
+        },
+        {
+          "kind": "property",
+          "name": "day"
+        },
+        {
+          "kind": "method",
+          "name": "events"
+        },
+        {
+          "kind": "method",
+          "name": "run"
+        },
+        {
+          "kind": "property",
+          "name": "step"
+        }
+      ],
+      "module": "tropoi.run.held_suarez.experiment",
+      "qualname": "HeldSuarezRun"
+    },
+    {
+      "decorators": [],
+      "external_bases": [
+        "RuntimeError"
+      ],
+      "id": "tropoi.run.held_suarez.experiment.RunError",
+      "members": [],
+      "module": "tropoi.run.held_suarez.experiment",
+      "qualname": "RunError"
+    },
+    {
+      "decorators": [],
+      "external_bases": [],
+      "id": "tropoi.run.held_suarez.statistics.OnlineStatistics",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__init__"
+        },
+        {
+          "kind": "method",
+          "name": "add"
+        },
+        {
+          "kind": "method",
+          "name": "block_means"
+        },
+        {
+          "kind": "method",
+          "name": "block_of"
+        },
+        {
+          "kind": "classmethod",
+          "name": "for_config"
+        },
+        {
+          "kind": "classmethod",
+          "name": "from_arrays"
+        },
+        {
+          "kind": "property",
+          "name": "last_day"
+        },
+        {
+          "kind": "method",
+          "name": "meta"
+        },
+        {
+          "kind": "method",
+          "name": "series_arrays"
+        },
+        {
+          "kind": "method",
+          "name": "to_arrays"
+        }
+      ],
+      "module": "tropoi.run.held_suarez.statistics",
+      "qualname": "OnlineStatistics"
     },
     {
       "decorators": [

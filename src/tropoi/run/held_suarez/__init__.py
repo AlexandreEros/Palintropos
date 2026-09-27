@@ -1,5 +1,7 @@
-"""Held–Suarez (1994) experiment: configuration and model builder (stage S4).
+"""Held–Suarez (1994) experiment: configuration, driver, checkpoints,
+online statistics, and the deterministic tier A/B/C report.
 
-``config`` is CPU-only (stdlib / NumPy); ``model`` builds the GPU model,
-the physics hooks and the semi-implicit stepper.
+``config`` and ``report`` are CPU-only (stdlib / NumPy); ``model`` and
+``experiment`` build the GPU model. Command line:
+``python -m tropoi.run.held_suarez --help``.
 """
