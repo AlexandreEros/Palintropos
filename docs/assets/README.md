@@ -15,6 +15,10 @@ No external reference data is committed yet. The MRI-JMA reference packages
 for Williamson 5 are kept outside Git; their SHA-256 sums are in
 [CHECKSUMS.txt](../validation/williamson5_mri_2026-07-30/CHECKSUMS.txt).
 
+`tests/test_published_layout.py` fails when a file here is missing from this
+inventory, and when a published run's receipt or figure hashes disagree with
+its files.
+
 ## Legacy figures awaiting published source runs
 
 The files below predate this layout. `docs/readme_figures.py` drew them from

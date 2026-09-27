@@ -18,8 +18,16 @@ docs/runs/<run-id>/
 under `assets/` is listed there. Each derived product records instead the
 SHA-256 of the files it read: the PNG metadata and JSON sidecar of an
 overview carry `CoefficientsSHA256` and `DiagnosticsSHA256`. Verify a
-receipt from inside the run directory with `sha256sum -c SHA256SUMS`;
-`tests/test_w5_canonical_capsule.py` does so on every CI run.
+receipt from inside the run directory with `sha256sum -c SHA256SUMS`.
+`tests/test_published_layout.py` checks every published run on every CI
+run. For each run it checks that:
+
+- the receipt lists every primary file and nothing under `assets/`;
+- every digest matches the file;
+- every figure under `assets/` names the coefficient and diagnostics hashes
+  in the receipt;
+- the run is listed in the index below;
+- Git never converts its line endings.
 
 Other directories hold different material:
 
