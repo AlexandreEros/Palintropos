@@ -17,11 +17,18 @@ classDiagram
     c_tropoi_orepresentation_ovisual_oevaluate_oRunFields : +#95;table()
     c_tropoi_orepresentation_ovisual_oevaluate_oRunFields : +#95;terrain#95;state()
     c_tropoi_orepresentation_ovisual_oevaluate_oRunFields : +#95;transform()
+    c_tropoi_orepresentation_ovisual_oevaluate_oRunFields : +#95;view#95;grid()
+    c_tropoi_orepresentation_ovisual_oevaluate_oRunFields : +#95;view#95;synthesis()
+    c_tropoi_orepresentation_ovisual_oevaluate_oRunFields : +#95;vorticity#95;divergence()
     c_tropoi_orepresentation_ovisual_oevaluate_oRunFields : +area#95;mean()
     c_tropoi_orepresentation_ovisual_oevaluate_oRunFields : +diagnostics#95;path
     c_tropoi_orepresentation_ovisual_oevaluate_oRunFields : +display#95;is#95;native
+    c_tropoi_orepresentation_ovisual_oevaluate_oRunFields : +display#95;streamfunction()
     c_tropoi_orepresentation_ovisual_oevaluate_oRunFields : +display#95;wind()
+    c_tropoi_orepresentation_ovisual_oevaluate_oRunFields : +divergent#95;fraction()
+    c_tropoi_orepresentation_ovisual_oevaluate_oRunFields : +free#95;surface#95;reference()
     c_tropoi_orepresentation_ovisual_oevaluate_oRunFields : +has#95;terrain
+    c_tropoi_orepresentation_ovisual_oevaluate_oRunFields : +helmholtz#95;rms#95;speeds()
     c_tropoi_orepresentation_ovisual_oevaluate_oRunFields : +host#95;radius#95;estimate
     c_tropoi_orepresentation_ovisual_oevaluate_oRunFields : +nlev
     c_tropoi_orepresentation_ovisual_oevaluate_oRunFields : +potential#95;enstrophy()
@@ -58,6 +65,7 @@ classDiagram
     c_tropoi_orepresentation_ovisual_omatplotlib__renderer_oMatplotlibRenderer : +#95;draw#95;arrows()
     c_tropoi_orepresentation_ovisual_omatplotlib__renderer_oMatplotlibRenderer : +#95;draw#95;background()
     c_tropoi_orepresentation_ovisual_omatplotlib__renderer_oMatplotlibRenderer : +#95;draw#95;contours()$
+    c_tropoi_orepresentation_ovisual_omatplotlib__renderer_oMatplotlibRenderer : +#95;draw#95;streamfunction()$
     c_tropoi_orepresentation_ovisual_omatplotlib__renderer_oMatplotlibRenderer : +#95;draw#95;streamlines()
     c_tropoi_orepresentation_ovisual_omatplotlib__renderer_oMatplotlibRenderer : +#95;label#95;spectral#95;axes()$
     c_tropoi_orepresentation_ovisual_omatplotlib__renderer_oMatplotlibRenderer : +#95;mpl#95;normalization()$
@@ -146,6 +154,9 @@ classDiagram
     class c_tropoi_orepresentation_ovisual_ospecs_oSpectralEncoding["SpectralEncoding (representation.visual.specs)"]
     c_tropoi_orepresentation_ovisual_ospecs_oSpectralEncoding : external base str
     c_tropoi_orepresentation_ovisual_ospecs_oSpectralEncoding : external base enum.Enum
+    class c_tropoi_orepresentation_ovisual_ospecs_oStreamfunctionLayer["StreamfunctionLayer (representation.visual.specs)"]
+    c_tropoi_orepresentation_ovisual_ospecs_oStreamfunctionLayer : +#95;#95;post#95;init#95;#95;()
+    c_tropoi_orepresentation_ovisual_ospecs_oStreamfunctionLayer : +levels()
     class c_tropoi_orepresentation_ovisual_ospecs_oStreamlineMapSpec["StreamlineMapSpec (representation.visual.specs)"]
     c_tropoi_orepresentation_ovisual_ospecs_oStreamlineMapSpec : +#95;#95;post#95;init#95;#95;()
     class c_tropoi_orepresentation_ovisual_ospecs_oTextPanelSpec["TextPanelSpec (representation.visual.specs)"]
@@ -165,6 +176,8 @@ classDiagram
     c_tropoi_orepresentation_ovisual_otimeline_oFigureTimeline : +specifications
     c_tropoi_orepresentation_ovisual_otimeline_oFigureTimeline : +times#95;seconds
     class c_tropoi_orepresentation_ovisual_oviews_oArrows["Arrows (representation.visual.views)"]
+    class c_tropoi_orepresentation_ovisual_oviews_oAutoVectors["AutoVectors (representation.visual.views)"]
+    c_tropoi_orepresentation_ovisual_oviews_oAutoVectors : +#95;#95;post#95;init#95;#95;()
     class c_tropoi_orepresentation_ovisual_oviews_oComplexity["Complexity (representation.visual.views)"]
     class c_tropoi_orepresentation_ovisual_oviews_oContours["Contours (representation.visual.views)"]
     class c_tropoi_orepresentation_ovisual_oviews_oDrift["Drift (representation.visual.views)"]
@@ -176,6 +189,8 @@ classDiagram
     c_tropoi_orepresentation_ovisual_oviews_oOverview : +#95;#95;post#95;init#95;#95;()
     class c_tropoi_orepresentation_ovisual_oviews_oSigma["Sigma (representation.visual.views)"]
     c_tropoi_orepresentation_ovisual_oviews_oSigma : +#95;#95;post#95;init#95;#95;()
+    class c_tropoi_orepresentation_ovisual_oviews_oStreamfunctionContours["StreamfunctionContours (representation.visual.views)"]
+    c_tropoi_orepresentation_ovisual_oviews_oStreamfunctionContours : +#95;#95;post#95;init#95;#95;()
     class c_tropoi_orepresentation_ovisual_oviews_oStreamlines["Streamlines (representation.visual.views)"]
     class c_tropoi_orepresentation_ovisual_oviews_oStyle["Style (representation.visual.views)"]
     class c_tropoi_orepresentation_ovisual_ovorticity__viewer_oVorticityViewer["VorticityViewer (representation.visual.vorticity_viewer)"]

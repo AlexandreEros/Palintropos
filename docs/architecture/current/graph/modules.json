@@ -1071,6 +1071,14 @@
         "function"
       ],
       "source": "tropoi.representation.visual.evaluate",
+      "target": "tropoi.spatial.grids.grid"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.representation.visual.evaluate",
       "target": "tropoi.spatial.grids.latlon_grid"
     },
     {
@@ -1080,6 +1088,14 @@
       ],
       "source": "tropoi.representation.visual.evaluate",
       "target": "tropoi.spatial.states.primitive_equations"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.representation.visual.evaluate",
+      "target": "tropoi.spatial.transforms.fast_geodesic_sh"
     },
     {
       "kind": "imports",

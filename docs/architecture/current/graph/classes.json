@@ -477,6 +477,18 @@
         },
         {
           "kind": "method",
+          "name": "_view_grid"
+        },
+        {
+          "kind": "method",
+          "name": "_view_synthesis"
+        },
+        {
+          "kind": "method",
+          "name": "_vorticity_divergence"
+        },
+        {
+          "kind": "method",
           "name": "area_mean"
         },
         {
@@ -489,11 +501,27 @@
         },
         {
           "kind": "method",
+          "name": "display_streamfunction"
+        },
+        {
+          "kind": "method",
           "name": "display_wind"
+        },
+        {
+          "kind": "method",
+          "name": "divergent_fraction"
+        },
+        {
+          "kind": "method",
+          "name": "free_surface_reference"
         },
         {
           "kind": "property",
           "name": "has_terrain"
+        },
+        {
+          "kind": "method",
+          "name": "helmholtz_rms_speeds"
         },
         {
           "kind": "property",
@@ -663,6 +691,10 @@
         {
           "kind": "staticmethod",
           "name": "_draw_contours"
+        },
+        {
+          "kind": "staticmethod",
+          "name": "_draw_streamfunction"
         },
         {
           "kind": "method",
@@ -1160,6 +1192,25 @@
         "dataclass(frozen=True)"
       ],
       "external_bases": [],
+      "id": "tropoi.representation.visual.specs.StreamfunctionLayer",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__post_init__"
+        },
+        {
+          "kind": "method",
+          "name": "levels"
+        }
+      ],
+      "module": "tropoi.representation.visual.specs",
+      "qualname": "StreamfunctionLayer"
+    },
+    {
+      "decorators": [
+        "dataclass(frozen=True)"
+      ],
+      "external_bases": [],
       "id": "tropoi.representation.visual.specs.StreamlineMapSpec",
       "members": [
         {
@@ -1276,6 +1327,21 @@
         "dataclass(frozen=True)"
       ],
       "external_bases": [],
+      "id": "tropoi.representation.visual.views.AutoVectors",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__post_init__"
+        }
+      ],
+      "module": "tropoi.representation.visual.views",
+      "qualname": "AutoVectors"
+    },
+    {
+      "decorators": [
+        "dataclass(frozen=True)"
+      ],
+      "external_bases": [],
       "id": "tropoi.representation.visual.views.Complexity",
       "members": [],
       "module": "tropoi.representation.visual.views",
@@ -1360,6 +1426,21 @@
       ],
       "module": "tropoi.representation.visual.views",
       "qualname": "Sigma"
+    },
+    {
+      "decorators": [
+        "dataclass(frozen=True)"
+      ],
+      "external_bases": [],
+      "id": "tropoi.representation.visual.views.StreamfunctionContours",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__post_init__"
+        }
+      ],
+      "module": "tropoi.representation.visual.views",
+      "qualname": "StreamfunctionContours"
     },
     {
       "decorators": [

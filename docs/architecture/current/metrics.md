@@ -9,13 +9,13 @@ Nodes are analysed modules; a directed edge A -> B means A has at least one stat
 * **all imports**: every static import statement, wherever it appears;
 * **import-time**: only edges with at least one import statement at module scope (executed when the importing module is imported). Edges made only of function-scope or `if TYPE_CHECKING:` imports are dropped.
 
-Edge counts by scope set: `function`: 88, `function+module`: 2, `function+type_checking`: 2, `module`: 210, `type_checking`: 7.
+Edge counts by scope set: `function`: 90, `function+module`: 2, `function+type_checking`: 2, `module`: 210, `type_checking`: 7.
 
 | Metric | all imports | import-time |
 |---|---|---|
 | Nodes \|V\| | 132 | 132 |
-| Directed edges \|E\| | 309 | 212 |
-| Density | 0.01787 | 0.01226 |
+| Directed edges \|E\| | 311 | 212 |
+| Density | 0.017985 | 0.01226 |
 | Weakly connected components | 3 | 7 |
 | WCC sizes | 81, 50, 1 | 74, 50, 4, 1, 1, 1, 1 |
 | Strongly connected components | 126 | 132 |
@@ -26,23 +26,23 @@ Edge counts by scope set: `function`: 88, `function+module`: 2, `function+type_c
 | Sources (in-degree 0) | 55 | 74 |
 | Sinks (out-degree 0) | 23 | 30 |
 | Reciprocal pairs | 1 | 0 |
-| Reciprocity | 0.006472 | 0 |
+| Reciprocity | 0.006431 | 0 |
 | In-degree min / median / max | 0 / 1 / 49 | 0 / 0 / 49 |
-| In-degree mean | 2.340909 | 1.606061 |
+| In-degree mean | 2.356061 | 1.606061 |
 | In-degree quartiles | 0, 1, 3 | 0, 0, 2 |
 | In-degree zeros | 55 | 74 |
 | Out-degree min / median / max | 0 / 1 / 17 | 0 / 1 / 11 |
-| Out-degree mean | 2.340909 | 1.606061 |
+| Out-degree mean | 2.356061 | 1.606061 |
 | Out-degree quartiles | 1, 1, 2.25 | 1, 1, 2 |
 | Out-degree zeros | 23 | 30 |
 | Condensation nodes | 126 | 132 |
-| Condensation edges | 275 | 212 |
+| Condensation edges | 277 | 212 |
 | Condensation sources / sinks | 56 / 23 | 74 / 30 |
 | Condensation longest path (edges) | 11 | 7 |
 
-In-degree histogram (all imports) {degree: modules}: 0: 55, 1: 18, 2: 19, 3: 11, 4: 10, 5: 3, 6: 6, 7: 3, 8: 1, 9: 3, 11: 1, 13: 1, 49: 1
+In-degree histogram (all imports) {degree: modules}: 0: 55, 1: 18, 2: 19, 3: 11, 4: 10, 5: 1, 6: 8, 7: 3, 8: 1, 9: 3, 11: 1, 13: 1, 49: 1
 
-Out-degree histogram (all imports) {degree: modules}: 0: 23, 1: 61, 2: 15, 3: 5, 4: 5, 5: 4, 6: 5, 7: 4, 8: 2, 9: 2, 10: 2, 11: 2, 12: 1, 17: 1
+Out-degree histogram (all imports) {degree: modules}: 0: 23, 1: 61, 2: 15, 3: 5, 4: 5, 5: 4, 6: 5, 7: 4, 8: 1, 9: 2, 10: 3, 11: 2, 12: 1, 17: 1
 
 **Top 10 fan-in (all imports)** (ties at cutoff: 3)
 
@@ -59,7 +59,7 @@ Out-degree histogram (all imports) {degree: modules}: 0: 23, 1: 61, 2: 15, 3: 5,
 | `tropoi.spatial.grids.geodesic_grid` | 7 |
 | `tropoi.spatial.grids.grid_base` | 7 |
 
-**Top 10 fan-out (all imports)** (ties at cutoff: 2)
+**Top 10 fan-out (all imports)** (ties at cutoff: 1)
 
 | Node | Degree |
 |---|---|
@@ -68,10 +68,10 @@ Out-degree histogram (all imports) {degree: modules}: 0: 23, 1: 61, 2: 15, 3: 5,
 | `tropoi.cli.swe` | 11 |
 | `tropoi.numerics` | 11 |
 | `tropoi.representation.visual.compose` | 10 |
+| `tropoi.representation.visual.evaluate` | 10 |
 | `tropoi.spatial.planet` | 10 |
 | `tropoi.cli.bve` | 9 |
 | `tropoi.run.bve.runner` | 9 |
-| `tropoi.representation.visual.evaluate` | 8 |
 | `tropoi.representation.visual.planet_viewer` | 8 |
 
 **Nontrivial strongly connected components (all imports)**
@@ -89,8 +89,8 @@ Every module is mapped to its containing package (a package's `__init__` to the 
 | Metric | packages |
 |---|---|
 | Nodes \|V\| | 24 |
-| Directed edges \|E\| | 77 |
-| Density | 0.139493 |
+| Directed edges \|E\| | 78 |
+| Density | 0.141304 |
 | Weakly connected components | 1 |
 | WCC sizes | 24 |
 | Strongly connected components | 16 |
@@ -101,13 +101,13 @@ Every module is mapped to its containing package (a package's `__init__` to the 
 | Sources (in-degree 0) | 6 |
 | Sinks (out-degree 0) | 3 |
 | Reciprocal pairs | 3 |
-| Reciprocity | 0.077922 |
+| Reciprocity | 0.076923 |
 | In-degree min / median / max | 0 / 3 / 13 |
-| In-degree mean | 3.208333 |
+| In-degree mean | 3.25 |
 | In-degree quartiles | 0.75, 3, 4.25 |
 | In-degree zeros | 6 |
 | Out-degree min / median / max | 0 / 2.5 / 10 |
-| Out-degree mean | 3.208333 |
+| Out-degree mean | 3.25 |
 | Out-degree quartiles | 1, 2.5, 4.25 |
 | Out-degree zeros | 3 |
 | Condensation nodes | 16 |
@@ -123,8 +123,8 @@ Every module is mapped to its containing package (a package's `__init__` to the 
 | `tropoi` | 9 |
 | `tropoi.temporal.tendencies` | 7 |
 | `tropoi.representation.visual` | 6 |
+| `tropoi.spatial.transforms` | 6 |
 | `tropoi.spatial.grids` | 5 |
-| `tropoi.spatial.transforms` | 5 |
 | `tropoi.representation.diagnostics` | 4 |
 | `tropoi.run.bve` | 4 |
 | `tropoi.spatial.operators` | 4 |
@@ -135,8 +135,8 @@ Every module is mapped to its containing package (a package's `__init__` to the 
 | Node | Degree |
 |---|---|
 | `tropoi.cli` | 10 |
+| `tropoi.representation.visual` | 8 |
 | `tropoi.run.pe` | 8 |
-| `tropoi.representation.visual` | 7 |
 | `tropoi.run.bve` | 7 |
 | `tropoi.run.swe` | 7 |
 | `tropoi.numerics` | 5 |
@@ -153,16 +153,16 @@ Every module is mapped to its containing package (a package's `__init__` to the 
 
 ## Class graph
 
-* Classes: 104
+* Classes: 107
 * `inherits` edges between analysed classes: 9
 * `nests` edges (class defined in a class body): 0
 * Bases outside the analysed package: `RuntimeError` x3, `ValueError` x9, `abc.ABC` x2, `collections.abc.Mapping` x1, `enum.Enum` x2, `str` x2, `typing.Protocol` x2
 
 ## Call graph
 
-* Nodes (functions, methods, classes): 896
-* Edges by kind: `call` 547, `constructor` 30, `instantiate` 241, `override` 6, `self` 205, `super` 2
-* Call sites by resolution outcome: builtin 1628, external 1137, internal 1353, unresolved 1654
+* Nodes (functions, methods, classes): 924
+* Edges by kind: `call` 579, `constructor` 30, `instantiate` 247, `override` 6, `self` 222, `super` 2
+* Call sites by resolution outcome: builtin 1695, external 1181, internal 1420, unresolved 1696
 
 | Scoped graph | Roots | Depth | Nodes | Edges | Truncated nodes | Reachable (unbounded) |
 |---|---|---|---|---|---|---|

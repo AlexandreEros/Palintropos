@@ -323,6 +323,11 @@
     {
       "kind": "instantiate",
       "source": "tropoi.cli.main._plot_view",
+      "target": "tropoi.representation.visual.views.AutoVectors"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.cli.main._plot_view",
       "target": "tropoi.representation.visual.views.Map"
     },
     {
@@ -334,6 +339,11 @@
       "kind": "instantiate",
       "source": "tropoi.cli.main._plot_view",
       "target": "tropoi.representation.visual.views.Sigma"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.cli.main._plot_view",
+      "target": "tropoi.representation.visual.views.StreamfunctionContours"
     },
     {
       "kind": "instantiate",
@@ -1373,12 +1383,22 @@
     {
       "kind": "call",
       "source": "tropoi.representation.visual.compose._compose_grid",
+      "target": "tropoi.representation.visual.compose._level_surface_scale"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.compose._compose_grid",
       "target": "tropoi.representation.visual.compose._map_panel"
     },
     {
       "kind": "call",
       "source": "tropoi.representation.visual.compose._compose_grid",
       "target": "tropoi.representation.visual.compose._record_base"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.compose._compose_grid",
+      "target": "tropoi.representation.visual.compose._resolve_vectors"
     },
     {
       "kind": "call",
@@ -1453,7 +1473,17 @@
     {
       "kind": "call",
       "source": "tropoi.representation.visual.compose._compose_overview",
+      "target": "tropoi.representation.visual.compose._divergent_share"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.compose._compose_overview",
       "target": "tropoi.representation.visual.compose._drift_panel"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.compose._compose_overview",
+      "target": "tropoi.representation.visual.compose._full_wind_note"
     },
     {
       "kind": "call",
@@ -1473,6 +1503,11 @@
     {
       "kind": "call",
       "source": "tropoi.representation.visual.compose._compose_overview",
+      "target": "tropoi.representation.visual.compose._level_surface_scale"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.compose._compose_overview",
       "target": "tropoi.representation.visual.compose._map_panel"
     },
     {
@@ -1488,12 +1523,32 @@
     {
       "kind": "call",
       "source": "tropoi.representation.visual.compose._compose_overview",
+      "target": "tropoi.representation.visual.compose._psi_interval"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.compose._compose_overview",
       "target": "tropoi.representation.visual.compose._record_base"
     },
     {
       "kind": "call",
       "source": "tropoi.representation.visual.compose._compose_overview",
+      "target": "tropoi.representation.visual.compose._resolve_vectors"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.compose._compose_overview",
+      "target": "tropoi.representation.visual.compose._rotational_indices"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.compose._compose_overview",
       "target": "tropoi.representation.visual.compose._snapshot_statistics"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.compose._compose_overview",
+      "target": "tropoi.representation.visual.compose._streamfunction_description"
     },
     {
       "kind": "call",
@@ -1576,6 +1631,11 @@
       "target": "tropoi.representation.visual.specs.LineSeriesSpec"
     },
     {
+      "kind": "call",
+      "source": "tropoi.representation.visual.compose._full_wind_note",
+      "target": "tropoi.representation.visual.compose._percent"
+    },
+    {
       "kind": "instantiate",
       "source": "tropoi.representation.visual.compose._level_for",
       "target": "tropoi.representation.visual.quantities.QuantityUnavailableError"
@@ -1599,6 +1659,16 @@
       "kind": "call",
       "source": "tropoi.representation.visual.compose._map_panel",
       "target": "tropoi.representation.visual.compose._normalization"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.compose._map_panel",
+      "target": "tropoi.representation.visual.compose._psi_interval"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.compose._map_panel",
+      "target": "tropoi.representation.visual.compose._rotational_indices"
     },
     {
       "kind": "call",
@@ -1633,6 +1703,11 @@
     {
       "kind": "instantiate",
       "source": "tropoi.representation.visual.compose._map_panel",
+      "target": "tropoi.representation.visual.specs.StreamfunctionLayer"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.representation.visual.compose._map_panel",
       "target": "tropoi.representation.visual.specs.VectorLayer"
     },
     {
@@ -1652,6 +1727,16 @@
     },
     {
       "kind": "call",
+      "source": "tropoi.representation.visual.compose._percent",
+      "target": "tropoi.representation.visual.compose._scientific"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.compose._psi_interval",
+      "target": "tropoi.representation.visual.compose._nice_step"
+    },
+    {
+      "kind": "call",
       "source": "tropoi.representation.visual.compose._record_base",
       "target": "tropoi.representation.visual.compose._sha256"
     },
@@ -1659,6 +1744,16 @@
       "kind": "call",
       "source": "tropoi.representation.visual.compose._record_base",
       "target": "tropoi.representation.visual.views.describe"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.compose._resolve_vectors",
+      "target": "tropoi.representation.visual.compose._largest_share"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.compose._resolve_vectors",
+      "target": "tropoi.representation.visual.compose._level_for"
     },
     {
       "kind": "call",
@@ -1672,13 +1767,53 @@
     },
     {
       "kind": "call",
+      "source": "tropoi.representation.visual.compose._streamfunction_description",
+      "target": "tropoi.representation.visual.compose._largest_share"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.compose._streamfunction_description",
+      "target": "tropoi.representation.visual.compose._nice_speeds"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.compose._streamfunction_description",
+      "target": "tropoi.representation.visual.compose._percent"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.compose._streamfunction_description",
+      "target": "tropoi.representation.visual.compose._scientific"
+    },
+    {
+      "kind": "call",
       "source": "tropoi.representation.visual.compose._time_label",
       "target": "tropoi.representation.visual.compose.elapsed_label"
     },
     {
       "kind": "call",
       "source": "tropoi.representation.visual.compose._vector_caption",
+      "target": "tropoi.representation.visual.compose._full_wind_note"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.compose._vector_caption",
       "target": "tropoi.representation.visual.compose._level_for"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.compose._vector_caption",
+      "target": "tropoi.representation.visual.compose._psi_interval"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.compose._vector_caption",
+      "target": "tropoi.representation.visual.compose._rotational_indices"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.compose._vector_caption",
+      "target": "tropoi.representation.visual.compose._streamfunction_description"
     },
     {
       "kind": "call",
@@ -1708,6 +1843,11 @@
     {
       "kind": "instantiate",
       "source": "tropoi.representation.visual.compose.default_view",
+      "target": "tropoi.representation.visual.views.AutoVectors"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.representation.visual.compose.default_view",
       "target": "tropoi.representation.visual.views.Contours"
     },
     {
@@ -1723,7 +1863,7 @@
     {
       "kind": "instantiate",
       "source": "tropoi.representation.visual.compose.default_view",
-      "target": "tropoi.representation.visual.views.Streamlines"
+      "target": "tropoi.representation.visual.views.StreamfunctionContours"
     },
     {
       "kind": "instantiate",
@@ -1811,6 +1951,11 @@
       "target": "tropoi.representation.visual.evaluate.RunFields._grid"
     },
     {
+      "kind": "self",
+      "source": "tropoi.representation.visual.evaluate.RunFields._display",
+      "target": "tropoi.representation.visual.evaluate.RunFields._view_grid"
+    },
+    {
       "kind": "call",
       "source": "tropoi.representation.visual.evaluate.RunFields._display",
       "target": "tropoi.representation.visual.evaluate._host"
@@ -1828,7 +1973,7 @@
     {
       "kind": "self",
       "source": "tropoi.representation.visual.evaluate.RunFields._energy_modes",
-      "target": "tropoi.representation.visual.evaluate.RunFields._frame"
+      "target": "tropoi.representation.visual.evaluate.RunFields._vorticity_divergence"
     },
     {
       "kind": "self",
@@ -1881,6 +2026,31 @@
       "target": "tropoi.representation.visual.evaluate.RunFields._resources"
     },
     {
+      "kind": "call",
+      "source": "tropoi.representation.visual.evaluate.RunFields._view_grid",
+      "target": "tropoi.spatial.grids.grid.LatLonGridGeometry.create"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.representation.visual.evaluate.RunFields._view_synthesis",
+      "target": "tropoi.representation.visual.evaluate.RunFields._view_grid"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.evaluate.RunFields._view_synthesis",
+      "target": "tropoi.representation.visual.evaluate._host"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.representation.visual.evaluate.RunFields._view_synthesis",
+      "target": "tropoi.spatial.transforms.fast_geodesic_sh.PointSetSphericalHarmonics"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.representation.visual.evaluate.RunFields._vorticity_divergence",
+      "target": "tropoi.representation.visual.evaluate.RunFields._frame"
+    },
+    {
       "kind": "self",
       "source": "tropoi.representation.visual.evaluate.RunFields.area_mean",
       "target": "tropoi.representation.visual.evaluate.RunFields.state_values"
@@ -1896,6 +2066,46 @@
       "target": "tropoi.representation.visual.evaluate.RunFields._grid"
     },
     {
+      "kind": "self",
+      "source": "tropoi.representation.visual.evaluate.RunFields.display_streamfunction",
+      "target": "tropoi.representation.visual.evaluate.RunFields._check"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.representation.visual.evaluate.RunFields.display_streamfunction",
+      "target": "tropoi.representation.visual.evaluate.RunFields._inverse_laplacian"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.representation.visual.evaluate.RunFields.display_streamfunction",
+      "target": "tropoi.representation.visual.evaluate.RunFields._view_grid"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.representation.visual.evaluate.RunFields.display_streamfunction",
+      "target": "tropoi.representation.visual.evaluate.RunFields._view_synthesis"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.representation.visual.evaluate.RunFields.display_streamfunction",
+      "target": "tropoi.representation.visual.evaluate.RunFields._vorticity_divergence"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.representation.visual.evaluate.RunFields.display_streamfunction",
+      "target": "tropoi.representation.visual.evaluate.RunFields.scalar_field"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.evaluate.RunFields.display_streamfunction",
+      "target": "tropoi.representation.visual.evaluate._host"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.representation.visual.evaluate.RunFields.display_streamfunction",
+      "target": "tropoi.representation.visual.fields.ScalarGridField"
+    },
+    {
       "kind": "instantiate",
       "source": "tropoi.representation.visual.evaluate.RunFields.display_wind",
       "target": "tropoi.representation.visual.evaluate.DisplayVectors"
@@ -1909,6 +2119,46 @@
       "kind": "self",
       "source": "tropoi.representation.visual.evaluate.RunFields.display_wind",
       "target": "tropoi.representation.visual.evaluate.RunFields.state_wind"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.evaluate.RunFields.divergent_fraction",
+      "target": "tropoi.representation.diagnostics.spectral.kinetic_energy_modes"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.representation.visual.evaluate.RunFields.divergent_fraction",
+      "target": "tropoi.representation.visual.evaluate.RunFields._check"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.representation.visual.evaluate.RunFields.divergent_fraction",
+      "target": "tropoi.representation.visual.evaluate.RunFields._vorticity_divergence"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.representation.visual.evaluate.RunFields.free_surface_reference",
+      "target": "tropoi.representation.visual.evaluate.RunFields._check"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.representation.visual.evaluate.RunFields.free_surface_reference",
+      "target": "tropoi.representation.visual.evaluate.RunFields.area_mean"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.evaluate.RunFields.helmholtz_rms_speeds",
+      "target": "tropoi.representation.diagnostics.spectral.kinetic_energy_modes"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.representation.visual.evaluate.RunFields.helmholtz_rms_speeds",
+      "target": "tropoi.representation.visual.evaluate.RunFields._check"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.representation.visual.evaluate.RunFields.helmholtz_rms_speeds",
+      "target": "tropoi.representation.visual.evaluate.RunFields._vorticity_divergence"
     },
     {
       "kind": "call",
@@ -2054,6 +2304,11 @@
       "kind": "self",
       "source": "tropoi.representation.visual.evaluate.RunFields.state_values",
       "target": "tropoi.representation.visual.evaluate.RunFields._terrain_state"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.representation.visual.evaluate.RunFields.state_values",
+      "target": "tropoi.representation.visual.evaluate.RunFields.free_surface_reference"
     },
     {
       "kind": "self",
@@ -2276,6 +2531,16 @@
       "target": "tropoi.representation.visual.matplotlib_renderer._closed_south_to_north"
     },
     {
+      "kind": "call",
+      "source": "tropoi.representation.visual.matplotlib_renderer.MatplotlibRenderer._draw_streamfunction",
+      "target": "tropoi.representation.visual.matplotlib_renderer._closed_south_to_north"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.matplotlib_renderer.MatplotlibRenderer._draw_streamfunction",
+      "target": "tropoi.representation.visual.matplotlib_renderer._flow_arrow_stations"
+    },
+    {
       "kind": "self",
       "source": "tropoi.representation.visual.matplotlib_renderer.MatplotlibRenderer._draw_streamlines",
       "target": "tropoi.representation.visual.matplotlib_renderer.MatplotlibRenderer._color_map"
@@ -2344,6 +2609,11 @@
       "kind": "self",
       "source": "tropoi.representation.visual.matplotlib_renderer.MatplotlibRenderer._render_layered_map",
       "target": "tropoi.representation.visual.matplotlib_renderer.MatplotlibRenderer._draw_contours"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.representation.visual.matplotlib_renderer.MatplotlibRenderer._render_layered_map",
+      "target": "tropoi.representation.visual.matplotlib_renderer.MatplotlibRenderer._draw_streamfunction"
     },
     {
       "kind": "self",
@@ -2479,6 +2749,11 @@
       "kind": "instantiate",
       "source": "tropoi.representation.visual.matplotlib_renderer.MatplotlibRenderer.render_streamline_map",
       "target": "tropoi.representation.visual.specs.PanelPlacement"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.matplotlib_renderer._flow_arrow_stations",
+      "target": "tropoi.representation.visual.matplotlib_renderer._bilinear"
     },
     {
       "kind": "instantiate",
@@ -6510,6 +6785,13 @@
       "type": "function"
     },
     {
+      "id": "tropoi.representation.visual.compose._divergent_share",
+      "kind": "function",
+      "module": "tropoi.representation.visual.compose",
+      "qualname": "_divergent_share",
+      "type": "function"
+    },
+    {
       "id": "tropoi.representation.visual.compose._drift_panel",
       "kind": "function",
       "module": "tropoi.representation.visual.compose",
@@ -6517,10 +6799,24 @@
       "type": "function"
     },
     {
+      "id": "tropoi.representation.visual.compose._full_wind_note",
+      "kind": "function",
+      "module": "tropoi.representation.visual.compose",
+      "qualname": "_full_wind_note",
+      "type": "function"
+    },
+    {
       "id": "tropoi.representation.visual.compose._header",
       "kind": "function",
       "module": "tropoi.representation.visual.compose",
       "qualname": "_header",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.compose._largest_share",
+      "kind": "function",
+      "module": "tropoi.representation.visual.compose",
+      "qualname": "_largest_share",
       "type": "function"
     },
     {
@@ -6538,6 +6834,13 @@
       "type": "function"
     },
     {
+      "id": "tropoi.representation.visual.compose._level_surface_scale",
+      "kind": "function",
+      "module": "tropoi.representation.visual.compose",
+      "qualname": "_level_surface_scale",
+      "type": "function"
+    },
+    {
       "id": "tropoi.representation.visual.compose._map_panel",
       "kind": "function",
       "module": "tropoi.representation.visual.compose",
@@ -6552,10 +6855,24 @@
       "type": "function"
     },
     {
+      "id": "tropoi.representation.visual.compose._nice_step",
+      "kind": "function",
+      "module": "tropoi.representation.visual.compose",
+      "qualname": "_nice_step",
+      "type": "function"
+    },
+    {
       "id": "tropoi.representation.visual.compose._normalization",
       "kind": "function",
       "module": "tropoi.representation.visual.compose",
       "qualname": "_normalization",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.compose._percent",
+      "kind": "function",
+      "module": "tropoi.representation.visual.compose",
+      "qualname": "_percent",
       "type": "function"
     },
     {
@@ -6566,10 +6883,38 @@
       "type": "function"
     },
     {
+      "id": "tropoi.representation.visual.compose._psi_interval",
+      "kind": "function",
+      "module": "tropoi.representation.visual.compose",
+      "qualname": "_psi_interval",
+      "type": "function"
+    },
+    {
       "id": "tropoi.representation.visual.compose._record_base",
       "kind": "function",
       "module": "tropoi.representation.visual.compose",
       "qualname": "_record_base",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.compose._resolve_vectors",
+      "kind": "function",
+      "module": "tropoi.representation.visual.compose",
+      "qualname": "_resolve_vectors",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.compose._rotational_indices",
+      "kind": "function",
+      "module": "tropoi.representation.visual.compose",
+      "qualname": "_rotational_indices",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.compose._scientific",
+      "kind": "function",
+      "module": "tropoi.representation.visual.compose",
+      "qualname": "_scientific",
       "type": "function"
     },
     {
@@ -6584,6 +6929,13 @@
       "kind": "function",
       "module": "tropoi.representation.visual.compose",
       "qualname": "_snapshot_statistics",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.compose._streamfunction_description",
+      "kind": "function",
+      "module": "tropoi.representation.visual.compose",
+      "qualname": "_streamfunction_description",
       "type": "function"
     },
     {
@@ -6769,6 +7121,27 @@
       "type": "function"
     },
     {
+      "id": "tropoi.representation.visual.evaluate.RunFields._view_grid",
+      "kind": "method",
+      "module": "tropoi.representation.visual.evaluate",
+      "qualname": "RunFields._view_grid",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.evaluate.RunFields._view_synthesis",
+      "kind": "method",
+      "module": "tropoi.representation.visual.evaluate",
+      "qualname": "RunFields._view_synthesis",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.evaluate.RunFields._vorticity_divergence",
+      "kind": "method",
+      "module": "tropoi.representation.visual.evaluate",
+      "qualname": "RunFields._vorticity_divergence",
+      "type": "function"
+    },
+    {
       "id": "tropoi.representation.visual.evaluate.RunFields.area_mean",
       "kind": "method",
       "module": "tropoi.representation.visual.evaluate",
@@ -6790,6 +7163,13 @@
       "type": "function"
     },
     {
+      "id": "tropoi.representation.visual.evaluate.RunFields.display_streamfunction",
+      "kind": "method",
+      "module": "tropoi.representation.visual.evaluate",
+      "qualname": "RunFields.display_streamfunction",
+      "type": "function"
+    },
+    {
       "id": "tropoi.representation.visual.evaluate.RunFields.display_wind",
       "kind": "method",
       "module": "tropoi.representation.visual.evaluate",
@@ -6797,10 +7177,31 @@
       "type": "function"
     },
     {
+      "id": "tropoi.representation.visual.evaluate.RunFields.divergent_fraction",
+      "kind": "method",
+      "module": "tropoi.representation.visual.evaluate",
+      "qualname": "RunFields.divergent_fraction",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.evaluate.RunFields.free_surface_reference",
+      "kind": "method",
+      "module": "tropoi.representation.visual.evaluate",
+      "qualname": "RunFields.free_surface_reference",
+      "type": "function"
+    },
+    {
       "id": "tropoi.representation.visual.evaluate.RunFields.has_terrain",
       "kind": "property",
       "module": "tropoi.representation.visual.evaluate",
       "qualname": "RunFields.has_terrain",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.evaluate.RunFields.helmholtz_rms_speeds",
+      "kind": "method",
+      "module": "tropoi.representation.visual.evaluate",
+      "qualname": "RunFields.helmholtz_rms_speeds",
       "type": "function"
     },
     {
@@ -7112,6 +7513,13 @@
       "type": "function"
     },
     {
+      "id": "tropoi.representation.visual.matplotlib_renderer.MatplotlibRenderer._draw_streamfunction",
+      "kind": "staticmethod",
+      "module": "tropoi.representation.visual.matplotlib_renderer",
+      "qualname": "MatplotlibRenderer._draw_streamfunction",
+      "type": "function"
+    },
+    {
       "id": "tropoi.representation.visual.matplotlib_renderer.MatplotlibRenderer._draw_streamlines",
       "kind": "method",
       "module": "tropoi.representation.visual.matplotlib_renderer",
@@ -7252,10 +7660,24 @@
       "type": "function"
     },
     {
+      "id": "tropoi.representation.visual.matplotlib_renderer._bilinear",
+      "kind": "function",
+      "module": "tropoi.representation.visual.matplotlib_renderer",
+      "qualname": "_bilinear",
+      "type": "function"
+    },
+    {
       "id": "tropoi.representation.visual.matplotlib_renderer._closed_south_to_north",
       "kind": "function",
       "module": "tropoi.representation.visual.matplotlib_renderer",
       "qualname": "_closed_south_to_north",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.matplotlib_renderer._flow_arrow_stations",
+      "kind": "function",
+      "module": "tropoi.representation.visual.matplotlib_renderer",
+      "qualname": "_flow_arrow_stations",
       "type": "function"
     },
     {
@@ -7952,6 +8374,27 @@
       "type": "class"
     },
     {
+      "id": "tropoi.representation.visual.specs.StreamfunctionLayer",
+      "kind": "class",
+      "module": "tropoi.representation.visual.specs",
+      "qualname": "StreamfunctionLayer",
+      "type": "class"
+    },
+    {
+      "id": "tropoi.representation.visual.specs.StreamfunctionLayer.__post_init__",
+      "kind": "method",
+      "module": "tropoi.representation.visual.specs",
+      "qualname": "StreamfunctionLayer.__post_init__",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.specs.StreamfunctionLayer.levels",
+      "kind": "method",
+      "module": "tropoi.representation.visual.specs",
+      "qualname": "StreamfunctionLayer.levels",
+      "type": "function"
+    },
+    {
       "id": "tropoi.representation.visual.specs.StreamlineMapSpec",
       "kind": "class",
       "module": "tropoi.representation.visual.specs",
@@ -8323,6 +8766,20 @@
       "type": "class"
     },
     {
+      "id": "tropoi.representation.visual.views.AutoVectors",
+      "kind": "class",
+      "module": "tropoi.representation.visual.views",
+      "qualname": "AutoVectors",
+      "type": "class"
+    },
+    {
+      "id": "tropoi.representation.visual.views.AutoVectors.__post_init__",
+      "kind": "method",
+      "module": "tropoi.representation.visual.views",
+      "qualname": "AutoVectors.__post_init__",
+      "type": "function"
+    },
+    {
       "id": "tropoi.representation.visual.views.Complexity",
       "kind": "class",
       "module": "tropoi.representation.visual.views",
@@ -8397,6 +8854,20 @@
       "kind": "method",
       "module": "tropoi.representation.visual.views",
       "qualname": "Sigma.__post_init__",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.views.StreamfunctionContours",
+      "kind": "class",
+      "module": "tropoi.representation.visual.views",
+      "qualname": "StreamfunctionContours",
+      "type": "class"
+    },
+    {
+      "id": "tropoi.representation.visual.views.StreamfunctionContours.__post_init__",
+      "kind": "method",
+      "module": "tropoi.representation.visual.views",
+      "qualname": "StreamfunctionContours.__post_init__",
       "type": "function"
     },
     {

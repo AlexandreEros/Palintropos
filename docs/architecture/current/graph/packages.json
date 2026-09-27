@@ -176,7 +176,7 @@
     },
     {
       "kind": "imports",
-      "module_edges": 8,
+      "module_edges": 9,
       "source": "tropoi.representation.visual",
       "target": "tropoi.spatial.grids"
     },
@@ -191,6 +191,12 @@
       "module_edges": 1,
       "source": "tropoi.representation.visual",
       "target": "tropoi.spatial.states"
+    },
+    {
+      "kind": "imports",
+      "module_edges": 1,
+      "source": "tropoi.representation.visual",
+      "target": "tropoi.spatial.transforms"
     },
     {
       "kind": "imports",
