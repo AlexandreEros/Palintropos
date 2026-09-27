@@ -3,7 +3,7 @@
 Plan: docs/superpowers/plans/2026-09-27-held-suarez-24h-plan.md (r3). T0 = 2026-09-27 04:25 −03:00
 (07:25 UTC), the approval commit f52ae5b. Budget is elapsed time. Branch:
 `feat/semi-implicit-integration` (the plan's `feat/held-suarez`; renamed by the user).
-**Handoff point: S0–S5 done; S6 next.**
+**Handoff point: S0–S6 done locally (not pushed); stop at the human S7/S8 launch decision.**
 
 | stage | state | evidence |
 |---|---|---|
@@ -14,7 +14,7 @@ Plan: docs/superpowers/plans/2026-09-27-held-suarez-24h-plan.md (r3). T0 = 2026-
 | S4 forcing + ∇⁸ | DONE | §S4 below |
 | S4b complete-scheme checks | DONE, with a finding | §S4b below |
 | S5 experiment module | DONE | §S5 below |
-| S6 notebook | NOT STARTED | |
+| S6 notebook | DONE | §S6 below |
 
 ## S4 — HS forcing, Rayleigh drag, ∇⁸ (generic stepper hooks)
 
@@ -56,6 +56,15 @@ Evidence: forced stop at day 1 and at mid-day step 100, resumed in a fresh drive
 **bit-identical** (sha256 `486752c9…`); one RK4 startup; online block means = offline to 0.0
 (2 samples per block); report on synthetic fixtures produces every verdict, never PASS on missing
 or incomplete data, byte-deterministic.
+
+## S6 — Colab notebook
+
+`notebooks/held_suarez_colab.ipynb`: pinned SOLVER_COMMIT, GPU/float64 hard check, Drive mount,
+reference hash check, 200-step benchmark gate with projection and automatic stop, restore from
+backup, resumable run loop (backup every 10 days, keep 3), report. SOLVER_COMMIT = f529c6b (S5;
+must be pushed). Smoke path executed locally through the same entrypoint
+(`tests/test_held_suarez_notebook.py`): benchmark 0.147 s/step (T21 L10, MX110), forced stop at day
+1 + resume in a fresh process, backups, report. T42 timing is Colab-only (MX110 TDR).
 
 ## DECISION NEEDED before launch (plan §6.1, §6.3-type numerics questions)
 

@@ -132,3 +132,15 @@ PROTOCOL.md). One entry per decision, newest last.
   over orphaned checkpoints or into another experiment's backup directory, refusal on PROTOCOL.md
   changes and on unknown commits, untracked files under src/ count as dirty, a missing event log
   or unverified reference B2 can never yield PASS, the grid is part of the reference match.
+- 2026-09-27 S6: `notebooks/held_suarez_colab.ipynb` pins SOLVER_COMMIT = f529c6b (the S5 commit;
+  it must be pushed before launch — A4). Every numerical action is a call to
+  `python -m tropoi.run.held_suarez` at that commit; the notebook adds only the GPU/float64 hard
+  check, Drive paths, the reference hash check and control flow. Default production parameters:
+  preset `production` (T42 L20, 64×128, 1200 days), Δt = 900 s, MAX_RUN_HOURS = 24,
+  DEADLINE = T0 + 24 h (2026-09-28T07:25Z; None accepts finishing later), SESSION_HOURS = 23.5.
+  The benchmark gate exits with code 3 ("DECISION NEEDED") when the projection exceeds the budget
+  and never lowers the resolution. The local smoke executes the notebook's own code cells
+  (`HS_NOTEBOOK_LOCAL_SMOKE=1`: smoke preset, no clone, no Drive) through the same entrypoint:
+  benchmark 0.147 s/step over 200 steps with 2 statistics samples and one 0.023 s checkpoint;
+  forced stop at day 1, resume in a fresh process with all 22 array hashes verified, completion,
+  backups, report.
