@@ -322,3 +322,27 @@ def test_refuses_to_start_over_orphaned_checkpoints_or_foreign_backup(uninterrup
     with pytest.raises(RunError, match="another configuration"):
         HeldSuarezRun(smoke_config(), tmp_path / "new", code=CODE, backup_dir=foreign,
                       log=lambda s: None)
+
+
+@gpu
+def test_backup_failure_is_logged_and_the_run_continues(tmp_path, monkeypatch):
+    """A dropped Drive mount (OSError while backing up) must not stop the run
+    or count as an abort (tier B1); state snapshots reach the backup when it
+    works."""
+    import tropoi.run.held_suarez.experiment as ex
+    good = tmp_path / "drive_ok"
+    run = ex.HeldSuarezRun(smoke_config(), tmp_path / "ok", code=CODE, backup_dir=good,
+                           log=lambda s: None)
+    run.run(until_day=1, backup_every_days=1)
+    assert (good / "states" / "state-d00001.npy").exists()
+    assert list((good / "checkpoints").glob("checkpoint-s*.npz"))
+
+    def broken(*a, **k):
+        raise OSError(107, "Transport endpoint is not connected")
+
+    monkeypatch.setattr(ex, "backup_files", broken)
+    run2 = ex.HeldSuarezRun(smoke_config(), tmp_path / "bad", code=CODE,
+                            backup_dir=tmp_path / "drive_bad", log=lambda s: None)
+    assert run2.run(backup_every_days=1)["status"] == "completed"
+    events = [e["event"] for e in run2.events()]
+    assert "backup_failed" in events and "interrupted" not in events and "aborted" not in events

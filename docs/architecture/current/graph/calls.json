@@ -3963,6 +3963,11 @@
     {
       "kind": "call",
       "source": "tropoi.run.held_suarez.experiment.HeldSuarezRun._backup",
+      "target": "tropoi.run.held_suarez.checkpoint.atomic_copy"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.held_suarez.experiment.HeldSuarezRun._backup",
       "target": "tropoi.run.held_suarez.checkpoint.backup_files"
     },
     {

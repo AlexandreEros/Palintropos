@@ -1,13 +1,13 @@
 {
   "call_graph": {
     "call_sites": {
-      "builtin": 2028,
+      "builtin": 2029,
       "external": 1474,
-      "internal": 1706,
-      "unresolved": 2222
+      "internal": 1707,
+      "unresolved": 2225
     },
     "edges_by_kind": {
-      "call": 711,
+      "call": 712,
       "constructor": 38,
       "instantiate": 269,
       "override": 6,

@@ -35,7 +35,7 @@ from typing import Any, Callable, Optional
 
 import numpy as np
 
-from tropoi.run.held_suarez.checkpoint import (CheckpointError, array_sha256,
+from tropoi.run.held_suarez.checkpoint import (CheckpointError, array_sha256, atomic_copy,
                                                atomic_write_bytes, backup_files,
                                                list_checkpoints, prune_checkpoints,
                                                read_checkpoint, write_checkpoint)
@@ -354,12 +354,19 @@ class HeldSuarezRun:
         failure (network drive, quota) is logged and does not stop the run."""
         if self.backup_dir is None:
             return
-        self._check_backup_dir()
         rd = self.run_dir
         try:
+            self._check_backup_dir()             # RunError (foreign experiment) propagates
             dst = backup_files(path, [rd / "config.json", rd / "events.jsonl", rd / "series.json",
                                       rd / "statistics.npz", rd / "progress.json"],
                                self.backup_dir, self.cfg.keep_checkpoints)
+            # the 10-day full states (PROTOCOL output), copied once each
+            sdir = rd / "states"
+            if sdir.is_dir():
+                for f in sorted(sdir.glob("state-d*.npy")):
+                    target = self.backup_dir / "states" / f.name
+                    if not target.exists():
+                        atomic_copy(f, target)
         except (OSError, CheckpointError) as exc:
             self._event("backup_failed", day=self.day, step=self.step, error=repr(exc))
             self.log(f"WARNING: backup of {path.name} failed ({exc!r}); the run continues")

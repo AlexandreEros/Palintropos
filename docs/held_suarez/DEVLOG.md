@@ -144,3 +144,12 @@ PROTOCOL.md). One entry per decision, newest last.
   benchmark 0.147 s/step over 200 steps with 2 statistics samples and one 0.023 s checkpoint;
   forced stop at day 1, resume in a fresh process with all 22 array hashes verified, completion,
   backups, report.
+- 2026-09-27 S6 review: an independent read-only review of the notebook found the pin not yet
+  pushed (launch blocker; user decision) and robustness gaps, fixed: the backup-directory check
+  now sits inside the backup's error handling (a dropped Drive mount is logged as
+  `backup_failed`, never stops the run — tested with an injected OSError); the 10-day state
+  snapshots are copied to the backup; the notebook restores from the newest *verifiable* Drive
+  backup, falling back to older ones; the committed `REFERENCE_B2.json` is used (after checking
+  its `series_sha256` against the pinned reference hash) when Drive holds no b2.json; the notebook
+  checks Python ≥ 3.12 and prints a resume instruction when a session-limit stop leaves the run
+  unfinished. SOLVER_COMMIT re-pinned to the commit with the solver fix.
