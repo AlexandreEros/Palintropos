@@ -245,15 +245,17 @@ tropoi plot runs --vectors streamfunction                   # psi contours (SWE/
 
 Full reference: [docs/SAVED_RUNS.md](docs/SAVED_RUNS.md).
 
-![Two opposite-signed vortices on a rotating sphere at days 0, 2, 5 and 10](docs/assets/two_vortices_evolution.png)
+![Two opposite-signed vortices on a rotating sphere: relative vorticity with streamfunction contours at days 0, 10, 15 and 25 on one colour scale; conservation drift and kinetic-energy spectral complexity](docs/runs/20260926T051829Z_two-vortices_rot24h_r4_l21_dt120h_e5dfc047_50ae9e93/assets/overview.png)
 
-*A qualitative BVE example: two compact vortices stretch into filaments and
-planetary-scale structure over ten days. Setup: experimental geodesic grid at
-resolution 4, `l_max = 21`, 24 h rotation, inviscid. It was run at commit
-`4a840226` with uncommitted local changes. Over the ten days, energy drops by
-3.7 % (printed on the day-10 panel), so treat this as an illustration, not
-conservation evidence. Full configuration:
-[figure provenance](docs/assets/provenance.json).*
+*A BVE example: two compact vortices of opposite sign on a sphere with a
+24 h rotation break up into a turbulent, planetary-scale flow over 25 days.
+This is the published run
+[`20260926T051829Z_two-vortices_…`](docs/runs/20260926T051829Z_two-vortices_rot24h_r4_l21_dt120h_e5dfc047_50ae9e93/)
+(Gauss–Legendre grid 128 × 256, ℓ ≤ 21, inviscid), drawn by the default
+`tropoi plot`. The lines are contours of the streamfunction ψ, the exact
+streamlines of this non-divergent flow, and closer lines mean faster flow.
+Recorded every step, the kinetic energy stays within 6.1 × 10⁻⁴ of its
+initial value and the absolute enstrophy within 1.1 × 10⁻⁴.*
 
 ## Validation: measured, not guaranteed
 

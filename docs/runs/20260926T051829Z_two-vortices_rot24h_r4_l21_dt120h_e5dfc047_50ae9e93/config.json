@@ -1,0 +1,29 @@
+{
+  "lmax": 21,
+  "grid": "latlon",
+  "resolution": 4,
+  "nlat": 128,
+  "nlon": 256,
+  "day_hours": 24.0,
+  "radius_earth_units": 1.0,
+  "duration_days": 25.0,
+  "dt_snapshots": 432000.0,
+  "scenario": "two_vortices",
+  "viscosity": 0.0,
+  "product_quadrature": "fine",
+  "out": "runs",
+  "experiment": null,
+  "overwrite": false,
+  "snapshot_mode": "count",
+  "n_snapshots": 6,
+  "snapshot_times": [
+    0.0,
+    432000.0,
+    864000.0,
+    1296000.0,
+    1728000.0,
+    2160000.0
+  ],
+  "plots": [],
+  "run_id": "20260926T051829Z_two-vortices_rot24h_r4_l21_dt120h_e5dfc047_50ae9e93"
+}

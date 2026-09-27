@@ -1,0 +1,243 @@
+{
+  "drift": {
+    "energy": {
+      "cadence": "every step",
+      "relative_drift_at_saved_states": [
+        0.0,
+        0.00025456106215782093,
+        0.0002757774359121168,
+        -0.00019620711450529793,
+        -0.00028208181557520806,
+        -0.00020887805486435873
+      ],
+      "saved_states_without_exact_row": []
+    },
+    "enstrophy_abs": {
+      "cadence": "every step",
+      "relative_drift_at_saved_states": [
+        0.0,
+        5.416391962476119e-05,
+        7.563747407290933e-05,
+        3.6684185594770824e-05,
+        3.8318198338993525e-05,
+        6.594735572740262e-05
+      ],
+      "saved_states_without_exact_row": []
+    }
+  },
+  "level": null,
+  "map_titles": [
+    "Day 0",
+    "Day 10",
+    "Day 15",
+    "Day 25"
+  ],
+  "maps": [
+    {
+      "index": 0,
+      "rms_speed": {
+        "divergent": 0.0,
+        "rotational": 13.683970064205445,
+        "units": "m s^-1"
+      },
+      "streamfunction": {
+        "max": 145532783.77130735,
+        "min": -145532783.77130732,
+        "units": "m^2 s^-1"
+      },
+      "time_s": 0.0,
+      "vorticity": {
+        "area_mean": -1.1911400820763599e-22,
+        "max": 4.9976698153360004e-05,
+        "min": -4.997669815336012e-05,
+        "units": "s^-1"
+      },
+      "wind_speed": {
+        "area_mean": 12.990429949360077,
+        "max": 25.273832629184778,
+        "units": "m s^-1"
+      }
+    },
+    {
+      "index": 2,
+      "rms_speed": {
+        "divergent": 0.0,
+        "rotational": 13.685856799223377,
+        "units": "m s^-1"
+      },
+      "streamfunction": {
+        "max": 100997963.71490462,
+        "min": -100997963.71490453,
+        "units": "m^2 s^-1"
+      },
+      "time_s": 864000.0,
+      "vorticity": {
+        "area_mean": -2.6469779601696886e-22,
+        "max": 1.938171638860564e-05,
+        "min": -1.9381716388605667e-05,
+        "units": "s^-1"
+      },
+      "wind_speed": {
+        "area_mean": 12.792027346521571,
+        "max": 26.619420238282967,
+        "units": "m s^-1"
+      }
+    },
+    {
+      "index": 3,
+      "rms_speed": {
+        "divergent": 0.0,
+        "rotational": 13.682627552208974,
+        "units": "m s^-1"
+      },
+      "streamfunction": {
+        "max": 101366142.80420479,
+        "min": -101366142.80420476,
+        "units": "m^2 s^-1"
+      },
+      "time_s": 1296000.0,
+      "vorticity": {
+        "area_mean": -1.0587911840678754e-22,
+        "max": 1.6815081455067637e-05,
+        "min": -1.681508145506766e-05,
+        "units": "s^-1"
+      },
+      "wind_speed": {
+        "area_mean": 12.8388489568695,
+        "max": 24.92916056824664,
+        "units": "m s^-1"
+      }
+    },
+    {
+      "index": 5,
+      "rms_speed": {
+        "divergent": 0.0,
+        "rotational": 13.68254084904371,
+        "units": "m s^-1"
+      },
+      "streamfunction": {
+        "max": 91589989.56911536,
+        "min": -91589989.56911536,
+        "units": "m^2 s^-1"
+      },
+      "time_s": 2160000.0,
+      "vorticity": {
+        "area_mean": 5.293955920339377e-23,
+        "max": 2.0499975035444265e-05,
+        "min": -2.0499975035444302e-05,
+        "units": "s^-1"
+      },
+      "wind_speed": {
+        "area_mean": 12.172291200888912,
+        "max": 27.86669207107019,
+        "units": "m s^-1"
+      }
+    }
+  ],
+  "omitted": [],
+  "run": {
+    "coefficients_sha256": "732e807bd24574df5f9242c27934510f88830d014548f8107718415c4d52b51e",
+    "diagnostics_sha256": "2fa384e0f80a42b28a617a0f55ef31b6cbe2df7e35c4e77f45a70939b817033d",
+    "git": {
+      "branch": "feat/saved-run-overview-plots",
+      "commit": "50ae9e93d270d14e1bd6be7211f5744184e7f1f2",
+      "dirty": true
+    },
+    "run_id": "20260926T051829Z_two-vortices_rot24h_r4_l21_dt120h_e5dfc047_50ae9e93",
+    "solver": "bve"
+  },
+  "spectral_complexity": {
+    "cadence": "saved states",
+    "effective_modes": [
+      5.526145854742426,
+      5.7273392979902855,
+      5.537391239436123,
+      5.7186914466018814,
+      5.54931359058036,
+      5.708025234238324
+    ],
+    "entropy": [
+      1.7094906204240614,
+      1.7452510769842315,
+      1.7115234944444893,
+      1.7437400111437045,
+      1.7136742427367582,
+      1.7418731204594649
+    ],
+    "level": null,
+    "mean_degree": [
+      1.9091493660178613,
+      1.9165073416926697,
+      1.911189308721854,
+      1.9118232138288167,
+      1.9027471689807538,
+      1.901538543567684
+    ],
+    "mean_order": [
+      1.2081100774319022,
+      1.2152885447961226,
+      1.1702022784937423,
+      1.1863094391690017,
+      1.1699343426281081,
+      1.1521615358958057
+    ],
+    "times_s": [
+      0.0,
+      432000.0,
+      864000.0,
+      1296000.0,
+      1728000.0,
+      2160000.0
+    ],
+    "undefined_at_s": []
+  },
+  "streamfunction": {
+    "definition": "psi_lm = -R^2 zeta_lm / (l(l+1)), l = 0 set to 0; lines at every multiple of the interval",
+    "divergent_kinetic_energy_fraction": [
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "interval_m2_s": 20000000.0,
+    "rotational_part_only": false
+  },
+  "synthesis_count": 16,
+  "view": {
+    "diagnostics": "auto",
+    "map": {
+      "background": "vorticity",
+      "color_policy": null,
+      "contours": [],
+      "level": null,
+      "limits": null,
+      "symmetric": null,
+      "type": "Map",
+      "vectors": {
+        "alpha": 0.85,
+        "arrow_size": 0.65,
+        "arrow_spacing": 80.0,
+        "color": "#262626",
+        "interval": null,
+        "level_count": 20,
+        "line_width": 0.45,
+        "type": "StreamfunctionContours"
+      }
+    },
+    "max_maps": 4,
+    "snapshots": null,
+    "static": "auto",
+    "style": {
+      "base_font_size": 8.0,
+      "diagnostics_height_inches": 2.45,
+      "dpi": 250,
+      "map_columns": 2,
+      "map_row_height_inches": 1.85,
+      "static_height_inches": 1.6,
+      "type": "Style",
+      "width_inches": 7.2
+    },
+    "title": null,
+    "type": "Overview"
+  }
+}

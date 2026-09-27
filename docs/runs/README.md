@@ -68,3 +68,23 @@ run compared with MRI-JMA in
   from this run's coefficients and diagnostics and from `aeolus_w5_t63.npz`,
   the grid package the validation notebook wrote from this same run. Its PNG
   metadata records the SHA-256 of all three.
+
+### `20260926T051829Z_two-vortices_rot24h_r4_l21_dt120h_e5dfc047_50ae9e93`
+
+The README's BVE example: two opposite-signed vortices on a sphere with a
+24 h rotation, Gauss–Legendre grid 128 × 256, ℓ ≤ 21, inviscid, 25 days,
+6 saved states (`tropoi run bve --day-hours 24 --duration-days 25
+--n-snapshots 6 --backend gauss-latlon`). It was produced at commit
+`50ae9e93` on 2026-09-26, on an NVIDIA GeForce MX110.
+
+- **Worktree:** the manifest records `dirty: true`, and the uncommitted
+  changes were not recorded. They did not affect the evidence: re-running
+  the same command from commit `93720a50`, with every file under `src/`
+  committed, reproduced
+  `vorticity_coeffs.npy`, `vorticity_grid.npy`, `bve_snapshot_times.npy`
+  and both files in `diagnostics/` byte for byte (2026-09-27). Only
+  `config.json` differed, in its `out` and `run_id` fields.
+- **Conservation** (recorded every step): kinetic energy stays within
+  6.1 × 10⁻⁴ of its initial value and absolute enstrophy within 1.1 × 10⁻⁴.
+- **Assets:** `overview.png` and `overview.json` are the default
+  `tropoi plot` overview (`sim.plot(sidecar=True)`), shown in the README.
