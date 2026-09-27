@@ -5077,6 +5077,96 @@
     },
     {
       "kind": "constructor",
+      "source": "tropoi.temporal.semi_implicit.SemiImplicitLeapfrogStepper",
+      "target": "tropoi.temporal.semi_implicit.SemiImplicitLeapfrogStepper.__init__"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.temporal.semi_implicit.SemiImplicitLeapfrogStepper.__init__",
+      "target": "tropoi.temporal.semi_implicit.SemiImplicitLeapfrogStepper._stable_startup_substeps"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.temporal.semi_implicit.SemiImplicitLeapfrogStepper.__init__",
+      "target": "tropoi.temporal.semi_implicit.SemiImplicitSolver"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.temporal.semi_implicit.SemiImplicitLeapfrogStepper._stable_startup_substeps",
+      "target": "tropoi.temporal.semi_implicit.rk4_imaginary_axis_gain"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.temporal.semi_implicit.SemiImplicitLeapfrogStepper._startup",
+      "target": "tropoi.temporal.integration.rk4_step_array"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.temporal.semi_implicit.SemiImplicitLeapfrogStepper.step",
+      "target": "tropoi.temporal.semi_implicit.SemiImplicitLeapfrogStepper._leapfrog"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.temporal.semi_implicit.SemiImplicitLeapfrogStepper.step",
+      "target": "tropoi.temporal.semi_implicit.SemiImplicitLeapfrogStepper._startup"
+    },
+    {
+      "kind": "constructor",
+      "source": "tropoi.temporal.semi_implicit.SemiImplicitOperator",
+      "target": "tropoi.temporal.semi_implicit.SemiImplicitOperator.__init__"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.temporal.semi_implicit.SemiImplicitOperator.__init__",
+      "target": "tropoi.spatial.sigma_coordinate.hydrostatic_geopotential"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.temporal.semi_implicit.SemiImplicitOperator.__init__",
+      "target": "tropoi.spatial.sigma_coordinate.omega_over_p"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.temporal.semi_implicit.SemiImplicitOperator.__init__",
+      "target": "tropoi.spatial.truncation.product_truncation_cut"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.temporal.semi_implicit.SemiImplicitOperator.apply",
+      "target": "tropoi.temporal.semi_implicit.SemiImplicitOperator._dev"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.temporal.semi_implicit.SemiImplicitOperator.apply",
+      "target": "tropoi.temporal.semi_implicit._array_module"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.temporal.semi_implicit.SemiImplicitOperator.frequencies",
+      "target": "tropoi.temporal.semi_implicit.SemiImplicitOperator.gravity_wave_speeds"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.temporal.semi_implicit.SemiImplicitOperator.max_frequency",
+      "target": "tropoi.temporal.semi_implicit.SemiImplicitOperator.frequencies"
+    },
+    {
+      "kind": "constructor",
+      "source": "tropoi.temporal.semi_implicit.SemiImplicitSolver",
+      "target": "tropoi.temporal.semi_implicit.SemiImplicitSolver.__init__"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.temporal.semi_implicit.SemiImplicitSolver.advance",
+      "target": "tropoi.temporal.semi_implicit.SemiImplicitSolver._minv"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.temporal.semi_implicit.SemiImplicitSolver.advance",
+      "target": "tropoi.temporal.semi_implicit._array_module"
+    },
+    {
+      "kind": "constructor",
       "source": "tropoi.temporal.simulation.Simulation",
       "target": "tropoi.temporal.simulation.Simulation.__init__"
     },
@@ -11453,6 +11543,223 @@
       "kind": "function",
       "module": "tropoi.temporal.integration",
       "qualname": "validate_snapshot_schedule",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.temporal.semi_implicit.SemiImplicitLeapfrogStepper",
+      "kind": "class",
+      "module": "tropoi.temporal.semi_implicit",
+      "qualname": "SemiImplicitLeapfrogStepper",
+      "type": "class"
+    },
+    {
+      "id": "tropoi.temporal.semi_implicit.SemiImplicitLeapfrogStepper.__init__",
+      "kind": "method",
+      "module": "tropoi.temporal.semi_implicit",
+      "qualname": "SemiImplicitLeapfrogStepper.__init__",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.temporal.semi_implicit.SemiImplicitLeapfrogStepper._leapfrog",
+      "kind": "method",
+      "module": "tropoi.temporal.semi_implicit",
+      "qualname": "SemiImplicitLeapfrogStepper._leapfrog",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.temporal.semi_implicit.SemiImplicitLeapfrogStepper._stable_startup_substeps",
+      "kind": "method",
+      "module": "tropoi.temporal.semi_implicit",
+      "qualname": "SemiImplicitLeapfrogStepper._stable_startup_substeps",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.temporal.semi_implicit.SemiImplicitLeapfrogStepper._startup",
+      "kind": "method",
+      "module": "tropoi.temporal.semi_implicit",
+      "qualname": "SemiImplicitLeapfrogStepper._startup",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.temporal.semi_implicit.SemiImplicitLeapfrogStepper.initialize",
+      "kind": "method",
+      "module": "tropoi.temporal.semi_implicit",
+      "qualname": "SemiImplicitLeapfrogStepper.initialize",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.temporal.semi_implicit.SemiImplicitLeapfrogStepper.load_state_dict",
+      "kind": "method",
+      "module": "tropoi.temporal.semi_implicit",
+      "qualname": "SemiImplicitLeapfrogStepper.load_state_dict",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.temporal.semi_implicit.SemiImplicitLeapfrogStepper.state",
+      "kind": "property",
+      "module": "tropoi.temporal.semi_implicit",
+      "qualname": "SemiImplicitLeapfrogStepper.state",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.temporal.semi_implicit.SemiImplicitLeapfrogStepper.state_dict",
+      "kind": "method",
+      "module": "tropoi.temporal.semi_implicit",
+      "qualname": "SemiImplicitLeapfrogStepper.state_dict",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.temporal.semi_implicit.SemiImplicitLeapfrogStepper.step",
+      "kind": "method",
+      "module": "tropoi.temporal.semi_implicit",
+      "qualname": "SemiImplicitLeapfrogStepper.step",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.temporal.semi_implicit.SemiImplicitLeapfrogStepper.step_count",
+      "kind": "property",
+      "module": "tropoi.temporal.semi_implicit",
+      "qualname": "SemiImplicitLeapfrogStepper.step_count",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.temporal.semi_implicit.SemiImplicitLeapfrogStepper.t",
+      "kind": "property",
+      "module": "tropoi.temporal.semi_implicit",
+      "qualname": "SemiImplicitLeapfrogStepper.t",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.temporal.semi_implicit.SemiImplicitLeapfrogStepper.x_prev",
+      "kind": "property",
+      "module": "tropoi.temporal.semi_implicit",
+      "qualname": "SemiImplicitLeapfrogStepper.x_prev",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.temporal.semi_implicit.SemiImplicitOperator",
+      "kind": "class",
+      "module": "tropoi.temporal.semi_implicit",
+      "qualname": "SemiImplicitOperator",
+      "type": "class"
+    },
+    {
+      "id": "tropoi.temporal.semi_implicit.SemiImplicitOperator.__init__",
+      "kind": "method",
+      "module": "tropoi.temporal.semi_implicit",
+      "qualname": "SemiImplicitOperator.__init__",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.temporal.semi_implicit.SemiImplicitOperator._dev",
+      "kind": "method",
+      "module": "tropoi.temporal.semi_implicit",
+      "qualname": "SemiImplicitOperator._dev",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.temporal.semi_implicit.SemiImplicitOperator.apply",
+      "kind": "method",
+      "module": "tropoi.temporal.semi_implicit",
+      "qualname": "SemiImplicitOperator.apply",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.temporal.semi_implicit.SemiImplicitOperator.dense_matrix",
+      "kind": "method",
+      "module": "tropoi.temporal.semi_implicit",
+      "qualname": "SemiImplicitOperator.dense_matrix",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.temporal.semi_implicit.SemiImplicitOperator.frequencies",
+      "kind": "method",
+      "module": "tropoi.temporal.semi_implicit",
+      "qualname": "SemiImplicitOperator.frequencies",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.temporal.semi_implicit.SemiImplicitOperator.from_model",
+      "kind": "classmethod",
+      "module": "tropoi.temporal.semi_implicit",
+      "qualname": "SemiImplicitOperator.from_model",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.temporal.semi_implicit.SemiImplicitOperator.gravity_wave_speeds",
+      "kind": "method",
+      "module": "tropoi.temporal.semi_implicit",
+      "qualname": "SemiImplicitOperator.gravity_wave_speeds",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.temporal.semi_implicit.SemiImplicitOperator.max_frequency",
+      "kind": "method",
+      "module": "tropoi.temporal.semi_implicit",
+      "qualname": "SemiImplicitOperator.max_frequency",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.temporal.semi_implicit.SemiImplicitSolver",
+      "kind": "class",
+      "module": "tropoi.temporal.semi_implicit",
+      "qualname": "SemiImplicitSolver",
+      "type": "class"
+    },
+    {
+      "id": "tropoi.temporal.semi_implicit.SemiImplicitSolver.__init__",
+      "kind": "method",
+      "module": "tropoi.temporal.semi_implicit",
+      "qualname": "SemiImplicitSolver.__init__",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.temporal.semi_implicit.SemiImplicitSolver._minv",
+      "kind": "method",
+      "module": "tropoi.temporal.semi_implicit",
+      "qualname": "SemiImplicitSolver._minv",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.temporal.semi_implicit.SemiImplicitSolver.advance",
+      "kind": "method",
+      "module": "tropoi.temporal.semi_implicit",
+      "qualname": "SemiImplicitSolver.advance",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.temporal.semi_implicit.SemiImplicitSolver.cayley_matrix",
+      "kind": "method",
+      "module": "tropoi.temporal.semi_implicit",
+      "qualname": "SemiImplicitSolver.cayley_matrix",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.temporal.semi_implicit.SemiImplicitSolver.inverse",
+      "kind": "method",
+      "module": "tropoi.temporal.semi_implicit",
+      "qualname": "SemiImplicitSolver.inverse",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.temporal.semi_implicit.SemiImplicitSolver.matrix",
+      "kind": "method",
+      "module": "tropoi.temporal.semi_implicit",
+      "qualname": "SemiImplicitSolver.matrix",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.temporal.semi_implicit._array_module",
+      "kind": "function",
+      "module": "tropoi.temporal.semi_implicit",
+      "qualname": "_array_module",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.temporal.semi_implicit.rk4_imaginary_axis_gain",
+      "kind": "function",
+      "module": "tropoi.temporal.semi_implicit",
+      "qualname": "rk4_imaginary_axis_gain",
       "type": "function"
     },
     {

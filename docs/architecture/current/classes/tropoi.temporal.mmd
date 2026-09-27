@@ -5,6 +5,35 @@ classDiagram
     class c_tropoi_otemporal_ointegration_oIntegrationScheduler["IntegrationScheduler (temporal.integration)"]
     c_tropoi_otemporal_ointegration_oIntegrationScheduler : +#95;#95;init#95;#95;()
     c_tropoi_otemporal_ointegration_oIntegrationScheduler : +next#95;event()
+    class c_tropoi_otemporal_osemi__implicit_oSemiImplicitLeapfrogStepper["SemiImplicitLeapfrogStepper (temporal.semi_implicit)"]
+    c_tropoi_otemporal_osemi__implicit_oSemiImplicitLeapfrogStepper : +#95;#95;init#95;#95;()
+    c_tropoi_otemporal_osemi__implicit_oSemiImplicitLeapfrogStepper : +#95;leapfrog()
+    c_tropoi_otemporal_osemi__implicit_oSemiImplicitLeapfrogStepper : +#95;stable#95;startup#95;substeps()
+    c_tropoi_otemporal_osemi__implicit_oSemiImplicitLeapfrogStepper : +#95;startup()
+    c_tropoi_otemporal_osemi__implicit_oSemiImplicitLeapfrogStepper : +initialize()
+    c_tropoi_otemporal_osemi__implicit_oSemiImplicitLeapfrogStepper : +load#95;state#95;dict()
+    c_tropoi_otemporal_osemi__implicit_oSemiImplicitLeapfrogStepper : +state
+    c_tropoi_otemporal_osemi__implicit_oSemiImplicitLeapfrogStepper : +state#95;dict()
+    c_tropoi_otemporal_osemi__implicit_oSemiImplicitLeapfrogStepper : +step()
+    c_tropoi_otemporal_osemi__implicit_oSemiImplicitLeapfrogStepper : +step#95;count
+    c_tropoi_otemporal_osemi__implicit_oSemiImplicitLeapfrogStepper : +t
+    c_tropoi_otemporal_osemi__implicit_oSemiImplicitLeapfrogStepper : +x#95;prev
+    class c_tropoi_otemporal_osemi__implicit_oSemiImplicitOperator["SemiImplicitOperator (temporal.semi_implicit)"]
+    c_tropoi_otemporal_osemi__implicit_oSemiImplicitOperator : +#95;#95;init#95;#95;()
+    c_tropoi_otemporal_osemi__implicit_oSemiImplicitOperator : +#95;dev()
+    c_tropoi_otemporal_osemi__implicit_oSemiImplicitOperator : +apply()
+    c_tropoi_otemporal_osemi__implicit_oSemiImplicitOperator : +dense#95;matrix()
+    c_tropoi_otemporal_osemi__implicit_oSemiImplicitOperator : +frequencies()
+    c_tropoi_otemporal_osemi__implicit_oSemiImplicitOperator : +from#95;model()$
+    c_tropoi_otemporal_osemi__implicit_oSemiImplicitOperator : +gravity#95;wave#95;speeds()
+    c_tropoi_otemporal_osemi__implicit_oSemiImplicitOperator : +max#95;frequency()
+    class c_tropoi_otemporal_osemi__implicit_oSemiImplicitSolver["SemiImplicitSolver (temporal.semi_implicit)"]
+    c_tropoi_otemporal_osemi__implicit_oSemiImplicitSolver : +#95;#95;init#95;#95;()
+    c_tropoi_otemporal_osemi__implicit_oSemiImplicitSolver : +#95;minv()
+    c_tropoi_otemporal_osemi__implicit_oSemiImplicitSolver : +advance()
+    c_tropoi_otemporal_osemi__implicit_oSemiImplicitSolver : +cayley#95;matrix()
+    c_tropoi_otemporal_osemi__implicit_oSemiImplicitSolver : +inverse()
+    c_tropoi_otemporal_osemi__implicit_oSemiImplicitSolver : +matrix()
     class c_tropoi_otemporal_osimulation_oSimulation["Simulation (temporal.simulation)"]
     c_tropoi_otemporal_osimulation_oSimulation : +#95;#95;getitem#95;#95;()
     c_tropoi_otemporal_osimulation_oSimulation : +#95;#95;init#95;#95;()

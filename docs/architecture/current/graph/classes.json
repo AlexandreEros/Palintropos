@@ -2774,6 +2774,137 @@
     {
       "decorators": [],
       "external_bases": [],
+      "id": "tropoi.temporal.semi_implicit.SemiImplicitLeapfrogStepper",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__init__"
+        },
+        {
+          "kind": "method",
+          "name": "_leapfrog"
+        },
+        {
+          "kind": "method",
+          "name": "_stable_startup_substeps"
+        },
+        {
+          "kind": "method",
+          "name": "_startup"
+        },
+        {
+          "kind": "method",
+          "name": "initialize"
+        },
+        {
+          "kind": "method",
+          "name": "load_state_dict"
+        },
+        {
+          "kind": "property",
+          "name": "state"
+        },
+        {
+          "kind": "method",
+          "name": "state_dict"
+        },
+        {
+          "kind": "method",
+          "name": "step"
+        },
+        {
+          "kind": "property",
+          "name": "step_count"
+        },
+        {
+          "kind": "property",
+          "name": "t"
+        },
+        {
+          "kind": "property",
+          "name": "x_prev"
+        }
+      ],
+      "module": "tropoi.temporal.semi_implicit",
+      "qualname": "SemiImplicitLeapfrogStepper"
+    },
+    {
+      "decorators": [],
+      "external_bases": [],
+      "id": "tropoi.temporal.semi_implicit.SemiImplicitOperator",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__init__"
+        },
+        {
+          "kind": "method",
+          "name": "_dev"
+        },
+        {
+          "kind": "method",
+          "name": "apply"
+        },
+        {
+          "kind": "method",
+          "name": "dense_matrix"
+        },
+        {
+          "kind": "method",
+          "name": "frequencies"
+        },
+        {
+          "kind": "classmethod",
+          "name": "from_model"
+        },
+        {
+          "kind": "method",
+          "name": "gravity_wave_speeds"
+        },
+        {
+          "kind": "method",
+          "name": "max_frequency"
+        }
+      ],
+      "module": "tropoi.temporal.semi_implicit",
+      "qualname": "SemiImplicitOperator"
+    },
+    {
+      "decorators": [],
+      "external_bases": [],
+      "id": "tropoi.temporal.semi_implicit.SemiImplicitSolver",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__init__"
+        },
+        {
+          "kind": "method",
+          "name": "_minv"
+        },
+        {
+          "kind": "method",
+          "name": "advance"
+        },
+        {
+          "kind": "method",
+          "name": "cayley_matrix"
+        },
+        {
+          "kind": "method",
+          "name": "inverse"
+        },
+        {
+          "kind": "method",
+          "name": "matrix"
+        }
+      ],
+      "module": "tropoi.temporal.semi_implicit",
+      "qualname": "SemiImplicitSolver"
+    },
+    {
+      "decorators": [],
+      "external_bases": [],
       "id": "tropoi.temporal.simulation.Simulation",
       "members": [
         {

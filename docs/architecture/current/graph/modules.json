@@ -2273,6 +2273,30 @@
       "scopes": [
         "module"
       ],
+      "source": "tropoi.temporal.semi_implicit",
+      "target": "tropoi.spatial.sigma_coordinate"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.temporal.semi_implicit",
+      "target": "tropoi.spatial.truncation"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.temporal.semi_implicit",
+      "target": "tropoi.temporal.integration"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
       "source": "tropoi.temporal.simulation",
       "target": "tropoi.spatial.modes"
     },
@@ -3978,6 +4002,22 @@
         "typing"
       ],
       "third_party_imports": []
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.temporal.semi_implicit",
+      "is_package": false,
+      "path": "tropoi/temporal/semi_implicit.py",
+      "stdlib_imports": [
+        "__future__",
+        "math",
+        "typing"
+      ],
+      "third_party_imports": [
+        "cupy",
+        "numpy"
+      ]
     },
     {
       "category": "code",

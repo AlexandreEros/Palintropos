@@ -434,7 +434,7 @@
     },
     {
       "kind": "imports",
-      "module_edges": 1,
+      "module_edges": 3,
       "source": "tropoi.temporal",
       "target": "tropoi.spatial"
     },
@@ -578,8 +578,8 @@
     },
     {
       "id": "tropoi.temporal",
-      "internal_edges": 1,
-      "modules": 3
+      "internal_edges": 2,
+      "modules": 4
     },
     {
       "id": "tropoi.temporal.tendencies",
