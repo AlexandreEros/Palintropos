@@ -2864,6 +2864,10 @@
         {
           "kind": "method",
           "name": "max_frequency"
+        },
+        {
+          "kind": "method",
+          "name": "signature"
         }
       ],
       "module": "tropoi.temporal.semi_implicit",

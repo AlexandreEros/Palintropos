@@ -5132,6 +5132,11 @@
     },
     {
       "kind": "self",
+      "source": "tropoi.temporal.semi_implicit.SemiImplicitOperator.__init__",
+      "target": "tropoi.temporal.semi_implicit.SemiImplicitOperator.gravity_wave_speeds"
+    },
+    {
+      "kind": "self",
       "source": "tropoi.temporal.semi_implicit.SemiImplicitOperator.apply",
       "target": "tropoi.temporal.semi_implicit.SemiImplicitOperator._dev"
     },
@@ -11697,6 +11702,13 @@
       "kind": "method",
       "module": "tropoi.temporal.semi_implicit",
       "qualname": "SemiImplicitOperator.max_frequency",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.temporal.semi_implicit.SemiImplicitOperator.signature",
+      "kind": "method",
+      "module": "tropoi.temporal.semi_implicit",
+      "qualname": "SemiImplicitOperator.signature",
       "type": "function"
     },
     {
