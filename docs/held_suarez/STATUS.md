@@ -30,8 +30,10 @@ a day), no-hook path bitwise S3. SEMI_IMPLICIT.md §8.
 
 - (a) scalar recurrence: |λ| = 0.99739925 / 0.8024 at Δt = 900 s, k_s (no RAW: 1.0026, growing);
   max |λ| over the (k, r, ω_SI) grid 1.000000000000. RAW limits explicit oscillations to
-  ωΔt ≤ 0.4371 → with ∇⁸, jet winds ≤ 109.5 m/s (900 s) / 80.4 m/s (1200 s) at T42 are
-  non-amplifying; Dinosaur reaches 94.5 m/s → **Δt = 900 s selected**.
+  ωΔt ≤ 0.4371 → with ∇⁸, peak winds ≤ 125.1 m/s (900 s) / 85.5 m/s (1200 s) at T42 (either
+  layout) are non-amplifying; Dinosaur reaches 94.5 m/s → **Δt = 900 s selected**. *Corrected
+  2026-09-28* (the bound first used ω = U l/(a cos 45°) with k = k_s: 109.5 / 80.4 m/s; see
+  "Stability-bound correction" below).
 - (b) convergence vs RK4, 2 days T21 L10: see "S4b (b)" in DEVLOG. **Finding:** the complete
   scheme is asymptotically *first order* in time; the cause is the plan's damping placement
   (factor on X^{n+1} ⇒ damping evaluated at n+1, local error −rΔt Ẋ), shown in isolation on the
@@ -76,6 +78,42 @@ GPU tests skip cleanly without CuPy (CI emulation: 50 passed, 17 skipped). Slowe
 convergence tests (24 and 19.5 min), S3 convergence (5.5 min). Architecture snapshot regenerated
 per commit; `--check` passes; no import cycle changed.
 
+## Stability-bound correction (2026-09-28)
+
+The RAW/advection jet bound (S4b (a); centred option, DECISION 2) used the explicit frequency
+ω_l = U l/(a cos 45°) + 2Ω with the explicit damping k = k_s on every row. Both were wrong for the
+wind at jet level:
+
+- **Wavenumber.** A degree-l harmonic with zonal wavenumber m has its amplitude where
+  cos φ ≳ m/√(l(l+1)) and is evanescent poleward, so m/(a cos φ) ≤ √(l(l+1))/a wherever it lives:
+  putting m = l at 45° overstates the frequency by √2. Checked on the T42 truncation
+  (`test_advective_frequency_bound_holds_on_the_truncation`: Galerkin zonal-advection eigenvalues
+  for solid-body rotation and jets at 30/45/60°): the largest frequency is 0.75–0.99 of
+  U√(L(L+1))/a, and the former form overstated it 1.46–2.62×; the fastest mode of a 45° jet has
+  m ≈ 28, not 42.
+- **Damping.** Above σ_b = 0.7 the wind has no Rayleigh drag and the Newtonian relaxation acts on
+  T only, so the jet-level wind rows have k = 0 (∇⁸ aside).
+
+Corrected bound, ω_l = U√(l(l+1))/a + 2Ω, k = 0, ∇⁸ per degree (`jet_wind_bound`;
+`test_raw_limits_explicit_oscillations_and_the_selected_dt_covers_the_jet`,
+`test_centred_raw_explicit_oscillation_bound`), retained T42 (cut 42), lagged / centred, m/s:
+
+| Δt | non-amplifying (was) | first degree to amplify | fast growth, > 1.01/step |
+|---|---|---|---|
+| 600 s | 198.8 / 198.7 (157.5 / 146.9) | 23 | — |
+| 720 s | 162.5 / 162.5 (131.8 / 121.1) | 22 | — |
+| 900 s | **125.1 / 125.0** (105.3 / 94.9) | 21 | **147.5 / 132.8** |
+| 1200 s | 85.5 / 85.5 (77.8 / 68.1) | 19 | 108.6 / 95.4 |
+
+The legacy layout (cut 28) gives the same non-amplifying bounds (125.1 / 85.5 m/s; was
+109.5 / 80.4). What changes: the 900 s margin over the reference's 94.5 m/s peak is ≈ 30 %, not
+≈ 11 % (lagged) or ≈ 0.4 % (centred); the non-amplification bound no longer depends on the damping
+placement, because the binding mode now sits at l ≈ 21 (Δt r∇⁸ < 1e−3), limited by RAW's α = 0.53
+growth above ωΔt = 0.437, not at the leapfrog limit at l ≈ 42. Unchanged: Δt = 900 s, every
+scheme, preset, config hash and the notebook pin (tests and documents only); the S4b (c) and T42
+one-day runs; the accuracy figures. The analysis is still the frozen-coefficient scalar
+recurrence; long-run T42 behaviour is measured by the S8 gate and run.
+
 ## DECISION NEEDED before launch (plan §6.1, §6.3-type numerics questions)
 
 1. **Effective truncation — RESOLVED by the opt-in patch (user decision 2026-09-27).** The
@@ -92,11 +130,18 @@ per commit; `--check` passes; no import cycle changed.
    leaves a first-order term ¼ the size of the lag term. At **Δt = 900 s** the lag term is
    ≈ 1.5 % of the 2-day ζ change (δ 2.3 %, T 0.07 %, q 0.45 %), the steady forced–dissipative
    balance is exact in both placements, and the centred option **does not lower the 900 s error
-   vs RK4** (the SI/explicit transient error dominates: ζ 2.4 %, δ/q ≈ 9 %). Stability: the
-   RAW/advection non-amplification bound at the retained T42 layout is **94.9 m/s** with centred
-   damping vs **105.3 m/s** lagged (reference peak 94.5 m/s), and growth beyond it is fast
-   (gain 1.12/step at 100 m/s); the lagged factor extends the explicit leapfrog limit by
-   √(1 + 2Δt r), the centred one shortens it to √(1 − (Δt r)²). Cost identical (11.7 ms/step
+   vs RK4** (the SI/explicit transient error dominates: ζ 2.4 %, δ/q ≈ 9 %). Stability
+   (*corrected 2026-09-28*, see "Stability-bound correction"): the RAW/advection
+   non-amplification bound at the retained T42 layout is **125.1 m/s lagged vs 125.0 m/s
+   centred** at 900 s (reference peak 94.5 m/s). The first degree to amplify is l ≈ 21, where
+   RAW's α = 0.53 growth beats a negligible ∇⁸ and the placement does not matter. Above the bound
+   growth is slow (e-folding ≈ 63 d at 130 m/s) until the leapfrog limit at l ≈ 42, where the
+   placement does matter (the lagged factor extends the explicit leapfrog limit to
+   √(1 + 2Δt r), the centred one shortens it to √(1 − (Δt r)²)): growth turns fast
+   (> 1.01/step, e-folding < 1 d) above **147.5 m/s lagged vs 132.8 m/s centred** at 900 s
+   (108.6 / 95.4 at 1200 s). The earlier 94.9 / 105.3 m/s at 900 s (146.9 / 157.5 at 600 s,
+   121.1 / 131.8 at 720 s) came from an overstated advective frequency and are withdrawn;
+   corrected 198.7 / 198.8 (600 s), 162.5 / 162.5 (720 s). Cost identical (11.7 ms/step
    non-tendency part at T42 L20 on the MX110, < 0.3 % of a step). Contracts touched by the
    option: `HeldSuarezConfig.damping_scheme` (production `config_sha256` dc5901db… →
    4cd2eeae… with the default; 692fadd1… centred), stepper `state_dict["damping_scheme"]`
@@ -105,10 +150,14 @@ per commit; `--check` passes; no import cycle changed.
    **Recommendation:** keep the lagged scheme with RAW(0.1, 0.53) at Δt = 900 s for the
    production run, accepting the documented first-order term (≈ 1 % transient-response bias of
    the damped fields, exact steady balance, climate impact unmeasured), because the centred
-   option buys no accuracy at 900 s and removes the 10 % advective stability margin over the
-   reference's peak winds; keep the centred option as a verified sensitivity switch (it is
-   bound 146.9 m/s at 600 s and 121.1 m/s at 720 s, vs lagged 157.5 / 131.8). Not recommended: α = 0.5 (0.4 %
+   option buys no accuracy at 900 s, needs a re-pin, and has the lower fast-growth threshold
+   (132.8 vs 147.5 m/s; both ≥ 40 % above the reference's peak, so a margin, not a blocker).
+   *Withdrawn 2026-09-28:* the earlier reason that the centred option "removes the 10 %
+   advective stability margin" — the non-amplification bounds are equal. Keep the centred option
+   as a verified sensitivity switch; at 900 s it is stability-safe. Not recommended: α = 0.5 (0.4 %
    effect, slightly less damping of explicit oscillations). Short-run numerical evidence only.
-3. **Δt = 900 s** (proposed from S4b); 1200 s is below the reference's typical peak jet speeds by
-   the RAW/advection bound.
+3. **Δt = 900 s** (proposed from S4b): corrected bound 125.1 m/s, ≈ 30 % above the reference's
+   94.5 m/s peak. 1200 s: bound 85.5 m/s, below that peak; a 94.5 m/s jet grows weakly there
+   (e-folding 34 d, RAW-limited, not a leapfrog blow-up), but the fast-growth threshold (108.6 m/s
+   lagged, 95.4 centred) sits close to the peak, so 900 s remains the proposal.
 4. Push `feat/semi-implicit-integration` so SOLVER_COMMIT is fetchable by Colab (A4).
