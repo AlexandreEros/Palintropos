@@ -88,7 +88,22 @@ class PrimitiveEquationsModel:
     def __init__(self, planet: Planet, sigma: SigmaGrid, *,
                  r_dry: float = R_DRY, cp_dry: float = CP_DRY,
                  surface_geopotential_lm: cp.ndarray | None = None,
-                 batched_transforms: bool = False):
+                 batched_transforms: bool = False,
+                 retained_truncation: int | None = None):
+        """``retained_truncation`` (opt-in, default None = the 2/3 product
+        cut ``product_truncation_cut(l_max)``, bitwise the historical path):
+        the highest degree/order every analyzed nonlinear product keeps, i.e.
+        the resolution the model evolves. It must be <= l_max - 1: the
+        meridional derivative ``sin_theta_d_theta_coeffs`` stores degrees
+        <= l_max only (its degree-(l_max+1) part is dropped), so a state
+        with content AT l_max gets an O(eps) spurious vorticity/divergence
+        tendency on every degree (measured, docs/held_suarez/
+        DEALIASING_AUDIT.md). Storing one extra degree and retaining
+        ``l_max - 1`` (Dinosaur's layout) keeps that degree a pure derivative
+        buffer: on the Gauss lat-lon "fine" 3/2-rule product grid every
+        quadratic term is then analyzed exactly at every retained degree
+        (the cubic V.grad(ln p_s) terms alias at the ~1e-6 level).
+        """
         if not (math.isfinite(r_dry) and r_dry > 0):
             raise ValueError(f"r_dry must be finite and > 0, got {r_dry}")
         if not (math.isfinite(cp_dry) and cp_dry > r_dry):
@@ -108,6 +123,17 @@ class PrimitiveEquationsModel:
         self.kappa = self.r_dry / self.cp_dry
         self.gamma = self.cp_dry / (self.cp_dry - self.r_dry)
         self.l_max = self.sh.l_max
+        if retained_truncation is None:
+            cut = product_truncation_cut(self.l_max)
+        else:
+            cut = int(retained_truncation)
+            if not (0 <= cut <= self.l_max - 1):
+                raise ValueError(
+                    f"retained_truncation must be in [0, l_max - 1] = "
+                    f"[0, {self.l_max - 1}], got {retained_truncation}: degree "
+                    "l_max is a derivative buffer (its sin(theta) d/dtheta "
+                    "has degree l_max + 1, which the storage drops)")
+        self.retained_truncation = cut
 
         # Surface geopotential: fixed spectral field (zeros by default).
         # A non-flat Phi_s must be band-limited at the dealiased product
@@ -119,7 +145,7 @@ class PrimitiveEquationsModel:
         # the uncancelled per-degree residual at rest equals |lap * Phi_s|
         # exactly for every l above the cut). Reject loudly, not silently.
         n = self.l_max + 1
-        self._phi_cut = product_truncation_cut(self.l_max)
+        self._phi_cut = cut
         if surface_geopotential_lm is None:
             self.phi_surface_lm = cp.zeros((n, n), dtype=cp.complex128)
         else:
@@ -136,7 +162,7 @@ class PrimitiveEquationsModel:
                     or bool(cp.any(phi_s[:, cut + 1:])):
                 raise ValueError(
                     "surface_geopotential_lm has spectral content above the "
-                    f"dealiased product truncation l = {cut} (2*l_max/3 for "
+                    f"dealiased product truncation l = {cut} (the retained truncation, 2*l_max/3 by default; "
                     f"l_max = {self.l_max}); such content cannot be balanced "
                     "by the dealiased pressure-gradient pathway and would "
                     "force the momentum equations permanently. Band-limit "
@@ -166,7 +192,7 @@ class PrimitiveEquationsModel:
 
         # 2/3-rule truncation cut for analyzed nonlinear products (the
         # SWE policy, applied once per combined quantity).
-        self._trunc_cut = product_truncation_cut(self.l_max)
+        self._trunc_cut = cut
 
         # Opt-in level-batched tendency path (one GEMM per transform
         # direction instead of one mat-vec per level and quantity). The

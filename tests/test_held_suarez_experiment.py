@@ -49,12 +49,18 @@ def test_config_hash_is_stable_and_sensitive():
     a, b = production_config(), production_config()
     assert a.sha256() == b.sha256()
     assert HeldSuarezConfig.from_dict(json.loads(a.canonical_json())).sha256() == a.sha256()
-    for change in ({"dt": 900.0}, {"raw_alpha": 0.5}, {"seed": 1}, {"l_max": 41},
-                   {"hyperdiffusion_efold_days": 0.2}, {"t_ref": 290.0}):
+    for change in ({"dt": 1200.0}, {"raw_alpha": 0.5}, {"seed": 1}, {"l_max": 44},
+                   {"hyperdiffusion_efold_days": 0.2}, {"t_ref": 290.0},
+                   {"retained_truncation": 41}):
         assert a.with_(**change).sha256() != a.sha256(), change
-    assert a.l_max == 42 and (a.nlat, a.nlon, a.nlev) == (64, 128, 20)
+    # production: store 43, retain 42 (DEALIASING_AUDIT.md); dt 900 s (S4b)
+    assert (a.l_max, a.retained_cut, a.dt) == (43, 42, 900.0)
+    assert (a.nlat, a.nlon, a.nlev) == (64, 128, 20)
     assert a.days == 1200 and a.spinup_days == 200 and a.block_days == 200 and a.n_blocks == 5
-    assert a.product_cut == 28
+    # the pre-audit layout is kept as its own preset and still evolves T28
+    from tropoi.run.held_suarez.config import legacy_production_config
+    lg = legacy_production_config()
+    assert lg.l_max == 42 and lg.product_cut == 28
     with pytest.raises(ValueError):
         a.with_(dt=1000.0)                               # does not divide a day
     with pytest.raises(ValueError):

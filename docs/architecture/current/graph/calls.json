@@ -3891,11 +3891,6 @@
       "target": "tropoi.run.held_suarez.checkpoint.checkpoint_name"
     },
     {
-      "kind": "call",
-      "source": "tropoi.run.held_suarez.config.HeldSuarezConfig.__post_init__",
-      "target": "tropoi.spatial.truncation.product_truncation_cut"
-    },
-    {
       "kind": "instantiate",
       "source": "tropoi.run.held_suarez.config.HeldSuarezConfig.__post_init__",
       "target": "tropoi.temporal.tendencies.held_suarez.HeldSuarezParameters"
@@ -3912,7 +3907,7 @@
     },
     {
       "kind": "call",
-      "source": "tropoi.run.held_suarez.config.HeldSuarezConfig.product_cut",
+      "source": "tropoi.run.held_suarez.config.HeldSuarezConfig.retained_cut",
       "target": "tropoi.spatial.truncation.product_truncation_cut"
     },
     {
@@ -3923,6 +3918,11 @@
     {
       "kind": "instantiate",
       "source": "tropoi.run.held_suarez.config.development_config",
+      "target": "tropoi.run.held_suarez.config.HeldSuarezConfig"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.run.held_suarez.config.legacy_production_config",
       "target": "tropoi.run.held_suarez.config.HeldSuarezConfig"
     },
     {
@@ -4344,6 +4344,11 @@
       "kind": "call",
       "source": "tropoi.run.held_suarez.report.config_mismatches",
       "target": "tropoi.run.held_suarez.report._effective_truncation"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.held_suarez.report.config_mismatches",
+      "target": "tropoi.run.held_suarez.report._hyperdiffusion_degree"
     },
     {
       "kind": "call",
@@ -10255,6 +10260,13 @@
       "type": "function"
     },
     {
+      "id": "tropoi.run.held_suarez.config.HeldSuarezConfig.retained_cut",
+      "kind": "property",
+      "module": "tropoi.run.held_suarez.config",
+      "qualname": "HeldSuarezConfig.retained_cut",
+      "type": "function"
+    },
+    {
       "id": "tropoi.run.held_suarez.config.HeldSuarezConfig.sha256",
       "kind": "method",
       "module": "tropoi.run.held_suarez.config",
@@ -10294,6 +10306,13 @@
       "kind": "function",
       "module": "tropoi.run.held_suarez.config",
       "qualname": "development_config",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.held_suarez.config.legacy_production_config",
+      "kind": "function",
+      "module": "tropoi.run.held_suarez.config",
+      "qualname": "legacy_production_config",
       "type": "function"
     },
     {
@@ -10539,6 +10558,13 @@
       "kind": "function",
       "module": "tropoi.run.held_suarez.report",
       "qualname": "_gauss_weights",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.held_suarez.report._hyperdiffusion_degree",
+      "kind": "function",
+      "module": "tropoi.run.held_suarez.report",
+      "qualname": "_hyperdiffusion_degree",
       "type": "function"
     },
     {

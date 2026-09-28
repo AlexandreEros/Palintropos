@@ -180,7 +180,12 @@ class SemiImplicitOperator:
     def from_model(cls, model, t_ref: float = 300.0,
                    fast_cut: Optional[int] = None) -> "SemiImplicitOperator":
         """Build L for a :class:`PrimitiveEquationsModel` (reads ``sigma``,
-        ``l_max``, ``R`` (radius), ``r_dry``, ``cp_dry``)."""
+        ``l_max``, ``R`` (radius), ``r_dry``, ``cp_dry``). ``fast_cut``
+        defaults to the model's ``retained_truncation`` (the degree at which
+        its analyzed products are cut), so L stays the exact linearization;
+        for a model without that attribute, the 2/3 product cut."""
+        if fast_cut is None:
+            fast_cut = getattr(model, "retained_truncation", None)
         return cls(model.sigma, l_max=model.l_max, radius=model.R,
                    r_dry=model.r_dry, cp_dry=model.cp_dry, t_ref=t_ref,
                    fast_cut=fast_cut)

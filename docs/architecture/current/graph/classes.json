@@ -1588,6 +1588,10 @@
           "name": "r_dry"
         },
         {
+          "kind": "property",
+          "name": "retained_cut"
+        },
+        {
           "kind": "method",
           "name": "sha256"
         },

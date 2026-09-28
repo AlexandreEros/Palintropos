@@ -34,7 +34,8 @@ def build_model(cfg: HeldSuarezConfig):
                              product_quadrature=cfg.product_quadrature)
     return PrimitiveEquationsModel(planet, SigmaGrid.uniform(cfg.nlev),
                                    r_dry=cfg.r_dry, cp_dry=cfg.cp_dry,
-                                   batched_transforms=cfg.batched_transforms)
+                                   batched_transforms=cfg.batched_transforms,
+                                   retained_truncation=cfg.retained_truncation)
 
 
 def build_physics(cfg: HeldSuarezConfig, model) -> tuple[tuple, tuple]:

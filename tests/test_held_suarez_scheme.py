@@ -170,6 +170,11 @@ def test_raw_limits_explicit_oscillations_and_the_selected_dt_covers_the_jet():
     print(f"largest non-amplifying jet wind at 45 deg, T42 (cut 28): dt=900 s {u9:.1f} m/s, "
           f"dt=1200 s {u12:.1f} m/s (Dinosaur reference max|u| 94.5 m/s)")
     assert u9 > 100.0 > 94.5 > u12
+    # production layout (store 43, retain 42, del^8 at 42): still above the
+    # reference's peak at 900 s, below it at 1200 s
+    p9, p12 = u_safe(900.0, cut=42), u_safe(1200.0, cut=42)
+    print(f"retained T42 (cut 42): dt=900 s {p9:.1f} m/s, dt=1200 s {p12:.1f} m/s")
+    assert p9 > 100.0 > 94.5 > p12
 
 
 def test_damping_applied_to_the_new_level_is_first_order_in_time():

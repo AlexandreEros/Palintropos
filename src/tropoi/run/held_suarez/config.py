@@ -17,7 +17,8 @@ from tropoi.spatial.truncation import product_truncation_cut
 from tropoi.temporal.tendencies.held_suarez import (DAY_SECONDS,
                                                     HeldSuarezParameters)
 
-__all__ = ["HeldSuarezConfig", "production_config", "development_config",
+__all__ = ["HeldSuarezConfig", "production_config", "legacy_production_config",
+           "development_config",
            "smoke_config", "PRESETS", "CONFIG_SCHEMA"]
 
 CONFIG_SCHEMA = "palintropos.held_suarez.config/1"
@@ -59,6 +60,10 @@ class HeldSuarezConfig:
     hyperdiffusion_efold_days: float = 0.1
     hyperdiffusion_reference_degree: Optional[int] = None   # None = l_max (PROTOCOL §2)
     forcing: HeldSuarezParameters = field(default_factory=HeldSuarezParameters)
+    # evolved spectral resolution: None = the core's historical 2/3 product
+    # cut (l_max 42 evolves l <= 28); an int L <= l_max - 1 retains every
+    # degree <= L (store l_max = L + 1, retain L: DEALIASING_AUDIT.md)
+    retained_truncation: Optional[int] = None
     # numerics of the transforms
     grid: str = "latlon"
     product_quadrature: str = "fine"
@@ -86,11 +91,14 @@ class HeldSuarezConfig:
             raise ValueError(f"dt = {self.dt} s must divide one day")
         if self.spinup_days < 0:
             raise ValueError("spinup_days must be >= 0")
-        cut = product_truncation_cut(self.l_max)
+        rt = self.retained_truncation
+        if rt is not None and not (1 <= int(rt) <= self.l_max - 1):
+            raise ValueError(f"retained_truncation must be in [1, l_max - 1], got {rt}")
+        cut = self.retained_cut
         if not (1 <= self.perturbation_lmin <= self.perturbation_lmax <= cut):
             raise ValueError(
                 f"perturbation degrees [{self.perturbation_lmin}, {self.perturbation_lmax}] "
-                f"must lie in [1, product cut {cut}] (SEMI_IMPLICIT.md §2)")
+                f"must lie in [1, retained cut {cut}] (SEMI_IMPLICIT.md §2)")
         ref = self.hyperdiffusion_reference_degree
         if ref is not None and not (1 <= ref <= self.l_max):
             raise ValueError("hyperdiffusion_reference_degree must be in [1, l_max]")
@@ -113,15 +121,27 @@ class HeldSuarezConfig:
         return self.days * self.steps_per_day
 
     @property
-    def product_cut(self) -> int:
+    def retained_cut(self) -> int:
         """Highest degree the core evolves (analyzed products are truncated
         here): the effective spectral truncation of the run."""
-        return product_truncation_cut(self.l_max)
+        if self.retained_truncation is None:
+            return product_truncation_cut(self.l_max)
+        return int(self.retained_truncation)
+
+    @property
+    def product_cut(self) -> int:
+        """Alias of :attr:`retained_cut` (historical name)."""
+        return self.retained_cut
 
     @property
     def hyperdiffusion_degree(self) -> int:
-        return (self.l_max if self.hyperdiffusion_reference_degree is None
-                else int(self.hyperdiffusion_reference_degree))
+        """Degree with e-folding ``hyperdiffusion_efold_days``: explicit, else
+        the retained truncation when one is set, else l_max (historical)."""
+        if self.hyperdiffusion_reference_degree is not None:
+            return int(self.hyperdiffusion_reference_degree)
+        if self.retained_truncation is not None:
+            return int(self.retained_truncation)
+        return self.l_max
 
     @property
     def n_blocks(self) -> int:
@@ -152,27 +172,42 @@ class HeldSuarezConfig:
 
 
 def production_config(experiment_id: str = "hs-T42L20-prod-001", *,
-                      dt: float = 1200.0) -> HeldSuarezConfig:
-    """The protocol configuration (PROTOCOL.md §2): T42 L20 on 64x128, 1200 days."""
+                      dt: float = 900.0) -> HeldSuarezConfig:
+    """The protocol configuration (PROTOCOL.md §2): evolved T42 (store l_max 43,
+    retain 42 — Dinosaur's spectral layout), L20, 64x128 state grid, 1200 days,
+    dt 900 s. The fine product grid for l_max 43 is 65x130 while Dinosaur
+    samples 64x128: the match is the retained spectral resolution and the
+    checked reference parameters, not identical product sampling."""
+    return HeldSuarezConfig(experiment_id=experiment_id, l_max=43, retained_truncation=42,
+                            nlat=64, nlon=128, nlev=20, dt=dt, days=1200)
+
+
+def legacy_production_config(experiment_id: str = "hs-T42L20-legacy", *,
+                             dt: float = 900.0) -> HeldSuarezConfig:
+    """The pre-audit layout: l_max 42 with the 2/3 product cut (evolves T28)."""
     return HeldSuarezConfig(experiment_id=experiment_id, l_max=42, nlat=64, nlon=128,
                             nlev=20, dt=dt, days=1200)
 
 
 def development_config(experiment_id: str = "hs-T21L10-dev", *, days: int = 5,
-                       dt: float = 1200.0, nlev: int = 10) -> HeldSuarezConfig:
-    """Local development resolution (T21 on 32x64); statistics blocks scaled
+                       dt: float = 1200.0, nlev: int = 10,
+                       retained: bool = False) -> HeldSuarezConfig:
+    """Local development resolution on 32x64. ``retained=False`` (the S4/S4b
+    evidence): l_max 21 with the 2/3 cut (evolves T14); ``retained=True``: the
+    production layout at T21 (store 22, retain 21). Statistics blocks scaled
     to the run so the pipeline is exercised end to end."""
-    return HeldSuarezConfig(experiment_id=experiment_id, l_max=21, nlat=32, nlon=64,
+    layout = ({"l_max": 22, "retained_truncation": 21} if retained else {"l_max": 21})
+    return HeldSuarezConfig(experiment_id=experiment_id, nlat=32, nlon=64,
                             nlev=nlev, dt=dt, days=days, spinup_days=0,
                             block_days=max(1, days // 2), checkpoint_every_days=1,
-                            state_every_days=1)
+                            state_every_days=1, **layout)
 
 
 def smoke_config(experiment_id: str = "hs-T21L10-smoke") -> HeldSuarezConfig:
     """Plan tier A3: T21 L10, 2 days, SI, checkpoint every day; one 2-day
     statistics block (so the accumulators sum more than one sample)."""
-    return development_config(experiment_id, days=2).with_(block_days=2)
+    return development_config(experiment_id, days=2, retained=True).with_(block_days=2)
 
 
-PRESETS = {"production": production_config, "development": development_config,
-           "smoke": smoke_config}
+PRESETS = {"production": production_config, "legacy-production": legacy_production_config,
+           "development": development_config, "smoke": smoke_config}

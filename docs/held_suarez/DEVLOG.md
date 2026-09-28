@@ -153,3 +153,27 @@ PROTOCOL.md). One entry per decision, newest last.
   its `series_sha256` against the pinned reference hash) when Drive holds no b2.json; the notebook
   checks Python ≥ 3.12 and prints a resume instruction when a session-limit stop leaves the run
   unfinished. SOLVER_COMMIT re-pinned to the commit with the solver fix.
+- 2026-09-27 dealiasing audit → opt-in retained truncation (user decision after the audit;
+  DEALIASING_AUDIT.md). The 2/3 product cut is not needed for dealiasing on the 3/2-rule Gauss
+  grid (every quadratic term exact at every degree; cubic V·∇ln p_s terms ~1e−6 for an HS-like
+  spectrum) but guarded a representational defect: sinθ∂θ drops its degree-(l_max+1) part, so
+  content at l_max produces O(ε) spurious ζ/δ on all degrees (S3's "above-cut" anomaly). Patch:
+  `PrimitiveEquationsModel(retained_truncation=L)`, L ≤ l_max − 1 (degree l_max refused); default
+  None = the 2/3 cut, bitwise (tested), so BVE/SWE, the PE runner/CLI and published capsules are
+  untouched. `SemiImplicitOperator.from_model` defaults `fast_cut` to the model's retained cut.
+  HS: `retained_truncation` config field; production = l_max 43 / retained 42 / 64×128 / Δt 900 s
+  (config sha256 dc5901db…); ∇⁸ reference defaults to the retained cut; `legacy-production`
+  preset keeps the T28 layout; smoke (A3) uses the retained layout at T21 (store 22 / retain 21);
+  the S4/S4b development config stays on the legacy layout, so the S4b evidence is unchanged.
+  Fresh reference comparison: `config_mismatches(production, REFERENCE_CONFIG)` = []; legacy: the
+  two known truncation findings. "Matches Dinosaur T42" = the retained spectral resolution and the
+  checked parameters; the product sampling differs (65×130 vs 64×128). RAW/advection bound at the
+  retained layout: 105.3 m/s at 900 s (77.8 at 1200 s) vs the reference's 94.5 m/s peak.
+- 2026-09-27 T42 check of the production layout (store 43 / retain 42, L20, Δt 900 s, per-level
+  path — the TDR-safe equivalent of the batched path, agreement ≤ 1e−12): SI fast_cut 42;
+  ω_max Δt = 2.045 < 2√2, startup substeps 1 (L only and with the hooks); X^1 with 1/2/4 substeps
+  vs 8: n_sub = 1 within 1.0e−4 of X^1 − X^0 (q), δ ratios 15.9, 17.2 (ζ, T, q 8–9, 13), i.e. RK4
+  stable and near fourth order. One day (96 SI steps): state valid, the storage-only degree 43
+  stays exactly 0, computational-mode indicator 0.267 (startup quarter) then 0.161, 0.190, 0.190
+  (flat), max|X^n − X^{n−1}_f| in ζ 7.7e−7 → 1.0e−6 (forced spin-up; at T21 this peaked on day 2
+  and decayed). A one-day check only: long-run T42 behaviour is measured by the S8 gate and run.

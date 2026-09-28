@@ -98,7 +98,13 @@ def test_notebook_smoke_path_executes_through_the_real_entrypoint(tmp_path, monk
     rep = json.loads((ns["REPORT_DIR"] / "report.json").read_text())
     verdicts = {t["tier"]: t["verdict"] for t in rep["tiers"]}
     print("smoke report tiers:", verdicts)
-    assert verdicts["B"] == "INCOMPLETE" or verdicts["B"] == "PASS"
+    b5 = next(c for c in rep["tiers"][1]["criteria"] if c["id"] == "B5")
+    if b5["values"]["git_dirty"]:
+        # run from uncommitted src/ changes (allowed for the smoke via
+        # --allow-dirty): the report must refuse a clean-commit verdict
+        assert b5["verdict"] == "FAIL" and verdicts["B"] == "FAIL"
+    else:
+        assert verdicts["B"] == "INCOMPLETE" or verdicts["B"] == "PASS"
     assert verdicts["A"] == "INCOMPLETE"
     # Fresh-VM resume: the local run directory is gone; the restore cell must
     # bring back the newest Drive backup that verifies, skipping a corrupt one.

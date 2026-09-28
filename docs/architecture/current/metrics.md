@@ -160,9 +160,9 @@ Every module is mapped to its containing package (a package's `__init__` to the 
 
 ## Call graph
 
-* Nodes (functions, methods, classes): 1106
-* Edges by kind: `call` 712, `constructor` 38, `instantiate` 269, `override` 6, `self` 263, `super` 2
-* Call sites by resolution outcome: builtin 2029, external 1474, internal 1707, unresolved 2225
+* Nodes (functions, methods, classes): 1109
+* Edges by kind: `call` 712, `constructor` 38, `instantiate` 270, `override` 6, `self` 263, `super` 2
+* Call sites by resolution outcome: builtin 2040, external 1474, internal 1707, unresolved 2228
 
 | Scoped graph | Roots | Depth | Nodes | Edges | Truncated nodes | Reachable (unbounded) |
 |---|---|---|---|---|---|---|

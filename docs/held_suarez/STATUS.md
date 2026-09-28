@@ -78,12 +78,11 @@ per commit; `--check` passes; no import cycle changed.
 
 ## DECISION NEEDED before launch (plan §6.1, §6.3-type numerics questions)
 
-1. **Effective truncation.** The core truncates analyzed products at 2/3, so l_max = 42 evolves
-   l ≤ 28 (effective T28) while Dinosaur T42 evolves l ≤ 42. As configured, tier C is
-   INCONCLUSIVE by construction (configuration mismatch) and ∇⁸ has 2.45-day e-folding at the
-   smallest evolving wave. Options: (a) l_max = 63 (cut 42), 64×128 state grid, ∇⁸ at l = 42 —
-   matches Dinosaur (`config_mismatches` = []), ≈ 4–5× cost per step (A100 needed); (b) keep
-   l_max = 42 and accept tier C INCONCLUSIVE (or rerun Dinosaur at T28); (c) ∇⁸ reference at 28.
+1. **Effective truncation — RESOLVED by the opt-in patch (user decision 2026-09-27).** The
+   production preset now stores l_max = 43 and retains 42 (DEALIASING_AUDIT.md): evolved T42, ∇⁸ at
+   l = 42, `config_mismatches` = [] against REFERENCE_CONFIG.json; product grid 65×130 vs Dinosaur's
+   64×128 (a sampling difference, not a resolution one); +4.6 % tendency cost (per-level, MX110).
+   The legacy layout (T28) remains as preset `legacy-production` and as the core default.
 2. **First-order complete scheme.** Accept the mandated backward-Euler damping on X^{n+1} and RAW
    α = 0.53 (complete scheme first order; lag term ≈ 1–1.5 % of the 2-day ζ change at 900 s), or
    authorize a centred (Crank–Nicolson) damping inside the SI solve (changes the S3 reduced system)

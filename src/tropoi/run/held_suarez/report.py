@@ -158,7 +158,17 @@ def load_run(run_dir: pathlib.Path) -> dict:
 
 
 def _effective_truncation(cfg: dict) -> int:
-    return (2 * int(cfg["l_max"])) // 3
+    """The retained (evolved) truncation of a run configuration."""
+    rt = cfg.get("retained_truncation")
+    return (2 * int(cfg["l_max"])) // 3 if rt is None else int(rt)
+
+
+def _hyperdiffusion_degree(cfg: dict) -> int:
+    if cfg.get("hyperdiffusion_reference_degree") is not None:
+        return int(cfg["hyperdiffusion_reference_degree"])
+    if cfg.get("retained_truncation") is not None:
+        return int(cfg["retained_truncation"])
+    return int(cfg["l_max"])
 
 
 # ---------------------------------------------------------------------------
@@ -250,7 +260,7 @@ def tier_b(run: dict) -> dict:
             ok = slope < 0 and spec[L] < spec[l0]
             out.append(_crit("B4", PASS if ok else FAIL,
                              f"log-log KE slope over ({l0}, {L}] < 0 and KE({L}) < KE({l0}); "
-                             "L = effective (product-cut) truncation",
+                             "L = retained (effective) truncation",
                              L=L, l0=l0, slope=slope, ke_L=spec[L], ke_l0=spec[l0]))
     shas = {e.get("config_sha256") for e in resumes} | {run["config_sha256"]}
     commits = {e.get("git_commit") for e in resumes} | {run["code"].get("git_commit")}
@@ -396,7 +406,7 @@ def config_mismatches(cfg: dict, ref_cfg: dict) -> list[str]:
     chk("hyperdiffusion order", cfg["hyperdiffusion_order"], ref_cfg["hyperdiffusion"]["order"])
     chk("hyperdiffusion e-folding days", cfg["hyperdiffusion_efold_days"],
         ref_cfg["hyperdiffusion"]["efold_days_at_truncation"])
-    ref_deg = cfg["hyperdiffusion_reference_degree"] or cfg["l_max"]
+    ref_deg = _hyperdiffusion_degree(cfg)
     chk("hyperdiffusion reference degree = reference truncation", ref_deg, ref_cfg["truncation"])
     chk("hyperdiffusion reference degree = our effective truncation (smallest evolving wave)",
         ref_deg, _effective_truncation(cfg))
@@ -609,7 +619,7 @@ def render_markdown(rep: dict) -> str:
     lines = [f"# Held–Suarez report: {rep['experiment_id']}", "",
              f"- config_sha256: `{rep['config_sha256']}`",
              f"- git_commit: `{rep['git_commit']}`",
-             f"- effective truncation (product cut): T{rep['effective_truncation']}", ""]
+             f"- effective truncation (retained degrees): T{rep['effective_truncation']}", ""]
     if rep.get("reference_tier_b") is not None:
         rb = rep["reference_tier_b"]
         lines += [f"- reference own tier B: {rb['verdict']} (failed {rb['failed']}; {rb['notes']})", ""]

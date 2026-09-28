@@ -80,7 +80,7 @@ def main(argv=None) -> int:
     if args.cmd == "show-config":
         cfg = _config(args)
         print(json.dumps({"config": cfg.to_dict(), "config_sha256": cfg.sha256(),
-                          "total_steps": cfg.total_steps, "effective_truncation": cfg.product_cut},
+                          "total_steps": cfg.total_steps, "effective_truncation": cfg.retained_cut},
                          indent=2, sort_keys=True))
         return 0
 

@@ -489,11 +489,15 @@ def test_newtonian_hook_matches_an_independent_product_grid_calculation(hs_model
 
 
 def test_build_physics_wiring_matches_the_protocol():
-    """Default del^8: order 4, tau = 0.1 d at l = l_max; drag then del^8; the
-    hyperdiffusion reference degree is validated."""
-    from tropoi.run.held_suarez.config import development_config, production_config
+    """Default del^8: order 4, tau = 0.1 d at the retained truncation (l = 42
+    for the store-43 production layout; l = l_max for the legacy layout);
+    drag then del^8; the hyperdiffusion reference degree is validated."""
+    from tropoi.run.held_suarez.config import (development_config,
+                                               legacy_production_config, production_config)
+    assert legacy_production_config().hyperdiffusion_degree == 42 == \
+        legacy_production_config().l_max
     cfg = production_config()
-    assert cfg.hyperdiffusion_degree == cfg.l_max == 42
+    assert cfg.hyperdiffusion_degree == cfg.retained_cut == 42 and cfg.l_max == 43
     assert cfg.hyperdiffusion_order == 4 and cfg.hyperdiffusion_efold_days == 0.1
     assert cfg.r_dry == pytest.approx(286.857142857142857, rel=1e-15)
     hyper = hyperdiffusion_damping(cfg.nlev, cfg.l_max, cfg.radius, 0.1 * DAY_SECONDS,

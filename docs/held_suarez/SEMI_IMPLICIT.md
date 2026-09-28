@@ -41,7 +41,8 @@ For each (l, m):
 
 **Dealiasing mask.** The nonlinear tendency analyzes every product on the dealiasing grid and zeroes
 the result above the product cut `c = product_truncation_cut(l_max)` (2/3 rule; c = 14 at T21,
-28 at T42). Three of the four fast terms reach the tendency through that pathway — R T_ref ∇q
+28 at T42) — or above the model's opt-in `retained_truncation` (production: 42 with l_max 43;
+`SemiImplicitOperator.from_model` then uses it as `fast_cut`, DEALIASING_AUDIT.md). Three of the four fast terms reach the tendency through that pathway — R T_ref ∇q
 through the weak-form pressure-gradient analysis, κ T_ref (ω/p) and −Σ Δσ_k G_k through the
 thermodynamic and mass analyses — while −∇²(G T) is an exact diagonal spectral term. L reproduces
 this: for l > c only the −∇²(G T) coupling is kept (`mask_l = 0` multiplies τ, ν and the R T_ref q

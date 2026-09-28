@@ -283,13 +283,15 @@ def test_report_is_byte_deterministic(tmp_path):
 
 
 def test_production_configuration_against_the_real_reference_config():
-    """The frozen reference list vs the production preset: exactly the
+    """The frozen reference list vs the production preset (store 43, retain 42):
+    no mismatch. The legacy layout (l_max 42, 2/3 cut) keeps exactly the
     effective-truncation findings (DEVLOG S4), nothing else."""
-    from tropoi.run.held_suarez.config import production_config
+    from tropoi.run.held_suarez.config import legacy_production_config, production_config
     from tropoi.run.held_suarez.report import config_mismatches
     ref = json.loads((pathlib.Path(__file__).resolve().parents[1] / "docs" / "held_suarez"
                       / "REFERENCE_CONFIG.json").read_text())
-    mm = config_mismatches(production_config(dt=900.0).to_dict(), ref)
+    assert config_mismatches(production_config().to_dict(), ref) == []
+    mm = config_mismatches(legacy_production_config(dt=900.0).to_dict(), ref)
     print("\n" + "\n".join(mm))
     assert mm == ["truncation (effective, retained degrees): ours 28 vs reference 42",
                   "hyperdiffusion reference degree = our effective truncation (smallest evolving "

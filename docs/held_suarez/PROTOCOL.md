@@ -79,11 +79,11 @@ between hemispheres estimates sampling error.
 | item | value | status |
 |---|---|---|
 | dynamics | dry hydrostatic PE, σ (Lorenz, Simmons–Burridge 1981), ζ–δ–T–ln p_s | fixed by the core |
-| horizontal | T42 triangular on the 64×128 Gaussian grid (`grid=latlon`) | choice; the paper's T63 is not affordable in the window. **Open (DEVLOG S4):** the core truncates every analyzed product at the 2/3 cut, so l_max = 42 evolves only l ≤ 28 (effective T28); matching Dinosaur's retained T42 needs l_max = 63 (cut 42) — user decision before launch |
+| horizontal | evolved T42: stored l_max = 43, retained truncation 42 (`retained_truncation=42`; degree 43 is a derivative buffer, Dinosaur's spectral layout), 64×128 Gaussian state/diagnostic grid, 65×130 fine product grid (`grid=latlon`) | choice (DEALIASING_AUDIT.md, user decision 2026-09-27); the paper's T63 is not affordable in the window. The pre-audit layout (l_max 42, 2/3 cut → T28) is kept as preset `legacy-production` |
 | vertical | 20 equally spaced σ levels, top at σ = 0 | matches paper and Dinosaur |
 | constants | R = 286.857 (= 2/7 · 1004), c_p = 1004, Ω = 7.292e−5, a = 6.371e6, g = 9.8, p0 = 1e5 | paper values |
 | forcing | §1.1 exactly | fixed |
-| ∇⁸ on ζ, δ, T′ | e-folding 0.1 day at l = 42 (paper's rule applied at our truncation) | choice, frozen at launch. **Open:** with the effective truncation 28 this gives 2.45 days at the smallest evolving wave; HS94's rule would put 0.1 day at l = 28 (or keep 42 with l_max = 63) |
+| ∇⁸ on ζ, δ, T′ | e-folding 0.1 day at l = 42, the retained truncation = the smallest evolving wave (paper's rule) | choice, frozen at launch |
 | ln p_s | not diffused | matches GFDL practice |
 | time scheme | SI leapfrog (T_ref = 300 K isothermal) + RAW filter (ν = 0.1, α = 0.53) | choice, frozen at launch |
 | Δt | 900 s (S4b: RAW-filtered explicit advection bound, DEVLOG); the S8 gate projects its cost | frozen at launch |
@@ -103,6 +103,10 @@ tref=300 K, p1=5 kPa surface-pressure perturbation)`, 1200 days.
 Matched: truncation, grid, levels, constants (Dinosaur: R = c_p·κ with c_p = 1004, Ω,
 a = 6.37122e6 vs our 6.371e6 — 0.003 %, documented), forcing, ∇⁸ order and e-folding,
 length, averaging.
+What matches: the retained spectral resolution (l, m ≤ 42 evolved, one extra stored degree) and
+every field of `REFERENCE_CONFIG.json` (`config_mismatches` = [] for the production preset). Not
+identical: the product sampling (ours 65×130, Dinosaur 64×128; the 64×128 state/diagnostic grid is
+shared), hence the cubic-term aliasing it permits (~1e−6, DEALIASING_AUDIT.md).
 Unavoidable differences: integrator (IMEX RK "SIL3" vs SI leapfrog+RAW), Δt, the exact
 per-step diffusion factor (exp(−2Δt K c_l⁴) vs 1/(1+2Δt K c_l⁴)), Dinosaur diffuses ln p_s
 and the full T (we diffuse T′ only), initial perturbation (surface pressure vs vorticity),
