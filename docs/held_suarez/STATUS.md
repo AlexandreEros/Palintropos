@@ -83,10 +83,32 @@ per commit; `--check` passes; no import cycle changed.
    l = 42, `config_mismatches` = [] against REFERENCE_CONFIG.json; product grid 65×130 vs Dinosaur's
    64×128 (a sampling difference, not a resolution one); +4.6 % tendency cost (per-level, MX110).
    The legacy layout (T28) remains as preset `legacy-production` and as the core default.
-2. **First-order complete scheme.** Accept the mandated backward-Euler damping on X^{n+1} and RAW
-   α = 0.53 (complete scheme first order; lag term ≈ 1–1.5 % of the 2-day ζ change at 900 s), or
-   authorize a centred (Crank–Nicolson) damping inside the SI solve (changes the S3 reduced system)
-   and/or α = 0.5 (second order, but slightly amplifies explicit oscillations).
+2. **First-order complete scheme — evidence complete (2026-09-28), decision open.** The
+   centred (Crank–Nicolson) damping is implemented as an **opt-in** (`damping_scheme="centred"`,
+   SEMI_IMPLICIT.md §9, `tests/test_centred_damping.py`, commit 6a447d8); the default, the
+   production preset, RAW α = 0.53 and the notebook pin are unchanged. Measured (DEVLOG
+   2026-09-28): reduced solve exact to 1e−15 vs the unreduced damped system; centred + RAW off is
+   second order on T21 L10 (ratios 3.77–4.13, equal to the damper-free campaign); RAW α = 0.53
+   leaves a first-order term ¼ the size of the lag term. At **Δt = 900 s** the lag term is
+   ≈ 1.5 % of the 2-day ζ change (δ 2.3 %, T 0.07 %, q 0.45 %), the steady forced–dissipative
+   balance is exact in both placements, and the centred option **does not lower the 900 s error
+   vs RK4** (the SI/explicit transient error dominates: ζ 2.4 %, δ/q ≈ 9 %). Stability: the
+   RAW/advection non-amplification bound at the retained T42 layout is **94.9 m/s** with centred
+   damping vs **105.3 m/s** lagged (reference peak 94.5 m/s), and growth beyond it is fast
+   (gain 1.12/step at 100 m/s); the lagged factor extends the explicit leapfrog limit by
+   √(1 + 2Δt r), the centred one shortens it to √(1 − (Δt r)²). Cost identical (11.7 ms/step
+   non-tendency part at T42 L20 on the MX110, < 0.3 % of a step). Contracts touched by the
+   option: `HeldSuarezConfig.damping_scheme` (production `config_sha256` dc5901db… →
+   4cd2eeae… with the default; 692fadd1… centred), stepper `state_dict["damping_scheme"]`
+   (checkpoints without the key load as lagged; mismatch refuses), notebook pin unchanged
+   (21203ff does not contain the option; a centred production run would need a re-pin).
+   **Recommendation:** keep the lagged scheme with RAW(0.1, 0.53) at Δt = 900 s for the
+   production run, accepting the documented first-order term (≈ 1 % transient-response bias of
+   the damped fields, exact steady balance, climate impact unmeasured), because the centred
+   option buys no accuracy at 900 s and removes the 10 % advective stability margin over the
+   reference's peak winds; keep the centred option as a verified sensitivity switch (it is
+   safe at Δt ≤ 600 s, where its bound scales to ≈ 140 m/s). Not recommended: α = 0.5 (0.4 %
+   effect, slightly less damping of explicit oscillations). Short-run numerical evidence only.
 3. **Δt = 900 s** (proposed from S4b); 1200 s is below the reference's typical peak jet speeds by
    the RAW/advection bound.
 4. Push `feat/semi-implicit-integration` so SOLVER_COMMIT is fetchable by Colab (A4).

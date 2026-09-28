@@ -177,3 +177,64 @@ PROTOCOL.md). One entry per decision, newest last.
   stays exactly 0, computational-mode indicator 0.267 (startup quarter) then 0.161, 0.190, 0.190
   (flat), max|X^n − X^{n−1}_f| in ζ 7.7e−7 → 1.0e−6 (forced spin-up; at T21 this peaked on day 2
   and decayed). A one-day check only: long-run T42 behaviour is measured by the S8 gate and run.
+- 2026-09-28 centred damping option (opt-in; user authorized implementing and testing it, not
+  adopting it). `SemiImplicitLeapfrogStepper(damping_scheme="centred")` /
+  `HeldSuarezConfig.damping_scheme` take −R X trapezoidally inside the SI solve (L → L − R;
+  SEMI_IMPLICIT.md §9); the default `"lagged"` is the S4 placement, unchanged bit for bit
+  (tested against the sequential-factor path). `tests/test_centred_damping.py` (14 tests).
+  CPU evidence: reduced solve vs the unreduced damped (2K+1)² system — residual 1.04e−15 /
+  1.24e−15 / 1.60e−15 at 300 / 1200 / 3600 s, dense-solve agreement ≤ 1e−12 per block; the ζ
+  row follows the centred 2×2 map to 1e−13; x′ = −k_f x + sin(Wt) ratios 4.0017, 4.0004, 4.0001
+  (lagged 1.875, 1.939, 1.970; 1200 s error 9.3e−4 vs 7.5e−3); scalar recurrence max |λ| over
+  (k ≤ k_s, r ∈ {0, k_f, ∇⁸ at l = 1, 14, 28, 42, k_f + ∇⁸₄₂}, ω_SI) = 1.000000000000 at 900 and
+  1200 s, pure damping |λ| = √((1 − Δt r)/(1 + Δt r)) (0.9007 at l = 42, 900 s); startup substep
+  count identical (the rule reads the rates, not the placement); rest bitwise (T21 L10, 6 steps,
+  drag + ∇⁸ + centred SI + RAW). **Stability finding:** the RAW-filtered explicit-oscillation
+  bound (largest non-amplifying 45° jet wind, every degree ≤ 42, ∇⁸ at 42, k = k_s) is
+  **lower** with centred damping: 94.9 m/s at 900 s (lagged 105.3) and 68.1 m/s at 1200 s
+  (lagged 77.8), against the reference's 94.5 m/s peak — the lagged factor damps the
+  computational/explicit-growth mode of the whole X^{n+1} by 1/(1 + 2Δt r) per step, the
+  centred form only through (1 − Δt r)/(1 + Δt r) on X^{n−1}: for an explicit oscillation ωΔt
+  the lagged recurrence λ²(1 + 2a) − 2iωΔt λ − 1 = 0 (a = Δt r) turns unstable only above
+  ωΔt = √(1 + 2a), the centred (1 + a)λ² − 2iωΔt λ − (1 − a) = 0 already above √(1 − a²), so the
+  strong ∇⁸ at l = 42 (a = 0.104) *extends* the leapfrog limit by 10 % in the lagged scheme and
+  *shortens* it by 0.5 % in the centred one. Beyond the bound growth is fast for both: worst
+  per-step gain over l ≤ 42 at 900 s — lagged 0.9973 (94.5 m/s), 0.9982 (105), 1.078 (110,
+  e-folding 0.1 d); centred 0.9973 (94.5), 1.116 (100 m/s, e-folding 0.1 d), 1.238 (105).
+  RAW α = 0.5 instead of 0.53 (centred, 94.5 m/s): gain 0.99826 vs 0.99730, still < 1.
+  Config hash: adding the field changes the production
+  `config_sha256` from dc5901db… to 4cd2eeae9b89ba095609f2675f1951a0e33f1025ee9e67e0b52bc1546e155802
+  (lagged) / 692fadd1e78ba945eb8468c501d82c869e241bbf16355bbb882d08eaf89ba2ad (centred); no
+  checkpoint or published run carries the old hash (production not launched).
+- 2026-09-28 sizing at the production Δt (T21 L10, HS initial state, 2 days, RK4 150 s
+  reference of the complete right-hand side, relative 2-norm error per block of the 2-day
+  change; scratch script, numbers reproduced by hand in `tests/test_centred_damping.py`'s
+  harness where marked). Complete scheme at **900 s** vs RK4: lagged RAW(0.1, 0.53)
+  [production] ζ 2.44e−2, δ 8.76e−2, T 4.03e−3, q 9.04e−2; centred RAW(0.1, 0.53) ζ 2.65e−2,
+  δ 8.81e−2, T 3.92e−3, q 9.00e−2; centred α = 0.5: ζ 2.62e−2; centred RAW off ζ 2.32e−2; lagged
+  RAW off ζ 2.20e−2. Pairwise (the size of each first-order term at 900 s): **damping lag**
+  (lagged − centred, same RAW) ζ 1.48e−2, δ 2.27e−2, T 7.4e−4, q 4.5e−3 — i.e. ≈ 1.5 % of the
+  2-day ζ change, 60 % of the ζ error vs RK4 but 25 % of δ's, 18 % of T's, 5 % of q's; **RAW
+  α = 0.53 vs 0.5** ζ 3.8e−3, δ 7.0e−3, T 3.5e−4, q 5.1e−3 (¼ of the lag term); RAW(0.1, 0.5)
+  vs off ζ 3.7e−3, q 1.3e−2. Reading: at 900 s the time-discretisation error is dominated by
+  the second-order SI/explicit dynamics of the switch-on transient (δ, q ≈ 9 %, ζ ≈ 2.4 %),
+  and **the centred option does not reduce the 900 s error against RK4** (ζ even 8 % larger:
+  the lag term partly cancels the SI phase error in this transient); its benefit is the
+  asymptotic order, visible below ≈ 300 s (T21 L10 campaign, RAW off: ζ 3.45e−3 / 9.15e−4 /
+  2.32e−4 at 300/150/75 s, ratios 3.766, 3.940; δ 4.131, 4.062; T 3.792, 3.944; q 3.756, 3.934
+  — identical to 3 digits to the damper-free forcing + SI campaign of S4b; with RAW(0.1, 0.53)
+  ζ 3.368, 2.915, δ 3.863, 3.517, T 3.719, 3.687, q 3.773, 3.920: RAW's first-order term is
+  what remains). Both placements have the **exact steady balance** x = N/r for constant
+  forcing (fixed point of either recurrence), so the lag term is a bias in the response to
+  time-varying forcing of the damped fields (≈ rΔt ≈ 1 % for k_f, ≈ 10 % of the ∇⁸ response
+  at l = 42 where it is 0.1 d), not a bias of the forced–dissipative balance. Against tier C
+  (C1 RMSE 2 m/s ≈ 7 % of the jet, C2 ±10 %, C3 1.5 K): a 1–1.5 % transient-response
+  discrepancy is well inside, but tier C measures 1000-day climate means, and the climate
+  impact of the placement is **unmeasured** (short-run numerical evidence only; the S4b
+  5-day runs and this 2-day campaign are not climate). 5-day centred stability at 900 /
+  1200 s (S4b (c) monitor): valid states, max|X^n − X^{n−1}_f| peaks on day 2 and decays
+  (ζ 7.07e−7 → 4.67e−7 at 900 s), indicator 0.171 → 0.058–0.065 (900 s), same as lagged.
+  **Cost:** the non-tendency part of a step at the production stack shape (61, 44, 44) on the
+  MX110 is 11.68 ms (lagged) vs 11.73 ms (centred), i.e. identical and < 0.3 % of the 4.55 s
+  T42 L20 tendency; T21 L10 full steps 135.4–135.8 ms for every variant (Colab numbers remain
+  estimates). Recommendation recorded in STATUS.md.
