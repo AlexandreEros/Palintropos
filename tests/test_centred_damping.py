@@ -20,6 +20,7 @@ convergence (second order with RAW off; RAW alpha = 0.53 quantified).
 """
 from __future__ import annotations
 
+import functools
 import math
 
 import numpy as np
@@ -34,7 +35,8 @@ from tropoi.temporal.tendencies.held_suarez import (DAY_SECONDS, HeldSuarezParam
                                                     hyperdiffusion_damping,
                                                     rayleigh_drag_damping)
 
-from test_held_suarez_scheme import BLOCKS, CONV_DTS, CONV_REF_DT, NU, ALPHA, _blocks, hs  # noqa: F401
+from test_held_suarez_scheme import (BLOCKS, CONV_DTS, CONV_REF_DT, NU, ALPHA, _blocks,  # noqa: F401
+                                     hs, jet_wind_bound)  # noqa: F401
 
 HS = HeldSuarezParameters()
 RADIUS, R_DRY, CP_DRY, T_REF = 6.371e6, 287.0, 1004.0, 300.0
@@ -319,30 +321,41 @@ def test_centred_recurrence_is_stable_at_the_production_dt():
         assert dt * max(rs) < 1.0                                  # no sign alternation
 
 
-def test_centred_raw_explicit_oscillation_bound_at_45deg():
-    """The largest non-amplifying 45-deg jet wind (test_held_suarez_scheme)
-    recomputed with centred damping; printed for the DEVLOG, must stay
-    above the reference's 94.5 m/s at 900 s."""
-    a = RADIUS
-    k8 = hyperdiffusion_coefficient(a, 0.1 * DAY_SECONDS, 42)
-    f0 = 2 * 7.292e-5
+def test_centred_raw_explicit_oscillation_bound():
+    """The jet bound of test_held_suarez_scheme (jet_wind_bound) with centred
+    damping, retained T42: equal to the lagged bound within 0.1 % at 600-1200
+    s (125.0 vs 125.1 m/s at 900 s), because the first degree to amplify
+    (19-23) has dt r(del^8) < 1e-3, where the placement does not matter.
+    Growth stays slow (RAW-limited) until the leapfrog limit at l ~ 42; the
+    wind at which it becomes fast (gain > 1.01 per step, e-folding < 1 d)
+    is where the placement matters: lagged 147.5 vs centred 132.8 m/s at
+    900 s, 108.6 vs 95.4 m/s at 1200 s. Printed for the DEVLOG and STATUS.
 
-    def u_safe(dt, centred, cut=42, coslat=math.cos(math.radians(45.0))):
-        def ok(U):
-            return all(max_gain(dt, k=HS.k_s, w_explicit=U * l / (a * coslat) + f0,
-                                r=k8 * (l * (l + 1) / a ** 2) ** 4, centred=centred) <= 1 + 1e-13
-                       for l in range(1, cut + 1))
-        lo, hi = 1.0, 400.0
-        for _ in range(40):
-            mid = 0.5 * (lo + hi)
-            lo, hi = (mid, hi) if ok(mid) else (lo, mid)
-        return lo
-
-    res = {(dt, c): u_safe(dt, c) for dt in (DT_PROD, 1200.0) for c in (False, True)}
-    print("\nretained T42 (cut 42) non-amplifying 45-deg jet wind: "
+    Corrected 2026-09-28: with the former frequency U l/(a cos 45 deg) and
+    k = k_s the binding modes sat at l ~ 40-42 and w dt ~ 1, where the lagged
+    factor extends the leapfrog limit to sqrt(1 + 2 dt r) and the centred one
+    shortens it to sqrt(1 - (dt r)^2); that gave centred 94.9 vs lagged
+    105.3 m/s at 900 s, an artefact of the overstated frequency."""
+    k8 = hyperdiffusion_coefficient(RADIUS, 0.1 * DAY_SECONDS, 42)
+    res = {(dt, c): jet_wind_bound(dt, cut=42, gain=functools.partial(max_gain, centred=c),
+                                   a=RADIUS)
+           for dt in (600.0, 720.0, DT_PROD, 1200.0) for c in (False, True)}
+    print("\nretained T42 (cut 42) non-amplifying peak wind: "
+          + ", ".join(f"dt={dt:.0f} {'centred' if c else 'lagged'} {u:.1f} m/s (l = {l})"
+                      for (dt, c), (u, l) in res.items()))
+    for dt in (600.0, 720.0, DT_PROD, 1200.0):
+        (lag, _), (cen, l) = res[(dt, False)], res[(dt, True)]
+        assert abs(cen - lag) <= 1e-3 * lag
+        assert dt * k8 * (l * (l + 1) / RADIUS ** 2) ** 4 < 1e-3
+    assert res[(DT_PROD, True)][0] > 120.0 > 94.5
+    fast = {(dt, c): jet_wind_bound(dt, cut=42, gain=functools.partial(max_gain, centred=c),
+                                    a=RADIUS, gain_limit=1.01)[0]
+            for dt in (DT_PROD, 1200.0) for c in (False, True)}
+    print("fast growth (gain > 1.01/step) above: "
           + ", ".join(f"dt={dt:.0f} {'centred' if c else 'lagged'} {u:.1f} m/s"
-                      for (dt, c), u in res.items()))
-    assert res[(DT_PROD, True)] > 94.5
+                      for (dt, c), u in fast.items()))
+    assert fast[(DT_PROD, False)] > fast[(DT_PROD, True)] > 1.3 * 94.5
+    assert fast[(1200.0, False)] > 1.1 * 94.5 > fast[(1200.0, True)]
 
 
 def test_damping_scheme_enters_the_state_dict_and_default_is_lagged():
