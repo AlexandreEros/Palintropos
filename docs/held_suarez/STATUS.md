@@ -107,7 +107,7 @@ per commit; `--check` passes; no import cycle changed.
    the damped fields, exact steady balance, climate impact unmeasured), because the centred
    option buys no accuracy at 900 s and removes the 10 % advective stability margin over the
    reference's peak winds; keep the centred option as a verified sensitivity switch (it is
-   safe at Δt ≤ 600 s, where its bound scales to ≈ 140 m/s). Not recommended: α = 0.5 (0.4 %
+   bound 146.9 m/s at 600 s and 121.1 m/s at 720 s, vs lagged 157.5 / 131.8). Not recommended: α = 0.5 (0.4 %
    effect, slightly less damping of explicit oscillations). Short-run numerical evidence only.
 3. **Δt = 900 s** (proposed from S4b); 1200 s is below the reference's typical peak jet speeds by
    the RAW/advection bound.
