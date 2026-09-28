@@ -5932,6 +5932,16 @@
     },
     {
       "kind": "self",
+      "source": "tropoi.temporal.semi_implicit.SemiImplicitSolver._advance_centred",
+      "target": "tropoi.temporal.semi_implicit.SemiImplicitSolver._centred_tables"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.temporal.semi_implicit.SemiImplicitSolver.advance",
+      "target": "tropoi.temporal.semi_implicit.SemiImplicitSolver._advance_centred"
+    },
+    {
+      "kind": "self",
       "source": "tropoi.temporal.semi_implicit.SemiImplicitSolver.advance",
       "target": "tropoi.temporal.semi_implicit.SemiImplicitSolver._minv"
     },
@@ -5939,6 +5949,11 @@
       "kind": "call",
       "source": "tropoi.temporal.semi_implicit.SemiImplicitSolver.advance",
       "target": "tropoi.temporal.semi_implicit._array_module"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.temporal.semi_implicit.SemiImplicitSolver.cayley_matrix",
+      "target": "tropoi.temporal.semi_implicit.SemiImplicitSolver.implicit_matrix"
     },
     {
       "kind": "constructor",
@@ -13368,6 +13383,20 @@
       "type": "function"
     },
     {
+      "id": "tropoi.temporal.semi_implicit.SemiImplicitSolver._advance_centred",
+      "kind": "method",
+      "module": "tropoi.temporal.semi_implicit",
+      "qualname": "SemiImplicitSolver._advance_centred",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.temporal.semi_implicit.SemiImplicitSolver._centred_tables",
+      "kind": "method",
+      "module": "tropoi.temporal.semi_implicit",
+      "qualname": "SemiImplicitSolver._centred_tables",
+      "type": "function"
+    },
+    {
       "id": "tropoi.temporal.semi_implicit.SemiImplicitSolver._minv",
       "kind": "method",
       "module": "tropoi.temporal.semi_implicit",
@@ -13386,6 +13415,13 @@
       "kind": "method",
       "module": "tropoi.temporal.semi_implicit",
       "qualname": "SemiImplicitSolver.cayley_matrix",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.temporal.semi_implicit.SemiImplicitSolver.implicit_matrix",
+      "kind": "method",
+      "module": "tropoi.temporal.semi_implicit",
+      "qualname": "SemiImplicitSolver.implicit_matrix",
       "type": "function"
     },
     {

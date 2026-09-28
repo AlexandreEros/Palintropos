@@ -60,7 +60,7 @@ def build_stepper(cfg: HeldSuarezConfig, model, *,
     return SemiImplicitLeapfrogStepper(
         model.tendency, op, cfg.dt, raw_nu=cfg.raw_nu, raw_alpha=cfg.raw_alpha,
         startup_substeps=cfg.startup_substeps, stage_validator=stage_validator,
-        explicit_terms=terms, dampers=dampers)
+        explicit_terms=terms, dampers=dampers, damping_scheme=cfg.damping_scheme)
 
 
 def perturbation_coefficients(cfg: HeldSuarezConfig) -> tuple[np.ndarray, dict[str, Any]]:

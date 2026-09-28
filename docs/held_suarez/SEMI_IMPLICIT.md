@@ -227,3 +227,49 @@ is uniform (4e−15) and matches an independent product-grid evaluation with non
 (1.5e−15); drag and ∇⁸ factors equal 1/(1 + 2Δt k) degree by degree (0 ulp for ∇⁸); isothermal rest
 is preserved bitwise through startup + SI + drag + ∇⁸ + RAW; a resting, horizontally uniform T_eq
 profile stays at rest under the full forcing (|ζ, δ| ≤ 2.6e−21 s⁻¹, |ΔT| ≤ 1.1e−14 K after 1 day).
+
+## 9. Centred damping (opt-in, `damping_scheme="centred"`; 2026-09-28)
+
+Motivation: §8's placement (factor on X^{n+1}) evaluates the damping at n+1, local error −rΔt Ẋ,
+and the complete scheme converges at first order (S4b). The option keeps every S3/S4 operation
+when off (the default `"lagged"` is untouched, tested bitwise against the sequential-factor path)
+and, when on, takes −R X trapezoidally over n−1, n+1, i.e. the implicit operator is L − R with
+R = Σ dampers' rates (diagonal per row and degree; the dampers' `apply_implicit` is not called).
+
+**Reduced solve.** With D_T = (I + Δt R_T)⁻¹ (per degree; ∇⁸ rates vary with l) and
+d_q = 1/(1 + Δt r_q) (0 for HS: ln p_s is not diffused), T̄ = D_T (T* − Δt m τ δ̄),
+q̄ = d_q (q* − Δt m νᵀ δ̄) with T* = T^{n−1} + Δt N_T, q* = q^{n−1} + Δt N_q, and
+
+    M_l δ̄ = δ^{n−1} + Δt [ N_δ + c_l G D_T T* + c_l R T_ref m d_q 1 q* ]
+    M_l = I + Δt R_δ + Δt² c_l m_l ( G D_T τ + R T_ref d_q 1 νᵀ )
+
+then δ^{n+1} = 2δ̄ − δ^{n−1} and, for the rows outside the δ block,
+
+    X^{n+1} = X^{n−1} + 2Δt (N_X − [L-coupling] − r X^{n−1}) / (1 + Δt r)
+
+(ζ: N_ζ only; T: −m τ δ̄; q: −m νᵀ δ̄). With R = 0 this is §3 exactly. Nothing is hand-derived:
+M_l is `I + Δt diag(r_δ) + Δt² c_l m_l (G @ D_T @ τ + R T_ref d_q 1 νᵀ)` from the same G, τ, ν.
+Verified (`tests/test_centred_damping.py`): the reduced solution inserted into the unreduced
+(2K+1)×(2K+1) system (I − Δt(L_l − R_l)) X^{n+1} = (I + Δt(L_l − R_l)) X^{n−1} + 2Δt N has residual
+1.04e−15 / 1.24e−15 / 1.60e−15 of the row scale at Δt = 300 / 1200 / 3600 s (criterion 1e−12) and
+agrees with a diagonally balanced dense solve to ≤ 1e−12 in every block; M_l equals the formula
+assembled from the operators and the rate tables; the Cayley matrix (I − Δt A)⁻¹(I + Δt A),
+A = L − R, has all moduli ≤ 1 (strictly < 1 for every coupled mode inside the cut; above the cut
+the frozen, undiffused ln p_s keeps exactly one eigenvalue 1).
+
+**Scalar recurrence.** For a ζ row the option is exactly the 2×2 map with the damping in the
+trapezoidal coefficient: (1 + Δt r) x^{n+1} = (1 − Δt r) x^{n−1} + 2Δt(−k + iω) x^n, then RAW
+(tied to the stepper to 1e−13). Pure damping: λ² = (1 − Δt r)/(1 + Δt r), both leapfrog modes
+damped, no sign alternation while Δt r < 1 (∇⁸ at l = 42: Δt r = 0.104 at 900 s; k_f: 0.0104).
+On x′ = −k_f x + sin(Wt) (2 days, RAW off) the error ratios are 4.0017, 4.0004, 4.0001 (lagged:
+1.875, 1.939, 1.970); the 1200 s error is 8× smaller than lagged.
+
+**Unchanged.** RK4 startup (the complete right-hand side and the substep rule read the rates, not
+the placement — identical counts), the RAW recurrence, the spectral mask, the two-level restart
+state, the operator/hook signature validation. `state_dict()` gains `damping_scheme`; a dict
+without the key (written before the option existed) loads as `"lagged"`; a mismatch refuses.
+Isothermal rest is preserved bitwise (every factor is exactly 1.0 and every subtracted term
+exactly 0.0 on the rest rows). Config: `HeldSuarezConfig.damping_scheme` (default `"lagged"`; the
+canonical JSON, hence `config_sha256`, changes for every preset by the added field).
+
+The measured stability bound and the T21 L10 convergence of the option are in DEVLOG (2026-09-28).

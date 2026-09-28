@@ -54,6 +54,9 @@ class HeldSuarezConfig:
     t_ref: float = 300.0
     raw_nu: float = 0.1
     raw_alpha: float = 0.53
+    # "lagged" (default, S4: 1/(1 + 2 dt r) on X^{n+1} after the SI solve) or
+    # "centred" (opt-in: Crank–Nicolson damping inside the solve, DEVLOG 2026-09-28)
+    damping_scheme: str = "lagged"
     startup_substeps: Optional[int] = None     # None = the stepper's rule
     # dissipation (frozen at launch)
     hyperdiffusion_order: int = 4
@@ -102,6 +105,8 @@ class HeldSuarezConfig:
         ref = self.hyperdiffusion_reference_degree
         if ref is not None and not (1 <= ref <= self.l_max):
             raise ValueError("hyperdiffusion_reference_degree must be in [1, l_max]")
+        if self.damping_scheme not in ("lagged", "centred"):
+            raise ValueError(f"damping_scheme must be 'lagged' or 'centred', got {self.damping_scheme!r}")
         if self.startup_substeps is not None and int(self.startup_substeps) < 1:
             raise ValueError("startup_substeps must be >= 1")
         if isinstance(self.forcing, dict):

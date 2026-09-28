@@ -51,6 +51,22 @@ added to ``N(X^n)`` (e.g. Newtonian relaxation); ``dampers`` are
 SI solve and before the RAW filter (e.g. Rayleigh drag, del^8
 hyperdiffusion). With no hooks every operation is the S3 one, bit for bit.
 
+Damping placement (``damping_scheme``, SEMI_IMPLICIT.md §9): the default
+``"lagged"`` is the S4 placement above, which evaluates the damping at
+n+1 and makes the damped part of the scheme first order in time. The
+opt-in ``"centred"`` scheme takes ``-R X`` (R = the summed damper rates,
+diagonal per row and degree) trapezoidally over n-1, n+1 inside the
+solve, i.e. L is replaced by L - R: for rows outside L (zeta) that is the
+per-row factor ``X^{n+1} = X^{n-1} + 2 dt (N - r X^{n-1}) / (1 + dt r)``;
+for (delta, T, q) the rates enter the per-degree K×K system,
+
+    [ I + dt R_delta + dt^2 c_l m_l ( G D_T tau + R T_ref d_q 1 nu^T ) ] delta_bar = rhs_l,
+    D_T = (I + dt R_T)^{-1},  d_q = 1 / (1 + dt r_q),
+
+assembled from the same column operators and verified against a direct
+dense solve of the unreduced damped system (tested, 1e-12). The option
+is part of ``state_dict()`` and a mismatch refuses to resume.
+
 Startup: X^1 is produced by RK4 over one interval dt in ``n_sub``
 substeps of the COMPLETE right-hand side (tendency + explicit terms +
 the dampers' explicit form ``-r X``), where ``n_sub`` is the smallest count
@@ -265,7 +281,8 @@ class SemiImplicitSolver:
     ``(I - dt L_l)^{-1} (I + dt L_l)`` of the pure linear scheme (tests).
     """
 
-    def __init__(self, operator: SemiImplicitOperator, dt: float):
+    def __init__(self, operator: SemiImplicitOperator, dt: float,
+                 dampers: Sequence[Any] = ()):
         if not (math.isfinite(dt) and dt > 0):
             raise ValueError(f"dt must be finite and > 0, got {dt}")
         self.operator = operator
@@ -273,7 +290,32 @@ class SemiImplicitSolver:
         op = operator
         K = op.K
         scale = (self.dt * self.dt) * (op.c_l * op.mask)             # (n,)
-        self._M = np.eye(K)[None, :, :] + scale[:, None, None] * op.B[None, :, :]
+        self.rates: Optional[np.ndarray] = None
+        if dampers:
+            # Centred damping (DEVLOG 2026-09-28): the summed rates R enter
+            # the implicit operator as L - R. Assembled from the same column
+            # operators as B, with the T and q rows' Crank–Nicolson factors
+            # folded in: B_l = G D_T,l tau + R T_ref d_q,l 1 nu^T.
+            rates = np.zeros((3 * K + 1, op.n))
+            for d in dampers:
+                if d.rates.shape != rates.shape:
+                    raise ValueError(
+                        f"damping {d.name!r} rates {d.rates.shape} do not match the "
+                        f"stack {rates.shape}")
+                rates = rates + d.rates
+            self.rates = rates
+            f_t = 1.0 / (1.0 + self.dt * rates[2 * K:3 * K])         # (K, n)
+            f_q = 1.0 / (1.0 + self.dt * rates[3 * K])                # (n,)
+            ones = np.ones((K, 1))
+            B_l = (np.einsum("ij,jl,jk->lik", op.G, f_t, op.tau)
+                   + (op.r_dry * op.t_ref) * f_q[:, None, None] * (ones @ op.nu[None, :])[None])
+            self._M = (np.eye(K)[None, :, :]
+                       + self.dt * np.einsum("kl,kj->lkj", rates[K:2 * K], np.eye(K))
+                       + scale[:, None, None] * B_l)
+            self._f_zeta = 1.0 / (1.0 + self.dt * rates[0:K])
+            self._f_t, self._f_q = f_t, f_q
+        else:
+            self._M = np.eye(K)[None, :, :] + scale[:, None, None] * op.B[None, :, :]
         # LU-based inverse per degree (np.linalg.inv factorizes with LAPACK
         # getrf/getri); applied as one batched product over (l, m).
         self._Minv = np.linalg.inv(self._M)
@@ -285,8 +327,16 @@ class SemiImplicitSolver:
     def inverse(self, l: int) -> np.ndarray:
         return self._Minv[l]
 
-    def cayley_matrix(self, l: int) -> np.ndarray:
+    def implicit_matrix(self, l: int) -> np.ndarray:
+        """The operator treated implicitly at degree l on (delta, T, q):
+        L_l, or L_l - R_l with centred damping."""
         A = self.operator.dense_matrix(l)
+        if self.rates is not None:
+            A = A - np.diag(self.rates[self.operator.K:, l])
+        return A
+
+    def cayley_matrix(self, l: int) -> np.ndarray:
+        A = self.implicit_matrix(l)
         I = np.eye(A.shape[0])
         return np.linalg.solve(I - self.dt * A, I + self.dt * A)
 
@@ -298,8 +348,23 @@ class SemiImplicitSolver:
             self._device[key] = m
         return m
 
+    def _centred_tables(self, xp):
+        key = (xp.__name__, "centred")
+        t = self._device.get(key)
+        if t is None:
+            K = self.operator.K
+            t = {"fz": xp.asarray(self._f_zeta)[:, :, None],
+                 "rz": xp.asarray(self.rates[0:K])[:, :, None],
+                 "ft": xp.asarray(self._f_t)[:, :, None],
+                 "rt": xp.asarray(self.rates[2 * K:3 * K])[:, :, None],
+                 "fq": xp.asarray(self._f_q)[:, None],
+                 "rq": xp.asarray(self.rates[3 * K])[:, None]}
+            self._device[key] = t
+        return t
+
     def advance(self, x_prev, explicit):
-        """X^{n+1} = X^{n-1} + 2 dt [ N + L (X^{n+1} + X^{n-1}) / 2 ]."""
+        """X^{n+1} = X^{n-1} + 2 dt [ N + L (X^{n+1} + X^{n-1}) / 2 ]
+        (with centred damping: L - R in place of L)."""
         op = self.operator
         xp = _array_module(x_prev)
         K = op.K
@@ -310,6 +375,8 @@ class SemiImplicitSolver:
                 f"have shape {(3 * K + 1, op.n, op.n)}")
         d = op._dev(xp)
         minv = self._minv(xp)
+        if self.rates is not None:
+            return self._advance_centred(x_prev, explicit, d, minv, xp)
 
         d_prev = x_prev[K:2 * K]
         t_prev = x_prev[2 * K:3 * K]
@@ -335,6 +402,42 @@ class SemiImplicitSolver:
             n_q - d["mask2"] * xp.einsum("j,jlm->lm", d["nu"], d_bar))
         return out
 
+    def _advance_centred(self, x_prev, explicit, d, minv, xp):
+        """The step with the damping -R X trapezoidal over n-1, n+1:
+
+            T_bar = D_T (T* - dt m tau delta_bar),  q_bar = d_q (q* - dt m nu.delta_bar),
+            M_l delta_bar = delta* + dt c_l (G D_T T* + R T_ref m d_q 1 q*),
+            X^{n+1} = X^{n-1} + 2 dt (N - m L-coupling - R X^{n-1}) / (1 + dt R)
+
+        for the T, q and zeta rows (with zero rates every factor is exactly
+        1.0 and every subtracted term exactly 0.0)."""
+        op = self.operator
+        K = op.K
+        dt = self.dt
+        c = self._centred_tables(xp)
+        d_prev = x_prev[K:2 * K]
+        t_prev = x_prev[2 * K:3 * K]
+        q_prev = x_prev[3 * K]
+        n_d = explicit[K:2 * K]
+        n_t = explicit[2 * K:3 * K]
+        n_q = explicit[3 * K]
+
+        t_star = c["ft"] * (t_prev + dt * n_t)
+        q_star = c["fq"] * (q_prev + dt * n_q)
+        rhs = d_prev + dt * (n_d
+                             + d["cl"] * xp.einsum("ij,jlm->ilm", d["G"], t_star)
+                             + (op.r_dry * op.t_ref) * (d["clq"] * q_star[None]))
+        d_bar = xp.einsum("lij,jlm->ilm", minv, rhs)
+
+        out = xp.empty_like(x_prev)
+        out[0:K] = x_prev[0:K] + (2.0 * dt) * c["fz"] * (explicit[0:K] - c["rz"] * x_prev[0:K])
+        out[K:2 * K] = 2.0 * d_bar - d_prev
+        out[2 * K:3 * K] = t_prev + (2.0 * dt) * c["ft"] * (
+            n_t - d["mask3"] * xp.einsum("ij,jlm->ilm", d["tau"], d_bar) - c["rt"] * t_prev)
+        out[3 * K] = q_prev + (2.0 * dt) * c["fq"] * (
+            n_q - d["mask2"] * xp.einsum("j,jlm->lm", d["nu"], d_bar) - c["rq"] * q_prev)
+        return out
+
 
 class SemiImplicitLeapfrogStepper:
     """Semi-implicit leapfrog + RAW filter behind the ``TimeStepper`` protocol.
@@ -355,30 +458,41 @@ class SemiImplicitLeapfrogStepper:
     """
 
     scheme = "si_leapfrog"
+    # "lagged": each damper's 1/(1 + 2 dt r) on X^{n+1} after the SI solve
+    # (S4, the default); "centred": -R X trapezoidal inside the solve
+    # (Crank–Nicolson; second order; DEVLOG 2026-09-28), opt-in.
+    DAMPING_SCHEMES = ("lagged", "centred")
 
     def __init__(self, tendency: Callable, operator: SemiImplicitOperator,
                  dt: float, *, raw_nu: float = 0.1, raw_alpha: float = 0.53,
                  startup_substeps: Optional[int] = None,
                  stage_validator: Optional[Callable] = None,
                  explicit_terms: Sequence[Callable] = (),
-                 dampers: Sequence[Any] = ()):
+                 dampers: Sequence[Any] = (),
+                 damping_scheme: str = "lagged"):
         if not (math.isfinite(dt) and dt > 0):
             raise ValueError(f"dt must be finite and > 0, got {dt}")
         if not (0.0 <= raw_nu < 1.0):
             raise ValueError(f"raw_nu must be in [0, 1), got {raw_nu}")
         if not (0.0 <= raw_alpha <= 1.0):
             raise ValueError(f"raw_alpha must be in [0, 1], got {raw_alpha}")
+        if damping_scheme not in self.DAMPING_SCHEMES:
+            raise ValueError(
+                f"damping_scheme must be one of {self.DAMPING_SCHEMES}, got {damping_scheme!r}")
         self.tendency = tendency
         self.operator = operator
         self.dt = float(dt)
         self.raw_nu = float(raw_nu)
         self.raw_alpha = float(raw_alpha)
+        self.damping_scheme = str(damping_scheme)
         self.stage_validator = stage_validator
         self.explicit_terms = tuple(explicit_terms)
         self.dampers = tuple(dampers)
         self._startup_tendency = complete_tendency(
             tendency, self.explicit_terms, self.dampers)
-        self.solver = SemiImplicitSolver(operator, self.dt)
+        self.solver = SemiImplicitSolver(
+            operator, self.dt,
+            dampers=self.dampers if self.damping_scheme == "centred" else ())
         if startup_substeps is None:
             startup_substeps = self._stable_startup_substeps()
         elif not (isinstance(startup_substeps, int) and startup_substeps >= 1):
@@ -447,8 +561,9 @@ class SemiImplicitLeapfrogStepper:
             explicit = explicit + term(x_curr)
         explicit = explicit - self.operator.apply(x_curr)
         x_next = self.solver.advance(x_prev, explicit)
-        for damper in self.dampers:
-            x_next = damper.apply_implicit(x_next, 2.0 * self.dt)
+        if self.damping_scheme == "lagged":
+            for damper in self.dampers:
+                x_next = damper.apply_implicit(x_next, 2.0 * self.dt)
         if self.raw_nu != 0.0:
             d = self.raw_nu * (x_prev - 2.0 * x_curr + x_next)
             x_curr_f = x_curr + self.raw_alpha * d
@@ -479,6 +594,7 @@ class SemiImplicitLeapfrogStepper:
         return {"scheme": self.scheme, "dt": self.dt, "t": self._t,
                 "step": self._n,
                 "raw_nu": self.raw_nu, "raw_alpha": self.raw_alpha,
+                "damping_scheme": self.damping_scheme,
                 "t_ref": self.operator.t_ref,
                 "operator": self.operator.signature(),
                 "startup_substeps": self.startup_substeps,
@@ -496,6 +612,11 @@ class SemiImplicitLeapfrogStepper:
             if float(d[key]) != mine:
                 raise ValueError(
                     f"state dict {key}={d[key]} differs from stepper {key}={mine}")
+        # dicts written before the option existed come from the lagged code
+        if d.get("damping_scheme", "lagged") != self.damping_scheme:
+            raise ValueError(
+                f"state dict damping_scheme={d.get('damping_scheme', 'lagged')!r} differs "
+                f"from stepper damping_scheme={self.damping_scheme!r}")
         if int(d["startup_substeps"]) != self.startup_substeps:
             raise ValueError(
                 f"state dict startup_substeps={d['startup_substeps']} differs from "

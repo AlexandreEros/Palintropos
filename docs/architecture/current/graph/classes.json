@@ -3122,6 +3122,14 @@
         },
         {
           "kind": "method",
+          "name": "_advance_centred"
+        },
+        {
+          "kind": "method",
+          "name": "_centred_tables"
+        },
+        {
+          "kind": "method",
           "name": "_minv"
         },
         {
@@ -3131,6 +3139,10 @@
         {
           "kind": "method",
           "name": "cayley_matrix"
+        },
+        {
+          "kind": "method",
+          "name": "implicit_matrix"
         },
         {
           "kind": "method",
