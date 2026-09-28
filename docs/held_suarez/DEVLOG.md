@@ -70,6 +70,7 @@ PROTOCOL.md). One entry per decision, newest last.
   ∇⁸ at 42). The Dinosaur T42 reference's instantaneous max|u| over days 200–1200: median 74.5,
   > 80 m/s on 20 % of days, max 94.5 m/s. **Development Δt selected: 900 s** (1200 s would sit
   below the reference's typical peak winds by this bound). Cost: 96 steps/day, 115 200 steps.
+  [Bound values superseded: see 2026-09-28 stability-bound correction.]
 - 2026-09-27 S4b (c): 5-day T21 L10 complete-scheme runs at Δt = 900 and 1200 s stay valid; the
   daily max of |X^n − X^{n−1}_f| per block peaks on day 2 and decreases afterwards (ζ 7.05e−7 →
   4.66e−7 at 900 s); the computational-mode indicator |D^n − D^{n−1}|/|D^n + D^{n−1}| drops after
@@ -169,6 +170,7 @@ PROTOCOL.md). One entry per decision, newest last.
   two known truncation findings. "Matches Dinosaur T42" = the retained spectral resolution and the
   checked parameters; the product sampling differs (65×130 vs 64×128). RAW/advection bound at the
   retained layout: 105.3 m/s at 900 s (77.8 at 1200 s) vs the reference's 94.5 m/s peak.
+  [Superseded: 125.1 / 85.5 m/s, see 2026-09-28 stability-bound correction.]
 - 2026-09-27 T42 check of the production layout (store 43 / retain 42, L20, Δt 900 s, per-level
   path — the TDR-safe equivalent of the batched path, agreement ≤ 1e−12): SI fast_cut 42;
   ω_max Δt = 2.045 < 2√2, startup substeps 1 (L only and with the hooks); X^1 with 1/2/4 substeps
@@ -189,7 +191,8 @@ PROTOCOL.md). One entry per decision, newest last.
   (k ≤ k_s, r ∈ {0, k_f, ∇⁸ at l = 1, 14, 28, 42, k_f + ∇⁸₄₂}, ω_SI) = 1.000000000000 at 900 and
   1200 s, pure damping |λ| = √((1 − Δt r)/(1 + Δt r)) (0.9007 at l = 42, 900 s); startup substep
   count identical (the rule reads the rates, not the placement); rest bitwise (T21 L10, 6 steps,
-  drag + ∇⁸ + centred SI + RAW). **Stability finding:** the RAW-filtered explicit-oscillation
+  drag + ∇⁸ + centred SI + RAW). **Stability finding** [withdrawn: see 2026-09-28
+  stability-bound correction — the non-amplification bounds are equal]: the RAW-filtered explicit-oscillation
   bound (largest non-amplifying 45° jet wind, every degree ≤ 42, ∇⁸ at 42, k = k_s) is
   **lower** with centred damping: 94.9 m/s at 900 s (lagged 105.3) and 68.1 m/s at 1200 s
   (lagged 77.8), against the reference's 94.5 m/s peak — the lagged factor damps the
@@ -238,3 +241,29 @@ PROTOCOL.md). One entry per decision, newest last.
   MX110 is 11.68 ms (lagged) vs 11.73 ms (centred), i.e. identical and < 0.3 % of the 4.55 s
   T42 L20 tendency; T21 L10 full steps 135.4–135.8 ms for every variant (Colab numbers remain
   estimates). Recommendation recorded in STATUS.md.
+- 2026-09-28 stability-bound correction (tests and documents only; no scheme, preset, config
+  hash or pin changed). The RAW/advection jet bound of S4b (a) and of the centred-damping entry
+  used ω_l = U l/(a cos 45°) + 2Ω with k = k_s on every row. (1) A degree-l harmonic with zonal
+  wavenumber m is evanescent poleward of cos φ ≈ m/√(l(l+1)), so m/(a cos φ) ≤ √(l(l+1))/a
+  wherever it has amplitude; m = l at 45° overstates the frequency by √2. Measured on the T42
+  truncation (`test_advective_frequency_bound_holds_on_the_truncation`: symmetric Galerkin matrix
+  of u/(a cos φ) on degrees m..42, 400 Gauss nodes, orthonormality to 1e−12): largest zonal
+  advection frequency / (U√(L(L+1))/a) = 0.9883 for solid-body rotation (exactly L/√(L(L+1)),
+  m = 42), 0.8789 / 0.8115 for jets at 45° (sin²2φ; Gaussian, 10° wide; m = 28 / 27), 0.7838 at
+  30° (m = 34), 0.7539 at 60° (m = 18); the former form overstates these by 1.59, 1.72, 1.46,
+  2.62×. (2) Above σ_b the wind has no drag and k_T acts on T only: the jet-level wind rows have
+  k = 0. Corrected bound (`jet_wind_bound`: ω_l = U√(l(l+1))/a + 2Ω, k = 0, ∇⁸ at 42 per
+  degree, every l ≤ cut non-amplifying): retained T42 lagged 198.8 / 162.5 / 125.1 / 85.5 m/s at
+  600 / 720 / 900 / 1200 s, centred 198.7 / 162.5 / 125.0 / 85.5 (was lagged 157.5 / 131.8 /
+  105.3 / 77.8, centred 146.9 / 121.1 / 94.9 / 68.1); legacy cut 28 the same 125.1 / 85.5 at
+  900 / 1200 s (was 109.5 / 80.4). The first degree to amplify is 23 / 22 / 21 / 19, with
+  Δt r∇⁸ < 1e−3 there: the binding constraint is RAW's α = 0.53 growth above ωΔt = 0.4371, not
+  the leapfrog limit at l ≈ 42 where the former frequency had put it (ωΔt ≈ 1.0 at l = 40–42),
+  which is why the placement no longer matters. Beyond the bound (900 s): gain 1.00016/step at
+  130 m/s (e-folding 62–64 d, both placements), 1.00094 lagged / 1.1247 centred at 140 m/s; fast
+  growth (> 1.01/step) above 147.5 m/s lagged, 132.8 m/s centred (1200 s: 108.6 / 95.4). A
+  94.5 m/s jet at 1200 s: worst gain 1.0004121/step (l = 22), e-folding 33.7 d. Consequences:
+  Δt = 900 s stands, with a ≈ 30 % margin over the reference's 94.5 m/s peak (not ≈ 11 %
+  lagged / 0.4 % centred); the stability argument against the centred option is withdrawn
+  (equal non-amplification bounds; the remaining stability difference is the fast-growth
+  threshold, both ≥ 40 % above the peak at 900 s); STATUS updated.

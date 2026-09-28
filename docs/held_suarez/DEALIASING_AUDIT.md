@@ -94,5 +94,5 @@ SI operator mask (`SemiImplicitOperator.from_model` defaults `fast_cut` to the m
 band-limit check, the RK4 startup bound (ω_max now at l = 42), the ∇⁸ reference degree (the
 retained truncation), the HS perturbation-degree check, the configuration hash and checkpoint
 operator signature, the report's effective truncation and B4 range, and the RAW/advection jet
-bound (105.3 m/s at 900 s with ∇⁸ at 42). BVE, SWE, the PE runner/CLI and every published
+bound (125.1 m/s at 900 s with ∇⁸ at 42; corrected 2026-09-28 from 105.3, STATUS.md). BVE, SWE, the PE runner/CLI and every published
 capsule use the default and are unchanged.
