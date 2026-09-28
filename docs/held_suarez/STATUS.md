@@ -66,6 +66,16 @@ must be pushed). Smoke path executed locally through the same entrypoint
 (`tests/test_held_suarez_notebook.py`): benchmark 0.147 s/step (T21 L10, MX110), forced stop at day
 1 + resume in a fresh process, backups, report. T42 timing is Colab-only (MX110 TDR).
 
+## Regression gate (final code, HEAD of the S6 follow-up)
+
+`pytest tests -q` on the MX110: **1109 passed, 5 skipped, 0 failed** in 65 min (the 5 skips are
+pre-existing: 4 run-through-subprocess placeholders in test_saved_run_overview.py and the
+TROPOI_W5_ACCEPTANCE gate). `git diff main -- tests/`: additions only (2702 lines; the one
+pre-existing file touched, test_pe_runner.py, gained 21 lines in S1). New skips: none on CUDA; the
+GPU tests skip cleanly without CuPy (CI emulation: 50 passed, 17 skipped). Slowest: the two S4b
+convergence tests (24 and 19.5 min), S3 convergence (5.5 min). Architecture snapshot regenerated
+per commit; `--check` passes; no import cycle changed.
+
 ## DECISION NEEDED before launch (plan §6.1, §6.3-type numerics questions)
 
 1. **Effective truncation.** The core truncates analyzed products at 2/3, so l_max = 42 evolves
