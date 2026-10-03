@@ -2,6 +2,7 @@
 
     python -m tropoi.run.held_suarez run       --preset production --run-dir DIR [--until-day N]
                                                [--max-wall-hours H] [--backup-dir D] [--dt S]
+                                               [--damping-scheme lagged|centred]
     python -m tropoi.run.held_suarez benchmark --preset production --work-dir DIR
                                                [--steps 200] [--max-hours H] [--deadline ISO]
     python -m tropoi.run.held_suarez report    --run-dir DIR --out DIR [--reference series.npz]
@@ -9,6 +10,7 @@
                                                [--tier-a JSON]
     python -m tropoi.run.held_suarez verify    --run-dir DIR
     python -m tropoi.run.held_suarez show-config --preset production [--dt S]
+                                               [--damping-scheme lagged|centred]
 
 Exit codes: 0 ok; 2 usage/refusal (config or code mismatch, corrupt
 checkpoint); 3 benchmark over budget (DECISION NEEDED); 4 run aborted.
@@ -35,6 +37,8 @@ def _config(args) -> HeldSuarezConfig:
         cfg = PRESETS[args.preset](**kw)
     if getattr(args, "dt", None):
         cfg = cfg.with_(dt=float(args.dt))
+    if getattr(args, "damping_scheme", None):
+        cfg = cfg.with_(damping_scheme=args.damping_scheme)
     return cfg
 
 
@@ -43,6 +47,9 @@ def _add_cfg(p):
     p.add_argument("--config", help="JSON configuration (overrides --preset)")
     p.add_argument("--experiment-id")
     p.add_argument("--dt", type=float, help="time step (s); must divide one day")
+    p.add_argument("--damping-scheme", choices=("lagged", "centred"),
+                   help="damper placement (default: the preset's, lagged); centred = "
+                        "Crank-Nicolson inside the SI solve (DEVLOG 2026-09-28, 2026-10-02)")
 
 
 def main(argv=None) -> int:

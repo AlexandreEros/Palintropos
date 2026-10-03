@@ -67,6 +67,31 @@ def test_config_hash_is_stable_and_sensitive():
         development_config().with_(perturbation_lmax=15)  # above the T21 cut (14)
 
 
+def test_cli_damping_scheme_flag_selects_the_run_002_configuration(capsys):
+    """Run 002 (STATUS 2026-10-02): the production preset with centred damping
+    at dt 720 s. Without the flag the configuration is run 001's, hash
+    unchanged; the flag changes only damping_scheme."""
+    from tropoi.run.held_suarez.__main__ import main
+
+    def show(*extra):
+        assert main(["show-config", "--preset", "production", *extra]) == 0
+        return json.loads(capsys.readouterr().out)
+
+    run001 = show("--experiment-id", "hs-T42L20-prod-001", "--dt", "900")
+    assert run001["config_sha256"] == "4cd2eeae9b89ba095609f2675f1951a0e33f1025ee9e67e0b52bc1546e155802"
+    assert run001["config"]["damping_scheme"] == "lagged"
+    assert show("--experiment-id", "hs-T42L20-prod-001", "--dt", "900",
+                "--damping-scheme", "lagged")["config_sha256"] == run001["config_sha256"]
+    run002 = show("--experiment-id", "hs-T42L20-prod-002", "--dt", "720",
+                  "--damping-scheme", "centred")
+    assert run002["config_sha256"] == "d1fa645db12038f21725bb40fa1f89e036b115ea4b752401a6e24e33f97d381c"
+    assert run002["total_steps"] == 144000 and run002["effective_truncation"] == 42
+    changed = {k for k in run001["config"] if run001["config"][k] != run002["config"][k]}
+    assert changed == {"experiment_id", "dt", "damping_scheme"}
+    with pytest.raises(SystemExit):
+        main(["show-config", "--damping-scheme", "implicit"])
+
+
 def test_perturbation_is_deterministic_confined_and_normalized():
     cfg = production_config()
     p1, s1 = perturbation_coefficients(cfg)
