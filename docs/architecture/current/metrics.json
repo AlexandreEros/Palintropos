@@ -1,10 +1,10 @@
 {
   "call_graph": {
     "call_sites": {
-      "builtin": 2045,
+      "builtin": 2046,
       "external": 1481,
       "internal": 1710,
-      "unresolved": 2242
+      "unresolved": 2244
     },
     "edges_by_kind": {
       "call": 712,
