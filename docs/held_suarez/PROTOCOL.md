@@ -116,3 +116,20 @@ vertical discretisation of the hydrostatic/energy terms, transform/dealiasing de
 
 See `docs/superpowers/plans/2026-09-27-held-suarez-24h-plan.md` §1–§2 (copied here at
 the freeze).
+
+## 5. Amendments after the freeze
+
+The text above is the protocol `hs-T42L20-prod-001` ran under (sha256 `bdc77bbe…` at
+206ef25). Each amendment is a user decision, applies only to experiments launched after
+it, and changes nothing in §1 or the §4 tiers or thresholds.
+
+### Amendment 1 (user decision 2026-10-03): from `hs-T42L20-prod-002`
+
+| item | prod-001 | from prod-002 | reason |
+|---|---|---|---|
+| damping placement | lagged: drag and ∇⁸ factors 1/(1 + 2Δt r) on X^{n+1} after the SI solve | centred: −R X trapezoidal inside the SI solve (`damping_scheme="centred"`, SEMI_IMPLICIT.md §9) | the lagged placement advances ln p_s with the undamped divergence: a measured mass leak of −1.36e−6/day that failed B2 in prod-001; centred −2e−9/day (DEVLOG 2026-10-02) |
+| Δt | 900 s | 720 s | the centred RAW/advection bound is 94.9 m/s at 900 s, below prod-001's 100.3 m/s peak; 121.1 m/s at 720 s |
+
+Configuration: preset `production` with `--dt 720 --damping-scheme centred`,
+`config_sha256` `d1fa645db12038f21725bb40fa1f89e036b115ea4b752401a6e24e33f97d381c`.
+Everything else in §2 is unchanged.
