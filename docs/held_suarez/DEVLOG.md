@@ -238,3 +238,38 @@ PROTOCOL.md). One entry per decision, newest last.
   MX110 is 11.68 ms (lagged) vs 11.73 ms (centred), i.e. identical and < 0.3 % of the 4.55 s
   T42 L20 tendency; T21 L10 full steps 135.4–135.8 ms for every variant (Colab numbers remain
   estimates). Recommendation recorded in STATUS.md.
+- 2026-10-02 run 001 (`hs-T42L20-prod-001`, post-freeze; nothing here changes its verdicts):
+  B2 FAIL attributed. Observed: ⟨p_s⟩ = Gaussian mean of exp(ln p_s) falls steadily from day ≈ 50
+  (onset of eddies), −1.354e−6/day fitted over days 200–1200 (200-day segments −1.30 to
+  −1.41e−6/day), the daily increment negative on all 1000 days (mean −1.361e−6, sd 1.4e−7, corr
+  with KE −0.55); |Δ| crosses 1e−3 on day 790, 1.548e−3 at day 1200. Not spin-up, not round-off.
+  **Spatial term:** ⟨e^q q_t⟩/⟨e^q⟩ from the model's ln p_s tendency on 11 saved states (days
+  210–1200) is +1e−10 (max 3.1e−10)/day — the semi-discrete scheme conserves mass to ≈ 1e−4 of
+  the leak (ln p_s is neither forced nor diffused). **Time scheme:** in the lagged placement
+  `SemiImplicitSolver.advance` computes q^{n+1} = q^{n−1} + 2Δt(N_q − ν·d̄) with
+  d̄ = (D\*^{n+1} + D^{n−1})/2 from the *undamped* D\*, and `_leapfrog` then divides D^{n+1} by
+  (1 + 2Δt r) (Rayleigh drag × ∇⁸). The stored state therefore carries an ln p_s increment
+  −Δt Σ_j ν_j (D\* − D)_j ≈ −2Δt² Σ_j ν_j r_j D_j per step that its own divergence does not
+  support; in the drag layer D > 0 under high p_s (Ekman), so ⟨e^q ·⟩ is negative definite in
+  practice. Each leapfrog chain advances 2Δt per update, so the predicted rate is
+  (steps/day ÷ 2)·⟨e^q dq⟩/⟨e^q⟩ = **−1.32e−6 ± 0.05e−6/day** (mean ± s.e., 11 states; drag 99.5 %,
+  ∇⁸ 0.5 %) vs −1.36e−6 observed. **Restarts** from the day-1200 checkpoint (`x_curr` sha256
+  `c6a1c493…`, RK4 startup n_sub = 1, per-level transforms, MX110), 2 days each: lagged 900 s
+  −2.616e−6 (predicted along the trajectory −2.636e−6), lagged 720 s −2.104e−6 (−2.116e−6; ratio
+  to 900 s 0.804 = first order in Δt), **centred 720 s −2.36e−9** (fit −2.1e−9/day, ≈ 1100×
+  smaller; the centred solve takes ln p_s with the same damped d̄). Evidence:
+  `tools/held_suarez/mass_budget.py` (`states`, `restart`), outputs in
+  `runs/hs-T42L20-prod-001/assets/mass_budget/`. Reading: the S4b first-order lag term
+  (2026-09-27/28, "climate impact unmeasured") is invisible in tier C (PASS, margins above) but
+  is a secular mass sink of 0.05 %/year at Δt 900 s. Also measured: daily max|u| peaked at
+  100.3 m/s on day 1047, 5 % under the lagged 900 s bound (105.3) and above the centred 900 s
+  bound (94.9). Run-002 options in STATUS.md.
+- 2026-10-02 run 001 housekeeping findings (no code changed): (1) the run used solver
+  `206ef25` while the committed notebook pins `21203ff` — the notebook's own checkout assertion
+  shows its Colab copy was edited before Run all; a run-002 launch should commit the pin it uses.
+  (2) `report.write_report` writes with the platform newline, so a report regenerated on
+  Windows differs from the Colab bytes only by CRLF (parsed JSON equal; byte-equal after
+  CRLF→LF). (3) `experiment.protocol_sha256` hashes the working-tree bytes of PROTOCOL.md; a
+  Windows checkout with `core.autocrlf=true` gives `185f5898…` instead of the frozen
+  `bdc77bbe…` (the committed LF bytes), so resuming a Colab checkpoint locally would be refused
+  as a protocol change.
