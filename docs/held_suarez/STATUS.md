@@ -5,7 +5,7 @@ Plan: docs/superpowers/plans/2026-09-27-held-suarez-24h-plan.md (r3). T0 = 2026-
 `feat/semi-implicit-integration` (the plan's `feat/held-suarez`; renamed by the user).
 **Handoff point (2026-10-02): production run `hs-T42L20-prod-001` completed (S7–S10); its
 verdicts stand as reported: A PASS (with the local tier-A evidence), B FAIL (B2 only), C PASS. The
-B2 cause is measured; run 002 is a user decision (plan §5, §6.4).**
+B2 cause is measured. Run 002 (centred damping, Δt 720 s) is set up and awaits push + launch.**
 
 | stage | state | evidence |
 |---|---|---|
@@ -173,9 +173,25 @@ item 3 (Δt 900 s), and item 4 done (the branch is pushed to 206ef25).
    the RAW/advection bound.
 4. Push `feat/semi-implicit-integration` so SOLVER_COMMIT is fetchable by Colab (A4).
 
-## DECISION NEEDED: run 002 (plan §5: run 001's verdicts stand; a fix starts `prod-002`)
+## Run 002 — `hs-T42L20-prod-002`: SET UP (2026-10-03), launch is a human step
 
-Options for the B2 failure (cost from run 001's 0.253 s/step on a T4):
+**Decided (user, 2026-10-03): option 1 below.** Set up on `feat/held-suarez`:
+
+- `--damping-scheme {lagged,centred}` on every config-taking CLI command (257f8f9; default = the
+  preset's, so run 001's configuration and hash are unchanged; test
+  `test_cli_damping_scheme_flag_selects_the_run_002_configuration`).
+- PROTOCOL.md §5 amendment 1 (a52ea20): centred damping, Δt 720 s, from prod-002; protocol
+  sha256 at the pin `26a8ac31…` (prod-001 ran under `bdc77bbe…`).
+- Notebook: `SOLVER_COMMIT = a52ea20…`, `PRESET = "production"`, `EXPERIMENT_ID =
+  "hs-T42L20-prod-002"`, `DT_SECONDS = 720.0`, `DAMPING_SCHEME = "centred"` (passed as
+  `--damping-scheme`), `DEADLINE = None`. Config `d1fa645d…`, 144 000 steps, retained T42,
+  `config_mismatches` = []. Projected ≈ 10.1 h on a T4 at run 001's 0.253 s/step; the S8
+  benchmark gate re-measures it (MAX_RUN_HOURS 24, SESSION_HOURS 23.5, resume across sessions).
+  The local smoke path now runs centred too (T21 L10, 1200 s).
+- **Before Run all:** push `feat/held-suarez` (the pin must be fetchable); the Drive folder
+  `Palintropos-HS/hs-T42L20-prod-002/` is new, so run 001's backups are untouched.
+
+Options considered for the B2 failure (cost from run 001's 0.253 s/step on a T4):
 
 1. **Centred damping at Δt = 720 s** (recommended): no new code (opt-in in 206ef25, tested;
    SEMI_IMPLICIT.md §9), leak measured −1e−9/day (B2 margin ≈ 400×), second order without RAW,
