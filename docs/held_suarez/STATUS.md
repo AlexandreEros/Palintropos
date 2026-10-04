@@ -3,9 +3,10 @@
 Plan: docs/superpowers/plans/2026-09-27-held-suarez-24h-plan.md (r3). T0 = 2026-09-27 04:25 −03:00
 (07:25 UTC), the approval commit f52ae5b. Budget is elapsed time. Branch:
 `feat/semi-implicit-integration` (the plan's `feat/held-suarez`; renamed by the user).
-**Handoff point (2026-10-02): production run `hs-T42L20-prod-001` completed (S7–S10); its
-verdicts stand as reported: A PASS (with the local tier-A evidence), B FAIL (B2 only), C PASS. The
-B2 cause is measured. Run 002 (centred damping, Δt 720 s) is set up and awaits push + launch.**
+**Handoff point (2026-10-04): two production runs completed. `hs-T42L20-prod-001` (lagged,
+900 s): A PASS (with the local tier-A evidence), B FAIL (B2 only, cause measured), C PASS.
+`hs-T42L20-prod-002` (centred, 720 s; PROTOCOL amendment 1): A PASS (local evidence), B PASS, C PASS; its
+climate is indistinguishable from run 001's. Verdicts stand as reported.**
 
 | stage | state | evidence |
 |---|---|---|
@@ -19,6 +20,7 @@ B2 cause is measured. Run 002 (centred damping, Δt 720 s) is set up and awaits 
 | S6 notebook | DONE | §S6 below |
 | S7–S9 launch, gate, production run | DONE (2026-09-30/10-01, Colab T4) | §Production run 001 |
 | S10 report | DONE; B FAIL (B2), C PASS | §Production run 001 |
+| run 002 (PROTOCOL amendment 1) | DONE (2026-10-03/04, Colab T4); B PASS, C PASS | §Production run 002 |
 
 ## Production run 001 — `hs-T42L20-prod-001` (verdicts as reported; never edited)
 
@@ -68,6 +70,49 @@ B2 cause is measured. Run 002 (centred damping, Δt 720 s) is set up and awaits 
   (`runs/hs-T42L20-prod-001/assets/report-with-tier-a/`) differs from the Colab `report/` (kept
   unchanged) only in the tier-A block: **A PASS, B FAIL, C PASS**, B and C byte-for-byte the same
   content. Evidence files in `runs/hs-T42L20-prod-001/assets/tier_a/`.
+
+## Production run 002 — `hs-T42L20-prod-002` (verdicts as reported; never edited)
+
+- **Provenance.** Solver commit `a52ea20` (clean; pushed), config `d1fa645d…` (production preset,
+  `--dt 720 --damping-scheme centred`), PROTOCOL.md amendment 1, protocol sha256 `26a8ac31…`.
+  Colab, Tesla T4, CuPy 14.0.1, CUDA runtime 13.0; created 2026-10-03 17:35:10Z, day 1200 at
+  2026-10-04 03:27:35Z, one segment, no resumes: **35 545 s wall (9.9 h), 0.247 s/step**. Initial
+  state sha256 `54ba7845…`, identical to run 001's (same seed and preset layout).
+- **Local copy.** `runs/hs-T42L20-prod-002/` (gitignored; the Drive backup folder, downloaded and
+  extracted by the user), zip in `runs/hs-T42L20-prod-002.download/`: all 130 zip members
+  byte-equal to the extracted files, `verify` passes on the three kept checkpoints (days
+  1180–1200), day-1200 state = checkpoint `x_curr` (sha256 `469169aa…`); the local `report`
+  reproduces `report/` exactly (modulo CRLF).
+- **Verdicts** (`runs/hs-T42L20-prod-002/report/REPORT.md`):
+
+  | tier | verdict | detail |
+  |---|---|---|
+  | A | INCOMPLETE → **PASS** | Colab report had no tier-A evidence JSON; PASS with the local evidence (below) |
+  | B | **PASS** | B1 day 1200, 0 aborts; **B2 2.016e−6** (limit 1e−3; fit −1.74e−9/day over days 200–1200, vs run 001's −1.354e−6/day); B3 KE trend 0.45 %, T trend 0.043 K; B4 slope −10.45; B5 one config, one clean commit |
+  | C | **PASS** | C1 corr 0.9955 / RMSE 0.90 m/s (sampling 1.05); C2 jets NH 32.56 vs 32.82 m/s, SH 32.80 vs 32.63 m/s, latitude within one Gaussian row, level equal; C3 0.29 K; C4 [T′²] peaks −4.5 % / +3.7 %, [v′T′] −0.4 % / +0.4 %, corr 0.994 / 0.999; C5 PASS; C6 jet 32.6 m/s at 43.3°, surface easterlies |
+
+- **Mass.** The leak measured in run 001 is gone; a residual of −1.7e−9/day remains (still
+  one-signed, matching the 2-day restart's −2.1e−9/day; RAW α ≠ ½ and SI time-centring are the
+  candidates, unattributed; 500× under B2 over 1200 days).
+- **Stability.** Daily max|u| peaked at **97.9 m/s on day 483** (mean of daily maxima, days
+  200–1200: 74.8 m/s) against the centred 720 s bound of 121.1 m/s (19 % margin). Three days
+  exceeded 94.9 m/s, the centred bound at 900 s, which confirms the choice of 720 s. Leapfrog
+  computational-mode indicator 0.013 (run 001: 0.016).
+- **Run 001 vs run 002 climate** (`tools/held_suarez/compare_runs.py`, the report's weights and
+  sampling error): every difference is below sampling noise: zonal-mean u RMSE 0.34 m/s
+  (0.34 × the sampling RMS of a 5-block difference), T 0.14 K (0.57 ×), [T′²] 0.58 K² (0.56 ×),
+  [v′T′] 0.20 K m/s (0.57 ×); jet maxima NH −0.40, SH +0.06 m/s at the same latitude and level.
+  The lagged placement's first-order term, its 0.15 % mass loss and the Δt change have **no
+  detectable effect on the climate** at this sampling (DEVLOG 2026-09-28's "climate impact
+  unmeasured" is now measured).
+- **Tier A evidence → A PASS.** Full suite at a52ea20 in a clean scratch worktree (the main
+  checkout's notebook was being edited; `runs/` joined in by a junction so the local-capsule
+  tests run as before; `PYTHONPATH` = the worktree's `src`), MX110, 2026-10-04 03:58–05:25Z:
+  **1132 passed, 5 skipped (the same pre-existing 5), 0 failed** in 87 min; tests/ diff vs main
+  additions only, 112 new test cases all PASS, no new skips, A3 bit-identical, a52ea20 an ancestor
+  of `origin/feat/held-suarez`. Regenerated report in
+  `runs/hs-T42L20-prod-002/assets/report-with-tier-a/` (only the tier-A block differs from the
+  Colab `report/`): **A PASS, B PASS, C PASS**. Evidence in `runs/hs-T42L20-prod-002/assets/tier_a/`.
 
 ## S4 — HS forcing, Rayleigh drag, ∇⁸ (generic stepper hooks)
 
@@ -173,7 +218,7 @@ item 3 (Δt 900 s), and item 4 done (the branch is pushed to 206ef25).
    the RAW/advection bound.
 4. Push `feat/semi-implicit-integration` so SOLVER_COMMIT is fetchable by Colab (A4).
 
-## Run 002 — `hs-T42L20-prod-002`: SET UP (2026-10-03), launch is a human step
+## Run 002 setup (2026-10-03; launched and completed, see §Production run 002)
 
 **Decided (user, 2026-10-03): option 1 below.** Set up on `feat/held-suarez`:
 

@@ -273,3 +273,21 @@ PROTOCOL.md). One entry per decision, newest last.
   Windows checkout with `core.autocrlf=true` gives `185f5898…` instead of the frozen
   `bdc77bbe…` (the committed LF bytes), so resuming a Colab checkpoint locally would be refused
   as a protocol change.
+- 2026-10-04 run 002 (`hs-T42L20-prod-002`, PROTOCOL amendment 1: centred damping, Δt 720 s;
+  solver a52ea20, config `d1fa645d…`): B PASS, C PASS (STATUS.md). **B2 fix confirmed at climate
+  length:** ⟨p_s⟩ changes by −2.016e−6 over 1200 days (fit −1.74e−9/day over days 200–1200, vs
+  run 001's −1.354e−6/day: ≈ 780× smaller; the 2-day restart from run 001's day-1200 state
+  predicted −2.1e−9/day). The residual is still negative on every day; it is not the damping
+  lag (the centred solve feeds the damped D to ln p_s) and is left unattributed (RAW α = 0.53 ≠ ½
+  and the SI time-centring are second-order candidates). **Climate impact of the damping
+  placement, now measured** (`tools/held_suarez/compare_runs.py`, the report's Gaussian × Δσ
+  weights and 5-block sampling error; output in `runs/hs-T42L20-prod-002/assets/compare/`):
+  run 001 vs run 002 zonal-mean u RMSE 0.34 m/s = 0.34 × sampling RMS, T 0.14 K (0.57 ×),
+  [T′²] 0.58 K² (0.56 ×), [v′T′] 0.20 K m/s (0.57 ×), correlations ≥ 0.998, jet maxima
+  NH −0.40 / SH +0.06 m/s at the same row and level. The first-order lag term, the 0.15 % mass
+  loss and the Δt change are invisible in the 1000-day climate. Stability: daily max|u| peak
+  97.9 m/s (day 483) under the centred 720 s bound 121.1 m/s; 3 days above the 900 s centred
+  bound 94.9 m/s. Wall 9.9 h on a T4 (0.247 s/step; run 001 0.253). Note: the Drive backup's
+  `events.jsonl` ends with the day-1200 checkpoint event in both runs (the backup is taken at
+  the checkpoint, before the driver logs `completed`); B1 reads the day-1200 entry of the
+  daily series in `statistics.npz`, not that event.
