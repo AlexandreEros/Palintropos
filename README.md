@@ -10,9 +10,10 @@ the equations themselves: idealized dynamical cores written in spherical
 harmonics, with conservation diagnostics and run provenance, so each claim can
 be traced back to a recorded run.
 
-It is **not** a climate or weather model. Its solvers are idealized: no forcing,
-no moisture, no radiation, no real or data-driven terrain. They do not model any
-particular planet, real or fictional.
+It is **not** a climate or weather model. Its solvers are idealized: no
+moisture, no radiation, no real or data-driven terrain, and the only forcing is
+the analytic Held–Suarez benchmark in the primitive-equation core. They do not
+model any particular planet, real or fictional.
 
 ![Williamson test case 5 at T63: static terrain; free-surface perturbation with streamfunction contours at days 0, 5, 10 and 15 on one colour scale; conservation drift and kinetic-energy spectral complexity](docs/runs/20260730T011700Z_williamson5_rot23p93h_r4_l63_dt120h_45406d82_668e6c9a/assets/overview.png)
 
@@ -63,14 +64,15 @@ machinery, the diagnostics, and the provenance.
 
 ## Model cores
 
-All three cores are spectral (spherical harmonics, `float64`/`complex128`) and
-use explicit RK4 time stepping.
+All three cores are spectral (spherical harmonics, `float64`/`complex128`).
+BVE and SWE use explicit RK4. PE also has a semi-implicit stepper, used for
+the long forced runs ([SEMI_IMPLICIT.md](docs/held_suarez/SEMI_IMPLICIT.md)).
 
 | Core | Command | Prognostic state | Evidence so far | Limits |
 |---|---|---|---|---|
 | **Barotropic vorticity (BVE)** | `tropoi run bve` | relative vorticity | RH4 traveling wave on both grids; conservation and rotation-equivalence tests | Single layer, non-divergent. Optional Laplacian viscosity has no stability control of its own |
 | **Rotating shallow water (SWE)** | `tropoi run swe` | vorticity, divergence, perturbation thickness geopotential | Linear gravity-wave dispersion, Williamson 2, exact lake at rest over terrain, Williamson 5 compared with an external model | Inviscid, single layer. Terrain is either one analytic Gaussian mountain or the benchmark cone |
-| **Dry hydrostatic primitive equations (PE)** | `tropoi run pe` | per-level vorticity, divergence, temperature; ln surface pressure | Exact rest; smooth short evolution; analytic orographic balance (to roundoff on the Gauss grid) | Early work. Fixed user-chosen step, no CFL controller, no forcing or hyperdiffusion, no energy-conservation claim, short demonstrations only |
+| **Dry hydrostatic primitive equations (PE)** | `tropoi run pe` | per-level vorticity, divergence, temperature; ln surface pressure | Exact rest; smooth short evolution; analytic orographic balance (to roundoff on the Gauss grid); **Held–Suarez forced climate, 1200 days at T42L20, all three acceptance tiers passed** ([STATUS.md](docs/held_suarez/STATUS.md)) | Fixed user-chosen step, no CFL controller, no energy-conservation claim. Forcing is Held–Suarez only (Newtonian relaxation + Rayleigh friction, ∇⁸ hyperdiffusion); no moisture or radiation |
 
 BVE and SWE pick their time step adaptively from an advective CFL limit that
 is recomputed after every accepted step. The PE runner uses a fixed step.
@@ -270,6 +272,8 @@ are truncated.
 | Williamson 5, 15-day inviscid runs (T42, T63) | completed; mass drift **0.0** (bit-identical); energy drift **+3.4 × 10⁻⁷ / −7.9 × 10⁻⁷** | same |
 | Williamson 5, day-15 free surface vs MRI-JMA | weighted RMS difference **5.6 m / 4.7 m**, on a layer about 5620 m deep | same |
 | RH4, 5 days, matched timestep | relative energy drift: geodesic **−4.46 × 10⁻⁴**, Gauss **−1.34 × 10⁻¹⁰** | `feat/latlon-grid` review, 2026-07-12; MX110 |
+| Held–Suarez forced climate, 1200 days, T42L20, semi-implicit, criteria fixed in advance (run `hs-T42L20-prod-002`) | **A PASS, B PASS, C PASS** | solver `a52ea20`, 2026-10-03/04; Colab Tesla T4; 1200 days in 8.1 h wall |
+| Held–Suarez, the earlier run `hs-T42L20-prod-001` (lagged damping, Δt 900 s) | A PASS, **B FAIL** (B2 only; cause measured), C PASS | solver `206ef25`, 2026-09-30/10-01. Kept in the record: verdicts as reported, never edited |
 
 **Williamson 5 is a comparison between two numerical models.** Williamson 5
 has no exact solution: the reference is another model's high-resolution
@@ -277,6 +281,18 @@ output, which has its own discretization error. The results do not claim
 agreement with truth, identical agreement with MRI-JMA, or a convergence
 order (two resolutions cannot measure one).
 [Full report →](docs/validation/williamson5_mri_2026-07-30.md)
+
+**The day-0 check exists because an earlier comparison was wrong.** The MRI-JMA
+archive stores its mass field as `h`, documented only as "height". An earlier
+version of this comparison read it as fluid-layer depth; it is free-surface
+height, and near the mountain the two initial states differ by up to 2000 m —
+so the model and the reference were integrating different physical problems.
+The identity was pinned down three independent ways (the reference paper's own
+equations; the archived day-0 field against the analytic case-2 free surface at
+every grid point, to 2.4 × 10⁻⁴ m; and the run's reported global mean mass,
+which excludes both alternatives). That comparison was refused rather than
+reported, and the day-0 gate now runs before integration.
+[Semantic audit →](notebooks/W5_MRI_SEMANTIC_AUDIT.md)
 
 **Tests.** GitHub CI and local GPU runs cover different tests, so their counts
 should not be added together:
@@ -291,11 +307,12 @@ GPU before each merge. See [ARCHITECTURE.md § Tests](docs/ARCHITECTURE.md#tests
 
 ## Limitations
 
-- No forcing, moisture, radiation, or real or time-varying terrain in any
-  solver. The terrain from `Planet.generate` is decorative only.
-- BVE and SWE are single-layer. The PE core has only been run in short,
-  fixed-step demonstrations.
-- There is no semi-implicit time stepping. There is no stability control for
+- No moisture, radiation, or real or time-varying terrain in any solver. The
+  only forcing is Held–Suarez in the PE core; BVE and SWE are unforced. The
+  terrain from `Planet.generate` is decorative only.
+- BVE and SWE are single-layer.
+- The semi-implicit stepper exists for PE and was used for the Held–Suarez
+  runs; BVE and SWE are explicit RK4 only. There is no stability control for
   explicit viscosity. The PE core has no CFL control.
 - The geodesic grid's quadrature is approximate and depends on how the grid is
   oriented. The Gauss grid is the reference.
@@ -313,6 +330,14 @@ Details: [KNOWN_LIMITATIONS.md](docs/KNOWN_LIMITATIONS.md) and
   Williamson-5 summary, conservation and rotation-equivalence tests.
 - [Williamson 5 vs MRI-JMA, 2026-07-30](docs/validation/williamson5_mri_2026-07-30.md):
   the full report, figures, provenance, and checksums.
+- [Held–Suarez status](docs/held_suarez/STATUS.md): both production runs,
+  stage by stage, with provenance and the verdicts as reported. Alongside it,
+  [PROTOCOL.md](docs/held_suarez/PROTOCOL.md) (acceptance criteria, frozen
+  before the runs), [DEVLOG.md](docs/held_suarez/DEVLOG.md) (the decisions and
+  corrections, dated), [SEMI_IMPLICIT.md](docs/held_suarez/SEMI_IMPLICIT.md)
+  and [DEALIASING_AUDIT.md](docs/held_suarez/DEALIASING_AUDIT.md).
+- [W5 semantic audit](notebooks/W5_MRI_SEMANTIC_AUDIT.md): how the MRI
+  reference's `h` was identified, and why the first comparison was refused.
 - [ARCHITECTURE.md](docs/ARCHITECTURE.md): package layout, grids, transform
   flow, run directories, CPU/GPU boundaries, and tests.
 - [SAVED_RUNS.md](docs/SAVED_RUNS.md): the read-only saved-run interface.
