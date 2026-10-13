@@ -236,3 +236,27 @@ def test_custom_run_with_terrain_rebuilds_for_plotting(tmp_path):
                             out=str(tmp_path / "runs"))
     figure = open_simulation(run)[-1].plot(tmp_path / "w5.png")
     assert figure.exists() and figure.stat().st_size > 0
+
+
+def test_cli_initial_state_flag_reproduces_the_python_run(tmp_path):
+    from tropoi.cli.main import main
+    from tropoi.run.bve.config import BVERunConfig
+    from tropoi.run.custom import initial_state_from_config, run_initial_state
+
+    cfg = BVERunConfig.resolve({
+        "scenario": "two_vortices", "grid": "latlon", "nlat": 12, "nlon": 24,
+        "lmax": 8, "day_hours": 24.0})
+    saved = initial_state_from_config(cfg).save(tmp_path / "state")
+    python_run = run_initial_state(saved, duration_days=0.02, n_snapshots=3,
+                                   out=str(tmp_path / "python"))
+    assert main(["run", "bve", "--initial-state", str(saved), "--days",
+                 "0.02", "--n-snapshots", "3", "--out",
+                 str(tmp_path / "cli")]) == 0
+    (cli_run,) = [p for p in (tmp_path / "cli").iterdir() if p.is_dir()]
+    # Same state, planet, grid and schedule: same scientific run-id hash
+    # and the same trajectory.
+    assert cli_run.name.split("_")[6] == python_run.name.split("_")[6]
+    expected = np.load(python_run / "vorticity_coeffs.npy")
+    np.testing.assert_allclose(np.load(cli_run / "vorticity_coeffs.npy"),
+                               expected, rtol=0,
+                               atol=1e-12 * np.abs(expected).max())

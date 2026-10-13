@@ -268,6 +268,11 @@
     {
       "kind": "call",
       "source": "tropoi.cli.main._cmd_run_swe",
+      "target": "tropoi.cli.main.run_initial_state_command"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.cli.main._cmd_run_swe",
       "target": "tropoi.cli.swe.execute_run"
     },
     {
@@ -357,6 +362,16 @@
     },
     {
       "kind": "call",
+      "source": "tropoi.cli.main.add_bve_arguments",
+      "target": "tropoi.cli.main._add_initial_state_argument"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.cli.main.add_swe_arguments",
+      "target": "tropoi.cli.main._add_initial_state_argument"
+    },
+    {
+      "kind": "call",
       "source": "tropoi.cli.main.build_bve_parser",
       "target": "tropoi.cli.main.add_bve_arguments"
     },
@@ -398,7 +413,27 @@
     {
       "kind": "call",
       "source": "tropoi.cli.main.run_bve_command",
+      "target": "tropoi.cli.main.run_initial_state_command"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.cli.main.run_bve_command",
       "target": "tropoi.run.bve.config.BVERunConfig.resolve"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.cli.main.run_initial_state_command",
+      "target": "tropoi.representation.archive.initial_state.load_initial_state"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.cli.main.run_initial_state_command",
+      "target": "tropoi.run.custom.config.CustomRunConfig.resolve"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.cli.main.run_initial_state_command",
+      "target": "tropoi.run.custom.execute.execute_custom_run"
     },
     {
       "kind": "instantiate",
@@ -897,6 +932,11 @@
     },
     {
       "kind": "instantiate",
+      "source": "tropoi.representation.archive.initial_state._install",
+      "target": "tropoi.representation.archive.initial_state.InitialStateError"
+    },
+    {
+      "kind": "instantiate",
       "source": "tropoi.representation.archive.initial_state._load_array",
       "target": "tropoi.representation.archive.initial_state.InitialStateError"
     },
@@ -979,6 +1019,11 @@
       "kind": "instantiate",
       "source": "tropoi.representation.archive.initial_state.save_initial_state",
       "target": "tropoi.representation.archive.initial_state.InitialStateError"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.archive.initial_state.save_initial_state",
+      "target": "tropoi.representation.archive.initial_state._install"
     },
     {
       "kind": "call",
@@ -7276,6 +7321,13 @@
       "type": "function"
     },
     {
+      "id": "tropoi.cli.main._add_initial_state_argument",
+      "kind": "function",
+      "module": "tropoi.cli.main",
+      "qualname": "_add_initial_state_argument",
+      "type": "function"
+    },
+    {
       "id": "tropoi.cli.main._asset_name",
       "kind": "function",
       "module": "tropoi.cli.main",
@@ -7469,6 +7521,13 @@
       "kind": "function",
       "module": "tropoi.cli.main",
       "qualname": "run_bve_command",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.cli.main.run_initial_state_command",
+      "kind": "function",
+      "module": "tropoi.cli.main",
+      "qualname": "run_initial_state_command",
       "type": "function"
     },
     {
@@ -7910,6 +7969,13 @@
       "kind": "function",
       "module": "tropoi.representation.archive.initial_state",
       "qualname": "_host_complex_array",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.archive.initial_state._install",
+      "kind": "function",
+      "module": "tropoi.representation.archive.initial_state",
+      "qualname": "_install",
       "type": "function"
     },
     {

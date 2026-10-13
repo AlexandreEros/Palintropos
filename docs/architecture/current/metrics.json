@@ -1,20 +1,20 @@
 {
   "call_graph": {
     "call_sites": {
-      "builtin": 2161,
-      "external": 1520,
-      "internal": 1911,
-      "unresolved": 2390
+      "builtin": 2170,
+      "external": 1532,
+      "internal": 1920,
+      "unresolved": 2401
     },
     "edges_by_kind": {
-      "call": 796,
+      "call": 804,
       "constructor": 38,
-      "instantiate": 305,
+      "instantiate": 306,
       "override": 6,
       "self": 278,
       "super": 2
     },
-    "nodes": 1204,
+    "nodes": 1207,
     "scoped": {
       "cli-gen": {
         "edges": 28,
@@ -37,14 +37,14 @@
         "truncated_nodes": 1
       },
       "cli-run-bve": {
-        "edges": 28,
+        "edges": 60,
         "max_depth": 4,
-        "nodes": 25,
-        "reachable_nodes_unbounded": 144,
+        "nodes": 45,
+        "reachable_nodes_unbounded": 207,
         "roots": [
           "tropoi.cli.main._cmd_run_bve"
         ],
-        "truncated_nodes": 6
+        "truncated_nodes": 13
       },
       "cli-run-pe": {
         "edges": 50,
@@ -57,14 +57,14 @@
         "truncated_nodes": 12
       },
       "cli-run-swe": {
-        "edges": 56,
+        "edges": 119,
         "max_depth": 4,
-        "nodes": 49,
-        "reachable_nodes_unbounded": 162,
+        "nodes": 82,
+        "reachable_nodes_unbounded": 209,
         "roots": [
           "tropoi.cli.main._cmd_run_swe"
         ],
-        "truncated_nodes": 16
+        "truncated_nodes": 15
       }
     }
   },
@@ -132,18 +132,18 @@
   "module_graph": {
     "all_imports": {
       "condensation": {
-        "edges": 338,
-        "longest_path_edges": 13,
-        "nodes": 143,
+        "edges": 318,
+        "longest_path_edges": 11,
+        "nodes": 140,
         "sinks": 27,
         "sources": 57
       },
-      "density": 0.017051,
-      "edges": 376,
+      "density": 0.017096,
+      "edges": 377,
       "in_degree": {
         "histogram": {
-          "0": 57,
-          "1": 21,
+          "0": 56,
+          "1": 22,
           "11": 2,
           "14": 1,
           "2": 25,
@@ -157,7 +157,7 @@
           "9": 4
         },
         "max": 49,
-        "mean": 2.52349,
+        "mean": 2.530201,
         "median": 1.0,
         "min": 0,
         "quartiles": [
@@ -165,12 +165,12 @@
           1.0,
           3.0
         ],
-        "zeros": 57
+        "zeros": 56
       },
       "nodes": 149,
       "nodes_in_cycles": {
-        "count": 7,
-        "fraction": 0.04698
+        "count": 10,
+        "fraction": 0.067114
       },
       "nontrivial_sccs": {
         "count": 1,
@@ -182,11 +182,14 @@
             "tropoi.cli.swe",
             "tropoi.representation.archive",
             "tropoi.representation.archive.capsule",
-            "tropoi.representation.visual.snapshot"
+            "tropoi.representation.visual.snapshot",
+            "tropoi.run.custom",
+            "tropoi.run.custom.execute",
+            "tropoi.run.custom.presets"
           ]
         ],
         "sizes": [
-          7
+          10
         ]
       },
       "out_degree": {
@@ -196,7 +199,7 @@
           "10": 5,
           "11": 2,
           "12": 2,
-          "17": 1,
+          "18": 1,
           "2": 17,
           "3": 6,
           "4": 7,
@@ -206,8 +209,8 @@
           "8": 3,
           "9": 1
         },
-        "max": 17,
-        "mean": 2.52349,
+        "max": 18,
+        "mean": 2.530201,
         "median": 1.0,
         "min": 0,
         "quartiles": [
@@ -226,12 +229,12 @@
           ]
         ]
       },
-      "reciprocity": 0.005319,
+      "reciprocity": 0.005305,
       "self_loops": 0,
       "sinks": 27,
-      "sources": 57,
+      "sources": 56,
       "strongly_connected_components": {
-        "count": 143
+        "count": 140
       },
       "top_fan_in": {
         "nodes": [
@@ -281,7 +284,7 @@
       "top_fan_out": {
         "nodes": [
           {
-            "degree": 17,
+            "degree": 18,
             "node": "tropoi.cli.main"
           },
           {
@@ -333,7 +336,7 @@
       }
     },
     "edge_scopes": {
-      "function": 121,
+      "function": 122,
       "function+module": 2,
       "function+type_checking": 2,
       "module": 244,
@@ -528,18 +531,18 @@
   },
   "package_graph": {
     "condensation": {
-      "edges": 39,
+      "edges": 34,
       "longest_path_edges": 7,
-      "nodes": 18,
+      "nodes": 17,
       "sinks": 3,
-      "sources": 8
+      "sources": 7
     },
-    "density": 0.141538,
-    "edges": 92,
+    "density": 0.143077,
+    "edges": 93,
     "in_degree": {
       "histogram": {
-        "0": 8,
-        "1": 1,
+        "0": 7,
+        "1": 2,
         "15": 1,
         "2": 3,
         "3": 2,
@@ -551,21 +554,21 @@
         "9": 1
       },
       "max": 15,
-      "mean": 3.538462,
+      "mean": 3.576923,
       "median": 3.0,
       "min": 0,
       "quartiles": [
-        0.0,
+        0.25,
         3.0,
         5.75
       ],
-      "zeros": 8
+      "zeros": 7
     },
     "intra_package_module_edges": 104,
     "nodes": 26,
     "nodes_in_cycles": {
-      "count": 11,
-      "fraction": 0.423077
+      "count": 12,
+      "fraction": 0.461538
     },
     "nontrivial_sccs": {
       "count": 3,
@@ -575,6 +578,7 @@
           "tropoi.representation.archive",
           "tropoi.representation.visual",
           "tropoi.run.bve",
+          "tropoi.run.custom",
           "tropoi.run.pe",
           "tropoi.run.swe"
         ],
@@ -589,7 +593,7 @@
         ]
       ],
       "sizes": [
-        6,
+        7,
         3,
         2
       ]
@@ -598,7 +602,7 @@
       "histogram": {
         "0": 3,
         "1": 5,
-        "10": 1,
+        "11": 1,
         "2": 4,
         "3": 3,
         "4": 4,
@@ -607,8 +611,8 @@
         "8": 2,
         "9": 1
       },
-      "max": 10,
-      "mean": 3.538462,
+      "max": 11,
+      "mean": 3.576923,
       "median": 3.0,
       "min": 0,
       "quartiles": [
@@ -619,11 +623,15 @@
       "zeros": 3
     },
     "reciprocal_pairs": {
-      "count": 4,
+      "count": 5,
       "pairs": [
         [
           "tropoi.cli",
           "tropoi.representation.visual"
+        ],
+        [
+          "tropoi.cli",
+          "tropoi.run.custom"
         ],
         [
           "tropoi.representation.archive",
@@ -639,12 +647,12 @@
         ]
       ]
     },
-    "reciprocity": 0.086957,
+    "reciprocity": 0.107527,
     "self_loops": 0,
     "sinks": 3,
-    "sources": 8,
+    "sources": 7,
     "strongly_connected_components": {
-      "count": 18
+      "count": 17
     },
     "top_fan_in": {
       "nodes": [
@@ -694,7 +702,7 @@
     "top_fan_out": {
       "nodes": [
         {
-          "degree": 10,
+          "degree": 11,
           "node": "tropoi.cli"
         },
         {
