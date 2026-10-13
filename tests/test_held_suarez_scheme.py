@@ -64,6 +64,39 @@ def max_gain(*args, **kw) -> float:
     return float(np.abs(np.linalg.eigvals(amplification(*args, **kw))).max())
 
 
+def advective_frequency(U, l, a=6.371e6):
+    """Upper bound on the frequency at which a flow of peak speed U advects
+    degree-l content: U sqrt(l(l+1)) / a, at any latitude. A degree-l
+    harmonic with zonal wavenumber m lives where cos(phi) >~ m / sqrt(l(l+1))
+    (poleward it is evanescent), so m / (a cos(phi)) <= sqrt(l(l+1)) / a
+    wherever it has amplitude; checked on the truncation by
+    test_advective_frequency_bound_holds_on_the_truncation."""
+    return U * math.sqrt(l * (l + 1)) / a
+
+
+def jet_wind_bound(dt, cut, gain=max_gain, a=6.371e6, efold_degree=42, k=0.0,
+                   gain_limit=1.0 + 1e-13):
+    """Largest peak wind U for which every degree l <= cut is non-amplifying
+    (per-step gain <= ``gain_limit``) under the explicit frequency
+    advective_frequency(U, l) + 2 Omega (the largest |f|), the per-degree
+    del^8 rate (0.1 d at ``efold_degree``) and the explicit damping k. k = 0
+    by default: at jet level the wind has no Rayleigh drag (sigma < sigma_b)
+    and the Newtonian relaxation acts on T only. Returns (U, the first
+    degree to exceed ``gain_limit`` just above U)."""
+    k8 = hyperdiffusion_coefficient(a, 0.1 * DAY_SECONDS, efold_degree)
+    f0 = 2 * 7.292e-5
+
+    def gains(U):
+        return [(gain(dt, k=k, w_explicit=advective_frequency(U, l, a) + f0,
+                      r=k8 * (l * (l + 1) / a ** 2) ** 4), l) for l in range(1, cut + 1)]
+
+    lo, hi = 1.0, 400.0
+    for _ in range(40):
+        mid = 0.5 * (lo + hi)
+        lo, hi = (mid, hi) if max(gains(mid))[0] <= gain_limit else (lo, mid)
+    return lo, max(gains(hi))[1]
+
+
 def test_recurrence_is_the_stepper_on_a_scalar_mode():
     """Tie the analysis to the code: a vorticity row (not in L) under an
     explicit term (-k + i w) and a damper evolves exactly by the 2x2 map."""
@@ -139,42 +172,104 @@ def _threshold(dt, nu=NU, alpha=ALPHA):
     return lo
 
 
+def _normalized_legendre(L, mu):
+    """p[l, m] = associated Legendre functions orthonormal on [-1, 1] in mu."""
+    s = np.sqrt(1.0 - mu * mu)
+    p = np.zeros((L + 1, L + 1, mu.size))
+    p[0, 0] = math.sqrt(0.5)
+    for m in range(1, L + 1):
+        p[m, m] = math.sqrt((2 * m + 1) / (2 * m)) * s * p[m - 1, m - 1]
+    for m in range(L):
+        p[m + 1, m] = math.sqrt(2 * m + 3) * mu * p[m, m]
+    for m in range(L + 1):
+        for l in range(m + 2, L + 1):
+            p[l, m] = math.sqrt((4 * l * l - 1) / (l * l - m * m)) * (
+                mu * p[l - 1, m] - math.sqrt(((l - 1) ** 2 - m * m) / (4 * (l - 1) ** 2 - 1))
+                * p[l - 2, m])
+    return p
+
+
+def test_advective_frequency_bound_holds_on_the_truncation():
+    """The frequency used by jet_wind_bound, checked on a T42 truncation:
+    zonal advection by u(phi) of zonal wavenumber m on degrees m..L is
+    m * eig(A_m), A_m[l, l'] = int P_l^m u/(a cos phi) P_l'^m dmu (Galerkin,
+    symmetric, so the frequencies are real). For solid-body rotation and
+    jets peaking at 30, 45 and 60 deg the largest frequency over m stays
+    below U sqrt(L(L+1))/a (0.75-0.99 of it), while U L/(a cos phi_jet),
+    the form the jet bound used before 2026-09-28, overstates it 1.46-2.62x:
+    the fastest mode of a mid-latitude jet has m ~ L cos(phi_jet), not L."""
+    L, U, a = 42, 94.5, 6.371e6
+    mu, w = np.polynomial.legendre.leggauss(400)
+    phi = np.arcsin(mu)
+    p = _normalized_legendre(L, mu)
+
+    def w_max(u):
+        g = w * u(phi) / (a * np.cos(phi))
+        best = (0.0, 0)
+        for m in range(1, L + 1):
+            P = p[m:, m]
+            assert np.allclose((P * w) @ P.T, np.eye(L - m + 1), rtol=0, atol=1e-12)
+            best = max(best, (m * np.abs(np.linalg.eigvalsh((P * g) @ P.T)).max(), m))
+        return best
+
+    def gauss_jet(lat, width):
+        return lambda ph: U * np.exp(-((np.degrees(np.abs(ph)) - lat) / width) ** 2)
+
+    bound = advective_frequency(U, L, a)
+    solid, m_solid = w_max(lambda ph: U * np.cos(ph))
+    print(f"\nT42 zonal advection, peak {U} m/s: solid body w_max / (U sqrt(L(L+1))/a) = "
+          f"{solid / bound:.4f} (m = {m_solid})")
+    assert 0.98 < solid / bound <= 1.0 and m_solid == L       # exactly m U / a
+    for lat, u in ((45, lambda ph: U * np.sin(2 * ph) ** 2), (45, gauss_jet(45, 10)),
+                   (30, gauss_jet(30, 8)), (60, gauss_jet(60, 8))):
+        wm, m = w_max(u)
+        former = U * L / (a * math.cos(math.radians(lat)))
+        print(f"  jet at {lat} deg: w_max / bound = {wm / bound:.4f} (m = {m}), "
+              f"former form / w_max = {former / wm:.2f}")
+        assert 0.7 < wm / bound <= 1.0
+        assert former / wm > 1.4
+        assert m < L
+
+
 def test_raw_limits_explicit_oscillations_and_the_selected_dt_covers_the_jet():
     """Explicit oscillations (advection, Coriolis) under RAW(0.1, 0.53): the
     physical mode is non-amplifying only for w dt <= 0.437; beyond, it grows
-    slowly. With the del^8 damping per degree (tau = 0.1 d at l = 42) the
-    largest zonal wind at 45 deg for which every degree l <= 28 (the T42
-    cut) is non-amplifying is ~80 m/s at dt = 1200 s and ~110 m/s at
-    dt = 900 s. The Dinosaur T42 reference reaches 94.5 m/s (max|u| days
-    200-1200; median 74.5 m/s), so dt = 900 s is selected."""
+    slowly (1.00036 per step at w dt = 0.5, 1.0056 at 0.7). The jet bound
+    (jet_wind_bound: w_l = U sqrt(l(l+1))/a + 2 Omega, the per-degree del^8
+    damping, no explicit damping of the wind): at the retained T42 layout
+    (cut 42, del^8 at 42) 125.1 m/s at dt = 900 s and 85.5 m/s at 1200 s,
+    the same for the legacy cut 28: the first degree to amplify is 21 (19),
+    where RAW's growth beats the del^8 damping. The
+    Dinosaur T42 reference reaches 94.5 m/s (max|u| days 200-1200; median
+    74.5 m/s): dt = 900 s covers it with a ~30 % margin; at 1200 s a 94.5 m/s
+    jet grows weakly (e-folding ~ 34 d, not a leapfrog blow-up).
+
+    Corrected 2026-09-28: the bound used w_l = U l/(a cos 45 deg) + 2 Omega
+    with k = k_s, which overstates the advective frequency by sqrt(2) (see
+    test_advective_frequency_bound_holds_on_the_truncation), puts l ~ 40-42
+    at the leapfrog limit w dt ~ 1, and damps the wind by a relaxation that
+    only acts on T; it gave 105.3 / 77.8 m/s (cut 42)."""
     thr = _threshold(1200.0)
     print(f"\nRAW(0.1, 0.53) explicit-oscillation limit: w dt <= {thr:.4f}; gain at w dt = 0.5: "
           f"{max_gain(1200.0, w_explicit=0.5 / 1200.0):.6f}")
     assert 0.43 < thr < 0.445
-    a = 6.371e6
-    k8 = hyperdiffusion_coefficient(a, 0.1 * DAY_SECONDS, 42)
-    f0 = 2 * 7.292e-5
-
-    def u_safe(dt, cut=28, coslat=math.cos(math.radians(45.0))):
-        def ok(U):
-            return all(max_gain(dt, k=HS.k_s, w_explicit=U * l / (a * coslat) + f0,
-                                r=k8 * (l * (l + 1) / a ** 2) ** 4) <= 1 + 1e-13
-                       for l in range(1, cut + 1))
-        lo, hi = 1.0, 400.0
-        for _ in range(40):
-            mid = 0.5 * (lo + hi)
-            lo, hi = (mid, hi) if ok(mid) else (lo, mid)
-        return lo
-
-    u9, u12 = u_safe(900.0), u_safe(1200.0)
-    print(f"largest non-amplifying jet wind at 45 deg, T42 (cut 28): dt=900 s {u9:.1f} m/s, "
-          f"dt=1200 s {u12:.1f} m/s (Dinosaur reference max|u| 94.5 m/s)")
-    assert u9 > 100.0 > 94.5 > u12
-    # production layout (store 43, retain 42, del^8 at 42): still above the
-    # reference's peak at 900 s, below it at 1200 s
-    p9, p12 = u_safe(900.0, cut=42), u_safe(1200.0, cut=42)
-    print(f"retained T42 (cut 42): dt=900 s {p9:.1f} m/s, dt=1200 s {p12:.1f} m/s")
-    assert p9 > 100.0 > 94.5 > p12
+    (u9, l9), (u12, l12) = jet_wind_bound(900.0, cut=28), jet_wind_bound(1200.0, cut=28)
+    print(f"largest non-amplifying peak wind, legacy T42 (cut 28, del^8 at 42): dt=900 s "
+          f"{u9:.1f} m/s (l = {l9}), dt=1200 s {u12:.1f} m/s (l = {l12})")
+    assert u9 > 120.0 > 94.5 > u12
+    # production layout (store 43, retain 42, del^8 at 42)
+    (p9, m9), (p12, m12) = jet_wind_bound(900.0, cut=42), jet_wind_bound(1200.0, cut=42)
+    print(f"retained T42 (cut 42): dt=900 s {p9:.1f} m/s (l = {m9}), "
+          f"dt=1200 s {p12:.1f} m/s (l = {m12})")
+    assert p9 > 120.0 > 94.5 > p12
+    assert m9 < 30                            # RAW-limited, not the leapfrog limit at l ~ 42
+    # beyond the 1200 s bound a 94.5 m/s jet grows weakly, not explosively
+    k8 = hyperdiffusion_coefficient(6.371e6, 0.1 * DAY_SECONDS, 42)
+    g12 = max(max_gain(1200.0, w_explicit=advective_frequency(94.5, l) + 2 * 7.292e-5,
+                       r=k8 * (l * (l + 1) / 6.371e6 ** 2) ** 4) for l in range(1, 43))
+    efold = 1200.0 / math.log(g12) / DAY_SECONDS
+    print(f"94.5 m/s at dt=1200 s: worst gain {g12:.7f}/step, e-folding {efold:.1f} d")
+    assert 1.0 < g12 < 1.001
 
 
 def test_damping_applied_to_the_new_level_is_first_order_in_time():
