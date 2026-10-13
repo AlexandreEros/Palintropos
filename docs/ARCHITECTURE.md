@@ -21,6 +21,7 @@ the orchestration that wires them together:
 src/tropoi/
 ├── spatial/             what a state is and how it is discretized
 │   ├── environment.py       PlanetaryParameters: the prescribed environment (CPU-only)
+│   ├── specification.py     versioned Planet/FluidLayer/Topography/Discretization specs (CPU-only)
 │   ├── williamson5.py       Williamson (1992) case-5 prescribed world constants (stdlib)
 │   ├── planet.py            Planet facade: environment + discretization resources + decorative elevation
 │   ├── terrain/             model topography (Topography) and decorative terrain generation
@@ -39,9 +40,11 @@ src/tropoi/
 │   └── simulation.py        read-only Simulation / Snapshot over a small storage protocol
 ├── representation/      what is recorded and shown
 │   ├── diagnostics/         per-core recorders, CSV/NPZ records and diagnostic figures
-│   ├── archive/             capsule reader (open_simulation), versioned schema, run-capsule writer
+│   ├── archive/             capsule reader (open_simulation), versioned schema, run-capsule writer,
+│   │                        saved resolved initial states (initial_state.py, CPU-only)
 │   └── visual/              figure fields/specs/timelines/renderers, per-core compositions, Snapshot.plot adapter
 ├── run/{bve,swe,pe}/    orchestration: resolved run configuration and the runners
+├── run/custom/          custom planets/initial states: configuration, execution, preset export
 ├── cli/                 tropoi (main.py); aeolus/psx-bve/psx-gen/psx-recompile compatibility entry points
 └── numerics/ physics/ planet/ viz/ support.py
                          compatibility import paths only (see "Compatibility paths")
@@ -154,10 +157,12 @@ distribution and every command (`tropoi`, `aeolus`, `psx-bve`, `psx-gen`,
   `tropoi inspect` with or without `--snapshot/--field`, `open_simulation`
   and host coefficient views, `spatial.truncation`,
   `spatial.environment`, `spatial.williamson5`, `spatial.modes`,
-  `temporal.integration`, `temporal.simulation`, and coefficient-space
-  (`"spectral"`) BVE/SWE snapshot plots. Fresh-interpreter tests enforce
-  these boundaries.
-- **CUDA required**: running any solver; anything that builds grids,
+  `spatial.specification`, `temporal.integration`, `temporal.simulation`,
+  saved initial states (`representation.archive.initial_state`: build,
+  validate, save, load, inspect) and the custom-run configuration
+  (`run.custom`), and coefficient-space (`"spectral"`) BVE/SWE snapshot
+  plots. Fresh-interpreter tests enforce these boundaries.
+- **CUDA required**: running any solver (including `run_initial_state`); anything that builds grids,
   transforms, backends, operators, states, initial conditions or
   tendencies; the per-step diagnostics recorders; and every physical-space
   plot (fields are synthesized through the run's own transform).

@@ -62,10 +62,14 @@ flowchart LR
     subgraph g_tropoi_ospatial_oplanet["spatial.planet"]
         n_tropoi_ospatial_oplanet_oPlanet_ogenerate["Planet.generate()"]
     end
+    subgraph g_tropoi_ospatial_ospecification["spatial.specification"]
+        n_tropoi_ospatial_ospecification_oPlanetSpec_ofrom__dict["PlanetSpec.from_dict()"]
+    end
     subgraph g_tropoi_ospatial_ostates_oshallow__water["spatial.states.shallow_water"]
         n_tropoi_ospatial_ostates_oshallow__water_oShallowWaterState{{"ShallowWaterState"}}
     end
     subgraph g_tropoi_ospatial_oterrain_otopography["spatial.terrain.topography"]
+        n_tropoi_ospatial_oterrain_otopography_oTopography{{"Topography"}}
         n_tropoi_ospatial_oterrain_otopography_oTopography_omountain["Topography.mountain()"]
         n_tropoi_ospatial_oterrain_otopography_oTopography_owilliamson5__cone["Topography.williamson5_cone()"]
     end
@@ -103,6 +107,8 @@ flowchart LR
     n_tropoi_ocli_oswe_obuild__swe__model --> n_tropoi_ocli_oswe_o__w5__planet__params
     n_tropoi_ocli_oswe_obuild__swe__model --> n_tropoi_ospatial_oenvironment_oPlanetaryParameters_ofrom__earth__like
     n_tropoi_ocli_oswe_obuild__swe__model --> n_tropoi_ospatial_oplanet_oPlanet_ogenerate
+    n_tropoi_ocli_oswe_obuild__swe__model --> n_tropoi_ospatial_ospecification_oPlanetSpec_ofrom__dict
+    n_tropoi_ocli_oswe_obuild__swe__model -->|instantiate| n_tropoi_ospatial_oterrain_otopography_oTopography
     n_tropoi_ocli_oswe_obuild__swe__model --> n_tropoi_ospatial_oterrain_otopography_oTopography_omountain
     n_tropoi_ocli_oswe_obuild__swe__model --> n_tropoi_ospatial_oterrain_otopography_oTopography_owilliamson5__cone
     n_tropoi_ocli_oswe_obuild__swe__model -->|instantiate| n_tropoi_otemporal_otendencies_oshallow__water_oShallowWaterModel
@@ -149,6 +155,8 @@ flowchart LR
     class n_tropoi_orepresentation_ovisual_oswe_orender__swe__snapshots truncated
     class n_tropoi_orepresentation_ovisual_oswe_orender__swe__summary truncated
     class n_tropoi_ospatial_oplanet_oPlanet_ogenerate truncated
+    class n_tropoi_ospatial_ospecification_oPlanetSpec_ofrom__dict truncated
+    class n_tropoi_ospatial_oterrain_otopography_oTopography truncated
     class n_tropoi_ospatial_oterrain_otopography_oTopography_omountain truncated
     class n_tropoi_ospatial_oterrain_otopography_oTopography_owilliamson5__cone truncated
     class n_tropoi_ospatial_otruncation_orequire__scenario__support truncated

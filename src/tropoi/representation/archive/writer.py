@@ -201,8 +201,12 @@ def make_run_id(
     # configurations are strongly disambiguated at the same timestamp (a
     # 32-bit digest makes an accidental same-second collision very
     # unlikely, not impossible).
+    # Runs started from a saved initial state (tropoi.run.custom) always
+    # carry the hash: it is what binds the run id to the state's content
+    # digest, whatever the snapshot mode.
     if (config.get("snapshot_mode") == "count"
-            or config.get("solver", "bve") != "bve"):
+            or config.get("solver", "bve") != "bve"
+            or "initial_state_digest" in config):
         parts.append(_config_hash(config))
     if commit:
         parts.append(_sanitize(commit))

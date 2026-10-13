@@ -247,6 +247,20 @@ tropoi plot runs --vectors streamfunction                   # psi contours (SWE/
 
 Full reference: [docs/SAVED_RUNS.md](docs/SAVED_RUNS.md).
 
+**Run your own planet and initial state (BVE, SWE).** Define a planet,
+discretization, and resolved spectral state in Python, save them as
+versioned JSON plus `.npy` arrays, reload them in any process (no GPU
+needed), and run them through the same lifecycle as the presets:
+
+```python
+from tropoi.run.custom import load_initial_state, run_initial_state
+
+state = load_initial_state("my_state")      # CPU only: validated, verified, digest-checked
+run_dir = run_initial_state(state, duration_days=1.0, n_snapshots=5)
+```
+
+See [docs/CUSTOM_INITIAL_STATES.md](docs/CUSTOM_INITIAL_STATES.md).
+
 ![Two opposite-signed vortices on a rotating sphere: relative vorticity with streamfunction contours at days 0, 10, 15 and 25 on one colour scale; conservation drift and kinetic-energy spectral complexity](docs/runs/20260926T051829Z_two-vortices_rot24h_r4_l21_dt120h_e5dfc047_50ae9e93/assets/overview.png)
 
 *A BVE example: two compact vortices of opposite sign on a sphere with a

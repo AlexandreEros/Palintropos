@@ -785,6 +785,17 @@ def _cmd_inspect(args: argparse.Namespace) -> int:
         show("grid", f"{grid} r{run_config.get('resolution')}")
     show("l_max", run_config.get("lmax"))
     show("scenario", run_config.get("scenario"))
+    if run_config.get("initial_state_digest"):
+        # Runs started from a saved initial state (tropoi.run.custom).
+        label = run_config.get("initial_state_label") or "(unlabelled)"
+        show("initial state",
+             f"{label} [{run_config['initial_state_digest']}]")
+        planet = run_config.get("planet")
+        if isinstance(planet, dict):
+            derived = planet.get("derived") or {}
+            show("planet",
+                 f"{planet.get('construction')}, dynamical radius "
+                 f"{derived.get('dynamical_radius_m')} m")
     if run_config.get("solver") in ("swe", "pe"):
         # Additive schema: manifests without a topography key are flat runs.
         topo_kind = run_config.get("topography", "flat")
@@ -799,11 +810,17 @@ def _cmd_inspect(args: argparse.Namespace) -> int:
             tag = ("canonical" if canonical
                    else "NONCANONICAL (W5-derived)" if canonical is False
                    else "")
-            show("topography",
-                 f"Williamson-5 cone (hs0={run_config.get('w5_cone_height_m')}"
-                 f" m, R0=pi/9 at lat {run_config.get('w5_cone_lat_deg')} deg,"
-                 f" lon {run_config.get('w5_cone_lon_deg')} deg)")
-            show("Williamson 5", tag)
+            if "w5_cone_height_m" in run_config:
+                show("topography",
+                     f"Williamson-5 cone (hs0={run_config.get('w5_cone_height_m')}"
+                     f" m, R0=pi/9 at lat {run_config.get('w5_cone_lat_deg')} deg,"
+                     f" lon {run_config.get('w5_cone_lon_deg')} deg)")
+                show("Williamson 5", tag)
+            else:  # a saved initial state's resolved cone (custom run)
+                params = run_config.get("topography_parameters") or {}
+                show("topography",
+                     f"Williamson-5 cone (hs0={params.get('height_m')} m), "
+                     "resolved coefficients from the initial state")
         else:
             show("topography", "flat")
     day_hours = run_config.get("day_hours")
