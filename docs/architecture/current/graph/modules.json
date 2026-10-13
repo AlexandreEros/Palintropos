@@ -1744,6 +1744,14 @@
         "module"
       ],
       "source": "tropoi.run.custom",
+      "target": "tropoi.run.custom.prepare"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.run.custom",
       "target": "tropoi.run.custom.presets"
     },
     {
@@ -1873,6 +1881,70 @@
       ],
       "source": "tropoi.run.custom.execute",
       "target": "tropoi.spatial.states.shallow_water"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.run.custom.prepare",
+      "target": "tropoi.cli.bve"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.run.custom.prepare",
+      "target": "tropoi.representation.archive.initial_state"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.run.custom.prepare",
+      "target": "tropoi.spatial.modes"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.run.custom.prepare",
+      "target": "tropoi.spatial.specification"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.run.custom.prepare",
+      "target": "tropoi.spatial.states.shallow_water"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.run.custom.prepare",
+      "target": "tropoi.spatial.terrain.topography"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.run.custom.prepare",
+      "target": "tropoi.spatial.truncation"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.run.custom.prepare",
+      "target": "tropoi.temporal.tendencies.shallow_water"
     },
     {
       "kind": "imports",
@@ -3972,6 +4044,23 @@
       ],
       "third_party_imports": [
         "cupy"
+      ]
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.run.custom.prepare",
+      "is_package": false,
+      "path": "tropoi/run/custom/prepare.py",
+      "stdlib_imports": [
+        "__future__",
+        "dataclasses",
+        "math",
+        "typing"
+      ],
+      "third_party_imports": [
+        "cupy",
+        "numpy"
       ]
     },
     {

@@ -260,13 +260,13 @@
     },
     {
       "kind": "imports",
-      "module_edges": 6,
+      "module_edges": 7,
       "source": "tropoi.run.custom",
       "target": "tropoi.cli"
     },
     {
       "kind": "imports",
-      "module_edges": 6,
+      "module_edges": 7,
       "source": "tropoi.run.custom",
       "target": "tropoi.representation.archive"
     },
@@ -284,7 +284,7 @@
     },
     {
       "kind": "imports",
-      "module_edges": 5,
+      "module_edges": 8,
       "source": "tropoi.run.custom",
       "target": "tropoi.spatial"
     },
@@ -296,7 +296,7 @@
     },
     {
       "kind": "imports",
-      "module_edges": 1,
+      "module_edges": 2,
       "source": "tropoi.run.custom",
       "target": "tropoi.spatial.states"
     },
@@ -304,7 +304,19 @@
       "kind": "imports",
       "module_edges": 1,
       "source": "tropoi.run.custom",
+      "target": "tropoi.spatial.terrain"
+    },
+    {
+      "kind": "imports",
+      "module_edges": 1,
+      "source": "tropoi.run.custom",
       "target": "tropoi.temporal"
+    },
+    {
+      "kind": "imports",
+      "module_edges": 1,
+      "source": "tropoi.run.custom",
+      "target": "tropoi.temporal.tendencies"
     },
     {
       "kind": "imports",
@@ -612,8 +624,8 @@
     },
     {
       "id": "tropoi.run.custom",
-      "internal_edges": 4,
-      "modules": 4
+      "internal_edges": 5,
+      "modules": 5
     },
     {
       "id": "tropoi.run.held_suarez",
