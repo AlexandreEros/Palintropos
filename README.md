@@ -259,6 +259,8 @@ state = load_initial_state("my_state")      # CPU only: validated, verified, dig
 run_dir = run_initial_state(state, duration_days=1.0, n_snapshots=5)
 ```
 
+or, from the shell, `tropoi run bve|swe --initial-state my_state --days 1`.
+
 States are prepared from callables `f(lat, lon)`, sampled arrays or
 spherical-harmonic coefficients, with projection residuals, mean modes and
 (SWE) positive thickness checked and reported. See

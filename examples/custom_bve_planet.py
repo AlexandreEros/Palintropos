@@ -6,6 +6,7 @@ fresh interpreter:
     python examples/custom_bve_planet.py prepare  states/rh4_small   # CPU
     python examples/custom_bve_planet.py inspect  states/rh4_small   # CPU, no CuPy
     python examples/custom_bve_planet.py run      states/rh4_small --out runs  # CUDA
+    tropoi run bve --initial-state states/rh4_small --days 1      # same run, from the shell
 
 The state is built from exact spherical-harmonic coefficients, so preparing
 it needs no GPU. Relative vorticity of the wave (Williamson et al. 1992,

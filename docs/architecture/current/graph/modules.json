@@ -246,6 +246,14 @@
         "function"
       ],
       "source": "tropoi.cli.main",
+      "target": "tropoi.run.custom"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.cli.main",
       "target": "tropoi.run.pe.config"
     },
     {
@@ -3502,7 +3510,8 @@
         "pathlib",
         "shutil",
         "typing",
-        "uuid"
+        "uuid",
+        "warnings"
       ],
       "third_party_imports": [
         "numpy"

@@ -219,6 +219,15 @@ rejected. Arrays are read with `allow_pickle=False`. Loading verifies:
 A file that fails any of these checks is refused. Coefficients round-trip
 bit for bit, signed zeros included.
 
+**Saving is never destructive.** A state is written to a hidden staging
+directory beside its destination and then renamed into place. With
+`overwrite=True` (which only replaces a directory that is itself a saved
+state), the previous state is first renamed aside, the new one is renamed
+into place, and only then is the previous one deleted. If installing the new
+state fails, the previous one is renamed back. If even that restore fails,
+nothing is deleted and the error names where both copies are. If only the
+final deletion fails, a warning says where the old copy was left.
+
 ## Identity
 
 `InitialState.digest` is `sha256:<hex>`, computed over a canonical
@@ -246,6 +255,31 @@ run_dir = run_initial_state(
     plots=None,                    # "diagnostics" / "snapshots" / "summary" / "all"
     out="runs", experiment=None, overwrite=False)
 ```
+
+From the shell, the same run is a flag on the ordinary commands:
+
+```bash
+tropoi run bve --initial-state states/rh4_small --days 2 --n-snapshots 9
+tropoi run swe --initial-state states/mars_jet --backend gauss-latlon --nlat 48 --nlon 96
+```
+
+With `--initial-state`:
+
+- **Accepted:** the schedule options (`--days`, `--n-snapshots`,
+  `--snapshot-interval-seconds`), `--plot`/`--no-plots`, `--out`,
+  `--experiment` and `--overwrite`. The grid options (`--backend`,
+  `--resolution`, `--nlat`, `--nlon`, and BVE `--product-quadrature`)
+  override the state's recorded grid. `--l-max` is accepted but must equal
+  the state's truncation. BVE `--viscosity` is accepted.
+- **Refused:** options the state already prescribes. For the BVE these are
+  `--preset`, `--scenario`, `--day-hours` and `--radius-earth-units`. The
+  SWE refuses the same planet options plus `--gravity`, `--mean-depth`,
+  `--topography` and `--mountain-*`.
+- **Errors:** a state of the other solver, or a file that fails
+  verification, is an argument error. No run directory is created and CUDA
+  is not touched.
+
+The defaults are those of the ordinary commands: 1 day and 5 stored states.
 
 Every option is validated on the CPU before CUDA is touched
 (`CustomRunConfig.resolve`). The run then goes through the same lifecycle,
@@ -301,8 +335,6 @@ the realized state.
 - BVE and SWE only; the PE core is unchanged and not supported.
 - Terrain is limited to the existing presets (`flat`, `mountain`,
   `williamson5_cone`). Custom terrain generation is out of scope.
-- `run_initial_state` is a Python interface; there is no `tropoi run` flag
-  for it yet.
 - Inputs are the cores' prognostic variables plus the potentials and the
   free-surface anomaly. Winds `(u, v)` are not accepted directly; give ψ and
   χ instead.

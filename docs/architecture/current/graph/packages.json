@@ -20,6 +20,12 @@
     },
     {
       "kind": "imports",
+      "module_edges": 1,
+      "source": "tropoi.cli",
+      "target": "tropoi.run.custom"
+    },
+    {
+      "kind": "imports",
       "module_edges": 3,
       "source": "tropoi.cli",
       "target": "tropoi.run.pe"

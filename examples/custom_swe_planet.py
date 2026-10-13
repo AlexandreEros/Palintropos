@@ -3,6 +3,7 @@
     python examples/custom_swe_planet.py prepare  states/mars_jet   # CUDA (projection)
     python examples/custom_swe_planet.py inspect  states/mars_jet   # CPU, no CuPy
     python examples/custom_swe_planet.py run      states/mars_jet --out runs  # CUDA
+    tropoi run swe --initial-state states/mars_jet --days 2       # same run, from the shell
 
 The planet, the layer and the terrain are prescribed separately: an oblate
 (ordinary-construction) planet with Mars' size and rotation, a 4 km layer

@@ -61,6 +61,7 @@ import os
 import pathlib
 import shutil
 import uuid
+import warnings
 from collections.abc import Mapping
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
@@ -463,7 +464,8 @@ def save_initial_state(state: InitialState, path, *,
     The directory is assembled beside its destination and moved into place,
     so an interrupted save never leaves a partial state under ``path``. An
     existing ``path`` is replaced only with ``overwrite=True`` and only if it
-    is itself a saved initial state.
+    is itself a saved initial state; the replacement never loses a copy
+    (see :func:`_install`).
     """
     if not isinstance(state, InitialState):
         raise InitialStateError(
@@ -494,14 +496,68 @@ def save_initial_state(state: InitialState, path, *,
             fh.write(text)
             fh.flush()
             os.fsync(fh.fileno())
-        if target.exists():
-            shutil.rmtree(target)
-        os.replace(staging, target)
+    except BaseException:
+        # Nothing under ``path`` has been touched yet.
+        with contextlib.suppress(OSError):
+            shutil.rmtree(staging)
+        raise
+    _install(staging, target)
+    return target
+
+
+def _install(staging: pathlib.Path, target: pathlib.Path) -> None:
+    """Move the complete ``staging`` directory to ``target``, losing no copy.
+
+    Without a previous state this is one rename. With one, the previous
+    state is first renamed aside to a hidden ``.<name>.bak-<id>`` sibling,
+    the new state is renamed into place, and only then is the previous
+    state deleted. Every step is a same-directory rename, so a failure
+    leaves a complete state on disk:
+
+    * setting the previous state aside fails: ``target`` is untouched and
+      the staging copy is removed;
+    * installing the new state fails: the previous state is renamed back to
+      ``target`` and the staging copy is removed; if that restore fails as
+      well, nothing is deleted and the error names where both copies are;
+    * deleting the set-aside previous state fails: the new state is in
+      place and the old copy stays at the reported path (a warning).
+    """
+    if not target.exists():
+        try:
+            os.replace(staging, target)
+        except BaseException:
+            with contextlib.suppress(OSError):
+                shutil.rmtree(staging)
+            raise
+        return
+
+    backup = target.parent / f".{target.name}.bak-{uuid.uuid4().hex}"
+    try:
+        os.replace(target, backup)
     except BaseException:
         with contextlib.suppress(OSError):
             shutil.rmtree(staging)
         raise
-    return target
+    try:
+        os.replace(staging, target)
+    except BaseException as install_err:
+        try:
+            os.replace(backup, target)
+        except BaseException as restore_err:
+            raise InitialStateError(
+                f"could not install the new initial state at {target} "
+                f"({install_err}) nor restore the previous one "
+                f"({restore_err}); nothing was deleted: the previous state "
+                f"is at {backup}, the new state at {staging}") from install_err
+        with contextlib.suppress(OSError):
+            shutil.rmtree(staging)
+        raise
+    try:
+        shutil.rmtree(backup)
+    except OSError as err:
+        warnings.warn(
+            f"saved the new initial state at {target}, but could not delete "
+            f"the previous one set aside at {backup}: {err}", stacklevel=3)
 
 
 def _require_mapping(value: Any, label: str) -> Mapping:

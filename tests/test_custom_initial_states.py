@@ -138,6 +138,127 @@ def test_save_refuses_to_clobber(tmp_path):
         state.save(tmp_path / "plain", overwrite=True)
 
 
+# ---------------------------------------------------------------------------
+# Overwrite is recoverable: failure injection
+# ---------------------------------------------------------------------------
+
+def _fail_renames(monkeypatch, should_fail):
+    """Make ``os.replace`` raise for the (src, dst) pairs ``should_fail`` picks."""
+    import os
+
+    real = os.replace
+    calls = []
+
+    def replace(src, dst):
+        src, dst = pathlib.Path(src), pathlib.Path(dst)
+        calls.append((src.name, dst.name))
+        if should_fail(src, dst):
+            raise OSError(f"injected rename failure {src.name} -> {dst.name}")
+        return real(src, dst)
+
+    monkeypatch.setattr(os, "replace", replace)
+    return calls
+
+
+def _siblings(path):
+    return sorted(p.name for p in path.parent.iterdir())
+
+
+def _old_and_new(tmp_path):
+    old = _swe_state(label="previous")
+    path = old.save(tmp_path / "s")
+    coeffs = np.array(old.coeffs)
+    coeffs[2, 3, 1] *= 2.0
+    return old, _swe_state(coeffs=coeffs, label="replacement"), path
+
+
+def test_failed_install_during_overwrite_keeps_the_previous_state(
+        tmp_path, monkeypatch):
+    old, new, path = _old_and_new(tmp_path)
+    calls = _fail_renames(monkeypatch, lambda src, dst:
+                          ".tmp-" in src.name and dst == path)
+    with pytest.raises(OSError, match="injected"):
+        new.save(path, overwrite=True)
+    monkeypatch.undo()
+    assert any(".tmp-" in src and dst == "s" for src, dst in calls)
+    restored = load_initial_state(path)
+    assert restored.digest == old.digest and restored.label == "previous"
+    assert _siblings(path) == ["s"]              # no staging/backup litter
+
+
+def test_failed_restore_deletes_nothing_and_says_where_both_copies_are(
+        tmp_path, monkeypatch):
+    old, new, path = _old_and_new(tmp_path)
+    _fail_renames(monkeypatch, lambda src, dst: dst == path
+                  and (".tmp-" in src.name or ".bak-" in src.name))
+    with pytest.raises(InitialStateError, match="nothing was deleted") as info:
+        new.save(path, overwrite=True)
+    monkeypatch.undo()
+    assert not path.exists()
+    names = _siblings(path)
+    (backup,) = [n for n in names if ".bak-" in n]
+    (staging,) = [n for n in names if ".tmp-" in n]
+    assert backup in str(info.value) and staging in str(info.value)
+    assert load_initial_state(tmp_path / backup).digest == old.digest
+    assert load_initial_state(tmp_path / staging).digest == new.digest
+
+
+def test_failure_setting_the_previous_state_aside_leaves_it_in_place(
+        tmp_path, monkeypatch):
+    old, new, path = _old_and_new(tmp_path)
+    _fail_renames(monkeypatch, lambda src, dst: src == path)
+    with pytest.raises(OSError, match="injected"):
+        new.save(path, overwrite=True)
+    monkeypatch.undo()
+    assert load_initial_state(path).digest == old.digest
+    assert _siblings(path) == ["s"]
+
+
+def test_failure_writing_the_replacement_leaves_the_previous_state(
+        tmp_path, monkeypatch):
+    import tropoi.representation.archive.initial_state as module
+
+    old, new, path = _old_and_new(tmp_path)
+
+    def broken_write(target, array):
+        raise OSError("injected: disk full")
+
+    monkeypatch.setattr(module, "_write_npy", broken_write)
+    with pytest.raises(OSError, match="disk full"):
+        new.save(path, overwrite=True)
+    assert load_initial_state(path).digest == old.digest
+    assert _siblings(path) == ["s"]
+
+
+def test_undeletable_previous_state_is_reported_not_fatal(tmp_path,
+                                                          monkeypatch):
+    import shutil
+    import tropoi.representation.archive.initial_state as module
+
+    old, new, path = _old_and_new(tmp_path)
+    real_rmtree = shutil.rmtree
+
+    def rmtree(target, *args, **kwargs):
+        if ".bak-" in pathlib.Path(target).name:
+            raise OSError("injected: permission denied")
+        return real_rmtree(target, *args, **kwargs)
+
+    monkeypatch.setattr(module.shutil, "rmtree", rmtree)
+    with pytest.warns(UserWarning, match="could not delete the previous"):
+        new.save(path, overwrite=True)
+    monkeypatch.undo()
+    assert load_initial_state(path).digest == new.digest
+    (backup,) = [n for n in _siblings(path) if ".bak-" in n]
+    assert load_initial_state(tmp_path / backup).digest == old.digest
+
+
+def test_successful_overwrite_leaves_no_litter(tmp_path):
+    old, new, path = _old_and_new(tmp_path)
+    new.save(path, overwrite=True)
+    assert load_initial_state(path).digest == new.digest != old.digest
+    assert _siblings(path) == ["s"]
+
+
 def _rewrite(path, mutate):
     meta = path / METADATA_FILE
     document = json.loads(meta.read_text(encoding="utf-8"))
