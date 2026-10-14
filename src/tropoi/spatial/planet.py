@@ -42,117 +42,6 @@ class Planet:
                 f"f={self.params.oblateness:.5f}, "
                 f"grid=GridGeometry(n_points={self.grid.n_points})")
 
-    # @classmethod
-    # def generate(cls,
-    #              params: PlanetaryParameters = PlanetaryParameters.from_earth_like(),
-    #             #  grid_resolution: Tuple[int, int] = (512, 1024),
-    #              grid_resolution: int = 3,
-    #              l_max: int = 15,
-    #              seed: int = 1) -> 'Planet':
-    #     """
-    #     Generate a complete planet with procedural terrain.
-
-    #     Parameters:
-    #     -----------
-    #     params : PlanetaryParameters
-    #         Physical parameters
-    #     grid_resolution : int
-    #         Resolution of the geodesic grid (default: 3)
-    #     noise_params : NoiseParameters, optional
-    #         Noise generation parameters
-    #     compute_sh : bool
-    #         Whether to compute spherical harmonic decomposition
-    #     l_max : int, optional
-    #         Maximum degree for SH (default: num_lat - 1)
-    #     """
-
-    #     # Create grid
-    #     grid = GridGeometry(resolution=grid_resolution, radius=params.equatorial_radius)
-    #     # grid = GridGeometry.create(grid_resolution)
-    #     # num_lat, num_lon = grid.num_lat, grid.num_lon
-
-
-    #     # Create spherical harmonics and decompose
-    #     print("Computing spherical harmonic decomposition on GPU...")
-
-    #     sh = SphericalHarmonics(grid, l_max=l_max)
-    #     # sh.set_grid(grid.longitudes, grid.colatitudes)
-
-    #     so = SpectralOperators(sh, params.radius)
-
-
-    #     # if noise_params is None:
-    #     #     noise_params = NoiseParameters()
-    #     # # Generate terrain using noise
-    #     # print("Generating terrain...")
-    #     # surface_height = cls._generate_terrain_noise(
-    #     #     params, grid, noise_params
-    #     # )
-    #     noise_params = SpectralTerrainParams(
-    #         rms_elevation=4000.0,
-    #         spectral_exponent=3.5,
-    #         seed=seed,
-    #         l_min=1,
-    #     )
-    #     # height, height_coeffs = generate_spectral_terrain_gpu(
-    #     #     sph=sh,
-    #     #     lambda_grid=grid.lon_grid,
-    #     #     phi_grid=grid.lat_grid,
-    #     #     params=noise_params
-    #     # )
-    #     height, height_coeffs = generate_spectral_terrain_gpu(
-    #         sph=sh,
-    #         grid=grid,
-    #         params=noise_params
-    #     )
-
-    #     # Calculate radial distances (includes oblateness)
-    #     radial_distance = cls._calculate_radial_distances(
-    #         params, grid, grid.radial_distances
-    #     )
-
-
-    #     tect_params = TectonicParams(
-    #         dt=2.0,
-    #         kappa_height=1e-5,
-    #         kappa_strain=5e-6,
-    #         noise_strength=5.0,
-    #         l_cut_noise=8,
-    #         gamma_activity=4.0,
-    #     )
-    #     strain_coeffs = cp.zeros_like(height_coeffs)
-    #     for step in range(30):
-    #         height_coeffs, strain_coeffs = tectonic_update_step(
-    #             sph=sh,
-    #             so=so,
-    #             h_lm=height_coeffs,
-    #             S_lm=strain_coeffs,
-    #             params=tect_params
-    #         )
-
-    #     # Final terrain back to CPU grid:
-    #     height = sh.inv_transform(height_coeffs)
-
-    #     # Create elevation data structure
-    #     elevation = ElevationData(
-    #         surface_height=height,
-    #         radial_distance=radial_distance,
-    #         sh_coeffs=height_coeffs,
-    #         power_spectrum = cls._compute_power_spectrum(
-    #             height_coeffs,
-    #             sh.l_max
-    #         )
-    #     )
-
-    #     so = SpectralOperators(sh, params.radius)
-
-    #     pln = cls(params, grid, elevation, sh, so)
-
-    #     print(f"Spherical harmonics computed up to degree {sh.l_max}")
-    #     print(f"Theoretical oblateness = {params.oblateness:.6f}")
-    #     print(f"SH-derived oblateness = {elevation.oblateness_from_sh:.6f}")
-
-    #     return pln
     
     @classmethod
     def generate(cls,
@@ -221,15 +110,6 @@ class Planet:
             l_cut_noise=8,
             gamma_activity=4.0,
         )
-        # strain_coeffs = cp.zeros_like(height_coeffs)
-        # for step in range(20):
-        #     height_coeffs, strain_coeffs = tectonic_update_step(
-        #         sph=sh,
-        #         so=so,
-        #         h_lm=height_coeffs,
-        #         S_lm=strain_coeffs,
-        #         params=tect_params
-        #     )
 
         # Final terrain back to CPU grid:
         height = sh.inv_transform(height_coeffs)
@@ -253,19 +133,7 @@ class Planet:
         # Calculate radial distances
         radial_distance = cls._calculate_radial_distances(params, grid, height)
 
-        print("Computing spherical harmonic decomposition (Fast Matrix Method)...")
-
-        # Weights shape must match flattened grid
-        # sin_colat = cp.sin(grid.colatitudes)
-        # Broadcast to 2D grid (num_lat, num_lon)
-        # weights_2d = sin_colat[:, None] * dlat * dlon
-        # # Normalize to sum to 4pi? Actually SH orthogonality expects exact integration.
-        # # Riemann sum approximation is decent.
-        # weights_flat = weights_2d.ravel()
-
         pln = cls(params, grid, elevation, sh, so)
-
-        print(f"Spherical harmonics computed up to degree {sh.l_max}")
 
         return pln
     
@@ -279,11 +147,6 @@ class Planet:
         """
         R_eq = params.equatorial_radius
         f = params.oblateness
-
-        # Reference oblate spheroid radius at each latitude
-        # r(lat) = R_eq * sqrt(cos²(lat) + (1-f)² * sin²(lat))
-        # Per-point latitudes: matches the flat (n_points,) surface_height
-        # for both unstructured and structured grid families.
         cos_lat = np.cos(grid.point_latitudes)
         sin_lat = np.sin(grid.point_latitudes)
 
