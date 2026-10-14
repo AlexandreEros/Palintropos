@@ -1,7 +1,7 @@
 {
   "call_graph": {
     "call_sites": {
-      "builtin": 2170,
+      "builtin": 2168,
       "external": 1532,
       "internal": 1920,
       "unresolved": 2401
