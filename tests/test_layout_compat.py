@@ -44,11 +44,9 @@ MOVED_MODULES = {
     "tropoi.numerics.spherical_harmonics": "tropoi.spatial.transforms.spherical_harmonics",
     "tropoi.numerics.fast_geodesic_sh": "tropoi.spatial.transforms.fast_geodesic_sh",
     "tropoi.numerics.optimized_geodesic_sh": "tropoi.spatial.transforms.optimized_geodesic_sh",
-    "tropoi.numerics.compute_optimal_weights": "tropoi.spatial.transforms.compute_optimal_weights",
     "tropoi.numerics.cuda.cuda_utils": "tropoi.spatial.transforms.cuda.cuda_utils",
     "tropoi.numerics.spherical_backend": "tropoi.spatial.spherical_backend",
     "tropoi.numerics.spectral_operators": "tropoi.spatial.operators.spectral_operators",
-    "tropoi.numerics.differential_operators_spherical": "tropoi.spatial.operators.differential_operators_spherical",
     # spatial: initialization
     "tropoi.run.bve.initial_conditions": "tropoi.spatial.initialization.bve",
     "tropoi.run.swe.initial_conditions": "tropoi.spatial.initialization.swe",
@@ -313,8 +311,7 @@ def test_documented_cpu_only_modules_import_without_cupy_or_matplotlib():
 def test_cuda_kernel_sources_are_package_resources():
     sources = importlib.resources.files("tropoi.spatial.transforms.cuda")
     names = {entry.name for entry in sources.iterdir()}
-    assert {"legendre.cu", "sh_matrix.cu", "sh_matrix_real.cu",
-            "sph_harm.cu"} <= names
+    assert {"legendre.cu", "sh_matrix.cu"} <= names
     # the legacy directory keeps only the alias, never a second copy
     assert not list((SRC / "numerics" / "cuda").glob("*.cu"))
 

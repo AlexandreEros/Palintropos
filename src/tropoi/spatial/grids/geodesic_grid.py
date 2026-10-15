@@ -56,7 +56,6 @@ class GeodesicGridGeometry(GridGeometry):
 
             self.sinlat = cp.sin(self.latitudes)
             self.coslat = cp.cos(self.latitudes)
-            self.sincolat = cp.sin(cp.pi/2 - self.latitudes)
 
             self.volume = (4.0/3.0) * np.pi * (self.radius**3) / self.n_points
             self.reference_radius = self.radius
@@ -185,9 +184,6 @@ class GeodesicGridGeometry(GridGeometry):
         self.min_edge_length = float(min_edge_length)
 
         return sparse.coo_matrix((data, (row_indices, col_indices)), shape=(self.n_points, self.n_points))
-
-    def points_latlon(self) -> np.ndarray:
-        return np.column_stack([self.longitudes, self.latitudes])
 
     @property
     def cfl_length_scale(self) -> float | None:

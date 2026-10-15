@@ -9,54 +9,54 @@ Nodes are analysed modules; a directed edge A -> B means A has at least one stat
 * **all imports**: every static import statement, wherever it appears;
 * **import-time**: only edges with at least one import statement at module scope (executed when the importing module is imported). Edges made only of function-scope or `if TYPE_CHECKING:` imports are dropped.
 
-Edge counts by scope set: `function`: 102, `function+module`: 2, `function+type_checking`: 2, `module`: 225, `type_checking`: 7.
+Edge counts by scope set: `function`: 98, `function+module`: 2, `function+type_checking`: 2, `module`: 220, `type_checking`: 5.
 
 | Metric | all imports | import-time |
 |---|---|---|
-| Nodes \|V\| | 143 | 143 |
-| Directed edges \|E\| | 338 | 227 |
-| Density | 0.016645 | 0.011179 |
-| Weakly connected components | 3 | 8 |
-| WCC sizes | 92, 50, 1 | 84, 50, 4, 1, 1, 1, 1, 1 |
-| Strongly connected components | 137 | 143 |
+| Nodes \|V\| | 139 | 139 |
+| Directed edges \|E\| | 327 | 222 |
+| Density | 0.017047 | 0.011573 |
+| Weakly connected components | 3 | 7 |
+| WCC sizes | 90, 48, 1 | 83, 48, 4, 1, 1, 1, 1 |
+| Strongly connected components | 133 | 139 |
 | Nontrivial SCCs | 1 | 0 |
 | Nontrivial SCC sizes | 7 | - |
 | Nodes in cycles | 7 | 0 |
-| Fraction of nodes in cycles | 0.048951 | 0 |
-| Sources (in-degree 0) | 56 | 79 |
-| Sinks (out-degree 0) | 27 | 34 |
+| Fraction of nodes in cycles | 0.05036 | 0 |
+| Sources (in-degree 0) | 54 | 77 |
+| Sinks (out-degree 0) | 27 | 33 |
 | Reciprocal pairs | 1 | 0 |
-| Reciprocity | 0.005917 | 0 |
-| In-degree min / median / max | 0 / 1 / 49 | 0 / 0 / 49 |
-| In-degree mean | 2.363636 | 1.587413 |
+| Reciprocity | 0.006116 | 0 |
+| In-degree min / median / max | 0 / 1 / 47 | 0 / 0 / 47 |
+| In-degree mean | 2.352518 | 1.597122 |
 | In-degree quartiles | 0, 1, 3 | 0, 0, 2 |
-| In-degree zeros | 56 | 79 |
+| In-degree zeros | 54 | 77 |
 | Out-degree min / median / max | 0 / 1 / 17 | 0 / 1 / 11 |
-| Out-degree mean | 2.363636 | 1.587413 |
+| Out-degree mean | 2.352518 | 1.597122 |
 | Out-degree quartiles | 1, 1, 3 | 1, 1, 2 |
-| Out-degree zeros | 27 | 34 |
-| Condensation nodes | 137 | 143 |
-| Condensation edges | 304 | 227 |
-| Condensation sources / sinks | 57 / 27 | 79 / 34 |
-| Condensation longest path (edges) | 11 | 7 |
+| Out-degree zeros | 27 | 33 |
+| Condensation nodes | 133 | 139 |
+| Condensation edges | 293 | 222 |
+| Condensation sources / sinks | 55 / 27 | 77 / 33 |
+| Condensation longest path (edges) | 10 | 7 |
 
-In-degree histogram (all imports) {degree: modules}: 0: 56, 1: 24, 2: 22, 3: 11, 4: 9, 5: 1, 6: 7, 7: 5, 8: 2, 9: 2, 11: 2, 14: 1, 49: 1
+In-degree histogram (all imports) {degree: modules}: 0: 54, 1: 22, 2: 23, 3: 11, 4: 8, 5: 4, 6: 5, 7: 5, 8: 1, 9: 2, 11: 2, 14: 1, 47: 1
 
-Out-degree histogram (all imports) {degree: modules}: 0: 27, 1: 63, 2: 16, 3: 5, 4: 6, 5: 6, 6: 4, 7: 5, 8: 2, 9: 2, 10: 3, 11: 2, 12: 1, 17: 1
+Out-degree histogram (all imports) {degree: modules}: 0: 27, 1: 61, 2: 15, 3: 4, 4: 7, 5: 7, 6: 3, 7: 4, 8: 2, 9: 2, 10: 3, 11: 2, 12: 1, 17: 1
 
 **Top 10 fan-in (all imports)** (ties at cutoff: 5)
 
 | Node | Degree |
 |---|---|
-| `tropoi._compat` | 49 |
+| `tropoi._compat` | 47 |
 | `tropoi.spatial.planet` | 14 |
 | `tropoi.representation.visual.normalization` | 11 |
 | `tropoi.spatial.truncation` | 11 |
 | `tropoi.representation.visual.renderers` | 9 |
 | `tropoi.representation.visual.specs` | 9 |
-| `tropoi.representation.visual.fields` | 8 |
 | `tropoi.temporal.integration` | 8 |
 | `tropoi.representation.archive.schema` | 7 |
+| `tropoi.representation.visual.fields` | 7 |
 | `tropoi.spatial.environment` | 7 |
 
 **Top 10 fan-out (all imports)** (ties at cutoff: 2)
@@ -84,38 +84,38 @@ Out-degree histogram (all imports) {degree: modules}: 0: 27, 1: 63, 2: 16, 3: 5,
 
 ## Package-aggregated import graph
 
-Every module is mapped to its containing package (a package's `__init__` to the package itself) and parallel edges merged; edges inside one package are not self-loops but are counted separately: 97 module edges stay inside their package.
+Every module is mapped to its containing package (a package's `__init__` to the package itself) and parallel edges merged; edges inside one package are not self-loops but are counted separately: 92 module edges stay inside their package.
 
 | Metric | packages |
 |---|---|
 | Nodes \|V\| | 25 |
-| Directed edges \|E\| | 83 |
-| Density | 0.138333 |
+| Directed edges \|E\| | 82 |
+| Density | 0.136667 |
 | Weakly connected components | 1 |
 | WCC sizes | 25 |
-| Strongly connected components | 17 |
+| Strongly connected components | 18 |
 | Nontrivial SCCs | 3 |
-| Nontrivial SCC sizes | 6, 3, 2 |
-| Nodes in cycles | 11 |
-| Fraction of nodes in cycles | 0.44 |
+| Nontrivial SCC sizes | 6, 2, 2 |
+| Nodes in cycles | 10 |
+| Fraction of nodes in cycles | 0.4 |
 | Sources (in-degree 0) | 7 |
 | Sinks (out-degree 0) | 3 |
 | Reciprocal pairs | 3 |
-| Reciprocity | 0.072289 |
+| Reciprocity | 0.073171 |
 | In-degree min / median / max | 0 / 2 / 14 |
-| In-degree mean | 3.32 |
+| In-degree mean | 3.28 |
 | In-degree quartiles | 0, 2, 5 |
 | In-degree zeros | 7 |
 | Out-degree min / median / max | 0 / 3 / 10 |
-| Out-degree mean | 3.32 |
+| Out-degree mean | 3.28 |
 | Out-degree quartiles | 1, 3, 4 |
 | Out-degree zeros | 3 |
-| Condensation nodes | 17 |
-| Condensation edges | 34 |
+| Condensation nodes | 18 |
+| Condensation edges | 39 |
 | Condensation sources / sinks | 7 / 3 |
-| Condensation longest path (edges) | 7 |
+| Condensation longest path (edges) | 8 |
 
-**Top 10 fan-in (packages)** (ties at cutoff: 4)
+**Top 10 fan-in (packages)** (ties at cutoff: 3)
 
 | Node | Degree |
 |---|---|
@@ -148,21 +148,21 @@ Every module is mapped to its containing package (a package's `__init__` to the 
 **Nontrivial SCCs (packages)**
 
 1. `tropoi.cli`, `tropoi.representation.archive`, `tropoi.representation.visual`, `tropoi.run.bve`, `tropoi.run.pe`, `tropoi.run.swe`
-2. `tropoi.spatial`, `tropoi.spatial.operators`, `tropoi.spatial.terrain`
+2. `tropoi.spatial`, `tropoi.spatial.operators`
 3. `tropoi.spatial.grids`, `tropoi.spatial.transforms`
 
 ## Class graph
 
-* Classes: 120
+* Classes: 119
 * `inherits` edges between analysed classes: 9
 * `nests` edges (class defined in a class body): 0
 * Bases outside the analysed package: `RuntimeError` x5, `ValueError` x9, `abc.ABC` x2, `collections.abc.Mapping` x1, `enum.Enum` x2, `str` x2, `typing.Protocol` x3
 
 ## Call graph
 
-* Nodes (functions, methods, classes): 1112
-* Edges by kind: `call` 712, `constructor` 38, `instantiate` 270, `override` 6, `self` 266, `super` 2
-* Call sites by resolution outcome: builtin 2044, external 1481, internal 1710, unresolved 2244
+* Nodes (functions, methods, classes): 1076
+* Edges by kind: `call` 704, `constructor` 37, `instantiate` 265, `override` 6, `self` 255, `super` 2
+* Call sites by resolution outcome: builtin 1999, external 1387, internal 1681, unresolved 2136
 
 | Scoped graph | Roots | Depth | Nodes | Edges | Truncated nodes | Reachable (unbounded) |
 |---|---|---|---|---|---|---|

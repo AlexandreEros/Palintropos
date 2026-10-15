@@ -558,23 +558,7 @@
       "scopes": [
         "module"
       ],
-      "source": "tropoi.numerics.compute_optimal_weights",
-      "target": "tropoi._compat"
-    },
-    {
-      "kind": "imports",
-      "scopes": [
-        "module"
-      ],
       "source": "tropoi.numerics.cuda.cuda_utils",
-      "target": "tropoi._compat"
-    },
-    {
-      "kind": "imports",
-      "scopes": [
-        "module"
-      ],
-      "source": "tropoi.numerics.differential_operators_spherical",
       "target": "tropoi._compat"
     },
     {
@@ -1108,14 +1092,6 @@
     {
       "kind": "imports",
       "scopes": [
-        "module"
-      ],
-      "source": "tropoi.representation.visual.grid_adapter",
-      "target": "tropoi.representation.visual.fields"
-    },
-    {
-      "kind": "imports",
-      "scopes": [
         "function",
         "type_checking"
       ],
@@ -1496,22 +1472,6 @@
         "module"
       ],
       "source": "tropoi.representation.visual.vorticity_viewer",
-      "target": "tropoi.representation.visual.maps"
-    },
-    {
-      "kind": "imports",
-      "scopes": [
-        "function"
-      ],
-      "source": "tropoi.representation.visual.vorticity_viewer",
-      "target": "tropoi.representation.visual.timeline"
-    },
-    {
-      "kind": "imports",
-      "scopes": [
-        "module"
-      ],
-      "source": "tropoi.representation.visual.vorticity_viewer",
       "target": "tropoi.spatial.grids.grid"
     },
     {
@@ -1529,14 +1489,6 @@
       ],
       "source": "tropoi.representation.visual.vorticity_viewer",
       "target": "tropoi.spatial.planet"
-    },
-    {
-      "kind": "imports",
-      "scopes": [
-        "function"
-      ],
-      "source": "tropoi.representation.visual.vorticity_viewer",
-      "target": "tropoi.temporal.tendencies.barotropic"
     },
     {
       "kind": "imports",
@@ -2189,14 +2141,6 @@
     {
       "kind": "imports",
       "scopes": [
-        "module"
-      ],
-      "source": "tropoi.spatial.operators.spectral_operators",
-      "target": "tropoi.spatial.operators.differential_operators_spherical"
-    },
-    {
-      "kind": "imports",
-      "scopes": [
         "function"
       ],
       "source": "tropoi.spatial.operators.spectral_operators",
@@ -2343,40 +2287,8 @@
       "scopes": [
         "type_checking"
       ],
-      "source": "tropoi.spatial.terrain.tectonics",
-      "target": "tropoi.spatial.operators.spectral_operators"
-    },
-    {
-      "kind": "imports",
-      "scopes": [
-        "type_checking"
-      ],
-      "source": "tropoi.spatial.terrain.tectonics",
-      "target": "tropoi.spatial.transforms.optimized_geodesic_sh"
-    },
-    {
-      "kind": "imports",
-      "scopes": [
-        "type_checking"
-      ],
       "source": "tropoi.spatial.terrain.terrain_spectral",
       "target": "tropoi.spatial.transforms.optimized_geodesic_sh"
-    },
-    {
-      "kind": "imports",
-      "scopes": [
-        "function"
-      ],
-      "source": "tropoi.spatial.transforms.compute_optimal_weights",
-      "target": "tropoi.spatial.grids.geodesic_grid"
-    },
-    {
-      "kind": "imports",
-      "scopes": [
-        "function"
-      ],
-      "source": "tropoi.spatial.transforms.compute_optimal_weights",
-      "target": "tropoi.spatial.transforms.fast_geodesic_sh"
     },
     {
       "kind": "imports",
@@ -2856,27 +2768,9 @@
     {
       "category": "code",
       "dynamic_import_calls": 0,
-      "id": "tropoi.numerics.compute_optimal_weights",
-      "is_package": false,
-      "path": "tropoi/numerics/compute_optimal_weights.py",
-      "stdlib_imports": [],
-      "third_party_imports": []
-    },
-    {
-      "category": "code",
-      "dynamic_import_calls": 0,
       "id": "tropoi.numerics.cuda.cuda_utils",
       "is_package": false,
       "path": "tropoi/numerics/cuda/cuda_utils.py",
-      "stdlib_imports": [],
-      "third_party_imports": []
-    },
-    {
-      "category": "code",
-      "dynamic_import_calls": 0,
-      "id": "tropoi.numerics.differential_operators_spherical",
-      "is_package": false,
-      "path": "tropoi/numerics/differential_operators_spherical.py",
       "stdlib_imports": [],
       "third_party_imports": []
     },
@@ -3508,12 +3402,10 @@
       "is_package": false,
       "path": "tropoi/representation/visual/vorticity_viewer.py",
       "stdlib_imports": [
-        "__future__",
-        "pathlib"
+        "__future__"
       ],
       "third_party_imports": [
         "cupy",
-        "matplotlib",
         "numpy"
       ]
     },
@@ -4026,18 +3918,6 @@
     {
       "category": "code",
       "dynamic_import_calls": 0,
-      "id": "tropoi.spatial.operators.differential_operators_spherical",
-      "is_package": false,
-      "path": "tropoi/spatial/operators/differential_operators_spherical.py",
-      "stdlib_imports": [],
-      "third_party_imports": [
-        "cupy",
-        "cupyx"
-      ]
-    },
-    {
-      "category": "code",
-      "dynamic_import_calls": 0,
       "id": "tropoi.spatial.operators.spectral_operators",
       "is_package": false,
       "path": "tropoi/spatial/operators/spectral_operators.py",
@@ -4158,12 +4038,9 @@
       "path": "tropoi/spatial/terrain/tectonics.py",
       "stdlib_imports": [
         "__future__",
-        "dataclasses",
-        "typing"
+        "dataclasses"
       ],
-      "third_party_imports": [
-        "cupy"
-      ]
+      "third_party_imports": []
     },
     {
       "category": "code",
@@ -4193,19 +4070,6 @@
       ],
       "third_party_imports": [
         "cupy"
-      ]
-    },
-    {
-      "category": "code",
-      "dynamic_import_calls": 0,
-      "id": "tropoi.spatial.transforms.compute_optimal_weights",
-      "is_package": false,
-      "path": "tropoi/spatial/transforms/compute_optimal_weights.py",
-      "stdlib_imports": [],
-      "third_party_imports": [
-        "cupy",
-        "numpy",
-        "scipy"
       ]
     },
     {

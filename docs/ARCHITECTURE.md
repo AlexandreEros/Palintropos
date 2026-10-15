@@ -127,10 +127,10 @@ Williamson-5 constants from `run.swe.config` / `run.pe.config`).
 | `tropoi.physics.topography` | `tropoi.spatial.terrain.topography` |
 | `tropoi.physics.sigma_coordinate` | `tropoi.spatial.sigma_coordinate` |
 | `tropoi.numerics.{grid_base,grid,geodesic_grid,latlon_grid,cartesian_to_spherical,integration,grid_interpolation}` | `tropoi.spatial.grids.*` |
-| `tropoi.numerics.{spherical_harmonics,fast_geodesic_sh,optimized_geodesic_sh,compute_optimal_weights}` | `tropoi.spatial.transforms.*` |
+| `tropoi.numerics.{spherical_harmonics,fast_geodesic_sh,optimized_geodesic_sh}` | `tropoi.spatial.transforms.*` |
 | `tropoi.numerics.cuda.cuda_utils` | `tropoi.spatial.transforms.cuda.cuda_utils` |
 | `tropoi.numerics.spherical_backend` | `tropoi.spatial.spherical_backend` |
-| `tropoi.numerics.{spectral_operators,differential_operators_spherical}` | `tropoi.spatial.operators.*` |
+| `tropoi.numerics.spectral_operators` | `tropoi.spatial.operators.spectral_operators` |
 | `tropoi.run.{bve,swe,pe}.initial_conditions` | `tropoi.spatial.initialization.{bve,swe,pe}` |
 | `tropoi.run.engine` | `tropoi.temporal.integration` |
 | `tropoi.physics.{barotropic,shallow_water,primitive_equations}` | `tropoi.temporal.tendencies.*` (states in `tropoi.spatial.states.*`) |

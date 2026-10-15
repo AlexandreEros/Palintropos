@@ -108,12 +108,6 @@ class GaussLatLonGridGeometry(GridGeometry):
     def grid_shape(self) -> tuple[int, int]:
         return (self.nlat, self.nlon)
 
-    def points_latlon(self) -> np.ndarray:
-        return np.column_stack([
-            cp.asnumpy(self._point_longitudes),
-            cp.asnumpy(self._point_latitudes),
-        ])
-
     # -- quadrature / metric ---------------------------------------------------
 
     @property
@@ -190,10 +184,6 @@ class GaussLatLonSphericalHarmonics:
     def inv_transform(self, coeffs) -> cp.ndarray:
         """Synthesis: coefficients -> flat (n_points,) field."""
         return self.sh.inv_transform(coeffs)
-
-    def inverse_transform(self, coeffs):
-        """Alias for inv_transform."""
-        return self.inv_transform(coeffs)
 
     def transform_batch(self, values) -> cp.ndarray:
         """Batched analysis of (K, n_points) fields -> (K, l+1, l+1)."""

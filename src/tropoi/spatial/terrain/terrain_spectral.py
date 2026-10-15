@@ -99,34 +99,3 @@ def generate_spectral_terrain_gpu(
     return coeffs
 
 
-def diffuse_spectral_coeffs(
-    coeffs: cp.ndarray,
-    kappa: float,
-    dt: float,
-) -> cp.ndarray:
-    """
-    Apply one step of spectral diffusion (∂h/∂t = κ ∇² h) to SH coefficients.
-
-    In spherical harmonics, ∇²Y_lm = -l(l+1) Y_lm, so each mode decays as:
-        a_lm(t + dt) = a_lm(t) * exp(-κ l(l+1) dt)
-
-    Parameters
-    ----------
-    coeffs : cp.ndarray, shape (l_max+1, l_max+1)
-        Spectral coefficients (real basis, m>=0 layout).
-    kappa : float
-        Diffusivity coefficient (controls the rate of smoothing).
-    dt : float
-        Time step.
-
-    Returns
-    -------
-    cp.ndarray
-        New coefficients after diffusion (same shape).
-    """
-    l_max = coeffs.shape[0] - 1
-    l_vals = cp.arange(l_max + 1, dtype=cp.float64)
-    decay = cp.exp(-kappa * l_vals * (l_vals + 1.0) * dt)
-    decay_mat = decay[:, None]  # broadcast over m
-
-    return coeffs * decay_mat

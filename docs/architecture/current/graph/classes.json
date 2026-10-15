@@ -1485,14 +1485,6 @@
         },
         {
           "kind": "method",
-          "name": "_plot_all_snapshots_legacy"
-        },
-        {
-          "kind": "method",
-          "name": "plot_all_snapshots"
-        },
-        {
-          "kind": "method",
           "name": "summary_spec"
         }
       ],
@@ -1916,10 +1908,6 @@
         {
           "kind": "property",
           "name": "point_longitudes"
-        },
-        {
-          "kind": "method",
-          "name": "points_latlon"
         }
       ],
       "module": "tropoi.spatial.grids.geodesic_grid",
@@ -1977,10 +1965,6 @@
         {
           "kind": "property",
           "name": "point_longitudes"
-        },
-        {
-          "kind": "method",
-          "name": "points_latlon"
         }
       ],
       "module": "tropoi.spatial.grids.grid",
@@ -2007,10 +1991,6 @@
         },
         {
           "kind": "property",
-          "name": "is_structured"
-        },
-        {
-          "kind": "property",
           "name": "latitudes"
         },
         {
@@ -2028,10 +2008,6 @@
         {
           "kind": "property",
           "name": "point_longitudes"
-        },
-        {
-          "kind": "method",
-          "name": "points_latlon"
         }
       ],
       "module": "tropoi.spatial.grids.grid_base",
@@ -2077,10 +2053,6 @@
         {
           "kind": "property",
           "name": "point_longitudes"
-        },
-        {
-          "kind": "method",
-          "name": "points_latlon"
         }
       ],
       "module": "tropoi.spatial.grids.latlon_grid",
@@ -2106,10 +2078,6 @@
         {
           "kind": "method",
           "name": "inv_transform_batch"
-        },
-        {
-          "kind": "method",
-          "name": "inverse_transform"
         },
         {
           "kind": "method",
@@ -2269,76 +2237,11 @@
     {
       "decorators": [],
       "external_bases": [],
-      "id": "tropoi.spatial.operators.differential_operators_spherical.DifferentialOperatorsSpherical",
-      "members": [
-        {
-          "kind": "method",
-          "name": "__init__"
-        },
-        {
-          "kind": "staticmethod",
-          "name": "_looks_like_degrees"
-        },
-        {
-          "kind": "method",
-          "name": "build_laplacian_matrix"
-        },
-        {
-          "kind": "method",
-          "name": "build_partial_derivative_operators"
-        },
-        {
-          "kind": "method",
-          "name": "build_spherical_laplacian_operator"
-        },
-        {
-          "kind": "method",
-          "name": "calculate_curl"
-        },
-        {
-          "kind": "method",
-          "name": "calculate_divergence"
-        },
-        {
-          "kind": "method",
-          "name": "calculate_gradient"
-        },
-        {
-          "kind": "method",
-          "name": "calculate_laplacian"
-        },
-        {
-          "kind": "method",
-          "name": "calculate_vector_gradient"
-        },
-        {
-          "kind": "classmethod",
-          "name": "from_geodesic_grid"
-        }
-      ],
-      "module": "tropoi.spatial.operators.differential_operators_spherical",
-      "qualname": "DifferentialOperatorsSpherical"
-    },
-    {
-      "decorators": [],
-      "external_bases": [],
       "id": "tropoi.spatial.operators.spectral_operators.SpectralOperators",
       "members": [
         {
           "kind": "method",
           "name": "__init__"
-        },
-        {
-          "kind": "method",
-          "name": "_get_differential_ops"
-        },
-        {
-          "kind": "staticmethod",
-          "name": "_is_geodesic_grid"
-        },
-        {
-          "kind": "staticmethod",
-          "name": "_is_latlon_grid"
         },
         {
           "kind": "method",
@@ -2366,15 +2269,7 @@
         },
         {
           "kind": "method",
-          "name": "d_lambda_field"
-        },
-        {
-          "kind": "method",
           "name": "grad_from_scalar"
-        },
-        {
-          "kind": "method",
-          "name": "inv_d_lambda"
         },
         {
           "kind": "method",
@@ -2395,10 +2290,6 @@
         {
           "kind": "method",
           "name": "sin_theta_d_theta_coeffs"
-        },
-        {
-          "kind": "method",
-          "name": "sin_theta_d_theta_field"
         },
         {
           "kind": "method",
@@ -2855,10 +2746,6 @@
         },
         {
           "kind": "method",
-          "name": "inverse_transform"
-        },
-        {
-          "kind": "method",
           "name": "transform"
         },
         {
@@ -2901,10 +2788,6 @@
         {
           "kind": "method",
           "name": "inv_transform"
-        },
-        {
-          "kind": "method",
-          "name": "inverse_transform"
         },
         {
           "kind": "method",
@@ -3401,14 +3284,6 @@
         {
           "kind": "method",
           "name": "__init__"
-        },
-        {
-          "kind": "method",
-          "name": "step_leapfrog"
-        },
-        {
-          "kind": "method",
-          "name": "streamfunction_to_vorticity"
         },
         {
           "kind": "method",

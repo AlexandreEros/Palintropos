@@ -62,7 +62,7 @@
     },
     {
       "kind": "imports",
-      "module_edges": 14,
+      "module_edges": 12,
       "source": "tropoi.numerics",
       "target": "tropoi"
     },
@@ -200,7 +200,7 @@
     },
     {
       "kind": "imports",
-      "module_edges": 3,
+      "module_edges": 2,
       "source": "tropoi.representation.visual",
       "target": "tropoi.temporal.tendencies"
     },
@@ -436,17 +436,11 @@
       "kind": "imports",
       "module_edges": 1,
       "source": "tropoi.spatial.terrain",
-      "target": "tropoi.spatial.operators"
-    },
-    {
-      "kind": "imports",
-      "module_edges": 2,
-      "source": "tropoi.spatial.terrain",
       "target": "tropoi.spatial.transforms"
     },
     {
       "kind": "imports",
-      "module_edges": 3,
+      "module_edges": 2,
       "source": "tropoi.spatial.transforms",
       "target": "tropoi.spatial.grids"
     },
@@ -514,7 +508,7 @@
     {
       "id": "tropoi.numerics",
       "internal_edges": 0,
-      "modules": 15
+      "modules": 13
     },
     {
       "id": "tropoi.numerics.cuda",
@@ -543,7 +537,7 @@
     },
     {
       "id": "tropoi.representation.visual",
-      "internal_edges": 55,
+      "internal_edges": 52,
       "modules": 20
     },
     {
@@ -588,8 +582,8 @@
     },
     {
       "id": "tropoi.spatial.operators",
-      "internal_edges": 1,
-      "modules": 2
+      "internal_edges": 0,
+      "modules": 1
     },
     {
       "id": "tropoi.spatial.states",
@@ -603,8 +597,8 @@
     },
     {
       "id": "tropoi.spatial.transforms",
-      "internal_edges": 2,
-      "modules": 4
+      "internal_edges": 1,
+      "modules": 3
     },
     {
       "id": "tropoi.spatial.transforms.cuda",

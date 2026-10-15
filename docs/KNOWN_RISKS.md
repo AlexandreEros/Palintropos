@@ -259,7 +259,7 @@ analysis quadrature error, and time-truncation error (the advective step is now
 state-adaptive per R-4, but RK4 temporal error and the uncontrolled `ν∇²` stability margin
 remain) — attribution is the next resolution/step sweep, not yet established.
 
-### R-6. `step_leapfrog` is dead code that crashes if called
+### R-6. `step_leapfrog` is dead code that crashes if called — ✅ FIXED (removed, branch `chore/remove-dead-code`)
 
 It passes raw coefficient arrays to `vorticity_to_streamfunction`, which asserts
 `isinstance(vrt_state, BarotropicState)` → `AssertionError` on first use. Only `rk4_step`
@@ -345,7 +345,11 @@ computation at res 5. Pin of `cupy-cuda11x` also ties the project to CUDA 11.
 
 ## S4 — Hygiene and documentation
 
-### R-16. Latent/duplicated numerical machinery
+### R-16. Latent/duplicated numerical machinery — partly fixed (branch `chore/remove-dead-code`)
+
+> `DifferentialOperatorsSpherical`, `compute_optimal_weights`, `sh_matrix_real.cu` and the
+> never-launched `sph_harm.cu` kernel were deleted. `LatLonSphericalHarmonics` remains as the
+> test baseline described below.
 
 `DifferentialOperatorsSpherical` (local least-squares gradients + a **graph Laplacian
 `D − W`, which is not a consistent surface-Laplacian discretization**) is constructed
@@ -355,11 +359,11 @@ these clearly as experimental or delete them.
 
 ### R-17. Assorted hygiene
 
-- Empty modules: `run/bve/config.py`, `run/bve/io.py`, `physics/gravity.py`,
-  `viz/spectra.py`, `viz/__init__.py`.
-- `.bak` files inside the package (`sh_matrixcu.bak`, `fast_geodesic_shpy.bak`).
-- Large commented-out blocks (old `Planet.generate`, old `SpectralOperators`).
-- `Planet.generate` computes `radial_distance` twice; runs terrain synthesis even for BVE
+- ✅ Empty modules (`physics/gravity.py`, `viz/spectra.py`), the `.bak` files and the
+  commented-out old `Planet.generate`/`SpectralOperators` blocks were deleted
+  (branch `chore/remove-dead-code`); `Planet.generate` no longer computes
+  `radial_distance` twice.
+- `Planet.generate` runs terrain synthesis even for BVE
   runs; default terrain RMS is 0.1 % of the radius (6.4 km) — decorative but odd.
 - `_random_low_l` writes coefficients into invalid m > l slots (harmlessly ignored) and
   non-zero imaginary parts on m = 0 (silently dropped by synthesis).
