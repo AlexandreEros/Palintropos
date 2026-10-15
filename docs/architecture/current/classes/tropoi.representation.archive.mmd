@@ -26,6 +26,23 @@ classDiagram
     c_tropoi_orepresentation_oarchive_ocapsule_oCapsuleStorage : +stored#95;array()
     c_tropoi_orepresentation_oarchive_ocapsule_oCapsuleStorage : +time#95;provenance
     c_tropoi_orepresentation_oarchive_ocapsule_oCapsuleStorage : +times
+    class c_tropoi_orepresentation_oarchive_oinitial__state_oInitialState["InitialState (representation.archive.initial_state)"]
+    c_tropoi_orepresentation_oarchive_oinitial__state_oInitialState : +#95;#95;post#95;init#95;#95;()
+    c_tropoi_orepresentation_oarchive_oinitial__state_oInitialState : +#95;#95;repr#95;#95;()
+    c_tropoi_orepresentation_oarchive_oinitial__state_oInitialState : +digest
+    c_tropoi_orepresentation_oarchive_oinitial__state_oInitialState : +identity()
+    c_tropoi_orepresentation_oarchive_oinitial__state_oInitialState : +l#95;max
+    c_tropoi_orepresentation_oarchive_oinitial__state_oInitialState : +load()$
+    c_tropoi_orepresentation_oarchive_oinitial__state_oInitialState : +run#95;config#95;entries()
+    c_tropoi_orepresentation_oarchive_oinitial__state_oInitialState : +save()
+    c_tropoi_orepresentation_oarchive_oinitial__state_oInitialState : +schema
+    c_tropoi_orepresentation_oarchive_oinitial__state_oInitialState : +state
+    c_tropoi_orepresentation_oarchive_oinitial__state_oInitialState : +summary()
+    c_tropoi_orepresentation_oarchive_oinitial__state_oInitialState : +to#95;document()
+    c_tropoi_orepresentation_oarchive_oinitial__state_oInitialState : +topography#95;modes
+    c_tropoi_orepresentation_oarchive_oinitial__state_oInitialState : +validate()
+    class c_tropoi_orepresentation_oarchive_oinitial__state_oInitialStateError["InitialStateError (representation.archive.initial_state)"]
+    c_tropoi_orepresentation_oarchive_oinitial__state_oInitialStateError : external base ValueError
     class c_tropoi_orepresentation_oarchive_oschema_oSchemaError["SchemaError (representation.archive.schema)"]
     c_tropoi_orepresentation_oarchive_oschema_oSchemaError : external base ValueError
     class c_tropoi_orepresentation_oarchive_oschema_oStateSchema["StateSchema (representation.archive.schema)"]

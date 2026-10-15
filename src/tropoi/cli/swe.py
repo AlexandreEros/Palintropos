@@ -64,7 +64,7 @@ def _w5_planet_params(run_config):
         sidereal_day_s=day_hours * 3600.0)
 
 
-def build_swe_model(run_config: Mapping):
+def build_swe_model(run_config: Mapping, *, topography_lm=None):
     """The shallow-water model (planet + terrain + core) of a run.
 
     Built from the resolved run configuration dict — exactly the values
@@ -73,13 +73,22 @@ def build_swe_model(run_config: Mapping):
     capsules are never re-validated by newer preset guards). Topography is
     reconstructed deterministically from the same keys the scientific
     hash covers. Imports CuPy; call only after validation.
+
+    Runs started from a saved initial state (``tropoi.run.custom``) carry
+    an explicit ``planet`` block, which is authoritative for the planet,
+    and use their persisted, already-resolved terrain: ``topography_lm``
+    (host or device elevation coefficients, metres) is then required for
+    any non-flat terrain and is used exactly, never re-projected.
     """
     from tropoi.spatial.environment import PlanetaryParameters
     from tropoi.spatial.planet import Planet
     from tropoi.temporal.tendencies.shallow_water import ShallowWaterModel
     from tropoi.spatial.terrain.topography import Topography
 
-    if run_config.get("scenario") == "williamson5":
+    if "planet" in run_config:
+        from tropoi.spatial.specification import PlanetSpec
+        params = PlanetSpec.from_dict(run_config["planet"]).to_parameters()
+    elif run_config.get("scenario") == "williamson5":
         # Benchmark planets are exact ideal spheres (see _w5_planet_params).
         params = _w5_planet_params(run_config)
     else:
@@ -100,7 +109,22 @@ def build_swe_model(run_config: Mapping):
     # terrain arrays need to be persisted with the run. Manifests without
     # a topography key are flat runs.
     topography_kind = run_config.get("topography", "flat")
-    if topography_kind == "mountain":
+    if topography_lm is not None:
+        if topography_kind == "flat":
+            raise ValueError(
+                "resolved terrain coefficients were given for a flat-bottom "
+                "run configuration")
+        import cupy as cp
+        topography = Topography(
+            cp.asarray(topography_lm, dtype=cp.complex128),
+            preset=topography_kind,
+            parameters=dict(run_config.get("topography_parameters") or {}))
+    elif "initial_state_digest" in run_config and topography_kind != "flat":
+        raise ValueError(
+            "this run started from a saved initial state whose resolved "
+            "terrain must be supplied (topography_lm, persisted under the "
+            "capsule's initial_state/); it is never re-projected")
+    elif topography_kind == "mountain":
         topography = Topography.mountain(
             planet,
             height_m=float(run_config["mountain_height_m"]),

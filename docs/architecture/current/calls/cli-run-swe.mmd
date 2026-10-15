@@ -6,6 +6,7 @@ flowchart LR
     end
     subgraph g_tropoi_ocli_omain["cli.main"]
         n_tropoi_ocli_omain_o__cmd__run__swe["_cmd_run_swe()"]
+        n_tropoi_ocli_omain_orun__initial__state__command["run_initial_state_command()"]
     end
     subgraph g_tropoi_ocli_orun__lifecycle["cli.run_lifecycle"]
         n_tropoi_ocli_orun__lifecycle_oexecute__with__provenance["execute_with_provenance()"]
@@ -20,7 +21,21 @@ flowchart LR
         n_tropoi_ocli_oswe_obuild__swe__model["build_swe_model()"]
         n_tropoi_ocli_oswe_oexecute__run["execute_run()"]
     end
+    subgraph g_tropoi_orepresentation_oarchive_oinitial__state["representation.archive.initial_state"]
+        n_tropoi_orepresentation_oarchive_oinitial__state_oInitialState{{"InitialState"}}
+        n_tropoi_orepresentation_oarchive_oinitial__state_oInitialStateError{{"InitialStateError"}}
+        n_tropoi_orepresentation_oarchive_oinitial__state_o__canonical__json["_canonical_json()"]
+        n_tropoi_orepresentation_oarchive_oinitial__state_o__check__block["_check_block()"]
+        n_tropoi_orepresentation_oarchive_oinitial__state_o__load__array["_load_array()"]
+        n_tropoi_orepresentation_oarchive_oinitial__state_o__require__mapping["_require_mapping()"]
+        n_tropoi_orepresentation_oarchive_oinitial__state_oarray__digest["array_digest()"]
+        n_tropoi_orepresentation_oarchive_oinitial__state_oload__initial__state["load_initial_state()"]
+    end
     subgraph g_tropoi_orepresentation_oarchive_oschema["representation.archive.schema"]
+        n_tropoi_orepresentation_oarchive_oschema_oSchemaError{{"SchemaError"}}
+        n_tropoi_orepresentation_oarchive_oschema_oStateSchema_ofrom__manifest__dict["StateSchema.from_manifest_dict()"]
+        n_tropoi_orepresentation_oarchive_oschema_oUnknownSchemaVersionError{{"UnknownSchemaVersionError"}}
+        n_tropoi_orepresentation_oarchive_oschema_oUnsupportedConventionError{{"UnsupportedConventionError"}}
         n_tropoi_orepresentation_oarchive_oschema_odiagnostic__definitions__for["diagnostic_definitions_for()"]
         n_tropoi_orepresentation_oarchive_oschema_oprovenance__blocks["provenance_blocks()"]
         n_tropoi_orepresentation_oarchive_oschema_ostate__schema__for["state_schema_for()"]
@@ -46,6 +61,21 @@ flowchart LR
         n_tropoi_orepresentation_ovisual_oswe_orender__swe__snapshots["render_swe_snapshots()"]
         n_tropoi_orepresentation_ovisual_oswe_orender__swe__summary["render_swe_summary()"]
     end
+    subgraph g_tropoi_orun_obve_oconfig["run.bve.config"]
+        n_tropoi_orun_obve_oconfig_oBVERunConfig_o__resolve__plots["BVERunConfig._resolve_plots()"]
+    end
+    subgraph g_tropoi_orun_ocustom_oconfig["run.custom.config"]
+        n_tropoi_orun_ocustom_oconfig_oCustomRunConfig_oresolve["CustomRunConfig.resolve()"]
+    end
+    subgraph g_tropoi_orun_ocustom_oexecute["run.custom.execute"]
+        n_tropoi_orun_ocustom_oexecute_o__clean__artifacts["_clean_artifacts()"]
+        n_tropoi_orun_ocustom_oexecute_o__execute__solver["_execute_solver()"]
+        n_tropoi_orun_ocustom_oexecute_o__integrate["_integrate()"]
+        n_tropoi_orun_ocustom_oexecute_o__notes["_notes()"]
+        n_tropoi_orun_ocustom_oexecute_o__persist__initial__state["_persist_initial_state()"]
+        n_tropoi_orun_ocustom_oexecute_o__resolve__base__dir["_resolve_base_dir()"]
+        n_tropoi_orun_ocustom_oexecute_oexecute__custom__run["execute_custom_run()"]
+    end
     subgraph g_tropoi_orun_oswe_oconfig["run.swe.config"]
         n_tropoi_orun_oswe_oconfig_oSWERunConfig_o__resolve__plots["SWERunConfig._resolve_plots()"]
         n_tropoi_orun_oswe_oconfig_oSWERunConfig_oresolve["SWERunConfig.resolve()"]
@@ -59,33 +89,54 @@ flowchart LR
     subgraph g_tropoi_ospatial_oinitialization_oswe["spatial.initialization.swe"]
         n_tropoi_ospatial_oinitialization_oswe_omake__swe__ic["make_swe_ic()"]
     end
+    subgraph g_tropoi_ospatial_omodes["spatial.modes"]
+        n_tropoi_ospatial_omodes_oFieldSpec_ofrom__dict["FieldSpec.from_dict()"]
+    end
     subgraph g_tropoi_ospatial_oplanet["spatial.planet"]
         n_tropoi_ospatial_oplanet_oPlanet_ogenerate["Planet.generate()"]
+    end
+    subgraph g_tropoi_ospatial_ospecification["spatial.specification"]
+        n_tropoi_ospatial_ospecification_oDiscretizationSpec_ofrom__dict["DiscretizationSpec.from_dict()"]
+        n_tropoi_ospatial_ospecification_oFluidLayerSpec_ofrom__dict["FluidLayerSpec.from_dict()"]
+        n_tropoi_ospatial_ospecification_oPlanetSpec_ofrom__dict["PlanetSpec.from_dict()"]
+        n_tropoi_ospatial_ospecification_oSpecificationError{{"SpecificationError"}}
+        n_tropoi_ospatial_ospecification_oTopographySpec_ofrom__dict["TopographySpec.from_dict()"]
+        n_tropoi_ospatial_ospecification_o__check__document["_check_document()"]
+        n_tropoi_ospatial_ospecification_o__check__statement["_check_statement()"]
     end
     subgraph g_tropoi_ospatial_ostates_oshallow__water["spatial.states.shallow_water"]
         n_tropoi_ospatial_ostates_oshallow__water_oShallowWaterState{{"ShallowWaterState"}}
     end
     subgraph g_tropoi_ospatial_oterrain_otopography["spatial.terrain.topography"]
+        n_tropoi_ospatial_oterrain_otopography_oTopography{{"Topography"}}
         n_tropoi_ospatial_oterrain_otopography_oTopography_omountain["Topography.mountain()"]
         n_tropoi_ospatial_oterrain_otopography_oTopography_owilliamson5__cone["Topography.williamson5_cone()"]
     end
     subgraph g_tropoi_ospatial_otruncation["spatial.truncation"]
+        n_tropoi_ospatial_otruncation_oproduct__truncation__cut["product_truncation_cut()"]
         n_tropoi_ospatial_otruncation_orequire__scenario__support["require_scenario_support()"]
     end
     subgraph g_tropoi_otemporal_ointegration["temporal.integration"]
         n_tropoi_otemporal_ointegration_oIntegrationScheduler{{"IntegrationScheduler"}}
+        n_tropoi_otemporal_ointegration_o__require__finite__nonneg["_require_finite_nonneg()"]
         n_tropoi_otemporal_ointegration_o__require__finite__number["_require_finite_number()"]
         n_tropoi_otemporal_ointegration_o__require__finite__positive["_require_finite_positive()"]
         n_tropoi_otemporal_ointegration_oadvective__cfl__timestep["advective_cfl_timestep()"]
+        n_tropoi_otemporal_ointegration_ocount__snapshot__times["count_snapshot_times()"]
         n_tropoi_otemporal_ointegration_ointegrate["integrate()"]
+        n_tropoi_otemporal_ointegration_ointerval__snapshot__times["interval_snapshot_times()"]
         n_tropoi_otemporal_ointegration_ork4__step__array["rk4_step_array()"]
         n_tropoi_otemporal_ointegration_ovalidate__snapshot__schedule["validate_snapshot_schedule()"]
     end
     subgraph g_tropoi_otemporal_otendencies_oshallow__water["temporal.tendencies.shallow_water"]
         n_tropoi_otemporal_otendencies_oshallow__water_oShallowWaterModel{{"ShallowWaterModel"}}
     end
+    n_tropoi_ocli_omain_o__cmd__run__swe --> n_tropoi_ocli_omain_orun__initial__state__command
     n_tropoi_ocli_omain_o__cmd__run__swe --> n_tropoi_ocli_oswe_oexecute__run
     n_tropoi_ocli_omain_o__cmd__run__swe --> n_tropoi_orun_oswe_oconfig_oSWERunConfig_oresolve
+    n_tropoi_ocli_omain_orun__initial__state__command --> n_tropoi_orepresentation_oarchive_oinitial__state_oload__initial__state
+    n_tropoi_ocli_omain_orun__initial__state__command --> n_tropoi_orun_ocustom_oconfig_oCustomRunConfig_oresolve
+    n_tropoi_ocli_omain_orun__initial__state__command --> n_tropoi_orun_ocustom_oexecute_oexecute__custom__run
     n_tropoi_ocli_orun__lifecycle_oexecute__with__provenance --> n_tropoi_orepresentation_oarchive_oschema_oprovenance__blocks
     n_tropoi_ocli_orun__lifecycle_oexecute__with__provenance --> n_tropoi_orepresentation_oarchive_owriter_oatomic__write__text
     n_tropoi_ocli_orun__lifecycle_oexecute__with__provenance --> n_tropoi_orepresentation_oarchive_owriter_ocreate__run__dir
@@ -103,6 +154,8 @@ flowchart LR
     n_tropoi_ocli_oswe_obuild__swe__model --> n_tropoi_ocli_oswe_o__w5__planet__params
     n_tropoi_ocli_oswe_obuild__swe__model --> n_tropoi_ospatial_oenvironment_oPlanetaryParameters_ofrom__earth__like
     n_tropoi_ocli_oswe_obuild__swe__model --> n_tropoi_ospatial_oplanet_oPlanet_ogenerate
+    n_tropoi_ocli_oswe_obuild__swe__model --> n_tropoi_ospatial_ospecification_oPlanetSpec_ofrom__dict
+    n_tropoi_ocli_oswe_obuild__swe__model -->|instantiate| n_tropoi_ospatial_oterrain_otopography_oTopography
     n_tropoi_ocli_oswe_obuild__swe__model --> n_tropoi_ospatial_oterrain_otopography_oTopography_omountain
     n_tropoi_ocli_oswe_obuild__swe__model --> n_tropoi_ospatial_oterrain_otopography_oTopography_owilliamson5__cone
     n_tropoi_ocli_oswe_obuild__swe__model -->|instantiate| n_tropoi_otemporal_otendencies_oshallow__water_oShallowWaterModel
@@ -111,8 +164,32 @@ flowchart LR
     n_tropoi_ocli_oswe_oexecute__run --> n_tropoi_ocli_oswe_o__execute__solver
     n_tropoi_ocli_oswe_oexecute__run --> n_tropoi_ocli_oswe_o__manifest__notes
     n_tropoi_ocli_oswe_oexecute__run --> n_tropoi_ocli_oswe_o__resolve__writable__base__dir
+    n_tropoi_orepresentation_oarchive_oinitial__state_o__canonical__json -->|instantiate| n_tropoi_orepresentation_oarchive_oinitial__state_oInitialStateError
+    n_tropoi_orepresentation_oarchive_oinitial__state_o__check__block -->|instantiate| n_tropoi_orepresentation_oarchive_oinitial__state_oInitialStateError
+    n_tropoi_orepresentation_oarchive_oinitial__state_o__load__array -->|instantiate| n_tropoi_orepresentation_oarchive_oinitial__state_oInitialStateError
+    n_tropoi_orepresentation_oarchive_oinitial__state_o__load__array --> n_tropoi_orepresentation_oarchive_oinitial__state_oarray__digest
+    n_tropoi_orepresentation_oarchive_oinitial__state_o__require__mapping -->|instantiate| n_tropoi_orepresentation_oarchive_oinitial__state_oInitialStateError
+    n_tropoi_orepresentation_oarchive_oinitial__state_oarray__digest --> n_tropoi_orepresentation_oarchive_oinitial__state_o__canonical__json
+    n_tropoi_orepresentation_oarchive_oinitial__state_oload__initial__state -->|instantiate| n_tropoi_orepresentation_oarchive_oinitial__state_oInitialState
+    n_tropoi_orepresentation_oarchive_oinitial__state_oload__initial__state -->|instantiate| n_tropoi_orepresentation_oarchive_oinitial__state_oInitialStateError
+    n_tropoi_orepresentation_oarchive_oinitial__state_oload__initial__state --> n_tropoi_orepresentation_oarchive_oinitial__state_o__canonical__json
+    n_tropoi_orepresentation_oarchive_oinitial__state_oload__initial__state --> n_tropoi_orepresentation_oarchive_oinitial__state_o__check__block
+    n_tropoi_orepresentation_oarchive_oinitial__state_oload__initial__state --> n_tropoi_orepresentation_oarchive_oinitial__state_o__load__array
+    n_tropoi_orepresentation_oarchive_oinitial__state_oload__initial__state --> n_tropoi_orepresentation_oarchive_oinitial__state_o__require__mapping
+    n_tropoi_orepresentation_oarchive_oinitial__state_oload__initial__state --> n_tropoi_orepresentation_oarchive_oschema_oStateSchema_ofrom__manifest__dict
+    n_tropoi_orepresentation_oarchive_oinitial__state_oload__initial__state --> n_tropoi_ospatial_ospecification_oDiscretizationSpec_ofrom__dict
+    n_tropoi_orepresentation_oarchive_oinitial__state_oload__initial__state --> n_tropoi_ospatial_ospecification_oFluidLayerSpec_ofrom__dict
+    n_tropoi_orepresentation_oarchive_oinitial__state_oload__initial__state --> n_tropoi_ospatial_ospecification_oPlanetSpec_ofrom__dict
+    n_tropoi_orepresentation_oarchive_oinitial__state_oload__initial__state --> n_tropoi_ospatial_ospecification_oTopographySpec_ofrom__dict
+    n_tropoi_orepresentation_oarchive_oschema_oStateSchema_ofrom__manifest__dict -->|instantiate| n_tropoi_orepresentation_oarchive_oschema_oSchemaError
+    n_tropoi_orepresentation_oarchive_oschema_oStateSchema_ofrom__manifest__dict -->|instantiate| n_tropoi_orepresentation_oarchive_oschema_oUnknownSchemaVersionError
+    n_tropoi_orepresentation_oarchive_oschema_oStateSchema_ofrom__manifest__dict -->|instantiate| n_tropoi_orepresentation_oarchive_oschema_oUnsupportedConventionError
+    n_tropoi_orepresentation_oarchive_oschema_oStateSchema_ofrom__manifest__dict --> n_tropoi_ospatial_omodes_oFieldSpec_ofrom__dict
+    n_tropoi_orepresentation_oarchive_oschema_oStateSchema_ofrom__manifest__dict --> n_tropoi_ospatial_otruncation_oproduct__truncation__cut
+    n_tropoi_orepresentation_oarchive_oschema_odiagnostic__definitions__for -->|instantiate| n_tropoi_orepresentation_oarchive_oschema_oSchemaError
     n_tropoi_orepresentation_oarchive_oschema_oprovenance__blocks --> n_tropoi_orepresentation_oarchive_oschema_odiagnostic__definitions__for
     n_tropoi_orepresentation_oarchive_oschema_oprovenance__blocks --> n_tropoi_orepresentation_oarchive_oschema_ostate__schema__for
+    n_tropoi_orepresentation_oarchive_oschema_ostate__schema__for -->|instantiate| n_tropoi_orepresentation_oarchive_oschema_oSchemaError
     n_tropoi_orepresentation_oarchive_owriter_o__short__commit --> n_tropoi_orepresentation_oarchive_owriter_o__git
     n_tropoi_orepresentation_oarchive_owriter_ocreate__run__dir -->|instantiate| n_tropoi_orepresentation_oarchive_owriter_oRunDirectory
     n_tropoi_orepresentation_oarchive_owriter_ocreate__run__dir --> n_tropoi_orepresentation_oarchive_owriter_o__sanitize
@@ -123,6 +200,26 @@ flowchart LR
     n_tropoi_orepresentation_oarchive_owriter_oupdate__manifest__status --> n_tropoi_orepresentation_oarchive_owriter_oatomic__write__text
     n_tropoi_orepresentation_oarchive_owriter_owrite__run__manifest --> n_tropoi_orepresentation_oarchive_owriter_o__git
     n_tropoi_orepresentation_oarchive_owriter_owrite__run__manifest --> n_tropoi_orepresentation_oarchive_owriter_oatomic__write__text
+    n_tropoi_orun_ocustom_oconfig_oCustomRunConfig_oresolve --> n_tropoi_orun_obve_oconfig_oBVERunConfig_o__resolve__plots
+    n_tropoi_orun_ocustom_oconfig_oCustomRunConfig_oresolve --> n_tropoi_otemporal_ointegration_o__require__finite__nonneg
+    n_tropoi_orun_ocustom_oconfig_oCustomRunConfig_oresolve --> n_tropoi_otemporal_ointegration_o__require__finite__positive
+    n_tropoi_orun_ocustom_oconfig_oCustomRunConfig_oresolve --> n_tropoi_otemporal_ointegration_ocount__snapshot__times
+    n_tropoi_orun_ocustom_oconfig_oCustomRunConfig_oresolve --> n_tropoi_otemporal_ointegration_ointerval__snapshot__times
+    n_tropoi_orun_ocustom_oexecute_o__clean__artifacts -->|instantiate| n_tropoi_ocli_obve_oOverwriteCleanupError
+    n_tropoi_orun_ocustom_oexecute_o__execute__solver --> n_tropoi_orun_ocustom_oexecute_o__integrate
+    n_tropoi_orun_ocustom_oexecute_o__execute__solver --> n_tropoi_orun_ocustom_oexecute_o__persist__initial__state
+    n_tropoi_orun_ocustom_oexecute_o__integrate --> n_tropoi_ocli_oswe_obuild__swe__model
+    n_tropoi_orun_ocustom_oexecute_o__integrate --> n_tropoi_orepresentation_oarchive_oschema_oprovenance__blocks
+    n_tropoi_orun_ocustom_oexecute_o__integrate --> n_tropoi_orepresentation_oarchive_owriter_owrite__run__manifest
+    n_tropoi_orun_ocustom_oexecute_o__integrate --> n_tropoi_orun_ocustom_oexecute_o__notes
+    n_tropoi_orun_ocustom_oexecute_o__integrate --> n_tropoi_orun_oswe_orunner_orun__swe
+    n_tropoi_orun_ocustom_oexecute_o__integrate -->|instantiate| n_tropoi_ospatial_ostates_oshallow__water_oShallowWaterState
+    n_tropoi_orun_ocustom_oexecute_o__persist__initial__state --> n_tropoi_orepresentation_oarchive_oinitial__state_oload__initial__state
+    n_tropoi_orun_ocustom_oexecute_oexecute__custom__run --> n_tropoi_ocli_orun__lifecycle_oexecute__with__provenance
+    n_tropoi_orun_ocustom_oexecute_oexecute__custom__run --> n_tropoi_orun_ocustom_oexecute_o__clean__artifacts
+    n_tropoi_orun_ocustom_oexecute_oexecute__custom__run --> n_tropoi_orun_ocustom_oexecute_o__execute__solver
+    n_tropoi_orun_ocustom_oexecute_oexecute__custom__run --> n_tropoi_orun_ocustom_oexecute_o__notes
+    n_tropoi_orun_ocustom_oexecute_oexecute__custom__run --> n_tropoi_orun_ocustom_oexecute_o__resolve__base__dir
     n_tropoi_orun_oswe_oconfig_oSWERunConfig_oresolve -.->|self| n_tropoi_orun_oswe_oconfig_oSWERunConfig_o__resolve__plots
     n_tropoi_orun_oswe_oconfig_oSWERunConfig_oresolve --> n_tropoi_otemporal_ointegration_o__require__finite__positive
     n_tropoi_orun_oswe_orunner_orun__swe -->|instantiate| n_tropoi_orepresentation_odiagnostics_oswe_oSWEDiagnosticsRecorder
@@ -136,7 +233,22 @@ flowchart LR
     n_tropoi_orun_oswe_orunner_orun__swe --> n_tropoi_otemporal_ointegration_ork4__step__array
     n_tropoi_orun_oswe_orunner_orun__swe --> n_tropoi_otemporal_ointegration_ovalidate__snapshot__schedule
     n_tropoi_ospatial_oinitialization_oswe_omake__swe__ic --> n_tropoi_ospatial_otruncation_orequire__scenario__support
+    n_tropoi_ospatial_ospecification_oDiscretizationSpec_ofrom__dict -->|instantiate| n_tropoi_ospatial_ospecification_oSpecificationError
+    n_tropoi_ospatial_ospecification_oDiscretizationSpec_ofrom__dict --> n_tropoi_ospatial_ospecification_o__check__document
+    n_tropoi_ospatial_ospecification_oFluidLayerSpec_ofrom__dict -->|instantiate| n_tropoi_ospatial_ospecification_oSpecificationError
+    n_tropoi_ospatial_ospecification_oFluidLayerSpec_ofrom__dict --> n_tropoi_ospatial_ospecification_o__check__document
+    n_tropoi_ospatial_ospecification_oFluidLayerSpec_ofrom__dict --> n_tropoi_ospatial_ospecification_o__check__statement
+    n_tropoi_ospatial_ospecification_oPlanetSpec_ofrom__dict -->|instantiate| n_tropoi_ospatial_ospecification_oSpecificationError
+    n_tropoi_ospatial_ospecification_oPlanetSpec_ofrom__dict --> n_tropoi_ospatial_ospecification_o__check__document
+    n_tropoi_ospatial_ospecification_oPlanetSpec_ofrom__dict --> n_tropoi_ospatial_ospecification_o__check__statement
+    n_tropoi_ospatial_ospecification_oTopographySpec_ofrom__dict -->|instantiate| n_tropoi_ospatial_ospecification_oSpecificationError
+    n_tropoi_ospatial_ospecification_oTopographySpec_ofrom__dict --> n_tropoi_ospatial_ospecification_o__check__document
+    n_tropoi_ospatial_ospecification_o__check__document -->|instantiate| n_tropoi_ospatial_ospecification_oSpecificationError
+    n_tropoi_ospatial_ospecification_o__check__statement -->|instantiate| n_tropoi_ospatial_ospecification_oSpecificationError
+    n_tropoi_ospatial_otruncation_orequire__scenario__support --> n_tropoi_ospatial_otruncation_oproduct__truncation__cut
+    n_tropoi_otemporal_ointegration_o__require__finite__nonneg --> n_tropoi_otemporal_ointegration_o__require__finite__number
     n_tropoi_otemporal_ointegration_o__require__finite__positive --> n_tropoi_otemporal_ointegration_o__require__finite__number
+    n_tropoi_otemporal_ointegration_oadvective__cfl__timestep --> n_tropoi_otemporal_ointegration_o__require__finite__nonneg
     n_tropoi_otemporal_ointegration_ointegrate --> n_tropoi_otemporal_ointegration_oadvective__cfl__timestep
     classDef root stroke-width:3px
     classDef truncated stroke-dasharray:4 3
@@ -148,10 +260,11 @@ flowchart LR
     class n_tropoi_orepresentation_odiagnostics_oswe_oSWEDiagnosticsRecorder truncated
     class n_tropoi_orepresentation_ovisual_oswe_orender__swe__snapshots truncated
     class n_tropoi_orepresentation_ovisual_oswe_orender__swe__summary truncated
+    class n_tropoi_orun_ocustom_oexecute_o__integrate truncated
     class n_tropoi_ospatial_oplanet_oPlanet_ogenerate truncated
+    class n_tropoi_ospatial_oterrain_otopography_oTopography truncated
     class n_tropoi_ospatial_oterrain_otopography_oTopography_omountain truncated
     class n_tropoi_ospatial_oterrain_otopography_oTopography_owilliamson5__cone truncated
     class n_tropoi_ospatial_otruncation_orequire__scenario__support truncated
     class n_tropoi_otemporal_ointegration_oIntegrationScheduler truncated
-    class n_tropoi_otemporal_ointegration_oadvective__cfl__timestep truncated
     class n_tropoi_otemporal_otendencies_oshallow__water_oShallowWaterModel truncated

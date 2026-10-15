@@ -113,11 +113,28 @@ examples:
   tropoi run bve --n-snapshots 20 --no-plots
   tropoi run bve --n-snapshots 1 --plot summary
   tropoi run bve --backend gauss-latlon --nlat 12 --nlon 24 --l-max 8 --days 0.02
+  tropoi run bve --initial-state states/rh4_small --days 2 --n-snapshots 9
 """
+
+
+def _add_initial_state_argument(parser: argparse.ArgumentParser,
+                                solver: str) -> None:
+    prescribed = ("planet and initial vorticity" if solver == "bve" else
+                  "planet, fluid layer, terrain and initial fields")
+    parser.add_argument(
+        "--initial-state", dest="initial_state", metavar="PATH",
+        default=None,
+        help=f"Run a saved {solver.upper()} initial state (a directory "
+             "written by tropoi.run.custom; docs/CUSTOM_INITIAL_STATES.md). "
+             f"The state prescribes the {prescribed}, so the options that "
+             "would redefine them are refused. The grid options may "
+             "override the state's recorded grid; --l-max must equal the "
+             "state's truncation.")
 
 
 def add_bve_arguments(parser: argparse.ArgumentParser) -> None:
     """All `run bve` options. Every default is None (see module docstring)."""
+    _add_initial_state_argument(parser, "bve")
     parser.add_argument(
         "--preset", choices=sorted(PRESETS), default=None,
         help="Named bundle of settings (see 'tropoi list presets'). "
@@ -254,6 +271,9 @@ def run_bve_command(args: argparse.Namespace,
     snapshot control is given: "count" (tropoi, N=5) or "interval"
     (legacy psx-bve, 21600 s).
     """
+    if getattr(args, "initial_state", None) is not None:
+        return run_initial_state_command("bve", args, parser,
+                                         snapshot_default=snapshot_default)
     preset_name = getattr(args, "preset", None)
     explicit = {k: getattr(args, k, None) for k in _EXPLICIT_KEYS}
     try:
@@ -267,6 +287,88 @@ def run_bve_command(args: argparse.Namespace,
     # Heavy imports (CuPy, matplotlib) happen inside execute_run.
     from tropoi.cli import bve as bve_module
     return bve_module.execute_run(cfg)
+
+
+#: Options a saved initial state makes meaningless: it already prescribes
+#: them. ``dest -> flag`` per solver.
+_INITIAL_STATE_CONFLICTS = {
+    "bve": {"preset": "--preset", "scenario": "--scenario",
+            "day_hours": "--day-hours",
+            "radius_earth_units": "--radius-earth-units"},
+    "swe": {"scenario": "--scenario", "day_hours": "--day-hours",
+            "radius_earth_units": "--radius-earth-units",
+            "gravity": "--gravity", "mean_depth_m": "--mean-depth",
+            "topography": "--topography",
+            "mountain_height_m": "--mountain-height-m",
+            "mountain_lat_deg": "--mountain-lat-deg",
+            "mountain_lon_deg": "--mountain-lon-deg",
+            "mountain_width_deg": "--mountain-width-deg"},
+}
+#: Grid options that may override the state's recorded discretization.
+_DISCRETIZATION_OVERRIDES = ("lmax", "grid", "resolution", "nlat", "nlon",
+                             "product_quadrature")
+
+
+def run_initial_state_command(solver: str, args: argparse.Namespace,
+                              parser: argparse.ArgumentParser,
+                              snapshot_default: str = "count") -> int:
+    """``tropoi run bve|swe --initial-state PATH``: run a saved state.
+
+    Loading, verification and configuration resolution all happen on the
+    CPU (``tropoi.run.custom``); any user error becomes a parser error
+    before CUDA is touched. The run itself is ``execute_custom_run``, the
+    same path as the Python ``run_initial_state``.
+    """
+    import dataclasses
+
+    conflicts = [flag for dest, flag in _INITIAL_STATE_CONFLICTS[solver].items()
+                 if getattr(args, dest, None) is not None]
+    if conflicts:
+        parser.error(
+            f"{', '.join(conflicts)} cannot be combined with --initial-state: "
+            "the saved state already prescribes "
+            + ("its planet and initial vorticity" if solver == "bve" else
+               "its planet, fluid layer, terrain and initial fields"))
+    from tropoi.run.custom import (CustomRunConfig, InitialStateError,
+                                   load_initial_state)  # CPU only
+    try:
+        state = load_initial_state(args.initial_state)
+    except (InitialStateError, OSError) as err:
+        parser.error(f"--initial-state: {err}")
+    if state.solver != solver:
+        parser.error(
+            f"--initial-state {args.initial_state} holds a "
+            f"{state.solver.upper()} state; run it with "
+            f"'tropoi run {state.solver} --initial-state ...'")
+
+    overrides = {k: getattr(args, k) for k in _DISCRETIZATION_OVERRIDES
+                 if getattr(args, k, None) is not None}
+    n_snapshots = args.n_snapshots
+    interval = args.dt_snapshots
+    if n_snapshots is None and interval is None \
+            and snapshot_default == "interval":
+        interval = DEFAULT_SNAPSHOT_INTERVAL_SECONDS
+    try:
+        cfg = CustomRunConfig.resolve(
+            state,
+            duration_days=(BASE_DEFAULTS["duration_days"]
+                           if args.duration_days is None
+                           else args.duration_days),
+            n_snapshots=n_snapshots, snapshot_interval_s=interval,
+            discretization=(dataclasses.replace(state.discretization,
+                                                **overrides)
+                            if overrides else None),
+            viscosity=getattr(args, "viscosity", None),
+            plots=[] if args.no_plots else args.plots,
+            out=args.out or BASE_DEFAULTS["out"],
+            experiment=args.experiment, overwrite=bool(args.overwrite))
+    except (ValueError, TypeError) as err:
+        parser.error(str(err))
+    print("\n".join(cfg.summary_lines()))
+    # Heavy imports (CuPy, matplotlib) happen inside the execution.
+    from tropoi.run.custom import execute_custom_run
+    execute_custom_run(cfg)
+    return 0
 
 
 def _cmd_run_bve(args: argparse.Namespace) -> int:
@@ -286,6 +388,7 @@ examples:
   tropoi run swe --topography mountain --mountain-height-m 2000 --days 2
   tropoi run swe --scenario williamson5 --backend gauss-latlon --nlat 64 \
                  --nlon 128 --l-max 42 --days 15 --n-snapshots 4
+  tropoi run swe --initial-state states/mars_jet --days 2
 """
 
 
@@ -294,6 +397,7 @@ def add_swe_arguments(parser: argparse.ArgumentParser) -> None:
     from tropoi.run.swe.config import (  # import-light
         SWE_PLOT_TYPES, SWE_SCENARIOS, SWE_TOPOGRAPHIES)
 
+    _add_initial_state_argument(parser, "swe")
     parser.add_argument(
         "--backend", "--grid", dest="grid", choices=list(BACKEND_CHOICES),
         default=None,
@@ -403,6 +507,8 @@ _SWE_EXPLICIT_KEYS = (
 def _cmd_run_swe(args: argparse.Namespace) -> int:
     from tropoi.run.swe.config import SWERunConfig  # import-light
 
+    if getattr(args, "initial_state", None) is not None:
+        return run_initial_state_command("swe", args, args._parser)
     explicit = {k: getattr(args, k, None) for k in _SWE_EXPLICIT_KEYS}
     try:
         cfg = SWERunConfig.resolve(explicit)
@@ -785,6 +891,17 @@ def _cmd_inspect(args: argparse.Namespace) -> int:
         show("grid", f"{grid} r{run_config.get('resolution')}")
     show("l_max", run_config.get("lmax"))
     show("scenario", run_config.get("scenario"))
+    if run_config.get("initial_state_digest"):
+        # Runs started from a saved initial state (tropoi.run.custom).
+        label = run_config.get("initial_state_label") or "(unlabelled)"
+        show("initial state",
+             f"{label} [{run_config['initial_state_digest']}]")
+        planet = run_config.get("planet")
+        if isinstance(planet, dict):
+            derived = planet.get("derived") or {}
+            show("planet",
+                 f"{planet.get('construction')}, dynamical radius "
+                 f"{derived.get('dynamical_radius_m')} m")
     if run_config.get("solver") in ("swe", "pe"):
         # Additive schema: manifests without a topography key are flat runs.
         topo_kind = run_config.get("topography", "flat")
@@ -799,11 +916,17 @@ def _cmd_inspect(args: argparse.Namespace) -> int:
             tag = ("canonical" if canonical
                    else "NONCANONICAL (W5-derived)" if canonical is False
                    else "")
-            show("topography",
-                 f"Williamson-5 cone (hs0={run_config.get('w5_cone_height_m')}"
-                 f" m, R0=pi/9 at lat {run_config.get('w5_cone_lat_deg')} deg,"
-                 f" lon {run_config.get('w5_cone_lon_deg')} deg)")
-            show("Williamson 5", tag)
+            if "w5_cone_height_m" in run_config:
+                show("topography",
+                     f"Williamson-5 cone (hs0={run_config.get('w5_cone_height_m')}"
+                     f" m, R0=pi/9 at lat {run_config.get('w5_cone_lat_deg')} deg,"
+                     f" lon {run_config.get('w5_cone_lon_deg')} deg)")
+                show("Williamson 5", tag)
+            else:  # a saved initial state's resolved cone (custom run)
+                params = run_config.get("topography_parameters") or {}
+                show("topography",
+                     f"Williamson-5 cone (hs0={params.get('height_m')} m), "
+                     "resolved coefficients from the initial state")
         else:
             show("topography", "flat")
     day_hours = run_config.get("day_hours")

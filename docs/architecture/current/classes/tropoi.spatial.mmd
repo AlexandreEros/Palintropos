@@ -59,6 +59,44 @@ classDiagram
     c_tropoi_ospatial_osigma__coordinate_oSigmaGrid : +uniform()$
     class c_tropoi_ospatial_osigma__coordinate_oSigmaGridError["SigmaGridError (spatial.sigma_coordinate)"]
     c_tropoi_ospatial_osigma__coordinate_oSigmaGridError : external base ValueError
+    class c_tropoi_ospatial_ospecification_oDiscretizationSpec["DiscretizationSpec (spatial.specification)"]
+    c_tropoi_ospatial_ospecification_oDiscretizationSpec : +#95;#95;post#95;init#95;#95;()
+    c_tropoi_ospatial_ospecification_oDiscretizationSpec : +describe()
+    c_tropoi_ospatial_ospecification_oDiscretizationSpec : +from#95;dict()$
+    c_tropoi_ospatial_ospecification_oDiscretizationSpec : +gauss#95;latlon()$
+    c_tropoi_ospatial_ospecification_oDiscretizationSpec : +geodesic()$
+    c_tropoi_ospatial_ospecification_oDiscretizationSpec : +run#95;config#95;entries()
+    c_tropoi_ospatial_ospecification_oDiscretizationSpec : +to#95;dict()
+    class c_tropoi_ospatial_ospecification_oFluidLayerSpec["FluidLayerSpec (spatial.specification)"]
+    c_tropoi_ospatial_ospecification_oFluidLayerSpec : +#95;#95;post#95;init#95;#95;()
+    c_tropoi_ospatial_ospecification_oFluidLayerSpec : +from#95;dict()$
+    c_tropoi_ospatial_ospecification_oFluidLayerSpec : +phi0
+    c_tropoi_ospatial_ospecification_oFluidLayerSpec : +to#95;dict()
+    class c_tropoi_ospatial_ospecification_oPlanetSpec["PlanetSpec (spatial.specification)"]
+    c_tropoi_ospatial_ospecification_oPlanetSpec : +#95;#95;post#95;init#95;#95;()
+    c_tropoi_ospatial_ospecification_oPlanetSpec : +angular#95;velocity#95;rad#95;s
+    c_tropoi_ospatial_ospecification_oPlanetSpec : +day#95;hours
+    c_tropoi_ospatial_ospecification_oPlanetSpec : +derived()
+    c_tropoi_ospatial_ospecification_oPlanetSpec : +describe()
+    c_tropoi_ospatial_ospecification_oPlanetSpec : +dynamical#95;radius#95;m
+    c_tropoi_ospatial_ospecification_oPlanetSpec : +earth#95;like()$
+    c_tropoi_ospatial_ospecification_oPlanetSpec : +from#95;dict()$
+    c_tropoi_ospatial_ospecification_oPlanetSpec : +ideal#95;sphere()$
+    c_tropoi_ospatial_ospecification_oPlanetSpec : +oblate()$
+    c_tropoi_ospatial_ospecification_oPlanetSpec : +rotating
+    c_tropoi_ospatial_ospecification_oPlanetSpec : +to#95;dict()
+    c_tropoi_ospatial_ospecification_oPlanetSpec : +to#95;parameters()
+    class c_tropoi_ospatial_ospecification_oSpecificationError["SpecificationError (spatial.specification)"]
+    c_tropoi_ospatial_ospecification_oSpecificationError : external base ValueError
+    class c_tropoi_ospatial_ospecification_oTopographySpec["TopographySpec (spatial.specification)"]
+    c_tropoi_ospatial_ospecification_oTopographySpec : +#95;#95;post#95;init#95;#95;()
+    c_tropoi_ospatial_ospecification_oTopographySpec : +flat()$
+    c_tropoi_ospatial_ospecification_oTopographySpec : +from#95;dict()$
+    c_tropoi_ospatial_ospecification_oTopographySpec : +is#95;flat
+    c_tropoi_ospatial_ospecification_oTopographySpec : +mountain()$
+    c_tropoi_ospatial_ospecification_oTopographySpec : +run#95;config#95;entries()
+    c_tropoi_ospatial_ospecification_oTopographySpec : +to#95;dict()
+    c_tropoi_ospatial_ospecification_oTopographySpec : +williamson5#95;cone()$
     class c_tropoi_ospatial_ospherical__backend_oGeodesicBackend["GeodesicBackend (spatial.spherical_backend)"]
     c_tropoi_ospatial_ospherical__backend_oGeodesicBackend : +#95;#95;init#95;#95;()
     c_tropoi_ospatial_ospherical__backend_oGeodesicBackend : +#95;build#95;product#95;space()

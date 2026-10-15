@@ -95,6 +95,35 @@ def _cuda_failure(err: BaseException) -> bool:
             or "CUDA" in name or "cuda" in str(err).lower())
 
 
+def _custom_terrain(storage):
+    """Persisted resolved terrain of a run started from a saved state.
+
+    Such runs (``tropoi.run.custom``) keep a copy of their initial state
+    under ``initial_state/``; its terrain coefficients rebuild the model
+    exactly. ``None`` for every other run (presets re-project their terrain
+    from the configuration, as before) and for flat terrain.
+    """
+    run_config = storage.run_config
+    if "initial_state_digest" not in run_config:
+        return None
+    if run_config.get("topography", "flat") == "flat":
+        return None
+    from tropoi.representation.archive.initial_state import (
+        load_initial_state)
+    run_dir = getattr(storage, "run_dir", None)
+    if run_dir is None:
+        raise PlotUnavailableError(
+            "this run started from a saved initial state; its terrain is "
+            "persisted in the capsule's initial_state/ directory, which this "
+            "storage does not expose")
+    state = load_initial_state(pathlib.Path(run_dir) / "initial_state")
+    if state.digest != run_config["initial_state_digest"]:
+        raise PlotUnavailableError(
+            "the capsule's initial_state/ does not match the run's recorded "
+            "initial_state_digest")
+    return state.topography_lm
+
+
 def build_resources(storage) -> SnapshotResources:
     """Reconstruct the run's Planet/model from its persisted configuration.
 
@@ -112,7 +141,8 @@ def build_resources(storage) -> SnapshotResources:
             return SnapshotResources(solver, planet)
         if solver == "swe":
             from tropoi.cli.swe import build_swe_model
-            model = build_swe_model(run_config)
+            model = build_swe_model(
+                run_config, topography_lm=_custom_terrain(storage))
             return SnapshotResources(solver, model.planet, model)
         if solver == "pe":
             from tropoi.cli.pe import build_pe_model

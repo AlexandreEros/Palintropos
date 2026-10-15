@@ -125,7 +125,10 @@ _MAX_T_END_SECONDS = 1e12  # ~31,700 years
 #: values and derived artifacts. Single source of truth shared by
 #: :meth:`BVERunConfig.scientific_config_dict` and ``io._config_hash`` so the
 #: hash exclusion logic is never duplicated (and can never drift).
-HASH_EXCLUDED_KEYS: tuple[str, ...] = ("out", "experiment", "overwrite", "plots")
+#: ``initial_state_label`` (custom runs only) is a descriptive name; the
+#: state's identity is its ``initial_state_digest``, which IS hashed.
+HASH_EXCLUDED_KEYS: tuple[str, ...] = ("out", "experiment", "overwrite", "plots",
+                                       "initial_state_label")
 
 
 def scientific_config_subset(config: Mapping) -> dict:

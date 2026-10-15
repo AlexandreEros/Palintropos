@@ -245,9 +245,13 @@ class Topography:
                     f"width {p.get('width_deg'):g}°)")
         if self._preset == "williamson5_cone":
             p = self._parameters
+            # A cone rebuilt from persisted coefficients (a saved initial
+            # state) has no measured residual in its parameters.
+            residual = p.get("projection_residual")
+            measured = ("" if residual is None
+                        else f"; projection residual {residual:.3f}")
             return (f"Williamson-5 cone (hs0={p.get('height_m'):g} m at "
-                    f"lat 30°, lon -90°, R0=pi/9; projection residual "
-                    f"{p.get('projection_residual'):.3f})")
+                    f"lat 30°, lon -90°, R0=pi/9{measured})")
         return "flat"
 
     # ------------------------------------------------------------------
