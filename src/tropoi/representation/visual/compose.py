@@ -663,8 +663,12 @@ def _header(fields: RunFields, title: str | None) -> tuple[str, str]:
     config = fields.run_config
     meta = fields.storage.metadata
     scenario = str(config.get("scenario") or fields.solver)
+    name = _SCENARIO_TITLES.get(scenario, scenario)
+    if config.get("initial_state_label"):
+        # A run started from a saved initial state names it by its label.
+        name = f"{config['initial_state_label']} (custom initial state)"
     heading = title or (
-        f"{_SCENARIO_TITLES.get(scenario, scenario)} · "
+        f"{name} · "
         f"{_SOLVER_NAMES[fields.solver]}")
     if config.get("grid") == "latlon":
         grid = f"Gauss–Legendre {config.get('nlat')} × {config.get('nlon')}"

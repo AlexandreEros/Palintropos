@@ -289,7 +289,12 @@ def test_documented_cpu_only_modules_import_without_cupy_or_matplotlib():
                "tropoi.representation.archive",
                "tropoi.representation.archive.writer",
                "tropoi.run.bve.config", "tropoi.run.swe.config",
-               "tropoi.run.pe.config", "tropoi.support", "tropoi.run.engine"]
+               "tropoi.run.pe.config", "tropoi.support", "tropoi.run.engine",
+               # custom planets and saved initial states (load/inspect/
+               # validate/configure without CUDA)
+               "tropoi.spatial.specification",
+               "tropoi.representation.archive.initial_state",
+               "tropoi.run.custom"]
     # (Not the legacy tropoi.planet.* paths: the tropoi.planet package
     # initializer has always imported the CUDA Planet facade.)
     probe = (

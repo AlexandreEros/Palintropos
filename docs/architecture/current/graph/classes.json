@@ -175,6 +175,83 @@
       "qualname": "CapsuleStorage"
     },
     {
+      "decorators": [
+        "dataclass(frozen=True, eq=False)"
+      ],
+      "external_bases": [],
+      "id": "tropoi.representation.archive.initial_state.InitialState",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__post_init__"
+        },
+        {
+          "kind": "method",
+          "name": "__repr__"
+        },
+        {
+          "kind": "property",
+          "name": "digest"
+        },
+        {
+          "kind": "method",
+          "name": "identity"
+        },
+        {
+          "kind": "property",
+          "name": "l_max"
+        },
+        {
+          "kind": "classmethod",
+          "name": "load"
+        },
+        {
+          "kind": "method",
+          "name": "run_config_entries"
+        },
+        {
+          "kind": "method",
+          "name": "save"
+        },
+        {
+          "kind": "property",
+          "name": "schema"
+        },
+        {
+          "kind": "property",
+          "name": "state"
+        },
+        {
+          "kind": "method",
+          "name": "summary"
+        },
+        {
+          "kind": "method",
+          "name": "to_document"
+        },
+        {
+          "kind": "property",
+          "name": "topography_modes"
+        },
+        {
+          "kind": "method",
+          "name": "validate"
+        }
+      ],
+      "module": "tropoi.representation.archive.initial_state",
+      "qualname": "InitialState"
+    },
+    {
+      "decorators": [],
+      "external_bases": [
+        "ValueError"
+      ],
+      "id": "tropoi.representation.archive.initial_state.InitialStateError",
+      "members": [],
+      "module": "tropoi.representation.archive.initial_state",
+      "qualname": "InitialStateError"
+    },
+    {
       "decorators": [],
       "external_bases": [
         "ValueError"
@@ -1535,6 +1612,208 @@
       "qualname": "BVERunConfig"
     },
     {
+      "decorators": [
+        "dataclass(frozen=True, eq=False)"
+      ],
+      "external_bases": [],
+      "id": "tropoi.run.custom.config.CustomRunConfig",
+      "members": [
+        {
+          "kind": "classmethod",
+          "name": "resolve"
+        },
+        {
+          "kind": "property",
+          "name": "scenario"
+        },
+        {
+          "kind": "method",
+          "name": "scientific_config_dict"
+        },
+        {
+          "kind": "method",
+          "name": "snapshot_times_seconds"
+        },
+        {
+          "kind": "property",
+          "name": "solver"
+        },
+        {
+          "kind": "method",
+          "name": "summary_lines"
+        },
+        {
+          "kind": "method",
+          "name": "to_run_config_dict"
+        }
+      ],
+      "module": "tropoi.run.custom.config",
+      "qualname": "CustomRunConfig"
+    },
+    {
+      "decorators": [
+        "dataclass"
+      ],
+      "external_bases": [],
+      "id": "tropoi.run.custom.prepare.FieldReport",
+      "members": [
+        {
+          "kind": "method",
+          "name": "to_dict"
+        }
+      ],
+      "module": "tropoi.run.custom.prepare",
+      "qualname": "FieldReport"
+    },
+    {
+      "decorators": [],
+      "external_bases": [
+        "ValueError"
+      ],
+      "id": "tropoi.run.custom.prepare.PreparationError",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__init__"
+        }
+      ],
+      "module": "tropoi.run.custom.prepare",
+      "qualname": "PreparationError"
+    },
+    {
+      "decorators": [
+        "dataclass"
+      ],
+      "external_bases": [],
+      "id": "tropoi.run.custom.prepare.PreparationReport",
+      "members": [
+        {
+          "kind": "method",
+          "name": "lines"
+        },
+        {
+          "kind": "method",
+          "name": "to_dict"
+        }
+      ],
+      "module": "tropoi.run.custom.prepare",
+      "qualname": "PreparationReport"
+    },
+    {
+      "decorators": [
+        "dataclass(frozen=True, eq=False)"
+      ],
+      "external_bases": [],
+      "id": "tropoi.run.custom.prepare.PreparedState",
+      "members": [
+        {
+          "kind": "method",
+          "name": "save"
+        }
+      ],
+      "module": "tropoi.run.custom.prepare",
+      "qualname": "PreparedState"
+    },
+    {
+      "decorators": [
+        "dataclass(frozen=True)"
+      ],
+      "external_bases": [],
+      "id": "tropoi.run.custom.prepare.ProjectionPolicy",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__post_init__"
+        },
+        {
+          "kind": "method",
+          "name": "to_dict"
+        }
+      ],
+      "module": "tropoi.run.custom.prepare",
+      "qualname": "ProjectionPolicy"
+    },
+    {
+      "decorators": [
+        "dataclass(frozen=True, eq=False)"
+      ],
+      "external_bases": [],
+      "id": "tropoi.run.custom.prepare.SampledField",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__post_init__"
+        }
+      ],
+      "module": "tropoi.run.custom.prepare",
+      "qualname": "SampledField"
+    },
+    {
+      "decorators": [
+        "dataclass(frozen=True, eq=False)"
+      ],
+      "external_bases": [],
+      "id": "tropoi.run.custom.prepare.SampledFunction",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__post_init__"
+        }
+      ],
+      "module": "tropoi.run.custom.prepare",
+      "qualname": "SampledFunction"
+    },
+    {
+      "decorators": [
+        "dataclass(frozen=True, eq=False)"
+      ],
+      "external_bases": [],
+      "id": "tropoi.run.custom.prepare.SpectralCoefficients",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__post_init__"
+        },
+        {
+          "kind": "property",
+          "name": "l_max"
+        }
+      ],
+      "module": "tropoi.run.custom.prepare",
+      "qualname": "SpectralCoefficients"
+    },
+    {
+      "decorators": [
+        "dataclass(frozen=True, eq=False)"
+      ],
+      "external_bases": [],
+      "id": "tropoi.run.custom.prepare.StateSampling",
+      "members": [],
+      "module": "tropoi.run.custom.prepare",
+      "qualname": "StateSampling"
+    },
+    {
+      "decorators": [],
+      "external_bases": [],
+      "id": "tropoi.run.custom.prepare._Resources",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__init__"
+        },
+        {
+          "kind": "property",
+          "name": "planet"
+        },
+        {
+          "kind": "property",
+          "name": "sampling"
+        }
+      ],
+      "module": "tropoi.run.custom.prepare",
+      "qualname": "_Resources"
+    },
+    {
       "decorators": [],
       "external_bases": [
         "RuntimeError"
@@ -2404,6 +2683,188 @@
       "members": [],
       "module": "tropoi.spatial.sigma_coordinate",
       "qualname": "SigmaGridError"
+    },
+    {
+      "decorators": [
+        "dataclass(frozen=True)"
+      ],
+      "external_bases": [],
+      "id": "tropoi.spatial.specification.DiscretizationSpec",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__post_init__"
+        },
+        {
+          "kind": "method",
+          "name": "describe"
+        },
+        {
+          "kind": "classmethod",
+          "name": "from_dict"
+        },
+        {
+          "kind": "classmethod",
+          "name": "gauss_latlon"
+        },
+        {
+          "kind": "classmethod",
+          "name": "geodesic"
+        },
+        {
+          "kind": "method",
+          "name": "run_config_entries"
+        },
+        {
+          "kind": "method",
+          "name": "to_dict"
+        }
+      ],
+      "module": "tropoi.spatial.specification",
+      "qualname": "DiscretizationSpec"
+    },
+    {
+      "decorators": [
+        "dataclass(frozen=True)"
+      ],
+      "external_bases": [],
+      "id": "tropoi.spatial.specification.FluidLayerSpec",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__post_init__"
+        },
+        {
+          "kind": "classmethod",
+          "name": "from_dict"
+        },
+        {
+          "kind": "property",
+          "name": "phi0"
+        },
+        {
+          "kind": "method",
+          "name": "to_dict"
+        }
+      ],
+      "module": "tropoi.spatial.specification",
+      "qualname": "FluidLayerSpec"
+    },
+    {
+      "decorators": [
+        "dataclass(frozen=True)"
+      ],
+      "external_bases": [],
+      "id": "tropoi.spatial.specification.PlanetSpec",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__post_init__"
+        },
+        {
+          "kind": "property",
+          "name": "angular_velocity_rad_s"
+        },
+        {
+          "kind": "property",
+          "name": "day_hours"
+        },
+        {
+          "kind": "method",
+          "name": "derived"
+        },
+        {
+          "kind": "method",
+          "name": "describe"
+        },
+        {
+          "kind": "property",
+          "name": "dynamical_radius_m"
+        },
+        {
+          "kind": "classmethod",
+          "name": "earth_like"
+        },
+        {
+          "kind": "classmethod",
+          "name": "from_dict"
+        },
+        {
+          "kind": "classmethod",
+          "name": "ideal_sphere"
+        },
+        {
+          "kind": "classmethod",
+          "name": "oblate"
+        },
+        {
+          "kind": "property",
+          "name": "rotating"
+        },
+        {
+          "kind": "method",
+          "name": "to_dict"
+        },
+        {
+          "kind": "method",
+          "name": "to_parameters"
+        }
+      ],
+      "module": "tropoi.spatial.specification",
+      "qualname": "PlanetSpec"
+    },
+    {
+      "decorators": [],
+      "external_bases": [
+        "ValueError"
+      ],
+      "id": "tropoi.spatial.specification.SpecificationError",
+      "members": [],
+      "module": "tropoi.spatial.specification",
+      "qualname": "SpecificationError"
+    },
+    {
+      "decorators": [
+        "dataclass(frozen=True)"
+      ],
+      "external_bases": [],
+      "id": "tropoi.spatial.specification.TopographySpec",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__post_init__"
+        },
+        {
+          "kind": "classmethod",
+          "name": "flat"
+        },
+        {
+          "kind": "classmethod",
+          "name": "from_dict"
+        },
+        {
+          "kind": "property",
+          "name": "is_flat"
+        },
+        {
+          "kind": "classmethod",
+          "name": "mountain"
+        },
+        {
+          "kind": "method",
+          "name": "run_config_entries"
+        },
+        {
+          "kind": "method",
+          "name": "to_dict"
+        },
+        {
+          "kind": "classmethod",
+          "name": "williamson5_cone"
+        }
+      ],
+      "module": "tropoi.spatial.specification",
+      "qualname": "TopographySpec"
     },
     {
       "decorators": [],

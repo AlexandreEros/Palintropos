@@ -421,7 +421,17 @@ def _geometry(run_config: Mapping, *, inferred: dict) -> dict:
         geometry["resolution"] = run_config.get("resolution")
     geometry["radius_earth_units"] = run_config.get("radius_earth_units")
     geometry["day_hours"] = run_config.get("day_hours")
-    if run_config.get("scenario") == "williamson5":
+    planet = run_config.get("planet")
+    if isinstance(planet, Mapping):
+        # Custom runs (tropoi.run.custom) carry an explicit, versioned
+        # PlanetSpec block: record its geometry convention and radii as
+        # stated, never re-derived from a scenario name.
+        derived = planet.get("derived") or {}
+        geometry["planet"] = planet.get("construction")
+        geometry["reference_radius_m"] = planet.get("reference_radius_m")
+        geometry["dynamical_radius_m"] = derived.get("dynamical_radius_m")
+        geometry["sidereal_day_s"] = planet.get("sidereal_day_s")
+    elif run_config.get("scenario") == "williamson5":
         geometry["planet"] = "ideal_sphere"
         geometry["reference_radius_m"] = W5_RADIUS_M
     else:
@@ -430,14 +440,22 @@ def _geometry(run_config: Mapping, *, inferred: dict) -> dict:
     return geometry
 
 
+#: Run-configuration keys of a custom run started from a saved initial
+#: state (tropoi.run.custom); absent from every preset configuration.
+_INITIAL_STATE_KEYS = ("initial_state_format", "initial_state_digest",
+                       "initial_state_label")
+
+
 def _environment(solver: str, run_config: Mapping) -> dict:
     keys = {
-        "bve": ("scenario", "viscosity", "product_quadrature"),
+        "bve": ("scenario", "viscosity", "product_quadrature",
+                *_INITIAL_STATE_KEYS),
         "swe": ("scenario", "gravity", "mean_depth_m", "topography",
                 "mountain_height_m", "mountain_lat_deg", "mountain_lon_deg",
                 "mountain_width_deg", "w5_u0_ms", "w5_cone_height_m",
                 "w5_cone_radius_rad", "w5_cone_lat_deg", "w5_cone_lon_deg",
-                "w5_projection", "w5_canonical"),
+                "w5_projection", "w5_canonical", "topography_parameters",
+                "topography_digest", *_INITIAL_STATE_KEYS),
         "pe": ("scenario", "r_dry", "cp_dry", "temperature",
                "surface_pressure", "thermal_amplitude", "dt_seconds",
                "topography", "mountain_height_m", "mountain_lat_deg",

@@ -311,6 +311,18 @@ object, as the README figure's recipe does
 `tests/test_readme_figure_recipe.py`), so that a later change of a default
 cannot alter them silently.
 
+## Runs started from a saved initial state
+
+Runs made with `tropoi.run.custom.run_initial_state`
+([CUSTOM_INITIAL_STATES.md](CUSTOM_INITIAL_STATES.md)) are ordinary BVE or
+SWE capsules with `scenario: "custom"`. Their `run_config` carries an
+explicit `planet` block and the state's `initial_state_digest`. The
+capsule's `initial_state/` directory holds a byte-exact copy of the state,
+loadable on the CPU with `load_initial_state`. `state_schema.geometry`
+records the planet's construction and dynamical radius instead of deriving
+them from a scenario name. `Snapshot.plot` rebuilds such a run's planet from
+the `planet` block, and its terrain from the copied resolved coefficients.
+
 ## Where the implementation lives
 
 The interface follows the package's spatial / temporal / representation
