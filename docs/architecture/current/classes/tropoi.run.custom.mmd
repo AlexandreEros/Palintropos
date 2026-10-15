@@ -10,3 +10,28 @@ classDiagram
     c_tropoi_orun_ocustom_oconfig_oCustomRunConfig : +solver
     c_tropoi_orun_ocustom_oconfig_oCustomRunConfig : +summary#95;lines()
     c_tropoi_orun_ocustom_oconfig_oCustomRunConfig : +to#95;run#95;config#95;dict()
+    class c_tropoi_orun_ocustom_oprepare_oFieldReport["FieldReport (run.custom.prepare)"]
+    c_tropoi_orun_ocustom_oprepare_oFieldReport : +to#95;dict()
+    class c_tropoi_orun_ocustom_oprepare_oPreparationError["PreparationError (run.custom.prepare)"]
+    c_tropoi_orun_ocustom_oprepare_oPreparationError : +#95;#95;init#95;#95;()
+    c_tropoi_orun_ocustom_oprepare_oPreparationError : external base ValueError
+    class c_tropoi_orun_ocustom_oprepare_oPreparationReport["PreparationReport (run.custom.prepare)"]
+    c_tropoi_orun_ocustom_oprepare_oPreparationReport : +lines()
+    c_tropoi_orun_ocustom_oprepare_oPreparationReport : +to#95;dict()
+    class c_tropoi_orun_ocustom_oprepare_oPreparedState["PreparedState (run.custom.prepare)"]
+    c_tropoi_orun_ocustom_oprepare_oPreparedState : +save()
+    class c_tropoi_orun_ocustom_oprepare_oProjectionPolicy["ProjectionPolicy (run.custom.prepare)"]
+    c_tropoi_orun_ocustom_oprepare_oProjectionPolicy : +#95;#95;post#95;init#95;#95;()
+    c_tropoi_orun_ocustom_oprepare_oProjectionPolicy : +to#95;dict()
+    class c_tropoi_orun_ocustom_oprepare_oSampledField["SampledField (run.custom.prepare)"]
+    c_tropoi_orun_ocustom_oprepare_oSampledField : +#95;#95;post#95;init#95;#95;()
+    class c_tropoi_orun_ocustom_oprepare_oSampledFunction["SampledFunction (run.custom.prepare)"]
+    c_tropoi_orun_ocustom_oprepare_oSampledFunction : +#95;#95;post#95;init#95;#95;()
+    class c_tropoi_orun_ocustom_oprepare_oSpectralCoefficients["SpectralCoefficients (run.custom.prepare)"]
+    c_tropoi_orun_ocustom_oprepare_oSpectralCoefficients : +#95;#95;post#95;init#95;#95;()
+    c_tropoi_orun_ocustom_oprepare_oSpectralCoefficients : +l#95;max
+    class c_tropoi_orun_ocustom_oprepare_oStateSampling["StateSampling (run.custom.prepare)"]
+    class c_tropoi_orun_ocustom_oprepare_o__Resources["_Resources (run.custom.prepare)"]
+    c_tropoi_orun_ocustom_oprepare_o__Resources : +#95;#95;init#95;#95;()
+    c_tropoi_orun_ocustom_oprepare_o__Resources : +planet
+    c_tropoi_orun_ocustom_oprepare_o__Resources : +sampling

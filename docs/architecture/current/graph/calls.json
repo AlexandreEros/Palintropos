@@ -4201,6 +4201,346 @@
       "target": "tropoi.run.custom.execute.execute_custom_run"
     },
     {
+      "kind": "constructor",
+      "source": "tropoi.run.custom.prepare.PreparationError",
+      "target": "tropoi.run.custom.prepare.PreparationError.__init__"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.custom.prepare.PreparationReport.lines",
+      "target": "tropoi.spatial.truncation.product_truncation_cut"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.custom.prepare.PreparationReport.to_dict",
+      "target": "tropoi.spatial.truncation.product_truncation_cut"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.run.custom.prepare.ProjectionPolicy.__post_init__",
+      "target": "tropoi.run.custom.prepare.PreparationError"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.run.custom.prepare.SampledField.__post_init__",
+      "target": "tropoi.run.custom.prepare.PreparationError"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.custom.prepare.SampledField.__post_init__",
+      "target": "tropoi.run.custom.prepare._reject_device_array"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.run.custom.prepare.SampledFunction.__post_init__",
+      "target": "tropoi.run.custom.prepare.PreparationError"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.run.custom.prepare.SpectralCoefficients.__post_init__",
+      "target": "tropoi.run.custom.prepare.PreparationError"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.custom.prepare.SpectralCoefficients.__post_init__",
+      "target": "tropoi.run.custom.prepare._reject_device_array"
+    },
+    {
+      "kind": "constructor",
+      "source": "tropoi.run.custom.prepare._Resources",
+      "target": "tropoi.run.custom.prepare._Resources.__init__"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.custom.prepare._Resources.planet",
+      "target": "tropoi.run.custom.prepare._build_planet"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.custom.prepare._Resources.sampling",
+      "target": "tropoi.run.custom.prepare._sampling_of"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.run.custom.prepare._as_source",
+      "target": "tropoi.run.custom.prepare.PreparationError"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.run.custom.prepare._as_source",
+      "target": "tropoi.run.custom.prepare.SampledFunction"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.custom.prepare._build_planet",
+      "target": "tropoi.cli.bve.build_planet"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.custom.prepare._build_planet",
+      "target": "tropoi.run.custom.prepare._base_config"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.run.custom.prepare._check_conventions",
+      "target": "tropoi.run.custom.prepare.PreparationError"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.run.custom.prepare._check_conventions",
+      "target": "tropoi.spatial.modes.FieldSpec"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.run.custom.prepare._check_conventions",
+      "target": "tropoi.spatial.modes.SpectralModes"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.run.custom.prepare._check_specs",
+      "target": "tropoi.run.custom.prepare.PreparationError"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.custom.prepare._degree_power_above_cut",
+      "target": "tropoi.spatial.truncation.product_truncation_cut"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.run.custom.prepare._either",
+      "target": "tropoi.run.custom.prepare.PreparationError"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.run.custom.prepare._finalize",
+      "target": "tropoi.run.custom.prepare.PreparationError"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.run.custom.prepare._reject_device_array",
+      "target": "tropoi.run.custom.prepare.PreparationError"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.run.custom.prepare._resolve_source",
+      "target": "tropoi.run.custom.prepare.FieldReport"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.run.custom.prepare._resolve_source",
+      "target": "tropoi.run.custom.prepare.PreparationError"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.run.custom.prepare._resolve_source",
+      "target": "tropoi.run.custom.prepare.SampledField"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.custom.prepare._resolve_source",
+      "target": "tropoi.run.custom.prepare._check_conventions"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.custom.prepare._resolve_source",
+      "target": "tropoi.run.custom.prepare._degree_power_above_cut"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.custom.prepare._resolve_source",
+      "target": "tropoi.run.custom.prepare._project"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.custom.prepare._resolve_source",
+      "target": "tropoi.run.custom.prepare._reject_device_array"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.custom.prepare._resolve_topography",
+      "target": "tropoi.spatial.terrain.topography.Topography.mountain"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.custom.prepare._resolve_topography",
+      "target": "tropoi.spatial.terrain.topography.Topography.williamson5_cone"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.run.custom.prepare._sampling_of",
+      "target": "tropoi.run.custom.prepare.StateSampling"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.custom.prepare._sampling_of",
+      "target": "tropoi.run.custom.prepare._host"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.run.custom.prepare.pad_coefficients",
+      "target": "tropoi.run.custom.prepare.PreparationError"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.custom.prepare.pad_coefficients",
+      "target": "tropoi.run.custom.prepare._reject_device_array"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.run.custom.prepare.prepare_bve_state",
+      "target": "tropoi.representation.archive.initial_state.InitialState"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.run.custom.prepare.prepare_bve_state",
+      "target": "tropoi.run.custom.prepare.PreparationError"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.run.custom.prepare.prepare_bve_state",
+      "target": "tropoi.run.custom.prepare.PreparationReport"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.run.custom.prepare.prepare_bve_state",
+      "target": "tropoi.run.custom.prepare.PreparedState"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.run.custom.prepare.prepare_bve_state",
+      "target": "tropoi.run.custom.prepare.ProjectionPolicy"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.run.custom.prepare.prepare_bve_state",
+      "target": "tropoi.run.custom.prepare._Resources"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.custom.prepare.prepare_bve_state",
+      "target": "tropoi.run.custom.prepare._as_source"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.custom.prepare.prepare_bve_state",
+      "target": "tropoi.run.custom.prepare._check_conventions"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.custom.prepare.prepare_bve_state",
+      "target": "tropoi.run.custom.prepare._check_specs"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.custom.prepare.prepare_bve_state",
+      "target": "tropoi.run.custom.prepare._either"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.custom.prepare.prepare_bve_state",
+      "target": "tropoi.run.custom.prepare._finalize"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.custom.prepare.prepare_bve_state",
+      "target": "tropoi.run.custom.prepare._laplacian"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.custom.prepare.prepare_bve_state",
+      "target": "tropoi.run.custom.prepare._resolve_source"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.run.custom.prepare.prepare_swe_state",
+      "target": "tropoi.representation.archive.initial_state.InitialState"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.run.custom.prepare.prepare_swe_state",
+      "target": "tropoi.run.custom.prepare.PreparationError"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.run.custom.prepare.prepare_swe_state",
+      "target": "tropoi.run.custom.prepare.PreparationReport"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.run.custom.prepare.prepare_swe_state",
+      "target": "tropoi.run.custom.prepare.PreparedState"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.run.custom.prepare.prepare_swe_state",
+      "target": "tropoi.run.custom.prepare.ProjectionPolicy"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.run.custom.prepare.prepare_swe_state",
+      "target": "tropoi.run.custom.prepare._Resources"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.custom.prepare.prepare_swe_state",
+      "target": "tropoi.run.custom.prepare._as_source"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.custom.prepare.prepare_swe_state",
+      "target": "tropoi.run.custom.prepare._check_specs"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.custom.prepare.prepare_swe_state",
+      "target": "tropoi.run.custom.prepare._either"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.custom.prepare.prepare_swe_state",
+      "target": "tropoi.run.custom.prepare._finalize"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.custom.prepare.prepare_swe_state",
+      "target": "tropoi.run.custom.prepare._laplacian"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.custom.prepare.prepare_swe_state",
+      "target": "tropoi.run.custom.prepare._resolve_source"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.custom.prepare.prepare_swe_state",
+      "target": "tropoi.run.custom.prepare._resolve_topography"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.custom.prepare.prepare_swe_state",
+      "target": "tropoi.spatial.specification.TopographySpec.flat"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.run.custom.prepare.prepare_swe_state",
+      "target": "tropoi.spatial.states.shallow_water.ShallowWaterState"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.run.custom.prepare.prepare_swe_state",
+      "target": "tropoi.temporal.tendencies.shallow_water.ShallowWaterModel"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.custom.prepare.state_sampling",
+      "target": "tropoi.run.custom.prepare._build_planet"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.custom.prepare.state_sampling",
+      "target": "tropoi.run.custom.prepare._sampling_of"
+    },
+    {
       "kind": "call",
       "source": "tropoi.run.custom.presets.initial_state_from_config",
       "target": "tropoi.cli.bve.build_planet"
@@ -11133,6 +11473,307 @@
       "kind": "function",
       "module": "tropoi.run.custom.execute",
       "qualname": "run_initial_state",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.custom.prepare.FieldReport",
+      "kind": "class",
+      "module": "tropoi.run.custom.prepare",
+      "qualname": "FieldReport",
+      "type": "class"
+    },
+    {
+      "id": "tropoi.run.custom.prepare.FieldReport.to_dict",
+      "kind": "method",
+      "module": "tropoi.run.custom.prepare",
+      "qualname": "FieldReport.to_dict",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.custom.prepare.PreparationError",
+      "kind": "class",
+      "module": "tropoi.run.custom.prepare",
+      "qualname": "PreparationError",
+      "type": "class"
+    },
+    {
+      "id": "tropoi.run.custom.prepare.PreparationError.__init__",
+      "kind": "method",
+      "module": "tropoi.run.custom.prepare",
+      "qualname": "PreparationError.__init__",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.custom.prepare.PreparationReport",
+      "kind": "class",
+      "module": "tropoi.run.custom.prepare",
+      "qualname": "PreparationReport",
+      "type": "class"
+    },
+    {
+      "id": "tropoi.run.custom.prepare.PreparationReport.lines",
+      "kind": "method",
+      "module": "tropoi.run.custom.prepare",
+      "qualname": "PreparationReport.lines",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.custom.prepare.PreparationReport.to_dict",
+      "kind": "method",
+      "module": "tropoi.run.custom.prepare",
+      "qualname": "PreparationReport.to_dict",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.custom.prepare.PreparedState",
+      "kind": "class",
+      "module": "tropoi.run.custom.prepare",
+      "qualname": "PreparedState",
+      "type": "class"
+    },
+    {
+      "id": "tropoi.run.custom.prepare.PreparedState.save",
+      "kind": "method",
+      "module": "tropoi.run.custom.prepare",
+      "qualname": "PreparedState.save",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.custom.prepare.ProjectionPolicy",
+      "kind": "class",
+      "module": "tropoi.run.custom.prepare",
+      "qualname": "ProjectionPolicy",
+      "type": "class"
+    },
+    {
+      "id": "tropoi.run.custom.prepare.ProjectionPolicy.__post_init__",
+      "kind": "method",
+      "module": "tropoi.run.custom.prepare",
+      "qualname": "ProjectionPolicy.__post_init__",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.custom.prepare.ProjectionPolicy.to_dict",
+      "kind": "method",
+      "module": "tropoi.run.custom.prepare",
+      "qualname": "ProjectionPolicy.to_dict",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.custom.prepare.SampledField",
+      "kind": "class",
+      "module": "tropoi.run.custom.prepare",
+      "qualname": "SampledField",
+      "type": "class"
+    },
+    {
+      "id": "tropoi.run.custom.prepare.SampledField.__post_init__",
+      "kind": "method",
+      "module": "tropoi.run.custom.prepare",
+      "qualname": "SampledField.__post_init__",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.custom.prepare.SampledFunction",
+      "kind": "class",
+      "module": "tropoi.run.custom.prepare",
+      "qualname": "SampledFunction",
+      "type": "class"
+    },
+    {
+      "id": "tropoi.run.custom.prepare.SampledFunction.__post_init__",
+      "kind": "method",
+      "module": "tropoi.run.custom.prepare",
+      "qualname": "SampledFunction.__post_init__",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.custom.prepare.SpectralCoefficients",
+      "kind": "class",
+      "module": "tropoi.run.custom.prepare",
+      "qualname": "SpectralCoefficients",
+      "type": "class"
+    },
+    {
+      "id": "tropoi.run.custom.prepare.SpectralCoefficients.__post_init__",
+      "kind": "method",
+      "module": "tropoi.run.custom.prepare",
+      "qualname": "SpectralCoefficients.__post_init__",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.custom.prepare.SpectralCoefficients.l_max",
+      "kind": "property",
+      "module": "tropoi.run.custom.prepare",
+      "qualname": "SpectralCoefficients.l_max",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.custom.prepare.StateSampling",
+      "kind": "class",
+      "module": "tropoi.run.custom.prepare",
+      "qualname": "StateSampling",
+      "type": "class"
+    },
+    {
+      "id": "tropoi.run.custom.prepare._Resources",
+      "kind": "class",
+      "module": "tropoi.run.custom.prepare",
+      "qualname": "_Resources",
+      "type": "class"
+    },
+    {
+      "id": "tropoi.run.custom.prepare._Resources.__init__",
+      "kind": "method",
+      "module": "tropoi.run.custom.prepare",
+      "qualname": "_Resources.__init__",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.custom.prepare._Resources.planet",
+      "kind": "property",
+      "module": "tropoi.run.custom.prepare",
+      "qualname": "_Resources.planet",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.custom.prepare._Resources.sampling",
+      "kind": "property",
+      "module": "tropoi.run.custom.prepare",
+      "qualname": "_Resources.sampling",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.custom.prepare._as_source",
+      "kind": "function",
+      "module": "tropoi.run.custom.prepare",
+      "qualname": "_as_source",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.custom.prepare._base_config",
+      "kind": "function",
+      "module": "tropoi.run.custom.prepare",
+      "qualname": "_base_config",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.custom.prepare._build_planet",
+      "kind": "function",
+      "module": "tropoi.run.custom.prepare",
+      "qualname": "_build_planet",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.custom.prepare._check_conventions",
+      "kind": "function",
+      "module": "tropoi.run.custom.prepare",
+      "qualname": "_check_conventions",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.custom.prepare._check_specs",
+      "kind": "function",
+      "module": "tropoi.run.custom.prepare",
+      "qualname": "_check_specs",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.custom.prepare._degree_power_above_cut",
+      "kind": "function",
+      "module": "tropoi.run.custom.prepare",
+      "qualname": "_degree_power_above_cut",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.custom.prepare._either",
+      "kind": "function",
+      "module": "tropoi.run.custom.prepare",
+      "qualname": "_either",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.custom.prepare._finalize",
+      "kind": "function",
+      "module": "tropoi.run.custom.prepare",
+      "qualname": "_finalize",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.custom.prepare._host",
+      "kind": "function",
+      "module": "tropoi.run.custom.prepare",
+      "qualname": "_host",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.custom.prepare._laplacian",
+      "kind": "function",
+      "module": "tropoi.run.custom.prepare",
+      "qualname": "_laplacian",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.custom.prepare._project",
+      "kind": "function",
+      "module": "tropoi.run.custom.prepare",
+      "qualname": "_project",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.custom.prepare._reject_device_array",
+      "kind": "function",
+      "module": "tropoi.run.custom.prepare",
+      "qualname": "_reject_device_array",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.custom.prepare._resolve_source",
+      "kind": "function",
+      "module": "tropoi.run.custom.prepare",
+      "qualname": "_resolve_source",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.custom.prepare._resolve_topography",
+      "kind": "function",
+      "module": "tropoi.run.custom.prepare",
+      "qualname": "_resolve_topography",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.custom.prepare._sampling_of",
+      "kind": "function",
+      "module": "tropoi.run.custom.prepare",
+      "qualname": "_sampling_of",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.custom.prepare.pad_coefficients",
+      "kind": "function",
+      "module": "tropoi.run.custom.prepare",
+      "qualname": "pad_coefficients",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.custom.prepare.prepare_bve_state",
+      "kind": "function",
+      "module": "tropoi.run.custom.prepare",
+      "qualname": "prepare_bve_state",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.custom.prepare.prepare_swe_state",
+      "kind": "function",
+      "module": "tropoi.run.custom.prepare",
+      "qualname": "prepare_swe_state",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.custom.prepare.state_sampling",
+      "kind": "function",
+      "module": "tropoi.run.custom.prepare",
+      "qualname": "state_sampling",
       "type": "function"
     },
     {

@@ -1659,6 +1659,169 @@
       "qualname": "CustomRunConfig"
     },
     {
+      "decorators": [
+        "dataclass"
+      ],
+      "external_bases": [],
+      "id": "tropoi.run.custom.prepare.FieldReport",
+      "members": [
+        {
+          "kind": "method",
+          "name": "to_dict"
+        }
+      ],
+      "module": "tropoi.run.custom.prepare",
+      "qualname": "FieldReport"
+    },
+    {
+      "decorators": [],
+      "external_bases": [
+        "ValueError"
+      ],
+      "id": "tropoi.run.custom.prepare.PreparationError",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__init__"
+        }
+      ],
+      "module": "tropoi.run.custom.prepare",
+      "qualname": "PreparationError"
+    },
+    {
+      "decorators": [
+        "dataclass"
+      ],
+      "external_bases": [],
+      "id": "tropoi.run.custom.prepare.PreparationReport",
+      "members": [
+        {
+          "kind": "method",
+          "name": "lines"
+        },
+        {
+          "kind": "method",
+          "name": "to_dict"
+        }
+      ],
+      "module": "tropoi.run.custom.prepare",
+      "qualname": "PreparationReport"
+    },
+    {
+      "decorators": [
+        "dataclass(frozen=True, eq=False)"
+      ],
+      "external_bases": [],
+      "id": "tropoi.run.custom.prepare.PreparedState",
+      "members": [
+        {
+          "kind": "method",
+          "name": "save"
+        }
+      ],
+      "module": "tropoi.run.custom.prepare",
+      "qualname": "PreparedState"
+    },
+    {
+      "decorators": [
+        "dataclass(frozen=True)"
+      ],
+      "external_bases": [],
+      "id": "tropoi.run.custom.prepare.ProjectionPolicy",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__post_init__"
+        },
+        {
+          "kind": "method",
+          "name": "to_dict"
+        }
+      ],
+      "module": "tropoi.run.custom.prepare",
+      "qualname": "ProjectionPolicy"
+    },
+    {
+      "decorators": [
+        "dataclass(frozen=True, eq=False)"
+      ],
+      "external_bases": [],
+      "id": "tropoi.run.custom.prepare.SampledField",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__post_init__"
+        }
+      ],
+      "module": "tropoi.run.custom.prepare",
+      "qualname": "SampledField"
+    },
+    {
+      "decorators": [
+        "dataclass(frozen=True, eq=False)"
+      ],
+      "external_bases": [],
+      "id": "tropoi.run.custom.prepare.SampledFunction",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__post_init__"
+        }
+      ],
+      "module": "tropoi.run.custom.prepare",
+      "qualname": "SampledFunction"
+    },
+    {
+      "decorators": [
+        "dataclass(frozen=True, eq=False)"
+      ],
+      "external_bases": [],
+      "id": "tropoi.run.custom.prepare.SpectralCoefficients",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__post_init__"
+        },
+        {
+          "kind": "property",
+          "name": "l_max"
+        }
+      ],
+      "module": "tropoi.run.custom.prepare",
+      "qualname": "SpectralCoefficients"
+    },
+    {
+      "decorators": [
+        "dataclass(frozen=True, eq=False)"
+      ],
+      "external_bases": [],
+      "id": "tropoi.run.custom.prepare.StateSampling",
+      "members": [],
+      "module": "tropoi.run.custom.prepare",
+      "qualname": "StateSampling"
+    },
+    {
+      "decorators": [],
+      "external_bases": [],
+      "id": "tropoi.run.custom.prepare._Resources",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__init__"
+        },
+        {
+          "kind": "property",
+          "name": "planet"
+        },
+        {
+          "kind": "property",
+          "name": "sampling"
+        }
+      ],
+      "module": "tropoi.run.custom.prepare",
+      "qualname": "_Resources"
+    },
+    {
       "decorators": [],
       "external_bases": [
         "RuntimeError"

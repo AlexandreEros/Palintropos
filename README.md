@@ -261,7 +261,11 @@ run_dir = run_initial_state(state, duration_days=1.0, n_snapshots=5)
 
 or, from the shell, `tropoi run bve|swe --initial-state my_state --days 1`.
 
-See [docs/CUSTOM_INITIAL_STATES.md](docs/CUSTOM_INITIAL_STATES.md).
+States are prepared from callables `f(lat, lon)`, sampled arrays or
+spherical-harmonic coefficients, with projection residuals, mean modes and
+(SWE) positive thickness checked and reported. See
+[docs/CUSTOM_INITIAL_STATES.md](docs/CUSTOM_INITIAL_STATES.md) and the two
+runnable examples in [examples/](examples/).
 
 ![Two opposite-signed vortices on a rotating sphere: relative vorticity with streamfunction contours at days 0, 10, 15 and 25 on one colour scale; conservation drift and kinetic-energy spectral complexity](docs/runs/20260926T051829Z_two-vortices_rot24h_r4_l21_dt120h_e5dfc047_50ae9e93/assets/overview.png)
 

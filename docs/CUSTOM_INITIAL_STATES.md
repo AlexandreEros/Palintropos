@@ -20,9 +20,18 @@ run_dir = run_initial_state(state, duration_days=2.0, n_snapshots=9)
 `tropoi plot` read it like any preset run
 ([SAVED_RUNS.md](SAVED_RUNS.md)).
 
-This page covers states whose spectral coefficients are already resolved.
-Building a state from physical fields or callables is a separate,
-explicit preparation step.
+Most states start from a physical description instead of raw
+coefficients. [Preparing a state](#preparing-a-state) turns callables,
+sampled arrays or coefficients into a validated `InitialState` and reports
+what was lost. Two runnable examples cover the whole cycle:
+
+```bash
+python examples/custom_bve_planet.py prepare states/rh4_small   # CPU
+python examples/custom_bve_planet.py inspect states/rh4_small   # fresh process, CuPy not needed
+python examples/custom_bve_planet.py run     states/rh4_small   # CUDA
+python examples/custom_swe_planet.py prepare states/mars_jet    # CUDA (projection)
+python examples/custom_swe_planet.py run     states/mars_jet    # CUDA
+```
 
 ## Three kinds of information, kept apart
 
@@ -128,6 +137,64 @@ capsule is marked `failed` with the reason.
 **Valid is not balanced.** A state that passes every check can still be far
 from balance and radiate gravity waves. Nothing balances a state
 automatically.
+
+## Preparing a state
+
+```python
+from tropoi.run.custom import (ProjectionPolicy, SampledField, SampledFunction,
+                               SpectralCoefficients, prepare_bve_state,
+                               prepare_swe_state, state_sampling)
+
+prepared = prepare_swe_state(planet, discretization, fluid, terrain,
+                             streamfunction=lambda lat, lon: -a * u0 * np.sin(lat),
+                             free_surface_anomaly=eta_prime)
+print("\n".join(prepared.report.lines()))
+prepared.save("mars_jet")
+```
+
+### Inputs are explicit about what they are
+
+| Source | What it is | Needs CUDA |
+| --- | --- | --- |
+| `SpectralCoefficients(coeffs)` | complex `(L+1, L+1)` coefficients **in the repository layout** (above). `L` must equal `lmax`; `pad_coefficients(c, lmax)` zero-pads explicitly. Nothing is ever truncated. | no |
+| `SampledField(values)` | real values (SI) at the **state-grid points**: shape `(nlat, nlon)` on the Gauss grid (rows north to south, longitudes `2πj/nlon`) or `(n_points,)` on the geodesic grid, in the order `state_sampling(planet, discretization)` reports | yes (projection) |
+| `SampledFunction(f)` or a bare callable | `f(lat, lon) -> values`. `lat` and `lon` are **host NumPy float64 arrays in radians**, shaped like the state grid; `lon` is as the grid stores it, so `f` must be 2π-periodic. `f` must return a real, finite NumPy array of the same shape (CuPy results are refused). It is called once on the CPU and never stored; only its name is recorded. | yes (projection) |
+
+`ShallowWaterState.from_fields(...)` only stacks coefficient arrays. Physical
+fields go through `SampledField` or `SampledFunction`, which project them
+with the backend's own analysis transform (`sh.transform`), as the preset
+initial conditions do.
+
+### Variables (SI units)
+
+| Core | Rotational | Divergent | Mass |
+| --- | --- | --- | --- |
+| BVE | `zeta` (s⁻¹) **or** `streamfunction` ψ (m² s⁻¹) | — | — |
+| SWE | `zeta` **or** `streamfunction` | `delta` (s⁻¹) **or** `velocity_potential` χ (m² s⁻¹) | `phi` (m² s⁻², perturbation thickness geopotential) **or** `free_surface_anomaly` η′ (m) |
+
+- The potentials are mapped exactly in spectral space:
+  `ζ_lm = −l(l+1)/a² ψ_lm` and `δ_lm = −l(l+1)/a² χ_lm`, where `a` is the
+  planet's dynamical radius.
+- `free_surface_anomaly` is the free-surface height minus its mean. It
+  becomes `phi_lm = g η′_lm − g h_s′_lm`, where `h_s′` is the *resolved*
+  terrain minus its mean. This is the construction every SWE preset uses,
+  so `free_surface_anomaly = 0` is the exact lake at rest over the terrain.
+- An omitted SWE variable is exactly zero.
+
+### Acceptance policy (`ProjectionPolicy`)
+
+| Check | Rule | On failure |
+| --- | --- | --- |
+| Projection residual | Each physical input reports the quadrature-weighted relative L2 residual between its samples and their band-limited synthesis on the same points, plus the maximum pointwise residual. Accepted up to `max_relative_residual` (default `1e-2`). On the geodesic grid the residual also contains the grid's quadrature error, about 1e-2, so geodesic inputs may need an explicitly relaxed policy. | `PreparationError`, carrying the report. The field is never smoothed, clipped or rescaled to pass. |
+| Mean modes | `zeta`, `delta`, `phi` and `free_surface_anomaly` must have zero global mean to the cores' tolerance (1e-10 of the field norm). This includes the BVE `zeta`, because no wind on a sphere has a nonzero vorticity integral. A mean in `phi` belongs in `mean_depth_m`. The means of `streamfunction` and `velocity_potential` are inert and not checked. | `PreparationError` stating the mean in field units. A mean is removed only for a variable named in `subtract_mean=(...)`, and the removed value is recorded. |
+| Coefficient conventions | finite, `Im a_l0 = 0`, zero padding | `PreparationError`; never repaired |
+| SWE positivity | `H + phi/g > 0` on the state **and** nonlinear-product samplings, checked by the model's own `validate_state`; the thickness range is reported | `PreparationError` with the margin |
+| Spectral support | the share of each field's power above the 2/3 product cut is **reported**; the stored state keeps its full support up to `lmax` | — |
+
+The report (`prepared.report`, `report.lines()`) is saved with the state as
+its `provenance["preparation"]`. It is descriptive, never part of the
+identity. Its `balanced` entry states the obvious: **no balance was
+assessed or imposed.**
 
 ## File format (version 1)
 
@@ -261,13 +328,18 @@ the realized state.
 
 | Needs only the CPU (no CuPy import, no CUDA) | Needs CUDA |
 | --- | --- |
-| building and validating specifications and `InitialState`s from coefficients; `save`, `load_initial_state`, `summary`, `digest`; `CustomRunConfig.resolve`; reading custom capsules (`open_simulation`, `tropoi inspect`) | `run_initial_state`, `initial_state_from_preset`, physical-space plotting |
+| building and validating specifications and `InitialState`s from coefficients; `prepare_bve_state` with `SpectralCoefficients`; `save`, `load_initial_state`, `summary`, `digest`; `CustomRunConfig.resolve`; reading custom capsules (`open_simulation`, `tropoi inspect`) | `state_sampling`; preparation from `SampledField`/`SampledFunction`; every `prepare_swe_state` call (terrain resolution and positivity); `run_initial_state`, `initial_state_from_preset`, physical-space plotting |
 
 ## Limitations
 
 - BVE and SWE only; the PE core is unchanged and not supported.
 - Terrain is limited to the existing presets (`flat`, `mountain`,
   `williamson5_cone`). Custom terrain generation is out of scope.
+- Inputs are the cores' prognostic variables plus the potentials and the
+  free-surface anomaly. Winds `(u, v)` are not accepted directly; give ψ and
+  χ instead.
+- Callables are evaluated on host NumPy arrays only. Large grids therefore
+  sample on the CPU before projecting on the GPU.
 - The SWE runs remain inviscid, and the BVE viscosity remains the optional
   Laplacian term without a stability control of its own. Equations,
   integration, truncation and normalization are the presets'.

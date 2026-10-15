@@ -44,11 +44,12 @@ src/tropoi/
 │   │                        saved resolved initial states (initial_state.py, CPU-only)
 │   └── visual/              figure fields/specs/timelines/renderers, per-core compositions, Snapshot.plot adapter
 ├── run/{bve,swe,pe}/    orchestration: resolved run configuration and the runners
-├── run/custom/          custom planets/initial states: configuration, execution, preset export
+├── run/custom/          custom planets/initial states: preparation, configuration, execution, preset export
 ├── cli/                 tropoi (main.py); aeolus/psx-bve/psx-gen/psx-recompile compatibility entry points
 └── numerics/ physics/ planet/ viz/ support.py
                          compatibility import paths only (see "Compatibility paths")
 tests/                   asserting GPU tests plus standalone audit scripts
+examples/                runnable custom-planet examples (BVE, SWE)
 docs/                    architecture, validation records, and tracked README assets
 ```
 
