@@ -9,7 +9,7 @@ from tropoi.spatial.grids.geodesic_grid import GeodesicGridGeometry
 from tropoi.spatial.environment import PlanetaryParameters
 from tropoi.spatial.terrain.elevation_data import ElevationData
 from tropoi.spatial.terrain.terrain_spectral import generate_spectral_terrain_gpu, SpectralTerrainParams
-from tropoi.spatial.terrain.tectonics import TectonicParams, tectonic_update_step
+from tropoi.spatial.terrain.tectonics import TectonicParams
 
 class Planet:
     """
@@ -102,15 +102,6 @@ class Planet:
             params=terrain_params
         )
 
-        tect_params = TectonicParams(
-            dt=2.0,
-            kappa_height=1e-5,
-            kappa_strain=5e-6,
-            noise_strength=5.0,
-            l_cut_noise=8,
-            gamma_activity=4.0,
-        )
-
         # Final terrain back to CPU grid:
         height = sh.inv_transform(height_coeffs)
 
@@ -129,9 +120,6 @@ class Planet:
                 sh.l_max
             )
         )
-
-        # Calculate radial distances
-        radial_distance = cls._calculate_radial_distances(params, grid, height)
 
         pln = cls(params, grid, elevation, sh, so)
 

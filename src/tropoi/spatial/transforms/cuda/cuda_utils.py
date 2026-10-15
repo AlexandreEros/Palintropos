@@ -18,10 +18,3 @@ def raw_module_from_cuda(name: str, **kwargs) -> cp.RawModule:
     """
     code = load_cuda_source(name)
     return cp.RawModule(code=code, **kwargs)
-
-def get_kernel_from_cuda(name: str, kernel_name: str, **kwargs) -> cp.RawKernel:
-    """
-    Convenience wrapper: load <name>.cu, create a RawModule, and get a kernel.
-    """
-    module = raw_module_from_cuda(name, **kwargs)
-    return module.get_kernel(kernel_name)

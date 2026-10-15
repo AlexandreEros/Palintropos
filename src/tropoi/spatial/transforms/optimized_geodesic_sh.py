@@ -249,10 +249,6 @@ class GeodesicSphericalHarmonics:
         return self.sh.inv_transform(coeffs)
     
     
-    def inverse_transform(self, coeffs):
-        """Alias for inv_transform."""
-        return self.inv_transform(coeffs)
-
     def __getattr__(self, name):
         return getattr(self.sh, name)
 

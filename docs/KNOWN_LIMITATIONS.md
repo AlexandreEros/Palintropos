@@ -66,8 +66,7 @@ shared by the shallow-water and primitive-equation cores enters dynamics.
 
 - Run `logs/` and `states/` subdirectories are semantic targets rather than the
   current on-disk layout; viewer plots and state arrays remain at capsule root.
-- `random_low_l` lacks recorded RNG seed provenance, and `step_leapfrog` is
-  legacy/dead rather than a supported integration option.
+- `random_low_l` lacks recorded RNG seed provenance.
 
 ## Before primitive equations (and remaining shallow-water gaps)
 

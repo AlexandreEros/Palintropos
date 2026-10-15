@@ -84,8 +84,6 @@ Y_l^m(θ, λ) = N_l^m · P_l^m(cos θ) · e^{imλ},      N_l^m = sqrt( (2l+1)/(4
   recursion*, so very high degrees (l ≳ 150) would overflow before normalizing; irrelevant
   at current l_max ≤ 45 but a known scaling limit.
 
-`sh_matrix_real.cu` (a real-basis variant) exists but is **never loaded** by any Python code.
-
 Spectral snapshot color follows this convention directly: hue represents
 `arg(a_lm)` on the fixed cyclic interval `[-pi, pi)`, with no sign inversion or
 palette phase offset, while amplitude dB relative to the timeline-wide maximum
@@ -231,13 +229,10 @@ all acting on the dense (l, m) coefficient array:
 - **Velocity-form advection** (`advect_scalar_by_streamfunction`): `u·∇q` from the two
   verified operators above. **[measured] correct** — but currently *unused* by the model.
 
-A completely separate **local (non-spectral) operator family**,
-[differential_operators_spherical.py](../src/tropoi/numerics/differential_operators_spherical.py),
-builds sparse least-squares gradient/divergence/curl matrices from the mesh adjacency and a
-**graph Laplacian** (`D − W`, which is *not* a consistent discretization of the surface
-Laplacian — no area/metric scaling). It is instantiated lazily by `SpectralOperators
-._get_differential_ops` but **no live code path calls it**; treat it as latent/experimental
-(R-16).
+A separate local (non-spectral) operator family, `DifferentialOperatorsSpherical`
+(sparse least-squares gradients and a graph Laplacian `D − W` that is not a consistent
+surface-Laplacian discretization), was never reached by any live path and has been
+deleted (R-16).
 
 ---
 
@@ -292,8 +287,6 @@ per evaluation, eight per RK4 step.
   The scheduling seam is the incremental `IntegrationScheduler` (one `next_event(dt_cfl)`
   per accepted step); `integration_plan` remains as a constant-ceiling compatibility/test
   helper.
-- **Leapfrog**: `step_leapfrog` exists but is dead code and would crash if called
-  (it passes raw arrays where a `BarotropicState` is asserted) (R-6).
 - The l = 0 row of every tendency is hard-zeroed ("mass conservation"), which pins the
   global circulation `∮ζ dA` to its initial value. **[measured]** circulation stays at
   round-off (≈5e−8 m²/s absolute) over 60 steps.
@@ -347,9 +340,9 @@ matrices, states, and operators live in GPU memory; `requirements.txt` pins
 
 GPU specifics:
 
-- Custom CUDA kernels: `legendre.cu` (per-mode P_l^m), `sph_harm.cu` (per-mode Y from
-  precomputed P), `sh_matrix.cu` (whole basis matrix, the operational one),
-  `sh_matrix_real.cu` (unused). All float64/complex128.
+- Custom CUDA kernels: `legendre.cu` (per-mode P_l^m, used only by the legacy
+  `LatLonSphericalHarmonics` test baseline) and `sh_matrix.cu` (whole basis matrix, the
+  operational one). All float64/complex128.
 - After basis construction, transforms are cuBLAS `zgemv`/`zgemm` calls; the BVE step is
   dominated by these. **[measured]** ≈41 ms per RK4 step at res 4 / l_max 20 on a GeForce
   MX110 (2 GB).
