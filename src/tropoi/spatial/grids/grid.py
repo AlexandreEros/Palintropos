@@ -79,9 +79,6 @@ class LatLonGridGeometry(GridGeometry):
     def grid_shape(self) -> tuple[int, int]:
         return self.lat_grid.shape
 
-    def points_latlon(self) -> np.ndarray:
-        return np.column_stack([self.lon_grid.ravel(), self.lat_grid.ravel()])
-
     @classmethod
     def create(cls, grid_resolution: Tuple[int, int],
               lon_range: Tuple[float, float] = (0, 2*np.pi)) -> 'LatLonGridGeometry':

@@ -5,7 +5,6 @@ from typing import TYPE_CHECKING
 
 import numpy as np
 
-from tropoi.representation.visual.fields import ScalarGridField
 
 if TYPE_CHECKING:
     from tropoi.spatial.grids.grid import LatLonGridGeometry
@@ -43,12 +42,3 @@ def map_to_uniform_latlon(values, source_grid, *,
     return target, mapped
 
 
-def scalar_field_on_uniform_latlon(values, source_grid, *, name: str,
-                                   units: str,
-                                   times: np.ndarray | None = None
-                                   ) -> ScalarGridField:
-    """Build a physical-grid field on the established uniform map sampling."""
-    target, mapped = map_to_uniform_latlon(values, source_grid)
-    return ScalarGridField(
-        mapped, _host(target.latitudes), _host(target.longitudes),
-        name=name, units=units, times=times)

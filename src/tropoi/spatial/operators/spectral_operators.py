@@ -1,55 +1,8 @@
 import cupy as cp
 
-from tropoi.spatial.operators.differential_operators_spherical import DifferentialOperatorsSpherical
 from tropoi.spatial.grids.geodesic_grid import GeodesicGridGeometry
-# from .spherical_harmonics import LatLonSphericalHarmonics as SphericalHarmonics
 from tropoi.spatial.transforms.optimized_geodesic_sh import GeodesicSphericalHarmonics
 from tropoi.spatial.truncation import product_truncation_cut
-
-# class SpectralOperators:
-#     def __init__(self, sh, radius: float):
-#         self.sh: PointSetSphericalHarmonics = sh
-#         self.R = radius
-        
-#         self.l_max = sh.l_max
-#         self._precompute_zonal_derivative()
-#         self._precompute_laplacian()
-#         self._precompute_meridional_operator()
-
-#     def _precompute_zonal_derivative(self):
-#         m = cp.arange(0, self.l_max + 1, dtype=cp.float64)[None, :]
-#         self.im_m = 1j * m
-
-#     def _precompute_laplacian(self):
-#         l = cp.arange(0, self.l_max + 1, dtype=cp.float64)
-#         self.lap_eigs = -l * (l + 1.0) / (self.R**2)
-
-#     def _precompute_meridional_operator(self):
-#         L = cp.arange(0, self.l_max + 1, dtype=cp.float64)[:, None]
-#         M = cp.arange(0, self.l_max + 1, dtype=cp.float64)[None, :]
-#         Lb = cp.broadcast_to(L, (self.l_max + 1, self.l_max + 1))
-#         Mb = cp.broadcast_to(M, (self.l_max + 1, self.l_max + 1))
-#         valid = Mb <= Lb
-#         num_plus = (Lb + 1.0)**2 - Mb**2
-#         den_plus = (2*Lb + 1.0) * (2*Lb + 3.0)
-#         C_plus = Lb * cp.sqrt(cp.maximum(num_plus, 0.0) / cp.maximum(den_plus, 1.0))
-#         num_minus = Lb**2 - Mb**2
-#         den_minus = (2*Lb - 1.0) * (2*Lb + 1.0)
-#         C_minus = -(Lb + 1.0) * cp.sqrt(cp.maximum(num_minus, 0.0) / cp.maximum(den_minus, 1.0))
-#         C_plus = cp.where(valid, C_plus, 0.0)
-#         C_minus = cp.where(valid, C_minus, 0.0)
-#         C_plus[self.l_max, :] = 0.0
-#         C_minus[0, :] = 0.0
-#         self.C_plus = C_plus.astype(cp.complex128)
-#         self.C_minus = C_minus.astype(cp.complex128)
-
-#     def laplacian_coeffs(self, coeffs): return self.lap_eigs[:, None] * coeffs if coeffs.ndim == 2 else self.lap_eigs * coeffs
-#     def d_lambda_coeffs(self, coeffs): return (self.im_m * coeffs) / self.R
-#     def sin_theta_d_theta_coeffs(self, coeffs):
-#         g = cp.zeros_like(coeffs, dtype=cp.complex128)
-#         g[1:, :] += self.C_plus[:-1, :] * coeffs[:-1, :]
-#         g[:-1, :] += self.C_minus[1:, :] * coeffs[1:, :]
-#         return g
 
 class SpectralOperators:
     """
@@ -93,8 +46,6 @@ class SpectralOperators:
         self.R = float(radius)
         self.l_max = sh.l_max
         self.grid = grid
-        self._diff_ops = None
-        self._diff_ops_grid_id = None
 
         self.backend = backend if backend is not None else make_backend(grid, sh)
         self.product_quadrature = product_quadrature
@@ -122,13 +73,9 @@ class SpectralOperators:
         # Coefficients for sinθ ∂/∂θ coupling l ↔ l±1
         self._C_plus, self._C_minus = self._precompute_sin_theta_d_theta_coeffs()
 
-        self._dphi = None
-        self._dlambda = None
-        self._cosphi = None
         # Lazily built one-degree-extended analysis pieces for the vector
         # curl/div weak form (see _vector_analysis_pieces).
         self._vector_analysis_cache = None
-        # self._init_latlon_metrics()
 
     # ------------------------------------------------------------------
     # Internal: meridional operator coefficients
@@ -175,38 +122,6 @@ class SpectralOperators:
         C_minus[0, :] = 0.0           # no l=-1
 
         return C_plus.astype(cp.complex128), C_minus.astype(cp.complex128)
-
-    @staticmethod
-    def _is_geodesic_grid(grid) -> bool:
-        return grid is not None and (isinstance(grid, GeodesicGridGeometry) or hasattr(grid, "adjacency_matrix"))
-
-    @staticmethod
-    def _is_latlon_grid(grid) -> bool:
-        return grid is not None and hasattr(grid, "num_lat") and hasattr(grid, "num_lon")
-
-    # def _init_latlon_metrics(self) -> None:
-    #     if self._is_geodesic_grid(self.grid):
-    #         return
-
-    #     lat = None
-    #     lon = None
-    #     if self._is_latlon_grid(self.grid):
-    #         lat = cp.asarray(self.grid.latitudes, dtype=cp.float64)
-    #         lon = cp.asarray(self.grid.longitudes, dtype=cp.float64)
-    #     elif hasattr(self.sh, "latitudes") and hasattr(self.sh, "longitudes"):
-    #         lat = cp.asarray(self.sh.latitudes, dtype=cp.float64)
-    #         lon = cp.asarray(self.sh.longitudes, dtype=cp.float64)
-
-    #     if lat is None or lon is None or lat.size == 0 or lon.size == 0:
-    #         return
-
-    #     if lat.size > 1:
-    #         self._dphi = float(lat[1] - lat[0])
-    #     if lon.size > 1:
-    #         self._dlambda = float(lon[1] - lon[0])
-
-    #     cosphi = cp.cos(lat)
-    #     self._cosphi = cp.maximum(cosphi, 1e-10)
 
     # ------------------------------------------------------------------
     # Public spectral operators
@@ -291,36 +206,10 @@ class SpectralOperators:
         inv_eigs = self.lap_eigs.copy()
         inv_eigs[0] = 1.0 / self.R**2   # arbitrary, only affects l=0
         return coeffs / inv_eigs[:, None]
-    
-    def inv_d_lambda(self, coeffs: cp.ndarray) -> cp.ndarray:
-        """
-        Inverse zonal derivative ∂⁻¹/∂λ in spectral space.
 
-        Parameters
-        ----------
-        coeffs : cp.ndarray
-            Scalar field in spectral space.
-
-        Returns
-        -------
-        cp.ndarray
-            Inverse zonal derivative applied to the input coefficients.
-        """
-        inv = cp.zeros_like(self._im_m_over_R)
-        inv[:, 1:] = 1.0 / self._im_m_over_R[:, 1:]
-        return inv * coeffs
-
-    
-
-    # Convenience wrappers to go back to grid
+    # Convenience wrapper to go back to grid
     def laplacian_field(self, coeffs: cp.ndarray) -> cp.ndarray:
         return self.sh.inv_transform(self.laplacian_coeffs(coeffs))
-
-    def d_lambda_field(self, coeffs: cp.ndarray) -> cp.ndarray:
-        return self.sh.inv_transform(self.d_lambda_coeffs(coeffs))
-
-    def sin_theta_d_theta_field(self, coeffs: cp.ndarray) -> cp.ndarray:
-        return self.sh.inv_transform(self.sin_theta_d_theta_coeffs(coeffs))
 
 
     # ------------------------------------------------------------------
@@ -538,14 +427,6 @@ class SpectralOperators:
             c_plus = cp.where(Mb <= Lb, c_plus, 0.0).astype(cp.complex128)
             self._vector_analysis_cache = (sh_ext, c_plus)
         return self._vector_analysis_cache
-
-    def _get_differential_ops(self, grid) -> DifferentialOperatorsSpherical:
-        grid_id = id(grid)
-        if self._diff_ops is None or self._diff_ops_grid_id != grid_id:
-            self._diff_ops = DifferentialOperatorsSpherical.from_geodesic_grid(grid)
-            self._diff_ops_grid_id = grid_id
-        return self._diff_ops
-    
 
     # ------------------------------------------------------------------
     # Jacobians (nonlinear, live in grid space)

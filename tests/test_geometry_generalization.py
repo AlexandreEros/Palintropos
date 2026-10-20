@@ -62,10 +62,6 @@ class _PointSetOnlyGeometry(GridGeometry if _HAS_CUDA else object):
     def n_points(self):
         return int(self._lat.size)
 
-    def points_latlon(self):
-        return np.column_stack(
-            [cp.asnumpy(self._lon), cp.asnumpy(self._lat)])
-
 
 @pytest.fixture(scope="module")
 def geodesic():

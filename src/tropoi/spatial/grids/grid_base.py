@@ -58,13 +58,3 @@ class GridGeometry(ABC):
         """
         return None
 
-    @property
-    def is_structured(self) -> bool:
-        return self.grid_shape is not None
-
-    @abstractmethod
-    def points_latlon(self) -> cp.ndarray:
-        """
-        Return an (n_points, 2) array of [lon, lat] pairs.
-        """
-        raise NotImplementedError

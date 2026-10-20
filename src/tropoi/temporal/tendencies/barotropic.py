@@ -87,31 +87,6 @@ class BarotropicVorticity:
 
         return psi_coeffs
 
-    def streamfunction_to_vorticity(self, psi_coeffs) -> BarotropicState:
-        """
-        Laplacian: ∇²ζ = ψ
-
-        In spectral space: ζ_lm = ∇²ψ_lm = -l(l+1)/R² * ψ_lm
-
-        Parameters
-        ----------
-        psi_coeffs : cp.ndarray
-            Coefficients of streamfunction in spectral space
-
-        Returns
-        -------
-        zeta_coeffs : BarotropicState
-            Coefficients of vorticity in spectral space
-        """
-
-        zeta_coeffs = cp.zeros_like(psi_coeffs)
-
-        # Multiply by eigenvalues (skip l=0)
-        zeta_coeffs[1:, :] = psi_coeffs[1:, :] * self.laplacian_eig[1:, None]
-
-        return BarotropicState(zeta_coeffs)
-
-
     def tendency(self, vrt_state: BarotropicState, forcing_coeffs) -> cp.ndarray:
         """
         Compute dζ/dt in spectral space
@@ -162,31 +137,3 @@ class BarotropicVorticity:
         return dzeta_dt
 
 
-    def step_leapfrog(self, zeta_prev, zeta_curr, dt, forcing_coeffs=None):
-        """
-        Leapfrog time step (second-order, time-reversible).
-        Requires two previous states.
-        """
-        if forcing_coeffs is None:
-            forcing_coeffs = cp.zeros_like(zeta_curr)
-
-        # Get tendency at current time
-        psi_c = self.vorticity_to_streamfunction(zeta_curr)
-        zeta_grid = self.sh.inv_transform(zeta_curr)
-        eta_grid = zeta_grid + self.f
-        eta_c = self.sh.transform(eta_grid)
-
-        J = self.so.jacobian_pseudospectral(psi_c, eta_c)
-        advection_c = self.sh.transform(-J)
-        diffusion_c = self.nu * self.laplacian_eig[:, None] * zeta_curr
-
-        dzeta_dt = advection_c + diffusion_c + forcing_coeffs
-
-        # Enforce mass conservation
-        dzeta_dt[0, :] = 0.0
-
-        # Leapfrog step
-        zeta_next = zeta_prev + 2 * dt * dzeta_dt
-
-        return zeta_next
-    

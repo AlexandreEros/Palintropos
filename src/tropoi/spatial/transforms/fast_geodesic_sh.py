@@ -53,8 +53,6 @@ class PointSetSphericalHarmonics:
         self.kernel((grid_size,), (block_size,),
                     (self.latitudes, self.longitudes, self.Y_matrix, self.n_points, l_max))
 
-        self.Y_matrix_real = self.Y_matrix.real
-
         # Indices mapper for (l, m) -> linear index
         self.l_indices = []
         self.m_indices = []
@@ -105,10 +103,6 @@ class PointSetSphericalHarmonics:
             return result.reshape(self.grid_shape)
 
         return result
-
-    def inverse_transform(self, coeffs):
-        """Alias for inv_transform."""
-        return self.inv_transform(coeffs)
 
     # ------------------------------------------------------------------
     # Level-batched transforms (opt-in; the scalar paths above are frozen

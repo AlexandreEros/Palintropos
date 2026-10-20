@@ -2721,21 +2721,6 @@
       "target": "tropoi.spatial.grids.grid_interpolation.geodesic_to_latlon_grid"
     },
     {
-      "kind": "instantiate",
-      "source": "tropoi.representation.visual.grid_adapter.scalar_field_on_uniform_latlon",
-      "target": "tropoi.representation.visual.fields.ScalarGridField"
-    },
-    {
-      "kind": "call",
-      "source": "tropoi.representation.visual.grid_adapter.scalar_field_on_uniform_latlon",
-      "target": "tropoi.representation.visual.grid_adapter._host"
-    },
-    {
-      "kind": "call",
-      "source": "tropoi.representation.visual.grid_adapter.scalar_field_on_uniform_latlon",
-      "target": "tropoi.representation.visual.grid_adapter.map_to_uniform_latlon"
-    },
-    {
       "kind": "constructor",
       "source": "tropoi.representation.visual.matplotlib_renderer.MatplotlibRenderer",
       "target": "tropoi.representation.visual.matplotlib_renderer.MatplotlibRenderer.__init__"
@@ -3864,36 +3849,6 @@
       "kind": "call",
       "source": "tropoi.representation.visual.vorticity_viewer.VorticityViewer._map_vector_to_view",
       "target": "tropoi.spatial.grids.grid_interpolation.geodesic_to_latlon_grid"
-    },
-    {
-      "kind": "call",
-      "source": "tropoi.representation.visual.vorticity_viewer.VorticityViewer._plot_all_snapshots_legacy",
-      "target": "tropoi.representation.visual.maps.plot_velocity_streamlines"
-    },
-    {
-      "kind": "self",
-      "source": "tropoi.representation.visual.vorticity_viewer.VorticityViewer._plot_all_snapshots_legacy",
-      "target": "tropoi.representation.visual.vorticity_viewer.VorticityViewer._map_scalar_to_view"
-    },
-    {
-      "kind": "self",
-      "source": "tropoi.representation.visual.vorticity_viewer.VorticityViewer._plot_all_snapshots_legacy",
-      "target": "tropoi.representation.visual.vorticity_viewer.VorticityViewer._map_vector_to_view"
-    },
-    {
-      "kind": "instantiate",
-      "source": "tropoi.representation.visual.vorticity_viewer.VorticityViewer._plot_all_snapshots_legacy",
-      "target": "tropoi.temporal.tendencies.barotropic.BarotropicVorticity"
-    },
-    {
-      "kind": "call",
-      "source": "tropoi.representation.visual.vorticity_viewer.VorticityViewer.plot_all_snapshots",
-      "target": "tropoi.representation.visual.bve.build_bve_snapshot_timeline_from_data"
-    },
-    {
-      "kind": "call",
-      "source": "tropoi.representation.visual.vorticity_viewer.VorticityViewer.plot_all_snapshots",
-      "target": "tropoi.representation.visual.timeline.render_figure_timeline"
     },
     {
       "kind": "call",
@@ -5661,11 +5616,6 @@
       "target": "tropoi.spatial.transforms.fast_geodesic_sh.PointSetSphericalHarmonics"
     },
     {
-      "kind": "self",
-      "source": "tropoi.spatial.grids.latlon_grid.GaussLatLonSphericalHarmonics.inverse_transform",
-      "target": "tropoi.spatial.grids.latlon_grid.GaussLatLonSphericalHarmonics.inv_transform"
-    },
-    {
       "kind": "call",
       "source": "tropoi.spatial.initialization.bve._equatorial_vortices",
       "target": "tropoi.spatial.initialization.bve._gaussian_on_sphere"
@@ -5867,26 +5817,6 @@
     },
     {
       "kind": "constructor",
-      "source": "tropoi.spatial.operators.differential_operators_spherical.DifferentialOperatorsSpherical",
-      "target": "tropoi.spatial.operators.differential_operators_spherical.DifferentialOperatorsSpherical.__init__"
-    },
-    {
-      "kind": "self",
-      "source": "tropoi.spatial.operators.differential_operators_spherical.DifferentialOperatorsSpherical.__init__",
-      "target": "tropoi.spatial.operators.differential_operators_spherical.DifferentialOperatorsSpherical._looks_like_degrees"
-    },
-    {
-      "kind": "self",
-      "source": "tropoi.spatial.operators.differential_operators_spherical.DifferentialOperatorsSpherical.__init__",
-      "target": "tropoi.spatial.operators.differential_operators_spherical.DifferentialOperatorsSpherical.build_laplacian_matrix"
-    },
-    {
-      "kind": "self",
-      "source": "tropoi.spatial.operators.differential_operators_spherical.DifferentialOperatorsSpherical.__init__",
-      "target": "tropoi.spatial.operators.differential_operators_spherical.DifferentialOperatorsSpherical.build_partial_derivative_operators"
-    },
-    {
-      "kind": "constructor",
       "source": "tropoi.spatial.operators.spectral_operators.SpectralOperators",
       "target": "tropoi.spatial.operators.spectral_operators.SpectralOperators.__init__"
     },
@@ -5899,11 +5829,6 @@
       "kind": "call",
       "source": "tropoi.spatial.operators.spectral_operators.SpectralOperators.__init__",
       "target": "tropoi.spatial.spherical_backend.make_backend"
-    },
-    {
-      "kind": "call",
-      "source": "tropoi.spatial.operators.spectral_operators.SpectralOperators._get_differential_ops",
-      "target": "tropoi.spatial.operators.differential_operators_spherical.DifferentialOperatorsSpherical.from_geodesic_grid"
     },
     {
       "kind": "call",
@@ -5929,11 +5854,6 @@
       "kind": "call",
       "source": "tropoi.spatial.operators.spectral_operators.SpectralOperators.advect_scalar_by_streamfunction",
       "target": "tropoi.spatial.truncation.product_truncation_cut"
-    },
-    {
-      "kind": "self",
-      "source": "tropoi.spatial.operators.spectral_operators.SpectralOperators.d_lambda_field",
-      "target": "tropoi.spatial.operators.spectral_operators.SpectralOperators.d_lambda_coeffs"
     },
     {
       "kind": "self",
@@ -5964,11 +5884,6 @@
       "kind": "self",
       "source": "tropoi.spatial.operators.spectral_operators.SpectralOperators.laplacian_field",
       "target": "tropoi.spatial.operators.spectral_operators.SpectralOperators.laplacian_coeffs"
-    },
-    {
-      "kind": "self",
-      "source": "tropoi.spatial.operators.spectral_operators.SpectralOperators.sin_theta_d_theta_field",
-      "target": "tropoi.spatial.operators.spectral_operators.SpectralOperators.sin_theta_d_theta_coeffs"
     },
     {
       "kind": "self",
@@ -6626,26 +6541,6 @@
       "target": "tropoi.spatial.terrain.topography.TopographyError"
     },
     {
-      "kind": "instantiate",
-      "source": "tropoi.spatial.transforms.compute_optimal_weights.test_optimized_weights",
-      "target": "tropoi.spatial.grids.geodesic_grid.GeodesicGridGeometry"
-    },
-    {
-      "kind": "call",
-      "source": "tropoi.spatial.transforms.compute_optimal_weights.test_optimized_weights",
-      "target": "tropoi.spatial.transforms.compute_optimal_weights.compute_sh_quadrature_weights"
-    },
-    {
-      "kind": "instantiate",
-      "source": "tropoi.spatial.transforms.compute_optimal_weights.test_optimized_weights",
-      "target": "tropoi.spatial.transforms.fast_geodesic_sh.PointSetSphericalHarmonics"
-    },
-    {
-      "kind": "call",
-      "source": "tropoi.spatial.transforms.cuda.cuda_utils.get_kernel_from_cuda",
-      "target": "tropoi.spatial.transforms.cuda.cuda_utils.raw_module_from_cuda"
-    },
-    {
       "kind": "call",
       "source": "tropoi.spatial.transforms.cuda.cuda_utils.raw_module_from_cuda",
       "target": "tropoi.spatial.transforms.cuda.cuda_utils.load_cuda_source"
@@ -6659,11 +6554,6 @@
       "kind": "call",
       "source": "tropoi.spatial.transforms.fast_geodesic_sh.PointSetSphericalHarmonics.__init__",
       "target": "tropoi.spatial.transforms.cuda.cuda_utils.raw_module_from_cuda"
-    },
-    {
-      "kind": "self",
-      "source": "tropoi.spatial.transforms.fast_geodesic_sh.PointSetSphericalHarmonics.inverse_transform",
-      "target": "tropoi.spatial.transforms.fast_geodesic_sh.PointSetSphericalHarmonics.inv_transform"
     },
     {
       "kind": "constructor",
@@ -6704,11 +6594,6 @@
       "kind": "self",
       "source": "tropoi.spatial.transforms.optimized_geodesic_sh.GeodesicSphericalHarmonics._save_cached_weights",
       "target": "tropoi.spatial.transforms.optimized_geodesic_sh.GeodesicSphericalHarmonics._get_cache_filename"
-    },
-    {
-      "kind": "self",
-      "source": "tropoi.spatial.transforms.optimized_geodesic_sh.GeodesicSphericalHarmonics.inverse_transform",
-      "target": "tropoi.spatial.transforms.optimized_geodesic_sh.GeodesicSphericalHarmonics.inv_transform"
     },
     {
       "kind": "instantiate",
@@ -7039,16 +6924,6 @@
       "kind": "constructor",
       "source": "tropoi.temporal.tendencies.barotropic.BarotropicVorticity",
       "target": "tropoi.temporal.tendencies.barotropic.BarotropicVorticity.__init__"
-    },
-    {
-      "kind": "self",
-      "source": "tropoi.temporal.tendencies.barotropic.BarotropicVorticity.step_leapfrog",
-      "target": "tropoi.temporal.tendencies.barotropic.BarotropicVorticity.vorticity_to_streamfunction"
-    },
-    {
-      "kind": "instantiate",
-      "source": "tropoi.temporal.tendencies.barotropic.BarotropicVorticity.streamfunction_to_vorticity",
-      "target": "tropoi.spatial.states.barotropic.BarotropicState"
     },
     {
       "kind": "self",
@@ -9747,13 +9622,6 @@
       "type": "function"
     },
     {
-      "id": "tropoi.representation.visual.grid_adapter.scalar_field_on_uniform_latlon",
-      "kind": "function",
-      "module": "tropoi.representation.visual.grid_adapter",
-      "qualname": "scalar_field_on_uniform_latlon",
-      "type": "function"
-    },
-    {
       "id": "tropoi.representation.visual.maps.plot_velocity_streamlines",
       "kind": "function",
       "module": "tropoi.representation.visual.maps",
@@ -11228,20 +11096,6 @@
       "kind": "method",
       "module": "tropoi.representation.visual.vorticity_viewer",
       "qualname": "VorticityViewer._map_vector_to_view",
-      "type": "function"
-    },
-    {
-      "id": "tropoi.representation.visual.vorticity_viewer.VorticityViewer._plot_all_snapshots_legacy",
-      "kind": "method",
-      "module": "tropoi.representation.visual.vorticity_viewer",
-      "qualname": "VorticityViewer._plot_all_snapshots_legacy",
-      "type": "function"
-    },
-    {
-      "id": "tropoi.representation.visual.vorticity_viewer.VorticityViewer.plot_all_snapshots",
-      "kind": "method",
-      "module": "tropoi.representation.visual.vorticity_viewer",
-      "qualname": "VorticityViewer.plot_all_snapshots",
       "type": "function"
     },
     {
@@ -12792,13 +12646,6 @@
       "type": "function"
     },
     {
-      "id": "tropoi.spatial.grids.geodesic_grid.GeodesicGridGeometry.points_latlon",
-      "kind": "method",
-      "module": "tropoi.spatial.grids.geodesic_grid",
-      "qualname": "GeodesicGridGeometry.points_latlon",
-      "type": "function"
-    },
-    {
       "id": "tropoi.spatial.grids.grid.LatLonGridGeometry",
       "kind": "class",
       "module": "tropoi.spatial.grids.grid",
@@ -12890,13 +12737,6 @@
       "type": "function"
     },
     {
-      "id": "tropoi.spatial.grids.grid.LatLonGridGeometry.points_latlon",
-      "kind": "method",
-      "module": "tropoi.spatial.grids.grid",
-      "qualname": "LatLonGridGeometry.points_latlon",
-      "type": "function"
-    },
-    {
       "id": "tropoi.spatial.grids.grid_base.GridGeometry",
       "kind": "class",
       "module": "tropoi.spatial.grids.grid_base",
@@ -12922,13 +12762,6 @@
       "kind": "property",
       "module": "tropoi.spatial.grids.grid_base",
       "qualname": "GridGeometry.grid_shape",
-      "type": "function"
-    },
-    {
-      "id": "tropoi.spatial.grids.grid_base.GridGeometry.is_structured",
-      "kind": "property",
-      "module": "tropoi.spatial.grids.grid_base",
-      "qualname": "GridGeometry.is_structured",
       "type": "function"
     },
     {
@@ -12964,13 +12797,6 @@
       "kind": "property",
       "module": "tropoi.spatial.grids.grid_base",
       "qualname": "GridGeometry.point_longitudes",
-      "type": "function"
-    },
-    {
-      "id": "tropoi.spatial.grids.grid_base.GridGeometry.points_latlon",
-      "kind": "method",
-      "module": "tropoi.spatial.grids.grid_base",
-      "qualname": "GridGeometry.points_latlon",
       "type": "function"
     },
     {
@@ -13072,13 +12898,6 @@
       "type": "function"
     },
     {
-      "id": "tropoi.spatial.grids.latlon_grid.GaussLatLonGridGeometry.points_latlon",
-      "kind": "method",
-      "module": "tropoi.spatial.grids.latlon_grid",
-      "qualname": "GaussLatLonGridGeometry.points_latlon",
-      "type": "function"
-    },
-    {
       "id": "tropoi.spatial.grids.latlon_grid.GaussLatLonSphericalHarmonics",
       "kind": "class",
       "module": "tropoi.spatial.grids.latlon_grid",
@@ -13111,13 +12930,6 @@
       "kind": "method",
       "module": "tropoi.spatial.grids.latlon_grid",
       "qualname": "GaussLatLonSphericalHarmonics.inv_transform_batch",
-      "type": "function"
-    },
-    {
-      "id": "tropoi.spatial.grids.latlon_grid.GaussLatLonSphericalHarmonics.inverse_transform",
-      "kind": "method",
-      "module": "tropoi.spatial.grids.latlon_grid",
-      "qualname": "GaussLatLonSphericalHarmonics.inverse_transform",
       "type": "function"
     },
     {
@@ -13492,90 +13304,6 @@
       "type": "function"
     },
     {
-      "id": "tropoi.spatial.operators.differential_operators_spherical.DifferentialOperatorsSpherical",
-      "kind": "class",
-      "module": "tropoi.spatial.operators.differential_operators_spherical",
-      "qualname": "DifferentialOperatorsSpherical",
-      "type": "class"
-    },
-    {
-      "id": "tropoi.spatial.operators.differential_operators_spherical.DifferentialOperatorsSpherical.__init__",
-      "kind": "method",
-      "module": "tropoi.spatial.operators.differential_operators_spherical",
-      "qualname": "DifferentialOperatorsSpherical.__init__",
-      "type": "function"
-    },
-    {
-      "id": "tropoi.spatial.operators.differential_operators_spherical.DifferentialOperatorsSpherical._looks_like_degrees",
-      "kind": "staticmethod",
-      "module": "tropoi.spatial.operators.differential_operators_spherical",
-      "qualname": "DifferentialOperatorsSpherical._looks_like_degrees",
-      "type": "function"
-    },
-    {
-      "id": "tropoi.spatial.operators.differential_operators_spherical.DifferentialOperatorsSpherical.build_laplacian_matrix",
-      "kind": "method",
-      "module": "tropoi.spatial.operators.differential_operators_spherical",
-      "qualname": "DifferentialOperatorsSpherical.build_laplacian_matrix",
-      "type": "function"
-    },
-    {
-      "id": "tropoi.spatial.operators.differential_operators_spherical.DifferentialOperatorsSpherical.build_partial_derivative_operators",
-      "kind": "method",
-      "module": "tropoi.spatial.operators.differential_operators_spherical",
-      "qualname": "DifferentialOperatorsSpherical.build_partial_derivative_operators",
-      "type": "function"
-    },
-    {
-      "id": "tropoi.spatial.operators.differential_operators_spherical.DifferentialOperatorsSpherical.build_spherical_laplacian_operator",
-      "kind": "method",
-      "module": "tropoi.spatial.operators.differential_operators_spherical",
-      "qualname": "DifferentialOperatorsSpherical.build_spherical_laplacian_operator",
-      "type": "function"
-    },
-    {
-      "id": "tropoi.spatial.operators.differential_operators_spherical.DifferentialOperatorsSpherical.calculate_curl",
-      "kind": "method",
-      "module": "tropoi.spatial.operators.differential_operators_spherical",
-      "qualname": "DifferentialOperatorsSpherical.calculate_curl",
-      "type": "function"
-    },
-    {
-      "id": "tropoi.spatial.operators.differential_operators_spherical.DifferentialOperatorsSpherical.calculate_divergence",
-      "kind": "method",
-      "module": "tropoi.spatial.operators.differential_operators_spherical",
-      "qualname": "DifferentialOperatorsSpherical.calculate_divergence",
-      "type": "function"
-    },
-    {
-      "id": "tropoi.spatial.operators.differential_operators_spherical.DifferentialOperatorsSpherical.calculate_gradient",
-      "kind": "method",
-      "module": "tropoi.spatial.operators.differential_operators_spherical",
-      "qualname": "DifferentialOperatorsSpherical.calculate_gradient",
-      "type": "function"
-    },
-    {
-      "id": "tropoi.spatial.operators.differential_operators_spherical.DifferentialOperatorsSpherical.calculate_laplacian",
-      "kind": "method",
-      "module": "tropoi.spatial.operators.differential_operators_spherical",
-      "qualname": "DifferentialOperatorsSpherical.calculate_laplacian",
-      "type": "function"
-    },
-    {
-      "id": "tropoi.spatial.operators.differential_operators_spherical.DifferentialOperatorsSpherical.calculate_vector_gradient",
-      "kind": "method",
-      "module": "tropoi.spatial.operators.differential_operators_spherical",
-      "qualname": "DifferentialOperatorsSpherical.calculate_vector_gradient",
-      "type": "function"
-    },
-    {
-      "id": "tropoi.spatial.operators.differential_operators_spherical.DifferentialOperatorsSpherical.from_geodesic_grid",
-      "kind": "classmethod",
-      "module": "tropoi.spatial.operators.differential_operators_spherical",
-      "qualname": "DifferentialOperatorsSpherical.from_geodesic_grid",
-      "type": "function"
-    },
-    {
       "id": "tropoi.spatial.operators.spectral_operators.SpectralOperators",
       "kind": "class",
       "module": "tropoi.spatial.operators.spectral_operators",
@@ -13587,27 +13315,6 @@
       "kind": "method",
       "module": "tropoi.spatial.operators.spectral_operators",
       "qualname": "SpectralOperators.__init__",
-      "type": "function"
-    },
-    {
-      "id": "tropoi.spatial.operators.spectral_operators.SpectralOperators._get_differential_ops",
-      "kind": "method",
-      "module": "tropoi.spatial.operators.spectral_operators",
-      "qualname": "SpectralOperators._get_differential_ops",
-      "type": "function"
-    },
-    {
-      "id": "tropoi.spatial.operators.spectral_operators.SpectralOperators._is_geodesic_grid",
-      "kind": "staticmethod",
-      "module": "tropoi.spatial.operators.spectral_operators",
-      "qualname": "SpectralOperators._is_geodesic_grid",
-      "type": "function"
-    },
-    {
-      "id": "tropoi.spatial.operators.spectral_operators.SpectralOperators._is_latlon_grid",
-      "kind": "staticmethod",
-      "module": "tropoi.spatial.operators.spectral_operators",
-      "qualname": "SpectralOperators._is_latlon_grid",
       "type": "function"
     },
     {
@@ -13653,24 +13360,10 @@
       "type": "function"
     },
     {
-      "id": "tropoi.spatial.operators.spectral_operators.SpectralOperators.d_lambda_field",
-      "kind": "method",
-      "module": "tropoi.spatial.operators.spectral_operators",
-      "qualname": "SpectralOperators.d_lambda_field",
-      "type": "function"
-    },
-    {
       "id": "tropoi.spatial.operators.spectral_operators.SpectralOperators.grad_from_scalar",
       "kind": "method",
       "module": "tropoi.spatial.operators.spectral_operators",
       "qualname": "SpectralOperators.grad_from_scalar",
-      "type": "function"
-    },
-    {
-      "id": "tropoi.spatial.operators.spectral_operators.SpectralOperators.inv_d_lambda",
-      "kind": "method",
-      "module": "tropoi.spatial.operators.spectral_operators",
-      "qualname": "SpectralOperators.inv_d_lambda",
       "type": "function"
     },
     {
@@ -13706,13 +13399,6 @@
       "kind": "method",
       "module": "tropoi.spatial.operators.spectral_operators",
       "qualname": "SpectralOperators.sin_theta_d_theta_coeffs",
-      "type": "function"
-    },
-    {
-      "id": "tropoi.spatial.operators.spectral_operators.SpectralOperators.sin_theta_d_theta_field",
-      "kind": "method",
-      "module": "tropoi.spatial.operators.spectral_operators",
-      "qualname": "SpectralOperators.sin_theta_d_theta_field",
       "type": "function"
     },
     {
@@ -14591,25 +14277,11 @@
       "type": "class"
     },
     {
-      "id": "tropoi.spatial.terrain.tectonics.tectonic_update_step",
-      "kind": "function",
-      "module": "tropoi.spatial.terrain.tectonics",
-      "qualname": "tectonic_update_step",
-      "type": "function"
-    },
-    {
       "id": "tropoi.spatial.terrain.terrain_spectral.SpectralTerrainParams",
       "kind": "class",
       "module": "tropoi.spatial.terrain.terrain_spectral",
       "qualname": "SpectralTerrainParams",
       "type": "class"
-    },
-    {
-      "id": "tropoi.spatial.terrain.terrain_spectral.diffuse_spectral_coeffs",
-      "kind": "function",
-      "module": "tropoi.spatial.terrain.terrain_spectral",
-      "qualname": "diffuse_spectral_coeffs",
-      "type": "function"
     },
     {
       "id": "tropoi.spatial.terrain.terrain_spectral.generate_spectral_terrain_gpu",
@@ -14745,27 +14417,6 @@
       "type": "function"
     },
     {
-      "id": "tropoi.spatial.transforms.compute_optimal_weights.compute_sh_quadrature_weights",
-      "kind": "function",
-      "module": "tropoi.spatial.transforms.compute_optimal_weights",
-      "qualname": "compute_sh_quadrature_weights",
-      "type": "function"
-    },
-    {
-      "id": "tropoi.spatial.transforms.compute_optimal_weights.test_optimized_weights",
-      "kind": "function",
-      "module": "tropoi.spatial.transforms.compute_optimal_weights",
-      "qualname": "test_optimized_weights",
-      "type": "function"
-    },
-    {
-      "id": "tropoi.spatial.transforms.cuda.cuda_utils.get_kernel_from_cuda",
-      "kind": "function",
-      "module": "tropoi.spatial.transforms.cuda.cuda_utils",
-      "qualname": "get_kernel_from_cuda",
-      "type": "function"
-    },
-    {
       "id": "tropoi.spatial.transforms.cuda.cuda_utils.load_cuda_source",
       "kind": "function",
       "module": "tropoi.spatial.transforms.cuda.cuda_utils",
@@ -14805,13 +14456,6 @@
       "kind": "method",
       "module": "tropoi.spatial.transforms.fast_geodesic_sh",
       "qualname": "PointSetSphericalHarmonics.inv_transform_batch",
-      "type": "function"
-    },
-    {
-      "id": "tropoi.spatial.transforms.fast_geodesic_sh.PointSetSphericalHarmonics.inverse_transform",
-      "kind": "method",
-      "module": "tropoi.spatial.transforms.fast_geodesic_sh",
-      "qualname": "PointSetSphericalHarmonics.inverse_transform",
       "type": "function"
     },
     {
@@ -14882,13 +14526,6 @@
       "kind": "method",
       "module": "tropoi.spatial.transforms.optimized_geodesic_sh",
       "qualname": "GeodesicSphericalHarmonics.inv_transform",
-      "type": "function"
-    },
-    {
-      "id": "tropoi.spatial.transforms.optimized_geodesic_sh.GeodesicSphericalHarmonics.inverse_transform",
-      "kind": "method",
-      "module": "tropoi.spatial.transforms.optimized_geodesic_sh",
-      "qualname": "GeodesicSphericalHarmonics.inverse_transform",
       "type": "function"
     },
     {
@@ -15841,20 +15478,6 @@
       "kind": "method",
       "module": "tropoi.temporal.tendencies.barotropic",
       "qualname": "BarotropicVorticity.__init__",
-      "type": "function"
-    },
-    {
-      "id": "tropoi.temporal.tendencies.barotropic.BarotropicVorticity.step_leapfrog",
-      "kind": "method",
-      "module": "tropoi.temporal.tendencies.barotropic",
-      "qualname": "BarotropicVorticity.step_leapfrog",
-      "type": "function"
-    },
-    {
-      "id": "tropoi.temporal.tendencies.barotropic.BarotropicVorticity.streamfunction_to_vorticity",
-      "kind": "method",
-      "module": "tropoi.temporal.tendencies.barotropic",
-      "qualname": "BarotropicVorticity.streamfunction_to_vorticity",
       "type": "function"
     },
     {

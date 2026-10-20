@@ -17,18 +17,6 @@ class PlanetViewer:
     def __init__(self, planet: Planet):
         self.planet = planet
         self.grid: GridGeometryBase = planet.grid
-        # Precompute triangulation for geodesic grids; None for structured lat/lon
-        self._tri = None
-        if hasattr(self.grid, "faces"):
-            lon = cp.asnumpy(self.grid.longitudes)
-            lat = cp.asnumpy(self.grid.latitudes)
-            faces = cp.asnumpy(getattr(self.grid, "faces"))
-            if lon.ndim == 1 and lat.ndim == 1 and faces.ndim == 2:
-                self._tri = mtri.Triangulation(
-                    lon * 180 / np.pi,
-                    lat * 180 / np.pi,
-                    triangles=faces
-                )
 
 
     def plot_summary(self):

@@ -17,9 +17,6 @@ class LatLonSphericalHarmonics:
         self.legendre_module = raw_module_from_cuda("legendre")
         self.legendre_kernel = self.legendre_module.get_function('compute_legendre')
 
-        self.sph_harm_module = raw_module_from_cuda("sph_harm")
-        self.sph_harm_kernel = self.sph_harm_module.get_function('compute_sph_harm')
-
         # Cache for factorials
         self._factorial_cache = cp.ones((2 * self.l_max + 1,), dtype=cp.float64)
         for i in range(1, len(self._factorial_cache)):
