@@ -4421,9 +4421,19 @@
       "target": "tropoi.run.custom.planet.PreparedPlanet.preview"
     },
     {
+      "kind": "call",
+      "source": "tropoi.run.custom.planet._measure_after_cut",
+      "target": "tropoi.spatial.terrain.topography.williamson5_cone_elevation"
+    },
+    {
       "kind": "instantiate",
       "source": "tropoi.run.custom.planet.prepare_planet",
       "target": "tropoi.run.custom.planet.PreparedPlanet"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.custom.planet.prepare_planet",
+      "target": "tropoi.run.custom.planet._measure_after_cut"
     },
     {
       "kind": "instantiate",
@@ -6886,6 +6896,11 @@
       "target": "tropoi.spatial.terrain.raster._geokeys"
     },
     {
+      "kind": "call",
+      "source": "tropoi.spatial.terrain.raster._geotiff_extent",
+      "target": "tropoi.spatial.terrain.raster._semi_major_axis_m"
+    },
+    {
       "kind": "instantiate",
       "source": "tropoi.spatial.terrain.raster._normalize_axes",
       "target": "tropoi.spatial.terrain.raster.ElevationImportError"
@@ -6957,6 +6972,11 @@
     },
     {
       "kind": "instantiate",
+      "source": "tropoi.spatial.terrain.raster._semi_major_axis_m",
+      "target": "tropoi.spatial.terrain.raster.ElevationImportError"
+    },
+    {
+      "kind": "instantiate",
       "source": "tropoi.spatial.terrain.raster._uniform_step",
       "target": "tropoi.spatial.terrain.raster.ElevationImportError"
     },
@@ -7014,6 +7034,11 @@
       "kind": "instantiate",
       "source": "tropoi.spatial.terrain.topography.Topography.__init__",
       "target": "tropoi.spatial.terrain.topography.TopographyError"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.spatial.terrain.topography.Topography.describe",
+      "target": "tropoi.spatial.terrain.topography.smoothing_record"
     },
     {
       "kind": "instantiate",
@@ -12177,6 +12202,13 @@
       "type": "function"
     },
     {
+      "id": "tropoi.run.custom.planet._measure_after_cut",
+      "kind": "function",
+      "module": "tropoi.run.custom.planet",
+      "qualname": "_measure_after_cut",
+      "type": "function"
+    },
+    {
       "id": "tropoi.run.custom.planet.prepare_planet",
       "kind": "function",
       "module": "tropoi.run.custom.planet",
@@ -15313,6 +15345,13 @@
       "type": "function"
     },
     {
+      "id": "tropoi.spatial.terrain.raster._semi_major_axis_m",
+      "kind": "function",
+      "module": "tropoi.spatial.terrain.raster",
+      "qualname": "_semi_major_axis_m",
+      "type": "function"
+    },
+    {
       "id": "tropoi.spatial.terrain.raster._uniform_step",
       "kind": "function",
       "module": "tropoi.spatial.terrain.raster",
@@ -15485,6 +15524,13 @@
       "kind": "function",
       "module": "tropoi.spatial.terrain.topography",
       "qualname": "_require",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.spatial.terrain.topography.smoothing_record",
+      "kind": "function",
+      "module": "tropoi.spatial.terrain.topography",
+      "qualname": "smoothing_record",
       "type": "function"
     },
     {
