@@ -292,6 +292,12 @@ g = 3.71 m/s²), 4 levels, 72 steps of 300 s. After 6 h:
 The capsule plotted from its `terrain/` copy. This is a balance check of
 the terrain coupling on real relief, not a Mars climate simulation.
 
+**In the viewer.** A browser capture of `view()` on this terrain
+(`l_max` 42, ×20 relief, colour bar in metres), with its exact settings and
+the command that reproduces it, is in
+[docs/validation/mola_terrain_2026-10-22](validation/mola_terrain_2026-10-22/README.md);
+the README shows it.
+
 **The 463 m USGS mosaic (alternative, untested here).** The USGS
 Astrogeology "Mars MGS MOLA DEM 463m"
 (<https://astrogeology.usgs.gov/search/map/mars_mgs_mola_dem_463m>, about

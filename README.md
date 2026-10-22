@@ -47,6 +47,24 @@ python docs/figures/williamson5_t63_overview.py   # this figure, from its recipe
 tropoi plot RUN_PATH                               # default overview of any saved run
 ```
 
+### Real terrain in the interactive viewer
+
+![Interactive globe of Mars from MOLA topography: the model terrain at l_max 42 with radial relief exaggerated twenty times, centred on the Tharsis region with Olympus Mons near the upper-left limb; side panel with the Model/Source layer switch, the exaggeration slider at x20, and an elevation colour bar in metres](docs/validation/mola_terrain_2026-10-22/mola_globe_l42.png)
+
+*Mars topography from NASA PDS MOLA MEGDR (4 px/deg), resolved at ℓ ≤ 42 on a
+Gauss grid and shown in the self-contained terrain viewer (browser capture).
+Layer: Model, the coefficients the solver uses. Relief exaggerated ×20 for
+display only. The colour bar is in metres and spans both layers. Details and
+provenance:
+[docs/validation/mola_terrain_2026-10-22](docs/validation/mola_terrain_2026-10-22/README.md).*
+
+```bash
+python examples/mola_mars.py show mola/megt_4ppd.nc --lmax 42 --units m --centre 0 -95 --exaggeration 20 --out mola --open
+```
+
+The command needs CUDA and the converted MOLA grid; see
+[docs/TERRAIN_IMPORT.md](docs/TERRAIN_IMPORT.md#real-data-mars-from-mola).
+
 ## What you can study with it today
 
 - **How rotating flow organizes itself.** Vortex interaction, Rossby–Haurwitz
