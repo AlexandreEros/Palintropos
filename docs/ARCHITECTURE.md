@@ -43,7 +43,8 @@ src/tropoi/
 ├── representation/      what is recorded and shown
 │   ├── diagnostics/         per-core recorders, CSV/NPZ records and diagnostic figures
 │   ├── archive/             capsule reader (open_simulation), versioned schema, run-capsule writer,
-│   │                        saved resolved initial states (initial_state.py, CPU-only)
+│   │                        saved resolved initial states (initial_state.py, CPU-only),
+│   │                        saved prepared terrain (prepared_terrain.py, CPU-only)
 │   └── visual/              figure fields/specs/timelines/renderers, per-core compositions, Snapshot.plot adapter,
 │                            terrain previews (terrain.py: static figure and self-contained HTML globe)
 ├── run/{bve,swe,pe}/    orchestration: resolved run configuration and the runners
@@ -166,7 +167,9 @@ distribution and every command (`tropoi`, `aeolus`, `psx-bve`, `psx-gen`,
   saved initial states (`representation.archive.initial_state`: build,
   validate, save, load, inspect) and the custom-run configuration
   (`run.custom`), and coefficient-space (`"spectral"`) BVE/SWE snapshot
-  plots; reading elevation files (`spatial.terrain.raster`), host synthesis
+  plots; saved prepared terrain (`representation.archive.prepared_terrain`,
+  `PreparedPlanet.save`/`load`) and `tropoi run pe --terrain` configuration
+  resolution; reading elevation files (`spatial.terrain.raster`), host synthesis
   (`spatial.transforms.host_synthesis`) and terrain previews of resolved
   coefficients (`PreparedPlanet.from_initial_state(...).plot()` /
   `.view()`, Matplotlib for `plot` only). Fresh-interpreter tests enforce these boundaries.

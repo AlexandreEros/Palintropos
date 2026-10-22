@@ -261,7 +261,7 @@ function drawColorbar() {
   }
   g.strokeStyle = cssVar("--line"); g.strokeRect(pad + 0.5, 4.5, w - 1, h - 1);
   g.fillStyle = cssVar("--ink-2"); g.font = "12px system-ui, sans-serif"; g.textAlign = "center";
-  for (const v of niceTicks(VMIN / UF, VMAX / UF, 5)) {
+  for (const v of niceTicks(VMIN / UF, VMAX / UF, 7)) {
     const x = pad + (v * UF - VMIN) / SPAN * w;
     g.fillRect(x - 0.5, 4 + h, 1, 4);
     g.fillText(Number(v.toPrecision(6)).toLocaleString(), x, 4 + h + 17);

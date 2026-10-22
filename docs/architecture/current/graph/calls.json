@@ -443,6 +443,11 @@
     {
       "kind": "call",
       "source": "tropoi.cli.pe._execute_solver",
+      "target": "tropoi.cli.pe._persist_terrain"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.cli.pe._execute_solver",
       "target": "tropoi.cli.pe.build_pe_model"
     },
     {
@@ -464,6 +469,16 @@
       "kind": "call",
       "source": "tropoi.cli.pe._execute_solver",
       "target": "tropoi.spatial.initialization.pe.make_pe_ic"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.cli.pe._persist_terrain",
+      "target": "tropoi.representation.archive.prepared_terrain.load_prepared_terrain"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.cli.pe._persist_terrain",
+      "target": "tropoi.representation.archive.prepared_terrain.save_prepared_terrain"
     },
     {
       "kind": "call",
@@ -1034,6 +1049,96 @@
       "kind": "call",
       "source": "tropoi.representation.archive.initial_state.save_initial_state",
       "target": "tropoi.representation.archive.initial_state._write_npy"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.representation.archive.prepared_terrain.SavedTerrain.__post_init__",
+      "target": "tropoi.representation.archive.prepared_terrain.PreparedTerrainError"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.representation.archive.prepared_terrain.SavedTerrain.__post_init__",
+      "target": "tropoi.spatial.modes.SpectralModes"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.archive.prepared_terrain.SavedTerrain.digest",
+      "target": "tropoi.representation.archive.initial_state._canonical_json"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.archive.prepared_terrain.SavedTerrain.digest",
+      "target": "tropoi.representation.archive.initial_state.array_digest"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.archive.prepared_terrain.SavedTerrain.to_document",
+      "target": "tropoi.representation.archive.initial_state.array_digest"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.archive.prepared_terrain.load_prepared_terrain",
+      "target": "tropoi.representation.archive.initial_state._check_block"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.archive.prepared_terrain.load_prepared_terrain",
+      "target": "tropoi.representation.archive.initial_state._load_array"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.archive.prepared_terrain.load_prepared_terrain",
+      "target": "tropoi.representation.archive.initial_state._require_mapping"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.representation.archive.prepared_terrain.load_prepared_terrain",
+      "target": "tropoi.representation.archive.prepared_terrain.PreparedTerrainError"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.representation.archive.prepared_terrain.load_prepared_terrain",
+      "target": "tropoi.representation.archive.prepared_terrain.SavedTerrain"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.archive.prepared_terrain.load_prepared_terrain",
+      "target": "tropoi.spatial.specification.DiscretizationSpec.from_dict"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.archive.prepared_terrain.load_prepared_terrain",
+      "target": "tropoi.spatial.specification.PlanetSpec.from_dict"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.archive.prepared_terrain.load_prepared_terrain",
+      "target": "tropoi.spatial.specification.TopographySpec.from_dict"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.archive.prepared_terrain.save_prepared_terrain",
+      "target": "tropoi.representation.archive.initial_state._install"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.archive.prepared_terrain.save_prepared_terrain",
+      "target": "tropoi.representation.archive.initial_state._software"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.archive.prepared_terrain.save_prepared_terrain",
+      "target": "tropoi.representation.archive.initial_state._write_npy"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.representation.archive.prepared_terrain.save_prepared_terrain",
+      "target": "tropoi.representation.archive.prepared_terrain.PreparedTerrainError"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.archive.prepared_terrain.save_prepared_terrain",
+      "target": "tropoi.representation.archive.prepared_terrain.is_prepared_terrain"
     },
     {
       "kind": "self",
@@ -3312,6 +3417,16 @@
     },
     {
       "kind": "call",
+      "source": "tropoi.representation.visual.snapshot._prepared_terrain",
+      "target": "tropoi.representation.archive.prepared_terrain.load_prepared_terrain"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.representation.visual.snapshot._prepared_terrain",
+      "target": "tropoi.representation.visual.snapshot.PlotUnavailableError"
+    },
+    {
+      "kind": "call",
       "source": "tropoi.representation.visual.snapshot.build_resources",
       "target": "tropoi.cli.bve.build_planet"
     },
@@ -3344,6 +3459,11 @@
       "kind": "call",
       "source": "tropoi.representation.visual.snapshot.build_resources",
       "target": "tropoi.representation.visual.snapshot._custom_terrain"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.snapshot.build_resources",
+      "target": "tropoi.representation.visual.snapshot._prepared_terrain"
     },
     {
       "kind": "call",
@@ -4242,6 +4362,16 @@
     },
     {
       "kind": "call",
+      "source": "tropoi.run.custom.planet.PreparedPlanet.load",
+      "target": "tropoi.representation.archive.prepared_terrain.is_prepared_terrain"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.custom.planet.PreparedPlanet.load",
+      "target": "tropoi.representation.archive.prepared_terrain.load_prepared_terrain"
+    },
+    {
+      "kind": "call",
       "source": "tropoi.run.custom.planet.PreparedPlanet.plot",
       "target": "tropoi.representation.visual.terrain.plot_terrain"
     },
@@ -4264,6 +4394,16 @@
       "kind": "self",
       "source": "tropoi.run.custom.planet.PreparedPlanet.preview",
       "target": "tropoi.run.custom.planet.PreparedPlanet.details"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.run.custom.planet.PreparedPlanet.save",
+      "target": "tropoi.representation.archive.prepared_terrain.SavedTerrain"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.custom.planet.PreparedPlanet.save",
+      "target": "tropoi.representation.archive.prepared_terrain.save_prepared_terrain"
     },
     {
       "kind": "call",
@@ -4319,6 +4459,16 @@
       "kind": "call",
       "source": "tropoi.run.custom.planet.prepare_planet",
       "target": "tropoi.spatial.terrain.topography.Topography.from_raster"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.custom.planet.prepare_planet",
+      "target": "tropoi.spatial.terrain.topography.Topography.mountain"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.custom.planet.prepare_planet",
+      "target": "tropoi.spatial.truncation.product_truncation_cut"
     },
     {
       "kind": "constructor",
@@ -5513,6 +5663,11 @@
     {
       "kind": "call",
       "source": "tropoi.run.pe.config.PERunConfig._validate_topography",
+      "target": "tropoi.spatial.truncation.product_truncation_cut"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.pe.config.PERunConfig._validate_topography",
       "target": "tropoi.temporal.integration._require_finite_number"
     },
     {
@@ -5524,6 +5679,11 @@
       "kind": "self",
       "source": "tropoi.run.pe.config.PERunConfig.resolve",
       "target": "tropoi.run.pe.config.PERunConfig._resolve_plots"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.pe.config.PERunConfig.resolve",
+      "target": "tropoi.run.pe.config._prepared_terrain_settings"
     },
     {
       "kind": "call",
@@ -5579,6 +5739,16 @@
       "kind": "self",
       "source": "tropoi.run.pe.config.PERunConfig.to_run_config_dict",
       "target": "tropoi.run.pe.config.PERunConfig.snapshot_times_seconds"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.pe.config._prepared_terrain_settings",
+      "target": "tropoi.representation.archive.prepared_terrain.load_prepared_terrain"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.pe.config._prepared_terrain_settings",
+      "target": "tropoi.spatial.truncation.product_truncation_cut"
     },
     {
       "kind": "instantiate",
@@ -8150,6 +8320,13 @@
       "type": "function"
     },
     {
+      "id": "tropoi.cli.pe._persist_terrain",
+      "kind": "function",
+      "module": "tropoi.cli.pe",
+      "qualname": "_persist_terrain",
+      "type": "function"
+    },
+    {
       "id": "tropoi.cli.pe._resolve_writable_base_dir",
       "kind": "function",
       "module": "tropoi.cli.pe",
@@ -8637,6 +8814,76 @@
       "kind": "function",
       "module": "tropoi.representation.archive.initial_state",
       "qualname": "save_initial_state",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.archive.prepared_terrain.PreparedTerrainError",
+      "kind": "class",
+      "module": "tropoi.representation.archive.prepared_terrain",
+      "qualname": "PreparedTerrainError",
+      "type": "class"
+    },
+    {
+      "id": "tropoi.representation.archive.prepared_terrain.SavedTerrain",
+      "kind": "class",
+      "module": "tropoi.representation.archive.prepared_terrain",
+      "qualname": "SavedTerrain",
+      "type": "class"
+    },
+    {
+      "id": "tropoi.representation.archive.prepared_terrain.SavedTerrain.__post_init__",
+      "kind": "method",
+      "module": "tropoi.representation.archive.prepared_terrain",
+      "qualname": "SavedTerrain.__post_init__",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.archive.prepared_terrain.SavedTerrain.digest",
+      "kind": "property",
+      "module": "tropoi.representation.archive.prepared_terrain",
+      "qualname": "SavedTerrain.digest",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.archive.prepared_terrain.SavedTerrain.to_document",
+      "kind": "method",
+      "module": "tropoi.representation.archive.prepared_terrain",
+      "qualname": "SavedTerrain.to_document",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.archive.prepared_terrain.describe_band_limit",
+      "kind": "function",
+      "module": "tropoi.representation.archive.prepared_terrain",
+      "qualname": "describe_band_limit",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.archive.prepared_terrain.is_prepared_terrain",
+      "kind": "function",
+      "module": "tropoi.representation.archive.prepared_terrain",
+      "qualname": "is_prepared_terrain",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.archive.prepared_terrain.load_prepared_terrain",
+      "kind": "function",
+      "module": "tropoi.representation.archive.prepared_terrain",
+      "qualname": "load_prepared_terrain",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.archive.prepared_terrain.save_prepared_terrain",
+      "kind": "function",
+      "module": "tropoi.representation.archive.prepared_terrain",
+      "qualname": "save_prepared_terrain",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.archive.prepared_terrain.summary",
+      "kind": "function",
+      "module": "tropoi.representation.archive.prepared_terrain",
+      "qualname": "summary",
       "type": "function"
     },
     {
@@ -10698,6 +10945,13 @@
       "type": "function"
     },
     {
+      "id": "tropoi.representation.visual.snapshot._prepared_terrain",
+      "kind": "function",
+      "module": "tropoi.representation.visual.snapshot",
+      "qualname": "_prepared_terrain",
+      "type": "function"
+    },
+    {
       "id": "tropoi.representation.visual.snapshot.build_resources",
       "kind": "function",
       "module": "tropoi.representation.visual.snapshot",
@@ -11881,6 +12135,13 @@
       "type": "function"
     },
     {
+      "id": "tropoi.run.custom.planet.PreparedPlanet.load",
+      "kind": "classmethod",
+      "module": "tropoi.run.custom.planet",
+      "qualname": "PreparedPlanet.load",
+      "type": "function"
+    },
+    {
       "id": "tropoi.run.custom.planet.PreparedPlanet.plot",
       "kind": "method",
       "module": "tropoi.run.custom.planet",
@@ -11892,6 +12153,13 @@
       "kind": "method",
       "module": "tropoi.run.custom.planet",
       "qualname": "PreparedPlanet.preview",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.custom.planet.PreparedPlanet.save",
+      "kind": "method",
+      "module": "tropoi.run.custom.planet",
+      "qualname": "PreparedPlanet.save",
       "type": "function"
     },
     {
@@ -13012,6 +13280,13 @@
       "kind": "method",
       "module": "tropoi.run.pe.config",
       "qualname": "PERunConfig.to_run_config_dict",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.pe.config._prepared_terrain_settings",
+      "kind": "function",
+      "module": "tropoi.run.pe.config",
+      "qualname": "_prepared_terrain_settings",
       "type": "function"
     },
     {

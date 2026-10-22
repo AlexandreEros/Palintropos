@@ -37,6 +37,23 @@ while any non-flat terrain (including its gravity) participates fully in
 the scientific identity. Old manifests without a ``topography`` key are
 unambiguously flat.
 
+Prepared terrain (``terrain``)
+------------------------------
+``terrain`` names a saved prepared terrain directory
+(``PreparedPlanet.save``; ``representation.archive.prepared_terrain``):
+elevation coefficients already resolved, and inspected, on one
+discretization and band-limited at the PE dealiased cut. Resolution reads
+and verifies it on the CPU, adopts its discretization (``lmax``, ``grid``
+and the grid's dimensions) unless those are given explicitly, in which case
+they must agree, and records ``topography`` (the terrain's own preset, for
+example ``imported``), ``topography_parameters`` (its provenance),
+``terrain_digest`` (its identity, including the coefficient bytes),
+``terrain_l_cut`` and ``gravity``. The directory path itself is not part of
+the run configuration (the digest identifies the terrain), and the run
+copies the directory into its capsule as ``terrain/``. The coefficients are
+never re-projected: they depend only on the discretization, not on the
+planet's size or rotation, which come from the run configuration as usual.
+
 Import-light on purpose (stdlib + numpy-only ``SigmaGrid``); parsing,
 ``--help``, ``list`` and validation never touch CuPy or matplotlib.
 """
@@ -158,10 +175,66 @@ PE_BASE_DEFAULTS: dict = {
     "mountain_lon_deg": None,
     "mountain_width_deg": None,
     "gravity": None,
+    "terrain": None,
     "out": "runs",
     "experiment": None,
     "overwrite": False,
 }
+
+
+#: Discretization keys a prepared terrain fixes, per grid family.
+_TERRAIN_GRID_KEYS = {"latlon": ("lmax", "grid", "nlat", "nlon"),
+                      "geodesic": ("lmax", "grid", "resolution")}
+
+
+def _prepared_terrain_settings(settings: Mapping, explicit: Mapping) -> dict:
+    """Settings implied by a saved prepared terrain (CPU; verified load)."""
+    from tropoi.representation.archive.prepared_terrain import (
+        PreparedTerrainError, load_prepared_terrain)
+
+    path = str(settings["terrain"])
+    try:
+        terrain = load_prepared_terrain(path)
+    except (PreparedTerrainError, OSError) as err:
+        raise ValueError(f"--terrain {path}: {err}") from err
+    if "topography" in explicit:
+        raise ValueError("--terrain replaces --topography; give one of them")
+    mountain = [name for name in _TERRAIN_PARAM_FIELDS[:-1]
+                if explicit.get(name) is not None]
+    if mountain:
+        raise ValueError(
+            f"mountain parameter(s) {mountain} do not apply to --terrain")
+    disc = terrain.discretization
+    adopted: dict = {}
+    for key in _TERRAIN_GRID_KEYS[disc.grid]:
+        value = getattr(disc, key)
+        given = explicit.get(key)
+        if key == "grid" and given == "gauss-latlon":
+            given = "latlon"
+        if given is not None and given != value:
+            raise ValueError(
+                f"--terrain {path} was resolved for {key}={value!r} "
+                f"({disc.describe()}), but the run asks for {key}={given!r}; "
+                "resolve the terrain on the run's discretization or drop the "
+                "option to adopt the terrain's")
+        adopted[key] = value
+    cut = product_truncation_cut(disc.lmax)
+    if terrain.l_cut != cut:
+        raise ValueError(
+            f"--terrain {path} is "
+            + ("not band-limited" if terrain.l_cut is None
+               else f"band-limited at {terrain.l_cut}")
+            + f"; the PE core needs the dealiased cut {cut} for "
+            f"l_max={disc.lmax}. Prepare it with prepare_planet(..., "
+            "solver='pe')")
+    adopted.update(
+        topography=terrain.topography.preset,
+        topography_parameters=tuple(sorted(
+            terrain.topography.parameters.items())),
+        terrain_digest=terrain.digest, terrain_l_cut=terrain.l_cut,
+        gravity=(settings["gravity"] if settings["gravity"] is not None
+                 else DEFAULT_GRAVITY))
+    return adopted
 
 
 @dataclass(frozen=True)
@@ -191,6 +264,10 @@ class PERunConfig:
     mountain_lon_deg: Optional[float] = None
     mountain_width_deg: Optional[float] = None
     gravity: Optional[float] = None
+    terrain: Optional[str] = None
+    topography_parameters: Optional[tuple] = None
+    terrain_digest: Optional[str] = None
+    terrain_l_cut: Optional[int] = None
     dt_snapshots: Optional[float] = None
     snapshot_mode: str = "count"
     n_snapshots: Optional[int] = DEFAULT_N_SNAPSHOTS
@@ -280,7 +357,31 @@ class PERunConfig:
 
     def _validate_topography(self) -> None:
         """Mirror of the SWE topography validation (same names, same rules),
-        plus the PE-only ``gravity`` terrain parameter."""
+        plus the PE-only ``gravity`` terrain parameter, plus prepared
+        terrain (see the module docstring)."""
+        prepared = (self.terrain, self.topography_parameters,
+                    self.terrain_digest, self.terrain_l_cut)
+        if any(v is not None for v in prepared):
+            if any(v is None for v in prepared):
+                raise ValueError(
+                    "prepared terrain needs terrain, topography_parameters, "
+                    "terrain_digest and terrain_l_cut together "
+                    "(PERunConfig.resolve fills them from --terrain)")
+            if self.topography == "flat":
+                raise ValueError("a prepared terrain cannot be flat")
+            given = [name for name in _TERRAIN_PARAM_FIELDS[:-1]
+                     if getattr(self, name) is not None]
+            if given:
+                raise ValueError(
+                    f"mountain parameter(s) {given} do not apply to a "
+                    "prepared terrain (--terrain)")
+            if self.terrain_l_cut != product_truncation_cut(self.lmax):
+                raise ValueError(
+                    f"the prepared terrain is band-limited at "
+                    f"{self.terrain_l_cut}, but l_max={self.lmax} needs the "
+                    f"PE dealiased cut {product_truncation_cut(self.lmax)}")
+            _require_finite_positive("gravity", self.gravity)
+            return
         if self.topography not in PE_TOPOGRAPHIES:
             raise ValueError(
                 f"unknown topography {self.topography!r}; choose from "
@@ -379,11 +480,14 @@ class PERunConfig:
         if settings["grid"] == "gauss-latlon":  # user-facing alias
             settings["grid"] = "latlon"
 
+        # A prepared terrain fixes the terrain and its discretization.
+        if settings["terrain"] is not None:
+            settings.update(_prepared_terrain_settings(settings, explicit))
         # Resolve the terrain parameters exactly like the SWE config:
         # defaults apply only when the mountain preset is selected;
         # supplying them with a flat surface is an error (caught by
         # __post_init__, with an early clear message here for the CLI path).
-        if settings["topography"] == "mountain":
+        elif settings["topography"] == "mountain":
             terrain_defaults = {
                 "mountain_height_m": DEFAULT_MOUNTAIN_HEIGHT_M,
                 "mountain_lat_deg": DEFAULT_MOUNTAIN_LAT_DEG,
@@ -518,7 +622,13 @@ class PERunConfig:
             "snapshot_times": self.snapshot_times_seconds(),
             "plots": list(self.plots),
         }
-        if self.topography != "flat":
+        if self.terrain_digest is not None:
+            config["topography"] = self.topography
+            config["topography_parameters"] = dict(self.topography_parameters)
+            config["terrain_digest"] = self.terrain_digest
+            config["terrain_l_cut"] = self.terrain_l_cut
+            config["gravity"] = self.gravity
+        elif self.topography != "flat":
             config["topography"] = self.topography
             config["mountain_height_m"] = self.mountain_height_m
             config["mountain_lat_deg"] = self.mountain_lat_deg
@@ -553,7 +663,15 @@ class PERunConfig:
         else:
             lines.append(f"  nlat x nlon         {self.nlat} x {self.nlon} "
                          "(Gauss-Legendre latitudes x uniform longitudes)")
-        if self.topography == "mountain":
+        if self.terrain_digest is not None:
+            params = dict(self.topography_parameters)
+            source = params.get("source_name")
+            topo = (f"prepared terrain ({self.topography}"
+                    + (f" from {source}" if source else "")
+                    + f", band-limited at l = {self.terrain_l_cut}) read "
+                    f"from {self.terrain}; Phi_s = g h_s with g = "
+                    f"{self.gravity:g} m/s^2")
+        elif self.topography == "mountain":
             topo = (f"mountain (h={self.mountain_height_m:g} m at "
                     f"lat {self.mountain_lat_deg:g} deg, "
                     f"lon {self.mountain_lon_deg:g} deg, "

@@ -478,3 +478,85 @@ def test_saved_state_previews_without_cupy(tmp_path):
                          text=True, check=True).stdout.split()
     assert out == ["imported", "fake.nc", "False"]
     assert (tmp_path / "g.html").stat().st_size > 10_000
+
+
+# ---------------------------------------------------------------------------
+# Example scripts (CPU steps)
+# ---------------------------------------------------------------------------
+
+EXAMPLES = __import__("pathlib").Path(__file__).resolve().parents[1] / \
+    "examples"
+
+
+def test_synthetic_example_generates_readable_files(tmp_path):
+    pytest.importorskip("netCDF4")
+    subprocess.run([sys.executable, str(EXAMPLES / "terrain_planet.py"),
+                    "generate", str(tmp_path)], check=True,
+                   capture_output=True)
+    nc = read_elevation(tmp_path / "mars_like.nc")
+    png = read_elevation(tmp_path / "mars_like.png",
+                         height_range=(-8000.0, 22000.0), lon_west_deg=-180)
+    assert nc.shape == png.shape == (720, 1440)
+    step = 30000.0 / 65535
+    np.testing.assert_allclose(png.elevation_m, nc.elevation_m,
+                               atol=step / 2 + 0.01)
+
+
+def _fake_megdr(tmp_path, ppd=1):
+    """A tiny PDS3 MEGDR-like product with one peak at (20 N, 230 E)."""
+    lines, samples = 180 * ppd, 360 * ppd
+    lat = 90 - (np.arange(lines) + 0.5) / ppd
+    lon = (np.arange(samples) + 0.5) / ppd
+    la, lo = np.meshgrid(lat, lon, indexing="ij")
+    heights = np.rint(-500 + 9000 * np.exp(
+        -((la - 20) ** 2 + (lo - 230) ** 2) / 50.0)).astype(">i2")
+    heights.tofile(tmp_path / "FAKE.IMG")
+    label = f"""PDS_VERSION_ID = PDS3
+^IMAGE = "FAKE.IMG"
+DATA_SET_ID = "TEST"
+DESCRIPTION = "The minimum and
+  maximum topography observations for the entire data set are -500
+  and 8500 meters."
+OBJECT = IMAGE
+ LINES = {lines}
+ LINE_SAMPLES = {samples}
+ SAMPLE_TYPE = MSB_INTEGER
+ SAMPLE_BITS = 16
+ UNIT = METER
+END_OBJECT = IMAGE
+OBJECT = IMAGE_MAP_PROJECTION
+ MAP_PROJECTION_TYPE = "SIMPLE CYLINDRICAL"
+ POSITIVE_LONGITUDE_DIRECTION = "EAST"
+ MAP_RESOLUTION = {ppd}.0 <PIXEL/DEGREE>
+ MAXIMUM_LATITUDE = 90.0 <DEGREE>
+ MINIMUM_LATITUDE = -90.0 <DEGREE>
+ WESTERNMOST_LONGITUDE = 0.0 <DEGREE>
+ EASTERNMOST_LONGITUDE = 360.0 <DEGREE>
+ COORDINATE_SYSTEM_NAME = "PLANETOCENTRIC"
+END_OBJECT = IMAGE_MAP_PROJECTION
+END
+"""
+    (tmp_path / "fake.lbl").write_text(label, encoding="ascii")
+    return tmp_path / "fake.lbl", float(heights.max())
+
+
+def test_mola_converter_reads_pds3_orientation_and_units(tmp_path):
+    pytest.importorskip("netCDF4")
+    label, highest = _fake_megdr(tmp_path)
+    out = tmp_path / "fake.nc"
+    done = subprocess.run([sys.executable, str(EXAMPLES / "mola_mars.py"),
+                           "convert", str(label), str(out)], check=True,
+                          capture_output=True, text=True)
+    assert "(label: -500 .. 8500 m)" in done.stdout
+    r = read_elevation(out)
+    assert r.provenance["units"] == "m" and r.shape == (180, 360)
+    lat, lon, h = peak(r)                  # 230 E == 130 W, north stays north
+    assert abs(lat - 20) <= 1 and abs(lon + 130) <= 1
+    assert h == highest
+    # A label that contradicts what the converter relies on is refused.
+    text = label.read_text().replace("MSB_INTEGER", "LSB_INTEGER")
+    label.write_text(text)
+    bad = subprocess.run([sys.executable, str(EXAMPLES / "mola_mars.py"),
+                          "convert", str(label), str(out)],
+                         capture_output=True, text=True)
+    assert bad.returncode != 0 and "SAMPLE_TYPE" in bad.stderr

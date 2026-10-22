@@ -393,7 +393,8 @@ class Topography:
 
     @classmethod
     def from_raster(cls, planet, raster, *, smoothing: float | None = None,
-                    clip_below_m: float | None = None) -> "Topography":
+                    clip_below_m: float | None = None,
+                    l_cut: int | None = None) -> "Topography":
         """Terrain from an elevation raster, projected to the truncation.
 
         ``raster`` is an :class:`~tropoi.spatial.terrain.raster.ElevationRaster`
@@ -411,7 +412,12 @@ class Topography:
            residual;
         4. optionally apply a Hoskins-type spectral filter
            ``exp(-k (l(l+1) / (L(L+1)))^2)`` with ``k = -ln(smoothing)``,
-           i.e. amplitude ``smoothing`` retained at ``l_max`` (0 < s <= 1).
+           i.e. amplitude ``smoothing`` retained at ``L`` (0 < s <= 1),
+           where ``L`` is ``l_cut`` if given, else ``l_max``.
+
+        ``l_cut`` band-limits the terrain at that degree before the residual
+        is measured, exactly as :meth:`mountain` does for the
+        primitive-equation core's dealiased cut.
 
         Real terrain is not band-limited, so the residual is REPORTED (as
         for the Williamson-5 cone), not used to reject; the preview shows
@@ -426,6 +432,10 @@ class Topography:
         clip = (None if clip_below_m is None
                 else _require("clip_below_m", clip_below_m))
         sh, grid = planet.sh, planet.grid
+        if l_cut is not None and not 1 <= int(l_cut) <= sh.l_max:
+            raise TopographyError(
+                f"l_cut must be in [1, l_max={sh.l_max}], got {l_cut}")
+        effective_l = sh.l_max if l_cut is None else int(l_cut)
         lat = cp.asnumpy(cp.asarray(grid.point_latitudes, dtype=cp.float64))
         lon = cp.asnumpy(cp.asarray(grid.point_longitudes, dtype=cp.float64))
         values, settings = raster.resample_to_points(
@@ -440,10 +450,14 @@ class Topography:
                 f"the {MAX_MOUNTAIN_HEIGHT_M:g} m sanity cap (units?)")
         sampled = cp.asarray(values.reshape(
             cp.asarray(grid.point_latitudes).shape), dtype=cp.float64)
-        coeffs, synthesized, rel = _analyze_elevation(sh, sampled)
+        coeffs, synthesized, rel = _analyze_elevation(sh, sampled,
+                                                      l_cut=l_cut)
         filtered_rel = None
         if retained is not None and retained < 1.0:
-            factor = cp.asarray(spectral_smoothing_factors(sh.l_max, retained))
+            factor = np.zeros(sh.l_max + 1)
+            factor[:effective_l + 1] = spectral_smoothing_factors(
+                effective_l, retained)
+            factor = cp.asarray(factor)
             coeffs = coeffs * factor[:, None]
             synthesized = sh.inv_transform(coeffs).real
             w = cp.asarray(sh.weights, dtype=cp.float64)
@@ -462,6 +476,7 @@ class Topography:
             "raster_resolution_deg": raster.resolution_deg,
             "registration": raster.registration,
             "clip_below_m": clip,
+            "l_cut": None if l_cut is None else int(l_cut),
             "smoothing_retained_at_lmax": retained,
             "projection_residual": rel,
             "smoothed_residual": filtered_rel,

@@ -642,8 +642,15 @@ def add_pe_arguments(parser: argparse.ArgumentParser) -> None:
         "--gravity", type=float, default=None,
         help="Surface gravity in m/s^2 used to convert the terrain "
              "elevation into the surface geopotential Phi_s = g * h_s "
-             "[default: 9.80616]. Requires --topography mountain (the dry "
-             "sigma core uses g nowhere else).")
+             "[default: 9.80616]. Requires --topography mountain or "
+             "--terrain (the dry sigma core uses g nowhere else).")
+    parser.add_argument(
+        "--terrain", metavar="DIR", default=None,
+        help="Run over a saved prepared terrain (PreparedPlanet.save; e.g. "
+             "imported from an elevation file, docs/TERRAIN_IMPORT.md), "
+             "resolved with solver='pe'. Its coefficients are used exactly "
+             "and copied into the capsule's terrain/. The run adopts the "
+             "terrain's l_max and grid unless given; replaces --topography.")
 
     parser.add_argument(
         "--dt-seconds", dest="dt_seconds", type=float, metavar="SECONDS",
@@ -694,8 +701,8 @@ _PE_EXPLICIT_KEYS = (
     "duration_days", "dt_seconds", "scenario", "temperature",
     "surface_pressure", "thermal_amplitude", "topography",
     "mountain_height_m", "mountain_lat_deg", "mountain_lon_deg",
-    "mountain_width_deg", "gravity", "n_snapshots", "dt_snapshots",
-    "plots", "no_plots", "out", "experiment", "overwrite")
+    "mountain_width_deg", "gravity", "terrain", "n_snapshots",
+    "dt_snapshots", "plots", "no_plots", "out", "experiment", "overwrite")
 
 
 def _cmd_run_pe(args: argparse.Namespace) -> int:
@@ -905,7 +912,16 @@ def _cmd_inspect(args: argparse.Namespace) -> int:
     if run_config.get("solver") in ("swe", "pe"):
         # Additive schema: manifests without a topography key are flat runs.
         topo_kind = run_config.get("topography", "flat")
-        if topo_kind == "mountain":
+        if "terrain_digest" in run_config:
+            params = run_config.get("topography_parameters") or {}
+            source = params.get("source_name")
+            show("topography",
+                 f"prepared terrain ({topo_kind}"
+                 + (f" from {source}" if source else "")
+                 + f", band-limited at l = {run_config.get('terrain_l_cut')}"
+                 f", g = {run_config.get('gravity')}), resolved coefficients "
+                 "in the capsule's terrain/")
+        elif topo_kind == "mountain":
             show("topography",
                  f"mountain (h={run_config.get('mountain_height_m')} m at "
                  f"lat {run_config.get('mountain_lat_deg')} deg, "

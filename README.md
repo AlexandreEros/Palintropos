@@ -274,8 +274,11 @@ elevation map, resolve it on the model grid, and look at exactly what the
 solver will use before running anything: `world.plot()` for a static figure,
 `world.view()` for an interactive 3D globe (one self-contained HTML file).
 The resolved terrain and its source provenance go into SWE initial states
-and the runs made from them. See [docs/TERRAIN_IMPORT.md](docs/TERRAIN_IMPORT.md)
-and [examples/terrain_planet.py](examples/terrain_planet.py).
+and the runs made from them, and into PE runs (`tropoi run pe --terrain DIR`).
+See [docs/TERRAIN_IMPORT.md](docs/TERRAIN_IMPORT.md),
+[examples/terrain_planet.py](examples/terrain_planet.py) (synthetic terrain),
+and [examples/mola_mars.py](examples/mola_mars.py) (real Mars topography from
+MOLA).
 
 ![Two opposite-signed vortices on a rotating sphere: relative vorticity with streamfunction contours at days 0, 10, 15 and 25 on one colour scale; conservation drift and kinetic-energy spectral complexity](docs/runs/20260926T051829Z_two-vortices_rot24h_r4_l21_dt120h_e5dfc047_50ae9e93/assets/overview.png)
 

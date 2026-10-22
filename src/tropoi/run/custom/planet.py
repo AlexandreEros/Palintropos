@@ -15,12 +15,19 @@ the solver will use::
     planet.view()                                           # interactive globe
 
 Resolving needs CUDA (the projection uses the model's own transform).
-Previewing does not: :meth:`PreparedPlanet.from_initial_state` rebuilds a
-prepared planet from a saved shallow-water initial state, or a custom run's
-``initial_state/``, on any machine. The prepared terrain feeds
-:func:`~tropoi.run.custom.prepare.prepare_swe_state` unchanged (pass the
-:class:`PreparedPlanet` as ``topography``), so the run uses these exact
-coefficients and the saved state records the source's provenance.
+Previewing does not: :meth:`PreparedPlanet.load` reads a saved prepared
+terrain, and :meth:`PreparedPlanet.from_initial_state` a saved shallow-water
+initial state or a custom run's ``initial_state/``, on any machine.
+
+Where the terrain goes:
+
+* shallow water: pass the :class:`PreparedPlanet` as ``topography`` to
+  :func:`~tropoi.run.custom.prepare.prepare_swe_state`; the state (and every
+  run from it) keeps these exact coefficients and the source's provenance;
+* primitive equations: resolve with ``solver="pe"`` (band-limited at the
+  dealiased product cut the PE core requires), :meth:`PreparedPlanet.save`
+  it, and run ``tropoi run pe --terrain DIR``; the capsule keeps a copy
+  under ``terrain/``.
 
 Plotting and HTML rendering live in
 :mod:`tropoi.representation.visual.terrain`, imported on use.
@@ -61,7 +68,7 @@ _DETAIL_LABELS = (
     ("resampling", "Resampling"),
     ("working_resolution_deg", "Working resolution (deg)"),
     ("clip_below_m", "Clipped below (m)"),
-    ("smoothing_retained_at_lmax", "Smoothing (amplitude at l_max)"),
+    ("smoothing_retained_at_lmax", "Smoothing (amplitude at band limit)"),
     ("projection_residual", "Truncation residual (rel. L2)"),
     ("smoothed_residual", "Residual after smoothing"),
 )
@@ -78,9 +85,11 @@ class PreparedPlanet:
     """A planet with terrain resolved on a discretization (host arrays).
 
     ``topography_lm`` holds the resolved surface-elevation coefficients
-    (metres, ``(L+1, L+1)``), or ``None`` for a flat bottom. ``source`` is
-    the elevation raster the terrain came from, when it was imported in
-    this session (it is not persisted; saved states keep its provenance).
+    (metres, ``(L+1, L+1)``), or ``None`` for a flat bottom. ``l_cut`` is
+    the band limit (the PE dealiased product cut) or ``None`` for the full
+    truncation. ``source`` is the elevation raster the terrain came from,
+    when it was imported in this session (it is not persisted; saved
+    terrain keeps its provenance).
     """
 
     planet: PlanetSpec
@@ -90,6 +99,7 @@ class PreparedPlanet:
     measured: Mapping[str, Any] = field(default_factory=dict)
     source: Any = None
     label: str = ""
+    l_cut: int | None = None
 
     def __post_init__(self) -> None:
         lm = self.topography_lm
@@ -127,6 +137,40 @@ class PreparedPlanet:
         return cls(state.planet, state.discretization, state.topography,
                    state.topography_lm, label=state.label)
 
+    @classmethod
+    def load(cls, path) -> "PreparedPlanet":
+        """Read a saved prepared terrain (CPU only).
+
+        ``path`` is a directory written by :meth:`save`, or a PE run
+        directory whose capsule keeps one under ``terrain/``.
+        """
+        from tropoi.representation.archive.prepared_terrain import (
+            is_prepared_terrain, load_prepared_terrain)
+
+        path = pathlib.Path(path)
+        if not is_prepared_terrain(path) and is_prepared_terrain(
+                path / "terrain"):
+            path = path / "terrain"
+        saved = load_prepared_terrain(path)
+        return cls(saved.planet, saved.discretization, saved.topography,
+                   saved.topography_lm, label=saved.label, l_cut=saved.l_cut)
+
+    def save(self, path, *, overwrite: bool = False) -> pathlib.Path:
+        """Write the resolved terrain and its record to ``path`` (CPU).
+
+        The source raster is not stored; its provenance is. A PE run reads
+        the directory with ``tropoi run pe --terrain PATH``.
+        """
+        from tropoi.representation.archive.prepared_terrain import (
+            SavedTerrain, save_prepared_terrain)
+
+        if self.topography_lm is None:
+            raise ValueError("a flat bottom has no terrain to save")
+        return save_prepared_terrain(
+            SavedTerrain(self.planet, self.discretization, self.topography,
+                         self.topography_lm, l_cut=self.l_cut,
+                         label=self.label), path, overwrite=overwrite)
+
     # -- description ----------------------------------------------------------
 
     @property
@@ -143,13 +187,17 @@ class PreparedPlanet:
                     f"{p['lon_deg']:g}), width {p['width_deg']:g} deg")
         else:
             what = spec.preset
-        return f"{what}; {self.discretization.describe()}"
+        band = "" if self.l_cut is None else f", band limit {self.l_cut} (PE)"
+        return f"{what}; {self.discretization.describe()}{band}"
 
     def details(self) -> list[tuple[str, str]]:
         """(label, value) lines: planet, grid, terrain provenance, ranges."""
         lines = [("Planet", self.planet.describe()),
                  ("Discretization", self.discretization.describe()),
                  ("Terrain", self.topography.preset)]
+        if self.l_cut is not None:
+            lines.append(("Band limit", f"l_cut = {self.l_cut}: the PE "
+                          "dealiased product cut; nothing above it"))
         params = dict(self.topography.parameters)
         params.update(self.measured)
         for key, label in _DETAIL_LABELS:
@@ -227,7 +275,7 @@ class PreparedPlanet:
 def prepare_planet(planet: PlanetSpec, discretization: DiscretizationSpec,
                    terrain=None, *, smoothing: float | None = None,
                    clip_below_m: float | None = None,
-                   label: str = "") -> PreparedPlanet:
+                   label: str = "", solver: str = "swe") -> PreparedPlanet:
     """Resolve terrain on a discretization (requires CUDA).
 
     ``terrain`` is an :class:`~tropoi.spatial.terrain.raster.ElevationRaster`
@@ -237,14 +285,26 @@ def prepare_planet(planet: PlanetSpec, discretization: DiscretizationSpec,
     ``clip_below_m`` are applied as described in
     :meth:`tropoi.spatial.terrain.topography.Topography.from_raster`, and
     the resulting :class:`TopographySpec` is an ``imported`` provenance
-    record. Terrain is resolved at the full truncation, as the shallow-water
-    core uses it.
+    record.
+
+    ``solver`` says which core the terrain is for. ``"swe"`` (default)
+    resolves at the full truncation. ``"pe"`` band-limits it at the
+    dealiased product cut ``floor(2 l_max / 3)``, which the primitive-
+    equation core requires (content above it cannot be balanced by the
+    dealiased pressure-gradient pathway; see ``Topography.mountain``).
     """
     from tropoi.run.custom.prepare import (PreparationError, _build_planet,
                                            _check_specs, _resolve_topography)
     from tropoi.spatial.terrain.raster import ElevationRaster
 
     _check_specs(planet, discretization)
+    if solver not in ("swe", "pe"):
+        raise PreparationError(
+            f"solver must be 'swe' or 'pe', got {solver!r}")
+    l_cut = None
+    if solver == "pe":
+        from tropoi.spatial.truncation import product_truncation_cut
+        l_cut = product_truncation_cut(discretization.lmax)
     if isinstance(terrain, (str, pathlib.Path)):
         raise PreparationError(
             "read the file first with read_elevation(path, ...) so its "
@@ -261,16 +321,26 @@ def prepare_planet(planet: PlanetSpec, discretization: DiscretizationSpec,
                 "the ElevationRaster instead")
         if terrain.is_flat:
             return PreparedPlanet(planet, discretization, terrain, None,
-                                  label=label)
+                                  label=label, l_cut=l_cut)
         import cupy as cp
-        resolved = _resolve_topography(_build_planet(planet, discretization),
-                                       terrain)
+        planet_obj = _build_planet(planet, discretization)
+        if l_cut is not None and terrain.preset == "mountain":
+            from tropoi.spatial.terrain.topography import Topography
+            p = terrain.parameters
+            resolved = Topography.mountain(
+                planet_obj, height_m=p["height_m"], lat_deg=p["lat_deg"],
+                lon_deg=p["lon_deg"], width_deg=p["width_deg"], l_cut=l_cut)
+        else:
+            resolved = _resolve_topography(planet_obj, terrain)
+        lm = cp.asnumpy(resolved.elevation_lm)
+        if l_cut is not None:
+            lm[l_cut + 1:, :] = 0.0
+            lm[:, l_cut + 1:] = 0.0
         measured = {k: float(v) for k, v in resolved.parameters.items()
                     if isinstance(v, (int, float)) and not isinstance(v, bool)
                     and math.isfinite(float(v))}
-        return PreparedPlanet(planet, discretization, terrain,
-                              cp.asnumpy(resolved.elevation_lm),
-                              measured=measured, label=label)
+        return PreparedPlanet(planet, discretization, terrain, lm,
+                              measured=measured, label=label, l_cut=l_cut)
     if not isinstance(terrain, ElevationRaster):
         raise PreparationError(
             "terrain must be an ElevationRaster, a TopographySpec or None, "
@@ -284,10 +354,11 @@ def prepare_planet(planet: PlanetSpec, discretization: DiscretizationSpec,
     try:
         resolved = Topography.from_raster(planet_obj, terrain,
                                           smoothing=smoothing,
-                                          clip_below_m=clip_below_m)
+                                          clip_below_m=clip_below_m,
+                                          l_cut=l_cut)
     except TopographyError as err:
         raise PreparationError(str(err)) from err
     spec = TopographySpec.imported(resolved.parameters)
     return PreparedPlanet(planet, discretization, spec,
                           cp.asnumpy(resolved.elevation_lm), source=terrain,
-                          label=label)
+                          label=label, l_cut=l_cut)

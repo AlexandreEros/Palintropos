@@ -294,6 +294,14 @@
         "function"
       ],
       "source": "tropoi.cli.pe",
+      "target": "tropoi.representation.archive.prepared_terrain"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.cli.pe",
       "target": "tropoi.representation.archive.schema"
     },
     {
@@ -870,6 +878,30 @@
       "scopes": [
         "module"
       ],
+      "source": "tropoi.representation.archive.prepared_terrain",
+      "target": "tropoi.representation.archive.initial_state"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.representation.archive.prepared_terrain",
+      "target": "tropoi.spatial.modes"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.representation.archive.prepared_terrain",
+      "target": "tropoi.spatial.specification"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
       "source": "tropoi.representation.archive.schema",
       "target": "tropoi.spatial.modes"
     },
@@ -1392,6 +1424,14 @@
         "function"
       ],
       "source": "tropoi.representation.visual.snapshot",
+      "target": "tropoi.representation.archive.prepared_terrain"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.representation.visual.snapshot",
       "target": "tropoi.representation.visual.bve"
     },
     {
@@ -1888,6 +1928,14 @@
         "function"
       ],
       "source": "tropoi.run.custom.planet",
+      "target": "tropoi.representation.archive.prepared_terrain"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.run.custom.planet",
       "target": "tropoi.representation.visual.terrain"
     },
     {
@@ -1921,6 +1969,14 @@
       ],
       "source": "tropoi.run.custom.planet",
       "target": "tropoi.spatial.terrain.topography"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.run.custom.planet",
+      "target": "tropoi.spatial.truncation"
     },
     {
       "kind": "imports",
@@ -2241,6 +2297,14 @@
       ],
       "source": "tropoi.run.held_suarez.model",
       "target": "tropoi.temporal.tendencies.primitive_equations"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.run.pe.config",
+      "target": "tropoi.representation.archive.prepared_terrain"
     },
     {
       "kind": "imports",
@@ -3194,7 +3258,10 @@
         "shutil",
         "typing"
       ],
-      "third_party_imports": []
+      "third_party_imports": [
+        "cupy",
+        "numpy"
+      ]
     },
     {
       "category": "code",
@@ -3502,6 +3569,30 @@
         "typing",
         "uuid",
         "warnings"
+      ],
+      "third_party_imports": [
+        "numpy"
+      ]
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.representation.archive.prepared_terrain",
+      "is_package": false,
+      "path": "tropoi/representation/archive/prepared_terrain.py",
+      "stdlib_imports": [
+        "__future__",
+        "collections",
+        "contextlib",
+        "dataclasses",
+        "datetime",
+        "hashlib",
+        "json",
+        "os",
+        "pathlib",
+        "shutil",
+        "typing",
+        "uuid"
       ],
       "third_party_imports": [
         "numpy"

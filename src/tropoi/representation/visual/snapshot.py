@@ -124,6 +124,31 @@ def _custom_terrain(storage):
     return state.topography_lm
 
 
+def _prepared_terrain(storage):
+    """Persisted coefficients of a PE run over a prepared terrain.
+
+    Such runs (``tropoi run pe --terrain``) copy the terrain into the
+    capsule's ``terrain/``; ``None`` for every other run.
+    """
+    run_config = storage.run_config
+    if "terrain_digest" not in run_config:
+        return None
+    from tropoi.representation.archive.prepared_terrain import (
+        load_prepared_terrain)
+    run_dir = getattr(storage, "run_dir", None)
+    if run_dir is None:
+        raise PlotUnavailableError(
+            "this run used a prepared terrain; it is persisted in the "
+            "capsule's terrain/ directory, which this storage does not "
+            "expose")
+    terrain = load_prepared_terrain(pathlib.Path(run_dir) / "terrain")
+    if terrain.digest != run_config["terrain_digest"]:
+        raise PlotUnavailableError(
+            "the capsule's terrain/ does not match the run's recorded "
+            "terrain_digest")
+    return terrain.topography_lm
+
+
 def build_resources(storage) -> SnapshotResources:
     """Reconstruct the run's Planet/model from its persisted configuration.
 
@@ -146,7 +171,8 @@ def build_resources(storage) -> SnapshotResources:
             return SnapshotResources(solver, model.planet, model)
         if solver == "pe":
             from tropoi.cli.pe import build_pe_model
-            model = build_pe_model(run_config)
+            model = build_pe_model(
+                run_config, topography_lm=_prepared_terrain(storage))
             return SnapshotResources(solver, model.planet, model)
     except Exception as err:  # noqa: BLE001 - classified below
         if _cuda_failure(err):

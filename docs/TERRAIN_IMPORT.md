@@ -16,6 +16,11 @@ world.plot()          # static Matplotlib figure
 world.view()          # interactive 3D globe, one self-contained HTML file
 ```
 
+The same terrain then feeds shallow-water states, or primitive-equation
+runs (`solver="pe"`, then `tropoi run pe --terrain`); see
+[Into a run](#into-a-run). [Real data: Mars from MOLA](#real-data-mars-from-mola)
+records what the path does with actual MOLA topography.
+
 A runnable version of this workflow, with generated reference terrain, is in
 [examples/terrain_planet.py](../examples/terrain_planet.py):
 
@@ -30,7 +35,7 @@ tropoi run swe --initial-state states/mars_like --days 1         # a run over th
 The generated terrain is **synthetic**. It has a dichotomy, a Tharsis-like
 rise with four volcanoes and a Hellas-like basin, so the whole file path can
 be exercised without a download. It is not MOLA data. For real Mars, see
-[Mars from MOLA](#mars-from-mola).
+[Real data: Mars from MOLA](#real-data-mars-from-mola).
 
 ## The pipeline
 
@@ -127,6 +132,8 @@ any machine. Built-in presets work too:
 
 ## Into a run
 
+### Shallow water
+
 Pass the `PreparedPlanet` as the topography of an SWE state. The run then
 uses exactly these coefficients:
 
@@ -148,44 +155,160 @@ source file. `free_surface_anomaly = 0` is the exact lake at rest over any
 terrain, imported or not. The layer's mean depth must exceed the highest
 resolved peak.
 
-## Mars from MOLA
+### Primitive equations
 
-The USGS Astrogeology "Mars MGS MOLA DEM 463m" global mosaic
-(<https://astrogeology.usgs.gov/search/map/mars_mgs_mola_dem_463m>, file
-`Mars_MGS_MOLA_DEM_mosaic_global_463m.tif`) is a signed 16-bit raster:
-elevation in metres relative to the areoid, about 46080 × 23040 pixels,
-about 2 GB. It is far finer than any truncation used here. Average it down
-to a global latitude–longitude grid with GDAL, for example 4 pixels per
-degree:
+The PE core needs terrain band-limited at its dealiased product cut
+`floor(2 l_max / 3)`, so resolve it for that core, save it, and run over the
+saved directory:
 
-```bash
-gdalwarp -t_srs "+proj=longlat +R=3396190 +no_defs" -te -180 -90 180 90 -ts 1440 720 -r average -ot Float32 Mars_MGS_MOLA_DEM_mosaic_global_463m.tif mola_4ppd.tif
+```python
+world = prepare_planet(PlanetSpec.earth_like(day_hours=24.6229, radius_earth_units=0.53307),
+                       DiscretizationSpec.gauss_latlon(42, 66, 132),
+                       read_elevation("megt_4ppd.nc"), solver="pe")
+world.view()                       # the band-limited terrain the PE core will use
+world.save("terrain/mola_pe")      # terrain.json + topography_elevation_lm.npy
 ```
 
 ```bash
-python examples/terrain_planet.py show mola_4ppd.tif --units m --smoothing 0.3
+tropoi run pe --terrain terrain/mola_pe --scenario orographic_isothermal_rest --radius-earth-units 0.53307 --day-hours 24.6229 --gravity 3.71 --r-dry 191.8 --cp-dry 735 --temperature 210 --surface-pressure 610 --levels 4 --dt-seconds 300 --days 0.25
 ```
 
-The result is a geographic GeoTIFF, which the TIFF reader places from its
-tags. Use elevation relative to the areoid, not planetary radius: radius
-includes the ~20 km polar flattening and would look like enormous terrain.
-The MOLA download and conversion have not been run in this repository's
-tests. The geographic and equirectangular GeoTIFF paths are tested with
-generated files.
+How `--terrain` behaves:
+
+- **Discretization.** The run adopts the terrain's `l_max` and grid unless
+  they are given on the command line, in which case they must agree. A
+  terrain resolved for the SWE (full truncation) is refused with a pointer
+  to `solver="pe"`.
+- **No re-projection.** The stored coefficients are used exactly. They
+  depend only on the discretization, not on the planet's size or rotation:
+  measured bit-identical on the Gauss grid and within 3e-11 m on the
+  geodesic grid for an Earth-sized and a Mars-sized planet. The run's
+  planet comes from its own options as usual (`--radius-earth-units`,
+  `--day-hours`), and `--gravity` converts elevation into
+  `Phi_s = g h_s`.
+- **Identity.** The run configuration records `topography` (the terrain's
+  preset, for example `imported`), `topography_parameters` (its
+  provenance), `terrain_digest`, `terrain_l_cut` and `gravity`. All are
+  part of the scientific hash. The directory path is not: the same terrain
+  saved in two places gives the same run id.
+- **Capsule.** The run copies the directory into `terrain/` and checks the
+  copy's digest. `tropoi inspect` reports the prepared terrain, and
+  `tropoi plot` rebuilds the model from `terrain/`. A capsule whose
+  `terrain/` was altered is refused for plotting.
+- **Same path as the presets.** A Gaussian mountain prepared this way gives
+  a run bit-identical to `--topography mountain` with the same parameters
+  (`tests/test_pe_prepared_terrain.py`).
+
+`PreparedPlanet.save(path)` / `PreparedPlanet.load(path)` store and read
+any resolved terrain (format: `representation/archive/prepared_terrain.py`).
+`load` also accepts a PE run directory, so `PreparedPlanet.load(run).view()`
+shows the terrain a past run used, on any machine.
+
+## Real data: Mars from MOLA
+
+This section is **real-data validation**. It is separate from the
+synthetic Mars-like example above, whose terrain is generated and
+resembles Mars only in its shapes.
+
+**Data.** The Mars Global Surveyor MOLA Mission Experiment Gridded Data
+Records (dataset `MGS-M-MOLA-5-MEGDR-L3-V1.0`) from the NASA PDS
+Geosciences Node,
+<https://pds-geosciences.wustl.edu/mgs/mgs-m-mola-5-megdr-l3-v1/mgsl_300x/>:
+
+| File | Grid | Size | SHA-256 of the `.img` |
+| --- | --- | --- | --- |
+| `meg004/megt90n000cb.img` + `.lbl` | 4 px/deg, 1440 × 720 | 2.1 MB | `25f16fb7aaf857898dcf98bc4f841341a24f8b9f7e98453ca083bc45d897ca2c` |
+| `meg016/megt90n000eb.img` + `.lbl` | 16 px/deg, 5760 × 2880 | 33 MB | `d18d9b9ab8c5516d02e157dd2cde0f1d0d160c21940e953ba22391269a545e7b` |
+
+Each sample is the median MOLA topography in its bin: planetary radius
+minus areoid radius, in metres, planetocentric, east longitude. The files
+are raw PDS3 images (big-endian int16) that `read_elevation` does not read
+directly. [examples/mola_mars.py](../examples/mola_mars.py) `convert`
+parses the PDS3 label, checks every property it relies on (sample type and
+bits, unit, simple-cylindrical projection, east-positive planetocentric
+longitude, global extent, size), and writes CF NetCDF. From there it is an
+ordinary import.
+
+```bash
+python examples/mola_mars.py convert megt90n000cb.lbl mola/megt_4ppd.nc
+python examples/mola_mars.py validate mola/megt_4ppd.nc --fine mola/megt_16ppd.nc
+python examples/mola_mars.py show mola/megt_4ppd.nc --lmax 42
+python examples/mola_mars.py prepare-pe mola/megt_4ppd.nc terrain/mola_pe
+```
+
+**Measured (2026-10-21, Windows, GeForce MX110, Gauss lat-lon grids, Mars-sized planet).**
+
+- **Extremes.** The imported extremes equal the label's stated extremes for
+  the whole data set: −8068 / 21134 m at 4 px/deg and −8177 / 21171 m at
+  16 px/deg. So nothing is lost or rescaled in conversion, units or
+  reading.
+- **Placement.** The highest sample, 21134 m, is at (17.4° N, 133.1° W) on
+  Olympus Mons. The lowest, −8068 m, is at (32.9° S, 62.1° E) on the
+  Hellas floor. The local summits of Ascraeus, Arsia and Elysium Mons lie
+  0.1°, 1.8° and 0.3° from their nominal positions; Olympus Mons is 1.4°
+  away. A north–south flip or a 180° longitude shift would move each by
+  tens of degrees.
+- **Dichotomy.** Area means are −2180 m in the north and +1077 m in the
+  south (global −552 m).
+- **Resolution.** The model terrain is the same from either source grid:
+  coefficients from 16 px/deg and 4 px/deg differ by 3.0e-3 to 4.6e-3
+  relative L2. Area-averaging to the working resolution makes the result
+  independent of the source's sampling.
+
+Per truncation:
+
+| `l_max` | truncation residual | model range (m) | Olympus Mons (m) | Hellas (m) | degree-1 north–south term (m) |
+| --- | --- | --- | --- | --- | --- |
+| 21 | 0.123 | −7495 .. 9019 | 7425 | −7322 | −3005 |
+| 31 | 0.090 | −7393 .. 11606 | 11544 | −7038 | −3001 |
+| 42 | 0.074 | −7326 .. 16500 | 16500 | −7140 | −3004 |
+
+The degree-1 term `a_10 · sqrt(3/4π)` is the amplitude of the
+`sin(latitude)` component of the elevation. At −3.0 km it agrees with the
+roughly 3 km southward offset of Mars's centre of figure from its centre of
+mass (Smith et al. 1999, *Science* 284, 1495). That is an independent
+physical check on the whole import and projection chain. Olympus Mons
+needs high degrees: it reaches 16.5 of 21.1 km at `l_max` 42.
+`l_max` 63 did not fit on the 2 GB MX110: the dense Gauss transform matrix
+alone is 0.64 GB, and its working copies exceed the device memory.
+
+**PE run over MOLA terrain.** The terrain was prepared with `solver="pe"`
+(`l_max` 42, cut 28) and run with the command above: orographic isothermal
+rest with Mars-like constants (CO₂ gas constants, 210 K, 610 Pa reference,
+g = 3.71 m/s²), 4 levels, 72 steps of 300 s. After 6 h:
+
+- maximum wind 1.1e-10 m/s and mass drift 3.3e-16;
+- temperature unchanged at 210 K (|T − 210 K| ≤ 1.1e-11 K at every level);
+- surface pressure 210 Pa (over the resolved Olympus Mons) to 1230 Pa
+  (Hellas), as the hydrostatic balance requires.
+
+The capsule plotted from its `terrain/` copy. This is a balance check of
+the terrain coupling on real relief, not a Mars climate simulation.
+
+**The 463 m USGS mosaic (alternative, untested here).** The USGS
+Astrogeology "Mars MGS MOLA DEM 463m"
+(<https://astrogeology.usgs.gov/search/map/mars_mgs_mola_dem_463m>, about
+2 GB, 46080 × 23040) exceeds the reader's 2²⁶-pixel limit. Average it to a
+geographic grid first, for example with
+`gdalwarp -t_srs "+proj=longlat +R=3396190 +no_defs" -te -180 -90 180 90 -ts 1440 720 -r average -ot Float32 <in>.tif mola_4ppd.tif`,
+then read it with `units="m"`. This route was not run: GDAL is not
+installed here and the MEGDR grids above cover the need.
 
 ## Limits
 
-- **SWE only.** Imported terrain reaches runs through SWE initial states.
-  The PE core needs terrain band-limited at its dealiased cut (see
-  `Topography.mountain(l_cut=...)`) and has no custom-state route, so PE
-  runs cannot use imported terrain yet. The `tropoi run` CLI has no terrain
-  file flag either; the Python API is the interface.
+- **Interfaces.** The `tropoi run` CLI has no elevation-file flag: import
+  and inspect terrain in Python, then pass the saved prepared terrain to
+  `tropoi run pe --terrain`, or the saved SWE state to `--initial-state`.
 - **Grids.** Global regular latitude–longitude rasters only. No
-  reprojection, no regional tiles, and no spherical-harmonic coefficient
-  files (for example SHTOOLS models).
-- **Not persisted.** The source raster itself is not stored. Saved states
-  keep its provenance and the resolved coefficients, so a reloaded preview
-  shows the model layer only.
+  reprojection, no regional tiles, no spherical-harmonic coefficient files
+  (for example SHTOOLS models), and no raw PDS3 images (convert them, as
+  `examples/mola_mars.py` does).
+- **Source raster not persisted.** The source raster itself is not stored.
+  Saved terrain keeps its provenance and the resolved coefficients, so a
+  reloaded preview shows the model layer only.
+- **Truncation on small GPUs.** Resolution uses the model's dense
+  transforms. On a 2 GB GPU, Gauss grids up to `l_max` 42 work and 63 does
+  not.
 - **Picking.** Hovering over the globe locates points on the undisplaced
   sphere. With strong relief exaggeration, the readout may refer to a point
   slightly offset from the one under the cursor. The flat map is exact.

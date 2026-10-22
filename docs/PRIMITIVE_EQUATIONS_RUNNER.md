@@ -112,6 +112,22 @@ analytically exact one). How it enters the dynamics:
   historical config schema (old run ids remain valid; manifests without a
   `topography` key are unambiguously flat).
 
+**Prepared terrain (`--terrain DIR`).** Any terrain resolved and saved with
+`prepare_planet(..., solver="pe")` and `PreparedPlanet.save(DIR)` — an
+elevation file such as Mars MOLA, or a preset — runs with
+`tropoi run pe --terrain DIR`. The run adopts the terrain's `l_max` and grid
+unless they are given (then they must agree), requires the terrain to be
+band-limited at this `l_max`'s dealiased cut, and uses the stored
+coefficients exactly: nothing is re-projected. The configuration records
+`topography` (the terrain's preset, e.g. `imported`),
+`topography_parameters` (its provenance), `terrain_digest`,
+`terrain_l_cut` and `gravity`, all in the scientific hash; the directory
+path is not. The capsule keeps a verified copy under `terrain/`, which
+`tropoi inspect` names and `tropoi plot` rebuilds the model from. A
+prepared Gaussian mountain gives a bit-identical run to `--topography
+mountain` with the same parameters (`tests/test_pe_prepared_terrain.py`).
+See [TERRAIN_IMPORT.md](TERRAIN_IMPORT.md).
+
 **Dealiased terrain truncation.** PE terrain is band-limited at the
 model's product-truncation cut `l = floor(2 l_max / 3)`, not at `l_max`.
 The full-T pressure-gradient force `R_d T grad(ln p_s)` reaches the

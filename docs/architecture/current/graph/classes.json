@@ -9,6 +9,12 @@
     {
       "kind": "inherits",
       "position": 0,
+      "source": "tropoi.representation.archive.prepared_terrain.PreparedTerrainError",
+      "target": "tropoi.representation.archive.initial_state.InitialStateError"
+    },
+    {
+      "kind": "inherits",
+      "position": 0,
       "source": "tropoi.representation.archive.schema.UnknownSchemaVersionError",
       "target": "tropoi.representation.archive.schema.SchemaError"
     },
@@ -250,6 +256,37 @@
       "members": [],
       "module": "tropoi.representation.archive.initial_state",
       "qualname": "InitialStateError"
+    },
+    {
+      "decorators": [],
+      "external_bases": [],
+      "id": "tropoi.representation.archive.prepared_terrain.PreparedTerrainError",
+      "members": [],
+      "module": "tropoi.representation.archive.prepared_terrain",
+      "qualname": "PreparedTerrainError"
+    },
+    {
+      "decorators": [
+        "dataclass(frozen=True, eq=False)"
+      ],
+      "external_bases": [],
+      "id": "tropoi.representation.archive.prepared_terrain.SavedTerrain",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__post_init__"
+        },
+        {
+          "kind": "property",
+          "name": "digest"
+        },
+        {
+          "kind": "method",
+          "name": "to_document"
+        }
+      ],
+      "module": "tropoi.representation.archive.prepared_terrain",
+      "qualname": "SavedTerrain"
     },
     {
       "decorators": [],
@@ -1705,12 +1742,20 @@
           "name": "is_flat"
         },
         {
+          "kind": "classmethod",
+          "name": "load"
+        },
+        {
           "kind": "method",
           "name": "plot"
         },
         {
           "kind": "method",
           "name": "preview"
+        },
+        {
+          "kind": "method",
+          "name": "save"
         },
         {
           "kind": "method",

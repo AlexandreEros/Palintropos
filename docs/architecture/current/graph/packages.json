@@ -2,7 +2,7 @@
   "edges": [
     {
       "kind": "imports",
-      "module_edges": 11,
+      "module_edges": 12,
       "source": "tropoi.cli",
       "target": "tropoi.representation.archive"
     },
@@ -140,7 +140,7 @@
     },
     {
       "kind": "imports",
-      "module_edges": 5,
+      "module_edges": 7,
       "source": "tropoi.representation.archive",
       "target": "tropoi.spatial"
     },
@@ -170,7 +170,7 @@
     },
     {
       "kind": "imports",
-      "module_edges": 1,
+      "module_edges": 2,
       "source": "tropoi.representation.visual",
       "target": "tropoi.representation.archive"
     },
@@ -272,7 +272,7 @@
     },
     {
       "kind": "imports",
-      "module_edges": 8,
+      "module_edges": 9,
       "source": "tropoi.run.custom",
       "target": "tropoi.representation.archive"
     },
@@ -296,7 +296,7 @@
     },
     {
       "kind": "imports",
-      "module_edges": 9,
+      "module_edges": 10,
       "source": "tropoi.run.custom",
       "target": "tropoi.spatial"
     },
@@ -359,6 +359,12 @@
       "module_edges": 4,
       "source": "tropoi.run.pe",
       "target": "tropoi"
+    },
+    {
+      "kind": "imports",
+      "module_edges": 1,
+      "source": "tropoi.run.pe",
+      "target": "tropoi.representation.archive"
     },
     {
       "kind": "imports",
@@ -605,8 +611,8 @@
     },
     {
       "id": "tropoi.representation.archive",
-      "internal_edges": 4,
-      "modules": 5
+      "internal_edges": 5,
+      "modules": 6
     },
     {
       "id": "tropoi.representation.diagnostics",

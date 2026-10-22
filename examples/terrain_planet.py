@@ -16,9 +16,9 @@ HTML file, opened in the browser). ``state`` stores the resolved terrain in
 a shallow-water initial state (a resting layer), the form a run keeps it
 in; ``preview`` draws a saved state's terrain on a machine without CUDA.
 
-Real Mars: see docs/TERRAIN_IMPORT.md ("Mars from MOLA") for downloading
-the USGS MOLA DEM and turning it into a global latitude-longitude file, then
-for example ``show mola_4ppd.tif --units m --smoothing 0.3``.
+Real Mars is a separate, real-data example: examples/mola_mars.py converts
+the MOLA MEGDR topography (NASA PDS) and validates the import; the measured
+results are in docs/TERRAIN_IMPORT.md ("Real data: Mars from MOLA").
 """
 from __future__ import annotations
 
