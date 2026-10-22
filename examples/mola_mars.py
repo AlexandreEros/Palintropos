@@ -4,7 +4,10 @@
     python examples/mola_mars.py validate mola/megt_4ppd.nc [--fine mola/megt_16ppd.nc]
     python examples/mola_mars.py show mola/megt_4ppd.nc --lmax 42               # CUDA
     python examples/mola_mars.py prepare-pe mola/megt_4ppd.nc terrain/mola_pe   # CUDA
-    tropoi run pe --terrain terrain/mola_pe --scenario orographic_isothermal_rest         --radius-earth-units 0.53307 --day-hours 24.6229 --gravity 3.71         --r-dry 191.8 --cp-dry 735 --temperature 210 --surface-pressure 610         --levels 4 --dt-seconds 300 --days 0.25
+    tropoi run pe --terrain terrain/mola_pe --scenario orographic_isothermal_rest \
+        --radius-earth-units 0.53307 --day-hours 24.6229 --gravity 3.71 \
+        --r-dry 191.8 --cp-dry 735 --temperature 210 --surface-pressure 610 \
+        --levels 4 --dt-seconds 300 --days 0.25
 
 This is REAL data, kept apart from examples/terrain_planet.py (synthetic
 Mars-like relief). Inputs are the Mars Global Surveyor MOLA Mission

@@ -685,7 +685,8 @@ def prepare_swe_state(planet: PlanetSpec, discretization: DiscretizationSpec,
 
     prepared_terrain = None
     if isinstance(topography, PreparedPlanet):
-        if topography.planet != planet                 or topography.discretization != discretization:
+        if (topography.planet != planet
+                or topography.discretization != discretization):
             raise PreparationError(
                 "the PreparedPlanet was resolved for a different planet or "
                 "discretization; prepare it with the same PlanetSpec and "

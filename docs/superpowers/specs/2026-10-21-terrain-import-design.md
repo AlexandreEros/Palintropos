@@ -84,3 +84,30 @@ checked so flips, 180° shifts and km/m mistakes fail. CPU tests for readers,
 rejections, resampling, host synthesis (analytic Y_lm) and HTML/figure
 generation; GPU parity of host synthesis; an SWE initial state over imported
 terrain saved, reloaded and run briefly; the HTML exercised in a browser.
+
+## Addendum, 2026-10-22: PE terrain and `tropoi run pe --terrain`
+
+The non-goals above listed "PE wiring of imported terrain" and "a `tropoi`
+CLI flag". At the user's request (same PR, commit `2a70164`), PE support was
+added. It does not contradict the second non-goal:
+
+- **What was added.** `prepare_planet(..., solver="pe")` band-limits the
+  resolved terrain at the PE dealiased cut `floor(2 l_max / 3)`.
+  `PreparedPlanet.save` writes a *prepared terrain* (resolved coefficients
+  plus their record: `representation/archive/prepared_terrain.py`), and
+  `tropoi run pe --terrain DIR` runs over it. The run adopts the terrain's
+  discretization, records its digest in the scientific identity, uses the
+  coefficients exactly, and keeps a verified copy in the capsule's
+  `terrain/`.
+- **What `--terrain` is not.** It does not read a raster. It takes a terrain
+  that was already imported, resolved and inspected in Python
+  (`read_elevation` → `prepare_planet` → `plot()`/`view()` → `save`). A
+  flag that imported an elevation file directly would have to expose every
+  reader option on the command line (units, scale/offset, georeferencing,
+  missing values, smoothing) and would re-resolve terrain nobody looked at.
+  That remains out of scope; the inspect-then-save route is the design.
+- **Band limit.** Smoothing's retained amplitude applies at the band limit
+  (`l_cut` for PE, `l_max` otherwise), recorded as
+  `smoothing_retained_at_band_limit` / `smoothing_band_limit`; the earlier
+  `smoothing_retained_at_lmax` is still read. PE-prepared terrain may also
+  be used in SWE states; the preparation report records its cut.
