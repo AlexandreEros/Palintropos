@@ -206,13 +206,25 @@ class ElevationRaster:
         Latitudes may be ascending or descending; longitudes may start
         anywhere, use either the [-180, 180) or [0, 360) convention, and
         repeat the seam column. Values must be finite metres.
+
+        Unless ``provenance`` says otherwise, the source is named ``"array"``
+        and identified by the SHA-256 of the normalized values and
+        coordinates, so an in-memory raster can be imported and traced like
+        a file.
         """
         values, lat, lon, notes = _normalize_axes(
             np.asarray(elevation_m, dtype=np.float64),
             np.asarray(lat_deg, dtype=np.float64),
             np.asarray(lon_deg, dtype=np.float64))
+        digest = hashlib.sha256()
+        for arr in (values, lat, lon):
+            arr = np.ascontiguousarray(arr, dtype="<f8")
+            digest.update(str(arr.shape).encode("ascii"))
+            digest.update(arr.tobytes())
         return cls(values, lat, lon, provenance={
-            "format": "array", **(provenance or {}), **notes})
+            "format": "array", "source_name": "array",
+            "source_sha256": digest.hexdigest(),
+            **(provenance or {}), **notes})
 
     # -- introspection -------------------------------------------------------
 
