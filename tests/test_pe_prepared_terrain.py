@@ -242,3 +242,37 @@ def test_imported_terrain_pe_run_keeps_rest_and_its_capsule(tmp_path):
     np.save(lm_path, lm)
     with pytest.raises(Exception, match="SHA-256|terrain"):
         build_resources(open_simulation(run_dir).storage)
+
+
+@requires_cuda
+def test_pe_cone_measurements_describe_the_cut_coefficients():
+    """The cone preset measures its full projection; after the PE cut the
+    published measurements must be those of the coefficients kept."""
+    from test_terrain_import import cone
+
+    from tropoi.run.custom import prepare_planet, state_sampling
+    from tropoi.spatial.transforms.host_synthesis import synthesize_latlon
+
+    spec = TopographySpec.williamson5_cone()
+    pe = prepare_planet(PlanetSpec.earth_like(), DISC, spec, solver="pe")
+    swe = prepare_planet(PlanetSpec.earth_like(), DISC, spec)
+    assert pe.l_cut == 10 and not np.any(pe.topography_lm[11:])
+    s = state_sampling(PlanetSpec.earth_like(), DISC)
+    lat = np.degrees(s.latitudes[:, 0])
+    lon = np.degrees(s.longitudes[0, :])
+    field = synthesize_latlon(pe.topography_lm, lat, lon)
+    analytic = cone(*np.meshgrid(lat, lon, indexing="ij"))
+    w = s.weights
+    residual = math.sqrt(np.sum(w * (field - analytic) ** 2)
+                         / np.sum(w * analytic ** 2))
+    m = pe.measured
+    assert m["elevation_min_m"] == pytest.approx(field.min(), abs=1e-8)
+    assert m["elevation_max_m"] == pytest.approx(field.max(), abs=1e-8)
+    assert m["projection_residual"] == pytest.approx(residual, rel=1e-10)
+    assert m["peak_error_m"] == pytest.approx(2000.0 - field.max(), abs=1e-8)
+    # ... and they are not the full-truncation values any more.
+    assert m["projection_residual"] > 2 * swe.measured["projection_residual"]
+    assert m["elevation_max_m"] < swe.measured["elevation_max_m"] - 100.0
+    details = dict(pe.details())
+    assert details["Truncation residual (rel. L2)"] == \
+        f"{m['projection_residual']:.6g}"

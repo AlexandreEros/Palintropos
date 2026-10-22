@@ -272,6 +272,45 @@ class PreparedPlanet:
         return f"{base or 'terrain'}-l{self.discretization.lmax}-{tag}"
 
 
+#: Measurements a preset reports about its resolved coefficients.
+_COEFFICIENT_MEASURES = ("projection_residual", "elevation_min_m",
+                         "elevation_max_m", "peak_error_m")
+
+
+def _measure_after_cut(planet_obj, spec: TopographySpec, lm: np.ndarray,
+                       measured: Mapping[str, float]) -> dict:
+    """Re-measure a preset from the coefficients kept after a band cut.
+
+    Extrema come from synthesizing ``lm`` on the state grid. The residual
+    and peak error need the analytic field, which is known here for the
+    Williamson-5 cone only; for any other preset they are omitted rather
+    than reported from the uncut projection.
+    """
+    import cupy as cp
+
+    out = {k: v for k, v in measured.items()
+           if k not in _COEFFICIENT_MEASURES}
+    sh = planet_obj.sh
+    synth = sh.inv_transform(cp.asarray(lm)).real
+    out["elevation_min_m"] = float(synth.min())
+    out["elevation_max_m"] = float(synth.max())
+    if spec.preset == "williamson5_cone":
+        from tropoi.spatial.terrain.topography import (
+            williamson5_cone_elevation)
+        grid = planet_obj.grid
+        analytic = williamson5_cone_elevation(
+            cp.asarray(grid.point_latitudes, dtype=cp.float64),
+            cp.asarray(grid.point_longitudes, dtype=cp.float64),
+            height_m=spec.parameters["height_m"]).reshape(synth.shape)
+        w = cp.asarray(sh.weights, dtype=cp.float64).reshape(synth.shape)
+        out["projection_residual"] = float(
+            cp.sqrt(cp.sum(w * (synth - analytic) ** 2))
+            / cp.sqrt(cp.sum(w * analytic ** 2)))
+        out["peak_error_m"] = float(spec.parameters["height_m"]) - float(
+            synth.max())
+    return out
+
+
 def prepare_planet(planet: PlanetSpec, discretization: DiscretizationSpec,
                    terrain=None, *, smoothing: float | None = None,
                    clip_below_m: float | None = None,
@@ -332,13 +371,18 @@ def prepare_planet(planet: PlanetSpec, discretization: DiscretizationSpec,
                 lon_deg=p["lon_deg"], width_deg=p["width_deg"], l_cut=l_cut)
         else:
             resolved = _resolve_topography(planet_obj, terrain)
-        lm = cp.asnumpy(resolved.elevation_lm)
+        full = cp.asnumpy(resolved.elevation_lm)
+        lm = full.copy()
         if l_cut is not None:
             lm[l_cut + 1:, :] = 0.0
             lm[:, l_cut + 1:] = 0.0
         measured = {k: float(v) for k, v in resolved.parameters.items()
                     if isinstance(v, (int, float)) and not isinstance(v, bool)
                     and math.isfinite(float(v))}
+        if not np.array_equal(lm, full):
+            # The preset measured its full-truncation projection; the cut
+            # changed the coefficients, so measure what is actually kept.
+            measured = _measure_after_cut(planet_obj, terrain, lm, measured)
         return PreparedPlanet(planet, discretization, terrain, lm,
                               measured=measured, label=label, l_cut=l_cut)
     if not isinstance(terrain, ElevationRaster):
