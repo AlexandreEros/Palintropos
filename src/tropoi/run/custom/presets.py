@@ -61,6 +61,9 @@ def topography_spec_for_run_config(run_config: Mapping) -> TopographySpec:
             width_deg=run_config["mountain_width_deg"])
     if kind == "williamson5_cone":
         return TopographySpec.williamson5_cone(height_m=W5_CONE_HEIGHT_M)
+    if kind == "imported":
+        return TopographySpec.imported(
+            run_config.get("topography_parameters") or {})
     raise ValueError(f"unknown topography {kind!r} in the run configuration")
 
 

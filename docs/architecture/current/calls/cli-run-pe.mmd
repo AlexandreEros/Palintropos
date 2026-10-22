@@ -10,6 +10,7 @@ flowchart LR
     subgraph g_tropoi_ocli_ope["cli.pe"]
         n_tropoi_ocli_ope_o__clean__overwrite__artifacts["_clean_overwrite_artifacts()"]
         n_tropoi_ocli_ope_o__execute__solver["_execute_solver()"]
+        n_tropoi_ocli_ope_o__persist__terrain["_persist_terrain()"]
         n_tropoi_ocli_ope_o__resolve__writable__base__dir["_resolve_writable_base_dir()"]
         n_tropoi_ocli_ope_obuild__pe__model["build_pe_model()"]
         n_tropoi_ocli_ope_oexecute__run["execute_run()"]
@@ -17,6 +18,17 @@ flowchart LR
     subgraph g_tropoi_ocli_orun__lifecycle["cli.run_lifecycle"]
         n_tropoi_ocli_orun__lifecycle_oexecute__with__provenance["execute_with_provenance()"]
         n_tropoi_ocli_orun__lifecycle_oresolve__writable__base__dir["resolve_writable_base_dir()"]
+    end
+    subgraph g_tropoi_orepresentation_oarchive_oinitial__state["representation.archive.initial_state"]
+        n_tropoi_orepresentation_oarchive_oinitial__state_o__check__block["_check_block()"]
+        n_tropoi_orepresentation_oarchive_oinitial__state_o__load__array["_load_array()"]
+        n_tropoi_orepresentation_oarchive_oinitial__state_o__require__mapping["_require_mapping()"]
+    end
+    subgraph g_tropoi_orepresentation_oarchive_oprepared__terrain["representation.archive.prepared_terrain"]
+        n_tropoi_orepresentation_oarchive_oprepared__terrain_oPreparedTerrainError{{"PreparedTerrainError"}}
+        n_tropoi_orepresentation_oarchive_oprepared__terrain_oSavedTerrain{{"SavedTerrain"}}
+        n_tropoi_orepresentation_oarchive_oprepared__terrain_oload__prepared__terrain["load_prepared_terrain()"]
+        n_tropoi_orepresentation_oarchive_oprepared__terrain_osave__prepared__terrain["save_prepared_terrain()"]
     end
     subgraph g_tropoi_orepresentation_oarchive_oschema["representation.archive.schema"]
         n_tropoi_orepresentation_oarchive_oschema_odiagnostic__definitions__for["diagnostic_definitions_for()"]
@@ -49,6 +61,7 @@ flowchart LR
     subgraph g_tropoi_orun_ope_oconfig["run.pe.config"]
         n_tropoi_orun_ope_oconfig_oPERunConfig_o__resolve__plots["PERunConfig._resolve_plots()"]
         n_tropoi_orun_ope_oconfig_oPERunConfig_oresolve["PERunConfig.resolve()"]
+        n_tropoi_orun_ope_oconfig_o__prepared__terrain__settings["_prepared_terrain_settings()"]
     end
     subgraph g_tropoi_orun_ope_orunner["run.pe.runner"]
         n_tropoi_orun_ope_orunner_orun__pe["run_pe()"]
@@ -65,6 +78,11 @@ flowchart LR
     subgraph g_tropoi_ospatial_osigma__coordinate["spatial.sigma_coordinate"]
         n_tropoi_ospatial_osigma__coordinate_oSigmaGrid{{"SigmaGrid"}}
         n_tropoi_ospatial_osigma__coordinate_oSigmaGrid_ouniform["SigmaGrid.uniform()"]
+    end
+    subgraph g_tropoi_ospatial_ospecification["spatial.specification"]
+        n_tropoi_ospatial_ospecification_oDiscretizationSpec_ofrom__dict["DiscretizationSpec.from_dict()"]
+        n_tropoi_ospatial_ospecification_oPlanetSpec_ofrom__dict["PlanetSpec.from_dict()"]
+        n_tropoi_ospatial_ospecification_oTopographySpec_ofrom__dict["TopographySpec.from_dict()"]
     end
     subgraph g_tropoi_ospatial_ostates_oprimitive__equations["spatial.states.primitive_equations"]
         n_tropoi_ospatial_ostates_oprimitive__equations_oPrimitiveEquationsState{{"PrimitiveEquationsState"}}
@@ -90,11 +108,14 @@ flowchart LR
     n_tropoi_ocli_omain_o__cmd__run__pe --> n_tropoi_ocli_ope_oexecute__run
     n_tropoi_ocli_omain_o__cmd__run__pe --> n_tropoi_orun_ope_oconfig_oPERunConfig_oresolve
     n_tropoi_ocli_ope_o__clean__overwrite__artifacts -->|instantiate| n_tropoi_ocli_obve_oOverwriteCleanupError
+    n_tropoi_ocli_ope_o__execute__solver --> n_tropoi_ocli_ope_o__persist__terrain
     n_tropoi_ocli_ope_o__execute__solver --> n_tropoi_ocli_ope_obuild__pe__model
     n_tropoi_ocli_ope_o__execute__solver --> n_tropoi_orepresentation_oarchive_oschema_oprovenance__blocks
     n_tropoi_ocli_ope_o__execute__solver --> n_tropoi_orepresentation_oarchive_owriter_owrite__run__manifest
     n_tropoi_ocli_ope_o__execute__solver --> n_tropoi_orun_ope_orunner_orun__pe
     n_tropoi_ocli_ope_o__execute__solver --> n_tropoi_ospatial_oinitialization_ope_omake__pe__ic
+    n_tropoi_ocli_ope_o__persist__terrain --> n_tropoi_orepresentation_oarchive_oprepared__terrain_oload__prepared__terrain
+    n_tropoi_ocli_ope_o__persist__terrain --> n_tropoi_orepresentation_oarchive_oprepared__terrain_osave__prepared__terrain
     n_tropoi_ocli_ope_o__resolve__writable__base__dir --> n_tropoi_ocli_orun__lifecycle_oresolve__writable__base__dir
     n_tropoi_ocli_ope_obuild__pe__model --> n_tropoi_ospatial_oenvironment_oPlanetaryParameters_ofrom__earth__like
     n_tropoi_ocli_ope_obuild__pe__model --> n_tropoi_ospatial_oplanet_oPlanet_ogenerate
@@ -113,6 +134,15 @@ flowchart LR
     n_tropoi_ocli_orun__lifecycle_oexecute__with__provenance --> n_tropoi_orepresentation_oarchive_owriter_ofailure__record
     n_tropoi_ocli_orun__lifecycle_oexecute__with__provenance --> n_tropoi_orepresentation_oarchive_owriter_oupdate__manifest__status
     n_tropoi_ocli_orun__lifecycle_oexecute__with__provenance --> n_tropoi_orepresentation_oarchive_owriter_owrite__run__manifest
+    n_tropoi_orepresentation_oarchive_oprepared__terrain_oload__prepared__terrain --> n_tropoi_orepresentation_oarchive_oinitial__state_o__check__block
+    n_tropoi_orepresentation_oarchive_oprepared__terrain_oload__prepared__terrain --> n_tropoi_orepresentation_oarchive_oinitial__state_o__load__array
+    n_tropoi_orepresentation_oarchive_oprepared__terrain_oload__prepared__terrain --> n_tropoi_orepresentation_oarchive_oinitial__state_o__require__mapping
+    n_tropoi_orepresentation_oarchive_oprepared__terrain_oload__prepared__terrain -->|instantiate| n_tropoi_orepresentation_oarchive_oprepared__terrain_oPreparedTerrainError
+    n_tropoi_orepresentation_oarchive_oprepared__terrain_oload__prepared__terrain -->|instantiate| n_tropoi_orepresentation_oarchive_oprepared__terrain_oSavedTerrain
+    n_tropoi_orepresentation_oarchive_oprepared__terrain_oload__prepared__terrain --> n_tropoi_ospatial_ospecification_oDiscretizationSpec_ofrom__dict
+    n_tropoi_orepresentation_oarchive_oprepared__terrain_oload__prepared__terrain --> n_tropoi_ospatial_ospecification_oPlanetSpec_ofrom__dict
+    n_tropoi_orepresentation_oarchive_oprepared__terrain_oload__prepared__terrain --> n_tropoi_ospatial_ospecification_oTopographySpec_ofrom__dict
+    n_tropoi_orepresentation_oarchive_oprepared__terrain_osave__prepared__terrain -->|instantiate| n_tropoi_orepresentation_oarchive_oprepared__terrain_oPreparedTerrainError
     n_tropoi_orepresentation_oarchive_oschema_oprovenance__blocks --> n_tropoi_orepresentation_oarchive_oschema_odiagnostic__definitions__for
     n_tropoi_orepresentation_oarchive_oschema_oprovenance__blocks --> n_tropoi_orepresentation_oarchive_oschema_ostate__schema__for
     n_tropoi_orepresentation_oarchive_owriter_o__short__commit --> n_tropoi_orepresentation_oarchive_owriter_o__git
@@ -126,7 +156,10 @@ flowchart LR
     n_tropoi_orepresentation_oarchive_owriter_owrite__run__manifest --> n_tropoi_orepresentation_oarchive_owriter_o__git
     n_tropoi_orepresentation_oarchive_owriter_owrite__run__manifest --> n_tropoi_orepresentation_oarchive_owriter_oatomic__write__text
     n_tropoi_orun_ope_oconfig_oPERunConfig_oresolve -.->|self| n_tropoi_orun_ope_oconfig_oPERunConfig_o__resolve__plots
+    n_tropoi_orun_ope_oconfig_oPERunConfig_oresolve --> n_tropoi_orun_ope_oconfig_o__prepared__terrain__settings
     n_tropoi_orun_ope_oconfig_oPERunConfig_oresolve --> n_tropoi_otemporal_ointegration_o__require__finite__positive
+    n_tropoi_orun_ope_oconfig_o__prepared__terrain__settings --> n_tropoi_orepresentation_oarchive_oprepared__terrain_oload__prepared__terrain
+    n_tropoi_orun_ope_oconfig_o__prepared__terrain__settings --> n_tropoi_ospatial_otruncation_oproduct__truncation__cut
     n_tropoi_orun_ope_orunner_orun__pe -->|instantiate| n_tropoi_orepresentation_odiagnostics_ope_oPEDiagnosticsRecorder
     n_tropoi_orun_ope_orunner_orun__pe --> n_tropoi_orepresentation_odiagnostics_ope_oplot__pe__diagnostics
     n_tropoi_orun_ope_orunner_orun__pe --> n_tropoi_orepresentation_ovisual_ope_orender__pe__summary
@@ -140,6 +173,10 @@ flowchart LR
     classDef root stroke-width:3px
     classDef truncated stroke-dasharray:4 3
     class n_tropoi_ocli_omain_o__cmd__run__pe root
+    class n_tropoi_orepresentation_oarchive_oinitial__state_o__check__block truncated
+    class n_tropoi_orepresentation_oarchive_oinitial__state_o__load__array truncated
+    class n_tropoi_orepresentation_oarchive_oinitial__state_o__require__mapping truncated
+    class n_tropoi_orepresentation_oarchive_oprepared__terrain_osave__prepared__terrain truncated
     class n_tropoi_orepresentation_oarchive_oschema_odiagnostic__definitions__for truncated
     class n_tropoi_orepresentation_oarchive_oschema_ostate__schema__for truncated
     class n_tropoi_orepresentation_oarchive_owriter_omake__run__id truncated
@@ -148,6 +185,9 @@ flowchart LR
     class n_tropoi_orepresentation_ovisual_ope__snapshots_orender__pe__snapshots truncated
     class n_tropoi_ospatial_oplanet_oPlanet_ogenerate truncated
     class n_tropoi_ospatial_osigma__coordinate_oSigmaGrid_ouniform truncated
+    class n_tropoi_ospatial_ospecification_oDiscretizationSpec_ofrom__dict truncated
+    class n_tropoi_ospatial_ospecification_oPlanetSpec_ofrom__dict truncated
+    class n_tropoi_ospatial_ospecification_oTopographySpec_ofrom__dict truncated
     class n_tropoi_ospatial_oterrain_otopography_oTopography_omountain truncated
     class n_tropoi_otemporal_ointegration_oIntegrationScheduler truncated
     class n_tropoi_otemporal_osteppers_oRK4Stepper truncated

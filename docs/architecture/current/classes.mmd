@@ -5,6 +5,9 @@ classDiagram
     class c_tropoi_orepresentation_oarchive_ocapsule_oCapsuleError["CapsuleError (representation.archive.capsule)"]
     c_tropoi_orepresentation_oarchive_ocapsule_oCapsuleError : external base ValueError
     class c_tropoi_orepresentation_oarchive_ocapsule_oCapsuleLayoutError["CapsuleLayoutError (representation.archive.capsule)"]
+    class c_tropoi_orepresentation_oarchive_oinitial__state_oInitialStateError["InitialStateError (representation.archive.initial_state)"]
+    c_tropoi_orepresentation_oarchive_oinitial__state_oInitialStateError : external base ValueError
+    class c_tropoi_orepresentation_oarchive_oprepared__terrain_oPreparedTerrainError["PreparedTerrainError (representation.archive.prepared_terrain)"]
     class c_tropoi_orepresentation_oarchive_oschema_oSchemaError["SchemaError (representation.archive.schema)"]
     c_tropoi_orepresentation_oarchive_oschema_oSchemaError : external base ValueError
     class c_tropoi_orepresentation_oarchive_oschema_oUnknownSchemaVersionError["UnknownSchemaVersionError (representation.archive.schema)"]
@@ -75,6 +78,7 @@ classDiagram
     c_tropoi_ospatial_ospherical__backend_oSphericalGridBackend : +supported#95;product#95;quadratures()
     c_tropoi_ospatial_ospherical__backend_oSphericalGridBackend : external base abc.ABC
     c_tropoi_orepresentation_oarchive_ocapsule_oCapsuleError <|-- c_tropoi_orepresentation_oarchive_ocapsule_oCapsuleLayoutError
+    c_tropoi_orepresentation_oarchive_oinitial__state_oInitialStateError <|-- c_tropoi_orepresentation_oarchive_oprepared__terrain_oPreparedTerrainError
     c_tropoi_orepresentation_oarchive_oschema_oSchemaError <|-- c_tropoi_orepresentation_oarchive_oschema_oUnknownSchemaVersionError
     c_tropoi_orepresentation_oarchive_oschema_oSchemaError <|-- c_tropoi_orepresentation_oarchive_oschema_oUnsupportedConventionError
     c_tropoi_ospatial_ogrids_ogrid__base_oGridGeometry <|-- c_tropoi_ospatial_ogrids_ogeodesic__grid_oGeodesicGridGeometry

@@ -1,0 +1,585 @@
+<!doctype html>
+<!--
+  Palintropos terrain globe: a self-contained, offline viewer written by
+  tropoi.representation.visual.terrain.write_globe_html. Plain WebGL, no
+  external scripts, fonts or network access.
+
+  The interaction design (rotatable shaded globe, field colours, optional
+  radial relief, graticules and a matching flat map) follows the
+  "Spherical Harmonics Explorer" of the Maurer GEM Lab
+  (https://maurer-gemlab.github.io/Potential_Field_Theory/, CC BY 4.0).
+  No code from it is reused; this file is an independent implementation.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>__PAGE_TITLE__</title>
+<style>
+:root {
+  --bg: #f7f6f3; --panel: #ffffff; --ink: #1d1d1b; --ink-2: #55544f;
+  --ink-3: #85847e; --line: #dddbd4; --accent: #2a78d6; --accent-ink: #ffffff;
+  --grat: rgba(29, 29, 27, 0.42); --space: #ecebe6;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #1b1b1a; --panel: #242423; --ink: #ecebe6; --ink-2: #b3b2ac;
+    --ink-3: #85847e; --line: #3a3a37; --accent: #5598e7; --accent-ink: #0d1520;
+    --grat: rgba(29, 29, 27, 0.42); --space: #121211;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #1b1b1a; --panel: #242423; --ink: #ecebe6; --ink-2: #b3b2ac;
+  --ink-3: #85847e; --line: #3a3a37; --accent: #5598e7; --accent-ink: #0d1520;
+  --grat: rgba(29, 29, 27, 0.42); --space: #121211;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0; background: var(--bg); color: var(--ink);
+  font: 14px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+header { padding: 16px 20px 8px; }
+h1 { font-size: 18px; margin: 0 0 2px; font-weight: 600; }
+.sub { color: var(--ink-2); margin: 0; }
+main {
+  display: grid; gap: 16px; padding: 8px 20px 20px;
+  grid-template-columns: minmax(0, 1fr) 320px;
+}
+@media (max-width: 860px) { main { grid-template-columns: minmax(0, 1fr); padding: 8px 16px 16px; } }
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; }
+#stage { position: relative; aspect-ratio: 1 / 0.82; min-height: 320px; overflow: hidden; background: var(--space); }
+#gl { width: 100%; height: 100%; display: block; touch-action: none; cursor: grab; }
+#gl.dragging { cursor: grabbing; }
+.zoom { position: absolute; right: 10px; top: 10px; display: flex; flex-direction: column; gap: 6px; }
+.zoom button { width: 34px; height: 34px; font-size: 18px; padding: 0; }
+#nogl { position: absolute; inset: 0; display: none; align-items: center; justify-content: center; text-align: center; padding: 24px; color: var(--ink-2); }
+.readout {
+  position: absolute; left: 10px; bottom: 10px; padding: 6px 10px; border-radius: 6px;
+  background: var(--panel); border: 1px solid var(--line); color: var(--ink);
+  font-variant-numeric: tabular-nums; pointer-events: none; min-height: 1.4em; max-width: calc(100% - 20px);
+}
+.readout:empty { display: none; }
+aside { display: flex; flex-direction: column; gap: 14px; }
+.section { padding: 12px 14px; }
+.section h2 { font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--ink-3); margin: 0 0 8px; font-weight: 600; }
+.seg { display: flex; flex-wrap: wrap; gap: 6px; }
+button {
+  font: inherit; color: var(--ink); background: var(--panel); border: 1px solid var(--line);
+  border-radius: 6px; padding: 5px 10px; cursor: pointer;
+}
+button:hover { border-color: var(--ink-3); }
+button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.row { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin: 6px 0; }
+.row label { color: var(--ink); }
+input[type="range"] { width: 100%; accent-color: var(--accent); }
+.note { color: var(--ink-2); font-size: 12.5px; margin: 4px 0 0; }
+#exagLabel { font-weight: 600; font-variant-numeric: tabular-nums; }
+#cbar { width: 100%; height: 54px; display: block; }
+#detailsWrap { grid-column: 1 / -1; }
+dl { margin: 0; display: grid; grid-template-columns: minmax(120px, max-content) minmax(0, 1fr); gap: 3px 14px; font-size: 12.5px; }
+dt { color: var(--ink-3); }
+dd { margin: 0; color: var(--ink); overflow-wrap: anywhere; }
+#mapWrap { grid-column: 1 / -1; padding: 12px 14px; }
+#mapWrap h2 { font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--ink-3); margin: 0 0 8px; font-weight: 600; }
+#mapStage { position: relative; width: 100%; aspect-ratio: 2.12 / 1; }
+#map, #mapOver { position: absolute; inset: 0; width: 100%; height: 100%; }
+#mapOver { cursor: crosshair; }
+.layerTag { font-weight: 600; }
+</style>
+</head>
+<body>
+<header>
+  <h1 id="title"></h1>
+  <p class="sub" id="subtitle"></p>
+</header>
+<main>
+  <section class="card" id="stage" aria-label="Interactive globe">
+    <canvas id="gl" tabindex="0" aria-label="Globe: drag to rotate, scroll or +/- to zoom, arrow keys to rotate"></canvas>
+    <div id="nogl">WebGL is not available in this browser, so the globe cannot be drawn. The flat map below shows the same terrain.</div>
+    <div class="zoom">
+      <button id="zoomIn" aria-label="Zoom in" title="Zoom in">+</button>
+      <button id="zoomOut" aria-label="Zoom out" title="Zoom out">−</button>
+      <button id="resetView" aria-label="Reset view" title="Reset view">⟲</button>
+    </div>
+    <div class="readout" id="globeReadout" aria-live="polite"></div>
+  </section>
+  <aside>
+    <div class="card section" id="layerSection">
+      <h2>Layer</h2>
+      <div class="seg" id="layerButtons" role="group" aria-label="Terrain layer"></div>
+      <p class="note" id="layerNote"></p>
+    </div>
+    <div class="card section">
+      <h2>Display</h2>
+      <div class="row"><label><input type="checkbox" id="relief" checked> Radial relief</label></div>
+      <div class="row"><span>Exaggeration</span><span id="exagLabel"></span></div>
+      <input type="range" id="exag" min="0" max="1000" step="1" aria-label="Relief exaggeration">
+      <p class="note">Display only: exaggerates radial relief on screen. The terrain the model uses is unchanged.</p>
+      <div class="row"><label><input type="checkbox" id="grat" checked> Graticule (30°)</label></div>
+      <div class="row"><label><input type="checkbox" id="spin"> Auto-rotate</label></div>
+    </div>
+    <div class="card section">
+      <h2 id="cbarTitle">Elevation</h2>
+      <canvas id="cbar" aria-label="Elevation colour scale"></canvas>
+      <p class="note" id="cbarNote"></p>
+    </div>
+  </aside>
+  <section class="card" id="mapWrap">
+    <h2>Flat map (equirectangular, north up) — <span class="layerTag" id="mapLayer"></span></h2>
+    <div id="mapStage">
+      <canvas id="map" aria-hidden="true"></canvas>
+      <canvas id="mapOver" aria-label="Flat map: hover for values, click to centre the globe"></canvas>
+    </div>
+    <p class="note" id="mapReadout" aria-live="polite">Hover for values; click to centre the globe there.</p>
+  </section>
+  <section class="card section" id="detailsWrap">
+    <h2>Terrain, provenance and preprocessing</h2>
+    <dl id="details"></dl>
+  </section>
+</main>
+<script id="terrain-data" type="application/json">__TERRAIN_DATA__</script>
+<script>
+"use strict";
+(function () {
+const D = JSON.parse(document.getElementById("terrain-data").textContent);
+
+/* ---------------- data ---------------- */
+function decodeF32(b64) {
+  const bin = atob(b64), bytes = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+  return new Float32Array(bytes.buffer);
+}
+const NLAT = D.nlat, NLON = D.nlon, N = NLAT * NLON;
+const LAT = new Float64Array(NLAT), LON = new Float64Array(NLON);
+for (let j = 0; j < NLAT; j++) LAT[j] = D.lat0 + j * D.dlat;
+for (let i = 0; i < NLON; i++) LON[i] = D.lon0 + i * D.dlon;
+const layers = D.layers.map(l => Object.assign({}, l, { values: decodeF32(l.data) }));
+const VMIN = D.range[0], VMAX = D.range[1];
+const SPAN = (VMAX > VMIN) ? VMAX - VMIN : 1;
+const UF = D.unit_factor, UNITS = D.units;
+const LUT = D.lut;                               // 256 x [r, g, b]
+
+const st = {
+  layer: 0, relief: true, grat: true, spin: false,
+  exag: D.default_exaggeration, yaw: 0, pitch: 0, dist: 3.9,
+};
+const reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+function fmtElev(v) {
+  const x = v / UF;
+  const digits = UF === 1 ? (Math.abs(x) >= 100 ? 0 : 1) : (Math.abs(x) >= 10 ? 2 : 3);
+  return x.toLocaleString(undefined, { maximumFractionDigits: digits, minimumFractionDigits: digits }) + " " + UNITS;
+}
+function fmtLat(v) { return Math.abs(v).toFixed(1) + "°" + (v >= 0 ? "N" : "S"); }
+function fmtLon(v) {
+  v = ((v + 180) % 360 + 360) % 360 - 180;
+  return Math.abs(v).toFixed(1) + "°" + (v >= 0 ? "E" : "W");
+}
+function colorOf(v) {
+  let t = (v - VMIN) / SPAN; t = Math.max(0, Math.min(1, t));
+  return LUT[Math.min(255, Math.floor(t * 256))];
+}
+function sampleLayer(values, lat, lon) {
+  const y = Math.max(0, Math.min(NLAT - 1.000001, (lat - D.lat0) / D.dlat));
+  let x = (((lon - D.lon0) % 360) + 360) % 360 / D.dlon;
+  x = Math.min(NLON - 1.000001, x);
+  const j = Math.floor(y), i = Math.floor(x), fy = y - j, fx = x - i;
+  const a = values[j * NLON + i], b = values[j * NLON + i + 1];
+  const c = values[(j + 1) * NLON + i], d = values[(j + 1) * NLON + i + 1];
+  return (a * (1 - fx) + b * fx) * (1 - fy) + (c * (1 - fx) + d * fx) * fy;
+}
+
+/* ---------------- static text ---------------- */
+document.getElementById("title").textContent = D.title;
+document.getElementById("subtitle").textContent = D.subtitle;
+const dl = document.getElementById("details");
+for (const [k, v] of D.details) {
+  const dt = document.createElement("dt"); dt.textContent = k;
+  const dd = document.createElement("dd"); dd.textContent = v;
+  dl.append(dt, dd);
+}
+document.getElementById("cbarTitle").textContent = "Elevation (" + UNITS + ")";
+document.getElementById("cbarNote").textContent = D.layers.length > 1
+  ? "One colour scale for both layers, so they compare directly."
+  : "Colour range spans the model terrain.";
+
+const layerButtons = document.getElementById("layerButtons");
+layers.forEach((l, k) => {
+  const b = document.createElement("button");
+  b.textContent = l.short; b.title = l.label;
+  b.setAttribute("aria-pressed", k === st.layer ? "true" : "false");
+  b.addEventListener("click", () => setLayer(k));
+  layerButtons.append(b);
+});
+function setLayer(k) {
+  st.layer = k;
+  [...layerButtons.children].forEach((b, i) => b.setAttribute("aria-pressed", i === k ? "true" : "false"));
+  document.getElementById("layerNote").textContent = layers[k].label;
+  document.getElementById("mapLayer").textContent = layers[k].short;
+  rebuildSurface(); drawMap(); drawMapOverlay(lastMapHover);
+}
+
+/* ---------------- exaggeration slider (log scale) ---------------- */
+const EX_MIN = 1, EX_MAX = Math.max(200, D.default_exaggeration * 10);
+const exag = document.getElementById("exag");
+function exToSlider(e) { return Math.round(1000 * Math.log(e / EX_MIN) / Math.log(EX_MAX / EX_MIN)); }
+function sliderToEx(s) {
+  const e = EX_MIN * Math.pow(EX_MAX / EX_MIN, s / 1000);
+  const p = Math.pow(10, Math.floor(Math.log10(e)) - 1);
+  return Math.max(1, Math.round(e / p) * p);
+}
+function updateExagLabel() {
+  document.getElementById("exagLabel").textContent = st.relief ? "×" + st.exag.toLocaleString() : "off";
+}
+exag.value = exToSlider(st.exag);
+exag.addEventListener("input", () => { st.exag = sliderToEx(+exag.value); updateExagLabel(); rebuildSurface(); });
+document.getElementById("relief").addEventListener("change", e => {
+  st.relief = e.target.checked; exag.disabled = !st.relief; updateExagLabel(); rebuildSurface();
+});
+document.getElementById("grat").addEventListener("change", e => { st.grat = e.target.checked; drawMapOverlay(lastMapHover); });
+const spinBox = document.getElementById("spin");
+spinBox.addEventListener("change", e => { st.spin = e.target.checked; });
+
+/* ---------------- colour bar ---------------- */
+function niceTicks(lo, hi, n) {
+  const span = hi - lo; if (!(span > 0)) return [lo];
+  const raw = span / n, mag = Math.pow(10, Math.floor(Math.log10(raw)));
+  const step = [1, 2, 2.5, 5, 10].map(f => f * mag).find(s => s >= raw) || 10 * mag;
+  const out = []; for (let v = Math.ceil(lo / step) * step; v <= hi + 1e-9 * span; v += step) out.push(v);
+  return out;
+}
+function cssVar(name) { return getComputedStyle(document.documentElement).getPropertyValue(name).trim(); }
+function drawColorbar() {
+  const c = document.getElementById("cbar"), r = c.getBoundingClientRect(), dpr = window.devicePixelRatio || 1;
+  c.width = Math.round(r.width * dpr); c.height = Math.round(r.height * dpr);
+  const g = c.getContext("2d"); g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, r.width, r.height);
+  const pad = 6, w = r.width - 2 * pad, h = 16;
+  for (let x = 0; x < w; x++) {
+    const col = LUT[Math.min(255, Math.floor(x / w * 256))];
+    g.fillStyle = "rgb(" + col[0] + "," + col[1] + "," + col[2] + ")"; g.fillRect(pad + x, 4, 1.5, h);
+  }
+  g.strokeStyle = cssVar("--line"); g.strokeRect(pad + 0.5, 4.5, w - 1, h - 1);
+  g.fillStyle = cssVar("--ink-2"); g.font = "12px system-ui, sans-serif"; g.textAlign = "center";
+  for (const v of niceTicks(VMIN / UF, VMAX / UF, 7)) {
+    const x = pad + (v * UF - VMIN) / SPAN * w;
+    g.fillRect(x - 0.5, 4 + h, 1, 4);
+    g.fillText(Number(v.toPrecision(6)).toLocaleString(), x, 4 + h + 17);
+  }
+}
+
+/* ---------------- WebGL globe ---------------- */
+const canvas = document.getElementById("gl");
+let gl = canvas.getContext("webgl2", { antialias: true });
+let isGL2 = !!gl;
+if (!gl) gl = canvas.getContext("webgl", { antialias: true }) || canvas.getContext("experimental-webgl");
+let indexType = null;
+if (gl) {
+  if (isGL2) indexType = gl.UNSIGNED_INT;
+  else if (gl.getExtension("OES_element_index_uint")) indexType = gl.UNSIGNED_INT;
+}
+const glOK = !!(gl && indexType);
+if (!glOK) document.getElementById("nogl").style.display = "flex";
+
+const VS = `
+attribute vec3 aPos; attribute vec3 aNrm; attribute vec3 aCol;
+uniform mat4 uMV; uniform mat4 uP;
+varying vec3 vN; varying vec3 vC;
+void main() {
+  vN = (uMV * vec4(aNrm, 0.0)).xyz; vC = aCol;
+  gl_Position = uP * uMV * vec4(aPos, 1.0);
+}`;
+const FS = `
+precision mediump float;
+varying vec3 vN; varying vec3 vC;
+uniform float uLit; uniform vec4 uFlat;
+void main() {
+  if (uFlat.a > 0.0) { gl_FragColor = uFlat; return; }
+  vec3 L = normalize(vec3(-0.45, 0.55, 0.70));
+  float d = max(dot(normalize(vN), L), 0.0);
+  float shade = mix(1.0, 0.50 + 0.62 * d, uLit);
+  gl_FragColor = vec4(vC * shade, 1.0);
+}`;
+let prog, buf = {}, nIdx = 0, gratRanges = [];
+const pos = new Float32Array(N * 3), nrm = new Float32Array(N * 3), col = new Float32Array(N * 3);
+const sinLat = new Float64Array(NLAT), cosLat = new Float64Array(NLAT), sinLon = new Float64Array(NLON), cosLon = new Float64Array(NLON);
+for (let j = 0; j < NLAT; j++) { const a = LAT[j] * Math.PI / 180; sinLat[j] = Math.sin(a); cosLat[j] = Math.cos(a); }
+for (let i = 0; i < NLON; i++) { const a = LON[i] * Math.PI / 180; sinLon[i] = Math.sin(a); cosLon[i] = Math.cos(a); }
+
+function compile(type, src) {
+  const s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s);
+  if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(s));
+  return s;
+}
+function initGL() {
+  prog = gl.createProgram();
+  gl.attachShader(prog, compile(gl.VERTEX_SHADER, VS));
+  gl.attachShader(prog, compile(gl.FRAGMENT_SHADER, FS));
+  gl.linkProgram(prog);
+  if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(prog));
+  const idx = new Uint32Array((NLAT - 1) * (NLON - 1) * 6);
+  let k = 0;
+  for (let j = 0; j < NLAT - 1; j++) for (let i = 0; i < NLON - 1; i++) {
+    const a = j * NLON + i, b = a + 1, c = a + NLON, d = c + 1;
+    idx[k++] = a; idx[k++] = b; idx[k++] = d; idx[k++] = a; idx[k++] = d; idx[k++] = c;
+  }
+  nIdx = k;
+  buf.idx = gl.createBuffer(); gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buf.idx); gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, idx, gl.STATIC_DRAW);
+  buf.pos = gl.createBuffer(); buf.nrm = gl.createBuffer(); buf.col = gl.createBuffer();
+  buf.grat = gl.createBuffer();
+  gl.enable(gl.DEPTH_TEST);
+}
+
+function surfaceRadius(h) { return st.relief ? 1 + st.exag * h / D.radius_m : 1; }
+function rebuildSurface() {
+  if (!glOK) return;
+  const v = layers[st.layer].values;
+  for (let j = 0; j < NLAT; j++) for (let i = 0; i < NLON; i++) {
+    const n = j * NLON + i, r = surfaceRadius(v[n]);
+    pos[3 * n] = r * cosLat[j] * sinLon[i]; pos[3 * n + 1] = r * sinLat[j]; pos[3 * n + 2] = r * cosLat[j] * cosLon[i];
+    const c = colorOf(v[n]); col[3 * n] = c[0] / 255; col[3 * n + 1] = c[1] / 255; col[3 * n + 2] = c[2] / 255;
+  }
+  // normals: cross product of the grid tangents (radial at the poles)
+  for (let j = 0; j < NLAT; j++) for (let i = 0; i < NLON; i++) {
+    const n = j * NLON + i;
+    const ie = Math.min(i + 1, NLON - 1), iw = Math.max(i - 1, 0);
+    const jn = Math.min(j + 1, NLAT - 1), js = Math.max(j - 1, 0);
+    const e = 3 * (j * NLON + ie), w = 3 * (j * NLON + iw), no = 3 * (jn * NLON + i), so = 3 * (js * NLON + i);
+    const tx = pos[e] - pos[w], ty = pos[e + 1] - pos[w + 1], tz = pos[e + 2] - pos[w + 2];
+    const ux = pos[no] - pos[so], uy = pos[no + 1] - pos[so + 1], uz = pos[no + 2] - pos[so + 2];
+    let nx = ty * uz - tz * uy, ny = tz * ux - tx * uz, nz = tx * uy - ty * ux;
+    let len = Math.hypot(nx, ny, nz);
+    if (!(len > 1e-12) || j === 0 || j === NLAT - 1) { nx = pos[3 * n]; ny = pos[3 * n + 1]; nz = pos[3 * n + 2]; len = Math.hypot(nx, ny, nz); }
+    if (nx * pos[3 * n] + ny * pos[3 * n + 1] + nz * pos[3 * n + 2] < 0) len = -len;
+    nrm[3 * n] = nx / len; nrm[3 * n + 1] = ny / len; nrm[3 * n + 2] = nz / len;
+  }
+  gl.bindBuffer(gl.ARRAY_BUFFER, buf.pos); gl.bufferData(gl.ARRAY_BUFFER, pos, gl.DYNAMIC_DRAW);
+  gl.bindBuffer(gl.ARRAY_BUFFER, buf.nrm); gl.bufferData(gl.ARRAY_BUFFER, nrm, gl.DYNAMIC_DRAW);
+  gl.bindBuffer(gl.ARRAY_BUFFER, buf.col); gl.bufferData(gl.ARRAY_BUFFER, col, gl.DYNAMIC_DRAW);
+  rebuildGraticule();
+}
+function rebuildGraticule() {
+  // graticule lines follow the displaced surface along grid lines every 30 degrees
+  const pts = []; gratRanges = [];
+  const lift = 1.004;
+  const at = n => [pos[3 * n] * lift, pos[3 * n + 1] * lift, pos[3 * n + 2] * lift];
+  for (let j = 0; j < NLAT; j++) {
+    const lat = LAT[j];
+    if (Math.abs(lat) > 89.9 || Math.abs(lat / 30 - Math.round(lat / 30)) > 1e-6) continue;
+    const start = pts.length / 3;
+    for (let i = 0; i < NLON; i++) pts.push(...at(j * NLON + i));
+    gratRanges.push([start, NLON]);
+  }
+  for (let i = 0; i < NLON - 1; i++) {
+    const lon = LON[i];
+    if (Math.abs(lon / 30 - Math.round(lon / 30)) > 1e-6) continue;
+    const start = pts.length / 3;
+    for (let j = 0; j < NLAT; j++) pts.push(...at(j * NLON + i));
+    gratRanges.push([start, NLAT]);
+  }
+  gl.bindBuffer(gl.ARRAY_BUFFER, buf.grat); gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(pts), gl.DYNAMIC_DRAW);
+}
+
+/* matrices (column-major) */
+function perspective(fovy, aspect, near, far) {
+  const f = 1 / Math.tan(fovy / 2), nf = 1 / (near - far);
+  return [f / aspect, 0, 0, 0, 0, f, 0, 0, 0, 0, (far + near) * nf, -1, 0, 0, 2 * far * near * nf, 0];
+}
+function modelView() {
+  const cy = Math.cos(st.yaw), sy = Math.sin(st.yaw), cp = Math.cos(st.pitch), sp = Math.sin(st.pitch);
+  // R = Rx(pitch) * Ry(yaw), then translate by -dist along z
+  const r = [
+    cy, sp * sy, -cp * sy,
+    0, cp, sp,
+    sy, -sp * cy, cp * cy,
+  ];
+  return [r[0], r[1], r[2], 0, r[3], r[4], r[5], 0, r[6], r[7], r[8], 0, 0, 0, -st.dist, 1];
+}
+const FOV = 35 * Math.PI / 180;
+
+function resizeGL() {
+  if (!glOK) return;
+  const r = canvas.getBoundingClientRect(), dpr = Math.min(window.devicePixelRatio || 1, 2);
+  canvas.width = Math.max(1, Math.round(r.width * dpr)); canvas.height = Math.max(1, Math.round(r.height * dpr));
+  gl.viewport(0, 0, canvas.width, canvas.height);
+}
+function bindAttr(name, b, size) {
+  const loc = gl.getAttribLocation(prog, name);
+  gl.bindBuffer(gl.ARRAY_BUFFER, b); gl.enableVertexAttribArray(loc);
+  gl.vertexAttribPointer(loc, size, gl.FLOAT, false, 0, 0);
+  return loc;
+}
+function render() {
+  if (!glOK) return;
+  const bg = cssVar("--space"); const m = bg.match(/#([0-9a-f]{6})/i);
+  const rgb = m ? [parseInt(m[1].slice(0, 2), 16), parseInt(m[1].slice(2, 4), 16), parseInt(m[1].slice(4, 6), 16)] : [236, 235, 230];
+  gl.clearColor(rgb[0] / 255, rgb[1] / 255, rgb[2] / 255, 1);
+  gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+  gl.useProgram(prog);
+  gl.uniformMatrix4fv(gl.getUniformLocation(prog, "uP"), false, new Float32Array(perspective(FOV, canvas.width / canvas.height, 0.05, 50)));
+  gl.uniformMatrix4fv(gl.getUniformLocation(prog, "uMV"), false, new Float32Array(modelView()));
+  gl.uniform1f(gl.getUniformLocation(prog, "uLit"), 1.0);
+  gl.uniform4f(gl.getUniformLocation(prog, "uFlat"), 0, 0, 0, 0);
+  bindAttr("aPos", buf.pos, 3); bindAttr("aNrm", buf.nrm, 3);
+  const cl = bindAttr("aCol", buf.col, 3);
+  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buf.idx);
+  gl.enable(gl.POLYGON_OFFSET_FILL); gl.polygonOffset(1, 1);
+  gl.drawElements(gl.TRIANGLES, nIdx, indexType, 0);
+  gl.disable(gl.POLYGON_OFFSET_FILL);
+  if (st.grat && gratRanges.length) {
+    const ink = cssVar("--grat").match(/[\d.]+/g) || ["29", "29", "27", "0.45"];
+    gl.enable(gl.BLEND); gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+    gl.uniform4f(gl.getUniformLocation(prog, "uFlat"), ink[0] / 255, ink[1] / 255, ink[2] / 255, +ink[3]);
+    gl.disableVertexAttribArray(cl); gl.vertexAttrib3f(cl, 0, 0, 0);
+    bindAttr("aPos", buf.grat, 3);
+    const nl = gl.getAttribLocation(prog, "aNrm"); gl.disableVertexAttribArray(nl); gl.vertexAttrib3f(nl, 0, 0, 1);
+    for (const [start, count] of gratRanges) gl.drawArrays(gl.LINE_STRIP, start, count);
+    gl.disable(gl.BLEND);
+  }
+}
+
+/* picking: ray against the undisplaced unit sphere */
+function pick(clientX, clientY) {
+  const r = canvas.getBoundingClientRect();
+  const x = (2 * (clientX - r.left) / r.width - 1), y = (1 - 2 * (clientY - r.top) / r.height);
+  const t = Math.tan(FOV / 2), aspect = r.width / r.height;
+  let dx = x * t * aspect, dy = y * t, dz = -1; const L = Math.hypot(dx, dy, dz); dx /= L; dy /= L; dz /= L;
+  // sphere centre at (0, 0, -dist) in view space, ray from the origin
+  const cz = -st.dist, b = dz * cz, c = cz * cz - 1, disc = b * b - c;
+  if (disc < 0) return null;
+  const s = b - Math.sqrt(disc);
+  const px = s * dx, py = s * dy, pz = s * dz - cz;
+  const cy = Math.cos(st.yaw), sy = Math.sin(st.yaw), cp = Math.cos(st.pitch), sp = Math.sin(st.pitch);
+  // inverse of Rx(pitch) * Ry(yaw)
+  const qx = px, qy = cp * py + sp * pz, qz = -sp * py + cp * pz;
+  const wx = cy * qx - sy * qz, wy = qy, wz = sy * qx + cy * qz;
+  return { lat: Math.asin(Math.max(-1, Math.min(1, wy))) * 180 / Math.PI, lon: Math.atan2(wx, wz) * 180 / Math.PI };
+}
+function centreOn(lat, lon) {
+  st.yaw = -lon * Math.PI / 180; st.pitch = Math.max(-1.5, Math.min(1.5, lat * Math.PI / 180));
+}
+
+/* interaction */
+let dragging = false, moved = false, px = 0, py = 0;
+const globeReadout = document.getElementById("globeReadout");
+function readoutText(lat, lon) {
+  const v = sampleLayer(layers[st.layer].values, lat, lon);
+  return fmtLat(lat) + ", " + fmtLon(lon) + " · " + fmtElev(v) + " (" + layers[st.layer].short.toLowerCase() + ")";
+}
+if (glOK) {
+  canvas.addEventListener("pointerdown", e => { dragging = true; moved = false; px = e.clientX; py = e.clientY; canvas.setPointerCapture(e.pointerId); canvas.classList.add("dragging"); });
+  canvas.addEventListener("pointermove", e => {
+    if (dragging) {
+      const k = 1.6 / (canvas.getBoundingClientRect().height || 500) * (st.dist - 1) / 2.4;
+      st.yaw += (e.clientX - px) * k; st.pitch = Math.max(-1.5, Math.min(1.5, st.pitch + (e.clientY - py) * k));
+      if (Math.abs(e.clientX - px) + Math.abs(e.clientY - py) > 0) moved = true;
+      px = e.clientX; py = e.clientY;
+    }
+    const p = pick(e.clientX, e.clientY);
+    globeReadout.textContent = p ? readoutText(p.lat, p.lon) + (st.relief ? " · relief ignored when picking" : "") : "";
+    if (p) { lastMapHover = { lat: p.lat, lon: p.lon }; drawMapOverlay(lastMapHover); }
+  });
+  const end = () => { dragging = false; canvas.classList.remove("dragging"); };
+  canvas.addEventListener("pointerup", end); canvas.addEventListener("pointercancel", end);
+  canvas.addEventListener("pointerleave", () => { globeReadout.textContent = ""; });
+  canvas.addEventListener("wheel", e => { e.preventDefault(); zoomBy(e.deltaY > 0 ? 1.1 : 1 / 1.1); }, { passive: false });
+  canvas.addEventListener("keydown", e => {
+    const step = 0.08;
+    if (e.key === "ArrowLeft") st.yaw -= step; else if (e.key === "ArrowRight") st.yaw += step;
+    else if (e.key === "ArrowUp") st.pitch = Math.max(-1.5, st.pitch - step);
+    else if (e.key === "ArrowDown") st.pitch = Math.min(1.5, st.pitch + step);
+    else if (e.key === "+" || e.key === "=") zoomBy(1 / 1.15); else if (e.key === "-") zoomBy(1.15);
+    else return;
+    e.preventDefault();
+  });
+}
+function zoomBy(f) { st.dist = Math.max(1.35, Math.min(9, st.dist * f)); }
+document.getElementById("zoomIn").addEventListener("click", () => zoomBy(1 / 1.2));
+document.getElementById("zoomOut").addEventListener("click", () => zoomBy(1.2));
+document.getElementById("resetView").addEventListener("click", resetView);
+function resetView() { centreOn(D.view_lat, D.view_lon); st.dist = 3.9; }
+
+/* ---------------- flat map ---------------- */
+const mapC = document.getElementById("map"), overC = document.getElementById("mapOver");
+const img = document.createElement("canvas"); img.width = NLON; img.height = NLAT;
+let lastMapHover = null;
+function drawMap() {
+  const g = img.getContext("2d"), data = g.createImageData(NLON, NLAT), v = layers[st.layer].values;
+  for (let j = 0; j < NLAT; j++) for (let i = 0; i < NLON; i++) {
+    const c = colorOf(v[j * NLON + i]), k = 4 * ((NLAT - 1 - j) * NLON + i);
+    data.data[k] = c[0]; data.data[k + 1] = c[1]; data.data[k + 2] = c[2]; data.data[k + 3] = 255;
+  }
+  g.putImageData(data, 0, 0);
+  const r = mapC.getBoundingClientRect(), dpr = window.devicePixelRatio || 1;
+  mapC.width = Math.round(r.width * dpr); mapC.height = Math.round(r.height * dpr);
+  const m = mapC.getContext("2d"); m.imageSmoothingEnabled = true;
+  const box = mapBox(r.width, r.height);
+  m.setTransform(dpr, 0, 0, dpr, 0, 0); m.clearRect(0, 0, r.width, r.height);
+  m.drawImage(img, box.x, box.y, box.w, box.h);
+}
+function mapBox(W, H) { const l = 34, b = 20, t = 4, rr = 6; return { x: l, y: t, w: W - l - rr, h: H - t - b }; }
+function drawMapOverlay(hover) {
+  const r = overC.getBoundingClientRect(), dpr = window.devicePixelRatio || 1;
+  overC.width = Math.round(r.width * dpr); overC.height = Math.round(r.height * dpr);
+  const g = overC.getContext("2d"); g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, r.width, r.height);
+  const box = mapBox(r.width, r.height);
+  const X = lon => box.x + (lon - D.lon0) / (NLON - 1) / D.dlon * box.w;
+  const Y = lat => box.y + (1 - (lat - D.lat0) / ((NLAT - 1) * D.dlat)) * box.h;
+  g.font = "11px system-ui, sans-serif"; g.fillStyle = cssVar("--ink-2");
+  g.strokeStyle = cssVar("--grat"); g.lineWidth = 1;
+  for (let lon = -180; lon <= 180; lon += 30) {
+    if (st.grat) { g.beginPath(); g.moveTo(X(lon) + 0.5, box.y); g.lineTo(X(lon) + 0.5, box.y + box.h); g.stroke(); }
+    if (lon % 60 === 0) { g.textAlign = "center"; g.fillText(lon === 0 ? "0°" : fmtLon(lon).replace(".0", ""), X(lon), box.y + box.h + 14); }
+  }
+  for (let lat = -90; lat <= 90; lat += 30) {
+    if (st.grat && Math.abs(lat) < 90) { g.beginPath(); g.moveTo(box.x, Y(lat) + 0.5); g.lineTo(box.x + box.w, Y(lat) + 0.5); g.stroke(); }
+    g.textAlign = "right"; g.fillText(lat === 0 ? "0°" : fmtLat(lat).replace(".0", ""), box.x - 4, Y(lat) + 4);
+  }
+  g.strokeStyle = cssVar("--line"); g.strokeRect(box.x + 0.5, box.y + 0.5, box.w - 1, box.h - 1);
+  // where the globe is looking
+  const vlat = st.pitch * 180 / Math.PI, vlon = ((-st.yaw * 180 / Math.PI + 180) % 360 + 360) % 360 - 180;
+  g.strokeStyle = cssVar("--accent"); g.lineWidth = 2;
+  g.beginPath(); g.arc(X(vlon), Y(vlat), 6, 0, 2 * Math.PI); g.stroke();
+  if (hover) {
+    const lon = ((hover.lon + 180) % 360 + 360) % 360 - 180;
+    g.strokeStyle = cssVar("--ink"); g.lineWidth = 1; g.setLineDash([3, 3]);
+    g.beginPath(); g.moveTo(X(lon) + 0.5, box.y); g.lineTo(X(lon) + 0.5, box.y + box.h);
+    g.moveTo(box.x, Y(hover.lat) + 0.5); g.lineTo(box.x + box.w, Y(hover.lat) + 0.5); g.stroke(); g.setLineDash([]);
+  }
+}
+function mapToLatLon(e) {
+  const r = overC.getBoundingClientRect(), box = mapBox(r.width, r.height);
+  const fx = (e.clientX - r.left - box.x) / box.w, fy = (e.clientY - r.top - box.y) / box.h;
+  if (fx < 0 || fx > 1 || fy < 0 || fy > 1) return null;
+  return { lat: D.lat0 + (1 - fy) * (NLAT - 1) * D.dlat, lon: D.lon0 + fx * (NLON - 1) * D.dlon };
+}
+const mapReadout = document.getElementById("mapReadout");
+overC.addEventListener("pointermove", e => {
+  const p = mapToLatLon(e); lastMapHover = p; drawMapOverlay(p);
+  mapReadout.textContent = p ? readoutText(p.lat, p.lon) : "Hover for values; click to centre the globe there.";
+});
+overC.addEventListener("pointerleave", () => { lastMapHover = null; drawMapOverlay(null); });
+overC.addEventListener("click", e => { const p = mapToLatLon(e); if (p) { centreOn(p.lat, p.lon); spinBox.checked = st.spin = false; } });
+
+/* ---------------- start ---------------- */
+function onResize() { resizeGL(); drawMap(); drawMapOverlay(lastMapHover); drawColorbar(); }
+window.addEventListener("resize", onResize);
+if (window.matchMedia) window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => { drawColorbar(); drawMapOverlay(lastMapHover); });
+if (glOK) { try { initGL(); } catch (err) { document.getElementById("nogl").style.display = "flex"; console.error(err); } }
+resetView();
+updateExagLabel();
+setLayer(0);
+onResize();
+let lastOverlay = 0;
+function loop(t) {
+  requestAnimationFrame(loop);
+  if (st.spin && !dragging && !reduceMotion) st.yaw += 0.003;
+  render();
+  if (t - lastOverlay > 120) { lastOverlay = t; drawMapOverlay(lastMapHover); }
+}
+requestAnimationFrame(loop);
+window.__terrainGlobe = { state: st, layers: layers.map(l => l.short), pick, sampleLayer: (lat, lon) => sampleLayer(layers[st.layer].values, lat, lon), glOK };
+})();
+</script>
+</body>
+</html>

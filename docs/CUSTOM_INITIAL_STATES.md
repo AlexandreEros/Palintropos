@@ -78,13 +78,19 @@ free-surface height     h + h_s                  (h_s = bottom elevation)
 `phi` is neither the full geopotential nor the free-surface elevation. Its
 global mean is zero, because the mean thickness lives in `H`.
 
-### `TopographySpec` (SWE): the existing terrain presets
+### `TopographySpec` (SWE): terrain presets or an imported file
 
 `TopographySpec.flat()`,
 `TopographySpec.mountain(height_m, lat_deg, lon_deg, width_deg)` (the
 `--topography mountain` Gaussian), or `TopographySpec.williamson5_cone()`
-(benchmark terrain, for reproducing or perturbing case 5). Custom terrain
-shapes are not supported.
+(benchmark terrain, for reproducing or perturbing case 5). Terrain from an
+elevation file (NetCDF, 16-bit PNG, TIFF) is resolved by
+`prepare_planet(planet, discretization, read_elevation(path))`. Pass the
+returned `PreparedPlanet` as `topography`. Its specification is an
+`imported` provenance record (source name, SHA-256, reader and
+preprocessing settings), and the resolved coefficients travel with it. See
+[TERRAIN_IMPORT.md](TERRAIN_IMPORT.md), which also covers `plot()` and the
+interactive `view()` globe.
 
 Terrain is projected onto the model grid, so its coefficients depend on the
 backend. An SWE initial state therefore stores the **resolved** elevation
@@ -333,8 +339,10 @@ the realized state.
 ## Limitations
 
 - BVE and SWE only; the PE core is unchanged and not supported.
-- Terrain is limited to the existing presets (`flat`, `mountain`,
-  `williamson5_cone`). Custom terrain generation is out of scope.
+- Terrain is a preset (`flat`, `mountain`, `williamson5_cone`) or imported
+  from a global latitude-longitude elevation file
+  ([TERRAIN_IMPORT.md](TERRAIN_IMPORT.md)). Procedural terrain generation is
+  out of scope.
 - Inputs are the cores' prognostic variables plus the potentials and the
   free-surface anomaly. Winds `(u, v)` are not accepted directly; give ψ and
   χ instead.

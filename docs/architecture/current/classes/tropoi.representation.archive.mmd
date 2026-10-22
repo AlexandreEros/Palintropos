@@ -43,6 +43,11 @@ classDiagram
     c_tropoi_orepresentation_oarchive_oinitial__state_oInitialState : +validate()
     class c_tropoi_orepresentation_oarchive_oinitial__state_oInitialStateError["InitialStateError (representation.archive.initial_state)"]
     c_tropoi_orepresentation_oarchive_oinitial__state_oInitialStateError : external base ValueError
+    class c_tropoi_orepresentation_oarchive_oprepared__terrain_oPreparedTerrainError["PreparedTerrainError (representation.archive.prepared_terrain)"]
+    class c_tropoi_orepresentation_oarchive_oprepared__terrain_oSavedTerrain["SavedTerrain (representation.archive.prepared_terrain)"]
+    c_tropoi_orepresentation_oarchive_oprepared__terrain_oSavedTerrain : +#95;#95;post#95;init#95;#95;()
+    c_tropoi_orepresentation_oarchive_oprepared__terrain_oSavedTerrain : +digest
+    c_tropoi_orepresentation_oarchive_oprepared__terrain_oSavedTerrain : +to#95;document()
     class c_tropoi_orepresentation_oarchive_oschema_oSchemaError["SchemaError (representation.archive.schema)"]
     c_tropoi_orepresentation_oarchive_oschema_oSchemaError : external base ValueError
     class c_tropoi_orepresentation_oarchive_oschema_oStateSchema["StateSchema (representation.archive.schema)"]
@@ -68,5 +73,6 @@ classDiagram
     class c_tropoi_orepresentation_oarchive_owriter_oRunProvenanceError["RunProvenanceError (representation.archive.writer)"]
     c_tropoi_orepresentation_oarchive_owriter_oRunProvenanceError : external base RuntimeError
     c_tropoi_orepresentation_oarchive_ocapsule_oCapsuleError <|-- c_tropoi_orepresentation_oarchive_ocapsule_oCapsuleLayoutError
+    c_tropoi_orepresentation_oarchive_oinitial__state_oInitialStateError <|-- c_tropoi_orepresentation_oarchive_oprepared__terrain_oPreparedTerrainError
     c_tropoi_orepresentation_oarchive_oschema_oSchemaError <|-- c_tropoi_orepresentation_oarchive_oschema_oUnknownSchemaVersionError
     c_tropoi_orepresentation_oarchive_oschema_oSchemaError <|-- c_tropoi_orepresentation_oarchive_oschema_oUnsupportedConventionError

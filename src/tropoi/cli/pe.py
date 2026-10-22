@@ -32,6 +32,7 @@ _GENERATED_RESULT_DIRS: tuple[str, ...] = (
     "figures",
     "snapshots",
     "assets",       # post-run figures (tropoi plot) of the replaced run
+    "terrain",      # the copied prepared terrain (--terrain runs)
 )
 
 #: Manifest notes describing the dry primitive-equation solver and the exact
@@ -66,11 +67,20 @@ PE_MANIFEST_NOTES = {
                   "the surface geopotential Phi_s = gravity * h_s (m^2/s^2) "
                   "that anchors the hydrostatic geopotential of every "
                   "column; sigma remains p/p_s. Runs without a 'topography' "
-                  "key in run_config have exactly zero Phi_s. Terrain is "
-                  "reconstructed deterministically from the resolved "
-                  "run_config (which participates in the scientific hash); "
-                  "no terrain arrays are persisted",
+                  "key in run_config have exactly zero Phi_s. Preset "
+                  "terrain is reconstructed deterministically from the "
+                  "resolved run_config (which participates in the "
+                  "scientific hash) and no terrain arrays are persisted. A "
+                  "prepared terrain (--terrain; run_config terrain_digest) "
+                  "is the exception: its resolved coefficients, already "
+                  "band-limited at the cut, are copied into terrain/ "
+                  "(prepared_terrain format) and used exactly, never "
+                  "re-projected",
 }
+
+
+#: Capsule directory holding a --terrain run's prepared terrain.
+PE_TERRAIN_DIR = "terrain"
 
 
 def _resolve_writable_base_dir(requested_out: str) -> tuple[pathlib.Path, bool]:
@@ -115,7 +125,7 @@ def _clean_overwrite_artifacts(out_dir: pathlib.Path) -> None:
             f"of {out_dir}: " + "; ".join(failures))
 
 
-def build_pe_model(run_config: Mapping):
+def build_pe_model(run_config: Mapping, *, topography_lm=None):
     """The primitive-equation model (planet + sigma grid + terrain) of a run.
 
     Built from the resolved run configuration dict — exactly the values
@@ -129,7 +139,11 @@ def build_pe_model(run_config: Mapping):
     (l_cut), the resolved band of the dealiased pressure-gradient
     pathway; the projection-residual gate validates the terrain actually
     used and fails loudly when the mountain is too narrow for the cut.
-    Imports CuPy; call only after validation.
+
+    A run over a prepared terrain (``terrain_digest`` in the configuration)
+    is built from its persisted coefficients, ``topography_lm`` (the
+    capsule's ``terrain/``), which must be supplied: they are never
+    re-projected. Imports CuPy; call only after validation.
     """
     from tropoi.spatial.environment import PlanetaryParameters
     from tropoi.spatial.planet import Planet
@@ -150,7 +164,21 @@ def build_pe_model(run_config: Mapping):
         nlon=int(run_config["nlon"]),
     )
     topography_kind = run_config.get("topography", "flat")
-    if topography_kind == "mountain":
+    if "terrain_digest" in run_config:
+        if topography_lm is None:
+            raise ValueError(
+                "this run uses a prepared terrain; its resolved coefficients "
+                "(persisted under the capsule's terrain/) must be supplied "
+                "as topography_lm; they are never re-projected")
+        import cupy as cp
+        import numpy as np
+        lm = np.asarray(topography_lm, dtype=np.complex128)
+        cut = int(run_config["terrain_l_cut"])
+        if np.any(lm[cut + 1:, :]) or np.any(lm[:, cut + 1:]):
+            raise ValueError(
+                f"prepared terrain has content above its cut {cut}")
+        surface_geopotential_lm = float(run_config["gravity"]) * cp.asarray(lm)
+    elif topography_kind == "mountain":
         from tropoi.temporal.tendencies.primitive_equations import (
             product_truncation_cut)
         topography = Topography.mountain(
@@ -182,6 +210,29 @@ def build_pe_model(run_config: Mapping):
         batched_transforms=bool(run_config.get("batched_transforms", False)))
 
 
+def _persist_terrain(cfg: "PERunConfig", out_dir: pathlib.Path):
+    """Copy the prepared terrain into the capsule; return its coefficients.
+
+    The copy is re-read and its digest compared with the one the
+    configuration recorded, so the capsule provably holds the terrain the
+    run was resolved against (the source directory may have changed since).
+    """
+    from tropoi.representation.archive.prepared_terrain import (
+        load_prepared_terrain, save_prepared_terrain)
+
+    terrain = load_prepared_terrain(cfg.terrain)
+    if terrain.digest != cfg.terrain_digest:
+        raise ValueError(
+            f"--terrain {cfg.terrain} changed since the run was configured "
+            f"({terrain.digest} != {cfg.terrain_digest})")
+    save_prepared_terrain(terrain, out_dir / PE_TERRAIN_DIR, overwrite=True)
+    copy = load_prepared_terrain(out_dir / PE_TERRAIN_DIR)
+    if copy.digest != cfg.terrain_digest:
+        raise ValueError("the terrain copied into the capsule does not "
+                         "match the configured terrain")
+    return copy.topography_lm
+
+
 def _execute_solver(cfg: "PERunConfig", run_dir, run_config: dict) -> None:
     """Heavy numerical portion: build planet + PE model, drive the solver."""
     from tropoi.representation.archive.writer import (RUN_STATUS_RUNNING,
@@ -191,7 +242,10 @@ def _execute_solver(cfg: "PERunConfig", run_dir, run_config: dict) -> None:
     from tropoi.representation.archive.schema import provenance_blocks
 
     out_dir = run_dir.path
-    model = build_pe_model(run_config)
+    topography_lm = None
+    if cfg.terrain_digest is not None:
+        topography_lm = _persist_terrain(cfg, out_dir)
+    model = build_pe_model(run_config, topography_lm=topography_lm)
     planet = model.planet
     state0 = make_pe_ic(cfg.scenario, model, temperature=cfg.temperature,
                         surface_pressure=cfg.surface_pressure,

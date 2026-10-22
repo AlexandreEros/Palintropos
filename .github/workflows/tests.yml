@@ -31,12 +31,13 @@ jobs:
 
       # The runtime pins minus CuPy, plus the architecture-tool pins so its
       # tests run too. The package is installed without dependencies so pip
-      # does not pull CuPy back in through requirements.txt.
+      # does not pull CuPy back in through requirements.txt. netCDF4 is the
+      # optional "terrain" extra, installed so the NetCDF reader tests run.
       - name: Install pinned CPU dependencies
         run: |
           grep -viE '^cupy' requirements.txt > ci-requirements.txt
           grep -E '^(grimp|networkx)==' requirements-dev.txt >> ci-requirements.txt
-          python -m pip install -r ci-requirements.txt pytest
+          python -m pip install -r ci-requirements.txt pytest "netCDF4==1.7.4"
           python -m pip install --no-deps -e .
 
       - name: Run the CPU test suite

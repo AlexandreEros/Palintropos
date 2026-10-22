@@ -48,13 +48,16 @@ from __future__ import annotations
 import math
 
 import cupy as cp
+import numpy as np
 
 #: Presets available to configuration layers (kept in sync with
 #: run/swe/config.SWE_TOPOGRAPHIES, which must stay import-light).
 #: ``williamson5_cone`` is benchmark-owned: it is constructed only by the
 #: ``williamson5`` shallow-water scenario and is deliberately NOT part of
-#: the user-facing SWE/PE ``--topography`` vocabulary.
-TOPOGRAPHY_PRESETS = ("flat", "mountain", "williamson5_cone")
+#: the user-facing SWE/PE ``--topography`` vocabulary. ``imported`` is
+#: terrain read from an elevation file (:meth:`Topography.from_raster`); it
+#: reaches a run only as resolved coefficients, never by name.
+TOPOGRAPHY_PRESETS = ("flat", "mountain", "williamson5_cone", "imported")
 
 #: Maximum quadrature-weighted relative L2 residual accepted between the
 #: analytic mountain and its band-limited projection. Above this the terrain
@@ -91,6 +94,44 @@ W5_CONE_MAX_PROJECTION_RESIDUAL = 0.25
 
 class TopographyError(ValueError):
     """A topography definition is invalid or not representable as configured."""
+
+
+#: Parameter names of the smoothing record of imported terrain. The
+#: retained amplitude applies at the band limit ``smoothing_band_limit``
+#: (``l_cut`` for the PE core, else ``l_max``). Terrain saved before the
+#: rename recorded it as ``smoothing_retained_at_lmax`` with the same
+#: meaning; :func:`smoothing_record` reads both.
+SMOOTHING_RETAINED_KEY = "smoothing_retained_at_band_limit"
+SMOOTHING_BAND_KEY = "smoothing_band_limit"
+LEGACY_SMOOTHING_RETAINED_KEY = "smoothing_retained_at_lmax"
+
+
+def smoothing_record(parameters) -> tuple[float | None, int | None]:
+    """(retained amplitude, degree it applies at) from terrain parameters.
+
+    Reads the current keys, falling back to the legacy
+    ``smoothing_retained_at_lmax`` (whose degree is ``l_cut`` when the
+    terrain was band-limited, else unrecorded: ``None``).
+    """
+    p = dict(parameters or {})
+    if SMOOTHING_RETAINED_KEY in p:
+        return p[SMOOTHING_RETAINED_KEY], p.get(SMOOTHING_BAND_KEY)
+    return p.get(LEGACY_SMOOTHING_RETAINED_KEY), p.get("l_cut")
+
+
+def spectral_smoothing_factors(l_max: int, retained: float) -> np.ndarray:
+    """Per-degree Hoskins-type filter, amplitude ``retained`` at degree ``L``.
+
+    ``exp(-k (l(l+1) / (L(L+1)))^2)`` with ``k = -ln(retained)``, ``L`` the
+    ``l_max`` argument (the band limit the caller filters to: ``l_cut`` for
+    the PE core, the model ``l_max`` otherwise): 1 at ``l = 0``,
+    ``retained`` at ``l = L``, scale-selective in between. Host array of
+    length ``L + 1``.
+    """
+    lmax = int(l_max)
+    degrees = np.arange(lmax + 1, dtype=np.float64)
+    ratio = degrees * (degrees + 1.0) / max(lmax * (lmax + 1.0), 1.0)
+    return np.exp(math.log(float(retained)) * ratio ** 2)
 
 
 def _require(name: str, value, *, lo: float | None = None,
@@ -252,6 +293,18 @@ class Topography:
                         else f"; projection residual {residual:.3f}")
             return (f"Williamson-5 cone (hs0={p.get('height_m'):g} m at "
                     f"lat 30°, lon -90°, R0=pi/9{measured})")
+        if self._preset == "imported":
+            p = self._parameters
+            sha = str(p.get("source_sha256") or "")[:12]
+            retained, band = smoothing_record(p)
+            smooth = ("no smoothing" if retained is None
+                      else f"smoothing {retained:g} at l = "
+                      f"{'band limit' if band is None else band}")
+            residual = p.get("projection_residual")
+            measured = ("" if residual is None
+                        else f"; projection residual {residual:.3f}")
+            return (f"imported from {p.get('source_name', '?')} "
+                    f"(sha256 {sha}..., {smooth}{measured})")
         return "flat"
 
     # ------------------------------------------------------------------
@@ -363,6 +416,106 @@ class Topography:
         if l_cut is not None:
             parameters["l_cut"] = int(l_cut)
         return cls(coeffs, preset="mountain", parameters=parameters)
+
+    @classmethod
+    def from_raster(cls, planet, raster, *, smoothing: float | None = None,
+                    clip_below_m: float | None = None,
+                    l_cut: int | None = None) -> "Topography":
+        """Terrain from an elevation raster, projected to the truncation.
+
+        ``raster`` is an :class:`~tropoi.spatial.terrain.raster.ElevationRaster`
+        (see :func:`~tropoi.spatial.terrain.raster.read_elevation`). The
+        pipeline, every step recorded in ``parameters``:
+
+        1. resample to the planet's state-grid points: a source finer than
+           :func:`~tropoi.spatial.terrain.raster.working_resolution_deg`
+           (about half the shortest resolved wavelength) is area-averaged to
+           it first, then sampled bilinearly (anti-aliasing);
+        2. optionally clip below ``clip_below_m`` (for example 0 to put an
+           ocean floor at sea level);
+        3. analyze once with the backend's own transform at the full model
+           truncation (as for the presets), measuring the truncation
+           residual;
+        4. optionally apply a Hoskins-type spectral filter
+           ``exp(-k (l(l+1) / (L(L+1)))^2)`` with ``k = -ln(smoothing)``,
+           i.e. amplitude ``smoothing`` retained at ``L`` (0 < s <= 1),
+           where ``L`` is ``l_cut`` if given, else ``l_max``.
+
+        ``l_cut`` band-limits the terrain at that degree before the residual
+        is measured, exactly as :meth:`mountain` does for the
+        primitive-equation core's dealiased cut.
+
+        Real terrain is not band-limited, so the residual is REPORTED (as
+        for the Williamson-5 cone), not used to reject; the preview shows
+        the result. All-zero terrain is rejected (use :meth:`flat`).
+        """
+        from tropoi.spatial.terrain.raster import working_resolution_deg
+
+        retained = None
+        if smoothing is not None:
+            retained = _require("smoothing", smoothing, positive=True,
+                                hi=1.0)
+        clip = (None if clip_below_m is None
+                else _require("clip_below_m", clip_below_m))
+        sh, grid = planet.sh, planet.grid
+        if l_cut is not None and not 1 <= int(l_cut) <= sh.l_max:
+            raise TopographyError(
+                f"l_cut must be in [1, l_max={sh.l_max}], got {l_cut}")
+        effective_l = sh.l_max if l_cut is None else int(l_cut)
+        lat = cp.asnumpy(cp.asarray(grid.point_latitudes, dtype=cp.float64))
+        lon = cp.asnumpy(cp.asarray(grid.point_longitudes, dtype=cp.float64))
+        values, settings = raster.resample_to_points(
+            lat, lon, working_resolution=working_resolution_deg(sh.l_max))
+        if clip is not None:
+            values = np.maximum(values, clip)
+        if not np.isfinite(values).all():
+            raise TopographyError("resampled terrain is not finite")
+        if float(np.abs(values).max()) > MAX_MOUNTAIN_HEIGHT_M:
+            raise TopographyError(
+                f"imported relief reaches {np.abs(values).max():.3g} m, above "
+                f"the {MAX_MOUNTAIN_HEIGHT_M:g} m sanity cap (units?)")
+        sampled = cp.asarray(values.reshape(
+            cp.asarray(grid.point_latitudes).shape), dtype=cp.float64)
+        coeffs, synthesized, rel = _analyze_elevation(sh, sampled,
+                                                      l_cut=l_cut)
+        filtered_rel = None
+        if retained is not None and retained < 1.0:
+            factor = np.zeros(sh.l_max + 1)
+            factor[:effective_l + 1] = spectral_smoothing_factors(
+                effective_l, retained)
+            factor = cp.asarray(factor)
+            coeffs = coeffs * factor[:, None]
+            synthesized = sh.inv_transform(coeffs).real
+            w = cp.asarray(sh.weights, dtype=cp.float64)
+            filtered_rel = float(
+                cp.sqrt(cp.sum(w * (synthesized - sampled) ** 2))
+                / cp.sqrt(cp.sum(w * sampled ** 2)))
+        if not bool(cp.any(coeffs)):
+            raise TopographyError(
+                "the imported terrain is identically zero; use "
+                "Topography.flat()")
+        parameters = {k: v for k, v in raster.provenance.items()
+                      if v is None or isinstance(v, (str, int, float, bool))}
+        parameters.update(settings)
+        parameters.update({
+            "raster_shape": f"{raster.shape[0]}x{raster.shape[1]}",
+            "raster_resolution_deg": raster.resolution_deg,
+            "registration": raster.registration,
+            "clip_below_m": clip,
+            "l_cut": None if l_cut is None else int(l_cut),
+            SMOOTHING_RETAINED_KEY: retained,
+            SMOOTHING_BAND_KEY: (None if retained is None
+                                 else int(effective_l)),
+            "projection_residual": rel,
+            "smoothed_residual": filtered_rel,
+            "source_min_m": float(raster.elevation_m.min()),
+            "source_max_m": float(raster.elevation_m.max()),
+            "sampled_min_m": float(values.min()),
+            "sampled_max_m": float(values.max()),
+            "elevation_min_m": float(synthesized.min()),
+            "elevation_max_m": float(synthesized.max()),
+        })
+        return cls(coeffs, preset="imported", parameters=parameters)
 
     @classmethod
     def williamson5_cone(cls, planet, *,

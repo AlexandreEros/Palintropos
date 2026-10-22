@@ -11,9 +11,11 @@ harmonics, with conservation diagnostics and run provenance, so each claim can
 be traced back to a recorded run.
 
 It is **not** a climate or weather model. Its solvers are idealized: no
-moisture, no radiation, no real or data-driven terrain, and the only forcing is
-the analytic Held–Suarez benchmark in the primitive-equation core. They do not
-model any particular planet, real or fictional.
+moisture, no radiation, and the only forcing is the analytic Held–Suarez
+benchmark in the primitive-equation core. Terrain can be analytic or read from
+an elevation file (for example Mars from MOLA), but it is fixed bottom
+topography only; running over real terrain does not make a run a model of
+that planet's atmosphere.
 
 ![Williamson test case 5 at T63: static terrain; free-surface perturbation with streamfunction contours at days 0, 5, 10 and 15 on one colour scale; conservation drift and kinetic-energy spectral complexity](docs/runs/20260730T011700Z_williamson5_rot23p93h_r4_l63_dt120h_45406d82_668e6c9a/assets/overview.png)
 
@@ -45,6 +47,24 @@ python docs/figures/williamson5_t63_overview.py   # this figure, from its recipe
 tropoi plot RUN_PATH                               # default overview of any saved run
 ```
 
+### Real terrain in the interactive viewer
+
+![Interactive globe of Mars from MOLA topography: the model terrain at l_max 42 with radial relief exaggerated twenty times, centred on the Tharsis region with Olympus Mons near the upper-left limb; side panel with the Model/Source layer switch, the exaggeration slider at x20, and an elevation colour bar in metres](docs/validation/mola_terrain_2026-10-22/mola_globe_l42.png)
+
+*Mars topography from NASA PDS MOLA MEGDR (4 px/deg), resolved at ℓ ≤ 42 on a
+Gauss grid and shown in the self-contained terrain viewer (browser capture).
+Layer: Model, the coefficients the solver uses. Relief exaggerated ×20 for
+display only. The colour bar is in metres and spans both layers. Details and
+provenance:
+[docs/validation/mola_terrain_2026-10-22](docs/validation/mola_terrain_2026-10-22/README.md).*
+
+```bash
+python examples/mola_mars.py show mola/megt_4ppd.nc --lmax 42 --units m --centre 0 -95 --exaggeration 20 --out mola --open
+```
+
+The command needs CUDA and the converted MOLA grid; see
+[docs/TERRAIN_IMPORT.md](docs/TERRAIN_IMPORT.md#real-data-mars-from-mola).
+
 ## What you can study with it today
 
 - **How rotating flow organizes itself.** Vortex interaction, Rossby–Haurwitz
@@ -71,7 +91,7 @@ the long forced runs ([SEMI_IMPLICIT.md](docs/held_suarez/SEMI_IMPLICIT.md)).
 | Core | Command | Prognostic state | Evidence so far | Limits |
 |---|---|---|---|---|
 | **Barotropic vorticity (BVE)** | `tropoi run bve` | relative vorticity | RH4 traveling wave on both grids; conservation and rotation-equivalence tests | Single layer, non-divergent. Optional Laplacian viscosity has no stability control of its own |
-| **Rotating shallow water (SWE)** | `tropoi run swe` | vorticity, divergence, perturbation thickness geopotential | Linear gravity-wave dispersion, Williamson 2, exact lake at rest over terrain, Williamson 5 compared with an external model | Inviscid, single layer. Terrain is either one analytic Gaussian mountain or the benchmark cone |
+| **Rotating shallow water (SWE)** | `tropoi run swe` | vorticity, divergence, perturbation thickness geopotential | Linear gravity-wave dispersion, Williamson 2, exact lake at rest over terrain, Williamson 5 compared with an external model | Inviscid, single layer. Terrain is an analytic Gaussian mountain, the benchmark cone, or imported from an elevation file through a saved initial state ([TERRAIN_IMPORT.md](docs/TERRAIN_IMPORT.md)) |
 | **Dry hydrostatic primitive equations (PE)** | `tropoi run pe` | per-level vorticity, divergence, temperature; ln surface pressure | Exact rest; smooth short evolution; analytic orographic balance (to roundoff on the Gauss grid); **Held–Suarez forced climate, 1200 days at T42L20, all three acceptance tiers passed** ([STATUS.md](docs/held_suarez/STATUS.md)) | Fixed user-chosen step, no CFL controller, no energy-conservation claim. Forcing is Held–Suarez only (Newtonian relaxation + Rayleigh friction, ∇⁸ hyperdiffusion); no moisture or radiation |
 
 BVE and SWE pick their time step adaptively from an advective CFL limit that
@@ -112,7 +132,9 @@ tropoi --help
 
 `requirements.txt` pins `cupy-cuda11x==13.4.0`. For CUDA 12.x, swap that one
 line for `cupy-cuda12x==13.4.0`, and install only one CuPy package. CUDA 12 has
-not been validated by this repository's benchmarks. If PowerShell blocks venv
+not been validated by this repository's benchmarks. Reading NetCDF elevation
+files ([docs/TERRAIN_IMPORT.md](docs/TERRAIN_IMPORT.md)) also needs
+`pip install -e ".[terrain]"` (netCDF4). If PowerShell blocks venv
 activation, run `Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass`,
 which applies to the current session only, and activate again.
 
@@ -264,8 +286,19 @@ or, from the shell, `tropoi run bve|swe --initial-state my_state --days 1`.
 States are prepared from callables `f(lat, lon)`, sampled arrays or
 spherical-harmonic coefficients, with projection residuals, mean modes and
 (SWE) positive thickness checked and reported. See
-[docs/CUSTOM_INITIAL_STATES.md](docs/CUSTOM_INITIAL_STATES.md) and the two
+[docs/CUSTOM_INITIAL_STATES.md](docs/CUSTOM_INITIAL_STATES.md) and the
 runnable examples in [examples/](examples/).
+
+**Terrain from elevation files.** Read a global NetCDF, 16-bit PNG or TIFF
+elevation map, resolve it on the model grid, and look at exactly what the
+solver will use before running anything: `world.plot()` for a static figure,
+`world.view()` for an interactive 3D globe (one self-contained HTML file).
+The resolved terrain and its source provenance go into SWE initial states
+and the runs made from them, and into PE runs (`tropoi run pe --terrain DIR`).
+See [docs/TERRAIN_IMPORT.md](docs/TERRAIN_IMPORT.md),
+[examples/terrain_planet.py](examples/terrain_planet.py) (synthetic terrain),
+and [examples/mola_mars.py](examples/mola_mars.py) (real Mars topography from
+MOLA).
 
 ![Two opposite-signed vortices on a rotating sphere: relative vorticity with streamfunction contours at days 0, 10, 15 and 25 on one colour scale; conservation drift and kinetic-energy spectral complexity](docs/runs/20260926T051829Z_two-vortices_rot24h_r4_l21_dt120h_e5dfc047_50ae9e93/assets/overview.png)
 
@@ -327,9 +360,11 @@ GPU before each merge. See [ARCHITECTURE.md § Tests](docs/ARCHITECTURE.md#tests
 
 ## Limitations
 
-- No moisture, radiation, or real or time-varying terrain in any solver. The
-  only forcing is Held–Suarez in the PE core; BVE and SWE are unforced. The
-  terrain from `Planet.generate` is decorative only.
+- No moisture, radiation, or time-varying terrain in any solver. Real
+  terrain can be imported (SWE initial states, `tropoi run pe --terrain`), but
+  only as fixed band-limited bottom topography. The only forcing is
+  Held–Suarez in the PE core; BVE and SWE are unforced. The terrain from
+  `Planet.generate` is decorative only.
 - BVE and SWE are single-layer.
 - The semi-implicit stepper exists for PE and was used for the Held–Suarez
   runs; BVE and SWE are explicit RK4 only. There is no stability control for
