@@ -84,7 +84,7 @@ def test_prepared_terrain_round_trip_and_verification(tmp_path):
     lm = np.load(path / "topography_elevation_lm.npy")
     lm[1, 0] += 1.0
     np.save(path / "topography_elevation_lm.npy", lm)
-    with pytest.raises(PreparedTerrainError, match="SHA-256"):
+    with pytest.raises(PreparedTerrainError, match="terrain coefficients do not match the recorded SHA-256"):
         load_prepared_terrain(path)
 
 
@@ -235,12 +235,15 @@ def test_imported_terrain_pe_run_keeps_rest_and_its_capsule(tmp_path):
     np.testing.assert_allclose(
         cp.asnumpy(resources.model.phi_surface_lm),
         g * world.topography_lm, rtol=0, atol=1e-9)
-    # A capsule whose terrain/ no longer matches is refused for plotting.
+    # Integrity: corrupted bytes in the capsule's terrain/ are refused by
+    # the format's own SHA-256 check, before identity is even considered.
+    from tropoi.representation.archive.prepared_terrain import (
+        PreparedTerrainError)
     lm_path = run_dir / "terrain" / "topography_elevation_lm.npy"
     lm = np.load(lm_path)
     lm[0, 0] += 1.0
     np.save(lm_path, lm)
-    with pytest.raises(Exception, match="SHA-256|terrain"):
+    with pytest.raises(PreparedTerrainError, match="terrain coefficients do not match the recorded SHA-256"):
         build_resources(open_simulation(run_dir).storage)
 
 
@@ -345,3 +348,60 @@ def test_pe_terrain_in_an_swe_state_reports_its_cut(tmp_path):
     np.testing.assert_array_equal(loaded.topography_lm, world.topography_lm)
     assert loaded.provenance["preparation"]["topography"][
         "band_limit_l_cut"] == 10
+
+
+
+def _other_valid_terrain(seed_shift=1.0):
+    """A different but internally consistent PE terrain on the same grid."""
+    from tropoi.run.custom import PreparedPlanet
+    lm = _band_limited()
+    lm[2, 1] += seed_shift * 1000.0
+    return PreparedPlanet(PlanetSpec.earth_like(), DISC, SPEC, lm, l_cut=10,
+                          label="substitute")
+
+
+@requires_cuda
+def test_capsule_terrain_replaced_by_valid_terrain_is_refused(tmp_path):
+    """Identity: a substitute terrain/ with correct internal checksums still
+    fails, because its digest is not the one the run recorded."""
+    from tropoi.representation.archive import open_simulation
+    from tropoi.representation.visual.snapshot import (PlotUnavailableError,
+                                                       build_resources)
+    from tropoi.run.custom import PreparedPlanet
+
+    _, path = _save(tmp_path)
+    cfg, run_dir = _run(tmp_path, "runs", terrain=str(path))
+    build_resources(open_simulation(run_dir).storage)        # intact: fine
+    substitute = _other_valid_terrain()
+    substitute.save(run_dir / "terrain", overwrite=True)
+    reread = PreparedPlanet.load(run_dir)                    # integrity OK
+    assert not np.array_equal(reread.topography_lm,
+                              _band_limited())
+    with pytest.raises(PlotUnavailableError,
+                       match="does not match the run's recorded "
+                             "terrain_digest"):
+        build_resources(open_simulation(run_dir).storage)
+
+
+@requires_cuda
+def test_terrain_source_changed_after_resolution_fails_the_run(tmp_path):
+    """Identity at execution: the configuration recorded one terrain; the
+    --terrain directory now holds another valid one, so the run fails at
+    the copy guard and its manifest says so."""
+    import json
+
+    from tropoi.cli.pe import execute_run
+
+    _, path = _save(tmp_path)
+    out = tmp_path / "runs"
+    cfg = _resolve(out=str(out), n_snapshots=3, plots=["diagnostics"],
+                   terrain=str(path))
+    _other_valid_terrain().save(path, overwrite=True)        # after resolve
+    with pytest.raises(ValueError,
+                       match="changed since the run was configured"):
+        execute_run(cfg)
+    (run_dir,) = [p for p in out.iterdir() if p.is_dir()]
+    manifest = json.loads((run_dir / "manifest.json").read_text())
+    assert manifest["status"] == "failed"
+    assert not (run_dir / "pe_coeffs.npy").exists()          # never ran
+    assert not (run_dir / "terrain").exists()                # nothing copied
