@@ -164,7 +164,7 @@ def test_topography_specifications_reuse_the_existing_presets():
     for spec in (TopographySpec.flat(), mountain, cone):
         assert TopographySpec.from_dict(
             _strict_round_trip(spec.to_dict())) == spec
-    with pytest.raises(SpecificationError, match="custom terrain"):
+    with pytest.raises(SpecificationError, match="must be one of"):
         TopographySpec("fractal", {})
     with pytest.raises(SpecificationError, match="missing"):
         TopographySpec("mountain", {"height_m": 1.0})

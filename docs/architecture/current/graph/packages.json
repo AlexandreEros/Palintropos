@@ -206,7 +206,7 @@
     },
     {
       "kind": "imports",
-      "module_edges": 1,
+      "module_edges": 2,
       "source": "tropoi.representation.visual",
       "target": "tropoi.spatial.transforms"
     },
@@ -272,9 +272,15 @@
     },
     {
       "kind": "imports",
-      "module_edges": 7,
+      "module_edges": 8,
       "source": "tropoi.run.custom",
       "target": "tropoi.representation.archive"
+    },
+    {
+      "kind": "imports",
+      "module_edges": 1,
+      "source": "tropoi.run.custom",
+      "target": "tropoi.representation.visual"
     },
     {
       "kind": "imports",
@@ -290,7 +296,7 @@
     },
     {
       "kind": "imports",
-      "module_edges": 8,
+      "module_edges": 9,
       "source": "tropoi.run.custom",
       "target": "tropoi.spatial"
     },
@@ -308,7 +314,7 @@
     },
     {
       "kind": "imports",
-      "module_edges": 1,
+      "module_edges": 4,
       "source": "tropoi.run.custom",
       "target": "tropoi.spatial.terrain"
     },
@@ -609,8 +615,8 @@
     },
     {
       "id": "tropoi.representation.visual",
-      "internal_edges": 52,
-      "modules": 20
+      "internal_edges": 53,
+      "modules": 21
     },
     {
       "id": "tropoi.run",
@@ -624,8 +630,8 @@
     },
     {
       "id": "tropoi.run.custom",
-      "internal_edges": 5,
-      "modules": 5
+      "internal_edges": 8,
+      "modules": 6
     },
     {
       "id": "tropoi.run.held_suarez",
@@ -669,13 +675,13 @@
     },
     {
       "id": "tropoi.spatial.terrain",
-      "internal_edges": 0,
-      "modules": 4
+      "internal_edges": 1,
+      "modules": 5
     },
     {
       "id": "tropoi.spatial.transforms",
       "internal_edges": 1,
-      "modules": 3
+      "modules": 4
     },
     {
       "id": "tropoi.spatial.transforms.cuda",

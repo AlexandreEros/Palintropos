@@ -112,7 +112,9 @@ tropoi --help
 
 `requirements.txt` pins `cupy-cuda11x==13.4.0`. For CUDA 12.x, swap that one
 line for `cupy-cuda12x==13.4.0`, and install only one CuPy package. CUDA 12 has
-not been validated by this repository's benchmarks. If PowerShell blocks venv
+not been validated by this repository's benchmarks. Reading NetCDF elevation
+files ([docs/TERRAIN_IMPORT.md](docs/TERRAIN_IMPORT.md)) also needs
+`pip install -e ".[terrain]"` (netCDF4). If PowerShell blocks venv
 activation, run `Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass`,
 which applies to the current session only, and activate again.
 
@@ -264,8 +266,16 @@ or, from the shell, `tropoi run bve|swe --initial-state my_state --days 1`.
 States are prepared from callables `f(lat, lon)`, sampled arrays or
 spherical-harmonic coefficients, with projection residuals, mean modes and
 (SWE) positive thickness checked and reported. See
-[docs/CUSTOM_INITIAL_STATES.md](docs/CUSTOM_INITIAL_STATES.md) and the two
+[docs/CUSTOM_INITIAL_STATES.md](docs/CUSTOM_INITIAL_STATES.md) and the
 runnable examples in [examples/](examples/).
+
+**Terrain from elevation files.** Read a global NetCDF, 16-bit PNG or TIFF
+elevation map, resolve it on the model grid, and look at exactly what the
+solver will use before running anything: `world.plot()` for a static figure,
+`world.view()` for an interactive 3D globe (one self-contained HTML file).
+The resolved terrain and its source provenance go into SWE initial states
+and the runs made from them. See [docs/TERRAIN_IMPORT.md](docs/TERRAIN_IMPORT.md)
+and [examples/terrain_planet.py](examples/terrain_planet.py).
 
 ![Two opposite-signed vortices on a rotating sphere: relative vorticity with streamfunction contours at days 0, 10, 15 and 25 on one colour scale; conservation drift and kinetic-energy spectral complexity](docs/runs/20260926T051829Z_two-vortices_rot24h_r4_l21_dt120h_e5dfc047_50ae9e93/assets/overview.png)
 

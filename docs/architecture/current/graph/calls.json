@@ -3736,6 +3736,76 @@
       "target": "tropoi.representation.visual.swe.build_swe_summary_spec"
     },
     {
+      "kind": "call",
+      "source": "tropoi.representation.visual.terrain._color_map",
+      "target": "tropoi.representation.visual.matplotlib_renderer.MatplotlibRenderer._color_map"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.terrain._map_axes",
+      "target": "tropoi.representation.visual.terrain._lat_label"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.terrain._map_axes",
+      "target": "tropoi.representation.visual.terrain._lon_label"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.representation.visual.terrain.build_terrain_preview",
+      "target": "tropoi.representation.visual.terrain.TerrainPreview"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.terrain.build_terrain_preview",
+      "target": "tropoi.representation.visual.terrain.display_resolution_deg"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.terrain.build_terrain_preview",
+      "target": "tropoi.spatial.transforms.host_synthesis.synthesize_latlon"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.terrain.globe_payload",
+      "target": "tropoi.representation.visual.terrain._b64_f32"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.terrain.globe_payload",
+      "target": "tropoi.representation.visual.terrain._color_map"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.terrain.globe_payload",
+      "target": "tropoi.representation.visual.terrain._display_units"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.terrain.globe_payload",
+      "target": "tropoi.representation.visual.terrain.default_exaggeration"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.terrain.plot_terrain",
+      "target": "tropoi.representation.visual.terrain._color_map"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.terrain.plot_terrain",
+      "target": "tropoi.representation.visual.terrain._display_units"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.terrain.plot_terrain",
+      "target": "tropoi.representation.visual.terrain._map_axes"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.terrain.write_globe_html",
+      "target": "tropoi.representation.visual.terrain.globe_payload"
+    },
+    {
       "kind": "self",
       "source": "tropoi.representation.visual.timeline.FigureTimeline.__post_init__",
       "target": "tropoi.representation.visual.timeline.FigureTimeline.filename_for"
@@ -4156,6 +4226,101 @@
       "target": "tropoi.run.custom.execute.execute_custom_run"
     },
     {
+      "kind": "call",
+      "source": "tropoi.run.custom.planet.PreparedPlanet.details",
+      "target": "tropoi.representation.archive.initial_state.array_digest"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.custom.planet.PreparedPlanet.details",
+      "target": "tropoi.run.custom.planet._fmt"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.custom.planet.PreparedPlanet.from_initial_state",
+      "target": "tropoi.representation.archive.initial_state.load_initial_state"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.custom.planet.PreparedPlanet.plot",
+      "target": "tropoi.representation.visual.terrain.plot_terrain"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.run.custom.planet.PreparedPlanet.plot",
+      "target": "tropoi.run.custom.planet.PreparedPlanet.preview"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.custom.planet.PreparedPlanet.preview",
+      "target": "tropoi.representation.visual.terrain.build_terrain_preview"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.run.custom.planet.PreparedPlanet.preview",
+      "target": "tropoi.run.custom.planet.PreparedPlanet.describe"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.run.custom.planet.PreparedPlanet.preview",
+      "target": "tropoi.run.custom.planet.PreparedPlanet.details"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.custom.planet.PreparedPlanet.view",
+      "target": "tropoi.representation.visual.terrain.write_globe_html"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.run.custom.planet.PreparedPlanet.view",
+      "target": "tropoi.run.custom.planet.PreparedPlanet._slug"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.run.custom.planet.PreparedPlanet.view",
+      "target": "tropoi.run.custom.planet.PreparedPlanet.preview"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.run.custom.planet.prepare_planet",
+      "target": "tropoi.run.custom.planet.PreparedPlanet"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.run.custom.planet.prepare_planet",
+      "target": "tropoi.run.custom.prepare.PreparationError"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.custom.planet.prepare_planet",
+      "target": "tropoi.run.custom.prepare._build_planet"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.custom.planet.prepare_planet",
+      "target": "tropoi.run.custom.prepare._check_specs"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.custom.planet.prepare_planet",
+      "target": "tropoi.run.custom.prepare._resolve_topography"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.custom.planet.prepare_planet",
+      "target": "tropoi.spatial.specification.TopographySpec.flat"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.custom.planet.prepare_planet",
+      "target": "tropoi.spatial.specification.TopographySpec.imported"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.custom.planet.prepare_planet",
+      "target": "tropoi.spatial.terrain.topography.Topography.from_raster"
+    },
+    {
       "kind": "constructor",
       "source": "tropoi.run.custom.prepare.PreparationError",
       "target": "tropoi.run.custom.prepare.PreparationError.__init__"
@@ -4309,6 +4474,11 @@
       "kind": "call",
       "source": "tropoi.run.custom.prepare._resolve_source",
       "target": "tropoi.run.custom.prepare._reject_device_array"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.run.custom.prepare._resolve_topography",
+      "target": "tropoi.run.custom.prepare.PreparationError"
     },
     {
       "kind": "call",
@@ -4483,6 +4653,11 @@
     {
       "kind": "instantiate",
       "source": "tropoi.run.custom.prepare.prepare_swe_state",
+      "target": "tropoi.spatial.terrain.topography.Topography"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.run.custom.prepare.prepare_swe_state",
       "target": "tropoi.temporal.tendencies.shallow_water.ShallowWaterModel"
     },
     {
@@ -4579,6 +4754,11 @@
       "kind": "call",
       "source": "tropoi.run.custom.presets.topography_spec_for_run_config",
       "target": "tropoi.spatial.specification.TopographySpec.flat"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.custom.presets.topography_spec_for_run_config",
+      "target": "tropoi.spatial.specification.TopographySpec.imported"
     },
     {
       "kind": "call",
@@ -6476,6 +6656,186 @@
       "target": "tropoi.spatial.terrain.elevation_data.ElevationData.get_j2"
     },
     {
+      "kind": "instantiate",
+      "source": "tropoi.spatial.terrain.raster.ElevationRaster.__post_init__",
+      "target": "tropoi.spatial.terrain.raster.ElevationImportError"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.spatial.terrain.raster.ElevationRaster.__post_init__",
+      "target": "tropoi.spatial.terrain.raster._uniform_step"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.spatial.terrain.raster.ElevationRaster.area_mean",
+      "target": "tropoi.spatial.terrain.raster._cell_areas"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.spatial.terrain.raster.ElevationRaster.coarsened",
+      "target": "tropoi.spatial.terrain.raster.ElevationRaster"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.spatial.terrain.raster.ElevationRaster.coarsened",
+      "target": "tropoi.spatial.terrain.raster._cell_areas"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.spatial.terrain.raster.ElevationRaster.from_array",
+      "target": "tropoi.spatial.terrain.raster._normalize_axes"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.spatial.terrain.raster.ElevationRaster.resample_to_points",
+      "target": "tropoi.spatial.terrain.raster.ElevationRaster.coarsened"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.spatial.terrain.raster._apply_missing",
+      "target": "tropoi.spatial.terrain.raster.ElevationImportError"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.spatial.terrain.raster._check_size",
+      "target": "tropoi.spatial.terrain.raster.ElevationImportError"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.spatial.terrain.raster._detect_format",
+      "target": "tropoi.spatial.terrain.raster.ElevationImportError"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.spatial.terrain.raster._geotiff_extent",
+      "target": "tropoi.spatial.terrain.raster.ElevationImportError"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.spatial.terrain.raster._geotiff_extent",
+      "target": "tropoi.spatial.terrain.raster._geokeys"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.spatial.terrain.raster._normalize_axes",
+      "target": "tropoi.spatial.terrain.raster.ElevationImportError"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.spatial.terrain.raster._normalize_axes",
+      "target": "tropoi.spatial.terrain.raster._uniform_step"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.spatial.terrain.raster._read_netcdf",
+      "target": "tropoi.spatial.terrain.raster.ElevationImportError"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.spatial.terrain.raster._read_netcdf",
+      "target": "tropoi.spatial.terrain.raster._check_size"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.spatial.terrain.raster._read_netcdf",
+      "target": "tropoi.spatial.terrain.raster._coordinate_kind"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.spatial.terrain.raster._read_netcdf",
+      "target": "tropoi.spatial.terrain.raster._unit_factor"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.spatial.terrain.raster._read_raster_image",
+      "target": "tropoi.spatial.terrain.raster.ElevationImportError"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.spatial.terrain.raster._read_raster_image",
+      "target": "tropoi.spatial.terrain.raster._check_size"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.spatial.terrain.raster._read_raster_image",
+      "target": "tropoi.spatial.terrain.raster._gdal_scale_offset"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.spatial.terrain.raster._read_raster_image",
+      "target": "tropoi.spatial.terrain.raster._geokeys"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.spatial.terrain.raster._read_raster_image",
+      "target": "tropoi.spatial.terrain.raster._geotiff_extent"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.spatial.terrain.raster._read_raster_image",
+      "target": "tropoi.spatial.terrain.raster._scale_offset"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.spatial.terrain.raster._read_raster_image",
+      "target": "tropoi.spatial.terrain.raster._unit_factor"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.spatial.terrain.raster._scale_offset",
+      "target": "tropoi.spatial.terrain.raster.ElevationImportError"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.spatial.terrain.raster._uniform_step",
+      "target": "tropoi.spatial.terrain.raster.ElevationImportError"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.spatial.terrain.raster._unit_factor",
+      "target": "tropoi.spatial.terrain.raster.ElevationImportError"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.spatial.terrain.raster.read_elevation",
+      "target": "tropoi.spatial.terrain.raster.ElevationImportError"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.spatial.terrain.raster.read_elevation",
+      "target": "tropoi.spatial.terrain.raster.ElevationRaster"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.spatial.terrain.raster.read_elevation",
+      "target": "tropoi.spatial.terrain.raster._apply_missing"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.spatial.terrain.raster.read_elevation",
+      "target": "tropoi.spatial.terrain.raster._detect_format"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.spatial.terrain.raster.read_elevation",
+      "target": "tropoi.spatial.terrain.raster._file_sha256"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.spatial.terrain.raster.read_elevation",
+      "target": "tropoi.spatial.terrain.raster._normalize_axes"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.spatial.terrain.raster.read_elevation",
+      "target": "tropoi.spatial.terrain.raster._read_netcdf"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.spatial.terrain.raster.read_elevation",
+      "target": "tropoi.spatial.terrain.raster._read_raster_image"
+    },
+    {
       "kind": "constructor",
       "source": "tropoi.spatial.terrain.topography.Topography",
       "target": "tropoi.spatial.terrain.topography.Topography.__init__"
@@ -6489,6 +6849,31 @@
       "kind": "instantiate",
       "source": "tropoi.spatial.terrain.topography.Topography.flat",
       "target": "tropoi.spatial.terrain.topography.TopographyError"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.spatial.terrain.topography.Topography.from_raster",
+      "target": "tropoi.spatial.terrain.raster.working_resolution_deg"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.spatial.terrain.topography.Topography.from_raster",
+      "target": "tropoi.spatial.terrain.topography.TopographyError"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.spatial.terrain.topography.Topography.from_raster",
+      "target": "tropoi.spatial.terrain.topography._analyze_elevation"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.spatial.terrain.topography.Topography.from_raster",
+      "target": "tropoi.spatial.terrain.topography._require"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.spatial.terrain.topography.Topography.from_raster",
+      "target": "tropoi.spatial.terrain.topography.spectral_smoothing_factors"
     },
     {
       "kind": "instantiate",
@@ -6554,6 +6939,11 @@
       "kind": "call",
       "source": "tropoi.spatial.transforms.fast_geodesic_sh.PointSetSphericalHarmonics.__init__",
       "target": "tropoi.spatial.transforms.cuda.cuda_utils.raw_module_from_cuda"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.spatial.transforms.host_synthesis.synthesize_latlon",
+      "target": "tropoi.spatial.transforms.host_synthesis._order_sums"
     },
     {
       "kind": "constructor",
@@ -10763,6 +11153,118 @@
       "type": "function"
     },
     {
+      "id": "tropoi.representation.visual.terrain.TerrainPreview",
+      "kind": "class",
+      "module": "tropoi.representation.visual.terrain",
+      "qualname": "TerrainPreview",
+      "type": "class"
+    },
+    {
+      "id": "tropoi.representation.visual.terrain.TerrainPreview.highest_point",
+      "kind": "method",
+      "module": "tropoi.representation.visual.terrain",
+      "qualname": "TerrainPreview.highest_point",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.terrain.TerrainPreview.resolution_deg",
+      "kind": "property",
+      "module": "tropoi.representation.visual.terrain",
+      "qualname": "TerrainPreview.resolution_deg",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.terrain.TerrainPreview.value_range",
+      "kind": "method",
+      "module": "tropoi.representation.visual.terrain",
+      "qualname": "TerrainPreview.value_range",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.terrain._b64_f32",
+      "kind": "function",
+      "module": "tropoi.representation.visual.terrain",
+      "qualname": "_b64_f32",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.terrain._color_map",
+      "kind": "function",
+      "module": "tropoi.representation.visual.terrain",
+      "qualname": "_color_map",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.terrain._display_units",
+      "kind": "function",
+      "module": "tropoi.representation.visual.terrain",
+      "qualname": "_display_units",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.terrain._lat_label",
+      "kind": "function",
+      "module": "tropoi.representation.visual.terrain",
+      "qualname": "_lat_label",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.terrain._lon_label",
+      "kind": "function",
+      "module": "tropoi.representation.visual.terrain",
+      "qualname": "_lon_label",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.terrain._map_axes",
+      "kind": "function",
+      "module": "tropoi.representation.visual.terrain",
+      "qualname": "_map_axes",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.terrain.build_terrain_preview",
+      "kind": "function",
+      "module": "tropoi.representation.visual.terrain",
+      "qualname": "build_terrain_preview",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.terrain.default_exaggeration",
+      "kind": "function",
+      "module": "tropoi.representation.visual.terrain",
+      "qualname": "default_exaggeration",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.terrain.display_resolution_deg",
+      "kind": "function",
+      "module": "tropoi.representation.visual.terrain",
+      "qualname": "display_resolution_deg",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.terrain.globe_payload",
+      "kind": "function",
+      "module": "tropoi.representation.visual.terrain",
+      "qualname": "globe_payload",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.terrain.plot_terrain",
+      "kind": "function",
+      "module": "tropoi.representation.visual.terrain",
+      "qualname": "plot_terrain",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.terrain.write_globe_html",
+      "kind": "function",
+      "module": "tropoi.representation.visual.terrain",
+      "qualname": "write_globe_html",
+      "type": "function"
+    },
+    {
       "id": "tropoi.representation.visual.timeline.FigureFrame",
       "kind": "class",
       "module": "tropoi.representation.visual.timeline",
@@ -11327,6 +11829,90 @@
       "kind": "function",
       "module": "tropoi.run.custom.execute",
       "qualname": "run_initial_state",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.custom.planet.PreparedPlanet",
+      "kind": "class",
+      "module": "tropoi.run.custom.planet",
+      "qualname": "PreparedPlanet",
+      "type": "class"
+    },
+    {
+      "id": "tropoi.run.custom.planet.PreparedPlanet.__post_init__",
+      "kind": "method",
+      "module": "tropoi.run.custom.planet",
+      "qualname": "PreparedPlanet.__post_init__",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.custom.planet.PreparedPlanet._slug",
+      "kind": "method",
+      "module": "tropoi.run.custom.planet",
+      "qualname": "PreparedPlanet._slug",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.custom.planet.PreparedPlanet.describe",
+      "kind": "method",
+      "module": "tropoi.run.custom.planet",
+      "qualname": "PreparedPlanet.describe",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.custom.planet.PreparedPlanet.details",
+      "kind": "method",
+      "module": "tropoi.run.custom.planet",
+      "qualname": "PreparedPlanet.details",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.custom.planet.PreparedPlanet.from_initial_state",
+      "kind": "classmethod",
+      "module": "tropoi.run.custom.planet",
+      "qualname": "PreparedPlanet.from_initial_state",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.custom.planet.PreparedPlanet.is_flat",
+      "kind": "property",
+      "module": "tropoi.run.custom.planet",
+      "qualname": "PreparedPlanet.is_flat",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.custom.planet.PreparedPlanet.plot",
+      "kind": "method",
+      "module": "tropoi.run.custom.planet",
+      "qualname": "PreparedPlanet.plot",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.custom.planet.PreparedPlanet.preview",
+      "kind": "method",
+      "module": "tropoi.run.custom.planet",
+      "qualname": "PreparedPlanet.preview",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.custom.planet.PreparedPlanet.view",
+      "kind": "method",
+      "module": "tropoi.run.custom.planet",
+      "qualname": "PreparedPlanet.view",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.custom.planet._fmt",
+      "kind": "function",
+      "module": "tropoi.run.custom.planet",
+      "qualname": "_fmt",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.custom.planet.prepare_planet",
+      "kind": "function",
+      "module": "tropoi.run.custom.planet",
+      "qualname": "prepare_planet",
       "type": "function"
     },
     {
@@ -13892,6 +14478,13 @@
       "type": "function"
     },
     {
+      "id": "tropoi.spatial.specification.TopographySpec.imported",
+      "kind": "classmethod",
+      "module": "tropoi.spatial.specification",
+      "qualname": "TopographySpec.imported",
+      "type": "function"
+    },
+    {
       "id": "tropoi.spatial.specification.TopographySpec.is_flat",
       "kind": "property",
       "module": "tropoi.spatial.specification",
@@ -14270,6 +14863,209 @@
       "type": "function"
     },
     {
+      "id": "tropoi.spatial.terrain.raster.ElevationImportError",
+      "kind": "class",
+      "module": "tropoi.spatial.terrain.raster",
+      "qualname": "ElevationImportError",
+      "type": "class"
+    },
+    {
+      "id": "tropoi.spatial.terrain.raster.ElevationRaster",
+      "kind": "class",
+      "module": "tropoi.spatial.terrain.raster",
+      "qualname": "ElevationRaster",
+      "type": "class"
+    },
+    {
+      "id": "tropoi.spatial.terrain.raster.ElevationRaster.__post_init__",
+      "kind": "method",
+      "module": "tropoi.spatial.terrain.raster",
+      "qualname": "ElevationRaster.__post_init__",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.spatial.terrain.raster.ElevationRaster.area_mean",
+      "kind": "method",
+      "module": "tropoi.spatial.terrain.raster",
+      "qualname": "ElevationRaster.area_mean",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.spatial.terrain.raster.ElevationRaster.coarsened",
+      "kind": "method",
+      "module": "tropoi.spatial.terrain.raster",
+      "qualname": "ElevationRaster.coarsened",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.spatial.terrain.raster.ElevationRaster.describe",
+      "kind": "method",
+      "module": "tropoi.spatial.terrain.raster",
+      "qualname": "ElevationRaster.describe",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.spatial.terrain.raster.ElevationRaster.from_array",
+      "kind": "classmethod",
+      "module": "tropoi.spatial.terrain.raster",
+      "qualname": "ElevationRaster.from_array",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.spatial.terrain.raster.ElevationRaster.registration",
+      "kind": "property",
+      "module": "tropoi.spatial.terrain.raster",
+      "qualname": "ElevationRaster.registration",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.spatial.terrain.raster.ElevationRaster.resample_to_points",
+      "kind": "method",
+      "module": "tropoi.spatial.terrain.raster",
+      "qualname": "ElevationRaster.resample_to_points",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.spatial.terrain.raster.ElevationRaster.resolution_deg",
+      "kind": "property",
+      "module": "tropoi.spatial.terrain.raster",
+      "qualname": "ElevationRaster.resolution_deg",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.spatial.terrain.raster.ElevationRaster.sample",
+      "kind": "method",
+      "module": "tropoi.spatial.terrain.raster",
+      "qualname": "ElevationRaster.sample",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.spatial.terrain.raster.ElevationRaster.shape",
+      "kind": "property",
+      "module": "tropoi.spatial.terrain.raster",
+      "qualname": "ElevationRaster.shape",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.spatial.terrain.raster._apply_missing",
+      "kind": "function",
+      "module": "tropoi.spatial.terrain.raster",
+      "qualname": "_apply_missing",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.spatial.terrain.raster._cell_areas",
+      "kind": "function",
+      "module": "tropoi.spatial.terrain.raster",
+      "qualname": "_cell_areas",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.spatial.terrain.raster._check_size",
+      "kind": "function",
+      "module": "tropoi.spatial.terrain.raster",
+      "qualname": "_check_size",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.spatial.terrain.raster._coordinate_kind",
+      "kind": "function",
+      "module": "tropoi.spatial.terrain.raster",
+      "qualname": "_coordinate_kind",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.spatial.terrain.raster._detect_format",
+      "kind": "function",
+      "module": "tropoi.spatial.terrain.raster",
+      "qualname": "_detect_format",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.spatial.terrain.raster._file_sha256",
+      "kind": "function",
+      "module": "tropoi.spatial.terrain.raster",
+      "qualname": "_file_sha256",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.spatial.terrain.raster._gdal_scale_offset",
+      "kind": "function",
+      "module": "tropoi.spatial.terrain.raster",
+      "qualname": "_gdal_scale_offset",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.spatial.terrain.raster._geokeys",
+      "kind": "function",
+      "module": "tropoi.spatial.terrain.raster",
+      "qualname": "_geokeys",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.spatial.terrain.raster._geotiff_extent",
+      "kind": "function",
+      "module": "tropoi.spatial.terrain.raster",
+      "qualname": "_geotiff_extent",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.spatial.terrain.raster._normalize_axes",
+      "kind": "function",
+      "module": "tropoi.spatial.terrain.raster",
+      "qualname": "_normalize_axes",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.spatial.terrain.raster._read_netcdf",
+      "kind": "function",
+      "module": "tropoi.spatial.terrain.raster",
+      "qualname": "_read_netcdf",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.spatial.terrain.raster._read_raster_image",
+      "kind": "function",
+      "module": "tropoi.spatial.terrain.raster",
+      "qualname": "_read_raster_image",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.spatial.terrain.raster._scale_offset",
+      "kind": "function",
+      "module": "tropoi.spatial.terrain.raster",
+      "qualname": "_scale_offset",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.spatial.terrain.raster._uniform_step",
+      "kind": "function",
+      "module": "tropoi.spatial.terrain.raster",
+      "qualname": "_uniform_step",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.spatial.terrain.raster._unit_factor",
+      "kind": "function",
+      "module": "tropoi.spatial.terrain.raster",
+      "qualname": "_unit_factor",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.spatial.terrain.raster.read_elevation",
+      "kind": "function",
+      "module": "tropoi.spatial.terrain.raster",
+      "qualname": "read_elevation",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.spatial.terrain.raster.working_resolution_deg",
+      "kind": "function",
+      "module": "tropoi.spatial.terrain.raster",
+      "qualname": "working_resolution_deg",
+      "type": "function"
+    },
+    {
       "id": "tropoi.spatial.terrain.tectonics.TectonicParams",
       "kind": "class",
       "module": "tropoi.spatial.terrain.tectonics",
@@ -14330,6 +15126,13 @@
       "kind": "classmethod",
       "module": "tropoi.spatial.terrain.topography",
       "qualname": "Topography.flat",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.spatial.terrain.topography.Topography.from_raster",
+      "kind": "classmethod",
+      "module": "tropoi.spatial.terrain.topography",
+      "qualname": "Topography.from_raster",
       "type": "function"
     },
     {
@@ -14410,6 +15213,13 @@
       "type": "function"
     },
     {
+      "id": "tropoi.spatial.terrain.topography.spectral_smoothing_factors",
+      "kind": "function",
+      "module": "tropoi.spatial.terrain.topography",
+      "qualname": "spectral_smoothing_factors",
+      "type": "function"
+    },
+    {
       "id": "tropoi.spatial.terrain.topography.williamson5_cone_elevation",
       "kind": "function",
       "module": "tropoi.spatial.terrain.topography",
@@ -14470,6 +15280,20 @@
       "kind": "method",
       "module": "tropoi.spatial.transforms.fast_geodesic_sh",
       "qualname": "PointSetSphericalHarmonics.transform_batch",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.spatial.transforms.host_synthesis._order_sums",
+      "kind": "function",
+      "module": "tropoi.spatial.transforms.host_synthesis",
+      "qualname": "_order_sums",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.spatial.transforms.host_synthesis.synthesize_latlon",
+      "kind": "function",
+      "module": "tropoi.spatial.transforms.host_synthesis",
+      "qualname": "synthesize_latlon",
       "type": "function"
     },
     {

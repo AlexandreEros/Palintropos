@@ -19,6 +19,9 @@ dynamic = ["dependencies"]
 dependencies = { file = ["requirements.txt"] }
 
 [project.optional-dependencies]
+# Reading NetCDF elevation files (tropoi.spatial.terrain.raster). Bitmaps and
+# TIFF use Pillow (pinned in requirements.txt).
+terrain = ["netCDF4"]
 dev = [
   "pytest",
   "ipykernel",
@@ -52,6 +55,8 @@ include = ["tropoi*"]
 # distribution needs no source checkout.
 [tool.setuptools.package-data]
 "tropoi.spatial.transforms.cuda" = ["*.cu"]
+# The self-contained terrain-globe page template (read via importlib.resources).
+"tropoi.representation.visual" = ["*.html"]
 
 [tool.deptry]
 # Treat the "dev" PEP 621 optional-dependency group as development-only.

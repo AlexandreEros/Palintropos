@@ -24,9 +24,11 @@ src/tropoi/
 │   ├── specification.py     versioned Planet/FluidLayer/Topography/Discretization specs (CPU-only)
 │   ├── williamson5.py       Williamson (1992) case-5 prescribed world constants (stdlib)
 │   ├── planet.py            Planet facade: environment + discretization resources + decorative elevation
-│   ├── terrain/             model topography (Topography) and decorative terrain generation
+│   ├── terrain/             model topography (Topography), elevation-file import (raster.py, CPU)
+│   │                        and decorative terrain generation
 │   ├── grids/               geodesic, uniform and Gauss lat-lon geometries, quadrature, interpolation
-│   ├── transforms/          spherical-harmonic transforms; cuda/ holds the .cu kernel sources
+│   ├── transforms/          spherical-harmonic transforms; cuda/ holds the .cu kernel sources;
+│   │                        host_synthesis.py evaluates the same basis on the CPU (previews)
 │   ├── spherical_backend.py backends and the ProductSpace nonlinear-product sampling
 │   ├── operators/           SpectralOperators (Laplacian, derivatives, velocity, Jacobian)
 │   ├── sigma_coordinate.py  PE vertical coordinate and column operators
@@ -42,14 +44,16 @@ src/tropoi/
 │   ├── diagnostics/         per-core recorders, CSV/NPZ records and diagnostic figures
 │   ├── archive/             capsule reader (open_simulation), versioned schema, run-capsule writer,
 │   │                        saved resolved initial states (initial_state.py, CPU-only)
-│   └── visual/              figure fields/specs/timelines/renderers, per-core compositions, Snapshot.plot adapter
+│   └── visual/              figure fields/specs/timelines/renderers, per-core compositions, Snapshot.plot adapter,
+│                            terrain previews (terrain.py: static figure and self-contained HTML globe)
 ├── run/{bve,swe,pe}/    orchestration: resolved run configuration and the runners
-├── run/custom/          custom planets/initial states: preparation, configuration, execution, preset export
+├── run/custom/          custom planets/initial states: preparation, configuration, execution, preset export,
+│                        prepared planets with terrain previews (planet.py)
 ├── cli/                 tropoi (main.py); aeolus/psx-bve/psx-gen/psx-recompile compatibility entry points
 └── numerics/ physics/ planet/ viz/ support.py
                          compatibility import paths only (see "Compatibility paths")
 tests/                   asserting GPU tests plus standalone audit scripts
-examples/                runnable custom-planet examples (BVE, SWE)
+examples/                runnable custom-planet examples (BVE, SWE, terrain import)
 docs/                    architecture, validation records, and tracked README assets
 ```
 
@@ -162,8 +166,12 @@ distribution and every command (`tropoi`, `aeolus`, `psx-bve`, `psx-gen`,
   saved initial states (`representation.archive.initial_state`: build,
   validate, save, load, inspect) and the custom-run configuration
   (`run.custom`), and coefficient-space (`"spectral"`) BVE/SWE snapshot
-  plots. Fresh-interpreter tests enforce these boundaries.
-- **CUDA required**: running any solver (including `run_initial_state`); anything that builds grids,
+  plots; reading elevation files (`spatial.terrain.raster`), host synthesis
+  (`spatial.transforms.host_synthesis`) and terrain previews of resolved
+  coefficients (`PreparedPlanet.from_initial_state(...).plot()` /
+  `.view()`, Matplotlib for `plot` only). Fresh-interpreter tests enforce these boundaries.
+- **CUDA required**: running any solver (including `run_initial_state`); resolving terrain
+  (`prepare_planet`); anything that builds grids,
   transforms, backends, operators, states, initial conditions or
   tendencies; the per-step diagnostics recorders; and every physical-space
   plot (fields are synthesized through the run's own transform).

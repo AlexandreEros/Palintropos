@@ -927,6 +927,12 @@ def _cmd_inspect(args: argparse.Namespace) -> int:
                 show("topography",
                      f"Williamson-5 cone (hs0={params.get('height_m')} m), "
                      "resolved coefficients from the initial state")
+        elif topo_kind == "imported":
+            params = run_config.get("topography_parameters") or {}
+            sha = str(params.get("source_sha256") or "")[:12]
+            show("topography",
+                 f"imported from {params.get('source_name')} (sha256 "
+                 f"{sha}...), resolved coefficients from the initial state")
         else:
             show("topography", "flat")
     day_hours = run_config.get("day_hours")

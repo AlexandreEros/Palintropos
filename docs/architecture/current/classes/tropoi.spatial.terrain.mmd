@@ -6,6 +6,19 @@ classDiagram
     c_tropoi_ospatial_oterrain_oelevation__data_oElevationData : +get#95;j2()
     c_tropoi_ospatial_oterrain_oelevation__data_oElevationData : +max#95;degree
     c_tropoi_ospatial_oterrain_oelevation__data_oElevationData : +oblateness#95;from#95;sh
+    class c_tropoi_ospatial_oterrain_oraster_oElevationImportError["ElevationImportError (spatial.terrain.raster)"]
+    c_tropoi_ospatial_oterrain_oraster_oElevationImportError : external base ValueError
+    class c_tropoi_ospatial_oterrain_oraster_oElevationRaster["ElevationRaster (spatial.terrain.raster)"]
+    c_tropoi_ospatial_oterrain_oraster_oElevationRaster : +#95;#95;post#95;init#95;#95;()
+    c_tropoi_ospatial_oterrain_oraster_oElevationRaster : +area#95;mean()
+    c_tropoi_ospatial_oterrain_oraster_oElevationRaster : +coarsened()
+    c_tropoi_ospatial_oterrain_oraster_oElevationRaster : +describe()
+    c_tropoi_ospatial_oterrain_oraster_oElevationRaster : +from#95;array()$
+    c_tropoi_ospatial_oterrain_oraster_oElevationRaster : +registration
+    c_tropoi_ospatial_oterrain_oraster_oElevationRaster : +resample#95;to#95;points()
+    c_tropoi_ospatial_oterrain_oraster_oElevationRaster : +resolution#95;deg
+    c_tropoi_ospatial_oterrain_oraster_oElevationRaster : +sample()
+    c_tropoi_ospatial_oterrain_oraster_oElevationRaster : +shape
     class c_tropoi_ospatial_oterrain_otectonics_oTectonicParams["TectonicParams (spatial.terrain.tectonics)"]
     class c_tropoi_ospatial_oterrain_oterrain__spectral_oSpectralTerrainParams["SpectralTerrainParams (spatial.terrain.terrain_spectral)"]
     class c_tropoi_ospatial_oterrain_otopography_oTopography["Topography (spatial.terrain.topography)"]
@@ -14,6 +27,7 @@ classDiagram
     c_tropoi_ospatial_oterrain_otopography_oTopography : +elevation#95;lm
     c_tropoi_ospatial_oterrain_otopography_oTopography : +elevation#95;on()
     c_tropoi_ospatial_oterrain_otopography_oTopography : +flat()$
+    c_tropoi_ospatial_oterrain_otopography_oTopography : +from#95;raster()$
     c_tropoi_ospatial_oterrain_otopography_oTopography : +is#95;flat
     c_tropoi_ospatial_oterrain_otopography_oTopography : +l#95;max
     c_tropoi_ospatial_oterrain_otopography_oTopography : +mean#95;elevation#95;m

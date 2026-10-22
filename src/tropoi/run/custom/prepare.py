@@ -639,6 +639,10 @@ def _resolve_topography(planet_obj, spec: TopographySpec):
 
     if spec.is_flat:
         return None
+    if spec.preset == "imported":
+        raise PreparationError(
+            "imported terrain is resolved once, from its file, by "
+            "prepare_planet(...); pass the PreparedPlanet as topography")
     p = spec.parameters
     if spec.preset == "mountain":
         return Topography.mountain(planet_obj, height_m=p["height_m"],
@@ -672,10 +676,20 @@ def prepare_swe_state(planet: PlanetSpec, discretization: DiscretizationSpec,
     if discretization.product_quadrature != "fine":
         raise PreparationError(
             "the shallow-water core always uses product_quadrature='fine'")
+    from tropoi.run.custom.planet import PreparedPlanet
+
+    prepared_terrain = None
+    if isinstance(topography, PreparedPlanet):
+        if topography.planet != planet                 or topography.discretization != discretization:
+            raise PreparationError(
+                "the PreparedPlanet was resolved for a different planet or "
+                "discretization; prepare it with the same PlanetSpec and "
+                "DiscretizationSpec")
+        prepared_terrain, topography = topography, topography.topography
     topography = topography or TopographySpec.flat()
     if not isinstance(topography, TopographySpec):
         raise PreparationError(
-            f"topography must be a TopographySpec, got "
+            f"topography must be a TopographySpec or a PreparedPlanet, got "
             f"{type(topography).__name__}")
     policy = policy or ProjectionPolicy()
     rot = _either("zeta", zeta, "streamfunction", streamfunction)
@@ -701,7 +715,15 @@ def prepare_swe_state(planet: PlanetSpec, discretization: DiscretizationSpec,
     report = PreparationReport("swe", policy, l_max)
     resources = _Resources(planet, discretization)
     planet_obj = resources.planet
-    terrain = _resolve_topography(planet_obj, topography)
+    if prepared_terrain is not None:
+        # Reuse the already-resolved coefficients exactly; never re-project.
+        from tropoi.spatial.terrain.topography import Topography
+        terrain = (None if prepared_terrain.topography_lm is None
+                   else Topography(cp.asarray(prepared_terrain.topography_lm),
+                                   preset=topography.preset,
+                                   parameters=dict(topography.parameters)))
+    else:
+        terrain = _resolve_topography(planet_obj, topography)
     topography_lm = None
     if terrain is not None:
         topography_lm = cp.asnumpy(terrain.elevation_lm)

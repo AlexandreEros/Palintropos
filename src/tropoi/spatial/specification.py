@@ -9,8 +9,9 @@ of a specification and never serialized:
   convention, rotation, mass;
 * :class:`FluidLayerSpec` -- the prescribed shallow-water layer: explicit
   gravity and mean fluid thickness;
-* :class:`TopographySpec` -- the prescribed SWE bottom topography, limited to
-  the existing terrain presets (``flat``, ``mountain``, ``williamson5_cone``);
+* :class:`TopographySpec` -- the prescribed SWE bottom topography: the
+  terrain presets (``flat``, ``mountain``, ``williamson5_cone``) or the
+  provenance record of terrain ``imported`` from an elevation file;
 * :class:`DiscretizationSpec` -- spectral truncation, grid family and
   dimensions, nonlinear-product sampling.
 
@@ -61,6 +62,7 @@ from tropoi.spatial.williamson5 import W5_CONE_HEIGHT_M
 __all__ = [
     "DiscretizationSpec",
     "FluidLayerSpec",
+    "IMPORTED_REQUIRED_KEYS",
     "PLANET_CONSTRUCTIONS",
     "PlanetSpec",
     "SPEC_VERSION",
@@ -104,8 +106,12 @@ MIN_NLON = 4
 #: Terrain presets a specification may name. The same vocabulary as
 #: ``spatial.terrain.topography.TOPOGRAPHY_PRESETS`` (synchronized by a
 #: test). ``williamson5_cone`` is the benchmark terrain, for reproducing or
-#: perturbing Williamson case 5.
-TOPOGRAPHY_SPEC_PRESETS = ("flat", "mountain", "williamson5_cone")
+#: perturbing Williamson case 5. ``imported`` records the source and the
+#: preprocessing of terrain read from a file; it is never re-resolved from
+#: the specification (the resolved coefficients travel with it).
+TOPOGRAPHY_SPEC_PRESETS = ("flat", "mountain", "williamson5_cone", "imported")
+#: Provenance keys an ``imported`` specification must carry.
+IMPORTED_REQUIRED_KEYS = ("source_name", "source_sha256", "format")
 #: Physical sanity cap on mountain heights (m); synchronized by a test with
 #: ``spatial.terrain.topography.MAX_MOUNTAIN_HEIGHT_M``.
 MAX_MOUNTAIN_HEIGHT_M = 1.0e5
@@ -412,16 +418,23 @@ class TopographySpec:
     specification into spectral coefficients is a projection on the model
     grid (CUDA); a saved initial state stores the resolved coefficients so
     reloading never re-projects.
+
+    ``imported`` (built by ``tropoi.run.custom.prepare_planet`` from an
+    elevation file) is a provenance record, not a recipe: its parameters
+    (JSON scalars: the file name and SHA-256, the reader's interpretation,
+    the preprocessing settings and measured residuals) describe how the
+    resolved coefficients were made, and those coefficients must always
+    accompany it.
     """
 
     preset: str = "flat"
-    parameters: Mapping[str, float] = field(default_factory=dict)
+    parameters: Mapping[str, Any] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
         if self.preset not in TOPOGRAPHY_SPEC_PRESETS:
             raise SpecificationError(
                 f"topography preset must be one of {TOPOGRAPHY_SPEC_PRESETS}, "
-                f"got {self.preset!r} (custom terrain is not supported)")
+                f"got {self.preset!r}")
         params = dict(self.parameters or {})
         if self.preset == "flat":
             if params:
@@ -454,6 +467,23 @@ class TopographySpec:
                     f"mountain width_deg must be <= 90, got {width}")
             resolved = {"height_m": height, "lat_deg": lat, "lon_deg": lon,
                         "width_deg": width}
+        elif self.preset == "imported":
+            missing = [k for k in IMPORTED_REQUIRED_KEYS if k not in params]
+            if missing:
+                raise SpecificationError(
+                    f"imported topography needs provenance keys {missing}")
+            resolved = {}
+            for key, value in params.items():
+                if isinstance(value, float) and not math.isfinite(value):
+                    raise SpecificationError(
+                        f"imported topography parameter {key!r} is not "
+                        "finite")
+                if value is not None and not isinstance(
+                        value, (str, int, float, bool)):
+                    raise SpecificationError(
+                        f"imported topography parameter {key!r} must be a "
+                        f"JSON scalar, got {type(value).__name__}")
+                resolved[str(key)] = value
         else:  # williamson5_cone
             unknown = sorted(set(params) - {"height_m"})
             if unknown:
@@ -482,6 +512,11 @@ class TopographySpec:
     def williamson5_cone(cls, *, height_m: float = W5_CONE_HEIGHT_M
                          ) -> "TopographySpec":
         return cls("williamson5_cone", {"height_m": height_m})
+
+    @classmethod
+    def imported(cls, parameters: Mapping[str, Any]) -> "TopographySpec":
+        """Provenance record of terrain imported from a file."""
+        return cls("imported", dict(parameters))
 
     @property
     def is_flat(self) -> bool:

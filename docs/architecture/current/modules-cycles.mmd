@@ -17,6 +17,7 @@ flowchart LR
     subgraph g_tropoi_orun_ocustom["run.custom"]
         n_tropoi_orun_ocustom["run.custom"]
         n_tropoi_orun_ocustom_oexecute["run.custom.execute"]
+        n_tropoi_orun_ocustom_oplanet["run.custom.planet"]
         n_tropoi_orun_ocustom_oprepare["run.custom.prepare"]
         n_tropoi_orun_ocustom_opresets["run.custom.presets"]
     end
@@ -36,11 +37,14 @@ flowchart LR
     n_tropoi_orepresentation_ovisual_osnapshot -.->|function| n_tropoi_ocli_ope
     n_tropoi_orepresentation_ovisual_osnapshot -.->|function| n_tropoi_ocli_oswe
     n_tropoi_orun_ocustom --> n_tropoi_orun_ocustom_oexecute
+    n_tropoi_orun_ocustom --> n_tropoi_orun_ocustom_oplanet
     n_tropoi_orun_ocustom --> n_tropoi_orun_ocustom_oprepare
     n_tropoi_orun_ocustom --> n_tropoi_orun_ocustom_opresets
     n_tropoi_orun_ocustom_oexecute -.->|function| n_tropoi_ocli_obve
     n_tropoi_orun_ocustom_oexecute -.->|function| n_tropoi_ocli_oswe
+    n_tropoi_orun_ocustom_oplanet -.->|function| n_tropoi_orun_ocustom_oprepare
     n_tropoi_orun_ocustom_oprepare -.->|function| n_tropoi_ocli_obve
+    n_tropoi_orun_ocustom_oprepare -.->|function| n_tropoi_orun_ocustom_oplanet
     n_tropoi_orun_ocustom_opresets -.->|function| n_tropoi_ocli_obve
     n_tropoi_orun_ocustom_opresets -.->|function| n_tropoi_ocli_omain
     n_tropoi_orun_ocustom_opresets -.->|function| n_tropoi_ocli_oswe
