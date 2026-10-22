@@ -70,6 +70,9 @@ extend_exclude = ["tools"]
 cupy-cuda11x = ["cupy", "cupyx", "cupy_backends"]
 
 [tool.pytest.ini_options]
+markers = [
+    "slow: long numerical convergence validation (select with -m slow; exclude with -m 'not slow')",
+]
 # Restrict discovery to tests/ so a pathless `pytest` from the project root
 # does not walk sibling output directories. A stale psx-bve-* fallback run dir
 # (and a similarly locked .pytest_cache) proved unreadable during collection

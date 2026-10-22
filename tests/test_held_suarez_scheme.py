@@ -562,6 +562,7 @@ def _convergence(hs, with_dampers: bool, raw_nu: float = NU):
 
 
 @gpu
+@pytest.mark.slow
 def test_forcing_and_si_converge_second_order_without_the_first_order_terms(hs):
     """(b) 2 days, T21 L10, HS initial state, Newtonian forcing + SI; no
     drag/del^8 in either path and RAW off — the two measured first-order terms
@@ -575,6 +576,7 @@ def test_forcing_and_si_converge_second_order_without_the_first_order_terms(hs):
 
 
 @gpu
+@pytest.mark.slow
 def test_complete_scheme_convergence_is_limited_by_the_damping_lag(hs):
     """(b) the complete scheme (forcing + drag + del^8 + SI + RAW(0.1, 0.53))
     against RK4 of the same right-hand side. Measured: asymptotically FIRST

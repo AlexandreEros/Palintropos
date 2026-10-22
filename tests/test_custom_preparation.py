@@ -9,6 +9,10 @@ from __future__ import annotations
 
 import json
 import math
+from pathlib import Path
+import subprocess
+import sys
+import textwrap
 
 import numpy as np
 import pytest
@@ -33,8 +37,7 @@ def _zonal_jet(l_max=L, amplitude=1e-5):
     return a
 
 
-def test_bve_from_vorticity_coefficients_is_exact_and_cpu_only():
-    import sys
+def test_bve_from_vorticity_coefficients_is_exact():
     zeta = _zonal_jet()
     prepared = prepare_bve_state(PLANET, DISC,
                                  zeta=SpectralCoefficients(zeta), label="jet")
@@ -48,7 +51,28 @@ def test_bve_from_vorticity_coefficients_is_exact_and_cpu_only():
     json.dumps(provenance, allow_nan=False)
     assert provenance["policy"]["max_relative_residual"] == 1e-2
     assert "not necessarily balanced" in provenance["balanced"]
-    assert "cupy" not in sys.modules
+
+
+def test_bve_coefficient_preparation_does_not_import_cupy():
+    # Other GPU tests may already have imported CuPy in this pytest process.
+    # A fresh interpreter checks imports and preparation without changing the
+    # parent's module cache or requiring CuPy to be installed.
+    code = textwrap.dedent("""
+        import json
+        import runpy
+        import sys
+
+        sys.path[:] = json.loads(sys.argv[2])
+        assert "cupy" not in sys.modules
+        namespace = runpy.run_path(sys.argv[1])
+        namespace["test_bve_from_vorticity_coefficients_is_exact"]()
+        assert "cupy" not in sys.modules
+    """)
+    result = subprocess.run(
+        [sys.executable, "-c", code, str(Path(__file__).resolve()), json.dumps(sys.path)],
+        capture_output=True, text=True, timeout=60,
+    )
+    assert result.returncode == 0, result.stdout + result.stderr
 
 
 def test_power_above_the_product_cut_is_reported_never_removed():

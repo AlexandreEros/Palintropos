@@ -481,6 +481,7 @@ def _convergence_centred(hs, raw_nu, raw_alpha, ref):
 
 
 @gpu
+@pytest.mark.slow
 def test_centred_complete_scheme_converges_second_order_on_t21_l10(hs):
     """2 days, T21 L10, forcing + drag + del^8 + SI with centred damping,
     against RK4 of the same right-hand side (150 s). RAW off: second order in
