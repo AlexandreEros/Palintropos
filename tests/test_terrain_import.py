@@ -86,7 +86,8 @@ def write_image(path, array, **kwargs):
     return path
 
 
-def geotiff_tags(west, north, dlon, dlat, *, projected=None):
+def geotiff_tags(west, north, dlon, dlat, *, projected=None,
+                 radius_keys=None):
     from PIL import TiffImagePlugin, TiffTags
     ifd = TiffImagePlugin.ImageFileDirectory_v2()
     ifd[33550] = (float(dlon), float(dlat), 0.0)
@@ -96,8 +97,13 @@ def geotiff_tags(west, north, dlon, dlat, *, projected=None):
     if projected is None:
         keys = (1, 1, 0, 3, 1024, 0, 1, 2, 1025, 0, 1, 1, 2054, 0, 1, 9102)
     else:  # equirectangular metres on a sphere of radius `projected`
-        keys = (1, 1, 0, 5, 1024, 0, 1, 1, 1025, 0, 1, 1, 2057, 34736, 1, 0,
-                3075, 0, 1, 17, 3076, 0, 1, 9001)
+        # radius_keys replaces the 2057 entry, e.g. ((2056, 0, 1, 7030),)
+        # for an ellipsoid code alone, or adds GeogLinearUnits (2052).
+        radius = ((2057, 34736, 1, 0),) if radius_keys is None             else tuple(radius_keys)
+        entries = ((1024, 0, 1, 1), (1025, 0, 1, 1), *radius,
+                   (3075, 0, 1, 17), (3076, 0, 1, 9001))
+        entries = tuple(sorted(entries))
+        keys = (1, 1, 0, len(entries)) + tuple(v for e in entries for v in e)
         ifd[34736] = (float(projected),)
         ifd.tagtype[34736] = TiffTags.DOUBLE
     ifd[34735] = keys
@@ -345,6 +351,59 @@ def test_geotiff_geographic_and_equirectangular(tmp_path):
     assert "equirectangular" in rp.provenance["georeferencing"]
     np.testing.assert_allclose(rp.elevation_m, r.elevation_m)
     np.testing.assert_allclose(rp.lon_deg, r.lon_deg, atol=1e-9)
+
+
+def test_equirectangular_geotiff_needs_an_explicit_semi_major_axis(tmp_path):
+    """2056 is an ellipsoid code, never a radius; 2057 must be present and
+    plausible (in metres, or kilometres via GeogLinearUnits 2052)."""
+    d = 10.0
+    arr = np.zeros((18, 36), dtype=np.float32)
+    arr[3, 4] = 100.0
+    radius = 3.3962e6
+    m = math.pi * radius / 180
+
+    def write(name, radius_keys, axis=radius):
+        return write_image(tmp_path / name, arr, tiffinfo=geotiff_tags(
+            0.0, 90 * m, d * m, d * m, projected=axis,
+            radius_keys=radius_keys))
+
+    only_code = write("ellipsoid.tif", ((2056, 0, 1, 7030),))
+    with pytest.raises(ElevationImportError,
+                       match="2056 names an ellipsoid code, not a radius"):
+        read_elevation(only_code, units="m")
+    missing = write("none.tif", ())
+    with pytest.raises(ElevationImportError,
+                       match="without an explicit sphere radius"):
+        read_elevation(missing, units="m")
+    # both present: 2057 is used and 2056 ignored
+    both = write("both.tif", ((2056, 0, 1, 7030), (2057, 34736, 1, 0)))
+    assert "3.3962e+06" in read_elevation(both, units="m").provenance[
+        "georeferencing"]
+    km = write("km.tif", ((2052, 0, 1, 9036), (2057, 34736, 1, 0)),
+               axis=radius / 1000)
+    np.testing.assert_allclose(read_elevation(km, units="m").lon_deg,
+                               read_elevation(both, units="m").lon_deg)
+    with pytest.raises(ElevationImportError, match="outside"):
+        read_elevation(write("small.tif", None, axis=3396.2), units="m")
+    with pytest.raises(ElevationImportError, match="linear unit 9002"):
+        read_elevation(write("feet.tif", ((2052, 0, 1, 9002),
+                                          (2057, 34736, 1, 0))), units="m")
+
+
+def test_netcdf_rejects_image_only_arguments(tmp_path):
+    lat, lon = cell_grid(10.0)
+    path = write_netcdf(tmp_path / "z.nc", lat, lon,
+                        np.zeros((lat.size, lon.size)))
+    with pytest.raises(ElevationImportError,
+                       match=r"height_range do\(es\) not apply to NetCDF"):
+        read_elevation(path, height_range=(0.0, 1.0))
+    with pytest.raises(ElevationImportError,
+                       match=r"lon_west_deg do\(es\) not apply"):
+        read_elevation(path, lon_west_deg=-180)
+    with pytest.raises(ElevationImportError,
+                       match="height_range, lon_west_deg"):
+        read_elevation(path, height_range=(0, 1), lon_west_deg=0)
+    assert read_elevation(path).shape == (18, 36)
 
 
 # ---------------------------------------------------------------------------

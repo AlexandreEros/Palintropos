@@ -456,6 +456,8 @@ def read_elevation(path, *, format: str | None = None,
         Longitude of the western edge of the first column, for rasters
         without georeferencing (bitmaps, plain TIFF). ``-180`` for maps
         centred on the prime meridian, ``0`` for maps starting at it.
+        ``height_range`` and ``lon_west_deg`` describe images without
+        coordinates; passing them for NetCDF is an error.
     nodata : float, optional
         Raw value marking missing data.
     fill_value : float, optional
@@ -472,6 +474,16 @@ def read_elevation(path, *, format: str | None = None,
     prov: dict = {"source_name": path.name,
                   "source_sha256": _file_sha256(path), "format": kind}
     if kind == "netcdf":
+        ignored = [name for name, value in (("height_range", height_range),
+                                            ("lon_west_deg", lon_west_deg))
+                   if value is not None]
+        if ignored:
+            raise ElevationImportError(
+                f"{path.name}: {', '.join(ignored)} do(es) not apply to "
+                "NetCDF: they describe images without coordinates (the grey "
+                "range and the west edge of column 0). NetCDF longitudes come "
+                "from its coordinate variable and values from the variable "
+                "(use scale/offset/units to reinterpret them)")
         values, lat, lon, missing = _read_netcdf(
             path, variable, units, scale, offset, nodata, prov)
     else:
@@ -744,6 +756,48 @@ def _geokeys(tags: Mapping, where: str) -> dict:
     return keys
 
 
+#: GeogLinearUnitsGeoKey (2052) codes accepted for the semi-major axis.
+_LINEAR_UNIT_M = {9001: 1.0, 9036: 1000.0}     # EPSG metre, kilometre
+#: Plausible sphere radii (m); outside this a unit mistake is likelier.
+_RADIUS_RANGE_M = (1.0e5, 1.0e8)
+
+
+def _semi_major_axis_m(keys: Mapping, where: str) -> float:
+    """The sphere radius of an equirectangular GeoTIFF, in metres.
+
+    Only GeogSemiMajorAxisGeoKey (2057) gives it. GeogEllipsoidGeoKey
+    (2056) is an ellipsoid *code*, not a length, so it is never used.
+    """
+    value = keys.get(2057)
+    if value is None:
+        raise ElevationImportError(
+            f"{where}: equirectangular GeoTIFF without an explicit sphere "
+            "radius (GeogSemiMajorAxisGeoKey 2057"
+            + ("; GeogEllipsoidGeoKey 2056 names an ellipsoid code, not a "
+               "radius" if 2056 in keys else "")
+            + "); cannot convert metres to degrees. Reproject to a "
+            "geographic latitude-longitude grid first")
+    if isinstance(value, tuple):
+        value = value[0] if len(value) == 1 else None
+    try:
+        radius = float(value)
+    except (TypeError, ValueError):
+        radius = math.nan
+    unit = keys.get(2052)
+    if unit is not None and unit not in _LINEAR_UNIT_M:
+        raise ElevationImportError(
+            f"{where}: semi-major axis linear unit {unit} is not supported "
+            "(EPSG 9001 metre or 9036 kilometre)")
+    radius *= _LINEAR_UNIT_M.get(unit, 1.0)
+    lo, hi = _RADIUS_RANGE_M
+    if not (math.isfinite(radius) and lo <= radius <= hi):
+        raise ElevationImportError(
+            f"{where}: GeogSemiMajorAxisGeoKey gives a sphere radius of "
+            f"{radius:g} m, outside [{lo:g}, {hi:g}] m; check its value and "
+            "GeogLinearUnitsGeoKey (2052)")
+    return radius
+
+
 def _geotiff_extent(tags: Mapping, nrow: int, ncol: int, where: str):
     """(west, north, dlon, dlat, note) in degrees from GeoTIFF tags, or None."""
     pixel_scale = tags.get(33550)
@@ -781,13 +835,7 @@ def _geotiff_extent(tags: Mapping, nrow: int, ncol: int, where: str):
         if linear not in (None, 9001):
             raise ElevationImportError(
                 f"{where}: projected linear unit {linear} is not metres")
-        radius = keys.get(2057) or keys.get(2056)
-        if not radius:
-            raise ElevationImportError(
-                f"{where}: equirectangular GeoTIFF without the sphere "
-                "radius (GeogSemiMajorAxisGeoKey); cannot convert metres "
-                "to degrees")
-        radius = float(radius)
+        radius = _semi_major_axis_m(keys, where)
         centre = float(keys.get(3088) or keys.get(3080) or 0.0)
         false_e = float(keys.get(3082) or 0.0)
         false_n = float(keys.get(3083) or 0.0)
