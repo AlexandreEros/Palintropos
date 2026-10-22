@@ -176,8 +176,8 @@ def validate(path: str, fine: str | None, lmaxes) -> None:
     print(raster.describe())
     print(f"  area mean {raster.area_mean():.1f} m; provenance: "
           f"{raster.provenance.get('variable')} in "
-          f"{raster.provenance.get('units')}, longitudes "
-          f"{raster.provenance.get('longitudes_rewrapped', 'as stored')}")
+          f"{raster.provenance.get('units')}; first column centred at "
+          f"{float(raster.lon_deg[0]):.3f} deg E after normalization")
     for label, pick in (("highest", np.argmax), ("lowest", np.argmin)):
         j, i = np.unravel_index(pick(raster.elevation_m), raster.shape)
         print(f"  {label} sample {raster.elevation_m[j, i]:.0f} m at "
