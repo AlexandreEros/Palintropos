@@ -68,7 +68,11 @@ _DETAIL_LABELS = (
     ("resampling", "Resampling"),
     ("working_resolution_deg", "Working resolution (deg)"),
     ("clip_below_m", "Clipped below (m)"),
-    ("smoothing_retained_at_lmax", "Smoothing (amplitude at band limit)"),
+    ("smoothing_retained_at_band_limit",
+     "Smoothing (amplitude kept at band limit)"),
+    ("smoothing_band_limit", "Smoothing band limit (degree)"),
+    ("smoothing_retained_at_lmax",
+     "Smoothing (amplitude kept at band limit)"),       # legacy key
     ("projection_residual", "Truncation residual (rel. L2)"),
     ("smoothed_residual", "Residual after smoothing"),
 )
@@ -320,7 +324,8 @@ def prepare_planet(planet: PlanetSpec, discretization: DiscretizationSpec,
     ``terrain`` is an :class:`~tropoi.spatial.terrain.raster.ElevationRaster`
     (from :func:`~tropoi.spatial.terrain.raster.read_elevation`), a
     :class:`TopographySpec` preset, or ``None`` (flat). For a raster,
-    ``smoothing`` (amplitude retained at ``l_max``, 0 < s <= 1) and
+    ``smoothing`` (amplitude retained at the band limit: ``l_cut`` with
+    ``solver="pe"``, ``l_max`` otherwise; 0 < s <= 1) and
     ``clip_below_m`` are applied as described in
     :meth:`tropoi.spatial.terrain.topography.Topography.from_raster`, and
     the resulting :class:`TopographySpec` is an ``imported`` provenance

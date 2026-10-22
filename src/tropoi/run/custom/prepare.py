@@ -332,6 +332,11 @@ class PreparationReport:
                 parts.append(
                     f"power above cut {f.power_above_product_cut:.2e}")
             out.append(", ".join(parts))
+        cut = (self.topography or {}).get("band_limit_l_cut")
+        if cut is not None:
+            out.append(f"  terrain              band-limited at l_cut={cut} "
+                       f"(resolved for the PE core; degrees {cut + 1}.."
+                       f"{self.l_max} are zero)")
         if self.min_thickness_m is not None:
             out.append(f"  thickness h in [{self.min_thickness_m:.6g}, "
                        f"{self.max_thickness_m:.6g}] m over the state and "
@@ -727,11 +732,21 @@ def prepare_swe_state(planet: PlanetSpec, discretization: DiscretizationSpec,
     topography_lm = None
     if terrain is not None:
         topography_lm = cp.asnumpy(terrain.elevation_lm)
+        source = (prepared_terrain.measured
+                  if prepared_terrain is not None
+                  and prepared_terrain.measured else terrain.parameters)
         report.topography = {
             "preset": topography.preset,
-            "measured": {k: float(v) for k, v in terrain.parameters.items()
+            "measured": {k: float(v) for k, v in source.items()
                          if isinstance(v, (int, float))
+                         and not isinstance(v, bool)
                          and math.isfinite(float(v))}}
+        if prepared_terrain is not None:
+            # A terrain resolved for the PE core keeps only degrees up to
+            # its cut; it stays valid here (fewer modes), and the report
+            # says so instead of hiding it.
+            report.topography["source"] = "PreparedPlanet (coefficients reused)"
+            report.topography["band_limit_l_cut"] = prepared_terrain.l_cut
     radius = planet.dynamical_radius_m
     g = fluid.gravity_m_s2
 

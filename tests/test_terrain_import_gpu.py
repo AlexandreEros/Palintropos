@@ -156,7 +156,9 @@ def test_smoothing_and_clipping(tmp_path):
                                raw.topography_lm * factors[:, None],
                                atol=1e-9)
     p = smooth.topography.parameters
-    assert p["smoothing_retained_at_lmax"] == 0.1
+    assert p["smoothing_retained_at_band_limit"] == 0.1
+    assert p["smoothing_band_limit"] == LMAX           # no cut: l_max
+    assert "smoothing_retained_at_lmax" not in p
     assert p["smoothed_residual"] > p["projection_residual"]
     # Smoothing damps the far-field Gibbs ringing (measured RMS beyond 45
     # degrees from the cone: 0.37 m raw, 0.03 m at 0.1); it does NOT remove

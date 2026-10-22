@@ -96,12 +96,37 @@ class TopographyError(ValueError):
     """A topography definition is invalid or not representable as configured."""
 
 
-def spectral_smoothing_factors(l_max: int, retained: float) -> np.ndarray:
-    """Per-degree Hoskins-type filter, amplitude ``retained`` at ``l_max``.
+#: Parameter names of the smoothing record of imported terrain. The
+#: retained amplitude applies at the band limit ``smoothing_band_limit``
+#: (``l_cut`` for the PE core, else ``l_max``). Terrain saved before the
+#: rename recorded it as ``smoothing_retained_at_lmax`` with the same
+#: meaning; :func:`smoothing_record` reads both.
+SMOOTHING_RETAINED_KEY = "smoothing_retained_at_band_limit"
+SMOOTHING_BAND_KEY = "smoothing_band_limit"
+LEGACY_SMOOTHING_RETAINED_KEY = "smoothing_retained_at_lmax"
 
-    ``exp(-k (l(l+1) / (L(L+1)))^2)`` with ``k = -ln(retained)``: 1 at
-    ``l = 0``, ``retained`` at ``l = l_max``, scale-selective in between.
-    Host array of length ``l_max + 1``.
+
+def smoothing_record(parameters) -> tuple[float | None, int | None]:
+    """(retained amplitude, degree it applies at) from terrain parameters.
+
+    Reads the current keys, falling back to the legacy
+    ``smoothing_retained_at_lmax`` (whose degree is ``l_cut`` when the
+    terrain was band-limited, else unrecorded: ``None``).
+    """
+    p = dict(parameters or {})
+    if SMOOTHING_RETAINED_KEY in p:
+        return p[SMOOTHING_RETAINED_KEY], p.get(SMOOTHING_BAND_KEY)
+    return p.get(LEGACY_SMOOTHING_RETAINED_KEY), p.get("l_cut")
+
+
+def spectral_smoothing_factors(l_max: int, retained: float) -> np.ndarray:
+    """Per-degree Hoskins-type filter, amplitude ``retained`` at degree ``L``.
+
+    ``exp(-k (l(l+1) / (L(L+1)))^2)`` with ``k = -ln(retained)``, ``L`` the
+    ``l_max`` argument (the band limit the caller filters to: ``l_cut`` for
+    the PE core, the model ``l_max`` otherwise): 1 at ``l = 0``,
+    ``retained`` at ``l = L``, scale-selective in between. Host array of
+    length ``L + 1``.
     """
     lmax = int(l_max)
     degrees = np.arange(lmax + 1, dtype=np.float64)
@@ -271,9 +296,10 @@ class Topography:
         if self._preset == "imported":
             p = self._parameters
             sha = str(p.get("source_sha256") or "")[:12]
-            smooth = p.get("smoothing_retained_at_lmax")
-            smooth = ("no smoothing" if smooth is None
-                      else f"smoothing {smooth:g} at l_max")
+            retained, band = smoothing_record(p)
+            smooth = ("no smoothing" if retained is None
+                      else f"smoothing {retained:g} at l = "
+                      f"{'band limit' if band is None else band}")
             residual = p.get("projection_residual")
             measured = ("" if residual is None
                         else f"; projection residual {residual:.3f}")
@@ -477,7 +503,9 @@ class Topography:
             "registration": raster.registration,
             "clip_below_m": clip,
             "l_cut": None if l_cut is None else int(l_cut),
-            "smoothing_retained_at_lmax": retained,
+            SMOOTHING_RETAINED_KEY: retained,
+            SMOOTHING_BAND_KEY: (None if retained is None
+                                 else int(effective_l)),
             "projection_residual": rel,
             "smoothed_residual": filtered_rel,
             "source_min_m": float(raster.elevation_m.min()),

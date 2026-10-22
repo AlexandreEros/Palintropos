@@ -44,8 +44,8 @@ be exercised without a download. It is not MOLA data. For real Mars, see
 | Read | `read_elevation` (CPU) | A format reader interprets the file. Every reader returns the same normalized `ElevationRaster`: metres, rows south to north, uniform global longitudes. The source's name, SHA-256 and every interpretation are recorded in `raster.provenance`. |
 | Resample | `ElevationRaster.resample_to_points` (CPU) | A source finer than the working resolution `180° / (2 (l_max + 1))` is area-averaged to it, then sampled bilinearly at the model's state-grid points. Longitudes wrap, and each pole is single-valued. |
 | Clip (optional) | `clip_below_m=` | For example `0` puts an ocean floor at sea level. |
-| Project | `Topography.from_raster` (CUDA) | Analysis with the backend's own transform at the full truncation, as for the presets. The truncation residual is measured. |
-| Smooth (optional) | `smoothing=s` | Hoskins-type filter `exp(-k (l(l+1)/(L(L+1)))²)`, `k = -ln s`. It keeps amplitude `s` at `l_max` and leaves `l = 0` untouched. Off by default. |
+| Project | `Topography.from_raster` (CUDA) | Analysis with the backend's own transform, as for the presets: at the full truncation `l_max`, or band-limited at `l_cut = floor(2 l_max / 3)` with `solver="pe"`. The truncation residual is measured on the coefficients kept. |
+| Smooth (optional) | `smoothing=s` | Hoskins-type filter `exp(-k (l(l+1)/(L(L+1)))²)`, `k = -ln s`, where `L` is the band limit: `l_cut` for the PE core, `l_max` without a cut. It keeps amplitude `s` at `L` and leaves `l = 0` untouched. Off by default. Recorded as `smoothing_retained_at_band_limit` with the degree in `smoothing_band_limit`; terrain saved earlier carries the same value as `smoothing_retained_at_lmax`, which is still read. |
 | Record | `TopographySpec.imported(...)` | A provenance record: the file name and SHA-256, the reader settings, the preprocessing settings, the measured residuals and extrema. It is not a recipe. The resolved coefficients always travel with it. |
 
 Real terrain is not band-limited. As for the Williamson-5 cone, the residual
@@ -154,6 +154,13 @@ the terrain from those coefficients, and nothing is ever re-read from the
 source file. `free_surface_anomaly = 0` is the exact lake at rest over any
 terrain, imported or not. The layer's mean depth must exceed the highest
 resolved peak.
+
+A terrain prepared for the PE core (`solver="pe"`) is also accepted here: it
+is simply terrain with fewer modes, zero above `l_cut`. Its coefficients are
+reused unchanged, and the preparation report states the band limit
+(`band_limit_l_cut`, and a line in `report.lines()`). The report is kept in
+the saved state's provenance, so the cut stays traceable after saving and
+reloading.
 
 ### Primitive equations
 

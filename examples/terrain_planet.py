@@ -181,7 +181,8 @@ def main(argv=None) -> int:
             p.add_argument("state", help="initial-state directory to write")
         p.add_argument("--lmax", type=int, default=42)
         p.add_argument("--smoothing", type=float, default=None,
-                       help="amplitude kept at l_max (0 < s <= 1)")
+                       help="amplitude kept at the band limit, l_max here "
+                            "(0 < s <= 1)")
         p.add_argument("--variable")
         p.add_argument("--units")
         p.add_argument("--scale", type=float)

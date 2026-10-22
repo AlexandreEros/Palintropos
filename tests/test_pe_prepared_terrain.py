@@ -276,3 +276,72 @@ def test_pe_cone_measurements_describe_the_cut_coefficients():
     details = dict(pe.details())
     assert details["Truncation residual (rel. L2)"] == \
         f"{m['projection_residual']:.6g}"
+
+
+def test_legacy_smoothing_key_is_still_shown(tmp_path):
+    """Terrain saved before the rename keeps its smoothing visible (CPU)."""
+    from tropoi.run.custom import PreparedPlanet
+
+    legacy = TopographySpec.imported({**SPEC.parameters,
+                                      "smoothing_retained_at_lmax": 0.3,
+                                      "l_cut": 10})
+    world = PreparedPlanet(PlanetSpec.earth_like(), DISC, legacy,
+                           _band_limited(), l_cut=10)
+    again = PreparedPlanet.load(world.save(tmp_path / "legacy"))
+    details = dict(again.details())
+    assert details["Smoothing (amplitude kept at band limit)"] == "0.3"
+    assert again.topography.parameters["smoothing_retained_at_lmax"] == 0.3
+
+
+@requires_cuda
+def test_smoothing_is_retained_at_the_pe_cut_and_legacy_key_reads():
+    from test_terrain_import import cell_grid, cone
+
+    from tropoi.run.custom import prepare_planet
+    from tropoi.spatial.terrain.raster import ElevationRaster
+    from tropoi.spatial.terrain.topography import (smoothing_record,
+                                                   spectral_smoothing_factors)
+
+    lat, lon = cell_grid(2.0)
+    raster = ElevationRaster.from_array(
+        cone(*np.meshgrid(lat, lon, indexing="ij")), lat, lon)
+    raw = prepare_planet(PlanetSpec.earth_like(), DISC, raster, solver="pe")
+    smooth = prepare_planet(PlanetSpec.earth_like(), DISC, raster,
+                            solver="pe", smoothing=0.2)
+    p = smooth.topography.parameters
+    assert smoothing_record(p) == (0.2, 10)          # at l_cut, not l_max
+    factors = spectral_smoothing_factors(10, 0.2)
+    np.testing.assert_allclose(smooth.topography_lm[:11],
+                               raw.topography_lm[:11] * factors[:, None],
+                               atol=1e-9)
+    assert factors[10] == pytest.approx(0.2)
+    assert smoothing_record({"smoothing_retained_at_lmax": 0.3,
+                             "l_cut": 10}) == (0.3, 10)
+    assert smoothing_record({"smoothing_retained_at_lmax": 0.3}) == (0.3,
+                                                                       None)
+
+
+@requires_cuda
+def test_pe_terrain_in_an_swe_state_reports_its_cut(tmp_path):
+    from tropoi.run.custom import (FluidLayerSpec, load_initial_state,
+                                   prepare_planet, prepare_swe_state)
+
+    world = prepare_planet(PlanetSpec.earth_like(), DISC,
+                           TopographySpec.williamson5_cone(), solver="pe")
+    prepared = prepare_swe_state(
+        PlanetSpec.earth_like(), DISC,
+        FluidLayerSpec(gravity_m_s2=9.80616, mean_depth_m=5960.0), world,
+        free_surface_anomaly=lambda la, lo: 0 * la)
+    topo = prepared.report.topography
+    assert topo["band_limit_l_cut"] == 10
+    assert topo["measured"]["projection_residual"] == pytest.approx(
+        world.measured["projection_residual"])
+    assert any("band-limited at l_cut=10" in line
+               for line in prepared.report.lines())
+    np.testing.assert_array_equal(prepared.state.topography_lm,
+                                  world.topography_lm)
+    path = prepared.save(tmp_path / "state")
+    loaded = load_initial_state(path)
+    np.testing.assert_array_equal(loaded.topography_lm, world.topography_lm)
+    assert loaded.provenance["preparation"]["topography"][
+        "band_limit_l_cut"] == 10
