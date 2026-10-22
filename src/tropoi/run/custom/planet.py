@@ -247,19 +247,26 @@ class PreparedPlanet:
 
         return plot_terrain(self.preview(), figsize=figsize)
 
-    def view(self, path=None, *, open_browser: bool = True) -> pathlib.Path:
+    def view(self, path=None, *, open_browser: bool = True,
+             units: str | None = None,
+             centre: tuple[float, float] | None = None,
+             exaggeration: float | None = None) -> pathlib.Path:
         """Write the interactive globe (one HTML file) and open it.
 
         ``path`` defaults to a file named after this terrain in the system
         temporary directory. The page is self-contained: it opens from disk
         with no server, network, Python or CUDA. Returns the path.
+        ``units`` ("m" or "km"), ``centre`` = (lat, lon) and
+        ``exaggeration`` set the page's initial colour-bar unit, view and
+        display-only relief factor; all remain adjustable in the page.
         """
         from tropoi.representation.visual.terrain import write_globe_html
 
         if path is None:
             path = pathlib.Path(tempfile.gettempdir()) / "tropoi" / (
                 self._slug() + "-globe.html")
-        path = write_globe_html(self.preview(), path)
+        path = write_globe_html(self.preview(), path, units=units,
+                                centre=centre, exaggeration=exaggeration)
         if open_browser:
             import webbrowser
             webbrowser.open(path.resolve().as_uri())

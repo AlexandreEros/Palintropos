@@ -1,8 +1,10 @@
-"""Real Mars terrain: MOLA MEGDR topography through the terrain-import path.
+r"""Real Mars terrain: MOLA MEGDR topography through the terrain-import path.
 
     python examples/mola_mars.py convert megt90n000cb.lbl mola/megt_4ppd.nc    # CPU
     python examples/mola_mars.py validate mola/megt_4ppd.nc [--fine mola/megt_16ppd.nc]
     python examples/mola_mars.py show mola/megt_4ppd.nc --lmax 42               # CUDA
+    python examples/mola_mars.py show mola/megt_4ppd.nc --lmax 42 --units m \
+        --centre 0 -95 --exaggeration 20 --open        # the README view
     python examples/mola_mars.py prepare-pe mola/megt_4ppd.nc terrain/mola_pe   # CUDA
     tropoi run pe --terrain terrain/mola_pe --scenario orographic_isothermal_rest \
         --radius-earth-units 0.53307 --day-hours 24.6229 --gravity 3.71 \
@@ -225,7 +227,9 @@ def validate(path: str, fine: str | None, lmaxes) -> None:
         _free_gpu()
 
 
-def show(path: str, lmax: int, smoothing, out: str | None) -> None:
+def show(path: str, lmax: int, smoothing, out: str | None, *,
+         units=None, centre=None, exaggeration=None,
+         open_browser: bool = False) -> None:
     import matplotlib
     matplotlib.use("Agg")
     from tropoi.run.custom import prepare_planet, read_elevation
@@ -239,7 +243,9 @@ def show(path: str, lmax: int, smoothing, out: str | None) -> None:
     stem.parent.mkdir(parents=True, exist_ok=True)
     world.plot().savefig(stem.with_name(stem.name + "_terrain.png"), dpi=110)
     page = world.view(stem.with_name(stem.name + "_globe.html"),
-                      open_browser=False)
+                      open_browser=open_browser, units=units,
+                      centre=None if centre is None else tuple(centre),
+                      exaggeration=exaggeration)
     print("figure:", stem.with_name(stem.name + "_terrain.png"))
     print("globe: ", page)
 
@@ -281,6 +287,14 @@ def main(argv=None) -> int:
     s.add_argument("--lmax", type=int, default=42)
     s.add_argument("--smoothing", type=float)
     s.add_argument("--out")
+    s.add_argument("--units", choices=("m", "km"),
+                   help="colour-bar unit of the globe")
+    s.add_argument("--centre", type=float, nargs=2, metavar=("LAT", "LON"),
+                   help="initial view centre of the globe (degrees)")
+    s.add_argument("--exaggeration", type=float,
+                   help="initial display-only relief exaggeration")
+    s.add_argument("--open", action="store_true",
+                   help="open the globe in the default browser")
     e = sub.add_parser("prepare-pe", help="resolve + save for PE (CUDA)")
     e.add_argument("file")
     e.add_argument("out")
@@ -294,7 +308,9 @@ def main(argv=None) -> int:
     elif args.step == "validate":
         validate(args.file, args.fine, args.lmax)
     else:
-        show(args.file, args.lmax, args.smoothing, args.out)
+        show(args.file, args.lmax, args.smoothing, args.out,
+             units=args.units, centre=args.centre,
+             exaggeration=args.exaggeration, open_browser=args.open)
     return 0
 
 

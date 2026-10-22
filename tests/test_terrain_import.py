@@ -619,3 +619,22 @@ def test_mola_converter_reads_pds3_orientation_and_units(tmp_path):
                           "convert", str(label), str(out)],
                          capture_output=True, text=True)
     assert bad.returncode != 0 and "SAMPLE_TYPE" in bad.stderr
+
+
+def test_globe_initial_view_options():
+    from tropoi.representation.visual.terrain import globe_payload
+
+    preview = _l1_preview()
+    default = globe_payload(preview)
+    assert default["units"] == "km"
+    assert default["view_lat"] == 60.0                 # highest point, clamped
+    p = globe_payload(preview, units="m", centre=(0.0, -95.0),
+                      exaggeration=20.0)
+    assert (p["units"], p["unit_factor"]) == ("m", 1.0)
+    assert (p["view_lat"], p["view_lon"]) == (0.0, -95.0)
+    assert p["default_exaggeration"] == 20.0
+    assert p["range"] == default["range"]              # display only
+    for name, value in (("units", "ft"), ("centre", (95.0, 0.0)),
+                        ("exaggeration", 0.5)):
+        with pytest.raises(ValueError, match=f"{name} must be"):
+            globe_payload(preview, **{name: value})

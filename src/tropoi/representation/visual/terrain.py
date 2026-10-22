@@ -253,10 +253,26 @@ def _b64_f32(values: np.ndarray) -> str:
         np.ascontiguousarray(values, dtype="<f4").tobytes()).decode("ascii")
 
 
-def globe_payload(preview: TerrainPreview) -> dict:
-    """The JSON document the globe page reads (exposed for tests)."""
+_UNIT_FACTORS = {"m": 1.0, "km": 1000.0}
+
+
+def globe_payload(preview: TerrainPreview, *, units: str | None = None,
+                  centre: tuple[float, float] | None = None,
+                  exaggeration: float | None = None) -> dict:
+    """The JSON document the globe page reads (exposed for tests).
+
+    ``units`` ("m" or "km") fixes the colour-bar unit (default: km when the
+    relief reaches 2 km); ``centre`` = (lat, lon) in degrees sets the initial
+    view (default: the highest point); ``exaggeration`` the initial
+    display-only relief factor (default: about 8 % of the radius).
+    """
     lo, hi = preview.value_range()
-    units, factor = _display_units(lo, hi)
+    if units is None:
+        units, factor = _display_units(lo, hi)
+    elif units in _UNIT_FACTORS:
+        factor = _UNIT_FACTORS[units]
+    else:
+        raise ValueError(f"units must be 'm' or 'km', got {units!r}")
     cmap = _color_map()
     lut = (np.asarray(cmap(np.linspace(0.0, 1.0, 256)))[:, :3] * 255.0)
     layers = [{"id": "model", "short": "Model",
@@ -270,7 +286,14 @@ def globe_payload(preview: TerrainPreview) -> dict:
                        "data": _b64_f32(preview.source_m),
                        "min": float(preview.source_m.min()),
                        "max": float(preview.source_m.max())})
-    view_lat, view_lon = preview.highest_point()
+    view_lat, view_lon = (preview.highest_point() if centre is None
+                          else (float(centre[0]), float(centre[1])))
+    if not (-90.0 <= view_lat <= 90.0 and math.isfinite(view_lon)):
+        raise ValueError(f"centre must be (lat, lon) in degrees, got {centre}")
+    if exaggeration is None:
+        exaggeration = default_exaggeration(preview)
+    elif not (math.isfinite(exaggeration) and exaggeration >= 1.0):
+        raise ValueError(f"exaggeration must be >= 1, got {exaggeration}")
     return {
         "title": preview.title, "subtitle": preview.subtitle,
         "radius_m": preview.radius_m, "l_max": preview.l_max,
@@ -281,18 +304,22 @@ def globe_payload(preview: TerrainPreview) -> dict:
         "range": [lo, hi], "units": units, "unit_factor": factor,
         "lut": np.rint(lut).astype(int).tolist(),
         "layers": layers,
-        "default_exaggeration": default_exaggeration(preview),
+        "default_exaggeration": float(exaggeration),
         "view_lat": max(-60.0, min(60.0, view_lat)), "view_lon": view_lon,
         "details": [list(item) for item in preview.details],
     }
 
 
-def write_globe_html(preview: TerrainPreview, path) -> pathlib.Path:
-    """Write the self-contained globe page to ``path``; return the path."""
+def write_globe_html(preview: TerrainPreview, path, **view) -> pathlib.Path:
+    """Write the self-contained globe page to ``path``; return the path.
+
+    ``view`` passes ``units``, ``centre`` and ``exaggeration`` to
+    :func:`globe_payload` (initial display settings only).
+    """
     template = importlib.resources.files(
         "tropoi.representation.visual").joinpath(
         "terrain_globe.html").read_text(encoding="utf-8")
-    payload = json.dumps(globe_payload(preview), allow_nan=False,
+    payload = json.dumps(globe_payload(preview, **view), allow_nan=False,
                          separators=(",", ":"))
     # Keep the JSON inert inside its <script> element.
     payload = payload.replace("<", "\\u003c").replace(">", "\\u003e")
