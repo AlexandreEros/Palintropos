@@ -95,7 +95,7 @@ Excluded by rule 4: `tropoi`, `tropoi.cli`, `tropoi.numerics.cuda`, `tropoi.phys
 
 ### Call graphs (ast)
 
-Each call expression inside a function or method body (nested functions, lambdas, and comprehensions are attributed to the enclosing function) is classified as `internal` (resolved to an analysed definition), `external` (resolved to a name outside the package), `builtin` (an unshadowed builtin), or `unresolved`. Totals: builtin 2628, external 1825, internal 2275, unresolved 2717.
+Each call expression inside a function or method body (nested functions, lambdas, and comprehensions are attributed to the enclosing function) is classified as `internal` (resolved to an analysed definition), `external` (resolved to a name outside the package), `builtin` (an unshadowed builtin), or `unresolved`. Totals: builtin 2628, external 1825, internal 2276, unresolved 2717.
 
 | Edge kind | Syntax | What it claims |
 |---|---|---|

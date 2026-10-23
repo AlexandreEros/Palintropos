@@ -3,7 +3,7 @@
     "call_sites": {
       "builtin": 2628,
       "external": 1825,
-      "internal": 2275,
+      "internal": 2276,
       "unresolved": 2717
     },
     "edges_by_kind": {
