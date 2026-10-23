@@ -36,6 +36,7 @@ __all__ = [
     "display_resolution_deg",
     "plot_terrain",
     "write_globe_html",
+    "write_globe_page",
 ]
 
 #: Colour policy of terrain everywhere in the repository's figures
@@ -316,17 +317,28 @@ def write_globe_html(preview: TerrainPreview, path, **view) -> pathlib.Path:
     ``view`` passes ``units``, ``centre`` and ``exaggeration`` to
     :func:`globe_payload` (initial display settings only).
     """
+    return write_globe_page(globe_payload(preview, **view), preview.title,
+                            path)
+
+
+def write_globe_page(payload: dict, title: str, path) -> pathlib.Path:
+    """Write one self-contained globe page for a prepared ``payload``.
+
+    The one page writer of the globe: :func:`write_globe_html` (terrain) and
+    ``representation.visual.atmosphere`` (terrain + atmosphere, the
+    payload's optional ``atmosphere`` block) both end here, with the same
+    template, embedding and escaping.
+    """
     template = importlib.resources.files(
         "tropoi.representation.visual").joinpath(
         "terrain_globe.html").read_text(encoding="utf-8")
-    payload = json.dumps(globe_payload(preview, **view), allow_nan=False,
-                         separators=(",", ":"))
+    data = json.dumps(payload, allow_nan=False, separators=(",", ":"))
     # Keep the JSON inert inside its <script> element.
-    payload = payload.replace("<", "\\u003c").replace(">", "\\u003e")
-    title = (preview.title.replace("&", "&amp;").replace("<", "&lt;")
+    data = data.replace("<", "\\u003c").replace(">", "\\u003e")
+    title = (str(title).replace("&", "&amp;").replace("<", "&lt;")
              .replace(">", "&gt;"))
     page = (template.replace("__PAGE_TITLE__", title)
-            .replace("__TERRAIN_DATA__", payload))
+            .replace("__TERRAIN_DATA__", data))
     path = pathlib.Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(page, encoding="utf-8")

@@ -156,6 +156,16 @@ class Snapshot:
         return self._storage.plot_simulation(output_path, view,
                                              snapshot=self._index, **options)
 
+    def view(self, path=None, **options) -> pathlib.Path:
+        """Write the 3-D atmosphere page for this one saved state.
+
+        ``Simulation.view(path, times=[index], **options)``; see there.
+        """
+        if "times" in options:
+            raise TypeError("Snapshot.view shows this snapshot; use "
+                            "Simulation.view(times=...) to choose times")
+        return _view(self._storage, path, times=[self._index], **options)
+
     def __repr__(self) -> str:
         return (f"Snapshot(solver={self.solver!r}, index={self._index}, "
                 f"time={self._time:g} s)")
@@ -212,6 +222,30 @@ class Simulation:
         """
         return self._storage.plot_simulation(output_path, view, **options)
 
+    def view(self, path=None, **options) -> pathlib.Path:
+        """Write a self-contained 3-D atmosphere page; returns its path.
+
+        Primitive-equation runs (capsules and Held–Suarez experiments): the
+        terrain globe plus one translucent native sigma surface whose radius
+        is the hydrostatic geopotential height of the saved state, coloured
+        by temperature, pressure, relative vorticity or divergence, with
+        optional horizontal streamlines and sliders over saved times,
+        native levels, exaggeration and opacity. One offline HTML file (no
+        network, server, Python or CUDA to open it), written outside the run
+        directory by default (the system temporary directory). Nothing is
+        written into the run.
+
+        Options (all keyword): ``times`` (saved indices, ``"all"``, or
+        ``None`` = all that fit the payload budget, evenly subsampled with a
+        warning), ``levels`` (native level indices, 0 = top; default all),
+        ``resolution_deg`` (display mesh), ``streamlines``, ``max_mb``,
+        ``gravity``, ``allow_cuda``, ``open_browser``, initial ``field``,
+        ``level``, ``time``, ``opacity``, ``exaggeration``. Reconstruction
+        runs on the CPU from the saved coefficients. See
+        ``tropoi.representation.visual.atmosphere`` and docs/ATMOSPHERE_VIEW.md.
+        """
+        return _view(self._storage, path, **options)
+
     def quantities(self) -> list[dict]:
         """What this run can plot: meaning, units, cadence, availability.
 
@@ -235,6 +269,15 @@ class Simulation:
     def __repr__(self) -> str:
         return (f"Simulation(solver={self.solver!r}, snapshots={len(self)}, "
                 f"fields={list(self.field_names)})")
+
+
+def _view(storage, path, **options) -> pathlib.Path:
+    view = getattr(storage, "view", None)
+    if view is None:
+        raise TypeError(
+            f"{type(storage).__name__} provides no 3-D view; it is offered "
+            "for saved primitive-equation runs opened with open_simulation")
+    return view(path, **options)
 
 
 __all__ = ["Simulation", "Snapshot", "SnapshotStorage"]

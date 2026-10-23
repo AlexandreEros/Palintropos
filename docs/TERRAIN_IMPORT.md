@@ -124,6 +124,11 @@ and drawn on the same colour scale.
   [Spherical Harmonics Explorer](https://maurer-gemlab.github.io/Potential_Field_Theory/demos/spherical_harmonics_explorer.html)
   (CC BY 4.0). No code is reused.
 
+The same page, with a translucent atmospheric layer over the terrain, is what
+`Simulation.view()` writes for a saved PE run; see
+[ATMOSPHERE_VIEW.md](ATMOSPHERE_VIEW.md). Terrain and atmosphere share the
+radius, the datum and the exaggeration.
+
 Previewing never needs CUDA once the terrain is resolved.
 `PreparedPlanet.from_initial_state(path)` accepts a saved SWE state or a
 custom run directory (its `initial_state/` is used) and draws its terrain on

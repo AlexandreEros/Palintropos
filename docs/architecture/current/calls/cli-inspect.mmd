@@ -15,6 +15,14 @@ flowchart LR
         n_tropoi_orepresentation_oarchive_ocapsule_oopen__simulation["open_simulation()"]
         n_tropoi_orepresentation_oarchive_ocapsule_oresolve__run__directory["resolve_run_directory()"]
     end
+    subgraph g_tropoi_orepresentation_oarchive_oheld__suarez["representation.archive.held_suarez"]
+        n_tropoi_orepresentation_oarchive_oheld__suarez_oHeldSuarezStorage{{"HeldSuarezStorage"}}
+        n_tropoi_orepresentation_oarchive_oheld__suarez_oHeldSuarezStorage_o____init____["HeldSuarezStorage.__init__()"]
+        n_tropoi_orepresentation_oarchive_oheld__suarez_o__experiment__config["_experiment_config()"]
+        n_tropoi_orepresentation_oarchive_oheld__suarez_o__read__config["_read_config()"]
+        n_tropoi_orepresentation_oarchive_oheld__suarez_ois__held__suarez__experiment["is_held_suarez_experiment()"]
+        n_tropoi_orepresentation_oarchive_oheld__suarez_ostatistics__only__description["statistics_only_description()"]
+    end
     subgraph g_tropoi_orepresentation_oarchive_oschema["representation.archive.schema"]
         n_tropoi_orepresentation_oarchive_oschema_oSchemaError{{"SchemaError"}}
         n_tropoi_orepresentation_oarchive_oschema_oStateSchema{{"StateSchema"}}
@@ -50,10 +58,21 @@ flowchart LR
     n_tropoi_orepresentation_oarchive_ocapsule_oCapsuleStorage -->|__init__| n_tropoi_orepresentation_oarchive_ocapsule_oCapsuleStorage_o____init____
     n_tropoi_orepresentation_oarchive_ocapsule_oCapsuleStorage_o____init____ -->|instantiate| n_tropoi_orepresentation_oarchive_oschema_oSchemaError
     n_tropoi_orepresentation_oarchive_ocapsule_oCapsuleStorage_o____init____ --> n_tropoi_orepresentation_oarchive_oschema_oStateSchema_ofrom__manifest__dict
+    n_tropoi_orepresentation_oarchive_ocapsule_oopen__simulation -->|instantiate| n_tropoi_orepresentation_oarchive_ocapsule_oCapsuleError
     n_tropoi_orepresentation_oarchive_ocapsule_oopen__simulation -->|instantiate| n_tropoi_orepresentation_oarchive_ocapsule_oCapsuleStorage
     n_tropoi_orepresentation_oarchive_ocapsule_oopen__simulation --> n_tropoi_orepresentation_oarchive_ocapsule_oresolve__run__directory
+    n_tropoi_orepresentation_oarchive_ocapsule_oopen__simulation -->|instantiate| n_tropoi_orepresentation_oarchive_oheld__suarez_oHeldSuarezStorage
+    n_tropoi_orepresentation_oarchive_ocapsule_oopen__simulation --> n_tropoi_orepresentation_oarchive_oheld__suarez_ois__held__suarez__experiment
+    n_tropoi_orepresentation_oarchive_ocapsule_oopen__simulation --> n_tropoi_orepresentation_oarchive_oheld__suarez_ostatistics__only__description
     n_tropoi_orepresentation_oarchive_ocapsule_oopen__simulation -->|instantiate| n_tropoi_otemporal_osimulation_oSimulation
     n_tropoi_orepresentation_oarchive_ocapsule_oresolve__run__directory -->|instantiate| n_tropoi_orepresentation_oarchive_ocapsule_oCapsuleError
+    n_tropoi_orepresentation_oarchive_oheld__suarez_oHeldSuarezStorage -->|__init__| n_tropoi_orepresentation_oarchive_oheld__suarez_oHeldSuarezStorage_o____init____
+    n_tropoi_orepresentation_oarchive_oheld__suarez_oHeldSuarezStorage_o____init____ --> n_tropoi_orepresentation_oarchive_oheld__suarez_o__experiment__config
+    n_tropoi_orepresentation_oarchive_oheld__suarez_oHeldSuarezStorage_o____init____ --> n_tropoi_orepresentation_oarchive_oheld__suarez_o__read__config
+    n_tropoi_orepresentation_oarchive_oheld__suarez_oHeldSuarezStorage_o____init____ -->|instantiate| n_tropoi_orepresentation_oarchive_oschema_oSchemaError
+    n_tropoi_orepresentation_oarchive_oheld__suarez_oHeldSuarezStorage_o____init____ --> n_tropoi_orepresentation_oarchive_oschema_ostate__schema__for
+    n_tropoi_orepresentation_oarchive_oheld__suarez_ois__held__suarez__experiment --> n_tropoi_orepresentation_oarchive_oheld__suarez_o__experiment__config
+    n_tropoi_orepresentation_oarchive_oheld__suarez_ois__held__suarez__experiment --> n_tropoi_orepresentation_oarchive_oheld__suarez_o__read__config
     n_tropoi_orepresentation_oarchive_oschema_oStateSchema_ofrom__manifest__dict -->|instantiate| n_tropoi_orepresentation_oarchive_oschema_oSchemaError
     n_tropoi_orepresentation_oarchive_oschema_oStateSchema_ofrom__manifest__dict -->|instantiate| n_tropoi_orepresentation_oarchive_oschema_oUnknownSchemaVersionError
     n_tropoi_orepresentation_oarchive_oschema_oStateSchema_ofrom__manifest__dict -->|instantiate| n_tropoi_orepresentation_oarchive_oschema_oUnsupportedConventionError
@@ -74,3 +93,4 @@ flowchart LR
     classDef truncated stroke-dasharray:4 3
     class n_tropoi_ocli_omain_o__cmd__inspect root
     class n_tropoi_orepresentation_oarchive_ocapsule_oCapsuleStorage_o____init____ truncated
+    class n_tropoi_orepresentation_oarchive_oheld__suarez_oHeldSuarezStorage_o____init____ truncated

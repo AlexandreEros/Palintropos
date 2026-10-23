@@ -2,6 +2,10 @@
 %% All classes defined in package tropoi.representation.visual.
 classDiagram
     direction LR
+    class c_tropoi_orepresentation_ovisual_oatmosphere_oAtmosphereViewWarning["AtmosphereViewWarning (representation.visual.atmosphere)"]
+    c_tropoi_orepresentation_ovisual_oatmosphere_oAtmosphereViewWarning : external base UserWarning
+    class c_tropoi_orepresentation_ovisual_oatmosphere_oPayloadTooLargeError["PayloadTooLargeError (representation.visual.atmosphere)"]
+    c_tropoi_orepresentation_ovisual_oatmosphere_oPayloadTooLargeError : external base ValueError
     class c_tropoi_orepresentation_ovisual_oevaluate_oDisplayVectors["DisplayVectors (representation.visual.evaluate)"]
     class c_tropoi_orepresentation_ovisual_oevaluate_oRunFields["RunFields (representation.visual.evaluate)"]
     c_tropoi_orepresentation_ovisual_oevaluate_oRunFields : +#95;#95;init#95;#95;()
@@ -163,6 +167,9 @@ classDiagram
     class c_tropoi_orepresentation_ovisual_ospecs_oVectorLayer["VectorLayer (representation.visual.specs)"]
     c_tropoi_orepresentation_ovisual_ospecs_oVectorLayer : +#95;#95;post#95;init#95;#95;()
     c_tropoi_orepresentation_ovisual_ospecs_oVectorLayer : +speed
+    class c_tropoi_orepresentation_ovisual_osphere__streamlines_o__MeshSampler["_MeshSampler (representation.visual.sphere_streamlines)"]
+    c_tropoi_orepresentation_ovisual_osphere__streamlines_o__MeshSampler : +#95;#95;call#95;#95;()
+    c_tropoi_orepresentation_ovisual_osphere__streamlines_o__MeshSampler : +#95;#95;init#95;#95;()
     class c_tropoi_orepresentation_ovisual_oterrain_oTerrainPreview["TerrainPreview (representation.visual.terrain)"]
     c_tropoi_orepresentation_ovisual_oterrain_oTerrainPreview : +highest#95;point()
     c_tropoi_orepresentation_ovisual_oterrain_oTerrainPreview : +resolution#95;deg

@@ -16,6 +16,7 @@ classDiagram
     c_tropoi_orepresentation_oarchive_ocapsule_oCapsuleStorage : +frame#95;count
     c_tropoi_orepresentation_oarchive_ocapsule_oCapsuleStorage : +level#95;values
     c_tropoi_orepresentation_oarchive_ocapsule_oCapsuleStorage : +metadata
+    c_tropoi_orepresentation_oarchive_ocapsule_oCapsuleStorage : +pe#95;context()
     c_tropoi_orepresentation_oarchive_ocapsule_oCapsuleStorage : +plot#95;simulation()
     c_tropoi_orepresentation_oarchive_ocapsule_oCapsuleStorage : +plot#95;snapshot()
     c_tropoi_orepresentation_oarchive_ocapsule_oCapsuleStorage : +quantities()
@@ -26,6 +27,30 @@ classDiagram
     c_tropoi_orepresentation_oarchive_ocapsule_oCapsuleStorage : +stored#95;array()
     c_tropoi_orepresentation_oarchive_ocapsule_oCapsuleStorage : +time#95;provenance
     c_tropoi_orepresentation_oarchive_ocapsule_oCapsuleStorage : +times
+    c_tropoi_orepresentation_oarchive_ocapsule_oCapsuleStorage : +view()
+    class c_tropoi_orepresentation_oarchive_oheld__suarez_oHeldSuarezPlotError["HeldSuarezPlotError (representation.archive.held_suarez)"]
+    c_tropoi_orepresentation_oarchive_oheld__suarez_oHeldSuarezPlotError : external base RuntimeError
+    class c_tropoi_orepresentation_oarchive_oheld__suarez_oHeldSuarezStorage["HeldSuarezStorage (representation.archive.held_suarez)"]
+    c_tropoi_orepresentation_oarchive_oheld__suarez_oHeldSuarezStorage : +#95;#95;init#95;#95;()
+    c_tropoi_orepresentation_oarchive_oheld__suarez_oHeldSuarezStorage : +#95;#95;repr#95;#95;()
+    c_tropoi_orepresentation_oarchive_oheld__suarez_oHeldSuarezStorage : +#95;scan#95;states()
+    c_tropoi_orepresentation_oarchive_oheld__suarez_oHeldSuarezStorage : +days
+    c_tropoi_orepresentation_oarchive_oheld__suarez_oHeldSuarezStorage : +field#95;specs
+    c_tropoi_orepresentation_oarchive_oheld__suarez_oHeldSuarezStorage : +frame()
+    c_tropoi_orepresentation_oarchive_oheld__suarez_oHeldSuarezStorage : +frame#95;count
+    c_tropoi_orepresentation_oarchive_oheld__suarez_oHeldSuarezStorage : +level#95;values
+    c_tropoi_orepresentation_oarchive_oheld__suarez_oHeldSuarezStorage : +metadata
+    c_tropoi_orepresentation_oarchive_oheld__suarez_oHeldSuarezStorage : +pe#95;context()
+    c_tropoi_orepresentation_oarchive_oheld__suarez_oHeldSuarezStorage : +plot#95;simulation()
+    c_tropoi_orepresentation_oarchive_oheld__suarez_oHeldSuarezStorage : +plot#95;snapshot()
+    c_tropoi_orepresentation_oarchive_oheld__suarez_oHeldSuarezStorage : +quantities()
+    c_tropoi_orepresentation_oarchive_oheld__suarez_oHeldSuarezStorage : +run#95;config
+    c_tropoi_orepresentation_oarchive_oheld__suarez_oHeldSuarezStorage : +schema
+    c_tropoi_orepresentation_oarchive_oheld__suarez_oHeldSuarezStorage : +state#95;path()
+    c_tropoi_orepresentation_oarchive_oheld__suarez_oHeldSuarezStorage : +times
+    c_tropoi_orepresentation_oarchive_oheld__suarez_oHeldSuarezStorage : +view()
+    class c_tropoi_orepresentation_oarchive_oheld__suarez_oNoSnapshotsError["NoSnapshotsError (representation.archive.held_suarez)"]
+    c_tropoi_orepresentation_oarchive_oheld__suarez_oNoSnapshotsError : external base ValueError
     class c_tropoi_orepresentation_oarchive_oinitial__state_oInitialState["InitialState (representation.archive.initial_state)"]
     c_tropoi_orepresentation_oarchive_oinitial__state_oInitialState : +#95;#95;post#95;init#95;#95;()
     c_tropoi_orepresentation_oarchive_oinitial__state_oInitialState : +#95;#95;repr#95;#95;()
@@ -43,6 +68,17 @@ classDiagram
     c_tropoi_orepresentation_oarchive_oinitial__state_oInitialState : +validate()
     class c_tropoi_orepresentation_oarchive_oinitial__state_oInitialStateError["InitialStateError (representation.archive.initial_state)"]
     c_tropoi_orepresentation_oarchive_oinitial__state_oInitialStateError : external base ValueError
+    class c_tropoi_orepresentation_oarchive_ope__context_oPEColumnContext["PEColumnContext (representation.archive.pe_context)"]
+    c_tropoi_orepresentation_oarchive_ope__context_oPEColumnContext : +#95;#95;post#95;init#95;#95;()
+    c_tropoi_orepresentation_oarchive_ope__context_oPEColumnContext : +full#95;levels
+    c_tropoi_orepresentation_oarchive_ope__context_oPEColumnContext : +is#95;flat
+    c_tropoi_orepresentation_oarchive_ope__context_oPEColumnContext : +nlev
+    c_tropoi_orepresentation_oarchive_ope__context_oPEColumnContext : +pressure#95;convention
+    c_tropoi_orepresentation_oarchive_ope__context_oPEColumnContext : +sigma
+    c_tropoi_orepresentation_oarchive_ope__context_oPEColumnContext : +surface#95;geopotential#95;lm()
+    c_tropoi_orepresentation_oarchive_ope__context_oPEColumnContext : +with#95;gravity()
+    class c_tropoi_orepresentation_oarchive_ope__context_oPEContextError["PEContextError (representation.archive.pe_context)"]
+    c_tropoi_orepresentation_oarchive_ope__context_oPEContextError : external base ValueError
     class c_tropoi_orepresentation_oarchive_oprepared__terrain_oPreparedTerrainError["PreparedTerrainError (representation.archive.prepared_terrain)"]
     class c_tropoi_orepresentation_oarchive_oprepared__terrain_oSavedTerrain["SavedTerrain (representation.archive.prepared_terrain)"]
     c_tropoi_orepresentation_oarchive_oprepared__terrain_oSavedTerrain : +#95;#95;post#95;init#95;#95;()

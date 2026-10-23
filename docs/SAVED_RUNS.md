@@ -311,6 +311,27 @@ object, as the README figure's recipe does
 `tests/test_readme_figure_recipe.py`), so that a later change of a default
 cannot alter them silently.
 
+## The 3-D atmosphere view: `Simulation.view`
+
+For primitive-equation runs, `sim.view()` writes one self-contained HTML
+page. It shows the terrain globe and a translucent native σ surface at its
+hydrostatic geopotential height, with sliders over saved times, levels,
+exaggeration and opacity, four fields and optional horizontal streamlines.
+It runs on the CPU from the saved coefficients and writes nothing into the
+run.
+
+```python
+sim.view()                                   # temp dir, opens the browser
+sim.view("hs.html", times=[0, -1], levels=[0, 10, 19], open_browser=False)
+sim[-1].view("last.html")                    # one saved state
+```
+
+`open_simulation` also opens a Held–Suarez experiment directory
+(`config.json` + `states/state-d*.npy`, `t = day × 86400 s`) as a PE
+simulation for this purpose. Such experiments have no snapshot figure
+product, so `plot` refuses them. The geometry, the snapshot requirements and
+the size bounds are in [ATMOSPHERE_VIEW.md](ATMOSPHERE_VIEW.md).
+
 ## Runs started from a saved initial state
 
 Runs made with `tropoi.run.custom.run_initial_state`
@@ -336,6 +357,8 @@ layout ([ARCHITECTURE.md](ARCHITECTURE.md), "Package layout"):
 | `Simulation`, `Snapshot`, the `SnapshotStorage` protocol | `tropoi.temporal.simulation` | CPU |
 | `FieldSpec`, `SpectralModes`, `SpectralState` host views | `tropoi.spatial.modes` | CPU |
 | `Snapshot.plot` adapter (no view) | `tropoi.representation.visual.snapshot` | per the table above |
+| Held–Suarez experiment directories | `tropoi.representation.archive.held_suarez` | CPU |
+| `Simulation.view` (3-D atmosphere page) | `tropoi.representation.{archive.pe_context, diagnostics.pe_levels, visual.atmosphere, visual.sphere_streamlines}` | CPU |
 | view objects | `tropoi.representation.visual.views` | CPU |
 | quantity catalogue | `tropoi.representation.visual.quantities` | CPU |
 | field evaluation and caching | `tropoi.representation.visual.evaluate` | CUDA for fields |

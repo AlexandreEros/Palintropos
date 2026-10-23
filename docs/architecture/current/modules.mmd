@@ -7,9 +7,9 @@ flowchart LR
     n_tropoi_onumerics_ocuda["numerics.cuda (1 module)"]
     n_tropoi_ophysics["physics (5 modules)"]
     n_tropoi_oplanet["planet (6 modules)"]
-    n_tropoi_orepresentation_oarchive["representation.archive (6 modules)"]
-    n_tropoi_orepresentation_odiagnostics["representation.diagnostics (4 modules)"]
-    n_tropoi_orepresentation_ovisual["representation.visual (21 modules)"]
+    n_tropoi_orepresentation_oarchive["representation.archive (8 modules)"]
+    n_tropoi_orepresentation_odiagnostics["representation.diagnostics (5 modules)"]
+    n_tropoi_orepresentation_ovisual["representation.visual (23 modules)"]
     n_tropoi_orun["run (1 module)"]
     n_tropoi_orun_obve["run.bve (8 modules)"]
     n_tropoi_orun_ocustom["run.custom (6 modules)"]
@@ -48,15 +48,16 @@ flowchart LR
     n_tropoi_oplanet -->|5| n_tropoi
     n_tropoi_oplanet -->|2| n_tropoi_ospatial
     n_tropoi_oplanet -->|1| n_tropoi_ospatial_oterrain
-    n_tropoi_orepresentation_oarchive -->|3| n_tropoi_orepresentation_ovisual
+    n_tropoi_orepresentation_oarchive -->|5| n_tropoi_orepresentation_ovisual
     n_tropoi_orepresentation_oarchive -->|1| n_tropoi_orun_obve
-    n_tropoi_orepresentation_oarchive -->|7| n_tropoi_ospatial
+    n_tropoi_orepresentation_oarchive -->|10| n_tropoi_ospatial
     n_tropoi_orepresentation_oarchive -->|1| n_tropoi_otemporal
-    n_tropoi_orepresentation_odiagnostics -->|1| n_tropoi_ospatial
+    n_tropoi_orepresentation_odiagnostics -->|2| n_tropoi_ospatial
+    n_tropoi_orepresentation_odiagnostics -->|1| n_tropoi_ospatial_otransforms
     n_tropoi_orepresentation_odiagnostics -->|2| n_tropoi_otemporal_otendencies
     n_tropoi_orepresentation_ovisual -->|3| n_tropoi_ocli
-    n_tropoi_orepresentation_ovisual -->|2| n_tropoi_orepresentation_oarchive
-    n_tropoi_orepresentation_ovisual -->|3| n_tropoi_orepresentation_odiagnostics
+    n_tropoi_orepresentation_ovisual -->|3| n_tropoi_orepresentation_oarchive
+    n_tropoi_orepresentation_ovisual -->|4| n_tropoi_orepresentation_odiagnostics
     n_tropoi_orepresentation_ovisual -->|5| n_tropoi_ospatial
     n_tropoi_orepresentation_ovisual -->|9| n_tropoi_ospatial_ogrids
     n_tropoi_orepresentation_ovisual -->|1| n_tropoi_ospatial_ooperators

@@ -238,6 +238,24 @@ sim[-1].plot("flow.png", Map(None, vectors=StreamfunctionContours()))  # streaml
 sim.quantities()                             # what this run can draw: meaning, units, cadence
 ```
 
+**Look at a PE atmosphere in 3D.** `sim.view()` writes one self-contained HTML
+page that opens offline. It shows the terrain globe and a translucent native σ
+surface placed at its hydrostatic geopotential height, coloured by temperature,
+pressure, vorticity or divergence, with optional horizontal streamlines and
+sliders over saved times, levels, exaggeration and opacity. It runs on the CPU
+and also opens Held–Suarez experiment directories:
+
+```python
+sim = open_simulation("runs/hs-T42L20-prod-002")
+sim.view("hs.html", times=[0, -1], levels=[0, 10, 19])
+```
+
+![Held–Suarez day 1200: relative vorticity on native level 6 of 20 (σ = 0.275) drawn as a translucent surface at its geopotential height, with instantaneous streamlines over a breaking jet](docs/validation/atmosphere_view_2026-10-23/held_suarez_vorticity_sigma0275.png)
+
+*Held–Suarez run 002 at day 1200: relative vorticity on σ = 0.275 (8.8–10.0 km),
+×20, in the exported page (browser capture). See
+[docs/ATMOSPHERE_VIEW.md](docs/ATMOSPHERE_VIEW.md).*
+
 ```powershell
 tropoi plot runs                                            # -> <latest run>/assets/overview.png
 tropoi plot runs --list-quantities                          # no GPU needed
@@ -400,6 +418,8 @@ Details: [KNOWN_LIMITATIONS.md](docs/KNOWN_LIMITATIONS.md) and
 - [ARCHITECTURE.md](docs/ARCHITECTURE.md): package layout, grids, transform
   flow, run directories, CPU/GPU boundaries, and tests.
 - [SAVED_RUNS.md](docs/SAVED_RUNS.md): the read-only saved-run interface.
+- [ATMOSPHERE_VIEW.md](docs/ATMOSPHERE_VIEW.md): the 3-D atmosphere page of a
+  saved PE run: geometry, snapshot requirements, size bounds.
 - [SHALLOW_WATER.md](docs/SHALLOW_WATER.md),
   [PRIMITIVE_EQUATIONS_DESIGN.md](docs/PRIMITIVE_EQUATIONS_DESIGN.md),
   [PRIMITIVE_EQUATIONS_RUNNER.md](docs/PRIMITIVE_EQUATIONS_RUNNER.md), and

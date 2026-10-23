@@ -425,6 +425,20 @@ class CapsuleStorage:
         return render_view(self, view, output_path, snapshot=snapshot,
                            sidecar=sidecar, renderer=renderer)
 
+    def pe_context(self, *, allow_cuda: bool = False):
+        """Constants, sigma levels and terrain of a PE capsule (host).
+
+        See :func:`~tropoi.representation.archive.pe_context.pe_capsule_context`.
+        """
+        from tropoi.representation.archive.pe_context import (
+            pe_capsule_context)
+        return pe_capsule_context(self, allow_cuda=allow_cuda)
+
+    def view(self, path=None, **options) -> pathlib.Path:
+        """Write the 3-D atmosphere page (PE runs); see ``Simulation.view``."""
+        from tropoi.representation.visual.atmosphere import view_atmosphere
+        return view_atmosphere(self, path, **options)
+
     def quantities(self) -> list[dict]:
         from tropoi.representation.visual.quantities import (
             available_quantities)
@@ -443,13 +457,29 @@ class CapsuleStorage:
 
 
 def open_simulation(run_path, *, mmap: bool = True) -> Simulation:
-    """Open a saved BVE, SWE, or PE run capsule as a read-only Simulation.
+    """Open a saved run as a read-only Simulation.
 
-    ``run_path`` is a run directory (or a base directory with
-    ``latest_run.txt``). Coefficients are memory-mapped read-only
-    (``mmap=False`` loads them into host memory instead, still read-only).
-    Opening validates metadata, array headers/layout/dtype, and the time
-    axis; it never reads coefficient values or initializes CUDA.
+    ``run_path`` is a BVE, SWE, or PE run capsule (or a base directory with
+    ``latest_run.txt``), or a Held–Suarez experiment directory, whose
+    ``states/state-d*.npy`` become the PE snapshots
+    (``representation.archive.held_suarez``). Coefficients are memory-mapped
+    read-only (``mmap=False`` loads them into host memory instead, still
+    read-only). Opening validates metadata, array headers/layout/dtype, and
+    the time axis; it never reads coefficient values or initializes CUDA.
     """
-    run_dir = resolve_run_directory(run_path)
+    from tropoi.representation.archive.held_suarez import (
+        HeldSuarezStorage, is_held_suarez_experiment,
+        statistics_only_description)
+
+    path = pathlib.Path(run_path)
+    if path.is_dir() and is_held_suarez_experiment(path):
+        return Simulation(HeldSuarezStorage(path, mmap=mmap))
+    try:
+        run_dir = resolve_run_directory(run_path)
+    except CapsuleError as err:
+        reason = (statistics_only_description(path) if path.is_dir()
+                  else None)
+        if reason is not None:
+            raise CapsuleError(reason) from err
+        raise
     return Simulation(CapsuleStorage(run_dir, mmap=mmap))

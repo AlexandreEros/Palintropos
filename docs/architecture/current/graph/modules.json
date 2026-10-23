@@ -804,10 +804,34 @@
     {
       "kind": "imports",
       "scopes": [
+        "function"
+      ],
+      "source": "tropoi.representation.archive.capsule",
+      "target": "tropoi.representation.archive.held_suarez"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.representation.archive.capsule",
+      "target": "tropoi.representation.archive.pe_context"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
         "module"
       ],
       "source": "tropoi.representation.archive.capsule",
       "target": "tropoi.representation.archive.schema"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.representation.archive.capsule",
+      "target": "tropoi.representation.visual.atmosphere"
     },
     {
       "kind": "imports",
@@ -854,6 +878,38 @@
       "scopes": [
         "module"
       ],
+      "source": "tropoi.representation.archive.held_suarez",
+      "target": "tropoi.representation.archive.pe_context"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.representation.archive.held_suarez",
+      "target": "tropoi.representation.archive.schema"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.representation.archive.held_suarez",
+      "target": "tropoi.representation.visual.atmosphere"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.representation.archive.held_suarez",
+      "target": "tropoi.spatial.modes"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
       "source": "tropoi.representation.archive.initial_state",
       "target": "tropoi.representation.archive.schema"
     },
@@ -872,6 +928,30 @@
       ],
       "source": "tropoi.representation.archive.initial_state",
       "target": "tropoi.spatial.specification"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.representation.archive.pe_context",
+      "target": "tropoi.representation.archive.prepared_terrain"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.representation.archive.pe_context",
+      "target": "tropoi.spatial.environment"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.representation.archive.pe_context",
+      "target": "tropoi.spatial.sigma_coordinate"
     },
     {
       "kind": "imports",
@@ -942,6 +1022,22 @@
       "scopes": [
         "module"
       ],
+      "source": "tropoi.representation.diagnostics.pe_levels",
+      "target": "tropoi.spatial.sigma_coordinate"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.representation.diagnostics.pe_levels",
+      "target": "tropoi.spatial.transforms.host_synthesis"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
       "source": "tropoi.representation.diagnostics.swe",
       "target": "tropoi.representation.diagnostics.bve"
     },
@@ -952,6 +1048,39 @@
       ],
       "source": "tropoi.representation.diagnostics.swe",
       "target": "tropoi.temporal.tendencies.shallow_water"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.representation.visual.atmosphere",
+      "target": "tropoi.representation.archive.held_suarez"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.representation.visual.atmosphere",
+      "target": "tropoi.representation.diagnostics.pe_levels"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.representation.visual.atmosphere",
+      "target": "tropoi.representation.visual.sphere_streamlines"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function",
+        "module"
+      ],
+      "source": "tropoi.representation.visual.atmosphere",
+      "target": "tropoi.representation.visual.terrain"
     },
     {
       "kind": "imports",
@@ -3550,6 +3679,25 @@
     {
       "category": "code",
       "dynamic_import_calls": 0,
+      "id": "tropoi.representation.archive.held_suarez",
+      "is_package": false,
+      "path": "tropoi/representation/archive/held_suarez.py",
+      "stdlib_imports": [
+        "__future__",
+        "collections",
+        "dataclasses",
+        "json",
+        "pathlib",
+        "re",
+        "typing"
+      ],
+      "third_party_imports": [
+        "numpy"
+      ]
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
       "id": "tropoi.representation.archive.initial_state",
       "is_package": false,
       "path": "tropoi/representation/archive/initial_state.py",
@@ -3569,6 +3717,23 @@
         "typing",
         "uuid",
         "warnings"
+      ],
+      "third_party_imports": [
+        "numpy"
+      ]
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.representation.archive.pe_context",
+      "is_package": false,
+      "path": "tropoi/representation/archive/pe_context.py",
+      "stdlib_imports": [
+        "__future__",
+        "collections",
+        "dataclasses",
+        "math",
+        "pathlib"
       ],
       "third_party_imports": [
         "numpy"
@@ -3675,6 +3840,21 @@
     {
       "category": "code",
       "dynamic_import_calls": 0,
+      "id": "tropoi.representation.diagnostics.pe_levels",
+      "is_package": false,
+      "path": "tropoi/representation/diagnostics/pe_levels.py",
+      "stdlib_imports": [
+        "__future__",
+        "collections",
+        "dataclasses"
+      ],
+      "third_party_imports": [
+        "numpy"
+      ]
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
       "id": "tropoi.representation.diagnostics.spectral",
       "is_package": false,
       "path": "tropoi/representation/diagnostics/spectral.py",
@@ -3700,6 +3880,27 @@
       "third_party_imports": [
         "cupy",
         "matplotlib",
+        "numpy"
+      ]
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.representation.visual.atmosphere",
+      "is_package": false,
+      "path": "tropoi/representation/visual/atmosphere.py",
+      "stdlib_imports": [
+        "__future__",
+        "base64",
+        "hashlib",
+        "math",
+        "pathlib",
+        "re",
+        "tempfile",
+        "warnings",
+        "webbrowser"
+      ],
+      "third_party_imports": [
         "numpy"
       ]
     },
@@ -3941,6 +4142,20 @@
         "enum",
         "math",
         "typing"
+      ],
+      "third_party_imports": [
+        "numpy"
+      ]
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.representation.visual.sphere_streamlines",
+      "is_package": false,
+      "path": "tropoi/representation/visual/sphere_streamlines.py",
+      "stdlib_imports": [
+        "__future__",
+        "math"
       ],
       "third_party_imports": [
         "numpy"
