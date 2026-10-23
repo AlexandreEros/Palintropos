@@ -35,7 +35,9 @@ with that slice's own min/max (display quantization, at most
 (max - min)/131070 per value). The payload is estimated BEFORE anything is
 reconstructed. With ``times=None`` as many evenly spaced saved states as fit
 ``max_mb`` are exported (first and last always included) and a warning
-names the subsampling; an explicit selection that does not fit raises.
+names the subsampling; if not even the endpoints fit (or, for a
+single-snapshot run, its one state), the export raises. An explicit
+selection that does not fit raises too.
 
 Display resolution (``resolution_deg``) is a property of the page only, not
 of the run: fields are evaluated exactly from the saved coefficients on that
@@ -180,6 +182,7 @@ def _select_times(times, count: int, requested, budget, per_time: int,
                   fixed: int) -> tuple[list[int], str | None]:
     if count == 0:
         raise ValueError("no saved snapshots")
+    note = None
     if isinstance(requested, str):
         if requested != "all":
             raise ValueError(f"times must be None, 'all' or saved indices, "
@@ -187,17 +190,36 @@ def _select_times(times, count: int, requested, budget, per_time: int,
         chosen = list(range(count))
     elif requested is None:
         if budget is None:
-            fit = count
-        else:
-            fit = max(1, int((budget - fixed) // per_time))
+            return list(range(count)), None
+        # The automatic contract: every state when they all fit, otherwise
+        # evenly spaced states that always include the first and the last.
+        # The minimum is therefore one state for a single-snapshot run and
+        # two (both endpoints) otherwise; below that the export is refused
+        # here, before any field is reconstructed.
+        minimum = 1 if count == 1 else 2
+        fit = int((budget - fixed) // per_time)
+        if fit < minimum:
+            if count == 1:
+                what, single = "the single saved state", ""
+            else:
+                what = f"the first and last of {count} saved states"
+                single = (", or pass an explicit times=[i] if one state "
+                          "is what you want")
+            raise PayloadTooLargeError(
+                f"{what} would embed about "
+                f"{(fixed + per_time * minimum) / 1e6:.3g} MB, above the "
+                f"{budget / 1e6:.3g} MB bound (max_mb). Choose fewer levels "
+                "or a coarser resolution_deg, or raise max_mb (max_mb=None "
+                f"removes the bound){single}")
         if fit >= count:
             return list(range(count)), None
+        # 2 <= fit < count: distinct indices, 0 and count - 1 included
         chosen = sorted({int(round(x)) for x in
-                         np.linspace(0, count - 1, max(fit, 1))})
+                         np.linspace(0, count - 1, fit)})
         days = ", ".join(f"{times[i] / 86400:g}" for i in chosen)
-        return chosen, (
+        note = (
             f"exported {len(chosen)} of {count} saved states, evenly "
-            f"subsampled to fit the {budget / 1e6:.0f} MB payload bound "
+            f"subsampled to fit the {budget / 1e6:.3g} MB payload bound "
             f"(saved indices {chosen}; days {days}). Pass times='all', a "
             "list of saved indices, fewer levels, a coarser resolution_deg "
             "or a larger max_mb to choose otherwise")
@@ -215,14 +237,15 @@ def _select_times(times, count: int, requested, budget, per_time: int,
         if len(set(chosen)) != len(chosen):
             raise ValueError(f"repeated saved indices {list(requested)}")
         chosen.sort()
+    # Every path (automatic, 'all', explicit) passes this guard.
     if budget is not None and fixed + per_time * len(chosen) > budget:
         raise PayloadTooLargeError(
             f"{len(chosen)} saved states would embed about "
-            f"{(fixed + per_time * len(chosen)) / 1e6:.0f} MB, above the "
-            f"{budget / 1e6:.0f} MB bound (max_mb). Choose fewer times or "
+            f"{(fixed + per_time * len(chosen)) / 1e6:.3g} MB, above the "
+            f"{budget / 1e6:.3g} MB bound (max_mb). Choose fewer times or "
             "levels, a coarser resolution_deg, or raise max_mb (max_mb=None "
             "removes the bound)")
-    return chosen, None
+    return chosen, note
 
 
 def _levels(levels, nlev: int) -> list[int]:

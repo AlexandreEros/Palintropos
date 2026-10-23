@@ -201,8 +201,12 @@ height, 2 bytes each) and its streamlines. The bound is estimated **before**
 anything is reconstructed. With `times=None` the export takes as many evenly
 spaced saved states as fit `max_mb`. It always includes the first and the last,
 and it issues a warning (`AtmosphereViewWarning`) naming the saved indices and
-days. The page shows the same note. An explicit selection that does not fit
-raises `PayloadTooLargeError` instead of being cut silently.
+days. The page shows the same note. If not even the first and the last fit
+(for a single-snapshot run, its one state), the automatic selection raises
+`PayloadTooLargeError` before anything is reconstructed; pass an explicit
+`times=[i]` if one state of a longer run is what you want. An explicit
+selection that does not fit raises `PayloadTooLargeError` too, instead of
+being cut silently.
 
 Measured on this machine (MX110 laptop, CPU path):
 

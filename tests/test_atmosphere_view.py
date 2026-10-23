@@ -656,6 +656,74 @@ def test_default_subsampling_is_announced_and_explicit_overflow_refused(
     assert [lv["number"] for lv in page["atmosphere"]["levels"]] == [1, 5]
 
 
+SEL_FIXED, SEL_PER_TIME = 200_000, 1_000_000      # simple byte costs
+SEL_TIMES3 = np.array([0.0, 86400.0, 172800.0])
+
+
+@pytest.mark.parametrize("count, budget", [
+    (3, 600_000),             # no state fits at all
+    (3, 1_500_000),           # one fits, but the endpoints need two
+    (1, 600_000),             # single-snapshot run, its one state too big
+])
+def test_automatic_selection_refuses_budgets_below_its_minimum(count, budget):
+    from tropoi.representation.visual.atmosphere import (
+        PayloadTooLargeError, _select_times)
+
+    with pytest.raises(PayloadTooLargeError, match="max_mb"):
+        _select_times(SEL_TIMES3[:count], count, None, budget, SEL_PER_TIME,
+                      SEL_FIXED)
+
+
+@pytest.mark.parametrize("count, budget, expected", [
+    (1, SEL_FIXED + SEL_PER_TIME, [0]),              # exact fit, one state
+    (3, SEL_FIXED + 2 * SEL_PER_TIME, [0, 2]),       # exact fit, endpoints
+    (3, SEL_FIXED + 3 * SEL_PER_TIME, [0, 1, 2]),    # exact fit, all
+])
+def test_automatic_selection_accepts_exact_fits(count, budget, expected):
+    from tropoi.representation.visual.atmosphere import _select_times
+
+    chosen, note = _select_times(SEL_TIMES3[:count], count, None, budget,
+                                 SEL_PER_TIME, SEL_FIXED)
+    assert chosen == expected
+    assert SEL_FIXED + SEL_PER_TIME * len(chosen) <= budget
+    assert (note is None) == (len(chosen) == count)
+
+
+def test_automatic_selection_keeps_unbounded_and_explicit_single_state():
+    from tropoi.representation.visual.atmosphere import _select_times
+
+    assert _select_times(SEL_TIMES3, 3, None, None, SEL_PER_TIME,
+                         SEL_FIXED) == ([0, 1, 2], None)
+    # one state of a longer run stays available, explicitly
+    assert _select_times(SEL_TIMES3, 3, [-1], 1_500_000, SEL_PER_TIME,
+                         SEL_FIXED) == ([2], None)
+
+
+def test_automatic_export_refuses_a_budget_without_room_for_endpoints(
+        tmp_path):
+    from tropoi.representation.archive import open_simulation
+    from tropoi.representation.visual.atmosphere import (
+        PayloadTooLargeError, _terrain_bytes, atmosphere_payload,
+        estimate_payload_bytes)
+
+    per_time = estimate_payload_bytes(1, 5, 37, 73) - 200_000
+    fixed = 200_000 + _terrain_bytes(L_MAX)
+    budget_mb = (fixed + 1.5 * per_time) / 1e6       # one state fits
+    many, _ = write_hs_experiment(tmp_path / "many", days=(10, 20, 30))
+    with pytest.raises(PayloadTooLargeError, match="first and last of 3"):
+        atmosphere_payload(open_simulation(many).storage,
+                           resolution_deg=5.0, max_mb=budget_mb)
+    one, _ = write_hs_experiment(tmp_path / "one", days=(10,))
+    with pytest.raises(PayloadTooLargeError, match="single saved state"):
+        atmosphere_payload(open_simulation(one).storage, resolution_deg=5.0,
+                           max_mb=(fixed + 0.5 * per_time) / 1e6)
+    # the single state fits once the bound allows it
+    page, report = atmosphere_payload(open_simulation(one).storage,
+                                      resolution_deg=5.0, max_mb=budget_mb)
+    assert report["times"] == [0]
+    assert report["estimate_bytes"] <= budget_mb * 1e6
+
+
 def test_view_refuses_other_solvers_and_flat_runs_without_gravity(tmp_path):
     from tropoi.representation.archive import open_simulation
 
