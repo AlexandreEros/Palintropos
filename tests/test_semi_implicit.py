@@ -693,6 +693,7 @@ def test_linear_gravity_waves_follow_the_si_amplification_factor(nonrotating_mod
 
 
 @gpu
+@pytest.mark.slow
 def test_si_converges_second_order_to_rk4_on_t21_l10():
     """2-day T21 L10 thermal wave: SI at Δt, Δt/2, Δt/4 against an RK4
     reference; consecutive error ratios ≈ 4."""

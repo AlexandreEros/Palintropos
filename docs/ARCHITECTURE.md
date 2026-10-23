@@ -527,8 +527,41 @@ installs the runtime pins minus CuPy and the architecture-tool pins, then
 installs the package with `--no-deps` so CuPy is not pulled back in. CI
 therefore covers the host-only tests: configuration, CLI, run capsules,
 saved-run API, provenance, layout, and the architecture tool. It does not run
-the CUDA numerics (transforms, tendencies, runners, benchmarks). Run the full suite
-locally on a GPU before merging.
+the CUDA numerics (transforms, tendencies, runners, benchmarks).
+
+For routine changes, run the GPU regression suite with the long convergence
+checks excluded:
+
+```powershell
+python -m pytest -m "not slow"
+```
+
+Four two-day T21 L10 convergence tests carry the registered `slow`
+marker: the centred complete-scheme check in `test_centred_damping.py`, the
+two Held–Suarez convergence checks in `test_held_suarez_scheme.py`, and the
+semi-implicit thermal-wave check against RK4 in `test_semi_implicit.py`. Their numerical
+criteria, resolutions, timesteps and durations are unchanged. Other GPU
+tests, including short rest checks and the five-day stability checks, remain
+in the routine suite; this selection is not a fixed runtime guarantee.
+
+Run the long checks when changing their numerical dependencies (the PE
+tendencies, transforms, semi-implicit solver, startup, damping or RAW filter),
+and run the full suite before releases:
+
+```powershell
+python -m pytest -m slow -vv -s --durations=10
+python -m pytest
+```
+
+Bare `pytest` still selects everything; no default skip or exclusion is
+installed. CPU CI also keeps its full selection and naturally skips the
+CUDA tests. Changes confined to documentation, viewer presentation or
+unrelated interfaces do not require repeating long convergence experiments.
+Record the tested commit, environment and selection with each result; call
+a result "full suite" only when the full selection was actually run.
+
+The BVE coefficient-only import check runs in a fresh interpreter, so CuPy
+imports by earlier GPU tests cannot cause a false failure.
 
 A test that needs CuPy must skip without it, not fail:
 

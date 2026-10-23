@@ -355,8 +355,12 @@ should not be added together:
 | GitHub Actions ([`tests.yml`](.github/workflows/tests.yml)) | `ubuntu-latest`, Python 3.12, **no CuPy, no GPU**: only the CPU tests (configuration, CLI, run directories, saved-run API, provenance, layout) | 530 passed, 400 skipped (the tests that need CUDA skip themselves) |
 | Local, full suite | Windows, Python 3.12.12, CuPy 13.4.0, NVIDIA GeForce MX110 | 951 passed, 1 skipped (the opt-in 15-day Williamson-5 acceptance run, `TROPOI_W5_ACCEPTANCE=1`); took 9 min |
 
-GitHub CI **does not run** the CUDA numerics. The full suite runs locally on a
-GPU before each merge. See [ARCHITECTURE.md § Tests](docs/ARCHITECTURE.md#tests).
+GitHub CI **does not run** the CUDA numerics. For routine GPU regression,
+run `python -m pytest -m "not slow"`. Run the long convergence checks with
+`python -m pytest -m slow -vv -s --durations=10` when their numerical
+dependencies change, and the full suite (`python -m pytest`) before releases.
+Bare pytest still includes the long tests; tolerances are unchanged.
+See [ARCHITECTURE.md § Tests](docs/ARCHITECTURE.md#tests).
 
 ## Limitations
 

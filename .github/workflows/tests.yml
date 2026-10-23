@@ -2,9 +2,9 @@
 #
 # GitHub-hosted runners have no GPU, so CuPy is not installed: tests that need
 # CUDA skip themselves (pytest.importorskip / cupy.is_available() guards) and
-# everything that runs on the host is exercised. The full suite, including the
-# GPU tests, is still run locally before merging. See "Tests" in
-# docs/ARCHITECTURE.md.
+# everything that runs on the host is exercised. GPU regression and long
+# numerical validation run locally with the selections documented under
+# "Tests" in docs/ARCHITECTURE.md. CI does not exclude the slow marker.
 name: tests
 
 on:
