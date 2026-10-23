@@ -536,9 +536,10 @@ checks excluded:
 python -m pytest -m "not slow"
 ```
 
-Three two-day Held–Suarez convergence tests carry the registered `slow`
-marker: the centred complete-scheme check in `test_centred_damping.py` and
-the two convergence checks in `test_held_suarez_scheme.py`. Their numerical
+Four two-day T21 L10 convergence tests carry the registered `slow`
+marker: the centred complete-scheme check in `test_centred_damping.py`, the
+two Held–Suarez convergence checks in `test_held_suarez_scheme.py`, and the
+semi-implicit thermal-wave check against RK4 in `test_semi_implicit.py`. Their numerical
 criteria, resolutions, timesteps and durations are unchanged. Other GPU
 tests, including short rest checks and the five-day stability checks, remain
 in the routine suite; this selection is not a fixed runtime guarantee.
