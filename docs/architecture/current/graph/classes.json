@@ -138,6 +138,10 @@
         },
         {
           "kind": "method",
+          "name": "pe_context"
+        },
+        {
+          "kind": "method",
           "name": "plot_simulation"
         },
         {
@@ -175,10 +179,115 @@
         {
           "kind": "property",
           "name": "times"
+        },
+        {
+          "kind": "method",
+          "name": "view"
         }
       ],
       "module": "tropoi.representation.archive.capsule",
       "qualname": "CapsuleStorage"
+    },
+    {
+      "decorators": [],
+      "external_bases": [
+        "RuntimeError"
+      ],
+      "id": "tropoi.representation.archive.held_suarez.HeldSuarezPlotError",
+      "members": [],
+      "module": "tropoi.representation.archive.held_suarez",
+      "qualname": "HeldSuarezPlotError"
+    },
+    {
+      "decorators": [],
+      "external_bases": [],
+      "id": "tropoi.representation.archive.held_suarez.HeldSuarezStorage",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__init__"
+        },
+        {
+          "kind": "method",
+          "name": "__repr__"
+        },
+        {
+          "kind": "method",
+          "name": "_scan_states"
+        },
+        {
+          "kind": "property",
+          "name": "days"
+        },
+        {
+          "kind": "property",
+          "name": "field_specs"
+        },
+        {
+          "kind": "method",
+          "name": "frame"
+        },
+        {
+          "kind": "property",
+          "name": "frame_count"
+        },
+        {
+          "kind": "property",
+          "name": "level_values"
+        },
+        {
+          "kind": "property",
+          "name": "metadata"
+        },
+        {
+          "kind": "method",
+          "name": "pe_context"
+        },
+        {
+          "kind": "method",
+          "name": "plot_simulation"
+        },
+        {
+          "kind": "method",
+          "name": "plot_snapshot"
+        },
+        {
+          "kind": "method",
+          "name": "quantities"
+        },
+        {
+          "kind": "property",
+          "name": "run_config"
+        },
+        {
+          "kind": "property",
+          "name": "schema"
+        },
+        {
+          "kind": "method",
+          "name": "state_path"
+        },
+        {
+          "kind": "property",
+          "name": "times"
+        },
+        {
+          "kind": "method",
+          "name": "view"
+        }
+      ],
+      "module": "tropoi.representation.archive.held_suarez",
+      "qualname": "HeldSuarezStorage"
+    },
+    {
+      "decorators": [],
+      "external_bases": [
+        "ValueError"
+      ],
+      "id": "tropoi.representation.archive.held_suarez.NoSnapshotsError",
+      "members": [],
+      "module": "tropoi.representation.archive.held_suarez",
+      "qualname": "NoSnapshotsError"
     },
     {
       "decorators": [
@@ -256,6 +365,59 @@
       "members": [],
       "module": "tropoi.representation.archive.initial_state",
       "qualname": "InitialStateError"
+    },
+    {
+      "decorators": [
+        "dataclass(frozen=True, eq=False)"
+      ],
+      "external_bases": [],
+      "id": "tropoi.representation.archive.pe_context.PEColumnContext",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__post_init__"
+        },
+        {
+          "kind": "property",
+          "name": "full_levels"
+        },
+        {
+          "kind": "property",
+          "name": "is_flat"
+        },
+        {
+          "kind": "property",
+          "name": "nlev"
+        },
+        {
+          "kind": "property",
+          "name": "pressure_convention"
+        },
+        {
+          "kind": "property",
+          "name": "sigma"
+        },
+        {
+          "kind": "method",
+          "name": "surface_geopotential_lm"
+        },
+        {
+          "kind": "method",
+          "name": "with_gravity"
+        }
+      ],
+      "module": "tropoi.representation.archive.pe_context",
+      "qualname": "PEColumnContext"
+    },
+    {
+      "decorators": [],
+      "external_bases": [
+        "ValueError"
+      ],
+      "id": "tropoi.representation.archive.pe_context.PEContextError",
+      "members": [],
+      "module": "tropoi.representation.archive.pe_context",
+      "qualname": "PEContextError"
     },
     {
       "decorators": [],
@@ -470,6 +632,21 @@
     },
     {
       "decorators": [
+        "dataclass(frozen=True, eq=False)"
+      ],
+      "external_bases": [],
+      "id": "tropoi.representation.diagnostics.pe_levels.LevelFields",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__getitem__"
+        }
+      ],
+      "module": "tropoi.representation.diagnostics.pe_levels",
+      "qualname": "LevelFields"
+    },
+    {
+      "decorators": [
         "dataclass(frozen=True)"
       ],
       "external_bases": [],
@@ -521,6 +698,26 @@
       ],
       "module": "tropoi.representation.diagnostics.swe",
       "qualname": "SWEDiagnosticsRecorder"
+    },
+    {
+      "decorators": [],
+      "external_bases": [
+        "UserWarning"
+      ],
+      "id": "tropoi.representation.visual.atmosphere.AtmosphereViewWarning",
+      "members": [],
+      "module": "tropoi.representation.visual.atmosphere",
+      "qualname": "AtmosphereViewWarning"
+    },
+    {
+      "decorators": [],
+      "external_bases": [
+        "ValueError"
+      ],
+      "id": "tropoi.representation.visual.atmosphere.PayloadTooLargeError",
+      "members": [],
+      "module": "tropoi.representation.visual.atmosphere",
+      "qualname": "PayloadTooLargeError"
     },
     {
       "decorators": [
@@ -1363,6 +1560,23 @@
       ],
       "module": "tropoi.representation.visual.specs",
       "qualname": "VectorLayer"
+    },
+    {
+      "decorators": [],
+      "external_bases": [],
+      "id": "tropoi.representation.visual.sphere_streamlines._MeshSampler",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__call__"
+        },
+        {
+          "kind": "method",
+          "name": "__init__"
+        }
+      ],
+      "module": "tropoi.representation.visual.sphere_streamlines",
+      "qualname": "_MeshSampler"
     },
     {
       "decorators": [
@@ -3740,6 +3954,10 @@
         {
           "kind": "property",
           "name": "times"
+        },
+        {
+          "kind": "method",
+          "name": "view"
         }
       ],
       "module": "tropoi.temporal.simulation",
@@ -3785,6 +4003,10 @@
         {
           "kind": "property",
           "name": "time"
+        },
+        {
+          "kind": "method",
+          "name": "view"
         }
       ],
       "module": "tropoi.temporal.simulation",

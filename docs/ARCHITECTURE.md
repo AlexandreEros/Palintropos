@@ -44,9 +44,13 @@ src/tropoi/
 │   ├── diagnostics/         per-core recorders, CSV/NPZ records and diagnostic figures
 │   ├── archive/             capsule reader (open_simulation), versioned schema, run-capsule writer,
 │   │                        saved resolved initial states (initial_state.py, CPU-only),
-│   │                        saved prepared terrain (prepared_terrain.py, CPU-only)
+│   │                        saved prepared terrain (prepared_terrain.py, CPU-only),
+│   │                        Held–Suarez experiment directories (held_suarez.py, CPU-only),
+│   │                        PE column constants and terrain of a saved run (pe_context.py, CPU-only)
+│   ├── diagnostics/pe_levels.py  native-level PE fields of a saved state on the CPU (Simulation.view)
 │   └── visual/              figure fields/specs/timelines/renderers, per-core compositions, Snapshot.plot adapter,
-│                            terrain previews (terrain.py: static figure and self-contained HTML globe)
+│                            terrain previews (terrain.py: static figure and self-contained HTML globe),
+│                            the 3-D atmosphere page (atmosphere.py, sphere_streamlines.py; same globe template)
 ├── run/{bve,swe,pe}/    orchestration: resolved run configuration and the runners
 ├── run/custom/          custom planets/initial states: preparation, configuration, execution, preset export,
 │                        prepared planets with terrain previews (planet.py)
@@ -172,7 +176,10 @@ distribution and every command (`tropoi`, `aeolus`, `psx-bve`, `psx-gen`,
   resolution; reading elevation files (`spatial.terrain.raster`), host synthesis
   (`spatial.transforms.host_synthesis`) and terrain previews of resolved
   coefficients (`PreparedPlanet.from_initial_state(...).plot()` /
-  `.view()`, Matplotlib for `plot` only). Fresh-interpreter tests enforce these boundaries.
+  `.view()`, Matplotlib for `plot` only); opening Held–Suarez experiment
+  directories and the 3-D atmosphere page of a saved PE run
+  (`Simulation.view`, Matplotlib for colour tables; a preset-mountain
+  terrain is rebuilt on the GPU only with `allow_cuda=True`). Fresh-interpreter tests enforce these boundaries.
 - **CUDA required**: running any solver (including `run_initial_state`); resolving terrain
   (`prepare_planet`); anything that builds grids,
   transforms, backends, operators, states, initial conditions or

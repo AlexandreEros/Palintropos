@@ -10,8 +10,10 @@ flowchart LR
     subgraph g_tropoi_orepresentation_oarchive["representation.archive"]
         n_tropoi_orepresentation_oarchive["representation.archive"]
         n_tropoi_orepresentation_oarchive_ocapsule["representation.archive.capsule"]
+        n_tropoi_orepresentation_oarchive_oheld__suarez["representation.archive.held_suarez"]
     end
     subgraph g_tropoi_orepresentation_ovisual["representation.visual"]
+        n_tropoi_orepresentation_ovisual_oatmosphere["representation.visual.atmosphere"]
         n_tropoi_orepresentation_ovisual_osnapshot["representation.visual.snapshot"]
     end
     subgraph g_tropoi_orun_ocustom["run.custom"]
@@ -32,7 +34,11 @@ flowchart LR
     n_tropoi_ocli_ope -.->|function| n_tropoi_ocli_obve
     n_tropoi_ocli_oswe -.->|function| n_tropoi_ocli_obve
     n_tropoi_orepresentation_oarchive --> n_tropoi_orepresentation_oarchive_ocapsule
+    n_tropoi_orepresentation_oarchive_ocapsule -.->|function| n_tropoi_orepresentation_oarchive_oheld__suarez
+    n_tropoi_orepresentation_oarchive_ocapsule -.->|function| n_tropoi_orepresentation_ovisual_oatmosphere
     n_tropoi_orepresentation_oarchive_ocapsule -.->|function| n_tropoi_orepresentation_ovisual_osnapshot
+    n_tropoi_orepresentation_oarchive_oheld__suarez -.->|function| n_tropoi_orepresentation_ovisual_oatmosphere
+    n_tropoi_orepresentation_ovisual_oatmosphere -.->|function| n_tropoi_orepresentation_oarchive_oheld__suarez
     n_tropoi_orepresentation_ovisual_osnapshot -.->|function| n_tropoi_ocli_obve
     n_tropoi_orepresentation_ovisual_osnapshot -.->|function| n_tropoi_ocli_ope
     n_tropoi_orepresentation_ovisual_osnapshot -.->|function| n_tropoi_ocli_oswe
