@@ -1,0 +1,519 @@
+{
+  "protocol": {
+    "version": 1,
+    "fields": {
+      "temperature": "T_k on the full levels (K)",
+      "surface_pressure": "p_s = exp(ln p_s) (Pa)",
+      "wind": "horizontal wind (u, v) on the full levels (m/s), Helmholtz reconstruction from zeta and delta; vector norm",
+      "vorticity": "relative vorticity zeta_k (1/s)",
+      "divergence": "divergence delta_k (1/s)"
+    },
+    "grid": "the run's own Gauss-Legendre grid (34 x 68): exact host synthesis of the saved coefficients at the Gauss latitudes and uniform longitudes",
+    "horizontal_weights": "Gauss weights w_j / (2 nlon) per node (they sum to 1: an area mean over the sphere)",
+    "vertical_weights": "sigma-layer thickness d_sigma_k (sum to 1) for level fields; none for p_s",
+    "rms": "sqrt(sum_k d_sigma_k sum_nodes w |X_a - X_b|^2), |.| the vector norm for the wind",
+    "max_abs": "maximum over levels and grid nodes of |X_a - X_b|",
+    "evolution": "max over saved times t_j of rms(X(t_j) - X(t_0)) within one run",
+    "control_drift": "the same evolution measure on the orographic_isothermal_rest control (same terrain, duration, resolution and 60 s step)",
+    "floating_point_floor": "64 * 2.22e-16 * max|X(t_0)| for each field, with max|X(t_0)| replaced by the field's maximum over the whole run when X(t_0) = 0 (winds, vorticity, divergence)",
+    "timestep_sensitivity": "rms(X_60(t_j) - X_30(t_j)) at every saved time (byte-identical initial states), normalized by the maximum evolution of the 30 s run",
+    "screening_targets": {
+      "evolution_over_control_and_floor": 100.0,
+      "timestep_sensitivity_max": 0.05,
+      "mass_rel_drift_max": 1e-06,
+      "later_wind_min_ms": 0.01,
+      "states_with_streamlines_min": 3
+    },
+    "notes": "Screening choices for this experiment, not solver guarantees. Vorticity/divergence sensitivity is screened only where their evolution exceeds 100 times the floor."
+  },
+  "runs": {
+    "main": {
+      "run_id": "20261027T175327Z_orographic-thermal-wave_rot24p62h_r3_l21_dt11080p3s_3a46f966_71c5441a",
+      "run_dir": "20261027T175327Z_orographic-thermal-wave_rot24p62h_r3_l21_dt11080p3s_3a46f966_71c5441a",
+      "terrain_digest": "sha256:afb016d805517202bfc4374ed24f91d72b71aa6376b789184d4cd010b35c31b8",
+      "dt_seconds": 60.0,
+      "git": {
+        "commit": "71c5441a59608bca022c985f8b88334b69c3bf31",
+        "branch": "feat/atmosphere-globe-view",
+        "dirty": true
+      },
+      "diagnostics": {
+        "steps": 1480,
+        "final_time_s": 88642.44,
+        "dt_values_s": [
+          40.304999999993015,
+          40.30500000000029,
+          40.30500000000757,
+          60.0
+        ],
+        "t_min_K": 208.92611796813063,
+        "t_max_K": 211.1462197990564,
+        "ps_min_Pa": 281.0254449752251,
+        "ps_max_Pa": 1229.6192924231245,
+        "max_wind_ms": 2.6951833465338852,
+        "final_max_wind_ms": 1.7823213596818492,
+        "max_courant": 0.04630323447484149,
+        "max_abs_mass_rel_drift": 6.163482923840662e-07,
+        "all_finite": true
+      },
+      "timing": {
+        "wall_s": {
+          "initialization": 2.240246999892406,
+          "integration": 971.4830619000131,
+          "persistence_and_exit": 0.03478500002529472,
+          "total": 973.7580938999308
+        },
+        "integration_s_per_step": 0.6564074742567656,
+        "device_memory_mib": {
+          "idle_before": 0.0,
+          "peak_sampled": 149.0,
+          "sampling": "nvidia-smi memory.used every 0.25 s (whole device, including the CUDA context)"
+        },
+        "cupy_pool_bytes_after": 51314176
+      }
+    },
+    "halved": {
+      "run_id": "20261027T182627Z_orographic-thermal-wave_rot24p62h_r3_l21_dt11080p3s_c1d6c801_71c5441a",
+      "run_dir": "20261027T182627Z_orographic-thermal-wave_rot24p62h_r3_l21_dt11080p3s_c1d6c801_71c5441a",
+      "terrain_digest": "sha256:afb016d805517202bfc4374ed24f91d72b71aa6376b789184d4cd010b35c31b8",
+      "dt_seconds": 30.0,
+      "git": {
+        "commit": "71c5441a59608bca022c985f8b88334b69c3bf31",
+        "branch": "feat/atmosphere-globe-view",
+        "dirty": true
+      },
+      "diagnostics": {
+        "steps": 2960,
+        "final_time_s": 88642.44,
+        "dt_values_s": [
+          10.304999999993015,
+          10.305000000000291,
+          10.305000000007567,
+          30.0
+        ],
+        "t_min_K": 208.9261165166267,
+        "t_max_K": 211.14621979976943,
+        "ps_min_Pa": 281.0254449812944,
+        "ps_max_Pa": 1229.6192922793916,
+        "max_wind_ms": 2.6951916163162823,
+        "final_max_wind_ms": 1.7823213762381918,
+        "max_courant": 0.023151617640491617,
+        "max_abs_mass_rel_drift": 6.163483267213131e-07,
+        "all_finite": true
+      },
+      "timing": {
+        "wall_s": {
+          "initialization": 2.035542399971746,
+          "integration": 2002.7192413000157,
+          "persistence_and_exit": 0.03317020006943494,
+          "total": 2004.787953900057
+        },
+        "integration_s_per_step": 0.6765943382770323,
+        "device_memory_mib": {
+          "idle_before": 0.0,
+          "peak_sampled": 149.0,
+          "sampling": "nvidia-smi memory.used every 0.25 s (whole device, including the CUDA context)"
+        },
+        "cupy_pool_bytes_after": 51314176
+      }
+    },
+    "control": {
+      "run_id": "20261027T180944Z_orographic-isothermal-rest_rot24p62h_r3_l21_dt11080p3s_729cdf7d_71c5441a",
+      "run_dir": "20261027T180944Z_orographic-isothermal-rest_rot24p62h_r3_l21_dt11080p3s_729cdf7d_71c5441a",
+      "terrain_digest": "sha256:afb016d805517202bfc4374ed24f91d72b71aa6376b789184d4cd010b35c31b8",
+      "dt_seconds": 60.0,
+      "git": {
+        "commit": "71c5441a59608bca022c985f8b88334b69c3bf31",
+        "branch": "feat/atmosphere-globe-view",
+        "dirty": true
+      },
+      "diagnostics": {
+        "steps": 1480,
+        "final_time_s": 88642.44,
+        "dt_values_s": [
+          40.304999999993015,
+          40.30500000000029,
+          40.30500000000757,
+          60.0
+        ],
+        "t_min_K": 209.99999999999653,
+        "t_max_K": 210.00000000000327,
+        "ps_min_Pa": 282.4136025176635,
+        "ps_max_Pa": 1226.6958449751523,
+        "max_wind_ms": 1.811748910334347e-11,
+        "final_max_wind_ms": 1.811748910334347e-11,
+        "max_courant": 0.045680827605194194,
+        "max_abs_mass_rel_drift": 3.3337132856648023e-16,
+        "all_finite": true
+      },
+      "timing": {
+        "wall_s": {
+          "initialization": 2.0979827999835834,
+          "integration": 998.360537200002,
+          "persistence_and_exit": 0.10870159999467432,
+          "total": 1000.5672215999803
+        },
+        "integration_s_per_step": 0.6745679305405419,
+        "device_memory_mib": {
+          "idle_before": 0.0,
+          "peak_sampled": 149.0,
+          "sampling": "nvidia-smi memory.used every 0.25 s (whole device, including the CUDA context)"
+        },
+        "cupy_pool_bytes_after": 51314176
+      }
+    }
+  },
+  "fields": {
+    "temperature": {
+      "evolution_rms_by_time": [
+        0.0,
+        0.1529652965797851,
+        0.31017875469009326,
+        0.32258303476797895,
+        0.3853936965382552,
+        0.41682054451190326,
+        0.4367683007968588,
+        0.4840944911940157,
+        0.4097894600673102
+      ],
+      "evolution_max_abs_by_time": [
+        0.0,
+        0.3895212341245724,
+        0.885829770845362,
+        1.1279640212232493,
+        1.449630132900154,
+        1.5991664706006645,
+        1.2419018843930871,
+        1.7541692449769641,
+        1.5338922093040424
+      ],
+      "evolution_rms_max": 0.4840944911940157,
+      "evolution_rms_max_halved": 0.484094491144886,
+      "control_drift_rms_max": 3.204778230759558e-13,
+      "control_drift_max_abs": 3.467448550509289e-12,
+      "floating_point_floor": 2.9946336340876972e-12,
+      "evolution_over_control_and_floor": 161653995227.8647,
+      "timestep_rms_by_time": [
+        0.0,
+        1.0666579103762358e-09,
+        2.173975922954276e-09,
+        3.0847840396595266e-09,
+        5.370972785436579e-09,
+        4.534443917707755e-09,
+        5.815760707371723e-09,
+        7.332385143321255e-09,
+        7.311578876908828e-09
+      ],
+      "timestep_max_abs_by_time": [
+        0.0,
+        4.44958914158633e-09,
+        8.200970569305355e-09,
+        1.1991431847491185e-08,
+        2.7772813382398454e-08,
+        2.844723212547251e-08,
+        2.3063620346874814e-08,
+        2.7116726641907007e-08,
+        3.5853958024745225e-08
+      ],
+      "timestep_sensitivity_by_time": [
+        0.0,
+        2.2034084871603978e-09,
+        4.490809052201382e-09,
+        6.372276685826348e-09,
+        1.1094885159164278e-08,
+        9.366857092266784e-09,
+        1.2013689091188413e-08,
+        1.5146599016196456e-08,
+        1.510361925337532e-08
+      ],
+      "timestep_sensitivity_max": 1.5146599016196456e-08,
+      "resolved_above_floor": true
+    },
+    "surface_pressure": {
+      "evolution_rms_by_time": [
+        0.0,
+        1.0629352670058085,
+        1.1710978445513869,
+        1.0803615037078997,
+        0.6518005147449444,
+        0.7952567379814824,
+        0.625259814986398,
+        0.6279755777614263,
+        0.9941241377974291
+      ],
+      "evolution_max_abs_by_time": [
+        0.0,
+        2.9895486419711688,
+        3.283372377843307,
+        3.3978380795927023,
+        1.9962207072087494,
+        3.6452980291167023,
+        2.0063162598449935,
+        2.327266394472872,
+        2.770036205553879
+      ],
+      "evolution_rms_max": 1.1710978445513869,
+      "evolution_rms_max_halved": 1.1710978446183018,
+      "control_drift_rms_max": 2.5112999246562446e-12,
+      "control_drift_max_abs": 1.8985701899509877e-11,
+      "floating_point_floor": 1.7428894565406996e-11,
+      "evolution_over_control_and_floor": 67192892822.69174,
+      "timestep_rms_by_time": [
+        0.0,
+        1.219166912781831e-08,
+        2.4876183295325752e-08,
+        3.40301026683442e-08,
+        5.80942276036519e-08,
+        4.77347523166856e-08,
+        6.528411705063009e-08,
+        8.349228650720816e-08,
+        8.260708393346734e-08
+      ],
+      "timestep_max_abs_by_time": [
+        0.0,
+        4.243463536113268e-08,
+        8.453787359030684e-08,
+        1.3079784366709646e-07,
+        1.9339699974807445e-07,
+        1.7654224393481854e-07,
+        2.4382177343795775e-07,
+        3.470004230621271e-07,
+        4.4739397253579227e-07
+      ],
+      "timestep_sensitivity_by_time": [
+        0.0,
+        1.0410461588537861e-08,
+        2.124176336729037e-08,
+        2.9058291606228427e-08,
+        4.9606638651603586e-08,
+        4.076068668049157e-08,
+        5.574608249057812e-08,
+        7.129403140044286e-08,
+        7.053815726250579e-08
+      ],
+      "timestep_sensitivity_max": 7.129403140044286e-08,
+      "resolved_above_floor": true
+    },
+    "wind": {
+      "evolution_rms_by_time": [
+        0.0,
+        0.48320740527285294,
+        0.5590402541163819,
+        0.5040600179817438,
+        0.5651563861199246,
+        0.5909711280507159,
+        0.5990347917184531,
+        0.4722909184352833,
+        0.4941723762427329
+      ],
+      "evolution_max_abs_by_time": [
+        0.0,
+        1.6541242444207422,
+        1.3919695968673307,
+        1.7230902582157663,
+        1.615649955360422,
+        2.308172379133624,
+        2.5422908211657607,
+        2.126629324353911,
+        1.782321359681849
+      ],
+      "evolution_rms_max": 0.5990347917184531,
+      "evolution_rms_max_halved": 0.5990347916989001,
+      "control_drift_rms_max": 2.8917504161246258e-12,
+      "control_drift_max_abs": 1.8117489103343402e-11,
+      "floating_point_floor": 3.612086798712313e-14,
+      "evolution_over_control_and_floor": 207153006144.02557,
+      "timestep_rms_by_time": [
+        0.0,
+        4.053058042330184e-09,
+        7.778299860169915e-09,
+        1.2746551800539885e-08,
+        1.1204657660015616e-08,
+        2.3867288568394915e-08,
+        2.677720687605481e-08,
+        2.8784683812689455e-08,
+        3.6906712254393344e-08
+      ],
+      "timestep_max_abs_by_time": [
+        0.0,
+        1.4447897521595646e-08,
+        2.5739580897065972e-08,
+        4.3321699052022126e-08,
+        6.460910407319568e-08,
+        9.220367153398756e-08,
+        9.306337905110743e-08,
+        9.654986338789578e-08,
+        1.3226119798180467e-07
+      ],
+      "timestep_sensitivity_by_time": [
+        0.0,
+        6.76598103899017e-09,
+        1.2984721368370225e-08,
+        2.127848328206425e-08,
+        1.8704519028416542e-08,
+        3.984290879116686e-08,
+        4.47005870896296e-08,
+        4.805177297140671e-08,
+        6.161029837636577e-08
+      ],
+      "timestep_sensitivity_max": 6.161029837636577e-08,
+      "resolved_above_floor": true
+    },
+    "vorticity": {
+      "evolution_rms_by_time": [
+        0.0,
+        1.9634939619153343e-07,
+        3.667456995510456e-07,
+        4.870662030687226e-07,
+        5.823580512358905e-07,
+        6.054652921516857e-07,
+        5.639707421578601e-07,
+        5.778191980349302e-07,
+        6.49371762805271e-07
+      ],
+      "evolution_max_abs_by_time": [
+        0.0,
+        1.000933959228346e-06,
+        2.0562608637447594e-06,
+        2.3768046054929363e-06,
+        3.6709964889113406e-06,
+        4.38257756296529e-06,
+        4.837106180903378e-06,
+        5.115511451503315e-06,
+        5.7325364729344975e-06
+      ],
+      "evolution_rms_max": 6.49371762805271e-07,
+      "evolution_rms_max_halved": 6.493717626032347e-07,
+      "control_drift_rms_max": 9.336368379936247e-18,
+      "control_drift_max_abs": 6.713322774109821e-17,
+      "floating_point_floor": 8.144787820745334e-20,
+      "evolution_over_control_and_floor": 69552928545.61778,
+      "timestep_rms_by_time": [
+        0.0,
+        1.0281197497100168e-15,
+        2.643514845586763e-15,
+        4.101109335045533e-15,
+        5.379425788184583e-15,
+        5.087949218890482e-15,
+        6.748826110635254e-15,
+        8.555099206738395e-15,
+        9.617228099900627e-15
+      ],
+      "timestep_max_abs_by_time": [
+        0.0,
+        4.371022521203546e-15,
+        1.2294396932259997e-14,
+        2.3306550108245405e-14,
+        2.2596665705020756e-14,
+        2.5866574617430392e-14,
+        3.4041260262865846e-14,
+        3.7506746012302066e-14,
+        4.2171739172757314e-14
+      ],
+      "timestep_sensitivity_by_time": [
+        0.0,
+        1.583252936019943e-09,
+        4.070880499930126e-09,
+        6.3155030311216445e-09,
+        8.284046362932793e-09,
+        7.835187040615457e-09,
+        1.039285429286333e-08,
+        1.3174424419753451e-08,
+        1.4810049733832886e-08
+      ],
+      "timestep_sensitivity_max": 1.4810049733832886e-08,
+      "resolved_above_floor": true
+    },
+    "divergence": {
+      "evolution_rms_by_time": [
+        0.0,
+        3.4387662302253183e-07,
+        3.78336612998336e-07,
+        3.9679229598065426e-07,
+        4.382883816989479e-07,
+        4.931413286467761e-07,
+        5.743258502546561e-07,
+        5.068695686475736e-07,
+        4.99419109994492e-07
+      ],
+      "evolution_max_abs_by_time": [
+        0.0,
+        1.5369815461785118e-06,
+        2.001392267996623e-06,
+        2.864548139030612e-06,
+        3.104958693213192e-06,
+        3.2130309158998188e-06,
+        3.2658411415436857e-06,
+        3.335591033512333e-06,
+        3.101226388380667e-06
+      ],
+      "evolution_rms_max": 5.743258502546561e-07,
+      "evolution_rms_max_halved": 5.743258518667164e-07,
+      "control_drift_rms_max": 6.160543457599494e-19,
+      "control_drift_max_abs": 4.711391717146484e-18,
+      "floating_point_floor": 4.7392077404143224e-20,
+      "evolution_over_control_and_floor": 932264911703.8237,
+      "timestep_rms_by_time": [
+        0.0,
+        1.5479594001095038e-14,
+        3.068101162253941e-14,
+        5.055798707348409e-14,
+        3.720263660097115e-14,
+        9.619999399105072e-14,
+        1.046608788408383e-13,
+        1.1150911022225014e-13,
+        1.493385084862846e-13
+      ],
+      "timestep_max_abs_by_time": [
+        0.0,
+        7.351897682219416e-14,
+        1.275838808316354e-13,
+        1.9361095979454886e-13,
+        2.9941745084358174e-13,
+        4.732999309869947e-13,
+        4.372049731822967e-13,
+        4.898969810776248e-13,
+        6.504377467880202e-13
+      ],
+      "timestep_sensitivity_by_time": [
+        0.0,
+        2.695263316248453e-08,
+        5.3420913446291364e-08,
+        8.803014335704509e-08,
+        6.477618320688924e-08,
+        1.6750072050278492e-07,
+        1.822325749409708e-07,
+        1.941565225730567e-07,
+        2.6002400553778576e-07
+      ],
+      "timestep_sensitivity_max": 2.6002400553778576e-07,
+      "resolved_above_floor": true
+    }
+  },
+  "pair": {
+    "initial_states_byte_identical": true,
+    "config_keys_that_differ": [
+      "dt_seconds",
+      "out",
+      "run_id"
+    ]
+  },
+  "saved_times_s": [
+    0.0,
+    11080.305,
+    22160.61,
+    33240.915,
+    44321.22,
+    55401.525,
+    66481.83,
+    77562.13500000001,
+    88642.44
+  ],
+  "screens": {
+    "evolution_over_control_and_floor": true,
+    "timestep_sensitivity": true,
+    "mass": true,
+    "positive_and_finite": true,
+    "later_wind": true
+  }
+}

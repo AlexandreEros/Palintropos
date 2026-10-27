@@ -116,6 +116,39 @@ also fixed over time), so a colour change during playback is a change in the
 saved field, not a rescaling. A view of a single saved state has no playback
 controls.
 
+### Example: an evolving Mars atmosphere over MOLA terrain
+
+![An evolving Mars atmosphere over MOLA terrain at its last saved state (t = 88642.44 s, 9 of 9): bottom-level divergence as a 55 % translucent surface over the relief (×10) with 157 black instantaneous streamlines; side panel with the playback controls and the note that the 9 states are 11080.305 s apart and are not interpolated](validation/mars_evolving_2026-10-27/mars_evolving_final_delta.png)
+
+*An idealized dry-CO₂ perturbation experiment over MOLA terrain, at the last of
+its 9 saved states, one Mars rotation (88642.44 s) after the start. The
+balanced resting atmosphere over real relief (`orographic_isothermal_rest`)
+received a 1 K coefficient on the (2, 2) temperature mode
+(`orographic_thermal_wave`, peak 0.77 K) and was integrated at `l_max` 21 with
+4 levels and 60 s RK4 steps. The image shows divergence on the bottom level
+(σ = 0.875) at 55 % opacity and ×10 relief, with instantaneous streamlines.
+Pressing play steps through the 9 saved states, 3.08 h of simulated time
+apart. The first state is at rest and has no streamlines; the winds reach
+about 2.5 m/s.*
+
+This is not a Mars climate model: there is no radiation, no diurnal heating
+and no surface physics. The page does not test the dynamics; that
+evidence is in
+[the experiment record](validation/mars_evolving_2026-10-27/README.md). There,
+the evolution is 10¹⁰ times the drift of a resting control, a 30 s rerun differs
+by under 3 × 10⁻⁷ of the evolution, and the relative mass drift is 6 × 10⁻⁷.
+The run is published as
+[`docs/runs/20261027T175327Z_orographic-thermal-wave_…_71c5441a`](runs/20261027T175327Z_orographic-thermal-wave_rot24p62h_r3_l21_dt11080p3s_3a46f966_71c5441a/),
+so the page can be rebuilt without a GPU or the MOLA files:
+
+```bash
+python examples/mola_mars_evolving.py view docs/runs/20261027T175327Z_orographic-thermal-wave_rot24p62h_r3_l21_dt11080p3s_3a46f966_71c5441a --out views
+```
+
+`views/mars_evolving_all_times.html` (5.2 MB) holds all 9 states at a 3° mesh.
+The full experiment (terrain preparation, the four runs, the measurements and
+the browser check) is reproduced by the commands in the record.
+
 ## What the surface is
 
 **The level.** Native levels are the core's full levels. With interfaces
@@ -255,6 +288,7 @@ Measured on this machine (MX110 laptop, CPU path):
 | `hs-T42L20-prod-002` (120 states, T42L20), default | 5 of 120 states (days 10, 310, 610, 900, 1200) × 20 levels | 2° | 26.4 MB | 10 s |
 | same, `times=[0, -1]`, `levels=[0, 10, 19]` | 2 × 3 | 3° | 1.3 MB | 1.4 s |
 | Mars MOLA orographic rest (3 states, T42L4, real terrain) | 3 × 4 | 2° | 3.1 MB | 1 s |
+| Mars MOLA evolving (9 states, T21L4, real terrain), `times="all"` | 9 × 4 | 3° | 5.2 MB | not timed |
 
 At the default 2° mesh one Held–Suarez time with all 20 levels costs about
 5 MB. Fewer levels, a coarser mesh or `streamlines=False` buy more times. In

@@ -303,6 +303,16 @@ the command that reproduces it, is in
 [docs/validation/mola_terrain_2026-10-22](validation/mola_terrain_2026-10-22/README.md);
 the README shows it.
 
+**An evolving atmosphere over MOLA.** The orographic-rest check above starts
+and stays at rest. [examples/mola_mars_evolving.py](../examples/mola_mars_evolving.py)
+adds a small temperature perturbation (`--scenario orographic_thermal_wave`)
+to the same balanced base, at `l_max` 21. It integrates one rotation period
+alongside a resting control and a 30 s-step twin. This is an idealized dry-CO₂
+perturbation experiment, not a climate simulation. Its protocol, results and
+offline page are in
+[docs/validation/mars_evolving_2026-10-27](validation/mars_evolving_2026-10-27/README.md),
+and the run is published under `docs/runs/`.
+
 **The 463 m USGS mosaic (alternative, untested here).** The USGS
 Astrogeology "Mars MGS MOLA DEM 463m"
 (<https://astrogeology.usgs.gov/search/map/mars_mgs_mola_dem_463m>, about
