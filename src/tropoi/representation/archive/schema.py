@@ -460,7 +460,8 @@ def _environment(solver: str, run_config: Mapping) -> dict:
                "surface_pressure", "thermal_amplitude", "dt_seconds",
                "topography", "mountain_height_m", "mountain_lat_deg",
                "mountain_lon_deg", "mountain_width_deg", "gravity",
-               "topography_parameters", "terrain_digest", "terrain_l_cut"),
+               "topography_parameters", "terrain_digest", "terrain_l_cut",
+               "initial_perturbation"),
     }[solver]
     env = {k: run_config[k] for k in keys if k in run_config}
     if solver in ("swe", "pe") and "topography" not in env:

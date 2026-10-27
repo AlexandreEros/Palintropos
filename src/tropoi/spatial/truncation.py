@@ -110,7 +110,8 @@ def require_scenario_support(scenario: str, lmax: int) -> None:
 THERMAL_WAVE_MIN_RETAINED_DEGREE = 2
 
 
-def require_thermal_wave_support(lmax: int, thermal_amplitude: float) -> None:
+def require_thermal_wave_support(lmax: int, thermal_amplitude: float, *,
+                                 scenario: str = "thermal_wave") -> None:
     """Raise ValueError unless ``lmax`` supports thermal_wave at this amplitude.
 
     Shared by the CPU configuration layer and the CUDA initial-condition
@@ -120,12 +121,12 @@ def require_thermal_wave_support(lmax: int, thermal_amplitude: float) -> None:
     lmax = int(lmax)
     if lmax < 2:
         raise ValueError(
-            f"scenario 'thermal_wave' needs lmax >= 2 for its degree-2 "
+            f"scenario {scenario!r} needs lmax >= 2 for its degree-2 "
             f"perturbation, got {lmax}")
     if float(thermal_amplitude) != 0.0 and \
             product_truncation_cut(lmax) < THERMAL_WAVE_MIN_RETAINED_DEGREE:
         raise ValueError(
-            "scenario 'thermal_wave' with a nonzero thermal_amplitude needs "
+            f"scenario {scenario!r} with a nonzero thermal_amplitude needs "
             "the 2/3 product cut to retain degree 2 (lmax >= 3); "
             f"lmax={lmax} retains only degrees <= "
             f"{product_truncation_cut(lmax)}, which freezes the temperature "

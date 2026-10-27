@@ -532,6 +532,7 @@ examples:
   tropoi run pe --levels 12 --dt-seconds 200 --days 0.05 --n-snapshots 4
   tropoi run pe --sigma-interfaces 0,0.25,0.6,1.0 --temperature 250
   tropoi run pe --scenario orographic_isothermal_rest --topography mountain
+  tropoi run pe --scenario orographic_thermal_wave --terrain DIR   evolving, over prepared terrain
 """
 
 
@@ -609,7 +610,9 @@ def add_pe_arguments(parser: argparse.ArgumentParser) -> None:
     parser.add_argument(
         "--thermal-amplitude", dest="thermal_amplitude", type=float,
         default=None,
-        help="thermal_wave degree-2 perturbation amplitude in K [default: 1].")
+        help="thermal_wave / orographic_thermal_wave perturbation: the real "
+             "(l, m) = (2, 2) temperature coefficient in K at every level "
+             "[default: 1]; the pointwise peak is about 0.773 times it.")
 
     parser.add_argument(
         "--topography", choices=sorted(PE_TOPOGRAPHIES), default=None,

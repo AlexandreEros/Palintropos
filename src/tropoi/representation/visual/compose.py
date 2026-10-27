@@ -80,6 +80,7 @@ _SCENARIO_TITLES = {
     "gravity_wave": "Linear gravity wave",
     "thermal_wave": "Thermal wave",
     "orographic_isothermal_rest": "Isothermal atmosphere at rest over terrain",
+    "orographic_thermal_wave": "Thermal wave over terrain",
 }
 _SOLVER_NAMES = {"bve": "barotropic vorticity core",
                  "swe": "shallow-water core",
