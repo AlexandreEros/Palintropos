@@ -6123,6 +6123,11 @@
     {
       "kind": "self",
       "source": "tropoi.run.pe.config.PERunConfig.to_run_config_dict",
+      "target": "tropoi.run.pe.config.PERunConfig.initial_perturbation"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.run.pe.config.PERunConfig.to_run_config_dict",
       "target": "tropoi.run.pe.config.PERunConfig.sigma_interfaces_resolved"
     },
     {
@@ -6464,6 +6469,11 @@
       "kind": "call",
       "source": "tropoi.spatial.initialization.pe._orographic_isothermal_rest",
       "target": "tropoi.spatial.states.primitive_equations.isothermal_rest_state"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.spatial.initialization.pe._orographic_thermal_wave",
+      "target": "tropoi.spatial.initialization.pe._orographic_isothermal_rest"
     },
     {
       "kind": "call",
@@ -14203,6 +14213,13 @@
       "type": "function"
     },
     {
+      "id": "tropoi.run.pe.config.PERunConfig.initial_perturbation",
+      "kind": "method",
+      "module": "tropoi.run.pe.config",
+      "qualname": "PERunConfig.initial_perturbation",
+      "type": "function"
+    },
+    {
       "id": "tropoi.run.pe.config.PERunConfig.resolve",
       "kind": "classmethod",
       "module": "tropoi.run.pe.config",
@@ -14868,6 +14885,13 @@
       "type": "function"
     },
     {
+      "id": "tropoi.spatial.initialization.pe._orographic_thermal_wave",
+      "kind": "function",
+      "module": "tropoi.spatial.initialization.pe",
+      "qualname": "_orographic_thermal_wave",
+      "type": "function"
+    },
+    {
       "id": "tropoi.spatial.initialization.pe._thermal_wave",
       "kind": "function",
       "module": "tropoi.spatial.initialization.pe",
@@ -14879,6 +14903,13 @@
       "kind": "function",
       "module": "tropoi.spatial.initialization.pe",
       "qualname": "make_pe_ic",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.spatial.initialization.pe.thermal_wave_peak",
+      "kind": "function",
+      "module": "tropoi.spatial.initialization.pe",
+      "qualname": "thermal_wave_peak",
       "type": "function"
     },
     {

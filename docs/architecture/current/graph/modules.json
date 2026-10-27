@@ -4810,6 +4810,7 @@
       "path": "tropoi/spatial/initialization/pe.py",
       "stdlib_imports": [
         "__future__",
+        "math",
         "typing"
       ],
       "third_party_imports": []

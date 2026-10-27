@@ -2363,6 +2363,10 @@
           "name": "_validate_topography"
         },
         {
+          "kind": "method",
+          "name": "initial_perturbation"
+        },
+        {
           "kind": "classmethod",
           "name": "resolve"
         },
