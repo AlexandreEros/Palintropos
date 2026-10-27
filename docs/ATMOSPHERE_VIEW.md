@@ -56,7 +56,9 @@ CDN, no remote textures, no fetches.
 The page provides:
 
 - **Saved time.** A discrete slider over the exported states, labelled with the
-  actual simulation time (`day 1200 (t = 103680000 s)`).
+  actual simulation time (`day 1200 (t = 103680000 s)`), with playback
+  controls (play/pause, previous/next, speed, loop). See
+  [Playback](#playback-saved-states-not-simulated-time).
 - **Native level.** A discrete slider over the exported levels, labelled with
   the level number (1 = top) and its σ.
 - **Field.** Temperature (K), pressure (hPa), relative vorticity and divergence
@@ -75,6 +77,44 @@ Temperature and pressure use sequential colour maps (`inferno`, `viridis`).
 Vorticity and divergence use `RdBu_r`, symmetric about zero. These are the
 repository's own colour policies (`compose.DISPLAY_DEFAULTS`). The terrain keeps
 the terrain viewer's `YlOrBr`.
+
+## Playback: saved states, not simulated time
+
+The play button steps the time slider through the **exported saved states**,
+one state per frame, in order. Nothing else happens between frames: there is
+no interpolation, no extrapolation and no integration in the page. A played
+frame is the same selection as moving the slider to that state: the same
+code path rebuilds the surface, colours, streamlines and flat map. A browser
+test checks that the two give byte-identical vertex buffers.
+
+Three clocks are easy to confuse:
+
+| clock | what it is | where it shows |
+| --- | --- | --- |
+| simulated time | the stored time of the saved state | the time label, e.g. `day 0.375 (t = 32400 s)` |
+| frame index | position in the exported list | after the label, e.g. `3/4` |
+| playback rate | saved states shown per second of **wall-clock** time | the `frames/s` selector (0.5 to 8) |
+
+The solver timestep appears in none of them. Saved states are usually far
+apart in model steps: a run with `dt = 60 s` saving every three hours shows
+180 steps per frame.
+
+Saved times need not be evenly spaced. The run may save at irregular times,
+and the view may export a subset (see [Size and subsampling](#size-and-subsampling)).
+Playback still advances one state per frame, so simulated time then passes at
+an uneven pace on screen. The note under the controls gives the gap to the
+previous exported state and says whether the exported times are evenly
+spaced.
+
+Playback stops on the last state. With **Loop** checked it wraps to the first
+state. Pressing play on the last state without Loop replays from the first.
+Moving the slider or pressing previous/next pauses playback and selects that
+state at once. Field, level, opacity, streamlines, exaggeration, camera and
+flat-map source stay as they are while time advances. The colour range stays
+fixed over all exported times (unless the per-level range is chosen, which is
+also fixed over time), so a colour change during playback is a change in the
+saved field, not a rescaling. A view of a single saved state has no playback
+controls.
 
 ## What the surface is
 
