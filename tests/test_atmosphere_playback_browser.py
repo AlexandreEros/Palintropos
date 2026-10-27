@@ -2,7 +2,7 @@
 
 Exports small synthetic PE capsules (four saved states at NONUNIFORM times,
 and a one-state capsule), opens each standalone page from ``file://`` in a
-headless Chromium with networking blocked (``browser_cdp``), and drives the
+headless Chromium with networking blocked (``tools.browser_cdp``), and drives the
 page's own controls: play, pause, previous/next, the time slider, the speed
 selector and the loop checkbox. Checks:
 
@@ -23,10 +23,17 @@ Skipped when no Chromium-family browser is installed.
 from __future__ import annotations
 
 import json
+import pathlib
+import sys
 
 import pytest
 
-from browser_cdp import OfflinePage, find_browser
+# tools/ is repository tooling, not part of the installed package
+REPO_ROOT = pathlib.Path(__file__).resolve().parents[1]
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
+
+from tools.browser_cdp import OfflinePage, find_browser  # noqa: E402
 from test_atmosphere_view import _band_limited_terrain, write_pe_capsule
 
 BROWSER = find_browser()
