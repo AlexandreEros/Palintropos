@@ -15,8 +15,11 @@ radiation, no diurnal heating, no surface physics.
     python examples/mola_mars_evolving.py run out/mola/mola_pe_l21 control
     # measurements (CPU): writes results.json
     python examples/mola_mars_evolving.py measure out/mola/evolving --out results.json
+    python examples/mola_mars_evolving.py figure out/mola/evolving --out maps.png
     # offline pages and the browser check (CPU + headless Chromium)
     python examples/mola_mars_evolving.py view out/mola/evolving --out out/mola/evolving/views
+    # (or from the published run alone, no GPU needed)
+    python examples/mola_mars_evolving.py view docs/runs/<run-id> --out views
     python examples/mola_mars_evolving.py browser-check out/mola/evolving/views --out DIR
 
 ``run`` prints and executes the exact ``tropoi run pe`` command of each
@@ -442,11 +445,16 @@ def figure(base: str, out: str, level: int = LEVELS - 1) -> None:
             fig.colorbar(im, ax=ax, shrink=0.85)
     sigma = 0.5 * (np.asarray(f.config["sigma_interfaces"][:-1])
                    + np.asarray(f.config["sigma_interfaces"][1:]))[level]
-    fig.suptitle(f"Mars orographic_thermal_wave over MOLA (degree <= 14), "
-                 f"{f.config['run_id']}: level {level + 1} of {f.K} "
-                 f"(sigma = {sigma:g}) and surface pressure; Gauss grid "
-                 f"{len(f.lat)} x {len(f.lon)}, east longitude", fontsize=11)
-    fig.savefig(out, dpi=90)
+    fig.suptitle(f"Mars orographic_thermal_wave over MOLA (degree <= 14): "
+                 f"T and |V| on level {level + 1} of {f.K} "
+                 f"(sigma = {sigma:g}), surface pressure p_s; Gauss grid "
+                 f"{len(f.lat)} x {len(f.lon)}, east longitude\n"
+                 f"run {f.config['run_id']}", fontsize=11)
+    import hashlib
+    digest = hashlib.sha256((f.run_dir / "pe_coeffs.npy").read_bytes())
+    fig.savefig(out, dpi=90, metadata={
+        "Source": f.config["run_id"],
+        "CoefficientsSHA256": digest.hexdigest()})
     print("wrote", out)
 
 
@@ -461,7 +469,10 @@ VIEW = {"resolution_deg": 3.0, "field": "delta", "level": LEVELS - 1,
 def view(base: str, out: str) -> dict:
     from tropoi.representation.archive import open_simulation
 
-    sim = open_simulation(_latest(pathlib.Path(base), "main"))
+    base = pathlib.Path(base)
+    # a run directory (e.g. the published docs/runs/<id>) or a run base
+    run = base if (base / "manifest.json").is_file() else _latest(base, "main")
+    sim = open_simulation(run)
     out = pathlib.Path(out)
     out.mkdir(parents=True, exist_ok=True)
     pages = {"all": sim.view(out / "mars_evolving_all_times.html",
@@ -473,6 +484,12 @@ def view(base: str, out: str) -> dict:
     for name, path in pages.items():
         print(f"{name:8s} {path} ({path.stat().st_size / 1e6:.2f} MB)")
     return pages
+
+
+def _requests(page, url: str) -> dict:
+    """Requests a page made, by file name (no local paths in the record)."""
+    return {"requests": [r.rsplit("/", 1)[-1] for r in page.requests],
+            "only_own_file": page.requests == [url]}
 
 
 def browser_check(views: str, out: str) -> dict:
@@ -532,7 +549,7 @@ def browser_check(views: str, out: str) -> dict:
         page.eval("new Promise(r => setTimeout(r, 500))")
         page.screenshot(out / "mars_evolving_final_delta.png")
         record["pages"]["all"] = {
-            "url_requests": page.requests, "expected": [url],
+            **_requests(page, url),
             "console_errors": page.console_errors,
             "exceptions": page.exceptions, "glOK": page.eval(
                 "window.__terrainGlobe.glOK"),
@@ -544,12 +561,12 @@ def browser_check(views: str, out: str) -> dict:
             url = page.open(views / f"mars_evolving_{name}.html")
             page.wait_for(f"{api}")
             record["pages"][name] = {
-                "url_requests": page.requests, "expected": [url],
+                **_requests(page, url),
                 "console_errors": page.console_errors,
                 "exceptions": page.exceptions,
                 "play_controls_hidden": page.eval(
                     "document.getElementById('playRow').hidden")}
-    ok = all(p["url_requests"] == p["expected"] and not p["console_errors"]
+    ok = all(p["only_own_file"] and not p["console_errors"]
              and not p["exceptions"] for p in record["pages"].values())
     record["offline_and_clean"] = ok
     (out / "browser_check.json").write_text(

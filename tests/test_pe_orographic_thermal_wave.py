@@ -220,9 +220,13 @@ def test_short_run_over_terrain_evolves_and_stays_physical(terrain_model,
     t_min = min(float(r["t_min"]) for r in rows)
     ps_min = min(float(r["ps_min"]) for r in rows)
     assert t_min > 0.0 and ps_min > 0.0
-    # total_mass integrates p_s = exp(ln p_s) on the grid, so it is not an
-    # exact invariant of the spectral scheme (the ln p_s monopole is); the
-    # 2 h run drifts by ~3e-10
+    # total_mass integrates p_s = exp(ln p_s) on the grid. The continuous
+    # equations conserve it, but the scheme advances ln p_s, whose tendency
+    # (-V.grad ln p_s - delta, column-integrated) is evaluated on the grid
+    # and truncated, so mass is conserved only to the spatial truncation
+    # (the ln p_s monopole itself is not an invariant over terrain). The
+    # 2 h run drifts by ~3e-10; the 1-sol MOLA run by up to 6e-7, the same
+    # at 60 s and 30 s steps
     assert max(abs(float(r["mass_rel_drift"])) for r in rows) < 1e-8
 
     wind = float(rows[-1]["max_wind_ms"])

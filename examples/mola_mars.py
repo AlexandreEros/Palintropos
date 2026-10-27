@@ -35,6 +35,9 @@ the numbers. ``show`` writes the static figure and the interactive globe.
 draws it; ``tropoi run pe --terrain`` then runs over exactly that terrain.
 The PE run above is an orographic-rest balance check with Mars-like
 constants (CO2 gas constants, 210 K, 610 Pa), not a Mars climate model.
+examples/mola_mars_evolving.py perturbs that balanced state and lets it
+evolve for one rotation period (an idealized dry-CO2 perturbation
+experiment), with its measurements and offline 3-D views.
 """
 from __future__ import annotations
 
