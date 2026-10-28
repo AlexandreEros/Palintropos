@@ -1,5 +1,9 @@
 # The 3-D atmosphere view of a saved PE run
 
+For a quick terrain-only Mars globe, an editable low-resolution heightmap,
+and examples using your own height function or elevation file, start with
+[the terrain quick start](TERRAIN_IMPORT.md#start-with-mars-without-downloading-a-dem).
+
 `Simulation.view()` writes one self-contained HTML page. The page shows the run's
 terrain globe and one translucent atmospheric surface: a native sigma level of a
 saved primitive-equation state. The surface is placed at that level's hydrostatic

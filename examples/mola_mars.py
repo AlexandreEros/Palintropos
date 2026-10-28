@@ -1,5 +1,6 @@
 r"""Real Mars terrain: MOLA MEGDR topography through the terrain-import path.
 
+    python examples/mola_mars.py quickstart --out out/mars             # CPU, no download
     python examples/mola_mars.py convert megt90n000cb.lbl mola/megt_4ppd.nc    # CPU
     python examples/mola_mars.py validate mola/megt_4ppd.nc [--fine mola/megt_16ppd.nc]
     python examples/mola_mars.py show mola/megt_4ppd.nc --lmax 42               # CUDA
@@ -43,6 +44,7 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import json
 import math
 import pathlib
 import re
@@ -62,6 +64,58 @@ LANDMARKS = (
 MARS_RADIUS_M = 3.3962e6
 MARS_DAY_S = 88642.66
 MARS_MASS_KG = 6.417e23
+
+
+def quickstart(out_path: str, *, open_browser: bool = False) -> None:
+    """Preview and reuse the repository's already-resolved MOLA terrain.
+
+    This is the degree-14 terrain from the published T21 PE example, not
+    the original MOLA raster. Loading and rendering it requires only CPU.
+    """
+    import matplotlib
+    matplotlib.use("Agg")
+    from PIL import Image
+    from tropoi.run.custom import PreparedPlanet
+    from tropoi.spatial.transforms.host_synthesis import synthesize_latlon
+
+    run_id = ("20261027T175327Z_orographic-thermal-wave_rot24p62h_r3_l21_"
+              "dt11080p3s_3a46f966_71c5441a")
+    source = pathlib.Path(__file__).resolve().parents[1] / "docs/runs" / run_id
+    world = PreparedPlanet.load(source)
+    out = pathlib.Path(out_path)
+    out.mkdir(parents=True, exist_ok=True)
+    saved = world.save(out / "terrain")
+    figure = world.plot()
+    figure.savefig(out / "mars_terrain.png", dpi=110)
+    import matplotlib.pyplot as plt
+    plt.close(figure)
+    page = world.view(out / "mars_globe.html", open_browser=open_browser,
+                      units="km", centre=(0, -100), exaggeration=10)
+
+    # A small, editable elevation image. The colour preview above is NOT
+    # a heightmap. Quantize metres explicitly, with row 0 at the north.
+    lat = np.arange(89.0, -90.0, -2.0)
+    lon = np.arange(-179.0, 180.0, 2.0)
+    heights = synthesize_latlon(world.topography_lm, lat, lon)
+    low, high = -10000.0, 10000.0
+    if heights.min() < low or heights.max() > high:
+        raise ValueError("resolved MOLA terrain exceeds the heightmap range")
+    grey = np.rint((heights - low) / (high - low) * 65535).astype(np.uint16)
+    Image.fromarray(grey).save(out / "mars_heightmap.png")
+    settings = {"source": "published MOLA terrain, degree <= 14",
+                "source_run": run_id, "resolution_deg": 2,
+                "row_0": "north", "read_elevation": {
+                    "height_range": [low, high], "lon_west_deg": -180}}
+    (out / "mars_heightmap.json").write_text(
+        json.dumps(settings, indent=2) + "\n", encoding="utf-8")
+    print("MOLA quick start: l_max 21, PE terrain band limit 14 (CPU).")
+    print("terrain:", saved)
+    print("globe:  ", page)
+    print("preview:", out / "mars_terrain.png")
+    print("editable 180 x 90 heightmap:", out / "mars_heightmap.png")
+    print("Read with height_range=(-10000, 10000), lon_west_deg=-180.")
+    print("This is resolved low-resolution relief; use convert/prepare-pe "
+          "to choose a different band limit from the source data.")
 
 
 # ---------------------------------------------------------------------------
@@ -278,6 +332,10 @@ def prepare_pe(path: str, out: str, lmax: int, smoothing) -> None:
 def main(argv=None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     sub = parser.add_subparsers(dest="step", required=True)
+    q = sub.add_parser("quickstart", help="bundled low-resolution Mars: "
+                       "terrain, heightmap and globe (CPU, no download)")
+    q.add_argument("--out", default="out/mars")
+    q.add_argument("--open", action="store_true", help="open the globe")
     c = sub.add_parser("convert", help="PDS3 MEGDR label -> NetCDF (CPU)")
     c.add_argument("label")
     c.add_argument("out")
@@ -304,7 +362,9 @@ def main(argv=None) -> int:
     e.add_argument("--lmax", type=int, default=42)
     e.add_argument("--smoothing", type=float)
     args = parser.parse_args(argv)
-    if args.step == "convert":
+    if args.step == "quickstart":
+        quickstart(args.out, open_browser=args.open)
+    elif args.step == "convert":
         convert(args.label, args.out)
     elif args.step == "prepare-pe":
         prepare_pe(args.file, args.out, args.lmax, args.smoothing)

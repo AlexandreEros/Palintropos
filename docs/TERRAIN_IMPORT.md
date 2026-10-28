@@ -1,5 +1,105 @@
 # Terrain from elevation files
 
+## Start with Mars, without downloading a DEM
+
+From a repository checkout:
+
+```bash
+python examples/mola_mars.py quickstart --out out/mars --open
+```
+
+This uses the small prepared MOLA terrain already included with the
+[published Mars example](runs/20261027T175327Z_orographic-thermal-wave_rot24p62h_r3_l21_dt11080p3s_3a46f966_71c5441a/terrain/).
+It needs no CUDA, network access, PDS conversion or NetCDF dependency. It writes:
+
+| Output | Use |
+| --- | --- |
+| `out/mars/mars_globe.html` | Open the interactive terrain globe offline. |
+| `out/mars/mars_terrain.png` | A coloured preview; this is not an elevation input. |
+| `out/mars/mars_heightmap.png` | An editable 16-bit grayscale elevation map, 180 × 90 pixels (2° cells). Black = −10000 m, white = +10000 m; row 0 is north, west edge −180°. |
+| `out/mars/mars_heightmap.json` | The heightmap's source and decoding settings. |
+| `out/mars/terrain/` | Prepared terrain, ready for `tropoi run pe --terrain out/mars/terrain`. |
+
+The prepared terrain is `l_max` 21 with elevation through degree 14, exactly
+as used in the example run. The grayscale image samples that **already
+truncated relief**, not the original MOLA measurements. Its height quantization
+is about 0.31 m per grey step. It is useful for learning and editing at this
+resolution; it cannot recover individual mountains removed by truncation.
+
+A short atmosphere run over the prepared terrain (CUDA):
+
+```bash
+tropoi run pe --terrain out/mars/terrain --scenario orographic_thermal_wave --radius-earth-units 0.53307 --day-hours 24.6229 --gravity 3.71 --r-dry 191.8 --cp-dry 735 --temperature 210 --surface-pressure 610 --levels 4 --dt-seconds 60 --days 0.02 --n-snapshots 3 --no-plots
+```
+
+This is a usage example. It demonstrates supplying terrain and evolving a
+small perturbation with the stated settings; it does not establish accuracy
+for arbitrary topographies. The longer run and its checks are documented
+[separately](validation/mars_evolving_2026-10-27/README.md).
+To choose a different terrain resolution from the source measurements, use
+the [raw MOLA workflow below](#real-data-mars-from-mola).
+
+## Other ways to make your planet's terrain
+
+[examples/custom_topographies.py](../examples/custom_topographies.py) has
+three runnable routes to the same broad synthetic hills and basins. No
+downloads are needed. Preparation uses CUDA; `--inputs-only` creates or reads
+the source on CPU without preparing a model.
+
+| Route | Command | What to change |
+| --- | --- | --- |
+| A Python height function | `python examples/custom_topographies.py function --out out/function` | Edit `elevation(lat_deg, lon_deg)`, returning metres; the script samples it and calls `ElevationRaster.from_array`. |
+| A painted grayscale heightmap | `python examples/custom_topographies.py image --out out/image` | Generates a small 16-bit PNG. Paint your own global map and supply `--file`, its height range, and longitude origin. |
+| A scientific elevation file | `python examples/custom_topographies.py netcdf --out out/netcdf` | Generates a tiny CF NetCDF with coordinates and units. Supply `--file` and, if needed, `--variable` for your own file. Requires `netCDF4` (`pip install "palintropos[terrain]"`). |
+
+For example, after editing the Mars heightmap above:
+
+```bash
+python examples/custom_topographies.py image --file out/mars/mars_heightmap.png --height-range -10000 10000 --lon-west -180 --out out/edited-mars
+```
+
+The image supplies elevation only. This script chooses a custom planet with
+0.8 Earth radii and a 30 h rotation; edit those choices independently of the
+terrain. Each route writes `terrain/`, `terrain.png` (source, resolved relief
+and their difference), and `globe.html`, then prints a short PE run command
+with matching planetary parameters. Use a new output directory for each
+preparation. Saved terrain can also feed an SWE state as shown
+[below](#shallow-water).
+
+The Python route needs no intermediate image:
+
+```python
+import numpy as np
+from tropoi.run.custom import ElevationRaster
+
+lat = np.arange(89, -90, -2)       # cell centres, north to south
+lon = np.arange(-179, 180, 2)      # east longitude
+la, lo = np.radians(np.meshgrid(lat, lon, indexing="ij"))
+h = 1200 * np.cos(la)**2 * np.cos(2 * lo) + 600 * np.sin(la)
+raster = ElevationRaster.from_array(h, lat, lon)  # metres; provenance hash
+# Pass raster to prepare_planet(..., solver="pe") as below.
+```
+
+Use broad features when learning at coarse truncations. Increasing image
+size adds no model detail once the source is adequately sampled: the retained
+spherical-harmonic degrees determine the relief used by the solver. Inspect
+the resolved preview, particularly after drawing narrow peaks or sharp edges.
+A coloured or shaded map does not encode elevation unambiguously; supply
+grayscale heights with an explicit scale, or an elevation file with units.
+
+For a single idealized mountain, a parameterized preset is shorter still:
+
+```python
+from tropoi.run.custom import TopographySpec
+
+world = prepare_planet(planet, disc,
+                       TopographySpec.mountain(height_m=1000, lat_deg=25,
+                                                lon_deg=60, width_deg=30),
+                       solver="pe")
+```
+
+## Import your own elevation file
+
 Load a planet's bottom topography from a NetCDF file, a grey bitmap
 (16-bit PNG and similar) or a global TIFF. Look at the terrain the model will
 actually use before running anything:
