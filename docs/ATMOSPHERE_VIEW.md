@@ -135,12 +135,13 @@ Pressing play steps through the 9 saved states, 3.08 h of simulated time
 apart. The first state is at rest and has no streamlines; the winds reach
 about 2.5 m/s.*
 
-This is not a Mars climate model: there is no radiation, no diurnal heating
-and no surface physics. The page does not test the dynamics; that
-evidence is in
+This is a worked example of imported terrain and saved-state playback.
+The measured checks and their limits are in
 [the experiment record](validation/mars_evolving_2026-10-27/README.md). There,
 the evolution is 10¹⁰ times the drift of a resting control, a 30 s rerun differs
 by under 3 × 10⁻⁷ of the evolution, and the relative mass drift is 6 × 10⁻⁷.
+These checks apply to this configuration; they do not establish accuracy for
+arbitrary terrain or a realistic Mars atmosphere.
 The run is published as
 [`docs/runs/20261027T175327Z_orographic-thermal-wave_…_71c5441a`](runs/20261027T175327Z_orographic-thermal-wave_rot24p62h_r3_l21_dt11080p3s_3a46f966_71c5441a/),
 so the page can be rebuilt without a GPU or the MOLA files:

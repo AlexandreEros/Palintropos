@@ -5,10 +5,11 @@ not a Mars climate model. There is no radiation, no diurnal or seasonal
 heating, no surface drag or heat exchange, no dust, no CO₂ condensation and no
 water. The atmosphere starts in exact hydrostatic balance at rest over real
 Mars relief. A small temperature perturbation then sets it moving, and it is
-integrated for one Mars rotation period. The experiment shows that the dry
-primitive-equation core produces a smooth, measurable, timestep-converged
-evolution over real terrain. It also shows that the offline atmosphere page
-plays that evolution back. It says nothing about Mars weather.
+integrated for one Mars rotation period. This worked example demonstrates
+importing terrain, evolving a small perturbation with the stated settings,
+and playing the saved states in the offline atmosphere page. The checks
+below measure evolution, timestep sensitivity and mass drift for this run;
+they do not establish accuracy for arbitrary topographies or Mars weather.
 
 The published run is
 [`docs/runs/20261027T175327Z_orographic-thermal-wave_rot24p62h_r3_l21_dt11080p3s_3a46f966_71c5441a`](../../runs/20261027T175327Z_orographic-thermal-wave_rot24p62h_r3_l21_dt11080p3s_3a46f966_71c5441a/).
@@ -145,17 +146,18 @@ field. Winds reach about 2 m/s.*
   K. So the motion comes from the perturbation, not from an imbalance of the
   base state over MOLA relief.
 - **Timestep.** Halving the step changes the saved fields by at most 2.6 × 10⁻⁷
-  of their evolution. This is what a fourth-order scheme gives at Courant
-  numbers of 0.046 (60 s) and 0.023 (30 s). The time error at 60 s is
-  negligible. The error that remains against the continuous equations comes
-  from spatial truncation (`l_max` 21, terrain cut at degree 14), which this
-  experiment does not measure.
+  of their evolution, at diagnostic Courant numbers of 0.046 (60 s) and
+  0.023 (30 s). This demonstrates low sensitivity to this timestep change
+  over the saved times. Two timesteps do not establish RK4 convergence
+  order or an absolute error bound. Spatial accuracy at `l_max` 21 with
+  terrain cut at degree 14 was not measured.
 - **Mass.** `total_mass` integrates p_s = exp(ln p_s) on the grid. The drift
   oscillates between −1.7 × 10⁻⁷ and +6.2 × 10⁻⁷ over the run (every step),
-  ending at its maximum. It is the same at 60 s and 30 s (6.1635 × 10⁻⁷ in both), so it
-  comes from the spatial discretization, not the time step. The core advances
-  ln p_s, whose tendency is evaluated on the grid and truncated, so mass is
-  conserved only to truncation. The ln p_s monopole is not an invariant here:
+  ending at its maximum. It is the same to the reported precision at 60 s
+  and 30 s (6.1635 × 10⁻⁷ in both). This suggests a contribution insensitive
+  to that timestep change, such as spatial discretization or quadrature;
+  its cause was not isolated. The core advances ln p_s, whose tendency is
+  evaluated on the grid and truncated. The ln p_s monopole is not an invariant here:
   it moves by 1.8 × 10⁻⁵ relative. The control, with no motion, drifts by
   3.3 × 10⁻¹⁶. The drift passes the 10⁻⁶ screen by a factor of 1.6 only. Longer
   runs were not tested, and nothing here says how it grows over many rotations.
@@ -222,7 +224,7 @@ divergence and no streamlines.*
   `l_max` 42 at most.
 - **No reference.** Nothing is compared with observations or with another
   model. The screens test that the evolution is real (above control and
-  rounding), converged in time and mass-consistent. They do not test that it
-  is right.
+  rounding), insensitive to the tested timestep change and within the
+  stated mass-drift screen. They do not establish physical accuracy.
 - **One machine.** One GPU, one browser build with software WebGL. The
   checks are in [ATMOSPHERE_VIEW.md](../../ATMOSPHERE_VIEW.md#limits).
