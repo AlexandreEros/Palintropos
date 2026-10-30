@@ -7398,7 +7398,7 @@
     {
       "kind": "instantiate",
       "source": "tropoi.spatial.terrain.raster.ElevationRaster.__post_init__",
-      "target": "tropoi.spatial.terrain.raster.ElevationImportError"
+      "target": "tropoi.spatial.terrain.elevation_import.ElevationImportError"
     },
     {
       "kind": "call",
@@ -7453,22 +7453,22 @@
     {
       "kind": "instantiate",
       "source": "tropoi.spatial.terrain.raster._apply_missing",
-      "target": "tropoi.spatial.terrain.raster.ElevationImportError"
+      "target": "tropoi.spatial.terrain.elevation_import.ElevationImportError"
     },
     {
       "kind": "instantiate",
       "source": "tropoi.spatial.terrain.raster._check_size",
-      "target": "tropoi.spatial.terrain.raster.ElevationImportError"
+      "target": "tropoi.spatial.terrain.elevation_import.ElevationImportError"
     },
     {
       "kind": "instantiate",
       "source": "tropoi.spatial.terrain.raster._detect_format",
-      "target": "tropoi.spatial.terrain.raster.ElevationImportError"
+      "target": "tropoi.spatial.terrain.elevation_import.ElevationImportError"
     },
     {
       "kind": "instantiate",
       "source": "tropoi.spatial.terrain.raster._geotiff_extent",
-      "target": "tropoi.spatial.terrain.raster.ElevationImportError"
+      "target": "tropoi.spatial.terrain.elevation_import.ElevationImportError"
     },
     {
       "kind": "call",
@@ -7483,7 +7483,7 @@
     {
       "kind": "instantiate",
       "source": "tropoi.spatial.terrain.raster._normalize_axes",
-      "target": "tropoi.spatial.terrain.raster.ElevationImportError"
+      "target": "tropoi.spatial.terrain.elevation_import.ElevationImportError"
     },
     {
       "kind": "call",
@@ -7493,7 +7493,7 @@
     {
       "kind": "instantiate",
       "source": "tropoi.spatial.terrain.raster._read_netcdf",
-      "target": "tropoi.spatial.terrain.raster.ElevationImportError"
+      "target": "tropoi.spatial.terrain.elevation_import.ElevationImportError"
     },
     {
       "kind": "call",
@@ -7513,7 +7513,7 @@
     {
       "kind": "instantiate",
       "source": "tropoi.spatial.terrain.raster._read_raster_image",
-      "target": "tropoi.spatial.terrain.raster.ElevationImportError"
+      "target": "tropoi.spatial.terrain.elevation_import.ElevationImportError"
     },
     {
       "kind": "call",
@@ -7548,32 +7548,32 @@
     {
       "kind": "instantiate",
       "source": "tropoi.spatial.terrain.raster._scale_offset",
-      "target": "tropoi.spatial.terrain.raster.ElevationImportError"
+      "target": "tropoi.spatial.terrain.elevation_import.ElevationImportError"
     },
     {
       "kind": "instantiate",
       "source": "tropoi.spatial.terrain.raster._semi_major_axis_m",
-      "target": "tropoi.spatial.terrain.raster.ElevationImportError"
+      "target": "tropoi.spatial.terrain.elevation_import.ElevationImportError"
     },
     {
       "kind": "instantiate",
       "source": "tropoi.spatial.terrain.raster._uniform_step",
-      "target": "tropoi.spatial.terrain.raster.ElevationImportError"
+      "target": "tropoi.spatial.terrain.elevation_import.ElevationImportError"
     },
     {
       "kind": "instantiate",
       "source": "tropoi.spatial.terrain.raster._unit_factor",
-      "target": "tropoi.spatial.terrain.raster.ElevationImportError"
+      "target": "tropoi.spatial.terrain.elevation_import.ElevationImportError"
     },
     {
       "kind": "instantiate",
       "source": "tropoi.spatial.terrain.raster.encode_grey16",
-      "target": "tropoi.spatial.terrain.raster.ElevationImportError"
+      "target": "tropoi.spatial.terrain.elevation_import.ElevationImportError"
     },
     {
       "kind": "instantiate",
       "source": "tropoi.spatial.terrain.raster.read_elevation",
-      "target": "tropoi.spatial.terrain.raster.ElevationImportError"
+      "target": "tropoi.spatial.terrain.elevation_import.ElevationImportError"
     },
     {
       "kind": "instantiate",
@@ -16375,6 +16375,13 @@
       "type": "function"
     },
     {
+      "id": "tropoi.spatial.terrain.elevation_import.ElevationImportError",
+      "kind": "class",
+      "module": "tropoi.spatial.terrain.elevation_import",
+      "qualname": "ElevationImportError",
+      "type": "class"
+    },
+    {
       "id": "tropoi.spatial.terrain.height_function.HeightExpression",
       "kind": "class",
       "module": "tropoi.spatial.terrain.height_function",
@@ -16485,13 +16492,6 @@
       "module": "tropoi.spatial.terrain.height_function",
       "qualname": "sampling_grid",
       "type": "function"
-    },
-    {
-      "id": "tropoi.spatial.terrain.raster.ElevationImportError",
-      "kind": "class",
-      "module": "tropoi.spatial.terrain.raster",
-      "qualname": "ElevationImportError",
-      "type": "class"
     },
     {
       "id": "tropoi.spatial.terrain.raster.ElevationRaster",

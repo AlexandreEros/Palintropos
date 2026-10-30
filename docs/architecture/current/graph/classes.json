@@ -70,7 +70,7 @@
       "kind": "inherits",
       "position": 0,
       "source": "tropoi.spatial.terrain.height_function.HeightFunctionError",
-      "target": "tropoi.spatial.terrain.raster.ElevationImportError"
+      "target": "tropoi.spatial.terrain.elevation_import.ElevationImportError"
     }
   ],
   "name": "classes",
@@ -3447,6 +3447,16 @@
       "qualname": "ElevationData"
     },
     {
+      "decorators": [],
+      "external_bases": [
+        "ValueError"
+      ],
+      "id": "tropoi.spatial.terrain.elevation_import.ElevationImportError",
+      "members": [],
+      "module": "tropoi.spatial.terrain.elevation_import",
+      "qualname": "ElevationImportError"
+    },
+    {
       "decorators": [
         "dataclass(frozen=True)"
       ],
@@ -3484,16 +3494,6 @@
       "members": [],
       "module": "tropoi.spatial.terrain.height_function",
       "qualname": "HeightFunctionError"
-    },
-    {
-      "decorators": [],
-      "external_bases": [
-        "ValueError"
-      ],
-      "id": "tropoi.spatial.terrain.raster.ElevationImportError",
-      "members": [],
-      "module": "tropoi.spatial.terrain.raster",
-      "qualname": "ElevationImportError"
     },
     {
       "decorators": [

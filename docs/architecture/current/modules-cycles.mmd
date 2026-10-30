@@ -24,10 +24,6 @@ flowchart LR
         n_tropoi_orun_ocustom_oprepare["run.custom.prepare"]
         n_tropoi_orun_ocustom_opresets["run.custom.presets"]
     end
-    subgraph g_tropoi_ospatial_oterrain["spatial.terrain"]
-        n_tropoi_ospatial_oterrain_oheight__function["spatial.terrain.height_function"]
-        n_tropoi_ospatial_oterrain_oraster["spatial.terrain.raster"]
-    end
     n_tropoi_ocli_obve -.->|function| n_tropoi_ocli_omain
     n_tropoi_ocli_omain -.->|function| n_tropoi_ocli_obve
     n_tropoi_ocli_omain -.->|function| n_tropoi_ocli_ope
@@ -40,8 +36,6 @@ flowchart LR
     n_tropoi_ocli_ope -.->|function| n_tropoi_ocli_obve
     n_tropoi_ocli_oswe -.->|function| n_tropoi_ocli_obve
     n_tropoi_ocli_oterrain -.->|function| n_tropoi_orun_ocustom
-    n_tropoi_ocli_oterrain -.->|function| n_tropoi_ospatial_oterrain_oheight__function
-    n_tropoi_ocli_oterrain -.->|function| n_tropoi_ospatial_oterrain_oraster
     n_tropoi_orepresentation_oarchive --> n_tropoi_orepresentation_oarchive_ocapsule
     n_tropoi_orepresentation_oarchive_ocapsule -.->|function| n_tropoi_orepresentation_oarchive_oheld__suarez
     n_tropoi_orepresentation_oarchive_ocapsule -.->|function| n_tropoi_orepresentation_ovisual_oatmosphere
@@ -55,16 +49,11 @@ flowchart LR
     n_tropoi_orun_ocustom --> n_tropoi_orun_ocustom_oplanet
     n_tropoi_orun_ocustom --> n_tropoi_orun_ocustom_oprepare
     n_tropoi_orun_ocustom --> n_tropoi_orun_ocustom_opresets
-    n_tropoi_orun_ocustom --> n_tropoi_ospatial_oterrain_oheight__function
-    n_tropoi_orun_ocustom --> n_tropoi_ospatial_oterrain_oraster
     n_tropoi_orun_ocustom_oexecute -.->|function| n_tropoi_ocli_obve
     n_tropoi_orun_ocustom_oexecute -.->|function| n_tropoi_ocli_oswe
     n_tropoi_orun_ocustom_oplanet -.->|function| n_tropoi_orun_ocustom_oprepare
-    n_tropoi_orun_ocustom_oplanet -.->|function| n_tropoi_ospatial_oterrain_oraster
     n_tropoi_orun_ocustom_oprepare -.->|function| n_tropoi_ocli_obve
     n_tropoi_orun_ocustom_oprepare -.->|function| n_tropoi_orun_ocustom_oplanet
     n_tropoi_orun_ocustom_opresets -.->|function| n_tropoi_ocli_obve
     n_tropoi_orun_ocustom_opresets -.->|function| n_tropoi_ocli_omain
     n_tropoi_orun_ocustom_opresets -.->|function| n_tropoi_ocli_oswe
-    n_tropoi_ospatial_oterrain_oheight__function --> n_tropoi_ospatial_oterrain_oraster
-    n_tropoi_ospatial_oterrain_oraster -.->|function| n_tropoi_ospatial_oterrain_oheight__function

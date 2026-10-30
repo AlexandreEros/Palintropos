@@ -687,8 +687,8 @@
     },
     {
       "id": "tropoi.spatial.terrain",
-      "internal_edges": 3,
-      "modules": 6
+      "internal_edges": 4,
+      "modules": 7
     },
     {
       "id": "tropoi.spatial.transforms",

@@ -3001,12 +3001,20 @@
         "module"
       ],
       "source": "tropoi.spatial.terrain.height_function",
-      "target": "tropoi.spatial.terrain.raster"
+      "target": "tropoi.spatial.terrain.elevation_import"
     },
     {
       "kind": "imports",
       "scopes": [
-        "function"
+        "module"
+      ],
+      "source": "tropoi.spatial.terrain.raster",
+      "target": "tropoi.spatial.terrain.elevation_import"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
       ],
       "source": "tropoi.spatial.terrain.raster",
       "target": "tropoi.spatial.terrain.height_function"
@@ -5060,6 +5068,17 @@
     {
       "category": "code",
       "dynamic_import_calls": 0,
+      "id": "tropoi.spatial.terrain.elevation_import",
+      "is_package": false,
+      "path": "tropoi/spatial/terrain/elevation_import.py",
+      "stdlib_imports": [
+        "__future__"
+      ],
+      "third_party_imports": []
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
       "id": "tropoi.spatial.terrain.height_function",
       "is_package": false,
       "path": "tropoi/spatial/terrain/height_function.py",
@@ -5069,13 +5088,13 @@
         "collections",
         "dataclasses",
         "hashlib",
-        "importlib",
         "math",
         "numbers",
         "operator",
         "pathlib",
         "re",
         "sys",
+        "types",
         "typing"
       ],
       "third_party_imports": [
