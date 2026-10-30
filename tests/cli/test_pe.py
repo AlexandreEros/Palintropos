@@ -16,7 +16,7 @@ from .conftest import assert_probe_passes
 
 @pytest.fixture
 def stub_pe_execute_run(monkeypatch):
-    import tropoi.cli.pe as pe_module
+    import tropoi.run.pe.execution as pe_module
 
     captured = {}
 

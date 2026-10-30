@@ -47,15 +47,15 @@ from scipy.spatial.transform import Rotation
 
 warnings.simplefilter("ignore")
 
-from tropoi.numerics import (
-    GeodesicGridGeometry,
-    GeodesicSphericalHarmonics,
-    SpectralOperators,
-)
-from tropoi.planet import Planet, PlanetaryParameters
-from tropoi.run.bve.barotropic_vorticity import BarotropicState, BarotropicVorticity
+from tropoi.spatial.grids.geodesic_grid import GeodesicGridGeometry
+from tropoi.spatial.transforms.optimized_geodesic_sh import GeodesicSphericalHarmonics
+from tropoi.spatial.operators.spectral_operators import SpectralOperators
+from tropoi.spatial.planet import Planet
+from tropoi.spatial.environment import PlanetaryParameters
+from tropoi.spatial.states.barotropic import BarotropicState
+from tropoi.temporal.tendencies.barotropic import BarotropicVorticity
 from tropoi.run.bve.runner import rk4_step
-from tropoi.run.bve.diagnostics import spectral_diagnostics
+from tropoi.representation.diagnostics.bve import spectral_diagnostics
 
 L_MAX = 21
 DAY_HOURS = 24.0

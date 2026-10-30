@@ -153,7 +153,7 @@ class PEColumnContext:
 # ---------------------------------------------------------------------------
 
 def _capsule_radius(run_config: Mapping) -> tuple[float, str]:
-    """The dynamical radius ``cli.pe.build_pe_model`` builds the planet with."""
+    """The dynamical radius ``run.pe.model.build_pe_model`` builds the planet with."""
     from tropoi.spatial.environment import PlanetaryParameters
 
     try:
@@ -167,7 +167,7 @@ def _capsule_radius(run_config: Mapping) -> tuple[float, str]:
         day_hours=day_hours, radius_earth_units=units).radius)
     return radius, (f"PlanetaryParameters.from_earth_like(day_hours="
                     f"{day_hours:g}, radius_earth_units={units:g}).radius, "
-                    "the volumetric-mean radius cli.pe.build_pe_model uses")
+                    "the volumetric-mean radius run.pe.model.build_pe_model uses")
 
 
 def _prepared_terrain(storage, run_config: Mapping) -> tuple[np.ndarray, str]:

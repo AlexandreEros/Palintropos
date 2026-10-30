@@ -4,8 +4,7 @@ This module deliberately imports nothing from the package: it is consumed
 by the spatial operators and initializers, the temporal cores, the
 diagnostics, the configuration layer and the CLI, so it must stay free of
 CuPy, Matplotlib, and the heavy package initializers. Keeping it neutral
-avoids an operators -> tendencies dependency. (Legacy path:
-``tropoi.support``.)
+avoids an operators -> tendencies dependency.
 
 Vocabulary (docs/ARCHITECTURE.md, docs/validation/
 preset_support_characterization.md):

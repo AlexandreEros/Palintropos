@@ -9,9 +9,8 @@ from __future__ import annotations
 
 import pytest
 
-from tropoi.physics.sigma_coordinate import SigmaGrid
-from tropoi.run.pe.snapshot_visualization import (
-    select_snapshot_levels)
+from tropoi.spatial.sigma_coordinate import SigmaGrid
+from tropoi.representation.visual.pe_snapshots import select_snapshot_levels
 
 
 def test_uniform_grid_hits_quarter_and_three_quarter_levels():

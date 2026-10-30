@@ -250,11 +250,6 @@ def load_prepared_terrain(path) -> SavedTerrain:
     return terrain
 
 
-def describe_band_limit(l_cut: int | None) -> str:
-    return ("full truncation" if l_cut is None
-            else f"band-limited at l_cut = {l_cut} (PE dealiased cut)")
-
-
 def summary(terrain: SavedTerrain) -> Mapping[str, Any]:
     """Small JSON-able summary (inspect output)."""
     params = terrain.topography.parameters

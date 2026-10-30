@@ -21,15 +21,13 @@ except Exception:  # pragma: no cover - import guard
 pytestmark = pytest.mark.skipif(not _HAS_CUDA, reason="CUDA/CuPy not available")
 
 if _HAS_CUDA:
-    from tropoi.numerics import (
-        GeodesicBackend,
-        GeodesicGridGeometry,
-        GeodesicSphericalHarmonics,
-        LatLonGridGeometry,
-        PointSetBackend,
-        SpectralOperators,
-        make_backend,
-    )
+    from tropoi.spatial.spherical_backend import GeodesicBackend
+    from tropoi.spatial.grids.geodesic_grid import GeodesicGridGeometry
+    from tropoi.spatial.transforms.optimized_geodesic_sh import GeodesicSphericalHarmonics
+    from tropoi.spatial.grids.grid import LatLonGridGeometry
+    from tropoi.spatial.spherical_backend import PointSetBackend
+    from tropoi.spatial.operators.spectral_operators import SpectralOperators
+    from tropoi.spatial.spherical_backend import make_backend
 
 L_MAX = 5  # tiny: contract tests, not accuracy tests
 

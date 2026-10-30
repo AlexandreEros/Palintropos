@@ -1,7 +1,6 @@
 """Generate a demo planet and save a summary plot.
 
-``tropoi gen`` is the canonical interface; ``psx-gen`` is a compatibility
-alias. Heavy imports (CuPy, matplotlib) happen after argument parsing.
+Invoked by ``tropoi gen``. Heavy imports (CuPy, matplotlib) happen after argument parsing.
 """
 from __future__ import annotations
 
@@ -34,14 +33,6 @@ def add_arguments(parser: argparse.ArgumentParser) -> None:
     parser.add_argument(
         "--grid-resolution", type=int, default=3,
         help="Geodesic grid subdivision level (default: 3).")
-
-
-def build_parser(prog: str = "psx-gen") -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(
-        prog=prog,
-        description="Generate a demo planet and save a summary plot.")
-    add_arguments(parser)
-    return parser
 
 
 def resolve_output_path(output: str) -> pathlib.Path:
@@ -86,12 +77,3 @@ def run(args: argparse.Namespace) -> int:
     fig.savefig(out_path, dpi=200)
     print(f"Saved planet summary to {out_path}")
     return 0
-
-
-def main() -> int:
-    """psx-gen == tropoi gen."""
-    return run(build_parser().parse_args())
-
-
-if __name__ == "__main__":
-    raise SystemExit(main())

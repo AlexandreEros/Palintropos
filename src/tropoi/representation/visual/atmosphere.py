@@ -318,7 +318,7 @@ def atmosphere_payload(storage, *, times=None, levels=None,
             f"is a {storage.solver!r} run")
     count = int(len(storage.times))
     if count == 0:
-        from tropoi.representation.archive.held_suarez import (
+        from tropoi.representation.archive.availability import (
             NoSnapshotsError, statistics_only_description)
         reason = statistics_only_description(storage.run_dir) or (
             f"{storage.run_dir} stores no snapshots")

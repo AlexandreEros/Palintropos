@@ -2,9 +2,10 @@
 import numpy as np
 import cupy as cp
 
-from tropoi.numerics import GeodesicGridGeometry, LatLonGridGeometry
-from tropoi.numerics import GeodesicSphericalHarmonics
-from tropoi.numerics.spherical_harmonics import LatLonSphericalHarmonics
+from tropoi.spatial.grids.geodesic_grid import GeodesicGridGeometry
+from tropoi.spatial.grids.grid import LatLonGridGeometry
+from tropoi.spatial.transforms.optimized_geodesic_sh import GeodesicSphericalHarmonics
+from tropoi.spatial.transforms.spherical_harmonics import LatLonSphericalHarmonics
 
 
 def test_y10(lat, lon):

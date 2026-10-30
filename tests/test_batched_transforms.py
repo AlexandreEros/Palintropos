@@ -81,7 +81,7 @@ def test_per_level_transform_is_unchanged_by_batching_support(sh):
 
 def test_pe_tendency_batched_matches_per_level():
     import cupy as cp
-    from tropoi.cli.pe import build_pe_model
+    from tropoi.run.pe.model import build_pe_model
     cfg = dict(day_hours=24.0, radius_earth_units=1.0, resolution=3, lmax=21,
                grid="latlon", nlat=32, nlon=64, topography="flat", nlev=6,
                r_dry=287.04, cp_dry=1004.64)
@@ -104,7 +104,7 @@ def test_pe_tendency_batched_matches_per_level():
 
 def test_pe_batched_rest_state_is_exactly_zero():
     import cupy as cp
-    from tropoi.cli.pe import build_pe_model
+    from tropoi.run.pe.model import build_pe_model
     cfg = dict(day_hours=24.0, radius_earth_units=1.0, resolution=3, lmax=21,
                grid="latlon", nlat=32, nlon=64, topography="flat", nlev=6,
                r_dry=287.04, cp_dry=1004.64, batched_transforms=True)

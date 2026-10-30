@@ -7,9 +7,10 @@ pytest.importorskip("cupy", reason="CUDA/CuPy not available")
 import cupy as cp
 from pathlib import Path
 
-from tropoi.numerics import LatLonGridGeometry, GeodesicGridGeometry
-from tropoi.numerics.spherical_harmonics import LatLonSphericalHarmonics
-from tropoi.numerics import GeodesicSphericalHarmonics
+from tropoi.spatial.grids.grid import LatLonGridGeometry
+from tropoi.spatial.grids.geodesic_grid import GeodesicGridGeometry
+from tropoi.spatial.transforms.spherical_harmonics import LatLonSphericalHarmonics
+from tropoi.spatial.transforms.optimized_geodesic_sh import GeodesicSphericalHarmonics
 
 
 def _has_cuda_cupy() -> bool:
@@ -69,7 +70,7 @@ class TestSphericalHarmonicsAgreement(unittest.TestCase):
         if rel_l2 >= 0.6:
             try:
                 import matplotlib.pyplot as plt
-                from tropoi.viz.planet_viewer import PlanetViewer
+                from tropoi.representation.visual.planet_viewer import PlanetViewer
 
                 fig, axes = plt.subplots(2, 2, figsize=(12, 10))
                 PlanetViewer.plot_scalar(values_latlon, latlon_grid,

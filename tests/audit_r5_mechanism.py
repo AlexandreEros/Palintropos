@@ -21,10 +21,12 @@ prefix) and not part of per-timestep runtime diagnostics. Run:
 import numpy as np
 import cupy as cp
 
-from tropoi.planet import Planet, PlanetaryParameters
-from tropoi.run.bve.barotropic_vorticity import BarotropicVorticity, BarotropicState
-from tropoi.run.bve.initial_conditions import make_ic
-from tropoi.run.bve.diagnostics import _mode_power
+from tropoi.spatial.planet import Planet
+from tropoi.spatial.environment import PlanetaryParameters
+from tropoi.temporal.tendencies.barotropic import BarotropicVorticity
+from tropoi.spatial.states.barotropic import BarotropicState
+from tropoi.spatial.initialization.bve import make_ic
+from tropoi.representation.diagnostics.bve import _mode_power
 
 import warnings
 warnings.simplefilter("ignore")

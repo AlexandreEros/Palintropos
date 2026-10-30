@@ -14,12 +14,20 @@ import math
 import numpy as np
 import pytest
 
-from tropoi.physics.sigma_coordinate import (
-    SigmaGrid, SigmaGridError, column_energy_conversion,
-    column_mass_tendency, column_pressure_work, energy_exchange,
-    hydrostatic_geopotential, interface_mean, interface_sigma_dot,
-    layer_mass_residual, omega_over_p, vertical_advection,
-    vertical_flux_divergence, vertical_sbp)
+from tropoi.spatial.sigma_coordinate import SigmaGrid
+from tropoi.spatial.sigma_coordinate import SigmaGridError
+from tropoi.spatial.sigma_coordinate import column_energy_conversion
+from tropoi.spatial.sigma_coordinate import column_mass_tendency
+from tropoi.spatial.sigma_coordinate import column_pressure_work
+from tropoi.spatial.sigma_coordinate import energy_exchange
+from tropoi.spatial.sigma_coordinate import hydrostatic_geopotential
+from tropoi.spatial.sigma_coordinate import interface_mean
+from tropoi.spatial.sigma_coordinate import interface_sigma_dot
+from tropoi.spatial.sigma_coordinate import layer_mass_residual
+from tropoi.spatial.sigma_coordinate import omega_over_p
+from tropoi.spatial.sigma_coordinate import vertical_advection
+from tropoi.spatial.sigma_coordinate import vertical_flux_divergence
+from tropoi.spatial.sigma_coordinate import vertical_sbp
 
 R_DRY = 287.04
 

@@ -9,16 +9,12 @@ Command tree::
     tropoi list scenarios       initial-condition scenarios
     tropoi inspect RUN_PATH     summarize a finished run from its manifest
     tropoi plot RUN_PATH        draw a saved run (maps, overlays, diagnostics)
-    tropoi gen [...]            demo planet + summary plot (psx-gen)
-    tropoi recompile [...]      clear/verify the CuPy kernel cache (psx-recompile)
+    tropoi gen [...]            demo planet + summary plot
+    tropoi recompile [...]      clear/verify the CuPy kernel cache
 
 ``tropoi validate`` and ``tropoi list planets`` are reserved: there is no
 automated validation scorer and no planet catalog yet, so they are neither
 implemented nor advertised.
-
-``aeolus`` (the former canonical command) and the ``psx-bve`` /
-``psx-gen`` / ``psx-recompile`` commands are kept as compatibility entry
-points and delegate to the same implementations.
 
 Design rules for this module:
 
@@ -32,7 +28,8 @@ Design rules for this module:
   enforces the precedence: explicit flag > preset value > ordinary default.
 - Resolution, cross-field validation, snapshot schedules, and plot
   selection live in ``tropoi.run.bve.config`` (BVERunConfig);
-  this module owns only parsing, aliases, and the preset registry.
+  this module owns parsing, option aliases, and command dispatch.
+  Named preset bundles live in run.bve.presets.
 """
 from __future__ import annotations
 
@@ -41,8 +38,9 @@ import sys
 from typing import Optional, Sequence
 
 from tropoi.cli import clear_cache, generate_planet
+from tropoi.run.bve.presets import PRESETS
 from tropoi.run.bve.config import (  # import-light (stdlib only)
-    BASE_DEFAULTS, DEFAULT_SNAPSHOT_INTERVAL_SECONDS, PLOT_TYPES, BVERunConfig)
+    BASE_DEFAULTS, PLOT_TYPES, BVERunConfig)
 
 # ---------------------------------------------------------------------------
 # Choices and presets
@@ -64,42 +62,6 @@ SCENARIOS = {
 
 #: User-facing backend spellings; 'gauss-latlon' normalizes to 'latlon'.
 BACKEND_CHOICES = ("geodesic", "latlon", "gauss-latlon")
-
-#: Named bundles of run-bve settings, corresponding to configurations
-#: already documented in the README / docs/VALIDATION.md. Keys are argparse
-#: dest names; explicit user flags always override preset values.
-PRESETS = {
-    "rh4": {
-        "description": "One-day Rossby-Haurwitz wavenumber-4 validation run "
-                       "(the docs/VALIDATION.md configuration).",
-        "settings": {
-            "scenario": "rh4",
-            "lmax": 21,
-            "resolution": 4,
-            "day_hours": 24.0,
-            "duration_days": 1.0,
-            "dt_snapshots": 21600.0,
-            "product_quadrature": "fine",
-            "viscosity": 0.0,
-            "experiment": "validation-rh4",
-        },
-    },
-    "two-vortices-quick": {
-        "description": "Small, fast two-vortex smoke run "
-                       "(the README quickstart configuration).",
-        "settings": {
-            "scenario": "two_vortices",
-            "lmax": 8,
-            "resolution": 3,
-            "nlat": 12,
-            "nlon": 24,
-            "duration_days": 0.02,
-            "dt_snapshots": 864.0,
-            "experiment": "quickstart",
-        },
-    },
-}
-
 
 # ---------------------------------------------------------------------------
 # run bve: arguments and dispatch
@@ -232,60 +194,27 @@ def add_bve_arguments(parser: argparse.ArgumentParser) -> None:
              "keep runs immutable.")
 
 
-def build_bve_parser(prog: str = "tropoi run bve",
-                     apply_defaults: bool = False) -> argparse.ArgumentParser:
-    """Standalone `run bve` parser.
-
-    ``apply_defaults=True`` fills in the ordinary defaults directly on the
-    parser (kept for the legacy ``tropoi.cli.bve.build_parser``
-    import surface). To match the historical psx-bve parser surface exactly,
-    it also applies the legacy ``dt_snapshots`` default (21600 s) so that
-    ``build_parser().parse_args([]).dt_snapshots == 21600.0``; the plot
-    controls stay None. The canonical tropoi parser (``apply_defaults=False``)
-    leaves *all* snapshot controls None so count mode (N=5) remains the
-    resolved default — defaults are otherwise applied in config resolution.
-    """
-    parser = argparse.ArgumentParser(
-        prog=prog,
-        description="Run the barotropic vorticity equation on a planet.",
-        epilog=_BVE_EXAMPLES,
-        formatter_class=argparse.RawDescriptionHelpFormatter)
-    add_bve_arguments(parser)
-    if apply_defaults:
-        parser.set_defaults(**BASE_DEFAULTS,
-                            dt_snapshots=DEFAULT_SNAPSHOT_INTERVAL_SECONDS)
-    return parser
-
-
 #: Parsed-namespace keys forwarded into configuration resolution.
 _EXPLICIT_KEYS = tuple(BASE_DEFAULTS) + (
     "n_snapshots", "dt_snapshots", "plots", "no_plots")
 
 
 def run_bve_command(args: argparse.Namespace,
-                    parser: argparse.ArgumentParser,
-                    snapshot_default: str = "count") -> int:
-    """Resolve, print the resolved configuration, and dispatch the run.
-
-    ``snapshot_default`` selects the interface default when neither
-    snapshot control is given: "count" (tropoi, N=5) or "interval"
-    (legacy psx-bve, 21600 s).
-    """
+                    parser: argparse.ArgumentParser) -> int:
+    """Resolve, print the resolved configuration, and dispatch the run."""
     if getattr(args, "initial_state", None) is not None:
-        return run_initial_state_command("bve", args, parser,
-                                         snapshot_default=snapshot_default)
+        return run_initial_state_command("bve", args, parser)
     preset_name = getattr(args, "preset", None)
     explicit = {k: getattr(args, k, None) for k in _EXPLICIT_KEYS}
     try:
         cfg = BVERunConfig.resolve(
             explicit=explicit,
-            preset=PRESETS[preset_name]["settings"] if preset_name else None,
-            snapshot_default=snapshot_default)
+            preset=PRESETS[preset_name]["settings"] if preset_name else None)
     except ValueError as err:
         parser.error(str(err))
     print("\n".join(cfg.summary_lines(preset=preset_name)))
     # Heavy imports (CuPy, matplotlib) happen inside execute_run.
-    from tropoi.cli import bve as bve_module
+    from tropoi.run.bve import execution as bve_module
     return bve_module.execute_run(cfg)
 
 
@@ -310,8 +239,7 @@ _DISCRETIZATION_OVERRIDES = ("lmax", "grid", "resolution", "nlat", "nlon",
 
 
 def run_initial_state_command(solver: str, args: argparse.Namespace,
-                              parser: argparse.ArgumentParser,
-                              snapshot_default: str = "count") -> int:
+                              parser: argparse.ArgumentParser) -> int:
     """``tropoi run bve|swe --initial-state PATH``: run a saved state.
 
     Loading, verification and configuration resolution all happen on the
@@ -345,9 +273,6 @@ def run_initial_state_command(solver: str, args: argparse.Namespace,
                  if getattr(args, k, None) is not None}
     n_snapshots = args.n_snapshots
     interval = args.dt_snapshots
-    if n_snapshots is None and interval is None \
-            and snapshot_default == "interval":
-        interval = DEFAULT_SNAPSHOT_INTERVAL_SECONDS
     try:
         cfg = CustomRunConfig.resolve(
             state,
@@ -372,7 +297,7 @@ def run_initial_state_command(solver: str, args: argparse.Namespace,
 
 
 def _cmd_run_bve(args: argparse.Namespace) -> int:
-    return run_bve_command(args, args._parser, snapshot_default="count")
+    return run_bve_command(args, args._parser)
 
 
 # ---------------------------------------------------------------------------
@@ -516,7 +441,7 @@ def _cmd_run_swe(args: argparse.Namespace) -> int:
         args._parser.error(str(err))
     print("\n".join(cfg.summary_lines()))
     # Heavy imports (CuPy, matplotlib) happen inside execute_run.
-    from tropoi.cli import swe as swe_module
+    from tropoi.run.swe import execution as swe_module
     return swe_module.execute_run(cfg)
 
 
@@ -715,7 +640,7 @@ def _cmd_run_pe(args: argparse.Namespace) -> int:
         args._parser.error(str(err))
     print("\n".join(cfg.summary_lines()))
     # Heavy imports (CuPy, matplotlib) happen inside execute_run.
-    from tropoi.cli import pe as pe_module
+    from tropoi.run.pe import execution as pe_module
     return pe_module.execute_run(cfg)
 
 
@@ -1326,10 +1251,6 @@ examples:
   tropoi run bve --days 1 --n-snapshots 9
   tropoi list presets
   tropoi inspect runs
-
-aeolus remains available as a compatibility alias for tropoi, and
-psx-bve, psx-gen, and psx-recompile as compatibility entry points for
-'tropoi run bve', 'tropoi gen', and 'tropoi recompile'.
 """
 
 

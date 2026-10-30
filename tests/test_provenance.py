@@ -29,8 +29,9 @@ REQUIRED_NUMERICS_KEYS = {
 
 @requires_cuda
 def test_geodesic_backend_describe():
-    from tropoi.numerics import (
-        GeodesicBackend, GeodesicGridGeometry, GeodesicSphericalHarmonics)
+    from tropoi.spatial.spherical_backend import GeodesicBackend
+    from tropoi.spatial.grids.geodesic_grid import GeodesicGridGeometry
+    from tropoi.spatial.transforms.optimized_geodesic_sh import GeodesicSphericalHarmonics
     grid = GeodesicGridGeometry(resolution=3, radius=1.0)
     sh = GeodesicSphericalHarmonics(grid, 5, weights="voronoi")
     desc = GeodesicBackend(grid, sh).describe("fine")
@@ -46,8 +47,9 @@ def test_geodesic_backend_describe():
 
 @requires_cuda
 def test_latlon_backend_describe():
-    from tropoi.numerics import (
-        GaussLatLonGridGeometry, GaussLatLonSphericalHarmonics, LatLonBackend)
+    from tropoi.spatial.grids.latlon_grid import GaussLatLonGridGeometry
+    from tropoi.spatial.grids.latlon_grid import GaussLatLonSphericalHarmonics
+    from tropoi.spatial.spherical_backend import LatLonBackend
     grid = GaussLatLonGridGeometry(12, 24, radius=1.0)
     sh = GaussLatLonSphericalHarmonics(grid, 5)
     desc = LatLonBackend(grid, sh).describe("fine")
@@ -63,8 +65,9 @@ def test_latlon_backend_describe():
 
 @requires_cuda
 def test_planet_generate_latlon_backend():
-    from tropoi.numerics import LatLonBackend
-    from tropoi.planet import Planet, PlanetaryParameters
+    from tropoi.spatial.spherical_backend import LatLonBackend
+    from tropoi.spatial.planet import Planet
+    from tropoi.spatial.environment import PlanetaryParameters
     planet = Planet.generate(
         params=PlanetaryParameters.from_earth_like(),
         grid_type="latlon", nlat=16, nlon=32, l_max=7)
@@ -80,7 +83,8 @@ def test_planet_generate_latlon_backend():
 
 @requires_cuda
 def test_planet_generate_unknown_grid_type_raises():
-    from tropoi.planet import Planet, PlanetaryParameters
+    from tropoi.spatial.planet import Planet
+    from tropoi.spatial.environment import PlanetaryParameters
     with pytest.raises(ValueError, match="grid_type"):
         Planet.generate(params=PlanetaryParameters.from_earth_like(),
                         grid_type="cubed-sphere", l_max=5)
@@ -91,17 +95,18 @@ def test_planet_generate_unknown_grid_type_raises():
 # ---------------------------------------------------------------------------
 
 def test_cli_exposes_grid_choice():
-    from tropoi.cli.bve import build_parser
+    from tropoi.cli.main import build_parser
+    from tropoi.run.bve.config import BVERunConfig
     parser = build_parser()
-    args = parser.parse_args([])
-    assert vars(args)["grid"] == "geodesic"
-    assert vars(parser.parse_args(["--grid", "latlon"]))["grid"] == "latlon"
+    args = parser.parse_args(["run", "bve"])
+    assert BVERunConfig.resolve({"grid": args.grid}).grid == "geodesic"
+    assert parser.parse_args(["run", "bve", "--grid", "latlon"]).grid == "latlon"
     with pytest.raises(SystemExit):
-        parser.parse_args(["--grid", "cubed-sphere"])
+        parser.parse_args(["run", "bve", "--grid", "cubed-sphere"])
 
 
 def test_manifest_records_numerics_section(tmp_path):
-    from tropoi.run.bve.io import write_run_manifest
+    from tropoi.representation.archive.writer import write_run_manifest
     numerics = {
         "backend": "LatLonBackend",
         "grid": "GaussLatLonGridGeometry",

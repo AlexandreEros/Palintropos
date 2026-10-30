@@ -258,7 +258,7 @@ and the CUDA factory; the measurements behind it are in
 [validation/preset_support_characterization.md](validation/preset_support_characterization.md).
 Coefficients are stored through `lmax`, but analyzed nonlinear products retain
 only degrees `<= product_truncation_cut(lmax) = 2*lmax//3`
-(`tropoi.support`); degrees above that cut receive no analyzed
+(`tropoi.spatial.truncation`); degrees above that cut receive no analyzed
 nonlinear-product contribution, while the core's other terms (the exact
 linear pressure pair, hyperdiffusion, the fixed topographic term) still act
 there. Stored capacity, nonlinear-product support, and those other terms are

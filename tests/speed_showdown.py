@@ -2,10 +2,8 @@ import time
 import numpy as np
 import cupy as cp
 
-from tropoi.numerics import (
-    LatLonSphericalHarmonics, 
-    PointSetSphericalHarmonics,
-)
+from tropoi.spatial.transforms.spherical_harmonics import LatLonSphericalHarmonics
+from tropoi.spatial.transforms.fast_geodesic_sh import PointSetSphericalHarmonics
 
 print("--- Speed Showdown ---\n")
 

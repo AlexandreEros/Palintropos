@@ -583,7 +583,7 @@ def test_run_identity_follows_content_not_label(tmp_path, monkeypatch):
 
 def test_interval_mode_custom_bve_run_ids_still_carry_the_hash(tmp_path,
                                                                monkeypatch):
-    from tropoi.run.bve.io import make_run_id
+    from tropoi.representation.archive.writer import make_run_id
 
     cfg = CustomRunConfig.resolve(_bve_state(), duration_days=0.25,
                                   snapshot_interval_s=7200.0)
@@ -625,18 +625,19 @@ def test_inspect_shows_the_initial_state(tmp_path, monkeypatch, capsys):
 
 def test_preset_run_ids_are_unchanged_by_the_custom_keys():
     from tropoi.run.bve.config import BVERunConfig
-    from tropoi.run.bve.io import _config_hash, make_run_id
+    from tropoi.representation.archive.writer import _config_hash
+    from tropoi.representation.archive.writer import make_run_id
     from tropoi.run.swe.config import SWERunConfig
 
     # Preset configurations carry none of the custom keys, so their
     # scientific subset (and hash) is exactly what it was.
     for cfg in (BVERunConfig.resolve({}), SWERunConfig.resolve({}),
-                BVERunConfig.resolve({}, snapshot_default="interval")):
+                BVERunConfig.resolve({"dt_snapshots": 21600.0})):
         config = cfg.to_run_config_dict()
         assert not {"planet", "initial_state_digest",
                     "initial_state_label"} & set(config)
         assert _config_hash(config) == _config_hash(
             dict(config, initial_state_label="ignored"))
-    legacy = BVERunConfig.resolve({}, snapshot_default="interval")
+    legacy = BVERunConfig.resolve({"dt_snapshots": 21600.0})
     assert make_run_id(legacy.to_run_config_dict(), commit="c").split(
         "_")[-2] == "dt6h"

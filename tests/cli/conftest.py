@@ -22,19 +22,18 @@ ADDITIVE_CONFIG_KEYS = {"snapshot_mode", "n_snapshots", "snapshot_times", "plots
 
 #: Modules whose presence in a fresh interpreter proves CLI help/list/inspect
 #: touched CUDA or matplotlib. All of these must stay unimported for the
-#: CPU-safety subprocess tests to pass. Legacy module paths are aliases, so
-#: heavy modules are listed under their canonical names as well.
+#: CPU-safety subprocess tests to pass.
 HEAVY_MODULES = ("cupy", "cupyx", "matplotlib",
-                 "tropoi.planet.planet", "tropoi.spatial.planet",
+                 "tropoi.spatial.planet",
                  "tropoi.run.bve.runner",
                  "tropoi.run.pe.runner",
-                 "tropoi.viz", "tropoi.representation.visual")
+                 "tropoi.representation.visual")
 
 
 @pytest.fixture
 def stub_execute_run(monkeypatch):
     """Replace cli.bve.execute_run with a capturing stub; return the captured cfg."""
-    import tropoi.cli.bve as bve_module
+    import tropoi.run.bve.execution as bve_module
 
     captured = {}
 
@@ -49,13 +48,6 @@ def stub_execute_run(monkeypatch):
 def run_tropoi_stubbed(argv, captured):
     from tropoi.cli.main import main
     assert main(argv) == 0
-    return captured["cfg"]
-
-
-def run_psx_bve_stubbed(argv, captured, monkeypatch):
-    import tropoi.cli.bve as bve_module
-    monkeypatch.setattr(sys, "argv", ["psx-bve", *argv])
-    assert bve_module.main() == 0
     return captured["cfg"]
 
 

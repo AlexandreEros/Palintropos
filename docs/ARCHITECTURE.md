@@ -54,9 +54,7 @@ src/tropoi/
 ├── run/{bve,swe,pe}/    orchestration: resolved run configuration and the runners
 ├── run/custom/          custom planets/initial states: preparation, configuration, execution, preset export,
 │                        prepared planets with terrain previews (planet.py)
-├── cli/                 tropoi (main.py); aeolus/psx-bve/psx-gen/psx-recompile compatibility entry points
-└── numerics/ physics/ planet/ viz/ support.py
-                         compatibility import paths only (see "Compatibility paths")
+└── cli/                 tropoi (main.py), the single command-line entry point
 tests/                   asserting GPU tests plus standalone audit scripts
 examples/                runnable custom-planet examples (BVE, SWE, terrain import)
 docs/                    architecture, validation records, and tracked README assets
@@ -76,21 +74,20 @@ consumers: the product cut lives in `spatial.truncation`, which the
 operators, the tendencies, the diagnostics and the configuration layer all
 consume, so no spatial operation depends on a tendency implementation. The
 initializers receive a model object but reference its class only for type
-annotations. `tests/test_layout_compat.py` enforces this direction by
+annotations. `tests/test_layout.py` enforces this direction by
 parsing every import, with exactly two documented exceptions:
 
 - `representation.archive.writer` (the run-capsule writer) imports
   `scientific_config_subset` from the stdlib-only `run.bve.config`: the
   run-id hash is defined by the configuration layer's scientific subset.
 - `representation.visual.snapshot` lazily imports the solver modules'
-  model builders (`cli.bve.build_planet`, `cli.swe.build_swe_model`,
-  `cli.pe.build_pe_model`) when `Snapshot.plot` must reconstruct model
+  model builders (`run.bve.model.build_planet`, `run.swe.model.build_swe_model`,
+  `run.pe.model.build_pe_model`) when `Snapshot.plot` must reconstruct model
   resources from a persisted configuration.
 
 Prescribed environment and discretization are separate objects.
 `PlanetaryParameters` (radius, rotation, mass) is importable without CuPy
-from `spatial.environment` (the legacy `tropoi.planet` paths still load the
-CUDA facade through that package's initializer, as they always did); grids, transforms, backends and their cached
+from `spatial.environment`; grids, transforms, backends and their cached
 `ProductSpace`s are discretization resources built from it and shared by
 every field and snapshot. `Planet` remains the facade that bundles them
 for the cores. Radius, gravity and rotation defaults are unchanged.
@@ -117,19 +114,13 @@ Matplotlib through a parent package. The one exception is
 `representation.archive`, whose initializer exposes the CPU-only reader
 API (`open_simulation`, the schema types).
 
-### Compatibility paths
+### Retired compatibility paths
 
-Every pre-reorganization module path still imports, for the remainder of
-the 0.1 series; removing one requires an explicit release decision. Each
-old module file calls `tropoi._compat.alias_module`, which binds the old
-name to the canonical module object in `sys.modules`: there is one
-implementation, `old.Class is new.Class`, module state is shared, and
-monkeypatching either name patches both. Canonical modules never import
-these paths. The legacy package initializers `tropoi.numerics`,
-`tropoi.planet` and `tropoi.viz` keep their historical re-exports (the same
-objects), and names that moved out of a module remain importable from it
-(the state classes from the tendency modules, the preset guards and
-Williamson-5 constants from `run.swe.config` / `run.pe.config`).
+The pre-reorganization import aliases and package re-exports were retired
+on 2026-10-27. Import implementations directly using the table below.
+This is an intentional breaking change to the Python and command interfaces;
+saved-run formats and readers are unchanged. Repository tests and scripts
+use the canonical paths.
 
 | Legacy path | Canonical module |
 | --- | --- |
@@ -153,12 +144,36 @@ Williamson-5 constants from `run.swe.config` / `run.pe.config`).
 | `tropoi.run.pe.snapshot_visualization` | `tropoi.representation.visual.pe_snapshots` |
 | `tropoi.viz.*` | `tropoi.representation.visual.*` |
 
-`tropoi.run.bve.barotropic_vorticity` remains the older re-export module
-for the BVE core and state. Dated records (audits, handoffs, validation
-reports) and descriptive strings already written into manifests keep the
-paths of their time; read them through this table. The package, the
-distribution and every command (`tropoi`, `aeolus`, `psx-bve`, `psx-gen`,
-`psx-recompile`) are unchanged.
+The older `tropoi.run.bve.barotropic_vorticity` module and the re-exports
+from `tropoi.run.bve` are also retired. Import `BarotropicVorticity` from
+`tropoi.temporal.tendencies.barotropic`, `BarotropicState` from
+`tropoi.spatial.states.barotropic`, and `run_bve` from `tropoi.run.bve.runner`.
+Dated records and descriptive strings in saved manifests keep the paths of
+their time; read them through this table.
+
+Use `tropoi` instead of `aeolus`, `tropoi run bve` instead of `psx-bve`,
+`tropoi gen` instead of `psx-gen`, and `tropoi recompile` instead of
+`psx-recompile`. The old commands and their standalone parser wrappers are
+removed. To reproduce the former `psx-bve` default schedule, pass
+`--snapshot-interval-seconds 21600`; the default remains five snapshots.
+The distribution is still `palintropos` and the import package is `tropoi`.
+
+Unused name aliases were also removed: use `GeodesicSphericalHarmonics`
+instead of `OptimizedGeodesicSH`, `PanelGroupSpec` instead of `PanelGroup`,
+`FigureFrame` instead of `TimelineFrame`, and `render_figure_timeline`
+instead of `render_timeline`. The uncalled `visual.maps` module,
+`SpectralOperators.laplacian_field`, `build_swe_spectral_snapshot_timeline`,
+and `prepared_terrain.describe_band_limit` were removed. SWE spectral
+frames remain available through `build_swe_snapshot_timelines` and the
+saved-run plotting interface.
+
+This cleanup used repository imports, name references (including strings
+in subprocess tests), command entry points, and the architecture graphs.
+Missing call-graph edges alone are not evidence of dead code: protocols,
+callbacks, public accessors, and numerical reference implementations need
+their consumers checked separately. In particular, the old lat–lon
+transform is still instantiated by comparison tests, and legacy capsule
+inference still reads published scientific runs; both remain supported.
 
 ### CPU and GPU requirements
 
@@ -252,7 +267,7 @@ passed at its boundary (never inferred from whether a schedule was supplied):
   stored snapshot times and final diagnostic time equal the requested targets
   exactly, including deliberately non-aligned durations such as
   `t_end = 600.0000003 s`.
-- **Interval mode** (`--snapshot-interval-seconds` / legacy `psx-bve`)
+- **Interval mode** (`--snapshot-interval-seconds`)
   reproduces the historical countdown bit-for-bit: it stores `t = 0` and each
   interval boundary, and stops within the legacy `1e-6 * dt_snapshots`
   tolerance — so the final state is stored only when the duration is a multiple

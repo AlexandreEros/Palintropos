@@ -23,10 +23,8 @@ Two mutually exclusive controls, both parsed as ``None`` by the CLI:
     stored only when the duration is a multiple of the interval (historical
     psx-bve behavior, preserved).
 
-When neither is supplied, the default depends on the calling interface:
-``tropoi run bve`` uses N=5 (which reproduces the historical 0/6/12/18/24 h
-states for the default one-day run); legacy ``psx-bve`` keeps the historical
-21600 s interval.
+When neither is supplied, use N=5: snapshots at 0/6/12/18/24 h for the
+default one-day run. Interval scheduling requires an explicit interval.
 
 Config-dict schema
 ------------------
@@ -257,15 +255,12 @@ class BVERunConfig:
     @classmethod
     def resolve(cls,
                 explicit: Mapping,
-                preset: Optional[Mapping] = None,
-                snapshot_default: str = "count") -> "BVERunConfig":
+                preset: Optional[Mapping] = None) -> "BVERunConfig":
         """Layer explicit values over a preset over ordinary defaults.
 
         ``explicit`` must contain only values the user actually supplied
         (the CLI parses every option with a None default and filters).
-        ``snapshot_default`` selects the interface default when neither
-        snapshot control is supplied: "count" (tropoi, N=5) or "interval"
-        (legacy psx-bve, 21600 s).
+        When neither snapshot control is supplied, use five snapshots.
         """
         explicit = {k: v for k, v in dict(explicit).items() if v is not None}
         preset = dict(preset) if preset else {}
@@ -314,13 +309,7 @@ class BVERunConfig:
                 "snapshot count and snapshot interval are mutually exclusive; "
                 "provide at most one")
         if n is None and interval is None:
-            if snapshot_default == "count":
-                n = DEFAULT_N_SNAPSHOTS
-            elif snapshot_default == "interval":
-                interval = DEFAULT_SNAPSHOT_INTERVAL_SECONDS
-            else:
-                raise ValueError(
-                    f"unknown snapshot_default: {snapshot_default!r}")
+            n = DEFAULT_N_SNAPSHOTS
 
         if n is not None:
             if isinstance(n, bool) or not isinstance(n, int):

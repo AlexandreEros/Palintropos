@@ -32,7 +32,8 @@ EARTH_RADIUS = 6.371e6
 
 def _make_planet(day_hours=24.0, grid_type="latlon", nlat=32, nlon=64,
                  l_max=15, resolution=3):
-    from tropoi.planet import Planet, PlanetaryParameters
+    from tropoi.spatial.planet import Planet
+    from tropoi.spatial.environment import PlanetaryParameters
     return Planet.generate(
         params=PlanetaryParameters.from_earth_like(day_hours=day_hours),
         grid_type=grid_type, nlat=nlat, nlon=nlon, l_max=l_max,
@@ -55,8 +56,8 @@ def nonrotating_planet():
 
 def test_resting_state_all_tendencies_zero(latlon_planet):
     import cupy as cp
-    from tropoi.physics.shallow_water import (
-        ShallowWaterModel, ShallowWaterState)
+    from tropoi.temporal.tendencies.shallow_water import ShallowWaterModel
+    from tropoi.spatial.states.shallow_water import ShallowWaterState
 
     model = ShallowWaterModel(latlon_planet, mean_depth=1000.0)
     state = ShallowWaterState.zeros(latlon_planet.sh.l_max)
@@ -71,11 +72,11 @@ def test_resting_state_all_tendencies_zero(latlon_planet):
 def _bve_limit_max_error(planet):
     """Return (max |SW - BVE| zeta tendency, max |BVE|) for delta=phi=0."""
     import cupy as cp
-    from tropoi.physics.barotropic import (
-        BarotropicState, BarotropicVorticity)
-    from tropoi.physics.shallow_water import (
-        ShallowWaterModel, ShallowWaterState)
-    from tropoi.run.bve.initial_conditions import make_ic
+    from tropoi.temporal.tendencies.barotropic import BarotropicState
+    from tropoi.temporal.tendencies.barotropic import BarotropicVorticity
+    from tropoi.temporal.tendencies.shallow_water import ShallowWaterModel
+    from tropoi.spatial.states.shallow_water import ShallowWaterState
+    from tropoi.spatial.initialization.bve import make_ic
 
     zeta_lm = planet.sh.transform(make_ic("rh4", planet))
     zeta_lm[0, :] = 0.0  # monopole-clean state (the transform is inexact)
@@ -115,8 +116,8 @@ def test_bve_limit_matches_bve_tendency_geodesic():
 
 def test_streamfunction_only_state_reconstructs_solid_body(latlon_planet):
     import cupy as cp
-    from tropoi.physics.shallow_water import (
-        ShallowWaterModel, ShallowWaterState)
+    from tropoi.temporal.tendencies.shallow_water import ShallowWaterModel
+    from tropoi.spatial.states.shallow_water import ShallowWaterState
 
     planet = latlon_planet
     model = ShallowWaterModel(planet, mean_depth=1000.0)
@@ -147,8 +148,8 @@ def test_streamfunction_only_state_reconstructs_solid_body(latlon_planet):
 def test_velocity_potential_only_state_reconstructs_meridional_flow(
         latlon_planet):
     import cupy as cp
-    from tropoi.physics.shallow_water import (
-        ShallowWaterModel, ShallowWaterState)
+    from tropoi.temporal.tendencies.shallow_water import ShallowWaterModel
+    from tropoi.spatial.states.shallow_water import ShallowWaterState
 
     planet = latlon_planet
     model = ShallowWaterModel(planet, mean_depth=1000.0)
@@ -201,8 +202,8 @@ def test_reconstructed_wind_recovers_vorticity_and_divergence(latlon_planet):
     and divergence to round-off (rather than to scalar-truncation level).
     """
     import cupy as cp
-    from tropoi.physics.shallow_water import (
-        ShallowWaterModel, ShallowWaterState)
+    from tropoi.temporal.tendencies.shallow_water import ShallowWaterModel
+    from tropoi.spatial.states.shallow_water import ShallowWaterState
 
     planet = latlon_planet
     model = ShallowWaterModel(planet, mean_depth=1000.0)
@@ -246,9 +247,9 @@ def test_reconstructed_wind_recovers_vorticity_and_divergence(latlon_planet):
 def test_gravity_wave_frequency_matches_dispersion_relation(
         nonrotating_planet):
     import cupy as cp
-    from tropoi.physics.shallow_water import (
-        ShallowWaterModel, ShallowWaterState)
-    from tropoi.run.engine import rk4_step_array
+    from tropoi.temporal.tendencies.shallow_water import ShallowWaterModel
+    from tropoi.spatial.states.shallow_water import ShallowWaterState
+    from tropoi.temporal.integration import rk4_step_array
 
     planet = nonrotating_planet
     assert planet.params.angular_velocity == 0.0
@@ -295,9 +296,9 @@ def test_gravity_wave_frequency_matches_dispersion_relation(
 
 def test_monopoles_conserved_exactly_through_nonlinear_steps(latlon_planet):
     import cupy as cp
-    from tropoi.physics.shallow_water import (
-        ShallowWaterModel, ShallowWaterState)
-    from tropoi.run.engine import rk4_step_array
+    from tropoi.temporal.tendencies.shallow_water import ShallowWaterModel
+    from tropoi.spatial.states.shallow_water import ShallowWaterState
+    from tropoi.temporal.integration import rk4_step_array
 
     planet = latlon_planet
     model = ShallowWaterModel(planet, mean_depth=1000.0)
@@ -323,8 +324,8 @@ def test_monopoles_conserved_exactly_through_nonlinear_steps(latlon_planet):
 
 def test_hyperdiffusion_damps_but_never_touches_monopoles(latlon_planet):
     import cupy as cp
-    from tropoi.physics.shallow_water import (
-        ShallowWaterModel, ShallowWaterState)
+    from tropoi.temporal.tendencies.shallow_water import ShallowWaterModel
+    from tropoi.spatial.states.shallow_water import ShallowWaterState
 
     planet = latlon_planet
     l_max = planet.sh.l_max
@@ -352,8 +353,9 @@ def test_hyperdiffusion_damps_but_never_touches_monopoles(latlon_planet):
 
 def test_validate_state_rejects_nan(latlon_planet):
     import cupy as cp
-    from tropoi.physics.shallow_water import (
-        ShallowWaterModel, ShallowWaterState, ShallowWaterStateError)
+    from tropoi.temporal.tendencies.shallow_water import ShallowWaterModel
+    from tropoi.spatial.states.shallow_water import ShallowWaterState
+    from tropoi.spatial.states.shallow_water import ShallowWaterStateError
 
     model = ShallowWaterModel(latlon_planet, mean_depth=1000.0)
     state = ShallowWaterState.zeros(latlon_planet.sh.l_max)
@@ -363,8 +365,9 @@ def test_validate_state_rejects_nan(latlon_planet):
 
 
 def test_validate_state_rejects_nonzero_monopole(latlon_planet):
-    from tropoi.physics.shallow_water import (
-        ShallowWaterModel, ShallowWaterState, ShallowWaterStateError)
+    from tropoi.temporal.tendencies.shallow_water import ShallowWaterModel
+    from tropoi.spatial.states.shallow_water import ShallowWaterState
+    from tropoi.spatial.states.shallow_water import ShallowWaterStateError
 
     model = ShallowWaterModel(latlon_planet, mean_depth=1000.0)
     state = ShallowWaterState.zeros(latlon_planet.sh.l_max)
@@ -374,8 +377,9 @@ def test_validate_state_rejects_nonzero_monopole(latlon_planet):
 
 
 def test_validate_state_rejects_negative_fluid_depth(latlon_planet):
-    from tropoi.physics.shallow_water import (
-        ShallowWaterModel, ShallowWaterState, ShallowWaterStateError)
+    from tropoi.temporal.tendencies.shallow_water import ShallowWaterModel
+    from tropoi.spatial.states.shallow_water import ShallowWaterState
+    from tropoi.spatial.states.shallow_water import ShallowWaterStateError
 
     model = ShallowWaterModel(latlon_planet, mean_depth=1000.0)
     state = ShallowWaterState.zeros(latlon_planet.sh.l_max)
@@ -389,8 +393,9 @@ def test_validate_state_checks_positivity_on_product_sampling():
     """Audit finding 1: depth can collapse on the (finer) product grid while
     every state-grid point stays positive; validation must scan both."""
     import cupy as cp
-    from tropoi.physics.shallow_water import (
-        ShallowWaterModel, ShallowWaterState, ShallowWaterStateError)
+    from tropoi.temporal.tendencies.shallow_water import ShallowWaterModel
+    from tropoi.spatial.states.shallow_water import ShallowWaterState
+    from tropoi.spatial.states.shallow_water import ShallowWaterStateError
 
     planet = _make_planet(grid_type="geodesic", resolution=3, l_max=10)
     model = ShallowWaterModel(planet, mean_depth=1000.0)
@@ -436,9 +441,10 @@ def test_rk4_stage_validation_catches_transient_depth_collapse(
     stages through negative depth while the accepted state looks valid; the
     stage validator must fail explicitly."""
     import cupy as cp
-    from tropoi.physics.shallow_water import (
-        ShallowWaterModel, ShallowWaterState, ShallowWaterStateError)
-    from tropoi.run.engine import rk4_step_array
+    from tropoi.temporal.tendencies.shallow_water import ShallowWaterModel
+    from tropoi.spatial.states.shallow_water import ShallowWaterState
+    from tropoi.spatial.states.shallow_water import ShallowWaterStateError
+    from tropoi.temporal.integration import rk4_step_array
 
     planet = nonrotating_planet
     model = ShallowWaterModel(planet, mean_depth=1000.0)
@@ -468,7 +474,7 @@ def test_rk4_stage_validation_catches_transient_depth_collapse(
 
 
 def test_model_rejects_bad_parameters(latlon_planet):
-    from tropoi.physics.shallow_water import ShallowWaterModel
+    from tropoi.temporal.tendencies.shallow_water import ShallowWaterModel
 
     with pytest.raises(ValueError, match="mean_depth"):
         ShallowWaterModel(latlon_planet, mean_depth=0.0)

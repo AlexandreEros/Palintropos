@@ -540,7 +540,7 @@ the linear gravity-wave terms is the documented escape hatch, deferred.
 * **Run capsules**: a future `PERunConfig` mirrors `SWERunConfig`
   (`solver: "pe"` in `to_run_config_dict()`, plus `nlev`,
   `sigma_interfaces`, `t_ref_profile` when it exists); `make_run_id`,
-  `config.json`/`manifest.json`, and the shared `cli/run_lifecycle.py`
+  `config.json`/`manifest.json`, and the shared `run/lifecycle.py`
   machinery are reused as-is. The sigma-interface list is part of run
   identity (it changes the science), exactly like `snapshot_times`.
 * **CLI**: `tropoi run pe` is **not** added in this milestone — there is

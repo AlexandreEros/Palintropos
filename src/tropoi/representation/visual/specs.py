@@ -555,10 +555,6 @@ class PanelGroupSpec:
             self.column + self.column_span)
 
 
-# Concise public spelling for callers that do not need the Spec suffix.
-PanelGroup = PanelGroupSpec
-
-
 @dataclass(frozen=True)
 class FigureSpec:
     panels: tuple[PanelPlacement, ...]

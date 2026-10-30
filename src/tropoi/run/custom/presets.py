@@ -33,8 +33,8 @@ __all__ = [
 def planet_spec_for_run_config(run_config: Mapping) -> PlanetSpec:
     """The planet a resolved run configuration builds, as a specification.
 
-    Mirrors the builders (``cli.bve.build_planet``,
-    ``cli.swe.build_swe_model``): an explicit ``planet`` block (custom runs)
+    Mirrors the builders (``run.bve.model.build_planet``,
+    ``run.swe.model.build_swe_model``): an explicit ``planet`` block (custom runs)
     is authoritative; the Williamson-5 scenario uses the ideal sphere of
     radius ``radius_earth_units * W5_RADIUS_M``; every other preset uses
     ``from_earth_like(day_hours, radius_earth_units)``.
@@ -92,7 +92,7 @@ def initial_state_from_config(cfg, *, label: Optional[str] = None,
     provenance: dict = {"kind": "preset-export", "scenario": cfg.scenario,
                         "preset": preset}
     if isinstance(cfg, BVERunConfig):
-        from tropoi.cli.bve import build_planet
+        from tropoi.run.bve.model import build_planet
         from tropoi.spatial.initialization.bve import make_ic
 
         planet = build_planet(run_config)
@@ -107,7 +107,7 @@ def initial_state_from_config(cfg, *, label: Optional[str] = None,
             label=label or f"bve-{preset or cfg.scenario}",
             provenance=provenance)
     if isinstance(cfg, SWERunConfig):
-        from tropoi.cli.swe import build_swe_model
+        from tropoi.run.swe.model import build_swe_model
         from tropoi.spatial.initialization.swe import make_swe_ic
 
         model = build_swe_model(run_config)
@@ -151,7 +151,7 @@ def initial_state_from_preset(solver: str, settings: Optional[Mapping] = None,
     if solver == "bve":
         preset_settings = None
         if preset is not None:
-            from tropoi.cli.main import PRESETS
+            from tropoi.run.bve.presets import PRESETS
             if preset not in PRESETS:
                 raise ValueError(
                     f"unknown BVE preset {preset!r}; choose from "

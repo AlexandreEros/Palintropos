@@ -197,13 +197,20 @@ def render_readme(metrics: dict, opts, files: list[str], generated_marker: str,
         "| | |",
         "|---|---|",
         f"| Source commit | `{source['commit']}` |" if source["commit"] else
-        "| Source commit | not recorded (working tree at generation time) |",
+        (f"| Source base commit | `{source['working_tree']['base_commit']}` + working-tree changes |"
+         if source.get("working_tree") else "| Source commit | not recorded (fixture or unspecified source) |"),
         f"| Analysed package | `{source['package']}` under `{source['src']}/` |",
         f"| Generator | `tools.architecture` {tool['version']}"
         + (f", commit `{tool['generator_commit']}`" if tool["generator_commit"] else "") + " |",
         f"| Toolchain | Python {tool['python']}, grimp {tool['grimp']}, networkx {tool['networkx']} |",
         f"| Command | `{opts.command}` |",
         "",
+        *([f"Source working tree: **{source['working_tree']['source']['status']}**. "
+           f"Content SHA-256: `{source['working_tree']['source']['sha256']}`. "
+           f"Generator working tree: **{source['working_tree']['generator']['status']}**. "
+           "Per-file hashes and scoped Git status are recorded in `metrics.json`. "
+           "The base commit alone does not identify uncommitted source.", ""]
+          if source.get("working_tree") else []),
         "## Reproducing",
         "",
         "From the repository root, with the development requirements installed "

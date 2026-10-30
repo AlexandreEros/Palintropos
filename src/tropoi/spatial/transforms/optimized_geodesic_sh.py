@@ -14,7 +14,7 @@ from scipy.optimize import lsq_linear
 from tropoi.spatial.grids.geodesic_grid import GeodesicGridGeometry
 from tropoi.spatial.transforms.fast_geodesic_sh import PointSetSphericalHarmonics
 
-__all__ = ["GeodesicSphericalHarmonics", "OptimizedGeodesicSH"]
+__all__ = ["GeodesicSphericalHarmonics"]
 
 # Minimum grid points per spherical-harmonic basis function for the discrete
 # (non-exact) quadrature to keep analysis/synthesis round trips well conditioned.
@@ -301,6 +301,3 @@ def test_optimized_vs_voronoi(resolution=4, radius=1.0, l_max=15):
 
 if __name__ == "__main__":
     test_optimized_vs_voronoi()
-
-# Backwards-compatible alias
-OptimizedGeodesicSH = GeodesicSphericalHarmonics

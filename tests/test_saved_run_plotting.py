@@ -114,8 +114,7 @@ def test_spectral_representation_renders_on_the_host(tmp_path, solver):
 
 def test_timeline_normalization_matches_the_persisted_product_limits(tmp_path):
     from tropoi.representation.visual.snapshot import build_snapshot_timeline
-    from tropoi.run.bve.visualization import (
-        build_bve_spectral_snapshot_timeline)
+    from tropoi.representation.visual.bve import build_bve_spectral_snapshot_timeline
     sim = open_simulation(_synthetic(tmp_path / "bve", "bve"))
     old = build_bve_spectral_snapshot_timeline(
         None, tmp_path / "bve", scenario="synthetic").resolve_normalizations()
@@ -199,8 +198,10 @@ def _copy_capsule(src: pathlib.Path, dst: pathlib.Path, frames: int) -> None:
 
 
 def _panel_inputs(spec):
-    from tropoi.viz.specs import (ScalarMapSpec, SpectralCoefficientMapSpec,
-                                  StreamlineMapSpec, TextPanelSpec)
+    from tropoi.representation.visual.specs import ScalarMapSpec
+    from tropoi.representation.visual.specs import SpectralCoefficientMapSpec
+    from tropoi.representation.visual.specs import StreamlineMapSpec
+    from tropoi.representation.visual.specs import TextPanelSpec
     out = []
     for placement in spec.panels:
         panel = placement.panel
@@ -241,22 +242,22 @@ def test_old_and_new_paths_render_the_same_saved_frame(tmp_path, name, index,
     resources = storage.resources()
 
     if sim.solver == "bve":
-        from tropoi.run.bve.visualization import (
-            build_bve_snapshot_timelines, render_bve_snapshots)
+        from tropoi.representation.visual.bve import build_bve_snapshot_timelines
+        from tropoi.representation.visual.bve import render_bve_snapshots
         old = build_bve_snapshot_timelines(resources.planet, dst,
                                            scenario=scenario)
         render_bve_snapshots(resources.planet, dst, scenario=scenario,
                              metadata={"RunId": run_id})
     elif sim.solver == "swe":
-        from tropoi.run.swe.visualization import (
-            build_swe_snapshot_timelines, render_swe_snapshots)
+        from tropoi.representation.visual.swe import build_swe_snapshot_timelines
+        from tropoi.representation.visual.swe import render_swe_snapshots
         old = build_swe_snapshot_timelines(resources.model, dst,
                                            scenario=scenario)
         render_swe_snapshots(resources.model, dst, scenario=scenario,
                              metadata={"RunId": run_id})
     else:
-        from tropoi.run.pe.snapshot_visualization import (
-            build_pe_snapshot_timeline, render_pe_snapshots)
+        from tropoi.representation.visual.pe_snapshots import build_pe_snapshot_timeline
+        from tropoi.representation.visual.pe_snapshots import render_pe_snapshots
         old = {"physical": build_pe_snapshot_timeline(
             resources.model, dst, scenario=scenario, run_id=run_id)}
         render_pe_snapshots(resources.model, dst, scenario=scenario,

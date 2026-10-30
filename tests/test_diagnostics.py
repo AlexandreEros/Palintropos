@@ -22,17 +22,13 @@ except Exception:  # pragma: no cover - import guard
 pytestmark = pytest.mark.skipif(not _HAS_CUDA, reason="CUDA/CuPy not available")
 
 if _HAS_CUDA:
-    from tropoi.numerics import (
-        GeodesicGridGeometry,
-        GeodesicSphericalHarmonics,
-        SpectralOperators,
-    )
-    from tropoi.run.bve.diagnostics import (
-        CSV_COLUMNS,
-        DiagnosticsRecorder,
-        grid_diagnostics,
-        spectral_diagnostics,
-    )
+    from tropoi.spatial.grids.geodesic_grid import GeodesicGridGeometry
+    from tropoi.spatial.transforms.optimized_geodesic_sh import GeodesicSphericalHarmonics
+    from tropoi.spatial.operators.spectral_operators import SpectralOperators
+    from tropoi.representation.diagnostics.bve import CSV_COLUMNS
+    from tropoi.representation.diagnostics.bve import DiagnosticsRecorder
+    from tropoi.representation.diagnostics.bve import grid_diagnostics
+    from tropoi.representation.diagnostics.bve import spectral_diagnostics
 
 R = 6.371e6
 OMEGA = 7.292e-5

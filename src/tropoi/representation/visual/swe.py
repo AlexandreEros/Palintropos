@@ -374,16 +374,6 @@ def build_swe_snapshot_timeline(
         model, spectral_fields, times, scenario=scenario)
 
 
-def build_swe_spectral_snapshot_timeline(
-        model, out_dir: pathlib.Path | str, *, scenario: str = "swe"
-        ) -> FigureTimeline:
-    """Build SWE coefficient-space frames at the persisted snapshot times."""
-    del model  # Kept for a symmetric public adapter signature.
-    spectral_fields, times = _load_swe_fields(out_dir)
-    return _build_swe_spectral_timeline(
-        spectral_fields, times, scenario=scenario)
-
-
 def build_swe_snapshot_timelines(
         model, out_dir: pathlib.Path | str, *, scenario: str = "swe"
         ) -> dict[str, FigureTimeline]:
@@ -461,7 +451,6 @@ __all__ = [
     "build_swe_snapshot_timelines",
     "build_swe_snapshot_timelines_from_data",
     "build_swe_snapshot_timeline",
-    "build_swe_spectral_snapshot_timeline",
     "build_swe_summary_spec",
     "build_swe_timeline",
     "render_swe_snapshot_timeline",

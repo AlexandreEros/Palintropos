@@ -13,9 +13,11 @@ from datetime import datetime, timezone
 import numpy as np
 import pytest
 
-from tropoi.run.bve.io import (RUN_STATUS_COMPLETED,
-                                          RunProvenanceError, create_run_dir,
-                                          make_run_id, update_manifest_status)
+from tropoi.representation.archive.writer import RUN_STATUS_COMPLETED
+from tropoi.representation.archive.writer import RunProvenanceError
+from tropoi.representation.archive.writer import create_run_dir
+from tropoi.representation.archive.writer import make_run_id
+from tropoi.representation.archive.writer import update_manifest_status
 from tropoi.run.pe.config import PERunConfig
 
 NOW = datetime(2026, 7, 19, 12, 0, 0, tzinfo=timezone.utc)
@@ -131,7 +133,7 @@ def _load_capsule(base):
 @cuda
 def test_end_to_end_capsule_is_complete_and_loadable(tmp_path):
     import pathlib
-    from tropoi.cli import pe as pe_module
+    from tropoi.run.pe import execution as pe_module
 
     cfg = _tiny_cfg(tmp_path)
     assert pe_module.execute_run(cfg) == 0

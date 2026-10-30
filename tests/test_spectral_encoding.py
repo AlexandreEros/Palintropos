@@ -6,15 +6,20 @@ import warnings
 import numpy as np
 from matplotlib.colors import hsv_to_rgb
 
-from tropoi.viz import (FigureFrame, FigureTimeline,
-                                    NormalizationKind, NormalizationPolicy,
-                                    PHASE_DOMAIN, SphericalHarmonicField,
-                                    SpectralCoefficientMapSpec,
-                                    SpectralEncoding, phase_hue,
-                                    phase_magnitude_hsv,
-                                    relative_magnitude_db)
-from tropoi.viz.matplotlib_renderer import MatplotlibRenderer
-from tropoi.viz.specs import FigureSpec, PanelPlacement
+from tropoi.representation.visual.timeline import FigureFrame
+from tropoi.representation.visual.timeline import FigureTimeline
+from tropoi.representation.visual.normalization import NormalizationKind
+from tropoi.representation.visual.normalization import NormalizationPolicy
+from tropoi.representation.visual.complex_encoding import PHASE_DOMAIN
+from tropoi.representation.visual.fields import SphericalHarmonicField
+from tropoi.representation.visual.specs import SpectralCoefficientMapSpec
+from tropoi.representation.visual.specs import SpectralEncoding
+from tropoi.representation.visual.complex_encoding import phase_hue
+from tropoi.representation.visual.complex_encoding import phase_magnitude_hsv
+from tropoi.representation.visual.complex_encoding import relative_magnitude_db
+from tropoi.representation.visual.matplotlib_renderer import MatplotlibRenderer
+from tropoi.representation.visual.specs import FigureSpec
+from tropoi.representation.visual.specs import PanelPlacement
 
 
 def _fixed_policy() -> NormalizationPolicy:

@@ -3,7 +3,7 @@
 :func:`run_initial_state` is the public execution path. It resolves the
 configuration on the CPU (:class:`CustomRunConfig`), then hands the run to
 the same provenance lifecycle every ``tropoi run`` command uses
-(``cli.run_lifecycle.execute_with_provenance``): a unique run directory,
+(``run.lifecycle.execute_with_provenance``): a unique run directory,
 ``config.json`` and ``manifest.json`` (status ``running`` -> ``completed``
 or ``failed``), the additive ``state_schema`` / ``diagnostic_definitions``
 blocks, and ``latest_run.txt`` published only on success. The cores and
@@ -33,7 +33,7 @@ INITIAL_STATE_DIR = "initial_state"
 
 
 def _notes(cfg: CustomRunConfig) -> dict:
-    from tropoi.cli.swe import SWE_MANIFEST_NOTES
+    from tropoi.run.swe.execution import SWE_MANIFEST_NOTES
     from tropoi.representation.archive.writer import _DEFAULT_MANIFEST_NOTES
 
     notes = dict(SWE_MANIFEST_NOTES if cfg.solver == "swe"
@@ -47,7 +47,7 @@ def _notes(cfg: CustomRunConfig) -> dict:
 
 
 def _clean_artifacts(cfg: CustomRunConfig, out_dir: pathlib.Path) -> None:
-    from tropoi.cli.bve import OverwriteCleanupError
+    from tropoi.run.bve.execution import OverwriteCleanupError
 
     target = out_dir / INITIAL_STATE_DIR
     if target.exists():
@@ -58,17 +58,17 @@ def _clean_artifacts(cfg: CustomRunConfig, out_dir: pathlib.Path) -> None:
                 f"could not remove stale {INITIAL_STATE_DIR}/ during "
                 f"--overwrite of {out_dir}: {err}") from err
     if cfg.solver == "swe":
-        from tropoi.cli.swe import _clean_overwrite_artifacts
+        from tropoi.run.swe.execution import _clean_overwrite_artifacts
     else:
-        from tropoi.cli.bve import _clean_overwrite_artifacts
+        from tropoi.run.bve.execution import _clean_overwrite_artifacts
     _clean_overwrite_artifacts(out_dir)
 
 
 def _resolve_base_dir(cfg: CustomRunConfig, out: str):
     if cfg.solver == "swe":
-        from tropoi.cli.swe import _resolve_writable_base_dir
+        from tropoi.run.swe.execution import _resolve_writable_base_dir
     else:
-        from tropoi.cli.bve import _resolve_writable_base_dir
+        from tropoi.run.bve.execution import _resolve_writable_base_dir
     return _resolve_writable_base_dir(out)
 
 
@@ -107,7 +107,7 @@ def _integrate(cfg: CustomRunConfig, run_dir, run_config: dict) -> None:
                                                       write_run_manifest)
 
     if cfg.solver == "bve":
-        from tropoi.cli.bve import build_planet
+        from tropoi.run.bve.model import build_planet
         from tropoi.run.bve.runner import run_bve
 
         planet = build_planet(run_config)
@@ -131,7 +131,7 @@ def _integrate(cfg: CustomRunConfig, run_dir, run_config: dict) -> None:
                 snapshot_mode=cfg.snapshot_mode)
         return
 
-    from tropoi.cli.swe import build_swe_model
+    from tropoi.run.swe.model import build_swe_model
     from tropoi.run.swe.runner import run_swe
     from tropoi.spatial.states.shallow_water import ShallowWaterState
 
@@ -158,7 +158,7 @@ def _integrate(cfg: CustomRunConfig, run_dir, run_config: dict) -> None:
 
 def execute_custom_run(cfg: CustomRunConfig) -> pathlib.Path:
     """Run a resolved :class:`CustomRunConfig`; return the run directory."""
-    from tropoi.cli.run_lifecycle import execute_with_provenance
+    from tropoi.run.lifecycle import execute_with_provenance
 
     if not isinstance(cfg, CustomRunConfig):
         raise TypeError(

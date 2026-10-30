@@ -1,6 +1,6 @@
 """CPU-safety of the shared support contract (fresh-interpreter probes).
 
-``tropoi.support`` is consumed by configuration, diagnostics, the CLI, and
+``tropoi.spatial.truncation`` is consumed by configuration, diagnostics, the CLI, and
 the numerical cores alike, so importing it (and the CLI paths that consult
 it) must never load CuPy, matplotlib, or the heavy runner/visualization
 modules. Each probe runs in a fresh subprocess and asserts the banned
@@ -16,7 +16,7 @@ from .conftest import HEAVY_MODULES, assert_probe_passes
 
 def test_importing_support_is_cpu_safe():
     assert_probe_passes(
-        "from tropoi.support import product_truncation_cut",
+        "from tropoi.spatial.truncation import product_truncation_cut",
         "0 if product_truncation_cut(21) == 14 else 1")
 
 
@@ -41,16 +41,6 @@ def test_truncation_import_loads_only_the_truncation_module():
     _assert_loads_exactly(
         "import tropoi.spatial.truncation",
         ["tropoi", "tropoi.spatial", "tropoi.spatial.truncation"])
-
-
-def test_legacy_support_import_adds_only_the_alias():
-    # tropoi.support (its home before the layout refactor) aliases the
-    # canonical module: it may add only itself and the stdlib-only alias
-    # helper.
-    _assert_loads_exactly(
-        "import tropoi.support",
-        ["tropoi", "tropoi._compat", "tropoi.spatial",
-         "tropoi.spatial.truncation", "tropoi.support"])
 
 
 def test_config_resolution_using_the_cut_is_cpu_safe():

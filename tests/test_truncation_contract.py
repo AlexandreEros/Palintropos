@@ -1,6 +1,6 @@
 """Contract of the single product-truncation cut (CPU-only).
 
-``tropoi.support.product_truncation_cut`` is the one production definition
+``tropoi.spatial.truncation.product_truncation_cut`` is the one production definition
 of the 2/3-rule cut. These tests pin its values, its identity at the
 historical primitive-equation import path, and its use by the BVE
 diagnostic band; the operator/core sites are exercised by the CUDA suites
@@ -11,7 +11,7 @@ from __future__ import annotations
 
 import pytest
 
-from tropoi.support import product_truncation_cut
+from tropoi.spatial.truncation import product_truncation_cut
 
 PINNED = {1: 0, 2: 1, 3: 2, 4: 2, 5: 3, 6: 4, 10: 6, 15: 10, 21: 14,
           42: 28, 63: 42}
@@ -44,7 +44,7 @@ def test_cut_never_exceeds_capacity_and_is_monotone():
 
 
 def test_support_module_has_no_package_dependencies():
-    import tropoi.support as support
+    import tropoi.spatial.truncation as support
     import tropoi.spatial.truncation as truncation
     assert support is truncation              # legacy path aliases the module
     # The cut plus the preset support guards relocated from the SWE/PE
@@ -66,5 +66,5 @@ def test_primitive_equations_reexports_the_same_function():
     cp = pytest.importorskip("cupy")
     if not cp.is_available():
         pytest.skip("CUDA/CuPy not available")
-    from tropoi.physics import primitive_equations as pe
+    import tropoi.temporal.tendencies.primitive_equations as pe
     assert pe.product_truncation_cut is product_truncation_cut

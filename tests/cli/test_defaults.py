@@ -1,4 +1,4 @@
-"""Canonical/legacy defaults, aliases, and parser compatibility surfaces."""
+"""Canonical defaults, option aliases, and persisted configuration keys."""
 from __future__ import annotations
 
 import pytest
@@ -6,14 +6,12 @@ import pytest
 from tropoi.cli.main import build_parser
 from tropoi.run.bve.config import (
     DEFAULT_N_SNAPSHOTS,
-    DEFAULT_SNAPSHOT_INTERVAL_SECONDS,
 )
 
 from .conftest import (
     ADDITIVE_CONFIG_KEYS,
     LEGACY_CONFIG_KEYS,
     run_tropoi_stubbed,
-    run_psx_bve_stubbed,
 )
 
 
@@ -24,25 +22,6 @@ def test_canonical_default_is_count_mode_n5(stub_execute_run):
     assert cfg.dt_snapshots == 21600.0
     assert cfg.snapshot_times_seconds() == [
         0.0, 21600.0, 43200.0, 64800.0, 86400.0]
-
-
-def test_legacy_psx_bve_default_is_interval_mode(
-        monkeypatch, stub_execute_run):
-    cfg = run_psx_bve_stubbed([], stub_execute_run, monkeypatch)
-    assert cfg.snapshot_mode == "interval"
-    assert cfg.n_snapshots is None
-    assert cfg.dt_snapshots == DEFAULT_SNAPSHOT_INTERVAL_SECONDS == 21600.0
-
-
-def test_legacy_default_does_not_scale_with_duration(
-        monkeypatch, stub_execute_run):
-    legacy = run_psx_bve_stubbed(
-        ["--duration-days", "2"], stub_execute_run, monkeypatch)
-    assert len(legacy.snapshot_times_seconds()) == 9
-    canonical = run_tropoi_stubbed(
-        ["run", "bve", "--days", "2"], stub_execute_run)
-    assert len(canonical.snapshot_times_seconds()) == 5
-    assert canonical.dt_snapshots == 43200.0
 
 
 def test_defaults_match_legacy_psx_bve_values(stub_execute_run):
@@ -87,40 +66,18 @@ def test_frozen_argparse_dest_names():
         assert hasattr(args, dest), f"missing frozen dest {dest}"
 
 
-def test_legacy_build_parser_keeps_defaults():
-    from tropoi.cli.bve import build_parser as legacy_parser
-
-    d = vars(legacy_parser().parse_args([]))
-    assert d["grid"] == "geodesic"
-    assert d["lmax"] == 21
-    assert d["resolution"] == 4
-    assert d["day_hours"] == float("inf")
-    assert d["scenario"] == "two_vortices"
-    assert d["n_snapshots"] is None
-    # The legacy default-applying parser surface restores the historical
-    # psx-bve dt_snapshots default (21600 s), matching the original psx-bve
-    # parser byte-for-byte; the canonical tropoi parser leaves it None so count-mode
-    # N=5 remains the resolved default (asserted below).
-    assert d["dt_snapshots"] == DEFAULT_SNAPSHOT_INTERVAL_SECONDS == 21600.0
+def test_cli_exposes_and_defaults_product_quadrature(stub_execute_run):
+    cfg = run_tropoi_stubbed(["run", "bve"], stub_execute_run)
+    assert cfg.to_run_config_dict()["product_quadrature"] == "fine"
+    parser = build_parser()
+    with pytest.raises(SystemExit):
+        parser.parse_args(["run", "bve", "--product-quadrature", "exact"])
+    args = parser.parse_args(["run", "bve"])
+    assert "--product-quadrature" in args._parser.format_help()
 
 
 def test_canonical_bve_parser_leaves_dt_snapshots_none():
     """Canonical tropoi parser must NOT apply the legacy interval default."""
-    from tropoi.cli.main import build_bve_parser
-
-    args = build_bve_parser().parse_args([])
+    args = build_parser().parse_args(["run", "bve"])
     assert args.dt_snapshots is None
     assert args.n_snapshots is None
-
-
-def test_legacy_build_parser_accepts_historical_flags():
-    from tropoi.cli.bve import build_parser as legacy_parser
-
-    args = legacy_parser().parse_args([
-        "--grid", "latlon", "--nlat", "12", "--nlon", "24", "--lmax", "8",
-        "--scenario", "two_vortices", "--duration-days", "0.02",
-        "--dt-snapshots", "864", "--out", "runs",
-        "--experiment", "quickstart-latlon"])
-    assert args.grid == "latlon"
-    assert args.duration_days == 0.02
-    assert args.dt_snapshots == 864.0

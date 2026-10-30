@@ -166,7 +166,7 @@ def test_cli_accepts_terrain(tmp_path):
 # ---------------------------------------------------------------------------
 
 def _run(tmp_path, name, **explicit):
-    from tropoi.cli.pe import execute_run
+    from tropoi.run.pe.execution import execute_run
     out = tmp_path / name
     cfg = _resolve(out=str(out), n_snapshots=3, plots=["diagnostics"],
                    **explicit)
@@ -390,7 +390,7 @@ def test_terrain_source_changed_after_resolution_fails_the_run(tmp_path):
     the copy guard and its manifest says so."""
     import json
 
-    from tropoi.cli.pe import execute_run
+    from tropoi.run.pe.execution import execute_run
 
     _, path = _save(tmp_path)
     out = tmp_path / "runs"

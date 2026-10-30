@@ -51,7 +51,8 @@ def _cut(l_max):
 
 
 def _planet(grid, l_max, day_hours=24.0):
-    from tropoi.planet import Planet, PlanetaryParameters
+    from tropoi.spatial.planet import Planet
+    from tropoi.spatial.environment import PlanetaryParameters
     return Planet.generate(
         params=PlanetaryParameters.from_earth_like(day_hours=day_hours),
         grid_type=grid, nlat=32, nlon=64, l_max=l_max, grid_resolution=3)
@@ -67,7 +68,7 @@ def _band_max(a, lo, hi):
 # ---------------------------------------------------------------------------
 
 def _thermal_wave_state(model, amp):
-    from tropoi.physics.primitive_equations import isothermal_rest_state
+    from tropoi.spatial.states.primitive_equations import isothermal_rest_state
     state = isothermal_rest_state(model.l_max, model.nlev,
                                   temperature=T0, surface_pressure=PS0)
     state.temperature[:, 2, 2] = float(amp)   # low-level, no factory guard
@@ -75,14 +76,14 @@ def _thermal_wave_state(model, amp):
 
 
 def _pe_model(grid, l_max, nlev=3):
-    from tropoi.physics.primitive_equations import PrimitiveEquationsModel
-    from tropoi.physics.sigma_coordinate import SigmaGrid
+    from tropoi.temporal.tendencies.primitive_equations import PrimitiveEquationsModel
+    from tropoi.spatial.sigma_coordinate import SigmaGrid
     return PrimitiveEquationsModel(_planet(grid, l_max), SigmaGrid.uniform(nlev))
 
 
 def _two_validated_seconds(model, state):
-    from tropoi.physics.primitive_equations import PrimitiveEquationsState
-    from tropoi.run.engine import rk4_step_array
+    from tropoi.spatial.states.primitive_equations import PrimitiveEquationsState
+    from tropoi.temporal.integration import rk4_step_array
 
     def validator(y):
         model.validate_state(PrimitiveEquationsState(y), context="stage")
@@ -153,8 +154,8 @@ def test_pe_thermal_wave_zero_amplitude_is_exact_rest_at_lmax2(grid):
 # ---------------------------------------------------------------------------
 
 def _gravity_wave(grid, l_max):
-    from tropoi.physics.shallow_water import (ShallowWaterModel,
-                                              ShallowWaterState)
+    from tropoi.temporal.tendencies.shallow_water import ShallowWaterModel
+    from tropoi.spatial.states.shallow_water import ShallowWaterState
     planet = _planet(grid, l_max, day_hours=math.inf)
     model = ShallowWaterModel(planet, mean_depth=1000.0)   # flat, nu4 = 0
     state = ShallowWaterState.zeros(l_max)
@@ -168,7 +169,7 @@ def _gravity_wave(grid, l_max):
 def test_swe_gravity_wave_upper_pair_is_exactly_linear(grid, l_max):
     """Above the cut, delta/phi see only the exact linear pressure pair."""
     import cupy as cp
-    from tropoi.run.engine import rk4_step_array
+    from tropoi.temporal.integration import rk4_step_array
     cut = _cut(l_max)
     _, model, state = _gravity_wave(grid, l_max)
     ten = model.tendency(state.coeffs)
@@ -189,7 +190,7 @@ def test_swe_gravity_wave_lower_band_is_fed_nonlinearly(grid, l_max):
     """The lower band (l <= cut) is NOT linear: removing the upper delta/phi
     inputs removes its tendency, so the upper modes feed it through the
     retained products. Only the upper pair is a linear regime."""
-    from tropoi.run.engine import rk4_step_array
+    from tropoi.temporal.integration import rk4_step_array
     cut = _cut(l_max)
     _, model, state = _gravity_wave(grid, l_max)
     y = rk4_step_array(model.tendency, state.coeffs, 0.0, 300.0)
@@ -211,7 +212,7 @@ def test_swe_gravity_wave_lower_band_is_fed_nonlinearly(grid, l_max):
 @pytest.mark.parametrize("grid", GRIDS)
 @pytest.mark.parametrize("l_max", [4, 5])
 def test_swe_gravity_wave_frequency_at_minimum_capacity(grid, l_max):
-    from tropoi.run.engine import rk4_step_array
+    from tropoi.temporal.integration import rk4_step_array
     planet, model, state = _gravity_wave(grid, l_max)
     l, m = 4, 2
     omega_exact = math.sqrt(model.phi0 * l * (l + 1)) / planet.params.radius
@@ -237,8 +238,8 @@ def test_swe_gravity_wave_frequency_at_minimum_capacity(grid, l_max):
 
 def _williamson2_lowlevel(grid, l_max, *, retain_all=False):
     """Flat-bottom W2 with canonical constants, built without the factory."""
-    from tropoi.physics.shallow_water import (ShallowWaterModel,
-                                              ShallowWaterState)
+    from tropoi.temporal.tendencies.shallow_water import ShallowWaterModel
+    from tropoi.spatial.states.shallow_water import ShallowWaterState
     planet = _planet(grid, l_max, day_hours=DAY_HOURS_W2)
     a = planet.params.radius
     u0 = 2.0 * math.pi * a / (12.0 * 86400.0)
@@ -303,7 +304,7 @@ def test_w5_construction_needs_degree_two_storage():
     """The W5 wind/free-surface pair writes the (2,0) coefficient; an
     lmax = 1 state cannot hold it (IndexError at the low level). No W5
     integration is run here."""
-    from tropoi.physics.shallow_water import ShallowWaterState
+    from tropoi.spatial.states.shallow_water import ShallowWaterState
     state = ShallowWaterState.zeros(1)
     with pytest.raises(IndexError):
         state.coeffs[2, 2, 0] += 1.0

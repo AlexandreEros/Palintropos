@@ -344,7 +344,7 @@ def prepare_planet(planet: PlanetSpec, discretization: DiscretizationSpec,
     equation core requires (content above it cannot be balanced by the
     dealiased pressure-gradient pathway; see ``Topography.mountain``).
     """
-    from tropoi.run.custom.prepare import (PreparationError, _build_planet,
+    from tropoi.run.custom.resources import (PreparationError, _build_planet,
                                            _check_specs, _resolve_topography)
     from tropoi.spatial.terrain.raster import ElevationRaster
 

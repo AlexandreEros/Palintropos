@@ -2,7 +2,7 @@
 
 Each CPU-safety probe writes a real (tiny) capsule to a temporary directory
 and runs the command in a FRESH interpreter, asserting that the banned
-heavy modules (CuPy, Matplotlib, the runners, tropoi.viz) never load.
+heavy modules (CuPy, Matplotlib, the runners, tropoi.representation.visual) never load.
 Error contracts (invalid index, wrong-solver field, --field without
 --snapshot, unknown schema versions, incomplete capsules) run in-process.
 """
@@ -97,7 +97,7 @@ def test_inspect_snapshot_is_cpu_safe_in_fresh_interpreter(tmp_path, solver,
         "assert code == 0, code\n"
         f"banned = [m for m in {HEAVY_MODULES!r} if m in sys.modules]\n"
         "assert not banned, banned\n"
-        "assert 'tropoi.numerics' not in sys.modules\n"
+        "assert 'tropoi.spatial.transforms' not in sys.modules\n"
         "assert 'tropoi.representation.visual.snapshot' not in sys.modules\n"
         # canonical homes of the numerics and cores (legacy names are aliases)
         "assert not [m for m in sys.modules if m.startswith(("
