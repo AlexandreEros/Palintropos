@@ -405,6 +405,51 @@ def test_bad_function_specifications(spec, match, terrain_file,
         load_height_function(spec)
 
 
+def test_an_edited_file_runs_its_new_source_not_cached_bytecode(
+        tmp_path, monkeypatch):
+    # Regression: an import loader may reuse __pycache__ bytecode whose
+    # recorded mtime (whole seconds) and size match, executing the OLD code
+    # while the provenance hashes the NEW source. Same size, same mtime,
+    # with bytecode writing on (as in a default interpreter; CI or a shell
+    # may set PYTHONDONTWRITEBYTECODE, which would hide the bug):
+    import os
+    monkeypatch.setattr(sys, "dont_write_bytecode", False)
+    monkeypatch.setattr(sys, "pycache_prefix", None)
+    path = tmp_path / "edited.py"
+    path.write_text("def height(lat, lon):\n    return 100\n",
+                    encoding="utf-8")
+    stat = path.stat()
+    first, record = load_height_function(f"{path}:height")
+    assert first(0, 0) == 100
+    path.write_text("def height(lat, lon):\n    return 900\n",
+                    encoding="utf-8")
+    os.utime(path, ns=(stat.st_atime_ns, stat.st_mtime_ns))
+    assert path.stat().st_size == stat.st_size
+    again, new_record = load_height_function(f"{path}:height")
+    assert again(0, 0) == 900
+    assert new_record["function_file_sha256"] == hashlib.sha256(
+        path.read_bytes()).hexdigest() != record["function_file_sha256"]
+    raster = ElevationRaster.from_function(again, resolution_deg=10,
+                                           provenance=new_record)
+    assert np.all(raster.elevation_m == 900)
+    # nothing is cached next to the user's file
+    assert not (tmp_path / "__pycache__").exists()
+
+
+def test_a_loaded_file_behaves_like_a_module(tmp_path):
+    path = tmp_path / "mod.py"
+    path.write_text(
+        "import dataclasses, numpy as np\n"
+        "@dataclasses.dataclass\nclass Hill:\n    h: float = 300.0\n"
+        "    def __call__(self, lat, lon):\n"
+        "        return self.h * np.cos(np.radians(lat))\n"
+        "hill = Hill()\n"
+        "assert __file__.endswith('mod.py'), __file__\n"
+        "assert __name__ != '__main__'\n", encoding="utf-8")
+    function, _ = load_height_function(f"{path}:hill")
+    assert function(0.0, 0.0) == pytest.approx(300.0)
+
+
 def test_errors_while_executing_or_calling_a_file_are_reported(tmp_path):
     bad = tmp_path / "bad.py"
     bad.write_text("import numpy as np\nraise ValueError('broken import')\n",

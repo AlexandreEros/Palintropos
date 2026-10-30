@@ -67,21 +67,21 @@ from __future__ import annotations
 
 import ast
 import hashlib
-import importlib.util
 import math
 import numbers
 import operator
 import pathlib
 import re
 import sys
+import types
 from collections.abc import Callable, Mapping
 from dataclasses import dataclass, field
 from typing import Any
 
 import numpy as np
 
-from tropoi.spatial.terrain.raster import (MAX_RASTER_PIXELS,
-                                           ElevationImportError)
+from tropoi.spatial.terrain.elevation_import import (MAX_RASTER_PIXELS,
+                                                     ElevationImportError)
 
 __all__ = [
     "EXPRESSION_FUNCTIONS",
@@ -534,7 +534,10 @@ def load_height_function(spec, *, cwd=None) -> tuple[Callable, dict]:
     relative path is resolved against ``cwd`` (default: the current working
     directory). Returns ``(function, provenance)``; the provenance records
     the file's name and SHA-256 (of the bytes executed) and the callable's
-    name, not its absolute path. Raises :class:`HeightFunctionError` for a
+    name, not its absolute path. The hashed bytes are exactly the ones
+    compiled and executed: no import system, no ``__pycache__`` bytecode,
+    so an edited file always runs as edited. Raises
+    :class:`HeightFunctionError` for a
     malformed specification, a missing file, an error while executing it,
     or a missing or non-callable name.
     """
@@ -559,17 +562,21 @@ def load_height_function(spec, *, cwd=None) -> tuple[Callable, dict]:
     if not path.is_file():
         raise HeightFunctionError(
             f"height-function path is not a file: {path}")
+    # Execute exactly the bytes read and hashed here. An import loader
+    # (importlib's SourceFileLoader) would re-read the file and may run
+    # cached __pycache__ bytecode validated only by mtime (whole seconds)
+    # and size, so an edit within the same second could run the old code
+    # under the new source's hash. compile() honours PEP 263 encoding
+    # declarations and writes no bytecode next to the user's file.
     source = path.read_bytes()
     digest = hashlib.sha256(source).hexdigest()
     module_name = f"_tropoi_height_function_{digest[:16]}"
-    module_spec = importlib.util.spec_from_file_location(module_name, path)
-    if module_spec is None or module_spec.loader is None:
-        raise HeightFunctionError(
-            f"cannot load {path} as Python source (use a .py file)")
-    module = importlib.util.module_from_spec(module_spec)
+    module = types.ModuleType(module_name)
+    module.__file__ = str(path)
     sys.modules[module_name] = module      # dataclasses etc. look it up
     try:
-        module_spec.loader.exec_module(module)
+        code = compile(source, str(path), "exec", dont_inherit=True)
+        exec(code, module.__dict__)        # trusted user code (documented)
     except BaseException as err:
         sys.modules.pop(module_name, None)
         if isinstance(err, (KeyboardInterrupt, SystemExit)):

@@ -65,6 +65,13 @@ from typing import Any
 
 import numpy as np
 
+# The error type and size limit are shared with height_function (which must
+# not depend on this module); both stay part of this module's public API.
+from tropoi.spatial.terrain.elevation_import import (MAX_RASTER_PIXELS,
+                                                     ElevationImportError)
+from tropoi.spatial.terrain.height_function import (HeightExpression,
+                                                    sample_height_function)
+
 __all__ = [
     "ElevationImportError",
     "ElevationRaster",
@@ -73,10 +80,6 @@ __all__ = [
     "read_elevation",
     "working_resolution_deg",
 ]
-
-#: Largest raster (pixels) read into memory (float64: 512 MB). Larger
-#: global DEMs must be downsampled first, e.g. ``gdal_translate -outsize``.
-MAX_RASTER_PIXELS = 1 << 26
 
 #: Relative tolerance on coordinate spacing and global coverage.
 _COORD_RTOL = 1e-4
@@ -95,10 +98,6 @@ _IMAGE_SUFFIXES = (".png", ".pgm", ".bmp", ".gif", ".jpg", ".jpeg", ".webp")
 _MODE_MAX_DN = {"L": 255, "I;16": 65535, "I;16B": 65535, "I;16L": 65535,
                 "I;16N": 65535}
 _GREY_MODES = ("L", "I;16", "I;16B", "I;16L", "I;16N", "I;16S", "I", "F")
-
-
-class ElevationImportError(ValueError):
-    """An elevation file is unsupported, ambiguous or inconsistent."""
 
 
 def _unit_factor(units: str, where: str) -> float:
@@ -260,9 +259,6 @@ class ElevationRaster:
         settings (plus ``provenance``); ``source_sha256`` identifies the
         sampled values. The callable itself is never stored.
         """
-        from tropoi.spatial.terrain.height_function import (
-            sample_height_function)
-
         values, lat, lon, record = sample_height_function(
             height, resolution_deg=resolution_deg,
             lon_start_deg=lon_start_deg, pointwise=pointwise, name=name)
@@ -283,8 +279,6 @@ class ElevationRaster:
         and its SHA-256, so saved terrain can be traced without re-running
         it.
         """
-        from tropoi.spatial.terrain.height_function import HeightExpression
-
         checked = HeightExpression(expression)
         return cls.from_function(checked, resolution_deg=resolution_deg,
                                  lon_start_deg=lon_start_deg,
