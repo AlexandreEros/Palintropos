@@ -40,6 +40,12 @@ that names the missing argument; nothing is guessed.
   parallel 0); without them it is a bitmap and needs ``lon_west_deg``.
   Vertical units must be given (``units=``) unless the file declares metres.
 
+* **Height functions** (:meth:`ElevationRaster.from_function`,
+  :meth:`ElevationRaster.from_expression`): a callable or an allowlisted
+  expression in latitude and longitude (degrees), sampled on a global
+  cell-centre grid at an explicit ``resolution_deg`` and then normalized
+  like an array (:mod:`tropoi.spatial.terrain.height_function`).
+
 Missing values (NaN, fill values, ``nodata=``) raise unless ``fill_value=``
 says what to put there. Only regular global latitude-longitude rasters are
 supported: general GIS reprojection and regional mosaics are out of scope.
@@ -63,6 +69,7 @@ __all__ = [
     "ElevationImportError",
     "ElevationRaster",
     "MAX_RASTER_PIXELS",
+    "encode_grey16",
     "read_elevation",
     "working_resolution_deg",
 ]
@@ -226,6 +233,64 @@ class ElevationRaster:
             "source_sha256": digest.hexdigest(),
             **(provenance or {}), **notes})
 
+    @classmethod
+    def from_function(cls, height, *, resolution_deg: float,
+                      lon_start_deg: float = -180.0, pointwise: bool = False,
+                      name: str | None = None,
+                      provenance: Mapping[str, Any] | None = None
+                      ) -> "ElevationRaster":
+        """Sample ``height(lat_deg, lon_deg) -> metres`` on a global grid.
+
+        ``height`` is a vectorized callable (or a number, for a constant
+        height); see :mod:`tropoi.spatial.terrain.height_function` for the
+        full contract: inputs are ``(nlat, nlon)`` arrays of latitude and
+        east longitude in **degrees** at cell centres (longitudes in
+        ``[lon_start_deg, lon_start_deg + 360)``, default [-180, 180)); the
+        result is real metres broadcastable to that shape. ``pointwise=True``
+        calls a scalar-only function once per point instead.
+
+        ``resolution_deg`` (required; must divide 180) is the sampling
+        spacing. It is unrelated to the spectral truncation chosen when the
+        raster is prepared: preparation averages or interpolates the sample
+        to the truncation's working resolution, as for any raster.
+
+        The result is an ordinary raster built by :meth:`from_array`, so it
+        is validated and traced the same way. Its provenance records the
+        function's name, the coordinate convention and the sampling
+        settings (plus ``provenance``); ``source_sha256`` identifies the
+        sampled values. The callable itself is never stored.
+        """
+        from tropoi.spatial.terrain.height_function import (
+            sample_height_function)
+
+        values, lat, lon, record = sample_height_function(
+            height, resolution_deg=resolution_deg,
+            lon_start_deg=lon_start_deg, pointwise=pointwise, name=name)
+        record = {"format": "function", **record, **(provenance or {})}
+        if record["format"] == "expression":
+            record.pop("function_name", None)
+        return cls.from_array(values, lat, lon, provenance=record)
+
+    @classmethod
+    def from_expression(cls, expression: str, *, resolution_deg: float,
+                        lon_start_deg: float = -180.0) -> "ElevationRaster":
+        """Sample a height expression in ``lat``/``lon`` (degrees), metres.
+
+        ``expression`` is checked by
+        :class:`~tropoi.spatial.terrain.height_function.HeightExpression`
+        (an allowlisted interpreter, never ``eval``) and sampled exactly as
+        :meth:`from_function`; the provenance keeps the expression's text
+        and its SHA-256, so saved terrain can be traced without re-running
+        it.
+        """
+        from tropoi.spatial.terrain.height_function import HeightExpression
+
+        checked = HeightExpression(expression)
+        return cls.from_function(checked, resolution_deg=resolution_deg,
+                                 lon_start_deg=lon_start_deg,
+                                 name="expression",
+                                 provenance=checked.provenance())
+
     # -- introspection -------------------------------------------------------
 
     @property
@@ -349,6 +414,39 @@ class ElevationRaster:
                            if source is not self else "bilinear"),
             "working_resolution_deg": float(source.resolution_deg),
         }
+
+
+def encode_grey16(elevation_m, height_range) -> np.ndarray:
+    """Quantize metres to 16-bit grey values for a heightmap image.
+
+    The inverse of ``read_elevation(image, height_range=(black, white))``:
+    ``black`` maps to 0, ``white`` to 65535, linearly in between (row and
+    column order are left to the caller). Values outside ``[black, white]``
+    are refused rather than wrapped or clipped (a ``uint16`` cast would wrap
+    them silently), as are NaN/Inf and an empty or inverted range.
+    """
+    values = np.asarray(elevation_m, dtype=np.float64)
+    try:
+        black, white = (float(v) for v in height_range)
+    except (TypeError, ValueError):
+        raise ElevationImportError(
+            f"height_range must be (black_m, white_m), got {height_range!r}"
+        ) from None
+    if not (math.isfinite(black) and math.isfinite(white) and white > black):
+        raise ElevationImportError(
+            f"height_range must be finite with black < white, got "
+            f"({black:g}, {white:g})")
+    if not np.isfinite(values).all():
+        raise ElevationImportError(
+            "cannot encode NaN/Inf heights in a grey heightmap")
+    low, high = float(values.min()), float(values.max())
+    if low < black or high > white:
+        raise ElevationImportError(
+            f"heights {low:g} .. {high:g} m fall outside the encoding range "
+            f"{black:g} .. {white:g} m; widen height_range (it is recorded "
+            "with the image) instead of letting 16-bit values wrap")
+    return np.rint((values - black) / (white - black) * 65535.0
+                   ).astype(np.uint16)
 
 
 # ---------------------------------------------------------------------------

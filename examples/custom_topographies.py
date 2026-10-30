@@ -1,14 +1,18 @@
 """Three ways to supply terrain for your own planet.
 
     python examples/custom_topographies.py function --out out/function
+    python examples/custom_topographies.py function --expression "where(lat > 0, 800, -400)" --out out/steps
+    python examples/custom_topographies.py function --function ./my_terrain.py:height --out out/mine
     python examples/custom_topographies.py image --out out/image
     python examples/custom_topographies.py netcdf --out out/netcdf
 
-Each command creates the same broad, synthetic relief by a different route,
-prepares it for PE at l_max 21 (CUDA), and writes terrain/, terrain.png and
-globe.html. Use --inputs-only to create/read the input on CPU, or --file to
-read your own global grayscale image or NetCDF instead of generating one.
-The function below is the place to design your own hills and basins.
+Each command creates the same broad, synthetic relief by a different route
+(unless you supply your own), prepares it for PE at l_max 21 (CUDA), and
+writes terrain/, terrain.png and globe.html. Use --inputs-only to create or
+read the input on CPU, or --file to read your own global grayscale image or
+NetCDF instead of generating one. For the function route, --expression and
+--function supply your own heights without editing this file (the same
+inputs as ``tropoi terrain prepare``; --function executes that file).
 """
 from __future__ import annotations
 
@@ -29,26 +33,39 @@ def elevation(lat_deg, lon_deg):
 
 
 def source_raster(kind, out, *, file=None, height_range=(-2000, 2000),
-                  lon_west=-180, variable=None):
+                  lon_west=-180, variable=None, expression=None,
+                  function=None, resolution_deg=2.0):
     """Create an example input or read a user's file; no CUDA needed."""
-    from tropoi.run.custom import ElevationRaster, read_elevation
+    from tropoi.run.custom import (ElevationRaster, encode_grey16,
+                                   load_height_function, read_elevation)
 
+    if kind == "function" and expression is not None:
+        return ElevationRaster.from_expression(
+            expression, resolution_deg=resolution_deg)
+    if kind == "function" and function is not None:
+        height, record = load_height_function(function)   # runs that file
+        return ElevationRaster.from_function(
+            height, resolution_deg=resolution_deg,
+            name=record["function_name"], provenance=record)
+    if kind == "function":
+        # The built-in elevation() above, sampled on 2-degree cell centres.
+        return ElevationRaster.from_function(
+            elevation, resolution_deg=resolution_deg, provenance={
+                "source_name": "broad synthetic hills and basins",
+                "definition": "1200*cos(lat)^2*cos(2*lon)+600*sin(lat) m"})
     if file is None:
         # A 180 x 90 global plate carree grid, row 0 = north. At l_max 21
         # there is no benefit in generating a many-megapixel source here.
         lat = np.arange(89.0, -90.0, -2.0)
         lon = np.arange(-179.0, 180.0, 2.0)
         h = elevation(*np.meshgrid(lat, lon, indexing="ij"))
-        if kind == "function":
-            return ElevationRaster.from_array(h, lat, lon, provenance={
-                "source_name": "broad synthetic hills and basins",
-                "definition": "1200*cos(lat)^2*cos(2*lon)+600*sin(lat) m"})
         if kind == "image":
             from PIL import Image
             file = out / "heightmap.png"
             # Explicit encoding, independent of the image's measured min/max:
-            # black = -2000 m, white = +2000 m, with 16-bit grey values.
-            grey = np.rint((h + 2000) / 4000 * 65535).astype(np.uint16)
+            # black = -2000 m, white = +2000 m, with 16-bit grey values;
+            # heights outside that range are refused, not wrapped.
+            grey = encode_grey16(h, (-2000, 2000))
             Image.fromarray(grey).save(file)
             height_range, lon_west = (-2000, 2000), -180
         else:
@@ -82,18 +99,31 @@ def main(argv=None):
                         default=(-2000, 2000), metavar=("BLACK_M", "WHITE_M"))
     parser.add_argument("--lon-west", type=float, default=-180)
     parser.add_argument("--variable", help="NetCDF elevation variable")
+    own = parser.add_mutually_exclusive_group()
+    own.add_argument("--expression", help="function route: metres as an "
+                     "expression in lat and lon (degrees)")
+    own.add_argument("--function", metavar="FILE.py:NAME",
+                     help="function route: NAME(lat_deg, lon_deg) -> metres "
+                          "in your own file (executes it)")
+    parser.add_argument("--resolution-deg", type=float, default=2.0,
+                        help="function route: sampling spacing (divides 180)")
     parser.add_argument("--lmax", type=int, default=21)
     parser.add_argument("--inputs-only", action="store_true",
                         help="create/read source on CPU; skip preparation")
     parser.add_argument("--open", action="store_true")
     args = parser.parse_args(argv)
     if args.kind == "function" and args.file is not None:
-        parser.error("--file applies to image or netcdf; edit elevation() "
-                     "for the function example")
+        parser.error("--file applies to image or netcdf; use --expression "
+                     "or --function for the function route")
+    if args.kind != "function" and (args.expression or args.function):
+        parser.error("--expression and --function apply to the function "
+                     "route")
     args.out.mkdir(parents=True, exist_ok=True)
     raster = source_raster(args.kind, args.out, file=args.file,
                            height_range=args.height_range,
-                           lon_west=args.lon_west, variable=args.variable)
+                           lon_west=args.lon_west, variable=args.variable,
+                           expression=args.expression, function=args.function,
+                           resolution_deg=args.resolution_deg)
     print(raster.describe())
     if args.inputs_only:
         return 0

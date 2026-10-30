@@ -76,6 +76,7 @@ def quickstart(out_path: str, *, open_browser: bool = False) -> None:
     matplotlib.use("Agg")
     from PIL import Image
     from tropoi.run.custom import PreparedPlanet
+    from tropoi.spatial.terrain.raster import encode_grey16
     from tropoi.spatial.transforms.host_synthesis import synthesize_latlon
 
     run_id = ("20261027T175327Z_orographic-thermal-wave_rot24p62h_r3_l21_"
@@ -98,9 +99,7 @@ def quickstart(out_path: str, *, open_browser: bool = False) -> None:
     lon = np.arange(-179.0, 180.0, 2.0)
     heights = synthesize_latlon(world.topography_lm, lat, lon)
     low, high = -10000.0, 10000.0
-    if heights.min() < low or heights.max() > high:
-        raise ValueError("resolved MOLA terrain exceeds the heightmap range")
-    grey = np.rint((heights - low) / (high - low) * 65535).astype(np.uint16)
+    grey = encode_grey16(heights, (low, high))     # refuses, never wraps
     Image.fromarray(grey).save(out / "mars_heightmap.png")
     settings = {"source": "published MOLA terrain, degree <= 14",
                 "source_run": run_id, "resolution_deg": 2,

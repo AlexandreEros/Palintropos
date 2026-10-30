@@ -11,6 +11,7 @@ to resolve a preset's state)::
 
     world = prepare_planet(planet, discretization,
                            read_elevation("terrain.nc"))   # terrain (CUDA)
+    raster = ElevationRaster.from_function(height, resolution_deg=2)  # CPU
     world.plot(); world.view()                   # static figure, 3D globe
 
     prepared = prepare_bve_state(planet, discretization,
@@ -42,8 +43,13 @@ from tropoi.run.custom.presets import (initial_state_from_config,
 from tropoi.spatial.specification import (DiscretizationSpec, FluidLayerSpec,
                                           PlanetSpec, SpecificationError,
                                           TopographySpec)
+from tropoi.spatial.terrain.height_function import (HeightExpression,
+                                                    HeightExpressionError,
+                                                    HeightFunctionError,
+                                                    load_height_function)
 from tropoi.spatial.terrain.raster import (ElevationImportError,
-                                           ElevationRaster, read_elevation)
+                                           ElevationRaster, encode_grey16,
+                                           read_elevation)
 
 __all__ = [
     "CustomRunConfig",
@@ -51,6 +57,9 @@ __all__ = [
     "ElevationImportError",
     "ElevationRaster",
     "FluidLayerSpec",
+    "HeightExpression",
+    "HeightExpressionError",
+    "HeightFunctionError",
     "INITIAL_STATE_DIR",
     "INITIAL_STATE_FORMAT",
     "INITIAL_STATE_FORMAT_VERSION",
@@ -68,9 +77,11 @@ __all__ = [
     "StateSampling",
     "SpecificationError",
     "TopographySpec",
+    "encode_grey16",
     "execute_custom_run",
     "initial_state_from_config",
     "initial_state_from_preset",
+    "load_height_function",
     "load_initial_state",
     "pad_coefficients",
     "planet_spec_for_run_config",

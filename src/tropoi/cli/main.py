@@ -41,6 +41,7 @@ import sys
 from typing import Optional, Sequence
 
 from tropoi.cli import clear_cache, generate_planet
+from tropoi.cli import terrain as terrain_cli
 from tropoi.run.bve.config import (  # import-light (stdlib only)
     BASE_DEFAULTS, DEFAULT_SNAPSHOT_INTERVAL_SECONDS, PLOT_TYPES, BVERunConfig)
 
@@ -1329,6 +1330,7 @@ examples:
   tropoi run bve --days 1 --n-snapshots 9
   tropoi list presets
   tropoi inspect runs
+  tropoi terrain prepare --expression "1000*cos(radians(lat))**2" --solver pe --out terrain/hills
 
 aeolus remains available as a compatibility alias for tropoi, and
 psx-bve, psx-gen, and psx-recompile as compatibility entry points for
@@ -1512,6 +1514,14 @@ def build_parser() -> argparse.ArgumentParser:
              "local desktop session, never under CI or SSH or without a "
              "display; a viewer failure never fails the command.")
     plot_parser.set_defaults(_handler=_cmd_plot)
+
+    # tropoi terrain prepare
+    terrain_parser = commands.add_parser(
+        "terrain", help="Prepare terrain from an expression or a Python "
+                        "height function.",
+        description="Terrain preparation. 'tropoi terrain prepare --help' "
+                    "lists the options.")
+    terrain_cli.add_arguments(terrain_parser)
 
     # tropoi gen
     gen_parser = commands.add_parser(

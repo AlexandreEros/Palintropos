@@ -294,7 +294,9 @@ def test_documented_cpu_only_modules_import_without_cupy_or_matplotlib():
                # validate/configure without CUDA)
                "tropoi.spatial.specification",
                "tropoi.representation.archive.initial_state",
-               "tropoi.run.custom"]
+               "tropoi.run.custom",
+               # terrain from height functions (sampling and the CLI)
+               "tropoi.spatial.terrain.height_function", "tropoi.cli.terrain"]
     # (Not the legacy tropoi.planet.* paths: the tropoi.planet package
     # initializer has always imported the CUDA Planet facade.)
     probe = (
