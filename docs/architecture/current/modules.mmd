@@ -2,7 +2,7 @@
 %% Package-level import graph: modules collapsed onto their containing package; edge label = number of module-level import edges.
 flowchart LR
     n_tropoi["tropoi (2 modules)"]
-    n_tropoi_ocli["cli (7 modules)"]
+    n_tropoi_ocli["cli (8 modules)"]
     n_tropoi_onumerics["numerics (13 modules)"]
     n_tropoi_onumerics_ocuda["numerics.cuda (1 module)"]
     n_tropoi_ophysics["physics (5 modules)"]
@@ -21,21 +21,21 @@ flowchart LR
     n_tropoi_ospatial_oinitialization["spatial.initialization (3 modules)"]
     n_tropoi_ospatial_ooperators["spatial.operators (1 module)"]
     n_tropoi_ospatial_ostates["spatial.states (3 modules)"]
-    n_tropoi_ospatial_oterrain["spatial.terrain (5 modules)"]
+    n_tropoi_ospatial_oterrain["spatial.terrain (6 modules)"]
     n_tropoi_ospatial_otransforms["spatial.transforms (4 modules)"]
     n_tropoi_ospatial_otransforms_ocuda["spatial.transforms.cuda (1 module)"]
     n_tropoi_otemporal["temporal (5 modules)"]
     n_tropoi_otemporal_otendencies["temporal.tendencies (4 modules)"]
     n_tropoi_oviz["viz (12 modules)"]
-    n_tropoi_ocli -->|12| n_tropoi_orepresentation_oarchive
+    n_tropoi_ocli -->|13| n_tropoi_orepresentation_oarchive
     n_tropoi_ocli -->|6| n_tropoi_orepresentation_ovisual
     n_tropoi_ocli -->|3| n_tropoi_orun_obve
-    n_tropoi_ocli -->|1| n_tropoi_orun_ocustom
+    n_tropoi_ocli -->|2| n_tropoi_orun_ocustom
     n_tropoi_ocli -->|3| n_tropoi_orun_ope
     n_tropoi_ocli -->|3| n_tropoi_orun_oswe
     n_tropoi_ocli -->|12| n_tropoi_ospatial
     n_tropoi_ocli -->|3| n_tropoi_ospatial_oinitialization
-    n_tropoi_ocli -->|4| n_tropoi_ospatial_oterrain
+    n_tropoi_ocli -->|6| n_tropoi_ospatial_oterrain
     n_tropoi_ocli -->|1| n_tropoi_ospatial_otransforms_ocuda
     n_tropoi_ocli -->|2| n_tropoi_otemporal_otendencies
     n_tropoi_onumerics -->|12| n_tropoi
@@ -80,7 +80,7 @@ flowchart LR
     n_tropoi_orun_ocustom -->|10| n_tropoi_ospatial
     n_tropoi_orun_ocustom -->|2| n_tropoi_ospatial_oinitialization
     n_tropoi_orun_ocustom -->|2| n_tropoi_ospatial_ostates
-    n_tropoi_orun_ocustom -->|4| n_tropoi_ospatial_oterrain
+    n_tropoi_orun_ocustom -->|5| n_tropoi_ospatial_oterrain
     n_tropoi_orun_ocustom -->|1| n_tropoi_otemporal
     n_tropoi_orun_ocustom -->|1| n_tropoi_otemporal_otendencies
     n_tropoi_orun_oheld__suarez -->|4| n_tropoi_ospatial

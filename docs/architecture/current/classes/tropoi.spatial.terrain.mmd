@@ -6,6 +6,12 @@ classDiagram
     c_tropoi_ospatial_oterrain_oelevation__data_oElevationData : +get#95;j2()
     c_tropoi_ospatial_oterrain_oelevation__data_oElevationData : +max#95;degree
     c_tropoi_ospatial_oterrain_oelevation__data_oElevationData : +oblateness#95;from#95;sh
+    class c_tropoi_ospatial_oterrain_oheight__function_oHeightExpression["HeightExpression (spatial.terrain.height_function)"]
+    c_tropoi_ospatial_oterrain_oheight__function_oHeightExpression : +#95;#95;call#95;#95;()
+    c_tropoi_ospatial_oterrain_oheight__function_oHeightExpression : +#95;#95;post#95;init#95;#95;()
+    c_tropoi_ospatial_oterrain_oheight__function_oHeightExpression : +provenance()
+    class c_tropoi_ospatial_oterrain_oheight__function_oHeightExpressionError["HeightExpressionError (spatial.terrain.height_function)"]
+    class c_tropoi_ospatial_oterrain_oheight__function_oHeightFunctionError["HeightFunctionError (spatial.terrain.height_function)"]
     class c_tropoi_ospatial_oterrain_oraster_oElevationImportError["ElevationImportError (spatial.terrain.raster)"]
     c_tropoi_ospatial_oterrain_oraster_oElevationImportError : external base ValueError
     class c_tropoi_ospatial_oterrain_oraster_oElevationRaster["ElevationRaster (spatial.terrain.raster)"]
@@ -14,6 +20,8 @@ classDiagram
     c_tropoi_ospatial_oterrain_oraster_oElevationRaster : +coarsened()
     c_tropoi_ospatial_oterrain_oraster_oElevationRaster : +describe()
     c_tropoi_ospatial_oterrain_oraster_oElevationRaster : +from#95;array()$
+    c_tropoi_ospatial_oterrain_oraster_oElevationRaster : +from#95;expression()$
+    c_tropoi_ospatial_oterrain_oraster_oElevationRaster : +from#95;function()$
     c_tropoi_ospatial_oterrain_oraster_oElevationRaster : +registration
     c_tropoi_ospatial_oterrain_oraster_oElevationRaster : +resample#95;to#95;points()
     c_tropoi_ospatial_oterrain_oraster_oElevationRaster : +resolution#95;deg
@@ -38,3 +46,5 @@ classDiagram
     c_tropoi_ospatial_oterrain_otopography_oTopography : +williamson5#95;cone()$
     class c_tropoi_ospatial_oterrain_otopography_oTopographyError["TopographyError (spatial.terrain.topography)"]
     c_tropoi_ospatial_oterrain_otopography_oTopographyError : external base ValueError
+    c_tropoi_ospatial_oterrain_oheight__function_oHeightFunctionError <|-- c_tropoi_ospatial_oterrain_oheight__function_oHeightExpressionError
+    c_tropoi_ospatial_oterrain_oraster_oElevationImportError <|-- c_tropoi_ospatial_oterrain_oheight__function_oHeightFunctionError

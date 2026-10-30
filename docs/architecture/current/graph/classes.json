@@ -59,6 +59,18 @@
       "position": 0,
       "source": "tropoi.spatial.spherical_backend.PointSetBackend",
       "target": "tropoi.spatial.spherical_backend.SphericalGridBackend"
+    },
+    {
+      "kind": "inherits",
+      "position": 0,
+      "source": "tropoi.spatial.terrain.height_function.HeightExpressionError",
+      "target": "tropoi.spatial.terrain.height_function.HeightFunctionError"
+    },
+    {
+      "kind": "inherits",
+      "position": 0,
+      "source": "tropoi.spatial.terrain.height_function.HeightFunctionError",
+      "target": "tropoi.spatial.terrain.raster.ElevationImportError"
     }
   ],
   "name": "classes",
@@ -3435,6 +3447,45 @@
       "qualname": "ElevationData"
     },
     {
+      "decorators": [
+        "dataclass(frozen=True)"
+      ],
+      "external_bases": [],
+      "id": "tropoi.spatial.terrain.height_function.HeightExpression",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__call__"
+        },
+        {
+          "kind": "method",
+          "name": "__post_init__"
+        },
+        {
+          "kind": "method",
+          "name": "provenance"
+        }
+      ],
+      "module": "tropoi.spatial.terrain.height_function",
+      "qualname": "HeightExpression"
+    },
+    {
+      "decorators": [],
+      "external_bases": [],
+      "id": "tropoi.spatial.terrain.height_function.HeightExpressionError",
+      "members": [],
+      "module": "tropoi.spatial.terrain.height_function",
+      "qualname": "HeightExpressionError"
+    },
+    {
+      "decorators": [],
+      "external_bases": [],
+      "id": "tropoi.spatial.terrain.height_function.HeightFunctionError",
+      "members": [],
+      "module": "tropoi.spatial.terrain.height_function",
+      "qualname": "HeightFunctionError"
+    },
+    {
       "decorators": [],
       "external_bases": [
         "ValueError"
@@ -3470,6 +3521,14 @@
         {
           "kind": "classmethod",
           "name": "from_array"
+        },
+        {
+          "kind": "classmethod",
+          "name": "from_expression"
+        },
+        {
+          "kind": "classmethod",
+          "name": "from_function"
         },
         {
           "kind": "property",
