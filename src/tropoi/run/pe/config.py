@@ -13,7 +13,8 @@ parameters the primitive-equation core needs:
   :class:`~tropoi.spatial.sigma_coordinate.SigmaGrid`);
 * the configurable dry gas constants ``r_dry`` / ``cp_dry``;
 * the initial-condition thermodynamic parameters ``temperature`` /
-  ``surface_pressure`` (and, for ``thermal_wave``, ``thermal_amplitude``).
+  ``surface_pressure`` (and, for ``thermal_wave`` and
+  ``orographic_thermal_wave``, ``thermal_amplitude``).
 
 The dry sigma core has no separate reference pressure (sigma = p/p_s), so the
 configurable thermodynamic identity is exactly (r_dry, cp_dry) plus the
@@ -125,6 +126,10 @@ PE_SCENARIOS = {
                                   "atmosphere over the configured surface "
                                   "topography: ln(p_s) = ln(p_ref) - "
                                   "Phi_s/(R_d T0) (equilibrium benchmark).",
+    "orographic_thermal_wave": "orographic_isothermal_rest plus the "
+                               "thermal_wave degree-2 temperature "
+                               "perturbation (an unbalanced perturbation of "
+                               "a balanced base over terrain).",
 }
 
 #: Available surface-topography presets for the PE solver. Same vocabulary
@@ -149,7 +154,13 @@ _TERRAIN_PARAM_FIELDS = ("mountain_height_m", "mountain_lat_deg",
                          "mountain_lon_deg", "mountain_width_deg", "gravity")
 
 #: Presets that require a resolvable degree-2 harmonic.
-_SCENARIOS_NEEDING_L2 = ("thermal_wave",)
+_SCENARIOS_NEEDING_L2 = ("thermal_wave", "orographic_thermal_wave")
+
+#: Pointwise peak of the thermal-wave perturbation per unit coefficient:
+#: 2 sqrt(15 / (32 pi)) for a real coefficient on (2, 2) in the repository's
+#: real-field convention (spatial.initialization.pe.thermal_wave_peak; kept
+#: literal here because that module imports CuPy).
+THERMAL_WAVE_PEAK_PER_COEFFICIENT = 2.0 * math.sqrt(15.0 / (32.0 * math.pi))
 
 PE_BASE_DEFAULTS: dict = {
     "lmax": 10,
@@ -301,8 +312,9 @@ class PERunConfig:
             raise ValueError(
                 f"scenario {self.scenario!r} needs lmax >= 2 for its degree-2 "
                 f"perturbation, got {self.lmax}")
-        if self.scenario == "thermal_wave":
-            require_thermal_wave_support(self.lmax, self.thermal_amplitude)
+        if self.scenario in _SCENARIOS_NEEDING_L2:
+            require_thermal_wave_support(self.lmax, self.thermal_amplitude,
+                                         scenario=self.scenario)
 
         self._validate_topography()
 
@@ -635,7 +647,28 @@ class PERunConfig:
             config["mountain_lon_deg"] = self.mountain_lon_deg
             config["mountain_width_deg"] = self.mountain_width_deg
             config["gravity"] = self.gravity
+        if self.scenario == "orographic_thermal_wave":
+            # Additive, emitted only for this preset: every other scenario's
+            # dict (and so its scientific hash and run id) is unchanged.
+            config["initial_perturbation"] = self.initial_perturbation()
         return config
+
+    def initial_perturbation(self) -> dict:
+        """The scientific record of the orographic_thermal_wave perturbation."""
+        amp = float(self.thermal_amplitude)
+        return {
+            "base_state": "orographic_isothermal_rest",
+            "field": "temperature",
+            "degree": 2,
+            "order": 2,
+            "coefficient_real_K": amp,
+            "coefficient_imag_K": 0.0,
+            "normalization": "orthonormal complex Y_lm; real field = a_l0 "
+                             "Y_l0 + 2 Re sum_{m>0} a_lm Y_lm",
+            "pointwise_peak_K": THERMAL_WAVE_PEAK_PER_COEFFICIENT * amp,
+            "vertical_profile": "uniform",
+            "vertical_weights": [1.0] * int(self.nlev),
+        }
 
     def summary_lines(self) -> list[str]:
         """Concise resolved-configuration summary (no CUDA involved)."""
@@ -694,6 +727,11 @@ class PERunConfig:
         if self.scenario == "thermal_wave":
             lines.append(f"  thermal amplitude   {self.thermal_amplitude:g} K "
                          "(degree-2 mode)")
+        elif self.scenario == "orographic_thermal_wave":
+            peak = THERMAL_WAVE_PEAK_PER_COEFFICIENT * self.thermal_amplitude
+            lines.append(f"  thermal amplitude   {self.thermal_amplitude:g} K "
+                         f"(real (2,2) coefficient at every level; pointwise "
+                         f"peak {peak:.4g} K)")
         lines += [
             f"  fixed timestep      {self.dt_seconds:g} s "
             f"({n_steps} steps over {self.duration_days:g} days)",

@@ -1,5 +1,263 @@
 # Terrain from elevation files
 
+## Start with Mars, without downloading a DEM
+
+From a repository checkout:
+
+```bash
+python examples/mola_mars.py quickstart --out out/mars --open
+```
+
+This uses the small prepared MOLA terrain already included with the
+[published Mars example](runs/20261027T175327Z_orographic-thermal-wave_rot24p62h_r3_l21_dt11080p3s_3a46f966_71c5441a/terrain/).
+It needs no CUDA, network access, PDS conversion or NetCDF dependency. It writes:
+
+| Output | Use |
+| --- | --- |
+| `out/mars/mars_globe.html` | Open the interactive terrain globe offline. |
+| `out/mars/mars_terrain.png` | A coloured preview; this is not an elevation input. |
+| `out/mars/mars_heightmap.png` | An editable 16-bit grayscale elevation map, 180 × 90 pixels (2° cells). Black = −10000 m, white = +10000 m; row 0 is north, west edge −180°. |
+| `out/mars/mars_heightmap.json` | The heightmap's source and decoding settings. |
+| `out/mars/terrain/` | Prepared terrain, ready for `tropoi run pe --terrain out/mars/terrain`. |
+
+The prepared terrain is `l_max` 21 with elevation through degree 14, exactly
+as used in the example run. The grayscale image samples that **already
+truncated relief**, not the original MOLA measurements. Its height quantization
+is about 0.31 m per grey step. It is useful for learning and editing at this
+resolution; it cannot recover individual mountains removed by truncation.
+
+A short atmosphere run over the prepared terrain (CUDA):
+
+```bash
+tropoi run pe --terrain out/mars/terrain --scenario orographic_thermal_wave --radius-earth-units 0.53307 --day-hours 24.6229 --gravity 3.71 --r-dry 191.8 --cp-dry 735 --temperature 210 --surface-pressure 610 --levels 4 --dt-seconds 60 --days 0.02 --n-snapshots 3 --no-plots
+```
+
+This is a usage example. It demonstrates supplying terrain and evolving a
+small perturbation with the stated settings; it does not establish accuracy
+for arbitrary topographies. The longer run and its checks are documented
+[separately](validation/mars_evolving_2026-10-27/README.md).
+To choose a different terrain resolution from the source measurements, use
+the [raw MOLA workflow below](#real-data-mars-from-mola).
+
+## Other ways to make your planet's terrain
+
+### A height expression or a Python function
+
+`tropoi terrain prepare` turns a formula into prepared terrain without
+editing any repository file. Give exactly one source:
+
+```bash
+tropoi terrain prepare --expression "1200*cos(radians(lat))**2*cos(2*radians(lon)) + 600*sin(radians(lat))" --resolution-deg 2 --lmax 21 --solver pe --out terrain/my_planet
+tropoi terrain prepare --function "./my_terrain.py:height" --resolution-deg 2 --lmax 21 --solver pe --out terrain/my_planet
+```
+
+where `my_terrain.py` is your own file, anywhere on disk:
+
+```python
+import numpy as np
+
+def height(lat_deg, lon_deg):
+    lat = np.deg2rad(lat_deg)
+    lon = np.deg2rad(lon_deg)
+    return 1200 * np.cos(lat)**2 * np.cos(2 * lon)
+```
+
+Both routes, and the Python API below, go through the same steps.
+The source is sampled on a global grid (CPU) by `ElevationRaster.from_function`.
+That gives an ordinary `ElevationRaster`, validated and traced like an imported file.
+`prepare_planet` then resolves it on the model's discretization (CUDA).
+`PreparedPlanet.save` writes it to `--out`.
+
+**The height-function contract.**
+
+- **Inputs.** The function is called **once** as `height(lat_deg, lon_deg)`
+  with two float64 NumPy arrays of the same shape `(nlat, nlon)`:
+  - latitude in degrees, north positive, at cell centres, south to north;
+  - east longitude in degrees, at cell centres in [−180, 180)
+    (`--lon-start-deg 0` gives [0, 360)).
+
+  Write it with NumPy (`np.cos`, `np.where`), not `math`. A function that
+  only handles scalars can use `--pointwise`, which calls it once per point.
+  These are **degrees**: the initial-field callables of
+  [custom initial states](CUSTOM_INITIAL_STATES.md) take radians.
+- **Output.** Elevation in **metres**: an array of that shape, or anything NumPy broadcasts to it.
+  - A scalar gives a constant height; `--expression "1000"` works.
+  - An `(nlat, 1)` column gives a function of latitude only.
+  - Integer and float results are accepted.
+  - Complex, boolean, NaN/Inf, masked and wrongly shaped results are refused, with the reason.
+- **Sampling is not truncation.** `--resolution-deg` (default 1, must divide
+  180) is the spacing of the sampled grid. `--lmax` is the spectral
+  truncation of the model terrain.
+  - Preparation area-averages a sample finer than the truncation's working
+    resolution, `180 / (2 (l_max + 1))` degrees (4.1° at `l_max` 21), then
+    interpolates it to the model grid.
+  - Sampling finer than that adds nothing the model keeps.
+  - The command notes when the sample is coarser than the working resolution.
+- **Solver.** `--solver pe` band-limits the terrain at the dealiased cut
+  `floor(2 l_max / 3)` that `tropoi run pe --terrain` requires.
+  `--solver swe` keeps the full truncation.
+- **Other settings.**
+  - Grid: `--nlat`/`--nlon` default to the Gauss grid
+    `3(l_max+1)/2 + 1` (rounded up to even) × twice that, which is 34 × 68 at `l_max` 21.
+  - Planet: `--radius-earth-units` (default 1) and `--day-hours` (default 24)
+    are stored with the terrain and size the previews. The coefficients do not
+    depend on them; a PE run takes its planet from its own options.
+  - Optional `--smoothing` and `--clip-below-m` work as for imported files.
+
+**Expressions** are checked against a narrow allowlist and evaluated by a
+small interpreter; they are never run as Python. An expression may use:
+- `lat` and `lon` in degrees, the constant `pi`, and numbers;
+- `+ - * / % **`, comparisons (chained too, `-30 < lat < 30`), and `& | ~` to combine conditions;
+- the NumPy functions `radians degrees sin cos tan arcsin arccos arctan
+  arctan2 sinh cosh tanh exp log log10 sqrt abs minimum maximum where clip
+  floor ceil sign hypot`.
+
+Piecewise terrain uses `where`, for example
+`"where((lat > 0) & (lon < 90), 800, -400)"`.
+
+Anything else is rejected before evaluation, with a message naming it:
+- statements and imports;
+- attribute access such as `np.sin`;
+- subscripts, comprehensions and lambdas;
+- `and`/`or`/`not` and `if`-expressions;
+- strings, keyword arguments and unknown names.
+
+An expression that starts with a minus sign must be attached to the option,
+`--expression="-500*sin(radians(lat))"`, so the shell parser does not take
+it for an option.
+
+**Python files** (`--function FILE.py:NAME`):
+- **This executes the file, as `python FILE.py` would.** Use only code you
+  trust: this route is not sandboxed.
+- A relative path is resolved from the current working directory. Paths with
+  spaces and Windows drive letters work: the text is split at its **final**
+  colon (`"C:\terrain\my hills.py:height"`).
+- `NAME` may be dotted (`Shapes.plateau`).
+- Errors name the problem: a missing file, an exception while executing it,
+  a missing name (listing the callables the file does define), something
+  not callable, or an exception raised by the function.
+
+**Without CUDA.** Sampling and validation run on the CPU.
+`--sample-only` checks the input, prints the sampled range and stops,
+writing nothing. The spectral preparation projects with the model's own
+transform and needs CUDA, like every `prepare_planet` call. Without CUDA the
+command says so.
+
+**What is saved.** The output directory holds:
+- the resolved coefficients;
+- a record with the source's provenance:
+  - the expression text and its SHA-256,
+  - or the function file's name (not its path), the SHA-256 of the bytes
+    executed, and the callable's name;
+- the coordinate convention, the sampling spacing and longitude range, and
+  the hash of the sampled values.
+
+The function is never stored or pickled, and saved terrain never re-runs it.
+After you delete or change the file, the terrain still reloads, previews and
+feeds runs, exactly as prepared. An existing `--out` is never replaced:
+`--overwrite` replaces only a previous prepared terrain, nothing else.
+
+**Look at it and use it.**
+
+- **Preview while preparing.** `--figure terrain.png` writes the source,
+  resolved and difference maps; `--globe globe.html` writes the offline 3-D
+  globe.
+- **Preview later, without CUDA.**
+
+  ```python
+  from tropoi.run.custom import PreparedPlanet
+
+  world = PreparedPlanet.load("terrain/my_planet")
+  world.view()          # offline globe
+  world.plot()          # resolved terrain and its provenance
+  ```
+- **Primitive equations (CUDA).** Run over the terrain with
+  `tropoi run pe --terrain terrain/my_planet --scenario orographic_isothermal_rest`,
+  plus the planet's options (the command prints a matching line).
+- **Shallow water.** Prepare with `--solver swe`, then pass the loaded terrain
+  to `prepare_swe_state(planet, disc, fluid, world, ...)` as shown
+  [below](#shallow-water).
+
+**From Python**, without the command line:
+
+```python
+import numpy as np
+from tropoi.run.custom import (DiscretizationSpec, ElevationRaster,
+                               PlanetSpec, prepare_planet)
+
+def height(lat_deg, lon_deg):                  # degrees in, metres out
+    lat, lon = np.radians(lat_deg), np.radians(lon_deg)
+    return 1200 * np.cos(lat)**2 * np.cos(2 * lon) + 600 * np.sin(lat)
+
+raster = ElevationRaster.from_function(height, resolution_deg=2)      # CPU
+same = ElevationRaster.from_expression(
+    "1200*cos(radians(lat))**2*cos(2*radians(lon)) + 600*sin(radians(lat))",
+    resolution_deg=2)                                                  # CPU
+world = prepare_planet(PlanetSpec.earth_like(),
+                       DiscretizationSpec.gauss_latlon(21, 34, 68),
+                       raster, solver="pe")                            # CUDA
+world.save("terrain/my_planet")
+```
+
+`load_height_function("path/to/file.py:height")` returns a file's callable
+and its provenance for `from_function(..., provenance=...)`; this is what
+`--function` does.
+
+### Runnable examples: function, image, NetCDF
+
+[examples/custom_topographies.py](../examples/custom_topographies.py) has
+three runnable routes to the same broad synthetic hills and basins. No
+downloads are needed. Preparation uses CUDA; `--inputs-only` creates or reads
+the source on CPU without preparing a model.
+
+| Route | Command | What to change |
+| --- | --- | --- |
+| A height function | `python examples/custom_topographies.py function --out out/function` | Nothing to edit: add `--expression "..."` or `--function FILE.py:NAME` (as above) to replace the built-in hills, and `--resolution-deg` to change the sampling. |
+| A painted grayscale heightmap | `python examples/custom_topographies.py image --out out/image` | Generates a small 16-bit PNG. Paint your own global map and supply `--file`, its height range, and longitude origin. |
+| A scientific elevation file | `python examples/custom_topographies.py netcdf --out out/netcdf` | Generates a tiny CF NetCDF with coordinates and units. Supply `--file` and, if needed, `--variable` for your own file. Requires `netCDF4` (`pip install "palintropos[terrain]"`). |
+
+For example, after editing the Mars heightmap above:
+
+```bash
+python examples/custom_topographies.py image --file out/mars/mars_heightmap.png --height-range -10000 10000 --lon-west -180 --out out/edited-mars
+```
+
+The image supplies elevation only. This script chooses a custom planet with
+0.8 Earth radii and a 30 h rotation; edit those choices independently of the
+terrain. Each route writes three things, then prints a short PE run command
+with matching planetary parameters:
+- `terrain/`;
+- `terrain.png`, showing the source, the resolved relief and their difference;
+- `globe.html`.
+
+Use a new output directory for each preparation. Saved terrain can also feed
+an SWE state as shown [below](#shallow-water).
+
+When writing a grayscale heightmap yourself, encode metres with
+`encode_grey16(heights, (black_m, white_m))`. It refuses heights outside the
+range instead of letting a `uint16` cast wrap them, and it is the inverse of
+`read_elevation(png, height_range=(black_m, white_m))`.
+
+Use broad features when learning at coarse truncations. Increasing image
+size adds no model detail once the source is adequately sampled: the retained
+spherical-harmonic degrees determine the relief used by the solver. Inspect
+the resolved preview, particularly after drawing narrow peaks or sharp edges.
+A coloured or shaded map does not encode elevation unambiguously; supply
+grayscale heights with an explicit scale, or an elevation file with units.
+
+For a single idealized mountain, a parameterized preset is shorter still:
+
+```python
+from tropoi.run.custom import TopographySpec
+
+world = prepare_planet(planet, disc,
+                       TopographySpec.mountain(height_m=1000, lat_deg=25,
+                                                lon_deg=60, width_deg=30),
+                       solver="pe")
+```
+
+## Import your own elevation file
+
 Load a planet's bottom topography from a NetCDF file, a grey bitmap
 (16-bit PNG and similar) or a global TIFF. Look at the terrain the model will
 actually use before running anything:
@@ -303,6 +561,16 @@ the command that reproduces it, is in
 [docs/validation/mola_terrain_2026-10-22](validation/mola_terrain_2026-10-22/README.md);
 the README shows it.
 
+**An evolving atmosphere over MOLA.** The orographic-rest check above starts
+and stays at rest. [examples/mola_mars_evolving.py](../examples/mola_mars_evolving.py)
+adds a small temperature perturbation (`--scenario orographic_thermal_wave`)
+to the same balanced base, at `l_max` 21. It integrates one rotation period
+alongside a resting control and a 30 s-step twin. This is an idealized dry-CO₂
+perturbation experiment, not a climate simulation. Its protocol, results and
+offline page are in
+[docs/validation/mars_evolving_2026-10-27](validation/mars_evolving_2026-10-27/README.md),
+and the run is published under `docs/runs/`.
+
 **The 463 m USGS mosaic (alternative, untested here).** The USGS
 Astrogeology "Mars MGS MOLA DEM 463m"
 (<https://astrogeology.usgs.gov/search/map/mars_mgs_mola_dem_463m>, about
@@ -314,9 +582,16 @@ installed here and the MEGDR grids above cover the need.
 
 ## Limits
 
-- **Interfaces.** The `tropoi run` CLI has no elevation-file flag: import
-  and inspect terrain in Python, then pass the saved prepared terrain to
-  `tropoi run pe --terrain`, or the saved SWE state to `--initial-state`.
+- **Interfaces.** `tropoi terrain prepare` takes a height expression or a
+  Python function, not an elevation file. Import and inspect files in Python.
+  Either way, pass the saved prepared terrain to `tropoi run pe --terrain`,
+  or a saved SWE state to `--initial-state`.
+- **Height functions.**
+  - Sampling is on global cell centres only; there is no node grid that
+    includes the poles.
+  - A `--function` file runs with your permissions; it is not sandboxed.
+  - Expressions are limited to the allowlist above; anything longer belongs
+    in a function file.
 - **Grids.** Global regular latitude–longitude rasters only. No
   reprojection, no regional tiles, no spherical-harmonic coefficient files
   (for example SHTOOLS models), and no raw PDS3 images (convert them, as

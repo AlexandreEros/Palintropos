@@ -2,7 +2,7 @@
   "edges": [
     {
       "kind": "imports",
-      "module_edges": 12,
+      "module_edges": 13,
       "source": "tropoi.cli",
       "target": "tropoi.representation.archive"
     },
@@ -20,7 +20,7 @@
     },
     {
       "kind": "imports",
-      "module_edges": 1,
+      "module_edges": 2,
       "source": "tropoi.cli",
       "target": "tropoi.run.custom"
     },
@@ -50,7 +50,7 @@
     },
     {
       "kind": "imports",
-      "module_edges": 4,
+      "module_edges": 6,
       "source": "tropoi.cli",
       "target": "tropoi.spatial.terrain"
     },
@@ -320,7 +320,7 @@
     },
     {
       "kind": "imports",
-      "module_edges": 4,
+      "module_edges": 5,
       "source": "tropoi.run.custom",
       "target": "tropoi.spatial.terrain"
     },
@@ -592,8 +592,8 @@
     },
     {
       "id": "tropoi.cli",
-      "internal_edges": 11,
-      "modules": 7
+      "internal_edges": 12,
+      "modules": 8
     },
     {
       "id": "tropoi.numerics",
@@ -687,8 +687,8 @@
     },
     {
       "id": "tropoi.spatial.terrain",
-      "internal_edges": 1,
-      "modules": 5
+      "internal_edges": 4,
+      "modules": 7
     },
     {
       "id": "tropoi.spatial.transforms",

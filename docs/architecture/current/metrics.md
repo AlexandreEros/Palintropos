@@ -9,40 +9,40 @@ Nodes are analysed modules; a directed edge A -> B means A has at least one stat
 * **all imports**: every static import statement, wherever it appears;
 * **import-time**: only edges with at least one import statement at module scope (executed when the importing module is imported). Edges made only of function-scope or `if TYPE_CHECKING:` imports are dropped.
 
-Edge counts by scope set: `function`: 142, `function+module`: 3, `function+type_checking`: 2, `module`: 259, `type_checking`: 5.
+Edge counts by scope set: `function`: 146, `function+module`: 3, `function+type_checking`: 2, `module`: 264, `type_checking`: 5.
 
 | Metric | all imports | import-time |
 |---|---|---|
-| Nodes \|V\| | 156 | 156 |
-| Directed edges \|E\| | 411 | 262 |
-| Density | 0.016998 | 0.010835 |
+| Nodes \|V\| | 159 | 159 |
+| Directed edges \|E\| | 420 | 267 |
+| Density | 0.016718 | 0.010628 |
 | Weakly connected components | 3 | 7 |
-| WCC sizes | 107, 48, 1 | 100, 48, 4, 1, 1, 1, 1 |
-| Strongly connected components | 144 | 156 |
+| WCC sizes | 110, 48, 1 | 103, 48, 4, 1, 1, 1, 1 |
+| Strongly connected components | 146 | 159 |
 | Nontrivial SCCs | 2 | 0 |
-| Nontrivial SCC sizes | 12, 2 | - |
-| Nodes in cycles | 14 | 0 |
-| Fraction of nodes in cycles | 0.089744 | 0 |
+| Nontrivial SCC sizes | 13, 2 | - |
+| Nodes in cycles | 15 | 0 |
+| Fraction of nodes in cycles | 0.09434 | 0 |
 | Sources (in-degree 0) | 54 | 81 |
-| Sinks (out-degree 0) | 29 | 36 |
+| Sinks (out-degree 0) | 29 | 37 |
 | Reciprocal pairs | 3 | 0 |
-| Reciprocity | 0.014599 | 0 |
+| Reciprocity | 0.014286 | 0 |
 | In-degree min / median / max | 0 / 2 / 47 | 0 / 0 / 47 |
-| In-degree mean | 2.634615 | 1.679487 |
+| In-degree mean | 2.641509 | 1.679245 |
 | In-degree quartiles | 0, 2, 3 | 0, 0, 2 |
 | In-degree zeros | 54 | 81 |
-| Out-degree min / median / max | 0 / 1 / 18 | 0 / 1 / 11 |
-| Out-degree mean | 2.634615 | 1.679487 |
+| Out-degree min / median / max | 0 / 1 / 19 | 0 / 1 / 11 |
+| Out-degree mean | 2.641509 | 1.679245 |
 | Out-degree quartiles | 1, 1, 4 | 1, 1, 2 |
-| Out-degree zeros | 29 | 36 |
-| Condensation nodes | 144 | 156 |
-| Condensation edges | 331 | 262 |
-| Condensation sources / sinks | 55 / 29 | 81 / 36 |
+| Out-degree zeros | 29 | 37 |
+| Condensation nodes | 146 | 159 |
+| Condensation edges | 335 | 267 |
+| Condensation sources / sinks | 55 / 29 | 81 / 37 |
 | Condensation longest path (edges) | 10 | 7 |
 
-In-degree histogram (all imports) {degree: modules}: 0: 54, 1: 21, 2: 34, 3: 10, 4: 8, 5: 8, 6: 3, 7: 4, 8: 3, 9: 5, 10: 2, 11: 1, 13: 1, 14: 1, 47: 1
+In-degree histogram (all imports) {degree: modules}: 0: 54, 1: 21, 2: 36, 3: 10, 4: 9, 5: 7, 6: 4, 7: 4, 8: 3, 9: 5, 10: 2, 11: 1, 13: 1, 14: 1, 47: 1
 
-Out-degree histogram (all imports) {degree: modules}: 0: 29, 1: 62, 2: 18, 3: 7, 4: 10, 5: 6, 6: 3, 7: 3, 8: 4, 9: 4, 10: 5, 11: 2, 12: 1, 13: 1, 18: 1
+Out-degree histogram (all imports) {degree: modules}: 0: 29, 1: 63, 2: 19, 3: 7, 4: 11, 5: 6, 6: 3, 7: 3, 8: 3, 9: 5, 10: 5, 11: 2, 12: 1, 13: 1, 19: 1
 
 **Top 10 fan-in (all imports)** (ties at cutoff: 5)
 
@@ -63,7 +63,7 @@ Out-degree histogram (all imports) {degree: modules}: 0: 29, 1: 62, 2: 18, 3: 7,
 
 | Node | Degree |
 |---|---|
-| `tropoi.cli.main` | 18 |
+| `tropoi.cli.main` | 19 |
 | `tropoi.cli.pe` | 13 |
 | `tropoi.cli.swe` | 12 |
 | `tropoi.numerics` | 11 |
@@ -76,7 +76,7 @@ Out-degree histogram (all imports) {degree: modules}: 0: 29, 1: 62, 2: 18, 3: 7,
 
 **Nontrivial strongly connected components (all imports)**
 
-1. (12 modules) `tropoi.cli.bve`, `tropoi.cli.main`, `tropoi.cli.pe`, `tropoi.cli.swe`, `tropoi.representation.archive`, `tropoi.representation.archive.capsule`, `tropoi.representation.visual.snapshot`, `tropoi.run.custom`, `tropoi.run.custom.execute`, `tropoi.run.custom.planet`, `tropoi.run.custom.prepare`, `tropoi.run.custom.presets`
+1. (13 modules) `tropoi.cli.bve`, `tropoi.cli.main`, `tropoi.cli.pe`, `tropoi.cli.swe`, `tropoi.cli.terrain`, `tropoi.representation.archive`, `tropoi.representation.archive.capsule`, `tropoi.representation.visual.snapshot`, `tropoi.run.custom`, `tropoi.run.custom.execute`, `tropoi.run.custom.planet`, `tropoi.run.custom.prepare`, `tropoi.run.custom.presets`
 2. (2 modules) `tropoi.representation.archive.held_suarez`, `tropoi.representation.visual.atmosphere`
 
 **Reciprocal pairs (all imports)**
@@ -87,7 +87,7 @@ Out-degree histogram (all imports) {degree: modules}: 0: 29, 1: 62, 2: 18, 3: 7,
 
 ## Package-aggregated import graph
 
-Every module is mapped to its containing package (a package's `__init__` to the package itself) and parallel edges merged; edges inside one package are not self-loops but are counted separately: 113 module edges stay inside their package.
+Every module is mapped to its containing package (a package's `__init__` to the package itself) and parallel edges merged; edges inside one package are not self-loops but are counted separately: 117 module edges stay inside their package.
 
 | Metric | packages |
 |---|---|
@@ -156,16 +156,16 @@ Every module is mapped to its containing package (a package's `__init__` to the 
 
 ## Class graph
 
-* Classes: 152
-* `inherits` edges between analysed classes: 10
+* Classes: 155
+* `inherits` edges between analysed classes: 12
 * `nests` edges (class defined in a class body): 0
 * Bases outside the analysed package: `RuntimeError` x6, `UserWarning` x1, `ValueError` x16, `abc.ABC` x2, `collections.abc.Mapping` x1, `enum.Enum` x2, `str` x2, `typing.Protocol` x3
 
 ## Call graph
 
-* Nodes (functions, methods, classes): 1375
-* Edges by kind: `call` 971, `constructor` 41, `instantiate` 381, `override` 6, `self` 274, `super` 2
-* Call sites by resolution outcome: builtin 2628, external 1825, internal 2276, unresolved 2717
+* Nodes (functions, methods, classes): 1404
+* Edges by kind: `call` 998, `constructor` 41, `instantiate` 392, `override` 6, `self` 277, `super` 2
+* Call sites by resolution outcome: builtin 2743, external 1863, internal 2384, unresolved 2804
 
 | Scoped graph | Roots | Depth | Nodes | Edges | Truncated nodes | Reachable (unbounded) |
 |---|---|---|---|---|---|---|

@@ -1,5 +1,9 @@
 # The 3-D atmosphere view of a saved PE run
 
+For a quick terrain-only Mars globe, an editable low-resolution heightmap,
+and examples using your own height function or elevation file, start with
+[the terrain quick start](TERRAIN_IMPORT.md#start-with-mars-without-downloading-a-dem).
+
 `Simulation.view()` writes one self-contained HTML page. The page shows the run's
 terrain globe and one translucent atmospheric surface: a native sigma level of a
 saved primitive-equation state. The surface is placed at that level's hydrostatic
@@ -56,7 +60,9 @@ CDN, no remote textures, no fetches.
 The page provides:
 
 - **Saved time.** A discrete slider over the exported states, labelled with the
-  actual simulation time (`day 1200 (t = 103680000 s)`).
+  actual simulation time (`day 1200 (t = 103680000 s)`), with playback
+  controls (play/pause, previous/next, speed, loop). See
+  [Playback](#playback-saved-states-not-simulated-time).
 - **Native level.** A discrete slider over the exported levels, labelled with
   the level number (1 = top) and its σ.
 - **Field.** Temperature (K), pressure (hPa), relative vorticity and divergence
@@ -75,6 +81,78 @@ Temperature and pressure use sequential colour maps (`inferno`, `viridis`).
 Vorticity and divergence use `RdBu_r`, symmetric about zero. These are the
 repository's own colour policies (`compose.DISPLAY_DEFAULTS`). The terrain keeps
 the terrain viewer's `YlOrBr`.
+
+## Playback: saved states, not simulated time
+
+The play button steps the time slider through the **exported saved states**,
+one state per frame, in order. Nothing else happens between frames: there is
+no interpolation, no extrapolation and no integration in the page. A played
+frame is the same selection as moving the slider to that state: the same
+code path rebuilds the surface, colours, streamlines and flat map. A browser
+test checks that the two give byte-identical vertex buffers.
+
+Three clocks are easy to confuse:
+
+| clock | what it is | where it shows |
+| --- | --- | --- |
+| simulated time | the stored time of the saved state | the time label, e.g. `day 0.375 (t = 32400 s)` |
+| frame index | position in the exported list | after the label, e.g. `3/4` |
+| playback rate | saved states shown per second of **wall-clock** time | the `frames/s` selector (0.5 to 8) |
+
+The solver timestep appears in none of them. Saved states are usually far
+apart in model steps: a run with `dt = 60 s` saving every three hours shows
+180 steps per frame.
+
+Saved times need not be evenly spaced. The run may save at irregular times,
+and the view may export a subset (see [Size and subsampling](#size-and-subsampling)).
+Playback still advances one state per frame, so simulated time then passes at
+an uneven pace on screen. The note under the controls gives the gap to the
+previous exported state and says whether the exported times are evenly
+spaced.
+
+Playback stops on the last state. With **Loop** checked it wraps to the first
+state. Pressing play on the last state without Loop replays from the first.
+Moving the slider or pressing previous/next pauses playback and selects that
+state at once. Field, level, opacity, streamlines, exaggeration, camera and
+flat-map source stay as they are while time advances. The colour range stays
+fixed over all exported times (unless the per-level range is chosen, which is
+also fixed over time), so a colour change during playback is a change in the
+saved field, not a rescaling. A view of a single saved state has no playback
+controls.
+
+### Example: an evolving Mars atmosphere over MOLA terrain
+
+![An evolving Mars atmosphere over MOLA terrain at its last saved state (t = 88642.44 s, 9 of 9): bottom-level divergence as a 55 % translucent surface over the relief (×10) with 157 black instantaneous streamlines; side panel with the playback controls and the note that the 9 states are 11080.305 s apart and are not interpolated](validation/mars_evolving_2026-10-27/mars_evolving_final_delta.png)
+
+*An idealized dry-CO₂ perturbation experiment over MOLA terrain, at the last of
+its 9 saved states, one Mars rotation (88642.44 s) after the start. The
+balanced resting atmosphere over real relief (`orographic_isothermal_rest`)
+received a 1 K coefficient on the (2, 2) temperature mode
+(`orographic_thermal_wave`, peak 0.77 K) and was integrated at `l_max` 21 with
+4 levels and 60 s RK4 steps. The image shows divergence on the bottom level
+(σ = 0.875) at 55 % opacity and ×10 relief, with instantaneous streamlines.
+Pressing play steps through the 9 saved states, 3.08 h of simulated time
+apart. The first state is at rest and has no streamlines; the winds reach
+about 2.5 m/s.*
+
+This is a worked example of imported terrain and saved-state playback.
+The measured checks and their limits are in
+[the experiment record](validation/mars_evolving_2026-10-27/README.md). There,
+the evolution is 10¹⁰ times the drift of a resting control, a 30 s rerun differs
+by under 3 × 10⁻⁷ of the evolution, and the relative mass drift is 6 × 10⁻⁷.
+These checks apply to this configuration; they do not establish accuracy for
+arbitrary terrain or a realistic Mars atmosphere.
+The run is published as
+[`docs/runs/20261027T175327Z_orographic-thermal-wave_…_71c5441a`](runs/20261027T175327Z_orographic-thermal-wave_rot24p62h_r3_l21_dt11080p3s_3a46f966_71c5441a/),
+so the page can be rebuilt without a GPU or the MOLA files:
+
+```bash
+python examples/mola_mars_evolving.py view docs/runs/20261027T175327Z_orographic-thermal-wave_rot24p62h_r3_l21_dt11080p3s_3a46f966_71c5441a --out views
+```
+
+`views/mars_evolving_all_times.html` (5.2 MB) holds all 9 states at a 3° mesh.
+The full experiment (terrain preparation, the four runs, the measurements and
+the browser check) is reproduced by the commands in the record.
 
 ## What the surface is
 
@@ -215,6 +293,7 @@ Measured on this machine (MX110 laptop, CPU path):
 | `hs-T42L20-prod-002` (120 states, T42L20), default | 5 of 120 states (days 10, 310, 610, 900, 1200) × 20 levels | 2° | 26.4 MB | 10 s |
 | same, `times=[0, -1]`, `levels=[0, 10, 19]` | 2 × 3 | 3° | 1.3 MB | 1.4 s |
 | Mars MOLA orographic rest (3 states, T42L4, real terrain) | 3 × 4 | 2° | 3.1 MB | 1 s |
+| Mars MOLA evolving (9 states, T21L4, real terrain), `times="all"` | 9 × 4 | 3° | 5.2 MB | not timed |
 
 At the default 2° mesh one Held–Suarez time with all 20 levels costs about
 5 MB. Fewer levels, a coarser mesh or `streamlines=False` buy more times. In

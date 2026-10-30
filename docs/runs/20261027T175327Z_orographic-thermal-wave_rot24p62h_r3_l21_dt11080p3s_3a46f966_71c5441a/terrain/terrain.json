@@ -1,0 +1,82 @@
+{
+  "format": "tropoi.prepared_terrain",
+  "version": 1,
+  "label": "Mars (MOLA MEGDR) for the PE core, l_max 21",
+  "digest": "sha256:afb016d805517202bfc4374ed24f91d72b71aa6376b789184d4cd010b35c31b8",
+  "planet": {
+    "version": 1,
+    "construction": "oblate_volumetric_mean",
+    "radius_convention": "reference_radius_m is the equatorial radius; the dynamical radius is the derived volumetric-mean radius of the first-order rotational oblate spheroid (PlanetaryParameters(mass, equatorial_radius, sidereal_day))",
+    "reference_radius_m": 3396200.0,
+    "sidereal_day_s": 88642.66,
+    "mass_kg": 5.972e+24,
+    "derived": {
+      "dynamical_radius_m": 3395920.4843182135,
+      "angular_velocity_rad_s": 7.088218367070196e-05,
+      "oblateness": 0.00024688711876549315
+    }
+  },
+  "discretization": {
+    "version": 1,
+    "lmax": 21,
+    "grid": "latlon",
+    "resolution": 4,
+    "nlat": 34,
+    "nlon": 68,
+    "product_quadrature": "fine"
+  },
+  "topography": {
+    "version": 1,
+    "preset": "imported",
+    "parameters": {
+      "source_name": "megt_4ppd.nc",
+      "source_sha256": "aea919137cbab87df2ffe5c2efb115a0741afda2bae7634aace5ce89c2ef24f2",
+      "format": "netcdf",
+      "variable": "topography",
+      "units": "m",
+      "unit_factor_to_m": 1.0,
+      "scale": 1.0,
+      "offset": 0.0,
+      "missing_count": 0,
+      "rows_flipped_to_south_first": true,
+      "longitudes_rewrapped": "[-180, 180)",
+      "lon_first_deg": -179.875,
+      "resampling": "area-weighted block mean, then bilinear",
+      "working_resolution_deg": 4.090909090909091,
+      "raster_shape": "720x1440",
+      "raster_resolution_deg": 0.25,
+      "registration": "cell",
+      "clip_below_m": null,
+      "l_cut": 14,
+      "smoothing_retained_at_band_limit": null,
+      "smoothing_band_limit": null,
+      "projection_residual": 0.1744392572675063,
+      "smoothed_residual": null,
+      "source_min_m": -8068.0,
+      "source_max_m": 21134.0,
+      "sampled_min_m": -6795.284955730829,
+      "sampled_max_m": 14625.330236572827,
+      "elevation_min_m": -7584.646735121492,
+      "elevation_max_m": 8360.521669376065
+    }
+  },
+  "band_limit": {
+    "l_cut": 14,
+    "meaning": "coefficients above l_cut are exactly zero (the primitive-equation dealiased product cut)"
+  },
+  "coefficients": {
+    "coefficient_file": "topography_elevation_lm.npy",
+    "shape": [
+      22,
+      22
+    ],
+    "sha256": "sha256:96a09dbca0ea35ab4240d1094eb33711772dc283e5b538e59fdee64ccc8c1236",
+    "units": "m",
+    "description": "resolved bottom-topography surface elevation h_s (metres); the surface geopotential is phi_s = gravity * h_s"
+  },
+  "created_utc": "2026-10-27T17:53:27.790579+00:00",
+  "software": {
+    "package": "palintropos",
+    "version": "0.1.0"
+  }
+}

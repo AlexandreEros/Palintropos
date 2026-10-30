@@ -51,9 +51,16 @@ __all__ = ["PreparedPlanet", "prepare_planet"]
 
 #: Labels of the provenance / preprocessing keys shown in previews, in order.
 _DETAIL_LABELS = (
-    ("source_name", "Source file"),
+    ("source_name", "Source"),
     ("source_sha256", "SHA-256"),
     ("format", "Format"),
+    ("expression", "Expression"),
+    ("function_name", "Height function"),
+    ("function_file", "Function file"),
+    ("function_file_sha256", "Function file SHA-256"),
+    ("sampling_resolution_deg", "Sampling spacing (deg)"),
+    ("sampling_lon_range_deg", "Sampled longitudes (deg)"),
+    ("sampling_mode", "Sampling"),
     ("variable", "Variable"),
     ("image_mode", "Pixel mode"),
     ("georeferencing", "Georeferencing"),

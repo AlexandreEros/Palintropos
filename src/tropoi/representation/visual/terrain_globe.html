@@ -93,6 +93,11 @@ dd { margin: 0; color: var(--ink); overflow-wrap: anywhere; }
 #interp li { margin: 2px 0; }
 .mapSource { float: right; text-transform: none; letter-spacing: 0; }
 .mapSource button { padding: 1px 8px; font-size: 12px; }
+.play { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: 6px 0 0; }
+.play button { padding: 3px 9px; }
+.play label { color: var(--ink-2); font-size: 12.5px; }
+select { font: inherit; font-size: 12.5px; color: var(--ink); background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 2px 4px; }
+select:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 </style>
 </head>
 <body>
@@ -121,6 +126,17 @@ dd { margin: 0; color: var(--ink); overflow-wrap: anywhere; }
       <h2>Atmosphere</h2>
       <div class="row"><span>Saved time</span><span id="timeLabel" class="val"></span></div>
       <input type="range" id="timeSlider" min="0" max="0" step="1" aria-label="Saved time">
+      <div class="play" id="playRow" role="group" aria-label="Playback of the exported saved states">
+        <button id="tPrev" aria-label="Previous saved state" title="Previous saved state">‹ Prev</button>
+        <button id="tPlay" aria-pressed="false" title="Play the exported saved states in order">▶ Play</button>
+        <button id="tNext" aria-label="Next saved state" title="Next saved state">Next ›</button>
+        <label title="Wall-clock playback rate: saved states shown per second of real time">
+          <select id="tSpeed" aria-label="Playback speed in saved states per second">
+            <option value="0.5">0.5</option><option value="1" selected>1</option><option value="2">2</option><option value="4">4</option><option value="8">8</option>
+          </select> frames/s</label>
+        <label><input type="checkbox" id="tLoop"> Loop</label>
+      </div>
+      <p class="note" id="timeNote"></p>
       <div class="row"><span>Native level <span class="note">(1 = top)</span></span><span id="levelLabel" class="val"></span></div>
       <input type="range" id="levelSlider" min="0" max="0" step="1" aria-label="Native sigma level">
       <div class="row"><span>Field</span></div>
@@ -718,8 +734,10 @@ function rebuildStreams(Z) {
     const a = 0.02;
     for (const w of [1, -1]) out.push(...T, ...[0, 1, 2].map(c => T[c] - a * d[c] + w * 0.55 * a * sd[c]));
   });
+  ATM.streamData = null;
   if (!ATM.streams || !out.length) return;
-  gl.bindBuffer(gl.ARRAY_BUFFER, buf.streams); gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(out), gl.DYNAMIC_DRAW);
+  ATM.streamData = new Float32Array(out);
+  gl.bindBuffer(gl.ARRAY_BUFFER, buf.streams); gl.bufferData(gl.ARRAY_BUFFER, ATM.streamData, gl.DYNAMIC_DRAW);
   ATM.nStreamVerts = out.length / 3;
 }
 function renderAtmosphere(cl, nl) {
@@ -752,6 +770,7 @@ function renderAtmosphere(cl, nl) {
 function updateAtmLabels(Z) {
   const A = ATM.A, t = A.times[ATM.it], lv = A.levels[ATM.il], f = atmField();
   document.getElementById("timeLabel").textContent = t.label + " · " + (ATM.it + 1) + "/" + ATM.nt;
+  document.getElementById("timeNote").textContent = timeNoteText();
   document.getElementById("levelLabel").textContent = lv.number + " / " + A.nlev + " · σ = " + lv.sigma.toFixed(4);
   document.getElementById("opacityLabel").textContent = Math.round(ATM.opacity * 100) + " %";
   let zlo = Infinity, zhi = -Infinity, zsum = 0;
@@ -828,7 +847,67 @@ function drawAtmMap() {
   m.restore();
 }
 function onAtmChange() { rebuildAtmosphere(); drawAtmColorbar(); drawMap(); drawMapOverlay(lastMapHover); }
+/* The one way a saved state is selected: slider, step buttons, playback and the page API
+   all come through here, so a played frame is exactly the manually selected one. */
 function atmSetTime(i) { ATM.it = Math.max(0, Math.min(ATM.nt - 1, i | 0)); document.getElementById("timeSlider").value = ATM.it; onAtmChange(); }
+
+/* ---- playback: steps through the exported saved states only (no interpolation) at a
+   wall-clock rate in frames per second; the label always shows the stored time ---- */
+const play = { on: false, fps: 1, loop: false, timer: 0 };
+function fmtSpan(s) {
+  const d = s / 86400;
+  return (Math.abs(d) >= 0.01 ? Number(d.toPrecision(6)) + " day (" : "(") + Number(s.toPrecision(10)) + " s)";
+}
+function timeSpacing() {
+  // gaps between consecutive exported times, and whether they are equal (to rounding)
+  const T = ATM.A.times.map(t => t.time_s), gaps = [];
+  for (let k = 1; k < T.length; k++) gaps.push(T[k] - T[k - 1]);
+  const lo = Math.min(...gaps), hi = Math.max(...gaps);
+  return { gaps, lo, hi, uniform: gaps.length > 0 && hi - lo <= 1e-9 * Math.max(Math.abs(hi), 1) };
+}
+function timeNoteText() {
+  if (ATM.nt < 2) return "One exported saved state: there is nothing to play.";
+  const sp = timeSpacing(), here = ATM.it > 0
+    ? "Δt from the previous exported state: " + fmtSpan(sp.gaps[ATM.it - 1]) + ". "
+    : "First exported state. ";
+  const spacing = sp.uniform
+    ? "The " + ATM.nt + " exported states are evenly spaced in simulated time (" + fmtSpan(sp.lo) + " apart)."
+    : "The " + ATM.nt + " exported states are unevenly spaced in simulated time (gaps " + fmtSpan(sp.lo) + " to " +
+      fmtSpan(sp.hi) + "), so simulated time does not pass at a constant pace during playback.";
+  return here + spacing + " Playback shows one saved state per frame at the chosen wall-clock rate; it does not interpolate between them.";
+}
+function setPlaying(on) {
+  play.on = !!on && ATM.nt > 1;
+  if (play.timer) { clearTimeout(play.timer); play.timer = 0; }
+  const b = document.getElementById("tPlay");
+  b.setAttribute("aria-pressed", play.on ? "true" : "false");
+  b.textContent = play.on ? "❚❚ Pause" : "▶ Play";
+  b.title = play.on ? "Pause playback" : "Play the exported saved states in order";
+  if (play.on) play.timer = setTimeout(playTick, 1000 / play.fps);
+}
+function playStart() {
+  if (ATM.nt < 2) return;
+  if (ATM.it >= ATM.nt - 1 && !play.loop) atmSetTime(0);   // replay from the first state
+  setPlaying(true);
+}
+function playTick() {
+  play.timer = 0;
+  if (!play.on) return;
+  atmSetTime(ATM.it >= ATM.nt - 1 ? 0 : ATM.it + 1);       // wraps only when looping (else stopped below)
+  if (ATM.it >= ATM.nt - 1 && !play.loop) { setPlaying(false); return; }
+  play.timer = setTimeout(playTick, 1000 / play.fps);
+}
+/* manual selection pauses playback first, so a scrub or step never races a pending frame */
+function atmSelectTime(i) { setPlaying(false); atmSetTime(i); }
+function atmStep(d) { atmSelectTime(ATM.it + (d < 0 ? -1 : 1)); }
+function setSpeed(fps) {
+  const v = +fps; if (!(v > 0)) return;
+  const sel = document.getElementById("tSpeed");
+  if (![...sel.options].some(o => +o.value === v)) sel.append(new Option(String(v), String(v)));
+  play.fps = v; sel.value = [...sel.options].find(o => +o.value === v).value;
+  if (play.on) setPlaying(true);                            // restart the pending frame at the new rate
+}
+function setLoop(on) { play.loop = !!on; document.getElementById("tLoop").checked = play.loop; }
 function atmSetLevel(i) { ATM.il = Math.max(0, Math.min(ATM.nl - 1, i | 0)); document.getElementById("levelSlider").value = ATM.il; onAtmChange(); }
 function atmSetField(k) {
   ATM.field = k;
@@ -860,7 +939,13 @@ function initAtmosphereUI() {
   const ts = document.getElementById("timeSlider"), ls = document.getElementById("levelSlider");
   ts.max = ATM.nt - 1; ts.value = ATM.it; ts.disabled = ATM.nt < 2;
   ls.max = ATM.nl - 1; ls.value = ATM.il; ls.disabled = ATM.nl < 2;
-  ts.addEventListener("input", () => atmSetTime(+ts.value));
+  ts.addEventListener("input", () => atmSelectTime(+ts.value));
+  document.getElementById("playRow").hidden = ATM.nt < 2;        // one saved state: nothing to play
+  document.getElementById("tPrev").addEventListener("click", () => atmStep(-1));
+  document.getElementById("tNext").addEventListener("click", () => atmStep(1));
+  document.getElementById("tPlay").addEventListener("click", () => (play.on ? setPlaying(false) : playStart()));
+  const sp = document.getElementById("tSpeed"); sp.addEventListener("change", () => setSpeed(sp.value));
+  const lp = document.getElementById("tLoop"); lp.addEventListener("change", () => setLoop(lp.checked));
   ls.addEventListener("input", () => atmSetLevel(+ls.value));
   const fb = document.getElementById("fieldButtons");
   ATM.fields.forEach((f, k) => {
@@ -897,19 +982,30 @@ function loop(t) {
 requestAnimationFrame(loop);
 window.__terrainGlobe = { state: st, layers: layers.map(l => l.short), pick, sampleLayer: (lat, lon) => sampleLayer(layers[st.layer].values, lat, lon), glOK,
   atmosphere: ATM ? {
-    setTime: atmSetTime, setLevel: atmSetLevel, setField: atmSetField, setOpacity: atmSetOpacity, setStreamlines: atmSetStreams, setMap: atmSetMap,
+    setTime: atmSelectTime, step: atmStep, play: playStart, pause: () => setPlaying(false), setSpeed, setLoop,
+    setLevel: atmSetLevel, setField: atmSetField, setOpacity: atmSetOpacity, setStreamlines: atmSetStreams, setMap: atmSetMap,
     setShow: on => { ATM.show = !!on; document.getElementById("atmShow").checked = ATM.show; },
     setPerLevel: on => { ATM.perLevel = !!on; document.getElementById("rangeLevel").checked = ATM.perLevel; onAtmChange(); },
     setExaggeration: e => { st.exag = e; exag.value = exToSlider(e); updateExagLabel(); rebuildSurface(); },
     centreOn: (lat, lon) => centreOn(lat, lon), setDistance: d => { st.dist = d; },
     sample: (lat, lon) => ({ value: sampleMesh(ATM.g, atmValues(), lat, lon), z: sampleMesh(ATM.g, atmHeight(), lat, lon) }),
+    digest: () => {
+      // FNV-1a over the drawn layer (positions, colours) and streamline vertices: equal
+      // digests mean the GPU buffers of two selections hold identical bytes
+      let h = 0x811c9dc5;
+      for (const a of [ATM.surf.pos, ATM.surf.col, ATM.streamData || new Float32Array(0)]) {
+        const b = new Uint8Array(a.buffer, a.byteOffset, a.byteLength);
+        for (let k = 0; k < b.length; k++) { h ^= b[k]; h = Math.imul(h, 0x01000193) >>> 0; }
+      }
+      return h.toString(16) + ":" + ATM.nStreamVerts;
+    },
     info: () => {
       const P = ATM.surf.pos, T = terrainSurf.pos; let rmin = Infinity, rmax = -Infinity, rsum = 0, below = 0;
       for (let k = 0; k < ATM.n; k++) { const r = Math.hypot(P[3 * k], P[3 * k + 1], P[3 * k + 2]); rmin = Math.min(rmin, r); rmax = Math.max(rmax, r); rsum += r; }
       for (let k = 0; k < N; k++) { const lat = LAT[Math.floor(k / NLON)], lon = LON[k % NLON];
         const ra = 1 + st.exag * sampleMesh(ATM.g, atmHeight(), lat, lon) / D.radius_m;
         if (ra <= Math.hypot(T[3 * k], T[3 * k + 1], T[3 * k + 2])) below++; }
-      return { time: ATM.A.times[ATM.it], level: ATM.A.levels[ATM.il], field: atmField().id, opacity: ATM.opacity, exag: st.exag,
+      return { time: ATM.A.times[ATM.it], timeIndex: ATM.it, playing: play.on, fps: play.fps, loop: play.loop, level: ATM.A.levels[ATM.il], field: atmField().id, opacity: ATM.opacity, exag: st.exag,
                streams: ATM.streams, lines: ATM.nLinesHere, streamVerts: ATM.nStreamVerts, radius: { min: rmin, max: rmax, mean: rsum / ATM.n },
                range: atmRange(), terrainNodesAboveLayer: below, mapLabel: document.getElementById("mapLayer").textContent };
     },

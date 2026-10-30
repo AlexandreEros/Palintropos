@@ -1,0 +1,246 @@
+{
+  "pages": {
+    "all": {
+      "requests": [
+        "mars_evolving_all_times.html"
+      ],
+      "only_own_file": true,
+      "console_errors": [],
+      "exceptions": [],
+      "glOK": true,
+      "states": [
+        {
+          "label": "day 0 (t = 0 s) \u00b7 1/9",
+          "digest": "87983054:0",
+          "streamlines": 0,
+          "radius_mean": 1.0021763282575826,
+          "terrain_nodes_above_layer": 0
+        },
+        {
+          "label": "day 0.128244 (t = 11080.305 s) \u00b7 2/9",
+          "digest": "42fad743:14594",
+          "streamlines": 160,
+          "radius_mean": 1.0021764763056076,
+          "terrain_nodes_above_layer": 0
+        },
+        {
+          "label": "day 0.256489 (t = 22160.61 s) \u00b7 3/9",
+          "digest": "68cd60ab:14894",
+          "streamlines": 160,
+          "radius_mean": 1.0021768420076616,
+          "terrain_nodes_above_layer": 0
+        },
+        {
+          "label": "day 0.384733 (t = 33240.915 s) \u00b7 4/9",
+          "digest": "a559464d:15132",
+          "streamlines": 160,
+          "radius_mean": 1.0021770208488712,
+          "terrain_nodes_above_layer": 0
+        },
+        {
+          "label": "day 0.512977 (t = 44321.22 s) \u00b7 5/9",
+          "digest": "5ebfb562:14754",
+          "streamlines": 159,
+          "radius_mean": 1.0021771748227277,
+          "terrain_nodes_above_layer": 0
+        },
+        {
+          "label": "day 0.641221 (t = 55401.525 s) \u00b7 6/9",
+          "digest": "57832909:14514",
+          "streamlines": 159,
+          "radius_mean": 1.0021772277819545,
+          "terrain_nodes_above_layer": 0
+        },
+        {
+          "label": "day 0.769466 (t = 66481.83 s) \u00b7 7/9",
+          "digest": "db8bd46f:15374",
+          "streamlines": 159,
+          "radius_mean": 1.0021770335907834,
+          "terrain_nodes_above_layer": 0
+        },
+        {
+          "label": "day 0.89771 (t = 77562.135 s) \u00b7 8/9",
+          "digest": "397f4f3e:14110",
+          "streamlines": 155,
+          "radius_mean": 1.0021769437418802,
+          "terrain_nodes_above_layer": 0
+        },
+        {
+          "label": "day 1.02595 (t = 88642.44 s) \u00b7 9/9",
+          "digest": "c1cb2c33:14944",
+          "streamlines": 157,
+          "radius_mean": 1.0021770500302496,
+          "terrain_nodes_above_layer": 0
+        }
+      ],
+      "levels_fields": [
+        {
+          "level": 0,
+          "field": "temperature",
+          "lines": 158,
+          "range": [
+            208.95315524676755,
+            211.14214068765625
+          ]
+        },
+        {
+          "level": 0,
+          "field": "pressure",
+          "lines": 158,
+          "range": [
+            35.08612199615711,
+            1096.8739651466574
+          ]
+        },
+        {
+          "level": 0,
+          "field": "zeta",
+          "lines": 158,
+          "range": [
+            -5.775117326846767e-06,
+            5.775117326846767e-06
+          ]
+        },
+        {
+          "level": 0,
+          "field": "delta",
+          "lines": 158,
+          "range": [
+            -3.3979076654759066e-06,
+            3.3979076654759066e-06
+          ]
+        },
+        {
+          "level": 1,
+          "field": "temperature",
+          "lines": 158,
+          "range": [
+            208.95315524676755,
+            211.14214068765625
+          ]
+        },
+        {
+          "level": 1,
+          "field": "pressure",
+          "lines": 158,
+          "range": [
+            35.08612199615711,
+            1096.8739651466574
+          ]
+        },
+        {
+          "level": 1,
+          "field": "zeta",
+          "lines": 158,
+          "range": [
+            -5.775117326846767e-06,
+            5.775117326846767e-06
+          ]
+        },
+        {
+          "level": 1,
+          "field": "delta",
+          "lines": 158,
+          "range": [
+            -3.3979076654759066e-06,
+            3.3979076654759066e-06
+          ]
+        },
+        {
+          "level": 2,
+          "field": "temperature",
+          "lines": 159,
+          "range": [
+            208.95315524676755,
+            211.14214068765625
+          ]
+        },
+        {
+          "level": 2,
+          "field": "pressure",
+          "lines": 159,
+          "range": [
+            35.08612199615711,
+            1096.8739651466574
+          ]
+        },
+        {
+          "level": 2,
+          "field": "zeta",
+          "lines": 159,
+          "range": [
+            -5.775117326846767e-06,
+            5.775117326846767e-06
+          ]
+        },
+        {
+          "level": 2,
+          "field": "delta",
+          "lines": 159,
+          "range": [
+            -3.3979076654759066e-06,
+            3.3979076654759066e-06
+          ]
+        },
+        {
+          "level": 3,
+          "field": "temperature",
+          "lines": 157,
+          "range": [
+            208.95315524676755,
+            211.14214068765625
+          ]
+        },
+        {
+          "level": 3,
+          "field": "pressure",
+          "lines": 157,
+          "range": [
+            35.08612199615711,
+            1096.8739651466574
+          ]
+        },
+        {
+          "level": 3,
+          "field": "zeta",
+          "lines": 157,
+          "range": [
+            -5.775117326846767e-06,
+            5.775117326846767e-06
+          ]
+        },
+        {
+          "level": 3,
+          "field": "delta",
+          "lines": 157,
+          "range": [
+            -3.3979076654759066e-06,
+            3.3979076654759066e-06
+          ]
+        }
+      ],
+      "distinct_digests": 9,
+      "playback_stopped_at": 8
+    },
+    "initial": {
+      "requests": [
+        "mars_evolving_initial.html"
+      ],
+      "only_own_file": true,
+      "console_errors": [],
+      "exceptions": [],
+      "play_controls_hidden": true
+    },
+    "final": {
+      "requests": [
+        "mars_evolving_final.html"
+      ],
+      "only_own_file": true,
+      "console_errors": [],
+      "exceptions": [],
+      "play_controls_hidden": true
+    }
+  },
+  "browser": "Chrome/156.0.8078.48",
+  "offline_and_clean": true
+}

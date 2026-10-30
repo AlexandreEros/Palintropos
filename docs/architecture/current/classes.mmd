@@ -77,6 +77,10 @@ classDiagram
     c_tropoi_ospatial_ospherical__backend_oSphericalGridBackend : +product#95;space()
     c_tropoi_ospatial_ospherical__backend_oSphericalGridBackend : +supported#95;product#95;quadratures()
     c_tropoi_ospatial_ospherical__backend_oSphericalGridBackend : external base abc.ABC
+    class c_tropoi_ospatial_oterrain_oelevation__import_oElevationImportError["ElevationImportError (spatial.terrain.elevation_import)"]
+    c_tropoi_ospatial_oterrain_oelevation__import_oElevationImportError : external base ValueError
+    class c_tropoi_ospatial_oterrain_oheight__function_oHeightExpressionError["HeightExpressionError (spatial.terrain.height_function)"]
+    class c_tropoi_ospatial_oterrain_oheight__function_oHeightFunctionError["HeightFunctionError (spatial.terrain.height_function)"]
     c_tropoi_orepresentation_oarchive_ocapsule_oCapsuleError <|-- c_tropoi_orepresentation_oarchive_ocapsule_oCapsuleLayoutError
     c_tropoi_orepresentation_oarchive_oinitial__state_oInitialStateError <|-- c_tropoi_orepresentation_oarchive_oprepared__terrain_oPreparedTerrainError
     c_tropoi_orepresentation_oarchive_oschema_oSchemaError <|-- c_tropoi_orepresentation_oarchive_oschema_oUnknownSchemaVersionError
@@ -87,3 +91,5 @@ classDiagram
     c_tropoi_ospatial_ospherical__backend_oSphericalGridBackend <|-- c_tropoi_ospatial_ospherical__backend_oGeodesicBackend
     c_tropoi_ospatial_ospherical__backend_oSphericalGridBackend <|-- c_tropoi_ospatial_ospherical__backend_oLatLonBackend
     c_tropoi_ospatial_ospherical__backend_oSphericalGridBackend <|-- c_tropoi_ospatial_ospherical__backend_oPointSetBackend
+    c_tropoi_ospatial_oterrain_oheight__function_oHeightFunctionError <|-- c_tropoi_ospatial_oterrain_oheight__function_oHeightExpressionError
+    c_tropoi_ospatial_oterrain_oelevation__import_oElevationImportError <|-- c_tropoi_ospatial_oterrain_oheight__function_oHeightFunctionError
