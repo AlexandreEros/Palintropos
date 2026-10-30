@@ -5,13 +5,13 @@
 
 | | |
 |---|---|
-| Source base commit | `5c8d7e8539be07e3e6c1f808380510f18d84a965` + working-tree changes |
+| Source base commit | `b6c04a0bf57a0167c06e821f49c1af318eb561e7` + working-tree changes |
 | Analysed package | `tropoi` under `src/` |
 | Generator | `tools.architecture` 1.0.0 |
 | Toolchain | Python 3.12, grimp 3.17, networkx 3.7 |
 | Command | `python -m tools.architecture.generate` |
 
-Source working tree: **dirty**. Content SHA-256: `00c88787523a1274f08ab64eaec5d92da348f288f87791734fcce83f180e1f48`. Generator working tree: **dirty**. Per-file hashes and scoped Git status are recorded in `metrics.json`. The base commit alone does not identify uncommitted source.
+Source working tree: **dirty**. Content SHA-256: `6ce9782138cf610389f72c465c41f061c1bba24eef2f441709ab07f5bc7b8f72`. Generator working tree: **clean**. Per-file hashes and scoped Git status are recorded in `metrics.json`. The base commit alone does not identify uncommitted source.
 
 ## Reproducing
 
@@ -68,7 +68,7 @@ The rules are generic path and syntax rules; none names a particular subpackage.
 4. Each module gets a syntactic category: `namespace` (a namespace package directory), `empty` (no statement besides a docstring), `reexport` (only imports, `__all__` assignments, and alias assignments `A = B`), or `code`. Categories are attributes, not filters, with one exception: a `namespace` or `empty` module that no analysed module imports is dropped from the module graph, because it has no code and no edges.
 5. Imports of modules outside the package are not graph edges; they are listed per module (`stdlib_imports`, `third_party_imports` in `graph/modules.json`).
 
-Modules discovered: 128; in the module graph: 108. Categories: code 106, empty 19, namespace 1, reexport 2.
+Modules discovered: 131; in the module graph: 111. Categories: code 109, empty 19, namespace 1, reexport 2.
 
 Excluded by rule 4: `tropoi`, `tropoi.cli`, `tropoi.representation`, `tropoi.representation.diagnostics`, `tropoi.representation.visual`, `tropoi.run`, `tropoi.run.bve`, `tropoi.run.held_suarez`, `tropoi.run.pe`, `tropoi.run.swe`, `tropoi.spatial`, `tropoi.spatial.grids`, `tropoi.spatial.initialization`, `tropoi.spatial.operators`, `tropoi.spatial.states`, `tropoi.spatial.terrain`, `tropoi.spatial.transforms`, `tropoi.spatial.transforms.cuda`, `tropoi.temporal`, `tropoi.temporal.tendencies`.
 
@@ -95,7 +95,7 @@ Excluded by rule 4: `tropoi`, `tropoi.cli`, `tropoi.representation`, `tropoi.rep
 
 ### Call graphs (ast)
 
-Each call expression inside a function or method body (nested functions, lambdas, and comprehensions are attributed to the enclosing function) is classified as `internal` (resolved to an analysed definition), `external` (resolved to a name outside the package), `builtin` (an unshadowed builtin), or `unresolved`. Totals: builtin 2615, external 1809, internal 2263, unresolved 2697.
+Each call expression inside a function or method body (nested functions, lambdas, and comprehensions are attributed to the enclosing function) is classified as `internal` (resolved to an analysed definition), `external` (resolved to a name outside the package), `builtin` (an unshadowed builtin), or `unresolved`. Totals: builtin 2730, external 1847, internal 2371, unresolved 2784.
 
 | Edge kind | Syntax | What it claims |
 |---|---|---|

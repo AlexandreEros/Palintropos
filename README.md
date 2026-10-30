@@ -65,6 +65,16 @@ python examples/mola_mars.py show mola/megt_4ppd.nc --lmax 42 --units m --centre
 The command needs CUDA and the converted MOLA grid; see
 [docs/TERRAIN_IMPORT.md](docs/TERRAIN_IMPORT.md#real-data-mars-from-mola).
 
+Terrain for your own planet can also come from a formula or from a function
+in your own Python file. Sampling is done on the CPU and preparation on CUDA:
+
+```bash
+tropoi terrain prepare --expression "1200*cos(radians(lat))**2*cos(2*radians(lon))" --resolution-deg 2 --lmax 21 --solver pe --out terrain/my_planet
+tropoi terrain prepare --function "./my_terrain.py:height" --resolution-deg 2 --lmax 21 --solver pe --out terrain/my_planet
+```
+
+See [docs/TERRAIN_IMPORT.md](docs/TERRAIN_IMPORT.md#a-height-expression-or-a-python-function).
+
 ## What you can study with it today
 
 - **How rotating flow organizes itself.** Vortex interaction, Rossby–Haurwitz

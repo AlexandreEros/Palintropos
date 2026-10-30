@@ -67,6 +67,14 @@
     {
       "kind": "imports",
       "scopes": [
+        "module"
+      ],
+      "source": "tropoi.cli.main",
+      "target": "tropoi.cli.terrain"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
         "function"
       ],
       "source": "tropoi.cli.main",
@@ -199,6 +207,38 @@
       ],
       "source": "tropoi.cli.main",
       "target": "tropoi.spatial.modes"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.cli.terrain",
+      "target": "tropoi.representation.archive.prepared_terrain"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.cli.terrain",
+      "target": "tropoi.run.custom"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.cli.terrain",
+      "target": "tropoi.spatial.terrain.height_function"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.cli.terrain",
+      "target": "tropoi.spatial.terrain.raster"
     },
     {
       "kind": "imports",
@@ -1361,6 +1401,14 @@
       ],
       "source": "tropoi.run.custom",
       "target": "tropoi.spatial.specification"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.run.custom",
+      "target": "tropoi.spatial.terrain.height_function"
     },
     {
       "kind": "imports",
@@ -2613,6 +2661,30 @@
     {
       "kind": "imports",
       "scopes": [
+        "module"
+      ],
+      "source": "tropoi.spatial.terrain.height_function",
+      "target": "tropoi.spatial.terrain.elevation_import"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.spatial.terrain.raster",
+      "target": "tropoi.spatial.terrain.elevation_import"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.spatial.terrain.raster",
+      "target": "tropoi.spatial.terrain.height_function"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
         "type_checking"
       ],
       "source": "tropoi.spatial.terrain.terrain_spectral",
@@ -2855,6 +2927,23 @@
         "typing"
       ],
       "third_party_imports": []
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.cli.terrain",
+      "is_package": false,
+      "path": "tropoi/cli/terrain.py",
+      "stdlib_imports": [
+        "__future__",
+        "argparse",
+        "pathlib",
+        "shlex",
+        "sys"
+      ],
+      "third_party_imports": [
+        "matplotlib"
+      ]
     },
     {
       "category": "reexport",
@@ -4006,6 +4095,7 @@
       "path": "tropoi/spatial/initialization/pe.py",
       "stdlib_imports": [
         "__future__",
+        "math",
         "typing"
       ],
       "third_party_imports": []
@@ -4168,6 +4258,42 @@
       ],
       "third_party_imports": [
         "cupy",
+        "numpy"
+      ]
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.spatial.terrain.elevation_import",
+      "is_package": false,
+      "path": "tropoi/spatial/terrain/elevation_import.py",
+      "stdlib_imports": [
+        "__future__"
+      ],
+      "third_party_imports": []
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.spatial.terrain.height_function",
+      "is_package": false,
+      "path": "tropoi/spatial/terrain/height_function.py",
+      "stdlib_imports": [
+        "__future__",
+        "ast",
+        "collections",
+        "dataclasses",
+        "hashlib",
+        "math",
+        "numbers",
+        "operator",
+        "pathlib",
+        "re",
+        "sys",
+        "types",
+        "typing"
+      ],
+      "third_party_imports": [
         "numpy"
       ]
     },

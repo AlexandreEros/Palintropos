@@ -81,7 +81,8 @@ def test_documented_cpu_only_modules_import_without_cupy_or_matplotlib():
                # validate/configure without CUDA)
                "tropoi.spatial.specification",
                "tropoi.representation.archive.initial_state",
-               "tropoi.run.custom"]
+               "tropoi.run.custom",
+               "tropoi.spatial.terrain.height_function", "tropoi.cli.terrain"]
     probe = (
         "import importlib, sys\n"
         "sys.modules['cupy'] = None\n"

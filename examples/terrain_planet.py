@@ -60,6 +60,8 @@ def mars_like_relief(lat_deg, lon_deg) -> np.ndarray:
 def generate(out_dir: str) -> None:
     from PIL import Image
 
+    from tropoi.spatial.terrain.raster import encode_grey16
+
     out = pathlib.Path(out_dir)
     out.mkdir(parents=True, exist_ok=True)
     d = 0.25
@@ -68,8 +70,8 @@ def generate(out_dir: str) -> None:
     h = mars_like_relief(*np.meshgrid(lat, lon, indexing="ij"))
     lo, hi = -8000.0, 22000.0
     png = out / "mars_like.png"
-    Image.fromarray(np.rint((h - lo) / (hi - lo) * 65535).astype(np.uint16)
-                    ).save(png)
+    # refuses heights outside (lo, hi) instead of wrapping them
+    Image.fromarray(encode_grey16(h, (lo, hi))).save(png)
     print(f"wrote {png} (16-bit grey; --height-range {lo:g} {hi:g} "
           "--lon-west -180)")
     try:

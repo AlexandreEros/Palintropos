@@ -88,4 +88,3 @@ def build_pe_model(run_config: Mapping, *, topography_lm=None):
         cp_dry=float(run_config["cp_dry"]),
         surface_geopotential_lm=surface_geopotential_lm,
         batched_transforms=bool(run_config.get("batched_transforms", False)))
-

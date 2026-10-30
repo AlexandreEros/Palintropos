@@ -51,4 +51,3 @@ def _resolve_topography(planet_obj, spec: TopographySpec):
                                    lat_deg=p["lat_deg"], lon_deg=p["lon_deg"],
                                    width_deg=p["width_deg"])
     return Topography.williamson5_cone(planet_obj, height_m=p["height_m"])
-

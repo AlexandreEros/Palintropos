@@ -188,7 +188,9 @@ inference still reads published scientific runs; both remain supported.
   (`run.custom`), and coefficient-space (`"spectral"`) BVE/SWE snapshot
   plots; saved prepared terrain (`representation.archive.prepared_terrain`,
   `PreparedPlanet.save`/`load`) and `tropoi run pe --terrain` configuration
-  resolution; reading elevation files (`spatial.terrain.raster`), host synthesis
+  resolution; reading elevation files (`spatial.terrain.raster`), sampling
+  height functions and expressions (`spatial.terrain.height_function`;
+  `tropoi terrain prepare --sample-only`), host synthesis
   (`spatial.transforms.host_synthesis`) and terrain previews of resolved
   coefficients (`PreparedPlanet.from_initial_state(...).plot()` /
   `.view()`, Matplotlib for `plot` only); opening Held–Suarez experiment

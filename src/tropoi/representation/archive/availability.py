@@ -34,4 +34,3 @@ def statistics_only_description(path) -> str | None:
             "no time series is made from the averages. The 3-D view needs "
             "saved states (a Held–Suarez experiment's states/state-d*.npy, "
             "written every state_every_days)")
-

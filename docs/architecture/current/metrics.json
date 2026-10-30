@@ -1,20 +1,20 @@
 {
   "call_graph": {
     "call_sites": {
-      "builtin": 2615,
-      "external": 1809,
-      "internal": 2263,
-      "unresolved": 2697
+      "builtin": 2730,
+      "external": 1847,
+      "internal": 2371,
+      "unresolved": 2784
     },
     "edges_by_kind": {
-      "call": 959,
+      "call": 986,
       "constructor": 41,
-      "instantiate": 381,
+      "instantiate": 392,
       "override": 6,
-      "self": 273,
+      "self": 276,
       "super": 2
     },
-    "nodes": 1360,
+    "nodes": 1389,
     "scoped": {
       "cli-gen": {
         "edges": 28,
@@ -69,7 +69,7 @@
     }
   },
   "class_graph": {
-    "classes": 152,
+    "classes": 155,
     "external_bases": {
       "RuntimeError": 6,
       "UserWarning": 1,
@@ -80,7 +80,7 @@
       "str": 2,
       "typing.Protocol": 3
     },
-    "inherits_edges": 10,
+    "inherits_edges": 12,
     "nests_edges": 0
   },
   "inclusion": {
@@ -110,13 +110,13 @@
       "tropoi.temporal.tendencies"
     ],
     "module_categories": {
-      "code": 106,
+      "code": 109,
       "empty": 19,
       "namespace": 1,
       "reexport": 2
     },
-    "modules_discovered": 128,
-    "modules_in_graph": 108,
+    "modules_discovered": 131,
+    "modules_in_graph": 111,
     "reexport_modules": [
       "tropoi.representation.archive",
       "tropoi.run.custom"
@@ -125,14 +125,14 @@
   "module_graph": {
     "all_imports": {
       "condensation": {
-        "edges": 350,
-        "longest_path_edges": 12,
-        "nodes": 108,
+        "edges": 359,
+        "longest_path_edges": 13,
+        "nodes": 111,
         "sinks": 29,
         "sources": 3
       },
-      "density": 0.030287,
-      "edges": 350,
+      "density": 0.029402,
+      "edges": 359,
       "in_degree": {
         "histogram": {
           "0": 3,
@@ -141,17 +141,17 @@
           "11": 1,
           "12": 1,
           "13": 1,
-          "2": 35,
+          "2": 37,
           "3": 8,
-          "4": 10,
-          "5": 6,
-          "6": 5,
+          "4": 11,
+          "5": 5,
+          "6": 6,
           "7": 1,
           "8": 6,
           "9": 2
         },
         "max": 13,
-        "mean": 3.240741,
+        "mean": 3.234234,
         "median": 2.0,
         "min": 0,
         "quartiles": [
@@ -161,7 +161,7 @@
         ],
         "zeros": 3
       },
-      "nodes": 108,
+      "nodes": 111,
       "nodes_in_cycles": {
         "count": 0,
         "fraction": 0.0
@@ -174,21 +174,21 @@
       "out_degree": {
         "histogram": {
           "0": 29,
-          "1": 14,
+          "1": 15,
           "10": 4,
           "13": 1,
-          "19": 1,
-          "2": 17,
+          "2": 18,
+          "20": 1,
           "3": 8,
-          "4": 9,
+          "4": 10,
           "5": 8,
           "6": 4,
           "7": 3,
-          "8": 5,
-          "9": 5
+          "8": 4,
+          "9": 6
         },
-        "max": 19,
-        "mean": 3.240741,
+        "max": 20,
+        "mean": 3.234234,
         "median": 2.0,
         "min": 0,
         "quartiles": [
@@ -207,7 +207,7 @@
       "sinks": 29,
       "sources": 3,
       "strongly_connected_components": {
-        "count": 108
+        "count": 111
       },
       "top_fan_in": {
         "nodes": [
@@ -257,7 +257,7 @@
       "top_fan_out": {
         "nodes": [
           {
-            "degree": 19,
+            "degree": 20,
             "node": "tropoi.cli.main"
           },
           {
@@ -294,41 +294,41 @@
           },
           {
             "degree": 9,
-            "node": "tropoi.run.custom.prepare"
+            "node": "tropoi.run.custom"
           }
         ],
-        "ties_at_cutoff": 5
+        "ties_at_cutoff": 6
       },
       "weakly_connected_components": {
         "count": 1,
         "sizes": [
-          108
+          111
         ]
       }
     },
     "edge_scopes": {
-      "function": 144,
+      "function": 148,
       "function+module": 3,
       "function+type_checking": 1,
-      "module": 196,
+      "module": 201,
       "type_checking": 6
     },
     "import_time": {
       "condensation": {
-        "edges": 199,
+        "edges": 204,
         "longest_path_edges": 7,
-        "nodes": 108,
-        "sinks": 39,
+        "nodes": 111,
+        "sinks": 40,
         "sources": 30
       },
-      "density": 0.01722,
-      "edges": 199,
+      "density": 0.016708,
+      "edges": 204,
       "in_degree": {
         "histogram": {
           "0": 30,
-          "1": 39,
+          "1": 40,
           "12": 1,
-          "2": 17,
+          "2": 19,
           "3": 6,
           "4": 2,
           "5": 2,
@@ -337,7 +337,7 @@
           "9": 3
         },
         "max": 12,
-        "mean": 1.842593,
+        "mean": 1.837838,
         "median": 1.0,
         "min": 0,
         "quartiles": [
@@ -347,7 +347,7 @@
         ],
         "zeros": 30
       },
-      "nodes": 108,
+      "nodes": 111,
       "nodes_in_cycles": {
         "count": 0,
         "fraction": 0.0
@@ -359,18 +359,18 @@
       },
       "out_degree": {
         "histogram": {
-          "0": 39,
-          "1": 19,
-          "2": 18,
+          "0": 40,
+          "1": 20,
+          "2": 19,
           "3": 12,
-          "4": 8,
-          "5": 5,
+          "4": 7,
+          "5": 6,
           "6": 3,
-          "8": 3,
-          "9": 1
+          "8": 2,
+          "9": 2
         },
         "max": 9,
-        "mean": 1.842593,
+        "mean": 1.837838,
         "median": 1.0,
         "min": 0,
         "quartiles": [
@@ -378,7 +378,7 @@
           1.0,
           3.0
         ],
-        "zeros": 39
+        "zeros": 40
       },
       "reciprocal_pairs": {
         "count": 0,
@@ -386,10 +386,10 @@
       },
       "reciprocity": 0.0,
       "self_loops": 0,
-      "sinks": 39,
+      "sinks": 40,
       "sources": 30,
       "strongly_connected_components": {
-        "count": 108
+        "count": 111
       },
       "top_fan_in": {
         "nodes": [
@@ -443,12 +443,12 @@
             "node": "tropoi.run.bve.runner"
           },
           {
-            "degree": 8,
-            "node": "tropoi.representation.visual.planet_viewer"
+            "degree": 9,
+            "node": "tropoi.run.custom"
           },
           {
             "degree": 8,
-            "node": "tropoi.run.custom"
+            "node": "tropoi.representation.visual.planet_viewer"
           },
           {
             "degree": 8,
@@ -468,23 +468,23 @@
           },
           {
             "degree": 5,
+            "node": "tropoi.cli.main"
+          },
+          {
+            "degree": 5,
             "node": "tropoi.representation.visual.pe"
           },
           {
             "degree": 5,
             "node": "tropoi.run.custom.prepare"
-          },
-          {
-            "degree": 5,
-            "node": "tropoi.run.pe.config"
           }
         ],
-        "ties_at_cutoff": 5
+        "ties_at_cutoff": 6
       },
       "weakly_connected_components": {
         "count": 5,
         "sizes": [
-          98,
+          101,
           7,
           1,
           1,
@@ -525,7 +525,7 @@
       ],
       "zeros": 2
     },
-    "intra_package_module_edges": 115,
+    "intra_package_module_edges": 119,
     "nodes": 20,
     "nodes_in_cycles": {
       "count": 10,
@@ -721,14 +721,9 @@
     "package": "tropoi",
     "src": "src",
     "working_tree": {
-      "base_commit": "5c8d7e8539be07e3e6c1f808380510f18d84a965",
+      "base_commit": "b6c04a0bf57a0167c06e821f49c1af318eb561e7",
       "generator": {
-        "changes": [
-          " M tools/architecture/generate.py",
-          " M tools/architecture/report.py",
-          "?? tools/architecture/export.py",
-          "?? tools/architecture/provenance.py"
-        ],
+        "changes": [],
         "files": {
           "tools/architecture/__init__.py": "84f07cd5e4bbe17c8b092ffcc99c76ae4cdce75231e8b0aa8a1979553bd17c8f",
           "tools/architecture/calls.py": "fe492066691403114d3adef4eade7541d55afd75bfbd02d14c72871bfd824e92",
@@ -744,106 +739,31 @@
           "tools/architecture/sources.py": "547a080e87018ce39b7e82eefd632a20dd4cad1158c57b888d7d25255a6aece1"
         },
         "sha256": "b347671b125102d67b45128e9ad38733fafa796221faead698c7363dfbb7315c",
-        "status": "dirty"
+        "status": "clean"
       },
       "source": {
         "changes": [
-          " D src/tropoi/_compat.py",
-          " D src/tropoi/cli/bve.py",
-          " M src/tropoi/cli/clear_cache.py",
-          " M src/tropoi/cli/generate_planet.py",
-          " M src/tropoi/cli/main.py",
-          " D src/tropoi/cli/pe.py",
-          " D src/tropoi/cli/run_lifecycle.py",
-          " D src/tropoi/cli/swe.py",
-          " D src/tropoi/numerics/__init__.py",
-          " D src/tropoi/numerics/cartesian_to_spherical.py",
-          " D src/tropoi/numerics/cuda/cuda_utils.py",
-          " D src/tropoi/numerics/fast_geodesic_sh.py",
-          " D src/tropoi/numerics/geodesic_grid.py",
-          " D src/tropoi/numerics/grid.py",
-          " D src/tropoi/numerics/grid_base.py",
-          " D src/tropoi/numerics/grid_interpolation.py",
-          " D src/tropoi/numerics/integration.py",
-          " D src/tropoi/numerics/latlon_grid.py",
-          " D src/tropoi/numerics/optimized_geodesic_sh.py",
-          " D src/tropoi/numerics/spectral_operators.py",
-          " D src/tropoi/numerics/spherical_backend.py",
-          " D src/tropoi/numerics/spherical_harmonics.py",
-          " D src/tropoi/physics/__init__.py",
-          " D src/tropoi/physics/barotropic.py",
-          " D src/tropoi/physics/primitive_equations.py",
-          " D src/tropoi/physics/shallow_water.py",
-          " D src/tropoi/physics/sigma_coordinate.py",
-          " D src/tropoi/physics/topography.py",
-          " D src/tropoi/planet/__init__.py",
-          " D src/tropoi/planet/elevation_data.py",
-          " D src/tropoi/planet/planet.py",
-          " D src/tropoi/planet/planetary_parameters.py",
-          " D src/tropoi/planet/tectonics.py",
-          " D src/tropoi/planet/terrain_spectral.py",
-          " M src/tropoi/representation/archive/held_suarez.py",
-          " M src/tropoi/representation/archive/pe_context.py",
-          " M src/tropoi/representation/archive/prepared_terrain.py",
-          " M src/tropoi/representation/visual/__init__.py",
-          " M src/tropoi/representation/visual/atmosphere.py",
-          " D src/tropoi/representation/visual/maps.py",
-          " M src/tropoi/representation/visual/snapshot.py",
-          " M src/tropoi/representation/visual/specs.py",
-          " M src/tropoi/representation/visual/swe.py",
-          " M src/tropoi/representation/visual/timeline.py",
-          " M src/tropoi/run/bve/__init__.py",
-          " D src/tropoi/run/bve/barotropic_vorticity.py",
-          " M src/tropoi/run/bve/config.py",
-          " D src/tropoi/run/bve/diagnostics.py",
-          " D src/tropoi/run/bve/initial_conditions.py",
-          " D src/tropoi/run/bve/io.py",
-          " D src/tropoi/run/bve/visualization.py",
-          " M src/tropoi/run/custom/execute.py",
-          " M src/tropoi/run/custom/planet.py",
-          " M src/tropoi/run/custom/prepare.py",
-          " M src/tropoi/run/custom/presets.py",
-          " D src/tropoi/run/engine.py",
-          " D src/tropoi/run/pe/diagnostics.py",
-          " D src/tropoi/run/pe/initial_conditions.py",
-          " D src/tropoi/run/pe/snapshot_visualization.py",
-          " D src/tropoi/run/pe/visualization.py",
-          " D src/tropoi/run/swe/diagnostics.py",
-          " D src/tropoi/run/swe/initial_conditions.py",
-          " D src/tropoi/run/swe/visualization.py",
-          " M src/tropoi/spatial/operators/spectral_operators.py",
-          " M src/tropoi/spatial/transforms/optimized_geodesic_sh.py",
-          " M src/tropoi/spatial/truncation.py",
-          " D src/tropoi/support.py",
-          " D src/tropoi/viz/__init__.py",
-          " D src/tropoi/viz/complex_encoding.py",
-          " D src/tropoi/viz/fields.py",
-          " D src/tropoi/viz/grid_adapter.py",
-          " D src/tropoi/viz/maps.py",
-          " D src/tropoi/viz/matplotlib_renderer.py",
-          " D src/tropoi/viz/normalization.py",
-          " D src/tropoi/viz/planet_viewer.py",
-          " D src/tropoi/viz/renderers.py",
-          " D src/tropoi/viz/specs.py",
-          " D src/tropoi/viz/timeline.py",
-          " D src/tropoi/viz/vorticity_viewer.py",
-          "?? src/tropoi/representation/archive/availability.py",
-          "?? src/tropoi/run/bve/execution.py",
-          "?? src/tropoi/run/bve/model.py",
-          "?? src/tropoi/run/bve/presets.py",
-          "?? src/tropoi/run/custom/resources.py",
-          "?? src/tropoi/run/lifecycle.py",
-          "?? src/tropoi/run/pe/execution.py",
-          "?? src/tropoi/run/pe/model.py",
-          "?? src/tropoi/run/swe/execution.py",
-          "?? src/tropoi/run/swe/model.py"
+          "UU src/tropoi/cli/main.py",
+          "A  src/tropoi/cli/terrain.py",
+          "M  src/tropoi/representation/archive/schema.py",
+          "M  src/tropoi/representation/visual/compose.py",
+          "M  src/tropoi/representation/visual/terrain_globe.html",
+          "M  src/tropoi/run/custom/__init__.py",
+          "M  src/tropoi/run/custom/planet.py",
+          "M  src/tropoi/run/pe/config.py",
+          "M  src/tropoi/spatial/initialization/pe.py",
+          "A  src/tropoi/spatial/terrain/elevation_import.py",
+          "A  src/tropoi/spatial/terrain/height_function.py",
+          "M  src/tropoi/spatial/terrain/raster.py",
+          "M  src/tropoi/spatial/truncation.py"
         ],
         "files": {
           "src/tropoi/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
           "src/tropoi/cli/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
           "src/tropoi/cli/clear_cache.py": "9f214cd2654208e4478b65ee537d4bc7c7ccbb2b3ed3f87bc897d1ead0bbbbc4",
           "src/tropoi/cli/generate_planet.py": "797b1d7d528c9bb2bd210ec95313772ffc5d090ab2e740d07b339aa66132b116",
-          "src/tropoi/cli/main.py": "7f9d2b46b0464f8c524649358b8fc67652605c458cfee69730f6102efe814e35",
+          "src/tropoi/cli/main.py": "93ef8cda5d55ee87f003b4ad04158e9649f08818fda9ed12fc19847308cdbdca",
+          "src/tropoi/cli/terrain.py": "040ca209c2096d99704976279d9d78e35f39e7f3070d8de7c66b9e2867ee3ae6",
           "src/tropoi/representation/__init__.py": "88477f9f4ebfdf96b2d33b5e6612d29b172238b1bd486e7100523ae1a79384a5",
           "src/tropoi/representation/archive/__init__.py": "b906c32582a42a8223ca9d8cb77e41c6d1de0a7e5691a5a53bd7f61e5dbd26f1",
           "src/tropoi/representation/archive/availability.py": "14d9c3f19ceff5a0b29973dfdde626acaee6ff948ccbc667b50306e334cce86e",
@@ -852,7 +772,7 @@
           "src/tropoi/representation/archive/initial_state.py": "61854bcadae2008bf566a0d67644db3a58ecc3db0dc0aec99975c1851b1165af",
           "src/tropoi/representation/archive/pe_context.py": "5d548c766a23c967a3373f14acf738e04e0d8c5775b2ec57c3eec115f4a8c6e9",
           "src/tropoi/representation/archive/prepared_terrain.py": "915687438a9b03f0881e1182c6635f1dec8c6ee9d0e8816bce3cfd1ba4fc8b83",
-          "src/tropoi/representation/archive/schema.py": "48f0a70d4d4f570faff06d06a0ba6b98135e8d589c28949e8f9f0d4f6bb890bf",
+          "src/tropoi/representation/archive/schema.py": "afa120c6c19b7d4a6e7785ee8182ebf0c5d802b76542253f65c982a4ddbc3efb",
           "src/tropoi/representation/archive/writer.py": "527dedc067b03d209979cf3a7dd79318ae6bddd3203e0977b326980a8fcbeab8",
           "src/tropoi/representation/diagnostics/__init__.py": "29950032dc1573f806bc05c980b6ee2c0fa5677cab03425dee607454b82e44b8",
           "src/tropoi/representation/diagnostics/bve.py": "695c9afb922c2eb1051f151f46b3d95f6bc6fa8152924fa95ab8560e8fa0ef18",
@@ -864,7 +784,7 @@
           "src/tropoi/representation/visual/atmosphere.py": "8e8dbe8cb287f29f22ca83c2b47d8064555255de47c61b4dbb67f29269f1b381",
           "src/tropoi/representation/visual/bve.py": "77e4b1f9d61a22a04a791f8c39904d32812b9ae9a38eb80e46513911216a9370",
           "src/tropoi/representation/visual/complex_encoding.py": "071c1a07ccdc7527937792e35c112a3900605ff733b5da42580bbc0f55a89a08",
-          "src/tropoi/representation/visual/compose.py": "545d233f5de7ebc27f8f429179521218e8295ef2dc9ad9136619fa59db608697",
+          "src/tropoi/representation/visual/compose.py": "cdbda41af443741998059c490323fb660c511f9de2dede34471bae20a78248e2",
           "src/tropoi/representation/visual/evaluate.py": "e85ab67612e6e13e224364e7e23fd2a22613bb85b3ba0656629e4386518099c7",
           "src/tropoi/representation/visual/fields.py": "1e3dbc051a384fa8245c17bb9bb9009f5716d3c6e9c81af57b218d194019bff2",
           "src/tropoi/representation/visual/grid_adapter.py": "d94cda5d2d2dc927c10bd583716edf2def6284deeba994ceae192b05a8a6e34b",
@@ -880,7 +800,7 @@
           "src/tropoi/representation/visual/sphere_streamlines.py": "3e870a59157574da70c19c8990972b4fd8e737605130c4807b6a56d24a9eb236",
           "src/tropoi/representation/visual/swe.py": "2b3e4a2c666d52e7b2380fe3e49a59b2c1cd6c8c2b3b85c1e1d6856cb19e88c0",
           "src/tropoi/representation/visual/terrain.py": "62f721efeb6ccb08ebfe15c0ff12ea27eda3b339ef5a597de0f691faaaa0b1dd",
-          "src/tropoi/representation/visual/terrain_globe.html": "2bda2d50c08a5b2c5ebadc6e1f07c0980a2ff632818c3c3f604c1696bebef6fa",
+          "src/tropoi/representation/visual/terrain_globe.html": "fce8c0f508885e40330882685a4cbe56021d9039c9e05b7f45a5b2007e1f7eac",
           "src/tropoi/representation/visual/timeline.py": "daf63d0946317b3930cae59770a3c264e43018420d631db55cd82fe6c786d83e",
           "src/tropoi/representation/visual/views.py": "102f42bbb2598b320652c1e080e91f56faa8b07c772101643a5a1be0d8952891",
           "src/tropoi/representation/visual/vorticity_viewer.py": "30c3f401cc653cc7856f829bbd5427fe2178cd425d5124f29bf2297d289d04f3",
@@ -891,10 +811,10 @@
           "src/tropoi/run/bve/model.py": "9600866830ccb68a51ec0c1028f5ef8b516f84719cad121739d74b5323869813",
           "src/tropoi/run/bve/presets.py": "dbd259fd2afed3aa7e5b3d2671888fdb2f73e26b36169bbaff9fec428eb1f2bb",
           "src/tropoi/run/bve/runner.py": "65d1ec69a055a5108b82497af8d2b36c65f9da20eef0632ab623fa2b84576b12",
-          "src/tropoi/run/custom/__init__.py": "66dae853ac0c1b267b7ea87da3c636bcbd80b529f9c00a224014febb0d9bee3d",
+          "src/tropoi/run/custom/__init__.py": "e9d264bc9ad6b1228af843ae2c245d3ecdce224323bb8fa14cea02ccd98c6cb3",
           "src/tropoi/run/custom/config.py": "366e0ea71613b479dd3ebf27bc4315e1e5d2e77cbfc968f1f90be6e06a0daa68",
           "src/tropoi/run/custom/execute.py": "095dd1875656c6bd39468a03eb56d13ad9b7767c7a57bd945fcb21033a2463e2",
-          "src/tropoi/run/custom/planet.py": "bb06043da17c76f1b6c58305a2b825c8491a2c5a0e140361bb7e1455c65b24a0",
+          "src/tropoi/run/custom/planet.py": "b79e62f8edd7a560d5b9198eb4e27e34e9b0c3d30cf0c0c4e0557c25e782d79e",
           "src/tropoi/run/custom/prepare.py": "6cc3c5c846451da495b1cfb186fa3c4d4ca69edb8e48d7260bf1a7deb668a12e",
           "src/tropoi/run/custom/presets.py": "aefebba1686878319bcffd189ad4c094a6b5624ddfd631c35568105c4862a306",
           "src/tropoi/run/custom/resources.py": "dcbeecdc7c5dc47f29dd59d3f7b3c7b142c469fae039112dcea5f95ea38d2d81",
@@ -908,7 +828,7 @@
           "src/tropoi/run/held_suarez/statistics.py": "51260c75563353139c5851c42fe0546d8925460c8bc1d738fac25728391252d0",
           "src/tropoi/run/lifecycle.py": "45d5b3074e306e97a84abe346ff90fb68afbe3d58321b80d1d774f817b7d4b95",
           "src/tropoi/run/pe/__init__.py": "0e9e348b801a601540acb14c70bbf9eecefa650bfb8855b98b9899acda85ba59",
-          "src/tropoi/run/pe/config.py": "c423053c6a51b615aee1ed5200bfb142a28c833d72d285c23ece22adc0f0782e",
+          "src/tropoi/run/pe/config.py": "7fc5eed50179277565ad98477fb3c8186be67afa7ec19f8de35d6f83894d54cd",
           "src/tropoi/run/pe/execution.py": "d642b1c3ef2f301e1b51c35c4e8cf87282c97850fc879b3cdf8b6738d4f0cf50",
           "src/tropoi/run/pe/model.py": "2295bb652d47c919cb638f40c3329671b9ee9ad91c1a39154a0e0810180bc74f",
           "src/tropoi/run/pe/runner.py": "1f3dc50308832c8d5a9a75fe77c98f0284462cac6e697a78a52b3ea8e0ccab07",
@@ -929,7 +849,7 @@
           "src/tropoi/spatial/grids/latlon_grid.py": "4401850a3b09f6e9bed3369d818c8032d4964767d96dd74e3922fb9734bc8983",
           "src/tropoi/spatial/initialization/__init__.py": "88ecf8f54c748ce0ac02049aaab1350b018b03294261a34e99c744ce95310fc9",
           "src/tropoi/spatial/initialization/bve.py": "036570f1327acf449134aa341a393aa83e7c1e4a8f651aff52748c731f6c4413",
-          "src/tropoi/spatial/initialization/pe.py": "2341cbff289c6be395ba4872386b934711fb89a84cdf6e4027b92317fd0197ee",
+          "src/tropoi/spatial/initialization/pe.py": "779e7e0b05fcede7e3702d6ccee3c77682c0d2edfb6dd68bb3971704ebaee7ab",
           "src/tropoi/spatial/initialization/swe.py": "8375bd0c2f60f9c272153cd05d5ccc0b20acb0759a309c51638b1c301a80b66f",
           "src/tropoi/spatial/modes.py": "6f7fcbbacee22eae7629e1b5183dda6c6e0f590777c806c1d42f55a950c83d56",
           "src/tropoi/spatial/operators/__init__.py": "fad4929748754331ba46d35351e6e10fa6eacb135e621e6d7f7955c45bb499cd",
@@ -944,7 +864,9 @@
           "src/tropoi/spatial/states/shallow_water.py": "d03fd2e49d7550e0ce375f1acc927d23189e81447442c214926294917d4b72e5",
           "src/tropoi/spatial/terrain/__init__.py": "65f36a37d2255235a0e51f6f3683900abdc000500c4b9d94bac2ccae0d4ff83b",
           "src/tropoi/spatial/terrain/elevation_data.py": "0c52864e0c526f004495fa451161bbd84837814b32c2540a1476defe86f56cd0",
-          "src/tropoi/spatial/terrain/raster.py": "dbcb7e2edc66395c835311f3d98d8729a472f95dbd60887217c702e0ad5cdc04",
+          "src/tropoi/spatial/terrain/elevation_import.py": "38897c0b39f423105e1b915716ec57be93c5a1b0822affe2931e3ffde5e8abee",
+          "src/tropoi/spatial/terrain/height_function.py": "38c323ca3e67a66f45ff00617d242916a5e2857a0bcd0e03424a4274738515a4",
+          "src/tropoi/spatial/terrain/raster.py": "f0fdef526947215a0405d7089422001b3474c445bac3bbfd7b503b954a519b7a",
           "src/tropoi/spatial/terrain/tectonics.py": "93f2c154505681c2730026f850df372e9779d47769d9ddaa5aab5b3bc2b98d6c",
           "src/tropoi/spatial/terrain/terrain_spectral.py": "0097abb3fa05232a75f8ed0a3890a539042b453d4018b64ba1fc1bf134225636",
           "src/tropoi/spatial/terrain/topography.py": "8047945028c7cd30d0b5bbb61f273d17c6fb7ec541228a1456aa5fd10ff1f509",
@@ -956,7 +878,7 @@
           "src/tropoi/spatial/transforms/host_synthesis.py": "a2eeeec41c703a644f82c3f164d6a28d35e7d77933ac486b04359613d4af42a1",
           "src/tropoi/spatial/transforms/optimized_geodesic_sh.py": "5a006811310edb5cbf9bad903d1f200946d87229ad000fa3b27240539e7b89d4",
           "src/tropoi/spatial/transforms/spherical_harmonics.py": "e94a6cdfff85230c9e7a2c5586524b196a7e37a96aeb201c63e46a97c25236ac",
-          "src/tropoi/spatial/truncation.py": "5b3416a1ce45f62ab861e5eb39a7415e500346a352cc2896150d8d970b2ddae0",
+          "src/tropoi/spatial/truncation.py": "6dee234cf90c4e6f8bd21acac3f8dafd39f9149b9f742662f8694cd8de9f2905",
           "src/tropoi/spatial/williamson5.py": "d980a4f4495f5a8724b62dbe7899b6f312af8c8ac034eeeedb4dc996baea9071",
           "src/tropoi/temporal/__init__.py": "b8b4efaf006eb548659313a955c754c1b5084e828b9d2fc679c5ae2a469e335b",
           "src/tropoi/temporal/hooks.py": "26bbaf20a973ed39625257f73212e94a4818ba62b57b7f2ffc35be81fcec4403",
@@ -970,7 +892,7 @@
           "src/tropoi/temporal/tendencies/primitive_equations.py": "70cf8c872343b3a2de90d19caf69a0f3b3c681143d21781a2194641698bffaf3",
           "src/tropoi/temporal/tendencies/shallow_water.py": "2e1145284557291e4cc4b900851f867bdc835eaef07c035053d04648a346cb7c"
         },
-        "sha256": "00c88787523a1274f08ab64eaec5d92da348f288f87791734fcce83f180e1f48",
+        "sha256": "6ce9782138cf610389f72c465c41f061c1bba24eef2f441709ab07f5bc7b8f72",
         "status": "dirty"
       }
     }

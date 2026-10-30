@@ -112,4 +112,3 @@ def build_swe_model(run_config: Mapping, *, topography_lm=None):
                               mean_depth=float(run_config["mean_depth_m"]),
                               topography=topography)
     return model
-

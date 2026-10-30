@@ -88,3 +88,27 @@ The README's BVE example: two opposite-signed vortices on a sphere with a
   6.1 × 10⁻⁴ of its initial value and absolute enstrophy within 1.1 × 10⁻⁴.
 - **Assets:** `overview.png` and `overview.json` are the default
   `tropoi plot` overview (`sim.plot(sidecar=True)`), shown in the README.
+
+### `20261027T175327Z_orographic-thermal-wave_rot24p62h_r3_l21_dt11080p3s_3a46f966_71c5441a`
+
+An idealized dry-CO₂ perturbation experiment over MOLA terrain, the main run
+of [mars_evolving_2026-10-27](../validation/mars_evolving_2026-10-27/README.md).
+It starts from the balanced resting atmosphere over real Mars relief plus a
+1 K (2, 2) temperature coefficient (`orographic_thermal_wave`). Mars-like
+constants; `l_max` 21, Gauss–Legendre grid 34 × 68, 4 σ levels; fixed 60 s
+RK4 steps for one rotation period (88642.44 s); 9 saved states. It was
+produced at commit `71c5441a` on 2026-10-27, on an NVIDIA GeForce MX110.
+
+- **Terrain:** `terrain/` holds the prepared MOLA terrain the run integrated
+  (band limit 14, digest `sha256:afb016d8…c35c31b8`). The capsule is
+  self-contained: `open_simulation` and `view()` need neither the MOLA files
+  nor a GPU.
+- **Worktree:** the manifest records `dirty: true`. The experiment script
+  recorded `git status --porcelain` at launch. The only modified tracked files
+  were two example scripts, neither imported by the run, and nothing under
+  `src/` was modified.
+- **Evidence:** the halved-step twin and the resting control are not
+  published. Their measured comparison with this run is in the record's
+  `results.json`.
+- **Assets:** none. The figures and browser captures combine this run with the
+  others, so they live in the validation folder.

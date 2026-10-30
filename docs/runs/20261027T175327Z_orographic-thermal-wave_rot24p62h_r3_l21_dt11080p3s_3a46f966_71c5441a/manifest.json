@@ -1,0 +1,389 @@
+{
+  "created_utc": "2026-10-27T17:53:29.197552+00:00",
+  "run_id": "20261027T175327Z_orographic-thermal-wave_rot24p62h_r3_l21_dt11080p3s_3a46f966_71c5441a",
+  "experiment": null,
+  "status": "completed",
+  "argv": [
+    "examples/mola_mars_evolving.py",
+    "run",
+    "out/mola/mola_pe_l21",
+    "main"
+  ],
+  "run_config": {
+    "solver": "pe",
+    "lmax": 21,
+    "grid": "latlon",
+    "resolution": 3,
+    "nlat": 34,
+    "nlon": 68,
+    "day_hours": 24.6229,
+    "radius_earth_units": 0.53307,
+    "nlev": 4,
+    "sigma_interfaces": [
+      0.0,
+      0.25,
+      0.5,
+      0.75,
+      1.0
+    ],
+    "r_dry": 191.8,
+    "cp_dry": 735.0,
+    "duration_days": 1.0259541666666667,
+    "dt_seconds": 60.0,
+    "scenario": "orographic_thermal_wave",
+    "temperature": 210.0,
+    "surface_pressure": 610.0,
+    "thermal_amplitude": 1.0,
+    "product_quadrature": "fine",
+    "dt_snapshots": 11080.305,
+    "out": "out\\mola\\evolving\\main",
+    "experiment": null,
+    "overwrite": false,
+    "snapshot_mode": "count",
+    "n_snapshots": 9,
+    "snapshot_times": [
+      0.0,
+      11080.305,
+      22160.61,
+      33240.915,
+      44321.22,
+      55401.525,
+      66481.83,
+      77562.13500000001,
+      88642.44
+    ],
+    "plots": [],
+    "topography": "imported",
+    "topography_parameters": {
+      "clip_below_m": null,
+      "elevation_max_m": 8360.521669376065,
+      "elevation_min_m": -7584.646735121492,
+      "format": "netcdf",
+      "l_cut": 14,
+      "lon_first_deg": -179.875,
+      "longitudes_rewrapped": "[-180, 180)",
+      "missing_count": 0,
+      "offset": 0.0,
+      "projection_residual": 0.1744392572675063,
+      "raster_resolution_deg": 0.25,
+      "raster_shape": "720x1440",
+      "registration": "cell",
+      "resampling": "area-weighted block mean, then bilinear",
+      "rows_flipped_to_south_first": true,
+      "sampled_max_m": 14625.330236572827,
+      "sampled_min_m": -6795.284955730829,
+      "scale": 1.0,
+      "smoothed_residual": null,
+      "smoothing_band_limit": null,
+      "smoothing_retained_at_band_limit": null,
+      "source_max_m": 21134.0,
+      "source_min_m": -8068.0,
+      "source_name": "megt_4ppd.nc",
+      "source_sha256": "aea919137cbab87df2ffe5c2efb115a0741afda2bae7634aace5ce89c2ef24f2",
+      "unit_factor_to_m": 1.0,
+      "units": "m",
+      "variable": "topography",
+      "working_resolution_deg": 4.090909090909091
+    },
+    "terrain_digest": "sha256:afb016d805517202bfc4374ed24f91d72b71aa6376b789184d4cd010b35c31b8",
+    "terrain_l_cut": 14,
+    "gravity": 3.71,
+    "initial_perturbation": {
+      "base_state": "orographic_isothermal_rest",
+      "field": "temperature",
+      "degree": 2,
+      "order": 2,
+      "coefficient_real_K": 1.0,
+      "coefficient_imag_K": 0.0,
+      "normalization": "orthonormal complex Y_lm; real field = a_l0 Y_l0 + 2 Re sum_{m>0} a_lm Y_lm",
+      "pointwise_peak_K": 0.7725484040463791,
+      "vertical_profile": "uniform",
+      "vertical_weights": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    "run_id": "20261027T175327Z_orographic-thermal-wave_rot24p62h_r3_l21_dt11080p3s_3a46f966_71c5441a"
+  },
+  "numerics": {
+    "backend": "LatLonBackend",
+    "grid": "GaussLatLonGridGeometry",
+    "state_sampling": "latlon-gauss-34x68-state",
+    "product_quadrature": "fine",
+    "product_sampling": "latlon-gauss-34x68-3/2rule",
+    "transform": "GaussLatLonSphericalHarmonics",
+    "l_max": 21
+  },
+  "git": {
+    "commit": "71c5441a59608bca022c985f8b88334b69c3bf31",
+    "branch": "feat/atmosphere-globe-view",
+    "dirty": true
+  },
+  "versions": {
+    "python": "3.12.12",
+    "numpy": "2.2.6",
+    "scipy": "1.16.3",
+    "cupy": "13.4.0",
+    "matplotlib": "3.10.8"
+  },
+  "gpu": "NVIDIA GeForce MX110",
+  "notes": {
+    "equations": "dry hydrostatic primitive equations in vorticity-divergence form on a sigma-coordinate vertical grid (see physics/primitive_equations.py and docs/PRIMITIVE_EQUATIONS_DESIGN.md)",
+    "coefficient_ordering": "pe_coeffs.npy has shape (n_snapshots, 3*nlev+1, l_max+1, l_max+1); axis 1 is [zeta_1..zeta_K, delta_1..delta_K, T_1..T_K, ln_ps] top-to-bottom (K = nlev), and the trailing two axes are the (degree, order) spherical-harmonic coefficient block",
+    "timestep_policy": "user-supplied FIXED timestep dt_seconds (no adaptive CFL controller); individual steps are shortened only to land exactly on requested output times and t_end. No forcing, no hyperdiffusion/filters, no semi-implicit terms, no adaptive timestepping",
+    "diagnostics": "see run/pe/diagnostics.py module docstring; total_mass is the integral of p_s dA (mass proxy), and no total-energy-conservation claim is made",
+    "topography": "optional fixed surface topography: a surface elevation h_s (m) band-limited at the DEALIASED product-truncation cut floor(2*l_max/3) (physics/topography.py with l_cut; content above the cut cannot be balanced by the dealiased pressure-gradient pathway and is rejected), consumed as the surface geopotential Phi_s = gravity * h_s (m^2/s^2) that anchors the hydrostatic geopotential of every column; sigma remains p/p_s. Runs without a 'topography' key in run_config have exactly zero Phi_s. Preset terrain is reconstructed deterministically from the resolved run_config (which participates in the scientific hash) and no terrain arrays are persisted. A prepared terrain (--terrain; run_config terrain_digest) is the exception: its resolved coefficients, already band-limited at the cut, are copied into terrain/ (prepared_terrain format) and used exactly, never re-projected"
+  },
+  "state_schema": {
+    "version": 1,
+    "solver": "pe",
+    "coefficient_file": "pe_coeffs.npy",
+    "time_file": "pe_snapshot_times.npy",
+    "time_units": "s",
+    "storage_axes": [
+      "time",
+      "row",
+      "l",
+      "m"
+    ],
+    "rows": 13,
+    "fields": [
+      {
+        "name": "zeta",
+        "units": "s^-1",
+        "description": "relative vorticity per full level, top to bottom",
+        "rows": [
+          0,
+          4
+        ],
+        "levels": true,
+        "dimensions": [
+          "level",
+          "l",
+          "m"
+        ],
+        "monopole": "zero-mean",
+        "normalization": "orthonormal-complex-m>=0-real-field",
+        "layout": "unpacked-l-m-nonnegative"
+      },
+      {
+        "name": "delta",
+        "units": "s^-1",
+        "description": "horizontal divergence per full level, top to bottom",
+        "rows": [
+          4,
+          8
+        ],
+        "levels": true,
+        "dimensions": [
+          "level",
+          "l",
+          "m"
+        ],
+        "monopole": "zero-mean",
+        "normalization": "orthonormal-complex-m>=0-real-field",
+        "layout": "unpacked-l-m-nonnegative"
+      },
+      {
+        "name": "temperature",
+        "units": "K",
+        "description": "full temperature per full level, top to bottom (not a perturbation; the (0,0) monopole is the horizontal mean times sqrt(4*pi))",
+        "rows": [
+          8,
+          12
+        ],
+        "levels": true,
+        "dimensions": [
+          "level",
+          "l",
+          "m"
+        ],
+        "monopole": "horizontal-mean",
+        "normalization": "orthonormal-complex-m>=0-real-field",
+        "layout": "unpacked-l-m-nonnegative"
+      },
+      {
+        "name": "ln_ps",
+        "units": "ln(Pa)",
+        "description": "natural logarithm of surface pressure (single surface row, no level axis)",
+        "rows": [
+          12,
+          13
+        ],
+        "levels": false,
+        "dimensions": [
+          "l",
+          "m"
+        ],
+        "monopole": "horizontal-mean",
+        "normalization": "orthonormal-complex-m>=0-real-field",
+        "layout": "unpacked-l-m-nonnegative"
+      }
+    ],
+    "support": {
+      "l_max": 21,
+      "product_truncation_cut": 14,
+      "triangle": "0 <= m <= l <= l_max"
+    },
+    "normalization": "orthonormal-complex-m>=0-real-field",
+    "layout": "unpacked-l-m-nonnegative",
+    "reality": "real field implied: coefficients stored for m >= 0 only, Im(a_l0) == 0, m > l entries are zero padding",
+    "nlev": 4,
+    "vertical": {
+      "coordinate": "sigma = p / p_s (Lorenz staggering, top to bottom)",
+      "interfaces": [
+        0.0,
+        0.25,
+        0.5,
+        0.75,
+        1.0
+      ],
+      "full_levels": [
+        0.125,
+        0.375,
+        0.625,
+        0.875
+      ]
+    },
+    "geometry": {
+      "grid": "latlon",
+      "nlat": 34,
+      "nlon": 68,
+      "radius_earth_units": 0.53307,
+      "day_hours": 24.6229,
+      "planet": "from_earth_like",
+      "reference_radius_m": 6371000.0
+    },
+    "environment": {
+      "scenario": "orographic_thermal_wave",
+      "r_dry": 191.8,
+      "cp_dry": 735.0,
+      "temperature": 210.0,
+      "surface_pressure": 610.0,
+      "thermal_amplitude": 1.0,
+      "dt_seconds": 60.0,
+      "topography": "imported",
+      "gravity": 3.71,
+      "topography_parameters": {
+        "clip_below_m": null,
+        "elevation_max_m": 8360.521669376065,
+        "elevation_min_m": -7584.646735121492,
+        "format": "netcdf",
+        "l_cut": 14,
+        "lon_first_deg": -179.875,
+        "longitudes_rewrapped": "[-180, 180)",
+        "missing_count": 0,
+        "offset": 0.0,
+        "projection_residual": 0.1744392572675063,
+        "raster_resolution_deg": 0.25,
+        "raster_shape": "720x1440",
+        "registration": "cell",
+        "resampling": "area-weighted block mean, then bilinear",
+        "rows_flipped_to_south_first": true,
+        "sampled_max_m": 14625.330236572827,
+        "sampled_min_m": -6795.284955730829,
+        "scale": 1.0,
+        "smoothed_residual": null,
+        "smoothing_band_limit": null,
+        "smoothing_retained_at_band_limit": null,
+        "source_max_m": 21134.0,
+        "source_min_m": -8068.0,
+        "source_name": "megt_4ppd.nc",
+        "source_sha256": "aea919137cbab87df2ffe5c2efb115a0741afda2bae7634aace5ce89c2ef24f2",
+        "unit_factor_to_m": 1.0,
+        "units": "m",
+        "variable": "topography",
+        "working_resolution_deg": 4.090909090909091
+      },
+      "terrain_digest": "sha256:afb016d805517202bfc4374ed24f91d72b71aa6376b789184d4cd010b35c31b8",
+      "terrain_l_cut": 14,
+      "initial_perturbation": {
+        "base_state": "orographic_isothermal_rest",
+        "field": "temperature",
+        "degree": 2,
+        "order": 2,
+        "coefficient_real_K": 1.0,
+        "coefficient_imag_K": 0.0,
+        "normalization": "orthonormal complex Y_lm; real field = a_l0 Y_l0 + 2 Re sum_{m>0} a_lm Y_lm",
+        "pointwise_peak_K": 0.7725484040463791,
+        "vertical_profile": "uniform",
+        "vertical_weights": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ]
+      }
+    },
+    "provenance": {
+      "source": "manifest"
+    }
+  },
+  "diagnostic_definitions": {
+    "version": 1,
+    "solver": "pe",
+    "timeseries": "diagnostics/timeseries.csv (one row per accepted step, columns in file order)",
+    "columns": [
+      {
+        "name": "time_s",
+        "meaning": "model time (s)"
+      },
+      {
+        "name": "dt_s",
+        "meaning": "accepted step length (s)"
+      },
+      {
+        "name": "step",
+        "meaning": "accepted step index"
+      },
+      {
+        "name": "t_min",
+        "meaning": "min temperature over every model sampling (K)"
+      },
+      {
+        "name": "t_max",
+        "meaning": "max temperature over every model sampling (K)"
+      },
+      {
+        "name": "ps_min",
+        "meaning": "min surface pressure on the state grid (Pa)"
+      },
+      {
+        "name": "ps_max",
+        "meaning": "max surface pressure on the state grid (Pa)"
+      },
+      {
+        "name": "max_wind_ms",
+        "meaning": "max |V| over the state grid, all levels (m/s)"
+      },
+      {
+        "name": "max_abs_zeta",
+        "meaning": "max |zeta| over the state grid, all levels (s^-1)"
+      },
+      {
+        "name": "max_abs_delta",
+        "meaning": "max |delta| over the state grid, all levels (s^-1)"
+      },
+      {
+        "name": "max_char_speed_ms",
+        "meaning": "max|V| + sqrt(gamma R_d T_max)"
+      },
+      {
+        "name": "courant",
+        "meaning": "max_char_speed * dt / cfl_length_scale (diagnostic only; the PE runner uses a fixed dt)"
+      },
+      {
+        "name": "total_mass",
+        "meaning": "integral p_s dA by state-grid quadrature (rho/g omitted)"
+      },
+      {
+        "name": "mass_rel_drift",
+        "meaning": "(total_mass - total_mass_0) / total_mass_0"
+      }
+    ],
+    "source": "run/pe/diagnostics.py"
+  },
+  "updated_utc": "2026-10-27T18:09:40.932685+00:00"
+}

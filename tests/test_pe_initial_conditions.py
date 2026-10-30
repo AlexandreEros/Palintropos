@@ -74,7 +74,8 @@ def _both(latlon_model, geodesic_model):
 
 def test_registry_has_exactly_the_known_presets():
     assert set(PE_INITIAL_CONDITIONS) == {
-        "isothermal_rest", "thermal_wave", "orographic_isothermal_rest"}
+        "isothermal_rest", "thermal_wave", "orographic_isothermal_rest",
+        "orographic_thermal_wave"}
     # And the import-light scenario catalog stays in sync with it.
     from tropoi.run.pe.config import PE_SCENARIOS
     assert set(PE_SCENARIOS) == set(PE_INITIAL_CONDITIONS)

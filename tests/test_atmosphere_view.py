@@ -99,7 +99,8 @@ def _band_limited_terrain(l_max=L_MAX, cut=6, scale=1500.0):
 
 
 def write_pe_capsule(root: pathlib.Path, *, terrain=True, frames=3,
-                     gravity=GRAVITY, topography=None, seed=11):
+                     gravity=GRAVITY, topography=None, seed=11,
+                     times=None):
     """A ``tropoi run pe`` capsule (manifest + coefficients + times), with a
     prepared terrain under terrain/ when ``terrain``."""
     from tropoi.representation.archive.schema import provenance_blocks
@@ -110,7 +111,9 @@ def write_pe_capsule(root: pathlib.Path, *, terrain=True, frames=3,
     root.mkdir(parents=True, exist_ok=True)
     coeffs = np.stack([make_frame(rng, t_offset=4.0 * i)
                        for i in range(frames)])
-    times = np.arange(frames, dtype=np.float64) * 21600.0
+    times = (np.arange(frames, dtype=np.float64) * 21600.0 if times is None
+             else np.asarray(times, dtype=np.float64))
+    assert times.shape == (frames,)
     np.save(root / "pe_coeffs.npy", coeffs)
     np.save(root / "pe_snapshot_times.npy", times)
     config = {"solver": "pe", "lmax": L_MAX, "grid": "latlon",

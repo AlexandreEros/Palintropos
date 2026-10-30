@@ -37,4 +37,3 @@ def build_planet(run_config: Mapping):
         nlat=int(run_config["nlat"]),
         nlon=int(run_config["nlon"]),
     )
-

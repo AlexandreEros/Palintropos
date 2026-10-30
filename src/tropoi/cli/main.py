@@ -39,6 +39,7 @@ from typing import Optional, Sequence
 
 from tropoi.cli import clear_cache, generate_planet
 from tropoi.run.bve.presets import PRESETS
+from tropoi.cli import terrain as terrain_cli
 from tropoi.run.bve.config import (  # import-light (stdlib only)
     BASE_DEFAULTS, PLOT_TYPES, BVERunConfig)
 
@@ -457,6 +458,7 @@ examples:
   tropoi run pe --levels 12 --dt-seconds 200 --days 0.05 --n-snapshots 4
   tropoi run pe --sigma-interfaces 0,0.25,0.6,1.0 --temperature 250
   tropoi run pe --scenario orographic_isothermal_rest --topography mountain
+  tropoi run pe --scenario orographic_thermal_wave --terrain DIR   evolving, over prepared terrain
 """
 
 
@@ -534,7 +536,9 @@ def add_pe_arguments(parser: argparse.ArgumentParser) -> None:
     parser.add_argument(
         "--thermal-amplitude", dest="thermal_amplitude", type=float,
         default=None,
-        help="thermal_wave degree-2 perturbation amplitude in K [default: 1].")
+        help="thermal_wave / orographic_thermal_wave perturbation: the real "
+             "(l, m) = (2, 2) temperature coefficient in K at every level "
+             "[default: 1]; the pointwise peak is about 0.773 times it.")
 
     parser.add_argument(
         "--topography", choices=sorted(PE_TOPOGRAPHIES), default=None,
@@ -1251,6 +1255,7 @@ examples:
   tropoi run bve --days 1 --n-snapshots 9
   tropoi list presets
   tropoi inspect runs
+  tropoi terrain prepare --expression "1000*cos(radians(lat))**2" --solver pe --out terrain/hills
 """
 
 
@@ -1430,6 +1435,14 @@ def build_parser() -> argparse.ArgumentParser:
              "local desktop session, never under CI or SSH or without a "
              "display; a viewer failure never fails the command.")
     plot_parser.set_defaults(_handler=_cmd_plot)
+
+    # tropoi terrain prepare
+    terrain_parser = commands.add_parser(
+        "terrain", help="Prepare terrain from an expression or a Python "
+                        "height function.",
+        description="Terrain preparation. 'tropoi terrain prepare --help' "
+                    "lists the options.")
+    terrain_cli.add_arguments(terrain_parser)
 
     # tropoi gen
     gen_parser = commands.add_parser(

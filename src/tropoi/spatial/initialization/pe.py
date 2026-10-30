@@ -1,6 +1,6 @@
 """Initial conditions for the dry primitive-equation core.
 
-Three presets. All are built spectrally on top of
+Four presets. All are built spectrally on top of
 :func:`~tropoi.spatial.states.primitive_equations.isothermal_rest_state`,
 so vorticity and divergence are exactly zero and the fields are exactly
 band-limited (no grid round trip).
@@ -50,9 +50,25 @@ band-limited (no grid round trip).
     Phi_ref(p), solve Phi_ref(p_s) = Phi_s for the local surface pressure,
     and evaluate T_k = T_ref(sigma_k p_s(lambda, phi)) — a separate
     constructor, deliberately not begun here.
+
+``orographic_thermal_wave``
+    ``orographic_isothermal_rest``, built by its unchanged constructor, plus
+    the ``thermal_wave`` temperature perturbation: the real coefficient
+    ``thermal_amplitude`` (K) on the (l, m) = (2, 2) mode at every full
+    level (imaginary part zero, vertical weights all 1). The terrain-aware
+    surface pressure and the zero vorticity/divergence of the balanced base
+    are left exactly as they are, and zero amplitude reduces bitwise to
+    ``orographic_isothermal_rest``. The state is a perturbation OF a
+    balanced base, not a balanced state: it starts a small, smooth,
+    deterministic evolution over terrain. In the repository's real-field
+    convention (f = a_l0 Y_l0 + 2 Re sum_{m>0} a_lm Y_lm, orthonormal
+    Y_lm) a real coefficient ``a`` on (2, 2) peaks pointwise at
+    ``2 sqrt(15 / (32 pi)) a``, about 0.773 a (:func:`thermal_wave_peak`):
+    the coefficient is not the pointwise peak.
 """
 from __future__ import annotations
 
+import math
 from typing import TYPE_CHECKING
 
 from tropoi.spatial.states.primitive_equations import (
@@ -68,6 +84,20 @@ if TYPE_CHECKING:  # annotation only: the factories use l_max/nlev/terrain
 #: well below any usable l_max.
 THERMAL_WAVE_DEGREE = 2
 THERMAL_WAVE_ORDER = 2
+
+#: Presets that place the thermal-wave perturbation (degree 2 must lie
+#: inside the dealiased product cut for a nonzero amplitude).
+THERMAL_WAVE_SCENARIOS = ("thermal_wave", "orographic_thermal_wave")
+
+
+def thermal_wave_peak(amplitude: float) -> float:
+    """Pointwise maximum of the thermal-wave perturbation, in kelvin.
+
+    A real coefficient ``a`` on (2, 2) synthesizes
+    ``2 a sqrt(15 / (32 pi)) sin^2(theta) cos(2 lambda)``, whose maximum
+    over the sphere is ``2 sqrt(15 / (32 pi)) |a|`` (about 0.7725 |a|).
+    """
+    return 2.0 * math.sqrt(15.0 / (32.0 * math.pi)) * abs(float(amplitude))
 
 
 def _isothermal_rest(model: PrimitiveEquationsModel, *, temperature: float,
@@ -113,10 +143,30 @@ def _orographic_isothermal_rest(model: PrimitiveEquationsModel, *,
     return state
 
 
+def _orographic_thermal_wave(model: PrimitiveEquationsModel, *,
+                             temperature: float, surface_pressure: float,
+                             thermal_amplitude: float
+                             ) -> PrimitiveEquationsState:
+    if model.l_max < THERMAL_WAVE_DEGREE:
+        raise ValueError(
+            f"orographic_thermal_wave needs l_max >= {THERMAL_WAVE_DEGREE}, "
+            f"got {model.l_max}")
+    # The balanced base from the unchanged constructor (ln p_s from the
+    # exact resolved Phi_s), then only the (2, 2) temperature coefficients:
+    # the isothermal base has none there, so this adds the perturbation and
+    # leaves ln p_s, zeta and delta at their base values.
+    state = _orographic_isothermal_rest(model, temperature=temperature,
+                                        surface_pressure=surface_pressure)
+    state.temperature[:, THERMAL_WAVE_DEGREE, THERMAL_WAVE_ORDER] += \
+        float(thermal_amplitude)
+    return state
+
+
 PE_INITIAL_CONDITIONS = {
     "isothermal_rest": _isothermal_rest,
     "thermal_wave": _thermal_wave,
     "orographic_isothermal_rest": _orographic_isothermal_rest,
+    "orographic_thermal_wave": _orographic_thermal_wave,
 }
 
 
@@ -127,13 +177,13 @@ def make_pe_ic(name: str, model: PrimitiveEquationsModel, *,
 
     ``temperature`` (K) and ``surface_pressure`` (Pa) set the resting base
     state; ``thermal_amplitude`` (K) is the degree-2 perturbation coefficient,
-    used only by ``thermal_wave``.
+    used only by the presets in :data:`THERMAL_WAVE_SCENARIOS`.
     """
     if name not in PE_INITIAL_CONDITIONS:
         raise ValueError(
             f"Unknown pe initial condition: {name}. "
             f"Available: {sorted(PE_INITIAL_CONDITIONS)}")
-    if name == "thermal_wave":
+    if name in THERMAL_WAVE_SCENARIOS:
         # Same contract as the CPU config layer (tropoi.spatial.truncation.
         # require_thermal_wave_support, re-exported by run/pe/config): storage lmax >= 2 always, and
         # degree 2 inside the product cut for a nonzero amplitude. Direct
