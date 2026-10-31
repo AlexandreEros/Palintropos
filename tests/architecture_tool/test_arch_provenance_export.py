@@ -43,3 +43,55 @@ def test_export_includes_results_provenance_and_original_mermaid(tmp_path):
     with zipfile.ZipFile(archive) as z:
         assert z.read('modules.mmd').decode() == code
         assert {'metrics.json', 'metrics.md', 'SHA256SUMS', 'combined.md'} <= set(z.namelist())
+
+
+def test_check_survives_commits_but_rejects_input_and_output_changes(tmp_path, monkeypatch):
+    from tools.architecture import generate
+
+    def git(*args):
+        return subprocess.check_output(
+            ['git', '-c', 'user.name=Fixture', '-c',
+             'user.email=fixture@example.invalid', *args],
+            cwd=tmp_path, text=True).strip()
+
+    git('init')
+    module = tmp_path / 'src' / 'pkg' / '__init__.py'
+    module.parent.mkdir(parents=True)
+    module.write_text('def entry():\n    return 1\n')
+    generator = tmp_path / 'tools' / 'architecture' / 'generate.py'
+    generator.parent.mkdir(parents=True)
+    generator.write_text('# generator identity fixture\n')
+    git('add', '.')
+    git('commit', '-m', 'source')
+    source_commit = git('rev-parse', 'HEAD')
+    monkeypatch.setattr(generate, 'REPO_ROOT', tmp_path)
+    args = ['--package', 'pkg', '--out', 'snapshot',
+            '--call-root', 'entry=pkg.entry']
+    assert generate.main([*args, '--source-commit', source_commit]) == 0
+    git('add', '.')
+    git('commit', '-m', 'record snapshot')
+    assert generate.main([*args, '--check']) == 0
+    # A later unrelated commit must also leave the snapshot current.
+    (tmp_path / 'notes.txt').write_text('unrelated\n')
+    git('add', '.')
+    git('commit', '-m', 'notes')
+    assert generate.main([*args, '--check']) == 0
+
+    # Even a comment-only input change must be detected by content identity.
+    for path in (module, generator):
+        original = path.read_text()
+        path.write_text(original + '# changed\n')
+        assert generate.main([*args, '--check']) == 1
+        path.write_text(original)
+    diagram = tmp_path / 'snapshot' / 'modules.mmd'
+    original = diagram.read_text()
+    diagram.write_text('tampered\n')
+    assert generate.main([*args, '--check']) == 1
+    diagram.write_text(original)
+
+    # Generating while dirty then committing both source and output is valid.
+    module.write_text('def entry():\n    return 2\n')
+    assert generate.main(args) == 0
+    git('add', '.')
+    git('commit', '-m', 'source and snapshot together')
+    assert generate.main([*args, '--check']) == 0

@@ -209,6 +209,8 @@ def render_readme(metrics: dict, opts, files: list[str], generated_marker: str,
            f"Content SHA-256: `{source['working_tree']['source']['sha256']}`. "
            f"Generator working tree: **{source['working_tree']['generator']['status']}**. "
            "Per-file hashes and scoped Git status are recorded in `metrics.json`. "
+           "These describe generation time; --check verifies source and generator "
+           "content hashes before reusing this context across later commits. "
            "The base commit alone does not identify uncommitted source.", ""]
           if source.get("working_tree") else []),
         "## Reproducing",

@@ -17,6 +17,7 @@ generator then refuses to overwrite it unless ``--overwrite-frozen`` is given.
 from __future__ import annotations
 
 import argparse
+import json
 import subprocess
 import sys
 from dataclasses import dataclass, field
@@ -268,6 +269,33 @@ def write(files: dict[str, str], out: Path, overwrite_frozen: bool) -> None:
             handle.write(text)
 
 
+
+def reuse_recorded_provenance(opts: Options, out: Path) -> None:
+    """Check the snapshot's bytes while retaining its generation-time context.
+
+    A documentation commit changes HEAD and clears dirty status without
+    changing the analyzed inputs. Content hashes, including the generator,
+    must match before we reuse the historical commit/status.
+    """
+    try:
+        source = json.loads((out / "metrics.json").read_text())["source"]
+        recorded = source["working_tree"]
+        for scope in ("source", "generator"):
+            for key in ("sha256", "files"):
+                if recorded[scope][key] != opts.working_tree[scope][key]:
+                    return
+        if opts.source_commit not in (None, source["commit"]):
+            return
+    except (OSError, ValueError, KeyError, TypeError):
+        return
+    opts.working_tree = recorded
+    if opts.source_commit is None and source["commit"]:
+        opts.source_commit = source["commit"]
+        prefix, separator, roots = opts.command.partition(" --call-root ")
+        opts.command = (prefix + f" --source-commit {opts.source_commit}"
+                        + separator + roots)
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="python -m tools.architecture.generate",
                                      description=__doc__.split("\n\n")[0])
@@ -321,8 +349,10 @@ def main(argv: list[str] | None = None) -> int:
 
     if not args.freeze:
         opts.working_tree = working_tree(REPO_ROOT, args.src, args.package)
-    files = render(opts)
     out = REPO_ROOT / args.out
+    if args.check and not args.freeze:
+        reuse_recorded_provenance(opts, out)
+    files = render(opts, root=REPO_ROOT)
     if args.check:
         problems = check(files, out)
         for line in problems:
