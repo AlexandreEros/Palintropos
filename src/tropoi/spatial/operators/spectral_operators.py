@@ -207,11 +207,6 @@ class SpectralOperators:
         inv_eigs[0] = 1.0 / self.R**2   # arbitrary, only affects l=0
         return coeffs / inv_eigs[:, None]
 
-    # Convenience wrapper to go back to grid
-    def laplacian_field(self, coeffs: cp.ndarray) -> cp.ndarray:
-        return self.sh.inv_transform(self.laplacian_coeffs(coeffs))
-
-
     # ------------------------------------------------------------------
     # Vector curl/divergence analysis (tangent field -> spectra)
     # ------------------------------------------------------------------

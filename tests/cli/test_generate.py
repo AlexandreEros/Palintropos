@@ -1,4 +1,4 @@
-"""tropoi gen / psx-gen parsing, paths, and dispatch."""
+"""tropoi gen parsing, paths, and dispatch."""
 from __future__ import annotations
 
 import pathlib
@@ -7,18 +7,18 @@ from tropoi.cli.main import main
 
 
 def test_gen_grid_resolution_is_an_int_not_a_list():
-    from tropoi.cli.generate_planet import build_parser
+    from tropoi.cli.main import build_parser
 
-    args = build_parser().parse_args(["--grid-resolution", "4"])
+    args = build_parser().parse_args(["gen", "--grid-resolution", "4"])
     assert args.grid_resolution == 4
 
 
 def test_gen_legacy_radius_spelling_still_accepted():
-    from tropoi.cli.generate_planet import build_parser
+    from tropoi.cli.main import build_parser
 
-    args = build_parser().parse_args(["--eq_radius-earth_units", "2.0"])
+    args = build_parser().parse_args(["gen", "--eq_radius-earth_units", "2.0"])
     assert args.radius_earth_units == 2.0
-    args = build_parser().parse_args(["--radius-earth-units", "2.0"])
+    args = build_parser().parse_args(["gen", "--radius-earth-units", "2.0"])
     assert args.radius_earth_units == 2.0
 
 

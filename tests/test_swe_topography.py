@@ -42,7 +42,7 @@ MOUNTAIN = dict(height_m=1500.0, lat_deg=25.0, lon_deg=60.0, width_deg=25.0)
 def test_flat_config_keeps_historical_schema_and_hash():
     """Flat runs must emit exactly the historical config dict (no topography
     keys), so old scientific hashes and run ids remain valid."""
-    from tropoi.run.bve.io import make_run_id
+    from tropoi.representation.archive.writer import make_run_id
     from tropoi.run.swe.config import SWERunConfig
 
     cfg = SWERunConfig.resolve({})
@@ -71,7 +71,7 @@ def test_flat_config_keeps_historical_schema_and_hash():
 
 def test_mountain_config_resolution_and_identity():
     from datetime import datetime, timezone
-    from tropoi.run.bve.io import make_run_id
+    from tropoi.representation.archive.writer import make_run_id
     from tropoi.run.swe.config import SWERunConfig
 
     cfg = SWERunConfig.resolve({"topography": "mountain"})
@@ -174,7 +174,8 @@ def test_inspect_shows_topography(tmp_path, capsys):
 
 def _make_planet(grid_type="latlon", nlat=32, nlon=64, l_max=15,
                  resolution=3, day_hours=23.9345):
-    from tropoi.planet import Planet, PlanetaryParameters
+    from tropoi.spatial.planet import Planet
+    from tropoi.spatial.environment import PlanetaryParameters
     return Planet.generate(
         params=PlanetaryParameters.from_earth_like(day_hours=day_hours),
         grid_type=grid_type, nlat=nlat, nlon=nlon, l_max=l_max,
@@ -196,8 +197,8 @@ def geodesic_planet():
 
 
 def _mountain_model(planet, mean_depth=3000.0, **model_kw):
-    from tropoi.physics.shallow_water import ShallowWaterModel
-    from tropoi.physics.topography import Topography
+    from tropoi.temporal.tendencies.shallow_water import ShallowWaterModel
+    from tropoi.spatial.terrain.topography import Topography
     topo = Topography.mountain(planet, **MOUNTAIN)
     return ShallowWaterModel(planet, mean_depth=mean_depth, topography=topo,
                              **model_kw)
@@ -205,7 +206,7 @@ def _mountain_model(planet, mean_depth=3000.0, **model_kw):
 
 def _nontrivial_state(l_max, phi0):
     import cupy as cp
-    from tropoi.physics.shallow_water import ShallowWaterState
+    from tropoi.spatial.states.shallow_water import ShallowWaterState
     zeta = cp.zeros((l_max + 1, l_max + 1), dtype=cp.complex128)
     delta = cp.zeros_like(zeta)
     phi = cp.zeros_like(zeta)
@@ -223,9 +224,9 @@ def _nontrivial_state(l_max, phi0):
 @requires_cuda
 def test_flat_topography_is_bit_identical_to_no_topography(latlon_planet):
     import cupy as cp
-    from tropoi.physics.shallow_water import ShallowWaterModel
-    from tropoi.physics.topography import Topography
-    from tropoi.run.swe.initial_conditions import make_swe_ic
+    from tropoi.temporal.tendencies.shallow_water import ShallowWaterModel
+    from tropoi.spatial.terrain.topography import Topography
+    from tropoi.spatial.initialization.swe import make_swe_ic
 
     m_none = ShallowWaterModel(latlon_planet, mean_depth=3000.0)
     m_flat = ShallowWaterModel(
@@ -252,7 +253,7 @@ def test_mountain_changes_only_the_divergence_tendency(latlon_planet):
     """The topographic term is exactly -laplacian(phi_s) in the delta row;
     zeta and phi tendencies are bitwise untouched."""
     import cupy as cp
-    from tropoi.physics.shallow_water import ShallowWaterModel
+    from tropoi.temporal.tendencies.shallow_water import ShallowWaterModel
 
     m_flat = ShallowWaterModel(latlon_planet, mean_depth=3000.0)
     m_mtn = _mountain_model(latlon_planet)
@@ -273,9 +274,9 @@ def test_mountain_changes_only_the_divergence_tendency(latlon_planet):
 
 def _assert_lake_at_rest_preserved(planet):
     import cupy as cp
-    from tropoi.physics.shallow_water import ShallowWaterState
-    from tropoi.run.engine import rk4_step_array
-    from tropoi.run.swe.initial_conditions import make_swe_ic
+    from tropoi.spatial.states.shallow_water import ShallowWaterState
+    from tropoi.temporal.integration import rk4_step_array
+    from tropoi.spatial.initialization.swe import make_swe_ic
 
     model = _mountain_model(planet)
     state = make_swe_ic("rest", model)
@@ -346,8 +347,8 @@ def test_uniform_bottom_and_surface_offset_does_not_alter_dynamics(
     unchanged) is dynamically invisible: the offset lives in the phi_s
     monopole, whose Laplacian eigenvalue is exactly zero."""
     import cupy as cp
-    from tropoi.physics.shallow_water import ShallowWaterModel
-    from tropoi.physics.topography import Topography
+    from tropoi.temporal.tendencies.shallow_water import ShallowWaterModel
+    from tropoi.spatial.terrain.topography import Topography
 
     m_base = _mountain_model(latlon_planet)
     elev = m_base.topography.elevation_lm
@@ -373,7 +374,7 @@ def test_uniform_bottom_and_surface_offset_does_not_alter_dynamics(
 def test_mountain_terrain_is_finite_and_band_limited(latlon_planet,
                                                      geodesic_planet):
     import cupy as cp
-    from tropoi.physics.topography import Topography
+    from tropoi.spatial.terrain.topography import Topography
 
     for planet in (latlon_planet, geodesic_planet):
         topo = Topography.mountain(planet, **MOUNTAIN)
@@ -393,8 +394,8 @@ def test_mountain_terrain_is_finite_and_band_limited(latlon_planet,
 
 @requires_cuda
 def test_mountain_rejects_invalid_parameters(latlon_planet):
-    from tropoi.physics.topography import (Topography,
-                                                      TopographyError)
+    from tropoi.spatial.terrain.topography import Topography
+    from tropoi.spatial.terrain.topography import TopographyError
 
     bad_params = [
         dict(MOUNTAIN, height_m=-100.0),
@@ -416,8 +417,8 @@ def test_mountain_rejects_invalid_parameters(latlon_planet):
 
 @requires_cuda
 def test_too_narrow_mountain_fails_the_projection_gate(latlon_planet):
-    from tropoi.physics.topography import (Topography,
-                                                      TopographyError)
+    from tropoi.spatial.terrain.topography import Topography
+    from tropoi.spatial.terrain.topography import TopographyError
     with pytest.raises(TopographyError, match="not representable"):
         Topography.mountain(latlon_planet, height_m=1500.0, lat_deg=25.0,
                             lon_deg=60.0, width_deg=3.0)
@@ -425,9 +426,8 @@ def test_too_narrow_mountain_fails_the_projection_gate(latlon_planet):
 
 @requires_cuda
 def test_protruding_mountain_fails_before_integration(latlon_planet):
-    from tropoi.physics.shallow_water import (
-        ShallowWaterStateError)
-    from tropoi.run.swe.initial_conditions import make_swe_ic
+    from tropoi.spatial.states.shallow_water import ShallowWaterStateError
+    from tropoi.spatial.initialization.swe import make_swe_ic
 
     model = _mountain_model(latlon_planet, mean_depth=200.0)
     with pytest.raises(ShallowWaterStateError,
@@ -437,8 +437,8 @@ def test_protruding_mountain_fails_before_integration(latlon_planet):
 
 @requires_cuda
 def test_topography_and_model_truncations_must_match(latlon_planet):
-    from tropoi.physics.shallow_water import ShallowWaterModel
-    from tropoi.physics.topography import Topography
+    from tropoi.temporal.tendencies.shallow_water import ShallowWaterModel
+    from tropoi.spatial.terrain.topography import Topography
 
     wrong = Topography.flat(latlon_planet.sh.l_max + 3)
     with pytest.raises(ValueError, match="truncation"):
@@ -451,8 +451,8 @@ def test_topography_and_model_truncations_must_match(latlon_planet):
 
 @requires_cuda
 def test_mountain_flow_run_conserves_mass_exactly(tmp_path, latlon_planet):
-    from tropoi.run.engine import count_snapshot_times
-    from tropoi.run.swe.initial_conditions import make_swe_ic
+    from tropoi.temporal.integration import count_snapshot_times
+    from tropoi.spatial.initialization.swe import make_swe_ic
     from tropoi.run.swe.runner import run_swe
 
     model = _mountain_model(latlon_planet, mean_depth=5960.0)
@@ -489,8 +489,8 @@ def test_rk4_timestep_refinement_for_mountain_flow(latlon_planet):
     ~4th order (measured ratios ~16-17 per dt halving) before spatial error
     dominates."""
     import cupy as cp
-    from tropoi.run.engine import rk4_step_array
-    from tropoi.run.swe.initial_conditions import make_swe_ic
+    from tropoi.temporal.integration import rk4_step_array
+    from tropoi.spatial.initialization.swe import make_swe_ic
 
     model = _mountain_model(latlon_planet, mean_depth=5960.0)
     state0 = make_swe_ic("williamson2", model)
@@ -525,8 +525,8 @@ def test_tendency_loop_performs_no_host_device_transfers(latlon_planet,
     bus: no numpy->device uploads and no device->host array downloads."""
     import cupy as cp
     import numpy as np
-    from tropoi.run.engine import rk4_step_array
-    from tropoi.run.swe.initial_conditions import make_swe_ic
+    from tropoi.temporal.integration import rk4_step_array
+    from tropoi.spatial.initialization.swe import make_swe_ic
 
     model = _mountain_model(latlon_planet)
     assert isinstance(model.phi_s_lm, cp.ndarray)  # device-resident terrain
@@ -566,7 +566,7 @@ def test_characteristic_speed_reflects_local_thickness(latlon_planet):
     """For the lake at rest over a mountain the deepest fluid (valley floor)
     sets the gravity-wave speed: strictly above sqrt(Phi0) because the
     valleys are deeper than the mean, and equal to sqrt(g*h_max)."""
-    from tropoi.run.swe.initial_conditions import make_swe_ic
+    from tropoi.spatial.initialization.swe import make_swe_ic
 
     model = _mountain_model(latlon_planet)
     state = make_swe_ic("rest", model)
@@ -586,11 +586,11 @@ def test_mountain_flow_demo_is_nontrivial_and_stable(latlon_planet):
     mean depth 5960 m): inviscid, no hidden damping, positive depth, and a
     clearly nontrivial divergence/vorticity response to the terrain."""
     import cupy as cp
-    from tropoi.physics.shallow_water import (ShallowWaterModel,
-                                                         ShallowWaterState)
-    from tropoi.physics.topography import Topography
-    from tropoi.run.engine import rk4_step_array
-    from tropoi.run.swe.initial_conditions import make_swe_ic
+    from tropoi.temporal.tendencies.shallow_water import ShallowWaterModel
+    from tropoi.spatial.states.shallow_water import ShallowWaterState
+    from tropoi.spatial.terrain.topography import Topography
+    from tropoi.temporal.integration import rk4_step_array
+    from tropoi.spatial.initialization.swe import make_swe_ic
 
     topo = Topography.mountain(latlon_planet, height_m=2000.0, lat_deg=30.0,
                                lon_deg=90.0, width_deg=20.0)

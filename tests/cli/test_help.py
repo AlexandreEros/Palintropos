@@ -31,17 +31,6 @@ def test_tropoi_help_and_list_are_cpu_safe(argv):
                         f"main({argv!r})")
 
 
-@pytest.mark.parametrize("module,name", [
-    ("tropoi.cli.bve", "psx-bve"),
-    ("tropoi.cli.generate_planet", "psx-gen"),
-    ("tropoi.cli.clear_cache", "psx-recompile"),
-])
-def test_psx_help_is_cpu_safe(module, name):
-    assert_probe_passes(
-        f"import {module} as m; sys.argv = [{name!r}, '--help']",
-        "m.main()")
-
-
 def test_bare_tropoi_prints_help(capsys):
     assert main([]) == 0
     assert "tropoi" in capsys.readouterr().out

@@ -25,18 +25,15 @@ except Exception:  # pragma: no cover - import guard
 pytestmark = pytest.mark.skipif(not _HAS_CUDA, reason="CUDA/CuPy not available")
 
 if _HAS_CUDA:
-    from tropoi.numerics import (
-        GeodesicGridGeometry,
-        GeodesicSphericalHarmonics,
-        SpectralOperators,
-    )
-    from tropoi.planet import Planet, PlanetaryParameters
-    from tropoi.run.bve.barotropic_vorticity import (
-        BarotropicState,
-        BarotropicVorticity,
-    )
+    from tropoi.spatial.grids.geodesic_grid import GeodesicGridGeometry
+    from tropoi.spatial.transforms.optimized_geodesic_sh import GeodesicSphericalHarmonics
+    from tropoi.spatial.operators.spectral_operators import SpectralOperators
+    from tropoi.spatial.planet import Planet
+    from tropoi.spatial.environment import PlanetaryParameters
+    from tropoi.spatial.states.barotropic import BarotropicState
+    from tropoi.temporal.tendencies.barotropic import BarotropicVorticity
     from tropoi.run.bve.runner import rk4_step
-    from tropoi.run.bve.diagnostics import spectral_diagnostics
+    from tropoi.representation.diagnostics.bve import spectral_diagnostics
 
 RES, L_MAX = 4, 21
 CUT = (2 * L_MAX) // 3
@@ -132,25 +129,11 @@ def test_invalid_product_quadrature_rejected(planet):
 
 def test_no_silent_fallback_on_unsupported_grid(planet):
     """'fine' on a non-geodesic grid must raise, never fall back to 'coarse'."""
-    from tropoi.numerics import LatLonGridGeometry
+    from tropoi.spatial.grids.grid import LatLonGridGeometry
     latlon = LatLonGridGeometry.create((9, 17))
     with pytest.raises(ValueError):
         SpectralOperators(planet.sh, planet.params.radius, latlon,
                           product_quadrature="fine")
-
-
-def test_cli_exposes_and_defaults_product_quadrature():
-    """--product-quadrature is a CLI option, defaults to 'fine', and lands in
-    the args dict that config.json and manifest.json serialize."""
-    from tropoi.cli.bve import build_parser
-    parser = build_parser()
-    args = parser.parse_args([])
-    assert vars(args)["product_quadrature"] == "fine"
-    # choices constrained: an invalid value must be rejected by the parser
-    with pytest.raises(SystemExit):
-        parser.parse_args(["--product-quadrature", "exact"])
-    # help text mentions it (exposed, not hidden)
-    assert "--product-quadrature" in parser.format_help()
 
 
 # ---------------------------------------------------------------------------

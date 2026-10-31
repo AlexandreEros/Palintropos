@@ -2,6 +2,8 @@
 %% All classes defined in package tropoi.representation.archive.
 classDiagram
     direction LR
+    class c_tropoi_orepresentation_oarchive_oavailability_oNoSnapshotsError["NoSnapshotsError (representation.archive.availability)"]
+    c_tropoi_orepresentation_oarchive_oavailability_oNoSnapshotsError : external base ValueError
     class c_tropoi_orepresentation_oarchive_ocapsule_oCapsuleError["CapsuleError (representation.archive.capsule)"]
     c_tropoi_orepresentation_oarchive_ocapsule_oCapsuleError : external base ValueError
     class c_tropoi_orepresentation_oarchive_ocapsule_oCapsuleLayoutError["CapsuleLayoutError (representation.archive.capsule)"]
@@ -49,8 +51,6 @@ classDiagram
     c_tropoi_orepresentation_oarchive_oheld__suarez_oHeldSuarezStorage : +state#95;path()
     c_tropoi_orepresentation_oarchive_oheld__suarez_oHeldSuarezStorage : +times
     c_tropoi_orepresentation_oarchive_oheld__suarez_oHeldSuarezStorage : +view()
-    class c_tropoi_orepresentation_oarchive_oheld__suarez_oNoSnapshotsError["NoSnapshotsError (representation.archive.held_suarez)"]
-    c_tropoi_orepresentation_oarchive_oheld__suarez_oNoSnapshotsError : external base ValueError
     class c_tropoi_orepresentation_oarchive_oinitial__state_oInitialState["InitialState (representation.archive.initial_state)"]
     c_tropoi_orepresentation_oarchive_oinitial__state_oInitialState : +#95;#95;post#95;init#95;#95;()
     c_tropoi_orepresentation_oarchive_oinitial__state_oInitialState : +#95;#95;repr#95;#95;()

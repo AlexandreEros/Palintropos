@@ -30,17 +30,9 @@ dev = [
   "networkx==3.7",
 ]
 
-# This creates CLI commands in the project venv.
-# `tropoi` is the canonical interface. `aeolus` (the former canonical name)
-# and the psx-* commands are kept as compatibility entry points bound to the
-# very same callables: aeolus == tropoi, psx-bve == tropoi run bve,
-# psx-gen == tropoi gen, psx-recompile == tropoi recompile.
+# The single public command-line interface.
 [project.scripts]
 tropoi = "tropoi.cli.main:main"
-aeolus = "tropoi.cli.main:main"
-psx-gen = "tropoi.cli.generate_planet:main"
-psx-bve = "tropoi.cli.bve:main"
-psx-recompile = "tropoi.cli.clear_cache:main"
 
 [tool.setuptools]
 package-dir = {"" = "src"}

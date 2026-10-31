@@ -17,9 +17,10 @@ def _has_cuda():
 @pytest.mark.skipif(not _has_cuda(), reason="CUDA/CuPy not available")
 def test_runner_consumes_explicit_schedule_exactly(tmp_path):
     import numpy as np
-    from tropoi.planet import Planet, PlanetaryParameters
+    from tropoi.spatial.planet import Planet
+    from tropoi.spatial.environment import PlanetaryParameters
     from tropoi.run.bve.config import count_snapshot_times
-    from tropoi.run.bve.initial_conditions import make_ic
+    from tropoi.spatial.initialization.bve import make_ic
     from tropoi.run.bve.runner import run_bve
 
     planet = Planet.generate(
@@ -65,9 +66,10 @@ _MISALIGNED_DAYS = _MISALIGNED_T_END_S / 86400.0
 def test_count_n1_ends_exactly_at_misaligned_t_end(tmp_path):
     """Blocker 1: N=1 stores the final state at exactly the requested t_end."""
     import numpy as np
-    from tropoi.planet import Planet, PlanetaryParameters
+    from tropoi.spatial.planet import Planet
+    from tropoi.spatial.environment import PlanetaryParameters
     from tropoi.run.bve.config import count_snapshot_times
-    from tropoi.run.bve.initial_conditions import make_ic
+    from tropoi.spatial.initialization.bve import make_ic
     from tropoi.run.bve.runner import run_bve
 
     planet = Planet.generate(
@@ -92,9 +94,10 @@ def test_count_n1_ends_exactly_at_misaligned_t_end(tmp_path):
 def test_count_n0_ends_exactly_at_misaligned_t_end(tmp_path):
     """Blocker 1: N=0 stores nothing but diagnostics still end exactly at t_end."""
     import numpy as np
-    from tropoi.planet import Planet, PlanetaryParameters
+    from tropoi.spatial.planet import Planet
+    from tropoi.spatial.environment import PlanetaryParameters
     from tropoi.run.bve.config import count_snapshot_times
-    from tropoi.run.bve.initial_conditions import make_ic
+    from tropoi.spatial.initialization.bve import make_ic
     from tropoi.run.bve.runner import run_bve
 
     planet = Planet.generate(
@@ -123,9 +126,10 @@ def test_legacy_interval_vs_count_stopping_semantics(tmp_path):
     (final state NOT stored) while count mode lands exactly on t_end.
     """
     import numpy as np
-    from tropoi.planet import Planet, PlanetaryParameters
+    from tropoi.spatial.planet import Planet
+    from tropoi.spatial.environment import PlanetaryParameters
     from tropoi.run.bve.config import count_snapshot_times
-    from tropoi.run.bve.initial_conditions import make_ic
+    from tropoi.spatial.initialization.bve import make_ic
     from tropoi.run.bve.runner import run_bve
 
     planet = Planet.generate(
@@ -170,9 +174,10 @@ def test_runner_reuses_diagnostics_velocity_no_duplicate_reconstruction(tmp_path
     import csv
 
     import numpy as np
-    from tropoi.planet import Planet, PlanetaryParameters
+    from tropoi.spatial.planet import Planet
+    from tropoi.spatial.environment import PlanetaryParameters
     from tropoi.run.bve.config import count_snapshot_times
-    from tropoi.run.bve.initial_conditions import make_ic
+    from tropoi.spatial.initialization.bve import make_ic
     from tropoi.run.bve.runner import run_bve
 
     planet = Planet.generate(

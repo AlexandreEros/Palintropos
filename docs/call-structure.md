@@ -5,19 +5,19 @@ or construction; dashed arrows show selected data passed into a later stage.
 
 ## Entry points and planet construction
 
-`tropoi` (cli/main.py) is the canonical executable; `aeolus` is bound to the
-same callable, and its `run bve`, `gen`, and `recompile` subcommands share
-implementations with the `psx-*` compatibility entry points. `tropoi list` and `tropoi inspect` are pure-stdlib and never
+`tropoi` (cli/main.py) is the single executable. Its `run bve`, `gen`, and
+`recompile` subcommands dispatch to their implementation modules.
+`tropoi list` and `tropoi inspect` are pure-stdlib and never
 reach the assembly stage below.
 
 ```mermaid
 flowchart LR
     subgraph cli["CLI entry points"]
         scripts["pyproject.toml scripts"]
-        tropoi["tropoi / aeolus<br/>main.main()"]
-        gen["psx-gen / tropoi gen<br/>generate_planet"]
-        bve["psx-bve / tropoi run bve<br/>bve.execute_run()"]
-        cache["psx-recompile / tropoi recompile<br/>clear_cache"]
+        tropoi["tropoi<br/>main.main()"]
+        gen["tropoi gen<br/>generate_planet"]
+        bve["tropoi run bve<br/>bve.execute_run()"]
+        cache["tropoi recompile<br/>clear_cache"]
     end
 
     subgraph assembly["Planet assembly"]

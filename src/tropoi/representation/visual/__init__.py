@@ -9,6 +9,5 @@ per-core scientific compositions (``bve``, ``swe``, ``pe``,
 
 This initializer imports nothing, and nothing in this package is imported
 by archive inspection or host coefficient access: ``Snapshot.plot`` and the
-runners import the modules they need on use. (Legacy paths:
-``tropoi.viz`` and ``tropoi.run.{bve,swe,pe}.visualization``.)
+runners import the modules they need on use.
 """

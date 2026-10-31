@@ -85,6 +85,9 @@ import numpy as np
 
 from tropoi.representation.archive.initial_state import (InitialState,
                                                          InitialStateError)
+from tropoi.run.custom.resources import (PreparationError, base_config,
+                                         build_spec_planet, check_specs,
+                                         resolve_topography)
 from tropoi.spatial.modes import (ZERO_MEAN_MONOPOLE_RTOL, FieldSpec,
                                   SpectralConventionError, SpectralModes)
 from tropoi.spatial.specification import (DiscretizationSpec, FluidLayerSpec,
@@ -120,17 +123,6 @@ VARIABLE_UNITS = {
 }
 #: Inputs whose global mean must vanish (the potentials' means are inert).
 _ZERO_MEAN_INPUTS = ("zeta", "delta", "phi", "free_surface_anomaly")
-
-
-class PreparationError(ValueError):
-    """An input cannot become a valid initial state under the policy.
-
-    ``report`` holds whatever was measured before the failure.
-    """
-
-    def __init__(self, message: str, report: "PreparationReport | None" = None):
-        super().__init__(message)
-        self.report = report
 
 
 # ---------------------------------------------------------------------------
@@ -376,18 +368,6 @@ def _host(array) -> np.ndarray:
     return np.asarray(array)
 
 
-def _base_config(planet: PlanetSpec, discretization: DiscretizationSpec
-                 ) -> dict:
-    return {**discretization.run_config_entries(),
-            "planet": planet.to_dict(), "day_hours": planet.day_hours}
-
-
-def _build_planet(planet: PlanetSpec, discretization: DiscretizationSpec):
-    from tropoi.cli.bve import build_planet
-
-    return build_planet(_base_config(planet, discretization))
-
-
 def _sampling_of(planet_obj, grid: str) -> StateSampling:
     g = planet_obj.grid
     shape = getattr(g, "grid_shape", None)
@@ -408,7 +388,7 @@ def state_sampling(planet: PlanetSpec,
     Built from the model's own grid object, so the coordinates are exactly
     the points the projection uses.
     """
-    return _sampling_of(_build_planet(planet, discretization),
+    return _sampling_of(build_spec_planet(planet, discretization),
                         discretization.grid)
 
 
@@ -425,7 +405,7 @@ class _Resources:
     @property
     def planet(self):
         if self._obj is None:
-            self._obj = _build_planet(self._planet, self._discretization)
+            self._obj = build_spec_planet(self._planet, self._discretization)
         return self._obj
 
     @property
@@ -584,16 +564,6 @@ def _either(name_a: str, a, name_b: str, b) -> tuple[str, Any]:
     return (name_b, b) if b is not None else (name_a, a)
 
 
-def _check_specs(planet, discretization) -> None:
-    if not isinstance(planet, PlanetSpec):
-        raise PreparationError(
-            f"planet must be a PlanetSpec, got {type(planet).__name__}")
-    if not isinstance(discretization, DiscretizationSpec):
-        raise PreparationError(
-            "discretization must be a DiscretizationSpec, got "
-            f"{type(discretization).__name__}")
-
-
 def _finalize(report: PreparationReport, make: Callable[[dict], InitialState]
               ) -> InitialState:
     try:
@@ -615,7 +585,7 @@ def prepare_bve_state(planet: PlanetSpec, discretization: DiscretizationSpec,
     Exactly one of ``zeta`` (s^-1) or ``streamfunction`` (m^2 s^-1). Only
     physical (sampled or function) inputs need CUDA.
     """
-    _check_specs(planet, discretization)
+    check_specs(planet, discretization)
     policy = policy or ProjectionPolicy()
     name, source = _either("zeta", zeta, "streamfunction", streamfunction)
     source = _as_source(name, source)
@@ -638,23 +608,6 @@ def prepare_bve_state(planet: PlanetSpec, discretization: DiscretizationSpec,
 # SWE
 # ---------------------------------------------------------------------------
 
-def _resolve_topography(planet_obj, spec: TopographySpec):
-    """The model's Topography for a specification (CUDA), or None if flat."""
-    from tropoi.spatial.terrain.topography import Topography
-
-    if spec.is_flat:
-        return None
-    if spec.preset == "imported":
-        raise PreparationError(
-            "imported terrain is resolved once, from its file, by "
-            "prepare_planet(...); pass the PreparedPlanet as topography")
-    p = spec.parameters
-    if spec.preset == "mountain":
-        return Topography.mountain(planet_obj, height_m=p["height_m"],
-                                   lat_deg=p["lat_deg"], lon_deg=p["lon_deg"],
-                                   width_deg=p["width_deg"])
-    return Topography.williamson5_cone(planet_obj, height_m=p["height_m"])
-
 
 def prepare_swe_state(planet: PlanetSpec, discretization: DiscretizationSpec,
                       fluid: FluidLayerSpec,
@@ -673,7 +626,7 @@ def prepare_swe_state(planet: PlanetSpec, discretization: DiscretizationSpec,
     specification is resolved on this discretization and stored with the
     state; positivity is checked with the model's own ``validate_state``.
     """
-    _check_specs(planet, discretization)
+    check_specs(planet, discretization)
     if not isinstance(fluid, FluidLayerSpec):
         raise PreparationError(
             "fluid must be a FluidLayerSpec (explicit gravity and mean "
@@ -729,7 +682,7 @@ def prepare_swe_state(planet: PlanetSpec, discretization: DiscretizationSpec,
                                    preset=topography.preset,
                                    parameters=dict(topography.parameters)))
     else:
-        terrain = _resolve_topography(planet_obj, topography)
+        terrain = resolve_topography(planet_obj, topography)
     topography_lm = None
     if terrain is not None:
         topography_lm = cp.asnumpy(terrain.elevation_lm)

@@ -176,7 +176,7 @@ def test_williamson2_from_potentials_matches_the_preset_state():
 
 
 def test_lake_at_rest_over_a_mountain_matches_the_preset_trajectory(tmp_path):
-    from tropoi.cli.swe import execute_run
+    from tropoi.run.swe.execution import execute_run
     from tropoi.representation.archive import resolve_run_directory
     from tropoi.run.custom import (SpectralCoefficients, TopographySpec,
                                    initial_state_from_preset,

@@ -23,11 +23,9 @@ except Exception:  # pragma: no cover - import guard
 pytestmark = pytest.mark.skipif(not _HAS_CUDA, reason="CUDA/CuPy not available")
 
 if _HAS_CUDA:
-    from tropoi.numerics import (
-        GaussLatLonGridGeometry,
-        GaussLatLonSphericalHarmonics,
-        LatLonSphericalHarmonics,
-    )
+    from tropoi.spatial.grids.latlon_grid import GaussLatLonGridGeometry
+    from tropoi.spatial.grids.latlon_grid import GaussLatLonSphericalHarmonics
+    from tropoi.spatial.transforms.spherical_harmonics import LatLonSphericalHarmonics
 
 L_MAX = 10
 NLAT, NLON = 24, 48  # >= (l_max+1, 2*l_max+1): analysis exact for l <= l_max

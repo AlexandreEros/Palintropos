@@ -174,7 +174,7 @@ saved state. Nothing is interpolated in the vertical.
   `R_d`;
 - `g` is the run's gravity, the same `g` that made `Φ_s = g·h_s`;
 - `R` is the run's dynamical radius (for a capsule, the volumetric-mean radius
-  `cli.pe.build_pe_model` builds the planet with; for Held–Suarez, the ideal
+  `run.pe.model.build_pe_model` builds the planet with; for Held–Suarez, the ideal
   sphere's `radius`);
 - `E` is the display exaggeration.
 

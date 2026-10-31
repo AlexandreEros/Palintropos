@@ -351,11 +351,12 @@ def prepare_planet(planet: PlanetSpec, discretization: DiscretizationSpec,
     equation core requires (content above it cannot be balanced by the
     dealiased pressure-gradient pathway; see ``Topography.mountain``).
     """
-    from tropoi.run.custom.prepare import (PreparationError, _build_planet,
-                                           _check_specs, _resolve_topography)
+    from tropoi.run.custom.resources import (PreparationError,
+                                             build_spec_planet, check_specs,
+                                             resolve_topography)
     from tropoi.spatial.terrain.raster import ElevationRaster
 
-    _check_specs(planet, discretization)
+    check_specs(planet, discretization)
     if solver not in ("swe", "pe"):
         raise PreparationError(
             f"solver must be 'swe' or 'pe', got {solver!r}")
@@ -381,7 +382,7 @@ def prepare_planet(planet: PlanetSpec, discretization: DiscretizationSpec,
             return PreparedPlanet(planet, discretization, terrain, None,
                                   label=label, l_cut=l_cut)
         import cupy as cp
-        planet_obj = _build_planet(planet, discretization)
+        planet_obj = build_spec_planet(planet, discretization)
         if l_cut is not None and terrain.preset == "mountain":
             from tropoi.spatial.terrain.topography import Topography
             p = terrain.parameters
@@ -389,7 +390,7 @@ def prepare_planet(planet: PlanetSpec, discretization: DiscretizationSpec,
                 planet_obj, height_m=p["height_m"], lat_deg=p["lat_deg"],
                 lon_deg=p["lon_deg"], width_deg=p["width_deg"], l_cut=l_cut)
         else:
-            resolved = _resolve_topography(planet_obj, terrain)
+            resolved = resolve_topography(planet_obj, terrain)
         full = cp.asnumpy(resolved.elevation_lm)
         lm = full.copy()
         if l_cut is not None:
@@ -413,7 +414,7 @@ def prepare_planet(planet: PlanetSpec, discretization: DiscretizationSpec,
 
     from tropoi.spatial.terrain.topography import Topography, TopographyError
 
-    planet_obj = _build_planet(planet, discretization)
+    planet_obj = build_spec_planet(planet, discretization)
     try:
         resolved = Topography.from_raster(planet_obj, terrain,
                                           smoothing=smoothing,

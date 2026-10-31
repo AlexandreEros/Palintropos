@@ -24,9 +24,6 @@ classDiagram
     c_tropoi_orun_ocustom_oplanet_oPreparedPlanet : +view()
     class c_tropoi_orun_ocustom_oprepare_oFieldReport["FieldReport (run.custom.prepare)"]
     c_tropoi_orun_ocustom_oprepare_oFieldReport : +to#95;dict()
-    class c_tropoi_orun_ocustom_oprepare_oPreparationError["PreparationError (run.custom.prepare)"]
-    c_tropoi_orun_ocustom_oprepare_oPreparationError : +#95;#95;init#95;#95;()
-    c_tropoi_orun_ocustom_oprepare_oPreparationError : external base ValueError
     class c_tropoi_orun_ocustom_oprepare_oPreparationReport["PreparationReport (run.custom.prepare)"]
     c_tropoi_orun_ocustom_oprepare_oPreparationReport : +lines()
     c_tropoi_orun_ocustom_oprepare_oPreparationReport : +to#95;dict()
@@ -47,3 +44,6 @@ classDiagram
     c_tropoi_orun_ocustom_oprepare_o__Resources : +#95;#95;init#95;#95;()
     c_tropoi_orun_ocustom_oprepare_o__Resources : +planet
     c_tropoi_orun_ocustom_oprepare_o__Resources : +sampling
+    class c_tropoi_orun_ocustom_oresources_oPreparationError["PreparationError (run.custom.resources)"]
+    c_tropoi_orun_ocustom_oresources_oPreparationError : +#95;#95;init#95;#95;()
+    c_tropoi_orun_ocustom_oresources_oPreparationError : external base ValueError

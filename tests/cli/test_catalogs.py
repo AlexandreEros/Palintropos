@@ -23,5 +23,5 @@ def test_list_scenarios_output(capsys):
 
 def test_scenario_choices_match_initial_conditions():
     pytest.importorskip("cupy")
-    from tropoi.run.bve.initial_conditions import INITIAL_CONDITIONS
+    from tropoi.spatial.initialization.bve import INITIAL_CONDITIONS
     assert set(SCENARIOS) == set(INITIAL_CONDITIONS)

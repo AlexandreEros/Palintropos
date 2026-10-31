@@ -53,7 +53,7 @@ def test_earth_like_reproduces_from_earth_like_bitwise(day_hours, units):
 
 
 def test_preset_run_configs_map_to_the_planets_their_builders_use():
-    from tropoi.cli.swe import _w5_planet_params
+    from tropoi.run.swe.model import _w5_planet_params
     from tropoi.run.bve.config import BVERunConfig
     from tropoi.run.custom import planet_spec_for_run_config
     from tropoi.run.swe.config import SWERunConfig

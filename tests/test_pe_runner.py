@@ -32,10 +32,10 @@ pytestmark = pytest.mark.skipif(not _has_cuda(),
 
 
 def _make_model(l_max=12, nlev=4, day_hours=24.0):
-    from tropoi.planet import Planet, PlanetaryParameters
-    from tropoi.physics.primitive_equations import (
-        PrimitiveEquationsModel)
-    from tropoi.physics.sigma_coordinate import SigmaGrid
+    from tropoi.spatial.planet import Planet
+    from tropoi.spatial.environment import PlanetaryParameters
+    from tropoi.temporal.tendencies.primitive_equations import PrimitiveEquationsModel
+    from tropoi.spatial.sigma_coordinate import SigmaGrid
     planet = Planet.generate(
         params=PlanetaryParameters.from_earth_like(day_hours=day_hours),
         grid_type="latlon", nlat=32, nlon=64, l_max=l_max, grid_resolution=3)
@@ -48,14 +48,14 @@ def model():
 
 
 def _ic(model, scenario, amplitude=0.0):
-    from tropoi.run.pe.initial_conditions import make_pe_ic
+    from tropoi.spatial.initialization.pe import make_pe_ic
     return make_pe_ic(scenario, model, temperature=T0, surface_pressure=PS0,
                       thermal_amplitude=amplitude)
 
 
 def _run(model, out_dir, scenario, *, dt_seconds=300.0, t_end_s=1200.0,
          n_snapshots=3, amplitude=AMP, plots=("diagnostics",)):
-    from tropoi.run.engine import count_snapshot_times
+    from tropoi.temporal.integration import count_snapshot_times
     from tropoi.run.pe.runner import run_pe
     times = count_snapshot_times(n_snapshots, t_end_s)
     dt_snap = t_end_s / (n_snapshots - 1) if n_snapshots >= 2 else None
@@ -145,9 +145,9 @@ def test_thermal_wave_evolves_measurably_and_stays_valid(model, tmp_path):
 
 def test_invalid_initial_state_fails_loudly(model, tmp_path):
     import cupy as cp
-    from tropoi.physics.primitive_equations import (
-        PrimitiveEquationsState, PrimitiveEquationsStateError)
-    from tropoi.run.engine import count_snapshot_times
+    from tropoi.spatial.states.primitive_equations import PrimitiveEquationsState
+    from tropoi.spatial.states.primitive_equations import PrimitiveEquationsStateError
+    from tropoi.temporal.integration import count_snapshot_times
     from tropoi.run.pe.runner import run_pe
 
     bad = _ic(model, "isothermal_rest")

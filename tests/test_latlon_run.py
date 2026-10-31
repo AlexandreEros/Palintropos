@@ -12,8 +12,9 @@ except Exception:  # pragma: no cover - import guard
 pytestmark = pytest.mark.skipif(not _HAS_CUDA, reason="CUDA/CuPy not available")
 
 if _HAS_CUDA:
-    from tropoi.planet import Planet, PlanetaryParameters
-    from tropoi.run.bve.initial_conditions import make_ic
+    from tropoi.spatial.planet import Planet
+    from tropoi.spatial.environment import PlanetaryParameters
+    from tropoi.spatial.initialization.bve import make_ic
     from tropoi.run.bve.runner import run_bve
 
 

@@ -16,8 +16,10 @@ import pytest
 # a module that fails to import.
 pytest.importorskip("cupy", reason="CUDA/CuPy not available")
 
-from tropoi.run.pe.initial_conditions import (
-    PE_INITIAL_CONDITIONS, THERMAL_WAVE_DEGREE, THERMAL_WAVE_ORDER, make_pe_ic)
+from tropoi.spatial.initialization.pe import PE_INITIAL_CONDITIONS
+from tropoi.spatial.initialization.pe import THERMAL_WAVE_DEGREE
+from tropoi.spatial.initialization.pe import THERMAL_WAVE_ORDER
+from tropoi.spatial.initialization.pe import make_pe_ic
 
 T0 = 260.0
 PS0 = 101325.0
@@ -39,10 +41,10 @@ pytestmark = pytest.mark.skipif(not _has_cuda(),
 
 def _make_model(grid_type="latlon", nlat=32, nlon=64, l_max=15, resolution=3,
                 nlev=5):
-    from tropoi.planet import Planet, PlanetaryParameters
-    from tropoi.physics.primitive_equations import (
-        PrimitiveEquationsModel)
-    from tropoi.physics.sigma_coordinate import SigmaGrid
+    from tropoi.spatial.planet import Planet
+    from tropoi.spatial.environment import PlanetaryParameters
+    from tropoi.temporal.tendencies.primitive_equations import PrimitiveEquationsModel
+    from tropoi.spatial.sigma_coordinate import SigmaGrid
     planet = Planet.generate(
         params=PlanetaryParameters.from_earth_like(day_hours=24.0),
         grid_type=grid_type, nlat=nlat, nlon=nlon, l_max=l_max,

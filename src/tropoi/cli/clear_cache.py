@@ -1,7 +1,6 @@
 """Clear the CuPy kernel cache and verify kernel compilation.
 
-``tropoi recompile`` is the canonical interface; ``psx-recompile`` is a
-compatibility alias. Output is plain ASCII so legacy Windows code pages
+Invoked by ``tropoi recompile``. Output is plain ASCII so legacy Windows code pages
 (CP1252) can print it, and ``--help`` shows help instead of touching the
 cache. CuPy is imported only when the command actually runs.
 """
@@ -17,15 +16,6 @@ def add_arguments(parser: argparse.ArgumentParser) -> None:
         "--skip-verify", action="store_true",
         help="Only clear the on-disk kernel cache and CuPy memory pools; "
              "skip the kernel recompilation check.")
-
-
-def build_parser(prog: str = "psx-recompile") -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(
-        prog=prog,
-        description="Clear CuPy's kernel cache and verify that the "
-                    "spherical-harmonics kernel recompiles.")
-    add_arguments(parser)
-    return parser
 
 
 def clear_cupy_cache(cp) -> None:
@@ -80,12 +70,3 @@ def run(args: argparse.Namespace) -> int:
     if not args.skip_verify:
         verify_kernel_source(cp)
     return 0
-
-
-def main() -> int:
-    """psx-recompile == tropoi recompile."""
-    return run(build_parser().parse_args())
-
-
-if __name__ == "__main__":
-    raise SystemExit(main())

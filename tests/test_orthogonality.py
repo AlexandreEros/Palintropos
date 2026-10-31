@@ -14,7 +14,8 @@ pytest.importorskip("cupy", reason="CUDA/CuPy not available")
 
 import cupy as cp
 
-from tropoi.numerics import GeodesicGridGeometry, GeodesicSphericalHarmonics
+from tropoi.spatial.grids.geodesic_grid import GeodesicGridGeometry
+from tropoi.spatial.transforms.optimized_geodesic_sh import GeodesicSphericalHarmonics
 
 
 def test_basis_orthogonality(l_max=5, resolution=4):

@@ -1,10 +1,4 @@
-"""Console-script wiring of the ``palintropos`` distribution.
-
-``tropoi`` is the canonical command; ``aeolus`` and the ``psx-*`` commands are
-compatibility entry points that must resolve to the *same* callables rather
-than to a parallel implementation. Skipped when the distribution is not
-installed (e.g. a bare ``PYTHONPATH=src`` checkout).
-"""
+"""The installed distribution exposes only the canonical tropoi command."""
 from __future__ import annotations
 
 from importlib.metadata import PackageNotFoundError, distribution
@@ -15,10 +9,6 @@ DISTRIBUTION = "palintropos"
 
 EXPECTED = {
     "tropoi": "tropoi.cli.main:main",
-    "aeolus": "tropoi.cli.main:main",
-    "psx-bve": "tropoi.cli.bve:main",
-    "psx-gen": "tropoi.cli.generate_planet:main",
-    "psx-recompile": "tropoi.cli.clear_cache:main",
 }
 
 
@@ -41,9 +31,7 @@ def test_console_script_targets(console_scripts, name, target):
     assert console_scripts[name].value == target
 
 
-def test_aeolus_alias_is_the_same_callable(console_scripts):
-    """The retained alias must delegate, not duplicate."""
+def test_tropoi_entry_point_loads_main(console_scripts):
     from tropoi.cli.main import main
 
-    assert console_scripts["aeolus"].load() is main
     assert console_scripts["tropoi"].load() is main

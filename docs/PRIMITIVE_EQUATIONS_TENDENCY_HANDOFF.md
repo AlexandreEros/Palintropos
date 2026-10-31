@@ -205,7 +205,7 @@ per-level monopoles, T > 0 envelope, finite exp(ln p_s)).
    resting-atmosphere multi-step bit-stability test.
 6. Normal-mode test (invariant 3) and short-run drift report (invariant 4).
 7. `PERunConfig` / runner / diagnostics recorder / `tropoi run pe` CLI —
-   mirror `run/swe/*` and the shared `cli/run_lifecycle.py`; sigma
+   mirror `run/swe/*` and the shared `run/lifecycle.py`; sigma
    interfaces join the run-identity config dict.
 
 ## 4. Unresolved items (explicitly NOT decided here)

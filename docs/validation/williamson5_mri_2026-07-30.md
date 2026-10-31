@@ -5,8 +5,7 @@
 > pinned commits, artifact filenames, and the `aeolus run swe` command lines
 > below are retained for provenance: they record what was actually executed
 > at commit `668e6c9a`, before the rename. The equivalent command today is
-> `tropoi run swe` with identical flags, and `aeolus` remains installed as a
-> compatibility alias.
+> `tropoi run swe` with identical flags. The `aeolus` command has been retired.
 
 **Status: accepted.** Aeolus integrates the corrected canonical Williamson-5
 initial-value problem, passes the day-zero physical contract at T42 and T63,

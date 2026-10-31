@@ -384,7 +384,7 @@ def _swe_fields(gravity, mean_depth_m) -> tuple[FieldSpec, ...]:
             "geopotential is Phi = g*h = Phi0 + phi with Phi0 = gravity * "
             f"mean_depth_m = {gravity} * {mean_depth_m}; the free-surface "
             "geopotential adds the fixed surface geopotential phi_s over "
-            "topography (physics/shallow_water.py)",
+            "topography (temporal/tendencies/shallow_water.py)",
             rows=(2, 3)),
     )
 
@@ -692,7 +692,7 @@ def high_l_enstrophy_fraction_definition(l_max: int) -> dict:
         "per_degree": "Z_l = 1/2 R^2 sum_m P_lm",
         "denominator": "sum over ALL degrees 0..l_max of Z_l",
         "zero_power": "0.0 when the denominator is zero",
-        "source": "run/bve/diagnostics.py::spectral_diagnostics",
+        "source": "representation/diagnostics/bve.py::spectral_diagnostics",
     }
 
 
@@ -702,11 +702,11 @@ def diagnostic_definitions_for(solver: str, run_config: Mapping) -> dict:
         raise SchemaError(f"unknown solver {solver!r}")
     columns, meanings, source = {
         "bve": (BVE_DIAGNOSTIC_COLUMNS, _BVE_COLUMN_MEANINGS,
-                "run/bve/diagnostics.py"),
+                "representation/diagnostics/bve.py"),
         "swe": (SWE_DIAGNOSTIC_COLUMNS, _SWE_COLUMN_MEANINGS,
-                "run/swe/diagnostics.py"),
+                "representation/diagnostics/swe.py"),
         "pe": (PE_DIAGNOSTIC_COLUMNS, _PE_COLUMN_MEANINGS,
-               "run/pe/diagnostics.py"),
+               "representation/diagnostics/pe.py"),
     }[solver]
     block = {
         "version": DIAGNOSTIC_DEFINITIONS_VERSION,

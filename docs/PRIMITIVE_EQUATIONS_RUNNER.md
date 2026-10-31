@@ -51,7 +51,7 @@ finite response (a nonzero divergence field), not a balanced flow.
 **Supported resolution.** `lmax >= 2` stores the `(2, 2)` mode, but a nonzero
 `--thermal-amplitude` additionally requires `lmax >= 3` so that degree 2 lies
 inside the 2/3 product cut (`product_truncation_cut(lmax) >= 2`,
-`tropoi.support`). At `lmax = 2` the cut is 1: the temperature perturbation
+`tropoi.spatial.truncation`). At `lmax = 2` the cut is 1: the temperature perturbation
 is then frozen for all time (its nonlinear products are discarded and the dry
 core applies no other term to it) while only the divergence responds to the
 exact hydrostatic forcing, which is not the advertised smooth response

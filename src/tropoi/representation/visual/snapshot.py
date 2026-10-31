@@ -161,16 +161,16 @@ def build_resources(storage) -> SnapshotResources:
     run_config = storage.run_config
     try:
         if solver == "bve":
-            from tropoi.cli.bve import build_planet
+            from tropoi.run.bve.model import build_planet
             planet = build_planet(run_config)
             return SnapshotResources(solver, planet)
         if solver == "swe":
-            from tropoi.cli.swe import build_swe_model
+            from tropoi.run.swe.model import build_swe_model
             model = build_swe_model(
                 run_config, topography_lm=_custom_terrain(storage))
             return SnapshotResources(solver, model.planet, model)
         if solver == "pe":
-            from tropoi.cli.pe import build_pe_model
+            from tropoi.run.pe.model import build_pe_model
             model = build_pe_model(
                 run_config, topography_lm=_prepared_terrain(storage))
             return SnapshotResources(solver, model.planet, model)

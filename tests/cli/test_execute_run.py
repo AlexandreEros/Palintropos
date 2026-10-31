@@ -11,18 +11,16 @@ import types
 
 import pytest
 
-import tropoi.cli.bve as bve
-import tropoi.run.bve.io as io
+import tropoi.run.bve.execution as bve
+import tropoi.representation.archive.writer as io
 from tropoi.run.bve.config import BVERunConfig
-from tropoi.run.bve.io import (
-    RUN_STATUS_COMPLETED,
-    RUN_STATUS_FAILED,
-    RUN_STATUS_RUNNING,
-    RunDirectory,
-    RunProvenanceError,
-    update_manifest_status,
-    write_run_manifest,
-)
+from tropoi.representation.archive.writer import RUN_STATUS_COMPLETED
+from tropoi.representation.archive.writer import RUN_STATUS_FAILED
+from tropoi.representation.archive.writer import RUN_STATUS_RUNNING
+from tropoi.representation.archive.writer import RunDirectory
+from tropoi.representation.archive.writer import RunProvenanceError
+from tropoi.representation.archive.writer import update_manifest_status
+from tropoi.representation.archive.writer import write_run_manifest
 
 
 # ---------------------------------------------------------------------------
@@ -124,13 +122,12 @@ def test_latest_pointer_publish_requires_matching_completed_manifest(
 # ---------------------------------------------------------------------------
 
 def test_execute_run_forwards_snapshot_mode_to_runner(monkeypatch, tmp_path):
-    """psx-bve interval config must arrive at run_bve as snapshot_mode='interval'."""
+    """Explicit interval config must arrive at run_bve as snapshot_mode='interval'."""
     pytest.importorskip("cupy", reason="tropoi.spatial.planet and "
                         "tropoi.run.bve.runner import CuPy at module scope")
-    # the CLI resolves Planet from its canonical module (the legacy
-    # tropoi.planet package re-exports the same class)
+    # Patch the implementation module used by the CLI.
     import tropoi.spatial.planet as planet_mod
-    import tropoi.run.bve.initial_conditions as ic_mod
+    import tropoi.spatial.initialization.bve as ic_mod
     import tropoi.run.bve.runner as runner_mod
 
     captured = {}
@@ -151,8 +148,8 @@ def test_execute_run_forwards_snapshot_mode_to_runner(monkeypatch, tmp_path):
                         lambda **kw: captured.update(kw) or 0)
 
     cfg = BVERunConfig.resolve(
-        {"out": str(tmp_path / "runs"), "duration_days": 1.1},
-        snapshot_default="interval")
+        {"out": str(tmp_path / "runs"), "duration_days": 1.1,
+         "dt_snapshots": 21600.0})
     assert cfg.snapshot_mode == "interval"
     assert bve.execute_run(cfg) == 0
     assert captured["snapshot_mode"] == "interval"
@@ -162,10 +159,9 @@ def test_execute_run_forwards_snapshot_mode_to_runner(monkeypatch, tmp_path):
 def test_execute_run_forwards_count_mode_to_runner(monkeypatch, tmp_path):
     pytest.importorskip("cupy", reason="tropoi.spatial.planet and "
                         "tropoi.run.bve.runner import CuPy at module scope")
-    # the CLI resolves Planet from its canonical module (the legacy
-    # tropoi.planet package re-exports the same class)
+    # Patch the implementation module used by the CLI.
     import tropoi.spatial.planet as planet_mod
-    import tropoi.run.bve.initial_conditions as ic_mod
+    import tropoi.spatial.initialization.bve as ic_mod
     import tropoi.run.bve.runner as runner_mod
 
     captured = {}

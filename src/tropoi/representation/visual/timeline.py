@@ -48,10 +48,6 @@ class FigureFrame:
         object.__setattr__(self, "time_seconds", time)
 
 
-# A convenient spelling for callers that think in terms of frames first.
-TimelineFrame = FigureFrame
-
-
 @dataclass(frozen=True)
 class FigureTimeline:
     """An ordered sequence of figures with shared normalization semantics.
@@ -573,18 +569,12 @@ def render_snapshot_product(
     return published_paths
 
 
-# Short alias for callers that already establish the figure nature in context.
-render_timeline = render_figure_timeline
-
-
 __all__ = [
     "build_timeline_overview",
     "resolve_figure_normalizations",
     "FigureFrame",
     "FigureTimeline",
-    "TimelineFrame",
     "render_figure_timeline",
     "render_snapshot_product",
-    "render_timeline",
     "select_representative_frame_indices",
 ]

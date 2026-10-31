@@ -71,7 +71,7 @@ def test_swe_plot_selection_is_deduplicated_and_canonical():
 
 
 def test_swe_config_dict_feeds_run_id():
-    from tropoi.run.bve.io import make_run_id
+    from tropoi.representation.archive.writer import make_run_id
     from tropoi.run.swe.config import SWERunConfig
 
     cfg = SWERunConfig.resolve({"grid": "gauss-latlon", "nlat": 16,
@@ -112,7 +112,7 @@ def test_swe_interval_run_ids_disambiguate_physics():
     legacy BVE id format — configs differing only in physics (e.g. gravity)
     must get distinct ids."""
     from datetime import datetime, timezone
-    from tropoi.run.bve.io import make_run_id
+    from tropoi.representation.archive.writer import make_run_id
     from tropoi.run.swe.config import SWERunConfig
 
     now = datetime(2026, 1, 1, tzinfo=timezone.utc)
@@ -141,10 +141,11 @@ def test_swe_interval_run_ids_disambiguate_physics():
 @pytest.mark.skipif(not _has_cuda(), reason="CUDA/CuPy not available")
 def test_swe_runner_end_to_end(tmp_path):
     import numpy as np
-    from tropoi.planet import Planet, PlanetaryParameters
-    from tropoi.physics.shallow_water import ShallowWaterModel
-    from tropoi.run.engine import count_snapshot_times
-    from tropoi.run.swe.initial_conditions import make_swe_ic
+    from tropoi.spatial.planet import Planet
+    from tropoi.spatial.environment import PlanetaryParameters
+    from tropoi.temporal.tendencies.shallow_water import ShallowWaterModel
+    from tropoi.temporal.integration import count_snapshot_times
+    from tropoi.spatial.initialization.swe import make_swe_ic
     from tropoi.run.swe.runner import run_swe
 
     planet = Planet.generate(
@@ -188,10 +189,11 @@ def test_swe_runner_end_to_end(tmp_path):
 @pytest.mark.skipif(not _has_cuda(), reason="CUDA/CuPy not available")
 def test_swe_runner_generates_final_summary_from_persisted_state(tmp_path):
     import matplotlib.image as mpimg
-    from tropoi.planet import Planet, PlanetaryParameters
-    from tropoi.physics.shallow_water import ShallowWaterModel
-    from tropoi.run.engine import count_snapshot_times
-    from tropoi.run.swe.initial_conditions import make_swe_ic
+    from tropoi.spatial.planet import Planet
+    from tropoi.spatial.environment import PlanetaryParameters
+    from tropoi.temporal.tendencies.shallow_water import ShallowWaterModel
+    from tropoi.temporal.integration import count_snapshot_times
+    from tropoi.spatial.initialization.swe import make_swe_ic
     from tropoi.run.swe.runner import run_swe
 
     planet = Planet.generate(
@@ -218,10 +220,11 @@ def test_swe_geodesic_mass_diagnostic_exactly_conserved(tmp_path):
     """Audit finding 5: total_mass is the spectrally computed conserved
     quantity, so it must be exactly constant even on the geodesic backend
     (whose grid quadrature would show spurious ~1e-7 drift)."""
-    from tropoi.planet import Planet, PlanetaryParameters
-    from tropoi.physics.shallow_water import ShallowWaterModel
-    from tropoi.run.engine import count_snapshot_times
-    from tropoi.run.swe.initial_conditions import make_swe_ic
+    from tropoi.spatial.planet import Planet
+    from tropoi.spatial.environment import PlanetaryParameters
+    from tropoi.temporal.tendencies.shallow_water import ShallowWaterModel
+    from tropoi.temporal.integration import count_snapshot_times
+    from tropoi.spatial.initialization.swe import make_swe_ic
     from tropoi.run.swe.runner import run_swe
 
     planet = Planet.generate(
@@ -271,7 +274,7 @@ def test_swe_cli_end_to_end(tmp_path, capsys):
 
 
 def test_swe_overwrite_cleanup_removes_snapshot_product(tmp_path):
-    from tropoi.cli import swe
+    from tropoi.run.swe import execution as swe
 
     snapshots = tmp_path / "snapshots" / "physical"
     snapshots.mkdir(parents=True)
@@ -318,7 +321,8 @@ def test_swe_config_scenario_support_boundary(scenario, lmax, accepted):
 
 
 def test_swe_support_table_covers_every_scenario():
-    from tropoi.run.swe.config import SWE_SCENARIOS, SWE_SCENARIO_SUPPORT
+    from tropoi.run.swe.config import SWE_SCENARIOS
+    from tropoi.spatial.truncation import SWE_SCENARIO_SUPPORT
     assert set(SWE_SCENARIO_SUPPORT) == set(SWE_SCENARIOS)
 
 
@@ -332,9 +336,10 @@ def test_swe_williamson2_retained_degree_message_names_the_remedy():
 @pytest.mark.parametrize("scenario,lmax,accepted", SUPPORT_CASES)
 def test_swe_factory_mirrors_the_config_support_boundary(scenario, lmax,
                                                          accepted):
-    from tropoi.physics.shallow_water import ShallowWaterModel
-    from tropoi.planet import Planet, PlanetaryParameters
-    from tropoi.run.swe.initial_conditions import make_swe_ic
+    from tropoi.temporal.tendencies.shallow_water import ShallowWaterModel
+    from tropoi.spatial.planet import Planet
+    from tropoi.spatial.environment import PlanetaryParameters
+    from tropoi.spatial.initialization.swe import make_swe_ic
 
     planet = Planet.generate(
         params=PlanetaryParameters.from_earth_like(day_hours=23.9345),

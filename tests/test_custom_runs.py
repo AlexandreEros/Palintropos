@@ -60,7 +60,7 @@ def _assert_same_trajectory(preset, custom, coefficient_file, time_file):
 # ---------------------------------------------------------------------------
 
 def test_bve_preset_versus_reloaded_trajectory(tmp_path):
-    from tropoi.cli.bve import execute_run
+    from tropoi.run.bve.execution import execute_run
     from tropoi.representation.archive import resolve_run_directory
     from tropoi.run.bve.config import BVERunConfig
     from tropoi.run.custom import (initial_state_from_config,
@@ -84,7 +84,7 @@ def test_bve_preset_versus_reloaded_trajectory(tmp_path):
 
 
 def test_williamson5_preset_versus_reloaded_trajectory(tmp_path):
-    from tropoi.cli.swe import execute_run
+    from tropoi.run.swe.execution import execute_run
     from tropoi.representation.archive import resolve_run_directory
     from tropoi.run.custom import (initial_state_from_config,
                                    load_initial_state, run_initial_state)
@@ -118,7 +118,7 @@ def test_williamson5_preset_versus_reloaded_trajectory(tmp_path):
 
 
 def test_mountain_flow_preset_versus_reloaded_trajectory(tmp_path):
-    from tropoi.cli.swe import execute_run
+    from tropoi.run.swe.execution import execute_run
     from tropoi.representation.archive import resolve_run_directory
     from tropoi.run.custom import (initial_state_from_config,
                                    load_initial_state, run_initial_state)
@@ -153,7 +153,7 @@ def _rh_like_vorticity(l_max, radius):
 
 
 def test_custom_bve_planet_smoke(tmp_path):
-    from tropoi.cli.bve import build_planet
+    from tropoi.run.bve.model import build_planet
     from tropoi.representation.archive import open_simulation
     from tropoi.run.custom import (DiscretizationSpec, InitialState,
                                    PlanetSpec, load_initial_state,

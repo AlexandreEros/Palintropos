@@ -156,9 +156,9 @@ Package names:
 | Python import | `tropoi` |
 | Command-line tool | `tropoi` |
 
-`aeolus`, `psx-bve`, `psx-gen`, and `psx-recompile` still work as
-compatibility commands from the project's time as *Aeolus*. The old
-`planetary_sandbox` import path does not.
+Use `tropoi` for all commands. The former `aeolus` and `psx-*` commands and
+the pre-reorganization Python import paths have been retired; see the
+[migration table](docs/ARCHITECTURE.md#retired-compatibility-paths).
 
 ## Quick start
 

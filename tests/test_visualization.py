@@ -8,21 +8,24 @@ import matplotlib.image as mpimg
 import numpy as np
 import pytest
 
-from tropoi.viz.fields import (ScalarGridField,
-                                           SphericalHarmonicField)
-from tropoi.viz.matplotlib_renderer import MatplotlibRenderer
-from tropoi.viz.normalization import (NormalizationKind,
-                                                  NormalizationPolicy)
-from tropoi.viz.specs import (ScalarMapSpec,
-                                         SpectralCoefficientMapSpec,
-                                         SpectralEncoding,
-                                         FigureSpec, PanelGroupSpec,
-                                         PanelPlacement, StreamlineMapSpec,
-                                         TextPanelSpec)
-from tropoi.viz.timeline import (FigureFrame, FigureTimeline,
-                                             render_figure_timeline,
-                                             render_snapshot_product,
-                                             select_representative_frame_indices)
+from tropoi.representation.visual.fields import ScalarGridField
+from tropoi.representation.visual.fields import SphericalHarmonicField
+from tropoi.representation.visual.matplotlib_renderer import MatplotlibRenderer
+from tropoi.representation.visual.normalization import NormalizationKind
+from tropoi.representation.visual.normalization import NormalizationPolicy
+from tropoi.representation.visual.specs import ScalarMapSpec
+from tropoi.representation.visual.specs import SpectralCoefficientMapSpec
+from tropoi.representation.visual.specs import SpectralEncoding
+from tropoi.representation.visual.specs import FigureSpec
+from tropoi.representation.visual.specs import PanelGroupSpec
+from tropoi.representation.visual.specs import PanelPlacement
+from tropoi.representation.visual.specs import StreamlineMapSpec
+from tropoi.representation.visual.specs import TextPanelSpec
+from tropoi.representation.visual.timeline import FigureFrame
+from tropoi.representation.visual.timeline import FigureTimeline
+from tropoi.representation.visual.timeline import render_figure_timeline
+from tropoi.representation.visual.timeline import render_snapshot_product
+from tropoi.representation.visual.timeline import select_representative_frame_indices
 
 
 LATITUDES = np.array([np.pi / 2.0, 0.0, -np.pi / 2.0])
@@ -441,7 +444,7 @@ def test_snapshot_product_publication_failure_rolls_back_directory(
     old.parent.mkdir(parents=True)
     old.write_bytes(b"old-product")
 
-    from tropoi.viz import timeline as timeline_module
+    import tropoi.representation.visual.timeline as timeline_module
     real_replace = timeline_module.os.replace
 
     def fail_final_directory_publish(source, destination):
@@ -501,8 +504,8 @@ def _write_fake_swe_artifacts(path):
 
 def test_swe_summary_titles_units_shape_and_nonempty_image(tmp_path):
     pytest.importorskip("cupy", reason=_MAP_VIEW_NEEDS_CUPY)
-    from tropoi.run.swe.visualization import (
-        build_swe_summary_spec, render_swe_summary)
+    from tropoi.representation.visual.swe import build_swe_summary_spec
+    from tropoi.representation.visual.swe import render_swe_summary
 
     _write_fake_swe_artifacts(tmp_path)
     specification = build_swe_summary_spec(_FakeSWEModel(), tmp_path)
@@ -530,9 +533,9 @@ def test_swe_summary_titles_units_shape_and_nonempty_image(tmp_path):
 
 def test_swe_snapshot_timeline_uses_persisted_times_and_shared_limits(tmp_path):
     pytest.importorskip("cupy", reason=_MAP_VIEW_NEEDS_CUPY)
-    from tropoi.run.swe.visualization import (
-        build_swe_snapshot_timeline, build_swe_snapshot_timelines,
-        render_swe_snapshots)
+    from tropoi.representation.visual.swe import build_swe_snapshot_timeline
+    from tropoi.representation.visual.swe import build_swe_snapshot_timelines
+    from tropoi.representation.visual.swe import render_swe_snapshots
 
     _write_fake_swe_artifacts(tmp_path)
     timeline = build_swe_snapshot_timeline(
@@ -615,9 +618,10 @@ class _FakeBVEPlanet:
 
 def test_bve_snapshot_timeline_reloads_persisted_artifacts(tmp_path):
     pytest.importorskip("cupy", reason=_MAP_VIEW_NEEDS_CUPY)
-    from tropoi.run.bve.visualization import (
-        BVE_SNAPSHOT_TIMES_FILENAME, build_bve_snapshot_timeline,
-        build_bve_snapshot_timelines, render_bve_snapshots)
+    from tropoi.representation.visual.bve import BVE_SNAPSHOT_TIMES_FILENAME
+    from tropoi.representation.visual.bve import build_bve_snapshot_timeline
+    from tropoi.representation.visual.bve import build_bve_snapshot_timelines
+    from tropoi.representation.visual.bve import render_bve_snapshots
 
     coefficients = np.zeros((2, 3, 3), dtype=np.complex128)
     coefficients[0, 1, 0] = 1.0
@@ -665,9 +669,9 @@ def test_bve_snapshot_timeline_reloads_persisted_artifacts(tmp_path):
 def test_swe_visualization_failure_prevents_completion_and_publication(
         tmp_path, monkeypatch):
     pytest.importorskip("cupy", reason=_MAP_VIEW_NEEDS_CUPY)
-    from tropoi.cli import swe
+    from tropoi.run.swe import execution as swe
     from tropoi.run.swe.config import SWERunConfig
-    from tropoi.run.swe.visualization import render_swe_summary
+    from tropoi.representation.visual.swe import render_swe_summary
 
     class FailingRenderer:
         def render_figure(self, specification, output_path, *, metadata=None):

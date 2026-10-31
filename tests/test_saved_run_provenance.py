@@ -26,11 +26,12 @@ from tropoi.representation.archive.schema import (
     high_l_enstrophy_fraction_definition, provenance_blocks,
     state_schema_for)
 from tropoi.run.bve.config import BVERunConfig
-from tropoi.run.bve.io import _config_hash, make_run_id
+from tropoi.representation.archive.writer import _config_hash
+from tropoi.representation.archive.writer import make_run_id
 from tropoi.run.pe.config import PERunConfig
 from tropoi.run.swe.config import SWERunConfig
 from tropoi.spatial.modes import ZERO_MEAN_MONOPOLE_RTOL
-from tropoi.support import product_truncation_cut
+from tropoi.spatial.truncation import product_truncation_cut
 
 NOW = datetime(2026, 7, 19, 12, 0, 0, tzinfo=timezone.utc)
 COMMIT = "abcdef12"
@@ -93,12 +94,12 @@ def _stub_solver(coeffs_name, times_name, frames_shape):
 
 
 @pytest.mark.parametrize("solver,module_name,cfg,coeffs_name,times_name,rows", [
-    ("bve", "tropoi.cli.bve", {"n_snapshots": 2, "lmax": 5},
+    ("bve", "tropoi.run.bve.execution", {"n_snapshots": 2, "lmax": 5},
      "vorticity_coeffs.npy", "bve_snapshot_times.npy", None),
-    ("swe", "tropoi.cli.swe", {"scenario": "williamson2", "n_snapshots": 2,
+    ("swe", "tropoi.run.swe.execution", {"scenario": "williamson2", "n_snapshots": 2,
                                "lmax": 5}, "swe_coeffs.npy",
      "swe_snapshot_times.npy", 3),
-    ("pe", "tropoi.cli.pe", {"scenario": "thermal_wave", "n_snapshots": 2,
+    ("pe", "tropoi.run.pe.execution", {"scenario": "thermal_wave", "n_snapshots": 2,
                              "lmax": 5, "sigma_interfaces": [0.0, 0.3, 1.0]},
      "pe_coeffs.npy", "pe_snapshot_times.npy", 7),
 ])
@@ -154,8 +155,9 @@ def test_lifecycle_writes_versioned_blocks_the_reader_consumes(
 
 
 def test_status_rewrite_preserves_blocks(tmp_path):
-    from tropoi.run.bve.io import (RUN_STATUS_COMPLETED, update_manifest_status,
-                                   write_run_manifest)
+    from tropoi.representation.archive.writer import RUN_STATUS_COMPLETED
+    from tropoi.representation.archive.writer import update_manifest_status
+    from tropoi.representation.archive.writer import write_run_manifest
     run_config = SWERunConfig.resolve({"scenario": "williamson2"}).to_run_config_dict()
     write_run_manifest(tmp_path, run_config, run_id="x",
                        **provenance_blocks("swe", run_config))
@@ -166,7 +168,7 @@ def test_status_rewrite_preserves_blocks(tmp_path):
 
 
 def test_manifest_without_blocks_is_still_written_for_legacy_callers(tmp_path):
-    from tropoi.run.bve.io import write_run_manifest
+    from tropoi.representation.archive.writer import write_run_manifest
     write_run_manifest(tmp_path, {"scenario": "rh4"}, run_id="x")
     manifest = json.loads((tmp_path / "manifest.json").read_text(encoding="utf-8"))
     assert "state_schema" not in manifest
@@ -189,9 +191,9 @@ def _cupy_available():
 @pytest.mark.skipif(not _cupy_available(),
                     reason="diagnostics modules import CuPy at import time")
 def test_diagnostic_columns_match_the_recorders():
-    from tropoi.run.bve.diagnostics import CSV_COLUMNS
-    from tropoi.run.pe.diagnostics import PE_CSV_COLUMNS
-    from tropoi.run.swe.diagnostics import SWE_CSV_COLUMNS
+    from tropoi.representation.diagnostics.bve import CSV_COLUMNS
+    from tropoi.representation.diagnostics.pe import PE_CSV_COLUMNS
+    from tropoi.representation.diagnostics.swe import SWE_CSV_COLUMNS
     assert tuple(CSV_COLUMNS) == BVE_DIAGNOSTIC_COLUMNS
     assert tuple(SWE_CSV_COLUMNS) == SWE_DIAGNOSTIC_COLUMNS
     assert tuple(PE_CSV_COLUMNS) == PE_DIAGNOSTIC_COLUMNS
@@ -200,8 +202,8 @@ def test_diagnostic_columns_match_the_recorders():
 @pytest.mark.skipif(not _cupy_available(),
                     reason="physics cores import CuPy at import time")
 def test_monopole_tolerance_matches_the_cores():
-    from tropoi.physics.primitive_equations import PrimitiveEquationsModel
-    from tropoi.physics.shallow_water import ShallowWaterModel
+    from tropoi.temporal.tendencies.primitive_equations import PrimitiveEquationsModel
+    from tropoi.temporal.tendencies.shallow_water import ShallowWaterModel
     assert ShallowWaterModel._MONOPOLE_RTOL == ZERO_MEAN_MONOPOLE_RTOL
     assert PrimitiveEquationsModel._MONOPOLE_RTOL == ZERO_MEAN_MONOPOLE_RTOL
 
@@ -209,8 +211,8 @@ def test_monopole_tolerance_matches_the_cores():
 @pytest.mark.skipif(not _cupy_available(),
                     reason="physics cores import CuPy at import time")
 def test_swe_stack_indices_match_the_core_everywhere():
-    from tropoi.physics import shallow_water
-    from tropoi.run.swe import visualization
+    import tropoi.temporal.tendencies.shallow_water as shallow_water
+    import tropoi.representation.visual.swe as visualization
     assert (visualization.ZETA, visualization.DELTA, visualization.PHI) ==         (shallow_water.ZETA, shallow_water.DELTA, shallow_water.PHI)
     schema = state_schema_for("swe", SWERunConfig.resolve(
         {"scenario": "williamson2"}).to_run_config_dict())

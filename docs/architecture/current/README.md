@@ -5,18 +5,20 @@
 
 | | |
 |---|---|
-| Source commit | not recorded (working tree at generation time) |
+| Source commit | `5555f930d1f062ca92eaf1f3d447a6b8260881f5` |
 | Analysed package | `tropoi` under `src/` |
 | Generator | `tools.architecture` 1.0.0 |
 | Toolchain | Python 3.12, grimp 3.17, networkx 3.7 |
-| Command | `python -m tools.architecture.generate` |
+| Command | `python -m tools.architecture.generate --source-commit 5555f930d1f062ca92eaf1f3d447a6b8260881f5` |
+
+Source working tree: **clean**. Content SHA-256: `25a92a1f509e4ae0691711599dbee90f57f82a98eb71fbbd4a0cd971999259c0`. Generator working tree: **clean**. Per-file hashes and scoped Git status are recorded in `metrics.json`. These describe generation time; --check verifies source and generator content hashes before reusing this context across later commits. The base commit alone does not identify uncommitted source.
 
 ## Reproducing
 
 From the repository root, with the development requirements installed (`pip install -r requirements-dev.txt`):
 
 ```bash
-python -m tools.architecture.generate
+python -m tools.architecture.generate --source-commit 5555f930d1f062ca92eaf1f3d447a6b8260881f5
 ```
 
 ## Files
@@ -30,7 +32,6 @@ python -m tools.architecture.generate
 | `calls/cli-run-pe.mmd` | Scoped static call graph (roots and depth: see *Call graphs* below). |
 | `calls/cli-run-swe.mmd` | Scoped static call graph (roots and depth: see *Call graphs* below). |
 | `classes.mmd` | Classes linked by inheritance between analysed classes, with their methods. |
-| `classes/tropoi.cli.mmd` | All classes of package `tropoi.cli`, with methods. |
 | `classes/tropoi.representation.archive.mmd` | All classes of package `tropoi.representation.archive`, with methods. |
 | `classes/tropoi.representation.diagnostics.mmd` | All classes of package `tropoi.representation.diagnostics`, with methods. |
 | `classes/tropoi.representation.visual.mmd` | All classes of package `tropoi.representation.visual`, with methods. |
@@ -53,7 +54,6 @@ python -m tools.architecture.generate
 | `graph/packages.json` | Package-aggregated import graph. |
 | `metrics.json` | All measurements, machine-readable. |
 | `metrics.md` | The same measurements as tables, with definitions. |
-| `modules-cycles.mmd` | Module-level import graph restricted to modules in import cycles (nontrivial SCCs). |
 | `modules.mmd` | Package-level import graph (modules collapsed onto their containing package). |
 
 Generated files contain no timestamps, absolute paths, or source line numbers, so they change only when the extracted structure changes (the call-site totals in `metrics.json` are the exception: they count call expressions).
@@ -68,11 +68,11 @@ The rules are generic path and syntax rules; none names a particular subpackage.
 4. Each module gets a syntactic category: `namespace` (a namespace package directory), `empty` (no statement besides a docstring), `reexport` (only imports, `__all__` assignments, and alias assignments `A = B`), or `code`. Categories are attributes, not filters, with one exception: a `namespace` or `empty` module that no analysed module imports is dropped from the module graph, because it has no code and no edges.
 5. Imports of modules outside the package are not graph edges; they are listed per module (`stdlib_imports`, `third_party_imports` in `graph/modules.json`).
 
-Modules discovered: 180; in the module graph: 159. Categories: code 154, empty 19, namespace 2, reexport 5.
+Modules discovered: 131; in the module graph: 111. Categories: code 109, empty 19, namespace 1, reexport 2.
 
-Excluded by rule 4: `tropoi`, `tropoi.cli`, `tropoi.numerics.cuda`, `tropoi.physics`, `tropoi.representation`, `tropoi.representation.diagnostics`, `tropoi.representation.visual`, `tropoi.run`, `tropoi.run.held_suarez`, `tropoi.run.pe`, `tropoi.run.swe`, `tropoi.spatial`, `tropoi.spatial.grids`, `tropoi.spatial.initialization`, `tropoi.spatial.operators`, `tropoi.spatial.states`, `tropoi.spatial.terrain`, `tropoi.spatial.transforms`, `tropoi.spatial.transforms.cuda`, `tropoi.temporal`, `tropoi.temporal.tendencies`.
+Excluded by rule 4: `tropoi`, `tropoi.cli`, `tropoi.representation`, `tropoi.representation.diagnostics`, `tropoi.representation.visual`, `tropoi.run`, `tropoi.run.bve`, `tropoi.run.held_suarez`, `tropoi.run.pe`, `tropoi.run.swe`, `tropoi.spatial`, `tropoi.spatial.grids`, `tropoi.spatial.initialization`, `tropoi.spatial.operators`, `tropoi.spatial.states`, `tropoi.spatial.terrain`, `tropoi.spatial.transforms`, `tropoi.spatial.transforms.cuda`, `tropoi.temporal`, `tropoi.temporal.tendencies`.
 
-`reexport` modules (kept): `tropoi.numerics`, `tropoi.planet`, `tropoi.representation.archive`, `tropoi.run.bve.barotropic_vorticity`, `tropoi.run.custom`.
+`reexport` modules (kept): `tropoi.representation.archive`, `tropoi.run.custom`.
 
 ## Extraction rules
 
@@ -80,7 +80,7 @@ Excluded by rule 4: `tropoi`, `tropoi.cli`, `tropoi.numerics.cuda`, `tropoi.phys
 
 * One edge A -> B when module A contains at least one `import` or `from ... import` statement that grimp resolves to module B of the package. `from pkg import name` resolves to the submodule `pkg.name` if one exists, otherwise to `pkg` itself.
 * Each edge records the scopes of its statements: `module` (runs when A is imported), `function` (inside a `def`, from the AST line spans of nested import statements), `type_checking` (under `if TYPE_CHECKING:`, found by rebuilding with grimp's `exclude_type_checking_imports=True` and taking the difference).
-* Not edges: dynamic imports (`importlib.import_module`, `__import__`, PEP 562 `__getattr__` tables), whose targets are strings. Their call sites are counted instead: `tropoi._compat` 1, `tropoi.representation.archive.writer` 1, `tropoi.run.bve` 1.
+* Not edges: dynamic imports (`importlib.import_module`, `__import__`, PEP 562 `__getattr__` tables), whose targets are strings. Their call sites are counted instead: `tropoi.representation.archive.writer` 1.
 * Safeguards: namespace subpackages are passed to grimp as additional roots (from the root alone grimp attributes imports of their modules to the root package); every edge grimp reports is cross-checked against the module names the import statement itself spells out (AST), and generation fails on a mismatch; the analysed package is never imported (asserted after extraction).
 * Not edges: the implicit execution of parent packages (`import a.b.c` runs `a/__init__` and `a/b/__init__`).
 * `modules.mmd` collapses modules onto their containing package; each edge label is the number of module edges merged into it. `modules-cycles.mmd` shows the modules of every nontrivial SCC; dashed edges there consist only of function-scope or `TYPE_CHECKING` imports.
@@ -95,7 +95,7 @@ Excluded by rule 4: `tropoi`, `tropoi.cli`, `tropoi.numerics.cuda`, `tropoi.phys
 
 ### Call graphs (ast)
 
-Each call expression inside a function or method body (nested functions, lambdas, and comprehensions are attributed to the enclosing function) is classified as `internal` (resolved to an analysed definition), `external` (resolved to a name outside the package), `builtin` (an unshadowed builtin), or `unresolved`. Totals: builtin 2743, external 1863, internal 2384, unresolved 2804.
+Each call expression inside a function or method body (nested functions, lambdas, and comprehensions are attributed to the enclosing function) is classified as `internal` (resolved to an analysed definition), `external` (resolved to a name outside the package), `builtin` (an unshadowed builtin), or `unresolved`. Totals: builtin 2730, external 1847, internal 2371, unresolved 2784.
 
 | Edge kind | Syntax | What it claims |
 |---|---|---|

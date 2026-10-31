@@ -28,10 +28,12 @@ import matplotlib.pyplot as plt
 import numpy as np
 from scipy.interpolate import griddata
 
-from tropoi.numerics.geodesic_grid import GeodesicGridGeometry
-from tropoi.numerics.latlon_grid import GaussLatLonGridGeometry
-from tropoi.planet import Planet, PlanetaryParameters
-from tropoi.run.bve.io import create_run_dir, write_run_manifest
+from tropoi.spatial.grids.geodesic_grid import GeodesicGridGeometry
+from tropoi.spatial.grids.latlon_grid import GaussLatLonGridGeometry
+from tropoi.spatial.planet import Planet
+from tropoi.spatial.environment import PlanetaryParameters
+from tropoi.representation.archive.writer import create_run_dir
+from tropoi.representation.archive.writer import write_run_manifest
 from tropoi.run.bve.runner import run_bve
 
 

@@ -114,7 +114,7 @@ def test_flat_pe_config_keeps_historical_schema_and_hash():
     topography keys), so existing scientific hashes and run ids remain
     valid for every configuration that does not request topography."""
     from datetime import datetime, timezone
-    from tropoi.run.bve.io import make_run_id
+    from tropoi.representation.archive.writer import make_run_id
     from tropoi.run.pe.config import PERunConfig
 
     cfg = PERunConfig.resolve({})
@@ -160,7 +160,7 @@ def test_orographic_scenario_is_registered():
 
 def test_mountain_pe_config_resolution_and_identity():
     from datetime import datetime, timezone
-    from tropoi.run.bve.io import make_run_id
+    from tropoi.representation.archive.writer import make_run_id
     from tropoi.run.pe.config import PERunConfig
 
     cfg = PERunConfig.resolve({"topography": "mountain"})
@@ -278,7 +278,8 @@ def test_inspect_shows_pe_topography(tmp_path, capsys):
 
 def _make_planet(grid_type="latlon", nlat=32, nlon=64, l_max=15,
                  resolution=3, day_hours=24.0):
-    from tropoi.planet import Planet, PlanetaryParameters
+    from tropoi.spatial.planet import Planet
+    from tropoi.spatial.environment import PlanetaryParameters
     return Planet.generate(
         params=PlanetaryParameters.from_earth_like(day_hours=day_hours),
         grid_type=grid_type, nlat=nlat, nlon=nlon, l_max=l_max,
@@ -300,17 +301,16 @@ def geodesic_planet():
 
 
 def _flat_model(planet, nlev=NLEV):
-    from tropoi.physics.primitive_equations import (
-        PrimitiveEquationsModel)
-    from tropoi.physics.sigma_coordinate import SigmaGrid
+    from tropoi.temporal.tendencies.primitive_equations import PrimitiveEquationsModel
+    from tropoi.spatial.sigma_coordinate import SigmaGrid
     return PrimitiveEquationsModel(planet, SigmaGrid.uniform(nlev))
 
 
 def _terrain_model(planet, nlev=NLEV):
-    from tropoi.physics.primitive_equations import (
-        PrimitiveEquationsModel, product_truncation_cut)
-    from tropoi.physics.sigma_coordinate import SigmaGrid
-    from tropoi.physics.topography import Topography
+    from tropoi.temporal.tendencies.primitive_equations import PrimitiveEquationsModel
+    from tropoi.spatial.truncation import product_truncation_cut
+    from tropoi.spatial.sigma_coordinate import SigmaGrid
+    from tropoi.spatial.terrain.topography import Topography
     # PE terrain is band-limited at the dealiased product-truncation cut
     # (the same construction the CLI performs; see cli/pe.py).
     topo = Topography.mountain(
@@ -322,7 +322,7 @@ def _terrain_model(planet, nlev=NLEV):
 
 
 def _orographic_state(model):
-    from tropoi.run.pe.initial_conditions import make_pe_ic
+    from tropoi.spatial.initialization.pe import make_pe_ic
     return make_pe_ic("orographic_isothermal_rest", model,
                       temperature=T0, surface_pressure=PS0)
 
@@ -368,9 +368,8 @@ def test_terrain_reaches_model_unchanged(latlon_planet, geodesic_planet):
 @requires_cuda
 def test_invalid_surface_geopotential_is_rejected(latlon_planet):
     import cupy as cp
-    from tropoi.physics.primitive_equations import (
-        PrimitiveEquationsModel)
-    from tropoi.physics.sigma_coordinate import SigmaGrid
+    from tropoi.temporal.tendencies.primitive_equations import PrimitiveEquationsModel
+    from tropoi.spatial.sigma_coordinate import SigmaGrid
     n = latlon_planet.sh.l_max + 1
     with pytest.raises(ValueError, match="shape"):
         PrimitiveEquationsModel(
@@ -390,10 +389,9 @@ def test_super_cut_terrain_is_rejected_loudly(latlon_planet):
     scientifically unsupported by the full-T PE tendency (its
     pressure-gradient force could never cancel there) and must be
     rejected loudly, never silently accepted or truncated."""
-    from tropoi.physics.primitive_equations import (
-        PrimitiveEquationsModel)
-    from tropoi.physics.sigma_coordinate import SigmaGrid
-    from tropoi.physics.topography import Topography
+    from tropoi.temporal.tendencies.primitive_equations import PrimitiveEquationsModel
+    from tropoi.spatial.sigma_coordinate import SigmaGrid
+    from tropoi.spatial.terrain.topography import Topography
     topo = Topography.mountain(latlon_planet, **MOUNTAIN)  # full l_max
     phi_full = topo.surface_geopotential_lm(GRAVITY)
     with pytest.raises(ValueError, match="dealiased product truncation"):
@@ -526,7 +524,7 @@ def test_orographic_imbalance_localizes_to_momentum_blocks(latlon_planet):
 
 def _run_orographic(model, out_dir, *, n_steps=5, n_snapshots=6):
     import pathlib
-    from tropoi.run.engine import count_snapshot_times
+    from tropoi.temporal.integration import count_snapshot_times
     from tropoi.run.pe.runner import run_pe
     state = _orographic_state(model)
     t_end = n_steps * DT
@@ -628,7 +626,7 @@ def test_zero_terrain_reduces_to_isothermal_rest(latlon_planet,
     isothermal_rest state, so every existing exact-rest guarantee
     transfers unchanged."""
     import cupy as cp
-    from tropoi.run.pe.initial_conditions import make_pe_ic
+    from tropoi.spatial.initialization.pe import make_pe_ic
     for planet in (latlon_planet, geodesic_planet):
         model = _flat_model(planet)
         orographic = make_pe_ic("orographic_isothermal_rest", model,
@@ -645,7 +643,7 @@ def test_snapshot_header_terrain_note(latlon_planet):
     """The per-snapshot figure header gains one terrain-context line for
     non-flat runs (derived from the model's own resolved Phi_s); flat
     runs keep the historical header byte-for-byte (note is None)."""
-    from tropoi.run.pe.snapshot_visualization import _terrain_note
+    from tropoi.representation.visual.pe_snapshots import _terrain_note
     model, _, _ = _terrain_model(latlon_planet)
     note = _terrain_note(model)
     assert note is not None and "Phi_s" in note

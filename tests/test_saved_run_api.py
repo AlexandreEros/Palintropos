@@ -602,8 +602,8 @@ def test_open_and_inspect_in_fresh_interpreter_is_cpu_safe(pe_capsule):
         "assert snap.metadata['schema']['fields'][2]['name'] == 'temperature'\n"
         f"banned = [m for m in {HEAVY_MODULES!r} if m in sys.modules]\n"
         "assert not banned, banned\n"
-        "assert 'tropoi.numerics' not in sys.modules\n"
-        "assert 'tropoi.physics.primitive_equations' not in sys.modules\n"
+        "assert 'tropoi.spatial.transforms' not in sys.modules\n"
+        "assert 'tropoi.temporal.tendencies.primitive_equations' not in sys.modules\n"
         # canonical homes of the numerics and cores (legacy names are aliases)
         "assert not [m for m in sys.modules if m.startswith(("
         "'tropoi.spatial.grids', 'tropoi.spatial.transforms', "

@@ -123,7 +123,8 @@ MEAN_DEPTH_CANON = H0 - C_CANON / (3.0 * GRAVITY) - CONE_MEAN_CANON
 def _make_w5_planet(grid_type="latlon", nlat=32, nlon=64, l_max=21,
                     resolution=4):
     """Ideal-sphere planet with the exact canonical radius and rotation."""
-    from tropoi.planet import Planet, PlanetaryParameters
+    from tropoi.spatial.planet import Planet
+    from tropoi.spatial.environment import PlanetaryParameters
     params = PlanetaryParameters.ideal_sphere(
         radius_m=A_CANON, sidereal_day_s=DAY_HOURS_CANON * 3600.0)
     return Planet.generate(
@@ -132,8 +133,8 @@ def _make_w5_planet(grid_type="latlon", nlat=32, nlon=64, l_max=21,
 
 
 def _make_w5_model(planet, *, cone=True, mean_depth=MEAN_DEPTH_CANON):
-    from tropoi.physics.shallow_water import ShallowWaterModel
-    from tropoi.physics.topography import Topography
+    from tropoi.temporal.tendencies.shallow_water import ShallowWaterModel
+    from tropoi.spatial.terrain.topography import Topography
     topo = Topography.williamson5_cone(planet) if cone else None
     return ShallowWaterModel(planet, gravity=GRAVITY, mean_depth=mean_depth,
                              topography=topo)
@@ -164,7 +165,7 @@ def test_ideal_sphere_parameters_are_exact():
 @requires_cuda
 def test_cone_analytic_center_peak_and_compact_support():
     import cupy as cp
-    from tropoi.physics.topography import williamson5_cone_elevation
+    from tropoi.spatial.terrain.topography import williamson5_cone_elevation
 
     lat = cp.asarray([LATC, LATC, LATC, 0.0, -LATC])
     lon = cp.asarray([LONC, LONC + 0.5 * R0, LONC + 1.5 * R0, LONC, LONC])
@@ -183,7 +184,7 @@ def test_cone_uses_coordinate_plane_distance_not_great_circle():
     distance |dlambda| but great-circle distance ~ |dlambda|*cos(lat_c).
     The canonical cone must follow the former exactly."""
     import cupy as cp
-    from tropoi.physics.topography import williamson5_cone_elevation
+    from tropoi.spatial.terrain.topography import williamson5_cone_elevation
 
     dl = 0.8 * R0
     hs = float(williamson5_cone_elevation(
@@ -199,7 +200,7 @@ def test_cone_uses_coordinate_plane_distance_not_great_circle():
 @requires_cuda
 def test_cone_longitude_wrapping():
     import cupy as cp
-    from tropoi.physics.topography import williamson5_cone_elevation
+    from tropoi.spatial.terrain.topography import williamson5_cone_elevation
 
     lat = cp.asarray([LATC, LATC, LATC, LATC])
     # -pi/2 and 3*pi/2 and 7*pi/2 are the same meridian; a point slightly
@@ -220,7 +221,7 @@ def test_cone_is_not_a_gaussian():
     """A Gaussian is smooth and strictly positive everywhere; the canonical
     cone is exactly zero outside R0 and linear in r inside."""
     import cupy as cp
-    from tropoi.physics.topography import williamson5_cone_elevation
+    from tropoi.spatial.terrain.topography import williamson5_cone_elevation
 
     r_frac = cp.asarray([0.25, 0.5, 0.75])
     lat = LATC + r_frac * R0
@@ -237,7 +238,7 @@ def test_cone_is_not_a_gaussian():
 
 @requires_cuda
 def test_cone_projection_latlon_measured_envelope():
-    from tropoi.physics.topography import Topography
+    from tropoi.spatial.terrain.topography import Topography
 
     planet = _make_w5_planet()          # GL 32x64, l_max=21
     topo = Topography.williamson5_cone(planet)
@@ -259,7 +260,7 @@ def test_cone_projection_latlon_measured_envelope():
 
 @requires_cuda
 def test_cone_projection_geodesic_measured_envelope():
-    from tropoi.physics.topography import Topography
+    from tropoi.spatial.terrain.topography import Topography
 
     planet = _make_w5_planet(grid_type="geodesic", resolution=4, l_max=21)
     topo = Topography.williamson5_cone(planet)
@@ -271,7 +272,7 @@ def test_cone_projection_geodesic_measured_envelope():
 def test_cone_projection_converges_with_resolution():
     """The nonsmooth cone is not band-limited; its projection residual must
     fall monotonically as l_max rises (measured 0.0895 -> 0.0249)."""
-    from tropoi.physics.topography import Topography
+    from tropoi.spatial.terrain.topography import Topography
 
     residuals = []
     for l_max, nlat, nlon in ((15, 32, 64), (31, 48, 96), (42, 64, 128)):
@@ -286,8 +287,8 @@ def test_cone_projection_converges_with_resolution():
 def test_cone_rejects_qualitatively_degraded_projection():
     """geodesic res3/l_max=10 measures residual 0.33 — no longer a faithful
     cone. The benchmark-specific gate (0.25) rejects it loudly."""
-    from tropoi.physics.topography import (Topography,
-                                                      TopographyError)
+    from tropoi.spatial.terrain.topography import Topography
+    from tropoi.spatial.terrain.topography import TopographyError
 
     planet = _make_w5_planet(grid_type="geodesic", resolution=3, l_max=10)
     with pytest.raises(TopographyError, match="not representable"):
@@ -300,7 +301,7 @@ def test_cone_backend_projection_difference_is_measured():
     the coefficient sets differ by ~1e-2 (measured 1.03e-2). Pin the order
     of magnitude so the backend dependence stays characterized."""
     import cupy as cp
-    from tropoi.physics.topography import Topography
+    from tropoi.spatial.terrain.topography import Topography
 
     t_lat = Topography.williamson5_cone(
         _make_w5_planet(l_max=21, nlat=48, nlon=96))
@@ -351,7 +352,7 @@ def test_w5_config_dict_carries_every_defining_choice():
 
 def test_w5_run_identity_is_distinct_and_canonicality_hashes():
     from datetime import datetime, timezone
-    from tropoi.run.bve.io import make_run_id
+    from tropoi.representation.archive.writer import make_run_id
     from tropoi.run.swe.config import SWERunConfig
 
     now = datetime(2026, 1, 1, tzinfo=timezone.utc)
@@ -425,7 +426,7 @@ def test_w5_leaves_existing_identities_unchanged():
 def test_w5_config_constants_match_physics_cone():
     """The import-light config constants must stay in sync with the
     CuPy-importing physics module (duplicated deliberately)."""
-    from tropoi.physics import topography as phys
+    import tropoi.spatial.terrain.topography as phys
     from tropoi.run.swe import config as swe_config
 
     assert swe_config.W5_CONE_HEIGHT_M == phys.W5_CONE_HEIGHT_M
@@ -465,7 +466,7 @@ def test_w5_cone_mean_height_closed_form_matches_quadrature():
 # ===========================================================================
 
 def test_w5_executor_builds_exact_ideal_sphere_params():
-    from tropoi.cli.swe import _w5_planet_params
+    from tropoi.run.swe.model import _w5_planet_params
     from tropoi.run.swe.config import SWERunConfig
 
     cfg = SWERunConfig.resolve({"scenario": "williamson5"})
@@ -525,8 +526,7 @@ def test_w5_scenario_registry_in_sync():
     from tropoi.run.swe.config import SWE_SCENARIOS
     if not _has_cuda():
         pytest.skip("CUDA/CuPy not available")
-    from tropoi.run.swe.initial_conditions import (
-        SWE_INITIAL_CONDITIONS)
+    from tropoi.spatial.initialization.swe import SWE_INITIAL_CONDITIONS
     assert set(SWE_SCENARIOS) == set(SWE_INITIAL_CONDITIONS)
     assert "williamson5" in SWE_SCENARIOS
 
@@ -545,7 +545,7 @@ def test_w5_model_uses_exact_canonical_planet():
 @requires_cuda
 def test_w5_ic_spectral_construction_is_exact():
     import cupy as cp
-    from tropoi.run.swe.initial_conditions import make_swe_ic
+    from tropoi.spatial.initialization.swe import make_swe_ic
 
     model = _make_w5_model(_make_w5_planet())
     state = make_swe_ic("williamson5", model)
@@ -579,7 +579,7 @@ def test_w5_ic_reconstructs_canonical_wind_free_surface_and_depth():
     """Direct canonical-field tests: winds, free-surface height, and layer
     depth against the analytic Williamson case-5 prescriptions."""
     import cupy as cp
-    from tropoi.run.swe.initial_conditions import make_swe_ic
+    from tropoi.spatial.initialization.swe import make_swe_ic
 
     planet = _make_w5_planet()
     model = _make_w5_model(planet)
@@ -617,7 +617,7 @@ def test_w5_ic_reconstructs_canonical_wind_free_surface_and_depth():
     # band-limiting of the terrain itself (Gibbs ringing near the cusp;
     # projection residual 0.0706 at this truncation) — bounded, documented.
     lon = cp.asarray(planet.grid.point_longitudes, dtype=cp.float64)
-    from tropoi.physics.topography import williamson5_cone_elevation
+    from tropoi.spatial.terrain.topography import williamson5_cone_elevation
     hs_analytic = williamson5_cone_elevation(lat, lon)
     band_limit_err = float(cp.abs(depth - (eta_ref - hs_analytic)).max())
     assert band_limit_err < 500.0          # peak undershoot ~246 m at l21
@@ -635,7 +635,7 @@ def test_w5_ic_is_terrain_aware():
     terrain-less model (defensive path) degenerates to the flat case-2
     pair."""
     import cupy as cp
-    from tropoi.run.swe.initial_conditions import make_swe_ic
+    from tropoi.spatial.initialization.swe import make_swe_ic
 
     planet = _make_w5_planet()
     model = _make_w5_model(planet)
@@ -659,7 +659,7 @@ def test_w5_regression_ic_is_free_surface_compensated():
     Sect. 2 + 3.5 and from the MRI-JMA reference trajectories (semantic
     audit: notebooks/W5_MRI_SEMANTIC_AUDIT.md)."""
     import cupy as cp
-    from tropoi.run.swe.initial_conditions import make_swe_ic
+    from tropoi.spatial.initialization.swe import make_swe_ic
 
     planet = _make_w5_planet()
     model = _make_w5_model(planet)
@@ -691,7 +691,7 @@ def test_w5_initial_free_surface_is_zonal_not_raised():
     truncation; a reader seeing a bump here is looking at the reverted,
     noncanonical construction.)"""
     import cupy as cp
-    from tropoi.run.swe.initial_conditions import make_swe_ic
+    from tropoi.spatial.initialization.swe import make_swe_ic
 
     planet = _make_w5_planet()
     model = _make_w5_model(planet)
@@ -717,8 +717,8 @@ def test_w5_initial_free_surface_is_zonal_not_raised():
 
 def _integrate_fixed_cfl(planet, model, state, days):
     """RK4-integrate for `days` at the initial advective+gravity-wave CFL."""
-    from tropoi.run.engine import (advective_cfl_timestep,
-                                              rk4_step_array)
+    from tropoi.temporal.integration import advective_cfl_timestep
+    from tropoi.temporal.integration import rk4_step_array
 
     length_scale = getattr(planet.grid, "cfl_length_scale", None)
     dt = advective_cfl_timestep(
@@ -749,7 +749,7 @@ def test_w5_initial_forcing_is_depth_advection_over_the_cone():
     With the cone absent (flat model, flat-built state) every tendency
     vanishes: the response is entirely terrain-driven."""
     import cupy as cp
-    from tropoi.run.swe.initial_conditions import make_swe_ic
+    from tropoi.spatial.initialization.swe import make_swe_ic
 
     planet = _make_w5_planet()
     model = _make_w5_model(planet)
@@ -786,9 +786,9 @@ def test_w5_initial_forcing_is_depth_advection_over_the_cone():
 @requires_cuda
 def test_w5_short_run_latlon_valid_and_conserving():
     import cupy as cp
-    from tropoi.physics.shallow_water import ShallowWaterState
-    from tropoi.run.swe.diagnostics import potential_enstrophy
-    from tropoi.run.swe.initial_conditions import make_swe_ic
+    from tropoi.spatial.states.shallow_water import ShallowWaterState
+    from tropoi.representation.diagnostics.swe import potential_enstrophy
+    from tropoi.spatial.initialization.swe import make_swe_ic
 
     planet = _make_w5_planet()
     model = _make_w5_model(planet)
@@ -823,9 +823,9 @@ def test_w5_short_run_geodesic_valid_and_conserving():
     """Geodesic backend characterization at its own measured envelope —
     NOT forced to meet Gauss-Legendre tolerances."""
     import cupy as cp
-    from tropoi.physics.shallow_water import ShallowWaterState
-    from tropoi.run.swe.diagnostics import potential_enstrophy
-    from tropoi.run.swe.initial_conditions import make_swe_ic
+    from tropoi.spatial.states.shallow_water import ShallowWaterState
+    from tropoi.representation.diagnostics.swe import potential_enstrophy
+    from tropoi.spatial.initialization.swe import make_swe_ic
 
     planet = _make_w5_planet(grid_type="geodesic", resolution=4, l_max=21)
     model = _make_w5_model(planet)
@@ -849,7 +849,7 @@ def test_w5_short_run_geodesic_valid_and_conserving():
 
 def _total_energy(planet, model, y):
     import cupy as cp
-    from tropoi.physics.shallow_water import ShallowWaterState
+    from tropoi.spatial.states.shallow_water import ShallowWaterState
     fields = model.characteristic_fields(ShallowWaterState(y))
     w = cp.asarray(planet.sh.weights) * planet.params.radius**2
     phi_t = fields["phi_total"]
@@ -869,8 +869,8 @@ def _total_energy(planet, model, y):
 def test_potential_enstrophy_matches_analytic_rest_value():
     """Z = integral (zeta+f)^2/(2h) dA. For a resting flat-bottom state,
     Z = 8*pi*Omega^2*R^2/(3H) exactly (integral of sin^2 = 4*pi/3)."""
-    from tropoi.run.swe.diagnostics import potential_enstrophy
-    from tropoi.run.swe.initial_conditions import make_swe_ic
+    from tropoi.representation.diagnostics.swe import potential_enstrophy
+    from tropoi.spatial.initialization.swe import make_swe_ic
 
     planet = _make_w5_planet()
     model = _make_w5_model(planet, cone=False)
@@ -909,10 +909,10 @@ def test_w5_fifteen_day_canonical_acceptance(tmp_path):
     import numpy as np
     import cupy as cp
     from tropoi.cli.main import main
-    from tropoi.physics.shallow_water import (ShallowWaterModel,
-                                                         ShallowWaterState)
-    from tropoi.physics.topography import Topography
-    from tropoi.run.swe.diagnostics import potential_enstrophy
+    from tropoi.temporal.tendencies.shallow_water import ShallowWaterModel
+    from tropoi.spatial.states.shallow_water import ShallowWaterState
+    from tropoi.spatial.terrain.topography import Topography
+    from tropoi.representation.diagnostics.swe import potential_enstrophy
 
     rc = main(["run", "swe", "--scenario", "williamson5",
                "--backend", "gauss-latlon", "--nlat", "64", "--nlon", "128",
@@ -952,8 +952,9 @@ def test_w5_fifteen_day_canonical_acceptance(tmp_path):
 @requires_cuda
 def test_gaussian_mountain_gate_unchanged():
     """The W5 cone policy must not touch the Gaussian preset's 0.2 gate."""
-    from tropoi.physics.topography import (
-        MAX_PROJECTION_RESIDUAL, Topography, TopographyError)
+    from tropoi.spatial.terrain.topography import MAX_PROJECTION_RESIDUAL
+    from tropoi.spatial.terrain.topography import Topography
+    from tropoi.spatial.terrain.topography import TopographyError
 
     assert MAX_PROJECTION_RESIDUAL == 0.2
     planet = _make_w5_planet()

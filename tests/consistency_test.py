@@ -5,10 +5,8 @@ pytest.importorskip("cupy", reason="CUDA/CuPy not available")
 import cupy as cp
 import numpy as np
 
-from tropoi.numerics import (
-    LatLonSphericalHarmonics,
-    PointSetSphericalHarmonics,
-)
+from tropoi.spatial.transforms.spherical_harmonics import LatLonSphericalHarmonics
+from tropoi.spatial.transforms.fast_geodesic_sh import PointSetSphericalHarmonics
 
 n_lat = 45 # Odd number
 n_lon = 90 # Even/Odd doesn't strictly matter for FastSH, but good for simpson
@@ -75,7 +73,7 @@ if diff_between_methods < 0.1:
 else:
     print("\n>> WARNING: Methods diverge significantly.")
     import matplotlib.pyplot as plt
-    from tropoi.viz.planet_viewer import PlanetViewer
+    from tropoi.representation.visual.planet_viewer import PlanetViewer
 
     fig, axes = plt.subplots(1, 2, figsize=(12, 5))
     PlanetViewer.plot_coefficient_complex_visualization(c_recovered_old, axes[0], fig)

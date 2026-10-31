@@ -176,6 +176,18 @@ def render_metrics_md(metrics: dict, opts) -> str:
     return "\n".join(out)
 
 
+def _source_row(source: dict) -> str:
+    """Provenance row naming the analysed source as precisely as recorded."""
+    if source["commit"]:
+        return f"| Source commit | `{source['commit']}` |"
+    tree = source.get("working_tree")
+    if not tree:
+        return "| Source commit | not recorded (fixture or unspecified source) |"
+    state = ("clean working tree" if tree["source"]["status"] == "clean"
+             else "plus uncommitted working-tree changes")
+    return f"| Source base commit | `{tree['base_commit']}` ({state}) |"
+
+
 def render_readme(metrics: dict, opts, files: list[str], generated_marker: str,
                   frozen_marker: str) -> str:
     tool, source, inc = metrics["tool"], metrics["source"], metrics["inclusion"]
@@ -196,14 +208,21 @@ def render_readme(metrics: dict, opts, files: list[str], generated_marker: str,
         "",
         "| | |",
         "|---|---|",
-        f"| Source commit | `{source['commit']}` |" if source["commit"] else
-        "| Source commit | not recorded (working tree at generation time) |",
+        _source_row(source),
         f"| Analysed package | `{source['package']}` under `{source['src']}/` |",
         f"| Generator | `tools.architecture` {tool['version']}"
         + (f", commit `{tool['generator_commit']}`" if tool["generator_commit"] else "") + " |",
         f"| Toolchain | Python {tool['python']}, grimp {tool['grimp']}, networkx {tool['networkx']} |",
         f"| Command | `{opts.command}` |",
         "",
+        *([f"Source working tree: **{source['working_tree']['source']['status']}**. "
+           f"Content SHA-256: `{source['working_tree']['source']['sha256']}`. "
+           f"Generator working tree: **{source['working_tree']['generator']['status']}**. "
+           "Per-file hashes and scoped Git status are recorded in `metrics.json`. "
+           "These describe generation time; --check verifies source and generator "
+           "content hashes before reusing this context across later commits. "
+           "The base commit alone does not identify uncommitted source.", ""]
+          if source.get("working_tree") else []),
         "## Reproducing",
         "",
         "From the repository root, with the development requirements installed "

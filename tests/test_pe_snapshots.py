@@ -33,10 +33,10 @@ pytestmark = pytest.mark.skipif(not _has_cuda(),
 
 def _make_model(grid_type="latlon", nlat=32, nlon=64, l_max=12, resolution=3,
                 nlev=6):
-    from tropoi.planet import Planet, PlanetaryParameters
-    from tropoi.physics.primitive_equations import (
-        PrimitiveEquationsModel)
-    from tropoi.physics.sigma_coordinate import SigmaGrid
+    from tropoi.spatial.planet import Planet
+    from tropoi.spatial.environment import PlanetaryParameters
+    from tropoi.temporal.tendencies.primitive_equations import PrimitiveEquationsModel
+    from tropoi.spatial.sigma_coordinate import SigmaGrid
     planet = Planet.generate(
         params=PlanetaryParameters.from_earth_like(day_hours=24.0),
         grid_type=grid_type, nlat=nlat, nlon=nlon, l_max=l_max,
@@ -46,8 +46,8 @@ def _make_model(grid_type="latlon", nlat=32, nlon=64, l_max=12, resolution=3,
 
 def _run_capsule(model, out_dir, scenario="thermal_wave", n_snapshots=3,
                  t_end_s=900.0):
-    from tropoi.run.engine import count_snapshot_times
-    from tropoi.run.pe.initial_conditions import make_pe_ic
+    from tropoi.temporal.integration import count_snapshot_times
+    from tropoi.spatial.initialization.pe import make_pe_ic
     from tropoi.run.pe.runner import run_pe
     state = make_pe_ic(scenario, model, temperature=T0, surface_pressure=PS0,
                        thermal_amplitude=AMP)
@@ -86,8 +86,8 @@ _GROUPS = ("pe-snapshot-vorticity", "pe-snapshot-divergence",
 # ---------------------------------------------------------------------------
 
 def test_prepared_fields_use_the_selected_levels(latlon_model, tmp_path):
-    from tropoi.run.pe.snapshot_visualization import (
-        prepare_pe_snapshot_fields, select_snapshot_levels)
+    from tropoi.representation.visual.pe_snapshots import prepare_pe_snapshot_fields
+    from tropoi.representation.visual.pe_snapshots import select_snapshot_levels
     _run_capsule(latlon_model, tmp_path)
     coeffs = np.load(tmp_path / "pe_coeffs.npy")
     times = np.load(tmp_path / "pe_snapshot_times.npy")
@@ -102,8 +102,9 @@ def test_prepared_fields_use_the_selected_levels(latlon_model, tmp_path):
 
 def test_temperature_anomaly_has_zero_area_weighted_mean(latlon_model,
                                                          tmp_path):
-    from tropoi.run.pe.snapshot_visualization import (
-        _area_weighted_mean, prepare_pe_snapshot_fields, select_snapshot_levels)
+    from tropoi.representation.visual.pe_snapshots import _area_weighted_mean
+    from tropoi.representation.visual.pe_snapshots import prepare_pe_snapshot_fields
+    from tropoi.representation.visual.pe_snapshots import select_snapshot_levels
     _run_capsule(latlon_model, tmp_path)
     coeffs = np.load(tmp_path / "pe_coeffs.npy")
     levels = select_snapshot_levels(latlon_model.sigma)
@@ -116,8 +117,9 @@ def test_temperature_anomaly_has_zero_area_weighted_mean(latlon_model,
 
 
 def test_surface_pressure_reconstruction_and_zero_mean(latlon_model, tmp_path):
-    from tropoi.run.pe.snapshot_visualization import (
-        _area_weighted_mean, prepare_pe_snapshot_fields, select_snapshot_levels)
+    from tropoi.representation.visual.pe_snapshots import _area_weighted_mean
+    from tropoi.representation.visual.pe_snapshots import prepare_pe_snapshot_fields
+    from tropoi.representation.visual.pe_snapshots import select_snapshot_levels
     _run_capsule(latlon_model, tmp_path)
     coeffs = np.load(tmp_path / "pe_coeffs.npy")
     levels = select_snapshot_levels(latlon_model.sigma)
@@ -130,8 +132,8 @@ def test_surface_pressure_reconstruction_and_zero_mean(latlon_model, tmp_path):
 
 
 def test_exact_rest_fields_are_all_zero(latlon_model, tmp_path):
-    from tropoi.run.pe.snapshot_visualization import (
-        prepare_pe_snapshot_fields, select_snapshot_levels)
+    from tropoi.representation.visual.pe_snapshots import prepare_pe_snapshot_fields
+    from tropoi.representation.visual.pe_snapshots import select_snapshot_levels
     _run_capsule(latlon_model, tmp_path, scenario="isothermal_rest")
     coeffs = np.load(tmp_path / "pe_coeffs.npy")
     levels = select_snapshot_levels(latlon_model.sigma)
@@ -145,8 +147,8 @@ def test_exact_rest_fields_are_all_zero(latlon_model, tmp_path):
 
 
 def test_fields_finite_on_geodesic_backend(tmp_path):
-    from tropoi.run.pe.snapshot_visualization import (
-        prepare_pe_snapshot_fields, select_snapshot_levels)
+    from tropoi.representation.visual.pe_snapshots import prepare_pe_snapshot_fields
+    from tropoi.representation.visual.pe_snapshots import select_snapshot_levels
     model = _make_model(grid_type="geodesic", l_max=10)
     _run_capsule(model, tmp_path)
     coeffs = np.load(tmp_path / "pe_coeffs.npy")
@@ -164,8 +166,7 @@ def test_fields_finite_on_geodesic_backend(tmp_path):
 
 def test_timeline_shares_one_symmetric_scale_per_variable(latlon_model,
                                                           tmp_path):
-    from tropoi.run.pe.snapshot_visualization import (
-        build_pe_snapshot_timeline)
+    from tropoi.representation.visual.pe_snapshots import build_pe_snapshot_timeline
     _run_capsule(latlon_model, tmp_path, n_snapshots=3)
     timeline = build_pe_snapshot_timeline(latlon_model, tmp_path,
                                           scenario="thermal_wave")
@@ -180,8 +181,7 @@ def test_timeline_shares_one_symmetric_scale_per_variable(latlon_model,
 
 
 def test_zero_field_run_yields_valid_fallback_limits(latlon_model, tmp_path):
-    from tropoi.run.pe.snapshot_visualization import (
-        build_pe_snapshot_timeline)
+    from tropoi.representation.visual.pe_snapshots import build_pe_snapshot_timeline
     _run_capsule(latlon_model, tmp_path, scenario="isothermal_rest",
                  n_snapshots=2)
     timeline = build_pe_snapshot_timeline(latlon_model, tmp_path,
@@ -195,9 +195,9 @@ def test_zero_field_run_yields_valid_fallback_limits(latlon_model, tmp_path):
 
 def test_late_snapshot_controls_the_shared_run_scale(latlon_model, tmp_path):
     """A late high-amplitude snapshot must set the shared vorticity scale."""
-    from tropoi.viz.timeline import FigureTimeline
-    from tropoi.run.pe.snapshot_visualization import (
-        build_pe_snapshot_timeline, select_snapshot_levels)
+    from tropoi.representation.visual.timeline import FigureTimeline
+    from tropoi.representation.visual.pe_snapshots import build_pe_snapshot_timeline
+    from tropoi.representation.visual.pe_snapshots import select_snapshot_levels
     K = latlon_model.nlev
     n = latlon_model.l_max + 1
     levels = select_snapshot_levels(latlon_model.sigma)
@@ -224,10 +224,11 @@ def test_late_snapshot_controls_the_shared_run_scale(latlon_model, tmp_path):
 # ---------------------------------------------------------------------------
 
 def test_snapshot_figure_layout_and_titles(latlon_model, tmp_path):
-    from tropoi.viz.specs import ScalarMapSpec, TextPanelSpec
-    from tropoi.run.pe.snapshot_visualization import (
-        build_pe_snapshot_figure, prepare_pe_snapshot_fields,
-        select_snapshot_levels)
+    from tropoi.representation.visual.specs import ScalarMapSpec
+    from tropoi.representation.visual.specs import TextPanelSpec
+    from tropoi.representation.visual.pe_snapshots import build_pe_snapshot_figure
+    from tropoi.representation.visual.pe_snapshots import prepare_pe_snapshot_fields
+    from tropoi.representation.visual.pe_snapshots import select_snapshot_levels
     times = _run_capsule(latlon_model, tmp_path)
     coeffs = np.load(tmp_path / "pe_coeffs.npy")
     levels = select_snapshot_levels(latlon_model.sigma)
@@ -269,10 +270,10 @@ def test_snapshot_figure_layout_and_titles(latlon_model, tmp_path):
 
 
 def test_surface_pressure_panel_spans_both_map_rows(latlon_model, tmp_path):
-    from tropoi.viz.specs import ScalarMapSpec
-    from tropoi.run.pe.snapshot_visualization import (
-        build_pe_snapshot_figure, prepare_pe_snapshot_fields,
-        select_snapshot_levels)
+    from tropoi.representation.visual.specs import ScalarMapSpec
+    from tropoi.representation.visual.pe_snapshots import build_pe_snapshot_figure
+    from tropoi.representation.visual.pe_snapshots import prepare_pe_snapshot_fields
+    from tropoi.representation.visual.pe_snapshots import select_snapshot_levels
     times = _run_capsule(latlon_model, tmp_path)
     coeffs = np.load(tmp_path / "pe_coeffs.npy")
     levels = select_snapshot_levels(latlon_model.sigma)
@@ -297,8 +298,9 @@ def _frame_names(snap_dir):
 
 def test_render_writes_physical_product_at_capsule_root(latlon_model,
                                                         tmp_path):
-    from tropoi.run.pe.snapshot_visualization import (
-        PE_SNAPSHOTS_DIRNAME, PE_SNAPSHOTS_REPRESENTATION, render_pe_snapshots)
+    from tropoi.representation.visual.pe_snapshots import PE_SNAPSHOTS_DIRNAME
+    from tropoi.representation.visual.pe_snapshots import PE_SNAPSHOTS_REPRESENTATION
+    from tropoi.representation.visual.pe_snapshots import render_pe_snapshots
     times = _run_capsule(latlon_model, tmp_path, n_snapshots=3)
     outputs = render_pe_snapshots(latlon_model, tmp_path,
                                   scenario="thermal_wave")
@@ -314,9 +316,8 @@ def test_render_writes_physical_product_at_capsule_root(latlon_model,
 
 
 def test_render_preserves_stored_data_and_summary(latlon_model, tmp_path):
-    from tropoi.run.pe.snapshot_visualization import (
-        render_pe_snapshots)
-    from tropoi.run.pe.visualization import render_pe_summary
+    from tropoi.representation.visual.pe_snapshots import render_pe_snapshots
+    from tropoi.representation.visual.pe import render_pe_summary
     _run_capsule(latlon_model, tmp_path, n_snapshots=3)
     coeffs_before = np.load(tmp_path / "pe_coeffs.npy")
     times_before = np.load(tmp_path / "pe_snapshot_times.npy")
@@ -332,8 +333,9 @@ def test_render_preserves_stored_data_and_summary(latlon_model, tmp_path):
 
 
 def test_render_on_geodesic_and_exact_rest(tmp_path):
-    from tropoi.run.pe.snapshot_visualization import (
-        PE_SNAPSHOTS_DIRNAME, PE_SNAPSHOTS_REPRESENTATION, render_pe_snapshots)
+    from tropoi.representation.visual.pe_snapshots import PE_SNAPSHOTS_DIRNAME
+    from tropoi.representation.visual.pe_snapshots import PE_SNAPSHOTS_REPRESENTATION
+    from tropoi.representation.visual.pe_snapshots import render_pe_snapshots
     model = _make_model(grid_type="geodesic", l_max=10)
     times = _run_capsule(model, tmp_path, scenario="isothermal_rest",
                          n_snapshots=2)
@@ -345,11 +347,11 @@ def test_render_on_geodesic_and_exact_rest(tmp_path):
 
 def test_runner_auto_generates_snapshots_with_summary_plot(latlon_model,
                                                            tmp_path):
-    from tropoi.run.engine import count_snapshot_times
-    from tropoi.run.pe.initial_conditions import make_pe_ic
+    from tropoi.temporal.integration import count_snapshot_times
+    from tropoi.spatial.initialization.pe import make_pe_ic
     from tropoi.run.pe.runner import run_pe
-    from tropoi.run.pe.snapshot_visualization import (
-        PE_SNAPSHOTS_DIRNAME, PE_SNAPSHOTS_REPRESENTATION)
+    from tropoi.representation.visual.pe_snapshots import PE_SNAPSHOTS_DIRNAME
+    from tropoi.representation.visual.pe_snapshots import PE_SNAPSHOTS_REPRESENTATION
     state = make_pe_ic("thermal_wave", latlon_model, temperature=T0,
                        surface_pressure=PS0, thermal_amplitude=AMP)
     times = count_snapshot_times(3, 900.0)
