@@ -340,10 +340,13 @@ def main(argv: list[str] | None = None) -> int:
 
     opts = Options(src=args.src, package=args.package, out=args.out, title=args.title,
                    call_roots=roots or dict(DEFAULT_CALL_ROOTS), call_depth=args.call_depth,
-                   freeze=args.freeze, command=command_line(args, args.source_commit))
+                   freeze=args.freeze)
     if args.source_commit:
         opts.source_commit = verify_source_commit(REPO_ROOT, args.source_commit,
                                                   args.src, args.package)
+    # Record the verified full sha, never the spelling given (HEAD, a short
+    # hash), so generation and --check always render the same command.
+    opts.command = command_line(args, opts.source_commit)
     if args.freeze:
         opts.generator_commit = generator_commit(REPO_ROOT)
 
