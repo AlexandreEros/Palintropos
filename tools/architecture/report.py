@@ -176,6 +176,18 @@ def render_metrics_md(metrics: dict, opts) -> str:
     return "\n".join(out)
 
 
+def _source_row(source: dict) -> str:
+    """Provenance row naming the analysed source as precisely as recorded."""
+    if source["commit"]:
+        return f"| Source commit | `{source['commit']}` |"
+    tree = source.get("working_tree")
+    if not tree:
+        return "| Source commit | not recorded (fixture or unspecified source) |"
+    state = ("clean working tree" if tree["source"]["status"] == "clean"
+             else "plus uncommitted working-tree changes")
+    return f"| Source base commit | `{tree['base_commit']}` ({state}) |"
+
+
 def render_readme(metrics: dict, opts, files: list[str], generated_marker: str,
                   frozen_marker: str) -> str:
     tool, source, inc = metrics["tool"], metrics["source"], metrics["inclusion"]
@@ -196,9 +208,7 @@ def render_readme(metrics: dict, opts, files: list[str], generated_marker: str,
         "",
         "| | |",
         "|---|---|",
-        f"| Source commit | `{source['commit']}` |" if source["commit"] else
-        (f"| Source base commit | `{source['working_tree']['base_commit']}` + working-tree changes |"
-         if source.get("working_tree") else "| Source commit | not recorded (fixture or unspecified source) |"),
+        _source_row(source),
         f"| Analysed package | `{source['package']}` under `{source['src']}/` |",
         f"| Generator | `tools.architecture` {tool['version']}"
         + (f", commit `{tool['generator_commit']}`" if tool["generator_commit"] else "") + " |",

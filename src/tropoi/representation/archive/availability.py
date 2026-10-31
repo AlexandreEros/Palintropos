@@ -1,6 +1,8 @@
 """Saved-state availability errors and statistics-only directory descriptions."""
 from __future__ import annotations
+
 import pathlib
+
 
 class NoSnapshotsError(ValueError):
     """The run stores no reconstructible instantaneous states."""

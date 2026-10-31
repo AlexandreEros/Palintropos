@@ -126,11 +126,11 @@ def test_host_synthesis_matches_the_model_transform(reference):
     import cupy as cp
 
     from tropoi.run.bve.model import build_planet
-    from tropoi.run.custom.prepare import _base_config
+    from tropoi.run.custom.resources import base_config
     from tropoi.spatial.transforms.host_synthesis import synthesize_latlon
 
     planet, disc = _specs()
-    model = build_planet(_base_config(planet, disc))
+    model = build_planet(base_config(planet, disc))
     lm = reference.topography_lm
     on_grid = cp.asnumpy(model.sh.inv_transform(cp.asarray(lm)).real)
     lat = np.degrees(cp.asnumpy(model.grid.latitudes))

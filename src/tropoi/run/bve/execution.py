@@ -3,15 +3,15 @@
 Heavy imports happen during execution, after argument parsing.
 """
 from __future__ import annotations
-from tropoi.run.bve.model import build_planet
 
 import pathlib
 import re
 import shutil
 from typing import TYPE_CHECKING, Mapping
 
+from tropoi.run.bve.model import build_planet
 from tropoi.run.lifecycle import (execute_with_provenance,
-                                                 resolve_writable_base_dir)
+                                  resolve_writable_base_dir)
 
 if TYPE_CHECKING:
     from tropoi.run.bve.config import BVERunConfig
@@ -110,8 +110,6 @@ def _clean_overwrite_artifacts(out_dir: pathlib.Path) -> None:
         raise OverwriteCleanupError(
             "could not remove stale generated artifact(s) during --overwrite "
             f"of {out_dir}: " + "; ".join(failures))
-
-
 
 
 def _execute_solver(cfg: "BVERunConfig", run_dir, run_config: dict) -> None:

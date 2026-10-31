@@ -3,7 +3,9 @@
 Heavy numerical imports happen only when a builder is called.
 """
 from __future__ import annotations
+
 from typing import Mapping
+
 
 def _w5_planet_params(run_config):
     """Exact canonical-planet parameters for the Williamson-5 scenario.

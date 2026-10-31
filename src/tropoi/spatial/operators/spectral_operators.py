@@ -207,7 +207,6 @@ class SpectralOperators:
         inv_eigs[0] = 1.0 / self.R**2   # arbitrary, only affects l=0
         return coeffs / inv_eigs[:, None]
 
-
     # ------------------------------------------------------------------
     # Vector curl/divergence analysis (tangent field -> spectra)
     # ------------------------------------------------------------------

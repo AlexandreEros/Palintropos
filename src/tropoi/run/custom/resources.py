@@ -1,6 +1,9 @@
 """Shared specification validation and construction for state/terrain preparation."""
 from __future__ import annotations
-from tropoi.spatial.specification import PlanetSpec, DiscretizationSpec, TopographySpec
+
+from tropoi.spatial.specification import (DiscretizationSpec, PlanetSpec,
+                                          TopographySpec)
+
 
 class PreparationError(ValueError):
     """An input cannot become a valid initial state under the policy.
@@ -13,19 +16,19 @@ class PreparationError(ValueError):
         self.report = report
 
 
-def _base_config(planet: PlanetSpec, discretization: DiscretizationSpec
+def base_config(planet: PlanetSpec, discretization: DiscretizationSpec
                  ) -> dict:
     return {**discretization.run_config_entries(),
             "planet": planet.to_dict(), "day_hours": planet.day_hours}
 
 
-def _build_planet(planet: PlanetSpec, discretization: DiscretizationSpec):
+def build_spec_planet(planet: PlanetSpec, discretization: DiscretizationSpec):
     from tropoi.run.bve.model import build_planet
 
-    return build_planet(_base_config(planet, discretization))
+    return build_planet(base_config(planet, discretization))
 
 
-def _check_specs(planet, discretization) -> None:
+def check_specs(planet, discretization) -> None:
     if not isinstance(planet, PlanetSpec):
         raise PreparationError(
             f"planet must be a PlanetSpec, got {type(planet).__name__}")
@@ -35,7 +38,7 @@ def _check_specs(planet, discretization) -> None:
             f"{type(discretization).__name__}")
 
 
-def _resolve_topography(planet_obj, spec: TopographySpec):
+def resolve_topography(planet_obj, spec: TopographySpec):
     """The model's Topography for a specification (CUDA), or None if flat."""
     from tropoi.spatial.terrain.topography import Topography
 

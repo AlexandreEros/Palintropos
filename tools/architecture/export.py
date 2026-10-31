@@ -1,6 +1,9 @@
 """Export a generated snapshot with metrics, provenance and Mermaid sources.
 
-Usage: python -m tools.architecture.export --out /workspace/downloads/architecture
+Usage: python -m tools.architecture.export --out <dir>/architecture
+
+Writes ``architecture.md`` (combined report) and ``architecture.zip``
+(snapshot, review context and SHA256SUMS) next to the given stem.
 """
 from __future__ import annotations
 import argparse

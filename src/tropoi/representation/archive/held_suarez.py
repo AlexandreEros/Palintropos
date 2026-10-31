@@ -29,7 +29,6 @@ topography and the experiment builds its model without terrain.
 Nothing here writes to the experiment. NumPy + stdlib only.
 """
 from __future__ import annotations
-from tropoi.representation.archive.availability import NoSnapshotsError, statistics_only_description
 
 import json
 import pathlib
@@ -40,6 +39,8 @@ from typing import Any
 
 import numpy as np
 
+from tropoi.representation.archive.availability import (
+    NoSnapshotsError, statistics_only_description)
 from tropoi.representation.archive.pe_context import PEColumnContext
 from tropoi.representation.archive.schema import SchemaError, state_schema_for
 from tropoi.spatial.modes import FieldSpec
@@ -71,8 +72,6 @@ CONFIG_DEFAULTS = {
     "grid": "latlon",
 }
 _REQUIRED = ("experiment_id", "l_max", "nlat", "nlon", "nlev")
-
-
 
 
 class HeldSuarezPlotError(RuntimeError):
@@ -107,8 +106,6 @@ def is_held_suarez_experiment(path) -> bool:
     """True for a directory holding a Held–Suarez experiment config.json."""
     doc = _read_config(pathlib.Path(path))
     return doc is not None and _experiment_config(doc) is not None
-
-
 
 
 class HeldSuarezStorage:

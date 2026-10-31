@@ -1,7 +1,7 @@
 # Architecture reform review
 
-The reform is reconciled with main at `6a03708` (PR #14) on the local
-branch `reform/reconcile-main`. The analyzed source and generator are based on the commit recorded in
+The reform is reconciled with main at `6a03708` (PR #14) on branch
+`reform/reconcile-main`. The analyzed source and generator are based on the commit recorded in
 `../current/metrics.json`; source and generator trees
 were clean when generated. Full provenance and per-file content hashes are
 in `../current/metrics.json`. The original reform baseline was

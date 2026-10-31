@@ -36,7 +36,7 @@ def test_export_includes_results_provenance_and_original_mermaid(tmp_path):
     (snapshot / 'metrics.md').write_text('| Nodes | 12 |\n')
     (snapshot / 'metrics.json').write_text(json.dumps({'source': {'commit': 'abc'}}))
     code = 'flowchart LR\n  A --> B\n'
-    (snapshot / 'modules.mmd').write_text(code)
+    (snapshot / 'modules.mmd').write_bytes(code.encode())
     md, archive = export(snapshot, tmp_path / 'download')
     assert '| Nodes | 12 |' in md.read_text()
     assert '"commit": "abc"' in md.read_text()
@@ -95,3 +95,17 @@ def test_check_survives_commits_but_rejects_input_and_output_changes(tmp_path, m
     git('add', '.')
     git('commit', '-m', 'source and snapshot together')
     assert generate.main([*args, '--check']) == 0
+
+
+def test_source_row_names_working_tree_state():
+    from tools.architecture.report import _source_row
+
+    def source(status):
+        return {'commit': None, 'working_tree': {
+            'base_commit': 'abc', 'source': {'status': status}}}
+
+    assert _source_row({'commit': 'def'}) == '| Source commit | `def` |'
+    assert _source_row(source('clean')) == (
+        '| Source base commit | `abc` (clean working tree) |')
+    assert 'uncommitted' in _source_row(source('dirty'))
+    assert 'not recorded' in _source_row({'commit': None})

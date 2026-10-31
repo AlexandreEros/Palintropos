@@ -5,15 +5,15 @@ parsing and ``--help`` never initialize CUDA. The provenance lifecycle is
 shared with the BVE command (``run/lifecycle.py``).
 """
 from __future__ import annotations
-from tropoi.run.swe.model import _w5_planet_params, build_swe_model
 
 import pathlib
 import re
 import shutil
 from typing import TYPE_CHECKING, Mapping
 
+from tropoi.run.swe.model import build_swe_model
 from tropoi.run.lifecycle import (execute_with_provenance,
-                                                 resolve_writable_base_dir)
+                                  resolve_writable_base_dir)
 
 if TYPE_CHECKING:
     from tropoi.run.swe.config import SWERunConfig
@@ -35,9 +35,6 @@ _GENERATED_RESULT_DIRS: tuple[str, ...] = (
 )
 
 _SNAPSHOT_FRAME_RE = re.compile(r".+_t\d{13}\.\d{9}s\.png\Z")
-
-
-
 
 
 def _manifest_notes(cfg: "SWERunConfig", topography=None) -> dict:
@@ -65,13 +62,15 @@ SWE_MANIFEST_NOTES = {
     "equations": "rotating shallow-water equations (vorticity-divergence "
                  "form, perturbation thickness geopotential, optional fixed "
                  "bottom topography entering the divergence tendency as "
-                 "-laplacian(phi_s); see physics/shallow_water.py and "
+                 "-laplacian(phi_s); see "
+                 "temporal/tendencies/shallow_water.py and "
                  "docs/SHALLOW_WATER.md)",
     "timestep_policy": "state-adaptive CFL ceiling "
                        "0.5*cfl_length_scale/max(|u|+sqrt(Phi0+phi)) "
                        "recomputed from every accepted state; steps shorten "
                        "to land exactly on output times and t_end",
-    "diagnostics": "see run/swe/diagnostics.py module docstring for definitions",
+    "diagnostics": "see representation/diagnostics/swe.py module docstring "
+                   "for definitions",
 }
 
 
@@ -122,8 +121,8 @@ def _clean_overwrite_artifacts(out_dir: pathlib.Path) -> None:
 
 def _execute_solver(cfg: "SWERunConfig", run_dir, run_config: dict) -> None:
     """Heavy numerical portion of a run: build planet + model, drive the solver."""
-    from tropoi.representation.archive.writer import (RUN_STATUS_RUNNING,
-                                              write_run_manifest)
+    from tropoi.representation.archive.writer import (
+        RUN_STATUS_RUNNING, write_run_manifest)
     from tropoi.spatial.initialization.swe import make_swe_ic
     from tropoi.run.swe.runner import run_swe
     from tropoi.representation.archive.schema import provenance_blocks

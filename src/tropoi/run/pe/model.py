@@ -3,7 +3,9 @@
 Heavy numerical imports happen only when a builder is called.
 """
 from __future__ import annotations
+
 from typing import Mapping
+
 
 def build_pe_model(run_config: Mapping, *, topography_lm=None):
     """The primitive-equation model (planet + sigma grid + terrain) of a run.

@@ -3,7 +3,9 @@
 Heavy numerical imports happen only when a builder is called.
 """
 from __future__ import annotations
+
 from typing import Mapping
+
 
 def build_planet(run_config: Mapping):
     """The BVE run's Planet (grid, transform, backend, operators).

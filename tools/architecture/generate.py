@@ -269,7 +269,6 @@ def write(files: dict[str, str], out: Path, overwrite_frozen: bool) -> None:
             handle.write(text)
 
 
-
 def reuse_recorded_provenance(opts: Options, out: Path) -> None:
     """Check the snapshot's bytes while retaining its generation-time context.
 
@@ -291,9 +290,22 @@ def reuse_recorded_provenance(opts: Options, out: Path) -> None:
     opts.working_tree = recorded
     if opts.source_commit is None and source["commit"]:
         opts.source_commit = source["commit"]
-        prefix, separator, roots = opts.command.partition(" --call-root ")
-        opts.command = (prefix + f" --source-commit {opts.source_commit}"
-                        + separator + roots)
+
+
+def command_line(args: argparse.Namespace, source_commit: str | None) -> str:
+    """The reproducing command recorded in the README (non-default flags only)."""
+    command = ["python -m tools.architecture.generate"]
+    for flag, value, default in (("--src", args.src, "src"), ("--package", args.package, "tropoi"),
+                                 ("--out", args.out, "docs/architecture/current"),
+                                 ("--title", args.title, "current"),
+                                 ("--call-depth", args.call_depth, DEFAULT_CALL_DEPTH),
+                                 ("--source-commit", source_commit, None)):
+        if value != default:
+            command.append(f"{flag} {value!s}" if " " not in str(value) else f'{flag} "{value}"')
+    command.extend(f"--call-root {item}" for item in args.call_root)
+    if args.freeze:
+        command.append("--freeze")
+    return " ".join(command)
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -326,21 +338,9 @@ def main(argv: list[str] | None = None) -> int:
     if args.freeze and not args.source_commit:
         parser.error("--freeze requires --source-commit")
 
-    command = ["python -m tools.architecture.generate"]
-    for flag, value, default in (("--src", args.src, "src"), ("--package", args.package, "tropoi"),
-                                 ("--out", args.out, "docs/architecture/current"),
-                                 ("--title", args.title, "current"),
-                                 ("--call-depth", args.call_depth, DEFAULT_CALL_DEPTH),
-                                 ("--source-commit", args.source_commit, None)):
-        if value != default:
-            command.append(f"{flag} {value!s}" if " " not in str(value) else f'{flag} "{value}"')
-    command.extend(f"--call-root {item}" for item in args.call_root)
-    if args.freeze:
-        command.append("--freeze")
-
     opts = Options(src=args.src, package=args.package, out=args.out, title=args.title,
                    call_roots=roots or dict(DEFAULT_CALL_ROOTS), call_depth=args.call_depth,
-                   freeze=args.freeze, command=" ".join(command))
+                   freeze=args.freeze, command=command_line(args, args.source_commit))
     if args.source_commit:
         opts.source_commit = verify_source_commit(REPO_ROOT, args.source_commit,
                                                   args.src, args.package)
@@ -352,6 +352,7 @@ def main(argv: list[str] | None = None) -> int:
     out = REPO_ROOT / args.out
     if args.check and not args.freeze:
         reuse_recorded_provenance(opts, out)
+        opts.command = command_line(args, opts.source_commit)
     files = render(opts, root=REPO_ROOT)
     if args.check:
         problems = check(files, out)

@@ -7,14 +7,14 @@ capsule uses the identical run-id, atomic-write, status, latest-pointer, and
 manifest machinery — there is no weaker PE-specific persistence path.
 """
 from __future__ import annotations
-from tropoi.run.pe.model import build_pe_model
 
 import pathlib
 import shutil
 from typing import TYPE_CHECKING, Mapping
 
+from tropoi.run.pe.model import build_pe_model
 from tropoi.run.lifecycle import (execute_with_provenance,
-                                                 resolve_writable_base_dir)
+                                  resolve_writable_base_dir)
 
 if TYPE_CHECKING:
     from tropoi.run.pe.config import PERunConfig
@@ -44,7 +44,7 @@ _GENERATED_RESULT_DIRS: tuple[str, ...] = (
 PE_MANIFEST_NOTES = {
     "equations": "dry hydrostatic primitive equations in vorticity-divergence "
                  "form on a sigma-coordinate vertical grid (see "
-                 "physics/primitive_equations.py and "
+                 "temporal/tendencies/primitive_equations.py and "
                  "docs/PRIMITIVE_EQUATIONS_DESIGN.md)",
     "coefficient_ordering": "pe_coeffs.npy has shape "
                             "(n_snapshots, 3*nlev+1, l_max+1, l_max+1); axis 1 "
@@ -57,13 +57,13 @@ PE_MANIFEST_NOTES = {
                        "land exactly on requested output times and t_end. No "
                        "forcing, no hyperdiffusion/filters, no semi-implicit "
                        "terms, no adaptive timestepping",
-    "diagnostics": "see run/pe/diagnostics.py module docstring; total_mass is "
-                   "the integral of p_s dA (mass proxy), and no total-energy-"
-                   "conservation claim is made",
+    "diagnostics": "see representation/diagnostics/pe.py module docstring; "
+                   "total_mass is the integral of p_s dA (mass proxy), and "
+                   "no total-energy-conservation claim is made",
     "topography": "optional fixed surface topography: a surface elevation "
                   "h_s (m) band-limited at the DEALIASED product-truncation "
-                  "cut floor(2*l_max/3) (physics/topography.py with l_cut; "
-                  "content above the cut cannot be balanced by the dealiased "
+                  "cut floor(2*l_max/3) (spatial/terrain/topography.py "
+                  "with l_cut; content above the cut cannot be balanced by the dealiased "
                   "pressure-gradient pathway and is rejected), consumed as "
                   "the surface geopotential Phi_s = gravity * h_s (m^2/s^2) "
                   "that anchors the hydrostatic geopotential of every "
@@ -126,8 +126,6 @@ def _clean_overwrite_artifacts(out_dir: pathlib.Path) -> None:
             f"of {out_dir}: " + "; ".join(failures))
 
 
-
-
 def _persist_terrain(cfg: "PERunConfig", out_dir: pathlib.Path):
     """Copy the prepared terrain into the capsule; return its coefficients.
 
@@ -153,8 +151,8 @@ def _persist_terrain(cfg: "PERunConfig", out_dir: pathlib.Path):
 
 def _execute_solver(cfg: "PERunConfig", run_dir, run_config: dict) -> None:
     """Heavy numerical portion: build planet + PE model, drive the solver."""
-    from tropoi.representation.archive.writer import (RUN_STATUS_RUNNING,
-                                              write_run_manifest)
+    from tropoi.representation.archive.writer import (
+        RUN_STATUS_RUNNING, write_run_manifest)
     from tropoi.spatial.initialization.pe import make_pe_ic
     from tropoi.run.pe.runner import run_pe
     from tropoi.representation.archive.schema import provenance_blocks
