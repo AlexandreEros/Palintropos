@@ -717,11 +717,11 @@
     }
   },
   "source": {
-    "commit": "ea4ebf47d48ecdb3506e90fe2b37086c70aec66b",
+    "commit": "5555f930d1f062ca92eaf1f3d447a6b8260881f5",
     "package": "tropoi",
     "src": "src",
     "working_tree": {
-      "base_commit": "ea4ebf47d48ecdb3506e90fe2b37086c70aec66b",
+      "base_commit": "5555f930d1f062ca92eaf1f3d447a6b8260881f5",
       "generator": {
         "changes": [],
         "files": {
@@ -729,7 +729,7 @@
           "tools/architecture/calls.py": "fe492066691403114d3adef4eade7541d55afd75bfbd02d14c72871bfd824e92",
           "tools/architecture/classes.py": "9436c2df4d3cf426b8893116faecd071b0a436b6b3eb1b7e4a81bb59ccdc16d1",
           "tools/architecture/export.py": "0c912ab5a81b921807c1e57796c486fc2faea5e1be23103d71eea0506a29ffef",
-          "tools/architecture/generate.py": "95a04f535f301510809512c5fa7c5c0d10ffba0cd811e07f069b90659aafcae5",
+          "tools/architecture/generate.py": "c3bde6bfb67b08f108e43c7a91afe5ed8002ee9f4f3b2b4f13eb6ca319965dee",
           "tools/architecture/imports.py": "5656681eaa89678c750220a66413dc17bbc4442de315e87ee9d9ea2f2c97f684",
           "tools/architecture/mermaid.py": "c504fb96757cb4c770a5ce81ec0e8007f3a84dc9c634bfc27857e191e20fa1d3",
           "tools/architecture/metrics.py": "f1bd0aff4c3d08f7834fcb8c729d3a03c5c951f8c7d3453adfa67876fcce1912",
@@ -738,7 +738,7 @@
           "tools/architecture/report.py": "8dee7d47d50378a29edc4cc2f118d15d26104262e5dc475e71b1d59e6c417c2a",
           "tools/architecture/sources.py": "547a080e87018ce39b7e82eefd632a20dd4cad1158c57b888d7d25255a6aece1"
         },
-        "sha256": "5cc57463735a18528b1eafa5fff49ea1f54b812d658168bc444cc5f08501fa06",
+        "sha256": "4a8ba007fd783bd023bc6118a9836cb02269e73be60ff8ebb82dad7d967b00b1",
         "status": "clean"
       },
       "source": {
