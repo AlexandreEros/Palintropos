@@ -5,20 +5,20 @@
 
 | | |
 |---|---|
-| Source base commit | `79929ae30504cdb6aace1bd141872dfb40a62007` + working-tree changes |
+| Source commit | `652879e08ff99e96a194a9e7d99ef15dbfa1ff20` |
 | Analysed package | `tropoi` under `src/` |
 | Generator | `tools.architecture` 1.0.0 |
 | Toolchain | Python 3.12, grimp 3.17, networkx 3.7 |
-| Command | `python -m tools.architecture.generate` |
+| Command | `python -m tools.architecture.generate --source-commit 652879e08ff99e96a194a9e7d99ef15dbfa1ff20` |
 
-Source working tree: **clean**. Content SHA-256: `66eba65cb89d07c0a3c40f9af1bbccff6ed89d40174d06bfec61d5cf98fd8d60`. Generator working tree: **clean**. Per-file hashes and scoped Git status are recorded in `metrics.json`. These describe generation time; --check verifies source and generator content hashes before reusing this context across later commits. The base commit alone does not identify uncommitted source.
+Source working tree: **clean**. Content SHA-256: `bf167d37a23be6d5126f81178869b63ef9dc395ec405773d80c86b0d1651e14d`. Generator working tree: **clean**. Per-file hashes and scoped Git status are recorded in `metrics.json`. These describe generation time; --check verifies source and generator content hashes before reusing this context across later commits. The base commit alone does not identify uncommitted source.
 
 ## Reproducing
 
 From the repository root, with the development requirements installed (`pip install -r requirements-dev.txt`):
 
 ```bash
-python -m tools.architecture.generate
+python -m tools.architecture.generate --source-commit 652879e08ff99e96a194a9e7d99ef15dbfa1ff20
 ```
 
 ## Files
