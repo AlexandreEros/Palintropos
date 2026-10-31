@@ -717,11 +717,11 @@
     }
   },
   "source": {
-    "commit": "3b5072168e2431dc3ab3117b3a3c20052ed4f07d",
+    "commit": null,
     "package": "tropoi",
     "src": "src",
     "working_tree": {
-      "base_commit": "3b5072168e2431dc3ab3117b3a3c20052ed4f07d",
+      "base_commit": "e220365d762f85f6301c92cceae6e9e4fe1d6ecb",
       "generator": {
         "changes": [],
         "files": {
@@ -729,16 +729,16 @@
           "tools/architecture/calls.py": "fe492066691403114d3adef4eade7541d55afd75bfbd02d14c72871bfd824e92",
           "tools/architecture/classes.py": "9436c2df4d3cf426b8893116faecd071b0a436b6b3eb1b7e4a81bb59ccdc16d1",
           "tools/architecture/export.py": "269651eb836ab6e304319e94100ee8b9087788c06b302752367199f2a891eb31",
-          "tools/architecture/generate.py": "1308f07216166337309214079f71616ad406c2c7312b2695714a8f753a2a10cf",
+          "tools/architecture/generate.py": "7f695d1ad7edd3ac1722b0492342925f81fa1724fd775e21a28c1f25c42d30d0",
           "tools/architecture/imports.py": "5656681eaa89678c750220a66413dc17bbc4442de315e87ee9d9ea2f2c97f684",
           "tools/architecture/mermaid.py": "c504fb96757cb4c770a5ce81ec0e8007f3a84dc9c634bfc27857e191e20fa1d3",
           "tools/architecture/metrics.py": "f1bd0aff4c3d08f7834fcb8c729d3a03c5c951f8c7d3453adfa67876fcce1912",
           "tools/architecture/model.py": "335acf6e713ca4bf79f2884d246addc8601effae88a43b68cff46ec98f293661",
           "tools/architecture/provenance.py": "fb9c86ec09799d136d3c5246f9179bd43e463b819320837ae9e7a8ee3a4f2391",
-          "tools/architecture/report.py": "6c4c08fc708fbb7a635a6557144cafc0e5011cf3d67d2a3fce0c0486d6a03574",
+          "tools/architecture/report.py": "c414fd4257da43e4c19c21855a9305ff05c8c442bb899526e88d1411c505fe5e",
           "tools/architecture/sources.py": "547a080e87018ce39b7e82eefd632a20dd4cad1158c57b888d7d25255a6aece1"
         },
-        "sha256": "b347671b125102d67b45128e9ad38733fafa796221faead698c7363dfbb7315c",
+        "sha256": "e68c4e6e22ece25c7529bf85ec14060a47c408c7a78b6b3c2f01d8f0c0f72092",
         "status": "clean"
       },
       "source": {

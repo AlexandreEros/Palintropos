@@ -1,8 +1,8 @@
 # Architecture reform review
 
 The reform is reconciled with main at `6a03708` (PR #14) on the local
-branch `reform/reconcile-main`. The analyzed source is merge commit
-`3b5072168e2431dc3ab3117b3a3c20052ed4f07d`; source and generator trees
+branch `reform/reconcile-main`. The analyzed source and generator are based on the commit recorded in
+`../current/metrics.json`; source and generator trees
 were clean when generated. Full provenance and per-file content hashes are
 in `../current/metrics.json`. The original reform baseline was
 `5c8d7e8539be07e3e6c1f808380510f18d84a965`.
@@ -116,3 +116,16 @@ browser playback are outstanding validation limitations. The reform and
 main reconciliation are committed locally; nothing has been pushed or merged
 into remote main. The branch is ready for diff review. A library/application
 split and namespace rename belong in a separate proposal and PR.
+
+## CI provenance correction
+
+The first pushed branch passed the CPU tests, but failed the architecture
+freshness job: generation-time HEAD, Git status, and the explicit source
+commit differed when CI regenerated after the report commit. Only README.md
+and metrics.json differed; the graphs were unchanged.
+
+The check now retains the original provenance when both source and generator
+content hashes and per-file inventories still match, and compares every
+generated file. Regression coverage includes later documentation commits,
+dirty generation followed by a commit, comment-only source/generator edits,
+and modified diagram output. All 49 architecture-tool tests pass.
