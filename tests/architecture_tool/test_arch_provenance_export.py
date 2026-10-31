@@ -109,3 +109,23 @@ def test_source_row_names_working_tree_state():
         '| Source base commit | `abc` (clean working tree) |')
     assert 'uncommitted' in _source_row(source('dirty'))
     assert 'not recorded' in _source_row({'commit': None})
+
+
+def test_content_hashes_ignore_checkout_line_endings(tmp_path):
+    from tools.architecture.provenance import working_tree
+
+    def snapshot(text: bytes):
+        repo = tmp_path / ('crlf' if b'\r' in text else 'lf')
+        module = repo / 'src' / 'pkg' / '__init__.py'
+        module.parent.mkdir(parents=True)
+        module.write_bytes(text)
+        (repo / 'tools' / 'architecture').mkdir(parents=True)
+        for args in (['init'], ['-c', 'core.autocrlf=false', 'add', '.'],
+                     ['-c', 'user.name=Fixture', '-c',
+                      'user.email=fixture@example.invalid', 'commit', '-m', 'x']):
+            subprocess.check_output(['git', *args], cwd=repo)
+        return working_tree(repo, 'src', 'pkg')['source']
+
+    lf, crlf = snapshot(b'a = 1\nb = 2\n'), snapshot(b'a = 1\r\nb = 2\r\n')
+    assert lf['sha256'] == crlf['sha256']
+    assert lf['files'] == crlf['files']

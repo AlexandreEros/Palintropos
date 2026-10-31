@@ -14,7 +14,10 @@ def working_tree(root: Path, src: str, package: str) -> dict:
         files = sorted(p for p in folder.rglob('*') if p.is_file()
                        and p.suffix in {'.py', '.cu', '.html'}
                        and '__pycache__' not in p.parts)
-        hashes = {p.relative_to(root).as_posix(): hashlib.sha256(p.read_bytes()).hexdigest()
+        # Hash LF-normalized content so the identity is the committed text,
+        # independent of checkout line endings (core.autocrlf on Windows).
+        hashes = {p.relative_to(root).as_posix():
+                  hashlib.sha256(p.read_bytes().replace(b'\r\n', b'\n')).hexdigest()
                   for p in files}
         digest = hashlib.sha256()
         for name, sha in hashes.items():
