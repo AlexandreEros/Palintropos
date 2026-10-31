@@ -1,9 +1,19 @@
 # Architecture reform review
 
-The current working tree is based on commit
-`5c8d7e8539be07e3e6c1f808380510f18d84a965`. The changes are uncommitted;
-current source/generator status and per-file content hashes are in
-`../current/metrics.json`. A base commit does not identify the dirty source.
+The reform is reconciled with main at `6a03708` (PR #14) on the local
+branch `reform/reconcile-main`. The analyzed source is merge commit
+`3b5072168e2431dc3ab3117b3a3c20052ed4f07d`; source and generator trees
+were clean when generated. Full provenance and per-file content hashes are
+in `../current/metrics.json`. The original reform baseline was
+`5c8d7e8539be07e3e6c1f808380510f18d84a965`.
+
+The merge preserves the new terrain expressions/functions/file loading,
+terrain CLI, orographic thermal-wave scenario, evolving Mars example and
+published capsule, and atmosphere playback. The CLI conflict was resolved
+by retaining both the run-owned preset registry and the new terrain command.
+The added CPU-import coverage was migrated from the retired compatibility
+test into `tests/test_layout.py`. Architecture outputs were regenerated
+from the combined source.
 
 ## Ownership findings and changes
 
@@ -48,25 +58,26 @@ schema, library/application split, or namespace rename is part of them.
 
 ## Snapshot comparison
 
-| Measurement | Base commit snapshot | After compatibility cleanup | After ownership review |
-|---|---:|---:|---:|
-| Discovered modules | 177 | 122 | 128 |
-| Modules included in import graph | 156 | 102 | 108 |
-| Module import edges | 411 | 339 | 350 |
-| Nontrivial module cyclic groups | 2 | 3 | 0 |
-| Modules in cyclic groups | 14 | 7 | 0 |
+| Measurement | Original base | After cleanup | After ownership | Updated main | Reconciled |
+|---|---:|---:|---:|---:|---:|
+| Discovered modules | 177 | 122 | 128 | 180 | 131 |
+| Modules included in import graph | 156 | 102 | 108 | 159 | 111 |
+| Module import edges | 411 | 339 | 350 | 420 | 359 |
+| Nontrivial module cyclic groups | 2 | 3 | 0 | 2 | 0 |
+| Modules in cyclic groups | 14 | 7 | 0 | 15 | 0 |
 
 The extra modules after ownership review represent explicit owners for shared
 code. These descriptive numbers are not quality scores. The base snapshot
 includes compatibility packages and re-export paths; its grouping differs.
 Full baseline measurements are `base-commit.metrics.json` and
-`after-cleanup.metrics.json`; current results are in `../current/metrics.md`
+`after-cleanup.metrics.json`, `after-ownership.metrics.json`, and
+`updated-main.metrics.json`; current results are in `../current/metrics.md`
 and `../current/metrics.json`. Static graphs omit some runtime dispatch;
 zero static cycles is not a claim that every runtime interaction is acyclic.
 
 ## Validation and compatibility
 
-* Full CPU suite: **844 passed, 428 skipped**. This includes saved-run,
+* Reconciled CPU suite: **971 passed, 435 skipped**. This includes saved-run,
   atmosphere export, snapshot plotting, custom-state and terrain persistence,
   lifecycle, overwrite cleanup, CPU-import, and architecture-tool checks.
 * Built a distribution wheel, installed it into a separate environment,
@@ -74,7 +85,9 @@ zero static cycles is not a claim that every runtime interaction is acyclic.
   Verified the imported package came from that installation.
 * Installed `tropoi list presets` and `tropoi inspect ... --snapshot -1
   --field zeta` passed; inspection reported the expected read-only 22×22
-  coefficients and valid conventions. Both committed published runs opened.
+  coefficients and valid conventions. All three committed published runs opened, including the new nine-state
+  Mars PE run; installed `tropoi inspect` read its final temperature field.
+  The installed `tropoi terrain prepare --help` command also passed.
 * Installed-package initial-state preparation/save/load and
   `PreparedPlanet.save/load` passed using synthetic coefficients on the CPU.
   This validates persistence and delegation, not numerical terrain projection.
@@ -82,8 +95,15 @@ zero static cycles is not a claim that every runtime interaction is acyclic.
   execution modules. Generated reports pass `--check`; export includes actual
   metrics, provenance, diagram sources, baseline results, and checksums.
 * CUDA numerical integration, physical-grid projection and GPU-dependent plot
-  reconstruction could not run on this CPU-only host. A browser was not used
-  for manual interaction with the exported globe in this review.
+  reconstruction could not run on this CPU-only host. The two new browser tests were attempted: Chromium navigation returned
+  `net::ERR_BLOCKED_BY_ADMINISTRATOR` for the exported local HTML, so the
+  viewer never loaded. The initial suite had 971 passes, 433 skips and these
+  two failures. The final run explicitly disabled browser discovery with
+  `TROPOI_BROWSER=/tmp/no-browser-in-this-managed-environment`, yielding the
+  435 skips above. Browser tests and viewer code remain unchanged from main;
+  offline playback still needs verification in an environment allowing local
+  HTML navigation. This is an environment limitation, not evidence of a
+  reform regression.
 
 Intentional breaks from the earlier cleanup remain: retired legacy Python
 paths, aeolus/psx-* commands, unused aliases and standalone parsers. The
@@ -91,7 +111,8 @@ internal `cli.bve`, `cli.swe`, `cli.pe`, and `cli.run_lifecycle` modules are
 also relocated; repository callers use the run-layer owners. Supported saved
 formats and the named convenience methods remain available.
 
-No remaining code blocker was found in these paths. GPU verification is the
-outstanding validation limitation. The changes remain uncommitted and have
-not been pushed or merged; they are ready for diff review. A library/application
+No remaining code blocker was found in these paths. GPU verification and
+browser playback are outstanding validation limitations. The reform and
+main reconciliation are committed locally; nothing has been pushed or merged
+into remote main. The branch is ready for diff review. A library/application
 split and namespace rename belong in a separate proposal and PR.
