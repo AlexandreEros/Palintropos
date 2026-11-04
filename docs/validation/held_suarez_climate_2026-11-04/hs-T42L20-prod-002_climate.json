@@ -8653,7 +8653,7 @@
       ]
     }
   },
-  "plotted_by": "cae66d7e",
+  "plotted_by": "29340e5a",
   "run": {
     "config_sha256": "d1fa645db12038f21725bb40fa1f89e036b115ea4b752401a6e24e33f97d381c",
     "created": "2026-10-03T17:35:10Z",
@@ -9996,7 +9996,8 @@
     "definitions": {
       "ke": "global mean of sum_k dsigma_k |V_k|^2 / 2 (m^2 s^-2)",
       "mean_T": "global mean of sum_k dsigma_k T_k (K)",
-      "relative_mass_drift": "(<p_s> - <p_s>(first day)) / <p_s>(first day), <> = Gaussian-weighted global mean"
+      "relative_mass_drift": "(<p_s> - <p_s>(first day)) / <p_s>(first day), <> = Gaussian-weighted global mean",
+      "weighting": "ke and mean_T: Gaussian area weights times sigma-layer thickness, no local p_s factor (area- and sigma-weighted, not mass-weighted)"
     },
     "ke": [
       1.018570550448675,
@@ -14038,7 +14039,7 @@
   ],
   "states_sha256": "5547924a5df618129cdfc0818841a291fd129962e9c37f245cd7012bcf57eca8",
   "timing_s": {
-    "reduce": 47.82293889997527
+    "reduce": 57.46911229984835
   },
   "view": {
     "interval_days": [
