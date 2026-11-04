@@ -631,6 +631,33 @@
         "dataclass(frozen=True)"
       ],
       "external_bases": [],
+      "id": "tropoi.representation.diagnostics.held_suarez_sections.DailySeries",
+      "members": [
+        {
+          "kind": "method",
+          "name": "mass_drift"
+        },
+        {
+          "kind": "property",
+          "name": "reference_day"
+        },
+        {
+          "kind": "method",
+          "name": "summary"
+        },
+        {
+          "kind": "method",
+          "name": "to_dict"
+        }
+      ],
+      "module": "tropoi.representation.diagnostics.held_suarez_sections",
+      "qualname": "DailySeries"
+    },
+    {
+      "decorators": [
+        "dataclass(frozen=True)"
+      ],
+      "external_bases": [],
       "id": "tropoi.representation.diagnostics.held_suarez_sections.SampleSelection",
       "members": [
         {

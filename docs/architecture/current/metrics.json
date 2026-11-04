@@ -1,20 +1,20 @@
 {
   "call_graph": {
     "call_sites": {
-      "builtin": 2852,
-      "external": 1908,
-      "internal": 2443,
-      "unresolved": 2917
+      "builtin": 2874,
+      "external": 1923,
+      "internal": 2456,
+      "unresolved": 2952
     },
     "edges_by_kind": {
-      "call": 1019,
+      "call": 1023,
       "constructor": 42,
-      "instantiate": 408,
+      "instantiate": 411,
       "override": 6,
-      "self": 279,
+      "self": 281,
       "super": 2
     },
-    "nodes": 1438,
+    "nodes": 1447,
     "scoped": {
       "cli-gen": {
         "edges": 28,
@@ -69,7 +69,7 @@
     }
   },
   "class_graph": {
-    "classes": 161,
+    "classes": 162,
     "external_bases": {
       "RuntimeError": 6,
       "UserWarning": 1,
@@ -717,11 +717,11 @@
     }
   },
   "source": {
-    "commit": "10638a29437b8699f5f65216ecdf1f4da9818411",
+    "commit": "18c6a5f31d7242f4c94cc850d0c684a527258b38",
     "package": "tropoi",
     "src": "src",
     "working_tree": {
-      "base_commit": "10638a29437b8699f5f65216ecdf1f4da9818411",
+      "base_commit": "18c6a5f31d7242f4c94cc850d0c684a527258b38",
       "generator": {
         "changes": [],
         "files": {
@@ -762,7 +762,7 @@
           "src/tropoi/representation/archive/writer.py": "527dedc067b03d209979cf3a7dd79318ae6bddd3203e0977b326980a8fcbeab8",
           "src/tropoi/representation/diagnostics/__init__.py": "29950032dc1573f806bc05c980b6ee2c0fa5677cab03425dee607454b82e44b8",
           "src/tropoi/representation/diagnostics/bve.py": "695c9afb922c2eb1051f151f46b3d95f6bc6fa8152924fa95ab8560e8fa0ef18",
-          "src/tropoi/representation/diagnostics/held_suarez_sections.py": "5f65c9ad7adf4e00d8470eb6b21e3372b0275e90e49cca4e0c42cfc7faeb6ad4",
+          "src/tropoi/representation/diagnostics/held_suarez_sections.py": "3ceeca2da162b25bae2b618bff343cdd7d010943089df2545dc8cc875d3d2ec5",
           "src/tropoi/representation/diagnostics/pe.py": "bedc6150dae35905160c6cbc5ebb917759b0d4514a3f4690c5a42b42caf07269",
           "src/tropoi/representation/diagnostics/pe_levels.py": "0a429f94afdde8a7774dd3a5a5fb14cd7f22f7bd4261ee75172b3a0510580c19",
           "src/tropoi/representation/diagnostics/spectral.py": "1c1eea172488db2bb44a51afa8100825307b0f197e4e2dcedb896bd4f56b1722",
@@ -775,7 +775,7 @@
           "src/tropoi/representation/visual/evaluate.py": "e85ab67612e6e13e224364e7e23fd2a22613bb85b3ba0656629e4386518099c7",
           "src/tropoi/representation/visual/fields.py": "1e3dbc051a384fa8245c17bb9bb9009f5716d3c6e9c81af57b218d194019bff2",
           "src/tropoi/representation/visual/grid_adapter.py": "d94cda5d2d2dc927c10bd583716edf2def6284deeba994ceae192b05a8a6e34b",
-          "src/tropoi/representation/visual/held_suarez_climate.py": "bd05b830ee8481e715da5e60040559a29769e60837d4296b2272434aa9a59e91",
+          "src/tropoi/representation/visual/held_suarez_climate.py": "4d9e15824647a92730507c5cc0f7242ae7a381b1cf77fe0f2a6f222be535480f",
           "src/tropoi/representation/visual/matplotlib_renderer.py": "5421b11b634cd37932e7064ea7a6d6ce7cd541a3a912724473a40e0a99d8b804",
           "src/tropoi/representation/visual/normalization.py": "4bf25e99bddb783d9226d7d7168d3d7a21695c85143bebb883d4035af29d5b21",
           "src/tropoi/representation/visual/pe.py": "a877b3de8605ee213d08bce15829a14e8e78d10fca4572a76eea0a643c768082",
@@ -880,7 +880,7 @@
           "src/tropoi/temporal/tendencies/primitive_equations.py": "70cf8c872343b3a2de90d19caf69a0f3b3c681143d21781a2194641698bffaf3",
           "src/tropoi/temporal/tendencies/shallow_water.py": "2e1145284557291e4cc4b900851f867bdc835eaef07c035053d04648a346cb7c"
         },
-        "sha256": "dca3fd26c802161c89d7c7f768e9461b82227e92fe1ca86777c8bbfce6968a62",
+        "sha256": "179d84d81af6df906332388f61e2d730f85e9b3083daa05dec84046bd484fbad",
         "status": "clean"
       }
     }

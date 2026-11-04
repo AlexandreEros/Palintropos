@@ -3388,6 +3388,7 @@
         "__future__",
         "collections",
         "dataclasses",
+        "hashlib",
         "json",
         "pathlib",
         "textwrap",

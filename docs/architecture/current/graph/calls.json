@@ -1317,6 +1317,16 @@
     },
     {
       "kind": "self",
+      "source": "tropoi.representation.diagnostics.held_suarez_sections.DailySeries.summary",
+      "target": "tropoi.representation.diagnostics.held_suarez_sections.DailySeries.mass_drift"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.representation.diagnostics.held_suarez_sections.DailySeries.to_dict",
+      "target": "tropoi.representation.diagnostics.held_suarez_sections.DailySeries.mass_drift"
+    },
+    {
+      "kind": "self",
       "source": "tropoi.representation.diagnostics.held_suarez_sections.SampleSelection.summary",
       "target": "tropoi.representation.diagnostics.held_suarez_sections.SampleSelection.cadence_label"
     },
@@ -1364,6 +1374,16 @@
       "kind": "call",
       "source": "tropoi.representation.diagnostics.held_suarez_sections._synthesize_uvT",
       "target": "tropoi.spatial.transforms.host_synthesis.synthesize_wind_latlon"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.representation.diagnostics.held_suarez_sections.daily_series",
+      "target": "tropoi.representation.diagnostics.held_suarez_sections.DailySeries"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.representation.diagnostics.held_suarez_sections.daily_series",
+      "target": "tropoi.representation.diagnostics.held_suarez_sections.SectionError"
     },
     {
       "kind": "instantiate",
@@ -3032,6 +3052,11 @@
     },
     {
       "kind": "call",
+      "source": "tropoi.representation.visual.held_suarez_climate._series_strip",
+      "target": "tropoi.representation.visual.held_suarez_climate._window_note"
+    },
+    {
+      "kind": "call",
       "source": "tropoi.representation.visual.held_suarez_climate.describe_run",
       "target": "tropoi.representation.visual.held_suarez_climate._nominal_truncation"
     },
@@ -3058,7 +3083,22 @@
     {
       "kind": "call",
       "source": "tropoi.representation.visual.held_suarez_climate.draw_sections",
+      "target": "tropoi.representation.visual.held_suarez_climate._series_strip"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.held_suarez_climate.draw_sections",
       "target": "tropoi.representation.visual.matplotlib_renderer.MatplotlibRenderer._save_atomic"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.representation.visual.held_suarez_climate.read_daily_series",
+      "target": "tropoi.representation.diagnostics.held_suarez_sections.SectionError"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.held_suarez_climate.read_daily_series",
+      "target": "tropoi.representation.diagnostics.held_suarez_sections.daily_series"
     },
     {
       "kind": "call",
@@ -3129,6 +3169,11 @@
       "kind": "call",
       "source": "tropoi.representation.visual.held_suarez_climate.render_held_suarez_climate",
       "target": "tropoi.representation.visual.held_suarez_climate.draw_sections"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.held_suarez_climate.render_held_suarez_climate",
+      "target": "tropoi.representation.visual.held_suarez_climate.read_daily_series"
     },
     {
       "kind": "call",
@@ -10268,6 +10313,41 @@
       "type": "function"
     },
     {
+      "id": "tropoi.representation.diagnostics.held_suarez_sections.DailySeries",
+      "kind": "class",
+      "module": "tropoi.representation.diagnostics.held_suarez_sections",
+      "qualname": "DailySeries",
+      "type": "class"
+    },
+    {
+      "id": "tropoi.representation.diagnostics.held_suarez_sections.DailySeries.mass_drift",
+      "kind": "method",
+      "module": "tropoi.representation.diagnostics.held_suarez_sections",
+      "qualname": "DailySeries.mass_drift",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.diagnostics.held_suarez_sections.DailySeries.reference_day",
+      "kind": "property",
+      "module": "tropoi.representation.diagnostics.held_suarez_sections",
+      "qualname": "DailySeries.reference_day",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.diagnostics.held_suarez_sections.DailySeries.summary",
+      "kind": "method",
+      "module": "tropoi.representation.diagnostics.held_suarez_sections",
+      "qualname": "DailySeries.summary",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.diagnostics.held_suarez_sections.DailySeries.to_dict",
+      "kind": "method",
+      "module": "tropoi.representation.diagnostics.held_suarez_sections",
+      "qualname": "DailySeries.to_dict",
+      "type": "function"
+    },
+    {
       "id": "tropoi.representation.diagnostics.held_suarez_sections.SampleSelection",
       "kind": "class",
       "module": "tropoi.representation.diagnostics.held_suarez_sections",
@@ -10398,6 +10478,13 @@
       "kind": "function",
       "module": "tropoi.representation.diagnostics.held_suarez_sections",
       "qualname": "_synthesize_uvT",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.diagnostics.held_suarez_sections.daily_series",
+      "kind": "function",
+      "module": "tropoi.representation.diagnostics.held_suarez_sections",
+      "qualname": "daily_series",
       "type": "function"
     },
     {
@@ -11675,6 +11762,13 @@
       "type": "function"
     },
     {
+      "id": "tropoi.representation.visual.held_suarez_climate._series_strip",
+      "kind": "function",
+      "module": "tropoi.representation.visual.held_suarez_climate",
+      "qualname": "_series_strip",
+      "type": "function"
+    },
+    {
       "id": "tropoi.representation.visual.held_suarez_climate._short",
       "kind": "function",
       "module": "tropoi.representation.visual.held_suarez_climate",
@@ -11686,6 +11780,13 @@
       "kind": "function",
       "module": "tropoi.representation.visual.held_suarez_climate",
       "qualname": "_stored_latitudes",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.held_suarez_climate._window_note",
+      "kind": "function",
+      "module": "tropoi.representation.visual.held_suarez_climate",
+      "qualname": "_window_note",
       "type": "function"
     },
     {
@@ -11707,6 +11808,13 @@
       "kind": "function",
       "module": "tropoi.representation.visual.held_suarez_climate",
       "qualname": "panel_facts",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.held_suarez_climate.read_daily_series",
+      "kind": "function",
+      "module": "tropoi.representation.visual.held_suarez_climate",
+      "qualname": "read_daily_series",
       "type": "function"
     },
     {

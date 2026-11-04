@@ -5,20 +5,20 @@
 
 | | |
 |---|---|
-| Source commit | `10638a29437b8699f5f65216ecdf1f4da9818411` |
+| Source commit | `18c6a5f31d7242f4c94cc850d0c684a527258b38` |
 | Analysed package | `tropoi` under `src/` |
 | Generator | `tools.architecture` 1.0.0 |
 | Toolchain | Python 3.12, grimp 3.17, networkx 3.7 |
-| Command | `python -m tools.architecture.generate --source-commit 10638a29437b8699f5f65216ecdf1f4da9818411` |
+| Command | `python -m tools.architecture.generate --source-commit 18c6a5f31d7242f4c94cc850d0c684a527258b38` |
 
-Source working tree: **clean**. Content SHA-256: `dca3fd26c802161c89d7c7f768e9461b82227e92fe1ca86777c8bbfce6968a62`. Generator working tree: **clean**. Per-file hashes and scoped Git status are recorded in `metrics.json`. These describe generation time; --check verifies source and generator content hashes before reusing this context across later commits. The base commit alone does not identify uncommitted source.
+Source working tree: **clean**. Content SHA-256: `179d84d81af6df906332388f61e2d730f85e9b3083daa05dec84046bd484fbad`. Generator working tree: **clean**. Per-file hashes and scoped Git status are recorded in `metrics.json`. These describe generation time; --check verifies source and generator content hashes before reusing this context across later commits. The base commit alone does not identify uncommitted source.
 
 ## Reproducing
 
 From the repository root, with the development requirements installed (`pip install -r requirements-dev.txt`):
 
 ```bash
-python -m tools.architecture.generate --source-commit 10638a29437b8699f5f65216ecdf1f4da9818411
+python -m tools.architecture.generate --source-commit 18c6a5f31d7242f4c94cc850d0c684a527258b38
 ```
 
 ## Files
@@ -95,7 +95,7 @@ Excluded by rule 4: `tropoi`, `tropoi.cli`, `tropoi.representation`, `tropoi.rep
 
 ### Call graphs (ast)
 
-Each call expression inside a function or method body (nested functions, lambdas, and comprehensions are attributed to the enclosing function) is classified as `internal` (resolved to an analysed definition), `external` (resolved to a name outside the package), `builtin` (an unshadowed builtin), or `unresolved`. Totals: builtin 2852, external 1908, internal 2443, unresolved 2917.
+Each call expression inside a function or method body (nested functions, lambdas, and comprehensions are attributed to the enclosing function) is classified as `internal` (resolved to an analysed definition), `external` (resolved to a name outside the package), `builtin` (an unshadowed builtin), or `unresolved`. Totals: builtin 2874, external 1923, internal 2456, unresolved 2952.
 
 | Edge kind | Syntax | What it claims |
 |---|---|---|
