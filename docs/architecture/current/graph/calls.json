@@ -621,6 +621,11 @@
       "target": "tropoi.representation.archive.held_suarez.HeldSuarezPlotError"
     },
     {
+      "kind": "call",
+      "source": "tropoi.representation.archive.held_suarez.HeldSuarezStorage.plot_simulation",
+      "target": "tropoi.representation.visual.held_suarez_climate.render_held_suarez_climate"
+    },
+    {
       "kind": "instantiate",
       "source": "tropoi.representation.archive.held_suarez.HeldSuarezStorage.plot_snapshot",
       "target": "tropoi.representation.archive.held_suarez.HeldSuarezPlotError"
@@ -1304,6 +1309,131 @@
       "kind": "call",
       "source": "tropoi.representation.diagnostics.bve.spectral_diagnostics",
       "target": "tropoi.spatial.truncation.product_truncation_cut"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.representation.diagnostics.held_suarez_sections.Bandlimit.check_longitudes",
+      "target": "tropoi.representation.diagnostics.held_suarez_sections.SectionError"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.representation.diagnostics.held_suarez_sections.SampleSelection.summary",
+      "target": "tropoi.representation.diagnostics.held_suarez_sections.SampleSelection.cadence_label"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.diagnostics.held_suarez_sections.SampleSelection.summary",
+      "target": "tropoi.representation.diagnostics.held_suarez_sections._fmt_day"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.representation.diagnostics.held_suarez_sections.SampleSelection.to_dict",
+      "target": "tropoi.representation.diagnostics.held_suarez_sections.SampleSelection.cadence_label"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.representation.diagnostics.held_suarez_sections.SampleSelection.to_dict",
+      "target": "tropoi.representation.diagnostics.held_suarez_sections.SampleSelection.coverage_label"
+    },
+    {
+      "kind": "constructor",
+      "source": "tropoi.representation.diagnostics.held_suarez_sections.SectionAccumulator",
+      "target": "tropoi.representation.diagnostics.held_suarez_sections.SectionAccumulator.__init__"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.representation.diagnostics.held_suarez_sections.SectionAccumulator.add",
+      "target": "tropoi.representation.diagnostics.held_suarez_sections.SectionError"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.representation.diagnostics.held_suarez_sections.SectionAccumulator.means",
+      "target": "tropoi.representation.diagnostics.held_suarez_sections.SectionError"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.representation.diagnostics.held_suarez_sections._check_interval",
+      "target": "tropoi.representation.diagnostics.held_suarez_sections.SectionError"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.diagnostics.held_suarez_sections._synthesize_uvT",
+      "target": "tropoi.spatial.transforms.host_synthesis.synthesize_latlon"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.diagnostics.held_suarez_sections._synthesize_uvT",
+      "target": "tropoi.spatial.transforms.host_synthesis.synthesize_wind_latlon"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.representation.diagnostics.held_suarez_sections.default_window",
+      "target": "tropoi.representation.diagnostics.held_suarez_sections.SectionError"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.representation.diagnostics.held_suarez_sections.gaussian_latitudes_deg",
+      "target": "tropoi.representation.diagnostics.held_suarez_sections.SectionError"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.representation.diagnostics.held_suarez_sections.reduce_sections",
+      "target": "tropoi.representation.diagnostics.held_suarez_sections.Bandlimit"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.representation.diagnostics.held_suarez_sections.reduce_sections",
+      "target": "tropoi.representation.diagnostics.held_suarez_sections.SectionAccumulator"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.representation.diagnostics.held_suarez_sections.reduce_sections",
+      "target": "tropoi.representation.diagnostics.held_suarez_sections.SectionError"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.representation.diagnostics.held_suarez_sections.reduce_sections",
+      "target": "tropoi.representation.diagnostics.held_suarez_sections.SectionResult"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.diagnostics.held_suarez_sections.reduce_sections",
+      "target": "tropoi.representation.diagnostics.held_suarez_sections._synthesize_uvT"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.representation.diagnostics.held_suarez_sections.select_samples",
+      "target": "tropoi.representation.diagnostics.held_suarez_sections.SampleSelection"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.representation.diagnostics.held_suarez_sections.select_samples",
+      "target": "tropoi.representation.diagnostics.held_suarez_sections.SectionError"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.diagnostics.held_suarez_sections.select_samples",
+      "target": "tropoi.representation.diagnostics.held_suarez_sections._check_interval"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.diagnostics.held_suarez_sections.select_samples",
+      "target": "tropoi.representation.diagnostics.held_suarez_sections._fmt_day"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.diagnostics.held_suarez_sections.select_samples",
+      "target": "tropoi.representation.diagnostics.held_suarez_sections.default_window"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.representation.diagnostics.held_suarez_sections.state_grid",
+      "target": "tropoi.representation.diagnostics.held_suarez_sections.SectionError"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.diagnostics.held_suarez_sections.state_grid",
+      "target": "tropoi.representation.diagnostics.held_suarez_sections.gaussian_latitudes_deg"
     },
     {
       "kind": "constructor",
@@ -2869,6 +2999,136 @@
       "kind": "call",
       "source": "tropoi.representation.visual.grid_adapter.map_to_uniform_latlon",
       "target": "tropoi.spatial.grids.grid_interpolation.geodesic_to_latlon_grid"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.held_suarez_climate._footer_lines",
+      "target": "tropoi.representation.visual.held_suarez_climate._short"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.held_suarez_climate._nominal_truncation",
+      "target": "tropoi.spatial.truncation.product_truncation_cut"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.held_suarez_climate._panel",
+      "target": "tropoi.representation.visual.held_suarez_climate._fmt"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.held_suarez_climate._panel",
+      "target": "tropoi.representation.visual.held_suarez_climate.panel_facts"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.held_suarez_climate._plotter_commit",
+      "target": "tropoi.representation.archive.writer._git"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.representation.visual.held_suarez_climate._resolve_scales",
+      "target": "tropoi.representation.visual.held_suarez_climate.SectionScale"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.held_suarez_climate.describe_run",
+      "target": "tropoi.representation.visual.held_suarez_climate._nominal_truncation"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.held_suarez_climate.draw_sections",
+      "target": "tropoi.representation.visual.held_suarez_climate._footer_lines"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.held_suarez_climate.draw_sections",
+      "target": "tropoi.representation.visual.held_suarez_climate._header_lines"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.held_suarez_climate.draw_sections",
+      "target": "tropoi.representation.visual.held_suarez_climate._panel"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.held_suarez_climate.draw_sections",
+      "target": "tropoi.representation.visual.held_suarez_climate._resolve_scales"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.held_suarez_climate.draw_sections",
+      "target": "tropoi.representation.visual.matplotlib_renderer.MatplotlibRenderer._save_atomic"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.held_suarez_climate.reduce_experiment",
+      "target": "tropoi.representation.archive.availability.statistics_only_description"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.representation.visual.held_suarez_climate.reduce_experiment",
+      "target": "tropoi.representation.diagnostics.held_suarez_sections.SectionError"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.held_suarez_climate.reduce_experiment",
+      "target": "tropoi.representation.diagnostics.held_suarez_sections.load_state"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.held_suarez_climate.reduce_experiment",
+      "target": "tropoi.representation.diagnostics.held_suarez_sections.reduce_sections"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.held_suarez_climate.reduce_experiment",
+      "target": "tropoi.representation.diagnostics.held_suarez_sections.select_samples"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.held_suarez_climate.reduce_experiment",
+      "target": "tropoi.representation.diagnostics.held_suarez_sections.state_grid"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.held_suarez_climate.reduce_experiment",
+      "target": "tropoi.representation.visual.held_suarez_climate._nominal_truncation"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.held_suarez_climate.reduce_experiment",
+      "target": "tropoi.representation.visual.held_suarez_climate._stored_latitudes"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.held_suarez_climate.render_held_suarez_climate",
+      "target": "tropoi.representation.visual.held_suarez_climate._checked_output"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.held_suarez_climate.render_held_suarez_climate",
+      "target": "tropoi.representation.visual.held_suarez_climate._plotter_commit"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.held_suarez_climate.render_held_suarez_climate",
+      "target": "tropoi.representation.visual.held_suarez_climate._resolve_scales"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.held_suarez_climate.render_held_suarez_climate",
+      "target": "tropoi.representation.visual.held_suarez_climate.describe_run"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.held_suarez_climate.render_held_suarez_climate",
+      "target": "tropoi.representation.visual.held_suarez_climate.draw_sections"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.held_suarez_climate.render_held_suarez_climate",
+      "target": "tropoi.representation.visual.held_suarez_climate.reduce_experiment"
     },
     {
       "kind": "constructor",
@@ -9975,6 +10235,209 @@
       "type": "function"
     },
     {
+      "id": "tropoi.representation.diagnostics.held_suarez_sections.Bandlimit",
+      "kind": "class",
+      "module": "tropoi.representation.diagnostics.held_suarez_sections",
+      "qualname": "Bandlimit",
+      "type": "class"
+    },
+    {
+      "id": "tropoi.representation.diagnostics.held_suarez_sections.Bandlimit.check_longitudes",
+      "kind": "method",
+      "module": "tropoi.representation.diagnostics.held_suarez_sections",
+      "qualname": "Bandlimit.check_longitudes",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.diagnostics.held_suarez_sections.Bandlimit.to_dict",
+      "kind": "method",
+      "module": "tropoi.representation.diagnostics.held_suarez_sections",
+      "qualname": "Bandlimit.to_dict",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.diagnostics.held_suarez_sections.Bandlimit.update",
+      "kind": "method",
+      "module": "tropoi.representation.diagnostics.held_suarez_sections",
+      "qualname": "Bandlimit.update",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.diagnostics.held_suarez_sections.SampleSelection",
+      "kind": "class",
+      "module": "tropoi.representation.diagnostics.held_suarez_sections",
+      "qualname": "SampleSelection",
+      "type": "class"
+    },
+    {
+      "id": "tropoi.representation.diagnostics.held_suarez_sections.SampleSelection.cadence_label",
+      "kind": "method",
+      "module": "tropoi.representation.diagnostics.held_suarez_sections",
+      "qualname": "SampleSelection.cadence_label",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.diagnostics.held_suarez_sections.SampleSelection.complete",
+      "kind": "property",
+      "module": "tropoi.representation.diagnostics.held_suarez_sections",
+      "qualname": "SampleSelection.complete",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.diagnostics.held_suarez_sections.SampleSelection.count",
+      "kind": "property",
+      "module": "tropoi.representation.diagnostics.held_suarez_sections",
+      "qualname": "SampleSelection.count",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.diagnostics.held_suarez_sections.SampleSelection.coverage_label",
+      "kind": "method",
+      "module": "tropoi.representation.diagnostics.held_suarez_sections",
+      "qualname": "SampleSelection.coverage_label",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.diagnostics.held_suarez_sections.SampleSelection.regular",
+      "kind": "property",
+      "module": "tropoi.representation.diagnostics.held_suarez_sections",
+      "qualname": "SampleSelection.regular",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.diagnostics.held_suarez_sections.SampleSelection.summary",
+      "kind": "method",
+      "module": "tropoi.representation.diagnostics.held_suarez_sections",
+      "qualname": "SampleSelection.summary",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.diagnostics.held_suarez_sections.SampleSelection.to_dict",
+      "kind": "method",
+      "module": "tropoi.representation.diagnostics.held_suarez_sections",
+      "qualname": "SampleSelection.to_dict",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.diagnostics.held_suarez_sections.SectionAccumulator",
+      "kind": "class",
+      "module": "tropoi.representation.diagnostics.held_suarez_sections",
+      "qualname": "SectionAccumulator",
+      "type": "class"
+    },
+    {
+      "id": "tropoi.representation.diagnostics.held_suarez_sections.SectionAccumulator.__init__",
+      "kind": "method",
+      "module": "tropoi.representation.diagnostics.held_suarez_sections",
+      "qualname": "SectionAccumulator.__init__",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.diagnostics.held_suarez_sections.SectionAccumulator.add",
+      "kind": "method",
+      "module": "tropoi.representation.diagnostics.held_suarez_sections",
+      "qualname": "SectionAccumulator.add",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.diagnostics.held_suarez_sections.SectionAccumulator.means",
+      "kind": "method",
+      "module": "tropoi.representation.diagnostics.held_suarez_sections",
+      "qualname": "SectionAccumulator.means",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.diagnostics.held_suarez_sections.SectionError",
+      "kind": "class",
+      "module": "tropoi.representation.diagnostics.held_suarez_sections",
+      "qualname": "SectionError",
+      "type": "class"
+    },
+    {
+      "id": "tropoi.representation.diagnostics.held_suarez_sections.SectionResult",
+      "kind": "class",
+      "module": "tropoi.representation.diagnostics.held_suarez_sections",
+      "qualname": "SectionResult",
+      "type": "class"
+    },
+    {
+      "id": "tropoi.representation.diagnostics.held_suarez_sections.SectionResult.__getitem__",
+      "kind": "method",
+      "module": "tropoi.representation.diagnostics.held_suarez_sections",
+      "qualname": "SectionResult.__getitem__",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.diagnostics.held_suarez_sections.SectionResult.states_sha256",
+      "kind": "method",
+      "module": "tropoi.representation.diagnostics.held_suarez_sections",
+      "qualname": "SectionResult.states_sha256",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.diagnostics.held_suarez_sections._check_interval",
+      "kind": "function",
+      "module": "tropoi.representation.diagnostics.held_suarez_sections",
+      "qualname": "_check_interval",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.diagnostics.held_suarez_sections._fmt_day",
+      "kind": "function",
+      "module": "tropoi.representation.diagnostics.held_suarez_sections",
+      "qualname": "_fmt_day",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.diagnostics.held_suarez_sections._synthesize_uvT",
+      "kind": "function",
+      "module": "tropoi.representation.diagnostics.held_suarez_sections",
+      "qualname": "_synthesize_uvT",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.diagnostics.held_suarez_sections.default_window",
+      "kind": "function",
+      "module": "tropoi.representation.diagnostics.held_suarez_sections",
+      "qualname": "default_window",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.diagnostics.held_suarez_sections.gaussian_latitudes_deg",
+      "kind": "function",
+      "module": "tropoi.representation.diagnostics.held_suarez_sections",
+      "qualname": "gaussian_latitudes_deg",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.diagnostics.held_suarez_sections.load_state",
+      "kind": "function",
+      "module": "tropoi.representation.diagnostics.held_suarez_sections",
+      "qualname": "load_state",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.diagnostics.held_suarez_sections.reduce_sections",
+      "kind": "function",
+      "module": "tropoi.representation.diagnostics.held_suarez_sections",
+      "qualname": "reduce_sections",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.diagnostics.held_suarez_sections.select_samples",
+      "kind": "function",
+      "module": "tropoi.representation.diagnostics.held_suarez_sections",
+      "qualname": "select_samples",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.diagnostics.held_suarez_sections.state_grid",
+      "kind": "function",
+      "module": "tropoi.representation.diagnostics.held_suarez_sections",
+      "qualname": "state_grid",
+      "type": "function"
+    },
+    {
       "id": "tropoi.representation.diagnostics.pe.PEDiagnosticsRecorder",
       "kind": "class",
       "module": "tropoi.representation.diagnostics.pe",
@@ -11113,6 +11576,146 @@
       "kind": "function",
       "module": "tropoi.representation.visual.grid_adapter",
       "qualname": "map_to_uniform_latlon",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.held_suarez_climate.SectionScale",
+      "kind": "class",
+      "module": "tropoi.representation.visual.held_suarez_climate",
+      "qualname": "SectionScale",
+      "type": "class"
+    },
+    {
+      "id": "tropoi.representation.visual.held_suarez_climate.SectionScale.__post_init__",
+      "kind": "method",
+      "module": "tropoi.representation.visual.held_suarez_climate",
+      "qualname": "SectionScale.__post_init__",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.held_suarez_climate.SectionScale.step",
+      "kind": "property",
+      "module": "tropoi.representation.visual.held_suarez_climate",
+      "qualname": "SectionScale.step",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.held_suarez_climate.SectionScale.to_dict",
+      "kind": "method",
+      "module": "tropoi.representation.visual.held_suarez_climate",
+      "qualname": "SectionScale.to_dict",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.held_suarez_climate._arange",
+      "kind": "function",
+      "module": "tropoi.representation.visual.held_suarez_climate",
+      "qualname": "_arange",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.held_suarez_climate._checked_output",
+      "kind": "function",
+      "module": "tropoi.representation.visual.held_suarez_climate",
+      "qualname": "_checked_output",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.held_suarez_climate._fmt",
+      "kind": "function",
+      "module": "tropoi.representation.visual.held_suarez_climate",
+      "qualname": "_fmt",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.held_suarez_climate._footer_lines",
+      "kind": "function",
+      "module": "tropoi.representation.visual.held_suarez_climate",
+      "qualname": "_footer_lines",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.held_suarez_climate._header_lines",
+      "kind": "function",
+      "module": "tropoi.representation.visual.held_suarez_climate",
+      "qualname": "_header_lines",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.held_suarez_climate._nominal_truncation",
+      "kind": "function",
+      "module": "tropoi.representation.visual.held_suarez_climate",
+      "qualname": "_nominal_truncation",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.held_suarez_climate._panel",
+      "kind": "function",
+      "module": "tropoi.representation.visual.held_suarez_climate",
+      "qualname": "_panel",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.held_suarez_climate._plotter_commit",
+      "kind": "function",
+      "module": "tropoi.representation.visual.held_suarez_climate",
+      "qualname": "_plotter_commit",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.held_suarez_climate._resolve_scales",
+      "kind": "function",
+      "module": "tropoi.representation.visual.held_suarez_climate",
+      "qualname": "_resolve_scales",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.held_suarez_climate._short",
+      "kind": "function",
+      "module": "tropoi.representation.visual.held_suarez_climate",
+      "qualname": "_short",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.held_suarez_climate._stored_latitudes",
+      "kind": "function",
+      "module": "tropoi.representation.visual.held_suarez_climate",
+      "qualname": "_stored_latitudes",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.held_suarez_climate.describe_run",
+      "kind": "function",
+      "module": "tropoi.representation.visual.held_suarez_climate",
+      "qualname": "describe_run",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.held_suarez_climate.draw_sections",
+      "kind": "function",
+      "module": "tropoi.representation.visual.held_suarez_climate",
+      "qualname": "draw_sections",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.held_suarez_climate.panel_facts",
+      "kind": "function",
+      "module": "tropoi.representation.visual.held_suarez_climate",
+      "qualname": "panel_facts",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.held_suarez_climate.reduce_experiment",
+      "kind": "function",
+      "module": "tropoi.representation.visual.held_suarez_climate",
+      "qualname": "reduce_experiment",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.held_suarez_climate.render_held_suarez_climate",
+      "kind": "function",
+      "module": "tropoi.representation.visual.held_suarez_climate",
+      "qualname": "render_held_suarez_climate",
       "type": "function"
     },
     {

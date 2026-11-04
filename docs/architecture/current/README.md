@@ -5,20 +5,20 @@
 
 | | |
 |---|---|
-| Source commit | `5555f930d1f062ca92eaf1f3d447a6b8260881f5` |
+| Source commit | `21e71558c2a16f83614b4abe8d6b8319ba3ccd29` |
 | Analysed package | `tropoi` under `src/` |
 | Generator | `tools.architecture` 1.0.0 |
 | Toolchain | Python 3.12, grimp 3.17, networkx 3.7 |
-| Command | `python -m tools.architecture.generate --source-commit 5555f930d1f062ca92eaf1f3d447a6b8260881f5` |
+| Command | `python -m tools.architecture.generate --source-commit 21e71558c2a16f83614b4abe8d6b8319ba3ccd29` |
 
-Source working tree: **clean**. Content SHA-256: `25a92a1f509e4ae0691711599dbee90f57f82a98eb71fbbd4a0cd971999259c0`. Generator working tree: **clean**. Per-file hashes and scoped Git status are recorded in `metrics.json`. These describe generation time; --check verifies source and generator content hashes before reusing this context across later commits. The base commit alone does not identify uncommitted source.
+Source working tree: **clean**. Content SHA-256: `de993c66223e60bd1cfa2554474faaaf7bed8a2cbf721a0405d4d52684a3c3c1`. Generator working tree: **clean**. Per-file hashes and scoped Git status are recorded in `metrics.json`. These describe generation time; --check verifies source and generator content hashes before reusing this context across later commits. The base commit alone does not identify uncommitted source.
 
 ## Reproducing
 
 From the repository root, with the development requirements installed (`pip install -r requirements-dev.txt`):
 
 ```bash
-python -m tools.architecture.generate --source-commit 5555f930d1f062ca92eaf1f3d447a6b8260881f5
+python -m tools.architecture.generate --source-commit 21e71558c2a16f83614b4abe8d6b8319ba3ccd29
 ```
 
 ## Files
@@ -68,7 +68,7 @@ The rules are generic path and syntax rules; none names a particular subpackage.
 4. Each module gets a syntactic category: `namespace` (a namespace package directory), `empty` (no statement besides a docstring), `reexport` (only imports, `__all__` assignments, and alias assignments `A = B`), or `code`. Categories are attributes, not filters, with one exception: a `namespace` or `empty` module that no analysed module imports is dropped from the module graph, because it has no code and no edges.
 5. Imports of modules outside the package are not graph edges; they are listed per module (`stdlib_imports`, `third_party_imports` in `graph/modules.json`).
 
-Modules discovered: 131; in the module graph: 111. Categories: code 109, empty 19, namespace 1, reexport 2.
+Modules discovered: 133; in the module graph: 113. Categories: code 111, empty 19, namespace 1, reexport 2.
 
 Excluded by rule 4: `tropoi`, `tropoi.cli`, `tropoi.representation`, `tropoi.representation.diagnostics`, `tropoi.representation.visual`, `tropoi.run`, `tropoi.run.bve`, `tropoi.run.held_suarez`, `tropoi.run.pe`, `tropoi.run.swe`, `tropoi.spatial`, `tropoi.spatial.grids`, `tropoi.spatial.initialization`, `tropoi.spatial.operators`, `tropoi.spatial.states`, `tropoi.spatial.terrain`, `tropoi.spatial.transforms`, `tropoi.spatial.transforms.cuda`, `tropoi.temporal`, `tropoi.temporal.tendencies`.
 
@@ -95,7 +95,7 @@ Excluded by rule 4: `tropoi`, `tropoi.cli`, `tropoi.representation`, `tropoi.rep
 
 ### Call graphs (ast)
 
-Each call expression inside a function or method body (nested functions, lambdas, and comprehensions are attributed to the enclosing function) is classified as `internal` (resolved to an analysed definition), `external` (resolved to a name outside the package), `builtin` (an unshadowed builtin), or `unresolved`. Totals: builtin 2730, external 1847, internal 2371, unresolved 2784.
+Each call expression inside a function or method body (nested functions, lambdas, and comprehensions are attributed to the enclosing function) is classified as `internal` (resolved to an analysed definition), `external` (resolved to a name outside the package), `builtin` (an unshadowed builtin), or `unresolved`. Totals: builtin 2851, external 1908, internal 2442, unresolved 2917.
 
 | Edge kind | Syntax | What it claims |
 |---|---|---|
