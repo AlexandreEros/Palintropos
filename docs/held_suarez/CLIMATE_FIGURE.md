@@ -139,7 +139,7 @@ about 0.5 s per state. Drawing and saving both files takes about 4 s. The proces
 peak working set is 202 MiB, against 60 MiB after the imports. The reduction itself
 is bounded by one frame plus the sums: an earlier run without the PDF band
 rasterization peaked at 109 MiB (62.7 s wall), so most of the difference is the
-rasterized PDF layers. Wall time varied between 50 and 63 s across runs. Running
+rasterized PDF layers. Wall time varied between 50 and 65 s across draws. Running
 under `tracemalloc` inflates the time about sevenfold (444 s), so do not time with
 it.
 

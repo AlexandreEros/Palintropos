@@ -266,6 +266,27 @@ sim.view("hs.html", times=[0, -1], levels=[0, 10, 19])
 ×20, in the exported page (browser capture). See
 [docs/ATMOSPHERE_VIEW.md](docs/ATMOSPHERE_VIEW.md).*
 
+**Draw a Held–Suarez climate.** On a Held–Suarez experiment, `sim.plot()` draws
+the six latitude–σ sections: [u], [T], [u*v*], [v*T*], ½[u*²+v*²] and [T*²].
+They are averaged with equal weights over the saved states of the averaging
+window, on the CPU, and written as a PNG plus a PDF beside it:
+
+```python
+sim = open_simulation("runs/hs-T42L20-prod-002")
+png = sim.plot()                                   # RUN/assets/overview.png + overview.pdf
+png = sim.plot("hs.png", interval=(1000, 1200), sidecar=True)   # 1000 < day <= 1200; numbers in hs.json
+```
+
+![Held–Suarez run 002, days 210–1200: zonal-mean wind and temperature, eddy momentum and heat fluxes, eddy kinetic energy and temperature variance on native σ levels](docs/validation/held_suarez_climate_2026-11-04/hs-T42L20-prod-002_climate.png)
+
+*Held–Suarez run 002, mean of 100 saved states (days 210–1200). The figure
+shows that run's climate under these definitions; the run's acceptance
+verdicts are in [STATUS.md](docs/held_suarez/STATUS.md). Definitions,
+sampling, fixed scales and the round-off check against the production
+accumulators are in
+[docs/held_suarez/CLIMATE_FIGURE.md](docs/held_suarez/CLIMATE_FIGURE.md).
+[PDF](docs/validation/held_suarez_climate_2026-11-04/hs-T42L20-prod-002_climate.pdf).*
+
 ```powershell
 tropoi plot runs                                            # -> <latest run>/assets/overview.png
 tropoi plot runs --list-quantities                          # no GPU needed
