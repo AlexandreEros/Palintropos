@@ -1,4 +1,4 @@
-# Held–Suarez climate figure (issue #17, CPU first pass)
+# Held–Suarez climate figure (issue #17)
 
 `Simulation.plot()` on a Held–Suarez experiment with saved states draws the six
 conventional latitude–σ climate sections as one PNG plus a PDF with the same
@@ -115,7 +115,8 @@ linear σ axis and has no tropopause or season labels.
 
 ## Real-run demonstration (CPU)
 
-`runs/hs-T42L20-prod-002` (local, gitignored): config `d1fa645d…`, commit
+`runs/hs-T42L20-prod-002` (the archive stays local; the figure is
+published, see below): config `d1fa645d…`, commit
 `a52ea205`, T42 retained (stored `l_max` 43), L20, 64 × 128, dt 720 s, centred
 damping. Default window `200 < day <= 1200`, with 100 states (days 210–1200 every
 10 days), coverage complete. Measured `m_max` = 42 < 64 = nlon/2. The buffer
@@ -159,12 +160,14 @@ area- and Δσ-weighted RMS uses the stored Gauss weights.
 | [T*²] | 1.76 | 0.33 | 41.7 | 1.47 K² |
 
 Daily block means cannot recover the every-tenth-day subset, so this comparison
-cannot isolate a GPU versus host synthesis difference.
+cannot isolate a GPU versus host synthesis difference. The production
+fixture below does that on matched states.
 
-## Verification in this pass (CPU only)
+## Verification
 
-`tests/test_held_suarez_climate.py` uses manufactured degree-1 spectral states with
-closed-form statistics:
+### Manufactured fields (`tests/test_held_suarez_climate.py`)
+
+Manufactured degree-1 spectral states with closed-form statistics check:
 
 * zonal means, the signs and magnitudes of the momentum and heat fluxes, full EKE
   including the [v*²] the accumulator lacks, and [T*²];
@@ -181,25 +184,89 @@ closed-form statistics:
   sidecar, overrides, the assets rule, refused views, and unchanged snapshot
   semantics.
 
-These tests do **not** stand in for the production-fixture comparison below.
+### Real GPU production run (`tests/test_held_suarez_climate_fixture.py`)
 
-## Outstanding acceptance items of #17 (deferred: need a GPU run)
+`tests/fixtures/hs-T21L10-dev4` is a real run of exactly
+`development_config(days=4, retained=True)`. That is the production retained
+layout, T21 stored in `l_max` 22, not the legacy `retained=False` default. It
+was made by the production `HeldSuarezRun` on a GPU from the clean commit
+`8ac1ca1a` by `python -m tools.held_suarez.climate_fixture --repeat 2`; see
+the fixture's `README.md`. Two independent runs, and an earlier trial, were bit
+identical. The fixture is 1.2 MB. Its `statistics.npz` and per-day
+`gpu_daily_samples.npz` come from the production `daily_sample` →
+`OnlineStatistics` path, which synthesizes on the GPU. The saved states are
+the states those samples were taken from. The CPU test reduces saved days 1–4
+and compares [u], [v], [T], [u*v*], [v*T*], [u*²] and [T*²]:
 
-1. Commit a small archive from a real GPU run of exactly
-   `development_config(days=4, retained=True)` (T21L10, 32 × 64, stored `l_max` 22,
-   retained 21, `spinup_days=0`, `state_every_days=1`, two 2-day blocks). It needs
-   asserted layout metadata, generation instructions, the resolved config and
-   source provenance, and a `statistics.npz` from the production
-   `daily_sample`/`OnlineStatistics` path. Then add a CPU CI test that reduces saved
-   days 1–4 and compares every corresponding accumulator statistic on the same grid.
-   No such fixture exists in the repository, and none was fabricated.
-2. Measure and document the GPU-transform versus host-synthesis discrepancy, to set
-   that test's tolerances. Optionally add a CUDA-marked regeneration test.
-3. Production comparisons at different cadences beyond the descriptive table above,
-   if wanted.
-4. Publish the real figure and README usage. The figure above lives in the gitignored
-   `runs/` tree. Committing it (for example under a published `docs/runs/` bundle)
-   is a separate publication decision.
+* each day on its own against that day's production sample;
+* `(0, 2]` and `(2, 4]` against the two block means;
+* the default window `(0, 4]` against the mean of the blocks.
 
-`tropoi plot` on a Held–Suarez directory still builds an ordinary overview view, so
-it refuses. The CLI route is not part of this pass.
+It needs no CUDA.
+
+Measured on the GPU (`generation.json`, NVIDIA MX110, CuPy 13.4, float64), on
+the same four states:
+
+| quantity | measured | test tolerance (smallest) | margin |
+| --- | --- | --- | --- |
+| GPU − host gridpoint u, v, T (relative to max \|field\|) | ≤ 1.7e-14 | budget 1e-12 | > 50 |
+| [u] | 1.7e-14 m s⁻¹ | 3.1e-12 | 186 |
+| [v] | 1.4e-14 m s⁻¹ | 3.1e-12 | 284 |
+| [T] | 4.5e-13 K | 3.0e-10 | 672 |
+| [u*v*] | 2.9e-14 m² s⁻² | 3.6e-11 | 1500 |
+| [v*T*] | 1.6e-13 K m s⁻¹ | 1.9e-9 | 12600 |
+| [u*²] | 5.3e-14 m² s⁻² | 3.4e-11 | 920 |
+| [T*²] | 5.8e-14 K² | 1.1e-9 | 18800 |
+
+The section rows give the largest |CPU − GPU| over every latitude, level and
+day. The tolerances are derived rather than fitted. Each synthesized field `a`
+is granted `δa = 1e-12 · max|a|` per state. That budget is checked to cover the
+measured gridpoint difference more than fiftyfold. Propagation then gives:
+
+* `δa` for [a];
+* `2(A*·δb + B*·δa) + 4·δa·δb` for [a*b*], where `A* = max|a*|`;
+* for a time mean, the largest per-state bound.
+
+The buffer degree 22 is exactly zero in every state. The highest nonzero degree
+and order are both 21. The GPU path drops the degree-`l_max + 1` part of the
+wind's latitude derivative, while the host synthesis keeps it. Those parts are
+identical here, because the buffer row is zero.
+
+The fixture shows that, on real production output, the CPU reduction recovers
+the run's own accumulators to round-off on the same states and grid. It shows
+nothing about the Held–Suarez climate itself. Four days from rest is far
+from equilibrium.
+
+## What this figure demonstrates, and what it does not
+
+* **Exact by construction:**
+  * the definitions and averaging rules above;
+  * alias-free longitude means when `nlon > 2 m_max`, with `m_max` measured;
+  * the run's own Gaussian latitudes and native σ levels.
+* **Measured, at round-off:** agreement with the production GPU statistics on
+  the four-day fixture.
+* **Descriptive only:** the table comparing the every-tenth-day sample of
+  `hs-T42L20-prod-002` with its daily accumulators. Different samples of the
+  same climate differ within the block-to-block spread, and that is not a
+  tolerance.
+* **Not shown here:** physical validation of the model climate. The
+  Held–Suarez acceptance verdicts of `hs-T42L20-prod-002` (tiers A, B, C) are
+  recorded in [STATUS.md](STATUS.md) against criteria fixed in advance. This
+  figure draws that run's climate but adds no new acceptance claim. The fixed
+  scales were chosen to cover that one run and are not a reference climatology.
+
+## Published figure
+
+[`docs/validation/held_suarez_climate_2026-11-04/`](../validation/held_suarez_climate_2026-11-04/)
+holds the figure of `hs-T42L20-prod-002`, drawn by `sim.plot(path,
+sidecar=True)`, as PNG, PDF and the JSON sidecar with every number drawn. The
+production archive itself is not committed: it is about 200 MB of states. The
+sidecar lists the SHA-256 of each state file it read.
+
+## Not done
+
+* `tropoi plot` on a Held–Suarez directory still builds an ordinary overview
+  view and refuses, so use `Simulation.plot()`. The CLI route is a separate
+  change.
+* Plotting from `statistics.npz` alone, without saved states, is not
+  implemented. The accumulator lacks [v*²], so it could not give full EKE.

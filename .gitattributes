@@ -5,3 +5,6 @@ docs/architecture/** text eol=lf
 # Published runs are byte-exact evidence (each carries a SHA256SUMS
 # receipt); never convert their line endings.
 docs/runs/** -text
+
+# Test fixtures from real runs carry a SHA256SUMS receipt; keep their bytes.
+tests/fixtures/** -text

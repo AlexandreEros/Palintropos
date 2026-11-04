@@ -1,0 +1,7 @@
+{"day": 0, "environment": {"cuda_driver": 11080, "cuda_runtime": 11080, "cupy": "13.4.0", "device": "NVIDIA GeForce MX110", "numpy": "2.2.6", "platform": "Windows-11-10.0.26200-SP0", "python": "3.12.12"}, "event": "created", "step": 0, "time": "2026-11-04T18:15:25Z", "x0_sha256": "1a33c43c90fea0e87a235c1f7a88a4e69350deff3db501bb17f6cedaba6d7ecb"}
+{"day": 0.0, "event": "checkpoint", "file": "checkpoint-s000000000.npz", "step": 0, "time": "2026-11-04T18:15:25Z", "x_curr_sha256": "1a33c43c90fea0e87a235c1f7a88a4e69350deff3db501bb17f6cedaba6d7ecb"}
+{"day": 1.0, "event": "checkpoint", "file": "checkpoint-s000000072.npz", "step": 72, "time": "2026-11-04T18:15:38Z", "x_curr_sha256": "497b73d62f53b3e6df5401ec78bfa5431c7ff189e16ddecfaf1cd49f452bec7c"}
+{"day": 2.0, "event": "checkpoint", "file": "checkpoint-s000000144.npz", "step": 144, "time": "2026-11-04T18:15:50Z", "x_curr_sha256": "54d65f4440f14172793ae063bf4a9ecf96ea6e8d900d1064bfe72a7ef3a15650"}
+{"day": 3.0, "event": "checkpoint", "file": "checkpoint-s000000216.npz", "step": 216, "time": "2026-11-04T18:16:02Z", "x_curr_sha256": "411505f83c286c71d3f19783b066988c3f8cffca7e67883cff69732a6b999901"}
+{"day": 4.0, "event": "checkpoint", "file": "checkpoint-s000000288.npz", "step": 288, "time": "2026-11-04T18:16:15Z", "x_curr_sha256": "59a334906dcbbf3ad7023297a314afddeac76476f3f9b8d8874d3f4d353c8cc9"}
+{"day": 4.0, "event": "completed", "step": 288, "time": "2026-11-04T18:16:15Z"}
