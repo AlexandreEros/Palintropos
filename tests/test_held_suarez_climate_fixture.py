@@ -198,5 +198,18 @@ def test_plot_draws_the_fixture_without_cuda(tmp_path, storage):
         assert image.text["PDF"] == "fixture.pdf"
     record = json.loads(png.with_suffix(".json").read_text(encoding="utf-8"))
     assert record["samples"]["days"] == [1, 2, 3, 4]
+    # The strip draws the run's own daily series: every day 0-4, the
+    # production values, the mass drift relative to day 0, and the sections'
+    # window (0, 4] shaded.
+    raw = (FIXTURE / "series.json").read_bytes()
+    daily = json.loads(raw)
+    series = record["series"]
+    assert series["sha256"] == hashlib.sha256(raw).hexdigest()
+    assert series["day"] == [0, 1, 2, 3, 4]
+    assert series["ke"] == daily["ke"] and series["mean_T"] == daily["mean_T"]
+    ps = np.asarray(daily["mean_ps"])
+    assert np.array_equal(series["relative_mass_drift"], (ps - ps[0]) / ps[0])
+    assert series["summary"]["window_days"] == [0.0, 4.0]
+    assert series["summary"]["days_in_window"] == 4
     assert not (FIXTURE / "assets").exists()
     assert (FIXTURE / "SHA256SUMS").read_bytes() == before

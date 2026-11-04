@@ -31,6 +31,7 @@ SectionResult`; :func:`draw_sections` only draws one.
 """
 from __future__ import annotations
 
+import hashlib
 import json
 import pathlib
 import time
@@ -41,8 +42,8 @@ from typing import Any
 import numpy as np
 
 from tropoi.representation.diagnostics.held_suarez_sections import (
-    SECTION_FIELDS, SECTION_KEYS, SectionError, SectionResult, load_state,
-    reduce_sections, select_samples, state_grid)
+    SECTION_FIELDS, SECTION_KEYS, DailySeries, SectionError, SectionResult,
+    daily_series, load_state, reduce_sections, select_samples, state_grid)
 
 __all__ = ["HS_SECTION_SCALES", "SectionScale", "draw_sections",
            "reduce_experiment", "render_held_suarez_climate"]
@@ -155,6 +156,20 @@ def _nominal_truncation(config: Mapping[str, Any]) -> int:
         return int(retained)
     from tropoi.spatial.truncation import product_truncation_cut
     return int(product_truncation_cut(int(config["l_max"])))
+
+
+def read_daily_series(run_dir) -> tuple[DailySeries | None, str | None]:
+    """The run's ``series.json`` (validated) and its SHA-256, or (None, None)
+    when the run has none."""
+    path = pathlib.Path(run_dir) / "series.json"
+    if not path.is_file():
+        return None, None
+    data = path.read_bytes()
+    try:
+        doc = json.loads(data.decode("utf-8"))
+    except (UnicodeDecodeError, ValueError) as err:
+        raise SectionError(f"{path} is not valid JSON: {err}") from err
+    return daily_series(doc), hashlib.sha256(data).hexdigest()
 
 
 def reduce_experiment(storage, *, interval=None, min_states: int = 2,
@@ -361,66 +376,127 @@ def _header_lines(result: SectionResult, run: dict) -> tuple[str, list[str]]:
     title = f"Held–Suarez climate: {run['experiment_id']}"
     dt = run.get("dt_s")
     start, end = sel.requested
+    window = ("default averaging window" if sel.window_source.startswith(
+        "default") else "explicit interval")
     lines = [
         f"{run['spectral']} · {run['levels']} · {run['grid']}"
         + (f" · dt {dt:g} s" if dt else "")
         + f" · {run['damping_scheme']} damping",
-        f"Time mean: equal-weight mean of {sel.count} saved states with "
-        f"{start:g} < day ≤ {end:g} ({sel.window_source}).",
-        f"Samples: day {sel.days[0]} to day {sel.days[-1]}, "
-        f"{sel.cadence_label()}. Coverage: {sel.coverage_label()}.",
+        f"Sections: equal-weight mean of {sel.count} saved states, "
+        f"{start:g} < day ≤ {end:g} ({window}); days {sel.days[0]}–"
+        f"{sel.days[-1]}, {sel.cadence_label()}; coverage "
+        f"{sel.coverage_label()}.",
     ]
     return title, lines
 
 
 def _footer_lines(result: SectionResult, run: dict, plotter: str | None,
-                  overridden: tuple[str, ...] = ()) -> list[str]:
-    nlon = result.lon_deg.size
-    band = result.bandlimit
+                  overridden: tuple[str, ...] = (),
+                  series_sha256: str | None = None) -> list[str]:
     commit = _short(run.get("run_commit"))
     if run.get("run_dirty"):
         commit += " (dirty)"
-    sigma = result.sigma
+    scales = ("fixed scales HS_SECTION_SCALES" if not overridden else
+              "fixed scales HS_SECTION_SCALES except "
+              + ", ".join(_PANEL_SYMBOLS[k] for k in overridden))
+    series = (f"  ·  series sha256 {series_sha256[:12]}…"
+              if series_sha256 else "")
     return [
-        f"[ ] = unweighted mean over the {nlon} equally spaced longitudes "
-        "at one latitude on one native σ level; * = departure from that "
-        "state's instantaneous [ ]. Eddy products are formed for each "
-        "state, then averaged.",
-        "All six panels come from the same states. No trapezoidal "
-        "weighting, interpolation or gap filling. σ-level means are not "
-        f"pressure-level means. The σ axis spans the full levels "
-        f"{sigma.min():g} to {sigma.max():g} (minor ticks).",
-        f"u, v, T synthesized on the host from the saved coefficients on the "
-        f"run's Gaussian latitudes; measured zonal bandlimit m_max = "
-        f"{band['max_nonzero_order']} < nlon/2, so longitude means of "
-        "products are exact. "
-        + ("Fixed scales: HS_SECTION_SCALES" if not overridden else
-           "Fixed scales: HS_SECTION_SCALES except "
-           + ", ".join(_PANEL_SYMBOLS[k] for k in overridden)
-           + " (overridden)")
-        + "; values beyond the scale are hatched.",
+        "[ ] = zonal mean on a native σ level, * = departure from that "
+        f"state's [ ]; {scales}; beyond-scale values hatched. Definitions "
+        "and sampling rules: docs/held_suarez/CLIMATE_FIGURE.md.",
         f"config sha256 {_short(run.get('config_sha256'))}…  ·  run commit "
-        f"{commit}  ·  protocol sha256 {_short(run.get('protocol_sha256'))}…"
-        f"  ·  states sha256 {result.states_sha256()[:12]}…  ·  plotted "
-        f"with palintropos {plotter or '(commit unknown)'}",
+        f"{commit}  ·  states sha256 {result.states_sha256()[:12]}…"
+        f"{series}  ·  plotted with palintropos "
+        f"{plotter or '(commit unknown)'}",
     ]
+
+
+def _window_note(stats: dict | None, unit: str, digits: int | None = None
+                 ) -> str:
+    if stats is None:
+        return "no daily values in the window"
+    fmt = _fmt if digits is None else (lambda x: f"{x:.{digits}f}")
+    return (f"window mean {fmt(stats['mean'])}{unit} "
+            f"({fmt(stats['min'])}–{fmt(stats['max'])})")
+
+
+def _series_strip(figure, spec, series: DailySeries | None, window,
+                  base_font: float, saved_count: int) -> dict | None:
+    """Three small daily-series panels under the sections (or a note)."""
+    start, end = window
+    if series is None:
+        axes = figure.add_subplot(spec[0, :])
+        axes.set_axis_off()
+        axes.text(0.0, 0.5, "No daily series (series.json) in this run: "
+                  "the mass and equilibration panels are omitted.",
+                  transform=axes.transAxes, ha="left", va="center",
+                  fontsize=base_font, color="#333333")
+        return None
+    summary = series.summary(window)
+    days = series.days
+    drift = series.mass_drift()
+    worst = summary["mass_drift_max_abs"]
+    # An explicit power of ten in the label (no floating offset text).
+    exponent = int(np.floor(np.log10(worst))) if worst > 0.0 else 0
+    panels = (
+        (r"Mass: global-mean $p_s$", drift / 10.0 ** exponent,
+         r"$\Delta\langle p_s\rangle / \langle p_s\rangle_{%d}$"
+         % series.reference_day
+         + (rf" ($\times 10^{{{exponent}}}$)" if exponent else ""),
+         f"max |Δ| {worst:.3g} (day {summary['mass_drift_max_abs_day']})"),
+        ("Kinetic energy, mass-weighted", series.ke, "m² s⁻²",
+         _window_note(summary["ke_window"], "")),
+        ("Temperature, mass-weighted", series.mean_T, "K",
+         _window_note(summary["mean_T_window"], " K", digits=2)),
+    )
+    for n, (title, values, ylabel, note) in enumerate(panels):
+        axes = figure.add_subplot(spec[0, n])
+        axes.axvspan(start, end, color="#e4e4e4", lw=0.0, zorder=0.0)
+        if n == 0:
+            axes.axhline(0.0, color="#777777", lw=0.5, zorder=1.0)
+        axes.plot(days, values, color="#1f1f1f", lw=0.7, zorder=2.0)
+        axes.set_xlim(float(days[0]), float(days[-1]))
+        axes.set_title(title, loc="left", fontsize=base_font,
+                       fontweight="semibold", pad=11.0)
+        axes.text(0.0, 1.012, note, transform=axes.transAxes, ha="left",
+                  va="bottom", fontsize=base_font - 1.5, color="#333333")
+        axes.set_ylabel(ylabel)
+        axes.set_xlabel("day")
+        axes.ticklabel_format(axis="y", style="plain", useOffset=False)
+    import textwrap
+    figure.text(_LEFT, spec.bottom - 0.045, textwrap.fill(
+        "Daily global means of every simulated day (series.json), not the "
+        f"{saved_count} saved states; grey = the sections' window. Mass is "
+        "conserved by the dry forcing; kinetic energy and temperature are "
+        "not, and show whether the climate has settled. Descriptive: the "
+        "run's acceptance verdicts are in its report.", 138),
+        ha="left", va="top", fontsize=base_font - 1.5, linespacing=1.45,
+        color="#333333")
+    return summary
 
 
 #: Figure geometry (inches; A4 portrait) and fractions of the figure.
 FIGURE_SIZE = (8.27, 11.69)
 _LEFT, _RIGHT = 0.075, 0.925
-_PANELS_TOP, _PANELS_BOTTOM = 0.83, 0.145
+_PANELS_TOP, _PANELS_BOTTOM = 0.865, 0.335
+_STRIP_TOP, _STRIP_BOTTOM = 0.238, 0.138
 
 
 def draw_sections(result: SectionResult, png_path, pdf_path, *, run: dict,
                   scales: Mapping[str, SectionScale] | None = None,
+                  series: DailySeries | None = None,
+                  series_sha256: str | None = None,
                   png_metadata: dict | None = None,
                   pdf_metadata: dict | None = None, dpi: int = 200,
                   plotter: str | None = None) -> dict:
     """Draw the six panels of ``result``; write the PNG and the PDF.
 
-    Both files are saved from the same figure. Returns per-panel facts
-    (data range, share of points beyond the fixed scale).
+    ``series`` (the run's daily global means) adds a strip of mass drift,
+    kinetic energy and temperature with the sections' window shaded;
+    without it the strip says so. Both files are saved from the same
+    figure. Returns per-panel facts (data range, share of points beyond the
+    fixed scale) and, under ``"series"``, the strip's summary (or None).
     """
     import textwrap
 
@@ -445,14 +521,14 @@ def draw_sections(result: SectionResult, png_path, pdf_path, *, run: dict,
         figure = plt.figure(figsize=FIGURE_SIZE)
         try:
             title, header = _header_lines(result, run)
-            figure.text(_LEFT, 0.972, title, ha="left", va="top",
+            figure.text(_LEFT, 0.975, title, ha="left", va="top",
                         fontsize=base_font + 4.5, fontweight="bold")
-            figure.text(_LEFT, 0.945, "\n".join(
+            figure.text(_LEFT, 0.950, "\n".join(
                 textwrap.fill(line, 112) for line in header), ha="left",
                 va="top", fontsize=base_font, linespacing=1.5)
             grid = figure.add_gridspec(
                 3, 5, left=_LEFT, right=_RIGHT, top=_PANELS_TOP,
-                bottom=_PANELS_BOTTOM, hspace=0.36, wspace=0.08,
+                bottom=_PANELS_BOTTOM, hspace=0.42, wspace=0.08,
                 width_ratios=(1.0, 0.035, 0.30, 1.0, 0.035))
             for n, key in enumerate(SECTION_KEYS):
                 row, col = divmod(n, 2)
@@ -461,10 +537,17 @@ def draw_sections(result: SectionResult, png_path, pdf_path, *, run: dict,
                 facts[key] = _panel(axes, cax, key, result[key], result,
                                     scales[key], base_font,
                                     xlabel=row == 2)
+            strip = figure.add_gridspec(
+                1, 3, left=_LEFT + 0.02, right=_RIGHT, top=_STRIP_TOP,
+                bottom=_STRIP_BOTTOM, wspace=0.42)
+            facts["series"] = _series_strip(
+                figure, strip, series, result.selection.requested,
+                base_font, result.selection.count)
             footer = "\n".join(textwrap.fill(line, 138)
                                for line in _footer_lines(
-                                   result, run, plotter, overridden))
-            figure.text(_LEFT, 0.098, footer, ha="left", va="top",
+                                   result, run, plotter, overridden,
+                                   series_sha256))
+            figure.text(_LEFT, 0.048, footer, ha="left", va="top",
                         fontsize=base_font - 1.5, linespacing=1.45,
                         color="#333333")
             png = pathlib.Path(png_path)
@@ -524,6 +607,7 @@ def render_held_suarez_climate(storage, output_path=None, *, interval=None,
             "zonal and eddy statistics of the single level")
     pdf = png.with_suffix(".pdf")
     scales = _resolve_scales(scales)
+    series, series_sha = read_daily_series(storage.run_dir)
     started = time.perf_counter()
     result = reduce_experiment(storage, interval=interval,
                                min_states=min_states, progress=progress)
@@ -544,6 +628,7 @@ def render_held_suarez_climate(storage, output_path=None, *, interval=None,
         "Commit": str(run.get("run_commit") or ""),
         "ConfigSHA256": str(run.get("config_sha256") or ""),
         "StatesSHA256": result.states_sha256(),
+        "SeriesSHA256": series_sha or "",
         "Samples": json.dumps(sel.to_dict(), sort_keys=True),
         "PDF": pdf.name,
         "View": json.dumps(view, sort_keys=True),
@@ -557,6 +642,7 @@ def render_held_suarez_climate(storage, output_path=None, *, interval=None,
         "CreationDate": None,
     }
     facts = draw_sections(result, png, pdf, run=run, scales=scales,
+                          series=series, series_sha256=series_sha,
                           png_metadata=png_meta, pdf_metadata=pdf_meta,
                           dpi=dpi, plotter=plotter)
     if sidecar:
@@ -581,6 +667,17 @@ def render_held_suarez_climate(storage, output_path=None, *, interval=None,
                              "definition": SECTION_FIELDS[key][2],
                              "values": np.asarray(result[key]).tolist(),
                              **facts[key]} for key in SECTION_KEYS},
+            "series": None if series is None else {
+                "source": "series.json (one value per simulated day)",
+                "sha256": series_sha,
+                "definitions": {
+                    "relative_mass_drift": "(<p_s> - <p_s>(first day)) / "
+                                           "<p_s>(first day), <> = "
+                                           "Gaussian-weighted global mean",
+                    "ke": "global mean of sum_k dsigma_k |V_k|^2 / 2 "
+                          "(m^2 s^-2)",
+                    "mean_T": "global mean of sum_k dsigma_k T_k (K)"},
+                "summary": facts["series"], **series.to_dict()},
             "timing_s": {"reduce": reduce_s},
         }
         png.with_suffix(".json").write_text(

@@ -20,6 +20,7 @@ here (deferred: docs/held_suarez/CLIMATE_FIGURE.md).
 """
 from __future__ import annotations
 
+import hashlib
 import json
 import math
 import pathlib
@@ -68,9 +69,13 @@ def _expected(lat_deg, *, U, A, B, T0, c):
 
 def write_experiment(root: pathlib.Path, states: dict, *, nlat=8, nlon=16,
                      l_max=3, retained=2, nlev=3, days=4, spinup=0,
-                     block_days=2, every=1, store_lat=True, lat=None):
+                     block_days=2, every=1, store_lat=True, lat=None,
+                     series=None):
     """A Held–Suarez experiment directory (run/held_suarez layout)."""
     root.mkdir(parents=True, exist_ok=True)
+    if series is not None:
+        (root / "series.json").write_text(json.dumps(series),
+                                          encoding="utf-8")
     config = {"schema": "palintropos.held_suarez.config/1",
               "experiment_id": "hs-manufactured", "l_max": l_max,
               "retained_truncation": retained, "nlat": nlat, "nlon": nlon,
@@ -478,6 +483,84 @@ def test_plot_refuses_bad_paths_views_and_insufficient_data(tmp_path):
     with pytest.raises(SectionError, match="no saved states"):
         _open(empty).plot()
     assert not (root / "figure.png").exists()
+
+
+def _series(days=5, ps0=1.0e5):
+    day = list(range(days))
+    return {"day": [float(d) for d in day],
+            "mean_ps": [ps0 * (1.0 - 2.0e-7 * d) for d in day],
+            "ke": [100.0 + 10.0 * d for d in day],
+            "mean_T": [250.0 - 0.5 * d for d in day],
+            "max_abs_u": [0.0] * days}
+
+
+def test_daily_series_validates_and_measures():
+    from tropoi.representation.diagnostics.held_suarez_sections import (
+        daily_series)
+    series = daily_series(_series())
+    assert np.allclose(series.mass_drift(), [-2.0e-7 * d for d in range(5)],
+                       rtol=1e-9, atol=0.0)
+    summary = series.summary((2.0, 4.0))          # days 3 and 4 only
+    assert summary["days_in_window"] == 2
+    assert summary["ke_window"] == {"mean": 135.0, "min": 130.0, "max": 140.0}
+    assert summary["mean_T_window"]["mean"] == pytest.approx(248.25)
+    assert summary["mass_drift_max_abs_day"] == 4
+    assert summary["mass_drift_max_abs"] == pytest.approx(8.0e-7)
+    assert daily_series(_series()).summary((10.0, 20.0))["ke_window"] is None
+    for broken in ({**_series(), "day": [0.0, 1.0, 3.0, 4.0, 5.0]},
+                   {**_series(), "ke": [1.0, 2.0]},
+                   {**_series(), "mean_ps": [0.0] * 5},
+                   {**_series(), "mean_T": [float("nan")] * 5},
+                   {"day": [0.0, 1.0]}):
+        with pytest.raises(SectionError):
+            daily_series(broken)
+
+
+def test_series_strip_uses_series_json_and_shades_the_window(tmp_path):
+    root = write_experiment(tmp_path / "hs",
+                            {d: _state(3, 3, **AMPS) for d in (3, 4)},
+                            spinup=2, series=_series())
+    png = _open(root).plot(tmp_path / "s.png", sidecar=True, dpi=60)
+    record = json.loads(png.with_suffix(".json").read_text(encoding="utf-8"))
+    series = record["series"]
+    raw = (root / "series.json").read_bytes()
+    assert series["sha256"] == hashlib.sha256(raw).hexdigest()
+    assert _png_text(png)["SeriesSHA256"] == series["sha256"]
+    assert series["day"] == [0, 1, 2, 3, 4]
+    assert series["ke"] == _series()["ke"]
+    assert series["relative_mass_drift"] == pytest.approx(
+        [-2.0e-7 * d for d in range(5)], rel=1e-9)
+    # the shaded window is the sections' own window, (spinup, end]
+    assert record["samples"]["requested_interval_days"] == [2.0, 4.0]
+    assert series["summary"]["window_days"] == [2.0, 4.0]
+    assert series["summary"]["ke_window"]["mean"] == 135.0
+    # an explicit interval moves both
+    png = _open(root).plot(tmp_path / "e.png", sidecar=True, dpi=60,
+                           interval=(0, 4))
+    record = json.loads(png.with_suffix(".json").read_text(encoding="utf-8"))
+    assert record["series"]["summary"]["window_days"] == [0.0, 4.0]
+
+
+def test_no_series_json_omits_the_strip_and_still_draws(tmp_path):
+    root = write_experiment(tmp_path / "hs",
+                            {d: _state(3, 3, **AMPS) for d in (1, 2)})
+    png = _open(root).plot(tmp_path / "n.png", sidecar=True, dpi=60)
+    assert png.is_file() and png.with_suffix(".pdf").is_file()
+    record = json.loads(png.with_suffix(".json").read_text(encoding="utf-8"))
+    assert record["series"] is None
+    assert _png_text(png)["SeriesSHA256"] == ""
+
+
+def test_a_broken_series_json_refuses_before_writing(tmp_path):
+    root = write_experiment(tmp_path / "hs",
+                            {d: _state(3, 3, **AMPS) for d in (1, 2)},
+                            series={**_series(), "day": [0, 2, 3, 4, 5]})
+    with pytest.raises(SectionError, match="consecutive"):
+        _open(root).plot(tmp_path / "b.png")
+    assert not (tmp_path / "b.png").exists()
+    (root / "series.json").write_text("{not json", encoding="utf-8")
+    with pytest.raises(SectionError, match="not valid JSON"):
+        _open(root).plot(tmp_path / "b.png")
 
 
 def test_single_level_experiment_refuses_the_figure_but_reduces(tmp_path):

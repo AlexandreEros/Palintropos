@@ -76,10 +76,12 @@ __all__ = [
     "SECTION_FIELDS",
     "SECTION_KEYS",
     "Bandlimit",
+    "DailySeries",
     "SampleSelection",
     "SectionAccumulator",
     "SectionError",
     "SectionResult",
+    "daily_series",
     "default_window",
     "gaussian_latitudes_deg",
     "reduce_sections",
@@ -448,6 +450,88 @@ class SectionResult:
         for name, digest in self.state_files:
             h.update(f"{name}:{digest}\n".encode())
         return h.hexdigest()
+
+
+# ---------------------------------------------------------------------------
+# daily global series (series.json)
+# ---------------------------------------------------------------------------
+
+@dataclass(frozen=True)
+class DailySeries:
+    """The run's daily global scalars, one value per simulated day.
+
+    Read from ``series.json`` (written by the run from every daily sample,
+    day 0 = the initial state), NOT from the saved states: ``mean_ps`` is
+    the Gaussian-weighted global mean of p_s (proportional to the total
+    mass, which the dry Held–Suarez forcing neither adds nor removes),
+    ``ke`` the global mean of sum_k dsigma_k |V_k|^2 / 2 and ``mean_T`` that
+    of sum_k dsigma_k T_k. The forcing and dissipation make KE and T
+    non-conserved; their series show whether the climate has settled.
+    """
+
+    days: np.ndarray
+    mean_ps: np.ndarray
+    ke: np.ndarray
+    mean_T: np.ndarray
+
+    @property
+    def reference_day(self) -> int:
+        return int(self.days[0])
+
+    def mass_drift(self) -> np.ndarray:
+        """(<p_s>(day) - <p_s>(first day)) / <p_s>(first day)."""
+        return (self.mean_ps - self.mean_ps[0]) / self.mean_ps[0]
+
+    def summary(self, window: tuple[float, float]) -> dict:
+        """Mass drift over all days; KE and T inside ``start < day <= end``."""
+        drift = self.mass_drift()
+        worst = int(np.argmax(np.abs(drift)))
+        start, end = window
+        inside = (self.days > start) & (self.days <= end)
+        out = {"reference_day": self.reference_day,
+               "first_day": int(self.days[0]),
+               "last_day": int(self.days[-1]),
+               "count": int(self.days.size),
+               "window_days": [float(start), float(end)],
+               "days_in_window": int(inside.sum()),
+               "mass_drift_max_abs": float(abs(drift[worst])),
+               "mass_drift_max_abs_day": int(self.days[worst]),
+               "mass_drift_last": float(drift[-1])}
+        for key in ("ke", "mean_T"):
+            values = getattr(self, key)[inside]
+            out[f"{key}_window"] = (None if values.size == 0 else {
+                "mean": float(values.mean()), "min": float(values.min()),
+                "max": float(values.max())})
+        return out
+
+    def to_dict(self) -> dict:
+        return {"day": self.days.astype(int).tolist(),
+                "relative_mass_drift": self.mass_drift().tolist(),
+                "ke": self.ke.tolist(), "mean_T": self.mean_T.tolist()}
+
+
+def daily_series(doc: Mapping[str, Any]) -> DailySeries:
+    """Validate the parsed ``series.json`` of a Held–Suarez run."""
+    try:
+        arrays = {k: np.asarray(doc[k], dtype=np.float64)
+                  for k in ("day", "mean_ps", "ke", "mean_T")}
+    except (KeyError, TypeError, ValueError) as err:
+        raise SectionError(
+            f"series.json lacks a usable day/mean_ps/ke/mean_T series: "
+            f"{err}") from err
+    days = arrays["day"]
+    if days.ndim != 1 or days.size < 2 or any(
+            a.shape != days.shape for a in arrays.values()):
+        raise SectionError("series.json series must be one-dimensional, of "
+                           "equal length and at least two days long")
+    if not all(np.isfinite(a).all() for a in arrays.values()):
+        raise SectionError("series.json holds non-finite values")
+    if np.any(days != np.round(days)) or np.any(np.diff(days) != 1.0):
+        raise SectionError("series.json days must be consecutive whole days")
+    if not np.all(arrays["mean_ps"] > 0.0):
+        raise SectionError("series.json mean_ps must be positive")
+    return DailySeries(days=days, mean_ps=arrays["mean_ps"],
+                       ke=arrays["ke"], mean_T=arrays["mean_T"])
 
 
 def _synthesize_uvT(frame: np.ndarray, nlev: int, lat, lon, radius_m: float):

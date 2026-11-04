@@ -45,6 +45,40 @@ This is the run-side accumulator's spatial-anomaly definition
 ("transient eddy") definition. The accumulator has no [v*²], so full EKE exists
 only from saved states. These are σ-level means, not pressure-level means.
 
+## The daily-series strip
+
+Under the sections, three small panels draw the run's own daily global means
+from `series.json`, one value per simulated day from day 0. They are not taken
+from the saved states, and the figure says so. The sections' averaging window is
+shaded grey, so you can see where the time mean starts relative to spin-up.
+
+| panel | quantity | what it shows |
+| --- | --- | --- |
+| Mass | (⟨p_s⟩ − ⟨p_s⟩ on day 0) / ⟨p_s⟩ on day 0, ⟨ ⟩ = Gaussian-weighted global mean | conservation: the dry Held–Suarez forcing adds or removes no mass, so any drift is numerical. This is the tier-B2 quantity |
+| Kinetic energy | global mean of Σ_k Δσ_k \|V_k\|²/2 (m² s⁻²) | settling: not conserved (Rayleigh friction, ∇⁸ diffusion); flat inside the window means the climate has settled |
+| Temperature | global mean of Σ_k Δσ_k T_k (K) | settling: not conserved (Newtonian relaxation) |
+
+There is no "energy conservation" panel. Energy is not conserved here, unlike
+in the unforced Williamson cases. Each panel note gives the largest mass drift
+and its day, or the window mean and range of KE and T. The strip is
+descriptive: the acceptance verdicts (B2 mass, B3 trends) come from the run's
+report and STATUS.md, not from this figure. A run without `series.json` gets a
+one-line note instead of the strip, and a malformed `series.json` refuses
+before any reduction. The sidecar holds the drawn series, their definitions,
+the summary and the SHA-256 of `series.json`. The PNG metadata also record it
+(`SeriesSHA256`).
+
+The image keeps only what interpreting it needs:
+- the run and resolution;
+- the window, sample count, cadence and coverage;
+- each panel's units and data range;
+- a one-line key to `[ ]` and `*`;
+- one provenance line: config, run commit, states and series hashes, and the
+  plotting commit.
+
+Definitions, sampling rules, the bandlimit statement and the scales live in
+this document and in the sidecar, not in the image.
+
 ## Sampling
 
 * Window: `start < day <= end`. The default is the accumulator's window,
@@ -185,7 +219,12 @@ Manufactured degree-1 spectral states with closed-form statistics check:
 * the stored-versus-rebuilt grid, and refusal of a different grid;
 * the public API: default and explicit paths, the PDF beside the PNG, metadata,
   sidecar, overrides, the assets rule, refused views, and unchanged snapshot
-  semantics.
+  semantics;
+* the daily-series strip: validation of `series.json`, mass drift relative to
+  day 0, window statistics, the shaded window following the sections' window
+  (default and explicit), no strip without `series.json`, and refusal of a
+  malformed one. The fixture test also checks the strip against the real
+  run's `series.json`.
 
 ### Real GPU production run (`tests/test_held_suarez_climate_fixture.py`)
 
