@@ -515,6 +515,13 @@ def render_held_suarez_climate(storage, output_path=None, *, interval=None,
     panel scales; ``min_states`` is the fewest states accepted.
     """
     png = _checked_output(storage, output_path)
+    nlev = int(storage.experiment_config["nlev"])
+    if nlev < 2:
+        raise SectionError(
+            f"{storage.run_dir} has nlev = {nlev}: a latitude–σ section "
+            "needs at least two σ levels to contour, so this figure is not "
+            "drawn. reduce_experiment(storage) still gives the (nlat, 1) "
+            "zonal and eddy statistics of the single level")
     pdf = png.with_suffix(".pdf")
     scales = _resolve_scales(scales)
     started = time.perf_counter()

@@ -61,6 +61,9 @@ only from saved states. These are σ-level means, not pressure-level means.
 * Defined failures (`SectionError`, a `ValueError`):
   * an empty, reversed, negative or non-finite interval;
   * fewer than `min_states` (default 2) states in the window;
+  * an experiment with fewer than two σ levels (`nlev = 1`): a section cannot
+    be contoured, so the figure refuses before reducing. `reduce_experiment`
+    still returns the `(nlat, 1)` statistics;
   * an experiment with no `states/`. The message says the figure needs saved
     states and that plotting from statistics alone is not implemented.
 * Explicit views and per-snapshot figures still refuse

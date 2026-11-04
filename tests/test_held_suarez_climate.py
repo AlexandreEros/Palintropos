@@ -480,6 +480,22 @@ def test_plot_refuses_bad_paths_views_and_insufficient_data(tmp_path):
     assert not (root / "figure.png").exists()
 
 
+def test_single_level_experiment_refuses_the_figure_but_reduces(tmp_path):
+    one = {k: v[:1] for k, v in AMPS.items()}
+    root = write_experiment(tmp_path / "hs1",
+                            {d: _state(3, 1, **one) for d in (1, 2)},
+                            nlev=1)
+    sim = _open(root)
+    with pytest.raises(SectionError, match="at least two σ levels"):
+        sim.plot(tmp_path / "one.png")
+    assert not (tmp_path / "one.png").exists()
+    assert not (tmp_path / "one.pdf").exists()
+    from tropoi.representation.visual.held_suarez_climate import (
+        reduce_experiment)
+    result = reduce_experiment(sim.storage)
+    assert result["u"].shape == (8, 1)
+
+
 def test_assets_name_matches_compose():
     from tropoi.representation.visual import compose, held_suarez_climate
     assert held_suarez_climate.ASSETS_DIRNAME == compose.ASSETS_DIRNAME
