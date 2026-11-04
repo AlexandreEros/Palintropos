@@ -717,11 +717,11 @@
     }
   },
   "source": {
-    "commit": "18c6a5f31d7242f4c94cc850d0c684a527258b38",
+    "commit": "f72857d8aef6383a1726cf01b2a8d8a6de0705aa",
     "package": "tropoi",
     "src": "src",
     "working_tree": {
-      "base_commit": "18c6a5f31d7242f4c94cc850d0c684a527258b38",
+      "base_commit": "f72857d8aef6383a1726cf01b2a8d8a6de0705aa",
       "generator": {
         "changes": [],
         "files": {
@@ -775,7 +775,7 @@
           "src/tropoi/representation/visual/evaluate.py": "e85ab67612e6e13e224364e7e23fd2a22613bb85b3ba0656629e4386518099c7",
           "src/tropoi/representation/visual/fields.py": "1e3dbc051a384fa8245c17bb9bb9009f5716d3c6e9c81af57b218d194019bff2",
           "src/tropoi/representation/visual/grid_adapter.py": "d94cda5d2d2dc927c10bd583716edf2def6284deeba994ceae192b05a8a6e34b",
-          "src/tropoi/representation/visual/held_suarez_climate.py": "4d9e15824647a92730507c5cc0f7242ae7a381b1cf77fe0f2a6f222be535480f",
+          "src/tropoi/representation/visual/held_suarez_climate.py": "e4abb2238584bb5e65b87cb7f61409d46707584a94be96ea1e0ab0ddd6d0e575",
           "src/tropoi/representation/visual/matplotlib_renderer.py": "5421b11b634cd37932e7064ea7a6d6ce7cd541a3a912724473a40e0a99d8b804",
           "src/tropoi/representation/visual/normalization.py": "4bf25e99bddb783d9226d7d7168d3d7a21695c85143bebb883d4035af29d5b21",
           "src/tropoi/representation/visual/pe.py": "a877b3de8605ee213d08bce15829a14e8e78d10fca4572a76eea0a643c768082",
@@ -880,7 +880,7 @@
           "src/tropoi/temporal/tendencies/primitive_equations.py": "70cf8c872343b3a2de90d19caf69a0f3b3c681143d21781a2194641698bffaf3",
           "src/tropoi/temporal/tendencies/shallow_water.py": "2e1145284557291e4cc4b900851f867bdc835eaef07c035053d04648a346cb7c"
         },
-        "sha256": "179d84d81af6df906332388f61e2d730f85e9b3083daa05dec84046bd484fbad",
+        "sha256": "2b081e5663f936ad1595b97d2e9b2ce600394bf5db73cab93eaa482acf330f12",
         "status": "clean"
       }
     }
