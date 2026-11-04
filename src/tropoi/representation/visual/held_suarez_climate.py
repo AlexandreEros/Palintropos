@@ -412,6 +412,11 @@ def _footer_lines(result: SectionResult, run: dict, plotter: str | None,
     ]
 
 
+#: How the run's daily KE and T series are weighted (experiment.daily_sample):
+#: Gaussian area weights times sigma-layer thicknesses, no local p_s factor.
+_WEIGHTING = "area- and σ-weighted (not mass-weighted)\n"
+
+
 def _window_note(stats: dict | None, unit: str, digits: int | None = None
                  ) -> str:
     if stats is None:
@@ -445,10 +450,11 @@ def _series_strip(figure, spec, series: DailySeries | None, window,
          % series.reference_day
          + (rf" ($\times 10^{{{exponent}}}$)" if exponent else ""),
          f"max |Δ| {worst:.3g} (day {summary['mass_drift_max_abs_day']})"),
-        ("Kinetic energy, mass-weighted", series.ke, "m² s⁻²",
-         _window_note(summary["ke_window"], "")),
-        ("Temperature, mass-weighted", series.mean_T, "K",
-         _window_note(summary["mean_T_window"], " K", digits=2)),
+        ("Kinetic energy", series.ke, "m² s⁻²",
+         _WEIGHTING + _window_note(summary["ke_window"], "")),
+        ("Temperature", series.mean_T, "K",
+         _WEIGHTING + _window_note(summary["mean_T_window"], " K",
+                                   digits=2)),
     )
     for n, (title, values, ylabel, note) in enumerate(panels):
         axes = figure.add_subplot(spec[0, n])
@@ -458,7 +464,7 @@ def _series_strip(figure, spec, series: DailySeries | None, window,
         axes.plot(days, values, color="#1f1f1f", lw=0.7, zorder=2.0)
         axes.set_xlim(float(days[0]), float(days[-1]))
         axes.set_title(title, loc="left", fontsize=base_font,
-                       fontweight="semibold", pad=11.0)
+                       fontweight="semibold", pad=20.0)
         axes.text(0.0, 1.012, note, transform=axes.transAxes, ha="left",
                   va="bottom", fontsize=base_font - 1.5, color="#333333")
         axes.set_ylabel(ylabel)
@@ -469,8 +475,9 @@ def _series_strip(figure, spec, series: DailySeries | None, window,
         "Daily global means of every simulated day (series.json), not the "
         f"{saved_count} saved states; grey = the sections' window. Mass is "
         "conserved by the dry forcing; kinetic energy and temperature are "
-        "not, and show whether the climate has settled. Descriptive: the "
-        "run's acceptance verdicts are in its report.", 138),
+        "not, and show whether the climate has settled (Gaussian-area means of "
+        "Δσ-weighted level sums, no p_s factor). Descriptive: the run's "
+        "acceptance verdicts are in its report.", 138),
         ha="left", va="top", fontsize=base_font - 1.5, linespacing=1.45,
         color="#333333")
     return summary
@@ -676,7 +683,11 @@ def render_held_suarez_climate(storage, output_path=None, *, interval=None,
                                            "Gaussian-weighted global mean",
                     "ke": "global mean of sum_k dsigma_k |V_k|^2 / 2 "
                           "(m^2 s^-2)",
-                    "mean_T": "global mean of sum_k dsigma_k T_k (K)"},
+                    "mean_T": "global mean of sum_k dsigma_k T_k (K)",
+                    "weighting": "ke and mean_T: Gaussian area weights times "
+                                 "sigma-layer thickness, no local p_s factor "
+                                 "(area- and sigma-weighted, not "
+                                 "mass-weighted)"},
                 "summary": facts["series"], **series.to_dict()},
             "timing_s": {"reduce": reduce_s},
         }

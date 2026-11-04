@@ -58,7 +58,10 @@ shaded grey, so you can see where the time mean starts relative to spin-up.
 | Kinetic energy | global mean of Σ_k Δσ_k \|V_k\|²/2 (m² s⁻²) | settling: not conserved (Rayleigh friction, ∇⁸ diffusion); flat inside the window means the climate has settled |
 | Temperature | global mean of Σ_k Δσ_k T_k (K) | settling: not conserved (Newtonian relaxation) |
 
-There is no "energy conservation" panel. Energy is not conserved here, unlike
+KE and T are weighted by Gaussian area and σ-layer thickness, exactly as the run
+computes them (`run/held_suarez/experiment.py: daily_sample`). They lack the
+local p_s factor of a true atmospheric mass-weighted mean, so the figure labels
+them "area- and σ-weighted (not mass-weighted)". There is no "energy conservation" panel. Energy is not conserved here, unlike
 in the unforced Williamson cases. Each panel note gives the largest mass drift
 and its day, or the window mean and range of KE and T. The strip is
 descriptive: the acceptance verdicts (B2 mass, B3 trends) come from the run's

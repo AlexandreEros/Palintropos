@@ -206,6 +206,8 @@ def test_plot_draws_the_fixture_without_cuda(tmp_path, storage):
     series = record["series"]
     assert series["sha256"] == hashlib.sha256(raw).hexdigest()
     assert series["day"] == [0, 1, 2, 3, 4]
+    # daily_sample weights KE and T by area and sigma thickness only
+    assert "not mass-weighted" in series["definitions"]["weighting"]
     assert series["ke"] == daily["ke"] and series["mean_T"] == daily["mean_T"]
     ps = np.asarray(daily["mean_ps"])
     assert np.array_equal(series["relative_mass_drift"], (ps - ps[0]) / ps[0])
