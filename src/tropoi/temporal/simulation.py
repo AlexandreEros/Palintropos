@@ -214,6 +214,10 @@ class Simulation:
         overlays, times and panels. Options: ``sidecar=True`` also writes
         every number shown to ``<output>.json``; ``renderer``.
 
+        Held–Suarez experiments instead draw their six-panel latitude–sigma
+        climate figure (PNG plus a PDF beside it) from the saved states on
+        the CPU; see docs/held_suarez/CLIMATE_FIGURE.md.
+
         ``output_path=None`` writes the default overview to
         ``RUN/assets/overview.png``. Figures are derived products of the
         run: inside the run directory only ``assets/`` is ever written, and

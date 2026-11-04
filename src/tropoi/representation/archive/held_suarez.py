@@ -18,6 +18,9 @@ experiment's dt divides one day and states are written after step
 ``d * steps_per_day``). Accumulated statistics are NOT snapshots: an
 experiment without ``states/`` opens as a simulation with no snapshots and
 says what it holds instead; no time series is ever made from averages.
+``plot_simulation`` (``Simulation.plot()``) draws the six-panel
+latitude–sigma climate figure from the saved states
+(``representation/visual/held_suarez_climate.py``).
 
 Compatibility: the configuration is read as ``HeldSuarezConfig.from_dict``
 reads it, a missing ``schema`` key means version 1 and missing constants
@@ -75,7 +78,7 @@ _REQUIRED = ("experiment_id", "l_max", "nlat", "nlon", "nlev")
 
 
 class HeldSuarezPlotError(RuntimeError):
-    """Held–Suarez experiments have no snapshot figure product."""
+    """A figure this Held–Suarez experiment does not offer was requested."""
 
 
 def _read_config(run_dir: pathlib.Path) -> dict | None:
@@ -314,11 +317,34 @@ class HeldSuarezStorage:
             "Simulation.view() for the 3-D atmosphere or the experiment's "
             "report (python -m tropoi.run.held_suarez report)")
 
-    def plot_simulation(self, output_path=None, view=None, **options):
-        raise HeldSuarezPlotError(
-            "Held–Suarez experiments are not run capsules and have no "
-            "overview figure here; use Simulation.view() for the 3-D "
-            "atmosphere or the experiment's report")
+    def plot_simulation(self, output_path=None, view=None, *,
+                        snapshot: int | None = None, sidecar: bool = False,
+                        renderer=None, interval=None, scales=None,
+                        min_states: int = 2, dpi: int = 200,
+                        progress=None) -> pathlib.Path:
+        """The six-panel latitude–sigma climate figure (PNG + PDF).
+
+        Reduced on the CPU from the saved states in the averaging window
+        (``tropoi.representation.visual.held_suarez_climate``); returns the
+        PNG path, with the PDF beside it. Views of other kinds are not
+        offered for Held–Suarez experiments.
+        """
+        if view is not None or snapshot is not None:
+            raise HeldSuarezPlotError(
+                "Held–Suarez experiments offer only their default climate "
+                "figure (Simulation.plot() with no view); explicit views and "
+                "per-snapshot figures are not available for them. Use "
+                "Simulation.view() for the 3-D atmosphere")
+        if renderer is not None:
+            raise HeldSuarezPlotError(
+                "the Held–Suarez climate figure is drawn with Matplotlib "
+                "only; renderer= is not supported")
+        from tropoi.representation.visual.held_suarez_climate import (
+            render_held_suarez_climate)
+        return render_held_suarez_climate(
+            self, output_path, interval=interval, scales=scales,
+            min_states=min_states, sidecar=sidecar, dpi=dpi,
+            progress=progress)
 
     def quantities(self) -> list[dict]:
         return []
