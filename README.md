@@ -267,9 +267,9 @@ sim.view("hs.html", times=[0, -1], levels=[0, 10, 19])
 [docs/ATMOSPHERE_VIEW.md](docs/ATMOSPHERE_VIEW.md).*
 
 **Draw a Held–Suarez climate.** On a Held–Suarez experiment, `sim.plot()` draws
-the six latitude–σ sections: [u], [T], [u*v*], [v*T*], ½[u*²+v*²] and [T*²].
-They are averaged with equal weights over the saved states of the averaging
-window, on the CPU, and written as a PNG plus a PDF beside it:
+the six latitude–σ sections from the saved states, on the CPU, as a PNG plus a
+PDF beside it. A strip under the sections shows the run's daily mass drift,
+kinetic energy and temperature:
 
 ```python
 sim = open_simulation("runs/hs-T42L20-prod-002")
@@ -277,15 +277,23 @@ png = sim.plot()                                   # RUN/assets/overview.png + o
 png = sim.plot("hs.png", interval=(1000, 1200), sidecar=True)   # 1000 < day <= 1200; numbers in hs.json
 ```
 
-![Held–Suarez run 002, days 210–1200: zonal-mean wind and temperature, eddy momentum and heat fluxes, eddy kinetic energy and temperature variance on native σ levels](docs/validation/held_suarez_climate_2026-11-04/hs-T42L20-prod-002_climate.png)
+![Held–Suarez run 002: zonal-mean wind and temperature, eddy momentum and heat fluxes, eddy kinetic energy and temperature variance on native σ levels, with daily mass drift, kinetic energy and temperature below](docs/validation/held_suarez_climate_2026-11-04/hs-T42L20-prod-002_climate.png)
 
-*Held–Suarez run 002, mean of 100 saved states (days 210–1200). The figure
-shows that run's climate under these definitions; the run's acceptance
-verdicts are in [STATUS.md](docs/held_suarez/STATUS.md). Definitions,
-sampling, fixed scales and the round-off check against the production
-accumulators are in
-[docs/held_suarez/CLIMATE_FIGURE.md](docs/held_suarez/CLIMATE_FIGURE.md).
-[PDF](docs/validation/held_suarez_climate_2026-11-04/hs-T42L20-prod-002_climate.pdf).*
+Held–Suarez run 002 (T42L20). The sections are equal-weight means of the 100
+saved states in 200 < day ≤ 1200. [ ] is the zonal mean on a native σ level and
+\* the departure from it in each state; eddy products are formed before
+averaging. The bottom strip draws every simulated day (grey: the averaging
+window):
+- mass, which the dry forcing conserves, drifts by 2.0 × 10⁻⁶ over 1200 days;
+- kinetic energy and temperature, which are not conserved, have settled
+  before the window.
+
+This is a description of the run's climate, not validation evidence. Its
+acceptance verdicts are in [STATUS.md](docs/held_suarez/STATUS.md).
+Definitions, sampling, scales, and the round-off match with the production
+statistics are in
+[CLIMATE_FIGURE.md](docs/held_suarez/CLIMATE_FIGURE.md).
+[PDF](docs/validation/held_suarez_climate_2026-11-04/hs-T42L20-prod-002_climate.pdf).
 
 ```powershell
 tropoi plot runs                                            # -> <latest run>/assets/overview.png
