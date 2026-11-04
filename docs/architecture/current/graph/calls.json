@@ -3101,6 +3101,11 @@
       "target": "tropoi.representation.visual.held_suarez_climate._stored_latitudes"
     },
     {
+      "kind": "instantiate",
+      "source": "tropoi.representation.visual.held_suarez_climate.render_held_suarez_climate",
+      "target": "tropoi.representation.diagnostics.held_suarez_sections.SectionError"
+    },
+    {
       "kind": "call",
       "source": "tropoi.representation.visual.held_suarez_climate.render_held_suarez_climate",
       "target": "tropoi.representation.visual.held_suarez_climate._checked_output"
