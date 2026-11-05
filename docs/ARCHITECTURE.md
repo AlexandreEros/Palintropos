@@ -105,6 +105,13 @@ import fails `tests/test_layout.py`; regenerating the snapshot then shows it
 as a red edge and a `layer_graph` diff, and CI rejects a push that skips the
 regeneration.
 
+One red edge is drawn today, and it is `TYPE_CHECKING`-only:
+`spatial.initialization.pe` and `.swe` import `PrimitiveEquationsModel` and
+`ShallowWaterModel` under `if TYPE_CHECKING:` to annotate their factory
+parameters. Nothing runs it, so `tests/test_layout.py` (which skips
+`TYPE_CHECKING` blocks) passes. No type checker is configured, so for now
+the edge is documentation; a type checker would follow it upward.
+
 Prescribed environment and discretization are separate objects.
 `PlanetaryParameters` (radius, rotation, mass) is importable without CuPy
 from `spatial.environment`; grids, transforms, backends and their cached

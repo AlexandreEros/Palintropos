@@ -10,7 +10,7 @@ packages should depend on each other.
 
 One input does, because it is given one: a layer declaration (`--layer`,
 default `DEFAULT_LAYERS` in `tools/architecture/layers.py`: `cli`, `run`,
-`representation`, `core`, top first, matching *Dependency direction* in
+`representation`, `temporal`, `spatial`, top first, matching *Dependency direction* in
 `docs/ARCHITECTURE.md`). It changes how `packages.mmd` is drawn and adds
 `graph/layers.json` and the `layer_graph` sections of `metrics.json`,
 `metrics.md`, and the snapshot README. Nothing else depends on it:

@@ -35,15 +35,15 @@ from .model import Graph
 
 #: Declared layers of ``tropoi``, top (most dependent) first. Every package
 #: whose dotted name starts with one of a layer's prefixes belongs to it; a
-#: package matched by no prefix is reported as unassigned. ``spatial`` and
-#: ``temporal`` are declared as one ``core`` layer here: their own direction
-#: (``temporal`` imports ``spatial``, never the reverse) stays visible as an
-#: ordinary edge inside the box.
+#: package matched by no prefix is reported as unassigned. The five layers
+#: are the *Dependency direction* of ``docs/ARCHITECTURE.md``, which
+#: ``tests/test_layout.py`` enforces for run-time imports.
 DEFAULT_LAYERS: list[tuple[str, tuple[str, ...]]] = [
     ("cli", ("tropoi.cli",)),
     ("run", ("tropoi.run",)),
     ("representation", ("tropoi.representation",)),
-    ("core", ("tropoi.spatial", "tropoi.temporal")),
+    ("temporal", ("tropoi.temporal",)),
+    ("spatial", ("tropoi.spatial",)),
 ]
 
 #: Where :data:`DEFAULT_LAYERS` comes from, as stated in every output that

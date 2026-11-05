@@ -69,8 +69,11 @@ def test_box_titles_are_short_and_the_legend_states_the_declaration():
     lines = legend_lines(DEFAULT_LAYERS, DEFAULT_SOURCE, unassigned=False)
     assert lines[0] == f"Layers declared in {DEFAULT_SOURCE},"
     assert "assigned by package-name prefix, not inferred from imports:" in lines
-    assert "core = tropoi.spatial, tropoi.temporal" in lines
+    assert "temporal = tropoi.temporal" in lines and "spatial = tropoi.spatial" in lines
     assert not any(line.startswith("unassigned") for line in lines)
+    # A layer with several prefixes lists them all on its line.
+    assert "both = pkg.a, pkg.b" in legend_lines([("both", ("pkg.a", "pkg.b"))], "x",
+                                                 unassigned=False)
     assert "unassigned = matched by no declared prefix" in legend_lines(
         LAYERS, "x", unassigned=True)
 
