@@ -1213,7 +1213,7 @@
     {
       "kind": "call",
       "source": "tropoi.representation.archive.writer._config_hash",
-      "target": "tropoi.run.bve.config.scientific_config_subset"
+      "target": "tropoi.representation.identity.scientific_config_subset"
     },
     {
       "kind": "call",
@@ -3808,17 +3808,17 @@
     {
       "kind": "call",
       "source": "tropoi.representation.visual.snapshot.build_resources",
-      "target": "tropoi.run.bve.model.build_planet"
+      "target": "tropoi.temporal.models.build_pe_model"
     },
     {
       "kind": "call",
       "source": "tropoi.representation.visual.snapshot.build_resources",
-      "target": "tropoi.run.pe.model.build_pe_model"
+      "target": "tropoi.temporal.models.build_planet"
     },
     {
       "kind": "call",
       "source": "tropoi.representation.visual.snapshot.build_resources",
-      "target": "tropoi.run.swe.model.build_swe_model"
+      "target": "tropoi.temporal.models.build_swe_model"
     },
     {
       "kind": "call",
@@ -4476,14 +4476,14 @@
       "target": "tropoi.temporal.integration.interval_snapshot_times"
     },
     {
+      "kind": "call",
+      "source": "tropoi.run.bve.config.BVERunConfig.scientific_config_dict",
+      "target": "tropoi.representation.identity.scientific_config_subset"
+    },
+    {
       "kind": "self",
       "source": "tropoi.run.bve.config.BVERunConfig.scientific_config_dict",
       "target": "tropoi.run.bve.config.BVERunConfig.to_run_config_dict"
-    },
-    {
-      "kind": "call",
-      "source": "tropoi.run.bve.config.BVERunConfig.scientific_config_dict",
-      "target": "tropoi.run.bve.config.scientific_config_subset"
     },
     {
       "kind": "call",
@@ -4528,17 +4528,17 @@
     {
       "kind": "call",
       "source": "tropoi.run.bve.execution._execute_solver",
-      "target": "tropoi.run.bve.model.build_planet"
-    },
-    {
-      "kind": "call",
-      "source": "tropoi.run.bve.execution._execute_solver",
       "target": "tropoi.run.bve.runner.run_bve"
     },
     {
       "kind": "call",
       "source": "tropoi.run.bve.execution._execute_solver",
       "target": "tropoi.spatial.initialization.bve.make_ic"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.bve.execution._execute_solver",
+      "target": "tropoi.temporal.models.build_planet"
     },
     {
       "kind": "call",
@@ -4564,21 +4564,6 @@
       "kind": "call",
       "source": "tropoi.run.bve.execution.execute_run",
       "target": "tropoi.run.lifecycle.execute_with_provenance"
-    },
-    {
-      "kind": "call",
-      "source": "tropoi.run.bve.model.build_planet",
-      "target": "tropoi.spatial.environment.PlanetaryParameters.from_earth_like"
-    },
-    {
-      "kind": "call",
-      "source": "tropoi.run.bve.model.build_planet",
-      "target": "tropoi.spatial.planet.Planet.generate"
-    },
-    {
-      "kind": "call",
-      "source": "tropoi.run.bve.model.build_planet",
-      "target": "tropoi.spatial.specification.PlanetSpec.from_dict"
     },
     {
       "kind": "instantiate",
@@ -4683,7 +4668,7 @@
     {
       "kind": "call",
       "source": "tropoi.run.custom.config.CustomRunConfig.scientific_config_dict",
-      "target": "tropoi.run.bve.config.scientific_config_subset"
+      "target": "tropoi.representation.identity.scientific_config_subset"
     },
     {
       "kind": "self",
@@ -4733,11 +4718,6 @@
     {
       "kind": "call",
       "source": "tropoi.run.custom.execute._integrate",
-      "target": "tropoi.run.bve.model.build_planet"
-    },
-    {
-      "kind": "call",
-      "source": "tropoi.run.custom.execute._integrate",
       "target": "tropoi.run.bve.runner.run_bve"
     },
     {
@@ -4748,17 +4728,22 @@
     {
       "kind": "call",
       "source": "tropoi.run.custom.execute._integrate",
-      "target": "tropoi.run.swe.model.build_swe_model"
-    },
-    {
-      "kind": "call",
-      "source": "tropoi.run.custom.execute._integrate",
       "target": "tropoi.run.swe.runner.run_swe"
     },
     {
       "kind": "instantiate",
       "source": "tropoi.run.custom.execute._integrate",
       "target": "tropoi.spatial.states.shallow_water.ShallowWaterState"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.custom.execute._integrate",
+      "target": "tropoi.temporal.models.build_planet"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.custom.execute._integrate",
+      "target": "tropoi.temporal.models.build_swe_model"
     },
     {
       "kind": "call",
@@ -5263,11 +5248,6 @@
     {
       "kind": "call",
       "source": "tropoi.run.custom.presets.initial_state_from_config",
-      "target": "tropoi.run.bve.model.build_planet"
-    },
-    {
-      "kind": "call",
-      "source": "tropoi.run.custom.presets.initial_state_from_config",
       "target": "tropoi.run.custom.presets._finite_parameters"
     },
     {
@@ -5279,11 +5259,6 @@
       "kind": "call",
       "source": "tropoi.run.custom.presets.initial_state_from_config",
       "target": "tropoi.run.custom.presets.topography_spec_for_run_config"
-    },
-    {
-      "kind": "call",
-      "source": "tropoi.run.custom.presets.initial_state_from_config",
-      "target": "tropoi.run.swe.model.build_swe_model"
     },
     {
       "kind": "call",
@@ -5304,6 +5279,16 @@
       "kind": "instantiate",
       "source": "tropoi.run.custom.presets.initial_state_from_config",
       "target": "tropoi.spatial.specification.FluidLayerSpec"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.custom.presets.initial_state_from_config",
+      "target": "tropoi.temporal.models.build_planet"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.custom.presets.initial_state_from_config",
+      "target": "tropoi.temporal.models.build_swe_model"
     },
     {
       "kind": "call",
@@ -5363,12 +5348,12 @@
     {
       "kind": "call",
       "source": "tropoi.run.custom.resources.build_spec_planet",
-      "target": "tropoi.run.bve.model.build_planet"
+      "target": "tropoi.run.custom.resources.base_config"
     },
     {
       "kind": "call",
       "source": "tropoi.run.custom.resources.build_spec_planet",
-      "target": "tropoi.run.custom.resources.base_config"
+      "target": "tropoi.temporal.models.build_planet"
     },
     {
       "kind": "instantiate",
@@ -6193,7 +6178,7 @@
     {
       "kind": "call",
       "source": "tropoi.run.pe.config.PERunConfig.scientific_config_dict",
-      "target": "tropoi.run.bve.config.scientific_config_subset"
+      "target": "tropoi.representation.identity.scientific_config_subset"
     },
     {
       "kind": "self",
@@ -6278,17 +6263,17 @@
     {
       "kind": "call",
       "source": "tropoi.run.pe.execution._execute_solver",
-      "target": "tropoi.run.pe.model.build_pe_model"
-    },
-    {
-      "kind": "call",
-      "source": "tropoi.run.pe.execution._execute_solver",
       "target": "tropoi.run.pe.runner.run_pe"
     },
     {
       "kind": "call",
       "source": "tropoi.run.pe.execution._execute_solver",
       "target": "tropoi.spatial.initialization.pe.make_pe_ic"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.pe.execution._execute_solver",
+      "target": "tropoi.temporal.models.build_pe_model"
     },
     {
       "kind": "call",
@@ -6324,41 +6309,6 @@
       "kind": "call",
       "source": "tropoi.run.pe.execution.execute_run",
       "target": "tropoi.run.pe.execution._resolve_writable_base_dir"
-    },
-    {
-      "kind": "call",
-      "source": "tropoi.run.pe.model.build_pe_model",
-      "target": "tropoi.spatial.environment.PlanetaryParameters.from_earth_like"
-    },
-    {
-      "kind": "call",
-      "source": "tropoi.run.pe.model.build_pe_model",
-      "target": "tropoi.spatial.planet.Planet.generate"
-    },
-    {
-      "kind": "instantiate",
-      "source": "tropoi.run.pe.model.build_pe_model",
-      "target": "tropoi.spatial.sigma_coordinate.SigmaGrid"
-    },
-    {
-      "kind": "call",
-      "source": "tropoi.run.pe.model.build_pe_model",
-      "target": "tropoi.spatial.sigma_coordinate.SigmaGrid.uniform"
-    },
-    {
-      "kind": "call",
-      "source": "tropoi.run.pe.model.build_pe_model",
-      "target": "tropoi.spatial.terrain.topography.Topography.mountain"
-    },
-    {
-      "kind": "call",
-      "source": "tropoi.run.pe.model.build_pe_model",
-      "target": "tropoi.spatial.truncation.product_truncation_cut"
-    },
-    {
-      "kind": "instantiate",
-      "source": "tropoi.run.pe.model.build_pe_model",
-      "target": "tropoi.temporal.tendencies.primitive_equations.PrimitiveEquationsModel"
     },
     {
       "kind": "instantiate",
@@ -6423,7 +6373,7 @@
     {
       "kind": "call",
       "source": "tropoi.run.swe.config.SWERunConfig.scientific_config_dict",
-      "target": "tropoi.run.bve.config.scientific_config_subset"
+      "target": "tropoi.representation.identity.scientific_config_subset"
     },
     {
       "kind": "self",
@@ -6483,17 +6433,17 @@
     {
       "kind": "call",
       "source": "tropoi.run.swe.execution._execute_solver",
-      "target": "tropoi.run.swe.model.build_swe_model"
-    },
-    {
-      "kind": "call",
-      "source": "tropoi.run.swe.execution._execute_solver",
       "target": "tropoi.run.swe.runner.run_swe"
     },
     {
       "kind": "call",
       "source": "tropoi.run.swe.execution._execute_solver",
       "target": "tropoi.spatial.initialization.swe.make_swe_ic"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.swe.execution._execute_solver",
+      "target": "tropoi.temporal.models.build_swe_model"
     },
     {
       "kind": "call",
@@ -6524,51 +6474,6 @@
       "kind": "call",
       "source": "tropoi.run.swe.execution.execute_run",
       "target": "tropoi.run.swe.execution._resolve_writable_base_dir"
-    },
-    {
-      "kind": "call",
-      "source": "tropoi.run.swe.model._w5_planet_params",
-      "target": "tropoi.spatial.environment.PlanetaryParameters.ideal_sphere"
-    },
-    {
-      "kind": "call",
-      "source": "tropoi.run.swe.model.build_swe_model",
-      "target": "tropoi.run.swe.model._w5_planet_params"
-    },
-    {
-      "kind": "call",
-      "source": "tropoi.run.swe.model.build_swe_model",
-      "target": "tropoi.spatial.environment.PlanetaryParameters.from_earth_like"
-    },
-    {
-      "kind": "call",
-      "source": "tropoi.run.swe.model.build_swe_model",
-      "target": "tropoi.spatial.planet.Planet.generate"
-    },
-    {
-      "kind": "call",
-      "source": "tropoi.run.swe.model.build_swe_model",
-      "target": "tropoi.spatial.specification.PlanetSpec.from_dict"
-    },
-    {
-      "kind": "instantiate",
-      "source": "tropoi.run.swe.model.build_swe_model",
-      "target": "tropoi.spatial.terrain.topography.Topography"
-    },
-    {
-      "kind": "call",
-      "source": "tropoi.run.swe.model.build_swe_model",
-      "target": "tropoi.spatial.terrain.topography.Topography.mountain"
-    },
-    {
-      "kind": "call",
-      "source": "tropoi.run.swe.model.build_swe_model",
-      "target": "tropoi.spatial.terrain.topography.Topography.williamson5_cone"
-    },
-    {
-      "kind": "instantiate",
-      "source": "tropoi.run.swe.model.build_swe_model",
-      "target": "tropoi.temporal.tendencies.shallow_water.ShallowWaterModel"
     },
     {
       "kind": "instantiate",
@@ -8179,6 +8084,101 @@
       "kind": "instantiate",
       "source": "tropoi.temporal.integration.integration_plan",
       "target": "tropoi.temporal.integration.IntegrationScheduler"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.temporal.models._w5_planet_params",
+      "target": "tropoi.spatial.environment.PlanetaryParameters.ideal_sphere"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.temporal.models.build_pe_model",
+      "target": "tropoi.spatial.environment.PlanetaryParameters.from_earth_like"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.temporal.models.build_pe_model",
+      "target": "tropoi.spatial.planet.Planet.generate"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.temporal.models.build_pe_model",
+      "target": "tropoi.spatial.sigma_coordinate.SigmaGrid"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.temporal.models.build_pe_model",
+      "target": "tropoi.spatial.sigma_coordinate.SigmaGrid.uniform"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.temporal.models.build_pe_model",
+      "target": "tropoi.spatial.terrain.topography.Topography.mountain"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.temporal.models.build_pe_model",
+      "target": "tropoi.spatial.truncation.product_truncation_cut"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.temporal.models.build_pe_model",
+      "target": "tropoi.temporal.tendencies.primitive_equations.PrimitiveEquationsModel"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.temporal.models.build_planet",
+      "target": "tropoi.spatial.environment.PlanetaryParameters.from_earth_like"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.temporal.models.build_planet",
+      "target": "tropoi.spatial.planet.Planet.generate"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.temporal.models.build_planet",
+      "target": "tropoi.spatial.specification.PlanetSpec.from_dict"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.temporal.models.build_swe_model",
+      "target": "tropoi.spatial.environment.PlanetaryParameters.from_earth_like"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.temporal.models.build_swe_model",
+      "target": "tropoi.spatial.planet.Planet.generate"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.temporal.models.build_swe_model",
+      "target": "tropoi.spatial.specification.PlanetSpec.from_dict"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.temporal.models.build_swe_model",
+      "target": "tropoi.spatial.terrain.topography.Topography"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.temporal.models.build_swe_model",
+      "target": "tropoi.spatial.terrain.topography.Topography.mountain"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.temporal.models.build_swe_model",
+      "target": "tropoi.spatial.terrain.topography.Topography.williamson5_cone"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.temporal.models.build_swe_model",
+      "target": "tropoi.temporal.models._w5_planet_params"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.temporal.models.build_swe_model",
+      "target": "tropoi.temporal.tendencies.shallow_water.ShallowWaterModel"
     },
     {
       "kind": "constructor",
@@ -10730,6 +10730,13 @@
       "kind": "function",
       "module": "tropoi.representation.diagnostics.swe",
       "qualname": "potential_enstrophy",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.identity.scientific_config_subset",
+      "kind": "function",
+      "module": "tropoi.representation.identity",
+      "qualname": "scientific_config_subset",
       "type": "function"
     },
     {
@@ -13554,13 +13561,6 @@
       "type": "function"
     },
     {
-      "id": "tropoi.run.bve.config.scientific_config_subset",
-      "kind": "function",
-      "module": "tropoi.run.bve.config",
-      "qualname": "scientific_config_subset",
-      "type": "function"
-    },
-    {
       "id": "tropoi.run.bve.execution.OverwriteCleanupError",
       "kind": "class",
       "module": "tropoi.run.bve.execution",
@@ -13600,13 +13600,6 @@
       "kind": "function",
       "module": "tropoi.run.bve.execution",
       "qualname": "execute_run",
-      "type": "function"
-    },
-    {
-      "id": "tropoi.run.bve.model.build_planet",
-      "kind": "function",
-      "module": "tropoi.run.bve.model",
-      "qualname": "build_planet",
       "type": "function"
     },
     {
@@ -15017,13 +15010,6 @@
       "type": "function"
     },
     {
-      "id": "tropoi.run.pe.model.build_pe_model",
-      "kind": "function",
-      "module": "tropoi.run.pe.model",
-      "qualname": "build_pe_model",
-      "type": "function"
-    },
-    {
       "id": "tropoi.run.pe.runner.run_pe",
       "kind": "function",
       "module": "tropoi.run.pe.runner",
@@ -15126,20 +15112,6 @@
       "kind": "function",
       "module": "tropoi.run.swe.execution",
       "qualname": "execute_run",
-      "type": "function"
-    },
-    {
-      "id": "tropoi.run.swe.model._w5_planet_params",
-      "kind": "function",
-      "module": "tropoi.run.swe.model",
-      "qualname": "_w5_planet_params",
-      "type": "function"
-    },
-    {
-      "id": "tropoi.run.swe.model.build_swe_model",
-      "kind": "function",
-      "module": "tropoi.run.swe.model",
-      "qualname": "build_swe_model",
       "type": "function"
     },
     {
@@ -17905,6 +17877,34 @@
       "kind": "function",
       "module": "tropoi.temporal.integration",
       "qualname": "validate_snapshot_schedule",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.temporal.models._w5_planet_params",
+      "kind": "function",
+      "module": "tropoi.temporal.models",
+      "qualname": "_w5_planet_params",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.temporal.models.build_pe_model",
+      "kind": "function",
+      "module": "tropoi.temporal.models",
+      "qualname": "build_pe_model",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.temporal.models.build_planet",
+      "kind": "function",
+      "module": "tropoi.temporal.models",
+      "qualname": "build_planet",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.temporal.models.build_swe_model",
+      "kind": "function",
+      "module": "tropoi.temporal.models",
+      "qualname": "build_swe_model",
       "type": "function"
     },
     {

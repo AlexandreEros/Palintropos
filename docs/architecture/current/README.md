@@ -5,20 +5,20 @@
 
 | | |
 |---|---|
-| Source commit | `f72857d8aef6383a1726cf01b2a8d8a6de0705aa` |
+| Source commit | `c924157dd740d5c33b379e5050905e957b65e67e` |
 | Analysed package | `tropoi` under `src/` |
-| Generator | `tools.architecture` 1.0.0 |
+| Generator | `tools.architecture` 1.1.0 |
 | Toolchain | Python 3.12, grimp 3.17, networkx 3.7 |
-| Command | `python -m tools.architecture.generate --source-commit f72857d8aef6383a1726cf01b2a8d8a6de0705aa` |
+| Command | `python -m tools.architecture.generate --source-commit c924157dd740d5c33b379e5050905e957b65e67e` |
 
-Source working tree: **clean**. Content SHA-256: `2b081e5663f936ad1595b97d2e9b2ce600394bf5db73cab93eaa482acf330f12`. Generator working tree: **clean**. Per-file hashes and scoped Git status are recorded in `metrics.json`. These describe generation time; --check verifies source and generator content hashes before reusing this context across later commits. The base commit alone does not identify uncommitted source.
+Source working tree: **clean**. Content SHA-256: `0866026f63008e69db9cdeb91e9b1b91e43ca3984bdad369d0b1cffd849cec12`. Generator working tree: **clean**. Per-file hashes and scoped Git status are recorded in `metrics.json`. These describe generation time; --check verifies source and generator content hashes before reusing this context across later commits. The base commit alone does not identify uncommitted source.
 
 ## Reproducing
 
 From the repository root, with the development requirements installed (`pip install -r requirements-dev.txt`):
 
 ```bash
-python -m tools.architecture.generate --source-commit f72857d8aef6383a1726cf01b2a8d8a6de0705aa
+python -m tools.architecture.generate --source-commit c924157dd740d5c33b379e5050905e957b65e67e
 ```
 
 ## Files
@@ -50,8 +50,10 @@ python -m tools.architecture.generate --source-commit f72857d8aef6383a1726cf01b2
 | `classes/tropoi.temporal.tendencies.mmd` | All classes of package `tropoi.temporal.tendencies`, with methods. |
 | `graph/calls.json` | Whole-package static call graph (all resolvable edges). |
 | `graph/classes.json` | Every class with members, bases, and inheritance/nesting edges. |
+| `graph/layers.json` | The declared layers as a graph: one node per layer, with upward edges marked. |
 | `graph/modules.json` | Full module import graph: every analysed module and import edge. |
 | `graph/packages.json` | Package-aggregated import graph. |
+| `layers.mmd` | The same packages boxed by declared layer, runtime edges only, upward edges marked. |
 | `metrics.json` | All measurements, machine-readable. |
 | `metrics.md` | The same measurements as tables, with definitions. |
 | `modules.mmd` | Package-level import graph (modules collapsed onto their containing package). |
@@ -68,11 +70,11 @@ The rules are generic path and syntax rules; none names a particular subpackage.
 4. Each module gets a syntactic category: `namespace` (a namespace package directory), `empty` (no statement besides a docstring), `reexport` (only imports, `__all__` assignments, and alias assignments `A = B`), or `code`. Categories are attributes, not filters, with one exception: a `namespace` or `empty` module that no analysed module imports is dropped from the module graph, because it has no code and no edges.
 5. Imports of modules outside the package are not graph edges; they are listed per module (`stdlib_imports`, `third_party_imports` in `graph/modules.json`).
 
-Modules discovered: 133; in the module graph: 113. Categories: code 111, empty 19, namespace 1, reexport 2.
+Modules discovered: 135; in the module graph: 115. Categories: code 110, empty 19, namespace 1, reexport 5.
 
 Excluded by rule 4: `tropoi`, `tropoi.cli`, `tropoi.representation`, `tropoi.representation.diagnostics`, `tropoi.representation.visual`, `tropoi.run`, `tropoi.run.bve`, `tropoi.run.held_suarez`, `tropoi.run.pe`, `tropoi.run.swe`, `tropoi.spatial`, `tropoi.spatial.grids`, `tropoi.spatial.initialization`, `tropoi.spatial.operators`, `tropoi.spatial.states`, `tropoi.spatial.terrain`, `tropoi.spatial.transforms`, `tropoi.spatial.transforms.cuda`, `tropoi.temporal`, `tropoi.temporal.tendencies`.
 
-`reexport` modules (kept): `tropoi.representation.archive`, `tropoi.run.custom`.
+`reexport` modules (kept): `tropoi.representation.archive`, `tropoi.run.bve.model`, `tropoi.run.custom`, `tropoi.run.pe.model`, `tropoi.run.swe.model`.
 
 ## Extraction rules
 
@@ -84,6 +86,15 @@ Excluded by rule 4: `tropoi`, `tropoi.cli`, `tropoi.representation`, `tropoi.rep
 * Safeguards: namespace subpackages are passed to grimp as additional roots (from the root alone grimp attributes imports of their modules to the root package); every edge grimp reports is cross-checked against the module names the import statement itself spells out (AST), and generation fails on a mismatch; the analysed package is never imported (asserted after extraction).
 * Not edges: the implicit execution of parent packages (`import a.b.c` runs `a/__init__` and `a/b/__init__`).
 * `modules.mmd` collapses modules onto their containing package; each edge label is the number of module edges merged into it. `modules-cycles.mmd` shows the modules of every nontrivial SCC; dashed edges there consist only of function-scope or `TYPE_CHECKING` imports.
+
+### Layer view (declared)
+
+`layers.mmd` is the only output that states an expectation. The layers are declared on the command line (`--layer NAME=PREFIX[,PREFIX]`, top = most dependent) and recorded under `layer_graph` in `metrics.json`; they are not derived from the code. Nothing else in this snapshot depends on them, and changing them changes no measurement.
+
+* It draws the same package nodes as `modules.mmd`, boxed by layer, with the boxes in declared order.
+* Only **runtime** edges are drawn: an edge whose import statements are all under `if TYPE_CHECKING:` is never executed and is left out. Function-scope imports are kept, because they do run when the function is called.
+* An edge from a lower layer to a higher one contradicts the declaration: it is drawn in red, labelled `up`, and listed under `layer_graph.upward_package_edges`. With none of them, the layer quotient graph is acyclic and the layers can be levelized.
+* A package no declared prefix matches is drawn in an `unassigned` box and listed under `layer_graph.unassigned_packages`.
 
 ### Class graph (ast)
 
@@ -141,3 +152,5 @@ Computed with networkx on the module import graph (all imports, and the import-t
 | `reciprocity` | Fraction of edges whose reverse edge also exists (`nx.overall_reciprocity`) = 2 x reciprocal_pairs / \|E\|. |
 | `condensation` | The DAG obtained by contracting each SCC to one node (`nx.condensation`): its node and edge counts, source and sink counts, and `longest_path_edges`, the number of edges on a longest directed path in that DAG (`nx.dag_longest_path_length`). |
 | `intra_package_module_edges` | Package graph only: module-level edges whose two modules map to the same package. They are counted here instead of becoming package self-loops. |
+| `declared / packages_by_layer / unassigned_packages` | Layer graph only: the layers given to the generator (`--layer`, top first) with their package prefixes, the packages each one matched, and the packages no prefix matched. A declaration, not a measurement. |
+| `upward_package_edges / modules_in_upward_edges` | Layer graph only: the package edges running from a lower declared layer to a higher one (the layer violations), and the total number of module-level import edges merged into them. Empty means every runtime dependency points downward, i.e. the layer quotient graph is a DAG and the layers can be levelized. |

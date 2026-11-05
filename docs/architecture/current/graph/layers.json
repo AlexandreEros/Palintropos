@@ -1,0 +1,83 @@
+{
+  "edges": [
+    {
+      "direction": "down",
+      "kind": "imports",
+      "module_edges": 8,
+      "package_edges": 3,
+      "source": "cli",
+      "target": "core"
+    },
+    {
+      "direction": "down",
+      "kind": "imports",
+      "module_edges": 10,
+      "package_edges": 2,
+      "source": "cli",
+      "target": "representation"
+    },
+    {
+      "direction": "down",
+      "kind": "imports",
+      "module_edges": 9,
+      "package_edges": 4,
+      "source": "cli",
+      "target": "run"
+    },
+    {
+      "direction": "down",
+      "kind": "imports",
+      "module_edges": 38,
+      "package_edges": 12,
+      "source": "representation",
+      "target": "core"
+    },
+    {
+      "direction": "down",
+      "kind": "imports",
+      "module_edges": 56,
+      "package_edges": 23,
+      "source": "run",
+      "target": "core"
+    },
+    {
+      "direction": "down",
+      "kind": "imports",
+      "module_edges": 30,
+      "package_edges": 13,
+      "source": "run",
+      "target": "representation"
+    }
+  ],
+  "name": "layers",
+  "nodes": [
+    {
+      "depth": 0,
+      "id": "cli",
+      "internal_package_edges": 0,
+      "modules": 4,
+      "packages": 1
+    },
+    {
+      "depth": 3,
+      "id": "core",
+      "internal_package_edges": 19,
+      "modules": 44,
+      "packages": 10
+    },
+    {
+      "depth": 2,
+      "id": "representation",
+      "internal_package_edges": 4,
+      "modules": 39,
+      "packages": 4
+    },
+    {
+      "depth": 1,
+      "id": "run",
+      "internal_package_edges": 9,
+      "modules": 28,
+      "packages": 6
+    }
+  ]
+}
