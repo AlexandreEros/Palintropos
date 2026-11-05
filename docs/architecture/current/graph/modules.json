@@ -363,6 +363,14 @@
     {
       "kind": "imports",
       "scopes": [
+        "function"
+      ],
+      "source": "tropoi.representation.archive.held_suarez",
+      "target": "tropoi.representation.visual.held_suarez_climate"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
         "module"
       ],
       "source": "tropoi.representation.archive.held_suarez",
@@ -471,6 +479,14 @@
       ],
       "source": "tropoi.representation.diagnostics.bve",
       "target": "tropoi.spatial.truncation"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.representation.diagnostics.held_suarez_sections",
+      "target": "tropoi.spatial.transforms.host_synthesis"
     },
     {
       "kind": "imports",
@@ -777,6 +793,46 @@
       ],
       "source": "tropoi.representation.visual.grid_adapter",
       "target": "tropoi.spatial.grids.grid_interpolation"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.representation.visual.held_suarez_climate",
+      "target": "tropoi.representation.archive.availability"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.representation.visual.held_suarez_climate",
+      "target": "tropoi.representation.archive.writer"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.representation.visual.held_suarez_climate",
+      "target": "tropoi.representation.diagnostics.held_suarez_sections"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.representation.visual.held_suarez_climate",
+      "target": "tropoi.representation.visual.matplotlib_renderer"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.representation.visual.held_suarez_climate",
+      "target": "tropoi.spatial.truncation"
     },
     {
       "kind": "imports",
@@ -3130,6 +3186,26 @@
     {
       "category": "code",
       "dynamic_import_calls": 0,
+      "id": "tropoi.representation.diagnostics.held_suarez_sections",
+      "is_package": false,
+      "path": "tropoi/representation/diagnostics/held_suarez_sections.py",
+      "stdlib_imports": [
+        "__future__",
+        "collections",
+        "dataclasses",
+        "hashlib",
+        "io",
+        "math",
+        "pathlib",
+        "typing"
+      ],
+      "third_party_imports": [
+        "numpy"
+      ]
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
       "id": "tropoi.representation.diagnostics.pe",
       "is_package": false,
       "path": "tropoi/representation/diagnostics/pe.py",
@@ -3299,6 +3375,28 @@
         "typing"
       ],
       "third_party_imports": [
+        "numpy"
+      ]
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.representation.visual.held_suarez_climate",
+      "is_package": false,
+      "path": "tropoi/representation/visual/held_suarez_climate.py",
+      "stdlib_imports": [
+        "__future__",
+        "collections",
+        "dataclasses",
+        "hashlib",
+        "json",
+        "pathlib",
+        "textwrap",
+        "time",
+        "typing"
+      ],
+      "third_party_imports": [
+        "matplotlib",
         "numpy"
       ]
     },

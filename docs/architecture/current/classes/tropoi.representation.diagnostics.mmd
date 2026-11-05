@@ -8,6 +8,32 @@ classDiagram
     c_tropoi_orepresentation_odiagnostics_obve_oDiagnosticsRecorder : +#95;#95;init#95;#95;()
     c_tropoi_orepresentation_odiagnostics_obve_oDiagnosticsRecorder : +close()
     c_tropoi_orepresentation_odiagnostics_obve_oDiagnosticsRecorder : +record()
+    class c_tropoi_orepresentation_odiagnostics_oheld__suarez__sections_oBandlimit["Bandlimit (representation.diagnostics.held_suarez_sections)"]
+    c_tropoi_orepresentation_odiagnostics_oheld__suarez__sections_oBandlimit : +check#95;longitudes()
+    c_tropoi_orepresentation_odiagnostics_oheld__suarez__sections_oBandlimit : +to#95;dict()
+    c_tropoi_orepresentation_odiagnostics_oheld__suarez__sections_oBandlimit : +update()
+    class c_tropoi_orepresentation_odiagnostics_oheld__suarez__sections_oDailySeries["DailySeries (representation.diagnostics.held_suarez_sections)"]
+    c_tropoi_orepresentation_odiagnostics_oheld__suarez__sections_oDailySeries : +mass#95;drift()
+    c_tropoi_orepresentation_odiagnostics_oheld__suarez__sections_oDailySeries : +reference#95;day
+    c_tropoi_orepresentation_odiagnostics_oheld__suarez__sections_oDailySeries : +summary()
+    c_tropoi_orepresentation_odiagnostics_oheld__suarez__sections_oDailySeries : +to#95;dict()
+    class c_tropoi_orepresentation_odiagnostics_oheld__suarez__sections_oSampleSelection["SampleSelection (representation.diagnostics.held_suarez_sections)"]
+    c_tropoi_orepresentation_odiagnostics_oheld__suarez__sections_oSampleSelection : +cadence#95;label()
+    c_tropoi_orepresentation_odiagnostics_oheld__suarez__sections_oSampleSelection : +complete
+    c_tropoi_orepresentation_odiagnostics_oheld__suarez__sections_oSampleSelection : +count
+    c_tropoi_orepresentation_odiagnostics_oheld__suarez__sections_oSampleSelection : +coverage#95;label()
+    c_tropoi_orepresentation_odiagnostics_oheld__suarez__sections_oSampleSelection : +regular
+    c_tropoi_orepresentation_odiagnostics_oheld__suarez__sections_oSampleSelection : +summary()
+    c_tropoi_orepresentation_odiagnostics_oheld__suarez__sections_oSampleSelection : +to#95;dict()
+    class c_tropoi_orepresentation_odiagnostics_oheld__suarez__sections_oSectionAccumulator["SectionAccumulator (representation.diagnostics.held_suarez_sections)"]
+    c_tropoi_orepresentation_odiagnostics_oheld__suarez__sections_oSectionAccumulator : +#95;#95;init#95;#95;()
+    c_tropoi_orepresentation_odiagnostics_oheld__suarez__sections_oSectionAccumulator : +add()
+    c_tropoi_orepresentation_odiagnostics_oheld__suarez__sections_oSectionAccumulator : +means()
+    class c_tropoi_orepresentation_odiagnostics_oheld__suarez__sections_oSectionError["SectionError (representation.diagnostics.held_suarez_sections)"]
+    c_tropoi_orepresentation_odiagnostics_oheld__suarez__sections_oSectionError : external base ValueError
+    class c_tropoi_orepresentation_odiagnostics_oheld__suarez__sections_oSectionResult["SectionResult (representation.diagnostics.held_suarez_sections)"]
+    c_tropoi_orepresentation_odiagnostics_oheld__suarez__sections_oSectionResult : +#95;#95;getitem#95;#95;()
+    c_tropoi_orepresentation_odiagnostics_oheld__suarez__sections_oSectionResult : +states#95;sha256()
     class c_tropoi_orepresentation_odiagnostics_ope_oPEDiagnosticsRecorder["PEDiagnosticsRecorder (representation.diagnostics.pe)"]
     c_tropoi_orepresentation_odiagnostics_ope_oPEDiagnosticsRecorder : +#95;#95;enter#95;#95;()
     c_tropoi_orepresentation_odiagnostics_ope_oPEDiagnosticsRecorder : +#95;#95;exit#95;#95;()

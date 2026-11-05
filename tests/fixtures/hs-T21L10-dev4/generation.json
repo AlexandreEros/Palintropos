@@ -1,0 +1,175 @@
+{
+  "code": {
+    "git_commit": "8ac1ca1a98b70bf0499e19d17eaa85ffa41db604",
+    "git_dirty": false
+  },
+  "command": "python -m tools.held_suarez.climate_fixture --repeat 2",
+  "config": {
+    "batched_transforms": true,
+    "block_days": 2,
+    "checkpoint_every_days": 1,
+    "cp_dry": 1004.0,
+    "damping_scheme": "lagged",
+    "days": 4,
+    "dt": 1200.0,
+    "experiment_id": "hs-T21L10-dev",
+    "forcing": {
+      "delta_t_y": 60.0,
+      "delta_theta_z": 10.0,
+      "k_a": 2.8935185185185185e-07,
+      "k_f": 1.1574074074074073e-05,
+      "k_s": 2.8935185185185184e-06,
+      "kappa": 0.2857142857142857,
+      "p0": 100000.0,
+      "sigma_b": 0.7,
+      "t_max": 315.0,
+      "t_min": 200.0
+    },
+    "gravity": 9.8,
+    "grid": "latlon",
+    "hyperdiffusion_efold_days": 0.1,
+    "hyperdiffusion_order": 4,
+    "hyperdiffusion_reference_degree": null,
+    "kappa": 0.2857142857142857,
+    "keep_checkpoints": 3,
+    "l_max": 22,
+    "nlat": 32,
+    "nlev": 10,
+    "nlon": 64,
+    "omega": 7.292e-05,
+    "perturbation_amplitude": 1e-06,
+    "perturbation_lmax": 8,
+    "perturbation_lmin": 1,
+    "product_quadrature": "fine",
+    "ps_init": 100000.0,
+    "radius": 6371000.0,
+    "raw_alpha": 0.53,
+    "raw_nu": 0.1,
+    "retained_truncation": 21,
+    "schema": "palintropos.held_suarez.config/1",
+    "seed": 20260927,
+    "spinup_days": 0,
+    "startup_substeps": null,
+    "state_every_days": 1,
+    "t_init": 300.0,
+    "t_ref": 300.0
+  },
+  "config_call": "development_config(days=4, retained=True)",
+  "config_sha256": "bac7f1536e4cf2b2a7115a38dc260ebf59631f89f2641c5055c3a11f9e7d37c3",
+  "environment": {
+    "cuda_driver": 11080,
+    "cuda_runtime": 11080,
+    "cupy": "13.4.0",
+    "device": "NVIDIA GeForce MX110",
+    "numpy": "2.2.6",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "python": "3.12.12"
+  },
+  "excluded": "checkpoints/ (resumption only)",
+  "fixture": "Held\u2013Suarez climate-figure comparison fixture (#17)",
+  "gpu_daily_samples": "zonal fields of each day's production daily_sample (sample_hook), days 0-4, shape (day, nlat, nlev)",
+  "gpu_vs_host_synthesis": {
+    "max_relative": {
+      "T": 3.745342932893464e-15,
+      "u": 1.6892195075518248e-14,
+      "v": 1.1302434091586931e-14
+    },
+    "per_state": [
+      {
+        "T": {
+          "max_abs_diff": 1.0231815394945443e-12,
+          "max_abs_field": 302.08636948201854,
+          "relative": 3.3870496747303533e-15
+        },
+        "file": "state-d00001.npy",
+        "max_abs_buffer_degree": 0.0,
+        "max_nonzero_degree": 21,
+        "max_nonzero_order": 21,
+        "u": {
+          "max_abs_diff": 4.0190073491430667e-14,
+          "max_abs_field": 3.490566812422969,
+          "relative": 1.1513910390826416e-14
+        },
+        "v": {
+          "max_abs_diff": 4.463096558993129e-14,
+          "max_abs_field": 3.9487923776660425,
+          "relative": 1.1302434091586931e-14
+        }
+      },
+      {
+        "T": {
+          "max_abs_diff": 1.1368683772161603e-12,
+          "max_abs_field": 303.54186454639887,
+          "relative": 3.745342932893464e-15
+        },
+        "file": "state-d00002.npy",
+        "max_abs_buffer_degree": 0.0,
+        "max_nonzero_degree": 21,
+        "max_nonzero_order": 21,
+        "u": {
+          "max_abs_diff": 4.7406523151494184e-14,
+          "max_abs_field": 3.301215219542531,
+          "relative": 1.4360324910310932e-14
+        },
+        "v": {
+          "max_abs_diff": 3.5360603334311236e-14,
+          "max_abs_field": 3.6270670086054952,
+          "relative": 9.749090174076047e-15
+        }
+      },
+      {
+        "T": {
+          "max_abs_diff": 1.1368683772161603e-12,
+          "max_abs_field": 304.7065805617123,
+          "relative": 3.731026665457624e-15
+        },
+        "file": "state-d00003.npy",
+        "max_abs_buffer_degree": 0.0,
+        "max_nonzero_degree": 21,
+        "max_nonzero_order": 21,
+        "u": {
+          "max_abs_diff": 4.1744385725905886e-14,
+          "max_abs_field": 3.146099349094614,
+          "relative": 1.3268616497415794e-14
+        },
+        "v": {
+          "max_abs_diff": 2.930988785010413e-14,
+          "max_abs_field": 3.118048292376487,
+          "relative": 9.400075015440181e-15
+        }
+      },
+      {
+        "T": {
+          "max_abs_diff": 1.0800249583553523e-12,
+          "max_abs_field": 305.70041985571385,
+          "relative": 3.5329521590618306e-15
+        },
+        "file": "state-d00004.npy",
+        "max_abs_buffer_degree": 0.0,
+        "max_nonzero_degree": 21,
+        "max_nonzero_order": 21,
+        "u": {
+          "max_abs_diff": 5.495603971894525e-14,
+          "max_abs_field": 3.253339158899052,
+          "relative": 1.6892195075518248e-14
+        },
+        "v": {
+          "max_abs_diff": 1.84297022087776e-14,
+          "max_abs_field": 3.2911719719487236,
+          "relative": 5.599738441460188e-15
+        }
+      }
+    ],
+    "what": "max |GPU - host| over the 32 x 64 x 10 grid of each saved state; relative = that / max |host field|"
+  },
+  "repeat_runs": [
+    {
+      "states_bit_identical": true,
+      "statistics_bit_identical": true
+    }
+  ],
+  "wall_seconds_per_run": [
+    55.31410160008818,
+    49.50477289990522
+  ]
+}

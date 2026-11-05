@@ -9,46 +9,46 @@ Nodes are analysed modules; a directed edge A -> B means A has at least one stat
 * **all imports**: every static import statement, wherever it appears;
 * **import-time**: only edges with at least one import statement at module scope (executed when the importing module is imported). Edges made only of function-scope or `if TYPE_CHECKING:` imports are dropped.
 
-Edge counts by scope set: `function`: 148, `function+module`: 3, `function+type_checking`: 1, `module`: 201, `type_checking`: 6.
+Edge counts by scope set: `function`: 153, `function+module`: 3, `function+type_checking`: 1, `module`: 203, `type_checking`: 6.
 
 | Metric | all imports | import-time |
 |---|---|---|
-| Nodes \|V\| | 111 | 111 |
-| Directed edges \|E\| | 359 | 204 |
-| Density | 0.029402 | 0.016708 |
+| Nodes \|V\| | 113 | 113 |
+| Directed edges \|E\| | 366 | 206 |
+| Density | 0.028919 | 0.016277 |
 | Weakly connected components | 1 | 5 |
-| WCC sizes | 111 | 101, 7, 1, 1, 1 |
-| Strongly connected components | 111 | 111 |
+| WCC sizes | 113 | 103, 7, 1, 1, 1 |
+| Strongly connected components | 113 | 113 |
 | Nontrivial SCCs | 0 | 0 |
 | Nontrivial SCC sizes | - | - |
 | Nodes in cycles | 0 | 0 |
 | Fraction of nodes in cycles | 0 | 0 |
-| Sources (in-degree 0) | 3 | 30 |
+| Sources (in-degree 0) | 3 | 31 |
 | Sinks (out-degree 0) | 29 | 40 |
 | Reciprocal pairs | 0 | 0 |
 | Reciprocity | 0 | 0 |
-| In-degree min / median / max | 0 / 2 / 13 | 0 / 1 / 12 |
-| In-degree mean | 3.234234 | 1.837838 |
+| In-degree min / median / max | 0 / 2 / 14 | 0 / 1 / 12 |
+| In-degree mean | 3.238938 | 1.823009 |
 | In-degree quartiles | 1, 2, 4 | 0, 1, 2 |
-| In-degree zeros | 3 | 30 |
+| In-degree zeros | 3 | 31 |
 | Out-degree min / median / max | 0 / 2 / 20 | 0 / 1 / 9 |
-| Out-degree mean | 3.234234 | 1.837838 |
+| Out-degree mean | 3.238938 | 1.823009 |
 | Out-degree quartiles | 0, 2, 5 | 0, 1, 3 |
 | Out-degree zeros | 29 | 40 |
-| Condensation nodes | 111 | 111 |
-| Condensation edges | 359 | 204 |
-| Condensation sources / sinks | 3 / 29 | 30 / 40 |
+| Condensation nodes | 113 | 113 |
+| Condensation edges | 366 | 206 |
+| Condensation sources / sinks | 3 / 29 | 31 / 40 |
 | Condensation longest path (edges) | 13 | 7 |
 
-In-degree histogram (all imports) {degree: modules}: 0: 3, 1: 27, 2: 37, 3: 8, 4: 11, 5: 5, 6: 6, 7: 1, 8: 6, 9: 2, 10: 2, 11: 1, 12: 1, 13: 1
+In-degree histogram (all imports) {degree: modules}: 0: 3, 1: 29, 2: 34, 3: 11, 4: 11, 5: 4, 6: 7, 7: 1, 8: 6, 9: 2, 10: 2, 11: 1, 12: 1, 14: 1
 
-Out-degree histogram (all imports) {degree: modules}: 0: 29, 1: 15, 2: 18, 3: 8, 4: 10, 5: 8, 6: 4, 7: 3, 8: 4, 9: 6, 10: 4, 13: 1, 20: 1
+Out-degree histogram (all imports) {degree: modules}: 0: 29, 1: 16, 2: 18, 3: 8, 4: 10, 5: 8, 6: 5, 7: 3, 8: 4, 9: 6, 10: 4, 13: 1, 20: 1
 
 **Top 10 fan-in (all imports)** (ties at cutoff: 6)
 
 | Node | Degree |
 |---|---|
-| `tropoi.spatial.truncation` | 13 |
+| `tropoi.spatial.truncation` | 14 |
 | `tropoi.spatial.planet` | 12 |
 | `tropoi.spatial.specification` | 11 |
 | `tropoi.representation.archive.schema` | 10 |
@@ -84,7 +84,7 @@ None.
 
 ## Package-aggregated import graph
 
-Every module is mapped to its containing package (a package's `__init__` to the package itself) and parallel edges merged; edges inside one package are not self-loops but are counted separately: 119 module edges stay inside their package.
+Every module is mapped to its containing package (a package's `__init__` to the package itself) and parallel edges merged; edges inside one package are not self-loops but are counted separately: 120 module edges stay inside their package.
 
 | Metric | packages |
 |---|---|
@@ -153,16 +153,16 @@ Every module is mapped to its containing package (a package's `__init__` to the 
 
 ## Class graph
 
-* Classes: 155
+* Classes: 162
 * `inherits` edges between analysed classes: 12
 * `nests` edges (class defined in a class body): 0
-* Bases outside the analysed package: `RuntimeError` x6, `UserWarning` x1, `ValueError` x16, `abc.ABC` x2, `collections.abc.Mapping` x1, `enum.Enum` x2, `str` x2, `typing.Protocol` x3
+* Bases outside the analysed package: `RuntimeError` x6, `UserWarning` x1, `ValueError` x17, `abc.ABC` x2, `collections.abc.Mapping` x1, `enum.Enum` x2, `str` x2, `typing.Protocol` x3
 
 ## Call graph
 
-* Nodes (functions, methods, classes): 1389
-* Edges by kind: `call` 986, `constructor` 41, `instantiate` 392, `override` 6, `self` 276, `super` 2
-* Call sites by resolution outcome: builtin 2730, external 1847, internal 2371, unresolved 2784
+* Nodes (functions, methods, classes): 1447
+* Edges by kind: `call` 1023, `constructor` 42, `instantiate` 411, `override` 6, `self` 281, `super` 2
+* Call sites by resolution outcome: builtin 2874, external 1923, internal 2456, unresolved 2952
 
 | Scoped graph | Roots | Depth | Nodes | Edges | Truncated nodes | Reachable (unbounded) |
 |---|---|---|---|---|---|---|

@@ -604,6 +604,145 @@
       "qualname": "DiagnosticsRecorder"
     },
     {
+      "decorators": [
+        "dataclass"
+      ],
+      "external_bases": [],
+      "id": "tropoi.representation.diagnostics.held_suarez_sections.Bandlimit",
+      "members": [
+        {
+          "kind": "method",
+          "name": "check_longitudes"
+        },
+        {
+          "kind": "method",
+          "name": "to_dict"
+        },
+        {
+          "kind": "method",
+          "name": "update"
+        }
+      ],
+      "module": "tropoi.representation.diagnostics.held_suarez_sections",
+      "qualname": "Bandlimit"
+    },
+    {
+      "decorators": [
+        "dataclass(frozen=True)"
+      ],
+      "external_bases": [],
+      "id": "tropoi.representation.diagnostics.held_suarez_sections.DailySeries",
+      "members": [
+        {
+          "kind": "method",
+          "name": "mass_drift"
+        },
+        {
+          "kind": "property",
+          "name": "reference_day"
+        },
+        {
+          "kind": "method",
+          "name": "summary"
+        },
+        {
+          "kind": "method",
+          "name": "to_dict"
+        }
+      ],
+      "module": "tropoi.representation.diagnostics.held_suarez_sections",
+      "qualname": "DailySeries"
+    },
+    {
+      "decorators": [
+        "dataclass(frozen=True)"
+      ],
+      "external_bases": [],
+      "id": "tropoi.representation.diagnostics.held_suarez_sections.SampleSelection",
+      "members": [
+        {
+          "kind": "method",
+          "name": "cadence_label"
+        },
+        {
+          "kind": "property",
+          "name": "complete"
+        },
+        {
+          "kind": "property",
+          "name": "count"
+        },
+        {
+          "kind": "method",
+          "name": "coverage_label"
+        },
+        {
+          "kind": "property",
+          "name": "regular"
+        },
+        {
+          "kind": "method",
+          "name": "summary"
+        },
+        {
+          "kind": "method",
+          "name": "to_dict"
+        }
+      ],
+      "module": "tropoi.representation.diagnostics.held_suarez_sections",
+      "qualname": "SampleSelection"
+    },
+    {
+      "decorators": [],
+      "external_bases": [],
+      "id": "tropoi.representation.diagnostics.held_suarez_sections.SectionAccumulator",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__init__"
+        },
+        {
+          "kind": "method",
+          "name": "add"
+        },
+        {
+          "kind": "method",
+          "name": "means"
+        }
+      ],
+      "module": "tropoi.representation.diagnostics.held_suarez_sections",
+      "qualname": "SectionAccumulator"
+    },
+    {
+      "decorators": [],
+      "external_bases": [
+        "ValueError"
+      ],
+      "id": "tropoi.representation.diagnostics.held_suarez_sections.SectionError",
+      "members": [],
+      "module": "tropoi.representation.diagnostics.held_suarez_sections",
+      "qualname": "SectionError"
+    },
+    {
+      "decorators": [
+        "dataclass(frozen=True)"
+      ],
+      "external_bases": [],
+      "id": "tropoi.representation.diagnostics.held_suarez_sections.SectionResult",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__getitem__"
+        },
+        {
+          "kind": "method",
+          "name": "states_sha256"
+        }
+      ],
+      "module": "tropoi.representation.diagnostics.held_suarez_sections",
+      "qualname": "SectionResult"
+    },
+    {
       "decorators": [],
       "external_bases": [],
       "id": "tropoi.representation.diagnostics.pe.PEDiagnosticsRecorder",
@@ -979,6 +1118,29 @@
       ],
       "module": "tropoi.representation.visual.fields",
       "qualname": "SphericalHarmonicField"
+    },
+    {
+      "decorators": [
+        "dataclass(frozen=True)"
+      ],
+      "external_bases": [],
+      "id": "tropoi.representation.visual.held_suarez_climate.SectionScale",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__post_init__"
+        },
+        {
+          "kind": "property",
+          "name": "step"
+        },
+        {
+          "kind": "method",
+          "name": "to_dict"
+        }
+      ],
+      "module": "tropoi.representation.visual.held_suarez_climate",
+      "qualname": "SectionScale"
     },
     {
       "decorators": [],
