@@ -161,34 +161,35 @@ The only part of this report that compares the code with an expectation. The lay
 | `cli` | `tropoi.cli` | `tropoi.cli` |
 | `run` | `tropoi.run` | `tropoi.run`, `tropoi.run.bve`, `tropoi.run.custom`, `tropoi.run.held_suarez`, `tropoi.run.pe`, `tropoi.run.swe` |
 | `representation` | `tropoi.representation` | `tropoi.representation`, `tropoi.representation.archive`, `tropoi.representation.diagnostics`, `tropoi.representation.visual` |
-| `core` | `tropoi.spatial`, `tropoi.temporal` | `tropoi.spatial`, `tropoi.spatial.grids`, `tropoi.spatial.initialization`, `tropoi.spatial.operators`, `tropoi.spatial.states`, `tropoi.spatial.terrain`, `tropoi.spatial.transforms`, `tropoi.spatial.transforms.cuda`, `tropoi.temporal`, `tropoi.temporal.tendencies` |
+| `temporal` | `tropoi.temporal` | `tropoi.temporal`, `tropoi.temporal.tendencies` |
+| `spatial` | `tropoi.spatial` | `tropoi.spatial`, `tropoi.spatial.grids`, `tropoi.spatial.initialization`, `tropoi.spatial.operators`, `tropoi.spatial.states`, `tropoi.spatial.terrain`, `tropoi.spatial.transforms`, `tropoi.spatial.transforms.cuda` |
 
 Packages matched by no declared layer: none.
 
 | Metric | layers |
 |---|---|
-| Nodes \|V\| | 4 |
-| Directed edges \|E\| | 6 |
+| Nodes \|V\| | 5 |
+| Directed edges \|E\| | 10 |
 | Density | 0.5 |
 | Weakly connected components | 1 |
-| WCC sizes | 4 |
+| WCC sizes | 5 |
 | Strongly connected components | 4 |
-| Nontrivial SCCs | 0 |
-| Nontrivial SCC sizes | - |
-| Nodes in cycles | 0 |
-| Fraction of nodes in cycles | 0 |
+| Nontrivial SCCs | 1 |
+| Nontrivial SCC sizes | 2 |
+| Nodes in cycles | 2 |
+| Fraction of nodes in cycles | 0.4 |
 | Sources (in-degree 0) | 1 |
-| Sinks (out-degree 0) | 1 |
-| Reciprocal pairs | 0 |
-| Reciprocity | 0 |
-| In-degree min / median / max | 0 / 1.5 / 3 |
-| In-degree mean | 1.5 |
-| In-degree quartiles | 0.75, 1.5, 2.25 |
+| Sinks (out-degree 0) | 0 |
+| Reciprocal pairs | 1 |
+| Reciprocity | 0.2 |
+| In-degree min / median / max | 0 / 2 / 4 |
+| In-degree mean | 2 |
+| In-degree quartiles | 1, 2, 3 |
 | In-degree zeros | 1 |
-| Out-degree min / median / max | 0 / 1.5 / 3 |
-| Out-degree mean | 1.5 |
-| Out-degree quartiles | 0.75, 1.5, 2.25 |
-| Out-degree zeros | 1 |
+| Out-degree min / median / max | 1 / 2 / 3 |
+| Out-degree mean | 2 |
+| Out-degree quartiles | 1, 2, 3 |
+| Out-degree zeros | 0 |
 | Condensation nodes | 4 |
 | Condensation edges | 6 |
 | Condensation sources / sinks | 1 / 1 |
@@ -196,7 +197,11 @@ Packages matched by no declared layer: none.
 
 **Edges against the declared order (layer violations)**
 
-None: every import edge, `TYPE_CHECKING`-only ones included, points downward or stays inside a layer, so the layer quotient graph is a DAG.
+| From | To | Crosses | Module edges | `TYPE_CHECKING` only |
+|---|---|---|---|---|
+| `tropoi.spatial.initialization` | `tropoi.temporal.tendencies` | spatial -> temporal | 2 | yes |
+
+Module-level import edges involved: 2.
 
 ## Class graph
 

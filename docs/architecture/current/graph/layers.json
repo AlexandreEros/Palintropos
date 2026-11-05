@@ -3,15 +3,6 @@
     {
       "direction": "down",
       "kind": "imports",
-      "module_edges": 8,
-      "package_edges": 3,
-      "source": "cli",
-      "target": "core",
-      "type_checking_only_package_edges": 0
-    },
-    {
-      "direction": "down",
-      "kind": "imports",
       "module_edges": 10,
       "package_edges": 2,
       "source": "cli",
@@ -30,19 +21,28 @@
     {
       "direction": "down",
       "kind": "imports",
-      "module_edges": 38,
-      "package_edges": 12,
-      "source": "representation",
-      "target": "core",
+      "module_edges": 8,
+      "package_edges": 3,
+      "source": "cli",
+      "target": "spatial",
       "type_checking_only_package_edges": 0
     },
     {
       "direction": "down",
       "kind": "imports",
-      "module_edges": 56,
-      "package_edges": 23,
-      "source": "run",
-      "target": "core",
+      "module_edges": 32,
+      "package_edges": 8,
+      "source": "representation",
+      "target": "spatial",
+      "type_checking_only_package_edges": 0
+    },
+    {
+      "direction": "down",
+      "kind": "imports",
+      "module_edges": 6,
+      "package_edges": 4,
+      "source": "representation",
+      "target": "temporal",
       "type_checking_only_package_edges": 0
     },
     {
@@ -52,6 +52,42 @@
       "package_edges": 13,
       "source": "run",
       "target": "representation",
+      "type_checking_only_package_edges": 0
+    },
+    {
+      "direction": "down",
+      "kind": "imports",
+      "module_edges": 37,
+      "package_edges": 13,
+      "source": "run",
+      "target": "spatial",
+      "type_checking_only_package_edges": 0
+    },
+    {
+      "direction": "down",
+      "kind": "imports",
+      "module_edges": 19,
+      "package_edges": 10,
+      "source": "run",
+      "target": "temporal",
+      "type_checking_only_package_edges": 0
+    },
+    {
+      "direction": "up",
+      "kind": "imports",
+      "module_edges": 2,
+      "package_edges": 1,
+      "source": "spatial",
+      "target": "temporal",
+      "type_checking_only_package_edges": 1
+    },
+    {
+      "direction": "down",
+      "kind": "imports",
+      "module_edges": 19,
+      "package_edges": 5,
+      "source": "temporal",
+      "target": "spatial",
       "type_checking_only_package_edges": 0
     }
   ],
@@ -63,13 +99,6 @@
       "internal_package_edges": 0,
       "modules": 4,
       "packages": 1
-    },
-    {
-      "depth": 3,
-      "id": "core",
-      "internal_package_edges": 21,
-      "modules": 44,
-      "packages": 10
     },
     {
       "depth": 2,
@@ -84,6 +113,20 @@
       "internal_package_edges": 9,
       "modules": 28,
       "packages": 6
+    },
+    {
+      "depth": 4,
+      "id": "spatial",
+      "internal_package_edges": 13,
+      "modules": 34,
+      "packages": 8
+    },
+    {
+      "depth": 3,
+      "id": "temporal",
+      "internal_package_edges": 2,
+      "modules": 10,
+      "packages": 2
     }
   ]
 }
