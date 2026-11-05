@@ -25,7 +25,7 @@ def test_render_is_deterministic(repo):
     first = render(_opts(), root=repo)
     second = render(_opts(), root=repo)
     assert first == second
-    assert {"README.md", "metrics.json", "metrics.md", "modules.mmd", "classes.mmd",
+    assert {"README.md", "metrics.json", "metrics.md", "packages.mmd", "classes.mmd",
             "calls/entry.mmd", "calls/uses.mmd", "graph/modules.json", "graph/calls.json"} <= set(first)
     assert "modules-cycles.mmd" in first  # a <-> b via a function-scope import
 
@@ -51,10 +51,10 @@ def test_check_reports_drift(repo, tmp_path):
     out = tmp_path / "out"
     files = render(_opts(), root=repo)
     write(files, out, overwrite_frozen=False)
-    (out / "modules.mmd").write_text("edited\n", encoding="utf-8")
+    (out / "packages.mmd").write_text("edited\n", encoding="utf-8")
     (out / "stray.txt").write_text("x\n", encoding="utf-8")
     (out / "metrics.md").unlink()
-    assert check(files, out) == ["missing: metrics.md", "differs: modules.mmd",
+    assert check(files, out) == ["missing: metrics.md", "differs: packages.mmd",
                                  "unexpected: stray.txt"]
 
 

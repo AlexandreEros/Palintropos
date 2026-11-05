@@ -96,12 +96,14 @@ sight — it reads finished runs:
   rebuild a legacy capsule's model without newer preset guards re-running.
   `run.{bve,swe,pe}.model` re-export them at their historical paths.
 
-The layer boxes, the runtime edges between them, and any edge that would
-point up are drawn in
-[architecture/current/layers.mmd](architecture/current/layers.mmd) and
-counted under `layer_graph` in that snapshot's `metrics.json`, so a new
-upward dependency fails both `tests/test_layout.py` and the architecture CI
-check.
+[architecture/current/packages.mmd](architecture/current/packages.mmd) draws
+every package import edge inside these layers, as declared in
+`DEFAULT_LAYERS` (`tools/architecture/layers.py`). An edge that points up is
+drawn in red and listed under `layer_graph` in that snapshot's
+`metrics.json`, `TYPE_CHECKING`-only ones included. A new upward runtime
+import fails `tests/test_layout.py`; regenerating the snapshot then shows it
+as a red edge and a `layer_graph` diff, and CI rejects a push that skips the
+regeneration.
 
 Prescribed environment and discretization are separate objects.
 `PlanetaryParameters` (radius, rotation, mass) is importable without CuPy

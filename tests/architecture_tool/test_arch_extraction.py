@@ -98,7 +98,7 @@ def test_import_time_subgraph_drops_deferred_edges(modules):
 def test_package_aggregation(project, modules):
     agg = aggregate_by_package(modules, project)
     assert set(agg.nodes) == {P, q("ns")}
-    assert agg.edges == {(P, q("ns"), "imports"): {"module_edges": 1}}
+    assert agg.edges == {(P, q("ns"), "imports"): {"module_edges": 1, "runtime_module_edges": 1}}
     assert agg.nodes[P]["internal_edges"] == len(modules.edges) - 1
 
 

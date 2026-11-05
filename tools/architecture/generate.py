@@ -28,10 +28,9 @@ from . import TOOL_VERSION
 from .calls import build_call_graph, scoped
 from .classes import build_class_graph
 from .imports import (aggregate_by_package, build_import_graph, containing_package,
-                      excluded_modules, import_time_subgraph, runtime_subgraph)
+                      excluded_modules, import_time_subgraph)
 from . import layers as layering
-from .mermaid import (call_flowchart, class_diagram, layer_flowchart, module_flowchart,
-                      package_flowchart)
+from .mermaid import call_flowchart, class_diagram, module_flowchart, package_flowchart
 from .metrics import describe
 from .model import dumps
 from .report import render_metrics_md, render_readme
@@ -65,10 +64,13 @@ class Options:
     call_roots: dict[str, list[str]] = field(default_factory=lambda: dict(DEFAULT_CALL_ROOTS))
     call_depth: int = DEFAULT_CALL_DEPTH
     #: Declared layers, top first (see :mod:`tools.architecture.layers`). The
-    #: only option that states an expectation rather than selecting a view;
-    #: when no declared layer matches a package, no layer view is rendered.
+    #: only option that states an expectation rather than selecting a view.
+    #: Empty, or matching no package: ``packages.mmd`` is a plain graph.
     layers: list[tuple[str, tuple[str, ...]]] = field(
         default_factory=lambda: list(layering.DEFAULT_LAYERS))
+    #: Where ``layers`` came from, stated in the outputs. ``None``: derived by
+    #: :func:`tools.architecture.layers.source_of`.
+    layers_source: str | None = None
     working_tree: dict | None = None
     source_commit: str | None = None     # full sha, verified by the caller
     generator_commit: str | None = None  # full sha, verified by the caller
@@ -83,9 +85,7 @@ def render(opts: Options, root: Path = REPO_ROOT) -> dict[str, str]:
 
     modules = build_import_graph(project)
     import_time = import_time_subgraph(modules)
-    runtime = runtime_subgraph(modules)
     packages = aggregate_by_package(modules, project)
-    runtime_packages = aggregate_by_package(runtime, project)
     classes = build_class_graph(project)
     calls, call_totals = build_call_graph(project)
 
@@ -98,35 +98,48 @@ def render(opts: Options, root: Path = REPO_ROOT) -> dict[str, str]:
     files["graph/classes.json"] = dumps(classes.to_dict())
     files["graph/calls.json"] = dumps(calls.to_dict())
 
-    # -- module diagrams --
-    files["modules.mmd"] = package_flowchart(
-        packages, pkg, "Package-level import graph: modules collapsed onto their "
-                       "containing package; edge label = number of module-level import edges.")
-    # -- layer view (the one declared expectation; see .layers) --
-    boxes = layering.boxes(runtime_packages, opts.layers)
+    # -- package diagram: layered when a declaration applies, plain otherwise --
+    edge_note = ("Edge label = number of module-level import edges; dashed, 'type-only' = "
+                 "every merged import is under if TYPE_CHECKING (never executed).")
+    boxes = layering.boxes(packages, opts.layers)
     declared = {name for name, _prefixes in opts.layers}
     layer_metrics = None
     if any(name in declared for name, _packages in boxes):
-        violations = layering.upward(runtime_packages, opts.layers)
-        quotient = layering.quotient(runtime_packages, opts.layers)
-        files["layers.mmd"] = layer_flowchart(
-            runtime_packages, boxes, pkg,
-            "Packages grouped into the declared layers, top (most dependent) first. "
-            "Runtime import edges only: an edge made exclusively of TYPE_CHECKING "
-            "imports is not drawn. Edge label = number of module-level import edges; "
-            "red and labelled 'up' = edge against the declared order (layer violation).",
-            upward={(v["source"], v["target"]) for v in violations})
-        placed = layering.assign(runtime_packages.nodes, opts.layers)
+        source = layering.source_of(opts.layers, opts.layers_source)
+        violations = layering.upward(packages, opts.layers)
+        quotient = layering.quotient(packages, opts.layers)
+        files["packages.mmd"] = package_flowchart(
+            packages, pkg,
+            "Package-level import graph, every edge drawn, packages boxed by declared layer "
+            f"(top = most dependent). Layers declared in {source}; each package is placed "
+            "by name prefix (first match in declaration order), not inferred from imports. "
+            + edge_note + " Red, 'up' = edge against the declared order (layer violation). "
+            "Box placement is the renderer's: read violations from colour and label.",
+            boxes=[(name, layering.box_title(name, opts.layers), members)
+                   for name, members in boxes],
+            upward={(v["source"], v["target"]) for v in violations},
+            legend=layering.legend_lines(
+                opts.layers, source,
+                unassigned=any(name == layering.UNASSIGNED for name, _members in boxes)))
+        placed = layering.assign(packages.nodes, opts.layers)
         layer_metrics = {
+            "declared_by": source,
             "declared": [{"layer": name, "prefixes": list(prefixes)}
                          for name, prefixes in opts.layers],
-            "packages_by_layer": {name: packages for name, packages in boxes},
+            "packages_by_layer": {name: members for name, members in boxes},
             "unassigned_packages": sorted(p for p, name in placed.items() if name is None),
             "upward_package_edges": violations,
             "modules_in_upward_edges": sum(v["module_edges"] for v in violations),
             **describe(quotient.to_networkx()),
         }
         files["graph/layers.json"] = dumps(quotient.to_dict())
+    else:
+        why = ("no layers declared" if not opts.layers
+               else "no declared layer matches a package")
+        files["packages.mmd"] = package_flowchart(
+            packages, pkg,
+            "Package-level import graph: modules collapsed onto their containing package, "
+            f"every edge drawn. {edge_note} No layer view: {why}.")
 
     cycle_nodes = [n for scc in all_metrics["nontrivial_sccs"]["members"] for n in scc]
     if cycle_nodes:
@@ -143,14 +156,6 @@ def render(opts: Options, root: Path = REPO_ROOT) -> dict[str, str]:
         classes, in_hierarchy, pkg,
         "Classes that take part in an inheritance edge between analysed classes, "
         "with the functions defined in each class body.")
-    by_package: dict[str, list[str]] = {}
-    for cid, attrs in classes.nodes.items():
-        info = project.modules[attrs["module"]]
-        owner = info.name if info.is_package else info.name.rpartition(".")[0]
-        by_package.setdefault(owner, []).append(cid)
-    for owner, members in sorted(by_package.items()):
-        files[f"classes/{owner}.mmd"] = class_diagram(
-            classes, members, pkg, f"All classes defined in package {owner}.")
 
     # -- call diagrams --
     scoped_summary = {}
@@ -215,6 +220,7 @@ def render(opts: Options, root: Path = REPO_ROOT) -> dict[str, str]:
         **({"layer_graph": layer_metrics} if layer_metrics else {}),
         "class_graph": {
             "classes": len(classes.nodes),
+            "classes_in_inherits_edges": len(in_hierarchy),
             "inherits_edges": len(classes.edges_of_kind("inherits")),
             "nests_edges": len(classes.edges_of_kind("nests")),
             "external_bases": dict(sorted(external_bases.items())),
@@ -340,6 +346,8 @@ def command_line(args: argparse.Namespace, source_commit: str | None) -> str:
             command.append(f"{flag} {value!s}" if " " not in str(value) else f'{flag} "{value}"')
     command.extend(f"--call-root {item}" for item in args.call_root)
     command.extend(f"--layer {item}" for item in args.layer)
+    if args.no_layers:
+        command.append("--no-layers")
     if args.freeze:
         command.append("--freeze")
     return " ".join(command)
@@ -356,9 +364,13 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--call-root", action="append", default=[], metavar="NAME=QUALNAME",
                         help="scoped call graph root (repeatable; replaces the defaults)")
     parser.add_argument("--call-depth", type=int, default=DEFAULT_CALL_DEPTH)
-    parser.add_argument("--layer", action="append", default=[], metavar="NAME=PREFIX[,PREFIX]",
-                        help="declared layer for the layer view, top first "
-                             "(repeatable; replaces the defaults)")
+    layer_group = parser.add_mutually_exclusive_group()
+    layer_group.add_argument("--layer", action="append", default=[],
+                             metavar="NAME=PREFIX[,PREFIX]",
+                             help="declared layer for packages.mmd, top first "
+                                  "(repeatable; replaces the defaults)")
+    layer_group.add_argument("--no-layers", action="store_true",
+                             help="declare no layers: packages.mmd is a plain dependency graph")
     parser.add_argument("--source-commit", metavar="REV",
                         help="verify that the analysed source equals REV and record its sha")
     parser.add_argument("--freeze", action="store_true",
@@ -386,7 +398,9 @@ def main(argv: list[str] | None = None) -> int:
 
     opts = Options(src=args.src, package=args.package, out=args.out, title=args.title,
                    call_roots=roots or dict(DEFAULT_CALL_ROOTS), call_depth=args.call_depth,
-                   layers=declared or list(layering.DEFAULT_LAYERS), freeze=args.freeze)
+                   layers=([] if args.no_layers else declared or list(layering.DEFAULT_LAYERS)),
+                   layers_source=layering.COMMAND_LINE_SOURCE if declared else None,
+                   freeze=args.freeze)
     if args.source_commit:
         opts.source_commit = verify_source_commit(REPO_ROOT, args.source_commit,
                                                   args.src, args.package)

@@ -12,9 +12,9 @@ FILE_DESCRIPTIONS = {
     "README.md": "This file: provenance, extraction rules, exclusions, limitations, metric definitions.",
     "metrics.json": "All measurements, machine-readable.",
     "metrics.md": "The same measurements as tables, with definitions.",
-    "modules.mmd": "Package-level import graph (modules collapsed onto their containing package).",
+    "packages.mmd": "Package-level import graph, every edge drawn; boxed by declared layer "
+                    "when a declaration applies (see *Package graph*).",
     "modules-cycles.mmd": "Module-level import graph restricted to modules in import cycles (nontrivial SCCs).",
-    "layers.mmd": "The same packages boxed by declared layer, runtime edges only, upward edges marked.",
     "classes.mmd": "Classes linked by inheritance between analysed classes, with their methods.",
     "graph/modules.json": "Full module import graph: every analysed module and import edge.",
     "graph/packages.json": "Package-aggregated import graph.",
@@ -27,8 +27,6 @@ FILE_DESCRIPTIONS = {
 def _describe_file(name: str) -> str:
     if name in FILE_DESCRIPTIONS:
         return FILE_DESCRIPTIONS[name]
-    if name.startswith("classes/"):
-        return f"All classes of package `{name[len('classes/'):-len('.mmd')]}`, with methods."
     if name.startswith("calls/"):
         return "Scoped static call graph (roots and depth: see *Call graphs* below)."
     return ""
@@ -156,11 +154,11 @@ def render_metrics_md(metrics: dict, opts) -> str:
             "## Declared layer graph",
             "",
             "The only part of this report that compares the code with an expectation. "
-            "The layers below were declared on the command line (top = most dependent); "
-            "every package is assigned to the first layer whose prefix it matches. Edges "
-            "are **runtime** import edges (module- or function-scope; `TYPE_CHECKING`-only "
-            "edges excluded) between packages of different layers; edges inside one layer "
-            "are counted on the layer instead of becoming self-loops.",
+            f"The layers below are declared in {lg['declared_by']} (top = most dependent), "
+            "not inferred from the code: every package is assigned to the first layer "
+            "whose prefix its name matches. All import edges between packages of "
+            "different layers count, `TYPE_CHECKING`-only ones included; edges inside "
+            "one layer are counted on the layer instead of becoming self-loops.",
             "",
             "| Layer | Prefixes | Packages |",
             "|---|---|---|",
@@ -181,19 +179,25 @@ def render_metrics_md(metrics: dict, opts) -> str:
             "",
         ]
         if lg["upward_package_edges"]:
-            out += ["| From | To | Crosses | Module edges |", "|---|---|---|---|"]
+            out += ["| From | To | Crosses | Module edges | `TYPE_CHECKING` only |",
+                    "|---|---|---|---|---|"]
             out += [f"| `{v['source']}` | `{v['target']}` | {v['source_layer']} -> "
-                    f"{v['target_layer']} | {v['module_edges']} |"
+                    f"{v['target_layer']} | {v['module_edges']} | "
+                    f"{'yes' if v['type_checking_only'] else 'no'} |"
                     for v in lg["upward_package_edges"]]
             out += ["", f"Module-level import edges involved: {lg['modules_in_upward_edges']}.", ""]
         else:
-            out += ["None: every runtime dependency points downward, so the layer "
-                    "quotient graph is a DAG.", ""]
+            out += ["None: every import edge, `TYPE_CHECKING`-only ones included, points "
+                    "downward or stays inside a layer, so the layer quotient graph is a DAG.",
+                    ""]
     cg, cl = metrics["call_graph"], metrics["class_graph"]
     out += [
         "## Class graph",
         "",
         f"* Classes: {cl['classes']}",
+        f"* Classes in at least one `inherits` edge (drawn in `classes.mmd`): "
+        f"{cl['classes_in_inherits_edges']}; with neither an analysed base nor an "
+        f"analysed subclass: {cl['classes'] - cl['classes_in_inherits_edges']}",
         f"* `inherits` edges between analysed classes: {cl['inherits_edges']}",
         f"* `nests` edges (class defined in a class body): {cl['nests_edges']}",
         "* Bases outside the analysed package: "
@@ -342,30 +346,46 @@ def render_readme(metrics: dict, opts, files: list[str], generated_marker: str,
         "mismatch; the analysed package is never imported (asserted after extraction).",
         "* Not edges: the implicit execution of parent packages (`import a.b.c` runs "
         "`a/__init__` and `a/b/__init__`).",
-        "* `modules.mmd` collapses modules onto their containing package; each edge label "
-        "is the number of module edges merged into it. `modules-cycles.mmd` shows the "
-        "modules of every nontrivial SCC; dashed edges there consist only of "
-        "function-scope or `TYPE_CHECKING` imports.",
+        "* `modules-cycles.mmd` shows the modules of every nontrivial SCC; dashed edges "
+        "there consist only of function-scope or `TYPE_CHECKING` imports (neither runs "
+        "when the importing module is imported).",
         "",
-        *(["### Layer view (declared)",
+        "### Package graph",
+        "",
+        "* `packages.mmd` collapses modules onto their containing package and draws "
+        "every resulting edge; each edge label is the number of module edges merged "
+        "into it. An edge whose merged imports are all under `if TYPE_CHECKING:` is "
+        "dashed and labelled `type-only` (a type checker follows it; the running "
+        "program never does). The edge data, with `runtime_module_edges` per edge, is "
+        "in `graph/packages.json`.",
+        *(["* No layer declaration applied, so the drawing is a plain dependency graph "
+           "with no grouping and no marking."]
+          if not metrics.get("layer_graph") else []),
+        "",
+        *(["### Declared layers in `packages.mmd`",
            "",
-           "`layers.mmd` is the only output that states an expectation. The layers are "
-           "declared on the command line (`--layer NAME=PREFIX[,PREFIX]`, top = most "
-           "dependent) and recorded under `layer_graph` in `metrics.json`; they are not "
-           "derived from the code. Nothing else in this snapshot depends on them, and "
-           "changing them changes no measurement.",
+           "The layers are the only input to this snapshot that states an expectation. "
+           f"They are declared in {metrics['layer_graph']['declared_by']} (top = most "
+           "dependent), recorded under `layer_graph` in `metrics.json`, and not derived "
+           "from the code: a package belongs to the first layer whose prefix its name "
+           "matches. The drawing says so in its legend. Changing the declaration "
+           "changes no measurement outside `layer_graph` and removes no edge.",
            "",
-           "* It draws the same package nodes as `modules.mmd`, boxed by layer, with the "
-           "boxes in declared order.",
-           "* Only **runtime** edges are drawn: an edge whose import statements are all "
-           "under `if TYPE_CHECKING:` is never executed and is left out. Function-scope "
-           "imports are kept, because they do run when the function is called.",
+           "* Packages are drawn inside one box per layer, captioned with the layer "
+           "name. The legend states the source of the declaration and each layer's "
+           "prefixes.",
+           "* Every edge is drawn between the two packages themselves: none is merged "
+           "into a layer-to-layer arrow, rerouted through a box, or left out.",
            "* An edge from a lower layer to a higher one contradicts the declaration: it "
            "is drawn in red, labelled `up`, and listed under "
-           "`layer_graph.upward_package_edges`. With none of them, the layer quotient "
-           "graph is acyclic and the layers can be levelized.",
+           "`layer_graph.upward_package_edges`. `TYPE_CHECKING`-only edges count too "
+           "and are flagged there. With no such edge, the layer quotient graph is "
+           "acyclic and the layers can be levelized.",
+           "* The renderer chooses where the boxes go, so an upward edge need not point "
+           "up on screen; the colour and label are what mark it.",
            "* A package no declared prefix matches is drawn in an `unassigned` box and "
            "listed under `layer_graph.unassigned_packages`.",
+           "* `--no-layers` renders the plain dependency graph instead.",
            ""]
           if metrics.get("layer_graph") else []),
         "### Class graph (ast)",
