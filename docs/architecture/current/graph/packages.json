@@ -3,552 +3,637 @@
     {
       "kind": "imports",
       "module_edges": 4,
+      "runtime_module_edges": 4,
       "source": "tropoi.cli",
       "target": "tropoi.representation.archive"
     },
     {
       "kind": "imports",
       "module_edges": 6,
+      "runtime_module_edges": 6,
       "source": "tropoi.cli",
       "target": "tropoi.representation.visual"
     },
     {
       "kind": "imports",
       "module_edges": 3,
+      "runtime_module_edges": 3,
       "source": "tropoi.cli",
       "target": "tropoi.run.bve"
     },
     {
       "kind": "imports",
       "module_edges": 2,
+      "runtime_module_edges": 2,
       "source": "tropoi.cli",
       "target": "tropoi.run.custom"
     },
     {
       "kind": "imports",
       "module_edges": 2,
+      "runtime_module_edges": 2,
       "source": "tropoi.cli",
       "target": "tropoi.run.pe"
     },
     {
       "kind": "imports",
       "module_edges": 2,
+      "runtime_module_edges": 2,
       "source": "tropoi.cli",
       "target": "tropoi.run.swe"
     },
     {
       "kind": "imports",
       "module_edges": 3,
+      "runtime_module_edges": 3,
       "source": "tropoi.cli",
       "target": "tropoi.spatial"
     },
     {
       "kind": "imports",
       "module_edges": 4,
+      "runtime_module_edges": 4,
       "source": "tropoi.cli",
       "target": "tropoi.spatial.terrain"
     },
     {
       "kind": "imports",
       "module_edges": 1,
+      "runtime_module_edges": 1,
       "source": "tropoi.cli",
       "target": "tropoi.spatial.transforms.cuda"
     },
     {
       "kind": "imports",
+      "module_edges": 1,
+      "runtime_module_edges": 1,
+      "source": "tropoi.representation.archive",
+      "target": "tropoi.representation"
+    },
+    {
+      "kind": "imports",
       "module_edges": 6,
+      "runtime_module_edges": 6,
       "source": "tropoi.representation.archive",
       "target": "tropoi.representation.visual"
     },
     {
       "kind": "imports",
-      "module_edges": 1,
-      "source": "tropoi.representation.archive",
-      "target": "tropoi.run.bve"
-    },
-    {
-      "kind": "imports",
       "module_edges": 10,
+      "runtime_module_edges": 10,
       "source": "tropoi.representation.archive",
       "target": "tropoi.spatial"
     },
     {
       "kind": "imports",
       "module_edges": 1,
+      "runtime_module_edges": 1,
       "source": "tropoi.representation.archive",
       "target": "tropoi.temporal"
     },
     {
       "kind": "imports",
       "module_edges": 2,
+      "runtime_module_edges": 2,
       "source": "tropoi.representation.diagnostics",
       "target": "tropoi.spatial"
     },
     {
       "kind": "imports",
       "module_edges": 2,
+      "runtime_module_edges": 2,
       "source": "tropoi.representation.diagnostics",
       "target": "tropoi.spatial.transforms"
     },
     {
       "kind": "imports",
       "module_edges": 2,
+      "runtime_module_edges": 2,
       "source": "tropoi.representation.diagnostics",
       "target": "tropoi.temporal.tendencies"
     },
     {
       "kind": "imports",
       "module_edges": 5,
+      "runtime_module_edges": 5,
       "source": "tropoi.representation.visual",
       "target": "tropoi.representation.archive"
     },
     {
       "kind": "imports",
       "module_edges": 5,
+      "runtime_module_edges": 5,
       "source": "tropoi.representation.visual",
       "target": "tropoi.representation.diagnostics"
     },
     {
       "kind": "imports",
-      "module_edges": 1,
-      "source": "tropoi.representation.visual",
-      "target": "tropoi.run.bve"
-    },
-    {
-      "kind": "imports",
-      "module_edges": 1,
-      "source": "tropoi.representation.visual",
-      "target": "tropoi.run.pe"
-    },
-    {
-      "kind": "imports",
-      "module_edges": 1,
-      "source": "tropoi.representation.visual",
-      "target": "tropoi.run.swe"
-    },
-    {
-      "kind": "imports",
       "module_edges": 5,
+      "runtime_module_edges": 5,
       "source": "tropoi.representation.visual",
       "target": "tropoi.spatial"
     },
     {
       "kind": "imports",
       "module_edges": 9,
+      "runtime_module_edges": 9,
       "source": "tropoi.representation.visual",
       "target": "tropoi.spatial.grids"
     },
     {
       "kind": "imports",
       "module_edges": 1,
+      "runtime_module_edges": 1,
       "source": "tropoi.representation.visual",
       "target": "tropoi.spatial.operators"
     },
     {
       "kind": "imports",
       "module_edges": 1,
+      "runtime_module_edges": 1,
       "source": "tropoi.representation.visual",
       "target": "tropoi.spatial.states"
     },
     {
       "kind": "imports",
       "module_edges": 2,
+      "runtime_module_edges": 2,
       "source": "tropoi.representation.visual",
       "target": "tropoi.spatial.transforms"
     },
     {
       "kind": "imports",
+      "module_edges": 1,
+      "runtime_module_edges": 1,
+      "source": "tropoi.representation.visual",
+      "target": "tropoi.temporal"
+    },
+    {
+      "kind": "imports",
       "module_edges": 2,
+      "runtime_module_edges": 2,
       "source": "tropoi.representation.visual",
       "target": "tropoi.temporal.tendencies"
     },
     {
       "kind": "imports",
       "module_edges": 2,
+      "runtime_module_edges": 2,
       "source": "tropoi.run",
       "target": "tropoi.representation.archive"
     },
     {
       "kind": "imports",
+      "module_edges": 1,
+      "runtime_module_edges": 1,
+      "source": "tropoi.run.bve",
+      "target": "tropoi.representation"
+    },
+    {
+      "kind": "imports",
       "module_edges": 2,
+      "runtime_module_edges": 2,
       "source": "tropoi.run.bve",
       "target": "tropoi.representation.archive"
     },
     {
       "kind": "imports",
       "module_edges": 1,
+      "runtime_module_edges": 1,
       "source": "tropoi.run.bve",
       "target": "tropoi.representation.diagnostics"
     },
     {
       "kind": "imports",
       "module_edges": 3,
+      "runtime_module_edges": 3,
       "source": "tropoi.run.bve",
       "target": "tropoi.representation.visual"
     },
     {
       "kind": "imports",
       "module_edges": 1,
+      "runtime_module_edges": 1,
       "source": "tropoi.run.bve",
       "target": "tropoi.run"
     },
     {
       "kind": "imports",
-      "module_edges": 4,
+      "module_edges": 1,
+      "runtime_module_edges": 1,
       "source": "tropoi.run.bve",
       "target": "tropoi.spatial"
     },
     {
       "kind": "imports",
       "module_edges": 1,
+      "runtime_module_edges": 1,
       "source": "tropoi.run.bve",
       "target": "tropoi.spatial.initialization"
     },
     {
       "kind": "imports",
       "module_edges": 1,
+      "runtime_module_edges": 1,
       "source": "tropoi.run.bve",
       "target": "tropoi.spatial.states"
     },
     {
       "kind": "imports",
-      "module_edges": 2,
+      "module_edges": 3,
+      "runtime_module_edges": 3,
       "source": "tropoi.run.bve",
       "target": "tropoi.temporal"
     },
     {
       "kind": "imports",
       "module_edges": 1,
+      "runtime_module_edges": 1,
       "source": "tropoi.run.bve",
       "target": "tropoi.temporal.tendencies"
     },
     {
       "kind": "imports",
       "module_edges": 9,
+      "runtime_module_edges": 9,
       "source": "tropoi.run.custom",
       "target": "tropoi.representation.archive"
     },
     {
       "kind": "imports",
       "module_edges": 1,
+      "runtime_module_edges": 1,
       "source": "tropoi.run.custom",
       "target": "tropoi.representation.visual"
     },
     {
       "kind": "imports",
       "module_edges": 1,
+      "runtime_module_edges": 1,
       "source": "tropoi.run.custom",
       "target": "tropoi.run"
     },
     {
       "kind": "imports",
       "module_edges": 8,
+      "runtime_module_edges": 8,
       "source": "tropoi.run.custom",
       "target": "tropoi.run.bve"
     },
     {
       "kind": "imports",
       "module_edges": 5,
+      "runtime_module_edges": 5,
       "source": "tropoi.run.custom",
       "target": "tropoi.run.swe"
     },
     {
       "kind": "imports",
       "module_edges": 11,
+      "runtime_module_edges": 11,
       "source": "tropoi.run.custom",
       "target": "tropoi.spatial"
     },
     {
       "kind": "imports",
       "module_edges": 2,
+      "runtime_module_edges": 2,
       "source": "tropoi.run.custom",
       "target": "tropoi.spatial.initialization"
     },
     {
       "kind": "imports",
       "module_edges": 2,
+      "runtime_module_edges": 2,
       "source": "tropoi.run.custom",
       "target": "tropoi.spatial.states"
     },
     {
       "kind": "imports",
       "module_edges": 6,
+      "runtime_module_edges": 6,
       "source": "tropoi.run.custom",
       "target": "tropoi.spatial.terrain"
     },
     {
       "kind": "imports",
       "module_edges": 1,
+      "runtime_module_edges": 1,
       "source": "tropoi.run.custom",
       "target": "tropoi.temporal"
     },
     {
       "kind": "imports",
       "module_edges": 1,
+      "runtime_module_edges": 1,
       "source": "tropoi.run.custom",
       "target": "tropoi.temporal.tendencies"
     },
     {
       "kind": "imports",
       "module_edges": 4,
+      "runtime_module_edges": 4,
       "source": "tropoi.run.held_suarez",
       "target": "tropoi.spatial"
     },
     {
       "kind": "imports",
       "module_edges": 3,
+      "runtime_module_edges": 3,
       "source": "tropoi.run.held_suarez",
       "target": "tropoi.spatial.states"
     },
     {
       "kind": "imports",
       "module_edges": 1,
+      "runtime_module_edges": 1,
       "source": "tropoi.run.held_suarez",
       "target": "tropoi.temporal"
     },
     {
       "kind": "imports",
       "module_edges": 3,
+      "runtime_module_edges": 3,
       "source": "tropoi.run.held_suarez",
       "target": "tropoi.temporal.tendencies"
     },
     {
       "kind": "imports",
       "module_edges": 4,
+      "runtime_module_edges": 4,
       "source": "tropoi.run.pe",
       "target": "tropoi.representation.archive"
     },
     {
       "kind": "imports",
       "module_edges": 1,
+      "runtime_module_edges": 1,
       "source": "tropoi.run.pe",
       "target": "tropoi.representation.diagnostics"
     },
     {
       "kind": "imports",
       "module_edges": 2,
+      "runtime_module_edges": 2,
       "source": "tropoi.run.pe",
       "target": "tropoi.representation.visual"
     },
     {
       "kind": "imports",
       "module_edges": 1,
+      "runtime_module_edges": 1,
       "source": "tropoi.run.pe",
       "target": "tropoi.run"
     },
     {
       "kind": "imports",
       "module_edges": 2,
+      "runtime_module_edges": 2,
       "source": "tropoi.run.pe",
       "target": "tropoi.run.bve"
     },
     {
       "kind": "imports",
       "module_edges": 1,
+      "runtime_module_edges": 1,
       "source": "tropoi.run.pe",
       "target": "tropoi.run.swe"
     },
     {
       "kind": "imports",
-      "module_edges": 5,
+      "module_edges": 2,
+      "runtime_module_edges": 2,
       "source": "tropoi.run.pe",
       "target": "tropoi.spatial"
     },
     {
       "kind": "imports",
       "module_edges": 1,
+      "runtime_module_edges": 1,
       "source": "tropoi.run.pe",
       "target": "tropoi.spatial.initialization"
     },
     {
       "kind": "imports",
-      "module_edges": 1,
-      "source": "tropoi.run.pe",
-      "target": "tropoi.spatial.terrain"
-    },
-    {
-      "kind": "imports",
-      "module_edges": 3,
+      "module_edges": 4,
+      "runtime_module_edges": 4,
       "source": "tropoi.run.pe",
       "target": "tropoi.temporal"
     },
     {
       "kind": "imports",
-      "module_edges": 2,
+      "module_edges": 1,
+      "runtime_module_edges": 1,
       "source": "tropoi.run.pe",
       "target": "tropoi.temporal.tendencies"
     },
     {
       "kind": "imports",
       "module_edges": 2,
+      "runtime_module_edges": 2,
       "source": "tropoi.run.swe",
       "target": "tropoi.representation.archive"
     },
     {
       "kind": "imports",
       "module_edges": 1,
+      "runtime_module_edges": 1,
       "source": "tropoi.run.swe",
       "target": "tropoi.representation.diagnostics"
     },
     {
       "kind": "imports",
       "module_edges": 1,
+      "runtime_module_edges": 1,
       "source": "tropoi.run.swe",
       "target": "tropoi.representation.visual"
     },
     {
       "kind": "imports",
       "module_edges": 1,
+      "runtime_module_edges": 1,
       "source": "tropoi.run.swe",
       "target": "tropoi.run"
     },
     {
       "kind": "imports",
       "module_edges": 2,
+      "runtime_module_edges": 2,
       "source": "tropoi.run.swe",
       "target": "tropoi.run.bve"
     },
     {
       "kind": "imports",
-      "module_edges": 5,
+      "module_edges": 2,
+      "runtime_module_edges": 2,
       "source": "tropoi.run.swe",
       "target": "tropoi.spatial"
     },
     {
       "kind": "imports",
       "module_edges": 1,
+      "runtime_module_edges": 1,
       "source": "tropoi.run.swe",
       "target": "tropoi.spatial.initialization"
     },
     {
       "kind": "imports",
-      "module_edges": 1,
-      "source": "tropoi.run.swe",
-      "target": "tropoi.spatial.terrain"
-    },
-    {
-      "kind": "imports",
-      "module_edges": 2,
+      "module_edges": 3,
+      "runtime_module_edges": 3,
       "source": "tropoi.run.swe",
       "target": "tropoi.temporal"
     },
     {
       "kind": "imports",
-      "module_edges": 2,
+      "module_edges": 1,
+      "runtime_module_edges": 1,
       "source": "tropoi.run.swe",
       "target": "tropoi.temporal.tendencies"
     },
     {
       "kind": "imports",
       "module_edges": 6,
+      "runtime_module_edges": 6,
       "source": "tropoi.spatial",
       "target": "tropoi.spatial.grids"
     },
     {
       "kind": "imports",
       "module_edges": 1,
+      "runtime_module_edges": 1,
       "source": "tropoi.spatial",
       "target": "tropoi.spatial.operators"
     },
     {
       "kind": "imports",
       "module_edges": 3,
+      "runtime_module_edges": 3,
       "source": "tropoi.spatial",
       "target": "tropoi.spatial.terrain"
     },
     {
       "kind": "imports",
       "module_edges": 2,
+      "runtime_module_edges": 2,
       "source": "tropoi.spatial",
       "target": "tropoi.spatial.transforms"
     },
     {
       "kind": "imports",
       "module_edges": 1,
+      "runtime_module_edges": 1,
       "source": "tropoi.spatial.grids",
       "target": "tropoi.spatial.transforms"
     },
     {
       "kind": "imports",
       "module_edges": 4,
+      "runtime_module_edges": 4,
       "source": "tropoi.spatial.initialization",
       "target": "tropoi.spatial"
     },
     {
       "kind": "imports",
       "module_edges": 2,
+      "runtime_module_edges": 2,
       "source": "tropoi.spatial.initialization",
       "target": "tropoi.spatial.states"
     },
     {
       "kind": "imports",
       "module_edges": 2,
+      "runtime_module_edges": 0,
       "source": "tropoi.spatial.initialization",
       "target": "tropoi.temporal.tendencies"
     },
     {
       "kind": "imports",
       "module_edges": 2,
+      "runtime_module_edges": 2,
       "source": "tropoi.spatial.operators",
       "target": "tropoi.spatial"
     },
     {
       "kind": "imports",
       "module_edges": 1,
+      "runtime_module_edges": 1,
       "source": "tropoi.spatial.operators",
       "target": "tropoi.spatial.grids"
     },
     {
       "kind": "imports",
       "module_edges": 2,
+      "runtime_module_edges": 2,
       "source": "tropoi.spatial.operators",
       "target": "tropoi.spatial.transforms"
     },
     {
       "kind": "imports",
       "module_edges": 1,
+      "runtime_module_edges": 0,
       "source": "tropoi.spatial.terrain",
       "target": "tropoi.spatial.transforms"
     },
     {
       "kind": "imports",
       "module_edges": 2,
+      "runtime_module_edges": 2,
       "source": "tropoi.spatial.transforms",
       "target": "tropoi.spatial.grids"
     },
     {
       "kind": "imports",
       "module_edges": 2,
+      "runtime_module_edges": 2,
       "source": "tropoi.spatial.transforms",
       "target": "tropoi.spatial.transforms.cuda"
     },
     {
       "kind": "imports",
-      "module_edges": 3,
+      "module_edges": 8,
+      "runtime_module_edges": 8,
       "source": "tropoi.temporal",
       "target": "tropoi.spatial"
     },
     {
       "kind": "imports",
+      "module_edges": 1,
+      "runtime_module_edges": 1,
+      "source": "tropoi.temporal",
+      "target": "tropoi.spatial.terrain"
+    },
+    {
+      "kind": "imports",
+      "module_edges": 2,
+      "runtime_module_edges": 2,
+      "source": "tropoi.temporal",
+      "target": "tropoi.temporal.tendencies"
+    },
+    {
+      "kind": "imports",
       "module_edges": 6,
+      "runtime_module_edges": 6,
       "source": "tropoi.temporal.tendencies",
       "target": "tropoi.spatial"
     },
     {
       "kind": "imports",
       "module_edges": 3,
+      "runtime_module_edges": 3,
       "source": "tropoi.temporal.tendencies",
       "target": "tropoi.spatial.states"
     },
     {
       "kind": "imports",
       "module_edges": 1,
+      "runtime_module_edges": 1,
       "source": "tropoi.temporal.tendencies",
       "target": "tropoi.spatial.terrain"
     },
     {
       "kind": "imports",
       "module_edges": 1,
+      "runtime_module_edges": 1,
       "source": "tropoi.temporal.tendencies",
       "target": "tropoi.temporal"
     }
@@ -559,6 +644,11 @@
       "id": "tropoi.cli",
       "internal_edges": 3,
       "modules": 4
+    },
+    {
+      "id": "tropoi.representation",
+      "internal_edges": 0,
+      "modules": 1
     },
     {
       "id": "tropoi.representation.archive",
@@ -602,7 +692,7 @@
     },
     {
       "id": "tropoi.run.swe",
-      "internal_edges": 5,
+      "internal_edges": 4,
       "modules": 4
     },
     {
@@ -648,7 +738,7 @@
     {
       "id": "tropoi.temporal",
       "internal_edges": 3,
-      "modules": 5
+      "modules": 6
     },
     {
       "id": "tropoi.temporal.tendencies",

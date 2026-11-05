@@ -86,7 +86,7 @@ def test_check_survives_commits_but_rejects_input_and_output_changes(tmp_path, m
         path.write_text(original + '# changed\n')
         assert generate.main([*args, '--check']) == 1
         path.write_text(original)
-    diagram = tmp_path / 'snapshot' / 'modules.mmd'
+    diagram = tmp_path / 'snapshot' / 'packages.mmd'
     original = diagram.read_text()
     diagram.write_text('tampered\n')
     assert generate.main([*args, '--check']) == 1

@@ -52,6 +52,16 @@ DEFINITIONS: dict[str, str] = {
     "intra_package_module_edges": "Package graph only: module-level edges whose two "
                                   "modules map to the same package. They are counted "
                                   "here instead of becoming package self-loops.",
+    "declared_by / declared / packages_by_layer / unassigned_packages": "Layer graph only: "
+        "where the declaration came from (`DEFAULT_LAYERS` or `--layer`), the layers it "
+        "gives (top first) with their package prefixes, the packages each one matched, "
+        "and the packages no prefix matched. A declaration, not a measurement.",
+    "upward_package_edges / modules_in_upward_edges": "Layer graph only: the package "
+        "edges running from a lower declared layer to a higher one (the layer "
+        "violations), each flagged `type_checking_only` when all its imports are under "
+        "`if TYPE_CHECKING:`, and the total number of module-level import edges merged "
+        "into them. Empty means every import edge points downward or stays inside a "
+        "layer, i.e. the layer quotient graph is a DAG and the layers can be levelized.",
 }
 
 

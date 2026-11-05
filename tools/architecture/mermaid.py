@@ -60,18 +60,74 @@ def _short(name: str, root: str) -> str:
 
 
 # -- module / package graphs ----------------------------------------------
-def package_flowchart(agg: Graph, root: str, title: str) -> str:
-    """Package-level import graph; edge labels count merged module edges."""
-    out = [HEADER, f"%% {title}", "flowchart LR"]
-    for pkg in sorted(agg.nodes):
-        attrs = agg.nodes[pkg]
-        count = attrs["modules"]
-        name = pkg if pkg == root else _short(pkg, root)
-        text = f"{name} ({count} module{'' if count == 1 else 's'})"
-        out.append(f"    {node_id(pkg)}[{label(text)}]")
-    for (s, t, _k) in sorted(agg.edges):
-        count = agg.edges[(s, t, _k)]["module_edges"]
-        out.append(f"    {node_id(s)} -->|{count}| {node_id(t)}")
+#: Styling of an edge that contradicts the declared layer order.
+UPWARD_STYLE = "stroke:#d62728,stroke-width:2px"
+#: Styling of the legend node of a layered drawing (not a package).
+LEGEND_STYLE = "fill:none,stroke:#999,stroke-dasharray:2 2"
+#: Text wrapping width (px) for a layered drawing. Mermaid's default, 200,
+#: breaks legend lines mid-phrase; it changes text layout only, not the graph.
+LAYERED_WRAPPING = '%%{init: {"flowchart": {"wrappingWidth": 700}}}%%'
+
+
+def label_lines(lines: list[str]) -> str:
+    """Quoted label of several lines: each escaped, joined by ``<br>``."""
+    return '"' + "<br>".join("".join(_ESCAPES.get(ch, ch) for ch in line)
+                             for line in lines) + '"'
+
+
+def _package_node(agg: Graph, pkg: str, root: str) -> str:
+    count = agg.nodes[pkg]["modules"]
+    name = pkg if pkg == root else _short(pkg, root)
+    text = f"{name} ({count} module{'' if count == 1 else 's'})"
+    return f"{node_id(pkg)}[{label(text)}]"
+
+
+def package_flowchart(agg: Graph, root: str, title: str,
+                      boxes: list[tuple[str, str, list[str]]] | None = None,
+                      upward: set[tuple[str, str]] = frozenset(),
+                      legend: list[str] | None = None) -> str:
+    """Package-level import graph; every edge of ``agg`` is drawn.
+
+    Edge label = number of module-level import edges merged into the edge.
+    An edge made only of ``TYPE_CHECKING`` imports (``runtime_module_edges``
+    is 0) is dashed and labelled ``type-only``.
+
+    Without ``boxes`` this is a plain dependency graph. With ``boxes``,
+    ``(name, caption, packages)`` in declaration order, the packages are
+    drawn inside one box per layer, top to bottom; the ``(source, target)``
+    pairs in ``upward`` are labelled ``up`` and styled with
+    :data:`UPWARD_STYLE`; and ``legend`` lines, if any, become a standalone
+    node stating where the declaration came from. Edges always connect the
+    two packages themselves, never a box, so nothing is merged or rerouted.
+    """
+    out = [HEADER, f"%% {title}"]
+    out += [LAYERED_WRAPPING, "flowchart TD"] if boxes else ["flowchart LR"]
+    if boxes:
+        if legend:
+            out.append(f"    legend[{label_lines(legend)}]")
+        for name, caption, packages in boxes:
+            out.append(f"    subgraph {node_id(name, 'g')}[{label(caption)}]")
+            out.extend(f"        {_package_node(agg, pkg, root)}" for pkg in packages)
+            out.append("    end")
+    else:
+        out.extend(f"    {_package_node(agg, pkg, root)}" for pkg in sorted(agg.nodes))
+    styled = []
+    for index, (s, t, k) in enumerate(sorted(agg.edges)):
+        attrs = agg.edges[(s, t, k)]
+        type_only = attrs.get("runtime_module_edges") == 0
+        text = str(attrs["module_edges"])
+        if (s, t) in upward:
+            styled.append(index)
+            text += " up"
+        if type_only:
+            text += ", type-only"
+        arrow = "-.->" if type_only else "-->"
+        shown = text if text.isdigit() else label(text)
+        out.append(f"    {node_id(s)} {arrow}|{shown}| {node_id(t)}")
+    if styled:
+        out.append(f"    linkStyle {','.join(str(i) for i in styled)} {UPWARD_STYLE}")
+    if boxes and legend:
+        out.append(f"    style legend {LEGEND_STYLE}")
     return _lines(*out)
 
 

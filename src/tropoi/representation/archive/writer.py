@@ -35,7 +35,7 @@ from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from typing import Optional
 
-from tropoi.run.bve.config import scientific_config_subset
+from tropoi.representation.identity import scientific_config_subset
 
 
 class RunProvenanceError(RuntimeError):
@@ -153,8 +153,9 @@ def _config_hash(config: dict) -> str:
     """Short deterministic hash of a run's scientific configuration.
 
     The scientific subset is selected by
-    :func:`config.scientific_config_subset` — the single shared source of the
-    exclusion set (``out``, ``experiment``, ``overwrite``, ``plots``) — so
+    :func:`tropoi.representation.identity.scientific_config_subset` — the
+    single shared source of the exclusion set (``out``, ``experiment``,
+    ``overwrite``, ``plots``), which the configuration layer uses too — so
     two runs of the same science produce the same hash regardless of output
     location or plot selection, and the exclusion logic is never duplicated.
     The digest is 4 bytes (32 bits), so distinct scientific configurations

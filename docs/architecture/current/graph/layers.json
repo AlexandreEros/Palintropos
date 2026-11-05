@@ -1,0 +1,132 @@
+{
+  "edges": [
+    {
+      "direction": "down",
+      "kind": "imports",
+      "module_edges": 10,
+      "package_edges": 2,
+      "source": "cli",
+      "target": "representation",
+      "type_checking_only_package_edges": 0
+    },
+    {
+      "direction": "down",
+      "kind": "imports",
+      "module_edges": 9,
+      "package_edges": 4,
+      "source": "cli",
+      "target": "run",
+      "type_checking_only_package_edges": 0
+    },
+    {
+      "direction": "down",
+      "kind": "imports",
+      "module_edges": 8,
+      "package_edges": 3,
+      "source": "cli",
+      "target": "spatial",
+      "type_checking_only_package_edges": 0
+    },
+    {
+      "direction": "down",
+      "kind": "imports",
+      "module_edges": 32,
+      "package_edges": 8,
+      "source": "representation",
+      "target": "spatial",
+      "type_checking_only_package_edges": 0
+    },
+    {
+      "direction": "down",
+      "kind": "imports",
+      "module_edges": 6,
+      "package_edges": 4,
+      "source": "representation",
+      "target": "temporal",
+      "type_checking_only_package_edges": 0
+    },
+    {
+      "direction": "down",
+      "kind": "imports",
+      "module_edges": 30,
+      "package_edges": 13,
+      "source": "run",
+      "target": "representation",
+      "type_checking_only_package_edges": 0
+    },
+    {
+      "direction": "down",
+      "kind": "imports",
+      "module_edges": 37,
+      "package_edges": 13,
+      "source": "run",
+      "target": "spatial",
+      "type_checking_only_package_edges": 0
+    },
+    {
+      "direction": "down",
+      "kind": "imports",
+      "module_edges": 19,
+      "package_edges": 10,
+      "source": "run",
+      "target": "temporal",
+      "type_checking_only_package_edges": 0
+    },
+    {
+      "direction": "up",
+      "kind": "imports",
+      "module_edges": 2,
+      "package_edges": 1,
+      "source": "spatial",
+      "target": "temporal",
+      "type_checking_only_package_edges": 1
+    },
+    {
+      "direction": "down",
+      "kind": "imports",
+      "module_edges": 19,
+      "package_edges": 5,
+      "source": "temporal",
+      "target": "spatial",
+      "type_checking_only_package_edges": 0
+    }
+  ],
+  "name": "layers",
+  "nodes": [
+    {
+      "depth": 0,
+      "id": "cli",
+      "internal_package_edges": 0,
+      "modules": 4,
+      "packages": 1
+    },
+    {
+      "depth": 2,
+      "id": "representation",
+      "internal_package_edges": 4,
+      "modules": 39,
+      "packages": 4
+    },
+    {
+      "depth": 1,
+      "id": "run",
+      "internal_package_edges": 9,
+      "modules": 28,
+      "packages": 6
+    },
+    {
+      "depth": 4,
+      "id": "spatial",
+      "internal_package_edges": 13,
+      "modules": 34,
+      "packages": 8
+    },
+    {
+      "depth": 3,
+      "id": "temporal",
+      "internal_package_edges": 2,
+      "modules": 10,
+      "packages": 2
+    }
+  ]
+}

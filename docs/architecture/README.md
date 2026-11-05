@@ -5,7 +5,26 @@ Everything below this directory, except this file, is written by
 reads the source of `src/tropoi` and records generic structural facts: module
 imports (grimp), classes, inheritance, and methods (`ast`), and statically
 resolvable calls (`ast`). It also records descriptive graph metrics (networkx).
-It encodes no expectation about how the packages should depend on each other.
+No extraction rule and no measurement encodes an expectation about how the
+packages should depend on each other.
+
+One input does, because it is given one: a layer declaration (`--layer`,
+default `DEFAULT_LAYERS` in `tools/architecture/layers.py`: `cli`, `run`,
+`representation`, `temporal`, `spatial`, top first, matching *Dependency direction* in
+`docs/ARCHITECTURE.md`). It changes how `packages.mmd` is drawn and adds
+`graph/layers.json` and the `layer_graph` sections of `metrics.json`,
+`metrics.md`, and the snapshot README. Nothing else depends on it:
+
+- The drawing's legend says where the layers came from and which package
+  prefixes each one holds. Layer membership is read from package names,
+  never inferred from imports.
+- Every import edge is still drawn between the two packages it connects.
+  An edge made only of `TYPE_CHECKING` imports is dashed and labelled, not
+  dropped.
+- An edge against the declared order is drawn in red, labelled `up`, and
+  listed in `layer_graph`, so a new upward dependency turns up as a diff.
+- With `--no-layers`, or a declaration that matches no package,
+  `packages.mmd` is a plain dependency graph with no boxes and no marking.
 
 The hand-authored `docs/class-structure.md` and `docs/call-structure.md` are
 separate and are not replaced by these files.

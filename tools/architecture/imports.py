@@ -180,8 +180,12 @@ def aggregate_by_package(graph: Graph, project: Project) -> Graph:
     """Collapse modules onto their containing package.
 
     Edge attribute ``module_edges`` counts the module-level edges merged into
-    each package-level edge. Intra-package edges become the node attribute
-    ``internal_edges`` rather than self-loops.
+    each package-level edge; ``runtime_module_edges`` counts those among them
+    with at least one ``module``- or ``function``-scope statement. A package
+    edge with ``runtime_module_edges == 0`` exists only for a type checker:
+    every statement behind it is under ``if TYPE_CHECKING:`` and never runs.
+    Intra-package edges become the node attribute ``internal_edges`` rather
+    than self-loops.
     """
     packages = sorted({m for m, info in project.modules.items() if info.is_package})
     agg = Graph("packages")
@@ -196,4 +200,11 @@ def aggregate_by_package(graph: Graph, project: Project) -> Graph:
             continue
         edge = agg.add_edge(ps, pt, "imports")
         edge["module_edges"] = edge.get("module_edges", 0) + 1
+        runs = bool({"module", "function"} & set(graph.edges[(s, t, _k)]["scopes"]))
+        edge["runtime_module_edges"] = edge.get("runtime_module_edges", 0) + int(runs)
     return agg
+
+
+def type_checking_only(edge_attrs: dict) -> bool:
+    """True for a package edge made exclusively of ``TYPE_CHECKING`` imports."""
+    return edge_attrs.get("runtime_module_edges") == 0
