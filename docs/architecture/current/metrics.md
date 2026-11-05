@@ -154,7 +154,7 @@ Every module is mapped to its containing package (a package's `__init__` to the 
 
 ## Declared layer graph
 
-The only part of this report that compares the code with an expectation. The layers below were declared on the command line (top = most dependent); every package is assigned to the first layer whose prefix it matches. Edges are **runtime** import edges (module- or function-scope; `TYPE_CHECKING`-only edges excluded) between packages of different layers; edges inside one layer are counted on the layer instead of becoming self-loops.
+The only part of this report that compares the code with an expectation. The layers below are declared in DEFAULT_LAYERS in tools/architecture/layers.py (top = most dependent), not inferred from the code: every package is assigned to the first layer whose prefix its name matches. All import edges between packages of different layers count, `TYPE_CHECKING`-only ones included; edges inside one layer are counted on the layer instead of becoming self-loops.
 
 | Layer | Prefixes | Packages |
 |---|---|---|
@@ -196,11 +196,12 @@ Packages matched by no declared layer: none.
 
 **Edges against the declared order (layer violations)**
 
-None: every runtime dependency points downward, so the layer quotient graph is a DAG.
+None: every import edge, `TYPE_CHECKING`-only ones included, points downward or stays inside a layer, so the layer quotient graph is a DAG.
 
 ## Class graph
 
 * Classes: 162
+* Classes in at least one `inherits` edge (drawn in `classes.mmd`): 18; with neither an analysed base nor an analysed subclass: 144
 * `inherits` edges between analysed classes: 12
 * `nests` edges (class defined in a class body): 0
 * Bases outside the analysed package: `RuntimeError` x6, `UserWarning` x1, `ValueError` x17, `abc.ABC` x2, `collections.abc.Mapping` x1, `enum.Enum` x2, `str` x2, `typing.Protocol` x3
@@ -238,5 +239,5 @@ None: every runtime dependency points downward, so the layer quotient graph is a
 | `reciprocity` | Fraction of edges whose reverse edge also exists (`nx.overall_reciprocity`) = 2 x reciprocal_pairs / \|E\|. |
 | `condensation` | The DAG obtained by contracting each SCC to one node (`nx.condensation`): its node and edge counts, source and sink counts, and `longest_path_edges`, the number of edges on a longest directed path in that DAG (`nx.dag_longest_path_length`). |
 | `intra_package_module_edges` | Package graph only: module-level edges whose two modules map to the same package. They are counted here instead of becoming package self-loops. |
-| `declared / packages_by_layer / unassigned_packages` | Layer graph only: the layers given to the generator (`--layer`, top first) with their package prefixes, the packages each one matched, and the packages no prefix matched. A declaration, not a measurement. |
-| `upward_package_edges / modules_in_upward_edges` | Layer graph only: the package edges running from a lower declared layer to a higher one (the layer violations), and the total number of module-level import edges merged into them. Empty means every runtime dependency points downward, i.e. the layer quotient graph is a DAG and the layers can be levelized. |
+| `declared_by / declared / packages_by_layer / unassigned_packages` | Layer graph only: where the declaration came from (`DEFAULT_LAYERS` or `--layer`), the layers it gives (top first) with their package prefixes, the packages each one matched, and the packages no prefix matched. A declaration, not a measurement. |
+| `upward_package_edges / modules_in_upward_edges` | Layer graph only: the package edges running from a lower declared layer to a higher one (the layer violations), each flagged `type_checking_only` when all its imports are under `if TYPE_CHECKING:`, and the total number of module-level import edges merged into them. Empty means every import edge points downward or stays inside a layer, i.e. the layer quotient graph is a DAG and the layers can be levelized. |
