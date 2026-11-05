@@ -152,25 +152,25 @@ def _prepared_terrain(storage):
 def build_resources(storage) -> SnapshotResources:
     """Reconstruct the run's Planet/model from its persisted configuration.
 
-    Uses the solver modules' own builders (the code path the run itself
-    used), never a preset validator, so legacy capsules are not
-    re-validated by newer guards. Requires CUDA; a missing CuPy/CUDA
+    Uses the solvers' own builders (:mod:`tropoi.temporal.models`, the code
+    path the run itself used), never a preset validator, so legacy capsules
+    are not re-validated by newer guards. Requires CUDA; a missing CuPy/CUDA
     surfaces as :class:`PlotUnavailableError` with the CPU alternatives.
     """
     solver = storage.solver
     run_config = storage.run_config
     try:
         if solver == "bve":
-            from tropoi.run.bve.model import build_planet
+            from tropoi.temporal.models import build_planet
             planet = build_planet(run_config)
             return SnapshotResources(solver, planet)
         if solver == "swe":
-            from tropoi.run.swe.model import build_swe_model
+            from tropoi.temporal.models import build_swe_model
             model = build_swe_model(
                 run_config, topography_lm=_custom_terrain(storage))
             return SnapshotResources(solver, model.planet, model)
         if solver == "pe":
-            from tropoi.run.pe.model import build_pe_model
+            from tropoi.temporal.models import build_pe_model
             model = build_pe_model(
                 run_config, topography_lm=_prepared_terrain(storage))
             return SnapshotResources(solver, model.planet, model)

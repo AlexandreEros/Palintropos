@@ -75,6 +75,42 @@ def package_flowchart(agg: Graph, root: str, title: str) -> str:
     return _lines(*out)
 
 
+#: Styling of an edge that contradicts the declared layer order.
+UPWARD_STYLE = "stroke:#d62728,stroke-width:2px"
+
+
+def layer_flowchart(agg: Graph, boxes: list[tuple[str, list[str]]], root: str,
+                    title: str, upward: set[tuple[str, str]]) -> str:
+    """Package graph drawn top to bottom inside one box per declared layer.
+
+    ``boxes`` gives the layers in declaration order (top first) with their
+    packages; ``upward`` holds the ``(source, target)`` package pairs that run
+    against that order. Those edges are labelled ``up`` and styled with
+    :data:`UPWARD_STYLE`, so a layer violation is visible both in the drawing
+    and in the diagram source.
+    """
+    out = [HEADER, f"%% {title}", "flowchart TD"]
+    for layer, packages in boxes:
+        out.append(f"    subgraph {node_id(layer, 'g')}[{label(layer)}]")
+        for pkg in packages:
+            count = agg.nodes[pkg]["modules"]
+            name = pkg if pkg == root else _short(pkg, root)
+            text = f"{name} ({count} module{'' if count == 1 else 's'})"
+            out.append(f"        {node_id(pkg)}[{label(text)}]")
+        out.append("    end")
+    styled = []
+    for index, (s, t, _k) in enumerate(sorted(agg.edges)):
+        count = agg.edges[(s, t, _k)]["module_edges"]
+        if (s, t) in upward:
+            styled.append(index)
+            out.append(f"    {node_id(s)} -->|{label(f'{count} up')}| {node_id(t)}")
+        else:
+            out.append(f"    {node_id(s)} -->|{count}| {node_id(t)}")
+    if styled:
+        out.append(f"    linkStyle {','.join(str(i) for i in styled)} {UPWARD_STYLE}")
+    return _lines(*out)
+
+
 def module_flowchart(graph: Graph, nodes: list[str], root: str, title: str,
                      group_by) -> str:
     """Module-level flowchart restricted to ``nodes``, grouped into subgraphs.

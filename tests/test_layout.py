@@ -36,17 +36,10 @@ ALLOWED = {
     "tropoi.representation": ("tropoi.spatial", "tropoi.temporal",
                               "tropoi.representation"),
 }
-#: Deliberate, documented exceptions (docs/ARCHITECTURE.md).
-EXCEPTIONS = {
-    # the run-id hash consumes the stdlib-only configuration layer's
-    # scientific subset
-    ("tropoi.representation.archive.writer", "tropoi.run.bve.config"),
-    # Snapshot.plot rebuilds model resources lazily through the solver
-    # modules' own builders (orchestration owns model construction)
-    ("tropoi.representation.visual.snapshot", "tropoi.run.bve.model"),
-    ("tropoi.representation.visual.snapshot", "tropoi.run.swe.model"),
-    ("tropoi.representation.visual.snapshot", "tropoi.run.pe.model"),
-}
+#: Deliberate, documented exceptions (docs/ARCHITECTURE.md). Empty: the
+#: layering is strict, so the layer graph has no cycle. Any entry added here
+#: is an upward edge and must be justified in docs/ARCHITECTURE.md.
+EXCEPTIONS: set[tuple[str, str]] = set()
 
 
 @pytest.mark.parametrize("layer", sorted(ALLOWED))

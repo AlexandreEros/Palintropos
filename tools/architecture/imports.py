@@ -169,6 +169,24 @@ def import_time_subgraph(graph: Graph) -> Graph:
     return sub
 
 
+def runtime_subgraph(graph: Graph) -> Graph:
+    """Subgraph without the edges that exist only for a type checker.
+
+    Keeps every edge with at least one ``module``- or ``function``-scope
+    statement: both run, the second only when the enclosing function is
+    called. Drops edges made exclusively of ``if TYPE_CHECKING:`` imports,
+    which are never executed, so this is the dependency graph of the running
+    program.
+    """
+    sub = Graph(f"{graph.name}-runtime")
+    for node, attrs in graph.nodes.items():
+        sub.add_node(node, **attrs)
+    for (s, t, k), attrs in graph.edges.items():
+        if {"module", "function"} & set(attrs["scopes"]):
+            sub.add_edge(s, t, k, **attrs)
+    return sub
+
+
 def containing_package(module: str, graph: Graph) -> str:
     """The package a module belongs to (a package ``__init__`` is its own)."""
     if graph.nodes.get(module, {}).get("is_package"):

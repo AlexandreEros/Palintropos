@@ -33,8 +33,8 @@ __all__ = [
 def planet_spec_for_run_config(run_config: Mapping) -> PlanetSpec:
     """The planet a resolved run configuration builds, as a specification.
 
-    Mirrors the builders (``run.bve.model.build_planet``,
-    ``run.swe.model.build_swe_model``): an explicit ``planet`` block (custom runs)
+    Mirrors the builders (``temporal.models.build_planet``,
+    ``temporal.models.build_swe_model``): an explicit ``planet`` block (custom runs)
     is authoritative; the Williamson-5 scenario uses the ideal sphere of
     radius ``radius_earth_units * W5_RADIUS_M``; every other preset uses
     ``from_earth_like(day_hours, radius_earth_units)``.

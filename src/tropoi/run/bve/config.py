@@ -56,6 +56,13 @@ from tropoi.temporal.integration import (  # noqa: F401  (re-exports)
     _require_finite_nonneg, _require_finite_number, _require_finite_positive,
     advective_cfl_timestep, count_snapshot_times, integration_plan,
     interval_snapshot_times, scheduler_tolerance, validate_snapshot_schedule)
+# The rule that says which keys carry a run's scientific identity belongs to
+# the layer that persists and re-reads run configurations: the archive hashes
+# the same subset out of a saved capsule's config.json, where no config object
+# exists any more. Re-exported here unchanged (every solver's configuration
+# imports it from this module).
+from tropoi.representation.identity import (  # noqa: F401  (re-exports)
+    HASH_EXCLUDED_KEYS, scientific_config_subset)
 
 #: Historical psx-bve snapshot cadence (seconds); the interval-mode default.
 DEFAULT_SNAPSHOT_INTERVAL_SECONDS = 21600.0
@@ -117,27 +124,6 @@ _EXPLICIT_ONLY_KEYS = _PRESET_ONLY_KEYS | frozenset({"plots", "no_plots"})
 #: tolerances and downstream time bookkeeping; it is far above any
 #: physically motivated Palintropos run and rejects overflow explicitly.
 _MAX_T_END_SECONDS = 1e12  # ~31,700 years
-
-
-#: Config keys excluded from the run-id hash: purely locational/control
-#: values and derived artifacts. Single source of truth shared by
-#: :meth:`BVERunConfig.scientific_config_dict` and ``io._config_hash`` so the
-#: hash exclusion logic is never duplicated (and can never drift).
-#: ``initial_state_label`` (custom runs only) is a descriptive name; the
-#: state's identity is its ``initial_state_digest``, which IS hashed.
-HASH_EXCLUDED_KEYS: tuple[str, ...] = ("out", "experiment", "overwrite", "plots",
-                                       "initial_state_label")
-
-
-def scientific_config_subset(config: Mapping) -> dict:
-    """Config subset that defines a run's *scientific* identity.
-
-    Drops purely locational/control values (``out``, ``experiment``,
-    ``overwrite``) and derived artifacts (``plots``) so two runs of the same
-    science hash identically regardless of output location or plot selection.
-    Shared by the config object and the run-id hash in ``io.py``.
-    """
-    return {k: v for k, v in dict(config).items() if k not in HASH_EXCLUDED_KEYS}
 
 
 @dataclass(frozen=True)
@@ -387,8 +373,9 @@ class BVERunConfig:
         it is being re-run. Plot selection also stays out — figures are
         derived artifacts, not part of the scientific state.
 
-        Delegates to :func:`scientific_config_subset` so the exclusion set is
-        defined once and shared with the run-id hash in ``io.py``.
+        Delegates to :func:`tropoi.representation.identity.scientific_config_subset`
+        so the exclusion set is defined once and shared with the archive's
+        run-id hash.
         """
         return scientific_config_subset(self.to_run_config_dict())
 

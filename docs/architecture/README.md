@@ -5,7 +5,17 @@ Everything below this directory, except this file, is written by
 reads the source of `src/tropoi` and records generic structural facts: module
 imports (grimp), classes, inheritance, and methods (`ast`), and statically
 resolvable calls (`ast`). It also records descriptive graph metrics (networkx).
-It encodes no expectation about how the packages should depend on each other.
+No extraction rule and no measurement encodes an expectation about how the
+packages should depend on each other.
+
+One *view* does, because it is given one: `layers.mmd` groups the extracted
+packages into the layers declared with `--layer` (default: `cli`, `run`,
+`representation`, `core`, top first, matching *Dependency direction* in
+`docs/ARCHITECTURE.md`), draws only the edges that exist at run time
+(`TYPE_CHECKING`-only edges are dropped), and marks in red every edge that
+runs against the declared order. `layer_graph` in `metrics.json` lists those
+edges, so a new upward dependency turns up as a diff in CI. The declaration
+changes no other output.
 
 The hand-authored `docs/class-structure.md` and `docs/call-structure.md` are
 separate and are not replaced by these files.

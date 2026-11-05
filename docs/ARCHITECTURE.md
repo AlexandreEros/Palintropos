@@ -39,8 +39,10 @@ src/tropoi/
 ├── temporal/            how states evolve, and how a saved evolution is read
 │   ├── integration.py       IntegrationScheduler, advective CFL arithmetic, RK4, driver loop (stdlib)
 │   ├── tendencies/          BVE, SWE and PE tendency implementations (coupled dissipation included)
+│   ├── models.py            the planet/model a resolved run configuration builds (one builder per solver)
 │   └── simulation.py        read-only Simulation / Snapshot over a small storage protocol
 ├── representation/      what is recorded and shown
+│   ├── identity.py          which configuration keys carry a run's scientific identity (stdlib)
 │   ├── diagnostics/         per-core recorders, CSV/NPZ records and diagnostic figures
 │   ├── archive/             capsule reader (open_simulation), versioned schema, run-capsule writer,
 │   │                        saved resolved initial states (initial_state.py, CPU-only),
@@ -74,16 +76,32 @@ consumers: the product cut lives in `spatial.truncation`, which the
 operators, the tendencies, the diagnostics and the configuration layer all
 consume, so no spatial operation depends on a tendency implementation. The
 initializers receive a model object but reference its class only for type
-annotations. `tests/test_layout.py` enforces this direction by
-parsing every import, with exactly two documented exceptions:
+annotations. `tests/test_layout.py` enforces this direction by parsing every
+import. There are no exceptions: every dependency points down, so the layer
+graph is acyclic and the layers can be levelized (`cli` -> `run` ->
+`representation` -> `temporal` -> `spatial`).
 
-- `representation.archive.writer` (the run-capsule writer) imports
-  `scientific_config_subset` from the stdlib-only `run.bve.config`: the
-  run-id hash is defined by the configuration layer's scientific subset.
-- `representation.visual.snapshot` lazily imports the solver modules'
-  model builders (`run.bve.model.build_planet`, `run.swe.model.build_swe_model`,
-  `run.pe.model.build_pe_model`) when `Snapshot.plot` must reconstruct model
-  resources from a persisted configuration.
+Two shared rules that orchestration might seem to own live below it,
+because the representation layer needs them with no configuration object in
+sight — it reads finished runs:
+
+- *What makes a run's science identical.* `representation.identity`
+  (stdlib only) holds the hash-exclusion rule. The archive applies it to a
+  saved capsule's `config.json`, where no config object exists any more;
+  each solver's `*RunConfig.scientific_config_dict` applies the same rule
+  through `run.bve.config`, which re-exports it.
+- *What model a resolved configuration builds.* `temporal.models` holds one
+  builder per solver (`build_planet`, `build_swe_model`, `build_pe_model`).
+  They read a plain mapping and never validate it, so `Snapshot.plot` can
+  rebuild a legacy capsule's model without newer preset guards re-running.
+  `run.{bve,swe,pe}.model` re-export them at their historical paths.
+
+The layer boxes, the runtime edges between them, and any edge that would
+point up are drawn in
+[architecture/current/layers.mmd](architecture/current/layers.mmd) and
+counted under `layer_graph` in that snapshot's `metrics.json`, so a new
+upward dependency fails both `tests/test_layout.py` and the architecture CI
+check.
 
 Prescribed environment and discretization are separate objects.
 `PlanetaryParameters` (radius, rotation, mass) is importable without CuPy
