@@ -326,7 +326,8 @@ final values once.
 
 ### R-12. Unclamped `1/cos φ` divisions rely on a hidden 0.01-rad grid rotation
 
-`grad_from_scalar` divides by `grid.coslat` with no floor (velocity path floors at 1e−6,
+`grad_from_scalar` (removed with the dead-code clean-up below; this note is kept for the
+other divisions) divided by `grid.coslat` with no floor (velocity path floors at 1e−6,
 Jacobian at 1e−8). Nothing prevents a future grid (or a user-supplied point set with a point
 at a pole) from producing Inf/NaN. The icosahedron "anti-singularity" rotation is the only
 protection, and it is undocumented.
@@ -367,6 +368,14 @@ computation at res 5. Pin of `cupy-cuda11x` also ties the project to CUDA 11.
 lazily but never called by any live path. `sh_matrix_real.cu` is never loaded.
 `LatLonSphericalHarmonics` survives only as a (biased, R-7) test baseline. Either quarantine
 these clearly as experimental or delete them.
+
+**Further clean-up** (branch `chore/single-laplacian-eigenvalue-and-dead-code-guard`):
+`SpectralOperators.laplacian_coeffs` had no caller and was deleted. `grad_from_scalar` and
+`advect_scalar_by_streamfunction` had no production caller; the second was the independent
+velocity-form reference for the Jacobian, so it now lives in `tests/test_spectral_operators.py`
+as `_velocity_form_advection` (same arithmetic, same test, same tolerance). So that deletions
+stay deleted, `tests/test_no_unreferenced_functions.py` fails when a function under `src/`
+loses its last reference (by name; see its docstring for what it does not catch).
 
 ### R-17. Assorted hygiene
 

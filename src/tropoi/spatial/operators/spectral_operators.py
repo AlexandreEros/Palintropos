@@ -126,13 +126,6 @@ class SpectralOperators:
     # ------------------------------------------------------------------
     # Public spectral operators
     # ------------------------------------------------------------------
-    def laplacian_coeffs(self, coeffs: cp.ndarray) -> cp.ndarray:
-        """
-        Apply the spherical Laplacian ∇² to a scalar field in spectral space.
-        """
-        lap_eigs = self.lap_eigs[:, None]  # (l,1)
-        return lap_eigs * coeffs
-
     def d_lambda_coeffs(self, coeffs: cp.ndarray) -> cp.ndarray:
         """
         Zonal derivative ∂ψ/∂λ in spectral space.
@@ -452,54 +445,6 @@ class SpectralOperators:
         return u, v
 
     
-
-    def grad_from_scalar(self, q_lm: cp.ndarray):
-        """
-        Return the two components of ∇q in physical units:
-          dq_dx = (1/(R cosφ)) q_λ
-          dq_dy = (1/R) q_φ
-        on the SH evaluation grid.
-        """
-
-        # (1/R) q_λ
-        q_lam_over_R = self.sh.inv_transform(self.d_lambda_coeffs(q_lm)).real
-
-        gq = self.sh.inv_transform(self.sin_theta_d_theta_coeffs(q_lm)).real
-        q_phi_over_R = -gq / (self.R * self.grid.coslat)
-
-        dq_dx = q_lam_over_R / self.grid.coslat
-        dq_dy = q_phi_over_R
-        return dq_dx, dq_dy
-    
-
-    def advect_scalar_by_streamfunction(self, 
-                                        psi_lm: cp.ndarray, 
-                                        q_lm: cp.ndarray, 
-                                        dealias: bool = True,
-                                        return_spectral: bool = False):
-        """
-        Compute u·∇q on the SH evaluation grid (no latlon conversion).
-        Optionally dealias by filtering after transforming the product.
-        """
-        u, v = self.velocity_from_streamfunction(psi_lm)
-        dq_dx, dq_dy = self.grad_from_scalar(q_lm)
-
-        adv_grid = u * dq_dx + v * dq_dy
-
-        if not (dealias or return_spectral):
-            return adv_grid
-
-        adv_lm = self.sh.transform(adv_grid)
-
-        if dealias:
-            L = self.l_max
-            cut = product_truncation_cut(L)
-            adv_lm[cut+1:, :] = 0.0
-            adv_lm[:, cut+1:] = 0.0
-
-        return adv_lm if return_spectral else self.sh.inv_transform(adv_lm).real
-    
-
 
     def jacobian_pseudospectral(self, a_lm: cp.ndarray, b_lm: cp.ndarray,
                                 dealias: bool = True,

@@ -220,14 +220,16 @@ all acting on the dense (l, m) coefficient array:
   `u = (1/(R cosφ))·(sinθ ψ_θ) = −ψ_φ/R`, `v = (ψ_λ/R)/cosφ`. **[measured]** exact to 9e−15
   for solid-body rotation. Points with |cos φ| < 1e−6 are set to NaN then zeroed (never
   triggered thanks to the grid rotation).
-- **Scalar gradient** (`grad_from_scalar`): `(q_λ/(R cosφ), q_φ/R)` — correct, but divides
-  by `grid.coslat` with no clamping (R-12).
+- **Scalar gradient** (`grad_from_scalar`, since deleted: no production caller):
+  `(q_λ/(R cosφ), q_φ/R)` — correct, but divided by `grid.coslat` with no clamping (R-12).
 - **Jacobian** (`jacobian_pseudospectral`): computes
   `J_code = (a_λ · sinθ b_θ − sinθ a_θ · b_λ) / (R² cos φ)`. Substituting
   `sinθ ∂θ = −cosφ ∂φ` gives **`J_code = −cos φ · J(a,b)`**: the intended `1/cos²φ` is a
   `1/cos φ`, and the sign is flipped. This is the operator the BVE tendency uses (R-1).
 - **Velocity-form advection** (`advect_scalar_by_streamfunction`): `u·∇q` from the two
-  verified operators above. **[measured] correct** — but currently *unused* by the model.
+  verified operators above. **[measured] correct** — but never used by the model, so it has
+  been deleted from `SpectralOperators`; the same arithmetic survives as the Jacobian test's
+  independent reference (`_velocity_form_advection` in `tests/test_spectral_operators.py`).
 
 A separate local (non-spectral) operator family, `DifferentialOperatorsSpherical`
 (sparse least-squares gradients and a graph Laplacian `D − W` that is not a consistent
