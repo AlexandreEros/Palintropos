@@ -1303,6 +1303,11 @@
     {
       "kind": "call",
       "source": "tropoi.representation.diagnostics.bve.grid_diagnostics",
+      "target": "tropoi.spatial.laplacian.invert_laplacian"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.diagnostics.bve.grid_diagnostics",
       "target": "tropoi.spatial.laplacian.laplacian_eigenvalues"
     },
     {
@@ -6836,6 +6841,11 @@
       "target": "tropoi.spatial.transforms.fast_geodesic_sh.PointSetSphericalHarmonics"
     },
     {
+      "kind": "call",
+      "source": "tropoi.spatial.operators.spectral_operators.SpectralOperators.inv_laplacian",
+      "target": "tropoi.spatial.laplacian.invert_laplacian"
+    },
+    {
       "kind": "self",
       "source": "tropoi.spatial.operators.spectral_operators.SpectralOperators.jacobian_pseudospectral",
       "target": "tropoi.spatial.operators.spectral_operators.SpectralOperators.d_lambda_coeffs"
@@ -8371,6 +8381,11 @@
       "target": "tropoi.temporal.tendencies.barotropic.BarotropicVorticity.vorticity_to_streamfunction"
     },
     {
+      "kind": "call",
+      "source": "tropoi.temporal.tendencies.barotropic.BarotropicVorticity.vorticity_to_streamfunction",
+      "target": "tropoi.spatial.laplacian.invert_laplacian"
+    },
+    {
       "kind": "constructor",
       "source": "tropoi.temporal.tendencies.held_suarez.NewtonianRelaxation",
       "target": "tropoi.temporal.tendencies.held_suarez.NewtonianRelaxation.__init__"
@@ -8489,6 +8504,11 @@
       "kind": "call",
       "source": "tropoi.temporal.tendencies.primitive_equations.PrimitiveEquationsModel.__init__",
       "target": "tropoi.spatial.truncation.product_truncation_cut"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.temporal.tendencies.primitive_equations.PrimitiveEquationsModel._inv_laplacian",
+      "target": "tropoi.spatial.laplacian.invert_laplacian"
     },
     {
       "kind": "call",
@@ -8769,6 +8789,11 @@
       "kind": "call",
       "source": "tropoi.temporal.tendencies.shallow_water.ShallowWaterModel.__init__",
       "target": "tropoi.spatial.truncation.product_truncation_cut"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.temporal.tendencies.shallow_water.ShallowWaterModel._inv_laplacian",
+      "target": "tropoi.spatial.laplacian.invert_laplacian"
     },
     {
       "kind": "self",
@@ -15741,6 +15766,13 @@
       "kind": "function",
       "module": "tropoi.spatial.initialization.swe",
       "qualname": "make_swe_ic",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.spatial.laplacian.invert_laplacian",
+      "kind": "function",
+      "module": "tropoi.spatial.laplacian",
+      "qualname": "invert_laplacian",
       "type": "function"
     },
     {

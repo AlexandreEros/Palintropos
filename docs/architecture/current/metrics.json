@@ -2,19 +2,19 @@
   "call_graph": {
     "call_sites": {
       "builtin": 2876,
-      "external": 1921,
-      "internal": 2460,
+      "external": 1917,
+      "internal": 2465,
       "unresolved": 2948
     },
     "edges_by_kind": {
-      "call": 1031,
+      "call": 1036,
       "constructor": 42,
       "instantiate": 411,
       "override": 6,
       "self": 277,
       "super": 2
     },
-    "nodes": 1445,
+    "nodes": 1446,
     "scoped": {
       "cli-gen": {
         "edges": 28,
@@ -926,7 +926,7 @@
     "package": "tropoi",
     "src": "src",
     "working_tree": {
-      "base_commit": "85e77798a4398cac921c3798f085787bd352b669",
+      "base_commit": "15f21fc762bda25051b5388fd60ea55200cc380d",
       "generator": {
         "changes": [],
         "files": {
@@ -950,14 +950,11 @@
       "source": {
         "changes": [
           " M src/tropoi/representation/diagnostics/bve.py",
-          " M src/tropoi/run/custom/prepare.py",
+          " M src/tropoi/spatial/laplacian.py",
           " M src/tropoi/spatial/operators/spectral_operators.py",
-          " M src/tropoi/temporal/semi_implicit.py",
           " M src/tropoi/temporal/tendencies/barotropic.py",
-          " M src/tropoi/temporal/tendencies/held_suarez.py",
           " M src/tropoi/temporal/tendencies/primitive_equations.py",
-          " M src/tropoi/temporal/tendencies/shallow_water.py",
-          "?? src/tropoi/spatial/laplacian.py"
+          " M src/tropoi/temporal/tendencies/shallow_water.py"
         ],
         "files": {
           "src/tropoi/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
@@ -977,7 +974,7 @@
           "src/tropoi/representation/archive/schema.py": "db53f5138caeee6d969508f0bd3f64e98bde23a86494a6c0cb7dcdc240ba6487",
           "src/tropoi/representation/archive/writer.py": "0642d754f9572f63fa962a092662a99814791f467f1f9b5a924a2b0bdb4c87a8",
           "src/tropoi/representation/diagnostics/__init__.py": "29950032dc1573f806bc05c980b6ee2c0fa5677cab03425dee607454b82e44b8",
-          "src/tropoi/representation/diagnostics/bve.py": "582d138fee17f374cea5d6edd4d8a047e1489bb6c20969bd7a2e45163ac71c8c",
+          "src/tropoi/representation/diagnostics/bve.py": "b1b2607eb7a7026855e00e1b5e74d624aaab44d2a1e6e658768414d9b83ed267",
           "src/tropoi/representation/diagnostics/held_suarez_sections.py": "3ceeca2da162b25bae2b618bff343cdd7d010943089df2545dc8cc875d3d2ec5",
           "src/tropoi/representation/diagnostics/pe.py": "bedc6150dae35905160c6cbc5ebb917759b0d4514a3f4690c5a42b42caf07269",
           "src/tropoi/representation/diagnostics/pe_levels.py": "0a429f94afdde8a7774dd3a5a5fb14cd7f22f7bd4261ee75172b3a0510580c19",
@@ -1056,10 +1053,10 @@
           "src/tropoi/spatial/initialization/bve.py": "036570f1327acf449134aa341a393aa83e7c1e4a8f651aff52748c731f6c4413",
           "src/tropoi/spatial/initialization/pe.py": "779e7e0b05fcede7e3702d6ccee3c77682c0d2edfb6dd68bb3971704ebaee7ab",
           "src/tropoi/spatial/initialization/swe.py": "8375bd0c2f60f9c272153cd05d5ccc0b20acb0759a309c51638b1c301a80b66f",
-          "src/tropoi/spatial/laplacian.py": "dad9da40e0c9e7352ce699d0a0ea37199d71a8ad45ea5727faa777bd1a310251",
+          "src/tropoi/spatial/laplacian.py": "4b3f2ea14ad135dbeba64e6c0854a6519f2072fa7882519bf801b105b4b20c84",
           "src/tropoi/spatial/modes.py": "6f7fcbbacee22eae7629e1b5183dda6c6e0f590777c806c1d42f55a950c83d56",
           "src/tropoi/spatial/operators/__init__.py": "fad4929748754331ba46d35351e6e10fa6eacb135e621e6d7f7955c45bb499cd",
-          "src/tropoi/spatial/operators/spectral_operators.py": "d9289acdaef4e30a70548992cc96737eb01164b0571ee424d963f3c426e9b43f",
+          "src/tropoi/spatial/operators/spectral_operators.py": "b80030ec8e8f4a51d11c4af1ea9ae5a88917dc3c7891413cbed0fdab4d08ad7e",
           "src/tropoi/spatial/planet.py": "7340abfd1c19f70a54f1e9e83061cf503f0b5c1a7e0ed3d5cf38b5decd6b3e37",
           "src/tropoi/spatial/sigma_coordinate.py": "feec1a2eb87c4870f7ca831b0bbe7920262aee577648abb6db96ad03cedcf4f6",
           "src/tropoi/spatial/specification.py": "721debd02458b574321cacc06f3a4b9a3c60be65f07fd83f1b6a3ff4d131f276",
@@ -1094,12 +1091,12 @@
           "src/tropoi/temporal/simulation.py": "04568c87105ddd073880fa6a64275ad377a94e85ab877040d5165e629eb75a45",
           "src/tropoi/temporal/steppers.py": "d318a44ce7277cac5e43cd54d9c0f090fc8d55f4f3ea67735cfa1df6f8ad10c4",
           "src/tropoi/temporal/tendencies/__init__.py": "64ae205b8d8abf902f9b9f285faae34048856829c3be34925b3af5f94ad71a20",
-          "src/tropoi/temporal/tendencies/barotropic.py": "81b0a55b88b21be8645522cab7a64477b44f0e3444c6385b61caa135ac7eadec",
+          "src/tropoi/temporal/tendencies/barotropic.py": "fd203effd9ce8c889be0d7db619e91bd23466202100dcfd012d8dcee1bd9f0a3",
           "src/tropoi/temporal/tendencies/held_suarez.py": "87f6fc3ef3d43ba843333cf505f45950ac2b7419d9603abfb37033def959b5d1",
-          "src/tropoi/temporal/tendencies/primitive_equations.py": "a15599450c596f9e298a5286490f95c5d47b50cc423da1f51603700e2c24f400",
-          "src/tropoi/temporal/tendencies/shallow_water.py": "8e40054e465d6f5d381e3f1ec21016a011286dd91d0ed8d371f39a533cb9c444"
+          "src/tropoi/temporal/tendencies/primitive_equations.py": "b3508be7873df7202000ed3e9b7ac4419b6537c9c7fc1e3cd8bb7fdb127075c2",
+          "src/tropoi/temporal/tendencies/shallow_water.py": "7ae521f2378824e89f88bc467fc99321d1ef4224b037c865137e076a601da3c8"
         },
-        "sha256": "10749dd7290ed9ffa38833cdfbf243b37621ece96270033f5d55dbe72e45d19c",
+        "sha256": "a82fcda31a55ba6be60e75443e122f0babf0bb56fef65b5f6356657a433b04f3",
         "status": "dirty"
       }
     }
