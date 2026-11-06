@@ -41,6 +41,7 @@ import math
 import cupy as cp
 
 from tropoi.spatial.planet import Planet
+from tropoi.spatial.laplacian import laplacian_eigenvalues
 from tropoi.spatial.states.primitive_equations import (  # noqa: F401  (re-exports)
     PROGNOSTICS, PrimitiveEquationsState, PrimitiveEquationsStateError,
     isothermal_rest_state)
@@ -171,8 +172,7 @@ class PrimitiveEquationsModel:
             self.phi_surface_lm = phi_s
 
         # Laplacian eigenvalues -l(l+1)/R^2 (l=0 exactly 0), as in BVE/SWE.
-        l = cp.arange(self.l_max + 1, dtype=cp.float64)
-        self.lap_eigs = -l * (l + 1.0) / self.R**2
+        self.lap_eigs = cp.asarray(laplacian_eigenvalues(self.l_max, self.R))
 
         # Exact spectral planetary vorticity: f = 2*Omega*sin(lat) is the
         # pure (1,0) mode (same construction as BVE/SWE; avoids the lossy

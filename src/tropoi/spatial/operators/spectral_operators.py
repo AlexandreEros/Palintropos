@@ -1,6 +1,7 @@
 import cupy as cp
 
 from tropoi.spatial.grids.geodesic_grid import GeodesicGridGeometry
+from tropoi.spatial.laplacian import laplacian_eigenvalues
 from tropoi.spatial.transforms.optimized_geodesic_sh import GeodesicSphericalHarmonics
 from tropoi.spatial.truncation import product_truncation_cut
 
@@ -59,11 +60,10 @@ class SpectralOperators:
                            if self._product_space.geometry is not None else None)
 
         # --- Eigenvalues for diagonal spectral operators ---
-        l = cp.arange(0, self.l_max + 1, dtype=cp.float64)              # (l,)
         m = cp.arange(0, self.l_max + 1, dtype=cp.float64)[None, :]     # (1, m)
 
-        # ∇² Y_l^m = -l(l+1)/R² * Y_l^m
-        self.lap_eigs = -l * (l + 1.0) / self.R**2   # l=0 stays exactly 0.0
+        # ∇² Y_l^m = -l(l+1)/R² * Y_l^m  (l=0 is exactly 0)
+        self.lap_eigs = cp.asarray(laplacian_eigenvalues(self.l_max, self.R))
         
         # ∂Y_l^m/∂λ = i m / R * Y_l^m  (zonal derivative on sphere of radius R)
         self._im_m_over_R = 1j * m / self.R   # (1, m)

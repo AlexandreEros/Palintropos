@@ -89,6 +89,7 @@ import cupy as cp
 
 from tropoi.spatial.terrain.topography import Topography
 from tropoi.spatial.planet import Planet
+from tropoi.spatial.laplacian import laplacian_eigenvalues
 from tropoi.spatial.states.shallow_water import (  # noqa: F401  (re-exports)
     DELTA, PHI, PROGNOSTICS, ZETA, ShallowWaterState, ShallowWaterStateError)
 from tropoi.spatial.truncation import product_truncation_cut
@@ -162,8 +163,7 @@ class ShallowWaterModel:
         # Laplacian eigenvalues -l(l+1)/R^2 (l=0 entry exactly 0) and the
         # inverse used by the Helmholtz solves (l=0 result pinned to zero,
         # matching BarotropicVorticity.vorticity_to_streamfunction).
-        l = cp.arange(self.l_max + 1, dtype=cp.float64)
-        self.lap_eigs = -l * (l + 1.0) / self.R**2
+        self.lap_eigs = cp.asarray(laplacian_eigenvalues(self.l_max, self.R))
 
         # Product space: same object the BVE Jacobian uses (fine co-grid /
         # 3/2-rule Gauss grid / state grid, per backend + configuration).

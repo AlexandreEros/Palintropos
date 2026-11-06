@@ -93,6 +93,7 @@ import numpy as np
 from tropoi.spatial.sigma_coordinate import (SigmaGrid, hydrostatic_geopotential,
                                              omega_over_p)
 from tropoi.spatial.truncation import product_truncation_cut
+from tropoi.spatial.laplacian import laplacian_eigenvalues
 from tropoi.temporal.hooks import complete_tendency, hook_signatures
 from tropoi.temporal.integration import rk4_step_array
 
@@ -177,8 +178,7 @@ class SemiImplicitOperator:
         ones = np.ones((K, 1), dtype=np.float64)
         self.B = self.G @ self.tau + (self.r_dry * self.t_ref) * (ones @ self.nu[None, :])
 
-        l = np.arange(self.n, dtype=np.float64)
-        self.c_l = l * (l + 1.0) / self.radius**2
+        self.c_l = -laplacian_eigenvalues(self.n - 1, self.radius)
         self.mask = (np.arange(self.n) <= self.fast_cut).astype(np.float64)
 
         self._device: dict[str, dict[str, Any]] = {}

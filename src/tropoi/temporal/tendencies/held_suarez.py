@@ -43,6 +43,7 @@ from dataclasses import asdict, dataclass
 import numpy as np
 
 from tropoi.temporal.hooks import DiagonalDamping
+from tropoi.spatial.laplacian import laplacian_eigenvalues
 
 __all__ = ["DAY_SECONDS", "HeldSuarezParameters", "equilibrium_temperature",
            "newtonian_rate", "rayleigh_rate", "newtonian_tendency_grid",
@@ -220,7 +221,8 @@ def rayleigh_drag_damping(sigma_full, n_degrees: int, params: HeldSuarezParamete
 def hyperdiffusion_coefficient(radius: float, efold_seconds: float,
                                reference_degree: int, order: int = 4) -> float:
     """K such that K c_ref^order = 1/tau (c_l = l(l+1)/a^2)."""
-    c_ref = reference_degree * (reference_degree + 1.0) / radius ** 2
+    n_ref = int(reference_degree)
+    c_ref = -laplacian_eigenvalues(n_ref, radius)[n_ref]
     return 1.0 / (efold_seconds * c_ref ** order)
 
 
@@ -238,10 +240,9 @@ def hyperdiffusion_damping(nlev: int, l_max: int, radius: float,
         raise ValueError(f"reference_degree must be in [1, l_max={l_max}], got {reference_degree}")
     K = int(nlev)
     k8 = hyperdiffusion_coefficient(radius, efold_seconds, int(reference_degree), order)
-    l = np.arange(int(l_max) + 1, dtype=np.float64)
-    c_l = l * (l + 1.0) / radius ** 2
+    c_l = -laplacian_eigenvalues(int(l_max), radius)
     per_degree = k8 * c_l ** order
-    rates = np.zeros((3 * K + 1, l.size))
+    rates = np.zeros((3 * K + 1, c_l.size))
     rates[0:3 * K, :] = per_degree[None, :]
     return DiagonalDamping(f"hyperdiffusion_del{2 * order}", rates,
                            params={"coefficient": k8, "order": order,

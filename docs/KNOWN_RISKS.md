@@ -298,13 +298,24 @@ the "truth" it is compared against.
 vorticity on a rotating sphere" demo runs with f = 0 unless the user passes `--day-hours`.
 Make rotation explicit, or default to 24 h.
 
-### R-10. Diffusion uses the mutated l = 0 eigenvalue
+### R-10. Diffusion uses the mutated l = 0 eigenvalue — ✅ FIXED (the BVE core; `inv_laplacian` remainder open)
 
 `BarotropicVorticity.__init__` overwrites `laplacian_eig[0] = +1/R²`; the diffusion term
 `ν·λ_l·ζ_lm` therefore *amplifies* the l = 0 mode. Currently masked by the hard-zeroing of
 the l = 0 tendency row — a silent coupling between two hacks. Keep the eigenvalue array
 physical and special-case the inversion instead. Related: `SpectralOperators.inv_laplacian`
 and `vorticity_to_streamfunction` treat the l = 0 mode differently (1/R² vs zeroed).
+
+**Fix applied**: every spelling of `−l(l+1)/R²` (nine, in the BVE, SWE and PE cores,
+`SpectralOperators`, the semi-implicit solver, the Held–Suarez hyperdiffusion, a BVE
+diagnostic and the custom-run preparation) now calls
+`tropoi.spatial.laplacian.laplacian_eigenvalues`, whose l = 0 entry is exactly zero. The BVE
+core no longer overwrites it; `vorticity_to_streamfunction` already skips l = 0, so results
+are unchanged (the swap is bit-for-bit identical for l ≥ 1, and l = 0 only ever met the
+hard-zeroed tendency row). Locked by `tests/test_laplacian_eigenvalues.py`, which checks the
+eigenvalue against the Legendre equation and fails if a second spelling reappears in `src/`.
+**Still open**: `SpectralOperators.inv_laplacian` substitutes `1/R²` at l = 0 (it feeds only the
+visualisers); decide whether it should zero that mode like the cores do.
 
 ### R-11. `d_lambda_coeffs` mutates shared precomputed state on every call
 
