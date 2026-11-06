@@ -30,7 +30,7 @@
     {
       "direction": "down",
       "kind": "imports",
-      "module_edges": 32,
+      "module_edges": 33,
       "package_edges": 8,
       "source": "representation",
       "target": "spatial",
@@ -57,7 +57,7 @@
     {
       "direction": "down",
       "kind": "imports",
-      "module_edges": 37,
+      "module_edges": 38,
       "package_edges": 13,
       "source": "run",
       "target": "spatial",
@@ -84,7 +84,7 @@
     {
       "direction": "down",
       "kind": "imports",
-      "module_edges": 19,
+      "module_edges": 24,
       "package_edges": 5,
       "source": "temporal",
       "target": "spatial",
@@ -118,7 +118,7 @@
       "depth": 4,
       "id": "spatial",
       "internal_package_edges": 13,
-      "modules": 34,
+      "modules": 35,
       "packages": 8
     },
     {

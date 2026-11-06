@@ -1302,6 +1302,16 @@
     },
     {
       "kind": "call",
+      "source": "tropoi.representation.diagnostics.bve.grid_diagnostics",
+      "target": "tropoi.spatial.laplacian.invert_laplacian"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.diagnostics.bve.grid_diagnostics",
+      "target": "tropoi.spatial.laplacian.laplacian_eigenvalues"
+    },
+    {
+      "kind": "call",
       "source": "tropoi.representation.diagnostics.bve.spectral_diagnostics",
       "target": "tropoi.representation.diagnostics.bve._mode_power"
     },
@@ -5021,6 +5031,11 @@
       "target": "tropoi.run.custom.resources.PreparationError"
     },
     {
+      "kind": "call",
+      "source": "tropoi.run.custom.prepare._laplacian",
+      "target": "tropoi.spatial.laplacian.laplacian_eigenvalues"
+    },
+    {
       "kind": "instantiate",
       "source": "tropoi.run.custom.prepare._reject_device_array",
       "target": "tropoi.run.custom.resources.PreparationError"
@@ -6801,6 +6816,11 @@
       "target": "tropoi.spatial.operators.spectral_operators.SpectralOperators.__init__"
     },
     {
+      "kind": "call",
+      "source": "tropoi.spatial.operators.spectral_operators.SpectralOperators.__init__",
+      "target": "tropoi.spatial.laplacian.laplacian_eigenvalues"
+    },
+    {
       "kind": "self",
       "source": "tropoi.spatial.operators.spectral_operators.SpectralOperators.__init__",
       "target": "tropoi.spatial.operators.spectral_operators.SpectralOperators._precompute_sin_theta_d_theta_coeffs"
@@ -6821,29 +6841,9 @@
       "target": "tropoi.spatial.transforms.fast_geodesic_sh.PointSetSphericalHarmonics"
     },
     {
-      "kind": "self",
-      "source": "tropoi.spatial.operators.spectral_operators.SpectralOperators.advect_scalar_by_streamfunction",
-      "target": "tropoi.spatial.operators.spectral_operators.SpectralOperators.grad_from_scalar"
-    },
-    {
-      "kind": "self",
-      "source": "tropoi.spatial.operators.spectral_operators.SpectralOperators.advect_scalar_by_streamfunction",
-      "target": "tropoi.spatial.operators.spectral_operators.SpectralOperators.velocity_from_streamfunction"
-    },
-    {
       "kind": "call",
-      "source": "tropoi.spatial.operators.spectral_operators.SpectralOperators.advect_scalar_by_streamfunction",
-      "target": "tropoi.spatial.truncation.product_truncation_cut"
-    },
-    {
-      "kind": "self",
-      "source": "tropoi.spatial.operators.spectral_operators.SpectralOperators.grad_from_scalar",
-      "target": "tropoi.spatial.operators.spectral_operators.SpectralOperators.d_lambda_coeffs"
-    },
-    {
-      "kind": "self",
-      "source": "tropoi.spatial.operators.spectral_operators.SpectralOperators.grad_from_scalar",
-      "target": "tropoi.spatial.operators.spectral_operators.SpectralOperators.sin_theta_d_theta_coeffs"
+      "source": "tropoi.spatial.operators.spectral_operators.SpectralOperators.inv_laplacian",
+      "target": "tropoi.spatial.laplacian.invert_laplacian"
     },
     {
       "kind": "self",
@@ -8243,6 +8243,11 @@
     {
       "kind": "call",
       "source": "tropoi.temporal.semi_implicit.SemiImplicitOperator.__init__",
+      "target": "tropoi.spatial.laplacian.laplacian_eigenvalues"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.temporal.semi_implicit.SemiImplicitOperator.__init__",
       "target": "tropoi.spatial.sigma_coordinate.hydrostatic_geopotential"
     },
     {
@@ -8366,9 +8371,19 @@
       "target": "tropoi.temporal.tendencies.barotropic.BarotropicVorticity.__init__"
     },
     {
+      "kind": "call",
+      "source": "tropoi.temporal.tendencies.barotropic.BarotropicVorticity.__init__",
+      "target": "tropoi.spatial.laplacian.laplacian_eigenvalues"
+    },
+    {
       "kind": "self",
       "source": "tropoi.temporal.tendencies.barotropic.BarotropicVorticity.tendency",
       "target": "tropoi.temporal.tendencies.barotropic.BarotropicVorticity.vorticity_to_streamfunction"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.temporal.tendencies.barotropic.BarotropicVorticity.vorticity_to_streamfunction",
+      "target": "tropoi.spatial.laplacian.invert_laplacian"
     },
     {
       "kind": "constructor",
@@ -8409,6 +8424,16 @@
       "kind": "call",
       "source": "tropoi.temporal.tendencies.held_suarez.equilibrium_temperature",
       "target": "tropoi.temporal.tendencies.held_suarez._xp"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.temporal.tendencies.held_suarez.hyperdiffusion_coefficient",
+      "target": "tropoi.spatial.laplacian.laplacian_eigenvalues"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.temporal.tendencies.held_suarez.hyperdiffusion_damping",
+      "target": "tropoi.spatial.laplacian.laplacian_eigenvalues"
     },
     {
       "kind": "instantiate",
@@ -8473,7 +8498,17 @@
     {
       "kind": "call",
       "source": "tropoi.temporal.tendencies.primitive_equations.PrimitiveEquationsModel.__init__",
+      "target": "tropoi.spatial.laplacian.laplacian_eigenvalues"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.temporal.tendencies.primitive_equations.PrimitiveEquationsModel.__init__",
       "target": "tropoi.spatial.truncation.product_truncation_cut"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.temporal.tendencies.primitive_equations.PrimitiveEquationsModel._inv_laplacian",
+      "target": "tropoi.spatial.laplacian.invert_laplacian"
     },
     {
       "kind": "call",
@@ -8743,12 +8778,22 @@
     {
       "kind": "call",
       "source": "tropoi.temporal.tendencies.shallow_water.ShallowWaterModel.__init__",
+      "target": "tropoi.spatial.laplacian.laplacian_eigenvalues"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.temporal.tendencies.shallow_water.ShallowWaterModel.__init__",
       "target": "tropoi.spatial.terrain.topography.Topography.flat"
     },
     {
       "kind": "call",
       "source": "tropoi.temporal.tendencies.shallow_water.ShallowWaterModel.__init__",
       "target": "tropoi.spatial.truncation.product_truncation_cut"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.temporal.tendencies.shallow_water.ShallowWaterModel._inv_laplacian",
+      "target": "tropoi.spatial.laplacian.invert_laplacian"
     },
     {
       "kind": "self",
@@ -15724,6 +15769,20 @@
       "type": "function"
     },
     {
+      "id": "tropoi.spatial.laplacian.invert_laplacian",
+      "kind": "function",
+      "module": "tropoi.spatial.laplacian",
+      "qualname": "invert_laplacian",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.spatial.laplacian.laplacian_eigenvalues",
+      "kind": "function",
+      "module": "tropoi.spatial.laplacian",
+      "qualname": "laplacian_eigenvalues",
+      "type": "function"
+    },
+    {
       "id": "tropoi.spatial.modes.FieldSpec",
       "kind": "class",
       "module": "tropoi.spatial.modes",
@@ -15976,24 +16035,10 @@
       "type": "function"
     },
     {
-      "id": "tropoi.spatial.operators.spectral_operators.SpectralOperators.advect_scalar_by_streamfunction",
-      "kind": "method",
-      "module": "tropoi.spatial.operators.spectral_operators",
-      "qualname": "SpectralOperators.advect_scalar_by_streamfunction",
-      "type": "function"
-    },
-    {
       "id": "tropoi.spatial.operators.spectral_operators.SpectralOperators.d_lambda_coeffs",
       "kind": "method",
       "module": "tropoi.spatial.operators.spectral_operators",
       "qualname": "SpectralOperators.d_lambda_coeffs",
-      "type": "function"
-    },
-    {
-      "id": "tropoi.spatial.operators.spectral_operators.SpectralOperators.grad_from_scalar",
-      "kind": "method",
-      "module": "tropoi.spatial.operators.spectral_operators",
-      "qualname": "SpectralOperators.grad_from_scalar",
       "type": "function"
     },
     {
@@ -16008,13 +16053,6 @@
       "kind": "method",
       "module": "tropoi.spatial.operators.spectral_operators",
       "qualname": "SpectralOperators.jacobian_pseudospectral",
-      "type": "function"
-    },
-    {
-      "id": "tropoi.spatial.operators.spectral_operators.SpectralOperators.laplacian_coeffs",
-      "kind": "method",
-      "module": "tropoi.spatial.operators.spectral_operators",
-      "qualname": "SpectralOperators.laplacian_coeffs",
       "type": "function"
     },
     {

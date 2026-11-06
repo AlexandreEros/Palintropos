@@ -3047,15 +3047,7 @@
         },
         {
           "kind": "method",
-          "name": "advect_scalar_by_streamfunction"
-        },
-        {
-          "kind": "method",
           "name": "d_lambda_coeffs"
-        },
-        {
-          "kind": "method",
-          "name": "grad_from_scalar"
         },
         {
           "kind": "method",
@@ -3064,10 +3056,6 @@
         {
           "kind": "method",
           "name": "jacobian_pseudospectral"
-        },
-        {
-          "kind": "method",
-          "name": "laplacian_coeffs"
         },
         {
           "kind": "method",

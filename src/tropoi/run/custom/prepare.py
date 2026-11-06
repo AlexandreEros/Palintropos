@@ -93,6 +93,7 @@ from tropoi.spatial.modes import (ZERO_MEAN_MONOPOLE_RTOL, FieldSpec,
 from tropoi.spatial.specification import (DiscretizationSpec, FluidLayerSpec,
                                           PlanetSpec, TopographySpec)
 from tropoi.spatial.truncation import product_truncation_cut
+from tropoi.spatial.laplacian import laplacian_eigenvalues
 
 __all__ = [
     "FieldReport",
@@ -551,8 +552,7 @@ def _project(planet_obj, values: np.ndarray
 
 def _laplacian(potential_lm: np.ndarray, radius: float) -> np.ndarray:
     """``lap(potential)`` in spectral space: ``-l(l+1)/a^2`` per degree."""
-    l = np.arange(potential_lm.shape[0], dtype=np.float64)
-    out = (-l * (l + 1.0) / radius ** 2)[:, None] * potential_lm
+    out = laplacian_eigenvalues(potential_lm.shape[0] - 1, radius)[:, None] * potential_lm
     out[0, :] = 0.0          # exactly mean-free (avoids -0.0 * a00 noise)
     return out
 

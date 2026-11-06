@@ -199,10 +199,11 @@ Implemented in [spectral_operators.py](../src/tropoi/numerics/spectral_operators
 all acting on the dense (l, m) coefficient array:
 
 - **Laplacian**: diagonal, `∇²Y_l^m = −l(l+1)/R² · Y_l^m`. Exact.
-- **Inverse Laplacian**: division by eigenvalues; the l = 0 mode is assigned the arbitrary
-  eigenvalue `1/R²` in `SpectralOperators.inv_laplacian` (documented as arbitrary) and is
-  *zeroed* in `BarotropicVorticity.vorticity_to_streamfunction`. Both are harmless because
-  derivatives annihilate constants, but the two code paths disagree.
+- **Inverse Laplacian**: division by eigenvalues, with the undetermined l = 0 mode of the
+  result set to zero. At audit time `SpectralOperators.inv_laplacian` instead assigned the
+  arbitrary eigenvalue `1/R²` there while `BarotropicVorticity.vorticity_to_streamfunction`
+  zeroed it (harmless for winds, since derivatives annihilate constants, but the paths
+  disagreed). Every inversion now goes through `tropoi.spatial.laplacian.invert_laplacian` (R-10).
 - **Zonal derivative**: `(∂/∂λ)Y_l^m = im·Y_l^m`, returned pre-divided by R
   (`d_lambda_coeffs = (im/R)·a`). Note: the operator *mutates its own precomputed buffer* on
   every call to zero the m = 0 entry (R-11, cosmetic).
@@ -220,14 +221,16 @@ all acting on the dense (l, m) coefficient array:
   `u = (1/(R cosφ))·(sinθ ψ_θ) = −ψ_φ/R`, `v = (ψ_λ/R)/cosφ`. **[measured]** exact to 9e−15
   for solid-body rotation. Points with |cos φ| < 1e−6 are set to NaN then zeroed (never
   triggered thanks to the grid rotation).
-- **Scalar gradient** (`grad_from_scalar`): `(q_λ/(R cosφ), q_φ/R)` — correct, but divides
-  by `grid.coslat` with no clamping (R-12).
+- **Scalar gradient** (`grad_from_scalar`, since deleted: no production caller):
+  `(q_λ/(R cosφ), q_φ/R)` — correct, but divided by `grid.coslat` with no clamping (R-12).
 - **Jacobian** (`jacobian_pseudospectral`): computes
   `J_code = (a_λ · sinθ b_θ − sinθ a_θ · b_λ) / (R² cos φ)`. Substituting
   `sinθ ∂θ = −cosφ ∂φ` gives **`J_code = −cos φ · J(a,b)`**: the intended `1/cos²φ` is a
   `1/cos φ`, and the sign is flipped. This is the operator the BVE tendency uses (R-1).
 - **Velocity-form advection** (`advect_scalar_by_streamfunction`): `u·∇q` from the two
-  verified operators above. **[measured] correct** — but currently *unused* by the model.
+  verified operators above. **[measured] correct** — but never used by the model, so it has
+  been deleted from `SpectralOperators`; the same arithmetic survives as the Jacobian test's
+  independent reference (`_velocity_form_advection` in `tests/test_spectral_operators.py`).
 
 A separate local (non-spectral) operator family, `DifferentialOperatorsSpherical`
 (sparse least-squares gradients and a graph Laplacian `D − W` that is not a consistent
@@ -295,9 +298,9 @@ per evaluation, eight per RK4 step.
 
 ## 8. Filtering and dissipation
 
-- **Explicit**: `ν ∇²ζ` with the true spectral eigenvalues (the `laplacian_eig[0] = 1/R²`
-  hack would inject spurious l = 0 growth, but the hard-zeroing of the l = 0 tendency masks
-  it). Default `ν = 0`. No hyperviscosity option.
+- **Explicit**: `ν ∇²ζ` with the true spectral eigenvalues (the former `laplacian_eig[0] =
+  1/R²` hack, masked by the hard-zeroing of the l = 0 tendency, has been removed: R-10).
+  Default `ν = 0`. No hyperviscosity option.
 - **Truncation**: the 2/3-style zeroing described in §6, every tendency evaluation.
 - **Implicit / unintended**: every tendency evaluation round-trips `η = ζ + f` through
   analysis∘synthesis (grid-space addition of f), which acts as a lossy filter whenever the

@@ -25,7 +25,7 @@ flowchart TD
         n_tropoi_otemporal_otendencies["temporal.tendencies (4 modules)"]
     end
     subgraph g_spatial["layer spatial"]
-        n_tropoi_ospatial["spatial (8 modules)"]
+        n_tropoi_ospatial["spatial (9 modules)"]
         n_tropoi_ospatial_ogrids["spatial.grids (7 modules)"]
         n_tropoi_ospatial_oinitialization["spatial.initialization (3 modules)"]
         n_tropoi_ospatial_ooperators["spatial.operators (1 module)"]
@@ -47,7 +47,7 @@ flowchart TD
     n_tropoi_orepresentation_oarchive -->|6| n_tropoi_orepresentation_ovisual
     n_tropoi_orepresentation_oarchive -->|10| n_tropoi_ospatial
     n_tropoi_orepresentation_oarchive -->|1| n_tropoi_otemporal
-    n_tropoi_orepresentation_odiagnostics -->|2| n_tropoi_ospatial
+    n_tropoi_orepresentation_odiagnostics -->|3| n_tropoi_ospatial
     n_tropoi_orepresentation_odiagnostics -->|2| n_tropoi_ospatial_otransforms
     n_tropoi_orepresentation_odiagnostics -->|2| n_tropoi_otemporal_otendencies
     n_tropoi_orepresentation_ovisual -->|5| n_tropoi_orepresentation_oarchive
@@ -75,7 +75,7 @@ flowchart TD
     n_tropoi_orun_ocustom -->|1| n_tropoi_orun
     n_tropoi_orun_ocustom -->|8| n_tropoi_orun_obve
     n_tropoi_orun_ocustom -->|5| n_tropoi_orun_oswe
-    n_tropoi_orun_ocustom -->|11| n_tropoi_ospatial
+    n_tropoi_orun_ocustom -->|12| n_tropoi_ospatial
     n_tropoi_orun_ocustom -->|2| n_tropoi_ospatial_oinitialization
     n_tropoi_orun_ocustom -->|2| n_tropoi_ospatial_ostates
     n_tropoi_orun_ocustom -->|6| n_tropoi_ospatial_oterrain
@@ -112,16 +112,16 @@ flowchart TD
     n_tropoi_ospatial_oinitialization -->|4| n_tropoi_ospatial
     n_tropoi_ospatial_oinitialization -->|2| n_tropoi_ospatial_ostates
     n_tropoi_ospatial_oinitialization -.->|"2 up, type-only"| n_tropoi_otemporal_otendencies
-    n_tropoi_ospatial_ooperators -->|2| n_tropoi_ospatial
+    n_tropoi_ospatial_ooperators -->|3| n_tropoi_ospatial
     n_tropoi_ospatial_ooperators -->|1| n_tropoi_ospatial_ogrids
     n_tropoi_ospatial_ooperators -->|2| n_tropoi_ospatial_otransforms
     n_tropoi_ospatial_oterrain -.->|"1, type-only"| n_tropoi_ospatial_otransforms
     n_tropoi_ospatial_otransforms -->|2| n_tropoi_ospatial_ogrids
     n_tropoi_ospatial_otransforms -->|2| n_tropoi_ospatial_otransforms_ocuda
-    n_tropoi_otemporal -->|8| n_tropoi_ospatial
+    n_tropoi_otemporal -->|9| n_tropoi_ospatial
     n_tropoi_otemporal -->|1| n_tropoi_ospatial_oterrain
     n_tropoi_otemporal -->|2| n_tropoi_otemporal_otendencies
-    n_tropoi_otemporal_otendencies -->|6| n_tropoi_ospatial
+    n_tropoi_otemporal_otendencies -->|10| n_tropoi_ospatial
     n_tropoi_otemporal_otendencies -->|3| n_tropoi_ospatial_ostates
     n_tropoi_otemporal_otendencies -->|1| n_tropoi_ospatial_oterrain
     n_tropoi_otemporal_otendencies -->|1| n_tropoi_otemporal

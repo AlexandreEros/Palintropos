@@ -68,6 +68,22 @@ def test_jacobian_matches_solid_body_advection(operators, l, m):
     assert abs(ratio - 1.0) < 5e-3, f"(l={l}, m={m}) ratio to analytic = {ratio}"
 
 
+def _velocity_form_advection(so, psi_lm, q_lm):
+    """u . grad q on the evaluation grid from PHYSICAL velocity and gradient.
+
+    The reference for the Jacobian's (a_sin_theta b_lam - a_lam b_sin_theta)/cos^2
+    form: it never forms that combination, so a slip in either path shows up as
+    a disagreement. It lived in ``SpectralOperators`` as
+    ``advect_scalar_by_streamfunction`` until no production code called it; it
+    is kept here, where it is used.
+    """
+    u, v = so.velocity_from_streamfunction(psi_lm)
+    q_lam_over_R = so.sh.inv_transform(so.d_lambda_coeffs(q_lm)).real
+    gq = so.sh.inv_transform(so.sin_theta_d_theta_coeffs(q_lm)).real
+    q_phi_over_R = -gq / (so.R * so.grid.coslat)
+    return u * (q_lam_over_R / so.grid.coslat) + v * q_phi_over_R
+
+
 def test_jacobian_agrees_with_velocity_form(operators):
     """The two advection paths must now agree closely."""
     _, sh, so = operators
@@ -76,9 +92,7 @@ def test_jacobian_agrees_with_velocity_form(operators):
     q_lm[6, 3] = 1.0 - 0.4j
 
     j_lm = sh.transform(so.jacobian_pseudospectral(psi_lm, q_lm, dealias=False))
-    adv_lm = sh.transform(
-        so.advect_scalar_by_streamfunction(psi_lm, q_lm, dealias=False)
-    )
+    adv_lm = sh.transform(_velocity_form_advection(so, psi_lm, q_lm))
     denom = float(cp.max(cp.abs(adv_lm))) + 1e-30
     rel = float(cp.max(cp.abs(j_lm - adv_lm))) / denom
     assert rel < 1e-3, f"jacobian vs velocity-form relative diff = {rel:.2e}"

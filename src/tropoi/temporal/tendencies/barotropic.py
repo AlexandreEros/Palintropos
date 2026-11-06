@@ -3,6 +3,7 @@ from __future__ import annotations
 import cupy as cp
 
 from tropoi.spatial.planet import Planet
+from tropoi.spatial.laplacian import invert_laplacian, laplacian_eigenvalues
 from tropoi.spatial.states.barotropic import BarotropicState  # noqa: F401  (re-export)
 
 
@@ -56,9 +57,9 @@ class BarotropicVorticity:
         self.f_lm[1, 0] = 2.0 * self.Omega * (4.0 * cp.pi / 3.0) ** 0.5
 
         # Precompute Laplacian eigenvalues
-        l_vals = cp.arange(self.sh.l_max + 1, dtype=cp.float64)
-        self.laplacian_eig = -l_vals * (l_vals + 1) / self.R**2
-        self.laplacian_eig[0] = 1.0 / self.R**2 # Avoid division by zero (l=0 mode is constant)
+        # The true eigenvalues, l=0 included (exactly 0). The l=0 mode is
+        # excluded from the inversion below, never given a stand-in value.
+        self.laplacian_eig = cp.asarray(laplacian_eigenvalues(self.sh.l_max, self.R))
 
     def vorticity_to_streamfunction(self, 
                                     vrt_state: BarotropicState
@@ -79,13 +80,8 @@ class BarotropicVorticity:
             Coefficients of streamfunction in spectral space
         """
         assert isinstance(vrt_state, BarotropicState)
-        zeta_coeffs = vrt_state.coeffs
-        psi_coeffs = cp.zeros_like(zeta_coeffs)
-
-        # Divide by eigenvalues (skip l=0, keep it zero)
-        psi_coeffs[1:, :] = zeta_coeffs[1:, :] / self.laplacian_eig[1:, None]
-
-        return psi_coeffs
+        # l=0 has no inverse; it is returned as zero.
+        return invert_laplacian(vrt_state.coeffs, self.laplacian_eig)
 
     def tendency(self, vrt_state: BarotropicState, forcing_coeffs) -> cp.ndarray:
         """

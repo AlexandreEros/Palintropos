@@ -101,11 +101,8 @@ classDiagram
         +backend
         +product_quadrature
         +R
-        +laplacian_coeffs(coeffs)
         +inv_laplacian(coeffs)
         +velocity_from_streamfunction(psi_lm)
-        +grad_from_scalar(q_lm)
-        +advect_scalar_by_streamfunction(psi_lm, q_lm)
         +jacobian_pseudospectral(a_lm, b_lm)
     }
 

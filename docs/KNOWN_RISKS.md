@@ -298,13 +298,29 @@ the "truth" it is compared against.
 vorticity on a rotating sphere" demo runs with f = 0 unless the user passes `--day-hours`.
 Make rotation explicit, or default to 24 h.
 
-### R-10. Diffusion uses the mutated l = 0 eigenvalue
+### R-10. Diffusion uses the mutated l = 0 eigenvalue — ✅ FIXED
 
 `BarotropicVorticity.__init__` overwrites `laplacian_eig[0] = +1/R²`; the diffusion term
 `ν·λ_l·ζ_lm` therefore *amplifies* the l = 0 mode. Currently masked by the hard-zeroing of
 the l = 0 tendency row — a silent coupling between two hacks. Keep the eigenvalue array
 physical and special-case the inversion instead. Related: `SpectralOperators.inv_laplacian`
 and `vorticity_to_streamfunction` treat the l = 0 mode differently (1/R² vs zeroed).
+
+**Fix applied**: every spelling of `−l(l+1)/R²` (nine, in the BVE, SWE and PE cores,
+`SpectralOperators`, the semi-implicit solver, the Held–Suarez hyperdiffusion, a BVE
+diagnostic and the custom-run preparation) now calls
+`tropoi.spatial.laplacian.laplacian_eigenvalues`, whose l = 0 entry is exactly zero. The BVE
+core no longer overwrites it; `vorticity_to_streamfunction` already skips l = 0, so results
+are unchanged (the swap is bit-for-bit identical for l ≥ 1, and l = 0 only ever met the
+hard-zeroed tendency row). Locked by `tests/test_laplacian_eigenvalues.py`, which checks the
+eigenvalue against the Legendre equation and fails if a second spelling reappears in `src/`.
+**Inversion, too**: the Laplacian was inverted in five places (`SpectralOperators.inv_laplacian`,
+the BVE, SWE and PE cores, the BVE grid diagnostic). Four zeroed l = 0; `inv_laplacian`
+divided by a stand-in `1/R²`, returning `R²·ζ₀₀` there. It fed the BVE diagnostics, frame
+renderer, saved-run wind evaluator and vorticity viewer; winds were unaffected (a constant
+has no gradient), only plotted ψ carried the offset. All five now call
+`tropoi.spatial.laplacian.invert_laplacian`, which zeroes l = 0 and is bit-for-bit the old
+division for l ≥ 1.
 
 ### R-11. `d_lambda_coeffs` mutates shared precomputed state on every call
 
@@ -315,7 +331,8 @@ final values once.
 
 ### R-12. Unclamped `1/cos φ` divisions rely on a hidden 0.01-rad grid rotation
 
-`grad_from_scalar` divides by `grid.coslat` with no floor (velocity path floors at 1e−6,
+`grad_from_scalar` (removed with the dead-code clean-up below; this note is kept for the
+other divisions) divided by `grid.coslat` with no floor (velocity path floors at 1e−6,
 Jacobian at 1e−8). Nothing prevents a future grid (or a user-supplied point set with a point
 at a pole) from producing Inf/NaN. The icosahedron "anti-singularity" rotation is the only
 protection, and it is undocumented.
@@ -356,6 +373,14 @@ computation at res 5. Pin of `cupy-cuda11x` also ties the project to CUDA 11.
 lazily but never called by any live path. `sh_matrix_real.cu` is never loaded.
 `LatLonSphericalHarmonics` survives only as a (biased, R-7) test baseline. Either quarantine
 these clearly as experimental or delete them.
+
+**Further clean-up** (branch `chore/single-laplacian-eigenvalue-and-dead-code-guard`):
+`SpectralOperators.laplacian_coeffs` had no caller and was deleted. `grad_from_scalar` and
+`advect_scalar_by_streamfunction` had no production caller; the second was the independent
+velocity-form reference for the Jacobian, so it now lives in `tests/test_spectral_operators.py`
+as `_velocity_form_advection` (same arithmetic, same test, same tolerance). So that deletions
+stay deleted, `tests/test_no_unreferenced_functions.py` fails when a function under `src/`
+loses its last reference (by name; see its docstring for what it does not catch).
 
 ### R-17. Assorted hygiene
 

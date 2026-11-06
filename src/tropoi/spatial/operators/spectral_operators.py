@@ -1,6 +1,7 @@
 import cupy as cp
 
 from tropoi.spatial.grids.geodesic_grid import GeodesicGridGeometry
+from tropoi.spatial.laplacian import invert_laplacian, laplacian_eigenvalues
 from tropoi.spatial.transforms.optimized_geodesic_sh import GeodesicSphericalHarmonics
 from tropoi.spatial.truncation import product_truncation_cut
 
@@ -59,11 +60,10 @@ class SpectralOperators:
                            if self._product_space.geometry is not None else None)
 
         # --- Eigenvalues for diagonal spectral operators ---
-        l = cp.arange(0, self.l_max + 1, dtype=cp.float64)              # (l,)
         m = cp.arange(0, self.l_max + 1, dtype=cp.float64)[None, :]     # (1, m)
 
-        # ∇² Y_l^m = -l(l+1)/R² * Y_l^m
-        self.lap_eigs = -l * (l + 1.0) / self.R**2   # l=0 stays exactly 0.0
+        # ∇² Y_l^m = -l(l+1)/R² * Y_l^m  (l=0 is exactly 0)
+        self.lap_eigs = cp.asarray(laplacian_eigenvalues(self.l_max, self.R))
         
         # ∂Y_l^m/∂λ = i m / R * Y_l^m  (zonal derivative on sphere of radius R)
         self._im_m_over_R = 1j * m / self.R   # (1, m)
@@ -126,13 +126,6 @@ class SpectralOperators:
     # ------------------------------------------------------------------
     # Public spectral operators
     # ------------------------------------------------------------------
-    def laplacian_coeffs(self, coeffs: cp.ndarray) -> cp.ndarray:
-        """
-        Apply the spherical Laplacian ∇² to a scalar field in spectral space.
-        """
-        lap_eigs = self.lap_eigs[:, None]  # (l,1)
-        return lap_eigs * coeffs
-
     def d_lambda_coeffs(self, coeffs: cp.ndarray) -> cp.ndarray:
         """
         Zonal derivative ∂ψ/∂λ in spectral space.
@@ -191,7 +184,7 @@ class SpectralOperators:
     def inv_laplacian(self, coeffs: cp.ndarray) -> cp.ndarray:
         """
         Apply the inverse spherical Laplacian ∇⁻² to a scalar field in spectral space.
-        NOTE: the l=0 mode is arbitrarily set to 1 / R**2 to avoid division by zero.
+        The undetermined l=0 mode of the result is zero, as in every model core.
 
         Parameters
         ----------
@@ -203,9 +196,7 @@ class SpectralOperators:
         cp.ndarray
             Inverse Laplacian applied to the input coefficients.
         """
-        inv_eigs = self.lap_eigs.copy()
-        inv_eigs[0] = 1.0 / self.R**2   # arbitrary, only affects l=0
-        return coeffs / inv_eigs[:, None]
+        return invert_laplacian(coeffs, self.lap_eigs)
 
     # ------------------------------------------------------------------
     # Vector curl/divergence analysis (tangent field -> spectra)
@@ -452,54 +443,6 @@ class SpectralOperators:
         return u, v
 
     
-
-    def grad_from_scalar(self, q_lm: cp.ndarray):
-        """
-        Return the two components of ∇q in physical units:
-          dq_dx = (1/(R cosφ)) q_λ
-          dq_dy = (1/R) q_φ
-        on the SH evaluation grid.
-        """
-
-        # (1/R) q_λ
-        q_lam_over_R = self.sh.inv_transform(self.d_lambda_coeffs(q_lm)).real
-
-        gq = self.sh.inv_transform(self.sin_theta_d_theta_coeffs(q_lm)).real
-        q_phi_over_R = -gq / (self.R * self.grid.coslat)
-
-        dq_dx = q_lam_over_R / self.grid.coslat
-        dq_dy = q_phi_over_R
-        return dq_dx, dq_dy
-    
-
-    def advect_scalar_by_streamfunction(self, 
-                                        psi_lm: cp.ndarray, 
-                                        q_lm: cp.ndarray, 
-                                        dealias: bool = True,
-                                        return_spectral: bool = False):
-        """
-        Compute u·∇q on the SH evaluation grid (no latlon conversion).
-        Optionally dealias by filtering after transforming the product.
-        """
-        u, v = self.velocity_from_streamfunction(psi_lm)
-        dq_dx, dq_dy = self.grad_from_scalar(q_lm)
-
-        adv_grid = u * dq_dx + v * dq_dy
-
-        if not (dealias or return_spectral):
-            return adv_grid
-
-        adv_lm = self.sh.transform(adv_grid)
-
-        if dealias:
-            L = self.l_max
-            cut = product_truncation_cut(L)
-            adv_lm[cut+1:, :] = 0.0
-            adv_lm[:, cut+1:] = 0.0
-
-        return adv_lm if return_spectral else self.sh.inv_transform(adv_lm).real
-    
-
 
     def jacobian_pseudospectral(self, a_lm: cp.ndarray, b_lm: cp.ndarray,
                                 dealias: bool = True,
