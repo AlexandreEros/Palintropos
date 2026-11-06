@@ -93,8 +93,8 @@
     },
     {
       "kind": "imports",
-      "module_edges": 2,
-      "runtime_module_edges": 2,
+      "module_edges": 3,
+      "runtime_module_edges": 3,
       "source": "tropoi.representation.diagnostics",
       "target": "tropoi.spatial"
     },
@@ -289,8 +289,8 @@
     },
     {
       "kind": "imports",
-      "module_edges": 11,
-      "runtime_module_edges": 11,
+      "module_edges": 12,
+      "runtime_module_edges": 12,
       "source": "tropoi.run.custom",
       "target": "tropoi.spatial"
     },
@@ -548,8 +548,8 @@
     },
     {
       "kind": "imports",
-      "module_edges": 2,
-      "runtime_module_edges": 2,
+      "module_edges": 3,
+      "runtime_module_edges": 3,
       "source": "tropoi.spatial.operators",
       "target": "tropoi.spatial"
     },
@@ -590,8 +590,8 @@
     },
     {
       "kind": "imports",
-      "module_edges": 8,
-      "runtime_module_edges": 8,
+      "module_edges": 9,
+      "runtime_module_edges": 9,
       "source": "tropoi.temporal",
       "target": "tropoi.spatial"
     },
@@ -611,8 +611,8 @@
     },
     {
       "kind": "imports",
-      "module_edges": 6,
-      "runtime_module_edges": 6,
+      "module_edges": 10,
+      "runtime_module_edges": 10,
       "source": "tropoi.temporal.tendencies",
       "target": "tropoi.spatial"
     },
@@ -698,7 +698,7 @@
     {
       "id": "tropoi.spatial",
       "internal_edges": 4,
-      "modules": 8
+      "modules": 9
     },
     {
       "id": "tropoi.spatial.grids",

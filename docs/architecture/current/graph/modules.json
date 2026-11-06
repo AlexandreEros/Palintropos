@@ -478,6 +478,14 @@
         "module"
       ],
       "source": "tropoi.representation.diagnostics.bve",
+      "target": "tropoi.spatial.laplacian"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.representation.diagnostics.bve",
       "target": "tropoi.spatial.truncation"
     },
     {
@@ -1680,6 +1688,14 @@
         "module"
       ],
       "source": "tropoi.run.custom.prepare",
+      "target": "tropoi.spatial.laplacian"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.run.custom.prepare",
       "target": "tropoi.spatial.modes"
     },
     {
@@ -2461,6 +2477,14 @@
     {
       "kind": "imports",
       "scopes": [
+        "module"
+      ],
+      "source": "tropoi.spatial.operators.spectral_operators",
+      "target": "tropoi.spatial.laplacian"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
         "function"
       ],
       "source": "tropoi.spatial.operators.spectral_operators",
@@ -2770,6 +2794,14 @@
         "module"
       ],
       "source": "tropoi.temporal.semi_implicit",
+      "target": "tropoi.spatial.laplacian"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.temporal.semi_implicit",
       "target": "tropoi.spatial.sigma_coordinate"
     },
     {
@@ -2818,6 +2850,14 @@
         "module"
       ],
       "source": "tropoi.temporal.tendencies.barotropic",
+      "target": "tropoi.spatial.laplacian"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.temporal.tendencies.barotropic",
       "target": "tropoi.spatial.planet"
     },
     {
@@ -2834,7 +2874,23 @@
         "module"
       ],
       "source": "tropoi.temporal.tendencies.held_suarez",
+      "target": "tropoi.spatial.laplacian"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.temporal.tendencies.held_suarez",
       "target": "tropoi.temporal.hooks"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.temporal.tendencies.primitive_equations",
+      "target": "tropoi.spatial.laplacian"
     },
     {
       "kind": "imports",
@@ -2867,6 +2923,14 @@
       ],
       "source": "tropoi.temporal.tendencies.primitive_equations",
       "target": "tropoi.spatial.truncation"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.temporal.tendencies.shallow_water",
+      "target": "tropoi.spatial.laplacian"
     },
     {
       "kind": "imports",
@@ -4183,6 +4247,19 @@
       ],
       "third_party_imports": [
         "cupy"
+      ]
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.spatial.laplacian",
+      "is_package": false,
+      "path": "tropoi/spatial/laplacian.py",
+      "stdlib_imports": [
+        "__future__"
+      ],
+      "third_party_imports": [
+        "numpy"
       ]
     },
     {
