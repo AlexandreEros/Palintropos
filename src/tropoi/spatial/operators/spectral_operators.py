@@ -1,7 +1,7 @@
 import cupy as cp
 
 from tropoi.spatial.grids.geodesic_grid import GeodesicGridGeometry
-from tropoi.spatial.laplacian import laplacian_eigenvalues
+from tropoi.spatial.laplacian import invert_laplacian, laplacian_eigenvalues
 from tropoi.spatial.transforms.optimized_geodesic_sh import GeodesicSphericalHarmonics
 from tropoi.spatial.truncation import product_truncation_cut
 
@@ -184,7 +184,7 @@ class SpectralOperators:
     def inv_laplacian(self, coeffs: cp.ndarray) -> cp.ndarray:
         """
         Apply the inverse spherical Laplacian ∇⁻² to a scalar field in spectral space.
-        NOTE: the l=0 mode is arbitrarily set to 1 / R**2 to avoid division by zero.
+        The undetermined l=0 mode of the result is zero, as in every model core.
 
         Parameters
         ----------
@@ -196,9 +196,7 @@ class SpectralOperators:
         cp.ndarray
             Inverse Laplacian applied to the input coefficients.
         """
-        inv_eigs = self.lap_eigs.copy()
-        inv_eigs[0] = 1.0 / self.R**2   # arbitrary, only affects l=0
-        return coeffs / inv_eigs[:, None]
+        return invert_laplacian(coeffs, self.lap_eigs)
 
     # ------------------------------------------------------------------
     # Vector curl/divergence analysis (tangent field -> spectra)

@@ -20,7 +20,7 @@ import numpy as np
 import pytest
 from numpy.polynomial.legendre import Legendre
 
-from tropoi.spatial.laplacian import laplacian_eigenvalues
+from tropoi.spatial.laplacian import invert_laplacian, laplacian_eigenvalues
 
 R_EARTH = 6.371e6
 
@@ -86,6 +86,39 @@ def test_no_second_definition_of_the_eigenvalue_in_src():
         if found - allowed else f"allow-list is stale: {sorted(allowed - found)}")
 
 
+def _random_coeffs(shape, seed=0):
+    rng = np.random.default_rng(seed)
+    return rng.standard_normal(shape) + 1j * rng.standard_normal(shape)
+
+
+def test_inversion_is_bit_identical_to_the_old_division_for_l_ge_1():
+    """For l >= 1 it is the same single division the five inline copies did."""
+    lam = laplacian_eigenvalues(21, R_EARTH)
+    zeta = _random_coeffs((22, 22))
+    psi = invert_laplacian(zeta, lam)
+    np.testing.assert_array_equal(psi[1:], zeta[1:] / lam[1:, None])
+
+
+def test_inversion_zeroes_l0_and_ignores_its_input():
+    """R-10 remainder: SpectralOperators used to return R^2 * zeta_00 here."""
+    lam = laplacian_eigenvalues(10, R_EARTH)
+    zeta = _random_coeffs((11, 11))
+    zeta[0, 0] = 7.0
+    psi = invert_laplacian(zeta, lam)
+    assert np.all(psi[0] == 0.0)
+    assert zeta[0, 0] == 7.0, "the input must not be modified"
+
+
+def test_inversion_batches_leading_axes_and_round_trips():
+    """Levels on a leading axis (the PE layout); lap(inv(z)) = z for l >= 1."""
+    lam = laplacian_eigenvalues(15, R_EARTH)
+    zeta = _random_coeffs((4, 16, 16), seed=1)
+    psi = invert_laplacian(zeta, lam)
+    for k in range(4):
+        np.testing.assert_array_equal(psi[k], invert_laplacian(zeta[k], lam))
+    np.testing.assert_allclose((lam[:, None] * psi)[:, 1:], zeta[:, 1:], rtol=1e-14)
+
+
 def _has_cuda() -> bool:
     try:
         import cupy as cp
@@ -111,3 +144,25 @@ def test_cores_read_the_shared_eigenvalues_and_bve_keeps_l0_physical():
     np.testing.assert_array_equal(cp.asnumpy(model.laplacian_eig), expected)
     np.testing.assert_array_equal(cp.asnumpy(planet.so.lap_eigs), expected)
     assert float(model.laplacian_eig[0]) == 0.0
+
+
+@pytest.mark.skipif(not _has_cuda(), reason="CUDA/CuPy not available")
+def test_every_inversion_route_agrees_including_l0():
+    """SpectralOperators.inv_laplacian, the BVE/SWE/PE inversions and the BVE
+    diagnostic used to be five implementations; one disagreed at l = 0."""
+    import cupy as cp
+
+    from tropoi.spatial.environment import PlanetaryParameters
+    from tropoi.spatial.planet import Planet
+    from tropoi.spatial.states.barotropic import BarotropicState
+    from tropoi.temporal.tendencies.barotropic import BarotropicVorticity
+
+    params = PlanetaryParameters.from_earth_like(day_hours=24.0)
+    planet = Planet.generate(params=params, grid_resolution=4, l_max=21)
+    model = BarotropicVorticity(planet, viscosity=0.0)
+    zeta = cp.asarray(_random_coeffs((22, 22), seed=2))
+    zeta[0, 0] = 1.0e-5
+    via_operators = planet.so.inv_laplacian(zeta)
+    via_core = model.vorticity_to_streamfunction(BarotropicState(zeta))
+    np.testing.assert_array_equal(cp.asnumpy(via_operators), cp.asnumpy(via_core))
+    assert float(cp.max(cp.abs(via_operators[0]))) == 0.0

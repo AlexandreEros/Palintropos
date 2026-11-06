@@ -41,7 +41,7 @@ import math
 import cupy as cp
 
 from tropoi.spatial.planet import Planet
-from tropoi.spatial.laplacian import laplacian_eigenvalues
+from tropoi.spatial.laplacian import invert_laplacian, laplacian_eigenvalues
 from tropoi.spatial.states.primitive_equations import (  # noqa: F401  (re-exports)
     PROGNOSTICS, PrimitiveEquationsState, PrimitiveEquationsStateError,
     isothermal_rest_state)
@@ -206,9 +206,7 @@ class PrimitiveEquationsModel:
 
     def _inv_laplacian(self, coeffs: cp.ndarray) -> cp.ndarray:
         """Solve laplacian(x) = coeffs per 2-D slice; l=0 mode zeroed."""
-        out = cp.zeros_like(coeffs)
-        out[..., 1:, :] = coeffs[..., 1:, :] / self.lap_eigs[1:, None]
-        return out
+        return invert_laplacian(coeffs, self.lap_eigs)
 
     def _deriv_fields(self, sh, coeffs: cp.ndarray
                       ) -> tuple[cp.ndarray, cp.ndarray]:

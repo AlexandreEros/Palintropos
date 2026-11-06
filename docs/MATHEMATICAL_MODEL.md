@@ -199,10 +199,11 @@ Implemented in [spectral_operators.py](../src/tropoi/numerics/spectral_operators
 all acting on the dense (l, m) coefficient array:
 
 - **Laplacian**: diagonal, `∇²Y_l^m = −l(l+1)/R² · Y_l^m`. Exact.
-- **Inverse Laplacian**: division by eigenvalues; the l = 0 mode is assigned the arbitrary
-  eigenvalue `1/R²` in `SpectralOperators.inv_laplacian` (documented as arbitrary) and is
-  *zeroed* in `BarotropicVorticity.vorticity_to_streamfunction`. Both are harmless because
-  derivatives annihilate constants, but the two code paths disagree.
+- **Inverse Laplacian**: division by eigenvalues, with the undetermined l = 0 mode of the
+  result set to zero. At audit time `SpectralOperators.inv_laplacian` instead assigned the
+  arbitrary eigenvalue `1/R²` there while `BarotropicVorticity.vorticity_to_streamfunction`
+  zeroed it (harmless for winds, since derivatives annihilate constants, but the paths
+  disagreed). Every inversion now goes through `tropoi.spatial.laplacian.invert_laplacian` (R-10).
 - **Zonal derivative**: `(∂/∂λ)Y_l^m = im·Y_l^m`, returned pre-divided by R
   (`d_lambda_coeffs = (im/R)·a`). Note: the operator *mutates its own precomputed buffer* on
   every call to zero the m = 0 entry (R-11, cosmetic).
@@ -297,9 +298,9 @@ per evaluation, eight per RK4 step.
 
 ## 8. Filtering and dissipation
 
-- **Explicit**: `ν ∇²ζ` with the true spectral eigenvalues (the `laplacian_eig[0] = 1/R²`
-  hack would inject spurious l = 0 growth, but the hard-zeroing of the l = 0 tendency masks
-  it). Default `ν = 0`. No hyperviscosity option.
+- **Explicit**: `ν ∇²ζ` with the true spectral eigenvalues (the former `laplacian_eig[0] =
+  1/R²` hack, masked by the hard-zeroing of the l = 0 tendency, has been removed: R-10).
+  Default `ν = 0`. No hyperviscosity option.
 - **Truncation**: the 2/3-style zeroing described in §6, every tendency evaluation.
 - **Implicit / unintended**: every tendency evaluation round-trips `η = ζ + f` through
   analysis∘synthesis (grid-space addition of f), which acts as a lossy filter whenever the

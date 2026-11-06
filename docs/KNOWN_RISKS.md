@@ -298,7 +298,7 @@ the "truth" it is compared against.
 vorticity on a rotating sphere" demo runs with f = 0 unless the user passes `--day-hours`.
 Make rotation explicit, or default to 24 h.
 
-### R-10. Diffusion uses the mutated l = 0 eigenvalue — ✅ FIXED (the BVE core; `inv_laplacian` remainder open)
+### R-10. Diffusion uses the mutated l = 0 eigenvalue — ✅ FIXED
 
 `BarotropicVorticity.__init__` overwrites `laplacian_eig[0] = +1/R²`; the diffusion term
 `ν·λ_l·ζ_lm` therefore *amplifies* the l = 0 mode. Currently masked by the hard-zeroing of
@@ -314,8 +314,13 @@ core no longer overwrites it; `vorticity_to_streamfunction` already skips l = 0,
 are unchanged (the swap is bit-for-bit identical for l ≥ 1, and l = 0 only ever met the
 hard-zeroed tendency row). Locked by `tests/test_laplacian_eigenvalues.py`, which checks the
 eigenvalue against the Legendre equation and fails if a second spelling reappears in `src/`.
-**Still open**: `SpectralOperators.inv_laplacian` substitutes `1/R²` at l = 0 (it feeds only the
-visualisers); decide whether it should zero that mode like the cores do.
+**Inversion, too**: the Laplacian was inverted in five places (`SpectralOperators.inv_laplacian`,
+the BVE, SWE and PE cores, the BVE grid diagnostic). Four zeroed l = 0; `inv_laplacian`
+divided by a stand-in `1/R²`, returning `R²·ζ₀₀` there. It fed the BVE diagnostics, frame
+renderer, saved-run wind evaluator and vorticity viewer; winds were unaffected (a constant
+has no gradient), only plotted ψ carried the offset. All five now call
+`tropoi.spatial.laplacian.invert_laplacian`, which zeroes l = 0 and is bit-for-bit the old
+division for l ≥ 1.
 
 ### R-11. `d_lambda_coeffs` mutates shared precomputed state on every call
 

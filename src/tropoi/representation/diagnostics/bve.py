@@ -32,7 +32,7 @@ import numpy as np
 import cupy as cp
 
 from tropoi.spatial.truncation import product_truncation_cut
-from tropoi.spatial.laplacian import laplacian_eigenvalues
+from tropoi.spatial.laplacian import invert_laplacian, laplacian_eigenvalues
 
 CSV_COLUMNS = [
     "time_s",
@@ -113,9 +113,7 @@ def grid_diagnostics(zeta_lm: cp.ndarray, sh, radius: float, omega: float,
     f = 2.0 * omega * cp.sin(cp.asarray(latitudes))
 
     l_max = zeta_lm.shape[0] - 1
-    psi_lm = cp.zeros_like(zeta_lm)
-    lam = cp.asarray(laplacian_eigenvalues(l_max, R))
-    psi_lm[1:, :] = zeta_lm[1:, :] / lam[1:, None]
+    psi_lm = invert_laplacian(zeta_lm, cp.asarray(laplacian_eigenvalues(l_max, R)))
     psi = sh.inv_transform(psi_lm).real
 
     return {

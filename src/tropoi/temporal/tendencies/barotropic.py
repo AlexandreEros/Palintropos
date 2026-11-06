@@ -3,7 +3,7 @@ from __future__ import annotations
 import cupy as cp
 
 from tropoi.spatial.planet import Planet
-from tropoi.spatial.laplacian import laplacian_eigenvalues
+from tropoi.spatial.laplacian import invert_laplacian, laplacian_eigenvalues
 from tropoi.spatial.states.barotropic import BarotropicState  # noqa: F401  (re-export)
 
 
@@ -80,13 +80,8 @@ class BarotropicVorticity:
             Coefficients of streamfunction in spectral space
         """
         assert isinstance(vrt_state, BarotropicState)
-        zeta_coeffs = vrt_state.coeffs
-        psi_coeffs = cp.zeros_like(zeta_coeffs)
-
-        # Divide by eigenvalues (skip l=0, keep it zero)
-        psi_coeffs[1:, :] = zeta_coeffs[1:, :] / self.laplacian_eig[1:, None]
-
-        return psi_coeffs
+        # l=0 has no inverse; it is returned as zero.
+        return invert_laplacian(vrt_state.coeffs, self.laplacian_eig)
 
     def tendency(self, vrt_state: BarotropicState, forcing_coeffs) -> cp.ndarray:
         """

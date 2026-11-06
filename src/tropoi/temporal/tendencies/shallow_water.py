@@ -89,7 +89,7 @@ import cupy as cp
 
 from tropoi.spatial.terrain.topography import Topography
 from tropoi.spatial.planet import Planet
-from tropoi.spatial.laplacian import laplacian_eigenvalues
+from tropoi.spatial.laplacian import invert_laplacian, laplacian_eigenvalues
 from tropoi.spatial.states.shallow_water import (  # noqa: F401  (re-exports)
     DELTA, PHI, PROGNOSTICS, ZETA, ShallowWaterState, ShallowWaterStateError)
 from tropoi.spatial.truncation import product_truncation_cut
@@ -232,9 +232,7 @@ class ShallowWaterModel:
 
     def _inv_laplacian(self, coeffs: cp.ndarray) -> cp.ndarray:
         """Solve laplacian(x) = coeffs; the undetermined l=0 mode is zeroed."""
-        out = cp.zeros_like(coeffs)
-        out[1:, :] = coeffs[1:, :] / self.lap_eigs[1:, None]
-        return out
+        return invert_laplacian(coeffs, self.lap_eigs)
 
     def helmholtz(self, state: ShallowWaterState
                   ) -> tuple[cp.ndarray, cp.ndarray]:
