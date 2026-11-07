@@ -8,3 +8,7 @@ docs/runs/** -text
 
 # Test fixtures from real runs carry a SHA256SUMS receipt; keep their bytes.
 tests/fixtures/** -text
+
+# Verbatim third-party data (the CIE 1931 table is SHA-256 checked on load);
+# never convert its line endings.
+src/tropoi/spatial/optics/data/** -text

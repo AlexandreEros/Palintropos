@@ -38,6 +38,9 @@ From the shell (the same call, as a runnable script):
 python examples/atmosphere_view.py runs/hs-T42L20-prod-002 --times 0 -1 --field zeta --open
 ```
 
+To look at the sky from a point on the surface (a visual prototype), pass
+`sky=SkySpec(...)`; see [SKY_VIEW.md](SKY_VIEW.md).
+
 `view` returns the path of the page. Its options are keyword-only:
 
 | option | meaning | default |

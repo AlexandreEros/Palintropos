@@ -311,14 +311,55 @@ def globe_payload(preview: TerrainPreview, *, units: str | None = None,
     }
 
 
-def write_globe_html(preview: TerrainPreview, path, **view) -> pathlib.Path:
+def sample_preview(preview: TerrainPreview, lat: float, lon: float) -> float:
+    """Bilinear sample of the model mesh, periodic in longitude (the same
+    arithmetic as the page's ``sampleMesh``)."""
+    lat0, dlat = float(preview.lat_deg[0]), preview.resolution_deg
+    lon0 = float(preview.lon_deg[0])
+    dlon = float(preview.lon_deg[1] - preview.lon_deg[0])
+    nlat, nlon = preview.model_m.shape
+    y = max(0.0, min(nlat - 1.000001, (lat - lat0) / dlat))
+    x = min(nlon - 1.000001, (((lon - lon0) % 360.0) + 360.0) % 360.0 / dlon)
+    j, i = int(math.floor(y)), int(math.floor(x))
+    fy, fx = y - j, x - i
+    v = preview.model_m
+    return float((v[j, i] * (1 - fx) + v[j, i + 1] * fx) * (1 - fy)
+                 + (v[j + 1, i] * (1 - fx) + v[j + 1, i + 1] * fx) * fy)
+
+
+def write_globe_html(preview: TerrainPreview, path, *, sky=None,
+                     **view) -> pathlib.Path:
     """Write the self-contained globe page to ``path``; return the path.
 
     ``view`` passes ``units``, ``centre`` and ``exaggeration`` to
-    :func:`globe_payload` (initial display settings only).
+    :func:`globe_payload` (initial display settings only). ``sky`` is an
+    optional :class:`~tropoi.representation.visual.sky.SkySpec` with a
+    ``hypothetical`` column (a terrain-only page has no saved atmosphere).
+    Without ``sky`` the page is exactly the terrain globe it always was.
     """
-    return write_globe_page(globe_payload(preview, **view), preview.title,
-                            path)
+    payload = globe_payload(preview, **view)
+    if sky is not None:
+        payload["sky"] = hypothetical_sky_block(sky, preview)
+    return write_globe_page(payload, preview.title, path)
+
+
+def hypothetical_sky_block(sky, preview: TerrainPreview) -> dict:
+    """The page's sky block for a labelled hypothetical column."""
+    from tropoi.representation.visual.sky import SkySpec, sky_block
+
+    if not isinstance(sky, SkySpec):
+        raise TypeError("sky must be a SkySpec")
+    if sky.hypothetical is None:
+        raise ValueError(
+            "a terrain-only page has no saved atmosphere: give the sky a "
+            "HypotheticalColumn (surface pressure, temperature, gravity, gas "
+            "constant), or view a saved primitive-equation run instead")
+    column = sky.hypothetical.build(sky.composition)
+    terrain_m = sample_preview(preview, float(sky.observer_lat_deg),
+                               float(sky.observer_lon_deg))
+    return sky_block(sky, column=column, column_kind="hypothetical",
+                     radius_m=preview.radius_m, r_dry=column.gas_constant,
+                     gravity=column.gravity, terrain_m=terrain_m)
 
 
 def write_globe_page(payload: dict, title: str, path) -> pathlib.Path:

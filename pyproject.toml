@@ -49,6 +49,8 @@ include = ["tropoi*"]
 "tropoi.spatial.transforms.cuda" = ["*.cu"]
 # The self-contained terrain-globe page template (read via importlib.resources).
 "tropoi.representation.visual" = ["*.html"]
+# The verbatim CIE 1931 colour-matching table (checked by SHA-256 on load).
+"tropoi.spatial.optics" = ["data/*.csv"]
 
 [tool.deptry]
 # Treat the "dev" PEP 621 optional-dependency group as development-only.

@@ -98,6 +98,14 @@ dd { margin: 0; color: var(--ink); overflow-wrap: anywhere; }
 .play label { color: var(--ink-2); font-size: 12.5px; }
 select { font: inherit; font-size: 12.5px; color: var(--ink); background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 2px 4px; }
 select:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+#sky { position: absolute; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; cursor: grab; background: #000; }
+.modeSw { position: absolute; left: 10px; top: 10px; display: flex; gap: 4px; z-index: 2; }
+.modeSw button { padding: 3px 10px; }
+.skyIn { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; margin: 6px 0; }
+.skyIn input[type="number"] { width: 92px; font: inherit; font-size: 12.5px; color: var(--ink); background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 2px 4px; }
+.skyIn label { color: var(--ink-2); font-size: 12.5px; }
+.warn { color: var(--ink); font-weight: 600; }
+.err { color: #c0392b; font-weight: 600; }
 </style>
 </head>
 <body>
@@ -115,6 +123,10 @@ select:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
       <button id="resetView" aria-label="Reset view" title="Reset view">⟲</button>
     </div>
     <div class="readout" id="globeReadout" aria-live="polite"></div>
+    <canvas id="sky" hidden tabindex="0" aria-label="Sky from the observer: drag to look around"></canvas>
+    <div class="modeSw seg" id="modeSw" role="group" aria-label="Stage shows" hidden>
+      <button id="modeGlobe" aria-pressed="true">Globe</button><button id="modeSky" aria-pressed="false">Sky</button>
+    </div>
   </section>
   <aside>
     <div class="card section" id="layerSection">
@@ -148,6 +160,33 @@ select:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
       <p class="note" id="streamNote"></p>
       <div class="row"><label><input type="checkbox" id="rangeLevel"> Colour range of this level only</label></div>
       <p class="note" id="atmNote"></p>
+    </div>
+    <div class="card section" id="skySection" hidden>
+      <h2>Sky from the surface</h2>
+      <p class="note warn" id="skyLabel"></p>
+      <div class="skyIn">
+        <label>Lat <input type="number" id="skyLat" step="0.1" min="-90" max="90" aria-label="Observer latitude (degrees)"></label>
+        <label>Lon <input type="number" id="skyLon" step="0.1" aria-label="Observer longitude (degrees)"></label>
+        <button id="skyFromView" title="Place the observer where the globe is centred">Globe centre</button>
+      </div>
+      <div class="skyIn">
+        <select id="skyAltMode" aria-label="How the observer's height is given">
+          <option value="ground">2 m above the ground</option>
+          <option value="altitude">Altitude above R (m)</option>
+          <option value="pressure">Pressure (hPa)</option>
+        </select>
+        <input type="number" id="skyAltVal" aria-label="Observer altitude or pressure">
+      </div>
+      <p class="note" id="skyObsNote"></p>
+      <div class="row"><span>Star azimuth</span><span id="skyStarAzL" class="val"></span></div>
+      <input type="range" id="skyStarAz" min="0" max="360" step="1" aria-label="Star azimuth (degrees from north)">
+      <div class="row"><span>Star elevation</span><span id="skyStarElL" class="val"></span></div>
+      <input type="range" id="skyStarEl" min="-20" max="90" step="0.5" aria-label="Star elevation (degrees)">
+      <div class="row"><span>Field of view</span><span id="skyFovL" class="val"></span></div>
+      <input type="range" id="skyFov" min="20" max="140" step="1" aria-label="Horizontal field of view (degrees)">
+      <div class="row"><span>Exposure</span><span id="skyEvL" class="val"></span></div>
+      <input type="range" id="skyEv" min="-10" max="10" step="0.25" aria-label="Exposure (stops)">
+      <p class="note" id="skyNote"></p>
     </div>
     <div class="card section">
       <h2>Display</h2>
@@ -491,7 +530,7 @@ function bindSurface(sf) {
   gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, sf.buf.idx);
 }
 function render() {
-  if (!glOK) return;
+  if (!glOK || (SKY && SKY.mode === "sky")) return;
   const bg = cssVar("--space"); const m = bg.match(/#([0-9a-f]{6})/i);
   const rgb = m ? [parseInt(m[1].slice(0, 2), 16), parseInt(m[1].slice(2, 4), 16), parseInt(m[1].slice(4, 6), 16)] : [236, 235, 230];
   gl.clearColor(rgb[0] / 255, rgb[1] / 255, rgb[2] / 255, 1);
@@ -625,6 +664,10 @@ function drawMapOverlay(hover) {
   const vlat = st.pitch * 180 / Math.PI, vlon = ((-st.yaw * 180 / Math.PI + 180) % 360 + 360) % 360 - 180;
   g.strokeStyle = cssVar("--accent"); g.lineWidth = 2;
   g.beginPath(); g.arc(X(vlon), Y(vlat), 6, 0, 2 * Math.PI); g.stroke();
+  if (SKY) {   // the sky observer
+    const ox = X(((SKY.obs.lon + 180) % 360 + 360) % 360 - 180), oy = Y(SKY.obs.lat);
+    g.fillStyle = SKY.error ? "#c0392b" : "#e0a100"; g.beginPath(); g.moveTo(ox, oy - 7); g.lineTo(ox - 5, oy + 4); g.lineTo(ox + 5, oy + 4); g.closePath(); g.fill();
+  }
   if (hover) {
     const lon = ((hover.lon + 180) % 360 + 360) % 360 - 180;
     g.strokeStyle = cssVar("--ink"); g.lineWidth = 1; g.setLineDash([3, 3]);
@@ -644,7 +687,11 @@ overC.addEventListener("pointermove", e => {
   mapReadout.textContent = p ? readoutText(p.lat, p.lon) : "Hover for values; click to centre the globe there.";
 });
 overC.addEventListener("pointerleave", () => { lastMapHover = null; drawMapOverlay(null); });
-overC.addEventListener("click", e => { const p = mapToLatLon(e); if (p) { centreOn(p.lat, p.lon); spinBox.checked = st.spin = false; } });
+overC.addEventListener("click", e => {
+  const p = mapToLatLon(e); if (!p) return;
+  if (SKY && SKY.mode === "sky") { skySetObserver({ lat: p.lat, lon: p.lon }); return; }   // sky mode: the map places the observer
+  centreOn(p.lat, p.lon); spinBox.checked = st.spin = false;
+});
 
 /* ---------------- atmosphere (optional "atmosphere" payload block) ----------------
    One translucent native sigma surface at radius 1 + E * Z / R (Z = geopotential height
@@ -846,7 +893,7 @@ function drawAtmMap() {
   });
   m.restore();
 }
-function onAtmChange() { rebuildAtmosphere(); drawAtmColorbar(); drawMap(); drawMapOverlay(lastMapHover); }
+function onAtmChange() { rebuildAtmosphere(); drawAtmColorbar(); drawMap(); drawMapOverlay(lastMapHover); if (SKY && SKY.S.column_kind === "saved_state") skySchedule(); }
 /* The one way a saved state is selected: slider, step buttons, playback and the page API
    all come through here, so a played frame is exactly the manually selected one. */
 function atmSetTime(i) { ATM.it = Math.max(0, Math.min(ATM.nt - 1, i | 0)); document.getElementById("timeSlider").value = ATM.it; onAtmChange(); }
@@ -962,12 +1009,366 @@ function initAtmosphereUI() {
   document.getElementById("mapTerrain").addEventListener("click", () => atmSetMap(false));
 }
 
+/* ---------------- sky (optional "sky" payload block) ----------------
+   Single-scattering Rayleigh sky seen from an observer, in float64 JavaScript. It repeats
+   tropoi.representation.visual.sky.radiance_table step for step (same column, density
+   table, graded ray steps and spectral bins), so the page and the NumPy reference agree to
+   rounding. A visual prototype, not a validated sky colour: the page says so. */
+const SKY = D.sky ? (function () {
+  const S = D.sky;
+  return { S, mode: "globe", obs: { lat: S.observer.lat_deg, lon: S.observer.lon_deg, mode: S.observer.mode,
+           altitude_m: S.observer.altitude_m, pressure_pa: S.observer.pressure_pa },
+           look: { az: S.look.azimuth_deg, el: S.look.elevation_deg, fov: S.look.fov_deg },
+           star: { az: S.star.azimuth_deg, el: S.star.elevation_deg }, ev: S.exposure_ev,
+           col: null, place: null, table: null, key: null, error: null, timer: 0, ms: 0, clip: { over: 0, gamut: 0 } };
+})() : null;
+const KB = 1.380649e-23, DEG = Math.PI / 180;
+
+function interp1(x, xp, fp) {
+  // numpy.interp for ascending xp (clamped at the ends)
+  const n = xp.length;
+  if (x <= xp[0]) return fp[0];
+  if (x >= xp[n - 1]) return fp[n - 1];
+  let lo = 0, hi = n - 1;
+  while (hi - lo > 1) { const m = (lo + hi) >> 1; if (xp[m] <= x) lo = m; else hi = m; }
+  return (fp[hi] - fp[lo]) / (xp[hi] - xp[lo]) * (x - xp[lo]) + fp[lo];
+}
+function skyFail(msg) { const e = new Error(msg); e.sky = true; throw e; }
+function sampleSlice(q, bounds, s, lat, lon) {
+  // bilinear sample of one 16-bit display-quantized slice (linear in the quantized value)
+  const [lo, hi] = bounds[s], off = s * ATM.n;
+  return lo + (hi - lo) / 65535 * sampleMesh(ATM.g, q.subarray(off, off + ATM.n), lat, lon);
+}
+/* the observer's column: (z, ln p, T) nodes, ascending, as AtmosphericColumn builds them */
+function skyColumn(lat, lon) {
+  const S = SKY.S;
+  if (S.column_kind === "hypothetical") {
+    const c = S.column;
+    return { kind: "hypothetical", z: c.z_m.slice(), lnp: c.ln_p.slice(), T: c.temperature_k.slice(), ceiling: c.ceiling_m,
+             terrain: sampleLayer(layers[0].values, lat, lon) };
+  }
+  if (ATM.nl !== ATM.A.nlev) skyFail("the sky needs every native level exported");
+  const fT = ATM.fields.find(f => f.id === "temperature"), fP = ATM.fields.find(f => f.id === "pressure");
+  const lv = [];
+  for (let l = 0; l < ATM.nl; l++) {
+    const s = ATM.it * ATM.nl + l;
+    lv.push({ z: sampleSlice(ATM.height.q, ATM.height.bounds, s, lat, lon), p: sampleSlice(fP.q, fP.bounds, s, lat, lon),
+              T: sampleSlice(fT.q, fT.bounds, s, lat, lon), sigma: ATM.A.levels[l].sigma });
+  }
+  lv.sort((a, b) => a.z - b.z);
+  // terrain on the SAME display mesh as the saved fields, so h_s and Z_k are interpolated alike
+  if (!SKY.hsMesh) {
+    const G = ATM.g, a = new Float64Array(ATM.n);
+    for (let j = 0; j < G.nlat; j++) for (let i = 0; i < G.nlon; i++) a[j * G.nlon + i] = sampleLayer(layers[0].values, G.lat0 + j * G.dlat, G.lon0 + i * G.dlon);
+    SKY.hsMesh = a;
+  }
+  const hs = sampleMesh(ATM.g, SKY.hsMesh, lat, lon), ps = lv[0].p / lv[0].sigma;
+  const r = S.r_dry, g = S.gravity, top = S.top_ratio;
+  if (!(lv[0].z > hs)) skyFail("the lowest full level is not above the surface here");
+  for (let k = 1; k < lv.length; k++) if (!(lv[k].z > lv[k - 1].z) || !(lv[k].p < lv[k - 1].p)) skyFail("the saved levels are not monotonic here");
+  const z = [hs], lnp = [Math.log(ps)], T = [lv[0].T];
+  for (const v of lv) { z.push(v.z); lnp.push(Math.log(v.p)); T.push(v.T); }
+  const lpEnd = Math.log(ps * top), last = lv[lv.length - 1];
+  if (lnp[lnp.length - 1] > lpEnd) { z.push(last.z + (lnp[lnp.length - 1] - lpEnd) * r * last.T / g); lnp.push(lpEnd); T.push(last.T); }
+  return { kind: "saved_state", z, lnp, T, ceiling: last.z, terrain: hs };
+}
+/* AtmosphericColumn.observer_altitude */
+function skyPlace(col, obs) {
+  const base = col.z[0], floor = Math.max(base, col.terrain), ps = Math.exp(col.lnp[0]);
+  let z;
+  if (obs.mode === "pressure") {
+    const p = obs.pressure_pa;
+    if (!(p > 0)) skyFail("pressure must be > 0");
+    if (p > ps) skyFail((p / 100).toFixed(1) + " hPa exceeds the surface pressure " + (ps / 100).toFixed(1) + " hPa here: the observer would be underground");
+    const lp = Math.log(p);
+    if (lp < col.lnp[col.lnp.length - 1]) skyFail("pressure outside the column");
+    z = interp1(lp, col.lnp.slice().reverse(), col.z.slice().reverse());
+  } else if (obs.mode === "ground") z = floor + 2;
+  else z = obs.altitude_m;
+  if (!isFinite(z)) skyFail("altitude must be finite");
+  if (z < floor - 1e-6) skyFail("altitude " + z.toFixed(1) + " m is below the ground (" + floor.toFixed(1) + " m) here: the observer would be underground");
+  if (z > col.ceiling + 1e-6) skyFail("altitude " + z.toFixed(0) + " m is above " + (col.kind === "saved_state" ? "the top saved full level" : "the top of the column") + " (" + col.ceiling.toFixed(0) + " m)");
+  return { z, p: Math.exp(interp1(z, col.z, col.lnp)), floor };
+}
+function skyDensity(col, G) {
+  const base = col.z[0], top = col.z[col.z.length - 1], dz = (top - base) / (G - 1), lnn = new Float64Array(G);
+  for (let j = 0; j < G; j++) {
+    const z = base + dz * j;
+    lnn[j] = interp1(z, col.z, col.lnp) - Math.log(KB * interp1(z, col.z, col.T));
+  }
+  return { base, dz, lnn, G };
+}
+function dens(dg, z) {
+  const x = (z - dg.base) / dg.dz;
+  if (!(x >= 0 && x <= dg.G - 1)) return 0;
+  const i = Math.min(Math.max(Math.floor(x), 0), dg.G - 2), f = x - i;
+  return Math.exp(dg.lnn[i] + f * (dg.lnn[i + 1] - dg.lnn[i]));
+}
+/* sky._segments: n graded midpoint steps on [0, L], densest at the ray's lowest point */
+function segs(r0, mu, L, n, mid, wid) {
+  const sl = Math.min(Math.max(-r0 * mu, 0), L);
+  const na = sl <= 0 ? 0 : (sl >= L ? n : Math.min(Math.max(Math.floor(n * (L > 0 ? sl / L : 0) + 0.5), 1), n - 1)), nb = n - na;
+  let prev = 0;
+  for (let j = 1; j <= n; j++) {
+    let e;
+    if (j <= na) { const t = j / na; e = sl * (1 - (1 - t) * (1 - t)); }
+    else { const t = (j - na) / nb; e = sl + (L - sl) * t * t; }
+    mid[j - 1] = 0.5 * (e + prev); wid[j - 1] = e - prev; prev = e;
+  }
+}
+function skyTable(col, zObs, starEl) {
+  const S = SKY.S, O = S.optics, N = S.numerics, R = S.radius_m, K = O.wavelengths_nm.length;
+  const dg = skyDensity(col, N.density_nodes), top = dg.base + dg.dz * (dg.G - 1);
+  const rb = R + dg.base, rt = R + top, ro = R + zObs;
+  const sig = O.cross_section_m2, irr = O.star_radiance.map(b => b * O.star_solid_angle_sr), W = O.cmf_weights;
+  const NZ = N.n_zenith, NA = N.n_azimuth, nv = N.view_steps, ns = N.sun_steps;
+  const spec = new Float64Array(NZ * NA * K), xyz = new Float64Array(NZ * NA * 3), ground = new Uint8Array(NZ * NA);
+  const vm = new Float64Array(nv), vw = new Float64Array(nv), sm = new Float64Array(ns), sw = new Float64Array(ns), acc = new Float64Array(K);
+  const e = starEl * DEG, ce = Math.cos(e), se = Math.sin(e);
+  for (let iz = 0; iz < NZ; iz++) {
+    const th = (180 * iz / (NZ - 1)) * DEG, mu = Math.cos(th), st = Math.sin(th);
+    for (let ia = 0; ia < NA; ia++) {
+      const ph = (180 * ia / (NA - 1)) * DEG, cph = Math.cos(ph);
+      const cosBig = st * cph * ce + mu * se;
+      const discG = rb * rb - ro * ro * (1 - mu * mu), gr = mu < 0 && discG >= 0;
+      let L = gr ? -ro * mu - Math.sqrt(Math.max(discG, 0)) : -ro * mu + Math.sqrt(Math.max(rt * rt - ro * ro * (1 - mu * mu), 0));
+      L = Math.max(L, 0);
+      segs(ro, mu, L, nv, vm, vw);
+      acc.fill(0);
+      let cum = 0;
+      for (let i = 0; i < nv; i++) {
+        const s = vm[i], rp = Math.sqrt(Math.max(ro * ro + s * s + 2 * ro * s * mu, 0));
+        const n = dens(dg, rp - R), step = n * vw[i], nmid = cum + 0.5 * step;
+        cum += step;
+        const mus = (s * (st * cph * ce + mu * se) + ro * se) / rp;
+        if (mus < 0 && rb * rb - rp * rp * (1 - mus * mus) >= 0) continue;     // star below the solid sphere
+        const ls = Math.max(-rp * mus + Math.sqrt(Math.max(rt * rt - rp * rp * (1 - mus * mus), 0)), 0);
+        segs(rp, mus, ls, ns, sm, sw);
+        let nsun = 0;
+        for (let j = 0; j < ns; j++) { const q = sm[j]; nsun += dens(dg, Math.sqrt(Math.max(rp * rp + q * q + 2 * rp * q * mus, 0)) - R) * sw[j]; }
+        const tot = nmid + nsun;
+        if (step > 0) for (let k = 0; k < K; k++) acc[k] += step * Math.exp(-sig[k] * tot);
+      }
+      const phase = 3 / (16 * Math.PI) * (1 + cosBig * cosBig), d = iz * NA + ia;
+      let X = 0, Y = 0, Z = 0;
+      for (let k = 0; k < K; k++) {
+        const v = acc[k] * sig[k] * irr[k] * phase; spec[d * K + k] = v;
+        X += v * W[k][0]; Y += v * W[k][1]; Z += v * W[k][2];
+      }
+      xyz[3 * d] = O.luminous_efficacy * X; xyz[3 * d + 1] = O.luminous_efficacy * Y; xyz[3 * d + 2] = O.luminous_efficacy * Z;
+      ground[d] = gr ? 1 : 0;
+    }
+  }
+  // the star disk seen through the column along its own direction
+  let starXYZ = null;
+  {
+    const discG = rb * rb - ro * ro * (1 - se * se);
+    if (!(se < 0 && discG >= 0)) {
+      const L = Math.max(-ro * se + Math.sqrt(Math.max(rt * rt - ro * ro * (1 - se * se), 0)), 0);
+      segs(ro, se, L, nv, vm, vw);
+      let cum = 0;
+      for (let i = 0; i < nv; i++) { const s = vm[i]; cum += dens(dg, Math.sqrt(Math.max(ro * ro + s * s + 2 * ro * s * se, 0)) - R) * vw[i]; }
+      let X = 0, Y = 0, Z = 0;
+      for (let k = 0; k < K; k++) { const v = O.star_radiance[k] * Math.exp(-sig[k] * cum); X += v * W[k][0]; Y += v * W[k][1]; Z += v * W[k][2]; }
+      starXYZ = [O.luminous_efficacy * X, O.luminous_efficacy * Y, O.luminous_efficacy * Z];
+    }
+  }
+  let lw = 0;
+  for (let iz = 0; 2 * iz <= NZ - 1; iz++) for (let ia = 0; ia < NA; ia++) lw = Math.max(lw, xyz[3 * (iz * NA + ia) + 1]);
+  return { spec, xyz, ground, NZ, NA, K, starXYZ, lwhite: lw > 0 ? lw : 1, dg };
+}
+
+/* recompute what changed: column (observer / saved time) and table (+ star elevation) */
+function skyUpdate() {
+  SKY.timer = 0;
+  try {
+    SKY.error = null;
+    const t0 = performance.now();
+    SKY.col = skyColumn(SKY.obs.lat, SKY.obs.lon);
+    SKY.place = skyPlace(SKY.col, SKY.obs);
+    const key = JSON.stringify([SKY.col.z, SKY.col.lnp, SKY.col.T, SKY.place.z, SKY.star.el]);
+    if (key !== SKY.key) { SKY.table = skyTable(SKY.col, SKY.place.z, SKY.star.el); SKY.key = key; SKY.ms = performance.now() - t0; }
+  } catch (err) {
+    if (!err.sky) throw err;
+    SKY.error = err.message; SKY.table = null; SKY.key = null;
+  }
+  skyLabels(); drawSky(); drawMapOverlay(lastMapHover);
+}
+function skySchedule() { if (SKY.timer) clearTimeout(SKY.timer); SKY.timer = setTimeout(skyUpdate, 120); }
+
+const skyC = document.getElementById("sky"), skyImg = document.createElement("canvas");
+function skyBasis() {
+  const a = SKY.look.az * DEG, e = SKY.look.el * DEG;
+  const f = [Math.cos(e) * Math.sin(a), Math.cos(e) * Math.cos(a), Math.sin(e)];     // east, north, up
+  const r = [Math.cos(a), -Math.sin(a), 0];
+  const u = [r[1] * f[2] - r[2] * f[1], r[2] * f[0] - r[0] * f[2], r[0] * f[1] - r[1] * f[0]];
+  return { f, r, u };
+}
+function skyLookup(T, thDeg, phDeg) {
+  const x = thDeg * (T.NZ - 1) / 180, y = phDeg * (T.NA - 1) / 180;
+  const i = Math.min(Math.max(Math.floor(x), 0), T.NZ - 2), j = Math.min(Math.max(Math.floor(y), 0), T.NA - 2), fx = x - i, fy = y - j;
+  const out = [0, 0, 0];
+  for (let c = 0; c < 3; c++) {
+    const a = T.xyz[3 * (i * T.NA + j) + c], b = T.xyz[3 * (i * T.NA + j + 1) + c];
+    const p = T.xyz[3 * ((i + 1) * T.NA + j) + c], q = T.xyz[3 * ((i + 1) * T.NA + j + 1) + c];
+    out[c] = (a * (1 - fy) + b * fy) * (1 - fx) + (p * (1 - fy) + q * fy) * fx;
+  }
+  return out;
+}
+function srgb(x) { x = Math.max(0, Math.min(1, x)); return x <= 0.0031308 ? 12.92 * x : 1.055 * Math.pow(x, 1 / 2.4) - 0.055; }
+function drawSky() {
+  if (!SKY || SKY.mode !== "sky") return;
+  const r = skyC.getBoundingClientRect(), dpr = Math.min(window.devicePixelRatio || 1, 2);
+  skyC.width = Math.max(1, Math.round(r.width * dpr)); skyC.height = Math.max(1, Math.round(r.height * dpr));
+  const g = skyC.getContext("2d"); g.setTransform(1, 0, 0, 1, 0, 0);
+  g.fillStyle = "#000"; g.fillRect(0, 0, skyC.width, skyC.height);
+  g.setTransform(dpr, 0, 0, dpr, 0, 0);
+  g.font = "12px system-ui, sans-serif"; g.textAlign = "left";
+  if (!SKY.table) {
+    g.fillStyle = "#f2b8b5"; g.fillText(SKY.error ? "No sky: " + SKY.error : "Computing…", 12, 52);
+    return;
+  }
+  const T = SKY.table, W = Math.max(1, Math.round(r.width / 3)), H = Math.max(1, Math.round(r.height / 3));
+  skyImg.width = W; skyImg.height = H;
+  const ctx = skyImg.getContext("2d"), img = ctx.createImageData(W, H), M = SKY.S.optics.xyz_to_linear_srgb;
+  const { f, r: rt, u } = skyBasis(), t = Math.tan(SKY.look.fov * DEG / 2), aspect = r.width / r.height;
+  const sa = SKY.star.az * DEG, se = SKY.star.el * DEG, sd = [Math.cos(se) * Math.sin(sa), Math.cos(se) * Math.cos(sa), Math.sin(se)];
+  const pixAng = SKY.look.fov * DEG / W, alpha = SKY.S.star.angular_radius_deg * DEG, rDisk = Math.max(alpha, pixAng);
+  const scale = Math.pow(2, SKY.ev) / T.lwhite;
+  let over = 0, gamut = 0;
+  for (let py = 0; py < H; py++) for (let px = 0; px < W; px++) {
+    const x = (2 * (px + 0.5) / W - 1) * t, y = (1 - 2 * (py + 0.5) / H) * t / aspect;
+    let d = [f[0] + x * rt[0] + y * u[0], f[1] + x * rt[1] + y * u[1], f[2] + x * rt[2] + y * u[2]];
+    const L = Math.hypot(d[0], d[1], d[2]); d = [d[0] / L, d[1] / L, d[2] / L];
+    const th = Math.acos(Math.max(-1, Math.min(1, d[2]))) / DEG;
+    let ph = Math.atan2(d[0], d[1]) - sa; ph = Math.abs(((ph + Math.PI) % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI) - Math.PI) / DEG;
+    const c = skyLookup(T, th, ph);
+    if (T.starXYZ && Math.acos(Math.max(-1, Math.min(1, d[0] * sd[0] + d[1] * sd[1] + d[2] * sd[2]))) <= rDisk) {
+      c[0] += T.starXYZ[0]; c[1] += T.starXYZ[1]; c[2] += T.starXYZ[2];
+    }
+    const k = 4 * (py * W + px);
+    for (let ch = 0; ch < 3; ch++) {
+      const v = (M[ch][0] * c[0] + M[ch][1] * c[1] + M[ch][2] * c[2]) * scale;
+      if (v > 1) over++; else if (v < 0) gamut++;
+      img.data[k + ch] = Math.round(255 * srgb(v));
+    }
+    img.data[k + 3] = 255;
+  }
+  ctx.putImageData(img, 0, 0);
+  SKY.clip = { over: over / (3 * W * H), gamut: gamut / (3 * W * H) };
+  g.imageSmoothingEnabled = true; g.drawImage(skyImg, 0, 0, r.width, r.height);
+  // overlays: horizon, cardinal points, the star marker, the prototype label
+  const proj = v => { const df = v[0] * f[0] + v[1] * f[1] + v[2] * f[2]; if (df <= 1e-6) return null;
+    return [(1 + (v[0] * rt[0] + v[1] * rt[1] + v[2] * rt[2]) / df / t) * r.width / 2, (1 - (v[0] * u[0] + v[1] * u[1] + v[2] * u[2]) / df / (t / aspect)) * r.height / 2]; };
+  g.strokeStyle = "rgba(255,255,255,0.55)"; g.lineWidth = 1; g.beginPath(); let pen = false;
+  for (let a = 0; a <= 360; a += 1) { const p = proj([Math.sin(a * DEG), Math.cos(a * DEG), 0]); if (!p) { pen = false; continue; } if (pen) g.lineTo(p[0], p[1]); else g.moveTo(p[0], p[1]); pen = true; }
+  g.stroke();
+  g.fillStyle = "rgba(255,255,255,0.85)"; g.textAlign = "center";
+  [["N", 0], ["E", 90], ["S", 180], ["W", 270]].forEach(([n, a]) => { const p = proj([Math.sin(a * DEG), Math.cos(a * DEG), 0]); if (p) g.fillText(n, p[0], p[1] + 15); });
+  const ps = proj(sd);
+  if (ps) { g.strokeStyle = "rgba(255,220,120,0.9)"; g.beginPath(); g.arc(ps[0], ps[1], 9, 0, 2 * Math.PI); g.stroke(); }
+  g.textAlign = "left"; g.fillStyle = "rgba(255,255,255,0.9)";
+  g.fillText(SKY.S.label, 12, r.height - 12);
+  SKY.disk = { enlarged: alpha < pixAng };
+}
+function skyLabels() {
+  const o = SKY.obs, pl = SKY.place;
+  document.getElementById("skyStarAzL").textContent = SKY.star.az.toFixed(0) + "°";
+  document.getElementById("skyStarElL").textContent = SKY.star.el.toFixed(1) + "°";
+  document.getElementById("skyFovL").textContent = SKY.look.fov.toFixed(0) + "°";
+  document.getElementById("skyEvL").textContent = (SKY.ev >= 0 ? "+" : "") + SKY.ev.toFixed(2) + " EV" + (SKY.table ? " · white = " + Number((SKY.table.lwhite / Math.pow(2, SKY.ev)).toPrecision(3)).toLocaleString() + " cd m⁻²" : "");
+  const n = document.getElementById("skyObsNote");
+  if (SKY.error) { n.className = "note err"; n.textContent = SKY.error; }
+  else {
+    n.className = "note";
+    n.textContent = fmtLat(o.lat) + ", " + fmtLon(o.lon) + " · z = " + pl.z.toFixed(1) + " m above R ≈ " + (pl.p / 100).toFixed(2) + " hPa · ground " + pl.floor.toFixed(1) + " m"
+      + (o.mode === "pressure" ? " (height from the pressure you entered)" : o.mode === "altitude" ? " (pressure from the altitude you entered)" : "")
+      + " · looking " + SKY.look.az.toFixed(0) + "° az, " + SKY.look.el.toFixed(0) + "° el"
+      + (SKY.S.column_kind === "hypothetical" ? " · HYPOTHETICAL column" : (ATM ? " · column of the saved state at " + ATM.A.times[ATM.it].label : ""));
+  }
+  const clip = SKY.clip;
+  document.getElementById("skyNote").textContent = (SKY.table ? "Table " + SKY.table.NZ + "×" + SKY.table.NA + " directions in " + Math.round(SKY.ms) + " ms. " : "")
+    + "Clipped: " + (100 * clip.over).toFixed(1) + " % over-exposed, " + (100 * clip.gamut).toFixed(1) + " % outside sRGB."
+    + (SKY.disk && SKY.disk.enlarged ? " The star disk is drawn larger than its true size (one pixel)." : "") + " " + SKY.S.consistency.text;
+}
+function skySetMode(m) {
+  SKY.mode = m === "sky" ? "sky" : "globe";
+  document.getElementById("modeGlobe").setAttribute("aria-pressed", SKY.mode === "globe" ? "true" : "false");
+  document.getElementById("modeSky").setAttribute("aria-pressed", SKY.mode === "sky" ? "true" : "false");
+  skyC.hidden = SKY.mode !== "sky";
+  document.getElementById("globeReadout").hidden = SKY.mode === "sky";
+  if (SKY.mode === "sky") { if (!SKY.table && !SKY.error) skyUpdate(); else drawSky(); }
+}
+function skySetObserver(o) {
+  if (o.lat !== undefined) SKY.obs.lat = Math.max(-90, Math.min(90, +o.lat));
+  if (o.lon !== undefined) SKY.obs.lon = ((+o.lon + 180) % 360 + 360) % 360 - 180;
+  if (o.altitude_m !== undefined) { SKY.obs.mode = "altitude"; SKY.obs.altitude_m = +o.altitude_m; }
+  else if (o.pressure_pa !== undefined) { SKY.obs.mode = "pressure"; SKY.obs.pressure_pa = +o.pressure_pa; }
+  else if (o.ground) SKY.obs.mode = "ground";
+  skySyncInputs(); skyUpdate();
+}
+function skySyncInputs() {
+  document.getElementById("skyLat").value = SKY.obs.lat.toFixed(2);
+  document.getElementById("skyLon").value = SKY.obs.lon.toFixed(2);
+  document.getElementById("skyAltMode").value = SKY.obs.mode;
+  const v = document.getElementById("skyAltVal");
+  v.disabled = SKY.obs.mode === "ground";
+  v.value = SKY.obs.mode === "pressure" ? (SKY.obs.pressure_pa / 100).toFixed(2) : SKY.obs.mode === "altitude" ? SKY.obs.altitude_m.toFixed(1) : "";
+  document.getElementById("skyStarAz").value = SKY.star.az; document.getElementById("skyStarEl").value = SKY.star.el;
+  document.getElementById("skyFov").value = SKY.look.fov; document.getElementById("skyEv").value = SKY.ev;
+}
+function initSkyUI() {
+  const S = SKY.S;
+  document.getElementById("skySection").hidden = false;
+  document.getElementById("modeSw").hidden = false;
+  document.getElementById("skyLabel").textContent = S.label + (S.column_kind === "hypothetical" ? " · HYPOTHETICAL column, not from a simulation" : "");
+  document.getElementById("modeGlobe").addEventListener("click", () => skySetMode("globe"));
+  document.getElementById("modeSky").addEventListener("click", () => skySetMode("sky"));
+  const num = id => document.getElementById(id);
+  num("skyLat").addEventListener("change", () => skySetObserver({ lat: +num("skyLat").value }));
+  num("skyLon").addEventListener("change", () => skySetObserver({ lon: +num("skyLon").value }));
+  num("skyFromView").addEventListener("click", () => skySetObserver({ lat: st.pitch / DEG, lon: -st.yaw / DEG }));
+  num("skyAltMode").addEventListener("change", () => {
+    const m = num("skyAltMode").value;
+    if (m === "ground") skySetObserver({ ground: true });
+    else if (m === "altitude") skySetObserver({ altitude_m: SKY.place ? SKY.place.z : 0 });
+    else skySetObserver({ pressure_pa: SKY.place ? SKY.place.p : 1e5 });
+  });
+  num("skyAltVal").addEventListener("change", () => {
+    const v = +num("skyAltVal").value;
+    if (SKY.obs.mode === "pressure") skySetObserver({ pressure_pa: v * 100 }); else if (SKY.obs.mode === "altitude") skySetObserver({ altitude_m: v });
+  });
+  num("skyStarAz").addEventListener("input", () => { SKY.star.az = +num("skyStarAz").value; skyLabels(); drawSky(); });
+  num("skyStarEl").addEventListener("input", () => { SKY.star.el = +num("skyStarEl").value; skyLabels(); skySchedule(); });
+  num("skyFov").addEventListener("input", () => { SKY.look.fov = +num("skyFov").value; skyLabels(); drawSky(); });
+  num("skyEv").addEventListener("input", () => { SKY.ev = +num("skyEv").value; skyLabels(); drawSky(); });
+  let drag = null;
+  skyC.addEventListener("pointerdown", e => { drag = [e.clientX, e.clientY]; skyC.setPointerCapture(e.pointerId); });
+  skyC.addEventListener("pointermove", e => {
+    if (!drag) return;
+    const k = SKY.look.fov / (skyC.getBoundingClientRect().width || 500);
+    SKY.look.az = ((SKY.look.az - (e.clientX - drag[0]) * k) % 360 + 360) % 360;
+    SKY.look.el = Math.max(-89, Math.min(89, SKY.look.el + (e.clientY - drag[1]) * k));
+    drag = [e.clientX, e.clientY]; skyLabels(); drawSky();
+  });
+  const end = () => { drag = null; };
+  skyC.addEventListener("pointerup", end); skyC.addEventListener("pointercancel", end);
+  const ul = document.getElementById("interp");
+  const add = text => { const li = document.createElement("li"); li.textContent = text; ul.append(li); };
+  S.notes.forEach(add);
+  add("Not modelled: " + S.unsupported.join("; ") + ".");
+  add("Sources: " + S.sources.join(" | "));
+  document.getElementById("interpWrap").hidden = false;
+  skySyncInputs();
+}
+
 /* ---------------- start ---------------- */
-function onResize() { resizeGL(); drawMap(); drawMapOverlay(lastMapHover); drawColorbar(); if (ATM) drawAtmColorbar(); }
+function onResize() { resizeGL(); drawMap(); drawMapOverlay(lastMapHover); drawColorbar(); if (ATM) drawAtmColorbar(); if (SKY) drawSky(); }
 window.addEventListener("resize", onResize);
 if (window.matchMedia) window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => { drawColorbar(); drawMapOverlay(lastMapHover); });
 if (glOK) { try { initGL(); } catch (err) { document.getElementById("nogl").style.display = "flex"; console.error(err); } }
 if (ATM) initAtmosphereUI();
+if (SKY) initSkyUI();
 resetView();
 updateExagLabel();
 setLayer(0);
@@ -1009,6 +1410,18 @@ window.__terrainGlobe = { state: st, layers: layers.map(l => l.short), pick, sam
                streams: ATM.streams, lines: ATM.nLinesHere, streamVerts: ATM.nStreamVerts, radius: { min: rmin, max: rmax, mean: rsum / ATM.n },
                range: atmRange(), terrainNodesAboveLayer: below, mapLabel: document.getElementById("mapLayer").textContent };
     },
+  } : null,
+  sky: SKY ? {
+    setMode: skySetMode, setObserver: skySetObserver,
+    setStar: (az, el) => { SKY.star.az = +az; SKY.star.el = +el; skySyncInputs(); skyUpdate(); },
+    setLook: (az, el, fov) => { SKY.look.az = +az; SKY.look.el = +el; if (fov !== undefined) SKY.look.fov = +fov; skySyncInputs(); skyLabels(); drawSky(); },
+    setExposure: ev => { SKY.ev = +ev; skySyncInputs(); skyLabels(); drawSky(); },
+    update: skyUpdate,
+    column: () => SKY.col && { kind: SKY.col.kind, z: SKY.col.z, lnp: SKY.col.lnp, T: SKY.col.T, ceiling: SKY.col.ceiling, terrain: SKY.col.terrain },
+    spectral: (iz, ia) => SKY.table ? Array.from(SKY.table.spec.subarray((iz * SKY.table.NA + ia) * SKY.table.K, (iz * SKY.table.NA + ia + 1) * SKY.table.K)) : null,
+    info: () => ({ mode: SKY.mode, error: SKY.error, observer: Object.assign({}, SKY.obs), place: SKY.place, look: Object.assign({}, SKY.look),
+                   star: Object.assign({}, SKY.star), ev: SKY.ev, lwhite: SKY.table ? SKY.table.lwhite : null, ms: SKY.ms,
+                   clip: SKY.clip, starXYZ: SKY.table ? SKY.table.starXYZ : null, label: SKY.S.label, columnKind: SKY.S.column_kind }),
   } : null };
 })();
 </script>

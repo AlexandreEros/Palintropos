@@ -298,15 +298,29 @@ def atmosphere_payload(storage, *, times=None, levels=None,
                        field: str = "temperature", level: int | None = None,
                        time: int | None = None, opacity: float = 0.6,
                        exaggeration: float | None = None,
-                       centre: tuple[float, float] | None = None
-                       ) -> tuple[dict, dict]:
+                       centre: tuple[float, float] | None = None,
+                       sky=None) -> tuple[dict, dict]:
     """The page document and an export report (exposed for tests).
 
     Returns ``(payload, report)``; ``report`` has the selected saved
     indices and levels, the mesh spacing, the payload estimate (bytes,
     computed before reconstruction), the selection note, the column
     context and the initial exaggeration.
+
+    ``sky`` is an optional :class:`~tropoi.representation.visual.sky.SkySpec`
+    (it needs every native level exported; its column is the saved state's).
     """
+    if sky is not None:
+        from tropoi.representation.visual.sky import SkySpec
+        if not isinstance(sky, SkySpec):
+            raise TypeError("sky must be a SkySpec")
+        if sky.hypothetical is not None:
+            raise ValueError("a saved run's sky uses the saved state's own "
+                             "column; hypothetical columns are for "
+                             "terrain-only pages")
+        if levels is not None:
+            raise ValueError("the sky needs every native level: leave "
+                             "levels=None")
     if field not in FIELDS:
         raise ValueError(f"field must be one of {list(FIELDS)}, got "
                          f"{field!r}")
@@ -511,11 +525,43 @@ def atmosphere_payload(storage, *, times=None, levels=None,
                      "streamlines": bool(streamlines)},
         "interpretation": interpretation,
     }
+    if sky is not None:
+        page["sky"] = _saved_sky_block(sky, storage, context,
+                                       chosen[t_default])
     report = {"times": chosen, "levels": chosen_levels,
               "resolution_deg": res, "estimate_bytes": estimate,
               "selection_note": note, "context": context,
               "exaggeration": float(exaggeration)}
     return page, report
+
+
+def _saved_sky_block(spec, storage, context, index) -> dict:
+    """The sky block, with the initial observer's column of saved state
+    ``index`` (exact synthesis at that point; the page rebuilds the column
+    from the exported slices whenever the observer or the time changes)."""
+    from tropoi.representation.visual.sky import sky_block
+    from tropoi.spatial.optics.column import (DEFAULT_TOP_RATIO,
+                                              AtmosphericColumn)
+    from tropoi.spatial.transforms.host_synthesis import synthesize_latlon
+
+    lat = np.array([float(spec.observer_lat_deg)])
+    lon = np.array([float(spec.observer_lon_deg)])
+    f = reconstruct_levels(storage.frame(index), context, lat, lon, None,
+                           winds=False)
+    full = np.asarray(context.full_levels, dtype=np.float64)
+    p_s = float(f["pressure"][-1, 0, 0] / full[-1])
+    # exact h_s at the point, like the exact Z_k it must lie below
+    h_s = (0.0 if context.surface_elevation_lm is None else float(
+        synthesize_latlon(context.surface_elevation_lm, lat, lon)[0, 0]))
+    column = AtmosphericColumn.from_levels(
+        f["geopotential_height"][:, 0, 0], f["pressure"][:, 0, 0],
+        f["temperature"][:, 0, 0], surface_height_m=h_s,
+        surface_pressure_pa=p_s, gas_constant=context.r_dry,
+        gravity=float(context.gravity), label=context.label)
+    return sky_block(spec, column=column, column_kind="saved_state",
+                     radius_m=context.radius_m, r_dry=context.r_dry,
+                     gravity=float(context.gravity), terrain_m=h_s,
+                     top_ratio=DEFAULT_TOP_RATIO)
 
 
 def _default_path(storage, report) -> pathlib.Path:

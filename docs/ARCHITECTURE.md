@@ -33,6 +33,8 @@ src/tropoi/
 │   ├── operators/           SpectralOperators (Laplacian, derivatives, velocity, Jacobian)
 │   ├── sigma_coordinate.py  PE vertical coordinate and column operators
 │   ├── states/              BVE / SWE / PE state dataclasses over packed coefficient stacks
+│   ├── optics/              gas optics (sourced Rayleigh data), explicit Composition, 1-D AtmosphericColumn,
+│   │                        blackbody Star, CIE 1931 table (CPU-only; the sky view; a future RT tendency)
 │   ├── modes.py             immutable field specifications and read-only host coefficient views
 │   ├── initialization/      named preset initial states (bve, swe, pe)
 │   └── truncation.py        the 2/3 product cut and the preset support guards (stdlib)
@@ -52,7 +54,8 @@ src/tropoi/
 │   ├── diagnostics/pe_levels.py  native-level PE fields of a saved state on the CPU (Simulation.view)
 │   └── visual/              figure fields/specs/timelines/renderers, per-core compositions, Snapshot.plot adapter,
 │                            terrain previews (terrain.py: static figure and self-contained HTML globe),
-│                            the 3-D atmosphere page (atmosphere.py, sphere_streamlines.py; same globe template)
+│                            the 3-D atmosphere page (atmosphere.py, sphere_streamlines.py; same globe template),
+│                            the sky-from-the-surface prototype (sky.py; optional block of the same page)
 ├── run/{bve,swe,pe}/    orchestration: resolved run configuration and the runners
 ├── run/custom/          custom planets/initial states: preparation, configuration, execution, preset export,
 │                        prepared planets with terrain previews (planet.py)
@@ -223,7 +226,9 @@ inference still reads published scientific runs; both remain supported.
   `.view()`, Matplotlib for `plot` only); opening Held–Suarez experiment
   directories and the 3-D atmosphere page of a saved PE run
   (`Simulation.view`, Matplotlib for colour tables; a preset-mountain
-  terrain is rebuilt on the GPU only with `allow_cuda=True`). Fresh-interpreter tests enforce these boundaries.
+  terrain is rebuilt on the GPU only with `allow_cuda=True`); gas optics,
+  compositions and columns (`spatial.optics`) and the sky panel
+  (`view(sky=...)`). Fresh-interpreter tests enforce these boundaries.
 - **CUDA required**: running any solver (including `run_initial_state`); resolving terrain
   (`prepare_planet`); anything that builds grids,
   transforms, backends, operators, states, initial conditions or
