@@ -486,6 +486,11 @@
       "target": "tropoi.representation.visual.snapshot.build_resources"
     },
     {
+      "kind": "call",
+      "source": "tropoi.representation.archive.capsule.CapsuleStorage.sky",
+      "target": "tropoi.representation.visual.sky.saved_sky_page"
+    },
+    {
       "kind": "instantiate",
       "source": "tropoi.representation.archive.capsule.CapsuleStorage.stored_array",
       "target": "tropoi.representation.archive.capsule.CapsuleError"
@@ -629,6 +634,11 @@
       "kind": "instantiate",
       "source": "tropoi.representation.archive.held_suarez.HeldSuarezStorage.plot_snapshot",
       "target": "tropoi.representation.archive.held_suarez.HeldSuarezPlotError"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.archive.held_suarez.HeldSuarezStorage.sky",
+      "target": "tropoi.representation.visual.sky.saved_sky_page"
     },
     {
       "kind": "call",
@@ -1561,26 +1571,6 @@
       "target": "tropoi.representation.visual.terrain._color_map"
     },
     {
-      "kind": "call",
-      "source": "tropoi.representation.visual.atmosphere._saved_sky_block",
-      "target": "tropoi.representation.diagnostics.pe_levels.reconstruct_levels"
-    },
-    {
-      "kind": "call",
-      "source": "tropoi.representation.visual.atmosphere._saved_sky_block",
-      "target": "tropoi.representation.visual.sky.sky_block"
-    },
-    {
-      "kind": "call",
-      "source": "tropoi.representation.visual.atmosphere._saved_sky_block",
-      "target": "tropoi.spatial.optics.column.AtmosphericColumn.from_levels"
-    },
-    {
-      "kind": "call",
-      "source": "tropoi.representation.visual.atmosphere._saved_sky_block",
-      "target": "tropoi.spatial.transforms.host_synthesis.synthesize_latlon"
-    },
-    {
       "kind": "instantiate",
       "source": "tropoi.representation.visual.atmosphere._select_times",
       "target": "tropoi.representation.visual.atmosphere.PayloadTooLargeError"
@@ -1639,11 +1629,6 @@
       "kind": "call",
       "source": "tropoi.representation.visual.atmosphere.atmosphere_payload",
       "target": "tropoi.representation.visual.atmosphere._quantize"
-    },
-    {
-      "kind": "call",
-      "source": "tropoi.representation.visual.atmosphere.atmosphere_payload",
-      "target": "tropoi.representation.visual.atmosphere._saved_sky_block"
     },
     {
       "kind": "call",
@@ -3796,18 +3781,23 @@
       "target": "tropoi.representation.visual.matplotlib_renderer.MatplotlibRenderer"
     },
     {
+      "kind": "self",
+      "source": "tropoi.representation.visual.sky.HypotheticalColumn.build",
+      "target": "tropoi.representation.visual.sky.HypotheticalColumn.gas_constant_for"
+    },
+    {
       "kind": "call",
       "source": "tropoi.representation.visual.sky.HypotheticalColumn.build",
       "target": "tropoi.spatial.optics.column.AtmosphericColumn.hypothetical"
     },
     {
       "kind": "call",
-      "source": "tropoi.representation.visual.sky.optics_block",
+      "source": "tropoi.representation.visual.sky._optics_block",
       "target": "tropoi.spatial.optics.colour.bin_weights"
     },
     {
       "kind": "call",
-      "source": "tropoi.representation.visual.sky.optics_block",
+      "source": "tropoi.representation.visual.sky._optics_block",
       "target": "tropoi.spatial.optics.colour.omitted_fraction"
     },
     {
@@ -3827,8 +3817,58 @@
     },
     {
       "kind": "call",
+      "source": "tropoi.representation.visual.sky.saved_sky_page",
+      "target": "tropoi.representation.diagnostics.pe_levels.reconstruct_levels"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.sky.saved_sky_page",
+      "target": "tropoi.representation.visual.atmosphere._check_outside_run"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.sky.saved_sky_page",
+      "target": "tropoi.representation.visual.atmosphere._time_label"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.sky.saved_sky_page",
+      "target": "tropoi.representation.visual.sky._default_path"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.sky.saved_sky_page",
+      "target": "tropoi.representation.visual.sky._open"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.sky.saved_sky_page",
+      "target": "tropoi.representation.visual.sky._write_page"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.sky.saved_sky_page",
+      "target": "tropoi.representation.visual.sky.sky_block"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.sky.saved_sky_page",
+      "target": "tropoi.spatial.optics.column.AtmosphericColumn.from_levels"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.sky.saved_sky_page",
+      "target": "tropoi.spatial.transforms.host_synthesis.synthesize_latlon"
+    },
+    {
+      "kind": "call",
       "source": "tropoi.representation.visual.sky.sky_block",
-      "target": "tropoi.representation.visual.sky.optics_block"
+      "target": "tropoi.representation.visual.sky._optics_block"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.sky.sky_block",
+      "target": "tropoi.representation.visual.sky._species_block"
     },
     {
       "kind": "call",
@@ -3839,6 +3879,41 @@
       "kind": "call",
       "source": "tropoi.representation.visual.sky.sky_block",
       "target": "tropoi.spatial.optics.composition.gas_constant_report"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.sky.star_path_column",
+      "target": "tropoi.representation.visual.sky._density"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.sky.star_path_column",
+      "target": "tropoi.representation.visual.sky._segments"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.sky.star_path_column",
+      "target": "tropoi.representation.visual.sky.density_grid"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.sky.write_sky_page",
+      "target": "tropoi.representation.visual.sky._default_path"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.sky.write_sky_page",
+      "target": "tropoi.representation.visual.sky._open"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.sky.write_sky_page",
+      "target": "tropoi.representation.visual.sky._write_page"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.sky.write_sky_page",
+      "target": "tropoi.representation.visual.sky.sky_block"
     },
     {
       "kind": "call",
@@ -4367,16 +4442,6 @@
     },
     {
       "kind": "call",
-      "source": "tropoi.representation.visual.terrain.hypothetical_sky_block",
-      "target": "tropoi.representation.visual.sky.sky_block"
-    },
-    {
-      "kind": "call",
-      "source": "tropoi.representation.visual.terrain.hypothetical_sky_block",
-      "target": "tropoi.representation.visual.terrain.sample_preview"
-    },
-    {
-      "kind": "call",
       "source": "tropoi.representation.visual.terrain.plot_terrain",
       "target": "tropoi.representation.visual.terrain._color_map"
     },
@@ -4394,11 +4459,6 @@
       "kind": "call",
       "source": "tropoi.representation.visual.terrain.write_globe_html",
       "target": "tropoi.representation.visual.terrain.globe_payload"
-    },
-    {
-      "kind": "call",
-      "source": "tropoi.representation.visual.terrain.write_globe_html",
-      "target": "tropoi.representation.visual.terrain.hypothetical_sky_block"
     },
     {
       "kind": "call",
@@ -9526,6 +9586,13 @@
       "type": "function"
     },
     {
+      "id": "tropoi.representation.archive.capsule.CapsuleStorage.sky",
+      "kind": "method",
+      "module": "tropoi.representation.archive.capsule",
+      "qualname": "CapsuleStorage.sky",
+      "type": "function"
+    },
+    {
       "id": "tropoi.representation.archive.capsule.CapsuleStorage.stored_array",
       "kind": "method",
       "module": "tropoi.representation.archive.capsule",
@@ -9719,6 +9786,13 @@
       "kind": "property",
       "module": "tropoi.representation.archive.held_suarez",
       "qualname": "HeldSuarezStorage.schema",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.archive.held_suarez.HeldSuarezStorage.sky",
+      "kind": "method",
+      "module": "tropoi.representation.archive.held_suarez",
+      "qualname": "HeldSuarezStorage.sky",
       "type": "function"
     },
     {
@@ -11042,13 +11116,6 @@
       "kind": "function",
       "module": "tropoi.representation.visual.atmosphere",
       "qualname": "_quantize",
-      "type": "function"
-    },
-    {
-      "id": "tropoi.representation.visual.atmosphere._saved_sky_block",
-      "kind": "function",
-      "module": "tropoi.representation.visual.atmosphere",
-      "qualname": "_saved_sky_block",
       "type": "function"
     },
     {
@@ -12718,10 +12785,31 @@
       "type": "class"
     },
     {
+      "id": "tropoi.representation.visual.sky.HypotheticalColumn.__post_init__",
+      "kind": "method",
+      "module": "tropoi.representation.visual.sky",
+      "qualname": "HypotheticalColumn.__post_init__",
+      "type": "function"
+    },
+    {
       "id": "tropoi.representation.visual.sky.HypotheticalColumn.build",
       "kind": "method",
       "module": "tropoi.representation.visual.sky",
       "qualname": "HypotheticalColumn.build",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.sky.HypotheticalColumn.gas_constant_for",
+      "kind": "method",
+      "module": "tropoi.representation.visual.sky",
+      "qualname": "HypotheticalColumn.gas_constant_for",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.sky.HypotheticalColumn.to_dict",
+      "kind": "method",
+      "module": "tropoi.representation.visual.sky",
+      "qualname": "HypotheticalColumn.to_dict",
       "type": "function"
     },
     {
@@ -12739,10 +12827,31 @@
       "type": "function"
     },
     {
+      "id": "tropoi.representation.visual.sky._default_path",
+      "kind": "function",
+      "module": "tropoi.representation.visual.sky",
+      "qualname": "_default_path",
+      "type": "function"
+    },
+    {
       "id": "tropoi.representation.visual.sky._density",
       "kind": "function",
       "module": "tropoi.representation.visual.sky",
       "qualname": "_density",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.sky._open",
+      "kind": "function",
+      "module": "tropoi.representation.visual.sky",
+      "qualname": "_open",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.sky._optics_block",
+      "kind": "function",
+      "module": "tropoi.representation.visual.sky",
+      "qualname": "_optics_block",
       "type": "function"
     },
     {
@@ -12753,6 +12862,20 @@
       "type": "function"
     },
     {
+      "id": "tropoi.representation.visual.sky._species_block",
+      "kind": "function",
+      "module": "tropoi.representation.visual.sky",
+      "qualname": "_species_block",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.sky._write_page",
+      "kind": "function",
+      "module": "tropoi.representation.visual.sky",
+      "qualname": "_write_page",
+      "type": "function"
+    },
+    {
       "id": "tropoi.representation.visual.sky.density_grid",
       "kind": "function",
       "module": "tropoi.representation.visual.sky",
@@ -12760,10 +12883,10 @@
       "type": "function"
     },
     {
-      "id": "tropoi.representation.visual.sky.optics_block",
+      "id": "tropoi.representation.visual.sky.optical_depth_diagnostic",
       "kind": "function",
       "module": "tropoi.representation.visual.sky",
-      "qualname": "optics_block",
+      "qualname": "optical_depth_diagnostic",
       "type": "function"
     },
     {
@@ -12774,10 +12897,31 @@
       "type": "function"
     },
     {
+      "id": "tropoi.representation.visual.sky.saved_sky_page",
+      "kind": "function",
+      "module": "tropoi.representation.visual.sky",
+      "qualname": "saved_sky_page",
+      "type": "function"
+    },
+    {
       "id": "tropoi.representation.visual.sky.sky_block",
       "kind": "function",
       "module": "tropoi.representation.visual.sky",
       "qualname": "sky_block",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.sky.star_path_column",
+      "kind": "function",
+      "module": "tropoi.representation.visual.sky",
+      "qualname": "star_path_column",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.sky.write_sky_page",
+      "kind": "function",
+      "module": "tropoi.representation.visual.sky",
+      "qualname": "write_sky_page",
       "type": "function"
     },
     {
@@ -13453,24 +13597,10 @@
       "type": "function"
     },
     {
-      "id": "tropoi.representation.visual.terrain.hypothetical_sky_block",
-      "kind": "function",
-      "module": "tropoi.representation.visual.terrain",
-      "qualname": "hypothetical_sky_block",
-      "type": "function"
-    },
-    {
       "id": "tropoi.representation.visual.terrain.plot_terrain",
       "kind": "function",
       "module": "tropoi.representation.visual.terrain",
       "qualname": "plot_terrain",
-      "type": "function"
-    },
-    {
-      "id": "tropoi.representation.visual.terrain.sample_preview",
-      "kind": "function",
-      "module": "tropoi.representation.visual.terrain",
-      "qualname": "sample_preview",
       "type": "function"
     },
     {
@@ -18882,6 +19012,13 @@
       "kind": "method",
       "module": "tropoi.temporal.simulation",
       "qualname": "Simulation.quantities",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.temporal.simulation.Simulation.sky",
+      "kind": "method",
+      "module": "tropoi.temporal.simulation",
+      "qualname": "Simulation.sky",
       "type": "function"
     },
     {

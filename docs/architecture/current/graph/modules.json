@@ -310,6 +310,14 @@
         "function"
       ],
       "source": "tropoi.representation.archive.capsule",
+      "target": "tropoi.representation.visual.sky"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.representation.archive.capsule",
       "target": "tropoi.representation.visual.snapshot"
     },
     {
@@ -367,6 +375,14 @@
       ],
       "source": "tropoi.representation.archive.held_suarez",
       "target": "tropoi.representation.visual.held_suarez_climate"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.representation.archive.held_suarez",
+      "target": "tropoi.representation.visual.sky"
     },
     {
       "kind": "imports",
@@ -555,14 +571,6 @@
     {
       "kind": "imports",
       "scopes": [
-        "function"
-      ],
-      "source": "tropoi.representation.visual.atmosphere",
-      "target": "tropoi.representation.visual.sky"
-    },
-    {
-      "kind": "imports",
-      "scopes": [
         "module"
       ],
       "source": "tropoi.representation.visual.atmosphere",
@@ -576,22 +584,6 @@
       ],
       "source": "tropoi.representation.visual.atmosphere",
       "target": "tropoi.representation.visual.terrain"
-    },
-    {
-      "kind": "imports",
-      "scopes": [
-        "function"
-      ],
-      "source": "tropoi.representation.visual.atmosphere",
-      "target": "tropoi.spatial.optics.column"
-    },
-    {
-      "kind": "imports",
-      "scopes": [
-        "function"
-      ],
-      "source": "tropoi.representation.visual.atmosphere",
-      "target": "tropoi.spatial.transforms.host_synthesis"
     },
     {
       "kind": "imports",
@@ -1061,6 +1053,22 @@
     {
       "kind": "imports",
       "scopes": [
+        "function"
+      ],
+      "source": "tropoi.representation.visual.sky",
+      "target": "tropoi.representation.diagnostics.pe_levels"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.representation.visual.sky",
+      "target": "tropoi.representation.visual.atmosphere"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
         "module"
       ],
       "source": "tropoi.representation.visual.sky",
@@ -1080,7 +1088,39 @@
         "module"
       ],
       "source": "tropoi.representation.visual.sky",
+      "target": "tropoi.spatial.optics.column"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.representation.visual.sky",
+      "target": "tropoi.spatial.optics.composition"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.representation.visual.sky",
       "target": "tropoi.spatial.optics.constants"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.representation.visual.sky",
+      "target": "tropoi.spatial.optics.rayleigh"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.representation.visual.sky",
+      "target": "tropoi.spatial.transforms.host_synthesis"
     },
     {
       "kind": "imports",
@@ -1217,14 +1257,6 @@
       ],
       "source": "tropoi.representation.visual.terrain",
       "target": "tropoi.representation.visual.matplotlib_renderer"
-    },
-    {
-      "kind": "imports",
-      "scopes": [
-        "function"
-      ],
-      "source": "tropoi.representation.visual.terrain",
-      "target": "tropoi.representation.visual.sky"
     },
     {
       "kind": "imports",
@@ -3686,7 +3718,13 @@
       "stdlib_imports": [
         "__future__",
         "dataclasses",
-        "math"
+        "importlib",
+        "json",
+        "math",
+        "pathlib",
+        "re",
+        "tempfile",
+        "webbrowser"
       ],
       "third_party_imports": [
         "numpy"

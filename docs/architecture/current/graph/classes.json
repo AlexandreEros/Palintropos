@@ -182,6 +182,10 @@
         },
         {
           "kind": "method",
+          "name": "sky"
+        },
+        {
+          "kind": "method",
           "name": "stored_array"
         },
         {
@@ -274,6 +278,10 @@
         {
           "kind": "property",
           "name": "schema"
+        },
+        {
+          "kind": "method",
+          "name": "sky"
         },
         {
           "kind": "method",
@@ -1432,7 +1440,19 @@
       "members": [
         {
           "kind": "method",
+          "name": "__post_init__"
+        },
+        {
+          "kind": "method",
           "name": "build"
+        },
+        {
+          "kind": "method",
+          "name": "gas_constant_for"
+        },
+        {
+          "kind": "method",
+          "name": "to_dict"
         }
       ],
       "module": "tropoi.representation.visual.sky",
@@ -4369,6 +4389,10 @@
         {
           "kind": "method",
           "name": "quantities"
+        },
+        {
+          "kind": "method",
+          "name": "sky"
         },
         {
           "kind": "method",
