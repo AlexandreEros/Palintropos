@@ -81,6 +81,40 @@ class Composition:
            "the user", **fractions: float) -> "Composition":
         return cls(tuple(fractions.items()), label=label, source=source)
 
+    @classmethod
+    def from_mass_fractions(cls, label: str = "user composition",
+                            source: str = "stated by the user",
+                            **fractions: float) -> "Composition":
+        """Mass fractions w_i (summing to 1, never renormalized) to mole
+        fractions x_i = (w_i / M_i) / sum_j (w_j / M_j)."""
+        if not fractions:
+            raise CompositionError("a composition needs at least one species")
+        unknown = [k for k in fractions if k not in SPECIES]
+        if unknown:
+            raise CompositionError(f"no optical data for {unknown}")
+        for k, w in fractions.items():
+            if not (math.isfinite(float(w)) and float(w) > 0.0):
+                raise CompositionError(f"mass fraction of {k} must be > 0, "
+                                       f"got {w}")
+        total = sum(float(w) for w in fractions.values())
+        if abs(total - 1.0) > SUM_TOLERANCE:
+            raise CompositionError(
+                f"mass fractions sum to {total:.9g}, not 1 (tolerance "
+                f"{SUM_TOLERANCE:g}); they are never renormalized silently")
+        moles = {k: float(w) / SPECIES[k].molar_mass_g_per_mol
+                 for k, w in fractions.items()}
+        n = sum(moles.values())
+        return cls(tuple((k, v / n) for k, v in moles.items()), label=label,
+                   source=source)
+
+    @property
+    def mass_fractions(self) -> tuple[tuple[str, float], ...]:
+        """w_i = x_i M_i / sum_j x_j M_j, in the stated order."""
+        m = [(k, x * SPECIES[k].molar_mass_g_per_mol)
+             for k, x in self.mole_fractions]
+        total = sum(v for _, v in m)
+        return tuple((k, v / total) for k, v in m)
+
     @property
     def molar_mass_kg_per_mol(self) -> float:
         return sum(x * SPECIES[k].molar_mass_g_per_mol

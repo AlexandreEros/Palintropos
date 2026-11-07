@@ -7201,6 +7201,11 @@
       "target": "tropoi.spatial.optics.composition.CompositionError"
     },
     {
+      "kind": "instantiate",
+      "source": "tropoi.spatial.optics.composition.Composition.from_mass_fractions",
+      "target": "tropoi.spatial.optics.composition.CompositionError"
+    },
+    {
       "kind": "self",
       "source": "tropoi.spatial.optics.rayleigh.Species.cross_section",
       "target": "tropoi.spatial.optics.rayleigh.Species.king_factor"
@@ -7217,8 +7222,23 @@
     },
     {
       "kind": "call",
+      "source": "tropoi.spatial.optics.star.Star.of",
+      "target": "tropoi.spatial.optics.star._alpha_deg"
+    },
+    {
+      "kind": "call",
       "source": "tropoi.spatial.optics.star.Star.radiance",
       "target": "tropoi.spatial.optics.star.planck_radiance"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.spatial.optics.star.Star.sun_at",
+      "target": "tropoi.spatial.optics.star.Star.of"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.spatial.optics.star.StellarBody.at",
+      "target": "tropoi.spatial.optics.star.Star.of"
     },
     {
       "kind": "constructor",
@@ -16753,6 +16773,20 @@
       "type": "function"
     },
     {
+      "id": "tropoi.spatial.optics.column.thin_atmosphere_mass_kg",
+      "kind": "function",
+      "module": "tropoi.spatial.optics.column",
+      "qualname": "thin_atmosphere_mass_kg",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.spatial.optics.column.thin_atmosphere_surface_pressure_pa",
+      "kind": "function",
+      "module": "tropoi.spatial.optics.column",
+      "qualname": "thin_atmosphere_surface_pressure_pa",
+      "type": "function"
+    },
+    {
       "id": "tropoi.spatial.optics.composition.Composition",
       "kind": "class",
       "module": "tropoi.spatial.optics.composition",
@@ -16781,10 +16815,24 @@
       "type": "function"
     },
     {
+      "id": "tropoi.spatial.optics.composition.Composition.from_mass_fractions",
+      "kind": "classmethod",
+      "module": "tropoi.spatial.optics.composition",
+      "qualname": "Composition.from_mass_fractions",
+      "type": "function"
+    },
+    {
       "id": "tropoi.spatial.optics.composition.Composition.gas_constant",
       "kind": "property",
       "module": "tropoi.spatial.optics.composition",
       "qualname": "Composition.gas_constant",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.spatial.optics.composition.Composition.mass_fractions",
+      "kind": "property",
+      "module": "tropoi.spatial.optics.composition",
+      "qualname": "Composition.mass_fractions",
       "type": "function"
     },
     {
@@ -16893,6 +16941,13 @@
       "type": "function"
     },
     {
+      "id": "tropoi.spatial.optics.star.Star.bolometric_irradiance_w_m2",
+      "kind": "property",
+      "module": "tropoi.spatial.optics.star",
+      "qualname": "Star.bolometric_irradiance_w_m2",
+      "type": "function"
+    },
+    {
       "id": "tropoi.spatial.optics.star.Star.describe",
       "kind": "method",
       "module": "tropoi.spatial.optics.star",
@@ -16904,6 +16959,20 @@
       "kind": "method",
       "module": "tropoi.spatial.optics.star",
       "qualname": "Star.irradiance",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.spatial.optics.star.Star.luminosity_lsun",
+      "kind": "property",
+      "module": "tropoi.spatial.optics.star",
+      "qualname": "Star.luminosity_lsun",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.spatial.optics.star.Star.of",
+      "kind": "classmethod",
+      "module": "tropoi.spatial.optics.star",
+      "qualname": "Star.of",
       "type": "function"
     },
     {
@@ -16946,6 +17015,41 @@
       "kind": "classmethod",
       "module": "tropoi.spatial.optics.star",
       "qualname": "Star.with_sun_irradiance_at_1au",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.spatial.optics.star.StellarBody",
+      "kind": "class",
+      "module": "tropoi.spatial.optics.star",
+      "qualname": "StellarBody",
+      "type": "class"
+    },
+    {
+      "id": "tropoi.spatial.optics.star.StellarBody.at",
+      "kind": "method",
+      "module": "tropoi.spatial.optics.star",
+      "qualname": "StellarBody.at",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.spatial.optics.star.StellarBody.from_luminosity",
+      "kind": "classmethod",
+      "module": "tropoi.spatial.optics.star",
+      "qualname": "StellarBody.from_luminosity",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.spatial.optics.star.StellarBody.to_dict",
+      "kind": "method",
+      "module": "tropoi.spatial.optics.star",
+      "qualname": "StellarBody.to_dict",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.spatial.optics.star._alpha_deg",
+      "kind": "function",
+      "module": "tropoi.spatial.optics.star",
+      "qualname": "_alpha_deg",
       "type": "function"
     },
     {

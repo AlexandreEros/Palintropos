@@ -9,13 +9,13 @@ Nodes are analysed modules; a directed edge A -> B means A has at least one stat
 * **all imports**: every static import statement, wherever it appears;
 * **import-time**: only edges with at least one import statement at module scope (executed when the importing module is imported). Edges made only of function-scope or `if TYPE_CHECKING:` imports are dropped.
 
-Edge counts by scope set: `function`: 150, `function+module`: 4, `function+type_checking`: 1, `module`: 229, `type_checking`: 6.
+Edge counts by scope set: `function`: 150, `function+module`: 4, `function+type_checking`: 1, `module`: 230, `type_checking`: 6.
 
 | Metric | all imports | import-time |
 |---|---|---|
 | Nodes \|V\| | 124 | 124 |
-| Directed edges \|E\| | 390 | 233 |
-| Density | 0.02557 | 0.015277 |
+| Directed edges \|E\| | 391 | 234 |
+| Density | 0.025636 | 0.015342 |
 | Weakly connected components | 1 | 6 |
 | WCC sizes | 124 | 105, 8, 8, 1, 1, 1 |
 | Strongly connected components | 124 | 124 |
@@ -28,21 +28,21 @@ Edge counts by scope set: `function`: 150, `function+module`: 4, `function+type_
 | Reciprocal pairs | 0 | 0 |
 | Reciprocity | 0 | 0 |
 | In-degree min / median / max | 0 / 2 / 14 | 0 / 1 / 12 |
-| In-degree mean | 3.145161 | 1.879032 |
+| In-degree mean | 3.153226 | 1.887097 |
 | In-degree quartiles | 1, 2, 4 | 0, 1, 2 |
 | In-degree zeros | 3 | 32 |
 | Out-degree min / median / max | 0 / 2 / 20 | 0 / 1 / 9 |
-| Out-degree mean | 3.145161 | 1.879032 |
+| Out-degree mean | 3.153226 | 1.887097 |
 | Out-degree quartiles | 0, 2, 5 | 0, 1, 3 |
 | Out-degree zeros | 33 | 42 |
 | Condensation nodes | 124 | 124 |
-| Condensation edges | 390 | 233 |
+| Condensation edges | 391 | 234 |
 | Condensation sources / sinks | 3 / 33 | 32 / 42 |
 | Condensation longest path (edges) | 14 | 7 |
 
-In-degree histogram (all imports) {degree: modules}: 0: 3, 1: 32, 2: 37, 3: 13, 4: 12, 5: 7, 6: 6, 7: 2, 8: 5, 9: 2, 10: 4, 14: 1
+In-degree histogram (all imports) {degree: modules}: 0: 3, 1: 31, 2: 38, 3: 13, 4: 12, 5: 7, 6: 6, 7: 2, 8: 5, 9: 2, 10: 4, 14: 1
 
-Out-degree histogram (all imports) {degree: modules}: 0: 33, 1: 19, 2: 21, 3: 8, 4: 8, 5: 9, 6: 4, 7: 5, 8: 5, 9: 4, 10: 6, 13: 1, 20: 1
+Out-degree histogram (all imports) {degree: modules}: 0: 33, 1: 19, 2: 21, 3: 8, 4: 8, 5: 9, 6: 4, 7: 5, 8: 5, 9: 3, 10: 7, 13: 1, 20: 1
 
 **Top 10 fan-in (all imports)** (ties at cutoff: 5)
 
@@ -59,7 +59,7 @@ Out-degree histogram (all imports) {degree: modules}: 0: 33, 1: 19, 2: 21, 3: 8,
 | `tropoi.representation.visual.renderers` | 8 |
 | `tropoi.representation.visual.specs` | 8 |
 
-**Top 10 fan-out (all imports)** (ties at cutoff: 4)
+**Top 10 fan-out (all imports)** (ties at cutoff: 3)
 
 | Node | Degree |
 |---|---|
@@ -68,10 +68,10 @@ Out-degree histogram (all imports) {degree: modules}: 0: 33, 1: 19, 2: 21, 3: 8,
 | `tropoi.representation.archive.capsule` | 10 |
 | `tropoi.representation.visual.compose` | 10 |
 | `tropoi.representation.visual.evaluate` | 10 |
+| `tropoi.representation.visual.sky` | 10 |
 | `tropoi.run.custom.prepare` | 10 |
 | `tropoi.run.custom.presets` | 10 |
 | `tropoi.spatial.planet` | 10 |
-| `tropoi.representation.visual.sky` | 9 |
 | `tropoi.run.bve.runner` | 9 |
 
 **Nontrivial strongly connected components (all imports)**
@@ -205,17 +205,17 @@ Module-level import edges involved: 2.
 
 ## Class graph
 
-* Classes: 171
-* Classes in at least one `inherits` edge (drawn in `classes.mmd`): 18; with neither an analysed base nor an analysed subclass: 153
+* Classes: 172
+* Classes in at least one `inherits` edge (drawn in `classes.mmd`): 18; with neither an analysed base nor an analysed subclass: 154
 * `inherits` edges between analysed classes: 12
 * `nests` edges (class defined in a class body): 0
 * Bases outside the analysed package: `RuntimeError` x6, `UserWarning` x1, `ValueError` x19, `abc.ABC` x2, `collections.abc.Mapping` x1, `enum.Enum` x2, `str` x2, `typing.Protocol` x3
 
 ## Call graph
 
-* Nodes (functions, methods, classes): 1527
-* Edges by kind: `call` 1078, `constructor` 42, `instantiate` 422, `override` 6, `self` 285, `super` 2
-* Call sites by resolution outcome: builtin 3031, external 2090, internal 2558, unresolved 3040
+* Nodes (functions, methods, classes): 1539
+* Edges by kind: `call` 1080, `constructor` 42, `instantiate` 423, `override` 6, `self` 286, `super` 2
+* Call sites by resolution outcome: builtin 3060, external 2098, internal 2565, unresolved 3050
 
 | Scoped graph | Roots | Depth | Nodes | Edges | Truncated nodes | Reachable (unbounded) |
 |---|---|---|---|---|---|---|

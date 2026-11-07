@@ -3243,8 +3243,16 @@
           "name": "describe"
         },
         {
+          "kind": "classmethod",
+          "name": "from_mass_fractions"
+        },
+        {
           "kind": "property",
           "name": "gas_constant"
+        },
+        {
+          "kind": "property",
+          "name": "mass_fractions"
         },
         {
           "kind": "property",
@@ -3315,12 +3323,24 @@
           "name": "__post_init__"
         },
         {
+          "kind": "property",
+          "name": "bolometric_irradiance_w_m2"
+        },
+        {
           "kind": "method",
           "name": "describe"
         },
         {
           "kind": "method",
           "name": "irradiance"
+        },
+        {
+          "kind": "property",
+          "name": "luminosity_lsun"
+        },
+        {
+          "kind": "classmethod",
+          "name": "of"
         },
         {
           "kind": "method",
@@ -3349,6 +3369,29 @@
       ],
       "module": "tropoi.spatial.optics.star",
       "qualname": "Star"
+    },
+    {
+      "decorators": [
+        "dataclass(frozen=True)"
+      ],
+      "external_bases": [],
+      "id": "tropoi.spatial.optics.star.StellarBody",
+      "members": [
+        {
+          "kind": "method",
+          "name": "at"
+        },
+        {
+          "kind": "classmethod",
+          "name": "from_luminosity"
+        },
+        {
+          "kind": "method",
+          "name": "to_dict"
+        }
+      ],
+      "module": "tropoi.spatial.optics.star",
+      "qualname": "StellarBody"
     },
     {
       "decorators": [],

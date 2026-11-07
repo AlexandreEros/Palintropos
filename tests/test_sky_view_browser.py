@@ -18,6 +18,7 @@
 from __future__ import annotations
 
 import json
+import math
 import pathlib
 import re
 import subprocess
@@ -210,7 +211,11 @@ def test_optical_depth_warnings_and_refusals(acceptance_page):
                            ("fov", "input"), ("ev", "input"),
                            ("expRef", "change"), ("altVal", "change"),
                            ("atmPs", "change"), ("comp_O2", "change"),
-                           ("starT", "change")):
+                           ("starT", "change"), ("starSize", "change"),
+                           ("starDist", "change"), ("starSizeMode", "change"),
+                           ("starDistMode", "change"), ("starPick", "change"),
+                           ("starEarthS", "click"), ("compUnits", "change"),
+                           ("atmG", "change"), ("atmRadius", "change")):
             page.eval(f"document.getElementById({cid!r})"
                       f".dispatchEvent(new Event({event!r}))")
         page.eval(f"{API}.set({{}})")
@@ -388,4 +393,194 @@ def test_a_bad_address_is_reported_not_obeyed():
         assert info["preset"] == "mars"
         assert info["compLabel"] == sky.SKY_PRESETS["mars"].spec \
             .composition.label
+        _assert_clean(page, url)
+
+
+# -- gas constant, amounts as masses, stars by radius and distance, the disk --
+
+def _control(page, cid, value, event="change"):
+    return page.eval(f"(() => {{ const e = document.getElementById({cid!r});"
+                     f" e.value = {json.dumps(value)};"
+                     f" e.dispatchEvent(new Event({event!r}));"
+                     f" return {API}.info(); }})()")
+
+
+def _display(page, element_id):
+    return page.eval(f"getComputedStyle(document.getElementById("
+                     f"{element_id!r})).display")
+
+
+EARTH_HYP = {k: v for k, v in sky.SKY_PRESETS["earth"].spec.hypothetical
+             .to_dict().items() if k not in ("top_ratio", "nodes")}
+
+
+def test_gas_constant_follows_the_composition(tmp_path):
+    with OfflinePage(BROWSER) as page:
+        url = page.open(STANDALONE)
+        # no gas-constant controls: R is derived and said so
+        assert page.eval("document.getElementById('atmRMode')") is None
+        assert page.eval("document.getElementById('atmR')") is None
+        assert _display(page, "atmFixedR") == "none"
+        note = _text(page, "atmNote")
+        assert "R = R*/M = 287.045" in note and "28.9657 g/mol" in note
+        _assert_clean(page, url)
+    # a script may still fix R (gases without optical data): shown, not hidden
+    fixed = sky.write_sky_page(sky.SkySpec(
+        Composition.of(N2=1.0, label="N2"),
+        hypothetical=sky.HypotheticalColumn(1e4, 250.0, 9.80665, 287.0,
+                                            6.371e6)), tmp_path / "r.html")
+    with OfflinePage(BROWSER) as page:
+        url = page.open(fixed)
+        assert "FIXED at 287" in _text(page, "atmNote")
+        assert _display(page, "atmFixedR") != "none"
+        page.eval("document.getElementById('atmUseComp').click()")
+        info = page.eval(f"{API}.set({{}})")
+        assert info["atmosphere"]["gas_constant"] == "from_composition"
+        _parity(page, hypothetical=dict(
+            surface_pressure_pa=1e4, temperature_k=250.0, gravity=9.80665,
+            gas_constant="from_composition", radius_m=6.371e6))
+        _assert_clean(page, url)
+
+
+def test_amounts_as_mass_fractions_and_masses():
+    from tropoi.spatial.optics import (thin_atmosphere_mass_kg,
+                                       thin_atmosphere_surface_pressure_pa)
+    air = COMPOSITION_PRESETS["earth_dry_air_illustrative"]
+    with OfflinePage(BROWSER) as page:
+        url = page.open(STANDALONE)
+        # mass fractions: the same mixture, shown converted
+        info = _control(page, "compUnits", "mass")
+        assert info["units"] == "mass" and info["preset"] == "earth"
+        for k, w in air.mass_fractions:
+            assert info["amounts"][k] == pytest.approx(w, rel=1e-13)
+        # edit mass fractions: x = (w/M) / sum(w/M), exactly as Python
+        info = page.eval(f"{API}.set({{amounts: {{N2: 0.6, O2: 0.3, Ar: 0.1,"
+                         " CO2: 0}})")
+        ref = Composition.from_mass_fractions(N2=0.6, O2=0.3, Ar=0.1)
+        got = dict(info["composition"])
+        for k, x in ref.mole_fractions:
+            assert got[k] == pytest.approx(x, rel=1e-13)
+        assert got["CO2"] == 0
+        _parity(page, hypothetical=EARTH_HYP)
+        # mass fractions that do not sum to 1 are refused, never rescaled
+        info = page.eval(f"{API}.set({{amounts: {{N2: 0.5}}}})")
+        assert "mass fractions sum to 0.9" in info["error"]
+        assert "never renormalized" in info["error"]
+        page.eval(f"{API}.reset()")
+        # masses: they set the surface pressure (thin atmosphere)
+        info = _control(page, "compUnits", "kg")
+        total = sum(info["amounts"].values())
+        assert total == pytest.approx(thin_atmosphere_mass_kg(
+            101325.0, 9.80665, 6.371e6), rel=1e-13)
+        assert page.eval("document.getElementById('atmPs').disabled")
+        assert "Total mass" in _text(page, "compSumL")
+        assert _display(page, "compFillRow") == "none"
+        n2 = info["amounts"]["N2"]
+        info = page.eval(f"{API}.set({{amounts: {{N2: {2 * n2!r}}}}})")
+        p_s = thin_atmosphere_surface_pressure_pa(total + n2, 9.80665,
+                                                  6.371e6)
+        assert info["surfacePressure"] == pytest.approx(p_s, rel=1e-13)
+        _parity(page, hypothetical=dict(
+            EARTH_HYP, surface_pressure_pa=info["surfacePressure"]))
+        # the masses stay put when gravity changes: the pressure follows
+        info = _control(page, "atmG", 3.71)
+        assert info["surfacePressure"] == pytest.approx(
+            thin_atmosphere_surface_pressure_pa(total + n2, 3.71, 6.371e6),
+            rel=1e-13)
+        # the address keeps how the amounts are shown
+        assert "amounts=kg" in page.eval(f"{API}.state()")
+        _assert_clean(page, url)
+
+
+def test_star_by_radius_luminosity_distance_and_irradiance():
+    from tropoi.spatial.optics import STARS
+    from tropoi.spatial.optics.star import SOLAR_CONSTANT
+    with OfflinePage(BROWSER) as page:
+        url = page.open(STANDALONE)
+        info = page.eval(f"{API}.info()")
+        assert info["starKey"] == "sun"
+        sun = Star.sun_at_1au()
+        assert info["star"]["alpha"] == pytest.approx(
+            sun.angular_radius_deg, rel=1e-14)
+        assert info["irradiance"] == pytest.approx(
+            sun.bolometric_irradiance_w_m2, rel=1e-13)
+        assert page.eval("document.getElementById('starEl').min") == "-90"
+        assert page.eval("document.getElementById('starEl').max") == "90"
+        # every catalogue star through the menu, placed at Earth's irradiance
+        for key, body in STARS.items():
+            info = _control(page, "starPick", key)
+            assert info["starKey"] == key
+            assert info["star"]["label"] == body.name
+            assert info["star"]["T"] == body.temperature_k
+            assert info["star"]["R"] == body.radius_rsun
+            page.eval("document.getElementById('starEarthS').click()")
+            info = page.eval(f"{API}.info()")
+            assert info["irradiance"] == pytest.approx(SOLAR_CONSTANT,
+                                                       rel=1e-12)
+            ref = Star.of(body.temperature_k, body.radius_rsun,
+                          info["star"]["d"])
+            assert info["star"]["alpha"] == pytest.approx(
+                ref.angular_radius_deg, rel=1e-13)
+            assert info["luminosity"] == pytest.approx(ref.luminosity_lsun,
+                                                       rel=1e-13)
+            _parity(page, hypothetical=EARTH_HYP)
+        # size as a luminosity: a new temperature keeps L; the radius follows
+        _control(page, "starPick", "sun")
+        _control(page, "starSizeMode", "luminosity")
+        _control(page, "starDistMode", "irradiance")
+        before = page.eval(f"{API}.info()")
+        info = _control(page, "starT", 4000)
+        assert info["luminosity"] == pytest.approx(before["luminosity"],
+                                                   rel=1e-12)
+        assert info["irradiance"] == pytest.approx(before["irradiance"],
+                                                   rel=1e-12)
+        assert info["star"]["R"] == pytest.approx((5772 / 4000) ** 2,
+                                                  rel=1e-12)
+        assert info["starKey"] is None
+        assert info["star"]["label"] == "blackbody star set in the page"
+        # an irradiance typed in sets the distance
+        info = _control(page, "starDist", 589.0)
+        assert info["irradiance"] == pytest.approx(589.0, rel=1e-12)
+        # a star filling more than 30 degrees is a message
+        info = page.eval(f"{API}.set({{star: {{R: 50, d: 0.1}}}})")
+        assert "more than 30°" in info["error"]
+        _assert_clean(page, url)
+
+
+DISK_PIXELS = """(() => {
+  const c = document.getElementById('sky'), g = c.getContext('2d');
+  const d = g.getImageData(0, 0, c.width, c.height).data;
+  let n = 0, sx = 0, sy = 0, sxx = 0, syy = 0, sxy = 0;
+  for (let y = 0; y < c.height; y++) for (let x = 0; x < c.width; x++) {
+    const k = 4 * (y * c.width + x);
+    if (d[k] > 250 && d[k + 1] > 250 && d[k + 2] > 250) {
+      n++; sx += x; sy += y; sxx += x * x; syy += y * y; sxy += x * y; }
+  }
+  const mx = sx / n, my = sy / n;
+  return {n, w: c.width, vx: sxx / n - mx * mx, vy: syy / n - my * my,
+          cxy: sxy / n - mx * my};
+})()"""
+
+
+def test_star_disk_is_round_at_full_resolution():
+    with OfflinePage(BROWSER) as page:
+        url = page.open(STANDALONE)
+        # a narrow view around the Sun, exposed so only the disk is white;
+        # three slightly different pointings (the old disk changed shape)
+        for az, el in ((135.0, 30.0), (135.7, 30.4), (134.2, 29.6)):
+            info = page.eval(f"{API}.set({{look: {{az: {az}, el: {el}, "
+                             "fov: 6}, exposure: {ev: -4}})")
+            assert info["disk"]["visible"] and not info["disk"]["enlarged"]
+            px = page.eval(DISK_PIXELS)
+            t = math.tan(math.radians(3.0))
+            r = math.tan(math.radians(info["star"]["alpha"])) / t * \
+                px["w"] / 2
+            assert px["n"] == pytest.approx(math.pi * r * r, rel=0.05)
+            # a disk: equal spreads in x and y, no tilt
+            assert px["vx"] == pytest.approx(px["vy"], rel=0.05)
+            assert abs(px["cxy"]) < 0.05 * px["vx"]
+        # below the horizon the disk is hidden by the ground
+        info = page.eval(f"{API}.set({{star: {{el: -1}}, look: {{el: 0, "
+                         "fov: 60}})")
+        assert info["disk"] is None or not info["disk"]["visible"]
         _assert_clean(page, url)

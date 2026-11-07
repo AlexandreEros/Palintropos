@@ -34,9 +34,28 @@ import numpy as np
 
 from tropoi.spatial.optics.constants import K_B
 
-__all__ = ["AtmosphericColumn", "ColumnError", "DEFAULT_TOP_RATIO"]
+__all__ = ["AtmosphericColumn", "ColumnError", "DEFAULT_TOP_RATIO",
+           "thin_atmosphere_mass_kg", "thin_atmosphere_surface_pressure_pa"]
 
 DEFAULT_TOP_RATIO = 1e-5
+
+
+def thin_atmosphere_mass_kg(surface_pressure_pa: float, gravity: float,
+                            radius_m: float) -> float:
+    """Total mass of an atmosphere, M = 4 pi R^2 p_s / g.
+
+    The standard thin-atmosphere relation: the weight of the whole column
+    over the sphere's surface. It ignores that the shell widens with height
+    (an undercount of about 2H/R, 0.3 % for Earth) and that g falls with
+    height, as the hypothetical column itself does.
+    """
+    return 4.0 * math.pi * radius_m * radius_m * surface_pressure_pa / gravity
+
+
+def thin_atmosphere_surface_pressure_pa(mass_kg: float, gravity: float,
+                                        radius_m: float) -> float:
+    """The inverse of :func:`thin_atmosphere_mass_kg`: p_s = g M / (4 pi R^2)."""
+    return gravity * mass_kg / (4.0 * math.pi * radius_m * radius_m)
 
 
 class ColumnError(ValueError):

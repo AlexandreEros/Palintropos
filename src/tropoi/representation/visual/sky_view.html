@@ -7,6 +7,7 @@
 <style>
 :root { --bg: #0d1117; --panel: #161b22; --ink: #e6edf3; --muted: #9da7b3; --line: #30363d; --accent: #e0a100; --bad: #f2b8b5; --badBg: #5c1d1d; --cauBg: #4d3a00; }
 * { box-sizing: border-box; }
+[hidden] { display: none !important; }
 html, body { margin: 0; height: 100%; background: var(--bg); color: var(--ink); font: 13px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif; }
 #app { display: grid; grid-template-columns: minmax(0, 1fr) 360px; height: 100vh; }
 #stage { position: relative; min-height: 320px; }
@@ -64,31 +65,38 @@ th:first-child, td:first-child { text-align: left; }
         <label for="atmLapse">Lapse rate (K/km)</label><input type="number" id="atmLapse" step="any" min="0">
         <label for="atmFloor">Floor temperature (K)</label><input type="number" id="atmFloor" step="any" min="0">
         <label for="atmG">Gravity (m s⁻²)</label><input type="number" id="atmG" step="any" min="0">
-        <label for="atmRMode">Gas constant</label>
-        <select id="atmRMode"><option value="from_composition">from the composition (R*/M)</option><option value="fixed">fixed value</option></select>
-        <label for="atmR">R (J kg⁻¹ K⁻¹)</label><input type="number" id="atmR" step="any" min="0">
         <label for="atmRadius">Planet radius (km)</label><input type="number" id="atmRadius" step="any" min="0">
       </div>
       <p class="note" id="atmNote"></p>
+      <div class="row" id="atmFixedR" hidden><button id="atmUseComp">Use the composition's R*/M</button></div>
     </details>
 
-    <details open><summary>Composition (mole fractions)</summary>
+    <details open><summary>Composition</summary>
+      <div class="grid"><label for="compUnits">Amounts as</label>
+        <select id="compUnits"><option value="mole">mole fractions</option><option value="mass">mass fractions</option><option value="kg">masses (kg), which set the surface pressure</option></select></div>
       <div class="grid" id="compGrid"></div>
-      <div class="row"><span>Sum</span><span class="val" id="compSum"></span></div>
-      <div class="row"><span><button id="compFill">Set</button> <select id="compFillWhich" aria-label="Species to set to the remainder" style="width:auto"></select> to the remainder</span></div>
+      <div class="row"><span id="compSumL">Sum</span><span class="val" id="compSum"></span></div>
+      <div class="row" id="compFillRow"><span><button id="compFill">Set</button> <select id="compFillWhich" aria-label="Species to set to the remainder" style="width:auto"></select> to the remainder</span></div>
       <p class="note" id="compNote"></p>
     </details>
 
     <details open><summary>Star</summary>
       <div class="grid">
+        <label for="starPick">Star</label><select id="starPick"></select>
         <label for="starT">Temperature (K)</label><input type="number" id="starT" step="any" min="0">
-        <label for="starAlpha">Angular radius (°)</label><input type="number" id="starAlpha" step="any" min="0" max="30">
+        <label for="starSizeMode">Size given as</label>
+        <select id="starSizeMode"><option value="radius">radius</option><option value="luminosity">luminosity</option></select>
+        <label for="starSize" id="starSizeL">Radius (R☉)</label><input type="number" id="starSize" step="any" min="0">
+        <label for="starDistMode">Distance given as</label>
+        <select id="starDistMode"><option value="distance">distance</option><option value="irradiance">irradiance at the planet</option></select>
+        <label for="starDist" id="starDistL">Distance (au)</label><input type="number" id="starDist" step="any" min="0">
       </div>
-      <div class="row"><button id="starSun">Sun at 1 au</button><span class="val" id="starIrr"></span></div>
+      <div class="row"><button id="starEarthS">Earth's irradiance</button><span class="val" id="starIrr"></span></div>
+      <p class="note" id="starDerived"></p>
       <div class="row"><span>Azimuth</span><span id="starAzL" class="val"></span></div>
       <input type="range" id="starAz" min="0" max="360" step="1" aria-label="Star azimuth (degrees clockwise from north)">
       <div class="row"><span>Elevation</span><span id="starElL" class="val"></span></div>
-      <input type="range" id="starEl" min="-20" max="90" step="0.5" aria-label="Star elevation (degrees)">
+      <input type="range" id="starEl" min="-90" max="90" step="0.5" aria-label="Star elevation (degrees)">
       <p class="note" id="starNote"></p>
     </details>
 
@@ -151,16 +159,34 @@ const O = S.optics, N = S.numerics, K = O.wavelengths_nm.length, DEG = Math.PI /
 const KB = O.planck.k_b;
 const $ = id => document.getElementById(id);
 
+/* the star: temperature, radius R (R_sun) and distance d (au); sin(alpha) = R / d.
+   A star given only by its angle is shown as its equivalent at 1 au. */
+const SC = S.star_constants, STARS = S.stars || [];
+const RSUN_M = SC.r_sun_km * 1e3, SIG = SC.sigma_sb, LSUN = SC.l_sun_w;
+function starFromBlock(b) {
+  let R = b.radius_rsun, d = b.distance_au;
+  if (R === null || R === undefined || d === null || d === undefined) { d = 1; R = Math.sin(b.angular_radius_deg * DEG) * SC.au_km / SC.r_sun_km; }
+  return { T: b.temperature_k, R, d, alpha: b.angular_radius_deg };
+}
+function sinAlpha(s) { return s.R * SC.r_sun_km / (s.d * SC.au_km); }
+function lumOf(T, R) { const r = R * RSUN_M; return 4 * Math.PI * r * r * SIG * T ** 4 / LSUN; }         // L_sun
+function radiusFor(L, T) { return Math.sqrt(L * LSUN / (4 * Math.PI * SIG * T ** 4)) / RSUN_M; }      // R_sun
+function irrOf(s) { const x = sinAlpha(s); return SIG * s.T ** 4 * x * x; }                             // W m^-2
+function distFor(S_, T, R) { return R * SC.r_sun_km * Math.sqrt(SIG * T ** 4 / S_) / SC.au_km; }      // au
+function deriveStar() { const x = sinAlpha(st.star); st.star.alpha = x > 0 && x < 1 ? Math.asin(x) * (180 / Math.PI) : NaN; }
+function matchingStar() { return STARS.find(b => b.temperature_k === st.star.T && b.radius_rsun === st.star.R) || null; }
+
 const st = {
   atm: HYP ? Object.assign({}, S.hypothetical) : null,
   comp: [], compLabel: S.composition.label, compSource: S.composition.source,
-  star: { T: S.star.temperature_k, alpha: S.star.angular_radius_deg, az: S.star.azimuth_deg, el: S.star.elevation_deg,
-          label: S.star.label, source: S.star.source },
+  star: Object.assign(starFromBlock(S.star), { az: S.star.azimuth_deg, el: S.star.elevation_deg,
+          label: S.star.label, source: S.star.source, sizeMode: "radius", distMode: "distance" }),
   obs: { mode: S.observer.mode, altitude_m: S.observer.altitude_m, pressure_pa: S.observer.pressure_pa },
   look: { az: S.look.azimuth_deg, el: S.look.elevation_deg, fov: S.look.fov_deg },
   exp: { mode: S.exposure.mode, ev: S.exposure.ev, ref: S.exposure.reference_cd_m2 },
   mix: null, col: null, place: null, table: null, view: null, diag: null,
   error: null, clip: null, disk: null, ms: 0, timer: 0,
+  units: "mole", buf: null, compErr: null,      // amounts shown as mole fractions, mass fractions or kg
 };
 // composition rows: the stated species in their order, then the other supported ones at 0
 for (const [k, x] of S.composition.mole_fractions) st.comp.push([k, x]);
@@ -183,11 +209,12 @@ function applyPreset(key) {
   const f = presetFractions(p);
   st.comp = st.comp.map(([k]) => [k, f[k] || 0]);
   st.compLabel = p.composition.label; st.compSource = p.composition.source;
-  st.star = { T: p.star.temperature_k, alpha: p.star.angular_radius_deg, az: p.star.azimuth_deg, el: p.star.elevation_deg,
+  st.star = { ...starFromBlock(p.star), az: p.star.azimuth_deg, el: p.star.elevation_deg, sizeMode: st.star.sizeMode, distMode: st.star.distMode,
               label: p.star.label, source: p.star.source };
   st.obs = { mode: "ground", altitude_m: st.obs.altitude_m, pressure_pa: st.obs.pressure_pa };
   st.look = { az: p.look.azimuth_deg, el: p.look.elevation_deg, fov: p.look.fov_deg };
   st.exp = { mode: "auto", ev: 0, ref: null };
+  refreshBuf();
   return true;
 }
 /* the preset whose atmosphere, composition and star spectrum the page shows exactly, if any */
@@ -196,7 +223,8 @@ function matchingPreset() {
     if (ATM_KEYS.some(k => st.atm[k] !== p.hypothetical[k])) continue;
     const f = presetFractions(p);
     if (st.comp.some(([k, x]) => x !== (f[k] || 0))) continue;
-    if (st.star.T === p.star.temperature_k && st.star.alpha === p.star.angular_radius_deg) return p;
+    const ps = starFromBlock(p.star);
+    if (st.star.T === ps.T && st.star.R === ps.R && st.star.d === ps.d) return p;
   }
   return null;
 }
@@ -213,7 +241,11 @@ function encodeState() {
     put("g", a.gravity); put("R", a.gas_constant === "from_composition" ? "composition" : a.gas_constant); put("radius", a.radius_m);
   }
   for (const [k, x] of st.comp) if (x !== 0) put(k, x);
-  put("star_T", st.star.T); put("star_alpha", st.star.alpha); put("star_az", st.star.az); put("star_el", st.star.el);
+  if (st.units !== "mole") put("amounts", st.units);
+  put("star_T", st.star.T); put("star_R", st.star.R); put("star_d", st.star.d);
+  if (st.star.sizeMode !== "radius") put("star_size", st.star.sizeMode);
+  if (st.star.distMode !== "distance") put("star_dist", st.star.distMode);
+  put("star_az", st.star.az); put("star_el", st.star.el);
   put("obs", st.obs.mode);
   if (st.obs.mode === "altitude") put("alt", st.obs.altitude_m);
   if (st.obs.mode === "pressure") put("p", st.obs.pressure_pa);
@@ -244,13 +276,17 @@ function restoreState(text, origin) {
   const given = {};
   for (const [k] of st.comp) { const x = num(k); if (x !== undefined) given[k] = x; }
   if (Object.keys(given).length) st.comp = st.comp.map(([k]) => [k, given[k] || 0]);
-  set(st.star, "T", num("star_T")); set(st.star, "alpha", num("star_alpha"));
+  set(st.star, "T", num("star_T")); set(st.star, "R", num("star_R")); set(st.star, "d", num("star_d"));
+  set(st.star, "sizeMode", word("star_size", ["radius", "luminosity"])); set(st.star, "distMode", word("star_dist", ["distance", "irradiance"]));
+  const units = word("amounts", HYP ? ["mole", "mass", "kg"] : ["mole", "mass"]);
+  if (units !== undefined) st.units = units;
   set(st.star, "az", num("star_az")); set(st.star, "el", num("star_el"));
   set(st.obs, "mode", word("obs", ["ground", "altitude", "pressure"]));
   set(st.obs, "altitude_m", num("alt")); set(st.obs, "pressure_pa", num("p"));
   set(st.look, "az", num("look_az")); set(st.look, "el", num("look_el")); set(st.look, "fov", num("fov"));
   set(st.exp, "mode", word("exposure", ["auto", "fixed"])); set(st.exp, "ev", num("ev")); set(st.exp, "ref", numOr("ref", "none"));
   for (const k of q.keys()) if (!used.has(k) && !ignored.includes(k)) ignored.push(k);
+  refreshBuf();
   // labels say where the numbers came from
   const p = matchingPreset();
   if (p) {
@@ -258,7 +294,9 @@ function restoreState(text, origin) {
     st.star.label = p.star.label; st.star.source = p.star.source;
   } else {
     if (JSON.stringify(st.comp) !== JSON.stringify(START.comp)) { st.compLabel = "composition from the " + origin; st.compSource = "stated by the user"; }
-    if (st.star.T !== START.star.T || st.star.alpha !== START.star.alpha) { st.star.label = "blackbody star from the " + origin; st.star.source = "stated by the user"; }
+    const b = matchingStar();
+    if (b) { st.star.label = b.name; st.star.source = b.source; }
+    else if (st.star.T !== START.star.T || st.star.R !== START.star.R || st.star.d !== START.star.d) { st.star.label = "blackbody star from the " + origin; st.star.source = "stated by the user"; }
   }
   return ignored;
 }
@@ -293,8 +331,35 @@ function interp1(x, xp, fp) {
 }
 function positive(name, v) { if (!(isFinite(v) && v > 0)) fail(name + " must be finite and > 0"); return v; }
 
+/* Amounts as mole fractions (the canonical form), mass fractions or masses (kg). The
+   other forms are converted exactly: x_i = (w_i/M_i) / sum_j (w_j/M_j); masses also set
+   the surface pressure, p_s = g sum m_i / (4 pi R^2) (thin atmosphere). */
+const MOLAR = k => S.species[k].molar_mass_g_per_mol;
+function totalMassKg() { const a = st.atm; return 4 * Math.PI * a.radius_m * a.radius_m * a.surface_pressure_pa / a.gravity; }
+function refreshBuf() {
+  st.compErr = null;
+  if (st.units === "mole") { st.buf = null; return; }
+  let sum = 0, mm = 0; for (const [k, x] of st.comp) { sum += x; mm += x * MOLAR(k); }
+  if (!(Math.abs(sum - 1) <= S.composition_rules.sum_tolerance && mm > 0)) { st.units = "mole"; st.buf = null; return; }  // invalid: show what is stated
+  const total = st.units === "kg" ? totalMassKg() : 1;
+  st.buf = {}; for (const [k, x] of st.comp) st.buf[k] = x === 0 ? 0 : total * (x * MOLAR(k) / mm);
+}
+function amountsEdited() {
+  st.compErr = null;
+  const kg = st.units === "kg", rows = st.comp.map(([k]) => [k, st.buf[k]]);
+  for (const [k, v] of rows) if (!(isFinite(v) && v >= 0)) { st.compErr = (kg ? "the mass of " : "the mass fraction of ") + k + " must be ≥ 0"; return; }
+  let total = 0; for (const r of rows) total += r[1];
+  if (!kg && Math.abs(total - 1) > S.composition_rules.sum_tolerance) {
+    st.compErr = "mass fractions sum to " + total.toPrecision(9) + ", not 1 (tolerance " + S.composition_rules.sum_tolerance + "); they are never renormalized"; return; }
+  if (!(total > 0)) { st.compErr = "the atmosphere needs some gas: every mass is 0"; return; }
+  let n = 0; const moles = rows.map(([k, v]) => { const m = v / MOLAR(k); n += m; return [k, m]; });
+  st.comp = moles.map(([k, m]) => [k, m / n]);
+  if (kg) st.atm.surface_pressure_pa = st.atm.gravity * total / (4 * Math.PI * st.atm.radius_m * st.atm.radius_m);
+}
+
 /* Composition: mole fractions as stated, never renormalized; sigma = sum x_i sigma_i */
 function mixture() {
+  if (st.compErr) fail(st.compErr);
   const rows = st.comp.filter(r => r[1] !== 0);
   for (const [k, x] of st.comp) if (!(isFinite(x) && x >= 0)) fail("mole fraction of " + k + " must be ≥ 0");
   if (!rows.length) fail("the composition needs at least one species");
@@ -444,7 +509,10 @@ function planck(T) {
 function starSolidAngle(alpha) { return 2 * Math.PI * (1 - Math.cos(alpha * DEG)); }
 function checkStar() {
   if (!(isFinite(st.star.T) && st.star.T > 0)) fail("star temperature must be > 0 K");
-  if (!(isFinite(st.star.alpha) && st.star.alpha > 0 && st.star.alpha < 30)) fail("star angular radius must be in (0°, 30°)");
+  if (!(isFinite(st.star.R) && st.star.R > 0)) fail("the star's radius must be > 0");
+  if (!(isFinite(st.star.d) && st.star.d > 0)) fail("the star's distance must be > 0");
+  deriveStar();
+  if (!(sinAlpha(st.star) < 0.5)) fail("a star of " + fmt(st.star.R) + " R☉ at " + fmt(st.star.d) + " au would fill more than 30° of sky");
 }
 /* spectral radiance, XYZ and the star disk for the current star (cheap: no ray marching) */
 function illuminate(G) {
@@ -544,7 +612,6 @@ function drawSky() {
   const ctx = skyImg.getContext("2d"), img = ctx.createImageData(W, H), M = O.xyz_to_linear_srgb;
   const { f, r: rt, u } = basis(), t = Math.tan(st.look.fov * DEG / 2), aspect = r.width / r.height;
   const sa = st.star.az * DEG, se = st.star.el * DEG, sd = [Math.cos(se) * Math.sin(sa), Math.cos(se) * Math.cos(sa), Math.sin(se)];
-  const pixAng = st.look.fov * DEG / W, alpha = st.star.alpha * DEG, rDisk = Math.max(alpha, pixAng);
   const scale = Math.pow(2, st.exp.ev) / whiteLuminance();
   let over = 0, gamut = 0;
   for (let py = 0; py < H; py++) for (let px = 0; px < W; px++) {
@@ -554,9 +621,6 @@ function drawSky() {
     const th = Math.acos(Math.max(-1, Math.min(1, d[2]))) / DEG;
     let ph = Math.atan2(d[0], d[1]) - sa; ph = Math.abs(((ph + Math.PI) % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI) - Math.PI) / DEG;
     const c = lookup(V, G, th, ph);
-    if (V.starXYZ && Math.acos(Math.max(-1, Math.min(1, d[0] * sd[0] + d[1] * sd[1] + d[2] * sd[2]))) <= rDisk) {
-      c[0] += V.starXYZ[0]; c[1] += V.starXYZ[1]; c[2] += V.starXYZ[2];
-    }
     const k = 4 * (py * W + px);
     for (let ch = 0; ch < 3; ch++) {
       const v = (M[ch][0] * c[0] + M[ch][1] * c[1] + M[ch][2] * c[2]) * scale;
@@ -567,8 +631,8 @@ function drawSky() {
   }
   ctx.putImageData(img, 0, 0);
   st.clip = { over: over / (3 * W * H), gamut: gamut / (3 * W * H) };
-  st.disk = { enlarged: alpha < pixAng };
   g.imageSmoothingEnabled = true; g.drawImage(skyImg, 0, 0, r.width, r.height);
+  drawStar(g, V, f, rt, u, t, aspect, sd, scale);
   // overlays: horizon, cardinal points, the star marker
   const proj = v => { const df = v[0] * f[0] + v[1] * f[1] + v[2] * f[2]; if (df <= 1e-6) return null;
     return [(1 + (v[0] * rt[0] + v[1] * rt[1] + v[2] * rt[2]) / df / t) * r.width / 2, (1 - (v[0] * u[0] + v[1] * u[1] + v[2] * u[2]) / df / (t / aspect)) * r.height / 2]; };
@@ -578,9 +642,64 @@ function drawSky() {
   g.fillStyle = "rgba(255,255,255,0.85)"; g.textAlign = "center";
   [["N", 0], ["E", 90], ["S", 180], ["W", 270]].forEach(([n, a]) => { const p = proj([Math.sin(a * DEG), Math.cos(a * DEG), 0]); if (p) g.fillText(n, p[0], p[1] + 15); });
   const ps = proj(sd);
-  if (ps) { g.strokeStyle = "rgba(255,220,120,0.9)"; g.beginPath(); g.arc(ps[0], ps[1], 9, 0, 2 * Math.PI); g.stroke(); }
+  // the marker ring stays outside the disk however large it is drawn
+  const ring = Math.max(9, st.star.alpha * DEG * (r.width / 2) / t + 4);
+  if (ps) { g.strokeStyle = "rgba(255,220,120,0.9)"; g.beginPath(); g.arc(ps[0], ps[1], ring, 0, 2 * Math.PI); g.stroke(); }
   g.textAlign = "left"; g.fillStyle = "rgba(255,255,255,0.9)";
   g.fillText((st.exp.mode === "fixed" ? "FIXED exposure" : "AUTO exposure") + " · " + (st.exp.ev >= 0 ? "+" : "") + st.exp.ev.toFixed(2) + " EV", 12, r.height - 12);
+}
+
+/* The star disk at full screen resolution: each device pixel near it is covered by
+   4x4 sample directions; samples inside the disk and above the ground add the star's
+   exposed colour (in linear light) to the sky already drawn. Below half a pixel in
+   radius the disk is drawn at half a pixel (and marked enlarged). */
+function drawStar(g, V, f, rt, u, t, aspect, sd, scale) {
+  st.disk = null;
+  if (!V.starXYZ) return;
+  const W = skyC.width, H = skyC.height, pxPerRad = (W / 2) / t;
+  const alpha = st.star.alpha * DEG, rDisk = Math.max(alpha, 0.5 / pxPerRad), cr = Math.cos(rDisk), sr = Math.sin(rDisk);
+  const dot = (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+  const cross = (a, b) => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
+  let e1 = cross(sd, Math.abs(sd[2]) < 0.9 ? [0, 0, 1] : [0, 1, 0]);
+  const n1 = Math.hypot(e1[0], e1[1], e1[2]); e1 = [e1[0] / n1, e1[1] / n1, e1[2] / n1];
+  const e2 = cross(sd, e1);
+  const proj = v => { const df = dot(v, f); if (df <= 1e-6) return null;
+    return [(1 + dot(v, rt) / df / t) * W / 2, (1 - dot(v, u) / df / (t / aspect)) * H / 2]; };
+  let x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity, behind = false;
+  for (let k = 0; k <= 64; k++) {
+    const th = 2 * Math.PI * k / 64, c = Math.cos(th), s = Math.sin(th);
+    const q = k === 64 ? sd : [0, 1, 2].map(i => cr * sd[i] + sr * (c * e1[i] + s * e2[i]));
+    const p = proj(q);
+    if (!p) { behind = true; continue; }
+    x0 = Math.min(x0, p[0]); x1 = Math.max(x1, p[0]); y0 = Math.min(y0, p[1]); y1 = Math.max(y1, p[1]);
+  }
+  const M = O.xyz_to_linear_srgb, lin = [0, 1, 2].map(ch => (M[ch][0] * V.starXYZ[0] + M[ch][1] * V.starXYZ[1] + M[ch][2] * V.starXYZ[2]) * scale);
+  st.disk = { enlarged: alpha * pxPerRad < 0.5, over: Math.max(...lin) > 1, visible: false };
+  if (x0 === Infinity) return;                       // entirely behind the viewer
+  if (behind) { x0 = 0; y0 = 0; x1 = W; y1 = H; }    // partly behind: scan the whole view
+  x0 = Math.max(0, Math.floor(x0) - 1); y0 = Math.max(0, Math.floor(y0) - 1);
+  x1 = Math.min(W, Math.ceil(x1) + 1); y1 = Math.min(H, Math.ceil(y1) + 1);
+  if (x1 <= x0 || y1 <= y0) return;                  // off screen
+  const R = radius(), rb = R + st.col.z[0], ro = R + st.place.z, NS = 4;
+  const img = g.getImageData(x0, y0, x1 - x0, y1 - y0), D = img.data, w = x1 - x0;
+  const toLin = v => { v /= 255; return v <= 0.04045 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); };
+  for (let py = y0; py < y1; py++) for (let px = x0; px < x1; px++) {
+    let cov = 0;
+    for (let sy = 0; sy < NS; sy++) for (let sx = 0; sx < NS; sx++) {
+      const x = (2 * (px + (sx + 0.5) / NS) / W - 1) * t, y = (1 - 2 * (py + (sy + 0.5) / NS) / H) * t / aspect;
+      const d = [f[0] + x * rt[0] + y * u[0], f[1] + x * rt[1] + y * u[1], f[2] + x * rt[2] + y * u[2]];
+      const L = Math.hypot(d[0], d[1], d[2]);
+      if (dot(d, sd) < cr * L) continue;                                   // outside the disk
+      const mu = d[2] / L;
+      if (mu < 0 && rb * rb - ro * ro * (1 - mu * mu) >= 0) continue;      // behind the ground
+      cov++;
+    }
+    if (!cov) continue;
+    cov /= NS * NS; st.disk.visible = true;
+    const k = 4 * ((py - y0) * w + (px - x0));
+    for (let ch = 0; ch < 3; ch++) D[k + ch] = Math.round(255 * srgb(toLin(D[k + ch]) + cov * lin[ch]));
+  }
+  g.putImageData(img, x0, y0);
 }
 
 /* ---- labels (after drawing, so the clipping figures describe the image shown) ---- */
@@ -601,7 +720,11 @@ function labels() {
   }
   // composition
   let sum = 0; for (const r of st.comp) sum += r[1];
-  $("compSum").textContent = sum.toPrecision(9);
+  const kgMode = st.units === "kg";
+  $("compSumL").textContent = kgMode ? "Total mass" : "Sum";
+  if (st.units === "mole") $("compSum").textContent = sum.toPrecision(9);
+  else { let b = 0; for (const [k] of st.comp) b += st.buf[k]; $("compSum").textContent = kgMode ? b.toExponential(5).replace("e+", " × 10^") + " kg → p_s = " + fmt(st.atm.surface_pressure_pa / 100, 6) + " hPa" : b.toPrecision(9); }
+  $("compFillRow").hidden = kgMode;
   const comp = $("compNote");
   if (st.mix && !st.error) {
     const rc = st.col ? st.col.R : null;
@@ -618,7 +741,11 @@ function labels() {
   if (HYP) {
     an.className = "note";
     an.textContent = "HYPOTHETICAL: not from a simulation. p_s is at the reference sphere (altitude 0); hydrostatic; nothing above p = " + st.atm.top_ratio + "·p_s."
-      + (st.col ? " Column top " + fmt(st.col.ceiling / 1000) + " km; R = " + fmt(st.col.R, 6) + " J kg⁻¹ K⁻¹." : "")
+      + (st.col ? " Column top " + fmt(st.col.ceiling / 1000) + " km." : "")
+      + (st.atm.gas_constant === "from_composition"
+         ? (st.mix ? " Gas constant R = R*/M = " + fmt(st.mix.R, 6) + " J kg⁻¹ K⁻¹, from the composition's mean molar mass M = " + fmt(st.mix.M * 1000, 6) + " g/mol." : "")
+         : " Gas constant FIXED at " + fmt(st.atm.gas_constant, 6) + " J kg⁻¹ K⁻¹ by the script that wrote this page (for gases without optical data); the composition alone would give " + (st.mix ? fmt(st.mix.R, 6) : "—") + ".")
+      + (kgMode ? " The surface pressure follows from the masses: p_s = g·M/(4πR²) (thin atmosphere; ignores the shell widening with height, ~2H/R)." : "")
       + " Horizontally uniform, so the observer's location has no effect.";
   } else {
     const c = S.context;
@@ -629,7 +756,12 @@ function labels() {
   }
   // star
   if (st.view) $("starIrr").textContent = "400–760 nm irradiance " + fmt(st.view.irrTotal) + " W m⁻²";
-  $("starNote").textContent = st.star.label + " (" + st.star.source + "): blackbody " + fmt(st.star.T, 6) + " K, angular radius " + fmt(st.star.alpha, 4) + "°; uniform disk, no limb darkening. Position set by hand (no orbit).";
+  const s = st.star;
+  $("starDerived").textContent = isFinite(s.alpha)
+    ? "Radius " + fmt(s.R, 5) + " R☉ · luminosity " + fmt(lumOf(s.T, s.R), 5) + " L☉ · distance " + fmt(s.d, 5) + " au · irradiance " + fmt(irrOf(s), 5)
+      + " W m⁻² (Earth: " + SC.solar_constant_w_m2 + ") · angular radius " + fmt(s.alpha, 4) + "°"
+    : "";
+  $("starNote").textContent = s.label + " (" + s.source + "): blackbody " + fmt(s.T, 6) + " K; uniform disk, no limb darkening; L = 4πR²σT⁴, sin α = R/d. Position set by hand (no orbit).";
   // observer
   const n = $("obsNote");
   if (st.error) { n.className = "note err"; n.textContent = st.error; }
@@ -653,7 +785,8 @@ function labels() {
   const clip = st.clip;
   $("clipNote").textContent = (st.table ? "Table " + st.table.NZ + "×" + st.table.NA + " directions in " + Math.round(st.ms) + " ms. " : "")
     + (clip ? "Clipped: " + (100 * clip.over).toFixed(1) + " % over-exposed, " + (100 * clip.gamut).toFixed(1) + " % outside sRGB." : "No sky image drawn yet.")
-    + (st.disk && st.disk.enlarged ? " The star disk is drawn larger than its true size (one pixel)." : "");
+    + (st.disk && st.disk.visible && st.disk.over ? " The star disk is over-exposed." : "")
+    + (st.disk && st.disk.enlarged ? " The star disk is drawn larger than its true size (half a screen pixel in radius)." : "");
   // optical depth
   const tt = $("tauTable"), tn = $("tauNote"), w = $("stageWarn");
   tt.innerHTML = "";
@@ -684,12 +817,22 @@ function syncInputs() {
     $("atmLapse").value = a.lapse_rate_k_per_m * 1000; $("atmFloor").value = a.temperature_floor_k === null ? "" : a.temperature_floor_k;
     $("atmFloor").disabled = !(a.lapse_rate_k_per_m > 0);
     $("atmG").value = a.gravity; $("atmRadius").value = a.radius_m / 1000;
-    $("atmRMode").value = a.gas_constant === "from_composition" ? "from_composition" : "fixed";
-    $("atmR").disabled = a.gas_constant === "from_composition";
-    $("atmR").value = a.gas_constant === "from_composition" ? (st.mix ? st.mix.R.toPrecision(6) : "") : a.gas_constant;
+    $("atmPs").disabled = st.units === "kg";
+    $("atmFixedR").hidden = a.gas_constant === "from_composition";
   }
-  for (const [k, x] of st.comp) $("comp_" + k).value = x;
-  $("starT").value = st.star.T; $("starAlpha").value = st.star.alpha;
+  $("compUnits").value = st.units;
+  for (const [k, x] of st.comp) {
+    const i = $("comp_" + k);
+    i.value = st.units === "mole" ? x : st.units === "kg" ? st.buf[k].toExponential(7) : Number(st.buf[k].toPrecision(8));
+    if (st.units === "kg") i.removeAttribute("max"); else i.max = "1";
+  }
+  const s = st.star, b = matchingStar();
+  $("starPick").value = b ? b.key : "";
+  $("starT").value = s.T;
+  $("starSizeMode").value = s.sizeMode; $("starSizeL").textContent = s.sizeMode === "radius" ? "Radius (R☉)" : "Luminosity (L☉)";
+  $("starSize").value = s.sizeMode === "radius" ? s.R : Number(lumOf(s.T, s.R).toPrecision(7));
+  $("starDistMode").value = s.distMode; $("starDistL").textContent = s.distMode === "distance" ? "Distance (au)" : "Irradiance (W m⁻²)";
+  $("starDist").value = s.distMode === "distance" ? s.d : Number(irrOf(s).toPrecision(7));
   $("starAz").value = st.star.az; $("starEl").value = st.star.el;
   $("altMode").value = st.obs.mode;
   const v = $("altVal"); v.disabled = st.obs.mode === "ground";
@@ -698,7 +841,11 @@ function syncInputs() {
   $("expMode").value = st.exp.mode; $("expRef").value = st.exp.ref === null ? "" : st.exp.ref;
 }
 function compEdited() { st.compLabel = "composition edited in the page"; st.compSource = "stated by the user"; }
-function starEdited() { st.star.label = "blackbody star set in the page"; st.star.source = "stated by the user"; }
+function starEdited() {
+  const b = matchingStar();
+  if (b) { st.star.label = b.name; st.star.source = b.source; }
+  else { st.star.label = "blackbody star set in the page"; st.star.source = "stated by the user"; }
+}
 function setExposureMode(m) {
   st.exp.mode = m === "fixed" ? "fixed" : "auto";
   // entering FIXED keeps the current picture: the reference starts at the brightest sky luminance now
@@ -729,19 +876,36 @@ function initUI() {
     setTimeout(() => URL.revokeObjectURL(a.href), 10000);
     $("shareNote").textContent = "Saved " + a.download + ": it opens with these settings, offline, on any computer.";
   });
-  $("shareReset").addEventListener("click", () => { load(START); $("shareNote").textContent = "Back to the settings this page was written with."; syncInputs(); recompute(); });
+  $("shareReset").addEventListener("click", () => { load(START); refreshBuf(); $("shareNote").textContent = "Back to the settings this page was written with."; syncInputs(); recompute(); });
   const grid = $("compGrid"), which = $("compFillWhich");
   for (const [k] of st.comp) {
     const l = document.createElement("label"); l.htmlFor = "comp_" + k; l.textContent = k;
     const i = document.createElement("input"); i.type = "number"; i.id = "comp_" + k; i.step = "any"; i.min = "0"; i.max = "1";
-    i.addEventListener("change", () => { st.comp.find(r => r[0] === k)[1] = +i.value; compEdited(); schedule(); labels(); });
+    i.addEventListener("change", () => {
+      if (st.units === "mole") st.comp.find(r => r[0] === k)[1] = +i.value;
+      else { st.buf[k] = +i.value; amountsEdited(); }
+      compEdited(); syncInputs(); schedule(); labels();
+    });
     grid.append(l, i);
     const o = document.createElement("option"); o.value = k; o.textContent = k; which.append(o);
   }
   $("compFill").addEventListener("click", () => {
     // an explicit action: the chosen species takes whatever the others leave
     const k = which.value; let others = 0; for (const r of st.comp) if (r[0] !== k) others += r[1];
-    st.comp.find(r => r[0] === k)[1] = Math.max(0, 1 - others); compEdited(); syncInputs(); recompute();
+    if (st.units === "mole") st.comp.find(r => r[0] === k)[1] = Math.max(0, 1 - others);
+    else { let o = 0; for (const [j] of st.comp) if (j !== k) o += st.buf[j]; st.buf[k] = Math.max(0, 1 - o); amountsEdited(); }
+    compEdited(); syncInputs(); recompute();
+  });
+  // amounts as mole fractions, mass fractions or masses: a view of the same mixture
+  if (!HYP) $("compUnits").querySelector('option[value="kg"]').disabled = true;
+  $("compUnits").addEventListener("change", () => {
+    const want = $("compUnits").value;
+    try { mixture(); } catch (e) {
+      if (!e.sky) throw e;
+      $("compUnits").value = st.units; $("compNote").className = "note err";
+      $("compNote").textContent = "Fix the amounts first (" + e.message + "), then change how they are given."; return;
+    }
+    st.units = want; refreshBuf(); syncInputs(); redraw();
   });
   if (HYP) {
     const num = (id, fn) => $(id).addEventListener("change", () => { fn(+$(id).value); syncInputs(); schedule(); });
@@ -749,14 +913,44 @@ function initUI() {
     num("atmT", v => { st.atm.temperature_k = v; });
     num("atmLapse", v => { st.atm.lapse_rate_k_per_m = v / 1000; if (v > 0 && st.atm.temperature_floor_k === null) st.atm.temperature_floor_k = Math.max(1, Math.round(st.atm.temperature_k * 0.6)); });
     num("atmFloor", v => { st.atm.temperature_floor_k = v; });
-    num("atmG", v => { st.atm.gravity = v; });
-    num("atmR", v => { st.atm.gas_constant = v; });
-    num("atmRadius", v => { st.atm.radius_m = v * 1000; });
-    $("atmRMode").addEventListener("change", () => { st.atm.gas_constant = $("atmRMode").value === "from_composition" ? "from_composition" : (st.mix ? Number(st.mix.R.toPrecision(6)) : 287); syncInputs(); schedule(); });
+    // with the amounts as masses, the surface pressure follows the masses, gravity and radius
+    num("atmG", v => { st.atm.gravity = v; if (st.units === "kg") amountsEdited(); });
+    num("atmRadius", v => { st.atm.radius_m = v * 1000; if (st.units === "kg") amountsEdited(); });
+    $("atmUseComp").addEventListener("click", () => { st.atm.gas_constant = "from_composition"; syncInputs(); schedule(); });
   }
-  $("starT").addEventListener("change", () => { st.star.T = +$("starT").value; starEdited(); relight(); });
-  $("starAlpha").addEventListener("change", () => { st.star.alpha = +$("starAlpha").value; starEdited(); relight(); });
-  $("starSun").addEventListener("click", () => { st.star.T = 5772; st.star.alpha = Math.asin(695700 / 149597870.7) / DEG; st.star.label = "Sun-like blackbody at 1 au"; st.star.source = "IAU 2015 B3 nominal T_eff = 5772 K, R = 695 700 km; IAU 2012 B2 au"; syncInputs(); relight(); });
+  /* the star: what is shown as given stays put. With the size given as a luminosity, a new
+     temperature keeps the luminosity (the radius follows); with the distance given as an
+     irradiance, a new temperature or size keeps the irradiance (the distance follows). */
+  const s = () => st.star;
+  const held = () => ({ L: lumOf(s().T, s().R), S: irrOf(s()) });
+  const keepIrr = h => { if (s().distMode === "irradiance") s().d = distFor(h.S, s().T, s().R); };
+  const pick = $("starPick");
+  for (const b of STARS) { const o = document.createElement("option"); o.value = b.key; o.textContent = b.name + " (" + b.kind + ", " + Math.round(b.temperature_k) + " K)"; pick.append(o); }
+  const other = document.createElement("option"); other.value = ""; other.textContent = "custom"; other.disabled = true; pick.append(other);
+  pick.addEventListener("change", () => {
+    const b = STARS.find(q => q.key === pick.value); if (!b) return;
+    const h = held(); s().T = b.temperature_k; s().R = b.radius_rsun; keepIrr(h);
+    s().label = b.name; s().source = b.source; syncInputs(); relight();
+  });
+  $("starT").addEventListener("change", () => {
+    const h = held(); s().T = +$("starT").value;
+    if (s().sizeMode === "luminosity") s().R = radiusFor(h.L, s().T);
+    keepIrr(h); starEdited(); syncInputs(); relight();
+  });
+  $("starSize").addEventListener("change", () => {
+    const h = held(), v = +$("starSize").value;
+    s().R = s().sizeMode === "radius" ? v : radiusFor(v, s().T);
+    keepIrr(h); starEdited(); syncInputs(); relight();
+  });
+  $("starDist").addEventListener("change", () => {
+    const v = +$("starDist").value;
+    s().d = s().distMode === "distance" ? v : distFor(v, s().T, s().R);
+    if (matchingStar()) starEdited();
+    syncInputs(); relight();
+  });
+  $("starSizeMode").addEventListener("change", () => { s().sizeMode = $("starSizeMode").value; syncInputs(); persistSoon(); });
+  $("starDistMode").addEventListener("change", () => { s().distMode = $("starDistMode").value; syncInputs(); persistSoon(); });
+  $("starEarthS").addEventListener("click", () => { s().d = distFor(SC.solar_constant_w_m2, s().T, s().R); if (matchingStar()) starEdited(); syncInputs(); relight(); });
   $("starAz").addEventListener("input", () => { st.star.az = +$("starAz").value; redraw(); });
   $("starEl").addEventListener("input", () => { st.star.el = +$("starEl").value; labels(); schedule(); });
   $("fov").addEventListener("input", () => { st.look.fov = +$("fov").value; redraw(); });
@@ -824,7 +1018,17 @@ window.__sky = {
   set: p => {
     if (p.atmosphere) { if (!HYP) throw new Error("the saved column cannot be edited"); Object.assign(st.atm, p.atmosphere); }
     if (p.composition) { st.comp = st.comp.map(([k]) => [k, p.composition[k] || 0]); compEdited(); }
-    if (p.star) { Object.assign(st.star, p.star); if (p.star.T !== undefined || p.star.alpha !== undefined) starEdited(); }
+    if (p.star) {
+      const q = Object.assign({}, p.star);
+      // an angle alone keeps the distance and sets the radius: sin(alpha) = R / d
+      if (q.alpha !== undefined && q.R === undefined) { q.R = Math.sin(q.alpha * DEG) * (q.d !== undefined ? q.d : st.star.d) * SC.au_km / SC.r_sun_km; }
+      delete q.alpha;
+      Object.assign(st.star, q);
+      if (q.T !== undefined || q.R !== undefined) starEdited();
+    }
+    if (p.atmosphere || p.composition) refreshBuf();
+    if (p.units) { st.units = p.units; refreshBuf(); }
+    if (p.amounts) { st.buf = Object.assign({}, st.buf || {}, p.amounts); amountsEdited(); compEdited(); }
     if (p.observer) Object.assign(st.obs, p.observer);
     if (p.look) Object.assign(st.look, p.look);
     if (p.exposure) Object.assign(st.exp, p.exposure);
@@ -834,7 +1038,7 @@ window.__sky = {
   preset: key => { if (!applyPreset(key)) throw new Error("no preset " + key); syncInputs(); recompute(); return window.__sky.info(); },
   state: () => encodeState(),
   restore: text => { const ignored = restoreFrom(text, "page address"); syncInputs(); recompute(); return ignored; },
-  reset: () => { load(START); syncInputs(); recompute(); return window.__sky.info(); },
+  reset: () => { load(START); refreshBuf(); syncInputs(); recompute(); return window.__sky.info(); },
   flush: () => { persist(); return location.hash; },
   savedPage: () => savedPage(),
   presets: () => PRESETS.map(p => p.key),
@@ -847,7 +1051,10 @@ window.__sky = {
                  zenithColumn: st.table ? st.table.zenithColumn : null, starColumn: st.table ? st.table.starColumn : null,
                  diagnostic: st.diag, clip: st.clip, ms: st.ms, radius: radius(), label: S.label,
                  atmosphere: st.atm && Object.assign({}, st.atm), composition: st.comp.map(r => r.slice()),
-                 compLabel: st.compLabel, preset: (matchingPreset() || {}).key || null }),
+                 compLabel: st.compLabel, preset: (matchingPreset() || {}).key || null,
+                 units: st.units, amounts: st.buf && Object.assign({}, st.buf), surfacePressure: HYP ? st.atm.surface_pressure_pa : null,
+                 luminosity: lumOf(st.star.T, st.star.R), irradiance: irrOf(st.star), starKey: (matchingStar() || {}).key || null,
+                 disk: st.disk && Object.assign({}, st.disk) }),
 };
 })();
 </script>

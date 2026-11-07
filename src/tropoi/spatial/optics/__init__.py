@@ -22,14 +22,17 @@ NumPy only. Never CuPy. Composition never changes solver behaviour: a
 mixture is never inferred from ``r_dry`` or a molar mass, and ``r_dry`` is
 never replaced by a value derived from a mixture.
 """
-from tropoi.spatial.optics.column import AtmosphericColumn, ColumnError
+from tropoi.spatial.optics.column import (AtmosphericColumn, ColumnError,
+                                          thin_atmosphere_mass_kg,
+                                          thin_atmosphere_surface_pressure_pa)
 from tropoi.spatial.optics.composition import (COMPOSITION_PRESETS,
                                                Composition,
                                                CompositionError,
                                                gas_constant_report)
 from tropoi.spatial.optics.rayleigh import SPECIES, rayleigh_cross_section
-from tropoi.spatial.optics.star import Star
+from tropoi.spatial.optics.star import STARS, Star, StellarBody
 
 __all__ = ["AtmosphericColumn", "COMPOSITION_PRESETS", "ColumnError",
-           "Composition", "CompositionError", "SPECIES", "Star",
-           "gas_constant_report", "rayleigh_cross_section"]
+           "Composition", "CompositionError", "SPECIES", "STARS", "Star",
+           "StellarBody", "gas_constant_report", "rayleigh_cross_section",
+           "thin_atmosphere_mass_kg", "thin_atmosphere_surface_pressure_pa"]

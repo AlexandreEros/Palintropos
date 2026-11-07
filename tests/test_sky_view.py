@@ -570,3 +570,91 @@ def test_committed_standalone_page_is_current():
     assert p_s in committed
     assert sky_page.differences(committed.replace(
         p_s, '"surface_pressure_pa":101325.0001', 1), expected) != []
+
+
+# -- stars by radius and distance; amounts by mass -----------------------------
+
+def test_star_of_radius_and_distance():
+    from tropoi.spatial.optics.star import (AU_KM, L_SUN_W, R_SUN_KM,
+                                            SIGMA_SB, SOLAR_CONSTANT)
+    # sigma from the exact SI constants
+    assert SIGMA_SB == pytest.approx(5.670374419e-8, rel=1e-9)
+    sun = Star.sun_at_1au()
+    assert (sun.radius_rsun, sun.distance_au) == (1.0, 1.0)
+    assert Star.of(5772.0, 1.0, 1.0).angular_radius_deg == \
+        sun.angular_radius_deg
+    # the IAU nominal values are consistent to their rounding
+    assert sun.luminosity_lsun == pytest.approx(1.0, rel=1e-5)
+    assert sun.bolometric_irradiance_w_m2 == pytest.approx(SOLAR_CONSTANT,
+                                                           rel=1e-3)
+    # S = L / (4 pi d^2) for any star given by radius and distance
+    s = Star.of(4000.0, 0.7, 0.3)
+    d_m = 0.3 * AU_KM * 1e3
+    assert s.bolometric_irradiance_w_m2 == pytest.approx(
+        s.luminosity_lsun * L_SUN_W / (4 * math.pi * d_m ** 2), rel=1e-12)
+    assert math.sin(math.radians(s.angular_radius_deg)) == pytest.approx(
+        0.7 * R_SUN_KM / (0.3 * AU_KM), rel=1e-14)
+    with pytest.raises(ValueError, match="more than 30 degrees"):
+        Star.of(5000.0, 50.0, 0.1)
+    with pytest.raises(ValueError, match="together"):
+        Star(5000.0, 1.0, radius_rsun=1.0)
+    # an angle alone is still a star (no radius, no luminosity)
+    assert Star(5000.0, 1.0).luminosity_lsun is None
+
+
+def test_star_catalogue_is_sourced_and_self_consistent():
+    from tropoi.spatial.optics import STARS, StellarBody
+    assert list(STARS) == ["proxima_centauri", "epsilon_eridani", "sun",
+                           "procyon_a", "sirius_a"]
+    temps = [b.temperature_k for b in STARS.values()]
+    assert temps == sorted(temps)                    # coolest first
+    for b in STARS.values():
+        assert b.source and b.name and b.kind
+        assert b.at(1.0).label.startswith(b.name)
+    # where the radius and luminosity come from one paper, T follows from
+    # them, and lands near the temperature that paper's neighbours quote
+    for key, r, lum in (("epsilon_eridani", 0.742, 0.326),
+                        ("procyon_a", 2.043, 7.049),
+                        ("sirius_a", 1.7144, 24.74)):
+        b = STARS[key]
+        assert b.at(1.0).luminosity_lsun == pytest.approx(lum, rel=1e-12)
+        assert b.radius_rsun == r
+    assert STARS["procyon_a"].temperature_k == pytest.approx(6582.0, abs=10)
+    assert STARS["sirius_a"].temperature_k == pytest.approx(9845.0, abs=30)
+    assert STARS["epsilon_eridani"].temperature_k == pytest.approx(5085.0,
+                                                                   abs=30)
+    assert "preprint" in STARS["proxima_centauri"].source
+    assert isinstance(STARS["sun"], StellarBody)
+
+
+def test_mass_fractions_convert_exactly_and_are_never_rescaled():
+    w = dict(AIR.mass_fractions)
+    assert sum(w.values()) == pytest.approx(1.0, abs=1e-15)
+    back = Composition.from_mass_fractions(**w)
+    for (k, x), (k2, x2) in zip(back.mole_fractions, AIR.mole_fractions):
+        assert k == k2 and x == pytest.approx(x2, rel=1e-14)
+    # heavier gases weigh more than their mole share
+    assert w["Ar"] > dict(AIR.mole_fractions)["Ar"]
+    with pytest.raises(CompositionError, match="never renormalized"):
+        Composition.from_mass_fractions(N2=0.5, O2=0.4)
+    with pytest.raises(CompositionError, match="no optical data"):
+        Composition.from_mass_fractions(He=1.0)
+
+
+def test_thin_atmosphere_mass_and_pressure_invert():
+    from tropoi.spatial.optics import (thin_atmosphere_mass_kg,
+                                       thin_atmosphere_surface_pressure_pa)
+    m = thin_atmosphere_mass_kg(101325.0, 9.80665, 6.371e6)
+    assert m == pytest.approx(5.27e18, rel=1e-3)     # 4 pi R^2 p / g
+    assert thin_atmosphere_surface_pressure_pa(m, 9.80665, 6.371e6) == \
+        pytest.approx(101325.0, rel=1e-15)
+
+
+def test_sky_block_carries_the_star_catalogue(tmp_path):
+    from tropoi.spatial.optics import STARS
+    block = _block(sky.write_sky_page(_hyp_spec(), tmp_path / "s.html"))
+    assert [s["key"] for s in block["stars"]] == list(STARS)
+    assert block["star_constants"]["solar_constant_w_m2"] == 1361.0
+    assert any("Soubiran" in s for s in block["sources"])
+    # an angle-only star stays angle-only in the block
+    assert block["star"]["radius_rsun"] is None

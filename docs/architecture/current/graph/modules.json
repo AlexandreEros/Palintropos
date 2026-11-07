@@ -1117,6 +1117,14 @@
     {
       "kind": "imports",
       "scopes": [
+        "module"
+      ],
+      "source": "tropoi.representation.visual.sky",
+      "target": "tropoi.spatial.optics.star"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
         "function"
       ],
       "source": "tropoi.representation.visual.sky",

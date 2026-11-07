@@ -74,6 +74,8 @@ from tropoi.spatial.optics.composition import R_DRY_TOLERANCE, SUM_TOLERANCE
 from tropoi.spatial.optics.constants import (ATOMIC_WEIGHT_SOURCE, C, H,
                                              K_B, LUMINOUS_EFFICACY, R_MOLAR)
 from tropoi.spatial.optics.rayleigh import KING_CHECK
+from tropoi.spatial.optics.star import (AU_KM, L_SUN_W, R_SUN_KM, SIGMA_SB,
+                                        SOLAR_CONSTANT, STARS)
 
 __all__ = ["BIN_EDGES_NM", "EXPOSURE_MODES", "HypotheticalColumn",
            "SKY_PRESETS", "STANDALONE_PRESET", "SkyPreset", "SkySpec",
@@ -554,7 +556,12 @@ def sky_block(spec: SkySpec, *, column: AtmosphericColumn,
             if hyp is not None and isinstance(hyp.gas_constant, str) else
             "The column's gas constant is fixed; the page reports whether "
             "the composition agrees with it and never changes it.")),
-        "Star: a uniform blackbody disk, no limb darkening.",
+        ("Star: a uniform blackbody disk, no limb darkening, of radius R "
+         "seen from distance d (sin α = R/d). Luminosity L = 4πR²σT⁴ and "
+         "irradiance S = σT⁴ sin²α use the IAU 2015 B3 nominal solar values "
+         "(R☉ = 695 700 km, L☉ = 3.828e26 W) and the IAU 2012 au; σ comes "
+         "from the exact SI constants. Earth's irradiance is the IAU nominal "
+         "total solar irradiance, 1361 W m⁻²."),
         ("Spectrum: 18 bins of 20 nm, 400–760 nm; the CIE functions outside "
          f"that range (x̄ {om[0] * 100:.2g} %, ȳ {om[1] * 100:.2g} %, z̄ "
          f"{om[2] * 100:.2g} % of their integrals) are omitted."),
@@ -573,7 +580,9 @@ def sky_block(spec: SkySpec, *, column: AtmosphericColumn,
     ]
     sources = ([sp["source"] for sp in _species_block().values()]
                + [KING_CHECK, f"Molar masses: {ATOMIC_WEIGHT_SOURCE}",
-                  CIE_SOURCE, "XYZ → sRGB: IEC 61966-2-1", spec.star.source])
+                  CIE_SOURCE, "XYZ → sRGB: IEC 61966-2-1", spec.star.source]
+               + [f"{b.name}: {b.source}" for b in STARS.values()
+                  if b.key != "sun"])
     return {
         "version": 3,
         "label": PROTOTYPE_LABEL,
@@ -592,6 +601,10 @@ def sky_block(spec: SkySpec, *, column: AtmosphericColumn,
         "species": _species_block(),
         "star": dict(spec.star.to_dict(), azimuth_deg=spec.star_azimuth_deg,
                      elevation_deg=spec.star_elevation_deg),
+        "stars": [s.to_dict() for s in STARS.values()],
+        "star_constants": {"r_sun_km": R_SUN_KM, "au_km": AU_KM,
+                           "l_sun_w": L_SUN_W, "sigma_sb": SIGMA_SB,
+                           "solar_constant_w_m2": SOLAR_CONSTANT},
         "optics": _optics_block(),
         "observer": {"ground_offset_m": GROUND_OFFSET_M, **obs},
         "look": {"azimuth_deg": float(spec.look_azimuth_deg),

@@ -91,9 +91,9 @@ Drag on the sky, or use the arrow keys, to look around. The panel holds:
 | section | controls |
 | --- | --- |
 | Start from (hypothetical only) | the **Preset** menu (see below); it reads *custom* once the atmosphere, composition or star spectrum differs from every preset |
-| Atmosphere (hypothetical only) | surface pressure, surface temperature, lapse rate and floor temperature, gravity, gas constant (from the composition, or a fixed value), planet radius |
-| Composition | a mole fraction for each supported gas (N₂, O₂, Ar, CO₂), their sum, and an explicit **Set *gas* to the remainder** button |
-| Star | temperature, angular radius, **Sun at 1 au**, azimuth, elevation; the 400–760 nm irradiance is shown |
+| Atmosphere (hypothetical only) | surface pressure, surface temperature, lapse rate and floor temperature, gravity, planet radius. The gas constant is not an input: it is `R*/M` of the composition, shown with `M` |
+| Composition | **Amounts as** mole fractions, mass fractions or masses (kg); an amount for each supported gas (N₂, O₂, Ar, CO₂), their sum (or total mass), and an explicit **Set *gas* to the remainder** button for fractions |
+| Star | a **Star** menu of real stars; temperature; size as a radius (R☉) or a luminosity (L☉); distance (au) or the irradiance at the planet (W m⁻²); **Earth's irradiance**; azimuth; elevation (−90° to 90°). Radius, luminosity, distance, irradiance and angular radius are all shown, with the 400–760 nm irradiance |
 | Observer and view | height as 2 m above the ground, altitude above `R`, or pressure; field of view |
 | Exposure | **AUTO** or **FIXED** (with the reference luminance), exposure in stops; clipped-pixel counts |
 | Optical depth and validity | Rayleigh optical depth at 410, 450, 550, 650 and 750 nm, at the zenith and towards the star, with the single-scattering verdict |
@@ -178,7 +178,8 @@ reported, not acceptance targets.
 | below ground | refused: an altitude below the terrain, or a pressure above the surface pressure. |
 | too high | refused: above the top saved full level (saved runs) or above the column (hypothetical). |
 | exposure | `exposure_mode="auto"` (no reference) or `"fixed"` with `exposure_reference_cd_m2 > 0`. |
-| star | temperature > 0 K; angular radius in (0°, 30°). |
+| star | temperature > 0 K; radius and distance > 0; a star filling more than 30° of sky (`R/d ≥ sin 30°`) is refused. |
+| amounts | mole and mass fractions sum to 1 (±1e-6) and are never renormalized; masses are ≥ 0 with at least one > 0. |
 
 On the page a refusal is a message, not an error.
 
@@ -187,8 +188,16 @@ On the page a refusal is a message, not an error.
 A composition implies a mean molar mass `M = Σ xᵢ Mᵢ`, using IUPAC/CIAAW
 standard atomic weights, and so a gas constant `R_mix = R*/M`:
 
-- With `gas_constant="from_composition"`, a hypothetical column uses `R_mix`, and editing the composition on the page rebuilds the column with it.
-- With a fixed gas constant, or on a saved column (the run's `r_dry`), the page reports whether `R_mix` agrees (0.1 % reporting threshold) or disagrees. It never changes the column's gas constant.
+- On the page, a hypothetical column always uses `R_mix`: the composition already fixes the gas constant, so the page has no control for it, and editing the composition rebuilds the column with it.
+- From Python, `HypotheticalColumn(gas_constant=<number>)` can still fix it. That is for a gas with species that have no optical data (Titan's CH₄, H₂ or He), whose stated composition would give the wrong `M`. The page then shows the fixed value, how far the composition's `R_mix` is from it, and a **Use the composition's R*/M** button.
+- On a saved column (the run's `r_dry`), the page reports whether `R_mix` agrees (0.1 % reporting threshold) or disagrees. It never changes the column's gas constant.
+
+Amounts can be given as mole fractions (the stored form), as mass fractions
+`wᵢ = xᵢMᵢ / Σ xⱼMⱼ` (converted back exactly, `xᵢ = (wᵢ/Mᵢ) / Σ (wⱼ/Mⱼ)`), or
+as masses in kg. Masses also set the surface pressure by the thin-atmosphere
+relation `p_s = g·Σmᵢ / (4πR²)`, which ignores that the shell widens with
+height (about 2H/R, 0.3 % for Earth). With masses, changing gravity or radius
+keeps the masses and moves the pressure.
 
 The number density is the ideal-gas `n = p/(k_B T)`, which needs no
 composition. The composition supplies only the cross section per molecule,
@@ -212,7 +221,20 @@ The optics live in `spatial.optics`, independent of either page, so a
   - saved: the native full levels, exact at the observer's point. `Z = Φ/g` is used as altitude. Below the lowest full level the column is isothermal; above the top one there is an isothermal extension (`R T / g` scale height) that the saved state does not describe;
   - both end at `p = 10⁻⁵ p_s`.
 - **Scattering.** Rayleigh, single scattering, phase function `3/(16π)(1+cos²Θ)`. Depolarization is kept in the King factor but not in the phase function. Attenuation applies along the view path and along the star path.
-- **Star.** A uniform blackbody disk (Planck radiance × solid angle), placed by hand. `Star.sun_at_1au()` uses the IAU 2015 B3 nominal Sun and the IAU 2012 au.
+- **Star.** A uniform blackbody disk (Planck radiance × solid angle), placed by hand. A star of radius `R` seen from distance `d` has `sin α = R/d`, luminosity `L = 4πR²σT⁴` and irradiance `S = σT⁴ sin²α`, with the IAU 2015 B3 nominal Sun (T = 5772 K, R☉ = 695 700 km, L☉ = 3.828e26 W, 1361 W m⁻²) and the IAU 2012 au; σ comes from the exact SI constants.
+  - What you give stays put: with the size as a luminosity, a new temperature keeps `L` (the radius follows); with the distance as an irradiance, a new temperature or size keeps `S` (the distance follows).
+  - The disk is drawn at full screen resolution with 4×4 samples per pixel, behind the ground below the horizon. A disk under half a pixel in radius is drawn at half a pixel and marked enlarged.
+- **Stars** (`spatial.optics.STARS`), as blackbodies. Where one paper gives both radius and luminosity, `T` follows from them:
+
+  | star | T (K) | R (R☉) | source |
+  | --- | --- | --- | --- |
+  | Proxima Centauri (M5.5 V) | 2833 | 0.162 | Anugu et al. 2026, arXiv:2610.33373, a **preprint** |
+  | ε Eridani (K2 V) | 5063 | 0.742 | Soubiran et al. 2024, A&A 682, A145 (R, L = 0.326 L☉) |
+  | the Sun (G2 V) | 5772 | 1 | IAU 2015 B3 nominal |
+  | Procyon A (F5 IV–V) | 6580 | 2.043 | Soubiran et al. 2024 (R, L = 7.049 L☉) |
+  | Sirius A (A0–A1 V) | 9832 | 1.7144 | Wikipedia's reference "bond-11" (R, L = 24.74 L☉) |
+
+  All were read from the stars' Wikipedia infoboxes on 2026-11-07, which cite these works.
 - **Ground.** The solid sphere at the column base shadows star paths and ends view paths. The ground is drawn unlit.
 - **Colour.** 18 bins of 20 nm from 400 to 760 nm, then CIE 1931 XYZ, then IEC 61966-2-1 sRGB.
   - The CIE functions outside the band are omitted and reported: x̄ 0.11 %, ȳ 0.004 %, z̄ 0.49 % of their integrals.
