@@ -1,0 +1,676 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>__PAGE_TITLE__</title>
+<style>
+:root { --bg: #0d1117; --panel: #161b22; --ink: #e6edf3; --muted: #9da7b3; --line: #30363d; --accent: #e0a100; --bad: #f2b8b5; --badBg: #5c1d1d; --cauBg: #4d3a00; }
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; background: var(--bg); color: var(--ink); font: 13px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif; }
+#app { display: grid; grid-template-columns: minmax(0, 1fr) 360px; height: 100vh; }
+#stage { position: relative; min-height: 320px; }
+#sky { position: absolute; inset: 0; width: 100%; height: 100%; display: block; cursor: grab; touch-action: none; }
+#sky:active { cursor: grabbing; }
+.banner { position: absolute; left: 10px; right: 10px; padding: 5px 9px; border-radius: 6px; font-weight: 600; pointer-events: none; }
+#stageLabel { top: 10px; background: rgba(0,0,0,0.55); color: #fff; }
+#stageWarn { top: 44px; }
+#stageWarn.caution { background: rgba(77,58,0,0.85); color: #ffe7a3; }
+#stageWarn.unreliable { background: rgba(92,29,29,0.9); color: #ffd6d3; }
+#panel { overflow-y: auto; background: var(--panel); border-left: 1px solid var(--line); padding: 10px 12px 24px; }
+h1 { font-size: 15px; margin: 2px 0 6px; }
+details { border-top: 1px solid var(--line); padding: 6px 0; }
+summary { cursor: pointer; font-weight: 600; padding: 2px 0; }
+.grid { display: grid; grid-template-columns: auto 1fr; gap: 4px 8px; align-items: center; margin: 6px 0; }
+.grid label { color: var(--muted); }
+input[type=number], select { width: 100%; background: var(--bg); color: var(--ink); border: 1px solid var(--line); border-radius: 4px; padding: 2px 4px; font: inherit; }
+input[type=range] { width: 100%; }
+input:disabled, select:disabled { opacity: 0.5; }
+button { background: var(--bg); color: var(--ink); border: 1px solid var(--line); border-radius: 4px; padding: 2px 8px; font: inherit; cursor: pointer; }
+.row { display: flex; justify-content: space-between; gap: 8px; margin-top: 6px; }
+.val { color: var(--muted); font-variant-numeric: tabular-nums; }
+.note { color: var(--muted); margin: 4px 0; }
+.warn { color: var(--ink); font-weight: 600; }
+.err { color: var(--bad); font-weight: 600; }
+.mode { display: inline-block; padding: 1px 6px; border-radius: 4px; font-weight: 700; background: #1f6feb; color: #fff; }
+.mode.auto { background: #6e7681; }
+table { border-collapse: collapse; width: 100%; font-variant-numeric: tabular-nums; }
+td, th { padding: 1px 4px; text-align: right; }
+th:first-child, td:first-child { text-align: left; }
+#notes li { margin: 3px 0; color: var(--muted); }
+@media (max-width: 800px) { #app { grid-template-columns: 1fr; grid-template-rows: 60vh auto; height: auto; } #panel { border-left: 0; } }
+</style>
+</head>
+<body>
+<main id="app">
+  <section id="stage" aria-label="Sky seen by the observer">
+    <canvas id="sky" tabindex="0" aria-label="Sky from the observer: drag or use the arrow keys to look around"></canvas>
+    <div class="banner" id="stageLabel"></div>
+    <div class="banner" id="stageWarn" hidden></div>
+  </section>
+  <aside id="panel">
+    <h1 id="title"></h1>
+    <p class="note warn" id="kindLabel"></p>
+
+    <details open id="atmSection"><summary>Atmosphere</summary>
+      <div id="atmHyp" class="grid">
+        <label for="atmPs">Surface pressure (hPa)</label><input type="number" id="atmPs" step="any" min="0">
+        <label for="atmT">Surface temperature (K)</label><input type="number" id="atmT" step="any" min="0">
+        <label for="atmLapse">Lapse rate (K/km)</label><input type="number" id="atmLapse" step="any" min="0">
+        <label for="atmFloor">Floor temperature (K)</label><input type="number" id="atmFloor" step="any" min="0">
+        <label for="atmG">Gravity (m s⁻²)</label><input type="number" id="atmG" step="any" min="0">
+        <label for="atmRMode">Gas constant</label>
+        <select id="atmRMode"><option value="from_composition">from the composition (R*/M)</option><option value="fixed">fixed value</option></select>
+        <label for="atmR">R (J kg⁻¹ K⁻¹)</label><input type="number" id="atmR" step="any" min="0">
+        <label for="atmRadius">Planet radius (km)</label><input type="number" id="atmRadius" step="any" min="0">
+      </div>
+      <p class="note" id="atmNote"></p>
+    </details>
+
+    <details open><summary>Composition (mole fractions)</summary>
+      <div class="grid" id="compGrid"></div>
+      <div class="row"><span>Sum</span><span class="val" id="compSum"></span></div>
+      <div class="row"><span><button id="compFill">Set</button> <select id="compFillWhich" aria-label="Species to set to the remainder" style="width:auto"></select> to the remainder</span></div>
+      <p class="note" id="compNote"></p>
+    </details>
+
+    <details open><summary>Star</summary>
+      <div class="grid">
+        <label for="starT">Temperature (K)</label><input type="number" id="starT" step="any" min="0">
+        <label for="starAlpha">Angular radius (°)</label><input type="number" id="starAlpha" step="any" min="0" max="30">
+      </div>
+      <div class="row"><button id="starSun">Sun at 1 au</button><span class="val" id="starIrr"></span></div>
+      <div class="row"><span>Azimuth</span><span id="starAzL" class="val"></span></div>
+      <input type="range" id="starAz" min="0" max="360" step="1" aria-label="Star azimuth (degrees clockwise from north)">
+      <div class="row"><span>Elevation</span><span id="starElL" class="val"></span></div>
+      <input type="range" id="starEl" min="-20" max="90" step="0.5" aria-label="Star elevation (degrees)">
+      <p class="note" id="starNote"></p>
+    </details>
+
+    <details open><summary>Observer and view</summary>
+      <div class="grid">
+        <label for="altMode">Height given as</label>
+        <select id="altMode"><option value="ground">2 m above the ground</option><option value="altitude">altitude above R (m)</option><option value="pressure">pressure (hPa)</option></select>
+        <label for="altVal">Value</label><input type="number" id="altVal" step="any">
+      </div>
+      <p class="note" id="obsNote"></p>
+      <div class="row"><span>Field of view</span><span id="fovL" class="val"></span></div>
+      <input type="range" id="fov" min="20" max="140" step="1" aria-label="Horizontal field of view (degrees)">
+    </details>
+
+    <details open><summary>Exposure</summary>
+      <div class="grid">
+        <label for="expMode">Mode</label>
+        <select id="expMode"><option value="auto">automatic (brightest sky)</option><option value="fixed">fixed reference luminance</option></select>
+        <label for="expRef">White at 0 EV (cd m⁻²)</label><input type="number" id="expRef" step="any" min="0">
+      </div>
+      <div class="row"><span>Exposure</span><span id="evL" class="val"></span></div>
+      <input type="range" id="ev" min="-10" max="10" step="0.25" aria-label="Exposure (stops)">
+      <p class="note" id="expNote"></p>
+      <p class="note" id="clipNote"></p>
+    </details>
+
+    <details open><summary>Optical depth and validity</summary>
+      <table id="tauTable" aria-label="Rayleigh optical depth"></table>
+      <p class="note" id="tauNote"></p>
+    </details>
+
+    <details><summary>Notes, limits and sources</summary>
+      <ul id="notes"></ul>
+    </details>
+  </aside>
+</main>
+<script id="sky-data" type="application/json">__SKY_DATA__</script>
+<script>
+"use strict";
+(function () {
+/* Single-scattering Rayleigh sky in float64 JavaScript. It repeats
+   tropoi.representation.visual.sky (radiance_table, star_path_column,
+   optical_depth_diagnostic) and tropoi.spatial.optics (Composition,
+   AtmosphericColumn.hypothetical, observer_altitude, Star) step for step, so
+   the page and the NumPy reference agree to rounding. A visual prototype,
+   not a validated sky colour: the page says so. */
+const S = JSON.parse(document.getElementById("sky-data").textContent);
+const HYP = S.column_kind === "hypothetical";
+const O = S.optics, N = S.numerics, K = O.wavelengths_nm.length, DEG = Math.PI / 180;
+const KB = O.planck.k_b;
+const $ = id => document.getElementById(id);
+
+const st = {
+  atm: HYP ? Object.assign({}, S.hypothetical) : null,
+  comp: [], compLabel: S.composition.label, compSource: S.composition.source,
+  star: { T: S.star.temperature_k, alpha: S.star.angular_radius_deg, az: S.star.azimuth_deg, el: S.star.elevation_deg,
+          label: S.star.label, source: S.star.source },
+  obs: { mode: S.observer.mode, altitude_m: S.observer.altitude_m, pressure_pa: S.observer.pressure_pa },
+  look: { az: S.look.azimuth_deg, el: S.look.elevation_deg, fov: S.look.fov_deg },
+  exp: { mode: S.exposure.mode, ev: S.exposure.ev, ref: S.exposure.reference_cd_m2 },
+  mix: null, col: null, place: null, table: null, view: null, diag: null,
+  error: null, clip: null, disk: null, ms: 0, timer: 0,
+};
+// composition rows: the stated species in their order, then the other supported ones at 0
+for (const [k, x] of S.composition.mole_fractions) st.comp.push([k, x]);
+for (const k of Object.keys(S.species)) if (!st.comp.some(r => r[0] === k)) st.comp.push([k, 0]);
+
+function radius() { return HYP ? st.atm.radius_m : S.radius_m; }
+function fail(msg) { const e = new Error(msg); e.sky = true; throw e; }
+function fmt(x, p) { return Number(x.toPrecision(p || 4)).toLocaleString("en-US", { maximumSignificantDigits: p || 4 }); }
+function interp1(x, xp, fp) {
+  // numpy.interp for ascending xp (clamped at the ends)
+  const n = xp.length;
+  if (x <= xp[0]) return fp[0];
+  if (x >= xp[n - 1]) return fp[n - 1];
+  let lo = 0, hi = n - 1;
+  while (hi - lo > 1) { const m = (lo + hi) >> 1; if (xp[m] <= x) lo = m; else hi = m; }
+  return (fp[hi] - fp[lo]) / (xp[hi] - xp[lo]) * (x - xp[lo]) + fp[lo];
+}
+function positive(name, v) { if (!(isFinite(v) && v > 0)) fail(name + " must be finite and > 0"); return v; }
+
+/* Composition: mole fractions as stated, never renormalized; sigma = sum x_i sigma_i */
+function mixture() {
+  const rows = st.comp.filter(r => r[1] !== 0);
+  for (const [k, x] of st.comp) if (!(isFinite(x) && x >= 0)) fail("mole fraction of " + k + " must be ≥ 0");
+  if (!rows.length) fail("the composition needs at least one species");
+  let total = 0; for (const r of rows) total += r[1];
+  if (Math.abs(total - 1) > S.composition_rules.sum_tolerance)
+    fail("mole fractions sum to " + total.toPrecision(9) + ", not 1 (tolerance " + S.composition_rules.sum_tolerance + "); they are never renormalized");
+  const sigma = new Float64Array(K);
+  let first = true, M = 0;
+  for (const [k, x] of rows) {
+    const s = S.species[k].cross_section_m2;
+    for (let i = 0; i < K; i++) sigma[i] = first ? x * s[i] : sigma[i] + x * s[i];
+    first = false;
+    M += x * S.species[k].molar_mass_g_per_mol;
+  }
+  M /= 1000;
+  return { rows: rows.map(r => [r[0], r[1]]), sigma, M, R: S.composition_rules.r_molar / M };
+}
+
+/* AtmosphericColumn.hypothetical (labelled), or the saved column (fixed) */
+function column(mix) {
+  if (!HYP) { const c = S.column; return { z: c.z_m, lnp: c.ln_p, T: c.temperature_k, ceiling: c.ceiling_m, R: S.r_dry, g: c.gravity }; }
+  const a = st.atm;
+  const ps = positive("surface pressure", a.surface_pressure_pa), t0 = positive("temperature", a.temperature_k);
+  const g = positive("gravity", a.gravity), r = positive("gas constant", a.gas_constant === "from_composition" ? mix.R : a.gas_constant);
+  positive("planet radius", a.radius_m);
+  const gamma = a.lapse_rate_k_per_m;
+  if (!(isFinite(gamma) && gamma >= 0)) fail("lapse rate must be ≥ 0");
+  const lp0 = Math.log(ps), lpEnd = Math.log(ps * a.top_ratio);
+  let zs, lps, ts;
+  if (gamma === 0) {
+    const zEnd = (lp0 - lpEnd) * r * t0 / g;
+    zs = [0, zEnd]; lps = [lp0, lpEnd]; ts = [t0, t0];
+  } else {
+    if (a.temperature_floor_k === null) fail("a lapse rate needs a floor temperature (isothermal above it)");
+    const tf = positive("floor temperature", a.temperature_floor_k);
+    if (!(tf < t0)) fail("the floor temperature must be below the surface temperature");
+    const zf = (t0 - tf) / gamma, expo = g / (r * gamma), n = a.nodes, step = zf / (n - 1);
+    zs = []; ts = []; lps = [];
+    for (let i = 0; i < n; i++) zs.push(i === n - 1 ? zf : i * step);
+    for (const z of zs) ts.push(t0 - gamma * z);
+    for (const t of ts) lps.push(lp0 + expo * Math.log(t / t0));
+    if (lps[lps.length - 1] <= lpEnd) fail("the lapse-rate layer reaches the column top; raise the floor temperature");
+    zs.push(zf + (lps[lps.length - 1] - lpEnd) * r * tf / g); lps.push(lpEnd); ts.push(tf);
+  }
+  return { z: zs, lnp: lps, T: ts, ceiling: zs[zs.length - 1], R: r, g };
+}
+
+/* AtmosphericColumn.observer_altitude */
+function place(col) {
+  const base = col.z[0], floor = Math.max(base, S.terrain_m), ps = Math.exp(col.lnp[0]);
+  let z;
+  if (st.obs.mode === "pressure") {
+    const p = st.obs.pressure_pa;
+    if (!(isFinite(p) && p > 0)) fail("pressure must be > 0");
+    if (p > ps) fail(fmt(p / 100) + " hPa exceeds the surface pressure " + fmt(ps / 100) + " hPa: the observer would be underground");
+    const lp = Math.log(p);
+    if (lp < col.lnp[col.lnp.length - 1]) fail("pressure outside the column");
+    z = interp1(lp, col.lnp.slice().reverse(), col.z.slice().reverse());
+  } else if (st.obs.mode === "ground") z = floor + S.observer.ground_offset_m;
+  else z = st.obs.altitude_m;
+  if (!isFinite(z)) fail("altitude must be finite");
+  if (z < floor - 1e-6) fail("altitude " + fmt(z) + " m is below the ground (" + fmt(floor) + " m): the observer would be underground");
+  if (z > col.ceiling + 1e-6) fail("altitude " + fmt(z) + " m is above " + (HYP ? "the top of the column" : "the top saved full level") + " (" + fmt(col.ceiling) + " m)");
+  return { z, p: Math.exp(interp1(z, col.z, col.lnp)), floor };
+}
+
+function densityGrid(col, G) {
+  const base = col.z[0], top = col.z[col.z.length - 1], dz = (top - base) / (G - 1), lnn = new Float64Array(G);
+  for (let j = 0; j < G; j++) { const z = base + dz * j; lnn[j] = interp1(z, col.z, col.lnp) - Math.log(KB * interp1(z, col.z, col.T)); }
+  return { base, dz, lnn, G };
+}
+function dens(dg, z) {
+  const x = (z - dg.base) / dg.dz;
+  if (!(x >= 0 && x <= dg.G - 1)) return 0;
+  const i = Math.min(Math.max(Math.floor(x), 0), dg.G - 2), f = x - i;
+  return Math.exp(dg.lnn[i] + f * (dg.lnn[i + 1] - dg.lnn[i]));
+}
+/* sky._segments: n graded midpoint steps on [0, L], densest at the ray's lowest point */
+function segs(r0, mu, L, n, mid, wid) {
+  const sl = Math.min(Math.max(-r0 * mu, 0), L);
+  const na = sl <= 0 ? 0 : (sl >= L ? n : Math.min(Math.max(Math.floor(n * (L > 0 ? sl / L : 0) + 0.5), 1), n - 1)), nb = n - na;
+  let prev = 0;
+  for (let j = 1; j <= n; j++) {
+    let e;
+    if (j <= na) { const t = j / na; e = sl * (1 - (1 - t) * (1 - t)); }
+    else { const t = (j - na) / nb; e = sl + (L - sl) * t * t; }
+    mid[j - 1] = 0.5 * (e + prev); wid[j - 1] = e - prev; prev = e;
+  }
+}
+/* sky.radiance_table without the irradiance: per direction and bin,
+   (sum of n ds exp(-tau)) * sigma * phase; the star's spectrum multiplies it later */
+function geometryTable(col, zObs, starEl, sig) {
+  const R = radius(), dg = densityGrid(col, N.density_nodes), top = dg.base + dg.dz * (dg.G - 1);
+  const rb = R + dg.base, rt = R + top, ro = R + zObs;
+  const NZ = N.n_zenith, NA = N.n_azimuth, nv = N.view_steps, ns = N.sun_steps;
+  const base = new Float64Array(NZ * NA * K), ground = new Uint8Array(NZ * NA);
+  const vm = new Float64Array(nv), vw = new Float64Array(nv), sm = new Float64Array(ns), sw = new Float64Array(ns), acc = new Float64Array(K);
+  const e = starEl * DEG, ce = Math.cos(e), se = Math.sin(e);
+  let zenithColumn = 0;
+  for (let iz = 0; iz < NZ; iz++) {
+    const th = (180 * iz / (NZ - 1)) * DEG, mu = Math.cos(th), sth = Math.sin(th);
+    for (let ia = 0; ia < NA; ia++) {
+      const ph = (180 * ia / (NA - 1)) * DEG, cph = Math.cos(ph);
+      const cosBig = sth * cph * ce + mu * se;
+      const discG = rb * rb - ro * ro * (1 - mu * mu), gr = mu < 0 && discG >= 0;
+      let L = gr ? -ro * mu - Math.sqrt(Math.max(discG, 0)) : -ro * mu + Math.sqrt(Math.max(rt * rt - ro * ro * (1 - mu * mu), 0));
+      L = Math.max(L, 0);
+      segs(ro, mu, L, nv, vm, vw);
+      acc.fill(0);
+      let cum = 0;
+      for (let i = 0; i < nv; i++) {
+        const s = vm[i], rp = Math.sqrt(Math.max(ro * ro + s * s + 2 * ro * s * mu, 0));
+        const n = dens(dg, rp - R), step = n * vw[i], nmid = cum + 0.5 * step;
+        cum += step;
+        const mus = (s * (sth * cph * ce + mu * se) + ro * se) / rp;
+        if (mus < 0 && rb * rb - rp * rp * (1 - mus * mus) >= 0) continue;     // star below the solid sphere
+        const ls = Math.max(-rp * mus + Math.sqrt(Math.max(rt * rt - rp * rp * (1 - mus * mus), 0)), 0);
+        segs(rp, mus, ls, ns, sm, sw);
+        let nsun = 0;
+        for (let j = 0; j < ns; j++) { const q = sm[j]; nsun += dens(dg, Math.sqrt(Math.max(rp * rp + q * q + 2 * rp * q * mus, 0)) - R) * sw[j]; }
+        const tot = nmid + nsun;
+        if (step > 0) for (let k = 0; k < K; k++) acc[k] += step * Math.exp(-sig[k] * tot);
+      }
+      if (iz === 0 && ia === 0) zenithColumn = cum;
+      const phase = 3 / (16 * Math.PI) * (1 + cosBig * cosBig), d = iz * NA + ia;
+      for (let k = 0; k < K; k++) base[d * K + k] = acc[k] * sig[k] * phase;
+      ground[d] = gr ? 1 : 0;
+    }
+  }
+  // sky.star_path_column: the column along the star's own direction (its disk's attenuation)
+  let starColumn = null;
+  if (!(se < 0 && rb * rb - ro * ro * (1 - se * se) >= 0)) {
+    const L = Math.max(-ro * se + Math.sqrt(Math.max(rt * rt - ro * ro * (1 - se * se), 0)), 0);
+    segs(ro, se, L, nv, vm, vw);
+    starColumn = 0;
+    for (let i = 0; i < nv; i++) { const s = vm[i]; starColumn += dens(dg, Math.sqrt(Math.max(ro * ro + s * s + 2 * ro * s * se, 0)) - R) * vw[i]; }
+  }
+  return { base, ground, NZ, NA, zenithColumn, starColumn, sig };
+}
+
+/* Star: Planck radiance B_lambda(T) of a uniform disk of angular radius alpha */
+function planck(T) {
+  const h = O.planck.h, c = O.planck.c, out = new Float64Array(K);
+  for (let k = 0; k < K; k++) { const lam = O.wavelengths_nm[k] * 1e-9, x = h * c / (lam * KB * T); out[k] = 2 * h * c ** 2 / lam ** 5 / Math.expm1(x) * 1e-9; }
+  return out;
+}
+function starSolidAngle(alpha) { return 2 * Math.PI * (1 - Math.cos(alpha * DEG)); }
+function checkStar() {
+  if (!(isFinite(st.star.T) && st.star.T > 0)) fail("star temperature must be > 0 K");
+  if (!(isFinite(st.star.alpha) && st.star.alpha > 0 && st.star.alpha < 30)) fail("star angular radius must be in (0°, 30°)");
+}
+/* spectral radiance, XYZ and the star disk for the current star (cheap: no ray marching) */
+function illuminate(G) {
+  checkStar();
+  const B = planck(st.star.T), omega = starSolidAngle(st.star.alpha), W = O.cmf_weights, eff = O.luminous_efficacy;
+  const n = G.NZ * G.NA, spec = new Float64Array(n * K), xyz = new Float64Array(n * 3);
+  const irr = B.map(b => b * omega);
+  for (let d = 0; d < n; d++) {
+    let X = 0, Y = 0, Z = 0;
+    for (let k = 0; k < K; k++) { const v = G.base[d * K + k] * irr[k]; spec[d * K + k] = v; X += v * W[k][0]; Y += v * W[k][1]; Z += v * W[k][2]; }
+    xyz[3 * d] = eff * X; xyz[3 * d + 1] = eff * Y; xyz[3 * d + 2] = eff * Z;
+  }
+  let starXYZ = null;
+  if (G.starColumn !== null) {
+    let X = 0, Y = 0, Z = 0;
+    for (let k = 0; k < K; k++) { const v = B[k] * Math.exp(-G.sig[k] * G.starColumn); X += v * W[k][0]; Y += v * W[k][1]; Z += v * W[k][2]; }
+    starXYZ = [eff * X, eff * Y, eff * Z];
+  }
+  let lw = 0;
+  for (let iz = 0; 2 * iz <= G.NZ - 1; iz++) for (let ia = 0; ia < G.NA; ia++) lw = Math.max(lw, xyz[3 * (iz * G.NA + ia) + 1]);
+  let irrTotal = 0; for (let k = 0; k < K; k++) irrTotal += irr[k] * (O.bin_edges_nm[k + 1] - O.bin_edges_nm[k]);
+  return { spec, xyz, starXYZ, lwhite: lw > 0 ? lw : 1, lbright: lw, irr, irrTotal };
+}
+
+/* sky.optical_depth_diagnostic */
+function diagnostic(G) {
+  const tz = Array.from(G.sig, s => s * G.zenithColumn), ts = G.starColumn === null ? null : Array.from(G.sig, s => s * G.starColumn);
+  const peak = Math.max(...tz), D = S.diagnostic;
+  return { tau_zenith: tz, tau_star: ts, peak_zenith: peak, level: peak >= D.tau_unreliable ? "unreliable" : peak >= D.tau_caution ? "caution" : "ok" };
+}
+
+/* full recompute (composition, column, observer, star elevation), then the star */
+function recompute() {
+  st.timer = 0;
+  const t0 = performance.now();
+  try {
+    st.error = null;
+    st.mix = mixture();
+    st.col = column(st.mix);
+    st.place = place(st.col);
+    st.table = geometryTable(st.col, st.place.z, st.star.el, st.mix.sigma);
+    st.diag = diagnostic(st.table);
+    st.view = illuminate(st.table);
+    st.ms = performance.now() - t0;
+  } catch (err) {
+    if (!err.sky) throw err;
+    st.error = err.message; st.table = null; st.view = null; st.diag = null;
+  }
+  redraw();
+}
+function relight() {
+  if (!st.table) return recompute();
+  try { st.error = null; st.view = illuminate(st.table); }
+  catch (err) { if (!err.sky) throw err; st.error = err.message; st.view = null; }
+  redraw();
+}
+function schedule() { if (st.timer) clearTimeout(st.timer); st.timer = setTimeout(recompute, 150); }
+function redraw() { drawSky(); labels(); }
+
+/* ---- drawing ---- */
+const skyC = $("sky"), skyImg = document.createElement("canvas");
+function basis() {
+  const a = st.look.az * DEG, e = st.look.el * DEG;
+  const f = [Math.cos(e) * Math.sin(a), Math.cos(e) * Math.cos(a), Math.sin(e)];     // east, north, up
+  const r = [Math.cos(a), -Math.sin(a), 0];
+  const u = [r[1] * f[2] - r[2] * f[1], r[2] * f[0] - r[0] * f[2], r[0] * f[1] - r[1] * f[0]];
+  return { f, r, u };
+}
+function lookup(V, G, thDeg, phDeg) {
+  const x = thDeg * (G.NZ - 1) / 180, y = phDeg * (G.NA - 1) / 180;
+  const i = Math.min(Math.max(Math.floor(x), 0), G.NZ - 2), j = Math.min(Math.max(Math.floor(y), 0), G.NA - 2), fx = x - i, fy = y - j;
+  const out = [0, 0, 0];
+  for (let c = 0; c < 3; c++) {
+    const a = V.xyz[3 * (i * G.NA + j) + c], b = V.xyz[3 * (i * G.NA + j + 1) + c];
+    const p = V.xyz[3 * ((i + 1) * G.NA + j) + c], q = V.xyz[3 * ((i + 1) * G.NA + j + 1) + c];
+    out[c] = (a * (1 - fy) + b * fy) * (1 - fx) + (p * (1 - fy) + q * fy) * fx;
+  }
+  return out;
+}
+function srgb(x) { x = Math.max(0, Math.min(1, x)); return x <= 0.0031308 ? 12.92 * x : 1.055 * Math.pow(x, 1 / 2.4) - 0.055; }
+function whiteLuminance() { return st.exp.mode === "fixed" ? st.exp.ref : (st.view ? st.view.lwhite : 1); }
+function drawSky() {
+  const r = skyC.getBoundingClientRect(), dpr = Math.min(window.devicePixelRatio || 1, 2);
+  skyC.width = Math.max(1, Math.round(r.width * dpr)); skyC.height = Math.max(1, Math.round(r.height * dpr));
+  const g = skyC.getContext("2d"); g.setTransform(1, 0, 0, 1, 0, 0);
+  g.fillStyle = "#000"; g.fillRect(0, 0, skyC.width, skyC.height);
+  g.setTransform(dpr, 0, 0, dpr, 0, 0);
+  g.font = "13px system-ui, sans-serif"; g.textAlign = "left";
+  if (!st.view || !(st.exp.mode === "auto" || (isFinite(st.exp.ref) && st.exp.ref > 0))) {
+    st.clip = null; st.disk = null;
+    g.fillStyle = "#f2b8b5";
+    g.fillText(st.error ? "No sky: " + st.error : (st.view ? "No sky: the fixed reference luminance must be > 0" : "Computing…"), 14, r.height / 2);
+    return;
+  }
+  const G = st.table, V = st.view, W = Math.max(1, Math.round(r.width / 3)), H = Math.max(1, Math.round(r.height / 3));
+  skyImg.width = W; skyImg.height = H;
+  const ctx = skyImg.getContext("2d"), img = ctx.createImageData(W, H), M = O.xyz_to_linear_srgb;
+  const { f, r: rt, u } = basis(), t = Math.tan(st.look.fov * DEG / 2), aspect = r.width / r.height;
+  const sa = st.star.az * DEG, se = st.star.el * DEG, sd = [Math.cos(se) * Math.sin(sa), Math.cos(se) * Math.cos(sa), Math.sin(se)];
+  const pixAng = st.look.fov * DEG / W, alpha = st.star.alpha * DEG, rDisk = Math.max(alpha, pixAng);
+  const scale = Math.pow(2, st.exp.ev) / whiteLuminance();
+  let over = 0, gamut = 0;
+  for (let py = 0; py < H; py++) for (let px = 0; px < W; px++) {
+    const x = (2 * (px + 0.5) / W - 1) * t, y = (1 - 2 * (py + 0.5) / H) * t / aspect;
+    let d = [f[0] + x * rt[0] + y * u[0], f[1] + x * rt[1] + y * u[1], f[2] + x * rt[2] + y * u[2]];
+    const L = Math.hypot(d[0], d[1], d[2]); d = [d[0] / L, d[1] / L, d[2] / L];
+    const th = Math.acos(Math.max(-1, Math.min(1, d[2]))) / DEG;
+    let ph = Math.atan2(d[0], d[1]) - sa; ph = Math.abs(((ph + Math.PI) % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI) - Math.PI) / DEG;
+    const c = lookup(V, G, th, ph);
+    if (V.starXYZ && Math.acos(Math.max(-1, Math.min(1, d[0] * sd[0] + d[1] * sd[1] + d[2] * sd[2]))) <= rDisk) {
+      c[0] += V.starXYZ[0]; c[1] += V.starXYZ[1]; c[2] += V.starXYZ[2];
+    }
+    const k = 4 * (py * W + px);
+    for (let ch = 0; ch < 3; ch++) {
+      const v = (M[ch][0] * c[0] + M[ch][1] * c[1] + M[ch][2] * c[2]) * scale;
+      if (v > 1) over++; else if (v < 0) gamut++;
+      img.data[k + ch] = Math.round(255 * srgb(v));
+    }
+    img.data[k + 3] = 255;
+  }
+  ctx.putImageData(img, 0, 0);
+  st.clip = { over: over / (3 * W * H), gamut: gamut / (3 * W * H) };
+  st.disk = { enlarged: alpha < pixAng };
+  g.imageSmoothingEnabled = true; g.drawImage(skyImg, 0, 0, r.width, r.height);
+  // overlays: horizon, cardinal points, the star marker
+  const proj = v => { const df = v[0] * f[0] + v[1] * f[1] + v[2] * f[2]; if (df <= 1e-6) return null;
+    return [(1 + (v[0] * rt[0] + v[1] * rt[1] + v[2] * rt[2]) / df / t) * r.width / 2, (1 - (v[0] * u[0] + v[1] * u[1] + v[2] * u[2]) / df / (t / aspect)) * r.height / 2]; };
+  g.strokeStyle = "rgba(255,255,255,0.55)"; g.lineWidth = 1; g.beginPath(); let pen = false;
+  for (let a = 0; a <= 360; a += 1) { const p = proj([Math.sin(a * DEG), Math.cos(a * DEG), 0]); if (!p) { pen = false; continue; } if (pen) g.lineTo(p[0], p[1]); else g.moveTo(p[0], p[1]); pen = true; }
+  g.stroke();
+  g.fillStyle = "rgba(255,255,255,0.85)"; g.textAlign = "center";
+  [["N", 0], ["E", 90], ["S", 180], ["W", 270]].forEach(([n, a]) => { const p = proj([Math.sin(a * DEG), Math.cos(a * DEG), 0]); if (p) g.fillText(n, p[0], p[1] + 15); });
+  const ps = proj(sd);
+  if (ps) { g.strokeStyle = "rgba(255,220,120,0.9)"; g.beginPath(); g.arc(ps[0], ps[1], 9, 0, 2 * Math.PI); g.stroke(); }
+  g.textAlign = "left"; g.fillStyle = "rgba(255,255,255,0.9)";
+  g.fillText((st.exp.mode === "fixed" ? "FIXED exposure" : "AUTO exposure") + " · " + (st.exp.ev >= 0 ? "+" : "") + st.exp.ev.toFixed(2) + " EV", 12, r.height - 12);
+}
+
+/* ---- labels (after drawing, so the clipping figures describe the image shown) ---- */
+function bin(nm) { return O.wavelengths_nm.indexOf(nm); }
+function labels() {
+  $("stageLabel").textContent = S.label + (HYP ? " · HYPOTHETICAL atmosphere" : " · saved state");
+  $("starAzL").textContent = st.star.az.toFixed(0) + "°";
+  $("starElL").textContent = st.star.el.toFixed(1) + "°";
+  $("fovL").textContent = st.look.fov.toFixed(0) + "°";
+  $("evL").textContent = (st.exp.ev >= 0 ? "+" : "") + st.exp.ev.toFixed(2) + " EV";
+  $("expRef").disabled = st.exp.mode !== "fixed";
+  // composition
+  let sum = 0; for (const r of st.comp) sum += r[1];
+  $("compSum").textContent = sum.toPrecision(9);
+  const comp = $("compNote");
+  if (st.mix && !st.error) {
+    const rc = st.col ? st.col.R : null;
+    let rel = rc ? (st.mix.R - rc) / rc : null;
+    const ok = rel !== null && Math.abs(rel) <= S.composition_rules.r_tolerance;
+    comp.className = "note";
+    comp.textContent = st.compLabel + " (" + st.compSource + "). M = " + fmt(st.mix.M * 1000, 6) + " g/mol, R*/M = " + fmt(st.mix.R, 6) + " J kg⁻¹ K⁻¹. "
+      + (HYP && st.atm.gas_constant === "from_composition" ? "The column's gas constant follows this composition."
+         : "The " + (HYP ? "hypothetical column uses R" : "run uses r_dry") + " = " + fmt(rc, 6) + " (" + (rel * 100 >= 0 ? "+" : "") + (rel * 100).toPrecision(3) + " %): "
+           + (ok ? "they agree within the " + (S.composition_rules.r_tolerance * 100) + " % reporting threshold." : "they DISAGREE; the column keeps its own gas constant and the composition only sets the cross section."));
+  } else if (st.error) { comp.className = "note"; comp.textContent = st.compLabel + " (" + st.compSource + ")."; }
+  // atmosphere
+  const an = $("atmNote");
+  if (HYP) {
+    an.className = "note";
+    an.textContent = "HYPOTHETICAL: not from a simulation. p_s is at the reference sphere (altitude 0); hydrostatic; nothing above p = " + st.atm.top_ratio + "·p_s."
+      + (st.col ? " Column top " + fmt(st.col.ceiling / 1000) + " km; R = " + fmt(st.col.R, 6) + " J kg⁻¹ K⁻¹." : "")
+      + " Horizontally uniform, so the observer's location has no effect.";
+  } else {
+    const c = S.context;
+    an.className = "note";
+    an.textContent = "Saved state " + c.time_index + " of " + c.run + " (" + c.time_label + ") above " + c.lat_deg.toFixed(2) + "°, " + c.lon_deg.toFixed(2)
+      + "°: surface " + fmt(S.terrain_m) + " m, p_s = " + fmt(Math.exp(S.column.ln_p[0]) / 100, 6) + " hPa, r_dry = " + fmt(S.r_dry, 6)
+      + " J kg⁻¹ K⁻¹, g = " + fmt(c.gravity, 6) + " m s⁻² (" + c.gravity_source + "). The column is the saved state's and cannot be edited here.";
+  }
+  // star
+  if (st.view) $("starIrr").textContent = "400–760 nm irradiance " + fmt(st.view.irrTotal) + " W m⁻²";
+  $("starNote").textContent = st.star.label + " (" + st.star.source + "): blackbody " + fmt(st.star.T, 6) + " K, angular radius " + fmt(st.star.alpha, 4) + "°; uniform disk, no limb darkening. Position set by hand (no orbit).";
+  // observer
+  const n = $("obsNote");
+  if (st.error) { n.className = "note err"; n.textContent = st.error; }
+  else if (!st.place) { n.className = "note"; n.textContent = "Computing…"; }
+  else {
+    n.className = "note";
+    n.textContent = "z = " + fmt(st.place.z, 6) + " m above R ≈ " + fmt(st.place.p / 100, 5) + " hPa · ground " + fmt(st.place.floor, 6) + " m"
+      + (st.obs.mode === "pressure" ? " (height from the pressure you entered)" : st.obs.mode === "altitude" ? " (pressure from the altitude you entered)" : "")
+      + " · looking " + st.look.az.toFixed(0) + "° az, " + st.look.el.toFixed(0) + "° el";
+  }
+  // exposure: which mode is active, and what white means
+  const e = $("expNote");
+  if (st.exp.mode === "fixed") {
+    e.innerHTML = '<span class="mode">FIXED</span> ';
+    e.append("White at 0 EV = " + (isFinite(st.exp.ref) && st.exp.ref > 0 ? fmt(st.exp.ref) + " cd m⁻²" : "— (set a reference > 0)") + ", held when the atmosphere or star changes, so brightness comparisons between settings are meaningful."
+      + (st.view ? " Brightest sky now: " + fmt(st.view.lbright) + " cd m⁻²." : ""));
+  } else {
+    e.innerHTML = '<span class="mode auto">AUTO</span> ';
+    e.append("White at 0 EV = the brightest sky luminance of the current table" + (st.view ? " (" + fmt(st.view.lbright) + " cd m⁻²)" : "") + ", recomputed whenever the sky changes: brightness differences between settings are normalized away. Use FIXED to compare.");
+  }
+  const clip = st.clip;
+  $("clipNote").textContent = (st.table ? "Table " + st.table.NZ + "×" + st.table.NA + " directions in " + Math.round(st.ms) + " ms. " : "")
+    + (clip ? "Clipped: " + (100 * clip.over).toFixed(1) + " % over-exposed, " + (100 * clip.gamut).toFixed(1) + " % outside sRGB." : "No sky image drawn yet.")
+    + (st.disk && st.disk.enlarged ? " The star disk is drawn larger than its true size (one pixel)." : "");
+  // optical depth
+  const tt = $("tauTable"), tn = $("tauNote"), w = $("stageWarn");
+  tt.innerHTML = "";
+  if (st.diag) {
+    const D = st.diag, head = tt.insertRow();
+    for (const h of ["λ (nm)", "τ zenith", "τ to the star"]) { const c = document.createElement("th"); c.textContent = h; head.append(c); }
+    for (const nm of [410, 450, 550, 650, 750]) {
+      const k = bin(nm), row = tt.insertRow();
+      row.insertCell().textContent = String(nm);
+      row.insertCell().textContent = D.tau_zenith[k].toPrecision(3);
+      row.insertCell().textContent = D.tau_star ? D.tau_star[k].toPrecision(3) : "star hidden";
+    }
+    const msg = D.level === "unreliable"
+      ? "UNRELIABLE: the zenith optical depth reaches " + D.peak_zenith.toPrecision(3) + " (≥ " + S.diagnostic.tau_unreliable + "). The atmosphere is optically thick; most light reaching the observer has scattered more than once, which this single-scattering model omits. Colours and brightness here are not meaningful."
+      : D.level === "caution"
+      ? "Caution: the zenith optical depth reaches " + D.peak_zenith.toPrecision(3) + " (≥ " + S.diagnostic.tau_caution + "). Multiple scattering, not modelled, is significant: colours and brightness are qualitative."
+      : "Zenith optical depth ≤ " + D.peak_zenith.toPrecision(3) + " (< " + S.diagnostic.tau_caution + "): single scattering is a reasonable first approximation.";
+    tn.className = D.level === "ok" ? "note" : "note warn"; tn.textContent = msg + " Thresholds are rules of thumb, not error bounds.";
+    w.hidden = D.level === "ok"; w.className = "banner " + D.level; w.textContent = D.level === "ok" ? "" : msg.split(":")[0] + ": zenith τ = " + D.peak_zenith.toPrecision(3) + " at 410 nm";
+  } else { tn.className = "note"; tn.textContent = st.error ? "No optical depth: " + st.error : ""; w.hidden = true; }
+}
+
+/* ---- controls ---- */
+function syncInputs() {
+  if (HYP) {
+    const a = st.atm;
+    $("atmPs").value = a.surface_pressure_pa / 100; $("atmT").value = a.temperature_k;
+    $("atmLapse").value = a.lapse_rate_k_per_m * 1000; $("atmFloor").value = a.temperature_floor_k === null ? "" : a.temperature_floor_k;
+    $("atmFloor").disabled = !(a.lapse_rate_k_per_m > 0);
+    $("atmG").value = a.gravity; $("atmRadius").value = a.radius_m / 1000;
+    $("atmRMode").value = a.gas_constant === "from_composition" ? "from_composition" : "fixed";
+    $("atmR").disabled = a.gas_constant === "from_composition";
+    $("atmR").value = a.gas_constant === "from_composition" ? (st.mix ? st.mix.R.toPrecision(6) : "") : a.gas_constant;
+  }
+  for (const [k, x] of st.comp) $("comp_" + k).value = x;
+  $("starT").value = st.star.T; $("starAlpha").value = st.star.alpha;
+  $("starAz").value = st.star.az; $("starEl").value = st.star.el;
+  $("altMode").value = st.obs.mode;
+  const v = $("altVal"); v.disabled = st.obs.mode === "ground";
+  v.value = st.obs.mode === "pressure" ? st.obs.pressure_pa / 100 : st.obs.mode === "altitude" ? st.obs.altitude_m : "";
+  $("fov").value = st.look.fov; $("ev").value = st.exp.ev;
+  $("expMode").value = st.exp.mode; $("expRef").value = st.exp.ref === null ? "" : st.exp.ref;
+}
+function compEdited() { st.compLabel = "composition edited in the page"; st.compSource = "stated by the user"; }
+function starEdited() { st.star.label = "blackbody star set in the page"; st.star.source = "stated by the user"; }
+function setExposureMode(m) {
+  st.exp.mode = m === "fixed" ? "fixed" : "auto";
+  // entering FIXED keeps the current picture: the reference starts at the brightest sky luminance now
+  if (st.exp.mode === "fixed" && !(st.exp.ref > 0) && st.view) st.exp.ref = Number(st.view.lbright.toPrecision(4));
+  syncInputs(); redraw();
+}
+function initUI() {
+  $("title").textContent = document.title;
+  $("kindLabel").textContent = HYP ? "HYPOTHETICAL atmosphere, prescribed here; not from a simulation." : "Column of a saved simulation state (fixed); composition and star are view settings only.";
+  $("atmHyp").hidden = !HYP;
+  const grid = $("compGrid"), which = $("compFillWhich");
+  for (const [k] of st.comp) {
+    const l = document.createElement("label"); l.htmlFor = "comp_" + k; l.textContent = k;
+    const i = document.createElement("input"); i.type = "number"; i.id = "comp_" + k; i.step = "any"; i.min = "0"; i.max = "1";
+    i.addEventListener("change", () => { st.comp.find(r => r[0] === k)[1] = +i.value; compEdited(); schedule(); labels(); });
+    grid.append(l, i);
+    const o = document.createElement("option"); o.value = k; o.textContent = k; which.append(o);
+  }
+  $("compFill").addEventListener("click", () => {
+    // an explicit action: the chosen species takes whatever the others leave
+    const k = which.value; let others = 0; for (const r of st.comp) if (r[0] !== k) others += r[1];
+    st.comp.find(r => r[0] === k)[1] = Math.max(0, 1 - others); compEdited(); syncInputs(); recompute();
+  });
+  if (HYP) {
+    const num = (id, fn) => $(id).addEventListener("change", () => { fn(+$(id).value); syncInputs(); schedule(); });
+    num("atmPs", v => { st.atm.surface_pressure_pa = v * 100; });
+    num("atmT", v => { st.atm.temperature_k = v; });
+    num("atmLapse", v => { st.atm.lapse_rate_k_per_m = v / 1000; if (v > 0 && st.atm.temperature_floor_k === null) st.atm.temperature_floor_k = Math.max(1, Math.round(st.atm.temperature_k * 0.6)); });
+    num("atmFloor", v => { st.atm.temperature_floor_k = v; });
+    num("atmG", v => { st.atm.gravity = v; });
+    num("atmR", v => { st.atm.gas_constant = v; });
+    num("atmRadius", v => { st.atm.radius_m = v * 1000; });
+    $("atmRMode").addEventListener("change", () => { st.atm.gas_constant = $("atmRMode").value === "from_composition" ? "from_composition" : (st.mix ? Number(st.mix.R.toPrecision(6)) : 287); syncInputs(); schedule(); });
+  }
+  $("starT").addEventListener("change", () => { st.star.T = +$("starT").value; starEdited(); relight(); });
+  $("starAlpha").addEventListener("change", () => { st.star.alpha = +$("starAlpha").value; starEdited(); relight(); });
+  $("starSun").addEventListener("click", () => { st.star.T = 5772; st.star.alpha = Math.asin(695700 / 149597870.7) / DEG; st.star.label = "Sun-like blackbody at 1 au"; st.star.source = "IAU 2015 B3 nominal T_eff = 5772 K, R = 695 700 km; IAU 2012 B2 au"; syncInputs(); relight(); });
+  $("starAz").addEventListener("input", () => { st.star.az = +$("starAz").value; redraw(); });
+  $("starEl").addEventListener("input", () => { st.star.el = +$("starEl").value; labels(); schedule(); });
+  $("fov").addEventListener("input", () => { st.look.fov = +$("fov").value; redraw(); });
+  $("ev").addEventListener("input", () => { st.exp.ev = +$("ev").value; redraw(); });
+  $("expMode").addEventListener("change", () => setExposureMode($("expMode").value));
+  $("expRef").addEventListener("change", () => { st.exp.ref = +$("expRef").value; redraw(); });
+  $("altMode").addEventListener("change", () => {
+    const m = $("altMode").value;
+    if (m === "altitude") st.obs.altitude_m = st.place ? st.place.z : 0;
+    if (m === "pressure") st.obs.pressure_pa = st.place ? st.place.p : 1e5;
+    st.obs.mode = m; syncInputs(); recompute();
+  });
+  $("altVal").addEventListener("change", () => {
+    const v = +$("altVal").value;
+    if (st.obs.mode === "pressure") st.obs.pressure_pa = v * 100; else if (st.obs.mode === "altitude") st.obs.altitude_m = v;
+    recompute();
+  });
+  let drag = null;
+  skyC.addEventListener("pointerdown", e => { drag = [e.clientX, e.clientY]; skyC.setPointerCapture(e.pointerId); });
+  skyC.addEventListener("pointermove", e => {
+    if (!drag) return;
+    const k = st.look.fov / (skyC.getBoundingClientRect().width || 500);
+    st.look.az = ((st.look.az - (e.clientX - drag[0]) * k) % 360 + 360) % 360;
+    st.look.el = Math.max(-89, Math.min(89, st.look.el + (e.clientY - drag[1]) * k));
+    drag = [e.clientX, e.clientY]; redraw();
+  });
+  const end = () => { drag = null; };
+  skyC.addEventListener("pointerup", end); skyC.addEventListener("pointercancel", end);
+  skyC.addEventListener("keydown", e => {
+    const d = { ArrowLeft: [-2, 0], ArrowRight: [2, 0], ArrowUp: [0, 2], ArrowDown: [0, -2] }[e.key];
+    if (!d) return;
+    e.preventDefault();
+    st.look.az = ((st.look.az + d[0]) % 360 + 360) % 360; st.look.el = Math.max(-89, Math.min(89, st.look.el + d[1])); redraw();
+  });
+  const ul = $("notes");
+  const add = text => { const li = document.createElement("li"); li.textContent = text; ul.append(li); };
+  S.notes.forEach(add);
+  add("Not modelled: " + S.unsupported.join("; ") + ".");
+  add("Sources: " + S.sources.join(" | "));
+  syncInputs();
+}
+
+/* ---- start ---- */
+window.addEventListener("resize", redraw);
+initUI();
+recompute();
+syncInputs();
+
+/* test and scripting API: set() applies changes and recomputes synchronously */
+window.__sky = {
+  set: p => {
+    if (p.atmosphere) { if (!HYP) throw new Error("the saved column cannot be edited"); Object.assign(st.atm, p.atmosphere); }
+    if (p.composition) { st.comp = st.comp.map(([k]) => [k, p.composition[k] || 0]); compEdited(); }
+    if (p.star) { Object.assign(st.star, p.star); if (p.star.T !== undefined || p.star.alpha !== undefined) starEdited(); }
+    if (p.observer) Object.assign(st.obs, p.observer);
+    if (p.look) Object.assign(st.look, p.look);
+    if (p.exposure) Object.assign(st.exp, p.exposure);
+    syncInputs(); recompute();
+    return window.__sky.info();
+  },
+  column: () => st.col && { z: st.col.z, lnp: st.col.lnp, T: st.col.T, ceiling: st.col.ceiling, R: st.col.R },
+  mixture: () => st.mix && { rows: st.mix.rows, sigma: Array.from(st.mix.sigma), M: st.mix.M, R: st.mix.R },
+  spectral: (iz, ia) => st.view ? Array.from(st.view.spec.subarray((iz * st.table.NA + ia) * K, (iz * st.table.NA + ia + 1) * K)) : null,
+  info: () => ({ kind: S.column_kind, error: st.error, place: st.place, observer: Object.assign({}, st.obs), look: Object.assign({}, st.look),
+                 star: Object.assign({}, st.star), exposure: Object.assign({}, st.exp), white: whiteLuminance(),
+                 brightest: st.view ? st.view.lbright : null, starXYZ: st.view ? st.view.starXYZ : null,
+                 zenithColumn: st.table ? st.table.zenithColumn : null, starColumn: st.table ? st.table.starColumn : null,
+                 diagnostic: st.diag, clip: st.clip, ms: st.ms, radius: radius(), label: S.label }),
+};
+})();
+</script>
+</body>
+</html>

@@ -311,6 +311,11 @@ class HeldSuarezStorage:
         from tropoi.representation.visual.atmosphere import view_atmosphere
         return view_atmosphere(self, path, **options)
 
+    def sky(self, spec, path=None, **options) -> pathlib.Path:
+        """Write the sky page of one saved column; see ``Simulation.sky``."""
+        from tropoi.representation.visual.sky import saved_sky_page
+        return saved_sky_page(self, spec, path, **options)
+
     def plot_snapshot(self, index: int, output_path, **options):
         raise HeldSuarezPlotError(
             "Held–Suarez experiments have no snapshot figure product; use "

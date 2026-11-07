@@ -55,7 +55,7 @@ src/tropoi/
 │   └── visual/              figure fields/specs/timelines/renderers, per-core compositions, Snapshot.plot adapter,
 │                            terrain previews (terrain.py: static figure and self-contained HTML globe),
 │                            the 3-D atmosphere page (atmosphere.py, sphere_streamlines.py; same globe template),
-│                            the sky-from-the-surface prototype (sky.py; optional block of the same page)
+│                            the standalone sky page (sky.py + sky_view.html; its own template, no globe)
 ├── run/{bve,swe,pe}/    orchestration: resolved run configuration and the runners
 ├── run/custom/          custom planets/initial states: preparation, configuration, execution, preset export,
 │                        prepared planets with terrain previews (planet.py)
@@ -227,8 +227,9 @@ inference still reads published scientific runs; both remain supported.
   directories and the 3-D atmosphere page of a saved PE run
   (`Simulation.view`, Matplotlib for colour tables; a preset-mountain
   terrain is rebuilt on the GPU only with `allow_cuda=True`); gas optics,
-  compositions and columns (`spatial.optics`) and the sky panel
-  (`view(sky=...)`). Fresh-interpreter tests enforce these boundaries.
+  compositions and columns (`spatial.optics`) and the sky page
+  (`sky.write_sky_page` for a hypothetical atmosphere, which needs no run,
+  planet, terrain or archive; `Simulation.sky` for a saved PE column). Fresh-interpreter tests enforce these boundaries.
 - **CUDA required**: running any solver (including `run_initial_state`); resolving terrain
   (`prepare_planet`); anything that builds grids,
   transforms, backends, operators, states, initial conditions or

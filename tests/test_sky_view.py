@@ -1,16 +1,23 @@
-"""Sky-from-the-surface prototype: optics, composition, column, reference.
+"""Sky optics laboratory: optics, composition, column, reference, page contracts.
 
 CPU only. No assertion compares a sky colour or an optical depth with an
 expected "look": the checks are internal physics and contracts --
 analytic hydrostatics, exact inverses, refusals, the no-inference rule,
-column counts against p_s R/(k_B g), numerical convergence, and the
-viewer's additive behaviour (no sky block unless asked; runs untouched).
+column counts against p_s R/(k_B g), numerical convergence, the King
+factors and air cross section against Bodhaine et al. (1999) as printed,
+and the page boundary (a standalone page that needs no simulation
+infrastructure; globe pages carry no sky; saved runs untouched).
 """
 from __future__ import annotations
 
 import hashlib
+import inspect
+import json
 import math
 import pathlib
+import re
+import subprocess
+import sys
 
 import numpy as np
 import pytest
@@ -25,6 +32,7 @@ from tropoi.spatial.optics.constants import K_B, R_MOLAR
 from tropoi.representation.visual import sky
 
 AIR = COMPOSITION_PRESETS["earth_dry_air_illustrative"]
+REPO = pathlib.Path(__file__).resolve().parents[1]
 
 
 # -- optics ------------------------------------------------------------------
@@ -53,12 +61,46 @@ def test_cross_section_scales_as_inverse_square_reference_density():
     assert float(twice.cross_section(550.0)) == pytest.approx(float(s0) / 4)
 
 
-def test_every_species_records_its_sources_and_unverified_king_factor():
+def test_every_species_records_its_sources_and_checked_king_factor():
     for species in SPECIES.values():
         text = species.describe()
         assert "refractiveindex.info" in text and "Bates (1984)" in text
-        assert species.king_verified is False
-        assert "not yet checked" in text
+        assert "eqs. 5-6" in text
+        assert species.king_verified is True
+        assert "not yet checked" not in text
+
+
+def test_king_factors_are_those_printed_by_bodhaine_1999():
+    # Bodhaine et al. (1999), J. Atmos. Oceanic Technol. 16, 1854, as
+    # printed: eq. 5 F(N2) = 1.034 + 3.17e-4 / lambda^2, eq. 6 F(O2) = 1.096
+    # + 1.385e-3 / lambda^2 + 1.448e-4 / lambda^4, then "F(Ar) = 1.00,
+    # F(CO2) = 1.15" (checked against the paper 2026-11-07).
+    assert SPECIES["N2"].king == (1.034, 3.17e-4, 0.0)
+    assert SPECIES["O2"].king == (1.096, 1.385e-3, 1.448e-4)
+    assert SPECIES["Ar"].king == (1.0, 0.0, 0.0)
+    assert SPECIES["CO2"].king == (1.15, 0.0, 0.0)
+
+    # lambda in micrometres: the paper's eq. 23 for 360 ppm CO2 air
+    # reproduces its Fig. 1 (about 1.080 at 0.2 um, 1.047 at 1 um)
+    def f_air(um):
+        n2, o2 = (SPECIES[k].king_factor(um) for k in ("N2", "O2"))
+        return float((78.084 * n2 + 20.946 * o2 + 0.934 * 1.00
+                      + 0.036 * 1.15) / (78.084 + 20.946 + 0.934 + 0.036))
+    assert f_air(0.2) == pytest.approx(1.080, abs=1.5e-3)
+    assert f_air(1.0) == pytest.approx(1.047, abs=1.5e-3)
+
+
+def test_dry_air_cross_section_agrees_with_bodhaine_eq_29():
+    # End to end (refractive indices, King factors, constants): eq. 29 is
+    # the paper's fit (better than 0.01 %) to its sigma of 360 ppm CO2 air,
+    # built from Peck & Reeder's air index, not from our per-gas records.
+    lam = sky.WAVELENGTHS_NM
+    um = lam / 1000.0
+    eq29 = ((1.0455996 - 341.29061 * um ** -2 - 0.90230850 * um ** 2)
+            / (1 + 0.0027059889 * um ** -2 - 85.968563 * um ** 2)) * 1e-32
+    rel = AIR.cross_section(lam) / eq29 - 1.0
+    # measured 2026-11-07: -0.094 % .. -0.054 % over 410-750 nm
+    assert np.max(np.abs(rel)) < 1.5e-3
 
 
 def test_cie_table_is_the_verbatim_cie_dataset():
@@ -201,13 +243,14 @@ def test_column_from_levels_nodes_and_ceiling():
 
 # -- reference radiance -----------------------------------------------------------
 
+def _irradiance():
+    return Star.sun_at_1au().irradiance(sky.WAVELENGTHS_NM)
+
+
 def _table(column, **kw):
-    o = sky.optics_block(AIR, Star.sun_at_1au())
     args = dict(radius_m=6.371e6, observer_z_m=2.0, star_elevation_deg=30.0,
-                cross_section_m2=o["cross_section_m2"],
-                irradiance=np.array(o["star_radiance"])
-                * o["star_solid_angle_sr"],
-                n_zenith=31, n_azimuth=13)
+                cross_section_m2=AIR.cross_section(sky.WAVELENGTHS_NM),
+                irradiance=_irradiance(), n_zenith=31, n_azimuth=13)
     args.update(kw)
     return sky.radiance_table((column.z_m, column.ln_p, column.temperature_k),
                               **args)
@@ -227,8 +270,7 @@ def test_no_scatterer_no_sky_and_linearity_in_irradiance():
     a = _table(c)
     b = _table(c, irradiance=2.0 * np.ones(18) * 3.0)
     ratio = b["radiance"] / np.where(a["radiance"] > 0, a["radiance"], 1)
-    o = sky.optics_block(AIR, Star.sun_at_1au())
-    irr = np.array(o["star_radiance"]) * o["star_solid_angle_sr"]
+    irr = _irradiance()
     np.testing.assert_allclose(ratio[a["radiance"] > 0],
                                np.broadcast_to(6.0 / irr, ratio.shape)
                                [a["radiance"] > 0], rtol=1e-12)
@@ -253,54 +295,170 @@ def test_numerical_convergence_of_the_default_steps():
     assert rel.max() < 5e-3
 
 
-# -- viewer contracts ---------------------------------------------------------------
+def test_star_path_column_overhead_is_the_zenith_column():
+    c = _iso()
+    nodes = (c.z_m, c.ln_p, c.temperature_k)
+    t = _table(c, star_elevation_deg=90.0)
+    overhead = sky.star_path_column(nodes, radius_m=6.371e6, observer_z_m=2.0,
+                                    star_elevation_deg=90.0)
+    assert overhead == pytest.approx(float(t["column"][0, 0]), rel=1e-12)
+    low = sky.star_path_column(nodes, radius_m=6.371e6, observer_z_m=2.0,
+                               star_elevation_deg=5.0)
+    assert low > 5 * overhead                       # a long slant path
+    assert sky.star_path_column(nodes, radius_m=6.371e6, observer_z_m=2.0,
+                                star_elevation_deg=-30.0) is None
 
-def _preview():
-    from tropoi.representation.visual.terrain import build_terrain_preview
-    lm = np.zeros((11, 11), complex)
-    lm[0, 0] = 500.0 * math.sqrt(4 * math.pi)
-    return build_terrain_preview(lm, radius_m=3.3895e6, title="t")
+
+def test_optical_depth_diagnostic_levels():
+    sig = AIR.cross_section(sky.WAVELENGTHS_NM)
+    unit = 1.0 / float(sig.max())                   # tau = 1 at 410 nm
+    for column, level in ((0.05 * unit, "ok"), (0.5 * unit, "caution"),
+                          (2.0 * unit, "unreliable")):
+        d = sky.optical_depth_diagnostic(sig, column, None)
+        assert d["level"] == level
+        assert d["peak_zenith"] == pytest.approx(column / unit)
+        assert d["tau_star"] is None
+    d = sky.optical_depth_diagnostic(sig, unit, 3 * unit)
+    np.testing.assert_allclose(d["tau_star"], 3 * np.asarray(d["tau_zenith"]))
+    assert sky.TAU_CAUTION < sky.TAU_UNRELIABLE
+
+
+# -- page contracts ---------------------------------------------------------------
+
+def _hyp(**kw):
+    args = dict(surface_pressure_pa=1.0e4, temperature_k=250.0,
+                gravity=9.80665, gas_constant="from_composition",
+                radius_m=6.371e6)
+    args.update(kw)
+    return sky.HypotheticalColumn(**args)
 
 
 def _hyp_spec(**kw):
-    args = dict(composition=Composition.of(CO2=1.0), observer_lat_deg=10.0,
-                hypothetical=sky.HypotheticalColumn(
-                    surface_pressure_pa=610.0, temperature_k=210.0,
-                    gravity=3.71, gas_constant="from_composition"))
+    args = dict(composition=Composition.of(N2=1.0, label="N2"),
+                star=Star(3200.0, 0.87), hypothetical=_hyp())
     args.update(kw)
     return sky.SkySpec(**args)
 
 
-def test_terrain_page_sky_is_additive(tmp_path):
-    from tropoi.representation.visual.terrain import (globe_payload,
-                                                      write_globe_html)
-    preview = _preview()
-    plain = write_globe_html(preview, tmp_path / "a.html")
-    import json, re
-    data = re.search(r'id="terrain-data" type="application/json">(.*?)</script>',
-                     plain.read_text(encoding="utf-8"), re.S).group(1)
-    assert "sky" not in json.loads(data)
-    assert "sky" not in globe_payload(preview)
-    page = write_globe_html(preview, tmp_path / "b.html", sky=_hyp_spec())
-    assert '"column_kind":"hypothetical"' in page.read_text(encoding="utf-8")
-    with pytest.raises(ValueError, match="no saved atmosphere"):
-        write_globe_html(preview, tmp_path / "c.html",
-                         sky=_hyp_spec(hypothetical=None))
-    with pytest.raises(ColumnError, match="underground"):
-        write_globe_html(preview, tmp_path / "d.html",
-                         sky=_hyp_spec(altitude_m=100.0))
+def _block(path) -> dict:
+    text = pathlib.Path(path).read_text(encoding="utf-8")
+    raw = re.search(r'id="sky-data" type="application/json">(.*?)</script>',
+                    text, re.S).group(1)
+    return json.loads(raw.replace("\\u003c", "<").replace("\\u003e", ">"))
 
 
-def test_hypothetical_block_contents():
-    from tropoi.representation.visual.terrain import hypothetical_sky_block
-    block = hypothetical_sky_block(_hyp_spec(pressure_pa=300.0), _preview())
+def test_spec_refusals():
+    with pytest.raises(TypeError, match="ever inferred"):
+        sky.SkySpec("N2", hypothetical=_hyp())
+    with pytest.raises(ValueError, match="horizontally uniform"):
+        _hyp_spec(observer_lat_deg=10.0, observer_lon_deg=0.0)
+    with pytest.raises(ValueError, match="or neither"):
+        sky.SkySpec(AIR, observer_lat_deg=10.0)
+    with pytest.raises(ValueError, match="exposure_reference_cd_m2 > 0"):
+        _hyp_spec(exposure_mode="fixed")
+    with pytest.raises(ValueError, match="'auto' uses"):
+        _hyp_spec(exposure_reference_cd_m2=100.0)
+    with pytest.raises(ValueError, match="exposure_mode"):
+        _hyp_spec(exposure_mode="bright")
+    with pytest.raises(ValueError, match="radius_m"):
+        _hyp(radius_m=0.0)
+    with pytest.raises(ValueError, match="from_composition"):
+        _hyp(gas_constant="guess")
+
+
+def test_write_sky_page_hypothetical_block(tmp_path):
+    path = sky.write_sky_page(_hyp_spec(pressure_pa=5000.0),
+                              tmp_path / "s.html")
+    block = _block(path)
     assert block["label"].startswith("Visual prototype")
+    assert block["column_kind"] == "hypothetical"
+    assert block["hypothetical"]["radius_m"] == 6.371e6
+    assert block["radius_m"] == 6.371e6
     assert block["observer"]["mode"] == "pressure"
-    assert block["observer"]["pressure_pa"] == pytest.approx(300.0)
+    assert block["observer"]["pressure_pa"] == pytest.approx(5000.0)
     assert block["consistency"]["status"] == "consistent"   # R from it
-    assert len(block["optics"]["cross_section_m2"]) == 18
+    assert block["exposure"] == {"mode": "auto", "ev": 0.0,
+                                 "reference_cd_m2": None}
+    assert set(block["species"]) == set(SPECIES)
+    for name, sp in block["species"].items():
+        np.testing.assert_array_equal(
+            sp["cross_section_m2"],
+            SPECIES[name].cross_section(sky.WAVELENGTHS_NM))
+    assert block["diagnostic"] == {"tau_caution": sky.TAU_CAUTION,
+                                   "tau_unreliable": sky.TAU_UNRELIABLE}
     assert any("aerosols" in u for u in block["unsupported"])
     assert any("CIE" in s for s in block["sources"])
+    assert any("checked 2026-11-07" in s for s in block["sources"])
+    with pytest.raises(ValueError, match="needs spec.hypothetical"):
+        sky.write_sky_page(sky.SkySpec(AIR), tmp_path / "x.html")
+    with pytest.raises(ColumnError, match="exceeds the surface pressure"):
+        sky.write_sky_page(_hyp_spec(pressure_pa=2.0e4), tmp_path / "y.html")
+    fixed = _block(sky.write_sky_page(
+        _hyp_spec(exposure_mode="fixed", exposure_reference_cd_m2=800.0),
+        tmp_path / "f.html"))
+    assert fixed["exposure"]["mode"] == "fixed"
+    assert fixed["exposure"]["reference_cd_m2"] == 800.0
+
+
+def test_numeric_gas_constant_is_reported_not_replaced(tmp_path):
+    block = _block(sky.write_sky_page(
+        _hyp_spec(hypothetical=_hyp(gas_constant=287.0)),
+        tmp_path / "r.html"))
+    assert block["column"]["gas_constant"] == 287.0     # kept as given
+    assert block["consistency"]["status"] == "inconsistent"
+    assert block["consistency"]["r_mix"] == pytest.approx(R_MOLAR / 0.028014)
+
+
+def test_globe_pages_carry_no_sky():
+    from tropoi.representation.visual.terrain import write_globe_html
+    from tropoi.run.custom.planet import PreparedPlanet
+    template = (pathlib.Path(sky.__file__).with_name("terrain_globe.html")
+                .read_text(encoding="utf-8"))
+    assert "sky" not in template.lower()
+    assert "sky" not in inspect.signature(write_globe_html).parameters
+    assert "sky" not in inspect.signature(PreparedPlanet.view).parameters
+
+
+def test_example_needs_no_simulation_infrastructure(tmp_path):
+    # The standalone example runs with CuPy, Matplotlib, the archive, runs,
+    # solvers, diagnostics, terrain, transforms and the globe viewer all
+    # made unimportable, and none of them is loaded afterwards.
+    out = tmp_path / "n2.html"
+    banned = ["cupy", "cupyx", "matplotlib", "tropoi.temporal",
+              "tropoi.run", "tropoi.representation.archive",
+              "tropoi.representation.diagnostics",
+              "tropoi.representation.visual.terrain",
+              "tropoi.representation.visual.atmosphere",
+              "tropoi.spatial.terrain", "tropoi.spatial.transforms"]
+    example = REPO / "examples" / "sky_hypothetical.py"
+    probe = "\n".join([
+        "import sys, runpy",
+        f"banned = {banned!r}",
+        "def hit(name):",
+        "    return any(name == b or name.startswith(b + '.') for b in banned)",
+        "class Block:",
+        "    def find_spec(self, name, path=None, target=None):",
+        "        if hit(name):",
+        "            raise ImportError('blocked for this test: ' + name)",
+        "sys.meta_path.insert(0, Block())",
+        f"sys.argv = ['sky_hypothetical.py', '--no-open', '--out', {str(out)!r}]",
+        f"runpy.run_path({str(example)!r}, run_name='__main__')",
+        "loaded = [m for m in sys.modules if hit(m)]",
+        "assert not loaded, loaded",
+    ])
+    result = subprocess.run([sys.executable, "-c", probe], capture_output=True,
+                            text=True, timeout=120)
+    assert result.returncode == 0, result.stdout + result.stderr
+    block = _block(out)
+    assert block["column_kind"] == "hypothetical"
+    assert block["composition"]["mole_fractions"] == [["N2", 1.0]]
+    assert block["hypothetical"]["surface_pressure_pa"] == 1.0e4
+    assert block["hypothetical"]["radius_m"] == 6.371e6
+    assert block["star"]["temperature_k"] == 3200.0
+    # bolometric irradiance of the IAU Sun at 1 au: T^4 sin^2(a) conserved
+    sin_a = math.sin(math.radians(block["star"]["angular_radius_deg"]))
+    assert 3200.0 ** 4 * sin_a ** 2 == pytest.approx(
+        5772.0 ** 4 * (695700.0 / 149597870.7) ** 2, rel=1e-12)
 
 
 def _tree_digest(root: pathlib.Path) -> dict:
@@ -315,13 +473,21 @@ def test_saved_run_sky_leaves_the_run_untouched(tmp_path):
     before = _tree_digest(root)
     sim = open_simulation(root)
     spec = sky.SkySpec(AIR, observer_lat_deg=20.0, observer_lon_deg=10.0)
-    path = sim.view(tmp_path / "p.html", open_browser=False,
-                    resolution_deg=6.0, times="all", sky=spec)
-    assert '"column_kind":"saved_state"' in path.read_text(encoding="utf-8")
+    block = _block(sim.sky(spec, tmp_path / "p.html", open_browser=False))
+    assert block["column_kind"] == "saved_state"
+    assert block["hypothetical"] is None
+    assert block["context"]["time_index"] == 1          # the last by default
+    assert block["context"]["lat_deg"] == 20.0
+    assert block["consistency"]["status"] in ("consistent", "inconsistent")
+    first = _block(sim.sky(spec, tmp_path / "p0.html", time=0,
+                           open_browser=False))
+    assert first["context"]["time_index"] == 0
+    with pytest.raises(ValueError, match="needs observer_lat_deg"):
+        sim.sky(sky.SkySpec(AIR), tmp_path / "q.html", open_browser=False)
+    with pytest.raises(ValueError, match="own"):
+        sim.sky(_hyp_spec(), tmp_path / "r.html", open_browser=False)
+    with pytest.raises(IndexError):
+        sim.sky(spec, tmp_path / "s.html", time=5, open_browser=False)
+    with pytest.raises(ValueError, match="inside the run directory"):
+        sim.sky(spec, root / "sky.html", open_browser=False)
     assert _tree_digest(root) == before
-    with pytest.raises(ValueError, match="every native level"):
-        sim.view(tmp_path / "q.html", open_browser=False, levels=[0, 1],
-                 resolution_deg=6.0, sky=spec)
-    with pytest.raises(ValueError, match="own column"):
-        sim.view(tmp_path / "r.html", open_browser=False, resolution_deg=6.0,
-                 sky=_hyp_spec())

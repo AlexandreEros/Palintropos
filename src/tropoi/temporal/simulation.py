@@ -250,6 +250,28 @@ class Simulation:
         """
         return _view(self._storage, path, **options)
 
+    def sky(self, spec, path=None, **options) -> pathlib.Path:
+        """Write the standalone sky page above one location; return its path.
+
+        Primitive-equation runs: the column of saved state ``time`` (a
+        saved index, default the last) above ``spec.observer_lat_deg``,
+        ``spec.observer_lon_deg``, reconstructed exactly on the CPU, seen
+        through a single-scattering Rayleigh visual prototype. ``spec`` is a
+        ``tropoi.representation.visual.sky.SkySpec`` with an explicit
+        composition (never inferred from ``r_dry``). Options: ``time``,
+        ``gravity``, ``allow_cuda``, ``open_browser``. Nothing is written
+        into the run. For a hypothetical atmosphere without any run, use
+        ``tropoi.representation.visual.sky.write_sky_page``. See
+        docs/SKY_VIEW.md.
+        """
+        sky = getattr(self._storage, "sky", None)
+        if sky is None:
+            raise TypeError(
+                f"{type(self._storage).__name__} provides no sky page; it is "
+                "offered for saved primitive-equation runs opened with "
+                "open_simulation")
+        return sky(spec, path, **options)
+
     def quantities(self) -> list[dict]:
         """What this run can plot: meaning, units, cadence, availability.
 

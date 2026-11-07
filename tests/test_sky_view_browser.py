@@ -1,25 +1,26 @@
-"""The sky panel of the offline globe page, checked in a headless browser.
+"""Standalone sky page in a real headless browser (Chrome, Chromium or Edge).
 
-Opens exported pages from ``file://`` with networking blocked
-(``tools.browser_cdp``) and checks:
-
-* page/NumPy parity: the page's float64 radiance table equals
-  ``sky.radiance_table`` evaluated on the page's own column, at sampled
-  directions (saved PE state and hypothetical column);
-* the page's saved-state column agrees with Python's exact column at the
-  initial observer up to display-mesh interpolation (reported, loose);
-* altitude <-> pressure placement round-trips in the page;
-* refusals (underground, above the top) show a message, raise nothing;
-* the star azimuth only rotates the table (no recomputation, same numbers);
-* switching back to the globe restores it; pages without a sky block show
-  no sky controls; one request (the file itself), no console errors.
-
-Skipped when no Chromium-family browser is installed.
+* The page's float64 JavaScript equals the NumPy reference
+  (``representation.visual.sky``, ``spatial.optics``) to a relative 1e-9:
+  the hypothetical column, the mixture cross section, the spectral
+  radiance in sampled directions, the zenith and star-path columns and the
+  optical-depth diagnostic -- for the acceptance case (0.1 bar N2, 3200 K
+  star) and after the atmosphere, composition and star are edited in the
+  page, and for a saved primitive-equation column.
+* Exposure: AUTO follows the brightest sky luminance; FIXED holds its
+  reference when pressure or illumination change, and the page says which.
+* Optical depth: the caution and unreliable warnings appear when the
+  zenith optical depth crosses the stated thresholds.
+* Refusals (non-unit mole-fraction sums, underground observers) are
+  messages, not exceptions; one request (the file itself), no console
+  errors.
 """
 from __future__ import annotations
 
 import json
 import pathlib
+import re
+import subprocess
 import sys
 
 import numpy as np
@@ -33,12 +34,16 @@ from tools.browser_cdp import OfflinePage, find_browser  # noqa: E402
 from test_atmosphere_view import write_pe_capsule  # noqa: E402
 
 from tropoi.representation.visual import sky  # noqa: E402
-from tropoi.spatial.optics import COMPOSITION_PRESETS, Composition  # noqa: E402
+from tropoi.spatial.optics import (COMPOSITION_PRESETS, Composition,  # noqa: E402
+                                   Star)
+from tropoi.spatial.optics.colour import bin_weights  # noqa: E402
+from tropoi.spatial.optics.constants import LUMINOUS_EFFICACY  # noqa: E402
 
 BROWSER = find_browser()
 pytestmark = pytest.mark.skipif(BROWSER is None,
                                 reason="needs Chrome, Chromium or Edge")
-API = "window.__terrainGlobe.sky"
+API = "window.__sky"
+WL = sky.WAVELENGTHS_NM
 DIRECTIONS = [(0, 0), (10, 5), (45, 0), (45, 30), (60, 60), (80, 20),
               (88, 0), (89, 45), (90, 10), (91, 0), (95, 30), (120, 60),
               (178, 2)]
@@ -50,154 +55,220 @@ def _assert_clean(page, url):
     assert page.exceptions == [], page.exceptions
 
 
-def _parity(page, payload_sky):
-    info = page.eval(f"{API}.info()")
-    assert info["error"] is None, info["error"]
-    col = page.eval(f"{API}.column()")
-    o = payload_sky["optics"]
-    ref = sky.radiance_table(
-        (col["z"], col["lnp"], col["T"]), radius_m=payload_sky["radius_m"],
-        observer_z_m=info["place"]["z"],
-        star_elevation_deg=info["star"]["el"],
-        cross_section_m2=o["cross_section_m2"],
-        irradiance=np.array(o["star_radiance"]) * o["star_solid_angle_sr"])
-    worst = 0.0
-    for iz, ia in DIRECTIONS:
-        got = np.array(page.eval(f"{API}.spectral({iz}, {ia})"))
-        want = ref["radiance"][iz, ia]
-        np.testing.assert_allclose(got, want, rtol=1e-9, atol=0.0,
-                                   err_msg=f"direction {iz}, {ia}")
-        worst = max(worst, float(np.max(np.abs(got - want) /
-                                        np.where(want > 0, want, 1))))
-    return worst
-
-
-def _payload(path):
-    import re
+def _block(path) -> dict:
     text = pathlib.Path(path).read_text(encoding="utf-8")
-    raw = re.search(r'id="terrain-data" type="application/json">(.*?)'
-                    r'</script>', text, re.S).group(1)
+    raw = re.search(r'id="sky-data" type="application/json">(.*?)</script>',
+                    text, re.S).group(1)
     return json.loads(raw.replace("\\u003c", "<").replace("\\u003e", ">"))
 
 
+def _text(page, element_id):
+    return page.eval(f"document.getElementById({element_id!r}).textContent")
+
+
+def _parity(page, *, hypothetical: dict | None):
+    """Page == NumPy reference for whatever the page now shows."""
+    info = page.eval(f"{API}.info()")
+    assert info["error"] is None, info["error"]
+    col = page.eval(f"{API}.column()")
+    mix = page.eval(f"{API}.mixture()")
+    composition = Composition(tuple((k, x) for k, x in mix["rows"]))
+    sigma = composition.cross_section(WL)
+    np.testing.assert_allclose(mix["sigma"], sigma, rtol=1e-12)
+    assert mix["R"] == pytest.approx(composition.gas_constant, rel=1e-14)
+    if hypothetical is not None:
+        ref_col = sky.HypotheticalColumn(**hypothetical).build(composition)
+        for got, want in ((col["z"], ref_col.z_m), (col["lnp"], ref_col.ln_p),
+                          (col["T"], ref_col.temperature_k)):
+            np.testing.assert_allclose(got, want, rtol=1e-12, atol=1e-9)
+    nodes = (col["z"], col["lnp"], col["T"])
+    star = Star(info["star"]["T"], info["star"]["alpha"])
+    kw = dict(radius_m=info["radius"], observer_z_m=info["place"]["z"],
+              star_elevation_deg=info["star"]["el"])
+    ref = sky.radiance_table(nodes, cross_section_m2=sigma,
+                             irradiance=star.irradiance(WL), **kw)
+    for iz, ia in DIRECTIONS:
+        got = np.array(page.eval(f"{API}.spectral({iz}, {ia})"))
+        np.testing.assert_allclose(got, ref["radiance"][iz, ia], rtol=1e-9,
+                                   atol=0.0, err_msg=f"direction {iz}, {ia}")
+    assert info["zenithColumn"] == pytest.approx(float(ref["column"][0, 0]),
+                                                 rel=1e-9)
+    star_col = sky.star_path_column(nodes, **kw)
+    if star_col is None:
+        assert info["starColumn"] is None and info["starXYZ"] is None
+    else:
+        assert info["starColumn"] == pytest.approx(star_col, rel=1e-9)
+        w = bin_weights(sky.BIN_EDGES_NM[:-1], sky.BIN_EDGES_NM[1:])
+        want = LUMINOUS_EFFICACY * (star.radiance(WL)
+                                    * np.exp(-sigma * star_col)) @ w
+        np.testing.assert_allclose(info["starXYZ"], want, rtol=1e-9)
+    d = sky.optical_depth_diagnostic(sigma, float(ref["column"][0, 0]),
+                                     star_col)
+    assert info["diagnostic"]["level"] == d["level"]
+    np.testing.assert_allclose(info["diagnostic"]["tau_zenith"],
+                               d["tau_zenith"], rtol=1e-9)
+    return info
+
+
 @pytest.fixture(scope="module")
-def saved_page(tmp_path_factory):
-    from tropoi.representation.archive import open_simulation
-    tmp = tmp_path_factory.mktemp("sky")
-    root, _, _ = write_pe_capsule(tmp / "cap", frames=2)
-    spec = sky.SkySpec(COMPOSITION_PRESETS["earth_dry_air_illustrative"],
-                       observer_lat_deg=20.0, observer_lon_deg=10.0)
-    return open_simulation(root).view(tmp / "saved.html", open_browser=False,
-                                      resolution_deg=6.0, times="all",
-                                      sky=spec)
+def acceptance_page(tmp_path_factory):
+    """The documented example, run as a script: 0.1 bar N2, 3200 K star."""
+    out = tmp_path_factory.mktemp("sky") / "n2.html"
+    result = subprocess.run(
+        [sys.executable, str(REPO_ROOT / "examples" / "sky_hypothetical.py"),
+         "--no-open", "--out", str(out)], capture_output=True, text=True,
+        timeout=120)
+    assert result.returncode == 0, result.stdout + result.stderr
+    return out
 
 
-def test_saved_state_sky_parity_and_controls(saved_page):
-    payload = _payload(saved_page)
+def test_acceptance_case_parity_and_editing(acceptance_page):
+    block = _block(acceptance_page)
+    hyp = {k: block["hypothetical"][k] for k in (
+        "surface_pressure_pa", "temperature_k", "gravity", "gas_constant",
+        "radius_m", "lapse_rate_k_per_m", "temperature_floor_k")}
     with OfflinePage(BROWSER) as page:
-        url = page.open(saved_page)
-        assert page.eval("document.getElementById('modeSw').hidden") is False
-        page.eval(f"{API}.setMode('sky')")
+        url = page.open(acceptance_page)
+        # opens straight at the observer's viewpoint: no mode switch
         assert page.eval("document.getElementById('sky').hidden") is False
-        _parity(page, payload["sky"])
+        assert "HYPOTHETICAL" in _text(page, "stageLabel")
+        assert "Visual prototype" in _text(page, "stageLabel")
+        info = _parity(page, hypothetical=hyp)
+        assert info["diagnostic"]["level"] == "ok"      # tau(410) ~ 0.03
+        assert info["place"]["z"] == pytest.approx(2.0)
 
-        # page column vs Python's exact one at the initial observer: same
-        # construction, display-mesh interpolation only (loose, reported)
-        col = page.eval(f"{API}.column()")
-        exact = payload["sky"]["initial_column"]
-        assert len(col["z"]) == len(exact["z_m"])
-        np.testing.assert_allclose(col["lnp"], exact["ln_p"], atol=0.02)
+        # atmosphere edited in the page: thicker, warmer, a lapse rate, a
+        # different planet, a fixed gas constant
+        edit = dict(hyp, surface_pressure_pa=6.0e4, temperature_k=280.0,
+                    lapse_rate_k_per_m=0.004, temperature_floor_k=200.0,
+                    gravity=7.5, radius_m=4.0e6, gas_constant=290.0)
+        page.eval(f"{API}.set({{atmosphere: {json.dumps(edit)}}})")
+        _parity(page, hypothetical=edit)
+        assert "DISAGREE" in _text(page, "compNote")    # 290 vs N2's R*/M
 
-        # star azimuth only rotates: the same table, no recomputation
-        before = page.eval(f"{API}.spectral(45, 30)")
-        page.eval(f"{API}.setStar(300, {payload['sky']['star']['elevation_deg']})")
-        assert page.eval(f"{API}.spectral(45, 30)") == before
+        # composition edited: a four-gas mixture (sums to 1 exactly)
+        page.eval(f"{API}.set({{composition: {{N2: 0.5, O2: 0.25, Ar: 0.125,"
+                  " CO2: 0.125}})")
+        _parity(page, hypothetical=edit)
+        assert "edited in the page" in _text(page, "compNote")
 
-        # altitude <-> pressure in the page
-        page.eval(f"{API}.setObserver({{pressure_pa: 70000}})")
-        z = page.eval(f"{API}.info()")["place"]["z"]
-        page.eval(f"{API}.setObserver({{altitude_m: {z!r}}})")
-        assert page.eval(f"{API}.info()")["place"]["p"] == pytest.approx(
-            70000.0, rel=1e-12)
+        # star edited: hotter and larger, lower in the sky
+        page.eval(f"{API}.set({{star: {{T: 9000, alpha: 1.5, el: 8}}}})")
+        info = _parity(page, hypothetical=edit)
+        assert info["star"]["label"] == "blackbody star set in the page"
 
-        # refusals are messages, not exceptions
-        page.eval(f"{API}.setObserver({{altitude_m: -500}})")
-        assert "underground" in page.eval(f"{API}.info()")["error"]
-        page.eval(f"{API}.setObserver({{altitude_m: 1e6}})")
-        assert "above the top saved full level" in \
-            page.eval(f"{API}.info()")["error"]
-        page.eval(f"{API}.setObserver({{pressure_pa: 2e5}})")
-        assert "underground" in page.eval(f"{API}.info()")["error"]
-        page.eval(f"{API}.setObserver({{ground: true}})")
-        assert page.eval(f"{API}.info()")["error"] is None
-
-        # a new saved time rebuilds the column (still parity)
-        page.eval("window.__terrainGlobe.atmosphere.setTime(0)")
-        page.eval(f"{API}.update()")
-        _parity(page, payload["sky"])
-
-        page.eval(f"{API}.setMode('globe')")
-        assert page.eval("document.getElementById('sky').hidden") is True
+        # observer by pressure
+        page.eval(f"{API}.set({{observer: {{mode: 'pressure', "
+                  "pressure_pa: 30000}})")
+        info = _parity(page, hypothetical=edit)
+        assert info["place"]["p"] == pytest.approx(30000.0, rel=1e-12)
         _assert_clean(page, url)
 
 
-def test_hypothetical_sky_parity(tmp_path):
-    import math
-    from tropoi.representation.visual.terrain import (build_terrain_preview,
-                                                      write_globe_html)
-    lm = np.zeros((11, 11), complex)
-    lm[0, 0] = 1000.0 * math.sqrt(4 * math.pi)
-    preview = build_terrain_preview(lm, radius_m=3.3895e6, title="hyp")
-    spec = sky.SkySpec(
-        Composition.of(CO2=1.0, label="pure CO2 (stated)"),
-        observer_lat_deg=-15.0, star_elevation_deg=12.0,
-        hypothetical=sky.HypotheticalColumn(
-            surface_pressure_pa=610.0, temperature_k=230.0, gravity=3.71,
-            gas_constant="from_composition", lapse_rate_k_per_m=0.0025,
-            temperature_floor_k=150.0))
-    path = write_globe_html(preview, tmp_path / "hyp.html", sky=spec)
-    payload = _payload(path)
+def test_exposure_modes_auto_and_fixed(acceptance_page):
     with OfflinePage(BROWSER) as page:
-        url = page.open(path)
-        # the Sky panel's sliders work before Sky mode has placed the observer
-        for sid in ("skyStarEl", "skyStarAz", "skyFov", "skyEv"):
-            page.eval(f"document.getElementById('{sid}')"
-                      ".dispatchEvent(new Event('input'))")
-        assert page.exceptions == [], page.exceptions
-        page.eval(f"{API}.setMode('sky')")
+        url = page.open(acceptance_page)
         info = page.eval(f"{API}.info()")
-        assert info["columnKind"] == "hypothetical"
-        # the clipping figures describe the image just drawn, not the last one
-        page.eval("const e = document.getElementById('skyEv'); e.value = 8;"
+        assert info["exposure"]["mode"] == "auto"
+        assert info["white"] == info["brightest"]
+        assert "AUTO" in _text(page, "expNote")
+        # thicker atmosphere: AUTO rescales the brightness change away
+        thick = page.eval(f"{API}.set({{atmosphere: "
+                          "{surface_pressure_pa: 4e4}})")
+        assert thick["white"] == thick["brightest"] != info["brightest"]
+        # switch to FIXED through the control: the reference starts at the
+        # brightest luminance now, then stays put
+        page.eval("const m = document.getElementById('expMode');"
+                  " m.value = 'fixed'; m.dispatchEvent(new Event('change'))")
+        fixed = page.eval(f"{API}.info()")
+        assert fixed["exposure"]["mode"] == "fixed"
+        assert fixed["white"] == pytest.approx(thick["brightest"], rel=1e-3)
+        assert "FIXED" in _text(page, "expNote")
+        assert "meaningful" in _text(page, "expNote")
+        thin = page.eval(f"{API}.set({{atmosphere: "
+                         "{surface_pressure_pa: 1e4}})")
+        assert thin["white"] == fixed["white"]          # held
+        assert thin["brightest"] < 0.5 * fixed["white"]  # so the sky darkens
+        dim = page.eval(f"{API}.set({{star: {{alpha: 0.3}}}})")
+        assert dim["white"] == fixed["white"]
+        assert dim["brightest"] < thin["brightest"]
+        # the clipping figures describe the image just drawn
+        page.eval("const e = document.getElementById('ev'); e.value = 9;"
                   " e.dispatchEvent(new Event('input'))")
         clip = page.eval(f"{API}.info()")["clip"]
-        assert clip["over"] > 0.5, clip
-        assert f"{100 * clip['over']:.1f} % over-exposed" in page.eval(
-            "document.getElementById('skyNote').textContent")
-        page.eval(f"{API}.setExposure(0)")
-        assert "HYPOTHETICAL" in page.eval(
-            "document.getElementById('skyLabel').textContent")
-        _parity(page, payload["sky"])
-        # terrain is 1000 m everywhere: 500 m is underground on this planet
-        page.eval(f"{API}.setObserver({{altitude_m: 500}})")
-        assert "underground" in page.eval(f"{API}.info()")["error"]
+        assert f"{100 * clip['over']:.1f} % over-exposed" in _text(
+            page, "clipNote")
         _assert_clean(page, url)
 
 
-def test_pages_without_sky_show_no_sky_controls(tmp_path):
-    import math
-    from tropoi.representation.visual.terrain import (build_terrain_preview,
-                                                      write_globe_html)
-    lm = np.zeros((11, 11), complex)
-    lm[0, 0] = 10.0 * math.sqrt(4 * math.pi)
-    path = write_globe_html(build_terrain_preview(lm, radius_m=6.4e6,
-                                                  title="plain"),
-                            tmp_path / "plain.html")
+def test_optical_depth_warnings_and_refusals(acceptance_page):
+    with OfflinePage(BROWSER) as page:
+        url = page.open(acceptance_page)
+        assert page.eval("document.getElementById('stageWarn').hidden") is True
+        # every control before anything else: no exceptions
+        for cid, event in (("starEl", "input"), ("starAz", "input"),
+                           ("fov", "input"), ("ev", "input"),
+                           ("expRef", "change"), ("altVal", "change"),
+                           ("atmPs", "change"), ("comp_O2", "change"),
+                           ("starT", "change")):
+            page.eval(f"document.getElementById({cid!r})"
+                      f".dispatchEvent(new Event({event!r}))")
+        page.eval(f"{API}.set({{}})")
+        assert page.exceptions == [], page.exceptions
+        # Earth-like column: zenith tau(410 nm) ~ 0.36 -> caution
+        air = dict(COMPOSITION_PRESETS["earth_dry_air_illustrative"]
+                   .mole_fractions)
+        info = page.eval(f"{API}.set({{composition: {json.dumps(air)}, "
+                         "atmosphere: {surface_pressure_pa: 101325}})")
+        assert info["diagnostic"]["level"] == "caution"
+        assert page.eval("document.getElementById('stageWarn').hidden") is False
+        assert "Caution" in _text(page, "tauNote")
+        # a thick CO2 column -> unreliable, said on the sky itself
+        info = page.eval(f"{API}.set({{composition: {{CO2: 1}}, atmosphere: "
+                         "{surface_pressure_pa: 2e6}})")
+        assert info["diagnostic"]["level"] == "unreliable"
+        assert info["diagnostic"]["peak_zenith"] >= sky.TAU_UNRELIABLE
+        assert "UNRELIABLE" in _text(page, "stageWarn")
+        # never renormalized: a sum of 0.9 is refused, the explicit
+        # "set to the remainder" action repairs it
+        info = page.eval(f"{API}.set({{composition: {{N2: 0.6, O2: 0.3}}}})")
+        assert "never renormalized" in info["error"]
+        assert "never renormalized" in _text(page, "obsNote")
+        page.eval("const w = document.getElementById('compFillWhich');"
+                  " w.value = 'N2'; document.getElementById('compFill')"
+                  ".click()")
+        info = page.eval(f"{API}.info()")
+        assert info["error"] is None
+        assert page.eval(f"{API}.mixture()")["rows"] == [["N2", 0.7],
+                                                       ["O2", 0.3]]
+        # underground is a message
+        info = page.eval(f"{API}.set({{observer: {{mode: 'pressure', "
+                         "pressure_pa: 5e6}})")
+        assert "underground" in info["error"]
+        _assert_clean(page, url)
+
+
+def test_saved_state_sky_page(tmp_path):
+    from tropoi.representation.archive import open_simulation
+    root, _, _ = write_pe_capsule(tmp_path / "cap", frames=2)
+    spec = sky.SkySpec(COMPOSITION_PRESETS["earth_dry_air_illustrative"],
+                       observer_lat_deg=20.0, observer_lon_deg=10.0)
+    path = open_simulation(root).sky(spec, tmp_path / "saved.html",
+                                     open_browser=False)
+    block = _block(path)
     with OfflinePage(BROWSER) as page:
         url = page.open(path)
-        assert page.eval("window.__terrainGlobe.sky") is None
-        assert page.eval("document.getElementById('modeSw').hidden") is True
-        assert page.eval("document.getElementById('skySection').hidden") \
-            is True
-        assert page.eval("document.getElementById('sky').hidden") is True
+        assert page.eval("document.getElementById('atmHyp').hidden") is True
+        assert "saved state" in _text(page, "stageLabel")
+        assert "cannot be edited" in _text(page, "atmNote")
+        info = _parity(page, hypothetical=None)
+        col = page.eval(f"{API}.column()")
+        np.testing.assert_array_equal(col["z"], block["column"]["z_m"])
+        assert info["place"]["floor"] == block["terrain_m"]
+        # composition and star stay view settings on a saved column
+        page.eval(f"{API}.set({{composition: {{N2: 1}}, star: {{T: 4000}}}})")
+        _parity(page, hypothetical=None)
+        assert "r_dry" in _text(page, "compNote")
+        with pytest.raises(RuntimeError, match="cannot be edited"):
+            page.eval(f"{API}.set({{atmosphere: {{temperature_k: 300}}}})")
         _assert_clean(page, url)

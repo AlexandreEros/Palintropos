@@ -257,8 +257,7 @@ class PreparedPlanet:
     def view(self, path=None, *, open_browser: bool = True,
              units: str | None = None,
              centre: tuple[float, float] | None = None,
-             exaggeration: float | None = None,
-             sky=None) -> pathlib.Path:
+             exaggeration: float | None = None) -> pathlib.Path:
         """Write the interactive globe (one HTML file) and open it.
 
         ``path`` defaults to a file named after this terrain in the system
@@ -267,9 +266,6 @@ class PreparedPlanet:
         ``units`` ("m" or "km"), ``centre`` = (lat, lon) and
         ``exaggeration`` set the page's initial colour-bar unit, view and
         display-only relief factor; all remain adjustable in the page.
-        ``sky`` adds the sky-from-the-surface panel: a
-        :class:`~tropoi.representation.visual.sky.SkySpec` with a labelled
-        hypothetical column (there is no saved atmosphere here).
         """
         from tropoi.representation.visual.terrain import write_globe_html
 
@@ -277,8 +273,7 @@ class PreparedPlanet:
             path = pathlib.Path(tempfile.gettempdir()) / "tropoi" / (
                 self._slug() + "-globe.html")
         path = write_globe_html(self.preview(), path, units=units,
-                                centre=centre, exaggeration=exaggeration,
-                                sky=sky)
+                                centre=centre, exaggeration=exaggeration)
         if open_browser:
             import webbrowser
             webbrowser.open(path.resolve().as_uri())

@@ -1,123 +1,193 @@
-# Sky from the surface (visual prototype)
+# Sky seen by an observer (an optics laboratory; visual prototype)
 
-The offline globe page can show the sky as seen by an observer on the planet.
-The observer has a latitude, a longitude, and either an altitude above the
-reference sphere or a pressure. They look in a chosen direction, and a
-configurable star lights the sky. The sky is a **visual prototype**: Rayleigh
-single scattering by an explicit gas mixture. **It is not a validated sky
-colour**, and the page says so on screen.
+A standalone offline page that opens directly at an observer's viewpoint and
+shows the sky they would see. An explicit gas mixture scatters light from a
+blackbody star by Rayleigh single scattering. Every input can be changed on
+the page:
+- the atmosphere: pressure, temperature profile, gravity, gas constant and planet radius;
+- the composition;
+- the star's temperature, angular size and position;
+- the observer's height, the view and the exposure.
 
-It is an optional `sky` block of the page that `Simulation.view()` and
-`PreparedPlanet.view()` already write. Without it, both pages are unchanged:
-browser captures of a terrain page and of a PE atmosphere page through the
-template on `main` and through this one differ in 0 of 1,070,176 pixels.
+It is a **visual prototype, not a validated sky colour**. The page says so on
+the sky itself.
+
+The sky has its own page (`sky_view.html`) and entry points. The globe pages
+(`terrain_globe.html`, `PreparedPlanet.view`, `Simulation.view`) carry no
+sky; they are exactly as on `main`.
 
 ## Use
 
-A saved primitive-equation run (the column is the saved state's):
+**A hypothetical atmosphere: the primary example.** It needs no simulation,
+prepared planet, terrain data or CUDA:
+
+```bash
+python examples/sky_hypothetical.py            # 0.1 bar N2 under a 3200 K star; opens the page
+python examples/sky_hypothetical.py --help     # every input, with its default
+```
+
+The example's defaults are the acceptance case, with every input stated:
+- composition: pure N₂;
+- surface pressure 10⁴ Pa (0.1 bar) at the reference sphere;
+- isothermal at 250 K;
+- g = 9.80665 m s⁻²;
+- R = R*/M of N₂ (296.8 J kg⁻¹ K⁻¹);
+- radius 6 371 000 m;
+- a 3200 K blackbody star. Its angular radius (0.867°) is chosen to give the IAU nominal Sun's bolometric irradiance at 1 au, so it delivers Earth's total sunlight, only redder;
+- the star 30° high at azimuth 135°;
+- the observer 2 m above the ground;
+- automatic exposure.
+
+The same from Python:
+
+```python
+from tropoi.representation.visual.sky import HypotheticalColumn, SkySpec, write_sky_page
+from tropoi.spatial.optics import Composition, Star
+
+spec = SkySpec(
+    Composition.of(N2=1.0, label="pure N2", source="stated for this example"),
+    star=Star(3200.0, 0.867, label="3200 K star"),
+    star_azimuth_deg=135.0, star_elevation_deg=30.0,
+    hypothetical=HypotheticalColumn(surface_pressure_pa=1e4, temperature_k=250.0,
+                                    gravity=9.80665, gas_constant="from_composition",
+                                    radius_m=6.371e6))
+write_sky_page(spec, "sky.html", open_browser=True)
+```
+
+A hypothetical column is horizontally uniform, so the observer's latitude and
+longitude would change nothing. `SkySpec` refuses them for a hypothetical
+column.
+
+**The column of a saved primitive-equation run** above one location. It is
+reconstructed exactly on the CPU from one saved state:
 
 ```python
 from tropoi.representation.archive import open_simulation
-from tropoi.representation.visual.sky import SkySpec
-from tropoi.spatial.optics import COMPOSITION_PRESETS, Composition
+from tropoi.spatial.optics import COMPOSITION_PRESETS
 
-air = COMPOSITION_PRESETS["earth_dry_air_illustrative"]   # or Composition.of(N2=..., O2=..., ...)
 sim = open_simulation("runs/hs-T42L20-prod-002")
-sim.view("sky.html", sky=SkySpec(air, observer_lat_deg=40, observer_lon_deg=-105,
-                                 star_azimuth_deg=200, star_elevation_deg=25))
+sim.sky(SkySpec(COMPOSITION_PRESETS["earth_dry_air_illustrative"],
+                observer_lat_deg=40.0, observer_lon_deg=-105.0),
+        "sky.html", time=-1)          # saved index; gravity=... if the run records none
 ```
 
-A terrain-only planet. There is no saved atmosphere, so you prescribe a
-**hypothetical** column; it is labelled as such everywhere:
+On a saved column the atmosphere is fixed, and the page says it cannot be
+edited. Composition, star, observer height, view and exposure stay
+adjustable. Nothing is written into the run.
 
-```python
-from tropoi.representation.visual.sky import HypotheticalColumn, SkySpec
-from tropoi.spatial.optics import Composition
+## The page
 
-co2 = Composition.of(CO2=1.0, label="pure CO2", source="stated for this example")
-planet.view(sky=SkySpec(co2, observer_lat_deg=-4.6, observer_lon_deg=137.4,
-                        hypothetical=HypotheticalColumn(
-                            surface_pressure_pa=610.0, temperature_k=210.0,
-                            gravity=3.71, gas_constant="from_composition")))
-```
+Drag on the sky, or use the arrow keys, to look around. The panel holds:
 
-In the page, **Sky** (top left of the stage) switches the stage to the sky.
-Drag to look around. The Sky panel sets:
-- the observer's latitude and longitude (or "Globe centre", or a click on the flat map in Sky mode);
-- how the observer's height is given: 2 m above the ground, altitude above `R`, or pressure;
-- the star's azimuth (clockwise from north) and elevation;
-- the field of view;
-- the exposure, in stops.
+| section | controls |
+| --- | --- |
+| Atmosphere (hypothetical only) | surface pressure, surface temperature, lapse rate and floor temperature, gravity, gas constant (from the composition, or a fixed value), planet radius |
+| Composition | a mole fraction for each supported gas (N₂, O₂, Ar, CO₂), their sum, and an explicit **Set *gas* to the remainder** button |
+| Star | temperature, angular radius, **Sun at 1 au**, azimuth, elevation; the 400–760 nm irradiance is shown |
+| Observer and view | height as 2 m above the ground, altitude above `R`, or pressure; field of view |
+| Exposure | **AUTO** or **FIXED** (with the reference luminance), exposure in stops; clipped-pixel counts |
+| Optical depth and validity | Rayleigh optical depth at 410, 450, 550, 650 and 750 nm, at the zenith and towards the star, with the single-scattering verdict |
+| Notes, limits and sources | the column's description, what is not modelled, every data source |
 
-Changing the star's azimuth only rotates the sky. Changing its elevation, the
-observer, or the saved time recomputes the sky (about 0.8 s in headless
-Chrome).
+Changing the star's temperature or size relights the existing table, which is
+instant. Changing the atmosphere, composition, observer or star elevation
+recomputes the table, in about 1 s in headless Chrome.
+
+### Exposure: AUTO and FIXED
+
+Displayed linear sRGB is `M·XYZ / L_white · 2^EV`, followed by the sRGB
+transfer function.
+
+- **AUTO**: `L_white` is the brightest sky luminance in the current direction table, star excluded. It is recomputed whenever the sky changes, so a change of pressure or stellar illumination is *rescaled away*. AUTO is good for seeing the colour of any one sky.
+- **FIXED**: `L_white` is a reference luminance in cd m⁻² that you set. It stays put while the atmosphere or star change, so the brightness difference stays visible, and comparisons between settings mean something. Switching to FIXED starts the reference at the current brightest luminance, so the picture does not jump; from then on it is held.
+
+The active mode is shown in the panel, as a badge with an explanation, and on
+the sky. The brightest sky luminance is always printed in cd m⁻².
+
+### Optical depth and validity
+
+The page reports the Rayleigh optical depth τ = σ·N above the observer, both
+straight up and along the path to the star. It also gives a verdict from the
+largest zenith τ, which is at 410 nm:
+
+| zenith τ | verdict |
+| --- | --- |
+| < 0.1 | single scattering is a reasonable first approximation |
+| ≥ 0.1 | **caution**: multiple scattering, not modelled, is significant; colours and brightness are qualitative (an Earth-like 1 bar of dry air is here, τ(410 nm) ≈ 0.36) |
+| ≥ 1 | **unreliable**: optically thick; most light reaching the observer has scattered more than once; the colours are not meaningful |
+
+The thresholds (`sky.TAU_CAUTION`, `sky.TAU_UNRELIABLE`) are rules of
+thumb, not derived error bounds. Caution and unreliable are also shown as a
+banner across the sky.
+
+For the acceptance case, the measured zenith τ is 0.034 at 410 nm, 0.016 at
+490 nm and 0.009 at 570 nm, so the verdict is "reasonable". These figures are
+reported, not acceptance targets.
 
 ## Inputs and refusals
 
 | input | rule |
 | --- | --- |
-| composition | **required and explicit.** Species with sourced optical data: N₂, O₂, Ar, CO₂. Mole fractions must sum to 1 (±1e-6); they are never renormalized. Unknown species are refused. A mixture is never inferred from `r_dry`, `kappa` or a molar mass. |
-| observer height | altitude above the reference sphere **or** pressure (both is refused). With neither: 2 m above the ground. |
-| below ground | refused: an altitude below the terrain, or a pressure above the local surface pressure. |
+| composition | **required and explicit.** Species with sourced optical data: N₂, O₂, Ar, CO₂. Mole fractions must sum to 1 (±1e-6), in Python and on the page alike; they are never renormalized. On the page, a gas at 0 is simply absent. Unknown species are refused. A mixture is never inferred from `r_dry`, `kappa` or a molar mass. |
+| hypothetical column | `surface_pressure_pa` (at altitude 0), `temperature_k`, `gravity`, `gas_constant` (a number, or the explicit string `"from_composition"`), `radius_m`; optionally `lapse_rate_k_per_m` with `temperature_floor_k`. |
+| saved column | `observer_lat_deg`/`observer_lon_deg` and a saved index `time`; the run must record gravity, or `gravity=` is given (as for `view`). |
+| observer height | altitude above the reference sphere **or** pressure; giving both is refused. With neither, 2 m above the ground. |
+| below ground | refused: an altitude below the terrain, or a pressure above the surface pressure. |
 | too high | refused: above the top saved full level (saved runs) or above the column (hypothetical). |
-| saved runs | every native level must be exported (`levels=None`); the run must record gravity (as for `view`). |
-| hypothetical | `surface_pressure_pa` (at altitude 0), `temperature_k`, `gravity`, and `gas_constant` (a number, or the explicit string `"from_composition"`); optionally `lapse_rate_k_per_m` with `temperature_floor_k`. |
+| exposure | `exposure_mode="auto"` (no reference) or `"fixed"` with `exposure_reference_cd_m2 > 0`. |
+| star | temperature > 0 K; angular radius in (0°, 30°). |
 
-In the page a refusal is a message in the panel, not an error.
+On the page a refusal is a message, not an error.
 
 ## How composition relates to the dry thermodynamics
 
 A composition implies a mean molar mass `M = Σ xᵢ Mᵢ`, using IUPAC/CIAAW
-standard atomic weights, and so a gas constant `R_mix = R*/M`. The page
-reports whether `R_mix` agrees with the run's `r_dry` (0.1 % reporting
-threshold), disagrees with it, or has nothing to compare against. It never
-changes `r_dry`, and no solver reads a composition.
+standard atomic weights, and so a gas constant `R_mix = R*/M`:
 
-The column's number density is the ideal-gas `n = p/(k_B T)` from the saved
-`p` and `T`, which needs no composition. The composition only supplies the
-cross section per molecule. `c_p` is not compared yet: that needs sourced,
-temperature-dependent heat capacities.
+- With `gas_constant="from_composition"`, a hypothetical column uses `R_mix`, and editing the composition on the page rebuilds the column with it.
+- With a fixed gas constant, or on a saved column (the run's `r_dry`), the page reports whether `R_mix` agrees (0.1 % reporting threshold) or disagrees. It never changes the column's gas constant.
 
-Nothing is written to a run: `config.json`, scientific hashes and run ids are
-unchanged (a test hashes the capsule before and after).
+The number density is the ideal-gas `n = p/(k_B T)`, which needs no
+composition. The composition supplies only the cross section per molecule,
+`σ = Σ xᵢσᵢ`. `c_p` is not compared yet: that needs sourced,
+temperature-dependent heat capacities. No solver reads a composition.
+`config.json`, scientific hashes and run ids are unchanged (a test hashes the
+capsule before and after).
 
 When radiative transfer arrives:
-- composition becomes a solver input the way topography did: emitted into the
-  config only when present, so existing runs keep byte-identical hashes;
-- a composition that disagrees with `r_dry`/`cp_dry` will be an error to
-  resolve, not a silent override.
+- composition becomes a solver input the way topography did: emitted into the config only when present, so existing runs keep byte-identical hashes;
+- a composition that disagrees with `r_dry`/`cp_dry` will be an error to resolve, not a silent override.
 
-The optics already live in `spatial.optics`, so a `temporal` tendency can
-import them.
+The optics live in `spatial.optics`, independent of either page, so a
+`temporal` tendency can import them.
 
 ## Physics and its limits
 
-- **Column.** One horizontally uniform, spherically symmetric column at the observer:
+- **Column.** One horizontally uniform, spherically symmetric column:
   - nodes `(z, ln p, T)`, with `ln p` and `T` linear in altitude between nodes;
-  - saved runs: the native full levels at the observer, interpolated from the exported display mesh. `Z = Φ/g` is used as altitude, the model's convention. The layer below the lowest full level is isothermal at that level's temperature. Above the top full level, an isothermal extension (`r_dry T / g` scale height) up to `p = 10⁻⁵ p_s`, which the saved state does not describe;
-  - empty above that.
-- **Scattering.** Rayleigh, single scattering, phase function `3/(16π)(1+cos²Θ)`. Depolarization is kept in the King factor but not in the phase function. Attenuation applies along both the view path and the star path.
-- **Star.** A uniform blackbody disk (Planck radiance × solid angle). `Star.sun_at_1au()` uses the IAU 2015 B3 nominal Sun (5772 K, 695 700 km) and the IAU 2012 au.
-- **Ground.** The solid sphere at the column base shadows star paths and ends view paths. The ground itself is drawn unlit; only the air in front of it scatters.
+  - hypothetical: isothermal, or a constant lapse rate to a floor temperature (64 nodes), then isothermal; hydrostatic;
+  - saved: the native full levels, exact at the observer's point. `Z = Φ/g` is used as altitude. Below the lowest full level the column is isothermal; above the top one there is an isothermal extension (`R T / g` scale height) that the saved state does not describe;
+  - both end at `p = 10⁻⁵ p_s`.
+- **Scattering.** Rayleigh, single scattering, phase function `3/(16π)(1+cos²Θ)`. Depolarization is kept in the King factor but not in the phase function. Attenuation applies along the view path and along the star path.
+- **Star.** A uniform blackbody disk (Planck radiance × solid angle), placed by hand. `Star.sun_at_1au()` uses the IAU 2015 B3 nominal Sun and the IAU 2012 au.
+- **Ground.** The solid sphere at the column base shadows star paths and ends view paths. The ground is drawn unlit.
 - **Colour.** 18 bins of 20 nm from 400 to 760 nm, then CIE 1931 XYZ, then IEC 61966-2-1 sRGB.
-  - The CIE functions outside 400–760 nm are omitted and reported: x̄ 0.11 %, ȳ 0.004 %, z̄ 0.49 % of their integrals.
-  - Exposure: `M·XYZ / L_white · 2^EV`, where `L_white` is the brightest sky luminance in the direction table, star excluded.
-  - Over-exposed and out-of-gamut channels are clipped and counted in the panel.
-  - The star disk is drawn at least one pixel in radius, and the panel says when it is enlarged.
+  - The CIE functions outside the band are omitted and reported: x̄ 0.11 %, ȳ 0.004 %, z̄ 0.49 % of their integrals.
+  - Over-exposed and out-of-gamut channels are clipped and counted, for the image actually drawn.
 
 **Not modelled:**
-- aerosols and dust (on Mars these dominate the real sky colour, so a Rayleigh-only CO₂ sky is *not* what Mars looks like);
+- aerosols, dust and haze (on Mars and Titan these dominate the real sky colour);
 - clouds;
-- gas absorption (ozone, CO₂, H₂O and others);
-- multiple scattering;
+- gas absorption (ozone, CO₂, CH₄, H₂O and others);
+- multiple scattering (see the optical-depth verdict);
 - refraction;
 - polarization;
 - surface reflection and a lit ground;
 - terrain shadows and a terrain horizon;
 - limb darkening and non-blackbody spectra;
 - horizontal variation of the atmosphere;
-- night-sky sources.
+- night-sky sources;
+- a star position from time and an orbit.
 
 ## Optical data and their status
 
@@ -126,52 +196,70 @@ import them.
 | N₂, Ar refractive index | Börzsönyi et al. 2008, Appl. Opt. 47, 4856 (0.4–1.0 µm, 273 K, 1000 hPa) | formulas from the refractiveindex.info database (Polyanskiy 2024), fetched 2026-11-07 |
 | O₂ refractive index | Zhang, Lu & Wang 2008, Appl. Opt. 47, 3143 (0.4–1.8 µm, 293 K, 101 325 Pa) | same |
 | CO₂ refractive index | Bideau-Mehu et al. 1973, Opt. Commun. 9, 432 (0.18–1.69 µm, 273.15 K, 101 325 Pa) | same |
-| King factors | Bates 1984, as tabulated by Bodhaine et al. 1999 | **transcribed without re-reading the paper** (`king_verified = False`); check before any quantitative use |
+| King factors | Bates 1984, as given by Bodhaine et al. 1999, J. Atmos. Oceanic Technol. 16, 1854, eqs. 5–6 and the text after eq. 6 | **checked 2026-11-07 against the paper's printed text** (`king_verified = True`, `rayleigh.KING_CHECK`); see below |
 | colour matching | CIE 1931 2° dataset, DOI 10.25039/CIE.DS.xvudnb9b | verbatim copy, SHA-256 checked on load |
 | sRGB | IEC 61966-2-1 matrix and transfer function | |
+
+The King factors were checked against the printed text of Bodhaine et al.
+(1999):
+- eq. 5: F(N₂) = 1.034 + 3.17×10⁻⁴ λ⁻²;
+- eq. 6: F(O₂) = 1.096 + 1.385×10⁻³ λ⁻² + 1.448×10⁻⁴ λ⁻⁴;
+- the sentence after eq. 6: F(Ar) = 1.00 and F(CO₂) = 1.15.
+
+The paper's Fig. 1 confirms that λ is in micrometres: its eq. 23 with these
+factors gives F(air) ≈ 1.079 at 0.2 µm and 1.047 at 1 µm, as plotted. Bates
+(1984) itself was not re-read, so the chain of citation runs Bates → Bodhaine.
+
+As an end-to-end check, the illustrative dry-air preset's cross section
+agrees with Bodhaine et al.'s eq. 29 to within 0.054–0.094 % over 410–750 nm.
+Eq. 29 is their fit to σ for 360 ppm CO₂ air, built from Peck & Reeder's air
+index, not from our per-gas records.
 
 Wavelengths outside a record's measured range are refused, not extrapolated.
 
 ## What the tests establish (and what they do not)
 
 **Established:**
-- The page's float64 radiance table equals the NumPy reference (`sky.radiance_table`) to a relative 1e-9 in every sampled direction, for a saved state and for a hypothetical column (`tests/test_sky_view_browser.py`).
+- The page's float64 arithmetic equals the NumPy reference to a relative 1e-9 (`tests/test_sky_view_browser.py`). This covers the hypothetical column nodes, the mixture cross section, the spectral radiance in 13 sampled directions, the zenith and star-path columns, the star disk's XYZ and the optical-depth verdict. It holds for:
+  - the acceptance case;
+  - after the atmosphere, the composition and the star are edited on the page;
+  - with the observer placed by pressure;
+  - for a saved column.
+- AUTO follows the brightest luminance; FIXED holds its reference while pressure and star size change, and the page names the active mode.
+- The caution and unreliable verdicts appear at the stated thresholds.
+- A non-unit sum is refused, and the remainder button repairs it.
+- The example runs with CuPy, Matplotlib, `tropoi.temporal`, `tropoi.run`, the archive, the diagnostics, terrain, the transforms and both globe modules made unimportable, and loads none of them (`tests/test_sky_view.py`).
+- Globe pages carry no sky: the globe template contains no sky code, and `write_globe_html`/`PreparedPlanet.view` take no sky.
+- The King factors and the dry-air cross section match Bodhaine et al. (1999) as above.
 - Hydrostatics are exact for isothermal columns.
 - Altitude ↔ pressure round-trips.
 - The vertical column count equals `p_s R/(k_B g)` within 2e-3.
 - A sky with no scatterers is black.
 - Radiance is linear in irradiance.
-- The column is fully shadowed when the star is far below the horizon.
-- Quadrupling every step count changes the spectral radiance above the horizon by at most 2.8e-3 (measured; tested against 5e-3).
-- The refusals work.
-- The no-inference rule holds.
-- Runs are left untouched.
-- Pages without a sky are unchanged.
+- Quadrupling every step count changes the spectral radiance above the horizon by at most 2.8e-3.
+- Saved runs are left untouched.
 
 **Not established:** that any colour or brightness matches a real sky. That
 would need a comparison of radiances, not colours, against a reference
 radiative-transfer code (for example libRadtran or DISORT) for a standard
-atmosphere, plus verified King factors. None of the colours or optical depths
-shown is an acceptance target.
+atmosphere. None of the colours or optical depths shown is an acceptance
+target.
 
 ## Deriving the star from time and an orbit (not implemented)
 
-The star's azimuth and elevation are manual. Deriving them needs data a saved
-run does not carry:
-- the rotation period (in `PlanetSpec`/the run config, not passed to the viewer);
-- obliquity, the sense of rotation, and the prime-meridian angle at an epoch;
+The star's azimuth and elevation are set by hand. Deriving them needs:
+- the rotation period, obliquity, sense of rotation, and the prime-meridian angle at an epoch;
 - the orbital elements (a, e, i, Ω, ω, mean anomaly at the epoch) and the mapping from model `t = 0` to that epoch;
 - the star's luminosity and radius, for irradiance and angular size.
 
 None of the current PE scenarios has insolation or a diurnal cycle, so a
-time-derived star would not be related to the simulated temperatures. The
-page should say so when this is added.
+time-derived star would not be related to a saved run's temperatures.
 
 ## Where it lives
 
 | layer | module |
 | --- | --- |
-| optics (CPU, spatial layer) | `spatial.optics`: `rayleigh`, `composition`, `column`, `star`, `colour`, `constants`, `data/CIE_xyz_1931_2deg.csv` |
-| reference + page block | `representation.visual.sky` (`SkySpec`, `HypotheticalColumn`, `radiance_table`, `sky_block`) |
-| entry points | `Simulation.view(sky=...)` → `atmosphere.atmosphere_payload`; `PreparedPlanet.view(sky=...)` → `terrain.write_globe_html` |
-| page | `representation.visual.terrain_globe.html`, sky section (`window.__terrainGlobe.sky` test API) |
+| optics (CPU, spatial layer; independent of both pages) | `spatial.optics`: `rayleigh`, `composition`, `column`, `star`, `colour`, `constants`, `data/CIE_xyz_1931_2deg.csv` |
+| reference, page block and writers | `representation.visual.sky`: `SkySpec`, `HypotheticalColumn`, `radiance_table`, `star_path_column`, `optical_depth_diagnostic`, `write_sky_page`, `saved_sky_page` |
+| entry points | `examples/sky_hypothetical.py`; `sky.write_sky_page`; `Simulation.sky` → `saved_sky_page` |
+| page | `representation.visual.sky_view.html` (test API `window.__sky`) |
