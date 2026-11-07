@@ -148,6 +148,21 @@ def test_altitude_pressure_round_trip(column):
     assert back["pressure_pa"] == pytest.approx(60000.0, rel=1e-12)
 
 
+def test_lapse_rate_profile_temperature_and_pressure():
+    c = _iso(lapse_rate_k_per_m=0.0065, temperature_floor_k=200.0)
+    z_f = (250.0 - 200.0) / 0.0065
+    z = np.array([0.0, 1000.0, 5000.0, z_f, z_f + 3000.0])
+    np.testing.assert_allclose(c.temperature_at(z),
+                               [250.0, 243.5, 217.5, 200.0, 200.0],
+                               rtol=1e-12)
+    # node values are the analytic polytrope p = p_s (T/T0)^(g/(R Gamma))
+    expo = 9.80665 / (287.04 * 0.0065)
+    nodes = c.z_m[:-1]
+    np.testing.assert_allclose(
+        c.pressure_at(nodes), 1.0e5 * ((250.0 - 0.0065 * nodes) / 250.0)
+        ** expo, rtol=1e-12)
+
+
 def test_observer_refusals():
     c = _iso()
     with pytest.raises(ColumnError, match="exactly one"):
