@@ -1020,7 +1020,7 @@ const SKY = D.sky ? (function () {
            altitude_m: S.observer.altitude_m, pressure_pa: S.observer.pressure_pa },
            look: { az: S.look.azimuth_deg, el: S.look.elevation_deg, fov: S.look.fov_deg },
            star: { az: S.star.azimuth_deg, el: S.star.elevation_deg }, ev: S.exposure_ev,
-           col: null, place: null, table: null, key: null, error: null, timer: 0, ms: 0, clip: { over: 0, gamut: 0 } };
+           col: null, place: null, table: null, key: null, error: null, timer: 0, ms: 0, clip: null };
 })() : null;
 const KB = 1.380649e-23, DEG = Math.PI / 180;
 
@@ -1192,7 +1192,7 @@ function skyUpdate() {
     if (!err.sky) throw err;
     SKY.error = err.message; SKY.table = null; SKY.key = null;
   }
-  skyLabels(); drawSky(); drawMapOverlay(lastMapHover);
+  drawSky(); skyLabels(); drawMapOverlay(lastMapHover);
 }
 function skySchedule() { if (SKY.timer) clearTimeout(SKY.timer); SKY.timer = setTimeout(skyUpdate, 120); }
 
@@ -1225,6 +1225,7 @@ function drawSky() {
   g.setTransform(dpr, 0, 0, dpr, 0, 0);
   g.font = "12px system-ui, sans-serif"; g.textAlign = "left";
   if (!SKY.table) {
+    SKY.clip = null; SKY.disk = null;
     g.fillStyle = "#f2b8b5"; g.fillText(SKY.error ? "No sky: " + SKY.error : "Computing…", 12, 52);
     return;
   }
@@ -1279,6 +1280,7 @@ function skyLabels() {
   document.getElementById("skyEvL").textContent = (SKY.ev >= 0 ? "+" : "") + SKY.ev.toFixed(2) + " EV" + (SKY.table ? " · white = " + Number((SKY.table.lwhite / Math.pow(2, SKY.ev)).toPrecision(3)).toLocaleString() + " cd m⁻²" : "");
   const n = document.getElementById("skyObsNote");
   if (SKY.error) { n.className = "note err"; n.textContent = SKY.error; }
+  else if (!pl) { n.className = "note"; n.textContent = fmtLat(o.lat) + ", " + fmtLon(o.lon) + " · switch to Sky to place the observer"; }
   else {
     n.className = "note";
     n.textContent = fmtLat(o.lat) + ", " + fmtLon(o.lon) + " · z = " + pl.z.toFixed(1) + " m above R ≈ " + (pl.p / 100).toFixed(2) + " hPa · ground " + pl.floor.toFixed(1) + " m"
@@ -1288,7 +1290,7 @@ function skyLabels() {
   }
   const clip = SKY.clip;
   document.getElementById("skyNote").textContent = (SKY.table ? "Table " + SKY.table.NZ + "×" + SKY.table.NA + " directions in " + Math.round(SKY.ms) + " ms. " : "")
-    + "Clipped: " + (100 * clip.over).toFixed(1) + " % over-exposed, " + (100 * clip.gamut).toFixed(1) + " % outside sRGB."
+    + (clip ? "Clipped: " + (100 * clip.over).toFixed(1) + " % over-exposed, " + (100 * clip.gamut).toFixed(1) + " % outside sRGB." : "No sky image drawn yet.")
     + (SKY.disk && SKY.disk.enlarged ? " The star disk is drawn larger than its true size (one pixel)." : "") + " " + SKY.S.consistency.text;
 }
 function skySetMode(m) {
@@ -1338,10 +1340,10 @@ function initSkyUI() {
     const v = +num("skyAltVal").value;
     if (SKY.obs.mode === "pressure") skySetObserver({ pressure_pa: v * 100 }); else if (SKY.obs.mode === "altitude") skySetObserver({ altitude_m: v });
   });
-  num("skyStarAz").addEventListener("input", () => { SKY.star.az = +num("skyStarAz").value; skyLabels(); drawSky(); });
+  num("skyStarAz").addEventListener("input", () => { SKY.star.az = +num("skyStarAz").value; drawSky(); skyLabels(); });
   num("skyStarEl").addEventListener("input", () => { SKY.star.el = +num("skyStarEl").value; skyLabels(); skySchedule(); });
-  num("skyFov").addEventListener("input", () => { SKY.look.fov = +num("skyFov").value; skyLabels(); drawSky(); });
-  num("skyEv").addEventListener("input", () => { SKY.ev = +num("skyEv").value; skyLabels(); drawSky(); });
+  num("skyFov").addEventListener("input", () => { SKY.look.fov = +num("skyFov").value; drawSky(); skyLabels(); });
+  num("skyEv").addEventListener("input", () => { SKY.ev = +num("skyEv").value; drawSky(); skyLabels(); });
   let drag = null;
   skyC.addEventListener("pointerdown", e => { drag = [e.clientX, e.clientY]; skyC.setPointerCapture(e.pointerId); });
   skyC.addEventListener("pointermove", e => {
@@ -1349,7 +1351,7 @@ function initSkyUI() {
     const k = SKY.look.fov / (skyC.getBoundingClientRect().width || 500);
     SKY.look.az = ((SKY.look.az - (e.clientX - drag[0]) * k) % 360 + 360) % 360;
     SKY.look.el = Math.max(-89, Math.min(89, SKY.look.el + (e.clientY - drag[1]) * k));
-    drag = [e.clientX, e.clientY]; skyLabels(); drawSky();
+    drag = [e.clientX, e.clientY]; drawSky(); skyLabels();
   });
   const end = () => { drag = null; };
   skyC.addEventListener("pointerup", end); skyC.addEventListener("pointercancel", end);
@@ -1414,8 +1416,8 @@ window.__terrainGlobe = { state: st, layers: layers.map(l => l.short), pick, sam
   sky: SKY ? {
     setMode: skySetMode, setObserver: skySetObserver,
     setStar: (az, el) => { SKY.star.az = +az; SKY.star.el = +el; skySyncInputs(); skyUpdate(); },
-    setLook: (az, el, fov) => { SKY.look.az = +az; SKY.look.el = +el; if (fov !== undefined) SKY.look.fov = +fov; skySyncInputs(); skyLabels(); drawSky(); },
-    setExposure: ev => { SKY.ev = +ev; skySyncInputs(); skyLabels(); drawSky(); },
+    setLook: (az, el, fov) => { SKY.look.az = +az; SKY.look.el = +el; if (fov !== undefined) SKY.look.fov = +fov; skySyncInputs(); drawSky(); skyLabels(); },
+    setExposure: ev => { SKY.ev = +ev; skySyncInputs(); drawSky(); skyLabels(); },
     update: skyUpdate,
     column: () => SKY.col && { kind: SKY.col.kind, z: SKY.col.z, lnp: SKY.col.lnp, T: SKY.col.T, ceiling: SKY.col.ceiling, terrain: SKY.col.terrain },
     spectral: (iz, ia) => SKY.table ? Array.from(SKY.table.spec.subarray((iz * SKY.table.NA + ia) * SKY.table.K, (iz * SKY.table.NA + ia + 1) * SKY.table.K)) : null,

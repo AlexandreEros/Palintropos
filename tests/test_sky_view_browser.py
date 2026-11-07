@@ -159,9 +159,22 @@ def test_hypothetical_sky_parity(tmp_path):
     payload = _payload(path)
     with OfflinePage(BROWSER) as page:
         url = page.open(path)
+        # the Sky panel's sliders work before Sky mode has placed the observer
+        for sid in ("skyStarEl", "skyStarAz", "skyFov", "skyEv"):
+            page.eval(f"document.getElementById('{sid}')"
+                      ".dispatchEvent(new Event('input'))")
+        assert page.exceptions == [], page.exceptions
         page.eval(f"{API}.setMode('sky')")
         info = page.eval(f"{API}.info()")
         assert info["columnKind"] == "hypothetical"
+        # the clipping figures describe the image just drawn, not the last one
+        page.eval("const e = document.getElementById('skyEv'); e.value = 8;"
+                  " e.dispatchEvent(new Event('input'))")
+        clip = page.eval(f"{API}.info()")["clip"]
+        assert clip["over"] > 0.5, clip
+        assert f"{100 * clip['over']:.1f} % over-exposed" in page.eval(
+            "document.getElementById('skyNote').textContent")
+        page.eval(f"{API}.setExposure(0)")
         assert "HYPOTHETICAL" in page.eval(
             "document.getElementById('skyLabel').textContent")
         _parity(page, payload["sky"])
