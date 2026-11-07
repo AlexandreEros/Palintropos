@@ -75,7 +75,9 @@ def test_documented_cpu_only_modules_import_without_cupy_or_matplotlib():
                "tropoi.spatial.specification",
                "tropoi.representation.archive.initial_state",
                "tropoi.run.custom",
-               "tropoi.spatial.terrain.height_function", "tropoi.cli.terrain"]
+               "tropoi.spatial.terrain.height_function", "tropoi.cli.terrain",
+               # gas optics / composition / columns (sky view; future RT)
+               "tropoi.spatial.optics", "tropoi.spatial.optics.colour"]
     probe = (
         "import importlib, sys\n"
         "sys.modules['cupy'] = None\n"

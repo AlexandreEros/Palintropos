@@ -1424,6 +1424,36 @@
       "qualname": "Renderer"
     },
     {
+      "decorators": [
+        "dataclass(frozen=True)"
+      ],
+      "external_bases": [],
+      "id": "tropoi.representation.visual.sky.HypotheticalColumn",
+      "members": [
+        {
+          "kind": "method",
+          "name": "build"
+        }
+      ],
+      "module": "tropoi.representation.visual.sky",
+      "qualname": "HypotheticalColumn"
+    },
+    {
+      "decorators": [
+        "dataclass(frozen=True)"
+      ],
+      "external_bases": [],
+      "id": "tropoi.representation.visual.sky.SkySpec",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__post_init__"
+        }
+      ],
+      "module": "tropoi.representation.visual.sky",
+      "qualname": "SkySpec"
+    },
+    {
       "decorators": [],
       "external_bases": [
         "RuntimeError"
@@ -3080,6 +3110,198 @@
       ],
       "module": "tropoi.spatial.operators.spectral_operators",
       "qualname": "SpectralOperators"
+    },
+    {
+      "decorators": [
+        "dataclass(frozen=True, eq=False)"
+      ],
+      "external_bases": [],
+      "id": "tropoi.spatial.optics.column.AtmosphericColumn",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__post_init__"
+        },
+        {
+          "kind": "method",
+          "name": "_check_z"
+        },
+        {
+          "kind": "method",
+          "name": "altitude_at"
+        },
+        {
+          "kind": "property",
+          "name": "base_m"
+        },
+        {
+          "kind": "classmethod",
+          "name": "from_levels"
+        },
+        {
+          "kind": "classmethod",
+          "name": "hypothetical"
+        },
+        {
+          "kind": "method",
+          "name": "number_density"
+        },
+        {
+          "kind": "method",
+          "name": "observer_altitude"
+        },
+        {
+          "kind": "method",
+          "name": "pressure_at"
+        },
+        {
+          "kind": "property",
+          "name": "surface_pressure_pa"
+        },
+        {
+          "kind": "method",
+          "name": "temperature_at"
+        },
+        {
+          "kind": "method",
+          "name": "to_dict"
+        },
+        {
+          "kind": "property",
+          "name": "top_m"
+        }
+      ],
+      "module": "tropoi.spatial.optics.column",
+      "qualname": "AtmosphericColumn"
+    },
+    {
+      "decorators": [],
+      "external_bases": [
+        "ValueError"
+      ],
+      "id": "tropoi.spatial.optics.column.ColumnError",
+      "members": [],
+      "module": "tropoi.spatial.optics.column",
+      "qualname": "ColumnError"
+    },
+    {
+      "decorators": [
+        "dataclass(frozen=True)"
+      ],
+      "external_bases": [],
+      "id": "tropoi.spatial.optics.composition.Composition",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__post_init__"
+        },
+        {
+          "kind": "method",
+          "name": "cross_section"
+        },
+        {
+          "kind": "method",
+          "name": "describe"
+        },
+        {
+          "kind": "property",
+          "name": "gas_constant"
+        },
+        {
+          "kind": "property",
+          "name": "molar_mass_kg_per_mol"
+        },
+        {
+          "kind": "classmethod",
+          "name": "of"
+        },
+        {
+          "kind": "method",
+          "name": "sources"
+        },
+        {
+          "kind": "method",
+          "name": "to_dict"
+        }
+      ],
+      "module": "tropoi.spatial.optics.composition",
+      "qualname": "Composition"
+    },
+    {
+      "decorators": [],
+      "external_bases": [
+        "ValueError"
+      ],
+      "id": "tropoi.spatial.optics.composition.CompositionError",
+      "members": [],
+      "module": "tropoi.spatial.optics.composition",
+      "qualname": "CompositionError"
+    },
+    {
+      "decorators": [
+        "dataclass(frozen=True)"
+      ],
+      "external_bases": [],
+      "id": "tropoi.spatial.optics.rayleigh.Species",
+      "members": [
+        {
+          "kind": "method",
+          "name": "cross_section"
+        },
+        {
+          "kind": "method",
+          "name": "describe"
+        },
+        {
+          "kind": "method",
+          "name": "king_factor"
+        },
+        {
+          "kind": "method",
+          "name": "refractivity"
+        }
+      ],
+      "module": "tropoi.spatial.optics.rayleigh",
+      "qualname": "Species"
+    },
+    {
+      "decorators": [
+        "dataclass(frozen=True)"
+      ],
+      "external_bases": [],
+      "id": "tropoi.spatial.optics.star.Star",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__post_init__"
+        },
+        {
+          "kind": "method",
+          "name": "describe"
+        },
+        {
+          "kind": "method",
+          "name": "irradiance"
+        },
+        {
+          "kind": "method",
+          "name": "radiance"
+        },
+        {
+          "kind": "property",
+          "name": "solid_angle_sr"
+        },
+        {
+          "kind": "classmethod",
+          "name": "sun_at_1au"
+        },
+        {
+          "kind": "method",
+          "name": "to_dict"
+        }
+      ],
+      "module": "tropoi.spatial.optics.star",
+      "qualname": "Star"
     },
     {
       "decorators": [],

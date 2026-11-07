@@ -555,6 +555,14 @@
     {
       "kind": "imports",
       "scopes": [
+        "function"
+      ],
+      "source": "tropoi.representation.visual.atmosphere",
+      "target": "tropoi.representation.visual.sky"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
         "module"
       ],
       "source": "tropoi.representation.visual.atmosphere",
@@ -568,6 +576,22 @@
       ],
       "source": "tropoi.representation.visual.atmosphere",
       "target": "tropoi.representation.visual.terrain"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.representation.visual.atmosphere",
+      "target": "tropoi.spatial.optics.column"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.representation.visual.atmosphere",
+      "target": "tropoi.spatial.transforms.host_synthesis"
     },
     {
       "kind": "imports",
@@ -1037,6 +1061,30 @@
     {
       "kind": "imports",
       "scopes": [
+        "module"
+      ],
+      "source": "tropoi.representation.visual.sky",
+      "target": "tropoi.spatial.optics"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.representation.visual.sky",
+      "target": "tropoi.spatial.optics.colour"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.representation.visual.sky",
+      "target": "tropoi.spatial.optics.constants"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
         "function"
       ],
       "source": "tropoi.representation.visual.snapshot",
@@ -1169,6 +1217,14 @@
       ],
       "source": "tropoi.representation.visual.terrain",
       "target": "tropoi.representation.visual.matplotlib_renderer"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.representation.visual.terrain",
+      "target": "tropoi.representation.visual.sky"
     },
     {
       "kind": "imports",
@@ -2519,6 +2575,79 @@
       "scopes": [
         "module"
       ],
+      "source": "tropoi.spatial.optics",
+      "target": "tropoi.spatial.optics.column"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.spatial.optics",
+      "target": "tropoi.spatial.optics.composition"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.spatial.optics",
+      "target": "tropoi.spatial.optics.rayleigh"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.spatial.optics",
+      "target": "tropoi.spatial.optics.star"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.spatial.optics.column",
+      "target": "tropoi.spatial.optics.constants"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.spatial.optics.composition",
+      "target": "tropoi.spatial.optics.constants"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.spatial.optics.composition",
+      "target": "tropoi.spatial.optics.rayleigh"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function",
+        "module"
+      ],
+      "source": "tropoi.spatial.optics.rayleigh",
+      "target": "tropoi.spatial.optics.constants"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.spatial.optics.star",
+      "target": "tropoi.spatial.optics.constants"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
       "source": "tropoi.spatial.planet",
       "target": "tropoi.spatial.environment"
     },
@@ -3551,6 +3680,21 @@
     {
       "category": "code",
       "dynamic_import_calls": 0,
+      "id": "tropoi.representation.visual.sky",
+      "is_package": false,
+      "path": "tropoi/representation/visual/sky.py",
+      "stdlib_imports": [
+        "__future__",
+        "dataclasses",
+        "math"
+      ],
+      "third_party_imports": [
+        "numpy"
+      ]
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
       "id": "tropoi.representation.visual.snapshot",
       "is_package": false,
       "path": "tropoi/representation/visual/snapshot.py",
@@ -4286,6 +4430,101 @@
       "stdlib_imports": [],
       "third_party_imports": [
         "cupy"
+      ]
+    },
+    {
+      "category": "reexport",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.spatial.optics",
+      "is_package": true,
+      "path": "tropoi/spatial/optics/__init__.py",
+      "stdlib_imports": [],
+      "third_party_imports": []
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.spatial.optics.colour",
+      "is_package": false,
+      "path": "tropoi/spatial/optics/colour.py",
+      "stdlib_imports": [
+        "__future__",
+        "hashlib",
+        "importlib"
+      ],
+      "third_party_imports": [
+        "numpy"
+      ]
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.spatial.optics.column",
+      "is_package": false,
+      "path": "tropoi/spatial/optics/column.py",
+      "stdlib_imports": [
+        "__future__",
+        "dataclasses",
+        "math"
+      ],
+      "third_party_imports": [
+        "numpy"
+      ]
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.spatial.optics.composition",
+      "is_package": false,
+      "path": "tropoi/spatial/optics/composition.py",
+      "stdlib_imports": [
+        "__future__",
+        "dataclasses",
+        "math"
+      ],
+      "third_party_imports": [
+        "numpy"
+      ]
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.spatial.optics.constants",
+      "is_package": false,
+      "path": "tropoi/spatial/optics/constants.py",
+      "stdlib_imports": [
+        "__future__"
+      ],
+      "third_party_imports": []
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.spatial.optics.rayleigh",
+      "is_package": false,
+      "path": "tropoi/spatial/optics/rayleigh.py",
+      "stdlib_imports": [
+        "__future__",
+        "dataclasses",
+        "math"
+      ],
+      "third_party_imports": [
+        "numpy"
+      ]
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.spatial.optics.star",
+      "is_package": false,
+      "path": "tropoi/spatial/optics/star.py",
+      "stdlib_imports": [
+        "__future__",
+        "dataclasses",
+        "math"
+      ],
+      "third_party_imports": [
+        "numpy"
       ]
     },
     {
