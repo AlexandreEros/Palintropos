@@ -1463,6 +1463,25 @@
         "dataclass(frozen=True)"
       ],
       "external_bases": [],
+      "id": "tropoi.representation.visual.sky.SkyPreset",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__post_init__"
+        },
+        {
+          "kind": "method",
+          "name": "to_dict"
+        }
+      ],
+      "module": "tropoi.representation.visual.sky",
+      "qualname": "SkyPreset"
+    },
+    {
+      "decorators": [
+        "dataclass(frozen=True)"
+      ],
+      "external_bases": [],
       "id": "tropoi.representation.visual.sky.SkySpec",
       "members": [
         {
@@ -3313,11 +3332,19 @@
         },
         {
           "kind": "classmethod",
+          "name": "sun_at"
+        },
+        {
+          "kind": "classmethod",
           "name": "sun_at_1au"
         },
         {
           "kind": "method",
           "name": "to_dict"
+        },
+        {
+          "kind": "classmethod",
+          "name": "with_sun_irradiance_at_1au"
         }
       ],
       "module": "tropoi.spatial.optics.star",

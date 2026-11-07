@@ -153,4 +153,16 @@ COMPOSITION_PRESETS: dict[str, Composition] = {
                 "species sum to 1. Ne, He, CH4 and other trace gases are "
                 "omitted. Not a reference composition"),
         notes=("illustrative preset: not a validated reference mixture",)),
+    "mars_illustrative": Composition(
+        (("CO2", 0.9531), ("N2", 0.0259), ("Ar", 0.0194), ("O2", 0.0016)),
+        label="Mars-like gas (illustrative)",
+        source=("NASA NSSDCA Mars Fact Sheet (D. R. Williams, updated "
+                "2025-05-19) volume fractions N2 2.59 %, Ar 1.94 %, O2 "
+                "0.16 %, CO2 95.1 %; CO (0.06 %, no optical data), the trace "
+                "gases and the rounding remainder (0.21 % in all) are added "
+                "to CO2 so the four species sum to 1. Not a reference "
+                "composition"),
+        notes=("illustrative preset: not a validated reference mixture",
+               "the real Martian sky colour is set by dust, which is not "
+               "modelled")),
 }

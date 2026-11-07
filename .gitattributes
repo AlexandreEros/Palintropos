@@ -12,3 +12,6 @@ tests/fixtures/** -text
 # Verbatim third-party data (the CIE 1931 table is SHA-256 checked on load);
 # never convert its line endings.
 src/tropoi/spatial/optics/data/** -text
+
+# The generated standalone sky page (python -m tools.sky_page); LF on checkout.
+docs/sky.html text eol=lf

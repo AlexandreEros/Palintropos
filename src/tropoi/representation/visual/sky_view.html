@@ -23,7 +23,7 @@ details { border-top: 1px solid var(--line); padding: 6px 0; }
 summary { cursor: pointer; font-weight: 600; padding: 2px 0; }
 .grid { display: grid; grid-template-columns: auto 1fr; gap: 4px 8px; align-items: center; margin: 6px 0; }
 .grid label { color: var(--muted); }
-input[type=number], select { width: 100%; background: var(--bg); color: var(--ink); border: 1px solid var(--line); border-radius: 4px; padding: 2px 4px; font: inherit; }
+input[type=number], input[type=text], select { width: 100%; background: var(--bg); color: var(--ink); border: 1px solid var(--line); border-radius: 4px; padding: 2px 4px; font: inherit; }
 input[type=range] { width: 100%; }
 input:disabled, select:disabled { opacity: 0.5; }
 button { background: var(--bg); color: var(--ink); border: 1px solid var(--line); border-radius: 4px; padding: 2px 8px; font: inherit; cursor: pointer; }
@@ -51,6 +51,11 @@ th:first-child, td:first-child { text-align: left; }
   <aside id="panel">
     <h1 id="title"></h1>
     <p class="note warn" id="kindLabel"></p>
+
+    <details open id="presetSection"><summary>Start from</summary>
+      <div class="grid"><label for="preset">Preset</label><select id="preset"></select></div>
+      <p class="note" id="presetNote"></p>
+    </details>
 
     <details open id="atmSection"><summary>Atmosphere</summary>
       <div id="atmHyp" class="grid">
@@ -115,15 +120,25 @@ th:first-child, td:first-child { text-align: left; }
       <p class="note" id="tauNote"></p>
     </details>
 
+    <details open id="shareSection"><summary>Keep and share</summary>
+      <p class="note">Every setting is kept in this page's address, so a reload or a bookmark reopens this exact sky. The address points at this file on this computer: to give the sky to someone else, use <b>Save as page</b> (one offline file that opens with these settings).</p>
+      <input type="text" id="shareUrl" readonly aria-label="Address of this sky">
+      <div class="row"><button id="shareCopy">Copy address</button><button id="shareSave">Save as page</button><button id="shareReset">Reset</button></div>
+      <p class="note" id="shareNote"></p>
+    </details>
+
     <details><summary>Notes, limits and sources</summary>
       <ul id="notes"></ul>
     </details>
   </aside>
 </main>
+<script id="sky-state" type="text/plain"></script>
 <script id="sky-data" type="application/json">__SKY_DATA__</script>
 <script>
 "use strict";
 (function () {
+// the page as delivered, before any script changes it: "Save as page" copies it
+const PRISTINE = "<!doctype html>\n" + document.documentElement.outerHTML;
 /* Single-scattering Rayleigh sky in float64 JavaScript. It repeats
    tropoi.representation.visual.sky (radiance_table, star_path_column,
    optical_depth_diagnostic) and tropoi.spatial.optics (Composition,
@@ -150,6 +165,119 @@ const st = {
 // composition rows: the stated species in their order, then the other supported ones at 0
 for (const [k, x] of S.composition.mole_fractions) st.comp.push([k, x]);
 for (const k of Object.keys(S.species)) if (!st.comp.some(r => r[0] === k)) st.comp.push([k, 0]);
+
+/* the settings the page was written with ("Reset" returns to them) and the presets */
+const SETTINGS = ["atm", "comp", "compLabel", "compSource", "star", "obs", "look", "exp"];
+const copy = x => JSON.parse(JSON.stringify(x));
+function snapshot() { const s = {}; for (const k of SETTINGS) s[k] = copy(st[k]); return s; }
+function load(s) { for (const k of SETTINGS) st[k] = copy(s[k]); }
+const START = snapshot();
+const PRESETS = HYP ? (S.presets || []) : [];
+const ATM_KEYS = ["surface_pressure_pa", "temperature_k", "gravity", "gas_constant", "radius_m", "lapse_rate_k_per_m", "temperature_floor_k"];
+function presetFractions(p) { const f = {}; for (const [k, x] of p.composition.mole_fractions) f[k] = x; return f; }
+/* a preset sets the atmosphere, composition and star, and resets observer, view and exposure */
+function applyPreset(key) {
+  const p = PRESETS.find(q => q.key === key);
+  if (!p) return false;
+  st.atm = copy(p.hypothetical);
+  const f = presetFractions(p);
+  st.comp = st.comp.map(([k]) => [k, f[k] || 0]);
+  st.compLabel = p.composition.label; st.compSource = p.composition.source;
+  st.star = { T: p.star.temperature_k, alpha: p.star.angular_radius_deg, az: p.star.azimuth_deg, el: p.star.elevation_deg,
+              label: p.star.label, source: p.star.source };
+  st.obs = { mode: "ground", altitude_m: st.obs.altitude_m, pressure_pa: st.obs.pressure_pa };
+  st.look = { az: p.look.azimuth_deg, el: p.look.elevation_deg, fov: p.look.fov_deg };
+  st.exp = { mode: "auto", ev: 0, ref: null };
+  return true;
+}
+/* the preset whose atmosphere, composition and star spectrum the page shows exactly, if any */
+function matchingPreset() {
+  for (const p of PRESETS) {
+    if (ATM_KEYS.some(k => st.atm[k] !== p.hypothetical[k])) continue;
+    const f = presetFractions(p);
+    if (st.comp.some(([k, x]) => x !== (f[k] || 0))) continue;
+    if (st.star.T === p.star.temperature_k && st.star.alpha === p.star.angular_radius_deg) return p;
+  }
+  return null;
+}
+
+/* settings <-> the page address (#key=value&...): readable, exact for every number
+   (String() of a double round-trips), view angles rounded to 0.01 degree */
+const r2 = x => Math.round(x * 100) / 100;
+function encodeState() {
+  const q = [], put = (k, v) => q.push(k + "=" + encodeURIComponent(String(v)));
+  if (HYP) {
+    const a = st.atm;
+    put("ps", a.surface_pressure_pa); put("T", a.temperature_k); put("lapse", a.lapse_rate_k_per_m);
+    put("floor", a.temperature_floor_k === null ? "none" : a.temperature_floor_k);
+    put("g", a.gravity); put("R", a.gas_constant === "from_composition" ? "composition" : a.gas_constant); put("radius", a.radius_m);
+  }
+  for (const [k, x] of st.comp) if (x !== 0) put(k, x);
+  put("star_T", st.star.T); put("star_alpha", st.star.alpha); put("star_az", st.star.az); put("star_el", st.star.el);
+  put("obs", st.obs.mode);
+  if (st.obs.mode === "altitude") put("alt", st.obs.altitude_m);
+  if (st.obs.mode === "pressure") put("p", st.obs.pressure_pa);
+  put("look_az", r2(st.look.az)); put("look_el", r2(st.look.el)); put("fov", st.look.fov);
+  put("exposure", st.exp.mode); put("ev", st.exp.ev);
+  if (st.exp.mode === "fixed") put("ref", st.exp.ref === null ? "none" : st.exp.ref);
+  return q.join("&");
+}
+/* Apply settings over the page's starting ones. A key that is absent keeps the start's
+   value, except the composition: if any species is given, the others are 0. Returns the
+   keys that were ignored (unknown, or not a usable value). */
+function restoreState(text, origin) {
+  const q = new URLSearchParams(String(text).replace(/^#/, "")), ignored = [], used = new Set();
+  const raw = k => { const v = q.get(k); if (v !== null) used.add(k); return v; };
+  const num = k => { const v = raw(k); if (v === null) return undefined; const x = Number(v);
+    if (v.trim() === "" || !isFinite(x)) { ignored.push(k); return undefined; } return x; };
+  const word = (k, allowed) => { const v = raw(k); if (v === null) return undefined; if (!allowed.includes(v)) { ignored.push(k); return undefined; } return v; };
+  const numOr = (k, w) => { const v = q.get(k); if (v === w) { used.add(k); return null; } return num(k); };
+  load(START);
+  const set = (o, k, v) => { if (v !== undefined) o[k] = v; };
+  if (HYP) {
+    const a = st.atm;
+    set(a, "surface_pressure_pa", num("ps")); set(a, "temperature_k", num("T")); set(a, "lapse_rate_k_per_m", num("lapse"));
+    set(a, "temperature_floor_k", numOr("floor", "none")); set(a, "gravity", num("g"));
+    set(a, "gas_constant", q.get("R") === "composition" ? (used.add("R"), "from_composition") : num("R"));
+    set(a, "radius_m", num("radius"));
+  }
+  const given = {};
+  for (const [k] of st.comp) { const x = num(k); if (x !== undefined) given[k] = x; }
+  if (Object.keys(given).length) st.comp = st.comp.map(([k]) => [k, given[k] || 0]);
+  set(st.star, "T", num("star_T")); set(st.star, "alpha", num("star_alpha"));
+  set(st.star, "az", num("star_az")); set(st.star, "el", num("star_el"));
+  set(st.obs, "mode", word("obs", ["ground", "altitude", "pressure"]));
+  set(st.obs, "altitude_m", num("alt")); set(st.obs, "pressure_pa", num("p"));
+  set(st.look, "az", num("look_az")); set(st.look, "el", num("look_el")); set(st.look, "fov", num("fov"));
+  set(st.exp, "mode", word("exposure", ["auto", "fixed"])); set(st.exp, "ev", num("ev")); set(st.exp, "ref", numOr("ref", "none"));
+  for (const k of q.keys()) if (!used.has(k) && !ignored.includes(k)) ignored.push(k);
+  // labels say where the numbers came from
+  const p = matchingPreset();
+  if (p) {
+    st.compLabel = p.composition.label; st.compSource = p.composition.source;
+    st.star.label = p.star.label; st.star.source = p.star.source;
+  } else {
+    if (JSON.stringify(st.comp) !== JSON.stringify(START.comp)) { st.compLabel = "composition from the " + origin; st.compSource = "stated by the user"; }
+    if (st.star.T !== START.star.T || st.star.alpha !== START.star.alpha) { st.star.label = "blackbody star from the " + origin; st.star.source = "stated by the user"; }
+  }
+  return ignored;
+}
+/* the address follows the settings (replaceState: no history entry per change) */
+let persistTimer = 0, written = null;
+function persist() {
+  clearTimeout(persistTimer); persistTimer = 0;
+  const h = "#" + encodeState();
+  if (location.hash !== h) {
+    written = h;
+    try { history.replaceState(null, "", h); } catch (e) { location.replace(h); }
+  }
+  $("shareUrl").value = location.href;
+}
+function persistSoon() { clearTimeout(persistTimer); persistTimer = setTimeout(persist, 250); }
+function savedPage() {
+  const s = encodeState();
+  return PRISTINE.replace(/(<script id="sky-state" type="text\/plain">)[^<]*(<\/script>)/, (m, a, b) => a + s + b);
+}
 
 function radius() { return HYP ? st.atm.radius_m : S.radius_m; }
 function fail(msg) { const e = new Error(msg); e.sky = true; throw e; }
@@ -374,7 +502,7 @@ function relight() {
   redraw();
 }
 function schedule() { if (st.timer) clearTimeout(st.timer); st.timer = setTimeout(recompute, 150); }
-function redraw() { drawSky(); labels(); }
+function redraw() { drawSky(); labels(); persistSoon(); }
 
 /* ---- drawing ---- */
 const skyC = $("sky"), skyImg = document.createElement("canvas");
@@ -464,6 +592,13 @@ function labels() {
   $("fovL").textContent = st.look.fov.toFixed(0) + "°";
   $("evL").textContent = (st.exp.ev >= 0 ? "+" : "") + st.exp.ev.toFixed(2) + " EV";
   $("expRef").disabled = st.exp.mode !== "fixed";
+  // preset: the one the page shows exactly, or custom
+  if (PRESETS.length) {
+    const p = matchingPreset();
+    $("preset").value = p ? p.key : "";
+    $("presetNote").textContent = p ? p.description
+      : "Custom settings (not exactly one of the presets). Choosing a preset replaces the atmosphere, composition and star, and resets the observer, view and exposure.";
+  }
   // composition
   let sum = 0; for (const r of st.comp) sum += r[1];
   $("compSum").textContent = sum.toPrecision(9);
@@ -574,6 +709,27 @@ function initUI() {
   $("title").textContent = document.title;
   $("kindLabel").textContent = HYP ? "HYPOTHETICAL atmosphere, prescribed here; not from a simulation." : "Column of a saved simulation state (fixed); composition and star are view settings only.";
   $("atmHyp").hidden = !HYP;
+  // presets (a hypothetical page only: a saved column is fixed)
+  const pre = $("preset");
+  $("presetSection").hidden = !PRESETS.length;
+  for (const p of PRESETS) { const o = document.createElement("option"); o.value = p.key; o.textContent = p.title; pre.append(o); }
+  const custom = document.createElement("option"); custom.value = ""; custom.textContent = "custom"; custom.disabled = true; pre.append(custom);
+  pre.addEventListener("change", () => { if (applyPreset(pre.value)) { $("shareNote").textContent = ""; syncInputs(); recompute(); } });
+  // keep and share
+  $("shareCopy").addEventListener("click", async () => {
+    persist();
+    try { await navigator.clipboard.writeText(location.href); $("shareNote").textContent = "Address copied."; }
+    catch (e) { $("shareUrl").select(); $("shareNote").textContent = "The browser did not allow copying: the address is selected above, copy it with Ctrl+C."; }
+  });
+  $("shareSave").addEventListener("click", () => {
+    const p = matchingPreset(), a = document.createElement("a");
+    a.href = URL.createObjectURL(new Blob([savedPage()], { type: "text/html" }));
+    a.download = "sky-" + (p ? p.key : "custom") + ".html";
+    document.body.append(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 10000);
+    $("shareNote").textContent = "Saved " + a.download + ": it opens with these settings, offline, on any computer.";
+  });
+  $("shareReset").addEventListener("click", () => { load(START); $("shareNote").textContent = "Back to the settings this page was written with."; syncInputs(); recompute(); });
   const grid = $("compGrid"), which = $("compFillWhich");
   for (const [k] of st.comp) {
     const l = document.createElement("label"); l.htmlFor = "comp_" + k; l.textContent = k;
@@ -644,10 +800,24 @@ function initUI() {
 }
 
 /* ---- start ---- */
+function restoreFrom(text, origin) {
+  const ignored = restoreState(text, origin);
+  $("shareNote").textContent = ignored.length ? "Ignored in the " + origin + ": " + ignored.join(", ") + " (not a setting, or not a usable value)." : "";
+  return ignored;
+}
 window.addEventListener("resize", redraw);
+window.addEventListener("hashchange", () => {
+  if (location.hash === written || location.hash.length < 2) return;   // our own write, or no settings
+  restoreFrom(location.hash, "page address"); syncInputs(); recompute();
+});
 initUI();
+// settings: the page address wins, then those saved into the page, then the page's own
+const embedded = $("sky-state").textContent.trim();
+if (location.hash.length > 1) restoreFrom(location.hash, "page address");
+else if (embedded) restoreFrom(embedded, "saved page");
 recompute();
 syncInputs();
+persist();
 
 /* test and scripting API: set() applies changes and recomputes synchronously */
 window.__sky = {
@@ -661,6 +831,13 @@ window.__sky = {
     syncInputs(); recompute();
     return window.__sky.info();
   },
+  preset: key => { if (!applyPreset(key)) throw new Error("no preset " + key); syncInputs(); recompute(); return window.__sky.info(); },
+  state: () => encodeState(),
+  restore: text => { const ignored = restoreFrom(text, "page address"); syncInputs(); recompute(); return ignored; },
+  reset: () => { load(START); syncInputs(); recompute(); return window.__sky.info(); },
+  flush: () => { persist(); return location.hash; },
+  savedPage: () => savedPage(),
+  presets: () => PRESETS.map(p => p.key),
   column: () => st.col && { z: st.col.z, lnp: st.col.lnp, T: st.col.T, ceiling: st.col.ceiling, R: st.col.R },
   mixture: () => st.mix && { rows: st.mix.rows, sigma: Array.from(st.mix.sigma), M: st.mix.M, R: st.mix.R },
   spectral: (iz, ia) => st.view ? Array.from(st.view.spec.subarray((iz * st.table.NA + ia) * K, (iz * st.table.NA + ia + 1) * K)) : null,
@@ -668,7 +845,9 @@ window.__sky = {
                  star: Object.assign({}, st.star), exposure: Object.assign({}, st.exp), white: whiteLuminance(),
                  brightest: st.view ? st.view.lbright : null, starXYZ: st.view ? st.view.starXYZ : null,
                  zenithColumn: st.table ? st.table.zenithColumn : null, starColumn: st.table ? st.table.starColumn : null,
-                 diagnostic: st.diag, clip: st.clip, ms: st.ms, radius: radius(), label: S.label }),
+                 diagnostic: st.diag, clip: st.clip, ms: st.ms, radius: radius(), label: S.label,
+                 atmosphere: st.atm && Object.assign({}, st.atm), composition: st.comp.map(r => r.slice()),
+                 compLabel: st.compLabel, preset: (matchingPreset() || {}).key || null }),
 };
 })();
 </script>

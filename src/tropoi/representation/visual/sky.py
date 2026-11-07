@@ -64,8 +64,9 @@ from dataclasses import dataclass, field
 
 import numpy as np
 
-from tropoi.spatial.optics import (SPECIES, AtmosphericColumn, Composition,
-                                   Star, gas_constant_report)
+from tropoi.spatial.optics import (COMPOSITION_PRESETS, SPECIES,
+                                   AtmosphericColumn, Composition, Star,
+                                   gas_constant_report)
 from tropoi.spatial.optics.colour import (CIE_SOURCE, XYZ_TO_LINEAR_SRGB,
                                           bin_weights, omitted_fraction)
 from tropoi.spatial.optics.column import DEFAULT_TOP_RATIO
@@ -74,10 +75,12 @@ from tropoi.spatial.optics.constants import (ATOMIC_WEIGHT_SOURCE, C, H,
                                              K_B, LUMINOUS_EFFICACY, R_MOLAR)
 from tropoi.spatial.optics.rayleigh import KING_CHECK
 
-__all__ = ["BIN_EDGES_NM", "EXPOSURE_MODES", "HypotheticalColumn", "SkySpec",
+__all__ = ["BIN_EDGES_NM", "EXPOSURE_MODES", "HypotheticalColumn",
+           "SKY_PRESETS", "STANDALONE_PRESET", "SkyPreset", "SkySpec",
            "TAU_CAUTION", "TAU_UNRELIABLE", "UNSUPPORTED", "density_grid",
-           "optical_depth_diagnostic", "radiance_table", "saved_sky_page",
-           "sky_block", "star_path_column", "write_sky_page"]
+           "optical_depth_diagnostic", "radiance_table", "render_page",
+           "saved_sky_page", "sky_block", "standalone_page",
+           "star_path_column", "write_sky_page"]
 
 BIN_EDGES_NM = np.arange(400.0, 761.0, 20.0)
 WAVELENGTHS_NM = 0.5 * (BIN_EDGES_NM[:-1] + BIN_EDGES_NM[1:])
@@ -238,6 +241,98 @@ class SkySpec:
             raise ValueError("exposure_reference_cd_m2 is for "
                              "exposure_mode='fixed'; 'auto' uses the "
                              "brightest sky luminance")
+
+
+# ---------------------------------------------------------------------------
+# Presets: named starting points of a hypothetical sky
+# ---------------------------------------------------------------------------
+
+@dataclass(frozen=True)
+class SkyPreset:
+    """A named, sourced starting point of a HYPOTHETICAL sky.
+
+    Choosing one in the page replaces the atmosphere, composition and star,
+    and resets the observer, view and exposure to the preset's. Every number
+    says where it comes from; none is a validated reference atmosphere.
+    """
+
+    key: str
+    title: str
+    description: str
+    spec: SkySpec
+
+    def __post_init__(self) -> None:
+        if not re.fullmatch(r"[a-z0-9_]+", self.key):
+            raise ValueError(f"preset key must be [a-z0-9_]+, got {self.key!r}")
+        if self.spec.hypothetical is None:
+            raise ValueError("a preset is a hypothetical sky")
+
+    def to_dict(self) -> dict:
+        s = self.spec
+        return {"key": self.key, "title": self.title,
+                "description": self.description,
+                "hypothetical": s.hypothetical.to_dict(),
+                "composition": s.composition.to_dict(),
+                "star": dict(s.star.to_dict(), azimuth_deg=s.star_azimuth_deg,
+                             elevation_deg=s.star_elevation_deg),
+                "look": {"azimuth_deg": float(s.look_azimuth_deg),
+                         "elevation_deg": float(s.look_elevation_deg),
+                         "fov_deg": float(s.fov_deg)}}
+
+
+def _presets() -> dict[str, SkyPreset]:
+    view =dict(look_azimuth_deg=135.0, look_elevation_deg=25.0, fov_deg=100.0,
+                star_azimuth_deg=135.0, star_elevation_deg=30.0)
+    earth = SkyPreset(
+        "earth", "Earth (dry air, 1 atm)",
+        "Dry Earth-like air at 1013.25 hPa with the US Standard Atmosphere "
+        "1976 troposphere (288.15 K, 6.5 K/km, isothermal from 216.65 K), "
+        "standard gravity, Earth's mean radius and the Sun at 1 au. No water "
+        "vapour, aerosols or ozone.",
+        SkySpec(COMPOSITION_PRESETS["earth_dry_air_illustrative"],
+                star=Star.sun_at_1au(), **view,
+                hypothetical=HypotheticalColumn(
+                    surface_pressure_pa=101325.0, temperature_k=288.15,
+                    gravity=9.80665, gas_constant="from_composition",
+                    radius_m=6.371e6, lapse_rate_k_per_m=0.0065,
+                    temperature_floor_k=216.65)))
+    n2 = SkyPreset(
+        "thin_n2_red_star", "0.1 bar N₂, 3200 K star",
+        "The sky page's acceptance case (examples/sky_hypothetical.py): pure "
+        "N₂ at 0.1 bar, isothermal at 250 K, Earth's gravity and radius, "
+        "under a 3200 K star sized to deliver the Sun's total irradiance at "
+        "1 au.",
+        SkySpec(Composition.of(label="pure N₂",
+                               source="stated for the acceptance case",
+                               N2=1.0),
+                star=Star.with_sun_irradiance_at_1au(3200.0), **view,
+                hypothetical=HypotheticalColumn(
+                    surface_pressure_pa=1.0e4, temperature_k=250.0,
+                    gravity=9.80665, gas_constant="from_composition",
+                    radius_m=6.371e6)))
+    mars = SkyPreset(
+        "mars", "Mars (gas only, no dust)",
+        "Mars-like gas at 6.36 hPa (the mean-radius surface pressure), "
+        "isothermal at 214 K, g = 3.73 m s⁻², radius 3389.5 km, the Sun at "
+        "1.52366 au (NASA NSSDCA Mars Fact Sheet). The real Martian sky is "
+        "coloured by dust, which this page does not model: expect a faint, "
+        "dark blue sky, not butterscotch.",
+        SkySpec(COMPOSITION_PRESETS["mars_illustrative"],
+                star=Star.sun_at(1.52366231, where="Mars",
+                                 distance_source="Mars semimajor axis, NASA "
+                                 "NSSDCA Mars Fact Sheet"), **view,
+                hypothetical=HypotheticalColumn(
+                    surface_pressure_pa=636.0, temperature_k=214.0,
+                    gravity=3.73, gas_constant="from_composition",
+                    radius_m=3.3895e6)))
+    return {p.key: p for p in (earth, n2, mars)}
+
+
+#: The presets every hypothetical sky page offers, in menu order.
+SKY_PRESETS: dict[str, SkyPreset] = _presets()
+#: The preset the standalone page (``docs/sky.html``) opens with.
+STANDALONE_PRESET = "earth"
+STANDALONE_TITLE = "Sky laboratory — hypothetical atmospheres"
 
 
 # ---------------------------------------------------------------------------
@@ -480,7 +575,7 @@ def sky_block(spec: SkySpec, *, column: AtmosphericColumn,
                + [KING_CHECK, f"Molar masses: {ATOMIC_WEIGHT_SOURCE}",
                   CIE_SOURCE, "XYZ → sRGB: IEC 61966-2-1", spec.star.source])
     return {
-        "version": 2,
+        "version": 3,
         "label": PROTOTYPE_LABEL,
         "column_kind": column_kind,
         "radius_m": float(radius_m),
@@ -515,10 +610,14 @@ def sky_block(spec: SkySpec, *, column: AtmosphericColumn,
         "notes": notes,
         "unsupported": list(UNSUPPORTED),
         "sources": sources,
+        # a saved column is fixed, so only a hypothetical page offers presets
+        "presets": ([p.to_dict() for p in SKY_PRESETS.values()]
+                    if column_kind == "hypothetical" else []),
     }
 
 
-def _write_page(block: dict, title: str, path) -> pathlib.Path:
+def render_page(block: dict, title: str) -> str:
+    """The page's HTML for a ``sky_block``: one offline file."""
     template = importlib.resources.files(
         "tropoi.representation.visual").joinpath(
         "sky_view.html").read_text(encoding="utf-8")
@@ -526,12 +625,34 @@ def _write_page(block: dict, title: str, path) -> pathlib.Path:
     data = data.replace("<", "\\u003c").replace(">", "\\u003e")
     title = (str(title).replace("&", "&amp;").replace("<", "&lt;")
              .replace(">", "&gt;"))
-    page = (template.replace("__PAGE_TITLE__", title)
+    return (template.replace("__PAGE_TITLE__", title)
             .replace("__SKY_DATA__", data))
+
+
+def _write_page(block: dict, title: str, path) -> pathlib.Path:
     path = pathlib.Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(page, encoding="utf-8")
+    path.write_text(render_page(block, title), encoding="utf-8")
     return path
+
+
+def _hypothetical_block(spec: SkySpec) -> dict:
+    hyp = spec.hypothetical
+    column = hyp.build(spec.composition)
+    return sky_block(spec, column=column, column_kind="hypothetical",
+                     radius_m=hyp.radius_m, r_dry=column.gas_constant)
+
+
+def standalone_page() -> str:
+    """The HTML of the standalone sky laboratory (``docs/sky.html``).
+
+    The ``STANDALONE_PRESET`` sky with every preset on offer: open it by
+    double-clicking, no Python needed. ``python -m tools.sky_page``
+    regenerates the committed copy; its ``--check`` (and the test suite)
+    fails if the copy no longer matches this function.
+    """
+    return render_page(_hypothetical_block(SKY_PRESETS[STANDALONE_PRESET]
+                                           .spec), STANDALONE_TITLE)
 
 
 def _default_path(name: str) -> pathlib.Path:
@@ -561,9 +682,7 @@ def write_sky_page(spec: SkySpec, path=None, *, title: str | None = None,
         raise ValueError(
             "write_sky_page needs spec.hypothetical (a HypotheticalColumn); "
             "for the column of a saved run use Simulation.sky(...)")
-    column = hyp.build(spec.composition)
-    block = sky_block(spec, column=column, column_kind="hypothetical",
-                      radius_m=hyp.radius_m, r_dry=column.gas_constant)
+    block = _hypothetical_block(spec)
     title = title or f"Sky — {spec.composition.label} (hypothetical)"
     path = _write_page(block, title,
                        path if path is not None else _default_path(title))

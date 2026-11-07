@@ -215,7 +215,7 @@ def test_optical_depth_warnings_and_refusals(acceptance_page):
                       f".dispatchEvent(new Event({event!r}))")
         page.eval(f"{API}.set({{}})")
         assert page.exceptions == [], page.exceptions
-        # Earth-like column: zenith tau(410 nm) ~ 0.36 -> caution
+        # Earth-like column: zenith tau(410 nm) ~ 0.32 -> caution
         air = dict(COMPOSITION_PRESETS["earth_dry_air_illustrative"]
                    .mole_fractions)
         info = page.eval(f"{API}.set({{composition: {json.dumps(air)}, "
@@ -259,6 +259,11 @@ def test_saved_state_sky_page(tmp_path):
     with OfflinePage(BROWSER) as page:
         url = page.open(path)
         assert page.eval("document.getElementById('atmHyp').hidden") is True
+        # no presets on a fixed column, and the address carries no atmosphere
+        assert block["presets"] == []
+        assert page.eval("document.getElementById('presetSection').hidden")
+        assert not re.search(r"(^|&)(ps|T|g|radius)=",
+                             page.eval(f"{API}.state()"))
         assert "saved state" in _text(page, "stageLabel")
         assert "cannot be edited" in _text(page, "atmNote")
         info = _parity(page, hypothetical=None)
@@ -271,4 +276,116 @@ def test_saved_state_sky_page(tmp_path):
         assert "r_dry" in _text(page, "compNote")
         with pytest.raises(RuntimeError, match="cannot be edited"):
             page.eval(f"{API}.set({{atmosphere: {{temperature_k: 300}}}})")
+        _assert_clean(page, url)
+
+
+# -- the standalone page, presets, and settings kept in the address -------------
+
+STANDALONE = REPO_ROOT / "docs" / "sky.html"
+
+
+def _settings(info) -> dict:
+    """What the address and a saved page must reproduce exactly."""
+    return {k: info[k] for k in ("atmosphere", "composition", "observer",
+                                 "exposure", "preset")} | {
+        "star": {k: info["star"][k] for k in ("T", "alpha", "az", "el")},
+        "look": {k: round(info["look"][k], 2) for k in ("az", "el", "fov")}}
+
+
+def test_standalone_page_opens_without_python_and_offers_presets():
+    """docs/sky.html, opened as a file: the Earth preset, then each preset,
+    each equal to the NumPy reference of that preset's sky."""
+    with OfflinePage(BROWSER) as page:
+        url = page.open(STANDALONE)
+        info = page.eval(f"{API}.info()")
+        assert info["error"] is None and info["preset"] == "earth"
+        assert page.eval("document.getElementById('preset').value") == "earth"
+        assert page.eval(f"{API}.presets()") == list(sky.SKY_PRESETS)
+        for key, preset in sky.SKY_PRESETS.items():
+            info = page.eval(f"{API}.preset({key!r})")
+            assert info["preset"] == key
+            assert info["compLabel"] == preset.spec.composition.label
+            assert info["observer"]["mode"] == "ground"
+            assert info["exposure"] == {"mode": "auto", "ev": 0,
+                                        "ref": None}
+            _parity(page, hypothetical={
+                k: v for k, v in preset.spec.hypothetical.to_dict().items()
+                if k not in ("top_ratio", "nodes")})
+            assert preset.description[:20] in _text(page, "presetNote")
+        # an edit leaves the preset: the menu says custom
+        info = page.eval(f"{API}.set({{atmosphere: {{temperature_k: 260}}}})")
+        assert info["preset"] is None
+        assert page.eval("document.getElementById('preset').value") == ""
+        assert "Custom settings" in _text(page, "presetNote")
+        _assert_clean(page, url)
+
+
+def test_settings_survive_the_address_and_a_saved_page(tmp_path):
+    edit = ("{atmosphere: {surface_pressure_pa: 54321.5, temperature_k: "
+            "271.25, lapse_rate_k_per_m: 0.004, temperature_floor_k: 201.5, "
+            "gas_constant: 290.5, gravity: 7.125, radius_m: 4.5e6}, "
+            "composition: {N2: 0.5, O2: 0.25, Ar: 0.125, CO2: 0.125}, "
+            "star: {T: 6100.5, alpha: 0.41, az: 200, el: 12.5}, "
+            "observer: {mode: 'pressure', pressure_pa: 30000}, "
+            "look: {az: 201.234, el: 10.5, fov: 80}, "
+            "exposure: {mode: 'fixed', ref: 1234.5, ev: -1.25}}")
+    with OfflinePage(BROWSER) as page:
+        url = page.open(STANDALONE)
+        want = _settings(page.eval(f"{API}.set({edit})"))
+        assert want["preset"] is None
+        fragment = page.eval(f"{API}.flush()")
+        assert page.eval("location.hash") == fragment
+        assert page.eval("document.getElementById('shareUrl').value"
+                         ).endswith(fragment)
+        html = page.eval(f"{API}.savedPage()")
+        _assert_clean(page, url)
+    # a reload (or a bookmark) of that address reopens the same sky
+    copy = tmp_path / "copy.html"
+    copy.write_text(STANDALONE.read_text(encoding="utf-8"), encoding="utf-8")
+    with OfflinePage(BROWSER) as page:
+        url = page.open(copy, fragment=fragment[1:])
+        info = page.eval(f"{API}.info()")
+        assert info["error"] is None
+        assert _settings(info) == want
+        assert "from the page address" in info["compLabel"]
+        assert "from the page address" in info["star"]["label"]
+        _parity(page, hypothetical={
+            "surface_pressure_pa": 54321.5, "temperature_k": 271.25,
+            "lapse_rate_k_per_m": 0.004, "temperature_floor_k": 201.5,
+            "gas_constant": 290.5, "gravity": 7.125, "radius_m": 4.5e6})
+        # Reset: back to what the page was written with
+        assert page.eval(f"{API}.reset()")["preset"] == "earth"
+        _assert_clean(page, url)
+    # "Save as page": one file that opens with those settings, no address
+    saved = tmp_path / "saved.html"
+    saved.write_text(html, encoding="utf-8")
+    with OfflinePage(BROWSER) as page:
+        url = page.open(saved)
+        info = page.eval(f"{API}.info()")
+        assert info["error"] is None and _settings(info) == want
+        assert "from the saved page" in info["compLabel"]
+        assert page.eval(f"{API}.reset()")["preset"] == "earth"
+        _assert_clean(page, url)
+
+
+def test_a_bad_address_is_reported_not_obeyed():
+    with OfflinePage(BROWSER) as page:
+        url = page.open(STANDALONE, fragment="ps=abc&foo=1&N2=1&obs=moon")
+        info = page.eval(f"{API}.info()")
+        assert info["error"] is None
+        assert info["atmosphere"]["surface_pressure_pa"] == 101325.0
+        assert info["observer"]["mode"] == "ground"
+        assert info["composition"] == [["N2", 1], ["O2", 0], ["Ar", 0],
+                                       ["CO2", 0]]
+        note = _text(page, "shareNote")
+        for key in ("ps", "foo", "obs"):
+            assert key in note
+        # a preset's exact numbers in the address bring back its labels
+        page.eval(f"{API}.preset('mars')")
+        mars = page.eval(f"{API}.state()")
+        page.eval(f"{API}.reset()")
+        info = page.eval(f"{API}.restore({mars!r}) && {API}.info()")
+        assert info["preset"] == "mars"
+        assert info["compLabel"] == sky.SKY_PRESETS["mars"].spec \
+            .composition.label
         _assert_clean(page, url)

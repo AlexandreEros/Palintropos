@@ -3792,6 +3792,11 @@
     },
     {
       "kind": "call",
+      "source": "tropoi.representation.visual.sky._hypothetical_block",
+      "target": "tropoi.representation.visual.sky.sky_block"
+    },
+    {
+      "kind": "call",
       "source": "tropoi.representation.visual.sky._optics_block",
       "target": "tropoi.spatial.optics.colour.bin_weights"
     },
@@ -3799,6 +3804,46 @@
       "kind": "call",
       "source": "tropoi.representation.visual.sky._optics_block",
       "target": "tropoi.spatial.optics.colour.omitted_fraction"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.representation.visual.sky._presets",
+      "target": "tropoi.representation.visual.sky.HypotheticalColumn"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.representation.visual.sky._presets",
+      "target": "tropoi.representation.visual.sky.SkyPreset"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.representation.visual.sky._presets",
+      "target": "tropoi.representation.visual.sky.SkySpec"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.sky._presets",
+      "target": "tropoi.spatial.optics.composition.Composition.of"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.sky._presets",
+      "target": "tropoi.spatial.optics.star.Star.sun_at"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.sky._presets",
+      "target": "tropoi.spatial.optics.star.Star.sun_at_1au"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.sky._presets",
+      "target": "tropoi.spatial.optics.star.Star.with_sun_irradiance_at_1au"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.sky._write_page",
+      "target": "tropoi.representation.visual.sky.render_page"
     },
     {
       "kind": "call",
@@ -3882,6 +3927,16 @@
     },
     {
       "kind": "call",
+      "source": "tropoi.representation.visual.sky.standalone_page",
+      "target": "tropoi.representation.visual.sky._hypothetical_block"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.sky.standalone_page",
+      "target": "tropoi.representation.visual.sky.render_page"
+    },
+    {
+      "kind": "call",
       "source": "tropoi.representation.visual.sky.star_path_column",
       "target": "tropoi.representation.visual.sky._density"
     },
@@ -3903,17 +3958,17 @@
     {
       "kind": "call",
       "source": "tropoi.representation.visual.sky.write_sky_page",
+      "target": "tropoi.representation.visual.sky._hypothetical_block"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.sky.write_sky_page",
       "target": "tropoi.representation.visual.sky._open"
     },
     {
       "kind": "call",
       "source": "tropoi.representation.visual.sky.write_sky_page",
       "target": "tropoi.representation.visual.sky._write_page"
-    },
-    {
-      "kind": "call",
-      "source": "tropoi.representation.visual.sky.write_sky_page",
-      "target": "tropoi.representation.visual.sky.sky_block"
     },
     {
       "kind": "call",
@@ -12813,6 +12868,27 @@
       "type": "function"
     },
     {
+      "id": "tropoi.representation.visual.sky.SkyPreset",
+      "kind": "class",
+      "module": "tropoi.representation.visual.sky",
+      "qualname": "SkyPreset",
+      "type": "class"
+    },
+    {
+      "id": "tropoi.representation.visual.sky.SkyPreset.__post_init__",
+      "kind": "method",
+      "module": "tropoi.representation.visual.sky",
+      "qualname": "SkyPreset.__post_init__",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.sky.SkyPreset.to_dict",
+      "kind": "method",
+      "module": "tropoi.representation.visual.sky",
+      "qualname": "SkyPreset.to_dict",
+      "type": "function"
+    },
+    {
       "id": "tropoi.representation.visual.sky.SkySpec",
       "kind": "class",
       "module": "tropoi.representation.visual.sky",
@@ -12841,6 +12917,13 @@
       "type": "function"
     },
     {
+      "id": "tropoi.representation.visual.sky._hypothetical_block",
+      "kind": "function",
+      "module": "tropoi.representation.visual.sky",
+      "qualname": "_hypothetical_block",
+      "type": "function"
+    },
+    {
       "id": "tropoi.representation.visual.sky._open",
       "kind": "function",
       "module": "tropoi.representation.visual.sky",
@@ -12852,6 +12935,13 @@
       "kind": "function",
       "module": "tropoi.representation.visual.sky",
       "qualname": "_optics_block",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.sky._presets",
+      "kind": "function",
+      "module": "tropoi.representation.visual.sky",
+      "qualname": "_presets",
       "type": "function"
     },
     {
@@ -12897,6 +12987,13 @@
       "type": "function"
     },
     {
+      "id": "tropoi.representation.visual.sky.render_page",
+      "kind": "function",
+      "module": "tropoi.representation.visual.sky",
+      "qualname": "render_page",
+      "type": "function"
+    },
+    {
       "id": "tropoi.representation.visual.sky.saved_sky_page",
       "kind": "function",
       "module": "tropoi.representation.visual.sky",
@@ -12908,6 +13005,13 @@
       "kind": "function",
       "module": "tropoi.representation.visual.sky",
       "qualname": "sky_block",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.sky.standalone_page",
+      "kind": "function",
+      "module": "tropoi.representation.visual.sky",
+      "qualname": "standalone_page",
       "type": "function"
     },
     {
@@ -16817,6 +16921,13 @@
       "type": "function"
     },
     {
+      "id": "tropoi.spatial.optics.star.Star.sun_at",
+      "kind": "classmethod",
+      "module": "tropoi.spatial.optics.star",
+      "qualname": "Star.sun_at",
+      "type": "function"
+    },
+    {
       "id": "tropoi.spatial.optics.star.Star.sun_at_1au",
       "kind": "classmethod",
       "module": "tropoi.spatial.optics.star",
@@ -16828,6 +16939,13 @@
       "kind": "method",
       "module": "tropoi.spatial.optics.star",
       "qualname": "Star.to_dict",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.spatial.optics.star.Star.with_sun_irradiance_at_1au",
+      "kind": "classmethod",
+      "module": "tropoi.spatial.optics.star",
+      "qualname": "Star.with_sun_irradiance_at_1au",
       "type": "function"
     },
     {

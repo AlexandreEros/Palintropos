@@ -491,3 +491,82 @@ def test_saved_run_sky_leaves_the_run_untouched(tmp_path):
     with pytest.raises(ValueError, match="inside the run directory"):
         sim.sky(spec, root / "sky.html", open_browser=False)
     assert _tree_digest(root) == before
+
+
+# -- presets and the standalone page -------------------------------------------
+
+def test_presets_are_sourced_hypothetical_skies_that_build(tmp_path):
+    assert list(sky.SKY_PRESETS) == ["earth", "thin_n2_red_star", "mars"]
+    for key, preset in sky.SKY_PRESETS.items():
+        spec = preset.spec
+        assert spec.hypothetical is not None and preset.description
+        assert spec.composition.source and spec.star.source
+        block = _block(sky.write_sky_page(spec, tmp_path / f"{key}.html"))
+        assert [p["key"] for p in block["presets"]] == list(sky.SKY_PRESETS)
+        assert block["presets"][list(sky.SKY_PRESETS).index(key)] == \
+            preset.to_dict()
+    earth = sky.SKY_PRESETS["earth"].spec
+    assert earth.composition is AIR
+    assert earth.star == Star.sun_at_1au()
+    mars = sky.SKY_PRESETS["mars"].spec
+    assert "NSSDCA" in mars.composition.source
+    assert sum(x for _, x in mars.composition.mole_fractions) == \
+        pytest.approx(1.0, abs=1e-12)
+    assert any("dust" in n for n in mars.composition.notes)
+    with pytest.raises(ValueError, match="hypothetical"):
+        sky.SkyPreset("x", "x", "x", sky.SkySpec(AIR))
+    with pytest.raises(ValueError, match="key"):
+        sky.SkyPreset("Bad Key", "x", "x", earth)
+
+
+def test_sun_at_a_distance_and_equal_irradiance_star():
+    assert Star.sun_at(1.0, where="Earth", distance_source="1 au") \
+        .angular_radius_deg == Star.sun_at_1au().angular_radius_deg
+    far = Star.sun_at(1.52366231, where="Mars", distance_source="NSSDCA")
+    assert math.sin(math.radians(far.angular_radius_deg)) * 1.52366231 == \
+        pytest.approx(math.sin(math.radians(
+            Star.sun_at_1au().angular_radius_deg)), rel=1e-14)
+    # the acceptance star: the example script's own formula
+    sys.path.insert(0, str(REPO / "examples"))
+    try:
+        import sky_hypothetical
+    finally:
+        sys.path.pop(0)
+    red = Star.with_sun_irradiance_at_1au(3200.0)
+    assert red.angular_radius_deg == \
+        sky_hypothetical.equal_irradiance_radius_deg(3200.0)
+    sun = Star.sun_at_1au()
+    # same bolometric irradiance: T^4 sin^2 alpha
+    assert (3200.0 ** 4 * math.sin(math.radians(red.angular_radius_deg)) ** 2
+            == pytest.approx(5772.0 ** 4 * math.sin(math.radians(
+                sun.angular_radius_deg)) ** 2, rel=1e-12))
+    with pytest.raises(ValueError, match="no such star"):
+        Star.with_sun_irradiance_at_1au(100.0)
+    with pytest.raises(ValueError, match="distance_au"):
+        Star.sun_at(0.0, where="x", distance_source="x")
+
+
+def test_committed_standalone_page_is_current():
+    """docs/sky.html is generated (python -m tools.sky_page), never edited."""
+    sys.path.insert(0, str(REPO))
+    try:
+        from tools import sky_page
+    finally:
+        sys.path.pop(0)
+    committed = (REPO / "docs" / "sky.html").read_text(encoding="utf-8")
+    expected = sky_page.expected_page()
+    assert sky_page.differences(committed, expected) == []
+    block = _block(REPO / "docs" / "sky.html")
+    assert block["column_kind"] == "hypothetical"
+    assert block["hypothetical"] == \
+        sky.SKY_PRESETS[sky.STANDALONE_PRESET].spec.hypothetical.to_dict()
+    assert "__SKY_DATA__" not in committed and "__PAGE_TITLE__" not in committed
+    assert 'id="sky-state" type="text/plain"></script>' in committed
+    # the check notices drift in the page text and in the numbers
+    assert sky_page.differences(committed.replace("Start from", "Begin"),
+                                expected) == [
+        "page text outside the data block"]
+    p_s = '"surface_pressure_pa":101325.0'
+    assert p_s in committed
+    assert sky_page.differences(committed.replace(
+        p_s, '"surface_pressure_pa":101325.0001', 1), expected) != []

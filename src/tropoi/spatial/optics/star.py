@@ -51,6 +51,33 @@ class Star:
                    source=("IAU 2015 B3 nominal T_eff = 5772 K, R = 695 700 "
                            "km; IAU 2012 B2 au"))
 
+    @classmethod
+    def sun_at(cls, distance_au: float, *, where: str,
+               distance_source: str) -> "Star":
+        """The IAU nominal Sun seen from ``distance_au`` (``where`` names the
+        place, ``distance_source`` says where the distance comes from)."""
+        d = float(distance_au)
+        if not (math.isfinite(d) and d > 0.0):
+            raise ValueError(f"distance_au must be > 0, got {d}")
+        return cls(5772.0, math.degrees(math.asin(
+            695700.0 / (149597870.7 * d))),
+            label=f"Sun-like blackbody at {d:g} au ({where})",
+            source=("IAU 2015 B3 nominal T_eff = 5772 K, R = 695 700 km; "
+                    f"IAU 2012 B2 au; distance: {distance_source}"))
+
+    @classmethod
+    def with_sun_irradiance_at_1au(cls, temperature_k: float) -> "Star":
+        """A blackbody of ``temperature_k`` sized to deliver the IAU nominal
+        Sun's bolometric irradiance at 1 au (irradiance ~ T^4 sin^2 alpha)."""
+        s = 695700.0 / 149597870.7 * (5772.0 / float(temperature_k)) ** 2
+        if not 0.0 < s < math.sin(math.radians(30.0)):
+            raise ValueError(f"no such star at {temperature_k} K "
+                             f"(sin alpha = {s})")
+        return cls(float(temperature_k), math.degrees(math.asin(s)),
+                   label=f"{float(temperature_k):g} K blackbody star",
+                   source=("angular radius chosen for the IAU nominal Sun's "
+                           "bolometric irradiance at 1 au"))
+
     @property
     def solid_angle_sr(self) -> float:
         return 2.0 * math.pi * (1.0 - math.cos(math.radians(

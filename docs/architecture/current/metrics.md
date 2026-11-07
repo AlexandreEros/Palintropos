@@ -205,17 +205,17 @@ Module-level import edges involved: 2.
 
 ## Class graph
 
-* Classes: 170
-* Classes in at least one `inherits` edge (drawn in `classes.mmd`): 18; with neither an analysed base nor an analysed subclass: 152
+* Classes: 171
+* Classes in at least one `inherits` edge (drawn in `classes.mmd`): 18; with neither an analysed base nor an analysed subclass: 153
 * `inherits` edges between analysed classes: 12
 * `nests` edges (class defined in a class body): 0
 * Bases outside the analysed package: `RuntimeError` x6, `UserWarning` x1, `ValueError` x19, `abc.ABC` x2, `collections.abc.Mapping` x1, `enum.Enum` x2, `str` x2, `typing.Protocol` x3
 
 ## Call graph
 
-* Nodes (functions, methods, classes): 1518
-* Edges by kind: `call` 1070, `constructor` 42, `instantiate` 419, `override` 6, `self` 285, `super` 2
-* Call sites by resolution outcome: builtin 3018, external 2082, internal 2541, unresolved 3033
+* Nodes (functions, methods, classes): 1527
+* Edges by kind: `call` 1078, `constructor` 42, `instantiate` 422, `override` 6, `self` 285, `super` 2
+* Call sites by resolution outcome: builtin 3031, external 2090, internal 2558, unresolved 3040
 
 | Scoped graph | Roots | Depth | Nodes | Edges | Truncated nodes | Reachable (unbounded) |
 |---|---|---|---|---|---|---|
