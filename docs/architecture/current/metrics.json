@@ -1,20 +1,20 @@
 {
   "call_graph": {
     "call_sites": {
-      "builtin": 2937,
-      "external": 1968,
-      "internal": 2484,
-      "unresolved": 2980
+      "builtin": 2984,
+      "external": 1983,
+      "internal": 2504,
+      "unresolved": 3010
     },
     "edges_by_kind": {
-      "call": 1048,
+      "call": 1064,
       "constructor": 42,
-      "instantiate": 414,
+      "instantiate": 417,
       "override": 6,
       "self": 277,
       "super": 2
     },
-    "nodes": 1461,
+    "nodes": 1475,
     "scoped": {
       "cli-gen": {
         "edges": 28,
@@ -69,7 +69,7 @@
     }
   },
   "class_graph": {
-    "classes": 165,
+    "classes": 166,
     "classes_in_inherits_edges": 18,
     "external_bases": {
       "RuntimeError": 6,
@@ -520,9 +520,9 @@
     },
     "edge_scopes": {
       "function": 145,
-      "function+module": 3,
+      "function+module": 4,
       "function+type_checking": 1,
-      "module": 217,
+      "module": 216,
       "type_checking": 6
     },
     "import_time": {
@@ -926,7 +926,7 @@
     "package": "tropoi",
     "src": "src",
     "working_tree": {
-      "base_commit": "254cd9c458d46464e27c37bcdc34febb0ed76b56",
+      "base_commit": "8d0d1389b101e1890c2824c311bf11fb9721032b",
       "generator": {
         "changes": [],
         "files": {
@@ -971,12 +971,12 @@
           "src/tropoi/representation/diagnostics/held_suarez_sections.py": "3ceeca2da162b25bae2b618bff343cdd7d010943089df2545dc8cc875d3d2ec5",
           "src/tropoi/representation/diagnostics/pe.py": "bedc6150dae35905160c6cbc5ebb917759b0d4514a3f4690c5a42b42caf07269",
           "src/tropoi/representation/diagnostics/pe_levels.py": "442f2cd786dab06badb47a75db895cee3a42319fdc8275de9b4e2802fabb04da",
-          "src/tropoi/representation/diagnostics/pe_surfaces.py": "d271a1c175e9af852fde0f91203134a1f6ff91be910125a66bc152e955c9f1b9",
+          "src/tropoi/representation/diagnostics/pe_surfaces.py": "84539f70f9f2f7740bf3f70182fdb0e539068d696858af4f09632be2c01cdad7",
           "src/tropoi/representation/diagnostics/spectral.py": "1c1eea172488db2bb44a51afa8100825307b0f197e4e2dcedb896bd4f56b1722",
           "src/tropoi/representation/diagnostics/swe.py": "04425be02d7888a7b9cc7d6239463e472e8b685c8824d450f792198c2f6d0d4d",
           "src/tropoi/representation/identity.py": "b4f3d44afa2515b090ba278d9442cd77578789ebc8b64a5dff930939653f81f2",
           "src/tropoi/representation/visual/__init__.py": "a9cc76b3056db2f0e387f1cea24bfd6bb5d4fa668207f3e526156fcd93541839",
-          "src/tropoi/representation/visual/atmosphere.py": "7d5c732145cd9fb8343ac9e669da33232d911821b860f5d3fcd7feed892ac5c9",
+          "src/tropoi/representation/visual/atmosphere.py": "6a3a37c7b6e738b18e2eef211ce1f3b2c4fa0d25c82de9323469084c1793cbbb",
           "src/tropoi/representation/visual/bve.py": "77e4b1f9d61a22a04a791f8c39904d32812b9ae9a38eb80e46513911216a9370",
           "src/tropoi/representation/visual/complex_encoding.py": "071c1a07ccdc7527937792e35c112a3900605ff733b5da42580bbc0f55a89a08",
           "src/tropoi/representation/visual/compose.py": "cdbda41af443741998059c490323fb660c511f9de2dede34471bae20a78248e2",
@@ -996,7 +996,7 @@
           "src/tropoi/representation/visual/sphere_streamlines.py": "24b521eeb3757a17e7a4a9848374200a008ef501776ad552ca41c048f513dc15",
           "src/tropoi/representation/visual/swe.py": "2b3e4a2c666d52e7b2380fe3e49a59b2c1cd6c8c2b3b85c1e1d6856cb19e88c0",
           "src/tropoi/representation/visual/terrain.py": "62f721efeb6ccb08ebfe15c0ff12ea27eda3b339ef5a597de0f691faaaa0b1dd",
-          "src/tropoi/representation/visual/terrain_globe.html": "c2bdbcd07fd5663656bdf769b19bda3adb60766ac93613dea6f8ee810eef6592",
+          "src/tropoi/representation/visual/terrain_globe.html": "3a2c739dc0406ec64101ea29cfd6992fe13aa2727368e9e00dc053272b49071b",
           "src/tropoi/representation/visual/timeline.py": "daf63d0946317b3930cae59770a3c264e43018420d631db55cd82fe6c786d83e",
           "src/tropoi/representation/visual/views.py": "102f42bbb2598b320652c1e080e91f56faa8b07c772101643a5a1be0d8952891",
           "src/tropoi/representation/visual/vorticity_viewer.py": "30c3f401cc653cc7856f829bbd5427fe2178cd425d5124f29bf2297d289d04f3",
@@ -1082,7 +1082,7 @@
           "src/tropoi/temporal/integration.py": "3f864c71235ae8bbd467356d9afe8c18e53bfeaa7a7c27f1091fe4a6986da045",
           "src/tropoi/temporal/models.py": "018085c98b9b96ed93e06cef817de5a1ab78eb9e609e1f13355716f9b0c3ba52",
           "src/tropoi/temporal/semi_implicit.py": "e11b3c8924b7f0f90aae105489955989cc1ae488053772a3a1cb137aa6066406",
-          "src/tropoi/temporal/simulation.py": "d402214fd1fdcb92359560910d3bab81c9346478f6cb8475099012e219d46e24",
+          "src/tropoi/temporal/simulation.py": "53aeff4a14c0d779e99582d91328ad5d89835fd0a3a5664cce1203870e55279a",
           "src/tropoi/temporal/steppers.py": "d318a44ce7277cac5e43cd54d9c0f090fc8d55f4f3ea67735cfa1df6f8ad10c4",
           "src/tropoi/temporal/tendencies/__init__.py": "64ae205b8d8abf902f9b9f285faae34048856829c3be34925b3af5f94ad71a20",
           "src/tropoi/temporal/tendencies/barotropic.py": "fd203effd9ce8c889be0d7db619e91bd23466202100dcfd012d8dcee1bd9f0a3",
@@ -1090,7 +1090,7 @@
           "src/tropoi/temporal/tendencies/primitive_equations.py": "b3508be7873df7202000ed3e9b7ac4419b6537c9c7fc1e3cd8bb7fdb127075c2",
           "src/tropoi/temporal/tendencies/shallow_water.py": "7ae521f2378824e89f88bc467fc99321d1ef4224b037c865137e076a601da3c8"
         },
-        "sha256": "88a43f5544d4c672fa0f6cf7cad9b0ff5273cf5953a3aa3941bc50a98038c1c9",
+        "sha256": "8964b8d8328cb643c64b0d6eab9798d8d1c50a5b84a24037ef3d3daacd852a93",
         "status": "clean"
       }
     }

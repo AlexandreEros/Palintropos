@@ -563,6 +563,7 @@
     {
       "kind": "imports",
       "scopes": [
+        "function",
         "module"
       ],
       "source": "tropoi.representation.visual.atmosphere",

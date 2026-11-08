@@ -788,6 +788,33 @@
     },
     {
       "decorators": [
+        "dataclass(frozen=True, eq=False)"
+      ],
+      "external_bases": [],
+      "id": "tropoi.representation.diagnostics.pe_surfaces.PressureColumns",
+      "members": [
+        {
+          "kind": "property",
+          "name": "nlev"
+        },
+        {
+          "kind": "method",
+          "name": "sampled_pressure_range"
+        },
+        {
+          "kind": "method",
+          "name": "stacks"
+        },
+        {
+          "kind": "property",
+          "name": "winds"
+        }
+      ],
+      "module": "tropoi.representation.diagnostics.pe_surfaces",
+      "qualname": "PressureColumns"
+    },
+    {
+      "decorators": [
         "dataclass(frozen=True)"
       ],
       "external_bases": [],

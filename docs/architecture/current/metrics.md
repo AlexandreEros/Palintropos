@@ -9,7 +9,7 @@ Nodes are analysed modules; a directed edge A -> B means A has at least one stat
 * **all imports**: every static import statement, wherever it appears;
 * **import-time**: only edges with at least one import statement at module scope (executed when the importing module is imported). Edges made only of function-scope or `if TYPE_CHECKING:` imports are dropped.
 
-Edge counts by scope set: `function`: 145, `function+module`: 3, `function+type_checking`: 1, `module`: 217, `type_checking`: 6.
+Edge counts by scope set: `function`: 145, `function+module`: 4, `function+type_checking`: 1, `module`: 216, `type_checking`: 6.
 
 | Metric | all imports | import-time |
 |---|---|---|
@@ -205,17 +205,17 @@ Module-level import edges involved: 2.
 
 ## Class graph
 
-* Classes: 165
-* Classes in at least one `inherits` edge (drawn in `classes.mmd`): 18; with neither an analysed base nor an analysed subclass: 147
+* Classes: 166
+* Classes in at least one `inherits` edge (drawn in `classes.mmd`): 18; with neither an analysed base nor an analysed subclass: 148
 * `inherits` edges between analysed classes: 12
 * `nests` edges (class defined in a class body): 0
 * Bases outside the analysed package: `RuntimeError` x6, `UserWarning` x1, `ValueError` x18, `abc.ABC` x2, `collections.abc.Mapping` x1, `enum.Enum` x2, `str` x2, `typing.Protocol` x3
 
 ## Call graph
 
-* Nodes (functions, methods, classes): 1461
-* Edges by kind: `call` 1048, `constructor` 42, `instantiate` 414, `override` 6, `self` 277, `super` 2
-* Call sites by resolution outcome: builtin 2937, external 1968, internal 2484, unresolved 2980
+* Nodes (functions, methods, classes): 1475
+* Edges by kind: `call` 1064, `constructor` 42, `instantiate` 417, `override` 6, `self` 277, `super` 2
+* Call sites by resolution outcome: builtin 2984, external 1983, internal 2504, unresolved 3010
 
 | Scoped graph | Roots | Depth | Nodes | Edges | Truncated nodes | Reachable (unbounded) |
 |---|---|---|---|---|---|---|
