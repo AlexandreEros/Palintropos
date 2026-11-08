@@ -36,6 +36,46 @@
         ],
         "truncated_nodes": 2
       },
+      "cli-list-presets": {
+        "edges": 0,
+        "max_depth": 4,
+        "nodes": 1,
+        "reachable_nodes_unbounded": 1,
+        "roots": [
+          "tropoi.cli.main._cmd_list_presets"
+        ],
+        "truncated_nodes": 0
+      },
+      "cli-list-scenarios": {
+        "edges": 0,
+        "max_depth": 4,
+        "nodes": 1,
+        "reachable_nodes_unbounded": 1,
+        "roots": [
+          "tropoi.cli.main._cmd_list_scenarios"
+        ],
+        "truncated_nodes": 0
+      },
+      "cli-plot": {
+        "edges": 76,
+        "max_depth": 4,
+        "nodes": 57,
+        "reachable_nodes_unbounded": 71,
+        "roots": [
+          "tropoi.cli.main._cmd_plot"
+        ],
+        "truncated_nodes": 4
+      },
+      "cli-recompile": {
+        "edges": 5,
+        "max_depth": 4,
+        "nodes": 6,
+        "reachable_nodes_unbounded": 6,
+        "roots": [
+          "tropoi.cli.main._cmd_recompile"
+        ],
+        "truncated_nodes": 0
+      },
       "cli-run-bve": {
         "edges": 60,
         "max_depth": 4,
@@ -65,6 +105,77 @@
           "tropoi.cli.main._cmd_run_swe"
         ],
         "truncated_nodes": 15
+      },
+      "cli-terrain-run-prepare": {
+        "edges": 62,
+        "max_depth": 4,
+        "nodes": 45,
+        "reachable_nodes_unbounded": 89,
+        "roots": [
+          "tropoi.cli.terrain.run_prepare"
+        ],
+        "truncated_nodes": 4
+      },
+      "custom-initial-states": {
+        "edges": 209,
+        "max_depth": 4,
+        "nodes": 133,
+        "reachable_nodes_unbounded": 244,
+        "roots": [
+          "tropoi.run.custom.execute.run_initial_state",
+          "tropoi.run.custom.presets.initial_state_from_preset",
+          "tropoi.run.custom.prepare.prepare_bve_state",
+          "tropoi.run.custom.prepare.prepare_swe_state"
+        ],
+        "truncated_nodes": 12
+      },
+      "sky-hypothetical": {
+        "edges": 16,
+        "max_depth": 4,
+        "nodes": 14,
+        "reachable_nodes_unbounded": 14,
+        "roots": [
+          "tropoi.representation.visual.sky.write_sky_page",
+          "tropoi.representation.visual.sky.standalone_page"
+        ],
+        "truncated_nodes": 0
+      },
+      "sky-numpy-reference": {
+        "edges": 6,
+        "max_depth": 4,
+        "nodes": 8,
+        "reachable_nodes_unbounded": 8,
+        "roots": [
+          "tropoi.representation.visual.sky.radiance_table",
+          "tropoi.representation.visual.sky.star_path_column",
+          "tropoi.representation.visual.sky.optical_depth_diagnostic",
+          "tropoi.spatial.optics.column.thin_atmosphere_mass_kg",
+          "tropoi.spatial.optics.column.thin_atmosphere_surface_pressure_pa"
+        ],
+        "truncated_nodes": 0
+      },
+      "sky-saved-column": {
+        "edges": 35,
+        "max_depth": 4,
+        "nodes": 31,
+        "reachable_nodes_unbounded": 32,
+        "roots": [
+          "tropoi.temporal.simulation.Simulation.sky",
+          "tropoi.representation.archive.capsule.CapsuleStorage.sky",
+          "tropoi.representation.archive.held_suarez.HeldSuarezStorage.sky"
+        ],
+        "truncated_nodes": 1
+      },
+      "terrain-raster": {
+        "edges": 32,
+        "max_depth": 4,
+        "nodes": 19,
+        "reachable_nodes_unbounded": 19,
+        "roots": [
+          "tropoi.spatial.terrain.raster.read_elevation",
+          "tropoi.spatial.terrain.raster.encode_grey16"
+        ],
+        "truncated_nodes": 0
       }
     }
   },
@@ -930,36 +1041,38 @@
     "package": "tropoi",
     "src": "src",
     "working_tree": {
-      "base_commit": "0486784b39a7f0a073ac3f37fd47d020200f4631",
+      "base_commit": "917e8056232682d3a11d87c1fc4cc80bddeb63b6",
       "generator": {
-        "changes": [],
+        "changes": [
+          " M tools/architecture/__init__.py",
+          " M tools/architecture/generate.py",
+          " M tools/architecture/mermaid.py",
+          " M tools/architecture/report.py",
+          "?? tools/architecture/coverage.py",
+          "?? tools/architecture/views.py"
+        ],
         "files": {
-          "tools/architecture/__init__.py": "6f2e1ed1942acefac9d057573af3c361e3dba22ef4df08984b8bfaa2a5934da9",
+          "tools/architecture/__init__.py": "7eaab7e08118ce5c31e59abccafd6d1464c255ec7d9812e4d8bda08c461d54ab",
           "tools/architecture/calls.py": "fe492066691403114d3adef4eade7541d55afd75bfbd02d14c72871bfd824e92",
           "tools/architecture/classes.py": "9436c2df4d3cf426b8893116faecd071b0a436b6b3eb1b7e4a81bb59ccdc16d1",
+          "tools/architecture/coverage.py": "2df39d6e828f27d28c64962e678de6bbbe44236cf87a4f9b97ef8a727c9ada41",
           "tools/architecture/export.py": "0c912ab5a81b921807c1e57796c486fc2faea5e1be23103d71eea0506a29ffef",
-          "tools/architecture/generate.py": "b621ceeb2b029729faf10a83677b2146e11db6ca4b8ff0453a6f86646a65033e",
+          "tools/architecture/generate.py": "d1cdd7242d145d4680ab4dcf8386e0e341ca41aa3cd421555ff4ef989f4c8ce1",
           "tools/architecture/imports.py": "be1b9267ae7d2da2d87e60cb3d3abde3011e49a7cfb628fb4222f5382c92d143",
           "tools/architecture/layers.py": "7c76303ec8515033b7ded6b5905eae1ac83dccbba350312c4d2d7d64ce623d9c",
-          "tools/architecture/mermaid.py": "de985a54bb56346a3bacdc2fe62ad922af42223d3cbe0408c09c3fe2f8eab965",
+          "tools/architecture/mermaid.py": "ad283b0848d4a54fb27904d2d9570ef25bacc196e580b3c00950440bce04cd32",
           "tools/architecture/metrics.py": "0c449fcc932fbae378a7e1c785506c05cda47d4449225d8d14462ce0de34e4db",
           "tools/architecture/model.py": "335acf6e713ca4bf79f2884d246addc8601effae88a43b68cff46ec98f293661",
           "tools/architecture/provenance.py": "bdb799b15386224f969b9743622e781f1e5b99adffbd5d01769f3872e733375a",
-          "tools/architecture/report.py": "001bc0593a870395da84f014480d675541bbb5739695b6f78ac50b38ea61614d",
-          "tools/architecture/sources.py": "547a080e87018ce39b7e82eefd632a20dd4cad1158c57b888d7d25255a6aece1"
+          "tools/architecture/report.py": "0afa2e4e37c1b0c850d32e320f1f41a1c8ddfbaa67d3611466eac3ecc5f68e5d",
+          "tools/architecture/sources.py": "547a080e87018ce39b7e82eefd632a20dd4cad1158c57b888d7d25255a6aece1",
+          "tools/architecture/views.py": "bfc2d188e1f519e47574f354486981762295dfe9235b3cfc4d58388c54bef3ff"
         },
-        "sha256": "ebff62873f918cb53ed80bb73c0932440b82f1cb3526a0b457730703318740c3",
-        "status": "clean"
+        "sha256": "4a41f250beea98c9e8bc5717ff98c542a145d71415e8a71fb2be8a01a0d561d9",
+        "status": "dirty"
       },
       "source": {
-        "changes": [
-          " M src/tropoi/representation/visual/sky.py",
-          " M src/tropoi/representation/visual/sky_view.html",
-          " M src/tropoi/spatial/optics/__init__.py",
-          " M src/tropoi/spatial/optics/column.py",
-          " M src/tropoi/spatial/optics/composition.py",
-          " M src/tropoi/spatial/optics/star.py"
-        ],
+        "changes": [],
         "files": {
           "src/tropoi/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
           "src/tropoi/cli/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
@@ -1110,7 +1223,7 @@
           "src/tropoi/temporal/tendencies/shallow_water.py": "7ae521f2378824e89f88bc467fc99321d1ef4224b037c865137e076a601da3c8"
         },
         "sha256": "08548deece887f429e7560fea7a0cd0c7f07335c33ac8fc557807afc6d2d7a56",
-        "status": "dirty"
+        "status": "clean"
       }
     }
   },
@@ -1120,6 +1233,6 @@
     "name": "tools.architecture",
     "networkx": "3.7",
     "python": "3.12",
-    "version": "2.0.0"
+    "version": "2.1.0"
   }
 }

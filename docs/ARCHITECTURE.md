@@ -4,9 +4,14 @@ This document describes how Palintropos is put together today: package layout, t
 two grid backends, the spectral transform flow, the run-capsule/provenance
 model, and how to add or compare a backend.
 
-> This file reflects the current backend/product-space design. The mermaid
-> [class diagram](class-structure.md) and [call diagram](call-structure.md) are
-> also current; equation conventions and normalizations live in
+> This file reflects the current backend/product-space design. The complete,
+> generated structure (every package, class and entry path, checked in CI) starts
+> at [architecture/current/index.md](architecture/current/index.md); subsystem
+> narratives such as [the sky](architecture/subsystems/sky.md) are linked from
+> [architecture/README.md](architecture/README.md). The hand-drawn
+> [class diagram](class-structure.md) and [call diagram](call-structure.md)
+> are curated BVE-era overviews, reconciled on 2026-11-07 but not complete.
+> Equation conventions and normalizations live in
 > [MATHEMATICAL_MODEL.md](MATHEMATICAL_MODEL.md). Dated audit records
 > ([KNOWN_RISKS.md](KNOWN_RISKS.md), [VALIDATION_PLAN.md](VALIDATION_PLAN.md))
 > carry their own snapshot commits — prefer this file and the current tests

@@ -1,0 +1,457 @@
+{
+  "declared": {
+    "candidates_as_roots": [
+      "tropoi.representation.visual.sky.optical_depth_diagnostic",
+      "tropoi.representation.visual.sky.radiance_table",
+      "tropoi.representation.visual.sky.standalone_page",
+      "tropoi.representation.visual.sky.star_path_column",
+      "tropoi.representation.visual.sky.write_sky_page",
+      "tropoi.run.custom.execute.run_initial_state",
+      "tropoi.run.custom.prepare.prepare_bve_state",
+      "tropoi.run.custom.prepare.prepare_swe_state",
+      "tropoi.run.custom.presets.initial_state_from_preset",
+      "tropoi.spatial.optics.column.thin_atmosphere_mass_kg",
+      "tropoi.spatial.optics.column.thin_atmosphere_surface_pressure_pa",
+      "tropoi.spatial.terrain.raster.encode_grey16",
+      "tropoi.spatial.terrain.raster.read_elevation"
+    ],
+    "entry_paths": [
+      {
+        "doc": "docs/architecture/subsystems/sky.md",
+        "name": "sky-hypothetical",
+        "roots": [
+          "tropoi.representation.visual.sky.write_sky_page",
+          "tropoi.representation.visual.sky.standalone_page"
+        ],
+        "title": "Sky page of a hypothetical atmosphere (no run, no planet)"
+      },
+      {
+        "doc": "docs/architecture/subsystems/sky.md",
+        "name": "sky-saved-column",
+        "roots": [
+          "tropoi.temporal.simulation.Simulation.sky",
+          "tropoi.representation.archive.capsule.CapsuleStorage.sky",
+          "tropoi.representation.archive.held_suarez.HeldSuarezStorage.sky"
+        ],
+        "title": "Sky page above one column of a saved primitive-equation run"
+      },
+      {
+        "doc": "docs/architecture/subsystems/sky.md",
+        "name": "sky-numpy-reference",
+        "roots": [
+          "tropoi.representation.visual.sky.radiance_table",
+          "tropoi.representation.visual.sky.star_path_column",
+          "tropoi.representation.visual.sky.optical_depth_diagnostic",
+          "tropoi.spatial.optics.column.thin_atmosphere_mass_kg",
+          "tropoi.spatial.optics.column.thin_atmosphere_surface_pressure_pa"
+        ],
+        "title": "NumPy reference of the sky page's arithmetic (parity tests; the page never calls it)"
+      },
+      {
+        "doc": null,
+        "name": "custom-initial-states",
+        "roots": [
+          "tropoi.run.custom.execute.run_initial_state",
+          "tropoi.run.custom.presets.initial_state_from_preset",
+          "tropoi.run.custom.prepare.prepare_bve_state",
+          "tropoi.run.custom.prepare.prepare_swe_state"
+        ],
+        "title": "Custom initial states from Python (docs/CUSTOM_INITIAL_STATES.md)"
+      },
+      {
+        "doc": null,
+        "name": "terrain-raster",
+        "roots": [
+          "tropoi.spatial.terrain.raster.read_elevation",
+          "tropoi.spatial.terrain.raster.encode_grey16"
+        ],
+        "title": "Terrain rasters from Python: read an elevation file, write 16-bit grey (docs/TERRAIN_IMPORT.md)"
+      }
+    ],
+    "excluded": {
+      "tropoi.representation.visual.swe.build_swe_snapshot_timeline": "exported timeline builder (alias build_swe_timeline) used directly by tests; no caller in the package",
+      "tropoi.representation.visual.timeline.build_timeline_overview": "exported but used nowhere in src or tests; kept as API surface",
+      "tropoi.run.custom.prepare.pad_coefficients": "helper that a user calls before prepare_*_state to zero-pad coefficients; no workflow starts here",
+      "tropoi.run.custom.prepare.state_sampling": "helper returning the grid coordinates a prepared state is sampled on; no workflow starts here",
+      "tropoi.run.held_suarez.config.legacy_production_config": "reached by name through the held_suarez.config.PRESETS registry (a dict lookup static analysis does not follow)",
+      "tropoi.run.held_suarez.config.production_config": "reached by name through the held_suarez.config.PRESETS registry (a dict lookup static analysis does not follow)",
+      "tropoi.run.held_suarez.config.smoke_config": "reached by name through the held_suarez.config.PRESETS registry (a dict lookup static analysis does not follow)",
+      "tropoi.spatial.optics.colour.srgb_encode": "colour helper; the sky page encodes sRGB in JavaScript, so no Python caller exists",
+      "tropoi.spatial.optics.rayleigh.rayleigh_cross_section": "convenience wrapper; the sky reaches cross sections through SPECIES[...].cross_section",
+      "tropoi.temporal.hooks.rk4_real_axis_limit": "numerical helper (RK4 stability limit on the real axis) used by a stability test; no workflow starts here"
+    }
+  },
+  "discovered": {
+    "classes": 172,
+    "cli_handlers": {
+      "cli-gen": "tropoi.cli.main._cmd_gen",
+      "cli-inspect": "tropoi.cli.main._cmd_inspect",
+      "cli-list-presets": "tropoi.cli.main._cmd_list_presets",
+      "cli-list-scenarios": "tropoi.cli.main._cmd_list_scenarios",
+      "cli-plot": "tropoi.cli.main._cmd_plot",
+      "cli-recompile": "tropoi.cli.main._cmd_recompile",
+      "cli-run-bve": "tropoi.cli.main._cmd_run_bve",
+      "cli-run-pe": "tropoi.cli.main._cmd_run_pe",
+      "cli-run-swe": "tropoi.cli.main._cmd_run_swe",
+      "cli-terrain-run-prepare": "tropoi.cli.terrain.run_prepare"
+    },
+    "entry_point_candidates": {
+      "tropoi.representation.visual.sky.optical_depth_diagnostic": [
+        "tropoi.representation.visual.sky.optical_depth_diagnostic"
+      ],
+      "tropoi.representation.visual.sky.radiance_table": [
+        "tropoi.representation.visual.sky.radiance_table"
+      ],
+      "tropoi.representation.visual.sky.standalone_page": [
+        "tropoi.representation.visual.sky.standalone_page"
+      ],
+      "tropoi.representation.visual.sky.star_path_column": [
+        "tropoi.representation.visual.sky.star_path_column"
+      ],
+      "tropoi.representation.visual.sky.write_sky_page": [
+        "tropoi.representation.visual.sky.write_sky_page"
+      ],
+      "tropoi.representation.visual.swe.build_swe_snapshot_timeline": [
+        "tropoi.representation.visual.swe.build_swe_snapshot_timeline",
+        "tropoi.representation.visual.swe.build_swe_timeline"
+      ],
+      "tropoi.representation.visual.timeline.build_timeline_overview": [
+        "tropoi.representation.visual.timeline.build_timeline_overview"
+      ],
+      "tropoi.run.custom.execute.run_initial_state": [
+        "tropoi.run.custom.execute.run_initial_state",
+        "tropoi.run.custom.run_initial_state"
+      ],
+      "tropoi.run.custom.prepare.pad_coefficients": [
+        "tropoi.run.custom.pad_coefficients",
+        "tropoi.run.custom.prepare.pad_coefficients"
+      ],
+      "tropoi.run.custom.prepare.prepare_bve_state": [
+        "tropoi.run.custom.prepare.prepare_bve_state",
+        "tropoi.run.custom.prepare_bve_state"
+      ],
+      "tropoi.run.custom.prepare.prepare_swe_state": [
+        "tropoi.run.custom.prepare.prepare_swe_state",
+        "tropoi.run.custom.prepare_swe_state"
+      ],
+      "tropoi.run.custom.prepare.state_sampling": [
+        "tropoi.run.custom.prepare.state_sampling",
+        "tropoi.run.custom.state_sampling"
+      ],
+      "tropoi.run.custom.presets.initial_state_from_preset": [
+        "tropoi.run.custom.initial_state_from_preset",
+        "tropoi.run.custom.presets.initial_state_from_preset"
+      ],
+      "tropoi.run.held_suarez.config.legacy_production_config": [
+        "tropoi.run.held_suarez.config.legacy_production_config"
+      ],
+      "tropoi.run.held_suarez.config.production_config": [
+        "tropoi.run.held_suarez.config.production_config"
+      ],
+      "tropoi.run.held_suarez.config.smoke_config": [
+        "tropoi.run.held_suarez.config.smoke_config"
+      ],
+      "tropoi.spatial.optics.colour.srgb_encode": [
+        "tropoi.spatial.optics.colour.srgb_encode"
+      ],
+      "tropoi.spatial.optics.column.thin_atmosphere_mass_kg": [
+        "tropoi.spatial.optics.column.thin_atmosphere_mass_kg",
+        "tropoi.spatial.optics.thin_atmosphere_mass_kg"
+      ],
+      "tropoi.spatial.optics.column.thin_atmosphere_surface_pressure_pa": [
+        "tropoi.spatial.optics.column.thin_atmosphere_surface_pressure_pa",
+        "tropoi.spatial.optics.thin_atmosphere_surface_pressure_pa"
+      ],
+      "tropoi.spatial.optics.rayleigh.rayleigh_cross_section": [
+        "tropoi.spatial.optics.rayleigh.rayleigh_cross_section",
+        "tropoi.spatial.optics.rayleigh_cross_section"
+      ],
+      "tropoi.spatial.terrain.raster.encode_grey16": [
+        "tropoi.run.custom.encode_grey16",
+        "tropoi.spatial.terrain.raster.encode_grey16"
+      ],
+      "tropoi.spatial.terrain.raster.read_elevation": [
+        "tropoi.run.custom.read_elevation",
+        "tropoi.spatial.terrain.raster.read_elevation"
+      ],
+      "tropoi.temporal.hooks.rk4_real_axis_limit": [
+        "tropoi.temporal.hooks.rk4_real_axis_limit"
+      ]
+    },
+    "functions": 1367,
+    "modules": 144,
+    "packages": 23
+  },
+  "limits": {
+    "call_sites": {
+      "builtin": 3060,
+      "external": 2098,
+      "internal": 2565,
+      "unresolved": 3050
+    },
+    "dynamic_import_sites": {
+      "tropoi.representation.archive.writer": 1
+    },
+    "modules_excluded_from_import_graph": [
+      "tropoi",
+      "tropoi.cli",
+      "tropoi.representation",
+      "tropoi.representation.diagnostics",
+      "tropoi.representation.visual",
+      "tropoi.run",
+      "tropoi.run.bve",
+      "tropoi.run.held_suarez",
+      "tropoi.run.pe",
+      "tropoi.run.swe",
+      "tropoi.spatial",
+      "tropoi.spatial.grids",
+      "tropoi.spatial.initialization",
+      "tropoi.spatial.operators",
+      "tropoi.spatial.states",
+      "tropoi.spatial.terrain",
+      "tropoi.spatial.transforms",
+      "tropoi.spatial.transforms.cuda",
+      "tropoi.temporal",
+      "tropoi.temporal.tendencies"
+    ],
+    "not_analysed_files": {
+      "tropoi.representation.visual": [
+        "sky_view.html",
+        "terrain_globe.html"
+      ],
+      "tropoi.spatial.transforms.cuda": [
+        "legendre.cu",
+        "sh_matrix.cu"
+      ]
+    },
+    "not_followed": [
+      "calls on objects and parameters",
+      "getattr",
+      "callbacks",
+      "decorator wrappers",
+      "functools.partial",
+      "classes defined inside functions",
+      "argparse dispatch (handlers are discovered separately)"
+    ]
+  },
+  "rendered": {
+    "call_graphs": {
+      "cli-gen": {
+        "packages": [
+          "tropoi.cli",
+          "tropoi.representation.visual",
+          "tropoi.spatial",
+          "tropoi.spatial.grids",
+          "tropoi.spatial.operators",
+          "tropoi.spatial.terrain",
+          "tropoi.spatial.transforms"
+        ],
+        "roots": [
+          "tropoi.cli.main._cmd_gen"
+        ]
+      },
+      "cli-inspect": {
+        "packages": [
+          "tropoi.cli",
+          "tropoi.representation.archive",
+          "tropoi.spatial",
+          "tropoi.temporal"
+        ],
+        "roots": [
+          "tropoi.cli.main._cmd_inspect"
+        ]
+      },
+      "cli-list-presets": {
+        "packages": [
+          "tropoi.cli"
+        ],
+        "roots": [
+          "tropoi.cli.main._cmd_list_presets"
+        ]
+      },
+      "cli-list-scenarios": {
+        "packages": [
+          "tropoi.cli"
+        ],
+        "roots": [
+          "tropoi.cli.main._cmd_list_scenarios"
+        ]
+      },
+      "cli-plot": {
+        "packages": [
+          "tropoi.cli",
+          "tropoi.representation.archive",
+          "tropoi.representation.visual",
+          "tropoi.spatial",
+          "tropoi.temporal"
+        ],
+        "roots": [
+          "tropoi.cli.main._cmd_plot"
+        ]
+      },
+      "cli-recompile": {
+        "packages": [
+          "tropoi.cli",
+          "tropoi.spatial.transforms.cuda"
+        ],
+        "roots": [
+          "tropoi.cli.main._cmd_recompile"
+        ]
+      },
+      "cli-run-bve": {
+        "packages": [
+          "tropoi.cli",
+          "tropoi.representation.archive",
+          "tropoi.run",
+          "tropoi.run.bve",
+          "tropoi.run.custom",
+          "tropoi.spatial",
+          "tropoi.spatial.initialization",
+          "tropoi.temporal"
+        ],
+        "roots": [
+          "tropoi.cli.main._cmd_run_bve"
+        ]
+      },
+      "cli-run-pe": {
+        "packages": [
+          "tropoi.cli",
+          "tropoi.representation.archive",
+          "tropoi.representation.diagnostics",
+          "tropoi.representation.visual",
+          "tropoi.run",
+          "tropoi.run.bve",
+          "tropoi.run.pe",
+          "tropoi.spatial",
+          "tropoi.spatial.initialization",
+          "tropoi.spatial.states",
+          "tropoi.spatial.terrain",
+          "tropoi.temporal",
+          "tropoi.temporal.tendencies"
+        ],
+        "roots": [
+          "tropoi.cli.main._cmd_run_pe"
+        ]
+      },
+      "cli-run-swe": {
+        "packages": [
+          "tropoi.cli",
+          "tropoi.representation.archive",
+          "tropoi.representation.diagnostics",
+          "tropoi.representation.visual",
+          "tropoi.run",
+          "tropoi.run.bve",
+          "tropoi.run.custom",
+          "tropoi.run.swe",
+          "tropoi.spatial",
+          "tropoi.spatial.initialization",
+          "tropoi.spatial.states",
+          "tropoi.spatial.terrain",
+          "tropoi.temporal",
+          "tropoi.temporal.tendencies"
+        ],
+        "roots": [
+          "tropoi.cli.main._cmd_run_swe"
+        ]
+      },
+      "cli-terrain-run-prepare": {
+        "packages": [
+          "tropoi.cli",
+          "tropoi.representation.archive",
+          "tropoi.run.custom",
+          "tropoi.spatial",
+          "tropoi.spatial.terrain",
+          "tropoi.temporal"
+        ],
+        "roots": [
+          "tropoi.cli.terrain.run_prepare"
+        ]
+      },
+      "custom-initial-states": {
+        "packages": [
+          "tropoi.representation.archive",
+          "tropoi.run",
+          "tropoi.run.bve",
+          "tropoi.run.custom",
+          "tropoi.run.swe",
+          "tropoi.spatial",
+          "tropoi.spatial.grids",
+          "tropoi.spatial.initialization",
+          "tropoi.spatial.operators",
+          "tropoi.spatial.states",
+          "tropoi.spatial.terrain",
+          "tropoi.spatial.transforms",
+          "tropoi.temporal",
+          "tropoi.temporal.tendencies"
+        ],
+        "roots": [
+          "tropoi.run.custom.execute.run_initial_state",
+          "tropoi.run.custom.presets.initial_state_from_preset",
+          "tropoi.run.custom.prepare.prepare_bve_state",
+          "tropoi.run.custom.prepare.prepare_swe_state"
+        ]
+      },
+      "sky-hypothetical": {
+        "packages": [
+          "tropoi.representation.visual",
+          "tropoi.spatial.optics"
+        ],
+        "roots": [
+          "tropoi.representation.visual.sky.write_sky_page",
+          "tropoi.representation.visual.sky.standalone_page"
+        ]
+      },
+      "sky-numpy-reference": {
+        "packages": [
+          "tropoi.representation.visual",
+          "tropoi.spatial.optics"
+        ],
+        "roots": [
+          "tropoi.representation.visual.sky.radiance_table",
+          "tropoi.representation.visual.sky.star_path_column",
+          "tropoi.representation.visual.sky.optical_depth_diagnostic",
+          "tropoi.spatial.optics.column.thin_atmosphere_mass_kg",
+          "tropoi.spatial.optics.column.thin_atmosphere_surface_pressure_pa"
+        ]
+      },
+      "sky-saved-column": {
+        "packages": [
+          "tropoi.representation.archive",
+          "tropoi.representation.diagnostics",
+          "tropoi.representation.visual",
+          "tropoi.spatial",
+          "tropoi.spatial.optics",
+          "tropoi.spatial.transforms",
+          "tropoi.temporal"
+        ],
+        "roots": [
+          "tropoi.temporal.simulation.Simulation.sky",
+          "tropoi.representation.archive.capsule.CapsuleStorage.sky",
+          "tropoi.representation.archive.held_suarez.HeldSuarezStorage.sky"
+        ]
+      },
+      "terrain-raster": {
+        "packages": [
+          "tropoi.spatial.terrain"
+        ],
+        "roots": [
+          "tropoi.spatial.terrain.raster.read_elevation",
+          "tropoi.spatial.terrain.raster.encode_grey16"
+        ]
+      }
+    },
+    "classes": 172,
+    "classes_in_inheritance_overview": 18,
+    "modules": 144,
+    "package_pages": 23
+  },
+  "rules": {
+    "cli_handlers": "every <parser>.set_defaults(<keyword>=<function>) handler gets calls/cli-<name>.mmd",
+    "entry_point_candidates": "module-level functions exported through some __all__ (re-exports followed) that no analysed function calls; each must be declared as an entry path root or excluded with a reason",
+    "packages": "every analysed package gets packages/<package>.md with all of its modules, classes and public module-level functions"
+  },
+  "scope_file": {
+    "path": "docs/architecture/entry-points.toml",
+    "sha256": "bdaff95007c413b8b4a984972d65f8b649c6bde936e354e922569175f06ae589"
+  }
+}

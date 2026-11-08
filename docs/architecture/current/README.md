@@ -5,13 +5,13 @@
 
 | | |
 |---|---|
-| Source base commit | `0486784b39a7f0a073ac3f37fd47d020200f4631` (plus uncommitted working-tree changes) |
+| Source base commit | `917e8056232682d3a11d87c1fc4cc80bddeb63b6` (clean working tree) |
 | Analysed package | `tropoi` under `src/` |
-| Generator | `tools.architecture` 2.0.0 |
+| Generator | `tools.architecture` 2.1.0 |
 | Toolchain | Python 3.12, grimp 3.17, networkx 3.7 |
 | Command | `python -m tools.architecture.generate` |
 
-Source working tree: **dirty**. Content SHA-256: `08548deece887f429e7560fea7a0cd0c7f07335c33ac8fc557807afc6d2d7a56`. Generator working tree: **clean**. Per-file hashes and scoped Git status are recorded in `metrics.json`. These describe generation time; --check verifies source and generator content hashes before reusing this context across later commits. The base commit alone does not identify uncommitted source.
+Source working tree: **clean**. Content SHA-256: `08548deece887f429e7560fea7a0cd0c7f07335c33ac8fc557807afc6d2d7a56`. Generator working tree: **dirty**. Per-file hashes and scoped Git status are recorded in `metrics.json`. These describe generation time; --check verifies source and generator content hashes before reusing this context across later commits. The base commit alone does not identify uncommitted source.
 
 ## Reproducing
 
@@ -28,20 +28,67 @@ python -m tools.architecture.generate
 | `README.md` | This file: provenance, extraction rules, exclusions, limitations, metric definitions. |
 | `calls/cli-gen.mmd` | Scoped static call graph (roots and depth: see *Call graphs* below). |
 | `calls/cli-inspect.mmd` | Scoped static call graph (roots and depth: see *Call graphs* below). |
+| `calls/cli-list-presets.mmd` | Scoped static call graph (roots and depth: see *Call graphs* below). |
+| `calls/cli-list-scenarios.mmd` | Scoped static call graph (roots and depth: see *Call graphs* below). |
+| `calls/cli-plot.mmd` | Scoped static call graph (roots and depth: see *Call graphs* below). |
+| `calls/cli-recompile.mmd` | Scoped static call graph (roots and depth: see *Call graphs* below). |
 | `calls/cli-run-bve.mmd` | Scoped static call graph (roots and depth: see *Call graphs* below). |
 | `calls/cli-run-pe.mmd` | Scoped static call graph (roots and depth: see *Call graphs* below). |
 | `calls/cli-run-swe.mmd` | Scoped static call graph (roots and depth: see *Call graphs* below). |
-| `classes.mmd` | Classes linked by inheritance between analysed classes, with their methods. |
+| `calls/cli-terrain-run-prepare.mmd` | Scoped static call graph (roots and depth: see *Call graphs* below). |
+| `calls/custom-initial-states.mmd` | Scoped static call graph (roots and depth: see *Call graphs* below). |
+| `calls/sky-hypothetical.mmd` | Scoped static call graph (roots and depth: see *Call graphs* below). |
+| `calls/sky-numpy-reference.mmd` | Scoped static call graph (roots and depth: see *Call graphs* below). |
+| `calls/sky-saved-column.mmd` | Scoped static call graph (roots and depth: see *Call graphs* below). |
+| `calls/terrain-raster.mmd` | Scoped static call graph (roots and depth: see *Call graphs* below). |
+| `classes.mmd` | Inheritance overview only: classes linked by inheritance between analysed classes. Every class, standalone ones included, is on its package page. |
+| `coverage.json` | What was discovered, what is rendered, deliberate exclusions, static-analysis limits. |
 | `graph/calls.json` | Whole-package static call graph (all resolvable edges). |
 | `graph/classes.json` | Every class with members, bases, and inheritance/nesting edges. |
 | `graph/layers.json` | The declared layers as a graph: one node per layer, with upward edges marked. |
 | `graph/modules.json` | Full module import graph: every analysed module and import edge. |
 | `graph/packages.json` | Package-aggregated import graph. |
+| `index.md` | Start here: every package page, every entry path, and the coverage summary. |
 | `metrics.json` | All measurements, machine-readable. |
 | `metrics.md` | The same measurements as tables, with definitions. |
 | `packages.mmd` | Package-level import graph, every edge drawn; boxed by declared layer when a declaration applies (see *Package graph*). |
+| `packages/tropoi.cli.md` | Package page: all of its modules, classes and public functions; imports in and out. |
+| `packages/tropoi.md` | Package page: all of its modules, classes and public functions; imports in and out. |
+| `packages/tropoi.representation.archive.md` | Package page: all of its modules, classes and public functions; imports in and out. |
+| `packages/tropoi.representation.diagnostics.md` | Package page: all of its modules, classes and public functions; imports in and out. |
+| `packages/tropoi.representation.md` | Package page: all of its modules, classes and public functions; imports in and out. |
+| `packages/tropoi.representation.visual.md` | Package page: all of its modules, classes and public functions; imports in and out. |
+| `packages/tropoi.run.bve.md` | Package page: all of its modules, classes and public functions; imports in and out. |
+| `packages/tropoi.run.custom.md` | Package page: all of its modules, classes and public functions; imports in and out. |
+| `packages/tropoi.run.held_suarez.md` | Package page: all of its modules, classes and public functions; imports in and out. |
+| `packages/tropoi.run.md` | Package page: all of its modules, classes and public functions; imports in and out. |
+| `packages/tropoi.run.pe.md` | Package page: all of its modules, classes and public functions; imports in and out. |
+| `packages/tropoi.run.swe.md` | Package page: all of its modules, classes and public functions; imports in and out. |
+| `packages/tropoi.spatial.grids.md` | Package page: all of its modules, classes and public functions; imports in and out. |
+| `packages/tropoi.spatial.initialization.md` | Package page: all of its modules, classes and public functions; imports in and out. |
+| `packages/tropoi.spatial.md` | Package page: all of its modules, classes and public functions; imports in and out. |
+| `packages/tropoi.spatial.operators.md` | Package page: all of its modules, classes and public functions; imports in and out. |
+| `packages/tropoi.spatial.optics.md` | Package page: all of its modules, classes and public functions; imports in and out. |
+| `packages/tropoi.spatial.states.md` | Package page: all of its modules, classes and public functions; imports in and out. |
+| `packages/tropoi.spatial.terrain.md` | Package page: all of its modules, classes and public functions; imports in and out. |
+| `packages/tropoi.spatial.transforms.cuda.md` | Package page: all of its modules, classes and public functions; imports in and out. |
+| `packages/tropoi.spatial.transforms.md` | Package page: all of its modules, classes and public functions; imports in and out. |
+| `packages/tropoi.temporal.md` | Package page: all of its modules, classes and public functions; imports in and out. |
+| `packages/tropoi.temporal.tendencies.md` | Package page: all of its modules, classes and public functions; imports in and out. |
 
 Generated files contain no timestamps, absolute paths, or source line numbers, so they change only when the extracted structure changes (the call-site totals in `metrics.json` are the exception: they count call expressions).
+
+## Scope and coverage
+
+Three generic rules decide what must be documented (`tools/architecture/coverage.py`):
+
+1. **Packages:** every analysed package gets packages/<package>.md with all of its modules, classes and public module-level functions. 23 packages, 23 pages; 144 of 144 modules and 172 of 172 classes rendered (generation fails if any is missing).
+2. **CLI handlers:** every <parser>.set_defaults(<keyword>=<function>) handler gets calls/cli-<name>.mmd. 10 discovered.
+3. **Public Python entry points:** module-level functions exported through some __all__ (re-exports followed) that no analysed function calls; each must be declared as an entry path root or excluded with a reason. 23 candidates: 13 are roots of declared entry paths, 10 excluded with a reason.
+
+The declarations are read from `docs/architecture/entry-points.toml` (SHA-256 `bdaff95007c413b8b4a984972d65f8b649c6bde936e354e922569175f06ae589`). Like the layer declaration, they state expectations; unlike it, a gap fails generation: an undeclared candidate, a declared root or exclusion that no longer exists, or a declared narrative page that is missing or does not link its diagram. `--check` therefore fails on any of these too.
+
+What CI establishes: the committed outputs equal what these rules produce from the committed source, and the rules found no undeclared entry point. It does not establish that a diagram is easy to read or that a narrative page is still accurate prose.
 
 ## Inclusion and exclusion rules
 
@@ -49,7 +96,7 @@ The rules are generic path and syntax rules; none names a particular subpackage.
 
 1. Only the package `tropoi` under `src/` is read. Tests, scripts, notebooks, and documentation are outside it and never analysed.
 2. A directory below the root is a subpackage if it contains `__init__.py`, or, lacking one, contains `*.py` files at any depth (an implicit namespace package, PEP 420, which Python imports all the same). `__pycache__` and dot-directories are skipped.
-3. Only `*.py` files are modules; other files (`*.bak`, `*.cu`, data) are ignored.
+3. Only `*.py` files are modules; other files (`*.bak`, `*.cu`, data, HTML templates) are never read. Those in a package directory are listed on its page and under `limits.not_analysed_files` in `coverage.json`.
 4. Each module gets a syntactic category: `namespace` (a namespace package directory), `empty` (no statement besides a docstring), `reexport` (only imports, `__all__` assignments, and alias assignments `A = B`), or `code`. Categories are attributes, not filters, with one exception: a `namespace` or `empty` module that no analysed module imports is dropped from the module graph, because it has no code and no edges.
 5. Imports of modules outside the package are not graph edges; they are listed per module (`stdlib_imports`, `third_party_imports` in `graph/modules.json`).
 
@@ -116,9 +163,19 @@ Scoped graphs follow edges of kinds `call`, `instantiate`, `constructor`, `self`
 |---|---|---|
 | `calls/cli-gen.mmd` | `tropoi.cli.main._cmd_gen` | 4 |
 | `calls/cli-inspect.mmd` | `tropoi.cli.main._cmd_inspect` | 4 |
+| `calls/cli-list-presets.mmd` | `tropoi.cli.main._cmd_list_presets` | 4 |
+| `calls/cli-list-scenarios.mmd` | `tropoi.cli.main._cmd_list_scenarios` | 4 |
+| `calls/cli-plot.mmd` | `tropoi.cli.main._cmd_plot` | 4 |
+| `calls/cli-recompile.mmd` | `tropoi.cli.main._cmd_recompile` | 4 |
 | `calls/cli-run-bve.mmd` | `tropoi.cli.main._cmd_run_bve` | 4 |
 | `calls/cli-run-pe.mmd` | `tropoi.cli.main._cmd_run_pe` | 4 |
 | `calls/cli-run-swe.mmd` | `tropoi.cli.main._cmd_run_swe` | 4 |
+| `calls/cli-terrain-run-prepare.mmd` | `tropoi.cli.terrain.run_prepare` | 4 |
+| `calls/custom-initial-states.mmd` | `tropoi.run.custom.execute.run_initial_state`, `tropoi.run.custom.presets.initial_state_from_preset`, `tropoi.run.custom.prepare.prepare_bve_state`, `tropoi.run.custom.prepare.prepare_swe_state` | 4 |
+| `calls/sky-hypothetical.mmd` | `tropoi.representation.visual.sky.write_sky_page`, `tropoi.representation.visual.sky.standalone_page` | 4 |
+| `calls/sky-numpy-reference.mmd` | `tropoi.representation.visual.sky.radiance_table`, `tropoi.representation.visual.sky.star_path_column`, `tropoi.representation.visual.sky.optical_depth_diagnostic`, `tropoi.spatial.optics.column.thin_atmosphere_mass_kg`, `tropoi.spatial.optics.column.thin_atmosphere_surface_pressure_pa` | 4 |
+| `calls/sky-saved-column.mmd` | `tropoi.temporal.simulation.Simulation.sky`, `tropoi.representation.archive.capsule.CapsuleStorage.sky`, `tropoi.representation.archive.held_suarez.HeldSuarezStorage.sky` | 4 |
+| `calls/terrain-raster.mmd` | `tropoi.spatial.terrain.raster.read_elevation`, `tropoi.spatial.terrain.raster.encode_grey16` | 4 |
 
 ## Metric definitions
 

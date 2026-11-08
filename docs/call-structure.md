@@ -1,6 +1,21 @@
 # Call Structure
 
-Updated from the implementation on 2026-07-15. Solid arrows are direct calls
+> **Scope and authority.** A curated, hand-drawn overview of the `tropoi run bve` path: CLI dispatch, planet construction, the integration loop and output products. It is
+> **not complete**: it omits most packages (including the sky subsystem,
+> `spatial.optics`, the archives, PE, Held–Suarez and terrain) and draws some
+> relations that static analysis cannot extract (data passed into a later stage, drawn dashed, and argparse dispatch). It is not
+> checked by `tools.architecture --check`. For the complete, generated
+> structure, every package, class and entry path, start at
+> [docs/architecture/current/index.md](architecture/current/index.md); where
+> this page and the generated files disagree about what exists, the
+> generated files are right. Reconciled with the source on 2026-11-07: names
+> that no longer exist were removed (listed at the end).
+
+Generated scoped call graphs for every CLI subcommand (all 10 handlers,
+including `run swe`, `run pe`, `plot`, `inspect` and `terrain prepare`) and
+for the declared Python entry paths are listed in the index above.
+
+First drawn from the implementation on 2026-07-15. Solid arrows are direct calls
 or construction; dashed arrows show selected data passed into a later stage.
 
 ## Entry points and planet construction

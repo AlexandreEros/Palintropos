@@ -26,8 +26,48 @@ default `DEFAULT_LAYERS` in `tools/architecture/layers.py`: `cli`, `run`,
 - With `--no-layers`, or a declaration that matches no package,
   `packages.mmd` is a plain dependency graph with no boxes and no marking.
 
-The hand-authored `docs/class-structure.md` and `docs/call-structure.md` are
-separate and are not replaced by these files.
+## Where to start
+
+| Page | What it is | Authority |
+|---|---|---|
+| [`current/index.md`](current/index.md) | Generated index: every package page, every entry path, the coverage summary | Generated from `src/`; CI fails if stale |
+| `current/packages/<package>.md` | One page per package: all modules, all classes (standalone ones included), public functions, imports in and out | Generated |
+| `current/calls/*.mmd` | Scoped static call graphs: one per CLI handler (discovered) and per declared Python entry path | Generated |
+| [`current/coverage.json`](current/coverage.json) | Discovered vs rendered, deliberate exclusions, static-analysis limits | Generated |
+| [`entry-points.toml`](entry-points.toml) | Declared Python entry paths and exclusions, with reasons | Hand-written input; the generator fails if it misses or misnames a candidate |
+| [`subsystems/sky.md`](subsystems/sky.md) | The sky subsystem: optics, page assembly, the JavaScript page, both entry paths, boundaries | Hand-written; must link its generated diagrams (checked) |
+| [`../class-structure.md`](../class-structure.md), [`../call-structure.md`](../call-structure.md) | Curated BVE-era overviews with relations static analysis cannot extract | Hand-written, incomplete, not checked; reconciled 2026-11-07 |
+
+## Coverage: what is guaranteed
+
+Three generic rules (`tools/architecture/coverage.py`) decide what must be
+documented, and none of them names a subsystem:
+
+1. **Every package gets a page** with all of its modules, classes and public
+   module-level functions. A new subpackage or a new standalone class appears
+   without any configuration; generation fails if anything discovered is
+   missing from the pages.
+2. **Every CLI handler gets a call graph.** Handlers are discovered from
+   `<parser>.set_defaults(<keyword>=<function>)`, the argparse dispatch the call
+   graph cannot follow. A new subcommand gets `calls/cli-<name>.mmd`.
+3. **Every public Python entry point is declared.** A candidate is a
+   module-level function exported through some `__all__` (re-exports
+   followed) that no analysed function calls: it is reached only from outside
+   the package. Each must be a root of an `[[entry_path]]` in
+   `entry-points.toml` (and then gets `calls/<name>.mmd`) or listed under
+   `[[excluded]]` with a reason. Not all functionality is CLI-reachable; the
+   sky, custom initial states and terrain rasters are reached from Python.
+
+Generation, and therefore `--check` and CI, fails when a candidate is
+undeclared, when a declared root or exclusion no longer exists or is no longer
+a candidate, or when a declared narrative page (`doc`) is missing or does not
+link its `calls/<name>.mmd`.
+
+What this does **not** establish: that a diagram is readable, that a
+hand-written page is still accurate prose, or that methods reached through
+objects are covered (they are not candidates; a declared path may name them
+as roots, as `sky-saved-column` does with `Simulation.sky`). The hand-drawn
+`docs/class-structure.md` and `docs/call-structure.md` are outside every check.
 
 ## Layout
 

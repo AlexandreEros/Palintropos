@@ -1,6 +1,17 @@
 # Class Structure
 
-Updated from the implementation on 2026-07-12. The diagrams separate the
+> **Scope and authority.** A curated, hand-drawn overview of the BVE-era core classes (grids, transforms, planet assembly, the BVE runtime and its viewers). It is
+> **not complete**: it omits most packages (including the sky subsystem,
+> `spatial.optics`, the archives, PE, Held–Suarez and terrain) and draws some
+> relations that static analysis cannot extract (composition and usage arrows such as "evolves" or "visualizes"). It is not
+> checked by `tools.architecture --check`. For the complete, generated
+> structure, every package, class and entry path, start at
+> [docs/architecture/current/index.md](architecture/current/index.md); where
+> this page and the generated files disagree about what exists, the
+> generated files are right. Reconciled with the source on 2026-11-07: names
+> that no longer exist were removed (listed at the end).
+
+First drawn from the implementation on 2026-07-12. The diagrams separate the
 load-bearing runtime classes from legacy and support classes so that the main
 relationships remain readable.
 
@@ -21,7 +32,6 @@ classDiagram
         +grid_shape
         +cfl_length_scale
         +is_structured
-        +points_latlon()
     }
 
     class GeodesicGridGeometry {
@@ -228,7 +238,6 @@ classDiagram
         +vorticity_to_streamfunction(state)
         +streamfunction_to_vorticity(psi_coeffs)
         +tendency(state, forcing_coeffs)
-        +step_leapfrog()
     }
 
     class DiagnosticsRecorder {
@@ -265,7 +274,6 @@ classDiagram
         +grid
         +snapshots
         +times
-        +plot_all_snapshots()
         +plot_summary()
     }
 
@@ -276,19 +284,11 @@ classDiagram
         +filename_for(frame)
     }
 
-    class ModelVisualizationAdapter {
-        +load persisted fields
-        +compose FigureSpec panels
-        +build snapshot timeline
-    }
-
     BarotropicVorticity --> Planet : evolves
     BarotropicVorticity ..> BarotropicState : reads and creates
     DiagnosticsRecorder --> Planet : receives its numerics
     PlanetViewer --> Planet : visualizes
     VorticityViewer --> Planet : visualizes
-    ModelVisualizationAdapter --> Planet : extracts physical fields
-    ModelVisualizationAdapter --> FigureTimeline : composes
     RunDirectory ..> PlanetViewer : figure metadata
     RunDirectory ..> VorticityViewer : figure metadata
 ```
@@ -296,8 +296,9 @@ classDiagram
 `run_bve()` and `rk4_step()` are orchestration functions rather than classes.
 They own the integration loop, pass `BarotropicState` through the model,
 record every accepted step with `DiagnosticsRecorder`, and save snapshots.
-The BVE/SWE visualization adapters reload those artifacts, compose their
-model-specific panels, and hand backend-neutral timelines to the renderer;
+The BVE/SWE visualization code in `representation.visual` (functions, not
+one adapter class) reloads those artifacts, composes the model-specific
+panels, and hands backend-neutral timelines to the renderer;
 `VorticityViewer` remains the BVE summary adapter. The CLI creates a
 `RunDirectory` and writes the run manifest/provenance around that flow.
 
@@ -318,19 +319,19 @@ classDiagram
         +transform()
         +inv_transform()
     }
-    class DifferentialOperatorsSpherical {
-        <<local finite differences>>
-        +from_geodesic_grid()
-        +calculate_gradient()
-        +calculate_divergence()
-        +calculate_curl()
-        +calculate_laplacian()
-    }
-
     GridGeometry <|-- LatLonGridGeometry
 ```
 
 The legacy equiangular grid/Simpson transform remain in the package for
 comparison and compatibility but are not selected by `Planet.generate()`.
-`DifferentialOperatorsSpherical` is retained as a local finite-difference
-operator family; the active BVE path uses `SpectralOperators` instead.
+The active BVE path uses `SpectralOperators` for its differential operators.
+
+## Removed when reconciled (2026-11-07)
+
+These appeared in earlier versions of this page and no longer exist in
+`src/tropoi`: the class `DifferentialOperatorsSpherical` (local
+finite-difference operators, with `from_geodesic_grid` and
+`calculate_gradient/divergence/curl/laplacian`); the conceptual box
+`ModelVisualizationAdapter`, which was never a class; and the members
+`GridGeometry.points_latlon()`, `BarotropicVorticity.step_leapfrog()` and
+`VorticityViewer.plot_all_snapshots()`.

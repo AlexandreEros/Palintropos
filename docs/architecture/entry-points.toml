@@ -1,0 +1,106 @@
+# Documentation scope for tools.architecture: declared Python entry paths and
+# deliberate exclusions. Read by `python -m tools.architecture.generate`.
+#
+# The generator discovers every *public Python entry-point candidate*: a
+# module-level function exported through some __all__ (re-exports followed)
+# that no analysed function calls, so it is reached only from outside the
+# package (scripts, notebooks, tests, users). Each candidate must appear here
+# exactly once: as a root of an [[entry_path]] (which then gets
+# docs/architecture/current/calls/<name>.mmd) or under [[excluded]] with a
+# reason. An undeclared candidate, a root or exclusion that no longer exists,
+# or a declared `doc` page that is missing or does not link its diagram makes
+# generation and `--check` fail. CLI handlers need no entry here: they are
+# discovered from set_defaults(...) and always drawn.
+#
+# Roots may also be methods (e.g. Simulation.sky): a declared path can start
+# where the candidate rule cannot see, because calls through objects and
+# getattr are not followed statically.
+
+[[entry_path]]
+name = "sky-hypothetical"
+title = "Sky page of a hypothetical atmosphere (no run, no planet)"
+roots = [
+  "tropoi.representation.visual.sky.write_sky_page",
+  "tropoi.representation.visual.sky.standalone_page",
+]
+doc = "docs/architecture/subsystems/sky.md"
+
+[[entry_path]]
+name = "sky-saved-column"
+title = "Sky page above one column of a saved primitive-equation run"
+roots = [
+  "tropoi.temporal.simulation.Simulation.sky",
+  "tropoi.representation.archive.capsule.CapsuleStorage.sky",
+  "tropoi.representation.archive.held_suarez.HeldSuarezStorage.sky",
+]
+doc = "docs/architecture/subsystems/sky.md"
+
+[[entry_path]]
+name = "sky-numpy-reference"
+title = "NumPy reference of the sky page's arithmetic (parity tests; the page never calls it)"
+roots = [
+  "tropoi.representation.visual.sky.radiance_table",
+  "tropoi.representation.visual.sky.star_path_column",
+  "tropoi.representation.visual.sky.optical_depth_diagnostic",
+  "tropoi.spatial.optics.column.thin_atmosphere_mass_kg",
+  "tropoi.spatial.optics.column.thin_atmosphere_surface_pressure_pa",
+]
+doc = "docs/architecture/subsystems/sky.md"
+
+[[entry_path]]
+name = "custom-initial-states"
+title = "Custom initial states from Python (docs/CUSTOM_INITIAL_STATES.md)"
+roots = [
+  "tropoi.run.custom.execute.run_initial_state",
+  "tropoi.run.custom.presets.initial_state_from_preset",
+  "tropoi.run.custom.prepare.prepare_bve_state",
+  "tropoi.run.custom.prepare.prepare_swe_state",
+]
+
+[[entry_path]]
+name = "terrain-raster"
+title = "Terrain rasters from Python: read an elevation file, write 16-bit grey (docs/TERRAIN_IMPORT.md)"
+roots = [
+  "tropoi.spatial.terrain.raster.read_elevation",
+  "tropoi.spatial.terrain.raster.encode_grey16",
+]
+
+[[excluded]]
+function = "tropoi.run.held_suarez.config.production_config"
+reason = "reached by name through the held_suarez.config.PRESETS registry (a dict lookup static analysis does not follow)"
+
+[[excluded]]
+function = "tropoi.run.held_suarez.config.legacy_production_config"
+reason = "reached by name through the held_suarez.config.PRESETS registry (a dict lookup static analysis does not follow)"
+
+[[excluded]]
+function = "tropoi.run.held_suarez.config.smoke_config"
+reason = "reached by name through the held_suarez.config.PRESETS registry (a dict lookup static analysis does not follow)"
+
+[[excluded]]
+function = "tropoi.run.custom.prepare.pad_coefficients"
+reason = "helper that a user calls before prepare_*_state to zero-pad coefficients; no workflow starts here"
+
+[[excluded]]
+function = "tropoi.run.custom.prepare.state_sampling"
+reason = "helper returning the grid coordinates a prepared state is sampled on; no workflow starts here"
+
+[[excluded]]
+function = "tropoi.representation.visual.swe.build_swe_snapshot_timeline"
+reason = "exported timeline builder (alias build_swe_timeline) used directly by tests; no caller in the package"
+
+[[excluded]]
+function = "tropoi.representation.visual.timeline.build_timeline_overview"
+reason = "exported but used nowhere in src or tests; kept as API surface"
+
+[[excluded]]
+function = "tropoi.spatial.optics.colour.srgb_encode"
+reason = "colour helper; the sky page encodes sRGB in JavaScript, so no Python caller exists"
+
+[[excluded]]
+function = "tropoi.spatial.optics.rayleigh.rayleigh_cross_section"
+reason = "convenience wrapper; the sky reaches cross sections through SPECIES[...].cross_section"
+
+[[excluded]]
+function = "tropoi.temporal.hooks.rk4_real_axis_limit"
+reason = "numerical helper (RK4 stability limit on the real axis) used by a stability test; no workflow starts here"
