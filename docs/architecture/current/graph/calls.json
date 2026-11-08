@@ -1667,6 +1667,11 @@
     },
     {
       "kind": "call",
+      "source": "tropoi.representation.visual.atmosphere._interactive_page",
+      "target": "tropoi.representation.visual.atmosphere.streamline_cache_bytes"
+    },
+    {
+      "kind": "call",
       "source": "tropoi.representation.visual.atmosphere._lut",
       "target": "tropoi.representation.visual.terrain._color_map"
     },
@@ -11267,6 +11272,13 @@
       "kind": "function",
       "module": "tropoi.representation.visual.atmosphere",
       "qualname": "quantize_columns",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.atmosphere.streamline_cache_bytes",
+      "kind": "function",
+      "module": "tropoi.representation.visual.atmosphere",
+      "qualname": "streamline_cache_bytes",
       "type": "function"
     },
     {
