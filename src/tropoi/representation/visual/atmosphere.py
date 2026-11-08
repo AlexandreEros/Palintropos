@@ -43,6 +43,20 @@ Display resolution (``resolution_deg``) is a property of the page only, not
 of the run: fields are evaluated exactly from the saved coefficients on that
 mesh (host synthesis), whatever grid the run used.
 
+Derived surface (``surface=("pressure", Pa)``, issue #13, first slice).
+Instead of native levels the page carries ONE fixed-pressure surface per
+exported saved time, from :mod:`~tropoi.representation.diagnostics.
+pe_surfaces` (log-sigma interpolation of the reconstructed column; masks
+for below-ground, above-top-level and below-bottom-level nodes). Fields:
+temperature, geopotential height and wind speed; pressure is constant on
+the surface, and vorticity/divergence are not exported (a sigma-level
+derivative is not a pressure-level one). Masked nodes carry no sample: the
+page drops the triangles touching them, greys them on the flat map, names
+the reason on hover and clips streamlines at them; colour ranges and
+quantization use valid nodes only. Everything else (budget, quantization,
+playback, offline packaging) is the native-level path. ``levels=`` and
+``surface=`` are exclusive; without ``surface`` nothing here changes.
+
 CPU only: NumPy, the archive readers and Matplotlib (colour tables). Never
 CuPy, never a model, never writes into the run directory.
 """
@@ -59,6 +73,9 @@ import warnings
 import numpy as np
 
 from tropoi.representation.diagnostics.pe_levels import reconstruct_levels
+from tropoi.representation.diagnostics.pe_surfaces import (
+    MASK_LABELS, MASK_VALID, level_sigma_positions, parse_surface,
+    pressure_surface)
 from tropoi.representation.visual.sphere_streamlines import (
     integrate_streamlines)
 from tropoi.representation.visual.terrain import (_color_map,
@@ -71,6 +88,7 @@ __all__ = [
     "DEFAULT_MAX_MB",
     "FIELDS",
     "PayloadTooLargeError",
+    "SURFACE_FIELDS",
     "atmosphere_payload",
     "default_resolution_deg",
     "estimate_payload_bytes",
@@ -88,6 +106,16 @@ FIELDS = {
     "zeta": ("Relative vorticity", "10⁻⁵ s⁻¹", 1.0e-5, "diverging",
              "RdBu_r"),
     "delta": ("Divergence", "10⁻⁵ s⁻¹", 1.0e-5, "diverging", "RdBu_r"),
+}
+
+#: Fields of a derived pressure surface (same tuple layout as ``FIELDS``).
+#: Pressure is constant on the surface; vorticity and divergence are not
+#: exported (no target-coordinate derivative in this slice of issue #13).
+SURFACE_FIELDS = {
+    "temperature": FIELDS["temperature"],
+    "geopotential_height": ("Geopotential height", "m", 1.0, "sequential",
+                            "viridis"),
+    "wind_speed": ("Wind speed", "m s⁻¹", 1.0, "sequential", "magma"),
 }
 
 #: Streamline settings (bounded): seeds, step, steps each way.
@@ -132,10 +160,18 @@ def _mesh(resolution_deg: float) -> tuple[np.ndarray, np.ndarray]:
 
 
 def estimate_payload_bytes(n_times: int, n_levels: int, nlat: int, nlon: int,
-                           *, streamlines: bool = True) -> int:
-    """Upper bound of the encoded atmosphere data (bytes)."""
+                           *, streamlines: bool = True,
+                           n_fields: int = len(FIELDS),
+                           mask: bool = False) -> int:
+    """Upper bound of the encoded atmosphere data (bytes).
+
+    ``n_fields`` 16-bit fields plus the 16-bit height per node and slice,
+    plus one mask byte per node and slice when ``mask`` (derived surfaces).
+    """
     nodes = nlat * nlon
-    per_slice = 2 * nodes * (len(FIELDS) + 1)            # 4 fields + height
+    per_slice = 2 * nodes * (n_fields + 1)                # fields + height
+    if mask:
+        per_slice += nodes
     if streamlines:
         per_slice += STREAMLINE_SEEDS * (
             (2 * STREAMLINE_MAX_STEPS + 1) * _STREAMLINE_POINT_BYTES + 4)
@@ -154,8 +190,14 @@ def _b64(array: np.ndarray, dtype: str) -> str:
         np.ascontiguousarray(array, dtype=dtype).tobytes()).decode("ascii")
 
 
-def _quantize(values: np.ndarray) -> tuple[np.ndarray, float, float]:
-    lo, hi = float(values.min()), float(values.max())
+def _quantize(values: np.ndarray, valid=None
+              ) -> tuple[np.ndarray, float, float]:
+    """16-bit display quantization over ``valid`` nodes (all when None);
+    masked nodes are stored as the slice minimum and never read back."""
+    inside = values if valid is None else values[valid]
+    lo, hi = float(inside.min()), float(inside.max())
+    if valid is not None:
+        values = np.where(valid, values, lo)
     if hi > lo:
         q = np.rint((values - lo) / (hi - lo) * 65535.0)
     else:
@@ -290,7 +332,8 @@ def _streamline_block(lines_per_slice) -> dict:
             "slice_line_start": slice_start}
 
 
-def atmosphere_payload(storage, *, times=None, levels=None,
+def atmosphere_payload(storage, *, times=None, levels=None, surface=None,
+                       level_sigma: str = "hydrostatic",
                        resolution_deg: float | None = None,
                        streamlines: bool = True,
                        max_mb: float | None = DEFAULT_MAX_MB,
@@ -305,11 +348,21 @@ def atmosphere_payload(storage, *, times=None, levels=None,
     Returns ``(payload, report)``; ``report`` has the selected saved
     indices and levels, the mesh spacing, the payload estimate (bytes,
     computed before reconstruction), the selection note, the column
-    context and the initial exaggeration.
+    context and the initial exaggeration. With ``surface=("pressure", Pa)``
+    the report also has ``surface`` and the per-time ``mask_counts``.
     """
-    if field not in FIELDS:
-        raise ValueError(f"field must be one of {list(FIELDS)}, got "
+    derived = surface is not None
+    target = parse_surface(surface) if derived else None
+    table = SURFACE_FIELDS if derived else FIELDS
+    if field not in table:
+        raise ValueError(f"field must be one of {list(table)}, got "
                          f"{field!r}")
+    if derived and levels is not None:
+        raise ValueError("levels= and surface= are exclusive: a derived "
+                         "surface replaces the native levels")
+    if derived and level is not None:
+        raise ValueError("level= selects a native level; a derived surface "
+                         "has none")
     if not 0.0 <= float(opacity) <= 1.0:
         raise ValueError(f"opacity must be in [0, 1], got {opacity}")
     if storage.solver != "pe":
@@ -330,13 +383,18 @@ def atmosphere_payload(storage, *, times=None, levels=None,
             "uses one), so geopotential height Phi/g is undefined. Pass the "
             "gravity to read it with, e.g. view(gravity=9.80665) for "
             "geopotential metres; it scales the displayed height only")
-    chosen_levels = _levels(levels, context.nlev)
+    chosen_levels = [0] if derived else _levels(levels, context.nlev)
+    if derived and context.nlev < 2:
+        raise ValueError("a pressure surface needs at least two full levels "
+                         f"to interpolate between; this run has {context.nlev}")
     res = float(resolution_deg or default_resolution_deg(context.l_max))
     lat, lon = _mesh(res)
     nlat, nlon = lat.size, lon.size
     budget = None if max_mb is None else float(max_mb) * 1e6
     per_time = estimate_payload_bytes(1, len(chosen_levels), nlat, nlon,
-                                      streamlines=streamlines) - 200_000
+                                      streamlines=streamlines,
+                                      n_fields=len(table),
+                                      mask=derived) - 200_000
     fixed = 200_000 + _terrain_bytes(context.l_max)
     times_s = np.asarray(storage.times, dtype=np.float64)
     chosen, note = _select_times(times_s, count, times, budget, per_time,
@@ -349,26 +407,55 @@ def atmosphere_payload(storage, *, times=None, levels=None,
 
     # -- reconstruction (CPU), one saved state at a time -------------------
     nl = len(chosen_levels)
-    data = {name: [] for name in (*FIELDS, "height")}
-    bounds = {name: [] for name in (*FIELDS, "height")}
-    stats = {name: np.zeros((nl, 2)) for name in FIELDS}
+    data = {name: [] for name in (*table, "height")}
+    bounds = {name: [] for name in (*table, "height")}
+    stats = {name: np.zeros((nl, 2)) for name in table}
     stats_init = False
     lines = []
     max_speed = 0.0
+    masks, mask_counts = [], []
     for index in chosen:
-        f = reconstruct_levels(storage.frame(index), context, lat, lon,
-                               chosen_levels, winds=streamlines)
-        source = {"temperature": f["temperature"], "pressure": f["pressure"],
-                  "zeta": f["zeta"], "delta": f["delta"],
-                  "height": f["geopotential_height"]}
+        if derived:
+            # Every full level is needed to bracket the target; winds are
+            # needed for the wind-speed field whether or not streamlines are
+            # drawn. The full column is dropped after this iteration.
+            s = pressure_surface(storage.frame(index), context, lat, lon,
+                                 target, winds=True, level_sigma=level_sigma,
+                                 time_label=_time_label(float(times_s[index])))
+            valid = s.valid
+            source = {"temperature": s["temperature"][None],
+                      "geopotential_height": s["geopotential_height"][None],
+                      "wind_speed": np.hypot(s["u"], s["v"])[None],
+                      "height": s["geopotential_height"][None]}
+            valid_levels = valid[None]
+            winds_uv = (s["u"][None], s["v"][None])
+            masks.append(s.mask.astype(np.uint8))
+            mask_counts.append(s.counts())
+        else:
+            f = reconstruct_levels(storage.frame(index), context, lat, lon,
+                                   chosen_levels, winds=streamlines)
+            source = {"temperature": f["temperature"],
+                      "pressure": f["pressure"],
+                      "zeta": f["zeta"], "delta": f["delta"],
+                      "height": f["geopotential_height"]}
+            valid_levels = None
+            winds_uv = (f["u"], f["v"]) if streamlines else None
         for name, values in source.items():
             for i in range(nl):
-                q, lo, hi = _quantize(values[i])
+                q, lo, hi = _quantize(
+                    values[i], None if valid_levels is None
+                    else valid_levels[i])
                 data[name].append(q)
                 bounds[name].append((lo, hi))
-        for name in FIELDS:
-            lo = source[name].min(axis=(1, 2))
-            hi = source[name].max(axis=(1, 2))
+        for name in table:
+            if valid_levels is None:
+                lo = source[name].min(axis=(1, 2))
+                hi = source[name].max(axis=(1, 2))
+            else:
+                lo = np.array([source[name][i][valid_levels[i]].min()
+                               for i in range(nl)])
+                hi = np.array([source[name][i][valid_levels[i]].max()
+                               for i in range(nl)])
             if not stats_init:
                 stats[name][:, 0], stats[name][:, 1] = lo, hi
             else:
@@ -376,19 +463,22 @@ def atmosphere_payload(storage, *, times=None, levels=None,
                 stats[name][:, 1] = np.maximum(stats[name][:, 1], hi)
         stats_init = True
         if streamlines:
+            u_all, v_all = winds_uv
             for i in range(nl):
-                speed = np.hypot(f["u"][i], f["v"][i])
-                max_speed = max(max_speed, float(speed.max()))
+                ok = None if valid_levels is None else valid_levels[i]
+                speed = np.hypot(u_all[i], v_all[i])
+                max_speed = max(max_speed, float(
+                    speed.max() if ok is None else speed[ok].max()))
                 lines.append(integrate_streamlines(
-                    f["u"][i], f["v"][i], lat, lon,
+                    u_all[i], v_all[i], lat, lon,
                     seed_count=STREAMLINE_SEEDS,
                     step_deg=STREAMLINE_STEP_DEG,
                     max_steps=STREAMLINE_MAX_STEPS,
-                    min_speed=STREAMLINE_MIN_SPEED))
+                    min_speed=STREAMLINE_MIN_SPEED, valid=ok))
 
     # -- colour limits: fixed per field over all exported times and levels -
     fields = []
-    for name, (label, units, factor, scale, policy) in FIELDS.items():
+    for name, (label, units, factor, scale, policy) in table.items():
         lo_l, hi_l = stats[name][:, 0], stats[name][:, 1]
         if scale == "diverging":
             per_level = [[-b, b] for b in np.maximum(np.abs(lo_l),
@@ -438,6 +528,16 @@ def atmosphere_payload(storage, *, times=None, levels=None,
         raise ValueError(f"initial time position {time} is outside the "
                          f"{len(chosen)} exported times")
     g = float(context.gravity)
+    if derived:
+        return _surface_page(
+            page=page, title=title, context=context, target=target,
+            level_sigma=level_sigma, res=res, preview=preview, count=count,
+            chosen=chosen, times_s=times_s, note=note, lat=lat, lon=lon,
+            fields=fields, height=height, masks=masks,
+            mask_counts=mask_counts, lines=lines, max_speed=max_speed,
+            streamlines=streamlines, elevation=elevation, g=g,
+            t_default=t_default, field=field, opacity=opacity,
+            estimate=estimate, exaggeration=exaggeration)
     interpretation = [
         f"Surface radius: R + E·Z, with Z = Φ/g the geopotential height of "
         f"the native full level (Simmons–Burridge hydrostatic geopotential "
@@ -518,14 +618,136 @@ def atmosphere_payload(storage, *, times=None, levels=None,
     return page, report
 
 
+def _surface_page(*, page, title, context, target, level_sigma, res, preview,
+                  count, chosen, times_s, note, lat, lon, fields, height,
+                  masks, mask_counts, lines, max_speed, streamlines,
+                  elevation, g, t_default, field, opacity, estimate,
+                  exaggeration) -> tuple[dict, dict]:
+    """Finish the page for a derived pressure surface (one slice per time)."""
+    nlat, nlon = lat.size, lon.size
+    positions = level_sigma_positions(context, level_sigma)
+    total = sum(c[MASK_VALID] for c in mask_counts)
+    nodes = nlat * nlon * len(chosen)
+    where = ("the Simmons–Burridge position σʰₖ = σₖ₊½·e^(−αₖ) of each full "
+             "level (the pressure at which Φₖ is the hydrostatic geopotential "
+             "of an isothermal layer)" if level_sigma == "hydrostatic" else
+             "the nominal position σₖ of each full level (the pressure the "
+             "native-level page labels it with)")
+    interpretation = [
+        f"Surface: the {target.label} isobar (p₀ = {target.pressure_pa:g} "
+        "Pa) of each saved state, interpolated from the reconstructed native "
+        "column. The solver never produced this surface; its fields are "
+        "display quantities, not solver state.",
+        f"Interpolation: linear in ln σ at the target σ* = p₀/pₛ, with pₛ = "
+        f"exp(ln pₛ) of the saved state, between {where}. Temperature, "
+        "geopotential and the wind components are interpolated; Z = Φ/g "
+        "and the wind speed follow. No extrapolation.",
+        "Masks: a node is not a sample where the isobar is under ground "
+        "(p₀ > pₛ), above the top full level or between the bottom full "
+        "level and the ground. Such nodes draw no triangle, are grey on "
+        "the flat map and say why on hover; colour ranges and streamlines "
+        "use valid nodes only. "
+        f"{total} of {nodes} exported nodes are valid.",
+        f"Surface radius: R + E·Z, Z = Φ(p₀)/g the interpolated geopotential "
+        f"height (absolute: Φ includes Φs = g·hs once), g = {g:g} m s⁻², R = "
+        f"{context.radius_m / 1000:.6g} km, E the display exaggeration; the "
+        "terrain is drawn at R + E·hs with the same E and datum.",
+        "Not exported: pressure (constant on this surface), relative "
+        "vorticity and divergence (a horizontal derivative on a sigma level "
+        "is not the derivative on a pressure level; a target-coordinate "
+        "derivative is a later slice of issue #13).",
+        "Streamlines: instantaneous horizontal streamlines of the "
+        "interpolated wind on this surface at one saved time, clipped to "
+        "cells whose four nodes are valid. Not parcel trajectories; no "
+        "vertical motion is computed or implied.",
+        "Values: exact synthesis of the saved coefficients on a "
+        f"{res:g}° display mesh, then vertical interpolation, stored with "
+        "16-bit display quantization per time over the valid nodes.",
+    ]
+    details = [
+        ["Run", context.label],
+        ["Archive", context.kind],
+        ["Saved snapshots", f"{count} (exported {len(chosen)})"],
+        ["Surface", f"{target.label} isobar ({target.pressure_pa:g} Pa), "
+                    "interpolated"],
+        ["Level positions", f"{level_sigma}: σ = "
+                            + ", ".join(f"{s:.6g}" for s in positions)],
+        ["Native levels", f"{context.nlev} sigma full levels (source of "
+                          "the interpolation, not exported)"],
+        ["Vertical coordinate", context.pressure_convention],
+        ["Sigma interfaces", ", ".join(f"{s:.6g}"
+                                       for s in context.sigma_interfaces)],
+        ["R_d, c_p", f"{context.r_dry:.6g}, {context.cp_dry:.6g} J kg⁻¹ K⁻¹"],
+        ["Gravity", f"{g:g} m s⁻² ({context.provenance.get('gravity')})"],
+        ["Radius", f"{context.radius_m:.10g} m "
+                   f"({context.provenance.get('radius_m')})"],
+        ["Terrain", context.terrain_label],
+        ["Spectral truncation", f"l_max = {context.l_max} (saved "
+                                "coefficients)"],
+        ["Display mesh", f"{res:g}° atmosphere, {preview.resolution_deg:g}° "
+                         "terrain (display only)"],
+        ["Valid nodes", f"{total} of {nodes} over the exported times"],
+    ]
+    if note:
+        details.append(["Time selection", note])
+    page["title"] = title
+    page["subtitle"] = (f"Primitive-equation run · {target.label} isobaric "
+                        f"surface (interpolated) · {len(chosen)} saved "
+                        "time(s)")
+    page["details"] = details
+    page["atmosphere"] = {
+        "version": 2,
+        "mesh": {"nlat": nlat, "nlon": nlon, "lat0": float(lat[0]),
+                 "lon0": float(lon[0]), "dlat": res, "dlon": res},
+        "times": [{"index": int(i), "time_s": float(times_s[i]),
+                   "label": _time_label(float(times_s[i]))} for i in chosen],
+        "saved_count": count,
+        "selection_note": note,
+        "levels": [{"index": None, "number": None, "sigma": None,
+                    "label": target.label}],
+        "nlev": context.nlev,
+        "surface": {
+            "kind": "pressure", "value": target.pressure_pa, "units": "Pa",
+            "label": target.label, "level_sigma": level_sigma,
+            "level_positions": [float(s) for s in positions],
+            "mask_labels": {str(k): v for k, v in MASK_LABELS.items()},
+            "valid_counts": [{str(k): v for k, v in c.items()}
+                             for c in mask_counts],
+        },
+        "mask": {"data": _b64(np.concatenate([m.ravel() for m in masks]),
+                              "u1")},
+        "gravity": g, "radius_m": context.radius_m,
+        "terrain_flat": elevation is None,
+        "fields": fields,
+        "height": height,
+        "streamlines": (dict(_streamline_block(lines), enabled=True,
+                             max_speed=max_speed,
+                             min_speed=STREAMLINE_MIN_SPEED)
+                        if streamlines else {"enabled": False}),
+        "defaults": {"time": t_default, "level": 0,
+                     "field": field, "opacity": float(opacity),
+                     "streamlines": bool(streamlines)},
+        "interpretation": interpretation,
+    }
+    report = {"times": chosen, "levels": [], "surface": target,
+              "level_sigma": level_sigma, "mask_counts": mask_counts,
+              "resolution_deg": res, "estimate_bytes": estimate,
+              "selection_note": note, "context": context,
+              "exaggeration": float(exaggeration)}
+    return page, report
+
+
 def _default_path(storage, report) -> pathlib.Path:
     label = report["context"].label
     base = re.sub(r"[^A-Za-z0-9]+", "-", label).strip("-").lower()[:48]
+    surface = report.get("surface")
     key = repr((str(pathlib.Path(storage.run_dir).resolve()), report["times"],
-                report["levels"], report["resolution_deg"])).encode()
+                report["levels"], report["resolution_deg"],
+                None if surface is None else surface.pressure_pa)).encode()
     tag = hashlib.sha256(key).hexdigest()[:8]
+    kind = "atmosphere" if surface is None else "isobar"
     return pathlib.Path(tempfile.gettempdir()) / "tropoi" / (
-        f"{base or 'run'}-atmosphere-{tag}.html")
+        f"{base or 'run'}-{kind}-{tag}.html")
 
 
 def _check_outside_run(path: pathlib.Path, run_dir) -> None:

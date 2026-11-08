@@ -137,8 +137,9 @@ select:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
         <label><input type="checkbox" id="tLoop"> Loop</label>
       </div>
       <p class="note" id="timeNote"></p>
-      <div class="row"><span>Native level <span class="note">(1 = top)</span></span><span id="levelLabel" class="val"></span></div>
+      <div class="row"><span id="levelTitle">Native level <span class="note">(1 = top)</span></span><span id="levelLabel" class="val"></span></div>
       <input type="range" id="levelSlider" min="0" max="0" step="1" aria-label="Native sigma level">
+      <p class="note" id="surfaceNote" hidden></p>
       <div class="row"><span>Field</span></div>
       <div class="seg" id="fieldButtons" role="group" aria-label="Atmospheric field"></div>
       <div class="row"><span>Opacity</span><span id="opacityLabel" class="val"></span></div>
@@ -146,7 +147,7 @@ select:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
       <div class="row"><label><input type="checkbox" id="atmShow" checked> Atmospheric surface</label></div>
       <div class="row"><label><input type="checkbox" id="streams"> Wind streamlines</label></div>
       <p class="note" id="streamNote"></p>
-      <div class="row"><label><input type="checkbox" id="rangeLevel"> Colour range of this level only</label></div>
+      <div class="row" id="rangeLevelRow"><label><input type="checkbox" id="rangeLevel"> Colour range of this level only</label></div>
       <p class="note" id="atmNote"></p>
     </div>
     <div class="card section">
@@ -378,7 +379,7 @@ function initSurfaceGL(s) {
     const a = j * NO + i, b = a + 1, c = a + NO, d = c + 1;
     idx[k++] = a; idx[k++] = b; idx[k++] = d; idx[k++] = a; idx[k++] = d; idx[k++] = c;
   }
-  s.nIdx = k;
+  s.nIdx = k; s.idxAll = idx;                 // kept: a masked surface re-indexes per frame
   s.buf.idx = gl.createBuffer(); gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, s.buf.idx); gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, idx, gl.STATIC_DRAW);
   s.buf.pos = gl.createBuffer(); s.buf.nrm = gl.createBuffer(); s.buf.col = gl.createBuffer();
 }
@@ -649,7 +650,10 @@ overC.addEventListener("click", e => { const p = mapToLatLon(e); if (p) { centre
 /* ---------------- atmosphere (optional "atmosphere" payload block) ----------------
    One translucent native sigma surface at radius 1 + E * Z / R (Z = geopotential height
    of the saved state, E the same exaggeration as the terrain), coloured by one field,
-   with optional instantaneous horizontal streamlines draped on it. */
+   with optional instantaneous horizontal streamlines draped on it. With a "surface"
+   block (version 2) the one "level" is a derived isobaric surface per saved time and
+   "mask" holds one validity byte per node and time: masked nodes are not samples, so
+   no triangle touches them, the flat map greys them and hover names the reason. */
 const ATM = D.atmosphere ? (function () {
   const A = D.atmosphere, g = A.mesh;
   const u16 = b64 => new Uint16Array(decodeBytes(b64).buffer);
@@ -658,6 +662,7 @@ const ATM = D.atmosphere ? (function () {
     A, g, n: g.nlat * g.nlon, nt: A.times.length, nl: A.levels.length,
     fields: A.fields.map(f => Object.assign({}, f, { q: u16(f.data) })),
     height: { q: u16(A.height.data), bounds: A.height.bounds },
+    surface: A.surface || null, mask: A.mask ? decodeBytes(A.mask.data) : null,
     lines: sl.enabled ? { pts: new Int16Array(decodeBytes(sl.points).buffer),
                           start: new Uint32Array(decodeBytes(sl.line_start).buffer),
                           slice: sl.slice_line_start } : null,
@@ -681,6 +686,17 @@ function atmDecode(key, q, bounds, s) {
 function atmField() { return ATM.fields[ATM.field]; }
 function atmValues(s) { const f = atmField(); return atmDecode("f" + ATM.field, f.q, f.bounds, s === undefined ? atmSlice() : s); }
 function atmHeight(s) { return atmDecode("z", ATM.height.q, ATM.height.bounds, s === undefined ? atmSlice() : s); }
+/* validity codes of the current slice (0 = valid), or null when every node is a sample */
+function atmMask(s) { if (!ATM.mask) return null; const o = (s === undefined ? atmSlice() : s) * ATM.n; return ATM.mask.subarray(o, o + ATM.n); }
+function atmMaskAt(lat, lon) {
+  // code of the nearest node (the hover answer); null where there is no mask
+  const m = atmMask(); if (!m) return null;
+  const g = ATM.g, j = Math.round(Math.max(0, Math.min(g.nlat - 1, (lat - g.lat0) / g.dlat)));
+  const i = Math.round((((lon - g.lon0) % 360) + 360) % 360 / g.dlon) % g.nlon;
+  return m[j * g.nlon + i];
+}
+function atmMaskLabel(code) { return ATM.surface && ATM.surface.mask_labels[String(code)] || ("mask code " + code); }
+const MASK_RGBA = [150, 150, 150, 110];
 function atmRange() { const f = atmField(); return ATM.perLevel ? f.level_ranges[ATM.il] : f.range; }
 function atmColour(v, rng, lut) {
   if (!(rng[1] > rng[0])) return lut[128];          // a constant field: the neutral middle colour
@@ -692,8 +708,10 @@ function atmFmt(f, v) {
   return Number(x.toPrecision(4)).toLocaleString(undefined, { maximumFractionDigits: 6 });
 }
 function atmReadout(lat, lon) {
+  const code = atmMaskAt(lat, lon);
+  if (code) return "no sample on the " + ATM.surface.label + " surface: " + atmMaskLabel(code);
   const f = atmField(), v = sampleMesh(ATM.g, atmValues(), lat, lon), z = sampleMesh(ATM.g, atmHeight(), lat, lon);
-  return f.label + " " + atmFmt(f, v) + " " + f.units + " · Z " + (z / 1000).toFixed(3) + " km";
+  return f.label + " " + atmFmt(f, v) + " " + f.units + " · Z " + (z / 1000).toFixed(3) + " km" + (ATM.surface ? " (interpolated)" : "");
 }
 function atmLineInk() { return atmField().scale === "diverging" ? [0.08, 0.08, 0.08, 0.9] : [1, 1, 1, 0.9]; }
 
@@ -701,8 +719,21 @@ function rebuildAtmosphere() {
   if (!glOK || !ATM) return;
   const Z = atmHeight(), v = atmValues(), rng = atmRange(), lut = atmField().lut, R = D.radius_m;
   fillSurface(ATM.surf, k => 1 + st.exag * Z[k] / R, k => atmColour(v[k], rng, lut));
+  reindexMasked(ATM.surf, atmMask());
   rebuildStreams(Z);
   updateAtmLabels(Z);
+}
+/* Drop every triangle with a masked vertex (a masked node is not a sample, so nothing
+   is drawn across it); without a mask the full index buffer is restored. */
+function reindexMasked(s, m) {
+  if (!m) { if (s.nIdx !== s.idxAll.length) { s.nIdx = s.idxAll.length; gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, s.buf.idx); gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, s.idxAll, gl.STATIC_DRAW); } return; }
+  const all = s.idxAll, out = new Uint32Array(all.length); let k = 0;
+  for (let t = 0; t < all.length; t += 3) {
+    if (m[all[t]] || m[all[t + 1]] || m[all[t + 2]]) continue;
+    out[k++] = all[t]; out[k++] = all[t + 1]; out[k++] = all[t + 2];
+  }
+  s.nIdx = k;
+  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, s.buf.idx); gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, out.subarray(0, k), gl.DYNAMIC_DRAW);
 }
 function lineXYZ(lat, lon, Z, lift) {
   const r = (1 + st.exag * sampleMesh(ATM.g, Z, lat, lon) / D.radius_m) * lift;
@@ -768,31 +799,40 @@ function renderAtmosphere(cl, nl) {
 }
 
 function updateAtmLabels(Z) {
-  const A = ATM.A, t = A.times[ATM.it], lv = A.levels[ATM.il], f = atmField();
+  const A = ATM.A, t = A.times[ATM.it], lv = A.levels[ATM.il], f = atmField(), S = ATM.surface, m = atmMask();
   document.getElementById("timeLabel").textContent = t.label + " · " + (ATM.it + 1) + "/" + ATM.nt;
   document.getElementById("timeNote").textContent = timeNoteText();
-  document.getElementById("levelLabel").textContent = lv.number + " / " + A.nlev + " · σ = " + lv.sigma.toFixed(4);
+  document.getElementById("levelLabel").textContent = S ? S.label + " isobar (interpolated)" : lv.number + " / " + A.nlev + " · σ = " + lv.sigma.toFixed(4);
   document.getElementById("opacityLabel").textContent = Math.round(ATM.opacity * 100) + " %";
-  let zlo = Infinity, zhi = -Infinity, zsum = 0;
-  for (let k = 0; k < ATM.n; k++) { const z = Z[k]; if (z < zlo) zlo = z; if (z > zhi) zhi = z; zsum += z; }
-  const pb = ATM.fields.find(x => x.id === "pressure").bounds[atmSlice()];
-  document.getElementById("atmNote").textContent =
-    "Surface radius R + E·Z, Z = Φ/g (geopotential height, g = " + A.gravity + " m s⁻²). Here Z = " +
-    (zlo / 1000).toFixed(3) + "–" + (zhi / 1000).toFixed(3) + " km (node mean " + (zsum / ATM.n / 1000).toFixed(3) +
-    " km); p = σ·ps = " + (pb[0] / 100).toFixed(1) + "–" + (pb[1] / 100).toFixed(1) + " hPa.";
-  const sn = document.getElementById("streamNote");
+  let zlo = Infinity, zhi = -Infinity, zsum = 0, nValid = 0;
+  for (let k = 0; k < ATM.n; k++) { if (m && m[k]) continue; const z = Z[k]; if (z < zlo) zlo = z; if (z > zhi) zhi = z; zsum += z; nValid++; }
+  const zText = "Z = " + (zlo / 1000).toFixed(3) + "–" + (zhi / 1000).toFixed(3) + " km (node mean " + (zsum / Math.max(nValid, 1) / 1000).toFixed(3) + " km)";
+  if (S) {
+    const c = S.valid_counts[ATM.it];
+    document.getElementById("atmNote").textContent =
+      "Isobaric surface p₀ = " + S.label + " (" + S.value + " Pa) at this saved time, radius R + E·Z with Z = Φ(p₀)/g interpolated (g = " + A.gravity +
+      " m s⁻²). Over the valid nodes " + zText + ". " + nValid + " of " + ATM.n + " nodes valid; " + c["1"] + " under ground, " + c["2"] +
+      " above the top full level, " + c["3"] + " between the bottom full level and the ground (no triangle, grey on the map).";
+  } else {
+    const pb = ATM.fields.find(x => x.id === "pressure").bounds[atmSlice()];
+    document.getElementById("atmNote").textContent =
+      "Surface radius R + E·Z, Z = Φ/g (geopotential height, g = " + A.gravity + " m s⁻²). Here " + zText +
+      "; p = σ·ps = " + (pb[0] / 100).toFixed(1) + "–" + (pb[1] / 100).toFixed(1) + " hPa.";
+  }
+  const sn = document.getElementById("streamNote"), on = S ? "on this isobaric surface" : "on this level";
   if (!ATM.lines) sn.textContent = "Streamlines were not exported.";
   else if (!ATM.nLinesHere) sn.textContent = "No streamlines on this surface: its wind is below the drawing threshold (" +
-    A.streamlines.min_speed * 1000 + " mm/s, or 2 % of the slice maximum).";
-  else sn.textContent = ATM.nLinesHere + " instantaneous horizontal streamlines of this saved state on this level (chevrons point downstream); not trajectories, no vertical motion.";
-  const where = "Atmosphere · " + f.label + " · level " + lv.number + " (σ = " + lv.sigma.toFixed(4) + ") · " + t.label;
+    A.streamlines.min_speed * 1000 + " mm/s, or 2 % of the slice maximum)" + (S ? ", or every seed lies in a masked cell." : ".");
+  else sn.textContent = ATM.nLinesHere + " instantaneous horizontal streamlines of this saved state " + on + " (chevrons point downstream); not trajectories, no vertical motion" +
+    (S ? "; clipped to cells whose four nodes are valid." : ".");
+  const where = "Atmosphere · " + f.label + (S ? " · " + S.label + " isobar (interpolated)" : " · level " + lv.number + " (σ = " + lv.sigma.toFixed(4) + ")") + " · " + t.label;
   if (ATM.mapAtm) document.getElementById("mapLayer").textContent = where;
 }
 function drawAtmColorbar() {
   const f = atmField(), rng = atmRange();
   document.getElementById("atmCbarTitle").textContent = f.label + " (" + f.units + ")";
   document.getElementById("atmCbarNote").textContent = (ATM.perLevel ? "Range of this level over the exported times" :
-    "Fixed over all exported times and levels") + (f.scale === "diverging" ? ", symmetric about zero." : ".");
+    ATM.surface ? "Fixed over all exported times, valid nodes only" : "Fixed over all exported times and levels") + (f.scale === "diverging" ? ", symmetric about zero." : ".");
   const c = document.getElementById("cbarAtm"), r = c.getBoundingClientRect(), dpr = window.devicePixelRatio || 1;
   c.width = Math.round(r.width * dpr); c.height = Math.round(r.height * dpr);
   const g = c.getContext("2d"); g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, r.width, r.height);
@@ -812,10 +852,10 @@ function drawAtmColorbar() {
 const imgAtm = ATM ? Object.assign(document.createElement("canvas"), { width: ATM.g.nlon, height: ATM.g.nlat }) : null;
 function drawAtmMap() {
   const G = ATM.g, g = imgAtm.getContext("2d"), data = g.createImageData(G.nlon, G.nlat);
-  const v = atmValues(), rng = atmRange(), lut = atmField().lut;
+  const v = atmValues(), rng = atmRange(), lut = atmField().lut, mk = atmMask();
   for (let j = 0; j < G.nlat; j++) for (let i = 0; i < G.nlon; i++) {
-    const c = atmColour(v[j * G.nlon + i], rng, lut), k = 4 * ((G.nlat - 1 - j) * G.nlon + i);
-    data.data[k] = c[0]; data.data[k + 1] = c[1]; data.data[k + 2] = c[2]; data.data[k + 3] = 255;
+    const n = j * G.nlon + i, c = (mk && mk[n]) ? MASK_RGBA : atmColour(v[n], rng, lut), k = 4 * ((G.nlat - 1 - j) * G.nlon + i);
+    data.data[k] = c[0]; data.data[k + 1] = c[1]; data.data[k + 2] = c[2]; data.data[k + 3] = c.length > 3 ? c[3] : 255;
   }
   g.putImageData(data, 0, 0);
   const r = mapC.getBoundingClientRect(), dpr = window.devicePixelRatio || 1;
@@ -939,6 +979,15 @@ function initAtmosphereUI() {
   const ts = document.getElementById("timeSlider"), ls = document.getElementById("levelSlider");
   ts.max = ATM.nt - 1; ts.value = ATM.it; ts.disabled = ATM.nt < 2;
   ls.max = ATM.nl - 1; ls.value = ATM.il; ls.disabled = ATM.nl < 2;
+  if (ATM.surface) {
+    // a derived surface: no native level to choose, one range over the exported times
+    document.getElementById("levelTitle").textContent = "Surface";
+    ls.hidden = true;
+    document.getElementById("rangeLevelRow").hidden = true;
+    const sn = document.getElementById("surfaceNote"); sn.hidden = false;
+    sn.textContent = "Interpolated in ln σ from the saved native levels (" + ATM.surface.level_sigma + " level positions σ = " +
+      ATM.surface.level_positions.map(s => s.toFixed(4)).join(", ") + "). Pressure, vorticity and divergence are not shown on this surface.";
+  }
   ts.addEventListener("input", () => atmSelectTime(+ts.value));
   document.getElementById("playRow").hidden = ATM.nt < 2;        // one saved state: nothing to play
   document.getElementById("tPrev").addEventListener("click", () => atmStep(-1));
@@ -988,7 +1037,7 @@ window.__terrainGlobe = { state: st, layers: layers.map(l => l.short), pick, sam
     setPerLevel: on => { ATM.perLevel = !!on; document.getElementById("rangeLevel").checked = ATM.perLevel; onAtmChange(); },
     setExaggeration: e => { st.exag = e; exag.value = exToSlider(e); updateExagLabel(); rebuildSurface(); },
     centreOn: (lat, lon) => centreOn(lat, lon), setDistance: d => { st.dist = d; },
-    sample: (lat, lon) => ({ value: sampleMesh(ATM.g, atmValues(), lat, lon), z: sampleMesh(ATM.g, atmHeight(), lat, lon) }),
+    sample: (lat, lon) => ({ value: sampleMesh(ATM.g, atmValues(), lat, lon), z: sampleMesh(ATM.g, atmHeight(), lat, lon), mask: atmMaskAt(lat, lon), readout: atmReadout(lat, lon) }),
     digest: () => {
       // FNV-1a over the drawn layer (positions, colours) and streamline vertices: equal
       // digests mean the GPU buffers of two selections hold identical bytes
@@ -997,7 +1046,13 @@ window.__terrainGlobe = { state: st, layers: layers.map(l => l.short), pick, sam
         const b = new Uint8Array(a.buffer, a.byteOffset, a.byteLength);
         for (let k = 0; k < b.length; k++) { h ^= b[k]; h = Math.imul(h, 0x01000193) >>> 0; }
       }
-      return h.toString(16) + ":" + ATM.nStreamVerts;
+      return h.toString(16) + ":" + ATM.nStreamVerts + ":" + ATM.surf.nIdx;
+    },
+    maskCounts: () => {
+      // nodes per validity code of the current slice, and the triangles drawn
+      const m = atmMask(), c = { "0": 0, "1": 0, "2": 0, "3": 0 };
+      if (m) for (let k = 0; k < ATM.n; k++) c[String(m[k])] = (c[String(m[k])] || 0) + 1; else c["0"] = ATM.n;
+      return { counts: c, triangles: ATM.surf.nIdx / 3, trianglesAll: ATM.surf.idxAll ? ATM.surf.idxAll.length / 3 : null };
     },
     info: () => {
       const P = ATM.surf.pos, T = terrainSurf.pos; let rmin = Infinity, rmax = -Infinity, rsum = 0, below = 0;
@@ -1006,6 +1061,7 @@ window.__terrainGlobe = { state: st, layers: layers.map(l => l.short), pick, sam
         const ra = 1 + st.exag * sampleMesh(ATM.g, atmHeight(), lat, lon) / D.radius_m;
         if (ra <= Math.hypot(T[3 * k], T[3 * k + 1], T[3 * k + 2])) below++; }
       return { time: ATM.A.times[ATM.it], timeIndex: ATM.it, playing: play.on, fps: play.fps, loop: play.loop, level: ATM.A.levels[ATM.il], field: atmField().id, opacity: ATM.opacity, exag: st.exag,
+               surface: ATM.surface ? ATM.surface.label : null, triangles: ATM.surf.nIdx / 3,
                streams: ATM.streams, lines: ATM.nLinesHere, streamVerts: ATM.nStreamVerts, radius: { min: rmin, max: rmax, mean: rsum / ATM.n },
                range: atmRange(), terrainNodesAboveLayer: below, mapLabel: document.getElementById("mapLayer").textContent };
     },

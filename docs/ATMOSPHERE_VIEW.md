@@ -45,6 +45,8 @@ python examples/atmosphere_view.py runs/hs-T42L20-prod-002 --times 0 -1 --field 
 | `path` | output file | `<tempdir>/tropoi/<run>-atmosphere-<tag>.html` |
 | `times` | saved snapshot indices (negative counts back), or `"all"` | as many evenly spaced states as fit `max_mb` (always the first and the last), with a warning |
 | `levels` | native full-level indices, 0 = top | all levels |
+| `surface` | `("pressure", Pa)`: one isobaric surface per exported time instead of native levels (see [Fixed-pressure surfaces](#fixed-pressure-surfaces-across-saved-times)); exclusive with `levels` | none (native levels) |
+| `level_sigma` | with `surface`: where a native level sits for the interpolation, `"hydrostatic"` or `"nominal"` | `"hydrostatic"` |
 | `resolution_deg` | display mesh spacing in degrees (a divisor of 180°) | about 4 nodes per shortest resolved wavelength, between 1° and 3°: 2° at T42 |
 | `max_mb` | bound on the embedded data, in MB | 32; `None` removes it |
 | `streamlines` | export horizontal streamlines | `True` |
@@ -153,6 +155,102 @@ python examples/mola_mars_evolving.py view docs/runs/20261027T175327Z_orographic
 `views/mars_evolving_all_times.html` (5.2 MB) holds all 9 states at a 3° mesh.
 The full experiment (terrain preparation, the four runs, the measurements and
 the browser check) is reproduced by the commands in the record.
+
+## Fixed-pressure surfaces across saved times
+
+The first slice of [issue #13](https://github.com/AlexandreEros/Palintropos/issues/13).
+Instead of native levels, `surface=("pressure", p₀)` exports **one isobaric
+surface per saved time**: the native column of each saved state is
+reconstructed on the display mesh and interpolated in the vertical to `p₀`
+(pascals, explicit). The page keeps its time slider and playback; the level
+slider is replaced by the surface label.
+
+```python
+sim = open_simulation("docs/runs/20261027T175327Z_orographic-thermal-wave_…_71c5441a")
+sim.view("mars_isobar_300Pa.html", surface=("pressure", 300.0), times="all",
+         resolution_deg=3.0)                           # 3 hPa: a Mars pressure
+sim.view("hs_500hPa.html", surface=("pressure", 50_000.0), times="all")   # Earth-like
+```
+
+```bash
+python examples/isobaric_view.py view RUN --pressure 300 --out isobar.html
+```
+
+Pressures are planet-specific: 500 hPa is underground everywhere on the Mars
+run (its surface pressure is 2.8–12 hPa), and the export then fails with the
+pressure range the saved states cover.
+
+![The 3 hPa isobar of the Mars run at its last saved state, coloured by geopotential height (7.65–7.75 km), with a hole over Tharsis where the isobar is under ground and instantaneous streamlines that stop at the hole; the side panel names the surface, the interpolation and the masked node counts](validation/pressure_surface_2026-11-07/mars_isobar_300Pa_t8.png)
+
+*The 3 hPa isobar of the published Mars run at its last saved state (×10
+relief, 75 % opacity), coloured by geopotential height. The terrain shows
+through the hole over the Tharsis volcanoes, where 3 hPa is under ground
+(11 of 7381 nodes) or between the bottom full level and the ground (36
+nodes). Streamlines stop at the hole. Headless-Chrome capture of the
+committed page [`assets/mars_isobar_300Pa.html`](runs/20261027T175327Z_orographic-thermal-wave_rot24p62h_r3_l21_dt11080p3s_3a46f966_71c5441a/assets/mars_isobar_300Pa.html),
+opened from `file://` with networking disabled; see
+[the record](validation/pressure_surface_2026-11-07/README.md).*
+
+**What is interpolated, and how.** The numerics live in
+`representation.diagnostics.pe_surfaces`, independent of the page, and are
+tested on analytic columns.
+
+| item | rule |
+| --- | --- |
+| vertical coordinate | `ln σ`. The target at each node and saved time is `σ* = p₀ / pₛ`, with `pₛ = exp(ln pₛ)` of the saved state. The node coordinates are the same at every column, so the bracket depends on `pₛ` only through `σ*`. |
+| where a level sits | `level_sigma="hydrostatic"` (default): `σʰₖ = σₖ₊½ · e^(−αₖ)`, the pressure at which the Simmons–Burridge `Φₖ` is the hydrostatic geopotential of an isothermal layer (`Φₖ − Φₖ₊½ = R_d Tₖ αₖ` is the step from `ln pₖ₊½` to `ln pₖ₊½ − αₖ`). With it an isothermal column interpolates to the closed form `Φₛ + R_d T ln(pₛ/p₀)` to round-off at every valid pressure, over flat and sloping terrain (tested to 1 µm). `"nominal"`: `σₖ`, the pressure the native-level page labels the level with; on an isothermal column that attachment is off by `R_d T (αₖ − ln(σₖ₊½/σₖ))/g` in the interior (zero for the top layer, `α₁ = ln 2`): 115 m at most on the test grid's four layers, measured. The two positions differ by `σ = 0.3750` versus `0.3679` for the second of four uniform layers. |
+| interpolant | linear in `ln σ` between the two bracketing levels, for temperature, geopotential, `u` and `v`; `Z = Φ/g` and the wind speed follow. A target on a level position reproduces that level's values to 1e−12 relative. |
+| valid bracket | `σ₁ ≤ σ* ≤ σ_K`, the ends widened by 1e−9 relative so round-off in `p₀/pₛ` cannot push a target placed exactly on an end level out of range. No extrapolation. |
+| masks | one byte per node and time: 0 valid; 1 below the surface (`p₀ > pₛ`); 2 above the top level; 3 between the bottom level and the surface (`σ_K < σ* ≤ 1`). Codes 2 and 3 are "outside the sampled full-level range", distinct from 1. |
+| failures | a non-finite reconstruction or a column whose `Φₖ` does not decrease downward raises; a saved time with no valid node raises `SurfaceUnavailableError` naming the time and the pressure range the states cover. |
+
+**What the mask does.** A masked node is not a sample, so nothing pretends
+it is: the globe draws no triangle that touches one (the terrain shows
+through the hole), the flat map greys it, hover says why ("no sample on the
+3 hPa surface: below the surface (p₀ > pₛ)"), colour ranges and the 16-bit
+quantization use valid nodes only, and streamlines are traced only through
+cells whose four nodes are valid (`integrate_streamlines(valid=…)`), so a
+line never crosses a gap. A browser test checks each of these on a page
+with holes.
+
+**Fields.** Temperature (K), geopotential height (m) and wind speed (m/s).
+Pressure is not offered: it is `p₀` everywhere on the surface. **Relative
+vorticity and divergence are not exported** on a derived surface: a
+horizontal derivative on a σ level is not the derivative on a pressure
+level, and interpolating `ζ_σ` would label the wrong quantity. The page says
+so. Target-coordinate derivatives from the surface winds are a later slice
+of #13. The native-level page is unchanged (its payload stays `version` 1;
+the derived page is `version` 2 with `surface` and `mask` blocks).
+
+**Playback and size.** The same contract as native levels: `times="all"`
+never subsamples (above `max_mb` it fails naming the alternatives), the
+payload is estimated before anything is reconstructed, frames are
+processed one saved state at a time, and the time slider and play button
+step through the exported saved states. Measured (CPU, the same laptop):
+
+| run | export | mesh | file | export time |
+| --- | --- | --- | --- | --- |
+| Mars MOLA evolving (9 states, T21L4) | 3 hPa, `times="all"` | 3° | 1.53 MB | 1.8 s |
+| `hs-T42L20-prod-002` (120 states, T42L20) | 500 hPa, `times="all"` | 3° | 15.9 MB | 73 s |
+| same | 500 hPa, `times="all"` | 2° | 28.9 MB | 99 s |
+
+Where the time goes, per saved state on the T42L20 run at 2° (16,471
+nodes): spherical-harmonic synthesis of temperature and geopotential 0.25 s,
+winds 0.29 s, hydrostatic coefficients 2 ms, **vertical interpolation 4 ms**
+(0.7 % of the reconstruction), streamlines 44 ms. The vorticity and
+divergence syntheses the native page pays (0.25 s) are skipped. The cost is
+the synthesis, and it scales with the number of saved states times the
+display nodes, not with the number of levels embedded: all 120 states fit the
+32 MB budget at 2°, where the native page holds 5 states with 20 levels.
+Measurements: [`validation/pressure_surface_2026-11-07/`](validation/pressure_surface_2026-11-07/README.md),
+reproduced with `python examples/isobaric_view.py measure RUN --pressure P`.
+
+**Not in this slice.** Geopotential-height surfaces (`("geopotential_height",
+m)` is refused by name), target-surface vorticity and divergence, lazy or
+compressed decoding, any GPU path. The page still decodes all embedded
+arrays eagerly; the 29 MB page became interactive in headless Chrome in
+1.1 s with 64 MB of JS heap, and switched frames in 25 ms (median), so
+lazy decoding is not needed at this size.
 
 ## What the surface is
 
@@ -302,8 +400,10 @@ headless Chrome with software WebGL these pages became interactive within
 
 ## Limits
 
-- One native σ surface at a time. There is no interpolation to pressure or
-  height levels, no volume rendering, no mass streamfunction.
+- One surface at a time: a native σ level, or one fixed-pressure surface
+  ([above](#fixed-pressure-surfaces-across-saved-times)). No
+  geopotential-height surfaces yet, no vorticity or divergence on a derived
+  surface, no volume rendering, no mass streamfunction.
 - Hovering the globe locates points on the undisplaced sphere ("relief ignored
   when picking"), as in the terrain viewer. The flat map is exact.
 - Streamline density is uniform in seeds, not adaptive. Lines in weak flow can
@@ -318,7 +418,7 @@ headless Chrome with software WebGL these pages became interactive within
 | layer | module |
 | --- | --- |
 | archive (reading saved runs) | `representation.archive.held_suarez` (Held–Suarez storage), `representation.archive.pe_context` (`PEColumnContext`: σ, constants, radius, gravity, terrain, provenance), `CapsuleStorage.pe_context` |
-| physical reconstruction (CPU) | `representation.diagnostics.pe_levels.reconstruct_levels`, `spatial.transforms.host_synthesis.synthesize_wind_latlon` |
+| physical reconstruction (CPU) | `representation.diagnostics.pe_levels.reconstruct_levels`, `spatial.transforms.host_synthesis.synthesize_wind_latlon`; derived pressure surfaces: `representation.diagnostics.pe_surfaces` (`pressure_surface`, `interpolate_log_sigma`, masks), `spatial.sigma_coordinate.SigmaGrid.hydrostatic_full_levels` |
 | payload | `representation.visual.atmosphere` (selection, bounds, quantization, colour limits), `representation.visual.sphere_streamlines` |
 | page | `representation.visual.terrain_globe.html`: the terrain viewer's template, extended with an optional `atmosphere` block; `terrain.write_globe_page` writes both kinds of page |
 | entry points | `Simulation.view`, `Snapshot.view` → `storage.view` |

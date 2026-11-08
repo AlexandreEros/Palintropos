@@ -110,16 +110,27 @@ class _MeshSampler:
 def integrate_streamlines(u, v, lat_deg, lon_deg, *, seeds=None,
                           seed_count: int = 160, step_deg: float = 1.5,
                           max_steps: int = 24, min_speed: float = 1.0e-3,
-                          relative_min_speed: float = 0.02
+                          relative_min_speed: float = 0.02, valid=None
                           ) -> list[tuple[np.ndarray, np.ndarray]]:
     """Streamlines through each seed, ordered downstream.
 
     ``u``, ``v`` are ``(nlat, nlon)`` on the mesh ``lat_deg`` (``-90 .. 90``)
     x ``lon_deg`` (seam repeated). ``seeds`` = (lat_deg, lon_deg) arrays
-    (default: ``seed_count`` Fibonacci points). Returns one ``(lat, lon)``
+    (default: ``seed_count`` Fibonacci points). ``valid`` is an optional
+    ``(nlat, nlon)`` boolean node mask: a line is traced only through mesh
+    cells whose four nodes are valid, so it never crosses a masked gap (the
+    wind at masked nodes is ignored; it is set to zero before sampling), and
+    a seed inside a masked cell gives no line. Returns one ``(lat, lon)``
     pair of arrays per drawn line (at least 3 points), each listed from its
     upstream end to its downstream end; seeds in calm air give no line.
     """
+    if valid is not None:
+        valid = np.asarray(valid, dtype=bool)
+        if valid.shape != np.shape(u):
+            raise ValueError(f"valid has shape {valid.shape}; expected the "
+                             f"wind's {np.shape(u)}")
+        u = np.where(valid, u, 0.0)
+        v = np.where(valid, v, 0.0)
     wind = cartesian_wind(u, v, lat_deg, lon_deg)
     speed = np.linalg.norm(wind, axis=-1)
     vmax = float(speed.max()) if speed.size else 0.0
@@ -127,6 +138,11 @@ def integrate_streamlines(u, v, lat_deg, lon_deg, *, seeds=None,
     if not vmax > threshold:
         return []
     sample = _MeshSampler(wind, lat_deg, lon_deg)
+    # The bilinear sample of the validity indicator is 1 only where every
+    # node with nonzero weight is valid: the cell test, with no extra search.
+    inside = (None if valid is None else
+              _MeshSampler(valid.astype(np.float64)[..., None], lat_deg,
+                           lon_deg))
     if seeds is None:
         seeds = fibonacci_seeds(seed_count)
     start = _to_xyz(np.asarray(seeds[0], float), np.asarray(seeds[1], float))
@@ -138,6 +154,8 @@ def integrate_streamlines(u, v, lat_deg, lon_deg, *, seeds=None,
         w = w - np.sum(w * x, axis=-1, keepdims=True) * x
         s = np.linalg.norm(w, axis=-1, keepdims=True)
         ok = s[..., 0] > threshold
+        if inside is not None:
+            ok = ok & (inside(lat, lon)[..., 0] > 1.0 - 1e-9)
         return np.where(ok[..., None], w / np.where(s > 0, s, 1.0), 0.0), ok
 
     def trace(sign: float) -> tuple[np.ndarray, np.ndarray]:

@@ -324,6 +324,8 @@ run.
 sim.view()                                   # temp dir, opens the browser
 sim.view("hs.html", times=[0, -1], levels=[0, 10, 19], open_browser=False)
 sim[-1].view("last.html")                    # one saved state
+sim.view("isobar.html", surface=("pressure", 50_000.0), times="all")
+                                             # one 500 hPa surface per saved time
 ```
 
 `open_simulation` also opens a Held–Suarez experiment directory
