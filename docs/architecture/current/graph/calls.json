@@ -1516,6 +1516,31 @@
       "target": "tropoi.spatial.transforms.host_synthesis.synthesize_wind_latlon"
     },
     {
+      "kind": "call",
+      "source": "tropoi.representation.diagnostics.pe_surfaces.GeopotentialHeightSurface.__post_init__",
+      "target": "tropoi.representation.diagnostics.pe_surfaces._is_number"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.diagnostics.pe_surfaces.PressureSurface.__post_init__",
+      "target": "tropoi.representation.diagnostics.pe_surfaces._is_number"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.representation.diagnostics.pe_surfaces._height_fields",
+      "target": "tropoi.representation.diagnostics.pe_surfaces.SurfaceFields"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.representation.diagnostics.pe_surfaces._height_fields",
+      "target": "tropoi.representation.diagnostics.pe_surfaces.SurfaceUnavailableError"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.diagnostics.pe_surfaces._height_fields",
+      "target": "tropoi.representation.diagnostics.pe_surfaces.interpolate_geopotential"
+    },
+    {
       "kind": "instantiate",
       "source": "tropoi.representation.diagnostics.pe_surfaces.interpolate_columns",
       "target": "tropoi.representation.diagnostics.pe_surfaces.SurfaceFields"
@@ -1528,12 +1553,22 @@
     {
       "kind": "call",
       "source": "tropoi.representation.diagnostics.pe_surfaces.interpolate_columns",
+      "target": "tropoi.representation.diagnostics.pe_surfaces._height_fields"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.diagnostics.pe_surfaces.interpolate_columns",
       "target": "tropoi.representation.diagnostics.pe_surfaces.interpolate_log_sigma"
     },
     {
       "kind": "call",
       "source": "tropoi.representation.diagnostics.pe_surfaces.interpolate_columns",
       "target": "tropoi.representation.diagnostics.pe_surfaces.parse_surface"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.representation.diagnostics.pe_surfaces.parse_surface",
+      "target": "tropoi.representation.diagnostics.pe_surfaces.GeopotentialHeightSurface"
     },
     {
       "kind": "instantiate",
@@ -1638,12 +1673,22 @@
     {
       "kind": "call",
       "source": "tropoi.representation.visual.atmosphere._interactive_page",
+      "target": "tropoi.representation.visual.atmosphere._check_stored_columns"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.atmosphere._interactive_page",
       "target": "tropoi.representation.visual.atmosphere._lut"
     },
     {
       "kind": "call",
       "source": "tropoi.representation.visual.atmosphere._interactive_page",
       "target": "tropoi.representation.visual.atmosphere._run_details"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.atmosphere._interactive_page",
+      "target": "tropoi.representation.visual.atmosphere._stored_height"
     },
     {
       "kind": "call",
@@ -1828,12 +1873,22 @@
     {
       "kind": "call",
       "source": "tropoi.representation.visual.atmosphere.atmosphere_payload",
+      "target": "tropoi.representation.visual.atmosphere.surface_height_bytes"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.atmosphere.atmosphere_payload",
       "target": "tropoi.representation.visual.sphere_streamlines.integrate_streamlines"
     },
     {
       "kind": "instantiate",
       "source": "tropoi.representation.visual.atmosphere.dequantize_columns",
       "target": "tropoi.representation.diagnostics.pe_surfaces.PressureColumns"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.atmosphere.dequantize_columns",
+      "target": "tropoi.representation.visual.atmosphere._stored_height"
     },
     {
       "kind": "call",
@@ -10841,6 +10896,34 @@
       "type": "function"
     },
     {
+      "id": "tropoi.representation.diagnostics.pe_surfaces.GeopotentialHeightSurface",
+      "kind": "class",
+      "module": "tropoi.representation.diagnostics.pe_surfaces",
+      "qualname": "GeopotentialHeightSurface",
+      "type": "class"
+    },
+    {
+      "id": "tropoi.representation.diagnostics.pe_surfaces.GeopotentialHeightSurface.__post_init__",
+      "kind": "method",
+      "module": "tropoi.representation.diagnostics.pe_surfaces",
+      "qualname": "GeopotentialHeightSurface.__post_init__",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.diagnostics.pe_surfaces.GeopotentialHeightSurface.label",
+      "kind": "property",
+      "module": "tropoi.representation.diagnostics.pe_surfaces",
+      "qualname": "GeopotentialHeightSurface.label",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.diagnostics.pe_surfaces.GeopotentialHeightSurface.value",
+      "kind": "property",
+      "module": "tropoi.representation.diagnostics.pe_surfaces",
+      "qualname": "GeopotentialHeightSurface.value",
+      "type": "function"
+    },
+    {
       "id": "tropoi.representation.diagnostics.pe_surfaces.PressureColumns",
       "kind": "class",
       "module": "tropoi.representation.diagnostics.pe_surfaces",
@@ -10855,6 +10938,13 @@
       "type": "function"
     },
     {
+      "id": "tropoi.representation.diagnostics.pe_surfaces.PressureColumns.sampled_height_range",
+      "kind": "method",
+      "module": "tropoi.representation.diagnostics.pe_surfaces",
+      "qualname": "PressureColumns.sampled_height_range",
+      "type": "function"
+    },
+    {
       "id": "tropoi.representation.diagnostics.pe_surfaces.PressureColumns.sampled_pressure_range",
       "kind": "method",
       "module": "tropoi.representation.diagnostics.pe_surfaces",
@@ -10866,6 +10956,13 @@
       "kind": "method",
       "module": "tropoi.representation.diagnostics.pe_surfaces",
       "qualname": "PressureColumns.stacks",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.diagnostics.pe_surfaces.PressureColumns.surface_geopotential",
+      "kind": "method",
+      "module": "tropoi.representation.diagnostics.pe_surfaces",
+      "qualname": "PressureColumns.surface_geopotential",
       "type": "function"
     },
     {
@@ -10894,6 +10991,13 @@
       "kind": "property",
       "module": "tropoi.representation.diagnostics.pe_surfaces",
       "qualname": "PressureSurface.label",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.diagnostics.pe_surfaces.PressureSurface.value",
+      "kind": "property",
+      "module": "tropoi.representation.diagnostics.pe_surfaces",
+      "qualname": "PressureSurface.value",
       "type": "function"
     },
     {
@@ -10939,10 +11043,31 @@
       "type": "function"
     },
     {
+      "id": "tropoi.representation.diagnostics.pe_surfaces._height_fields",
+      "kind": "function",
+      "module": "tropoi.representation.diagnostics.pe_surfaces",
+      "qualname": "_height_fields",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.diagnostics.pe_surfaces._is_number",
+      "kind": "function",
+      "module": "tropoi.representation.diagnostics.pe_surfaces",
+      "qualname": "_is_number",
+      "type": "function"
+    },
+    {
       "id": "tropoi.representation.diagnostics.pe_surfaces.interpolate_columns",
       "kind": "function",
       "module": "tropoi.representation.diagnostics.pe_surfaces",
       "qualname": "interpolate_columns",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.diagnostics.pe_surfaces.interpolate_geopotential",
+      "kind": "function",
+      "module": "tropoi.representation.diagnostics.pe_surfaces",
+      "qualname": "interpolate_geopotential",
       "type": "function"
     },
     {
@@ -11128,6 +11253,13 @@
       "type": "function"
     },
     {
+      "id": "tropoi.representation.visual.atmosphere._check_stored_columns",
+      "kind": "function",
+      "module": "tropoi.representation.visual.atmosphere",
+      "qualname": "_check_stored_columns",
+      "type": "function"
+    },
+    {
       "id": "tropoi.representation.visual.atmosphere._default_path",
       "kind": "function",
       "module": "tropoi.representation.visual.atmosphere",
@@ -11188,6 +11320,13 @@
       "kind": "function",
       "module": "tropoi.representation.visual.atmosphere",
       "qualname": "_select_times",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.atmosphere._stored_height",
+      "kind": "function",
+      "module": "tropoi.representation.visual.atmosphere",
+      "qualname": "_stored_height",
       "type": "function"
     },
     {
@@ -11279,6 +11418,13 @@
       "kind": "function",
       "module": "tropoi.representation.visual.atmosphere",
       "qualname": "streamline_cache_bytes",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.atmosphere.surface_height_bytes",
+      "kind": "function",
+      "module": "tropoi.representation.visual.atmosphere",
+      "qualname": "surface_height_bytes",
       "type": "function"
     },
     {
