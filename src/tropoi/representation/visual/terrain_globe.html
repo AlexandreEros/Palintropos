@@ -689,11 +689,16 @@ function atmHeight(s) { return atmDecode("z", ATM.height.q, ATM.height.bounds, s
 /* validity codes of the current slice (0 = valid), or null when every node is a sample */
 function atmMask(s) { if (!ATM.mask) return null; const o = (s === undefined ? atmSlice() : s) * ATM.n; return ATM.mask.subarray(o, o + ATM.n); }
 function atmMaskAt(lat, lon) {
-  // code of the nearest node (the hover answer); null where there is no mask
+  // the hover answer: 0 only when every node the bilinear sample (sampleMesh) draws on
+  // is valid; otherwise the code of the nearest masked contributor. null without a mask.
   const m = atmMask(); if (!m) return null;
-  const g = ATM.g, j = Math.round(Math.max(0, Math.min(g.nlat - 1, (lat - g.lat0) / g.dlat)));
-  const i = Math.round((((lon - g.lon0) % 360) + 360) % 360 / g.dlon) % g.nlon;
-  return m[j * g.nlon + i];
+  const g = ATM.g, y = Math.max(0, Math.min(g.nlat - 1.000001, (lat - g.lat0) / g.dlat));
+  const x = Math.min(g.nlon - 1.000001, (((lon - g.lon0) % 360) + 360) % 360 / g.dlon);
+  const j = Math.floor(y), i = Math.floor(x), fy = y - j, fx = x - i, W = g.nlon;
+  const corners = [[j, i, fy + fx], [j, i + 1, fy + 1 - fx], [j + 1, i, 1 - fy + fx], [j + 1, i + 1, 2 - fy - fx]];
+  let code = 0, best = Infinity;
+  for (const [jj, ii, d] of corners) { const c = m[jj * W + ii]; if (c && d < best) { best = d; code = c; } }
+  return code;
 }
 function atmMaskLabel(code) { return ATM.surface && ATM.surface.mask_labels[String(code)] || ("mask code " + code); }
 const MASK_RGBA = [150, 150, 150, 110];

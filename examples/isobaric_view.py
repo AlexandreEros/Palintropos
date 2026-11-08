@@ -139,8 +139,12 @@ def cmd_measure(args) -> dict:
                                       times=times, resolution_deg=res,
                                       gravity=args.gravity)
     t1 = time.perf_counter()
-    out_html = pathlib.Path(args.scratch or
-                            pathlib.Path(args.out).parent) / "measure.html"
+    import tempfile
+    scratch = (args.scratch if args.scratch else
+               pathlib.Path(args.out).parent if args.out else
+               pathlib.Path(tempfile.gettempdir()) / "tropoi")
+    out_html = pathlib.Path(scratch) / "measure.html"
+    out_html.parent.mkdir(parents=True, exist_ok=True)
     write_globe_page(page, page["title"], out_html)
     t2 = time.perf_counter()
     size = out_html.stat().st_size

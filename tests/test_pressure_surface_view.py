@@ -335,6 +335,20 @@ def test_page_drops_masked_triangles_and_names_the_reason(holed_page):
         j, i = np.argwhere(mask[-1] == MASK_VALID)[0]
         good = page.eval(f"{API}.sample({lat[j]}, {lon[i]})")
         assert good["mask"] == 0 and "interpolated" in good["readout"]
+        # between a valid node and a masked neighbour the bilinear sample
+        # would mix in a placeholder: the readout must refuse it even where
+        # the nearest node is valid
+        m = mask[-1]
+        pair = None
+        for (jj, ii) in np.argwhere(m == MASK_VALID):
+            if ii + 1 < nlon and m[jj, ii + 1] == MASK_BELOW_SURFACE:
+                pair = (jj, ii)
+                break
+        assert pair is not None
+        jj, ii = pair
+        near = page.eval(f"{API}.sample({lat[jj]}, {lon[ii] + 0.4 * d})")
+        assert near["mask"] == MASK_BELOW_SURFACE
+        assert near["readout"].startswith("no sample")
         # streamline points never fall in a cell with a masked node
         pts = np.frombuffer(base64.b64decode(A["streamlines"]["points"]),
                             dtype="<i2").reshape(-1, 2) / 100.0

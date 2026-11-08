@@ -302,3 +302,24 @@ def test_streamlines_stop_at_masked_cells():
     assert any(((lo > lon_lo) & (lo < lon_hi)).any() for _, lo in free)
     with pytest.raises(ValueError, match="valid has shape"):
         integrate_streamlines(u, v, lat, lon, valid=valid[:, :10])
+
+
+def test_a_step_longer_than_a_cell_cannot_jump_a_thin_masked_band():
+    # 1 deg mesh, one masked node column at 1 degE (cells 0..2 invalid), a
+    # zonal flow and a 6 deg step: the RK4 evaluation points of a seed at
+    # -0.1 degE lie at -0.1, 2.9, 2.9 and 5.9 degE, all valid, so only a check
+    # along the whole segment can stop the line.
+    lat = np.linspace(-90.0, 90.0, 181)
+    lon = np.linspace(-180.0, 180.0, 361)
+    u = np.full((lat.size, lon.size), 20.0)
+    v = np.zeros_like(u)
+    valid = np.ones_like(u, dtype=bool)
+    valid[:, 181] = False                                  # lon = +1 deg
+    seeds = (np.zeros(5), np.array([-0.1, -0.4, -3.0, 4.0, 10.0]))
+    lines = integrate_streamlines(u, v, lat, lon, valid=valid, seeds=seeds,
+                                  step_deg=6.0, max_steps=4)
+    for la, lo in lines:
+        assert not ((lo > 0.0) & (lo < 2.0)).any(), (lo.min(), lo.max())
+        # a line is entirely west or entirely east of the band
+        assert (lo <= 0.0).all() or (lo >= 2.0).all()
+    assert lines                                           # some survive
