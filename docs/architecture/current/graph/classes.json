@@ -791,6 +791,58 @@
         "dataclass(frozen=True)"
       ],
       "external_bases": [],
+      "id": "tropoi.representation.diagnostics.pe_surfaces.PressureSurface",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__post_init__"
+        },
+        {
+          "kind": "property",
+          "name": "label"
+        }
+      ],
+      "module": "tropoi.representation.diagnostics.pe_surfaces",
+      "qualname": "PressureSurface"
+    },
+    {
+      "decorators": [
+        "dataclass(frozen=True, eq=False)"
+      ],
+      "external_bases": [],
+      "id": "tropoi.representation.diagnostics.pe_surfaces.SurfaceFields",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__getitem__"
+        },
+        {
+          "kind": "method",
+          "name": "counts"
+        },
+        {
+          "kind": "property",
+          "name": "valid"
+        }
+      ],
+      "module": "tropoi.representation.diagnostics.pe_surfaces",
+      "qualname": "SurfaceFields"
+    },
+    {
+      "decorators": [],
+      "external_bases": [
+        "ValueError"
+      ],
+      "id": "tropoi.representation.diagnostics.pe_surfaces.SurfaceUnavailableError",
+      "members": [],
+      "module": "tropoi.representation.diagnostics.pe_surfaces",
+      "qualname": "SurfaceUnavailableError"
+    },
+    {
+      "decorators": [
+        "dataclass(frozen=True)"
+      ],
+      "external_bases": [],
       "id": "tropoi.representation.diagnostics.spectral.SpectralComplexity",
       "members": [
         {
@@ -3136,6 +3188,10 @@
         {
           "kind": "method",
           "name": "full_levels_array"
+        },
+        {
+          "kind": "method",
+          "name": "hydrostatic_full_levels"
         },
         {
           "kind": "method",

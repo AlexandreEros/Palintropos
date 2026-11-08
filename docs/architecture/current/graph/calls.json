@@ -1516,6 +1516,46 @@
       "target": "tropoi.spatial.transforms.host_synthesis.synthesize_wind_latlon"
     },
     {
+      "kind": "instantiate",
+      "source": "tropoi.representation.diagnostics.pe_surfaces.parse_surface",
+      "target": "tropoi.representation.diagnostics.pe_surfaces.PressureSurface"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.diagnostics.pe_surfaces.pressure_surface",
+      "target": "tropoi.representation.diagnostics.pe_levels.reconstruct_levels"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.representation.diagnostics.pe_surfaces.pressure_surface",
+      "target": "tropoi.representation.diagnostics.pe_surfaces.SurfaceFields"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.representation.diagnostics.pe_surfaces.pressure_surface",
+      "target": "tropoi.representation.diagnostics.pe_surfaces.SurfaceUnavailableError"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.diagnostics.pe_surfaces.pressure_surface",
+      "target": "tropoi.representation.diagnostics.pe_surfaces._check_column_geometry"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.diagnostics.pe_surfaces.pressure_surface",
+      "target": "tropoi.representation.diagnostics.pe_surfaces.interpolate_log_sigma"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.diagnostics.pe_surfaces.pressure_surface",
+      "target": "tropoi.representation.diagnostics.pe_surfaces.level_sigma_positions"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.diagnostics.pe_surfaces.pressure_surface",
+      "target": "tropoi.representation.diagnostics.pe_surfaces.parse_surface"
+    },
+    {
       "kind": "call",
       "source": "tropoi.representation.diagnostics.spectral.kinetic_energy_modes",
       "target": "tropoi.representation.diagnostics.spectral.mode_power"
@@ -1572,6 +1612,26 @@
     },
     {
       "kind": "call",
+      "source": "tropoi.representation.visual.atmosphere._surface_page",
+      "target": "tropoi.representation.diagnostics.pe_surfaces.level_sigma_positions"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.atmosphere._surface_page",
+      "target": "tropoi.representation.visual.atmosphere._b64"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.atmosphere._surface_page",
+      "target": "tropoi.representation.visual.atmosphere._streamline_block"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.atmosphere._surface_page",
+      "target": "tropoi.representation.visual.atmosphere._time_label"
+    },
+    {
+      "kind": "call",
       "source": "tropoi.representation.visual.atmosphere._terrain_bytes",
       "target": "tropoi.representation.visual.terrain.display_resolution_deg"
     },
@@ -1589,6 +1649,16 @@
       "kind": "call",
       "source": "tropoi.representation.visual.atmosphere.atmosphere_payload",
       "target": "tropoi.representation.diagnostics.pe_levels.reconstruct_levels"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.atmosphere.atmosphere_payload",
+      "target": "tropoi.representation.diagnostics.pe_surfaces.parse_surface"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.atmosphere.atmosphere_payload",
+      "target": "tropoi.representation.diagnostics.pe_surfaces.pressure_surface"
     },
     {
       "kind": "call",
@@ -1629,6 +1699,11 @@
       "kind": "call",
       "source": "tropoi.representation.visual.atmosphere.atmosphere_payload",
       "target": "tropoi.representation.visual.atmosphere._streamline_block"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.atmosphere.atmosphere_payload",
+      "target": "tropoi.representation.visual.atmosphere._surface_page"
     },
     {
       "kind": "call",
@@ -10666,6 +10741,97 @@
       "type": "function"
     },
     {
+      "id": "tropoi.representation.diagnostics.pe_surfaces.PressureSurface",
+      "kind": "class",
+      "module": "tropoi.representation.diagnostics.pe_surfaces",
+      "qualname": "PressureSurface",
+      "type": "class"
+    },
+    {
+      "id": "tropoi.representation.diagnostics.pe_surfaces.PressureSurface.__post_init__",
+      "kind": "method",
+      "module": "tropoi.representation.diagnostics.pe_surfaces",
+      "qualname": "PressureSurface.__post_init__",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.diagnostics.pe_surfaces.PressureSurface.label",
+      "kind": "property",
+      "module": "tropoi.representation.diagnostics.pe_surfaces",
+      "qualname": "PressureSurface.label",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.diagnostics.pe_surfaces.SurfaceFields",
+      "kind": "class",
+      "module": "tropoi.representation.diagnostics.pe_surfaces",
+      "qualname": "SurfaceFields",
+      "type": "class"
+    },
+    {
+      "id": "tropoi.representation.diagnostics.pe_surfaces.SurfaceFields.__getitem__",
+      "kind": "method",
+      "module": "tropoi.representation.diagnostics.pe_surfaces",
+      "qualname": "SurfaceFields.__getitem__",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.diagnostics.pe_surfaces.SurfaceFields.counts",
+      "kind": "method",
+      "module": "tropoi.representation.diagnostics.pe_surfaces",
+      "qualname": "SurfaceFields.counts",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.diagnostics.pe_surfaces.SurfaceFields.valid",
+      "kind": "property",
+      "module": "tropoi.representation.diagnostics.pe_surfaces",
+      "qualname": "SurfaceFields.valid",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.diagnostics.pe_surfaces.SurfaceUnavailableError",
+      "kind": "class",
+      "module": "tropoi.representation.diagnostics.pe_surfaces",
+      "qualname": "SurfaceUnavailableError",
+      "type": "class"
+    },
+    {
+      "id": "tropoi.representation.diagnostics.pe_surfaces._check_column_geometry",
+      "kind": "function",
+      "module": "tropoi.representation.diagnostics.pe_surfaces",
+      "qualname": "_check_column_geometry",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.diagnostics.pe_surfaces.interpolate_log_sigma",
+      "kind": "function",
+      "module": "tropoi.representation.diagnostics.pe_surfaces",
+      "qualname": "interpolate_log_sigma",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.diagnostics.pe_surfaces.level_sigma_positions",
+      "kind": "function",
+      "module": "tropoi.representation.diagnostics.pe_surfaces",
+      "qualname": "level_sigma_positions",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.diagnostics.pe_surfaces.parse_surface",
+      "kind": "function",
+      "module": "tropoi.representation.diagnostics.pe_surfaces",
+      "qualname": "parse_surface",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.diagnostics.pe_surfaces.pressure_surface",
+      "kind": "function",
+      "module": "tropoi.representation.diagnostics.pe_surfaces",
+      "qualname": "pressure_surface",
+      "type": "function"
+    },
+    {
       "id": "tropoi.representation.diagnostics.spectral.SpectralComplexity",
       "kind": "class",
       "module": "tropoi.representation.diagnostics.spectral",
@@ -10866,6 +11032,13 @@
       "kind": "function",
       "module": "tropoi.representation.visual.atmosphere",
       "qualname": "_streamline_block",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.atmosphere._surface_page",
+      "kind": "function",
+      "module": "tropoi.representation.visual.atmosphere",
+      "qualname": "_surface_page",
       "type": "function"
     },
     {
@@ -16172,6 +16345,13 @@
       "kind": "method",
       "module": "tropoi.spatial.sigma_coordinate",
       "qualname": "SigmaGrid.full_levels_array",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.spatial.sigma_coordinate.SigmaGrid.hydrostatic_full_levels",
+      "kind": "method",
+      "module": "tropoi.spatial.sigma_coordinate",
+      "qualname": "SigmaGrid.hydrostatic_full_levels",
       "type": "function"
     },
     {
