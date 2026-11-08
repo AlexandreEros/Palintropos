@@ -515,12 +515,13 @@ mask boundary can change mask; the test excludes only those.
 
 **Measured** ([the record](validation/derived_surfaces_2026-11-08/README.md);
 the committed Mars page is the reproducible example). In the page's own
-timer, a height update takes a median of 23 ms on the Mars page (1.8 ms of
-interpolation) and 43 ms on the 29 MB Held–Suarez page (12 ms). A coordinate
-switch takes 28 ms. A first streamline trace of a surface takes 30–150 ms
-(warm repeats 7–18 ms on Mars); while a slider is dragged it runs once,
-about 185–210 ms after the last movement. Start-up is 1.0 s and 2.8 s; the
-heap stays at 20 and 50 MB over the bench.
+timer, a height update takes a median of 22 ms on the 5.15 MB Mars page
+(1.9 ms of interpolation) and 41 ms on the 43 MB eight-state Held–Suarez
+page (10 ms). A coordinate switch takes 21–29 ms. A first streamline trace
+of a surface takes up to ~180 ms (warm repeats 7–18 ms on Mars); while a
+slider is dragged it runs once, about 200 ms after the last movement.
+Start-up is 1.2 s and 2.9 s; the heap stays at 20 and 72 MB over the bench.
+σ-surface numbers are in the [σ section](#constant-σ-surfaces).
 
 ![The Mars run's 4 km geopotential-height surface at its last saved state over Tharsis: the surface where it lies above the terrain, holes where the terrain rises through it, white streamlines that stop at the holes, and the side panel with the Pressure / Geopotential height switch, the linear height slider and the typed value in km](validation/derived_surfaces_2026-11-08/mars_isobars_interactive_z4000m.png)
 
@@ -574,6 +575,19 @@ before base64, about 50 % more than before. On the T42L20 run at 2°, 8 saved
 states no longer fit the 32 MB default; `max_mb` or fewer states choose
 otherwise, and the refusal says so. The fixed-surface pages are `version` 2,
 the column page `version` 4 as before.
+
+**Measured** ([the record](validation/derived_surfaces_2026-11-08/README.md)).
+
+- **Updates.** A σ update takes a median of 19.5 ms on the Mars page (1.2 ms
+  of interpolation) and 31 ms on the 43 MB Held–Suarez page (3.8 ms).
+- **Lazy ζ/δ decoding.** The page decodes ζ and δ only while σ is selected,
+  so on isobars and height surfaces a saved-time switch does not pay for
+  them: 149 ms on the Held–Suarez page, against 242 ms when they were
+  decoded eagerly.
+- **Validity.** On Mars, σ = 0.95 lies below the bottom level, so that
+  surface is empty and says so; 0.2 to 0.875 are drawn whole.
+
+![Relative vorticity on the σ = 0.5 surface of the Mars run at its last saved state, on a diverging scale, with dark instantaneous streamlines; the side panel shows the Pressure / Geopotential height / σ switch, the linear σ slider and the typed value](validation/derived_surfaces_2026-11-08/mars_isobars_interactive_s0.5.png)
 
 ## What the surface is
 
