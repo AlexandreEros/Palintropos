@@ -45,9 +45,9 @@ python examples/atmosphere_view.py runs/hs-T42L20-prod-002 --times 0 -1 --field 
 | `path` | output file | `<tempdir>/tropoi/<run>-atmosphere-<tag>.html` |
 | `times` | saved snapshot indices (negative counts back), or `"all"` | as many evenly spaced states as fit `max_mb` (always the first and the last), with a warning |
 | `levels` | native full-level indices, 0 = top | all levels |
-| `surface` | `("pressure", Pa)` or `("geopotential_height", m)`: one derived surface per exported time instead of native levels (see [Fixed-pressure surfaces](#fixed-pressure-surfaces-across-saved-times), [Geopotential-height surfaces](#geopotential-height-surfaces)); exclusive with `levels` | none (native levels) |
+| `surface` | `("pressure", Pa)`, `("geopotential_height", m)` or `("sigma", value)`: one derived surface per exported time instead of native levels (see [Fixed-pressure surfaces](#fixed-pressure-surfaces-across-saved-times), [Geopotential-height surfaces](#geopotential-height-surfaces), [Constant-σ surfaces](#constant-σ-surfaces)); exclusive with `levels` | none (native levels) |
 | `level_sigma` | with `surface`: where a native level sits for the interpolation, `"hydrostatic"` or `"nominal"` | `"hydrostatic"` |
-| `interactive_surface` | with `surface` (then the initial surface): export the native columns and choose any pressure or geopotential height in the page (see [Any pressure in the browser](#any-pressure-in-the-browser-interactive-pressure-mode)); streamlines are traced in the page. `interactive_pressure=True` is the same switch under its older name | `False` |
+| `interactive_surface` | with `surface` (then the initial surface): export the native columns and choose any pressure, geopotential height or σ in the page (see [Any pressure in the browser](#any-pressure-in-the-browser-interactive-pressure-mode)); streamlines are traced in the page. `interactive_pressure=True` is the same switch under its older name | `False` |
 | `resolution_deg` | display mesh spacing in degrees (a divisor of 180°) | about 4 nodes per shortest resolved wavelength, between 1° and 3°: 2° at T42 |
 | `max_mb` | bound on the embedded data, in MB | 32; `None` removes it |
 | `streamlines` | horizontal streamlines (exported lines; traced in the page in interactive mode) | `True` |
@@ -216,9 +216,9 @@ with holes.
 
 **Fields.** Temperature (K), geopotential height (m) and wind speed (m/s).
 Pressure is not offered: it is `p₀` everywhere on the surface. **Relative
-vorticity and divergence are not exported** on a derived surface: a
+vorticity and divergence are not exported** on an isobar: a
 horizontal derivative on a σ level is not the derivative on a pressure
-level, and interpolating `ζ_σ` would label the wrong quantity. The page says
+level (constant-σ surfaces are the exception, [below](#constant-σ-surfaces)), and interpolating `ζ_σ` would label the wrong quantity. The page says
 so. Target-coordinate derivatives from the surface winds are a later slice
 of #13. The native-level page is unchanged (its payload stays `version` 1;
 the derived page is `version` 2 with `surface` and `mask` blocks).
@@ -391,7 +391,9 @@ goes through the stored form to the same bound.
 headless Chrome with software WebGL, `examples/isobaric_view.py bench`,
 [the record](validation/interactive_pressure_2026-11-08/README.md)).
 Full columns cost more than one surface: per saved state, `8·K` bytes per
-node plus 4 for the surface pressure before base64, against 7 (+ streamlines)
+node plus 4 for the surface pressure before base64 (`12·K` since the
+columns also carry ζ and δ for [σ surfaces](#constant-σ-surfaces); the
+numbers below predate that), against 7 (+ streamlines)
 for a fixed surface; the estimate is made before anything is reconstructed
 and the decoded memory of one state is reported separately (page details
 and the export report).
@@ -422,7 +424,8 @@ is cheaper than the fixed-surface export of the same states (0.69 s against
 **Not in this slice.** Target-surface vorticity
 and divergence; compression of the columns
 (the file is base64 of raw 16-bit slices); any GPU path. The 32 MB default
-budget bounds the T42L20 run to 8 states at 2° or 19 at 3°; the budget is
+budget bounds the T42L20 run to 5 states at 2° or 13 at 3° (8 and 19
+before the columns carried ζ and δ for σ surfaces); the budget is
 explicit (`max_mb`, `None` removes it) and the refusal says what to change.
 
 ## Geopotential-height surfaces
@@ -479,8 +482,8 @@ heights.
 
 **Fields.** Temperature, pressure (hPa) and wind speed; the height itself is
 constant on the surface, and relative vorticity and divergence stay off on
-both derived coordinates (a horizontal derivative on a sigma level is not
-the derivative on the target surface).
+height surfaces as on isobars (a horizontal derivative on a sigma level is
+not the derivative on the target surface).
 
 **In a column page** both coordinates are available without regenerating the
 file. A **Pressure / Geopotential height** switch sits above the controls;
@@ -520,6 +523,57 @@ about 185–210 ms after the last movement. Start-up is 1.0 s and 2.8 s; the
 heap stays at 20 and 50 MB over the bench.
 
 ![The Mars run's 4 km geopotential-height surface at its last saved state over Tharsis: the surface where it lies above the terrain, holes where the terrain rises through it, white streamlines that stop at the holes, and the side panel with the Pressure / Geopotential height switch, the linear height slider and the typed value in km](validation/derived_surfaces_2026-11-08/mars_isobars_interactive_z4000m.png)
+
+## Constant-σ surfaces
+
+`surface=("sigma", σ₀)` with `0 < σ₀ ≤ 1` is the third derived coordinate,
+in both modes:
+
+```python
+sim.view("mars_sigma.html", surface=("sigma", 0.6), times="all")          # one σ surface per saved time
+sim.view("surfaces.html", surface=("sigma", 0.6), interactive_surface=True)  # any σ, pressure or height in the page
+```
+
+```bash
+python examples/isobaric_view.py view RUN --sigma 0.6
+python examples/isobaric_view.py interactive RUN --sigma 0.6
+```
+
+**Nominal positions.** σ surfaces interpolate linearly in `ln σ` between
+the nominal level positions `σₖ`, the labels of the native levels, whatever
+`level_sigma` says for the other coordinates. Choosing a level's own `σₖ`
+reproduces that native level exactly: every field, ζ and δ included (tested
+at every level). `p = σ₀·pₛ` and `Z = Φ(σ₀)/g`.
+
+**Why ζ and δ are shown here and nowhere else.** The interpolation weight is
+the same number at every node of a σ surface. Horizontal derivatives
+therefore pass through the interpolation, and the interpolated relative
+vorticity and divergence are exactly those of the interpolated wind: the
+same linear combination of the two levels' spectral coefficients. A test
+synthesizes that combination and finds ζ and δ to 1e−12, and the wind to
+the wind synthesis's own round-off (5e−10 relative: ψ = ζR²/l(l+1) reaches
+~4e8 m²/s before it is differentiated back down to tens of m/s). On isobars
+and height surfaces the weight varies along the surface, so the same
+interpolation would label the wrong quantity there.
+
+**Masks.** A σ surface never meets the ground. Above the top full level
+(`σ₀ < σ₁`) or below the bottom one (`σ₀ > σ_K`, the band down to the ground)
+it has no valid node at all, so a σ surface is wholly drawn or wholly empty.
+The end levels are widened by 1e−9 as for pressure.
+
+**Fields.** Temperature, geopotential height, pressure, wind speed, relative
+vorticity and divergence (diverging colour scale, symmetric about zero,
+fixed from the column maxima).
+
+**In a column page** the coordinate switch has a third button, **σ**, with a
+linear slider over the native range (`σ₁` to `σ_K`) and a typed value; the
+note lists the native σₖ. Each of the three coordinates keeps its own value
+and field choice. The columns now carry ζ and δ for every level as well (six
+16-bit stacks instead of four): `12·K + 4` bytes per node and saved state
+before base64, about 50 % more than before. On the T42L20 run at 2°, 8 saved
+states no longer fit the 32 MB default; `max_mb` or fewer states choose
+otherwise, and the refusal says so. The fixed-surface pages are `version` 2,
+the column page `version` 4 as before.
 
 ## What the surface is
 
@@ -673,7 +727,9 @@ headless Chrome with software WebGL these pages became interactive within
   ([above](#fixed-pressure-surfaces-across-saved-times)) or any pressure
   interpolated in the page ([interactive mode](#any-pressure-in-the-browser-interactive-pressure-mode),
   streamlines traced in the page), or a geopotential-height surface (fixed
-  or chosen in the page). No vorticity or divergence on a derived surface, no volume rendering, no mass
+  or chosen in the page), or a constant-σ surface. No vorticity or
+  divergence on isobars or height surfaces (only on σ surfaces), no volume
+  rendering, no mass
   streamfunction.
 - The streamline mask check samples each step at points closer than half a
   mesh cell, measured in degrees. That stops a line at any masked band one

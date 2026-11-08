@@ -1,11 +1,12 @@
-"""Fields of a saved PE state on a fixed-pressure (isobaric) or fixed
-geopotential-height surface (CPU).
+"""Fields of a saved PE state on a fixed-pressure (isobaric), fixed
+geopotential-height or constant-sigma surface (CPU).
 
 A derived display surface: the native full-level fields of
 :func:`~tropoi.representation.diagnostics.pe_levels.reconstruct_levels`
-interpolated in the vertical to one pressure ``p0`` or one geopotential
-height ``Z0``. The solver never produces such a surface; this module only
-reads saved states. Rules for pressure surfaces:
+interpolated in the vertical to one pressure ``p0``, one geopotential
+height ``Z0`` or one sigma ``sigma0``. The solver never produces such a
+surface (a sigma surface between two full levels included); this module
+only reads saved states. Rules for pressure surfaces:
 
 * **Vertical coordinate.** ``x = ln sigma``. The target at each node is
   ``sigma* = p0 / p_s`` with ``p_s = exp(ln p_s)`` of the saved state. The
@@ -72,10 +73,31 @@ gravity law, no rotational potential, no new coordinate):
   zero or inverted interval is never divided by. The check runs on every
   call, so it also covers stored (quantized) columns.
 
-Vorticity and divergence are deliberately absent on both coordinates: a
-horizontal derivative on a sigma level is not the derivative on a pressure
-or height surface, and the honest target-coordinate derivative is a later
-slice of issue #13.
+Rules for constant-sigma surfaces (``("sigma", sigma0)``, ``0 < sigma0
+<= 1``):
+
+* **Where a level sits.** The NOMINAL positions ``sigma_k`` (the labels of
+  the native levels, :attr:`PressureColumns.full_levels`), whatever
+  ``level_sigma`` says for the other coordinates: choosing a level's own
+  ``sigma_k`` reproduces that native level exactly.
+* **Interpolant.** Linear in ``ln sigma`` between the bracketing levels, as
+  for pressure, with the target ``sigma0`` the same at every node; ``p =
+  sigma0 p_s``, ``Z = Phi / g``.
+* **Masks.** Code 2 above the top full level (``sigma0 < sigma_1``) and 3
+  below the bottom one (``sigma0 > sigma_K``), ends widened by
+  :data:`END_TOLERANCE`; a sigma surface never meets the ground, so a
+  surface is wholly valid or wholly empty.
+* **Vorticity and divergence.** Because the weight is the same at every
+  node, horizontal derivatives commute with the interpolation: the
+  interpolated ``zeta``/``delta`` ARE the vorticity and divergence of the
+  interpolated wind (both are the same linear combination of the levels'
+  spectral coefficients). This is the one derived coordinate on which they
+  are offered.
+
+Vorticity and divergence are deliberately absent on pressure and height
+surfaces: there the weight varies along the surface, so a horizontal
+derivative on a sigma level is not the derivative on the target surface,
+and the honest target-coordinate derivative is a later slice of issue #13.
 
 Two steps, usable apart: :func:`pressure_columns` reconstructs and checks
 the native columns of one state ONCE (:class:`PressureColumns`), and
@@ -108,6 +130,9 @@ __all__ = [
     "MASK_LABELS",
     "MASK_VALID",
     "PressureColumns",
+    "SIGMA_MASK_LABELS",
+    "SIGMA_SURFACE_FIELDS",
+    "SigmaSurface",
     "PressureSurface",
     "SURFACE_FIELDS",
     "SurfaceFields",
@@ -142,6 +167,18 @@ HEIGHT_MASK_LABELS = {
     MASK_ABOVE_TOP_LEVEL: "above the highest sampled full level",
     MASK_BELOW_BOTTOM_LEVEL: "between the terrain and the lowest full level",
 }
+
+#: The codes on a constant-sigma surface (code 1 never occurs: sigma <= 1).
+SIGMA_MASK_LABELS = {
+    MASK_VALID: "valid",
+    MASK_ABOVE_TOP_LEVEL: "above the top full level (sigma0 < sigma_1)",
+    MASK_BELOW_BOTTOM_LEVEL: "below the bottom full level (sigma0 > sigma_K)",
+}
+
+#: Outputs on a constant-sigma surface: ``pressure`` is ``sigma0 p_s``;
+#: ``zeta``/``delta`` when the columns hold them.
+SIGMA_SURFACE_FIELDS = ("temperature", "geopotential", "geopotential_height",
+                        "pressure", "u", "v", "zeta", "delta")
 
 #: Interpolated outputs of :func:`pressure_surface` (``u``/``v`` need winds).
 SURFACE_FIELDS = ("temperature", "geopotential", "geopotential_height",
@@ -250,15 +287,46 @@ class GeopotentialHeightSurface:
         return f"{z:.6g} m"
 
 
+@dataclass(frozen=True)
+class SigmaSurface:
+    """A constant-sigma surface ``p / p_s = sigma0``, ``0 < sigma0 <= 1``."""
+
+    sigma: float
+
+    kind = "sigma"
+    units = ""
+
+    def __post_init__(self) -> None:
+        x = self.sigma
+        if not _is_number(x):
+            raise TypeError(f"sigma must be a number, got {x!r}")
+        x = float(x)
+        if not (math.isfinite(x) and 0.0 < x <= 1.0):
+            raise ValueError(f"sigma must be finite and in (0, 1], got {x}")
+        object.__setattr__(self, "sigma", x)
+
+    @property
+    def value(self) -> float:
+        return self.sigma
+
+    @property
+    def label(self) -> str:
+        """``"σ = 0.5"``."""
+        return f"σ = {self.sigma:.6g}"
+
+
 _SPEC_HELP = ("('pressure', value_in_Pa), e.g. ('pressure', 50000.0) for 500 "
-              "hPa, or ('geopotential_height', value_in_m), e.g. "
-              "('geopotential_height', 5500.0)")
+              "hPa, ('geopotential_height', value_in_m), e.g. "
+              "('geopotential_height', 5500.0), or ('sigma', value), e.g. "
+              "('sigma', 0.5)")
 
 
-def parse_surface(spec) -> PressureSurface | GeopotentialHeightSurface:
-    """``("pressure", Pa)``, ``("geopotential_height", m)`` or one of the
-    two surface classes."""
-    if isinstance(spec, (PressureSurface, GeopotentialHeightSurface)):
+def parse_surface(spec
+                  ) -> PressureSurface | GeopotentialHeightSurface | SigmaSurface:
+    """``("pressure", Pa)``, ``("geopotential_height", m)``, ``("sigma",
+    value)`` or one of the three surface classes."""
+    if isinstance(spec, (PressureSurface, GeopotentialHeightSurface,
+                         SigmaSurface)):
         return spec
     if isinstance(spec, (str, bytes)) or not hasattr(spec, "__len__") \
             or len(spec) != 2:
@@ -268,6 +336,8 @@ def parse_surface(spec) -> PressureSurface | GeopotentialHeightSurface:
         return PressureSurface(value)
     if kind == "geopotential_height":
         return GeopotentialHeightSurface(value)
+    if kind == "sigma":
+        return SigmaSurface(value)
     raise ValueError(f"unknown surface coordinate {kind!r}; use {_SPEC_HELP}")
 
 
@@ -285,7 +355,7 @@ class SurfaceFields:
     ground. Read it only through ``valid``.
     """
 
-    surface: PressureSurface | GeopotentialHeightSurface
+    surface: PressureSurface | GeopotentialHeightSurface | SigmaSurface
     level_sigma: str
     level_positions: tuple[float, ...]
     lat_deg: np.ndarray
@@ -473,9 +543,12 @@ class PressureColumns:
     vertical interpolation reads and what the interactive page exports.
 
     Stacks are ``(K, nlat, nlon)``: ``temperature`` (K), ``geopotential``
-    (m² s⁻², absolute), ``u`` and ``v`` (m/s; ``None`` without winds).
-    ``surface_pressure`` (Pa) is ``exp(ln p_s)`` of the state. The column
-    geometry has been checked (finite, ``Phi`` decreasing downward).
+    (m² s⁻², absolute), ``u`` and ``v`` (m/s; ``None`` without winds),
+    ``zeta`` and ``delta`` (s⁻¹; ``None`` unless requested).
+    ``surface_pressure`` (Pa) is ``exp(ln p_s)`` of the state;
+    ``full_levels`` the nominal level positions ``sigma_k`` (constant-sigma
+    surfaces use them). The column geometry has been checked (finite,
+    ``Phi`` decreasing downward).
     """
 
     level_sigma: str
@@ -489,6 +562,9 @@ class PressureColumns:
     surface_pressure: np.ndarray
     surface_height: np.ndarray | None
     gravity: float
+    full_levels: tuple[float, ...] = ()
+    zeta: np.ndarray | None = None
+    delta: np.ndarray | None = None
 
     @property
     def nlev(self) -> int:
@@ -547,13 +623,16 @@ def _check_column_geometry(levels: LevelFields) -> None:
 
 def pressure_columns(frame, context, lat_deg, lon_deg, *, winds: bool = True,
                      levels: LevelFields | None = None,
-                     level_sigma: str = "hydrostatic") -> PressureColumns:
+                     level_sigma: str = "hydrostatic",
+                     vorticity_divergence: bool = True) -> PressureColumns:
     """The native columns of one saved state, ready to interpolate.
 
     Reconstructs every full level on the display mesh with
     :func:`reconstruct_levels` (winds when ``winds``; never vorticity or
-    divergence), or takes ``levels`` when the caller already has them (they
-    must hold every full level of ``context`` on this mesh). Checks the
+    divergence unless ``vorticity_divergence``, which the column page and
+    constant-sigma surfaces need), or takes ``levels`` when the caller
+    already has them (they must hold every full level of ``context`` on
+    this mesh). Checks the
     column geometry and the surface pressure. ``level_sigma`` chooses where
     a level sits (module doc). This is the one reconstruction a saved state
     needs, whatever pressures are later asked of it.
@@ -564,13 +643,17 @@ def pressure_columns(frame, context, lat_deg, lon_deg, *, winds: bool = True,
                          "geopotential height Phi/g is undefined")
     if levels is None:
         levels = reconstruct_levels(frame, context, lat_deg, lon_deg, None,
-                                    winds=winds, vorticity_divergence=False)
+                                    winds=winds,
+                                    vorticity_divergence=vorticity_divergence)
     if levels.levels != tuple(range(context.nlev)):
         raise ValueError("pressure_columns needs every full level of the "
                          f"run, got levels {levels.levels}")
     if winds and "u" not in levels.values:
         raise ValueError("winds were requested but the given levels hold "
                          "no u/v")
+    if vorticity_divergence and "zeta" not in levels.values:
+        raise ValueError("vorticity/divergence were requested but the given "
+                         "levels hold no zeta/delta")
     _check_column_geometry(levels)
     p_s = levels.surface_pressure
     if not (np.all(np.isfinite(p_s)) and np.all(p_s > 0.0)):
@@ -583,7 +666,12 @@ def pressure_columns(frame, context, lat_deg, lon_deg, *, winds: bool = True,
         u=np.asarray(levels["u"], dtype=np.float64) if winds else None,
         v=np.asarray(levels["v"], dtype=np.float64) if winds else None,
         surface_pressure=np.asarray(p_s, dtype=np.float64),
-        surface_height=levels.surface_height, gravity=float(context.gravity))
+        surface_height=levels.surface_height, gravity=float(context.gravity),
+        full_levels=tuple(float(x) for x in context.full_levels),
+        zeta=(np.asarray(levels["zeta"], dtype=np.float64)
+              if vorticity_divergence else None),
+        delta=(np.asarray(levels["delta"], dtype=np.float64)
+               if vorticity_divergence else None))
 
 
 def interpolate_columns(columns: PressureColumns, surface, *,
@@ -604,6 +692,8 @@ def interpolate_columns(columns: PressureColumns, surface, *,
     target = parse_surface(surface)
     if target.kind == "geopotential_height":
         return _height_fields(columns, target, time_label)
+    if target.kind == "sigma":
+        return _sigma_fields(columns, target, time_label)
     positions = columns.level_positions
     p_s = columns.surface_pressure
     sigma_target = target.pressure_pa / p_s
@@ -656,14 +746,44 @@ def _height_fields(columns: PressureColumns, target, time_label
                          surface_height=columns.surface_height)
 
 
+def _sigma_fields(columns: PressureColumns, target, time_label
+                  ) -> SurfaceFields:
+    positions = columns.full_levels
+    if len(positions) != columns.nlev:
+        raise ValueError("these columns record no nominal level positions; "
+                         "rebuild them with pressure_columns")
+    stacks = columns.stacks()
+    if columns.zeta is not None:
+        stacks["zeta"], stacks["delta"] = columns.zeta, columns.delta
+    p_s = columns.surface_pressure
+    sigma_target = np.full(p_s.shape, target.sigma)
+    values, mask, bracket = interpolate_log_sigma(positions, stacks,
+                                                  sigma_target)
+    if not np.any(mask == MASK_VALID):
+        raise SurfaceUnavailableError(
+            f"the {target.label} surface has no valid node at {time_label}: "
+            f"the full levels sit at sigma {positions[0]:.6g} to "
+            f"{positions[-1]:.6g} (nominal); choose a sigma inside that range")
+    values["geopotential_height"] = values["geopotential"] / columns.gravity
+    values["pressure"] = target.sigma * p_s
+    return SurfaceFields(surface=target, level_sigma="nominal",
+                         level_positions=positions, lat_deg=columns.lat_deg,
+                         lon_deg=columns.lon_deg, values=values, mask=mask,
+                         bracket=bracket, sigma_target=sigma_target,
+                         surface_pressure=p_s,
+                         surface_height=columns.surface_height)
+
+
 def pressure_surface(frame, context, lat_deg, lon_deg, surface, *,
                      winds: bool = True, levels: LevelFields | None = None,
                      level_sigma: str = "hydrostatic",
                      time_label: str = "this saved state") -> SurfaceFields:
     """Interpolate one saved state to the derived surface ``surface``.
 
-    ``surface`` is ``("pressure", Pa)``, ``("geopotential_height", m)`` or
-    one of the surface classes (the name predates height surfaces).
+    ``surface`` is ``("pressure", Pa)``, ``("geopotential_height", m)``,
+    ``("sigma", value)`` or one of the surface classes (the name predates
+    height and sigma surfaces). ``level_sigma`` does not apply to sigma
+    surfaces (they use the nominal positions).
     :func:`pressure_columns` followed by :func:`interpolate_columns`: the
     native levels are reconstructed on the display mesh (all full levels,
     winds when ``winds``), or taken from ``levels`` when the caller already
@@ -672,6 +792,9 @@ def pressure_surface(frame, context, lat_deg, lon_deg, surface, *,
     the surface.
     """
     target = parse_surface(surface)          # refuse a bad spec first
+    # zeta/delta only where they are offered (constant sigma); the other
+    # coordinates skip their syntheses
     columns = pressure_columns(frame, context, lat_deg, lon_deg, winds=winds,
-                               levels=levels, level_sigma=level_sigma)
+                               levels=levels, level_sigma=level_sigma,
+                               vorticity_divergence=target.kind == "sigma")
     return interpolate_columns(columns, target, time_label=time_label)

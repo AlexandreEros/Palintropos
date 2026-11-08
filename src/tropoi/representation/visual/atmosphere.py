@@ -93,6 +93,15 @@ float32), never the exaggerated display. The inversion is
 :func:`~tropoi.representation.diagnostics.pe_surfaces.
 interpolate_geopotential`, mirrored by the page.
 
+Constant-sigma surfaces (``surface=("sigma", value)``). The third derived
+coordinate, in both modes, interpolated in ``ln sigma`` between the NOMINAL
+level positions (a level's own ``sigma_k`` reproduces that native level).
+The weight is the same at every node, so relative vorticity and divergence,
+interpolated from the levels' own, are exactly those of the interpolated
+wind: they are offered on sigma surfaces only. Column pages therefore carry
+``zeta`` and ``delta`` columns too (six 16-bit stacks per level instead of
+four).
+
 CPU only: NumPy, the archive readers and Matplotlib (colour tables). Never
 CuPy, never a model, never writes into the run directory.
 """
@@ -111,7 +120,7 @@ import numpy as np
 from tropoi.representation.diagnostics.pe_levels import reconstruct_levels
 from tropoi.representation.diagnostics.pe_surfaces import (
     END_TOLERANCE, HEIGHT_MASK_LABELS, MASK_LABELS, MASK_VALID,
-    SurfaceUnavailableError, level_sigma_positions, parse_surface,
+    SIGMA_MASK_LABELS, SurfaceUnavailableError, level_sigma_positions, parse_surface,
     pressure_columns, pressure_surface)
 from tropoi.representation.visual.sphere_streamlines import (
     integrate_streamlines)
@@ -127,6 +136,7 @@ __all__ = [
     "FIELDS",
     "HEIGHT_SURFACE_FIELDS",
     "MAX_DECODED_TIMES",
+    "SIGMA_SURFACE_FIELDS",
     "PayloadTooLargeError",
     "SURFACE_FIELDS",
     "atmosphere_payload",
@@ -172,13 +182,26 @@ HEIGHT_SURFACE_FIELDS = {
     "wind_speed": SURFACE_FIELDS["wind_speed"],
 }
 
+#: Fields of a derived constant-sigma surface: everything varies on it,
+#: and vorticity and divergence are honest there (module doc).
+SIGMA_SURFACE_FIELDS = {
+    "temperature": FIELDS["temperature"],
+    "pressure": FIELDS["pressure"],
+    "geopotential_height": SURFACE_FIELDS["geopotential_height"],
+    "wind_speed": SURFACE_FIELDS["wind_speed"],
+    "zeta": FIELDS["zeta"],
+    "delta": FIELDS["delta"],
+}
+
 #: Fields of a column page and the coordinates each is offered on (the
 #: first three in the order of the earlier pressure-only page).
 COLUMN_PAGE_FIELDS = (
-    ("temperature", ("pressure", "geopotential_height")),
-    ("geopotential_height", ("pressure",)),
-    ("wind_speed", ("pressure", "geopotential_height")),
-    ("pressure", ("geopotential_height",)),
+    ("temperature", ("pressure", "geopotential_height", "sigma")),
+    ("geopotential_height", ("pressure", "sigma")),
+    ("wind_speed", ("pressure", "geopotential_height", "sigma")),
+    ("pressure", ("geopotential_height", "sigma")),
+    ("zeta", ("sigma",)),
+    ("delta", ("sigma",)),
 )
 
 #: The page's own mask code for a stored column it cannot invert (the
@@ -189,7 +212,8 @@ _INVALID_STORED_LABEL = ("invalid stored column (geopotential not "
 
 #: Native stacks the column page carries per saved state, in this order;
 #: wind speed, geopotential height and pressure are derived in the page.
-COLUMN_FIELDS = ("temperature", "geopotential", "u", "v")
+#: ``zeta``/``delta`` serve constant-sigma surfaces only.
+COLUMN_FIELDS = ("temperature", "geopotential", "u", "v", "zeta", "delta")
 
 #: Decoded saved states the interactive page keeps at once (LRU).
 MAX_DECODED_TIMES = 2
@@ -272,10 +296,11 @@ def estimate_column_payload_bytes(n_times: int, n_levels: int, nlat: int,
 
 
 #: Browser bytes per node of the arrays derived for the surface shown, held
-#: once whatever the number of decoded states: six float32 fields
-#: (temperature, geopotential height, pressure, wind speed, u, v), the mask
-#: byte, and the float32 terrain height the height masks read.
-DERIVED_BYTES_PER_NODE = 6 * 4 + 1 + 4
+#: once whatever the number of decoded states: eight float32 fields
+#: (temperature, geopotential height, pressure, wind speed, u, v, zeta,
+#: delta), the mask byte, and the float32 terrain height the height masks
+#: read.
+DERIVED_BYTES_PER_NODE = 8 * 4 + 1 + 4
 #: The streamline integrator's working arrays per node: the float64
 #: Cartesian wind, a float64 validity indicator and a validity byte.
 STREAMLINE_WORK_BYTES_PER_NODE = 3 * 8 + 8 + 1
@@ -345,6 +370,10 @@ def quantize_columns(columns) -> tuple[dict, dict, np.ndarray]:
     """
     quantized, bounds = {}, {}
     for name in COLUMN_FIELDS:
+        if getattr(columns, name) is None:
+            raise ValueError(f"the columns hold no {name!r}: build them with "
+                             "pressure_columns(..., winds=True, "
+                             "vorticity_divergence=True)")
         stack = np.array(getattr(columns, name), dtype=np.float64)
         stack[..., -1] = stack[..., 0]
         q = np.empty((stack.shape[0], stack[0].size), dtype="<u2")
@@ -384,7 +413,8 @@ def dequantize_columns(quantized: dict, bounds: dict, p_s: np.ndarray,
         surface_pressure=np.asarray(p_s, dtype=np.float32).astype(
             np.float64).reshape(shape),
         surface_height=_stored_height(template.surface_height),
-        gravity=template.gravity)
+        gravity=template.gravity, full_levels=template.full_levels,
+        zeta=stacks["zeta"], delta=stacks["delta"])
 
 
 def _stored_height(h):
@@ -563,8 +593,10 @@ def atmosphere_payload(storage, *, times=None, levels=None, surface=None,
             "surface=('geopotential_height', m)")
     target = parse_surface(surface) if derived else None
     height = derived and target.kind == "geopotential_height"
+    sigma = derived and target.kind == "sigma"
     table = (dict(COLUMN_PAGE_FIELDS) if interactive else
              HEIGHT_SURFACE_FIELDS if height else
+             SIGMA_SURFACE_FIELDS if sigma else
              SURFACE_FIELDS if derived else FIELDS)
     if field not in table or (interactive and target.kind not in
                               dict(COLUMN_PAGE_FIELDS)[field]):
@@ -659,7 +691,11 @@ def atmosphere_payload(storage, *, times=None, levels=None, surface=None,
             source = {"temperature": s["temperature"][None],
                       "wind_speed": np.hypot(s["u"], s["v"])[None],
                       "height": s["geopotential_height"][None]}
-            if height:
+            if sigma:
+                for name in ("pressure", "geopotential_height", "zeta",
+                             "delta"):
+                    source[name] = s[name][None]
+            elif height:
                 source["pressure"] = s["pressure"][None]
             else:
                 source["geopotential_height"] = \
@@ -900,6 +936,8 @@ def _interactive_page(*, storage, context, target, level_sigma, res, lat,
     ps_lo, ps_hi, sampled_lo, sampled_hi = math.inf, -math.inf, math.inf, \
         -math.inf
     zs_lo, zs_hi = math.inf, -math.inf         # heights the levels sample
+    zeta_hi = delta_hi = 0.0
+    full = tuple(float(x) for x in context.full_levels)   # nominal sigma_k
     h_store = None
     for index in chosen:
         cols = pressure_columns(storage.frame(index), context, lat, lon,
@@ -919,6 +957,8 @@ def _interactive_page(*, storage, context, target, level_sigma, res, lat,
         z_lo = min(z_lo, float(cols.geopotential.min()) / g)
         z_hi = max(z_hi, float(cols.geopotential.max()) / g)
         speed_hi = max(speed_hi, float(np.hypot(cols.u, cols.v).max()))
+        zeta_hi = max(zeta_hi, float(np.abs(cols.zeta).max()))
+        delta_hi = max(delta_hi, float(np.abs(cols.delta).max()))
         ps_lo = min(ps_lo, float(cols.surface_pressure.min()))
         ps_hi = max(ps_hi, float(cols.surface_pressure.max()))
         lo, hi = cols.sampled_pressure_range()
@@ -942,12 +982,22 @@ def _interactive_page(*, storage, context, target, level_sigma, res, lat,
             f"at any exported saved state: the full levels sample {zs_lo:.6g} "
             f"to {zs_hi:.6g} m; choose an initial height inside that range "
             "(any height can be chosen in the page afterwards)")
-    # each coordinate keeps its own value; the one not chosen starts in the
-    # middle of its range (never converted from the other)
+    if target.kind == "sigma" and not (
+            full[0] * (1 - END_TOLERANCE) <= target.sigma
+            <= full[-1] * (1 + END_TOLERANCE)):
+        raise SurfaceUnavailableError(
+            f"the initial {target.label} surface lies outside the full levels "
+            f"(nominal sigma {full[0]:.6g} to {full[-1]:.6g}); choose an "
+            "initial sigma inside that range (any sigma can be chosen in the "
+            "page afterwards)")
+    # each coordinate keeps its own value; the ones not chosen start in the
+    # middle of their ranges (never converted from another)
     p_initial = (target.pressure_pa if target.kind == "pressure"
                  else math.sqrt(sampled_lo * sampled_hi))
     z_initial = (target.height_m if target.kind == "geopotential_height"
                  else 0.5 * (zs_lo + zs_hi))
+    s_initial = (target.sigma if target.kind == "sigma"
+                 else 0.5 * (full[0] + full[-1]))
 
     # -- colour limits: conservative bounds from the columns. Interpolation
     #    is linear, so T and Z stay inside their column ranges; the speed of
@@ -956,9 +1006,14 @@ def _interactive_page(*, storage, context, target, level_sigma, res, lat,
     #    level position times the lowest p_s and the last times the highest.
     ranges = {"temperature": [t_lo, t_hi],
               "geopotential_height": [z_lo, z_hi],
-              "pressure": [positions[0] * ps_lo, positions[-1] * ps_hi],
-              "wind_speed": [0.0, speed_hi]}
-    tables = {**SURFACE_FIELDS, **HEIGHT_SURFACE_FIELDS}
+              "pressure": [min(positions[0], full[0]) * ps_lo,
+                           max(positions[-1], full[-1]) * ps_hi],
+              "wind_speed": [0.0, speed_hi],
+              # interpolation is a convex combination: |zeta| and |delta|
+              # stay within their column maxima; symmetric about zero
+              "zeta": [-zeta_hi, zeta_hi], "delta": [-delta_hi, delta_hi]}
+    tables = {**SURFACE_FIELDS, **HEIGHT_SURFACE_FIELDS,
+              **SIGMA_SURFACE_FIELDS}
     fields = []
     for name, kinds in COLUMN_PAGE_FIELDS:
         label, units, factor, scale, policy = tables[name]
@@ -979,10 +1034,11 @@ def _interactive_page(*, storage, context, target, level_sigma, res, lat,
              "the nominal position σₖ of each full level (the pressure the "
              "native-level page labels it with)")
     interpretation = [
-        "Surface: the isobar p₀ or the geopotential-height surface Z₀ chosen "
-        "in the page (a coordinate switch, a slider or a typed value; "
-        f"starting at the {target.label} "
-        f"{'isobar' if target.kind == 'pressure' else 'height surface'}) of "
+        "Surface: the isobar p₀, the geopotential-height surface Z₀ or the "
+        "σ surface σ₀ chosen in the page (a coordinate switch, a slider or a "
+        f"typed value; starting at the {target.label} "
+        + {"pressure": "isobar", "geopotential_height": "height surface",
+           "sigma": "surface"}[target.kind] + ") of "
         "the selected saved state, interpolated in the browser from the "
         "exported native columns. The solver never produced this surface; "
         "its fields are display quantities, not solver state. Nothing is "
@@ -1031,11 +1087,16 @@ def _interactive_page(*, storage, context, target, level_sigma, res, lat,
         "vertical motion is computed or implied. While a slider is dragged "
         "the lines are traced once it settles; the previous surface's lines "
         "are removed at once.",
-        "Not available in this mode: pressure on an isobar and geopotential "
-        "height on a height surface (each constant there), relative "
-        "vorticity and divergence on either (a horizontal derivative on a "
-        "sigma level is not the derivative on a pressure or height "
-        "surface).",
+        "Constant-σ surfaces: linear in ln σ between the NOMINAL level "
+        "positions σₖ (a level's own σₖ reproduces that native level), "
+        "p = σ₀·pₛ. The weight is the same at every node, so the "
+        "interpolated relative vorticity and divergence are exactly those "
+        "of the interpolated wind: they are offered on σ surfaces only.",
+        "Not available: pressure on an isobar and geopotential height on a "
+        "height surface (each constant there); relative vorticity and "
+        "divergence on isobars and height surfaces (there the weight varies "
+        "along the surface, so a sigma-level derivative is not the "
+        "derivative on the surface).",
         "Values: exact synthesis of the saved coefficients on a "
         f"{res:g}° display mesh, every full level stored with 16-bit display "
         "quantization per level and saved state (at most (max − min)/131070 "
@@ -1045,11 +1106,13 @@ def _interactive_page(*, storage, context, target, level_sigma, res, lat,
     ]
     details = _run_details(context, preview, res, count, chosen, g)
     details[3:3] = [
-        ["Surface", f"interactive isobar or geopotential-height surface, "
-                    f"initially the {target.label} "
-                    + ("isobar" if target.kind == "pressure" else
-                       "height surface")
-                    + f" ({target.value:g} {target.units})"],
+        ["Surface", f"interactive isobar, geopotential-height or σ "
+                    f"surface, initially the {target.label} "
+                    + {"pressure": "isobar",
+                       "geopotential_height": "height surface",
+                       "sigma": "surface"}[target.kind]
+                    + ("" if target.kind == "sigma" else
+                       f" ({target.value:g} {target.units})")],
         ["Level positions", f"{level_sigma}: σ = "
                             + ", ".join(f"{s:.6g}" for s in positions)],
         ["Native levels", f"{nlev} sigma full levels, all exported as "
@@ -1061,6 +1124,8 @@ def _interactive_page(*, storage, context, target, level_sigma, res, lat,
                               f"{ps_lo:.6g} to {ps_hi:.6g} Pa)"],
         ["Sampled heights", f"{zs_lo:.6g} to {zs_hi:.6g} m (lowest bottom "
                             "to highest top full level)"],
+        ["Sigma surfaces", "nominal level positions σ = "
+                           + ", ".join(f"{x:.6g}" for x in full)],
         ["Embedded data", f"about {estimate / 1e6:.3g} MB (estimated before "
                           "reconstruction)"],
         ["Decoded memory", f"{decoded / 1e6:.3g} MB per saved state "
@@ -1071,9 +1136,9 @@ def _interactive_page(*, storage, context, target, level_sigma, res, lat,
     if note:
         details.append(["Time selection", note])
     page["title"] = title
-    page["subtitle"] = (f"Primitive-equation run · any isobar or "
-                        f"geopotential-height surface (interpolated in the "
-                        f"browser) · {len(chosen)} saved time(s)")
+    page["subtitle"] = (f"Primitive-equation run · any isobar, "
+                        f"geopotential-height or σ surface (interpolated in "
+                        f"the browser) · {len(chosen)} saved time(s)")
     page["details"] = details
     page["atmosphere"] = {
         "version": 4,
@@ -1108,7 +1173,13 @@ def _interactive_page(*, storage, context, target, level_sigma, res, lat,
                     "mask_labels": {
                         **{str(k): v for k, v in HEIGHT_MASK_LABELS.items()},
                         str(MASK_INVALID_STORED): _INVALID_STORED_LABEL}},
+                "sigma": {
+                    "units": "", "range": [full[0], full[-1]],
+                    "initial": s_initial,
+                    "mask_labels": {str(k): v
+                                    for k, v in SIGMA_MASK_LABELS.items()}},
             },
+            "sigma_positions": list(full),
             "surface_height_range": (
                 None if h_store is None else
                 [float(h_store.min()), float(h_store.max())]),
@@ -1138,7 +1209,7 @@ def _interactive_page(*, storage, context, target, level_sigma, res, lat,
         "defaults": {"time": t_default, "level": 0, "field": field,
                      "opacity": float(opacity), "streamlines": streamlines,
                      "coordinate": target.kind, "pressure_pa": p_initial,
-                     "height_m": z_initial},
+                     "height_m": z_initial, "sigma": s_initial},
         "interpretation": interpretation,
     }
     report = {"times": chosen, "levels": [], "surface": target,
@@ -1148,6 +1219,7 @@ def _interactive_page(*, storage, context, target, level_sigma, res, lat,
               "decoded_bytes_per_time": decoded,
               "pressure_range": (sampled_lo, sampled_hi),
               "height_range": (zs_lo, zs_hi),
+              "sigma_range": (full[0], full[-1]),
               "bounds": bounds_all, "selection_note": note,
               "context": context, "exaggeration": float(exaggeration)}
     return page, report
@@ -1187,8 +1259,13 @@ def _surface_page(*, page, title, context, target, level_sigma, res, preview,
     """Finish the page for a derived surface (one slice per time)."""
     nlat, nlon = lat.size, lon.size
     isobar = target.kind == "pressure"
-    noun = "isobar" if isobar else "geopotential-height surface"
-    labels = MASK_LABELS if isobar else HEIGHT_MASK_LABELS
+    on_sigma = target.kind == "sigma"
+    noun = ("isobar" if isobar else "surface" if on_sigma else
+            "geopotential-height surface")
+    labels = (MASK_LABELS if isobar else SIGMA_MASK_LABELS if on_sigma else
+              HEIGHT_MASK_LABELS)
+    if on_sigma:
+        level_sigma = "nominal"            # sigma surfaces: nominal sigma_k
     positions = level_sigma_positions(context, level_sigma)
     total = sum(c[MASK_VALID] for c in mask_counts)
     nodes = nlat * nlon * len(chosen)
@@ -1198,6 +1275,7 @@ def _surface_page(*, page, title, context, target, level_sigma, res, preview,
              "the nominal position σₖ of each full level (the pressure the "
              "native-level page labels it with)")
     what = (f"p₀ = {target.pressure_pa:g} Pa" if isobar else
+            f"p = σ₀·pₛ" if on_sigma else
             f"Z₀ = {target.height_m:g} m, Φ₀ = g·Z₀")
     interpretation = [
         f"Surface: the {target.label} {noun} ({what}) of each saved state, "
@@ -1243,12 +1321,31 @@ def _surface_page(*, page, title, context, target, level_sigma, res, preview,
         f"{res:g}° display mesh, then vertical interpolation, stored with "
         "16-bit display quantization per time over the valid nodes.",
     ]
+    if on_sigma:
+        interpretation[1:5] = [
+            f"Interpolation: linear in ln σ at σ₀ = {target.sigma:g}, the same "
+            "at every node, between the nominal level positions σₖ (a "
+            "level's own σₖ reproduces that native level); p = σ₀·pₛ, "
+            "Z = Φ/g. No extrapolation.",
+            "Masks: a σ surface never meets the ground; outside the full "
+            "levels (σ₀ < σ₁ or σ₀ > σ_K) it has no valid node. "
+            f"{total} of {nodes} exported nodes are valid.",
+            f"Surface radius: R + E·Z, Z = Φ(σ₀)/g, g = {g:g} m s⁻², R = "
+            f"{context.radius_m / 1000:.6g} km, E the display exaggeration; "
+            "the terrain is drawn at R + E·hs with the same E and datum.",
+            "Relative vorticity and divergence: interpolated from the "
+            "levels' own with the weight that is the same everywhere on the "
+            "surface, so they are exactly those of the interpolated wind.",
+        ]
     details = [
         ["Run", context.label],
         ["Archive", context.kind],
         ["Saved snapshots", f"{count} (exported {len(chosen)})"],
-        ["Surface", f"{target.label} {noun} ({target.value:g} "
-                    f"{target.units}), interpolated"],
+        ["Surface", f"{target.label} {noun}"
+                    + ("" if on_sigma else
+                       f" ({target.value:g} {target.units})")
+                    + (", interpolated between the nominal level positions"
+                       if on_sigma else ", interpolated")],
         ["Level positions", f"{level_sigma}: σ = "
                             + ", ".join(f"{s:.6g}" for s in positions)],
         ["Native levels", f"{context.nlev} sigma full levels (source of "
@@ -1326,14 +1423,15 @@ def _default_path(storage, report) -> pathlib.Path:
     # pressure keeps its earlier key, so existing default names are stable
     value = (None if surface is None else surface.pressure_pa
              if surface.kind == "pressure" else (surface.kind, surface.value))
+    kinds = {"pressure": ("isobar", "isobars"),
+             "geopotential_height": ("height", "heights"),
+             "sigma": ("sigma", "sigmas")}
     key = repr((str(pathlib.Path(storage.run_dir).resolve()), report["times"],
                 report["levels"], report["resolution_deg"], value,
                 interactive)).encode()
     tag = hashlib.sha256(key).hexdigest()[:8]
-    isobar = surface is not None and surface.kind == "pressure"
     kind = ("atmosphere" if surface is None else
-            ("isobars" if isobar else "heights") if interactive else
-            "isobar" if isobar else "height")
+            kinds[surface.kind][1 if interactive else 0])
     return pathlib.Path(tempfile.gettempdir()) / "tropoi" / (
         f"{base or 'run'}-{kind}-{tag}.html")
 

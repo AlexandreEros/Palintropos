@@ -1,16 +1,17 @@
-r"""Isobaric and geopotential-height surfaces of a saved PE run (CPU only).
+r"""Isobaric, geopotential-height and sigma surfaces of a saved PE run (CPU).
 
-    python examples/isobaric_view.py view RUN (--pressure 300 | --height 7500)
+    python examples/isobaric_view.py view RUN (--pressure 300 | --height 7500
+        | --sigma 0.5)
         [--out FILE] [--resolution 3] [--max-mb 32] [--no-streamlines]
         [--field F] [--open]
     python examples/isobaric_view.py interactive RUN (--pressure 300 |
-        --height 7500) [--out FILE] [--times all | 0 4 -1] [--resolution 3]
+        --height 7500 | --sigma 0.5) [--out FILE] [--times all | 0 4 -1] [--resolution 3]
         [--max-mb 32] [--open]
     python examples/isobaric_view.py measure RUN --pressure 300 [--times 0 -1]
         [--resolution 2] [--out results.json]
     python examples/isobaric_view.py capture PAGE OUT_DIR [--centre LAT LON]
     python examples/isobaric_view.py bench PAGE OUT_DIR [--pressures 300 150 ...]
-        [--heights 7500 -2000 ...]
+        [--heights 7500 -2000 ...] [--sigmas 0.5 0.875 ...]
 
 RUN is a ``tropoi run pe`` capsule or a Held–Suarez experiment directory.
 Issue #13: ``view`` and ``interactive`` are the documented API, nothing more:
@@ -35,7 +36,9 @@ interpolates them to ANY pressure or geopotential height chosen in the
 browser (a coordinate switch, sliders, typed values), offline, tracing the
 streamlines there too. Pressure is in pascals: 300 Pa (3 hPa) suits the
 published Mars run; 50000 Pa (500 hPa) an Earth-like one. Heights are
-geopotential metres on the terrain's datum (negative below it).
+geopotential metres on the terrain's datum (negative below it). Sigma
+surfaces interpolate between the nominal level positions and are the only
+derived surfaces with relative vorticity and divergence.
 
 ``measure`` times the parts of one export separately (spherical-harmonic
 synthesis of the column, hydrostatic coefficients, winds, the vorticity and
@@ -67,6 +70,8 @@ def _storage(sim):
 
 
 def _surface(args):
+    if getattr(args, "sigma", None) is not None:
+        return ("sigma", float(args.sigma))
     if args.height is not None:
         return ("geopotential_height", float(args.height))
     return ("pressure", float(args.pressure))
@@ -177,9 +182,14 @@ def cmd_measure(args) -> dict:
                               step_deg=STREAMLINE_STEP_DEG,
                               max_steps=STREAMLINE_MAX_STEPS,
                               min_speed=STREAMLINE_MIN_SPEED, valid=s.valid)
+        # the column page also stores zeta/delta (their syntheses are timed
+        # above as zeta_delta_syntheses_skipped); quantizing is timed alone
+        full_levels = reconstruct_levels(frame, context, lat, lon, None,
+                                         winds=True,
+                                         vorticity_divergence=True)
+        cols = pressure_columns(frame, context, lat, lon, levels=full_levels)
         t7 = time.perf_counter()
-        quantize_columns(pressure_columns(frame, context, lat, lon,
-                                          levels=levels))
+        quantize_columns(cols)
         t8 = time.perf_counter()
         parts["quantize_columns"].append(t8 - t7)
         parts["hydrostatic_coefficients"].append(t1 - t0)
@@ -416,16 +426,38 @@ def cmd_bench(args) -> dict:
             shot = out / f"{page_path.stem}_z{float(z0):g}m.png"
             page.screenshot(shot)
             report.setdefault("captures", []).append(shot.name)
+        # constant-sigma surfaces, with relative vorticity shown
+        report["sigmas"] = []
+        page.eval(f"{api}.setTime({nt - 1})")
+        for s0 in args.sigmas or []:
+            for rep_i in range(args.repeat):
+                page.eval(f"{api}.setSigma(0.5)")
+                t1 = time.perf_counter()
+                r = page.eval(f"{api}.setSigma({float(s0)!r})")
+                round_trip = time.perf_counter() - t1
+                page.eval(f"{api}.setField('zeta')")
+                info = page.eval(f"{api}.info()")
+                report["sigmas"].append({
+                    "sigma": float(s0), "ok": r["ok"],
+                    "seconds_round_trip": round_trip,
+                    "page_ms": page.eval(f"{api}.timing()"),
+                    "mask_counts": page.eval(f"{api}.maskCounts()")["counts"],
+                    "lines": info["lines"], "zeta_range": info["range"]})
+            shot = out / f"{page_path.stem}_s{float(s0):g}.png"
+            page.screenshot(shot)
+            report.setdefault("captures", []).append(shot.name)
         # coordinate switches: each keeps its own value
         report["coordinate_switches"] = []
-        for kind in ["pressure", "geopotential_height"] * args.repeat:
+        for kind in ["pressure", "geopotential_height",
+                     "sigma"] * args.repeat:
             t1 = time.perf_counter()
             page.eval(f"{api}.setCoordinate('{kind}')")
             report["coordinate_switches"].append({
                 "coordinate": kind,
                 "seconds_round_trip": time.perf_counter() - t1,
                 "page_ms": page.eval(f"{api}.timing()"),
-                "value": page.eval(f"[{api}.pressure(), {api}.height()]")})
+                "value": page.eval(f"[{api}.pressure(), {api}.height(), "
+                                   f"{api}.sigma()]")})
         # a slider drag: the surface follows each frame; how long until the
         # deferred streamlines are published after the last movement
         drag = page.eval("""(async () => {
@@ -460,7 +492,12 @@ def cmd_bench(args) -> dict:
 
     rows = report["pressures"]
     hrows = report["heights"]
+    srows = report["sigmas"]
     report["summary"] = {
+        "sigma_update_ms_median_page_total": med(
+            "t", [{"t": r["page_ms"]["total_ms"]} for r in srows]),
+        "sigma_update_ms_median_interpolate": med(
+            "t", [{"t": r["page_ms"]["interpolate_ms"]} for r in srows]),
         "height_update_ms_median_page_total": med(
             "t", [{"t": r["page_ms"]["total_ms"]} for r in hrows]),
         "height_update_ms_median_interpolate": med(
@@ -511,6 +548,9 @@ def main(argv=None):
     vs = v.add_mutually_exclusive_group(required=True)
     vs.add_argument("--pressure", type=float,
                     help="isobar in Pa (300 = 3 hPa)")
+    vs.add_argument("--sigma", type=float,
+                    help="constant sigma = p/p_s in (0, 1] (nominal level "
+                         "positions; vorticity and divergence available)")
     vs.add_argument("--height", type=float,
                     help="geopotential height in m (negative below the "
                          "datum)")
@@ -521,9 +561,10 @@ def main(argv=None):
     v.add_argument("--no-streamlines", action="store_true")
     v.add_argument("--field", default="temperature",
                    choices=("temperature", "geopotential_height",
-                            "pressure", "wind_speed"),
-                   help="geopotential_height on isobars, pressure on height "
-                        "surfaces")
+                            "pressure", "wind_speed", "zeta", "delta"),
+                   help="geopotential_height on isobars and sigma surfaces, "
+                        "pressure on height and sigma surfaces, zeta/delta "
+                        "on sigma surfaces")
     v.add_argument("--opacity", type=float, default=0.6)
     v.add_argument("--exaggeration", type=float)
     v.add_argument("--centre", type=float, nargs=2, metavar=("LAT", "LON"))
@@ -540,6 +581,9 @@ def main(argv=None):
     js.add_argument("--pressure", type=float,
                     help="initial isobar in Pa (any pressure or height in "
                          "the page)")
+    js.add_argument("--sigma", type=float,
+                    help="constant sigma = p/p_s in (0, 1] (nominal level "
+                         "positions; vorticity and divergence available)")
     js.add_argument("--height", type=float,
                     help="initial geopotential height in m")
     i.add_argument("--times", nargs="+", default=["all"],
@@ -549,7 +593,7 @@ def main(argv=None):
     i.add_argument("--max-mb", type=float, default=32.0)
     i.add_argument("--field", default="temperature",
                    choices=("temperature", "geopotential_height",
-                            "pressure", "wind_speed"))
+                            "pressure", "wind_speed", "zeta", "delta"))
     i.add_argument("--opacity", type=float, default=0.6)
     i.add_argument("--exaggeration", type=float)
     i.add_argument("--centre", type=float, nargs=2, metavar=("LAT", "LON"))
@@ -586,6 +630,8 @@ def main(argv=None):
                    help="pressures (Pa) to select in turn")
     b.add_argument("--heights", type=float, nargs="+",
                    help="geopotential heights (m) to select in turn")
+    b.add_argument("--sigmas", type=float, nargs="+",
+                   help="sigma values to select in turn")
     b.add_argument("--repeat", type=int, default=5)
     b.add_argument("--field", type=int, default=1,
                    help="field button index (0 T, 1 Z, 2 speed)")

@@ -95,8 +95,10 @@ def test_surface_specification_is_explicit_about_coordinate_and_units():
     assert PressureSurface(50_000.0).label == "500 hPa"
     # heights are a coordinate of their own now (test_pe_height_surface)
     assert parse_surface(("geopotential_height", 5000.0)).height_m == 5000.0
+    # sigma is a coordinate too now (test_pe_sigma_surface); others are not
+    assert parse_surface(("sigma", 0.5)).sigma == 0.5
     with pytest.raises(ValueError, match="unknown surface coordinate"):
-        parse_surface(("sigma", 0.5))
+        parse_surface(("theta", 300.0))
     with pytest.raises(TypeError, match="'pressure'"):
         parse_surface(50_000.0)
     for bad in (0.0, -1.0, math.inf, math.nan):

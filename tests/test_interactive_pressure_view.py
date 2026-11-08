@@ -305,8 +305,9 @@ def test_estimate_precedes_reconstruction_and_reports_memory_apart(tmp_path):
         page["atmosphere"]["mesh"]["nlon"]
     nlev = report["context"].nlev
     per_time = estimate_column_payload_bytes(1, nlev, nlat, nlon) - 200_000
+    # six 16-bit stacks per level (T, Phi, u, v, zeta, delta) + float32 p_s
     assert per_time == math.ceil(
-        (2 * nlat * nlon * nlev * 4 + 4 * nlat * nlon) * 4 / 3)
+        (2 * nlat * nlon * nlev * 6 + 4 * nlat * nlon) * 4 / 3)
     assert report["estimate_bytes"] >= 3 * per_time
     # the float32 terrain for the height masks, once per file
     from tropoi.representation.visual.atmosphere import surface_height_bytes
@@ -322,12 +323,16 @@ def test_estimate_precedes_reconstruction_and_reports_memory_apart(tmp_path):
     assert path.stat().st_size <= report["estimate_bytes"] + 300_000
     # the file holds every saved state; memory is per decoded state
     decoded = decoded_column_bytes(nlev, nlat, nlon)
-    # columns + p_s per state, then the derived arrays (6 float32, mask,
-    # float32 terrain) and the streamline working arrays (3 float64 +
-    # float64 + byte)
-    assert decoded == nlat * nlon * (16 * nlev + 4 + 29 + 33)
+    # columns (6 float32 stacks) + p_s per state, then the derived arrays
+    # (8 float32, mask, float32 terrain) and the streamline working arrays
+    # (3 float64 + float64 + byte)
+    assert decoded == nlat * nlon * (24 * nlev + 4 + 37 + 33)
     assert report["decoded_bytes_per_time"] == decoded
-    assert decoded < report["estimate_bytes"] / 3     # one state, not all
+    # one decoded state, whatever the number exported
+    _, one = atmosphere_payload(storage, surface=("pressure", 7.0e4),
+                                interactive_pressure=True, times=[0],
+                                resolution_deg=6.0)
+    assert one["decoded_bytes_per_time"] == decoded
     # the other estimates are what they were
     assert estimate_payload_bytes(2, 3, 31, 61) == estimate_payload_bytes(
         2, 3, 31, 61, n_fields=len(FIELDS), mask=False)

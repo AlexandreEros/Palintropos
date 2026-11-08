@@ -85,7 +85,7 @@ def test_column_page_carries_both_coordinates(tmp_path):
     assert S["kind"] == "geopotential_height" and S["value"] == 1500.0
     assert S["units"] == "m" and S["label"] == "1.5 km"
     C = S["coordinates"]
-    assert set(C) == {"pressure", "geopotential_height"}
+    assert set(C) == {"pressure", "geopotential_height", "sigma"}
     assert C["geopotential_height"]["units"] == "m"
     assert C["pressure"]["units"] == "Pa"
     assert C["geopotential_height"]["initial"] == 1500.0
@@ -117,9 +117,12 @@ def test_column_page_carries_both_coordinates(tmp_path):
     # fields name their coordinates
     fields = {f["id"]: f for f in A["fields"]}
     assert set(fields) == {"temperature", "geopotential_height", "pressure",
-                           "wind_speed"}
-    assert fields["pressure"]["coordinates"] == ["geopotential_height"]
-    assert fields["geopotential_height"]["coordinates"] == ["pressure"]
+                           "wind_speed", "zeta", "delta"}
+    assert fields["pressure"]["coordinates"] == ["geopotential_height",
+                                                 "sigma"]
+    assert fields["geopotential_height"]["coordinates"] == ["pressure",
+                                                            "sigma"]
+    assert fields["zeta"]["coordinates"] == ["sigma"]
     assert set(fields["temperature"]["coordinates"]) == set(C)
     assert fields["pressure"]["units"] == "hPa"
     assert A["defaults"]["coordinate"] == "geopotential_height"
