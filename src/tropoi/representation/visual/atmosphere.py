@@ -68,10 +68,15 @@ initial isobar. Geometry, fields and masks of a frame always come from one
 (pressure, saved time) pair computed in one pass; only the selected saved
 state is decoded (two held at most). Colour ranges are conservative bounds
 from the exported columns, fixed while the pressure moves. Streamlines are
-not available in this mode (the wind on an arbitrary isobar exists only in
-the browser; tracing it there is a later slice). The payload is estimated
-before reconstruction and the decoded memory per saved state is reported
-separately; ``times="all"`` fails above the budget as elsewhere.
+traced in the page from the interpolated ``u, v`` of the surface shown, by a
+transcription of :func:`~tropoi.representation.visual.sphere_streamlines.
+integrate_streamlines` (same seeds, steps, stopping rules and mask
+clipping; the tests compare the two on identical winds): nothing extra is
+exported for them, and while a slider is dragged they are traced once the
+selection settles, the previous surface's lines being cleared at once. The
+payload is estimated before reconstruction and the decoded memory per saved
+state is reported separately; ``times="all"`` fails above the budget as
+elsewhere.
 
 CPU only: NumPy, the archive readers and Matplotlib (colour tables). Never
 CuPy, never a model, never writes into the run directory.
@@ -113,6 +118,7 @@ __all__ = [
     "dequantize_columns",
     "estimate_column_payload_bytes",
     "estimate_payload_bytes",
+    "streamline_cache_bytes",
     "quantize_columns",
     "view_atmosphere",
 ]
@@ -152,6 +158,12 @@ STREAMLINE_SEEDS = 160
 STREAMLINE_STEP_DEG = 1.5
 STREAMLINE_MAX_STEPS = 24
 STREAMLINE_MIN_SPEED = 1.0e-3      # m/s: calmer air draws no line
+STREAMLINE_RELATIVE_MIN_SPEED = 0.02   # ... or air below 2 % of the maximum
+#: Interactive pages trace streamlines in the browser: while a slider is
+#: dragged, this long after the last movement (or on release); the newest
+#: line sets are kept, at most this many.
+STREAMLINE_SETTLE_MS = 150
+STREAMLINE_CACHE = 8
 _STREAMLINE_POINT_BYTES = 4        # int16 lat, lon in centidegrees
 
 _RESOLUTIONS = (1.0, 1.25, 1.5, 2.0, 2.5, 3.0)
@@ -218,14 +230,34 @@ def estimate_column_payload_bytes(n_times: int, n_levels: int, nlat: int,
     return int(math.ceil(n_times * per_time * 4 / 3)) + 200_000
 
 
+#: Browser bytes per node of the arrays derived for the surface shown, held
+#: once whatever the number of decoded states: five float32 fields
+#: (temperature, geopotential height, wind speed, u, v) and the mask byte.
+DERIVED_BYTES_PER_NODE = 5 * 4 + 1
+#: The streamline integrator's working arrays per node: the float64
+#: Cartesian wind, a float64 validity indicator and a validity byte.
+STREAMLINE_WORK_BYTES_PER_NODE = 3 * 8 + 8 + 1
+
+
+def streamline_cache_bytes() -> int:
+    """Upper bound of the page's cached line sets: :data:`STREAMLINE_CACHE`
+    sets of at most ``STREAMLINE_SEEDS`` lines of ``2 * STREAMLINE_MAX_STEPS
+    + 1`` float64 (lat, lon) points."""
+    return (STREAMLINE_CACHE * STREAMLINE_SEEDS
+            * (2 * STREAMLINE_MAX_STEPS + 1) * 16)
+
+
 def decoded_column_bytes(n_levels: int, nlat: int, nlon: int) -> int:
-    """Browser memory of ONE decoded saved state: float32 columns (four
-    stacks), the float32 surface pressure and the derived surface arrays
-    (three float32 fields and one mask byte per node). The page holds at
-    most :data:`MAX_DECODED_TIMES` decoded states."""
+    """Browser memory of ONE decoded saved state (float32 columns, four
+    stacks, and the float32 surface pressure) plus the arrays derived for
+    the surface shown and the streamline working arrays
+    (:data:`DERIVED_BYTES_PER_NODE`, :data:`STREAMLINE_WORK_BYTES_PER_NODE`).
+    The page holds at most :data:`MAX_DECODED_TIMES` decoded states; the
+    line cache is bounded apart (:func:`streamline_cache_bytes`)."""
     nodes = nlat * nlon
     return (4 * nodes * n_levels * len(COLUMN_FIELDS) + 4 * nodes
-            + nodes * (3 * 4 + 1))
+            + nodes * (DERIVED_BYTES_PER_NODE
+                       + STREAMLINE_WORK_BYTES_PER_NODE))
 
 
 def _terrain_bytes(l_max: int) -> int:
@@ -477,8 +509,6 @@ def atmosphere_payload(storage, *, times=None, levels=None, surface=None,
     if derived and level is not None:
         raise ValueError("level= selects a native level; a derived surface "
                          "has none")
-    if interactive:
-        streamlines = False        # not available on an arbitrary isobar
     if not 0.0 <= float(opacity) <= 1.0:
         raise ValueError(f"opacity must be in [0, 1], got {opacity}")
     if storage.solver != "pe":
@@ -535,7 +565,8 @@ def atmosphere_payload(storage, *, times=None, levels=None, surface=None,
             level_sigma=level_sigma, res=res, lat=lat, lon=lon, count=count,
             chosen=chosen, times_s=times_s, note=note, estimate=estimate,
             t_default=t_default, field=field, opacity=float(opacity),
-            exaggeration=exaggeration, centre=centre)
+            exaggeration=exaggeration, centre=centre,
+            streamlines=bool(streamlines))
 
     # -- reconstruction (CPU), one saved state at a time -------------------
     nl = len(chosen_levels)
@@ -606,7 +637,9 @@ def atmosphere_payload(storage, *, times=None, levels=None, surface=None,
                     seed_count=STREAMLINE_SEEDS,
                     step_deg=STREAMLINE_STEP_DEG,
                     max_steps=STREAMLINE_MAX_STEPS,
-                    min_speed=STREAMLINE_MIN_SPEED, valid=ok))
+                    min_speed=STREAMLINE_MIN_SPEED,
+                    relative_min_speed=STREAMLINE_RELATIVE_MIN_SPEED,
+                    valid=ok))
 
     # -- colour limits: fixed per field over all exported times and levels -
     fields = []
@@ -776,7 +809,7 @@ def _run_details(context, preview, res, count, chosen, g) -> list:
 
 def _interactive_page(*, storage, context, target, level_sigma, res, lat,
                       lon, count, chosen, times_s, note, estimate, t_default,
-                      field, opacity, exaggeration, centre
+                      field, opacity, exaggeration, centre, streamlines
                       ) -> tuple[dict, dict]:
     """The interactive-pressure page: native columns per exported saved
     state, interpolated in the browser (module doc)."""
@@ -869,11 +902,19 @@ def _interactive_page(*, storage, context, target, level_sigma, res, lat,
         "their column ranges under linear interpolation; the interpolated "
         "wind speed never exceeds the larger bracket speed), so colours "
         "are comparable while the pressure moves.",
-        "Not available in this mode: streamlines (the wind on an arbitrary "
-        "isobar exists only in the browser; tracing it there is a later "
-        "slice), pressure (constant on the surface), relative vorticity "
-        "and divergence (a horizontal derivative on a sigma level is not "
-        "the derivative on a pressure level).",
+        "Streamlines: instantaneous horizontal streamlines of the wind "
+        "interpolated to the surface shown, at one saved time, traced in "
+        "the page (the integrator of representation.visual."
+        "sphere_streamlines, transcribed: deterministic seeds, RK4 on the "
+        "sphere, the same stopping rules) and draped on the surface, "
+        "clipped to cells whose four nodes are valid, every step checked "
+        "along its length. Not parcel trajectories, not 3-D flow; no "
+        "vertical motion is computed or implied. While a slider is dragged "
+        "the lines are traced once it settles; the previous surface's lines "
+        "are removed at once.",
+        "Not available in this mode: pressure (constant on the surface), "
+        "relative vorticity and divergence (a horizontal derivative on a "
+        "sigma level is not the derivative on a pressure level).",
         "Values: exact synthesis of the saved coefficients on a "
         f"{res:g}° display mesh, every full level stored with 16-bit display "
         "quantization per level and saved state (at most (max − min)/131070 "
@@ -896,7 +937,9 @@ def _interactive_page(*, storage, context, target, level_sigma, res, lat,
         ["Embedded data", f"about {estimate / 1e6:.3g} MB (estimated before "
                           "reconstruction)"],
         ["Decoded memory", f"{decoded / 1e6:.3g} MB per saved state "
-                           f"(at most {MAX_DECODED_TIMES} held)"],
+                           f"(at most {MAX_DECODED_TIMES} held) and at most "
+                           f"{streamline_cache_bytes() / 1e6:.2g} MB of "
+                           "cached streamlines"],
     ]
     if note:
         details.append(["Time selection", note])
@@ -935,10 +978,16 @@ def _interactive_page(*, storage, context, target, level_sigma, res, lat,
         "gravity": g, "radius_m": context.radius_m,
         "terrain_flat": elevation is None,
         "fields": fields,
-        "streamlines": {"enabled": False, "reason":
-                        "not available in interactive-pressure mode"},
+        "streamlines": {
+            "enabled": streamlines, "mode": "browser",
+            "seed_count": STREAMLINE_SEEDS, "step_deg": STREAMLINE_STEP_DEG,
+            "max_steps": STREAMLINE_MAX_STEPS,
+            "min_speed": STREAMLINE_MIN_SPEED,
+            "relative_min_speed": STREAMLINE_RELATIVE_MIN_SPEED,
+            "settle_ms": STREAMLINE_SETTLE_MS,
+            "cache_size": STREAMLINE_CACHE, "max_speed": speed_hi},
         "defaults": {"time": t_default, "level": 0, "field": field,
-                     "opacity": float(opacity), "streamlines": False,
+                     "opacity": float(opacity), "streamlines": streamlines,
                      "pressure_pa": target.pressure_pa},
         "interpretation": interpretation,
     }

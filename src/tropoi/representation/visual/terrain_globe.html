@@ -677,12 +677,13 @@ const ATM = D.atmosphere ? (function () {
     surface: A.surface || null, mask: A.mask ? decodeBytes(A.mask.data) : null,
     cols: C, colCache: [], p0: C ? A.defaults.pressure_pa : null, derived: null, seq: 0, pending: null, raf: 0,
     timing: C ? { decode_ms: 0, interpolate_ms: 0, mesh_ms: 0, map_ms: 0, total_ms: 0 } : null, pressureError: null,
-    lines: sl.enabled ? { pts: new Int16Array(decodeBytes(sl.points).buffer),
+    lines: sl.enabled && sl.points ? { pts: new Int16Array(decodeBytes(sl.points).buffer),
                           start: new Uint32Array(decodeBytes(sl.line_start).buffer),
                           slice: sl.slice_line_start } : null,
     surf: makeSurface(g), it: A.defaults.time, il: A.defaults.level,
     field: Math.max(0, A.fields.findIndex(f => f.id === A.defaults.field)),
-    opacity: A.defaults.opacity, streams: !!(A.defaults.streamlines && sl.enabled),
+    opacity: A.defaults.opacity, streams: !!(A.defaults.streamlines && sl.enabled), canStream: !!sl.enabled,
+    sl: { gen: 0, timer: 0, key: null, lines: null, pending: false, published: 0, cache: [], timing: { integrate_ms: 0 } },
     show: true, perLevel: false, mapAtm: true, cache: {}, nStreamVerts: 0, nLinesHere: 0,
   };
 })() : null;
@@ -724,7 +725,8 @@ function computeSurface() {
   const c = colDecode(it);
   const t1 = performance.now();
   let d = ATM.derived;
-  if (!d) d = ATM.derived = { temperature: new Float32Array(n), geopotential_height: new Float32Array(n), wind_speed: new Float32Array(n), mask: new Uint8Array(n) };
+  if (!d) d = ATM.derived = { temperature: new Float32Array(n), geopotential_height: new Float32Array(n), wind_speed: new Float32Array(n),
+    u: new Float32Array(n), v: new Float32Array(n), mask: new Uint8Array(n) };
   const lnsig = sig.map(Math.log), top = sig[0] * (1 - S.end_tolerance), bottom = sig[K - 1] * (1 + S.end_tolerance), g = ATM.A.gravity;
   const counts = [0, 0, 0, 0], T = c.temperature, P = c.geopotential, U = c.u, V = c.v, ps = c.ps;
   for (let i = 0; i < n; i++) {
@@ -739,6 +741,7 @@ function computeSurface() {
       d.temperature[i] = k < 0 ? 0 : T[a];
       d.geopotential_height[i] = k < 0 ? 0 : P[a] / g;
       d.wind_speed[i] = k < 0 ? 0 : Math.hypot(U[a], V[a]);
+      d.u[i] = k < 0 ? 0 : U[a]; d.v[i] = k < 0 ? 0 : V[a];
       continue;
     }
     let k = 0; while (k < K - 2 && sig[k + 1] <= st) k++;              // upper bracket, clamped
@@ -746,15 +749,170 @@ function computeSurface() {
     const a = k * n + i, b = a + n;
     d.temperature[i] = T[a] + w * (T[b] - T[a]);
     d.geopotential_height[i] = (P[a] + w * (P[b] - P[a])) / g;
-    d.wind_speed[i] = Math.hypot(U[a] + w * (U[b] - U[a]), V[a] + w * (V[b] - V[a]));
+    const uu = U[a] + w * (U[b] - U[a]), vv = V[a] + w * (V[b] - V[a]);
+    d.u[i] = uu; d.v[i] = vv; d.wind_speed[i] = Math.hypot(uu, vv);
   }
   d.counts = counts; d.nValid = counts[0]; d.p0 = p0; d.it = it; d.psRange = c.psRange;
+  d.key = "pressure:" + p0 + ":" + it;
   d.sampled = [sig[0] * c.psRange[0], sig[K - 1] * c.psRange[1]];
   const t2 = performance.now();
   ATM.timing.decode_ms = t1 - t0; ATM.timing.interpolate_ms = t2 - t1;
 }
 function ensureSurface() {
   if (ATM.cols && (!ATM.derived || ATM.derived.p0 !== ATM.p0 || ATM.derived.it !== ATM.it)) computeSurface();
+}
+
+/* ---- instantaneous horizontal streamlines of the selected derived surface, traced here.
+   A transcription of representation.visual.sphere_streamlines.integrate_streamlines (the
+   Python reference; the tests compare the two on identical winds and seeds): arc-length
+   parameter on the unit sphere, dx/ds = V_t/|V_t|, classical RK4 in R^3 renormalized onto
+   the sphere (regular across the poles, periodic in longitude), the wind interpolated
+   bilinearly in its Cartesian components with each pole row carrying its mean vector,
+   deterministic Fibonacci seeds, a step stops where the speed falls below the threshold or
+   leaves the cells whose four nodes are valid, and every accepted step is re-checked at
+   points closer than half a cell so a long step cannot jump a narrow masked band. The
+   arithmetic follows the NumPy expressions term by term (numpy's floored modulo, sqrt of
+   the sum of squares rather than hypot) so the two agree to the last few bits. ---- */
+function npMod(a, b) { let m = a % b; if (m !== 0 && (m < 0) !== (b < 0)) m += b; return m; }
+function unit3(x, y, z) { const s = Math.sqrt(x * x + y * y + z * z); return [x / s, y / s, z / s]; }
+function makeSampler(g, values, comps) {
+  // the reference's _MeshSampler: clip in latitude, floored modulo in longitude
+  const out = new Float64Array(comps), ymax = g.nlat - 1.000001, xmax = g.nlon - 1.000001, W = g.nlon;
+  return (lat, lon) => {
+    let y = (lat - g.lat0) / g.dlat; y = y < 0 ? 0 : y > ymax ? ymax : y;
+    let x = npMod(lon - g.lon0, 360.0) / g.dlon; x = x < 0 ? 0 : x > xmax ? xmax : x;
+    const j = Math.floor(y), i = Math.floor(x), fy = y - j, fx = x - i;
+    const a = (j * W + i) * comps, b = a + comps, c = a + W * comps, d = c + comps;
+    for (let q = 0; q < comps; q++)
+      out[q] = (values[a + q] * (1 - fx) + values[b + q] * fx) * (1 - fy) + (values[c + q] * (1 - fx) + values[d + q] * fx) * fy;
+    return out;
+  };
+}
+function fibonacciSeeds(count) {
+  const lat = new Float64Array(count), lon = new Float64Array(count), golden = Math.PI * (3.0 - Math.sqrt(5.0));
+  for (let k = 0; k < count; k++) {
+    const i = k + 0.5;
+    lat[k] = Math.asin(1.0 - 2.0 * i / count) * (180.0 / Math.PI);
+    lon[k] = npMod(golden * i, 2.0 * Math.PI) * (180.0 / Math.PI) - 180.0;
+  }
+  return { lat, lon };
+}
+function toLatLon(x) {
+  const y = x[1] < -1 ? -1 : x[1] > 1 ? 1 : x[1];
+  return [Math.asin(y) * (180.0 / Math.PI), Math.atan2(x[0], x[2]) * (180.0 / Math.PI)];
+}
+function traceStreamlines(g, u, v, valid, opt) {
+  // u, v: node winds (m/s); valid: node validity (truthy = sample) or null. Returns
+  // [{lat: Float64Array, lon: Float64Array}] upstream -> downstream, as the reference.
+  const NA = g.nlat, NO = g.nlon, n = NA * NO, wind = new Float64Array(3 * n), ind = new Float64Array(n);
+  const R = Math.PI / 180.0;
+  for (let j = 0; j < NA; j++) {
+    const la = (g.lat0 + j * g.dlat) * R, sl = Math.sin(la), cl = Math.cos(la);
+    for (let i = 0; i < NO; i++) {
+      const lo = (g.lon0 + i * g.dlon) * R, so = Math.sin(lo), co = Math.cos(lo), k = j * NO + i;
+      const ok = !valid || !!valid[k]; ind[k] = ok ? 1 : 0;
+      const uu = ok ? u[k] : 0, vv = ok ? v[k] : 0;
+      wind[3 * k] = uu * co + vv * (-sl * so);
+      wind[3 * k + 1] = uu * 0.0 + vv * cl;
+      wind[3 * k + 2] = uu * -so + vv * (-sl * co);
+    }
+  }
+  const seam = Math.abs((g.lon0 + (NO - 1) * g.dlon) - g.lon0 - 360.0) <= 1e-8 + 1e-5 * 360.0;
+  const cols = seam ? NO - 1 : NO;
+  for (let j = 0; j < NA; j++) {
+    if (Math.abs(Math.abs(g.lat0 + j * g.dlat) - 90.0) > 1e-8 + 1e-5 * 90.0) continue;
+    const m = [0, 0, 0];
+    for (let i = 0; i < cols; i++) for (let q = 0; q < 3; q++) m[q] += wind[3 * (j * NO + i) + q];
+    for (let q = 0; q < 3; q++) m[q] /= cols;
+    for (let i = 0; i < NO; i++) for (let q = 0; q < 3; q++) wind[3 * (j * NO + i) + q] = m[q];
+  }
+  let vmax = 0;
+  for (let k = 0; k < n; k++) {
+    const a = wind[3 * k], b = wind[3 * k + 1], c = wind[3 * k + 2], s = Math.sqrt(a * a + b * b + c * c);
+    if (s > vmax) vmax = s;
+  }
+  const threshold = Math.max(opt.min_speed, opt.relative_min_speed * vmax);
+  if (!(vmax > threshold)) return [];
+  const sample = makeSampler(g, wind, 3), inside = makeSampler(g, ind, 1);
+  const isInside = x => { const p = toLatLon(x); return inside(p[0], p[1])[0] > 1.0 - 1e-9; };
+  const direction = x => {
+    const p = toLatLon(x), w = sample(p[0], p[1]);
+    const dot = w[0] * x[0] + w[1] * x[1] + w[2] * x[2];
+    const t0 = w[0] - dot * x[0], t1 = w[1] - dot * x[1], t2 = w[2] - dot * x[2];
+    const s = Math.sqrt(t0 * t0 + t1 * t1 + t2 * t2), ok = s > threshold && isInside(x);
+    return ok ? [[t0 / s, t1 / s, t2 / s], true] : [[0, 0, 0], false];
+  };
+  const cell = Math.min(Math.abs(g.dlat), Math.abs(g.dlon)), count = Math.ceil(2.0 * opt.step_deg / cell) + 1;
+  // interior points and the step's end (np.linspace(0, 1, count + 1)[1:]: the last is exactly 1)
+  const fractions = []; for (let i = 1; i < count; i++) fractions.push(i * (1.0 / count)); fractions.push(1.0);
+  const segmentInside = (x0, x1) => {
+    for (const f of fractions)
+      if (!isInside(unit3(x0[0] + f * (x1[0] - x0[0]), x0[1] + f * (x1[1] - x0[1]), x0[2] + f * (x1[2] - x0[2])))) return false;
+    return true;
+  };
+  const h = opt.step_deg * (Math.PI / 180.0);
+  const add = (x, c, k) => unit3(x[0] + c * k[0], x[1] + c * k[1], x[2] + c * k[2]);
+  const trace = (start, sign) => {
+    const pts = [start]; let x = start;
+    for (let s = 0; s < opt.max_steps; s++) {
+      const [k1, a1] = direction(x), [k2, a2] = direction(add(x, 0.5 * sign * h, k1));
+      const [k3, a3] = direction(add(x, 0.5 * sign * h, k2)), [k4, a4] = direction(add(x, sign * h, k3));
+      if (!(a1 && a2 && a3 && a4)) break;
+      const c = sign * h / 6.0, xn = unit3(
+        x[0] + c * (k1[0] + 2 * k2[0] + 2 * k3[0] + k4[0]), x[1] + c * (k1[1] + 2 * k2[1] + 2 * k3[1] + k4[1]),
+        x[2] + c * (k1[2] + 2 * k2[2] + 2 * k3[2] + k4[2]));
+      if (!segmentInside(x, xn)) break;
+      x = xn; pts.push(x);
+    }
+    return pts;
+  };
+  const seeds = opt.seeds || fibonacciSeeds(opt.seed_count), lines = [];
+  for (let s = 0; s < seeds.lat.length; s++) {
+    const a = seeds.lat[s] * R, b = seeds.lon[s] * R, c = Math.cos(a);
+    const start = [c * Math.sin(b), Math.sin(a), c * Math.cos(b)];
+    if (!direction(start)[1]) continue;
+    const pts = trace(start, -1).slice(1).reverse().concat(trace(start, 1));
+    if (pts.length < 3) continue;
+    const la = new Float64Array(pts.length), lo = new Float64Array(pts.length);
+    pts.forEach((p, k) => { const q = toLatLon(p); la[k] = q[0]; lo[k] = q[1]; });
+    lines.push({ lat: la, lon: lo });
+  }
+  return lines;
+}
+/* Which lines may be drawn: only those traced for the surface now shown (its key names the
+   coordinate, value and saved time). A new surface invalidates the drawn lines at once; a
+   deferred trace (while a slider is dragged) carries a generation number and publishes only
+   if no newer request came after it. Finished line sets are kept in a small LRU. */
+function surfaceStreams(deferred) {
+  const S = ATM.sl, key = ATM.derived.key;
+  if (S.key !== key) { S.key = null; S.lines = null; }
+  if (S.timer) { clearTimeout(S.timer); S.timer = 0; }
+  S.gen++;
+  if (!ATM.streams || S.key === key) { S.pending = false; return; }
+  const hit = S.cache.findIndex(e => e.key === key);
+  if (hit >= 0) { const e = S.cache.splice(hit, 1)[0]; S.cache.push(e); S.key = key; S.lines = e.lines; S.pending = false; return; }
+  if (!deferred) { publishStreams(S.gen, key); return; }
+  S.pending = true;
+  const gen = S.gen;
+  S.timer = setTimeout(() => {
+    S.timer = 0;
+    if (gen !== S.gen || !ATM.derived || ATM.derived.key !== key) return;     // superseded
+    publishStreams(gen, key); rebuildStreams(atmHeight()); drawMap(); drawMapOverlay(lastMapHover); updateAtmLabels(atmHeight());
+  }, ATM.A.streamlines.settle_ms);
+}
+function publishStreams(gen, key) {
+  const S = ATM.sl, d = ATM.derived, t0 = performance.now();
+  const lines = traceStreamlines(ATM.g, d.u, d.v, d.mask.map(m => m === 0 ? 1 : 0), ATM.A.streamlines);
+  S.timing.integrate_ms = performance.now() - t0;
+  if (gen !== S.gen || d.key !== key) return;
+  S.key = key; S.lines = lines; S.pending = false; S.published++;
+  S.cache.push({ key, lines });
+  while (S.cache.length > ATM.A.streamlines.cache_size) S.cache.shift();
+}
+function flushStreams() {
+  // slider released: apply a pending value now and trace its lines without waiting
+  if (ATM.raf) { cancelAnimationFrame(ATM.raf); ATM.raf = 0; const v = ATM.pending; ATM.pending = null; if (v !== null && v !== ATM.p0) { applyPressure(v); return; } }
+  if (ATM.sl.pending) onAtmChange();
 }
 function fmtPressure(pa) { return pa >= 100 ? Number((pa / 100).toPrecision(6)) + " hPa" : Number(pa.toPrecision(6)) + " Pa"; }
 function atmSurfaceLabel() { const S = ATM.surface; return S.interactive ? fmtPressure(ATM.p0) : S.label; }
@@ -773,16 +931,16 @@ function parsePressure(text, unit) {
 /* The one way p0 changes: slider, typed value and the page API all come through here,
    synchronously. The surface is recomputed before anything is drawn, so geometry, colours,
    masks and labels always describe one (p0, saved time), and a later call always wins. */
-function applyPressure(pa) {
+function applyPressure(pa, deferStreams) {
   ATM.p0 = pa; ATM.seq++;
   document.getElementById("pressureSlider").value = pressureToSlider(pa);
   syncPressureInput();
-  onAtmChange();
+  onAtmChange(!!deferStreams);
 }
 function requestPressure(pa) {
   // rapid slider input: one recomputation per animation frame, the newest value wins
   ATM.pending = pa;
-  if (!ATM.raf) ATM.raf = requestAnimationFrame(() => { ATM.raf = 0; const v = ATM.pending; ATM.pending = null; if (v !== null && v !== ATM.p0) applyPressure(v); });
+  if (!ATM.raf) ATM.raf = requestAnimationFrame(() => { ATM.raf = 0; const v = ATM.pending; ATM.pending = null; if (v !== null && v !== ATM.p0) applyPressure(v, true); });
 }
 function setPressureFromInput() {
   const inp = document.getElementById("pressureInput"), unit = +document.getElementById("pressureUnit").value;
@@ -879,6 +1037,12 @@ function lineXYZ(lat, lon, Z, lift) {
 }
 function eachLine(fn) {
   // fn(lats, lons) for every streamline of the current slice, upstream to downstream
+  if (ATM.cols) {
+    // traced in this page: drawn only when traced for the surface now shown
+    const S = ATM.sl; if (!S.lines || !ATM.derived || S.key !== ATM.derived.key) return 0;
+    for (const l of S.lines) fn(Array.from(l.lat), Array.from(l.lon));
+    return S.lines.length;
+  }
   const L = ATM.lines; if (!L) return 0;
   const s = atmSlice(), l0 = L.slice[s], l1 = L.slice[s + 1];
   for (let l = l0; l < l1; l++) {
@@ -966,7 +1130,16 @@ function updateAtmLabels(Z) {
       "; p = σ·ps = " + (pb[0] / 100).toFixed(1) + "–" + (pb[1] / 100).toFixed(1) + " hPa.";
   }
   const sn = document.getElementById("streamNote"), on = S ? "on this isobaric surface" : "on this level";
-  if (ATM.cols) sn.textContent = "Streamlines are not available in interactive-pressure mode: the file holds native columns, not a wind field on a chosen isobar; tracing streamlines in the browser is a later slice.";
+  if (ATM.cols) {
+    const P = A.streamlines;
+    if (!P.enabled) sn.textContent = "Streamlines were not requested for this page.";
+    else if (!ATM.streams) sn.textContent = "Streamlines off. When on, they are traced in this page from the interpolated wind of the surface shown.";
+    else if (ATM.sl.pending) sn.textContent = "Tracing streamlines for this surface once the selection settles (the previous surface's lines are cleared).";
+    else if (!ATM.nLinesHere) sn.textContent = "No streamlines on this surface: its wind is below the drawing threshold (" + P.min_speed * 1000 +
+      " mm/s, or " + P.relative_min_speed * 100 + " % of its maximum), or every seed lies in a masked cell.";
+    else sn.textContent = ATM.nLinesHere + " instantaneous horizontal streamlines of the wind interpolated to this surface, traced in this page at this saved time " +
+      "(chevrons point downstream), draped on the surface; clipped to cells whose four nodes are valid. Not parcel trajectories; no vertical motion.";
+  }
   else if (!ATM.lines) sn.textContent = "Streamlines were not exported.";
   else if (!ATM.nLinesHere) sn.textContent = "No streamlines on this surface: its wind is below the drawing threshold (" +
     A.streamlines.min_speed * 1000 + " mm/s, or 2 % of the slice maximum)" + (S ? ", or every seed lies in a masked cell." : ".");
@@ -1034,13 +1207,15 @@ function drawAtmMap() {
   });
   m.restore();
 }
-function onAtmChange() {
+function onAtmChange(deferStreams) {
   if (!ATM.cols) { rebuildAtmosphere(); drawAtmColorbar(); drawMap(); drawMapOverlay(lastMapHover); return; }
-  // interactive pressure: interpolation first (ensureSurface), then mesh, then map; timed apart
+  // interactive surface: interpolation first (ensureSurface), then streamlines (now, or once
+  // a dragged slider settles), then mesh, then map; timed apart
   const t0 = performance.now(); ensureSurface(); const t1 = performance.now();
+  ATM.sl.timing.integrate_ms = 0; surfaceStreams(!!deferStreams); const ts = performance.now();
   rebuildAtmosphere(); const t2 = performance.now();
   drawAtmColorbar(); drawMap(); drawMapOverlay(lastMapHover); const t3 = performance.now();
-  Object.assign(ATM.timing, { mesh_ms: t2 - t1, map_ms: t3 - t2, total_ms: t3 - t0 });
+  Object.assign(ATM.timing, { streams_ms: ts - t1, mesh_ms: t2 - ts, map_ms: t3 - t2, total_ms: t3 - t0 });
 }
 /* The one way a saved state is selected: slider, step buttons, playback and the page API
    all come through here, so a played frame is exactly the manually selected one. */
@@ -1110,7 +1285,7 @@ function atmSetField(k) {
   onAtmChange();
 }
 function atmSetOpacity(a) { ATM.opacity = Math.max(0, Math.min(1, a)); document.getElementById("opacity").value = Math.round(ATM.opacity * 100); updateAtmLabels(atmHeight()); }
-function atmSetStreams(on) { ATM.streams = !!on && !!ATM.lines; document.getElementById("streams").checked = ATM.streams; onAtmChange(); }
+function atmSetStreams(on) { ATM.streams = !!on && ATM.canStream; document.getElementById("streams").checked = ATM.streams; onAtmChange(); }
 function atmSetMap(atm) {
   ATM.mapAtm = !!atm;
   document.getElementById("mapAtm").setAttribute("aria-pressed", ATM.mapAtm ? "true" : "false");
@@ -1143,11 +1318,12 @@ function initAtmosphereUI() {
     const where = ATM.surface.level_sigma + " level positions σ = " + ATM.surface.level_positions.map(s => s.toFixed(4)).join(", ");
     if (ATM.cols) {
       sn.textContent = "Any isobar: interpolated in this page, in ln σ, from the exported native columns of the selected saved state (" + where +
-        "); changing the saved time recomputes the surface from that state, never between states. Pressure, vorticity, divergence and streamlines are not shown on this surface.";
+        "); changing the saved time recomputes the surface from that state, never between states. Pressure (constant here), vorticity and divergence are not shown on this surface.";
       document.getElementById("pressureBlock").hidden = false;
       const ps = document.getElementById("pressureSlider"), inp = document.getElementById("pressureInput"), un = document.getElementById("pressureUnit");
       un.value = ATM.p0 >= 100 ? "100" : "1";
       ps.addEventListener("input", () => requestPressure(sliderToPressure(+ps.value)));
+      ps.addEventListener("change", flushStreams);            // released: trace now
       inp.addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); setPressureFromInput(); } });
       document.getElementById("pressureApply").addEventListener("click", setPressureFromInput);
       un.addEventListener("change", () => { inp.removeAttribute("aria-invalid"); ATM.pressureError = null; inp.blur(); syncPressureInput(); });
@@ -1172,7 +1348,7 @@ function initAtmosphereUI() {
   const op = document.getElementById("opacity");
   op.value = Math.round(ATM.opacity * 100); op.addEventListener("input", () => atmSetOpacity(+op.value / 100));
   const show = document.getElementById("atmShow"); show.addEventListener("change", () => { ATM.show = show.checked; });
-  const sb = document.getElementById("streams"); sb.checked = ATM.streams; sb.disabled = !ATM.lines;
+  const sb = document.getElementById("streams"); sb.checked = ATM.streams; sb.disabled = !ATM.canStream;
   sb.addEventListener("change", () => atmSetStreams(sb.checked));
   const rl = document.getElementById("rangeLevel"); rl.addEventListener("change", () => { ATM.perLevel = rl.checked; onAtmChange(); });
   document.getElementById("mapAtm").addEventListener("click", () => atmSetMap(true));
@@ -1188,6 +1364,7 @@ if (ATM) initAtmosphereUI();
 resetView();
 updateExagLabel();
 setLayer(0);
+if (ATM && ATM.cols) onAtmChange();          // the first surface's streamlines, traced now
 onResize();
 let lastOverlay = 0;
 function loop(t) {
@@ -1210,8 +1387,17 @@ window.__terrainGlobe = { state: st, layers: layers.map(l => l.short), pick, sam
     setPressure: ATM.cols ? pa => { const r = parsePressure(pa, 1); if (r.error) return { ok: false, error: r.error, pressure_pa: ATM.p0 }; applyPressure(r.pa); return { ok: true, pressure_pa: ATM.p0, seq: ATM.seq }; } : null,
     pressure: () => ATM.p0,
     surfaceArrays: ATM.cols ? () => { ensureSurface(); const d = ATM.derived; return { p0: d.p0, timeIndex: d.it, counts: d.counts, temperature: Array.from(d.temperature),
-      geopotential_height: Array.from(d.geopotential_height), wind_speed: Array.from(d.wind_speed), mask: Array.from(d.mask) }; } : null,
-    timing: () => ATM.timing, decodedTimes: () => ATM.colCache.map(e => e.it), seq: () => ATM.seq,
+      geopotential_height: Array.from(d.geopotential_height), wind_speed: Array.from(d.wind_speed), u: Array.from(d.u), v: Array.from(d.v),
+      mask: Array.from(d.mask), key: d.key }; } : null,
+    timing: () => Object.assign({}, ATM.timing, ATM.cols ? { integrate_ms: ATM.sl.timing.integrate_ms } : {}), decodedTimes: () => ATM.colCache.map(e => e.it), seq: () => ATM.seq,
+    /* streamlines traced in the page (interactive pages): the drawn set and its state */
+    streamlines: ATM.cols ? () => { const S = ATM.sl, here = !!(S.lines && ATM.derived && S.key === ATM.derived.key);
+      return { key: S.key, surfaceKey: ATM.derived ? ATM.derived.key : null, current: here, pending: S.pending, published: S.published, cached: S.cache.length,
+               drawnVerts: ATM.nStreamVerts, lines: here ? S.lines.map(l => ({ lat: Array.from(l.lat), lon: Array.from(l.lon) })) : [] }; } : null,
+    /* the page's integrator on given node winds (mesh of this page, its settings unless overridden) */
+    traceStreamlines: ATM.cols ? (u, v, valid, over) => traceStreamlines(ATM.g, u, v, valid, Object.assign({}, ATM.A.streamlines, over || {}))
+      .map(l => ({ lat: Array.from(l.lat), lon: Array.from(l.lon) })) : null,
+    flushStreams: ATM.cols ? () => flushStreams() : null,
     memory: () => performance.memory ? { usedJSHeapSize: performance.memory.usedJSHeapSize, totalJSHeapSize: performance.memory.totalJSHeapSize } : null,
     pressureControls: ATM.cols ? () => ({ slider: +document.getElementById("pressureSlider").value, input: document.getElementById("pressureInput").value,
       unit: +document.getElementById("pressureUnit").value, invalid: document.getElementById("pressureInput").getAttribute("aria-invalid") === "true",

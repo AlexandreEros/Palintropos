@@ -247,10 +247,12 @@ def test_interactive_payload_holds_columns_not_surfaces(tmp_path):
     assert C["nlev"] == report["context"].nlev
     assert C["max_decoded_times"] == MAX_DECODED_TIMES
     assert len(C["times"]) == 2
-    assert A["streamlines"] == {"enabled": False, "reason":
-                                "not available in interactive-pressure mode"}
+    # streamlines are traced in the page: settings only, no line data
+    assert A["streamlines"]["enabled"] is True
+    assert A["streamlines"]["mode"] == "browser"
+    assert "points" not in A["streamlines"]
     assert A["defaults"]["pressure_pa"] == 7.0e4
-    assert A["defaults"]["streamlines"] is False
+    assert A["defaults"]["streamlines"] is True
     # each time's block decodes to the quantized columns of that state
     context = report["context"]
     lat, lon = _mesh(6.0)
@@ -307,7 +309,9 @@ def test_estimate_precedes_reconstruction_and_reports_memory_apart(tmp_path):
     assert path.stat().st_size <= report["estimate_bytes"] + 300_000
     # the file holds every saved state; memory is per decoded state
     decoded = decoded_column_bytes(nlev, nlat, nlon)
-    assert decoded == nlat * nlon * (16 * nlev + 4 + 13)
+    # columns + p_s per state, then the derived arrays (5 float32 + mask)
+    # and the streamline working arrays (3 float64 + float64 + byte)
+    assert decoded == nlat * nlon * (16 * nlev + 4 + 21 + 33)
     assert report["decoded_bytes_per_time"] == decoded
     assert decoded < report["estimate_bytes"] / 3     # one state, not all
     # the other estimates are what they were
@@ -478,9 +482,9 @@ def test_page_interpolates_like_python_at_arbitrary_pressures(
         url = _ready(page, path)
         info = page.eval(f"{API}.info()")
         assert info["interactive"] and info["pressure_pa"] == 7.0e4
-        assert info["surface"] == "700 hPa" and info["streams"] is False
-        assert page.eval("document.getElementById('streams').disabled")
-        assert "not available in interactive-pressure mode" in page.eval(
+        assert info["surface"] == "700 hPa" and info["streams"] is True
+        assert not page.eval("document.getElementById('streams').disabled")
+        assert "traced in this page" in page.eval(
             "document.getElementById('streamNote').textContent")
         assert not page.eval("document.getElementById('pressureBlock')"
                              ".hidden")

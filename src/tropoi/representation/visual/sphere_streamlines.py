@@ -122,8 +122,9 @@ def integrate_streamlines(u, v, lat_deg, lon_deg, *, seeds=None,
     wind at masked nodes is ignored; it is set to zero before sampling), and
     a seed inside a masked cell gives no line. The test covers the whole
     step, not only its RK4 evaluation points: each accepted segment is
-    sampled at intervals shorter than half a mesh cell, so a step longer
-    than a cell cannot jump a thin masked band. Returns one ``(lat, lon)``
+    sampled at intervals shorter than half a mesh cell, its end included,
+    so a step longer than a cell cannot jump a thin masked band and no
+    drawn point lies in a masked cell. Returns one ``(lat, lon)``
     pair of arrays per drawn line (at least 3 points), each listed from its
     upstream end to its downstream end; seeds in calm air give no line.
     """
@@ -167,13 +168,15 @@ def integrate_streamlines(u, v, lat_deg, lon_deg, *, seeds=None,
 
     # Points along a step at which the validity is re-checked: spaced closer
     # than half the smaller mesh spacing, so no cell between two checks is
-    # skipped. None when there is no mask.
+    # skipped, up to and including the step's end (the accepted point is
+    # drawn, so it must lie in a valid cell even when no step follows it).
+    # None when there is no mask.
     if inside is None:
         fractions = None
     else:
         cell = min(abs(inside.dlat), abs(inside.dlon))
         count = int(math.ceil(2.0 * float(step_deg) / cell)) + 1
-        fractions = np.linspace(0.0, 1.0, count + 1)[1:-1]
+        fractions = np.linspace(0.0, 1.0, count + 1)[1:]
 
     def segment_inside(x0, x1):
         ok = np.ones(x0.shape[0], dtype=bool)

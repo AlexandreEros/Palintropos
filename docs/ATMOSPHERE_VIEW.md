@@ -47,10 +47,10 @@ python examples/atmosphere_view.py runs/hs-T42L20-prod-002 --times 0 -1 --field 
 | `levels` | native full-level indices, 0 = top | all levels |
 | `surface` | `("pressure", Pa)`: one isobaric surface per exported time instead of native levels (see [Fixed-pressure surfaces](#fixed-pressure-surfaces-across-saved-times)); exclusive with `levels` | none (native levels) |
 | `level_sigma` | with `surface`: where a native level sits for the interpolation, `"hydrostatic"` or `"nominal"` | `"hydrostatic"` |
-| `interactive_pressure` | with `surface` (then the initial isobar): export the native columns and choose any pressure in the page (see [Any pressure in the browser](#any-pressure-in-the-browser-interactive-pressure-mode)); streamlines off | `False` |
+| `interactive_pressure` | with `surface` (then the initial isobar): export the native columns and choose any pressure in the page (see [Any pressure in the browser](#any-pressure-in-the-browser-interactive-pressure-mode)); streamlines are traced in the page | `False` |
 | `resolution_deg` | display mesh spacing in degrees (a divisor of 180°) | about 4 nodes per shortest resolved wavelength, between 1° and 3°: 2° at T42 |
 | `max_mb` | bound on the embedded data, in MB | 32; `None` removes it |
-| `streamlines` | export horizontal streamlines | `True` |
+| `streamlines` | horizontal streamlines (exported lines; traced in the page in interactive mode) | `True` |
 | `field`, `level`, `time`, `opacity`, `exaggeration`, `centre` | initial page state (`level` is a native index; `time` a position among the exported times; `centre` = (lat, lon)) | temperature; middle exported level; last time; 0.6; the top exported level near 8 % of the radius; the highest terrain point (flat: 35°N, 0°) |
 | `gravity` | only for runs that record none (see below) | none |
 | `allow_cuda` | rebuild a preset-mountain terrain through the run's CUDA model | `False` |
@@ -275,9 +275,9 @@ python examples/isobaric_view.py interactive RUN --pressure 300 --out isobars.ht
 
 `surface` is then the initial isobar (required, pascals); `times` and
 `max_mb` keep their contract; `level_sigma` chooses the level positions as
-before; `levels`, `level` and `streamlines` do not apply (`levels`/`level`
-are refused, streamlines are off, see below). The default output name
-contains `-isobars-`.
+before; `levels` and `level` do not apply (they are refused);
+`streamlines=False` turns the browser-traced lines off (see below). The
+default output name contains `-isobars-`.
 
 **What the file holds.** Per exported saved state: temperature, geopotential,
 `u` and `v` on **every** full level (16-bit per level slice, with that
@@ -330,10 +330,45 @@ ranges under linear interpolation, and the speed of an interpolated vector
 is at most the larger bracket speed, so the scales stay put while the
 pressure moves (the native per-level option does not apply).
 
-**Streamlines are not available in this mode.** The wind on an arbitrary
-isobar exists only in the browser, and tracing it there is a later slice;
-the checkbox is disabled and the page says so. The fixed-surface and
-native pages keep their streamlines.
+**Streamlines are traced in the page.** The wind on an arbitrary surface
+exists only in the browser, so the page integrates it there: the
+interpolated `u, v` of the surface shown (vorticity and divergence are not
+needed) go through a transcription of
+`representation.visual.sphere_streamlines.integrate_streamlines`, the
+Python reference, with its geometry and rules unchanged: arc length on the
+unit sphere, `dx/ds = V_t/|V_t|`, classical RK4 in R³ renormalized onto the
+sphere (regular across the poles, periodic across the seam), the wind
+interpolated bilinearly in Cartesian components with each pole row carrying
+its mean vector, the same 160 Fibonacci seeds, 1.5° steps, at most 24 each
+way, stopping below 1 mm/s or 2 % of the surface's maximum speed, and only
+through cells whose four nodes are valid, every accepted step checked along
+its length (points closer than half a cell, its end included) so a long
+step cannot jump a narrow masked band. Nothing extra is exported, so file
+size is unchanged. A browser test feeds the page's own decoded winds and
+mask to Python and finds the same lines point for point (largest
+difference 1e−14 on the unit sphere, libm round-off; the tolerance is 1e−9),
+on analytic winds too (solid-body zonal flow, a flow over the poles, the
+seam, calm air, a one-node masked band that a 30° step would otherwise
+jump, an all-masked surface).
+
+They are instantaneous horizontal streamlines of one saved state on the
+selected surface, draped on it: not parcel trajectories, not 3-D flow.
+
+*Scheduling.* Surface fields and geometry follow a dragged slider every
+frame; the lines of the previous surface are removed at once and the new
+ones are traced 150 ms after the slider stops moving, or immediately on
+release. Typed values, saved-time switches, playback and coordinate changes
+trace synchronously, so their frame always carries the matching lines. Each
+request carries a generation number and only the newest may publish: a
+deferred trace superseded by a later selection is dropped. The last 8 line
+sets are kept (at most 1 MB), so returning to a surface is instant.
+
+*Fix in the reference.* Writing the browser test exposed a gap in the
+Python integrator: the end of an accepted step was never checked against
+the mask itself, only the next step's first evaluation was, so the last
+point of a line could lie in a masked cell. The whole-step check now
+includes the step's end, in Python and in the page alike; fixed-surface
+exports can lose that last point of an occasional line.
 
 **Stored precision, measured.** Each level slice of each field is stored
 with its own 16-bit range, so the error is at most half a quantum,
@@ -384,7 +419,7 @@ holds 50 MB of heap, not the 44 MB its eight states would decode to. Export
 is cheaper than the fixed-surface export of the same states (0.69 s against
 0.93 s per state on the T42L20 run at 2°) because no streamlines are traced.
 
-**Not in this slice.** Browser-side streamlines; target-surface vorticity
+**Not in this slice.** Target-surface vorticity
 and divergence; geopotential-height surfaces; compression of the columns
 (the file is base64 of raw 16-bit slices); any GPU path. The 32 MB default
 budget bounds the T42L20 run to 8 states at 2° or 19 at 3°; the budget is
@@ -541,9 +576,16 @@ headless Chrome with software WebGL these pages became interactive within
 - One surface at a time: a native σ level, one fixed-pressure surface
   ([above](#fixed-pressure-surfaces-across-saved-times)) or any pressure
   interpolated in the page ([interactive mode](#any-pressure-in-the-browser-interactive-pressure-mode),
-  without streamlines). No geopotential-height surfaces yet, no vorticity or
-  divergence on a derived surface, no volume rendering, no mass
+  streamlines traced in the page). No geopotential-height surfaces yet, no
+  vorticity or divergence on a derived surface, no volume rendering, no mass
   streamfunction.
+- The streamline mask check samples each step at points closer than half a
+  mesh cell, measured in degrees. That stops a line at any masked band one
+  node wide or more, except near a pole, where a cell's longitude width in
+  arc shrinks below the check spacing: there a step much longer than the
+  default 1.5° could cross a one-node band (a test shows it with 30° steps).
+  Between two check points a line can also cut the corner of a masked cell,
+  by at most a quarter cell.
 - Hovering the globe locates points on the undisplaced sphere ("relief ignored
   when picking"), as in the terrain viewer. The flat map is exact.
 - Streamline density is uniform in seeds, not adaptive. Lines in weak flow can
