@@ -231,8 +231,13 @@ def test_interactive_payload_holds_columns_not_surfaces(tmp_path):
         storage, surface=("pressure", 7.0e4), interactive_pressure=True,
         times="all", resolution_deg=6.0)
     A = page["atmosphere"]
-    assert A["version"] == 3
-    assert [f["id"] for f in A["fields"]] == list(SURFACE_FIELDS)
+    # version 4: the column page offers pressure and geopotential height;
+    # on an isobar the fields are those of the pressure surface page, in
+    # the same order, plus pressure (offered on height surfaces only)
+    assert A["version"] == 4
+    assert [f["id"] for f in A["fields"]
+            if "pressure" in f["coordinates"]] == list(SURFACE_FIELDS)
+    assert [f["id"] for f in A["fields"]][:3] == list(SURFACE_FIELDS)
     assert all("data" not in f and "bounds" not in f for f in A["fields"])
     assert "height" not in A and "mask" not in A
     S, C = A["surface"], A["columns"]
@@ -303,15 +308,24 @@ def test_estimate_precedes_reconstruction_and_reports_memory_apart(tmp_path):
     assert per_time == math.ceil(
         (2 * nlat * nlon * nlev * 4 + 4 * nlat * nlon) * 4 / 3)
     assert report["estimate_bytes"] >= 3 * per_time
+    # the float32 terrain for the height masks, once per file
+    from tropoi.representation.visual.atmosphere import surface_height_bytes
+    assert surface_height_bytes(nlat, nlon) == math.ceil(
+        4 * nlat * nlon * 4 / 3)
+    _, one = atmosphere_payload(storage, surface=("pressure", 7.0e4),
+                                interactive_pressure=True, times=[0],
+                                resolution_deg=6.0)
+    assert report["estimate_bytes"] - one["estimate_bytes"] == 2 * per_time
     path = sim.view(tmp_path / "cols.html", surface=("pressure", 7.0e4),
                     interactive_pressure=True, times="all",
                     resolution_deg=6.0, open_browser=False)
     assert path.stat().st_size <= report["estimate_bytes"] + 300_000
     # the file holds every saved state; memory is per decoded state
     decoded = decoded_column_bytes(nlev, nlat, nlon)
-    # columns + p_s per state, then the derived arrays (5 float32 + mask)
-    # and the streamline working arrays (3 float64 + float64 + byte)
-    assert decoded == nlat * nlon * (16 * nlev + 4 + 21 + 33)
+    # columns + p_s per state, then the derived arrays (6 float32, mask,
+    # float32 terrain) and the streamline working arrays (3 float64 +
+    # float64 + byte)
+    assert decoded == nlat * nlon * (16 * nlev + 4 + 29 + 33)
     assert report["decoded_bytes_per_time"] == decoded
     assert decoded < report["estimate_bytes"] / 3     # one state, not all
     # the other estimates are what they were

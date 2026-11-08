@@ -217,8 +217,11 @@ def test_surface_options_are_validated(tmp_path):
         atmosphere_payload(storage, surface=("pressure", 7e4), field="zeta")
     with pytest.raises(ValueError, match="field must be one of"):
         atmosphere_payload(storage, field="wind_speed")
-    with pytest.raises(NotImplementedError, match="geopotential-height"):
-        atmosphere_payload(storage, surface=("geopotential_height", 5e3))
+    # heights are exported now (test_interactive_height_view); a bad one
+    # is refused by the specification
+    with pytest.raises(ValueError, match="finite"):
+        atmosphere_payload(storage, surface=("geopotential_height",
+                                             float("nan")))
     with pytest.raises(TypeError, match="'pressure'"):
         atmosphere_payload(storage, surface=70000.0)
     with pytest.raises(ValueError, match="level_sigma must be one of"):

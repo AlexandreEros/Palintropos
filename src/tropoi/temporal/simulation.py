@@ -242,13 +242,16 @@ class Simulation:
         Options (all keyword): ``times`` (saved indices, ``"all"``, or
         ``None`` = all that fit the payload budget, evenly subsampled with a
         warning), ``levels`` (native level indices, 0 = top; default all),
-        ``surface`` (``("pressure", Pa)``: one interpolated isobaric
-        surface per exported time instead of native levels, with masks
-        where it is under ground or outside the sampled levels; exclusive
-        with ``levels``), ``level_sigma`` (with ``surface``),
-        ``interactive_pressure`` (with ``surface`` as the initial isobar:
-        export the native columns and choose any pressure in the page, no
-        streamlines), ``resolution_deg`` (display mesh), ``streamlines``,
+        ``surface`` (``("pressure", Pa)`` or ``("geopotential_height",
+        m)``: one interpolated derived surface per exported time instead of
+        native levels, with masks where it is under ground or outside the
+        sampled levels; exclusive with ``levels``), ``level_sigma`` (with
+        ``surface``), ``interactive_surface`` (with ``surface`` as the
+        initial surface: export the native columns and choose any pressure
+        or geopotential height in the page, switching between them, with
+        streamlines traced in the page; ``interactive_pressure`` is the
+        same switch under its older name), ``resolution_deg`` (display
+        mesh), ``streamlines``,
         ``max_mb``, ``gravity``,
         ``allow_cuda``, ``open_browser``, initial ``field``, ``level``,
         ``time``, ``opacity``, ``exaggeration``. Reconstruction runs on the

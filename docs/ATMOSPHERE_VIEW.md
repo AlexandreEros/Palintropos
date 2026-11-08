@@ -45,9 +45,9 @@ python examples/atmosphere_view.py runs/hs-T42L20-prod-002 --times 0 -1 --field 
 | `path` | output file | `<tempdir>/tropoi/<run>-atmosphere-<tag>.html` |
 | `times` | saved snapshot indices (negative counts back), or `"all"` | as many evenly spaced states as fit `max_mb` (always the first and the last), with a warning |
 | `levels` | native full-level indices, 0 = top | all levels |
-| `surface` | `("pressure", Pa)`: one isobaric surface per exported time instead of native levels (see [Fixed-pressure surfaces](#fixed-pressure-surfaces-across-saved-times)); exclusive with `levels` | none (native levels) |
+| `surface` | `("pressure", Pa)` or `("geopotential_height", m)`: one derived surface per exported time instead of native levels (see [Fixed-pressure surfaces](#fixed-pressure-surfaces-across-saved-times), [Geopotential-height surfaces](#geopotential-height-surfaces)); exclusive with `levels` | none (native levels) |
 | `level_sigma` | with `surface`: where a native level sits for the interpolation, `"hydrostatic"` or `"nominal"` | `"hydrostatic"` |
-| `interactive_pressure` | with `surface` (then the initial isobar): export the native columns and choose any pressure in the page (see [Any pressure in the browser](#any-pressure-in-the-browser-interactive-pressure-mode)); streamlines are traced in the page | `False` |
+| `interactive_surface` | with `surface` (then the initial surface): export the native columns and choose any pressure or geopotential height in the page (see [Any pressure in the browser](#any-pressure-in-the-browser-interactive-pressure-mode)); streamlines are traced in the page. `interactive_pressure=True` is the same switch under its older name | `False` |
 | `resolution_deg` | display mesh spacing in degrees (a divisor of 180°) | about 4 nodes per shortest resolved wavelength, between 1° and 3°: 2° at T42 |
 | `max_mb` | bound on the embedded data, in MB | 32; `None` removes it |
 | `streamlines` | horizontal streamlines (exported lines; traced in the page in interactive mode) | `True` |
@@ -246,8 +246,8 @@ display nodes, not with the number of levels embedded: all 120 states fit the
 Measurements: [`validation/pressure_surface_2026-11-07/`](validation/pressure_surface_2026-11-07/README.md),
 reproduced with `python examples/isobaric_view.py measure RUN --pressure P`.
 
-**Not in this slice.** Geopotential-height surfaces (`("geopotential_height",
-m)` is refused by name), target-surface vorticity and divergence, lazy or
+**Not in this slice.** Geopotential-height surfaces (added later, see
+[below](#geopotential-height-surfaces)), target-surface vorticity and divergence, lazy or
 compressed decoding, any GPU path. The page still decodes all embedded
 arrays eagerly; the 29 MB page became interactive in headless Chrome in
 1.1 s with 64 MB of JS heap, and switched frames in 25 ms (median), so
@@ -420,10 +420,106 @@ is cheaper than the fixed-surface export of the same states (0.69 s against
 0.93 s per state on the T42L20 run at 2°) because no streamlines are traced.
 
 **Not in this slice.** Target-surface vorticity
-and divergence; geopotential-height surfaces; compression of the columns
+and divergence; compression of the columns
 (the file is base64 of raw 16-bit slices); any GPU path. The 32 MB default
 budget bounds the T42L20 run to 8 states at 2° or 19 at 3°; the budget is
 explicit (`max_mb`, `None` removes it) and the refusal says what to change.
+
+## Geopotential-height surfaces
+
+The third slice of [issue #13](https://github.com/AlexandreEros/Palintropos/issues/13).
+`surface=("geopotential_height", Z0)` (metres, any sign) is the other
+derived coordinate, in both modes:
+
+```python
+sim.view("mars_z7500.html", surface=("geopotential_height", 7500.0),
+         times="all", resolution_deg=3.0)               # one height surface per saved time
+sim.view("mars_surfaces.html", surface=("geopotential_height", 7500.0),
+         interactive_surface=True, times="all")          # any height or pressure in the page
+```
+
+```bash
+python examples/isobaric_view.py view RUN --height 7500
+python examples/isobaric_view.py interactive RUN --height 7500
+```
+
+**The convention is the model's own.** The target is `Φ₀ = g·Z₀` with the
+run's constant `g`; zero is the datum of the terrain and of the native
+reconstruction (`Φ = Φs + …`, `Φs = g·hs`), so a negative height is valid
+wherever the terrain lies below it. No other gravity law, no rotational
+potential and no new solver coordinate is involved. The surface is drawn
+at `R + E·Z₀` (the same `E` as the terrain), so at a fixed `Z₀` and
+exaggeration every valid node sits at the same radius at every saved time;
+which nodes are valid, and the fields on them, change with the state.
+
+**The inversion.** Between the level positions each column's `Φₖ` is
+piecewise linear in `ln σ` (the rule the isobars use, read the other way).
+With `k` the upper bracket, `Φₖ ≥ Φ₀ ≥ Φₖ₊₁`:
+
+    w = (Φ₀ − Φₖ) / (Φₖ₊₁ − Φₖ)
+    ln σ* = (1 − w) ln σₖ + w ln σₖ₊₁
+
+and temperature and both wind components take the same bracket and weight;
+`p = pₛ·exp(ln σ*)`, and the wind speed comes from the interpolated
+components. Where `Φ₀` equals a level's `Φₖ` that level is reproduced. The
+end levels are widened by 1e−9 relative to each end's `|Φ|` (the round-off
+of `g·Z₀` is relative too, so the band works near zero and below the datum);
+the weight is clamped there and nothing is extrapolated. The columns must be
+finite, strictly decreasing downward and above the terrain, otherwise
+`ValueError`: a zero or inverted interval is never divided by. The Python
+reference is `pe_surfaces.interpolate_geopotential` (through
+`interpolate_columns` / `pressure_surface`, which take either coordinate).
+
+**Masks** (the same codes, height labels): 1 below the terrain
+(`Z₀ < hₛ`, decided with the physical surface geopotential, never the
+exaggerated display), 2 above the highest sampled full level, 3 between the
+terrain and the lowest full level. On the isothermal fixture with tall
+terrain (−12.8 to +23.5 km) all three appear, at negative, zero and positive
+heights.
+
+**Fields.** Temperature, pressure (hPa) and wind speed; the height itself is
+constant on the surface, and relative vorticity and divergence stay off on
+both derived coordinates (a horizontal derivative on a sigma level is not
+the derivative on the target surface).
+
+**In a column page** both coordinates are available without regenerating the
+file. A **Pressure / Geopotential height** switch sits above the controls;
+the height has a linear slider over the heights the exported states sample
+(lowest bottom to highest top full level, which on the Mars run starts below
+the datum) and a typed value in km or m. Zero and negative heights are
+accepted; non-finite or empty input is refused with the reason. Each
+coordinate keeps its own last value. Switching never converts one into the
+other, since neither is one global value of the other. The coordinate not
+chosen at export starts in the middle of its range (geometric middle for
+pressure). Field buttons follow the coordinate (geopotential height on
+isobars, pressure on height surfaces), and the field choice is kept per
+coordinate. The terrain height needed for the masks is carried once per
+file as float32, `4·nodes` bytes before base64 (30 KB on the Mars 3° mesh
+and 66 KB at 2° on the T42L20 run; 39 and 88 KB encoded), included in the
+estimate made before reconstruction; no surface bank, no second copy of the
+columns. Streamlines add nothing to the file. The page is `version` 4; the fixed-surface pages stay `version` 2.
+`interactive_surface=True` is the switch, and `interactive_pressure=True` is
+the same switch under its older name.
+
+**Stored precision.** The page inverts the stored columns: 16-bit
+geopotential per level slice and float32 `pₛ` and `hₛ`. The Python reference
+dequantizes them with the page's own arithmetic (`dequantize_columns`), so
+the browser matches it to the float32 storage of its results. Against the
+exact columns, the error is the stored quantum propagated through the weight
+(`|δw| ≤ ½ quantum of Φ / layer thickness`). A test bounds it node by node
+and reports it apart from the interpolation. A node within one quantum of a
+mask boundary can change mask; the test excludes only those.
+
+**Measured** ([the record](validation/derived_surfaces_2026-11-08/README.md);
+the committed Mars page is the reproducible example). In the page's own
+timer, a height update takes a median of 23 ms on the Mars page (1.8 ms of
+interpolation) and 43 ms on the 29 MB Held–Suarez page (12 ms). A coordinate
+switch takes 28 ms. A first streamline trace of a surface takes 30–150 ms
+(warm repeats 7–18 ms on Mars); while a slider is dragged it runs once,
+about 185–210 ms after the last movement. Start-up is 1.0 s and 2.8 s; the
+heap stays at 20 and 50 MB over the bench.
+
+![The Mars run's 4 km geopotential-height surface at its last saved state over Tharsis: the surface where it lies above the terrain, holes where the terrain rises through it, white streamlines that stop at the holes, and the side panel with the Pressure / Geopotential height switch, the linear height slider and the typed value in km](validation/derived_surfaces_2026-11-08/mars_isobars_interactive_z4000m.png)
 
 ## What the surface is
 
@@ -576,8 +672,8 @@ headless Chrome with software WebGL these pages became interactive within
 - One surface at a time: a native σ level, one fixed-pressure surface
   ([above](#fixed-pressure-surfaces-across-saved-times)) or any pressure
   interpolated in the page ([interactive mode](#any-pressure-in-the-browser-interactive-pressure-mode),
-  streamlines traced in the page). No geopotential-height surfaces yet, no
-  vorticity or divergence on a derived surface, no volume rendering, no mass
+  streamlines traced in the page), or a geopotential-height surface (fixed
+  or chosen in the page). No vorticity or divergence on a derived surface, no volume rendering, no mass
   streamfunction.
 - The streamline mask check samples each step at points closer than half a
   mesh cell, measured in degrees. That stops a line at any masked band one
@@ -600,9 +696,9 @@ headless Chrome with software WebGL these pages became interactive within
 | layer | module |
 | --- | --- |
 | archive (reading saved runs) | `representation.archive.held_suarez` (Held–Suarez storage), `representation.archive.pe_context` (`PEColumnContext`: σ, constants, radius, gravity, terrain, provenance), `CapsuleStorage.pe_context` |
-| physical reconstruction (CPU) | `representation.diagnostics.pe_levels.reconstruct_levels`, `spatial.transforms.host_synthesis.synthesize_wind_latlon`; derived pressure surfaces: `representation.diagnostics.pe_surfaces` (`pressure_columns`, `interpolate_columns`, `pressure_surface`, `interpolate_log_sigma`, masks), `spatial.sigma_coordinate.SigmaGrid.hydrostatic_full_levels` |
+| physical reconstruction (CPU) | `representation.diagnostics.pe_levels.reconstruct_levels`, `spatial.transforms.host_synthesis.synthesize_wind_latlon`; derived pressure and height surfaces: `representation.diagnostics.pe_surfaces` (`pressure_columns`, `interpolate_columns`, `pressure_surface`, `interpolate_log_sigma`, `interpolate_geopotential`, masks), `spatial.sigma_coordinate.SigmaGrid.hydrostatic_full_levels` |
 | payload | `representation.visual.atmosphere` (selection, bounds, quantization, colour limits; `quantize_columns`/`dequantize_columns` and the column estimates for the interactive page), `representation.visual.sphere_streamlines` |
-| page | `representation.visual.terrain_globe.html`: the terrain viewer's template, extended with an optional `atmosphere` block (native levels, one fixed surface, or columns interpolated in the page: `computeSurface`); `terrain.write_globe_page` writes both kinds of page |
+| page | `representation.visual.terrain_globe.html`: the terrain viewer's template, extended with an optional `atmosphere` block (native levels, one fixed surface, or columns interpolated in the page: `computeSurface` with `pressurePass`/`heightPass`, and `traceStreamlines`, the transcription of `sphere_streamlines`); `terrain.write_globe_page` writes both kinds of page |
 | entry points | `Simulation.view`, `Snapshot.view` → `storage.view` |
 
 The terrain-only page is unchanged. A browser capture of the same terrain

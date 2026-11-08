@@ -1,34 +1,41 @@
-r"""Isobaric surfaces of a saved PE run across its saved times (CPU only).
+r"""Isobaric and geopotential-height surfaces of a saved PE run (CPU only).
 
-    python examples/isobaric_view.py view RUN --pressure 300 [--out FILE]
-        [--resolution 3] [--max-mb 32] [--no-streamlines] [--field F] [--open]
-    python examples/isobaric_view.py interactive RUN --pressure 300 [--out FILE]
-        [--times all | 0 4 -1] [--resolution 3] [--max-mb 32] [--open]
+    python examples/isobaric_view.py view RUN (--pressure 300 | --height 7500)
+        [--out FILE] [--resolution 3] [--max-mb 32] [--no-streamlines]
+        [--field F] [--open]
+    python examples/isobaric_view.py interactive RUN (--pressure 300 |
+        --height 7500) [--out FILE] [--times all | 0 4 -1] [--resolution 3]
+        [--max-mb 32] [--open]
     python examples/isobaric_view.py measure RUN --pressure 300 [--times 0 -1]
         [--resolution 2] [--out results.json]
     python examples/isobaric_view.py capture PAGE OUT_DIR [--centre LAT LON]
     python examples/isobaric_view.py bench PAGE OUT_DIR [--pressures 300 150 ...]
+        [--heights 7500 -2000 ...]
 
 RUN is a ``tropoi run pe`` capsule or a Held–Suarez experiment directory.
-Issue #13, first and second slices: ``view`` and ``interactive`` are the
-documented API, nothing more:
+Issue #13: ``view`` and ``interactive`` are the documented API, nothing more:
 
     from tropoi.representation.archive import open_simulation
 
     sim = open_simulation(RUN)
     sim.view(out, surface=("pressure", 300.0), times="all", open_browser=False)
-    sim.view(out2, surface=("pressure", 300.0), interactive_pressure=True,
+    sim.view(out1, surface=("geopotential_height", 7500.0), times="all",
+             open_browser=False)
+    sim.view(out2, surface=("pressure", 300.0), interactive_surface=True,
              times="all", open_browser=False)
 
 ``view`` writes ONE self-contained HTML file with the run's terrain plus the
-requested isobar of EVERY saved state (``times="all"`` never subsamples: it
-fails above ``--max-mb`` and says what to change), coloured by temperature,
-geopotential height or wind speed, with masks where the isobar is under
-ground or outside the sampled full levels. ``interactive`` writes the native
-columns of every exported saved state instead, and the page interpolates
-them to ANY pressure chosen in the browser (slider or typed value), offline.
-Pressure is in pascals: 300 Pa (3 hPa) suits the published Mars run; 50000
-Pa (500 hPa) an Earth-like one.
+requested isobar or height surface of EVERY saved state (``times="all"``
+never subsamples: it fails above ``--max-mb`` and says what to change),
+coloured by temperature, geopotential height (isobars) or pressure (height
+surfaces) and wind speed, with masks where the surface is under ground or
+outside the sampled full levels, and streamlines. ``interactive`` writes
+the native columns of every exported saved state instead, and the page
+interpolates them to ANY pressure or geopotential height chosen in the
+browser (a coordinate switch, sliders, typed values), offline, tracing the
+streamlines there too. Pressure is in pascals: 300 Pa (3 hPa) suits the
+published Mars run; 50000 Pa (500 hPa) an Earth-like one. Heights are
+geopotential metres on the terrain's datum (negative below it).
 
 ``measure`` times the parts of one export separately (spherical-harmonic
 synthesis of the column, hydrostatic coefficients, winds, the vorticity and
@@ -39,7 +46,9 @@ written page in headless Chrome with networking blocked, checks it and saves
 screenshots and a JSON report (tools/browser_cdp). ``bench`` does the same
 for an interactive page and measures what the browser pays: start-up,
 pressure updates (interpolation apart from mesh and map work), saved-time
-switches and JS heap. See docs/ATMOSPHERE_VIEW.md.
+switches, height selections, coordinate switches, streamline tracing (and
+the latency of a deferred trace after a slider drag), rendering and JS heap.
+See docs/ATMOSPHERE_VIEW.md.
 """
 from __future__ import annotations
 
@@ -57,6 +66,12 @@ def _storage(sim):
     return getattr(sim, "_storage", None) or sim.storage
 
 
+def _surface(args):
+    if args.height is not None:
+        return ("geopotential_height", float(args.height))
+    return ("pressure", float(args.pressure))
+
+
 def cmd_view(args) -> pathlib.Path:
     from tropoi.representation.archive import open_simulation
 
@@ -64,7 +79,7 @@ def cmd_view(args) -> pathlib.Path:
     print(f"{sim!r}: saved times {sim.times[0]:g} .. {sim.times[-1]:g} s")
     path = sim.view(
         args.out, open_browser=args.open,
-        surface=("pressure", float(args.pressure)), times="all",
+        surface=_surface(args), times="all",
         resolution_deg=args.resolution, max_mb=args.max_mb,
         streamlines=not args.no_streamlines, field=args.field,
         opacity=args.opacity, exaggeration=args.exaggeration,
@@ -88,7 +103,7 @@ def cmd_interactive(args) -> pathlib.Path:
     t0 = time.perf_counter()
     path = sim.view(
         args.out, open_browser=args.open,
-        surface=("pressure", float(args.pressure)), interactive_pressure=True,
+        surface=_surface(args), interactive_surface=True,
         times=_times_option(args.times, len(sim)),
         resolution_deg=args.resolution, max_mb=args.max_mb, field=args.field,
         opacity=args.opacity, exaggeration=args.exaggeration,
@@ -377,6 +392,57 @@ def cmd_bench(args) -> dict:
                 "time_index": i, "seconds_round_trip": switch,
                 "page_ms": timing,
                 "decoded_times": page.eval(f"{api}.decodedTimes()")})
+        # geopotential-height surfaces: the same split, plus the lines
+        hrng = page.eval("JSON.parse(document.getElementById('terrain-data')"
+                         ".textContent).atmosphere.surface.coordinates"
+                         ".geopotential_height.range")
+        report["height_range_m"] = hrng
+        report["heights"] = []
+        page.eval(f"{api}.setTime({nt - 1})")
+        for z0 in args.heights or []:
+            for rep_i in range(args.repeat):
+                page.eval(f"{api}.setHeight({0.5 * (hrng[0] + hrng[1])!r})")
+                t1 = time.perf_counter()
+                r = page.eval(f"{api}.setHeight({float(z0)!r})")
+                round_trip = time.perf_counter() - t1
+                timing = page.eval(f"{api}.timing()")
+                counts = page.eval(f"{api}.maskCounts()")
+                info = page.eval(f"{api}.info()")
+                report["heights"].append({
+                    "height_m": float(z0), "ok": r["ok"],
+                    "seconds_round_trip": round_trip, "page_ms": timing,
+                    "triangles": counts["triangles"],
+                    "mask_counts": counts["counts"], "lines": info["lines"]})
+            shot = out / f"{page_path.stem}_z{float(z0):g}m.png"
+            page.screenshot(shot)
+            report.setdefault("captures", []).append(shot.name)
+        # coordinate switches: each keeps its own value
+        report["coordinate_switches"] = []
+        for kind in ["pressure", "geopotential_height"] * args.repeat:
+            t1 = time.perf_counter()
+            page.eval(f"{api}.setCoordinate('{kind}')")
+            report["coordinate_switches"].append({
+                "coordinate": kind,
+                "seconds_round_trip": time.perf_counter() - t1,
+                "page_ms": page.eval(f"{api}.timing()"),
+                "value": page.eval(f"[{api}.pressure(), {api}.height()]")})
+        # a slider drag: the surface follows each frame; how long until the
+        # deferred streamlines are published after the last movement
+        drag = page.eval("""(async () => {
+            const a = window.__terrainGlobe.atmosphere;
+            a.setCoordinate('pressure');
+            const s = document.getElementById('pressureSlider'), t0 = performance.now();
+            for (const v of [200, 260, 320, 380, 440, 500]) {
+              s.value = v; s.dispatchEvent(new Event('input', {bubbles: true}));
+              await new Promise(r => requestAnimationFrame(r));
+            }
+            const moved = performance.now(), pub = a.streamlines().published;
+            while (a.streamlines().published === pub) await new Promise(r => setTimeout(r, 5));
+            return { frames_ms: moved - t0, publish_after_last_input_ms: performance.now() - moved,
+                     lines: a.streamlines().lines.length, timing: a.timing() };
+        })()""")
+        report["slider_drag"] = drag
+        report["render_ms_per_frame"] = page.eval(f"{api}.benchRender(20)")
         report["memory_mb_after_use"] = page.eval(f"{api}.memory()")
         # typed-input path once, for the record
         page.eval("document.getElementById('pressureInput').value = "
@@ -393,11 +459,24 @@ def cmd_bench(args) -> dict:
         return statistics.median(vals) if vals else None
 
     rows = report["pressures"]
+    hrows = report["heights"]
     report["summary"] = {
+        "height_update_ms_median_page_total": med(
+            "t", [{"t": r["page_ms"]["total_ms"]} for r in hrows]),
+        "height_update_ms_median_interpolate": med(
+            "t", [{"t": r["page_ms"]["interpolate_ms"]} for r in hrows]),
+        "streamline_integrate_ms_median": med(
+            "t", [{"t": r["page_ms"]["integrate_ms"]} for r in rows + hrows
+                  if r["page_ms"].get("integrate_ms")]),
+        "coordinate_switch_ms_median_page_total": med(
+            "t", [{"t": r["page_ms"]["total_ms"]}
+                  for r in report["coordinate_switches"]]),
         "pressure_update_ms_median_page_total": med(
             "t", [{"t": r["page_ms"]["total_ms"]} for r in rows]),
         "pressure_update_ms_median_interpolate": med(
             "t", [{"t": r["page_ms"]["interpolate_ms"]} for r in rows]),
+        "pressure_update_ms_median_streams": med(
+            "t", [{"t": r["page_ms"]["streams_ms"]} for r in rows]),
         "pressure_update_ms_median_mesh": med(
             "t", [{"t": r["page_ms"]["mesh_ms"]} for r in rows]),
         "pressure_update_ms_median_map": med(
@@ -429,8 +508,12 @@ def main(argv=None):
     v = sub.add_parser("view", help="write the isobar page for every saved "
                                     "state")
     v.add_argument("run")
-    v.add_argument("--pressure", type=float, required=True,
-                   help="surface pressure level in Pa (300 = 3 hPa)")
+    vs = v.add_mutually_exclusive_group(required=True)
+    vs.add_argument("--pressure", type=float,
+                    help="isobar in Pa (300 = 3 hPa)")
+    vs.add_argument("--height", type=float,
+                    help="geopotential height in m (negative below the "
+                         "datum)")
     v.add_argument("--out", help="output HTML (default: temp directory)")
     v.add_argument("--resolution", type=float,
                    help="display mesh spacing in degrees")
@@ -438,7 +521,9 @@ def main(argv=None):
     v.add_argument("--no-streamlines", action="store_true")
     v.add_argument("--field", default="temperature",
                    choices=("temperature", "geopotential_height",
-                            "wind_speed"))
+                            "pressure", "wind_speed"),
+                   help="geopotential_height on isobars, pressure on height "
+                        "surfaces")
     v.add_argument("--opacity", type=float, default=0.6)
     v.add_argument("--exaggeration", type=float)
     v.add_argument("--centre", type=float, nargs=2, metavar=("LAT", "LON"))
@@ -447,11 +532,16 @@ def main(argv=None):
     v.add_argument("--open", action="store_true")
     v.set_defaults(func=cmd_view)
 
-    i = sub.add_parser("interactive", help="write the interactive-pressure "
-                                           "page (native columns)")
+    i = sub.add_parser("interactive", help="write the interactive page "
+                                           "(native columns: any pressure "
+                                           "or height)")
     i.add_argument("run")
-    i.add_argument("--pressure", type=float, required=True,
-                   help="initial isobar in Pa (any pressure in the page)")
+    js = i.add_mutually_exclusive_group(required=True)
+    js.add_argument("--pressure", type=float,
+                    help="initial isobar in Pa (any pressure or height in "
+                         "the page)")
+    js.add_argument("--height", type=float,
+                    help="initial geopotential height in m")
     i.add_argument("--times", nargs="+", default=["all"],
                    help="'all' (default) or saved indices")
     i.add_argument("--out", help="output HTML (default: temp directory)")
@@ -459,7 +549,7 @@ def main(argv=None):
     i.add_argument("--max-mb", type=float, default=32.0)
     i.add_argument("--field", default="temperature",
                    choices=("temperature", "geopotential_height",
-                            "wind_speed"))
+                            "pressure", "wind_speed"))
     i.add_argument("--opacity", type=float, default=0.6)
     i.add_argument("--exaggeration", type=float)
     i.add_argument("--centre", type=float, nargs=2, metavar=("LAT", "LON"))
@@ -494,6 +584,8 @@ def main(argv=None):
     b.add_argument("out_dir")
     b.add_argument("--pressures", type=float, nargs="+",
                    help="pressures (Pa) to select in turn")
+    b.add_argument("--heights", type=float, nargs="+",
+                   help="geopotential heights (m) to select in turn")
     b.add_argument("--repeat", type=int, default=5)
     b.add_argument("--field", type=int, default=1,
                    help="field button index (0 T, 1 Z, 2 speed)")
