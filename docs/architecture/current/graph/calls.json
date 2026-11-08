@@ -1526,6 +1526,11 @@
       "target": "tropoi.representation.diagnostics.pe_surfaces._is_number"
     },
     {
+      "kind": "call",
+      "source": "tropoi.representation.diagnostics.pe_surfaces.SigmaSurface.__post_init__",
+      "target": "tropoi.representation.diagnostics.pe_surfaces._is_number"
+    },
+    {
       "kind": "instantiate",
       "source": "tropoi.representation.diagnostics.pe_surfaces._height_fields",
       "target": "tropoi.representation.diagnostics.pe_surfaces.SurfaceFields"
@@ -1542,6 +1547,21 @@
     },
     {
       "kind": "instantiate",
+      "source": "tropoi.representation.diagnostics.pe_surfaces._sigma_fields",
+      "target": "tropoi.representation.diagnostics.pe_surfaces.SurfaceFields"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.representation.diagnostics.pe_surfaces._sigma_fields",
+      "target": "tropoi.representation.diagnostics.pe_surfaces.SurfaceUnavailableError"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.diagnostics.pe_surfaces._sigma_fields",
+      "target": "tropoi.representation.diagnostics.pe_surfaces.interpolate_log_sigma"
+    },
+    {
+      "kind": "instantiate",
       "source": "tropoi.representation.diagnostics.pe_surfaces.interpolate_columns",
       "target": "tropoi.representation.diagnostics.pe_surfaces.SurfaceFields"
     },
@@ -1554,6 +1574,11 @@
       "kind": "call",
       "source": "tropoi.representation.diagnostics.pe_surfaces.interpolate_columns",
       "target": "tropoi.representation.diagnostics.pe_surfaces._height_fields"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.diagnostics.pe_surfaces.interpolate_columns",
+      "target": "tropoi.representation.diagnostics.pe_surfaces._sigma_fields"
     },
     {
       "kind": "call",
@@ -1574,6 +1599,11 @@
       "kind": "instantiate",
       "source": "tropoi.representation.diagnostics.pe_surfaces.parse_surface",
       "target": "tropoi.representation.diagnostics.pe_surfaces.PressureSurface"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.representation.diagnostics.pe_surfaces.parse_surface",
+      "target": "tropoi.representation.diagnostics.pe_surfaces.SigmaSurface"
     },
     {
       "kind": "call",
@@ -11001,6 +11031,34 @@
       "type": "function"
     },
     {
+      "id": "tropoi.representation.diagnostics.pe_surfaces.SigmaSurface",
+      "kind": "class",
+      "module": "tropoi.representation.diagnostics.pe_surfaces",
+      "qualname": "SigmaSurface",
+      "type": "class"
+    },
+    {
+      "id": "tropoi.representation.diagnostics.pe_surfaces.SigmaSurface.__post_init__",
+      "kind": "method",
+      "module": "tropoi.representation.diagnostics.pe_surfaces",
+      "qualname": "SigmaSurface.__post_init__",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.diagnostics.pe_surfaces.SigmaSurface.label",
+      "kind": "property",
+      "module": "tropoi.representation.diagnostics.pe_surfaces",
+      "qualname": "SigmaSurface.label",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.diagnostics.pe_surfaces.SigmaSurface.value",
+      "kind": "property",
+      "module": "tropoi.representation.diagnostics.pe_surfaces",
+      "qualname": "SigmaSurface.value",
+      "type": "function"
+    },
+    {
       "id": "tropoi.representation.diagnostics.pe_surfaces.SurfaceFields",
       "kind": "class",
       "module": "tropoi.representation.diagnostics.pe_surfaces",
@@ -11054,6 +11112,13 @@
       "kind": "function",
       "module": "tropoi.representation.diagnostics.pe_surfaces",
       "qualname": "_is_number",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.diagnostics.pe_surfaces._sigma_fields",
+      "kind": "function",
+      "module": "tropoi.representation.diagnostics.pe_surfaces",
+      "qualname": "_sigma_fields",
       "type": "function"
     },
     {

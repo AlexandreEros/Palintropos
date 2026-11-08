@@ -869,6 +869,29 @@
     },
     {
       "decorators": [
+        "dataclass(frozen=True)"
+      ],
+      "external_bases": [],
+      "id": "tropoi.representation.diagnostics.pe_surfaces.SigmaSurface",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__post_init__"
+        },
+        {
+          "kind": "property",
+          "name": "label"
+        },
+        {
+          "kind": "property",
+          "name": "value"
+        }
+      ],
+      "module": "tropoi.representation.diagnostics.pe_surfaces",
+      "qualname": "SigmaSurface"
+    },
+    {
+      "decorators": [
         "dataclass(frozen=True, eq=False)"
       ],
       "external_bases": [],
