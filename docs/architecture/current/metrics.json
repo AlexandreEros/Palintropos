@@ -1,10 +1,10 @@
 {
   "call_graph": {
     "call_sites": {
-      "builtin": 2932,
-      "external": 1965,
-      "internal": 2482,
-      "unresolved": 2977
+      "builtin": 2937,
+      "external": 1968,
+      "internal": 2484,
+      "unresolved": 2980
     },
     "edges_by_kind": {
       "call": 1048,
@@ -926,7 +926,7 @@
     "package": "tropoi",
     "src": "src",
     "working_tree": {
-      "base_commit": "acf181c34ccde6048ab5e0827988393126a5ef86",
+      "base_commit": "254cd9c458d46464e27c37bcdc34febb0ed76b56",
       "generator": {
         "changes": [],
         "files": {
@@ -993,10 +993,10 @@
           "src/tropoi/representation/visual/renderers.py": "9f6173f49588029f1404914b1fd3edd7ef1559688b02e3a056e67fa121cb261e",
           "src/tropoi/representation/visual/snapshot.py": "2aa254f731fdf0caadab5a960fcffbbabca6319c20fe21f79dba967beb7eb3ae",
           "src/tropoi/representation/visual/specs.py": "f43a3bff6371425f177d9f8d0d2f03823bd038af5c830cf4214a1174ed6ba68e",
-          "src/tropoi/representation/visual/sphere_streamlines.py": "821043e2d191e2c4e023c5a9cef5ec2a5a28520d256e5825c53ea535dc17b0fb",
+          "src/tropoi/representation/visual/sphere_streamlines.py": "24b521eeb3757a17e7a4a9848374200a008ef501776ad552ca41c048f513dc15",
           "src/tropoi/representation/visual/swe.py": "2b3e4a2c666d52e7b2380fe3e49a59b2c1cd6c8c2b3b85c1e1d6856cb19e88c0",
           "src/tropoi/representation/visual/terrain.py": "62f721efeb6ccb08ebfe15c0ff12ea27eda3b339ef5a597de0f691faaaa0b1dd",
-          "src/tropoi/representation/visual/terrain_globe.html": "df2e6246932d20bae747c67044aa689bb13827306ba49b926a64eda6d93d1222",
+          "src/tropoi/representation/visual/terrain_globe.html": "c2bdbcd07fd5663656bdf769b19bda3adb60766ac93613dea6f8ee810eef6592",
           "src/tropoi/representation/visual/timeline.py": "daf63d0946317b3930cae59770a3c264e43018420d631db55cd82fe6c786d83e",
           "src/tropoi/representation/visual/views.py": "102f42bbb2598b320652c1e080e91f56faa8b07c772101643a5a1be0d8952891",
           "src/tropoi/representation/visual/vorticity_viewer.py": "30c3f401cc653cc7856f829bbd5427fe2178cd425d5124f29bf2297d289d04f3",
@@ -1090,7 +1090,7 @@
           "src/tropoi/temporal/tendencies/primitive_equations.py": "b3508be7873df7202000ed3e9b7ac4419b6537c9c7fc1e3cd8bb7fdb127075c2",
           "src/tropoi/temporal/tendencies/shallow_water.py": "7ae521f2378824e89f88bc467fc99321d1ef4224b037c865137e076a601da3c8"
         },
-        "sha256": "aa66f71bb45e3df2815d6de9bcfb1bd5ec2543ed67bba83d04f53118f8bbd0ff",
+        "sha256": "88a43f5544d4c672fa0f6cf7cad9b0ff5273cf5953a3aa3941bc50a98038c1c9",
         "status": "clean"
       }
     }

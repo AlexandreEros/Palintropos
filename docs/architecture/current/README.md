@@ -5,13 +5,13 @@
 
 | | |
 |---|---|
-| Source base commit | `acf181c34ccde6048ab5e0827988393126a5ef86` (clean working tree) |
+| Source base commit | `254cd9c458d46464e27c37bcdc34febb0ed76b56` (clean working tree) |
 | Analysed package | `tropoi` under `src/` |
 | Generator | `tools.architecture` 2.0.0 |
 | Toolchain | Python 3.12, grimp 3.17, networkx 3.7 |
 | Command | `python -m tools.architecture.generate` |
 
-Source working tree: **clean**. Content SHA-256: `aa66f71bb45e3df2815d6de9bcfb1bd5ec2543ed67bba83d04f53118f8bbd0ff`. Generator working tree: **clean**. Per-file hashes and scoped Git status are recorded in `metrics.json`. These describe generation time; --check verifies source and generator content hashes before reusing this context across later commits. The base commit alone does not identify uncommitted source.
+Source working tree: **clean**. Content SHA-256: `88a43f5544d4c672fa0f6cf7cad9b0ff5273cf5953a3aa3941bc50a98038c1c9`. Generator working tree: **clean**. Per-file hashes and scoped Git status are recorded in `metrics.json`. These describe generation time; --check verifies source and generator content hashes before reusing this context across later commits. The base commit alone does not identify uncommitted source.
 
 ## Reproducing
 
@@ -95,7 +95,7 @@ The layers are the only input to this snapshot that states an expectation. They 
 
 ### Call graphs (ast)
 
-Each call expression inside a function or method body (nested functions, lambdas, and comprehensions are attributed to the enclosing function) is classified as `internal` (resolved to an analysed definition), `external` (resolved to a name outside the package), `builtin` (an unshadowed builtin), or `unresolved`. Totals: builtin 2932, external 1965, internal 2482, unresolved 2977.
+Each call expression inside a function or method body (nested functions, lambdas, and comprehensions are attributed to the enclosing function) is classified as `internal` (resolved to an analysed definition), `external` (resolved to a name outside the package), `builtin` (an unshadowed builtin), or `unresolved`. Totals: builtin 2937, external 1968, internal 2484, unresolved 2980.
 
 | Edge kind | Syntax | What it claims |
 |---|---|---|
