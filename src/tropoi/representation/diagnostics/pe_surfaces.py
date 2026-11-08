@@ -44,6 +44,14 @@ Vorticity and divergence are deliberately absent: a horizontal derivative on
 a sigma level is not the derivative on a pressure level, and the honest
 target-coordinate derivative is a later slice of issue #13.
 
+Two steps, usable apart: :func:`pressure_columns` reconstructs and checks
+the native columns of one state ONCE (:class:`PressureColumns`), and
+:func:`interpolate_columns` is the pure vertical step for any pressure.
+:func:`pressure_surface` is the two in sequence. The interactive-pressure
+page of :mod:`~tropoi.representation.visual.atmosphere` exports the columns
+and performs the vertical step itself, in the browser, by these rules;
+this module is its reference and the tests compare the two.
+
 NumPy only; never imports CuPy, never touches the page.
 """
 from __future__ import annotations
@@ -62,14 +70,17 @@ __all__ = [
     "MASK_BELOW_SURFACE",
     "MASK_LABELS",
     "MASK_VALID",
+    "PressureColumns",
     "PressureSurface",
     "SURFACE_FIELDS",
     "SurfaceFields",
     "SurfaceUnavailableError",
     "LEVEL_SIGMA_CHOICES",
+    "interpolate_columns",
     "interpolate_log_sigma",
     "level_sigma_positions",
     "parse_surface",
+    "pressure_columns",
     "pressure_surface",
 ]
 
@@ -269,6 +280,54 @@ def interpolate_log_sigma(sigma_full, columns: dict, sigma_target):
     return values, mask, bracket
 
 
+@dataclass(frozen=True, eq=False)
+class PressureColumns:
+    """The native columns of one saved state on the display mesh: what the
+    vertical interpolation reads and what the interactive page exports.
+
+    Stacks are ``(K, nlat, nlon)``: ``temperature`` (K), ``geopotential``
+    (m² s⁻², absolute), ``u`` and ``v`` (m/s; ``None`` without winds).
+    ``surface_pressure`` (Pa) is ``exp(ln p_s)`` of the state. The column
+    geometry has been checked (finite, ``Phi`` decreasing downward).
+    """
+
+    level_sigma: str
+    level_positions: tuple[float, ...]
+    lat_deg: np.ndarray
+    lon_deg: np.ndarray
+    temperature: np.ndarray
+    geopotential: np.ndarray
+    u: np.ndarray | None
+    v: np.ndarray | None
+    surface_pressure: np.ndarray
+    surface_height: np.ndarray | None
+    gravity: float
+
+    @property
+    def nlev(self) -> int:
+        return int(self.temperature.shape[0])
+
+    @property
+    def winds(self) -> bool:
+        return self.u is not None
+
+    def stacks(self) -> dict:
+        """The interpolated fields by name (winds when present)."""
+        out = {"temperature": self.temperature,
+               "geopotential": self.geopotential}
+        if self.winds:
+            out["u"] = self.u
+            out["v"] = self.v
+        return out
+
+    def sampled_pressure_range(self) -> tuple[float, float]:
+        """Pressures (Pa) the full levels span over the mesh: ``sigma_1 min
+        p_s`` to ``sigma_K max p_s``. A target outside it has no valid node."""
+        p_s = self.surface_pressure
+        return (float(self.level_positions[0] * p_s.min()),
+                float(self.level_positions[-1] * p_s.max()))
+
+
 def _check_column_geometry(levels: LevelFields) -> None:
     phi = levels["geopotential"]
     if phi.shape[0] < 2:
@@ -284,27 +343,28 @@ def _check_column_geometry(levels: LevelFields) -> None:
             "is interpolated")
 
 
-def pressure_surface(frame, context, lat_deg, lon_deg, surface, *,
-                     winds: bool = True, levels: LevelFields | None = None,
-                     level_sigma: str = "hydrostatic",
-                     time_label: str = "this saved state") -> SurfaceFields:
-    """Interpolate one saved state to the pressure surface ``surface``.
+def pressure_columns(frame, context, lat_deg, lon_deg, *, winds: bool = True,
+                     levels: LevelFields | None = None,
+                     level_sigma: str = "hydrostatic") -> PressureColumns:
+    """The native columns of one saved state, ready to interpolate.
 
-    ``surface`` is a :class:`PressureSurface` or ``("pressure", Pa)``. The
-    native levels are reconstructed with :func:`reconstruct_levels` on the
-    display mesh (all full levels, winds when ``winds``), or taken from
-    ``levels`` when the caller already has them (it must hold every full
-    level of ``context`` on this mesh). ``level_sigma`` chooses where a
-    level sits (module doc). Raises on invalid column geometry and when no
-    node of the state samples the surface.
+    Reconstructs every full level on the display mesh with
+    :func:`reconstruct_levels` (winds when ``winds``; never vorticity or
+    divergence), or takes ``levels`` when the caller already has them (they
+    must hold every full level of ``context`` on this mesh). Checks the
+    column geometry and the surface pressure. ``level_sigma`` chooses where
+    a level sits (module doc). This is the one reconstruction a saved state
+    needs, whatever pressures are later asked of it.
     """
-    target = parse_surface(surface)
     positions = level_sigma_positions(context, level_sigma)
+    if context.gravity is None:
+        raise ValueError("the column context records no gravity, so "
+                         "geopotential height Phi/g is undefined")
     if levels is None:
         levels = reconstruct_levels(frame, context, lat_deg, lon_deg, None,
                                     winds=winds, vorticity_divergence=False)
     if levels.levels != tuple(range(context.nlev)):
-        raise ValueError("pressure_surface needs every full level of the "
+        raise ValueError("pressure_columns needs every full level of the "
                          f"run, got levels {levels.levels}")
     if winds and "u" not in levels.values:
         raise ValueError("winds were requested but the given levels hold "
@@ -313,27 +373,65 @@ def pressure_surface(frame, context, lat_deg, lon_deg, surface, *,
     p_s = levels.surface_pressure
     if not (np.all(np.isfinite(p_s)) and np.all(p_s > 0.0)):
         raise ValueError("surface pressure is not finite and positive")
+    return PressureColumns(
+        level_sigma=level_sigma, level_positions=positions,
+        lat_deg=levels.lat_deg, lon_deg=levels.lon_deg,
+        temperature=np.asarray(levels["temperature"], dtype=np.float64),
+        geopotential=np.asarray(levels["geopotential"], dtype=np.float64),
+        u=np.asarray(levels["u"], dtype=np.float64) if winds else None,
+        v=np.asarray(levels["v"], dtype=np.float64) if winds else None,
+        surface_pressure=np.asarray(p_s, dtype=np.float64),
+        surface_height=levels.surface_height, gravity=float(context.gravity))
+
+
+def interpolate_columns(columns: PressureColumns, surface, *,
+                        time_label: str = "this saved state"
+                        ) -> SurfaceFields:
+    """Interpolate prepared columns to the pressure surface ``surface``.
+
+    The pure vertical step (module doc): ``sigma* = p0 / p_s``, linear in
+    ``ln sigma`` for every stack of ``columns``, ``Z = Phi / g`` after.
+    Raises :class:`SurfaceUnavailableError` when no node is valid. The
+    browser's interactive-pressure page implements exactly this step on
+    the exported columns; this function is its reference.
+    """
+    target = parse_surface(surface)
+    positions = columns.level_positions
+    p_s = columns.surface_pressure
     sigma_target = target.pressure_pa / p_s
-    columns = {"temperature": levels["temperature"],
-               "geopotential": levels["geopotential"]}
-    if winds:
-        columns["u"] = levels["u"]
-        columns["v"] = levels["v"]
-    values, mask, bracket = interpolate_log_sigma(positions, columns,
+    values, mask, bracket = interpolate_log_sigma(positions, columns.stacks(),
                                                   sigma_target)
     if not np.any(mask == MASK_VALID):
-        sig = positions
+        lo, hi = columns.sampled_pressure_range()
         raise SurfaceUnavailableError(
             f"the {target.label} surface has no valid node at {time_label}: "
             f"the saved surface pressure spans {p_s.min():.6g} to "
-            f"{p_s.max():.6g} Pa and the full levels sample "
-            f"{sig[0] * p_s.min():.6g} to {sig[-1] * p_s.max():.6g} Pa; "
-            "choose a pressure inside that range")
-    g = float(context.gravity)
-    values["geopotential_height"] = values["geopotential"] / g
-    return SurfaceFields(surface=target, level_sigma=level_sigma,
-                         level_positions=positions, lat_deg=levels.lat_deg,
-                         lon_deg=levels.lon_deg, values=values, mask=mask,
+            f"{p_s.max():.6g} Pa and the full levels sample {lo:.6g} to "
+            f"{hi:.6g} Pa; choose a pressure inside that range")
+    values["geopotential_height"] = values["geopotential"] / columns.gravity
+    return SurfaceFields(surface=target, level_sigma=columns.level_sigma,
+                         level_positions=positions, lat_deg=columns.lat_deg,
+                         lon_deg=columns.lon_deg, values=values, mask=mask,
                          bracket=bracket, sigma_target=sigma_target,
                          surface_pressure=p_s,
-                         surface_height=levels.surface_height)
+                         surface_height=columns.surface_height)
+
+
+def pressure_surface(frame, context, lat_deg, lon_deg, surface, *,
+                     winds: bool = True, levels: LevelFields | None = None,
+                     level_sigma: str = "hydrostatic",
+                     time_label: str = "this saved state") -> SurfaceFields:
+    """Interpolate one saved state to the pressure surface ``surface``.
+
+    ``surface`` is a :class:`PressureSurface` or ``("pressure", Pa)``.
+    :func:`pressure_columns` followed by :func:`interpolate_columns`: the
+    native levels are reconstructed on the display mesh (all full levels,
+    winds when ``winds``), or taken from ``levels`` when the caller already
+    has them. ``level_sigma`` chooses where a level sits (module doc).
+    Raises on invalid column geometry and when no node of the state samples
+    the surface.
+    """
+    target = parse_surface(surface)          # refuse a bad spec first
+    columns = pressure_columns(frame, context, lat_deg, lon_deg, winds=winds,
+                               levels=levels, level_sigma=level_sigma)
+    return interpolate_columns(columns, target, time_label=time_label)

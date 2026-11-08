@@ -245,8 +245,11 @@ class Simulation:
         ``surface`` (``("pressure", Pa)``: one interpolated isobaric
         surface per exported time instead of native levels, with masks
         where it is under ground or outside the sampled levels; exclusive
-        with ``levels``), ``level_sigma`` (with ``surface``), ``resolution_deg``
-        (display mesh), ``streamlines``, ``max_mb``, ``gravity``,
+        with ``levels``), ``level_sigma`` (with ``surface``),
+        ``interactive_pressure`` (with ``surface`` as the initial isobar:
+        export the native columns and choose any pressure in the page, no
+        streamlines), ``resolution_deg`` (display mesh), ``streamlines``,
+        ``max_mb``, ``gravity``,
         ``allow_cuda``, ``open_browser``, initial ``field``, ``level``,
         ``time``, ``opacity``, ``exaggeration``. Reconstruction runs on the
         CPU from the saved coefficients. See

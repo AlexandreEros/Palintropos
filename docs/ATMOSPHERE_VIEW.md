@@ -47,6 +47,7 @@ python examples/atmosphere_view.py runs/hs-T42L20-prod-002 --times 0 -1 --field 
 | `levels` | native full-level indices, 0 = top | all levels |
 | `surface` | `("pressure", Pa)`: one isobaric surface per exported time instead of native levels (see [Fixed-pressure surfaces](#fixed-pressure-surfaces-across-saved-times)); exclusive with `levels` | none (native levels) |
 | `level_sigma` | with `surface`: where a native level sits for the interpolation, `"hydrostatic"` or `"nominal"` | `"hydrostatic"` |
+| `interactive_pressure` | with `surface` (then the initial isobar): export the native columns and choose any pressure in the page (see [Any pressure in the browser](#any-pressure-in-the-browser-interactive-pressure-mode)); streamlines off | `False` |
 | `resolution_deg` | display mesh spacing in degrees (a divisor of 180°) | about 4 nodes per shortest resolved wavelength, between 1° and 3°: 2° at T42 |
 | `max_mb` | bound on the embedded data, in MB | 32; `None` removes it |
 | `streamlines` | export horizontal streamlines | `True` |
@@ -252,6 +253,143 @@ arrays eagerly; the 29 MB page became interactive in headless Chrome in
 1.1 s with 64 MB of JS heap, and switched frames in 25 ms (median), so
 lazy decoding is not needed at this size.
 
+## Any pressure in the browser: interactive-pressure mode
+
+The second slice of [issue #13](https://github.com/AlexandreEros/Palintropos/issues/13).
+`interactive_pressure=True` exports the **native columns** of each saved
+state instead of one surface, and the page interpolates them to **any
+pressure chosen in the browser**, offline. Export once; decide the isobars
+later.
+
+```python
+sim = open_simulation("docs/runs/20261027T175327Z_orographic-thermal-wave_…_71c5441a")
+sim.view("mars_isobars.html", surface=("pressure", 300.0),   # initial isobar, Pa
+         interactive_pressure=True, times="all", resolution_deg=3.0)
+sim.view("hs_isobars.html", surface=("pressure", 50_000.0),
+         interactive_pressure=True, times=[0, 60, 119])       # explicit saved indices
+```
+
+```bash
+python examples/isobaric_view.py interactive RUN --pressure 300 --out isobars.html
+```
+
+`surface` is then the initial isobar (required, pascals); `times` and
+`max_mb` keep their contract; `level_sigma` chooses the level positions as
+before; `levels`, `level` and `streamlines` do not apply (`levels`/`level`
+are refused, streamlines are off, see below). The default output name
+contains `-isobars-`.
+
+**What the file holds.** Per exported saved state: temperature, geopotential,
+`u` and `v` on **every** full level (16-bit per level slice, with that
+slice's min/max) and the surface pressure (float32); shared: the level
+positions in σ, the mask labels, the end tolerance, conservative colour
+ranges. Nothing redundant: wind speed and geopotential height are derived
+in the page, and the interpolated height serves both the geometry and the
+displayed field. Each state is reconstructed once (one spherical-harmonic
+synthesis per field and level), quantized, and dropped before the next.
+The payload is `version` 3 with a `columns` block; the fixed-surface page
+(`version` 2) and the native page (`version` 1) are unchanged.
+
+**What the page computes.** The vertical step of
+`representation.diagnostics.pe_surfaces`, line for line: at each node
+`σ* = p₀/pₛ`; masks 1 (`σ* > 1`, under ground), 2 (above the top level),
+3 (between the bottom level and the ground), the end levels widened by
+1e−9; temperature, geopotential, `u` and `v` linear in `ln σ` between the
+bracketing levels, the weight clamped (no extrapolation); then `Z = Φ/g` and
+the wind speed. One pass produces the fields, the height and the mask
+together for one (pressure, saved time), so geometry, colours, masks, flat
+map, hover and labels always describe the same selection. Python is the
+reference: `pressure_columns` → `interpolate_columns` is what
+`pressure_surface` does, and a browser test compares the page's arrays with
+it at arbitrary pressures, on both end levels and in holes (masks identical;
+values within the float32 storage of the result).
+
+**Controls.** A logarithmic slider over the pressures some node of some
+exported state samples (`σ₁·min pₛ` to `σ_K·max pₛ`, 1001 positions) and a
+typed value with an explicit unit (hPa or Pa), kept synchronized: a typed
+value between slider positions is used exactly and the slider shows the
+nearest position. Non-finite, empty, zero or negative input is refused with
+the reason, nothing changes. Rapid slider input is coalesced to one
+recomputation per animation frame and the newest value wins; the
+recomputation itself is synchronous, so no older update can overwrite a
+newer selection. Changing the saved time keeps the pressure and recomputes
+the surface from that state's columns; nothing is interpolated in time.
+
+**Masks and the empty surface.** As in the fixed-surface page: masked nodes
+draw no triangle, are grey on the flat map and say why on hover (every node
+the bilinear sample draws on is checked). A pressure no node samples at the
+selected time gives an **empty surface** with an explanation (the state's
+surface-pressure range and the sampled range) and live controls; the Python
+reference raises `SurfaceUnavailableError` for the same case. An initial
+pressure no exported state samples anywhere fails at export, naming the
+range.
+
+**Colour ranges** are fixed bounds from the exported columns over all times
+and levels: temperature and geopotential height cannot leave their column
+ranges under linear interpolation, and the speed of an interpolated vector
+is at most the larger bracket speed, so the scales stay put while the
+pressure moves (the native per-level option does not apply).
+
+**Streamlines are not available in this mode.** The wind on an arbitrary
+isobar exists only in the browser, and tracing it there is a later slice;
+the checkbox is disabled and the page says so. The fixed-surface and
+native pages keep their streamlines.
+
+**Stored precision, measured.** Each level slice of each field is stored
+with its own 16-bit range, so the error is at most half a quantum,
+`(max − min)/131070`, per value; the surface pressure is float32 (6e−8
+relative), which keeps the under-ground comparison `p₀ > pₛ` exact to that
+precision and can move a node that sits exactly on an end level across the
+1e−9 tolerance band (a test excludes such nodes; it is the only place the
+stored form and the exact columns disagree on a mask). Interpolation is
+linear, so the interpolated error is within the bracket quanta; the test
+measures it apart from the interpolation error (zero on the stored columns
+up to float32 storage of the result) and the analytic isothermal column
+goes through the stored form to the same bound.
+
+| run | half-quantum of the stored columns (worst level) | Z |
+| --- | --- | --- |
+| Mars MOLA evolving (T21L4, 3°) | T 0.02 mK, wind 0.03 mm/s | 0.12 m |
+| `hs-T42L20-prod-002` (T42L20, 2°) | T 0.4 mK, wind 1 mm/s | 0.01 m |
+
+**Size and speed, measured** (export: the same laptop CPU as above; page:
+headless Chrome with software WebGL, `examples/isobaric_view.py bench`,
+[the record](validation/interactive_pressure_2026-11-08/README.md)).
+Full columns cost more than one surface: per saved state, `8·K` bytes per
+node plus 4 for the surface pressure before base64, against 7 (+ streamlines)
+for a fixed surface; the estimate is made before anything is reconstructed
+and the decoded memory of one state is reported separately (page details
+and the export report).
+
+| run | states | mesh | file | export | per decoded state |
+| --- | --- | --- | --- | --- | --- |
+| Mars (T21L4), `times="all"` | 9 | 3° (7381 nodes) | 3.64 MB | 1.6 s | 0.60 MB |
+| `hs-T42L20-prod-002`, `times="all"` | 120 | 2° | **refused**: 433 MB above 32 MB (194 MB at 3°) | – | – |
+| same, 8 evenly spaced states | 8 | 2° (16,471 nodes) | 29.3 MB | 6.9 s | 5.6 MB |
+
+| page | interactive after | JS heap | pressure update (page) | of which interpolation | saved-time switch (page) | of which decoding |
+| --- | --- | --- | --- | --- | --- | --- |
+| Mars, 3.64 MB | 0.9 s | 19 MB | 6 ms | 0.9 ms | 12 ms | 4.5 ms |
+| Held–Suarez, 29.3 MB | 1.05 s | 50 MB | 15 ms | 3.5 ms | 140 ms | 112 ms |
+
+The page's own timer splits each update into decoding (only on a saved-time
+switch not in the two-state cache), interpolation, mesh (positions,
+colours, triangle re-indexing, labels) and flat map; the round trip seen
+through the DevTools protocol adds about 30–40 ms of its own. Interpolation
+is the cheapest part of a pressure update at both sizes; at 20 levels the
+base64 decoding of a state dominates a time switch, so playback of the
+29 MB page runs at about 7 states per second, not 8. Only the selected
+state is decoded (two held, least recently used dropped); the 29 MB page
+holds 50 MB of heap, not the 44 MB its eight states would decode to. Export
+is cheaper than the fixed-surface export of the same states (0.69 s against
+0.93 s per state on the T42L20 run at 2°) because no streamlines are traced.
+
+**Not in this slice.** Browser-side streamlines; target-surface vorticity
+and divergence; geopotential-height surfaces; compression of the columns
+(the file is base64 of raw 16-bit slices); any GPU path. The 32 MB default
+budget bounds the T42L20 run to 8 states at 2° or 19 at 3°; the budget is
+explicit (`max_mb`, `None` removes it) and the refusal says what to change.
+
 ## What the surface is
 
 **The level.** Native levels are the core's full levels. With interfaces
@@ -400,10 +538,12 @@ headless Chrome with software WebGL these pages became interactive within
 
 ## Limits
 
-- One surface at a time: a native σ level, or one fixed-pressure surface
-  ([above](#fixed-pressure-surfaces-across-saved-times)). No
-  geopotential-height surfaces yet, no vorticity or divergence on a derived
-  surface, no volume rendering, no mass streamfunction.
+- One surface at a time: a native σ level, one fixed-pressure surface
+  ([above](#fixed-pressure-surfaces-across-saved-times)) or any pressure
+  interpolated in the page ([interactive mode](#any-pressure-in-the-browser-interactive-pressure-mode),
+  without streamlines). No geopotential-height surfaces yet, no vorticity or
+  divergence on a derived surface, no volume rendering, no mass
+  streamfunction.
 - Hovering the globe locates points on the undisplaced sphere ("relief ignored
   when picking"), as in the terrain viewer. The flat map is exact.
 - Streamline density is uniform in seeds, not adaptive. Lines in weak flow can
@@ -418,9 +558,9 @@ headless Chrome with software WebGL these pages became interactive within
 | layer | module |
 | --- | --- |
 | archive (reading saved runs) | `representation.archive.held_suarez` (Held–Suarez storage), `representation.archive.pe_context` (`PEColumnContext`: σ, constants, radius, gravity, terrain, provenance), `CapsuleStorage.pe_context` |
-| physical reconstruction (CPU) | `representation.diagnostics.pe_levels.reconstruct_levels`, `spatial.transforms.host_synthesis.synthesize_wind_latlon`; derived pressure surfaces: `representation.diagnostics.pe_surfaces` (`pressure_surface`, `interpolate_log_sigma`, masks), `spatial.sigma_coordinate.SigmaGrid.hydrostatic_full_levels` |
-| payload | `representation.visual.atmosphere` (selection, bounds, quantization, colour limits), `representation.visual.sphere_streamlines` |
-| page | `representation.visual.terrain_globe.html`: the terrain viewer's template, extended with an optional `atmosphere` block; `terrain.write_globe_page` writes both kinds of page |
+| physical reconstruction (CPU) | `representation.diagnostics.pe_levels.reconstruct_levels`, `spatial.transforms.host_synthesis.synthesize_wind_latlon`; derived pressure surfaces: `representation.diagnostics.pe_surfaces` (`pressure_columns`, `interpolate_columns`, `pressure_surface`, `interpolate_log_sigma`, masks), `spatial.sigma_coordinate.SigmaGrid.hydrostatic_full_levels` |
+| payload | `representation.visual.atmosphere` (selection, bounds, quantization, colour limits; `quantize_columns`/`dequantize_columns` and the column estimates for the interactive page), `representation.visual.sphere_streamlines` |
+| page | `representation.visual.terrain_globe.html`: the terrain viewer's template, extended with an optional `atmosphere` block (native levels, one fixed surface, or columns interpolated in the page: `computeSurface`); `terrain.write_globe_page` writes both kinds of page |
 | entry points | `Simulation.view`, `Snapshot.view` → `storage.view` |
 
 The terrain-only page is unchanged. A browser capture of the same terrain

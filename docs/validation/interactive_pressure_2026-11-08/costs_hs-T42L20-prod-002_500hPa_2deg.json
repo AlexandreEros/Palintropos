@@ -1,0 +1,62 @@
+{
+  "run": "runs\\hs-T42L20-prod-002",
+  "label": "hs-T42L20-prod-002",
+  "l_max": 43,
+  "nlev": 20,
+  "resolution_deg": 2.0,
+  "mesh_nodes": 16471,
+  "pressure_pa": 50000.0,
+  "times": [
+    0,
+    60,
+    119
+  ],
+  "valid_fraction": [
+    1.0,
+    1.0,
+    1.0
+  ],
+  "seconds_per_time": {
+    "synthesis_T_phi": 0.29852816672064364,
+    "hydrostatic_coefficients": 0.0031843666608134904,
+    "winds": 0.3169115665368736,
+    "zeta_delta_syntheses_skipped": 0.28236680004435283,
+    "reconstruct_levels_total": 0.6126340667251498,
+    "vertical_interpolation": 0.0044728999491781,
+    "streamlines": 0.06395356675299506,
+    "quantize_columns": 0.011073266544068852
+  },
+  "seconds_total_payload": 2.8048344999551773,
+  "seconds_total_payload_per_time": 0.9349448333183924,
+  "seconds_write_page": 0.03737149992957711,
+  "estimate_bytes": 1269442,
+  "file_bytes": 1161354,
+  "interactive": {
+    "seconds_total_payload": 2.0669362999033183,
+    "seconds_total_payload_per_time": 0.6889787666344395,
+    "seconds_write_page": 0.09980989992618561,
+    "estimate_bytes": 11353462,
+    "file_bytes": 11260670,
+    "decoded_bytes_per_time": 5550727,
+    "pressure_range_pa": [
+      2370.3489513870272,
+      99749.31566145379
+    ]
+  },
+  "ratio_interpolation_to_reconstruction": 0.007301095698265842,
+  "level_fields_native_page": [
+    "temperature",
+    "pressure",
+    "geopotential",
+    "geopotential_height",
+    "zeta",
+    "delta",
+    "u",
+    "v"
+  ],
+  "machine": {
+    "python": "3.12.12",
+    "processor": "Intel64 Family 6 Model 142 Stepping 10, GenuineIntel",
+    "system": "Windows-11-10.0.26200-SP0"
+  }
+}
