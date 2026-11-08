@@ -183,7 +183,9 @@ def load_scope(root: Path, rel: str | None) -> Scope:
     path = root / rel
     if not path.is_file():
         return Scope(path=rel, problems=[f"scope file {rel} not found"])
-    data = path.read_bytes()
+    # Hash with LF line endings so a Windows checkout (CRLF) and CI (LF)
+    # record the same identity for the same declarations.
+    data = path.read_bytes().replace(b"\r\n", b"\n")
     scope = Scope(path=rel, sha256=hashlib.sha256(data).hexdigest())
     try:
         doc = tomllib.loads(data.decode("utf-8"))

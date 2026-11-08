@@ -5,7 +5,7 @@
 
 | | |
 |---|---|
-| Source base commit | `917e8056232682d3a11d87c1fc4cc80bddeb63b6` (clean working tree) |
+| Source base commit | `d5d1ae014db229ff876a35d74ea07211d514274f` (clean working tree) |
 | Analysed package | `tropoi` under `src/` |
 | Generator | `tools.architecture` 2.1.0 |
 | Toolchain | Python 3.12, grimp 3.17, networkx 3.7 |
@@ -86,7 +86,7 @@ Three generic rules decide what must be documented (`tools/architecture/coverage
 2. **CLI handlers:** every <parser>.set_defaults(<keyword>=<function>) handler gets calls/cli-<name>.mmd. 10 discovered.
 3. **Public Python entry points:** module-level functions exported through some __all__ (re-exports followed) that no analysed function calls; each must be declared as an entry path root or excluded with a reason. 23 candidates: 13 are roots of declared entry paths, 10 excluded with a reason.
 
-The declarations are read from `docs/architecture/entry-points.toml` (SHA-256 `bdaff95007c413b8b4a984972d65f8b649c6bde936e354e922569175f06ae589`). Like the layer declaration, they state expectations; unlike it, a gap fails generation: an undeclared candidate, a declared root or exclusion that no longer exists, or a declared narrative page that is missing or does not link its diagram. `--check` therefore fails on any of these too.
+The declarations are read from `docs/architecture/entry-points.toml` (SHA-256 `1cd1ce6a9dd537f5cbd28ddea5085a5b1592344f3ffdf595c1a071b80562d970`). Like the layer declaration, they state expectations; unlike it, a gap fails generation: an undeclared candidate, a declared root or exclusion that no longer exists, or a declared narrative page that is missing or does not link its diagram. `--check` therefore fails on any of these too.
 
 What CI establishes: the committed outputs equal what these rules produce from the committed source, and the rules found no undeclared entry point. It does not establish that a diagram is easy to read or that a narrative page is still accurate prose.
 

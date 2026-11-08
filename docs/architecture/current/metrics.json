@@ -1041,21 +1041,16 @@
     "package": "tropoi",
     "src": "src",
     "working_tree": {
-      "base_commit": "917e8056232682d3a11d87c1fc4cc80bddeb63b6",
+      "base_commit": "d5d1ae014db229ff876a35d74ea07211d514274f",
       "generator": {
         "changes": [
-          " M tools/architecture/__init__.py",
-          " M tools/architecture/generate.py",
-          " M tools/architecture/mermaid.py",
-          " M tools/architecture/report.py",
-          "?? tools/architecture/coverage.py",
-          "?? tools/architecture/views.py"
+          " M tools/architecture/coverage.py"
         ],
         "files": {
           "tools/architecture/__init__.py": "7eaab7e08118ce5c31e59abccafd6d1464c255ec7d9812e4d8bda08c461d54ab",
           "tools/architecture/calls.py": "fe492066691403114d3adef4eade7541d55afd75bfbd02d14c72871bfd824e92",
           "tools/architecture/classes.py": "9436c2df4d3cf426b8893116faecd071b0a436b6b3eb1b7e4a81bb59ccdc16d1",
-          "tools/architecture/coverage.py": "2df39d6e828f27d28c64962e678de6bbbe44236cf87a4f9b97ef8a727c9ada41",
+          "tools/architecture/coverage.py": "83c9189d58da8ba7f007e857bf50df686cfe982cedb172837feefafdfd1fed79",
           "tools/architecture/export.py": "0c912ab5a81b921807c1e57796c486fc2faea5e1be23103d71eea0506a29ffef",
           "tools/architecture/generate.py": "d1cdd7242d145d4680ab4dcf8386e0e341ca41aa3cd421555ff4ef989f4c8ce1",
           "tools/architecture/imports.py": "be1b9267ae7d2da2d87e60cb3d3abde3011e49a7cfb628fb4222f5382c92d143",
@@ -1068,7 +1063,7 @@
           "tools/architecture/sources.py": "547a080e87018ce39b7e82eefd632a20dd4cad1158c57b888d7d25255a6aece1",
           "tools/architecture/views.py": "bfc2d188e1f519e47574f354486981762295dfe9235b3cfc4d58388c54bef3ff"
         },
-        "sha256": "4a41f250beea98c9e8bc5717ff98c542a145d71415e8a71fb2be8a01a0d561d9",
+        "sha256": "bf1b64e5fc3a264907991307a4f10580462762d2de694e080d22099bdadd837b",
         "status": "dirty"
       },
       "source": {
