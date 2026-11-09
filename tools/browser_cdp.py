@@ -161,12 +161,21 @@ class OfflinePage:
     def __enter__(self):
         port_file = pathlib.Path(self.profile) / "DevToolsActivePort"
         deadline = time.monotonic() + self.timeout
-        while not (port_file.exists() and port_file.read_text().strip()):
+
+        def port_text() -> str:
+            # On Windows the file can be locked while the browser writes it
+            # (PermissionError): not ready yet, try again.
+            try:
+                return port_file.read_text().strip()
+            except OSError:
+                return ""
+
+        while not port_text():
             if self.proc.poll() is not None or time.monotonic() > deadline:
                 self.__exit__(None, None, None)
                 raise RuntimeError("the browser did not start DevTools")
             time.sleep(0.05)
-        port = int(port_file.read_text().split()[0])
+        port = int(port_text().split()[0])
         opener = urllib.request.build_opener(urllib.request.ProxyHandler({}))
         base = f"http://127.0.0.1:{port}"
         self.version = json.loads(opener.open(f"{base}/json/version",

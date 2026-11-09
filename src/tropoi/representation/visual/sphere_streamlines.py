@@ -110,16 +110,31 @@ class _MeshSampler:
 def integrate_streamlines(u, v, lat_deg, lon_deg, *, seeds=None,
                           seed_count: int = 160, step_deg: float = 1.5,
                           max_steps: int = 24, min_speed: float = 1.0e-3,
-                          relative_min_speed: float = 0.02
+                          relative_min_speed: float = 0.02, valid=None
                           ) -> list[tuple[np.ndarray, np.ndarray]]:
     """Streamlines through each seed, ordered downstream.
 
     ``u``, ``v`` are ``(nlat, nlon)`` on the mesh ``lat_deg`` (``-90 .. 90``)
     x ``lon_deg`` (seam repeated). ``seeds`` = (lat_deg, lon_deg) arrays
-    (default: ``seed_count`` Fibonacci points). Returns one ``(lat, lon)``
+    (default: ``seed_count`` Fibonacci points). ``valid`` is an optional
+    ``(nlat, nlon)`` boolean node mask: a line is traced only through mesh
+    cells whose four nodes are valid, so it never crosses a masked gap (the
+    wind at masked nodes is ignored; it is set to zero before sampling), and
+    a seed inside a masked cell gives no line. The test covers the whole
+    step, not only its RK4 evaluation points: each accepted segment is
+    sampled at intervals shorter than half a mesh cell, its end included,
+    so a step longer than a cell cannot jump a thin masked band and no
+    drawn point lies in a masked cell. Returns one ``(lat, lon)``
     pair of arrays per drawn line (at least 3 points), each listed from its
     upstream end to its downstream end; seeds in calm air give no line.
     """
+    if valid is not None:
+        valid = np.asarray(valid, dtype=bool)
+        if valid.shape != np.shape(u):
+            raise ValueError(f"valid has shape {valid.shape}; expected the "
+                             f"wind's {np.shape(u)}")
+        u = np.where(valid, u, 0.0)
+        v = np.where(valid, v, 0.0)
     wind = cartesian_wind(u, v, lat_deg, lon_deg)
     speed = np.linalg.norm(wind, axis=-1)
     vmax = float(speed.max()) if speed.size else 0.0
@@ -127,10 +142,19 @@ def integrate_streamlines(u, v, lat_deg, lon_deg, *, seeds=None,
     if not vmax > threshold:
         return []
     sample = _MeshSampler(wind, lat_deg, lon_deg)
+    # The bilinear sample of the validity indicator is 1 only where every
+    # node with nonzero weight is valid: the cell test, with no extra search.
+    inside = (None if valid is None else
+              _MeshSampler(valid.astype(np.float64)[..., None], lat_deg,
+                           lon_deg))
     if seeds is None:
         seeds = fibonacci_seeds(seed_count)
     start = _to_xyz(np.asarray(seeds[0], float), np.asarray(seeds[1], float))
     h = math.radians(float(step_deg))
+
+    def is_inside(x):
+        lat, lon = _to_latlon(x)
+        return inside(lat, lon)[..., 0] > 1.0 - 1e-9
 
     def direction(x):
         lat, lon = _to_latlon(x)
@@ -138,7 +162,29 @@ def integrate_streamlines(u, v, lat_deg, lon_deg, *, seeds=None,
         w = w - np.sum(w * x, axis=-1, keepdims=True) * x
         s = np.linalg.norm(w, axis=-1, keepdims=True)
         ok = s[..., 0] > threshold
+        if inside is not None:
+            ok = ok & is_inside(x)
         return np.where(ok[..., None], w / np.where(s > 0, s, 1.0), 0.0), ok
+
+    # Points along a step at which the validity is re-checked: spaced closer
+    # than half the smaller mesh spacing, so no cell between two checks is
+    # skipped, up to and including the step's end (the accepted point is
+    # drawn, so it must lie in a valid cell even when no step follows it).
+    # None when there is no mask.
+    if inside is None:
+        fractions = None
+    else:
+        cell = min(abs(inside.dlat), abs(inside.dlon))
+        count = int(math.ceil(2.0 * float(step_deg) / cell)) + 1
+        fractions = np.linspace(0.0, 1.0, count + 1)[1:]
+
+    def segment_inside(x0, x1):
+        ok = np.ones(x0.shape[0], dtype=bool)
+        if fractions is None:
+            return ok
+        for f in fractions:
+            ok &= is_inside(_unit(x0 + f * (x1 - x0)))
+        return ok
 
     def trace(sign: float) -> tuple[np.ndarray, np.ndarray]:
         points = [start]
@@ -151,9 +197,9 @@ def integrate_streamlines(u, v, lat_deg, lon_deg, *, seeds=None,
             k3, a3 = direction(_unit(x + 0.5 * sign * h * k2))
             k4, a4 = direction(_unit(x + sign * h * k3))
             alive = alive & a1 & a2 & a3 & a4
-            x = np.where(alive[:, None],
-                         _unit(x + sign * h / 6.0 * (k1 + 2 * k2 + 2 * k3
-                                                     + k4)), x)
+            x_new = _unit(x + sign * h / 6.0 * (k1 + 2 * k2 + 2 * k3 + k4))
+            alive = alive & segment_inside(x, x_new)
+            x = np.where(alive[:, None], x_new, x)
             points.append(x)
             valid.append(alive.copy())
             if not alive.any():

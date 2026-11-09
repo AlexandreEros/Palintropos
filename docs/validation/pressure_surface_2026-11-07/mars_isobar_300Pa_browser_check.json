@@ -1,0 +1,234 @@
+{
+  "page": "mars_isobar_300Pa.html",
+  "frames": [
+    {
+      "time": {
+        "index": 0,
+        "time_s": 0,
+        "label": "day 0 (t = 0 s)"
+      },
+      "triangles": 14278,
+      "triangles_all": 14400,
+      "mask_counts": {
+        "0": 7334,
+        "1": 11,
+        "2": 0,
+        "3": 36
+      },
+      "lines": 0,
+      "range": [
+        7650.739435575053,
+        7752.462938646781
+      ],
+      "seconds_switch": 0.008521300042048097
+    },
+    {
+      "time": {
+        "index": 1,
+        "time_s": 11080.305,
+        "label": "day 0.128244 (t = 11080.305 s)"
+      },
+      "triangles": 14278,
+      "triangles_all": 14400,
+      "mask_counts": {
+        "0": 7334,
+        "1": 11,
+        "2": 0,
+        "3": 36
+      },
+      "lines": 158,
+      "range": [
+        7650.739435575053,
+        7752.462938646781
+      ],
+      "seconds_switch": 0.04371259990148246
+    },
+    {
+      "time": {
+        "index": 2,
+        "time_s": 22160.61,
+        "label": "day 0.256489 (t = 22160.61 s)"
+      },
+      "triangles": 14281,
+      "triangles_all": 14400,
+      "mask_counts": {
+        "0": 7335,
+        "1": 10,
+        "2": 0,
+        "3": 36
+      },
+      "lines": 157,
+      "range": [
+        7650.739435575053,
+        7752.462938646781
+      ],
+      "seconds_switch": 0.042542099952697754
+    },
+    {
+      "time": {
+        "index": 3,
+        "time_s": 33240.915,
+        "label": "day 0.384733 (t = 33240.915 s)"
+      },
+      "triangles": 14278,
+      "triangles_all": 14400,
+      "mask_counts": {
+        "0": 7334,
+        "1": 11,
+        "2": 0,
+        "3": 36
+      },
+      "lines": 156,
+      "range": [
+        7650.739435575053,
+        7752.462938646781
+      ],
+      "seconds_switch": 0.029586599906906486
+    },
+    {
+      "time": {
+        "index": 4,
+        "time_s": 44321.22,
+        "label": "day 0.512977 (t = 44321.22 s)"
+      },
+      "triangles": 14278,
+      "triangles_all": 14400,
+      "mask_counts": {
+        "0": 7334,
+        "1": 11,
+        "2": 0,
+        "3": 36
+      },
+      "lines": 157,
+      "range": [
+        7650.739435575053,
+        7752.462938646781
+      ],
+      "seconds_switch": 0.017584400018677115
+    },
+    {
+      "time": {
+        "index": 5,
+        "time_s": 55401.525,
+        "label": "day 0.641221 (t = 55401.525 s)"
+      },
+      "triangles": 14278,
+      "triangles_all": 14400,
+      "mask_counts": {
+        "0": 7334,
+        "1": 11,
+        "2": 0,
+        "3": 36
+      },
+      "lines": 158,
+      "range": [
+        7650.739435575053,
+        7752.462938646781
+      ],
+      "seconds_switch": 0.04665549984201789
+    },
+    {
+      "time": {
+        "index": 6,
+        "time_s": 66481.83,
+        "label": "day 0.769466 (t = 66481.83 s)"
+      },
+      "triangles": 14278,
+      "triangles_all": 14400,
+      "mask_counts": {
+        "0": 7334,
+        "1": 11,
+        "2": 0,
+        "3": 36
+      },
+      "lines": 156,
+      "range": [
+        7650.739435575053,
+        7752.462938646781
+      ],
+      "seconds_switch": 0.11987649998627603
+    },
+    {
+      "time": {
+        "index": 7,
+        "time_s": 77562.13500000001,
+        "label": "day 0.89771 (t = 77562.135 s)"
+      },
+      "triangles": 14278,
+      "triangles_all": 14400,
+      "mask_counts": {
+        "0": 7334,
+        "1": 11,
+        "2": 0,
+        "3": 36
+      },
+      "lines": 158,
+      "range": [
+        7650.739435575053,
+        7752.462938646781
+      ],
+      "seconds_switch": 0.08468130021356046
+    },
+    {
+      "time": {
+        "index": 8,
+        "time_s": 88642.44,
+        "label": "day 1.02595 (t = 88642.44 s)"
+      },
+      "triangles": 14278,
+      "triangles_all": 14400,
+      "mask_counts": {
+        "0": 7334,
+        "1": 11,
+        "2": 0,
+        "3": 36
+      },
+      "lines": 158,
+      "range": [
+        7650.739435575053,
+        7752.462938646781
+      ],
+      "seconds_switch": 0.051666000159457326
+    }
+  ],
+  "seconds_to_interactive": 0.9991347999311984,
+  "glOK": true,
+  "captures": [
+    "mars_isobar_300Pa_t0.png",
+    "mars_isobar_300Pa_t8.png"
+  ],
+  "hover": [
+    {
+      "lat": -5.0,
+      "lon": -115.0,
+      "value": 7656.87646484375,
+      "z": 7656.87646484375,
+      "mask": 1,
+      "readout": "no sample on the 3 hPa surface: below the surface (p0 > ps)"
+    },
+    {
+      "lat": -38.0,
+      "lon": 57.0,
+      "value": 7709.078450520834,
+      "z": 7709.078450520834,
+      "mask": 0,
+      "readout": "Geopotential height 7709 m \u00b7 Z 7.709 km (interpolated)"
+    },
+    {
+      "lat": 0.0,
+      "lon": 0.0,
+      "value": 7731.185546875,
+      "z": 7731.185546875,
+      "mask": 0,
+      "readout": "Geopotential height 7731 m \u00b7 Z 7.731 km (interpolated)"
+    }
+  ],
+  "distinct_frames": 9,
+  "requests": [
+    "file:///C:/Users/User/AppData/Local/Temp/claude/86f9d81d008feec2/77f44637-3c21-4230-ac18-e009ea23bd1c/scratchpad/mars/mars_isobar_300Pa.html"
+  ],
+  "requests_ok": true,
+  "console_errors": [],
+  "exceptions": [],
+  "memory_mb": 23.1
+}

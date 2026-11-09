@@ -1,0 +1,49 @@
+{
+  "run": "docs\\runs\\20261027T175327Z_orographic-thermal-wave_rot24p62h_r3_l21_dt11080p3s_3a46f966_71c5441a",
+  "label": "20261027T175327Z_orographic-thermal-wave_rot24p62h_r3_l21_dt11080p3s_3a46f966_71c5441a",
+  "l_max": 21,
+  "nlev": 4,
+  "resolution_deg": 3.0,
+  "mesh_nodes": 7381,
+  "pressure_pa": 300.0,
+  "times": [
+    0,
+    4,
+    8
+  ],
+  "valid_fraction": [
+    0.9936322991464571,
+    0.9936322991464571,
+    0.9936322991464571
+  ],
+  "seconds_per_time": {
+    "synthesis_T_phi": 0.017703566700220108,
+    "hydrostatic_coefficients": 0.00015126665433247885,
+    "winds": 0.01933016659071048,
+    "zeta_delta_syntheses_skipped": 0.017535466700792313,
+    "reconstruct_levels_total": 0.04299959998267392,
+    "vertical_interpolation": 0.001751199985543887,
+    "streamlines": 0.03415936673991382
+  },
+  "seconds_total_payload": 0.7914275000803173,
+  "seconds_total_payload_per_time": 0.26380916669343907,
+  "seconds_write_page": 0.010181399993598461,
+  "estimate_bytes": 942202,
+  "file_bytes": 776102,
+  "ratio_interpolation_to_reconstruction": 0.040725959921708764,
+  "level_fields_native_page": [
+    "temperature",
+    "pressure",
+    "geopotential",
+    "geopotential_height",
+    "zeta",
+    "delta",
+    "u",
+    "v"
+  ],
+  "machine": {
+    "python": "3.12.12",
+    "processor": "Intel64 Family 6 Model 142 Stepping 10, GenuineIntel",
+    "system": "Windows-11-10.0.26200-SP0"
+  }
+}
