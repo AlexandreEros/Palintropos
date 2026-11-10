@@ -34,18 +34,22 @@ normalization and the `C±` recurrence are in
 
 `product_quadrature` selects where pointwise products are evaluated:
 
-- `"coarse"`: on the state sampling. Its quadrature cannot integrate the
-  degree-`2L` content of a quadratic product, so aliasing lands in the
-  retained band.
-- `"fine"`: on an overresolved sampling chosen by the backend. Gauss uses
-  the 3/2 rule (`nlon >= 3L+1`, `nlat >= ceil((3L+1)/2)`), which is exact
-  for quadratic products. Geodesic uses a resolution-`r+1` co-grid, which
-  reduces but does not remove aliasing (about 6× smaller invariant drift at
-  resolution 4, `L = 21`).
+- `"coarse"`: on the state sampling itself. Whether that aliases depends
+  on the grid. A Gauss state grid that already meets the 3/2 rule
+  (`nlon >= 3L+1`, `nlat >= ceil((3L+1)/2)`) analyzes quadratic products
+  exactly; the default lat–lon grid (128×256 at `L = 21`) does. A smaller
+  Gauss grid, or any geodesic grid, lets aliasing reach the kept band.
+- `"fine"`: on an overresolved sampling chosen by the backend. Gauss uses a
+  grid of at least the 3/2-rule size (the larger of that and the state
+  grid), which is exact for quadratic products. Geodesic uses a
+  resolution-`r+1` co-grid, which reduces but does not remove aliasing
+  (about 6× smaller invariant drift at resolution 4, `L = 21`).
 
 Unsupported modes raise `ValueError`; there is no silent fallback. After
-analysis, products are truncated once to `floor(2L/3)` (the `dealias` flag
-keeps its historical name, but the operation is a truncation). Measurements
+analysis, each product is truncated once. The cut is `floor(2L/3)` by
+default; PE can instead keep a chosen retained degree (see Limits). The
+`dealias` flag keeps its historical name, but the operation is a
+truncation. Measurements
 are in the [R-3 characterization](../../../../docs/validation/r3_characterization.md)
 and the [lat–lon backend review](../../../../docs/validation/latlon_backend_review.md).
 
@@ -53,10 +57,13 @@ and the [lat–lon backend review](../../../../docs/validation/latlon_backend_re
 
 - **Top-degree derivative.** `sin_theta_d_theta_coeffs` has no slot for
   degree `l_max + 1`, so the meridional derivative of degree-`l_max`
-  content is truncated. PE stores `l_max = L + 1` and keeps degree `L + 1`
-  as a derivative buffer
+  content is truncated. By default every core cuts products at
+  `floor(2L/3)`, which keeps evolved content well below the top stored
+  degree. The PE core also accepts an opt-in `retained_truncation` at most
+  `l_max - 1`, so the top stored degree is only a derivative buffer. The
+  Held–Suarez production run uses it (stored degree 43, retained 42); the
+  fixed-step `tropoi run pe` command keeps the 2/3 cut
   ([retained truncation](../../temporal/tendencies/RETAINED_TRUNCATION.md)).
-  BVE and SWE store through `L` and rely on the 2/3 product cut instead.
 - **Poles.** Velocity reconstruction sets winds to zero where
   `|cos φ| < 1e-6`, and other metric divisions assume no sample sits on a
   pole. The production grids avoid exact poles; arbitrary point sets that
