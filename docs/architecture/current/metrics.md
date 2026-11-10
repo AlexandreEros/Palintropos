@@ -9,13 +9,13 @@ Nodes are analysed modules; a directed edge A -> B means A has at least one stat
 * **all imports**: every static import statement, wherever it appears;
 * **import-time**: only edges with at least one import statement at module scope (executed when the importing module is imported). Edges made only of function-scope or `if TYPE_CHECKING:` imports are dropped.
 
-Edge counts by scope set: `function`: 160, `function+module`: 4, `function+type_checking`: 1, `module`: 236, `type_checking`: 6.
+Edge counts by scope set: `function`: 161, `function+module`: 4, `function+type_checking`: 1, `module`: 236, `type_checking`: 6.
 
 | Metric | all imports | import-time |
 |---|---|---|
 | Nodes \|V\| | 133 | 133 |
-| Directed edges \|E\| | 407 | 240 |
-| Density | 0.023183 | 0.013671 |
+| Directed edges \|E\| | 408 | 240 |
+| Density | 0.02324 | 0.013671 |
 | Weakly connected components | 1 | 7 |
 | WCC sizes | 133 | 120, 8, 1, 1, 1, 1, 1 |
 | Strongly connected components | 133 | 133 |
@@ -28,23 +28,23 @@ Edge counts by scope set: `function`: 160, `function+module`: 4, `function+type_
 | Reciprocal pairs | 0 | 0 |
 | Reciprocity | 0 | 0 |
 | In-degree min / median / max | 0 / 2 / 15 | 0 / 1 / 12 |
-| In-degree mean | 3.06015 | 1.804511 |
+| In-degree mean | 3.067669 | 1.804511 |
 | In-degree quartiles | 1, 2, 4 | 0, 1, 2 |
 | In-degree zeros | 6 | 37 |
 | Out-degree min / median / max | 0 / 2 / 20 | 0 / 1 / 9 |
-| Out-degree mean | 3.06015 | 1.804511 |
+| Out-degree mean | 3.067669 | 1.804511 |
 | Out-degree quartiles | 0, 2, 5 | 0, 1, 3 |
 | Out-degree zeros | 37 | 48 |
 | Condensation nodes | 133 | 133 |
-| Condensation edges | 407 | 240 |
+| Condensation edges | 408 | 240 |
 | Condensation sources / sinks | 6 / 37 | 37 / 48 |
 | Condensation longest path (edges) | 14 | 7 |
 
-In-degree histogram (all imports) {degree: modules}: 0: 6, 1: 35, 2: 39, 3: 15, 4: 12, 5: 5, 6: 5, 7: 3, 8: 5, 9: 1, 10: 5, 11: 1, 15: 1
+In-degree histogram (all imports) {degree: modules}: 0: 6, 1: 35, 2: 39, 3: 15, 4: 12, 5: 5, 6: 5, 7: 3, 8: 4, 9: 2, 10: 5, 11: 1, 15: 1
 
-Out-degree histogram (all imports) {degree: modules}: 0: 37, 1: 22, 2: 21, 3: 9, 4: 7, 5: 10, 6: 6, 7: 4, 8: 5, 9: 4, 10: 5, 13: 1, 15: 1, 20: 1
+Out-degree histogram (all imports) {degree: modules}: 0: 37, 1: 22, 2: 21, 3: 9, 4: 7, 5: 10, 6: 6, 7: 4, 8: 5, 9: 4, 10: 5, 13: 1, 16: 1, 20: 1
 
-**Top 10 fan-in (all imports)** (ties at cutoff: 5)
+**Top 10 fan-in (all imports)** (ties at cutoff: 4)
 
 | Node | Degree |
 |---|---|
@@ -55,16 +55,16 @@ Out-degree histogram (all imports) {degree: modules}: 0: 37, 1: 22, 2: 21, 3: 9,
 | `tropoi.spatial.sigma_coordinate` | 10 |
 | `tropoi.spatial.specification` | 10 |
 | `tropoi.spatial.states.primitive_equations` | 10 |
+| `tropoi.spatial.laplacian` | 9 |
 | `tropoi.temporal.integration` | 9 |
 | `tropoi.representation.archive.initial_state` | 8 |
-| `tropoi.representation.visual.renderers` | 8 |
 
 **Top 10 fan-out (all imports)** (ties at cutoff: 4)
 
 | Node | Degree |
 |---|---|
 | `tropoi.cli.main` | 20 |
-| `tropoi.run.radiative.model` | 15 |
+| `tropoi.run.radiative.model` | 16 |
 | `tropoi.run.custom.execute` | 13 |
 | `tropoi.representation.visual.compose` | 10 |
 | `tropoi.representation.visual.evaluate` | 10 |
@@ -215,8 +215,8 @@ Module-level import edges involved: 2.
 ## Call graph
 
 * Nodes (functions, methods, classes): 1720
-* Edges by kind: `call` 1188, `constructor` 61, `instantiate` 471, `override` 6, `self` 312, `super` 4
-* Call sites by resolution outcome: builtin 3318, external 2185, internal 2750, unresolved 3445
+* Edges by kind: `call` 1189, `constructor` 61, `instantiate` 471, `override` 6, `self` 312, `super` 4
+* Call sites by resolution outcome: builtin 3318, external 2184, internal 2751, unresolved 3445
 
 | Scoped graph | Roots | Depth | Nodes | Edges | Truncated nodes | Reachable (unbounded) |
 |---|---|---|---|---|---|---|

@@ -7588,6 +7588,11 @@
     {
       "kind": "call",
       "source": "tropoi.run.radiative.model.initial_state",
+      "target": "tropoi.spatial.laplacian.laplacian_eigenvalues"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.radiative.model.initial_state",
       "target": "tropoi.spatial.states.primitive_equations.isothermal_rest_state"
     },
     {

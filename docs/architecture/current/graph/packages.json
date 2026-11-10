@@ -457,8 +457,8 @@
     },
     {
       "kind": "imports",
-      "module_edges": 4,
-      "runtime_module_edges": 4,
+      "module_edges": 5,
+      "runtime_module_edges": 5,
       "source": "tropoi.run.radiative",
       "target": "tropoi.spatial"
     },

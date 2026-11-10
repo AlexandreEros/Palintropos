@@ -29,17 +29,28 @@ the snapshot was regenerated for the final source; not rerun after.
 | slab/atmosphere exchange | 120.41 vs 122.11 W m^-2 | the test divided by 86400 s; the accumulator covers 85200 s (startup step excluded) | test corrected; the uncounted startup step is documented as a gap |
 | adiabatic energy (first version) | −52 W m^-2 on Jupiter | del^8 sink (see README §6) | rewritten to measure with and without del^8; bounds are regression envelopes around the measurements, stated as such |
 
-## Pending when this file was written
+## Routine regression suite
 
 ```bash
 python -m pytest -m "not slow" -q
 ```
 
-The routine regression suite (existing BVE/SWE/PE/Held–Suarez tests plus the
-new ones) was started on the committed source and had reached 34 % with no
-failure and one expected skip when the session ended. **Its result is not
-known. Rerun it before merging.** The four `slow` convergence tests and the
-browser tests were not run.
+Run on `2d5ca13` (existing BVE/SWE/PE/Held–Suarez tests plus the new ones):
+**1633 passed, 22 skipped, 1 failed, 4 deselected (slow)** in 1269 s.
+
+The failure was `test_laplacian_eigenvalues.py::
+test_no_second_definition_of_the_eigenvalue_in_src`, a textual guard against
+spelling `l (l + 1)` outside `spatial/laplacian.py`. It flagged two new
+files. `run/radiative/model.py` did re-spell the eigenvalue in the seeded
+perturbation and now calls `laplacian_eigenvalues()`. `physics/
+thermodynamics.py` uses `J (J + 1)` for the rotational levels of H2, which is
+not the Laplacian, and was added to the guard's allow-list with that reason.
+
+After the fix, the guard, the radiative–dynamical tests, the layer rule and
+the dead-code guard were rerun: 64 passed in 91 s. **The full suite was not
+rerun after the fix**; the change touches only the initial-state seed of
+`tropoi.run.radiative`. The four `slow` convergence tests and the browser
+tests were not run.
 
 ## Not tested at all
 

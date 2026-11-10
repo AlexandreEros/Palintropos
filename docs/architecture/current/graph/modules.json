@@ -2441,6 +2441,14 @@
         "function"
       ],
       "source": "tropoi.run.radiative.model",
+      "target": "tropoi.spatial.laplacian"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.run.radiative.model",
       "target": "tropoi.spatial.planet"
     },
     {

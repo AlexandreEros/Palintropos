@@ -271,16 +271,17 @@ def initial_state(cfg: RadiativeConfig):
     x0 = isothermal_rest_state(cfg.l_max, K, temperature=float(profile[0]),
                                surface_pressure=cfg.reference_pressure).coeffs
     x0[2 * K:3 * K, 0, 0] = cp.asarray(profile) * math.sqrt(4.0 * math.pi)
+    from tropoi.spatial.laplacian import laplacian_eigenvalues
+    c_l = -laplacian_eigenvalues(cfg.l_max, cfg.radius)        # l (l+1) / a^2
     rng = np.random.Generator(np.random.PCG64(cfg.seed))
     zeta = np.zeros((n, n), dtype=np.complex128)
     for l in range(1, cfg.perturbation_lmax + 1):
         for m in range(l + 1):
             re, im = rng.standard_normal(2)
-            zeta[l, m] = complex(re, im if m > 0 else 0.0) / math.sqrt(l * (l + 1.0))
-    # mean of |V|^2 = a^2 sum |zeta_lm|^2 / (l (l+1)) / (4 pi), m > 0 counted twice
-    l_idx = np.arange(n, dtype=np.float64)[:, None]
+            zeta[l, m] = complex(re, im if m > 0 else 0.0) / math.sqrt(c_l[l])
+    # mean of |V|^2 = sum |zeta_lm|^2 / c_l / (4 pi), m > 0 counted twice
     with np.errstate(divide="ignore", invalid="ignore"):
-        fac = np.where(l_idx > 0, cfg.radius ** 2 / (l_idx * (l_idx + 1.0)), 0.0)
+        fac = np.where(c_l > 0, 1.0 / c_l, 0.0)[:, None]
     power = (fac * np.abs(zeta) ** 2)
     mean_v2 = (power[:, 0].sum() + 2.0 * power[:, 1:].sum()) / (4.0 * math.pi)
     zeta *= cfg.perturbation_wind / math.sqrt(mean_v2)
