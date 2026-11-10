@@ -5,7 +5,7 @@
 
 | | |
 |---|---|
-| Source base commit | `8e8249f6066e38f49760eb43f3f4e8fd3f758b62` (clean working tree) |
+| Source base commit | `55d46cd34f6657ca494675cdd1527d22f9db8df1` (clean working tree) |
 | Analysed package | `tropoi` under `src/` |
 | Generator | `tools.architecture` 2.0.0 |
 | Toolchain | Python 3.12, grimp 3.17, networkx 3.7 |

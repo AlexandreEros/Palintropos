@@ -926,7 +926,7 @@
     "package": "tropoi",
     "src": "src",
     "working_tree": {
-      "base_commit": "8e8249f6066e38f49760eb43f3f4e8fd3f758b62",
+      "base_commit": "55d46cd34f6657ca494675cdd1527d22f9db8df1",
       "generator": {
         "changes": [],
         "files": {
