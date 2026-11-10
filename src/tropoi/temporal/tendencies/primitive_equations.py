@@ -1,6 +1,6 @@
 """Dry hydrostatic primitive-equation core on the sphere.
 
-Scope (docs/PRIMITIVE_EQUATIONS_DESIGN.md): the spectral state
+Scope (src/tropoi/temporal/tendencies/PRIMITIVE_EQUATIONS.md): the spectral state
 representation, hard state validation, hydrostatic geopotential
 reconstruction, the discrete column continuity diagnostics (surface-
 pressure tendency, interface sigma-velocity, layer mass closure), the
@@ -15,9 +15,11 @@ degeneracy, monopole/continuity invariants, RK4 stage-validated
 stability). Surface topography enters only as the fixed spectral
 ``surface_geopotential_lm`` (band-limited at the dealiased product
 truncation — see :func:`product_truncation_cut` and the constructor);
-terrain construction/configuration lives with the runner. Deliberately
-NOT here (still deferred): runner/CLI/config, semi-implicit terms, T_ref
-split, hyperdiffusion, forcing, long integrations.
+terrain construction/configuration lives with the runner. The fixed-step
+runner/CLI live in tropoi.run.pe. Semi-implicit splitting, forcing and
+damping are composed by the temporal stepper/hooks and the separate
+tropoi.run.held_suarez experiment driver; they are not part of this
+unsplit dry tendency.
 
 Formulation summary (full derivation and sign conventions in the design
 doc): sigma = p/p_s vertical coordinate, Lorenz staggering, prognostic
@@ -98,8 +100,8 @@ class PrimitiveEquationsModel:
         meridional derivative ``sin_theta_d_theta_coeffs`` stores degrees
         <= l_max only (its degree-(l_max+1) part is dropped), so a state
         with content AT l_max gets an O(eps) spurious vorticity/divergence
-        tendency on every degree (measured, docs/held_suarez/
-        DEALIASING_AUDIT.md). Storing one extra degree and retaining
+        tendency on every degree (measured, see neighboring
+        RETAINED_TRUNCATION.md). Storing one extra degree and retaining
         ``l_max - 1`` (Dinosaur's layout) keeps that degree a pure derivative
         buffer: on the Gauss lat-lon "fine" 3/2-rule product grid every
         quadratic term is then analyzed exactly at every retained degree
@@ -415,7 +417,7 @@ class PrimitiveEquationsModel:
 
     # ------------------------------------------------------------------
     # Tendency-path product-grid reconstruction (tendency milestone,
-    # Phase 1 — docs/PRIMITIVE_EQUATIONS_TENDENCY_HANDOFF.md)
+    # Phase 1 — src/tropoi/temporal/tendencies/PRIMITIVE_EQUATIONS.md (tendency assembly))
     # ------------------------------------------------------------------
 
     def _tendency_product_fields(self, coeffs: cp.ndarray) -> dict:

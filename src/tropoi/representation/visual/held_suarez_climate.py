@@ -91,7 +91,7 @@ def _arange(lo: float, hi: float, step: float) -> tuple[float, ...]:
 
 
 #: The fixed comparison scales (a repository recipe, documented with its
-#: rationale in docs/held_suarez/CLIMATE_FIGURE.md): each range covers the
+#: rationale in src/tropoi/representation/visual/HELD_SUAREZ_CLIMATE.md): each range covers the
 #: measured T42L20 climate of hs-T42L20-prod-002 (days 210-1200) with
 #: headroom, so runs drawn with the defaults compare panel by panel. Colour
 #: intervals 5 m/s, 5 K, 10 m²/s², 2 K m/s, 25 m²/s², 2.5 K²; labelled lines
@@ -404,7 +404,7 @@ def _footer_lines(result: SectionResult, run: dict, plotter: str | None,
     return [
         "[ ] = zonal mean on a native σ level, * = departure from that "
         f"state's [ ]; {scales}; beyond-scale values hatched. Definitions "
-        "and sampling rules: docs/held_suarez/CLIMATE_FIGURE.md.",
+        "and sampling rules: src/tropoi/representation/visual/HELD_SUAREZ_CLIMATE.md.",
         f"config sha256 {_short(run.get('config_sha256'))}…  ·  run commit "
         f"{commit}  ·  states sha256 {result.states_sha256()[:12]}…"
         f"{series}  ·  plotted with palintropos "

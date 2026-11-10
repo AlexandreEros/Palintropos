@@ -6,7 +6,7 @@ atmosphere page exports the native columns of each saved state and
 interpolates them to any pressure chosen offline in the browser
 (`Simulation.view(surface=("pressure", Pa), interactive_pressure=True)`).
 The method is described in
-[ATMOSPHERE_VIEW.md](../../ATMOSPHERE_VIEW.md#any-pressure-in-the-browser-interactive-pressure-mode);
+[ATMOSPHERE_VIEW.md](../../../src/tropoi/representation/visual/ATMOSPHERE_VIEW.md#any-pressure-in-the-browser-interactive-pressure-mode);
 the numbers come from the committed script
 [examples/isobaric_view.py](../../../examples/isobaric_view.py) on the same
 laptop as the earlier records (Intel Core i5-8250U class CPU, Windows 11,
@@ -39,7 +39,7 @@ python examples/isobaric_view.py bench out/hs_isobars_2deg_8states.html docs/val
 ```
 
 The Held–Suarez run (`runs/hs-T42L20-prod-002`, 120 states every 10 days,
-[the run record](../../held_suarez/)) is local and not committed; the Mars run
+[the run record](../../held_suarez)) is local and not committed; the Mars run
 is published under `docs/runs/`. `times="all"` on it is refused at the
 default budget: 433 MB at 2°, 194 MB at 3° (the message names the
 alternatives; 8 states fit at 2°, 19 at 3°).

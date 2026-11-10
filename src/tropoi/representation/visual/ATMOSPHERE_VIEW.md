@@ -2,7 +2,7 @@
 
 For a quick terrain-only Mars globe, an editable low-resolution heightmap,
 and examples using your own height function or elevation file, start with
-[the terrain quick start](TERRAIN_IMPORT.md#start-with-mars-without-downloading-a-dem).
+[the terrain quick start](../../spatial/terrain/IMPORT.md#start-with-mars-without-downloading-a-dem).
 
 `Simulation.view()` writes one self-contained HTML page. The page shows the run's
 terrain globe and one translucent atmospheric surface: a native sigma level of a
@@ -12,13 +12,13 @@ divergence. Optional horizontal streamlines can be draped on it. Sliders move
 between the exported saved times and native levels, and change the vertical
 exaggeration and the opacity.
 
-![Held–Suarez run 002 at day 1200: relative vorticity on native level 6 of 20 (σ = 0.275) as a translucent surface 9.4 km up (×20), with black instantaneous streamlines over a breaking jet; side panel with the time, level, field, opacity and streamline controls and a symmetric colour bar](validation/atmosphere_view_2026-10-23/held_suarez_vorticity_sigma0275.png)
+![Held–Suarez run 002 at day 1200: relative vorticity on native level 6 of 20 (σ = 0.275) as a translucent surface 9.4 km up (×20), with black instantaneous streamlines over a breaking jet; side panel with the time, level, field, opacity and streamline controls and a symmetric colour bar](../../../../docs/validation/atmosphere_view_2026-10-23/held_suarez_vorticity_sigma0275.png)
 
 *Held–Suarez run `hs-T42L20-prod-002`, day 1200, relative vorticity on native level 6
 of 20 (σ = 0.275, geopotential height 8.8–10.0 km), exaggeration ×20, with
 instantaneous horizontal streamlines. This is a headless-Chrome capture of the
 exported page, opened from `file://` with networking disabled. Reproduce it with
-the command in [the validation record](validation/atmosphere_view_2026-10-23/README.md).*
+the command in [the validation record](../../../../docs/validation/atmosphere_view_2026-10-23/README.md).*
 
 ## Use
 
@@ -125,7 +125,7 @@ controls.
 
 ### Example: an evolving Mars atmosphere over MOLA terrain
 
-![An evolving Mars atmosphere over MOLA terrain at its last saved state (t = 88642.44 s, 9 of 9): bottom-level divergence as a 55 % translucent surface over the relief (×10) with 157 black instantaneous streamlines; side panel with the playback controls and the note that the 9 states are 11080.305 s apart and are not interpolated](validation/mars_evolving_2026-10-27/mars_evolving_final_delta.png)
+![An evolving Mars atmosphere over MOLA terrain at its last saved state (t = 88642.44 s, 9 of 9): bottom-level divergence as a 55 % translucent surface over the relief (×10) with 157 black instantaneous streamlines; side panel with the playback controls and the note that the 9 states are 11080.305 s apart and are not interpolated](../../../../docs/validation/mars_evolving_2026-10-27/mars_evolving_final_delta.png)
 
 *An idealized dry-CO₂ perturbation experiment over MOLA terrain, at the last of
 its 9 saved states, one Mars rotation (88642.44 s) after the start. The
@@ -140,13 +140,13 @@ about 2.5 m/s.*
 
 This is a worked example of imported terrain and saved-state playback.
 The measured checks and their limits are in
-[the experiment record](validation/mars_evolving_2026-10-27/README.md). There,
+[the experiment record](../../../../docs/validation/mars_evolving_2026-10-27/README.md). There,
 the evolution is 10¹⁰ times the drift of a resting control, a 30 s rerun differs
 by under 3 × 10⁻⁷ of the evolution, and the relative mass drift is 6 × 10⁻⁷.
 These checks apply to this configuration; they do not establish accuracy for
 arbitrary terrain or a realistic Mars atmosphere.
 The run is published as
-[`docs/runs/20261027T175327Z_orographic-thermal-wave_…_71c5441a`](runs/20261027T175327Z_orographic-thermal-wave_rot24p62h_r3_l21_dt11080p3s_3a46f966_71c5441a/),
+[`docs/runs/20261027T175327Z_orographic-thermal-wave_…_71c5441a`](../../../../docs/runs/20261027T175327Z_orographic-thermal-wave_rot24p62h_r3_l21_dt11080p3s_3a46f966_71c5441a),
 so the page can be rebuilt without a GPU or the MOLA files:
 
 ```bash
@@ -181,16 +181,16 @@ Pressures are planet-specific: 500 hPa is underground everywhere on the Mars
 run (its surface pressure is 2.8–12 hPa), and the export then fails with the
 pressure range the saved states cover.
 
-![The 3 hPa isobar of the Mars run at its last saved state, coloured by geopotential height (7.65–7.75 km), with a hole over Tharsis where the isobar is under ground and instantaneous streamlines that stop at the hole; the side panel names the surface, the interpolation and the masked node counts](validation/pressure_surface_2026-11-07/mars_isobar_300Pa_t8.png)
+![The 3 hPa isobar of the Mars run at its last saved state, coloured by geopotential height (7.65–7.75 km), with a hole over Tharsis where the isobar is under ground and instantaneous streamlines that stop at the hole; the side panel names the surface, the interpolation and the masked node counts](../../../../docs/validation/pressure_surface_2026-11-07/mars_isobar_300Pa_t8.png)
 
 *The 3 hPa isobar of the published Mars run at its last saved state (×10
 relief, 75 % opacity), coloured by geopotential height. The terrain shows
 through the hole over the Tharsis volcanoes, where 3 hPa is under ground
 (11 of 7381 nodes) or between the bottom full level and the ground (36
 nodes). Streamlines stop at the hole. Headless-Chrome capture of the
-committed page [`assets/mars_isobar_300Pa.html`](runs/20261027T175327Z_orographic-thermal-wave_rot24p62h_r3_l21_dt11080p3s_3a46f966_71c5441a/assets/mars_isobar_300Pa.html),
+committed page [`assets/mars_isobar_300Pa.html`](../../../../docs/runs/20261027T175327Z_orographic-thermal-wave_rot24p62h_r3_l21_dt11080p3s_3a46f966_71c5441a/assets/mars_isobar_300Pa.html),
 opened from `file://` with networking disabled; see
-[the record](validation/pressure_surface_2026-11-07/README.md).*
+[the record](../../../../docs/validation/pressure_surface_2026-11-07/README.md).*
 
 **What is interpolated, and how.** The numerics live in
 `representation.diagnostics.pe_surfaces`, independent of the page, and are
@@ -243,7 +243,7 @@ divergence syntheses the native page pays (0.25 s) are skipped. The cost is
 the synthesis, and it scales with the number of saved states times the
 display nodes, not with the number of levels embedded: all 120 states fit the
 32 MB budget at 2°, where the native page holds 5 states with 20 levels.
-Measurements: [`validation/pressure_surface_2026-11-07/`](validation/pressure_surface_2026-11-07/README.md),
+Measurements: [`validation/pressure_surface_2026-11-07/`](../../../../docs/validation/pressure_surface_2026-11-07/README.md),
 reproduced with `python examples/isobaric_view.py measure RUN --pressure P`.
 
 **Not in this slice.** Geopotential-height surfaces (added later, see
@@ -389,7 +389,7 @@ goes through the stored form to the same bound.
 
 **Size and speed, measured** (export: the same laptop CPU as above; page:
 headless Chrome with software WebGL, `examples/isobaric_view.py bench`,
-[the record](validation/interactive_pressure_2026-11-08/README.md)).
+[the record](../../../../docs/validation/interactive_pressure_2026-11-08/README.md)).
 Full columns cost more than one surface: per saved state, `8·K` bytes per
 node plus 4 for the surface pressure before base64 (`12·K` since the
 columns also carry ζ and δ for [σ surfaces](#constant-σ-surfaces); the
@@ -513,7 +513,7 @@ exact columns, the error is the stored quantum propagated through the weight
 and reports it apart from the interpolation. A node within one quantum of a
 mask boundary can change mask; the test excludes only those.
 
-**Measured** ([the record](validation/derived_surfaces_2026-11-08/README.md);
+**Measured** ([the record](../../../../docs/validation/derived_surfaces_2026-11-08/README.md);
 the committed Mars page is the reproducible example). In the page's own
 timer, a height update takes a median of 22 ms on the 5.15 MB Mars page
 (1.9 ms of interpolation) and 41 ms on the 43 MB eight-state Held–Suarez
@@ -523,7 +523,7 @@ slider is dragged it runs once, about 200 ms after the last movement.
 Start-up is 1.2 s and 2.9 s; the heap stays at 20 and 72 MB over the bench.
 σ-surface numbers are in the [σ section](#constant-σ-surfaces).
 
-![The Mars run's 4 km geopotential-height surface at its last saved state over Tharsis: the surface where it lies above the terrain, holes where the terrain rises through it, white streamlines that stop at the holes, and the side panel with the Pressure / Geopotential height switch, the linear height slider and the typed value in km](validation/derived_surfaces_2026-11-08/mars_isobars_interactive_z4000m.png)
+![The Mars run's 4 km geopotential-height surface at its last saved state over Tharsis: the surface where it lies above the terrain, holes where the terrain rises through it, white streamlines that stop at the holes, and the side panel with the Pressure / Geopotential height switch, the linear height slider and the typed value in km](../../../../docs/validation/derived_surfaces_2026-11-08/mars_isobars_interactive_z4000m.png)
 
 ## Constant-σ surfaces
 
@@ -576,7 +576,7 @@ states no longer fit the 32 MB default; `max_mb` or fewer states choose
 otherwise, and the refusal says so. The fixed-surface pages are `version` 2,
 the column page `version` 4 as before.
 
-**Measured** ([the record](validation/derived_surfaces_2026-11-08/README.md)).
+**Measured** ([the record](../../../../docs/validation/derived_surfaces_2026-11-08/README.md)).
 
 - **Updates.** A σ update takes a median of 19.5 ms on the Mars page (1.2 ms
   of interpolation) and 31 ms on the 43 MB Held–Suarez page (3.8 ms).
@@ -587,7 +587,7 @@ the column page `version` 4 as before.
 - **Validity.** On Mars, σ = 0.95 lies below the bottom level, so that
   surface is empty and says so; 0.2 to 0.875 are drawn whole.
 
-![Relative vorticity on the σ = 0.5 surface of the Mars run at its last saved state, on a diverging scale, with dark instantaneous streamlines; the side panel shows the Pressure / Geopotential height / σ switch, the linear σ slider and the typed value](validation/derived_surfaces_2026-11-08/mars_isobars_interactive_s0.5.png)
+![Relative vorticity on the σ = 0.5 surface of the Mars run at its last saved state, on a diverging scale, with dark instantaneous streamlines; the side panel shows the Pressure / Geopotential height / σ switch, the linear σ slider and the typed value](../../../../docs/validation/derived_surfaces_2026-11-08/mars_isobars_interactive_s0.5.png)
 
 ## What the surface is
 
@@ -634,7 +634,7 @@ its pressure follows the surface pressure. On the Mars run below, the bottom
 level (σ = 0.875) reads 1.8 hPa over Tharsis (−10°, −120°, terrain 11.5 km) and
 10.9 hPa over Hellas (−38°, 57°, terrain −7.7 km).
 
-![Mars orographic-rest run over MOLA terrain: the bottom native level (4 of 4, σ = 0.875) as a 40 % translucent surface coloured by pressure, following the terrain (×10), low pressure over the Tharsis volcanoes, terrain visible beneath; side panel says there are no streamlines because the state is at rest](validation/atmosphere_view_2026-10-23/mars_orographic_rest_pressure_bottom.png)
+![Mars orographic-rest run over MOLA terrain: the bottom native level (4 of 4, σ = 0.875) as a 40 % translucent surface coloured by pressure, following the terrain (×10), low pressure over the Tharsis volcanoes, terrain visible beneath; side panel says there are no streamlines because the state is at rest](../../../../docs/validation/atmosphere_view_2026-10-23/mars_orographic_rest_pressure_bottom.png)
 
 *Mars orographic-rest run over real MOLA terrain (`l_max` 42, 4 levels): pressure
 on the bottom native level at 40 % opacity, exaggeration ×10. The surface sits
@@ -643,7 +643,7 @@ follows Tharsis and Hellas. The terrain shows through. The run is at rest
 (|V| ~ 1e−10 m/s), so no streamlines are drawn. This is a visualization of the
 saved orographic-rest state, not evidence of dynamical stability: the view
 displays states, it does not test them (the balance check of that run is in
-[TERRAIN_IMPORT.md](TERRAIN_IMPORT.md#real-data-mars-from-mola)).*
+[TERRAIN_IMPORT.md](../../spatial/terrain/IMPORT.md#real-data-mars-from-mola)).*
 
 **Fields** are exact host evaluations of the saved spherical-harmonic
 coefficients on the display mesh (`spatial.transforms.host_synthesis`, the

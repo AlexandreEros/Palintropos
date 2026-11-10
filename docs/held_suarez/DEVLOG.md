@@ -1,5 +1,14 @@
 # Held–Suarez development log
 
+This is dated experimental evidence, retained for its measured convergence,
+performance, damping and reference-data results. It is not a current setup
+guide. Use the [experiment index](README.md), [completed results](STATUS.md)
+and [scheme reference](../../src/tropoi/temporal/SEMI_IMPLICIT.md) for the
+implemented path. In particular, historical 94.9/105.3 m/s stability bounds
+were superseded by the corrected recurrence analysis summarized in
+[STATUS.md](STATUS.md#stability-interpretation); entries preserve what was
+recorded at their date.
+
 Development-phase decisions and tuning (allowed before the production freeze; see
 PROTOCOL.md). One entry per decision, newest last.
 

@@ -1,11 +1,11 @@
-# PE dealiasing audit and the retained-truncation option (2026-09-27)
+# PE product quadrature and retained truncation
 
 Question: the PE core with stored `l_max = 42` evolves only degrees ≤ 28, although nonlinear
 products are evaluated on the Gauss "fine" (3/2-rule) product grid. Is the additional 2/3 cut
 necessary, or does it combine an enlarged product quadrature with an unintended reduction of the
 retained spectrum?
 
-## Verdict
+## Implemented policy and measured bounds
 
 - **Not necessary for dealiasing (proven).** On the 3/2-rule Gauss grid every quadratic PE term
   is analyzed exactly at every degree ≤ L; the only aliasing terms are the cubic ones through
@@ -15,7 +15,7 @@ retained spectrum?
   part. A state with content AT l_max therefore gets an O(ε) spurious ζ/δ tendency on every degree,
   which no cut removes. The 2/3 cut avoided this only by never letting the state reach l_max, at the
   cost of a third of the band.
-- **Repair (implemented, opt-in):** store one extra degree and retain `L = l_max − 1`
+- **Retained-degree option (implemented):** store one extra degree and retain `L = l_max − 1`
   (`PrimitiveEquationsModel(retained_truncation=L)`); degree l_max becomes a pure derivative
   buffer, the same spectral layout as Dinosaur (`Grid.T42()`: longitude wavenumbers 43, total
   wavenumbers 44). No operator changes. The default (None) is the historical 2/3 cut, bitwise.
@@ -70,7 +70,7 @@ quadratic terms exact (3.5e−14), cubic HS-like 6.7e−8, the storage-only degr
 retained degree's rest cancellation 1.2e−23, rest linearization ratios 4.00 in every block with the
 SI operator's default mask, scalar vs batched 3.6e−15, terrain accepted up to L.
 
-## Options compared
+## Measured storage options (2026-09-27)
 
 | option | correctness | evolved resolution | cost (per-level T42 L20 tendency, MX110) |
 |---|---|---|---|
@@ -81,7 +81,7 @@ SI operator's default mask, scalar vs batched 3.6e−15, terrain accepted up to 
 ## What "matches Dinosaur T42" means here
 
 The **retained spectral resolution** (l, m ≤ 42 evolved; one extra stored degree for derivatives)
-and the **checked reference parameters** (`REFERENCE_CONFIG.json`; `config_mismatches` = [] for the
+and the **checked reference parameters** ([reference configuration](../../../../docs/held_suarez/REFERENCE_CONFIG.json); `config_mismatches` = [] for the
 production preset). It does **not** mean identical sampling: with stored l_max = 43 the fine rule
 gives a **65×130 product grid**, while the state/diagnostic grid stays 64×128 (Dinosaur uses
 64×128 for everything). Product sampling, the ~1e−6 cubic aliasing it permits, the transform

@@ -4,7 +4,7 @@ These exercise the runner's scheduling/control seam (``_integrate``) with the
 *real* scheduler and *real* CFL helper but purely stubbed physics, so they run
 on CPU and prove — without a long numerical run — that the max speed returned
 after accepted step ``n`` determines the CFL ceiling used to size step
-``n+1``. See docs/KNOWN_RISKS.md R-4.
+``n+1``. See src/tropoi/temporal/integration.py (state-adaptive ceiling).
 """
 from __future__ import annotations
 

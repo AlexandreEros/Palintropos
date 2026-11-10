@@ -9,7 +9,7 @@ python examples/mola_mars.py quickstart --out out/mars --open
 ```
 
 This uses the small prepared MOLA terrain already included with the
-[published Mars example](runs/20261027T175327Z_orographic-thermal-wave_rot24p62h_r3_l21_dt11080p3s_3a46f966_71c5441a/terrain/).
+[published Mars example](../../../../docs/runs/20261027T175327Z_orographic-thermal-wave_rot24p62h_r3_l21_dt11080p3s_3a46f966_71c5441a/terrain).
 It needs no CUDA, network access, PDS conversion or NetCDF dependency. It writes:
 
 | Output | Use |
@@ -35,7 +35,7 @@ tropoi run pe --terrain out/mars/terrain --scenario orographic_thermal_wave --ra
 This is a usage example. It demonstrates supplying terrain and evolving a
 small perturbation with the stated settings; it does not establish accuracy
 for arbitrary topographies. The longer run and its checks are documented
-[separately](validation/mars_evolving_2026-10-27/README.md).
+[separately](../../../../docs/validation/mars_evolving_2026-10-27/README.md).
 To choose a different terrain resolution from the source measurements, use
 the [raw MOLA workflow below](#real-data-mars-from-mola).
 
@@ -79,7 +79,7 @@ That gives an ordinary `ElevationRaster`, validated and traced like an imported 
   Write it with NumPy (`np.cos`, `np.where`), not `math`. A function that
   only handles scalars can use `--pointwise`, which calls it once per point.
   These are **degrees**: the initial-field callables of
-  [custom initial states](CUSTOM_INITIAL_STATES.md) take radians.
+  [custom initial states](../../run/custom/INITIAL_STATES.md) take radians.
 - **Output.** Elevation in **metres**: an array of that shape, or anything NumPy broadcasts to it.
   - A scalar gives a constant height; `--expression "1000"` works.
   - An `(nlat, 1)` column gives a function of latitude only.
@@ -205,7 +205,7 @@ and its provenance for `from_function(..., provenance=...)`; this is what
 
 ### Runnable examples: function, image, NetCDF
 
-[examples/custom_topographies.py](../examples/custom_topographies.py) has
+[examples/custom_topographies.py](../../../../examples/custom_topographies.py) has
 three runnable routes to the same broad synthetic hills and basins. No
 downloads are needed. Preparation uses CUDA; `--inputs-only` creates or reads
 the source on CPU without preparing a model.
@@ -280,7 +280,7 @@ runs (`solver="pe"`, then `tropoi run pe --terrain`); see
 records what the path does with actual MOLA topography.
 
 A runnable version of this workflow, with generated reference terrain, is in
-[examples/terrain_planet.py](../examples/terrain_planet.py):
+[examples/terrain_planet.py](../../../../examples/terrain_planet.py):
 
 ```bash
 python examples/terrain_planet.py generate terrain               # synthetic Mars-like files (CPU)
@@ -384,7 +384,7 @@ and drawn on the same colour scale.
 
 The same page, with a translucent atmospheric layer over the terrain, is what
 `Simulation.view()` writes for a saved PE run; see
-[ATMOSPHERE_VIEW.md](ATMOSPHERE_VIEW.md). Terrain and atmosphere share the
+[ATMOSPHERE_VIEW.md](../../representation/visual/ATMOSPHERE_VIEW.md). Terrain and atmosphere share the
 radius, the datum and the exaggeration.
 
 Previewing never needs CUDA once the terrain is resolved.
@@ -493,7 +493,7 @@ Geosciences Node,
 Each sample is the median MOLA topography in its bin: planetary radius
 minus areoid radius, in metres, planetocentric, east longitude. The files
 are raw PDS3 images (big-endian int16) that `read_elevation` does not read
-directly. [examples/mola_mars.py](../examples/mola_mars.py) `convert`
+directly. [examples/mola_mars.py](../../../../examples/mola_mars.py) `convert`
 parses the PDS3 label, checks every property it relies on (sample type and
 bits, unit, simple-cylindrical projection, east-positive planetocentric
 longitude, global extent, size), and writes CF NetCDF. From there it is an
@@ -558,17 +558,17 @@ the terrain coupling on real relief, not a Mars climate simulation.
 **In the viewer.** A browser capture of `view()` on this terrain
 (`l_max` 42, ×20 relief, colour bar in metres), with its exact settings and
 the command that reproduces it, is in
-[docs/validation/mola_terrain_2026-10-22](validation/mola_terrain_2026-10-22/README.md);
+[docs/validation/mola_terrain_2026-10-22](../../../../docs/validation/mola_terrain_2026-10-22/README.md);
 the README shows it.
 
 **An evolving atmosphere over MOLA.** The orographic-rest check above starts
-and stays at rest. [examples/mola_mars_evolving.py](../examples/mola_mars_evolving.py)
+and stays at rest. [examples/mola_mars_evolving.py](../../../../examples/mola_mars_evolving.py)
 adds a small temperature perturbation (`--scenario orographic_thermal_wave`)
 to the same balanced base, at `l_max` 21. It integrates one rotation period
 alongside a resting control and a 30 s-step twin. This is an idealized dry-CO₂
 perturbation experiment, not a climate simulation. Its protocol, results and
 offline page are in
-[docs/validation/mars_evolving_2026-10-27](validation/mars_evolving_2026-10-27/README.md),
+[docs/validation/mars_evolving_2026-10-27](../../../../docs/validation/mars_evolving_2026-10-27/README.md),
 and the run is published under `docs/runs/`.
 
 **The 463 m USGS mosaic (alternative, untested here).** The USGS

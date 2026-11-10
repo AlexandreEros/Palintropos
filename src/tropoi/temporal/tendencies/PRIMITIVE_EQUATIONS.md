@@ -1,19 +1,19 @@
-# Dry Hydrostatic Primitive Equations — Design (Foundation Milestone)
+# Dry hydrostatic primitive equations
 
-Status: **foundation + explicit nonlinear tendency**. This document
-specifies the formulation of the dry hydrostatic primitive-equation (PE)
-core: vertical-grid metadata, the spectral state representation, state
-validation, hydrostatic geopotential reconstruction, the discrete column
-continuity operator (surface-pressure tendency and interface
-sigma-velocity), the column mass-closure diagnostics, and — as of the
-tendency milestone — the first true nonlinear tendency
-(`PrimitiveEquationsModel.tendency`): fully explicit, unsplit (no `T_ref`
-split, no semi-implicit terms, full `T` in `R_d T grad(ln p_s)`, no
-hyperdiffusion), with all nonlinear terms evaluated on the backend product
-sampling and the vector curl/divergence pathway resolved by measurement
-(Section 8a). Still absent by design: runner/CLI/config, forcing,
-topography experiments, semi-implicit scheme, long integrations
-(Section 12).
+The implemented dry PE core is [`PrimitiveEquationsModel`](primitive_equations.py),
+with state layout in [`spatial.states`](../../spatial/states/primitive_equations.py)
+and column algebra in [`sigma_coordinate.py`](../../spatial/sigma_coordinate.py).
+This reference preserves the formulation and discrete identities. The
+[PE runner guide](../../run/pe/GUIDE.md) covers fixed-step experiments and
+terrain; [semi-implicit integration](../SEMI_IMPLICIT.md) covers the fast
+operator, startup, RAW and damping. The completed
+[Held–Suarez baseline](../../../../docs/held_suarez/README.md) adds forcing,
+Rayleigh drag, hyperdiffusion, checkpoints and long-run acceptance evidence.
+
+The full nonlinear tendency is unsplit (full T in the pressure gradient).
+The semi-implicit stepper selects a fast linear operator and evaluates the
+remainder as `N(X) = tendency(X) - L X`. That arrangement changes the time
+integration, not the governing equations below.
 
 Notation: `a` planetary radius, `Omega` rotation rate, `f = 2*Omega*sin(lat)`,
 `k` local vertical unit vector, `V = (u, v)` horizontal velocity (eastward,
@@ -71,7 +71,7 @@ Sign conventions are those already used by the BVE and SWE cores:
 `delta > 0` for divergent flow, `f = 2*Omega*sin(lat)` is the exact spectral
 (1,0) mode. In the pure-rotational, uniform-`ln p_s`, horizontally uniform-`T`
 limit the `zeta` equation must degenerate pointwise to the BVE, exactly as
-the SWE does (this is the acceptance invariant for the future tendency).
+the SWE does (this is a tested invariant of the assembled tendency).
 
 Physical constants (values fixed here so tests and docs cannot drift):
 
@@ -95,12 +95,12 @@ entries with `m > l` are zero):
 
 `T` is the **full** temperature (its `(0,0)` monopole is the global-mean
 temperature, nonzero). The reference/perturbation split `T = T_ref(sigma) +
-T'` is a *semi-implicit arrangement* deferred to the tendency milestone; it
+T'` is the implemented *semi-implicit arrangement*; it
 changes which terms are linear, not the equations.
 
 **`ln p_s`, not `p_s`, is prognostic.** Justification: (a) `p_s =
-exp(ln p_s) > 0` by construction, so surface-pressure positivity can never
-be violated by the time integration; (b) the pressure-gradient and
+exp(ln p_s) > 0` mathematically; finite-precision overflow/underflow and
+the state-validation envelope still constrain representable states; (b) the pressure-gradient and
 continuity terms need `grad(ln p_s)` directly; (c) it is the standard choice
 of the spectral PE literature (Bourke 1974; Hoskins & Simmons 1975). The
 known cost — the global mean of `exp(ln p_s)` (total dry mass) is not
@@ -118,8 +118,8 @@ Diagnostic:
 | `u_k, v_k`          | full levels (grid)    | m s^-1      |
 
 `Phi_s` (surface geopotential) is a fixed spectral field owned by the model
-(default: all zeros — no topography). It is representable from day one so
-adding topography later is a data change, not a schema change.
+(default: all zeros — no topography). It is coupled through the hydrostatic boundary and pressure gradient;
+prepared imported terrain and analytic mountains are supported.
 
 ## 3. Vertical placement (Lorenz staggering)
 
@@ -134,7 +134,7 @@ Layer thickness `Dsigma_k = sigma_{k+1/2} - sigma_{k-1/2} > 0`.
 Full-level coordinate: `sigma_k = (sigma_{k-1/2} + sigma_{k+1/2}) / 2`
 (arithmetic mean). Full-level pressure `p_k = sigma_k p_s`.
 
-Lorenz staggering: `zeta, delta, T, Phi` (and later all their tendencies)
+Lorenz staggering: `zeta, delta, T, Phi` and their tendencies
 live at full levels; `sigma_dot` lives at interfaces. There is no prognostic
 variable at interfaces. The known cost of the Lorenz grid — a computational
 mode in the vertical temperature structure — is accepted for this core
@@ -292,17 +292,14 @@ Which equation uses which form:
    spectral equations only through the curl/divergence of the assembled
    nonlinear vector (Section 1), never as scalar spectral fields.
 3. CURL/DIVERGENCE representation: the vector
-   `W_k = (V_adv(u)_k, V_adv(v)_k)` joins the other nonlinear vector
-   terms (eta k x V, R_d T' grad ln p_s) BEFORE the curl/divergence is
-   taken; the spectral pathway for a general grid vector is a tendency-
-   milestone decision (see the handoff document) and is deliberately NOT
-   chosen here.
+   `W_k = (V_adv(u)_k, V_adv(v)_k)` joins `R_d T_k grad(ln p_s)` in
+   the residual vector Z before its weak-form curl/divergence analysis
+   (Section 8a). The eta-V terms use separate pointwise SWE expansions,
+   preserving the exact BVE-reduction limit.
 
-What this does NOT claim: no statement is made about total-energy
-conservation of the full assembled tendency (horizontal terms, the
-omega/p heating, and the PGF must be combined and tested first —
-Section 7b provides the exchange identity, this section the transport
-identities; the assembly proof is future work).
+The transport and Section-7b exchange identities are column-local. They
+do not establish total-energy conservation of the full assembled tendency
+with horizontal products, quadrature and time integration.
 
 ### 7b. Energy-conversion term `kappa T omega/p` (RESOLVED; implemented)
 
@@ -362,7 +359,7 @@ Properties (tested):
 
 The heating term entering the thermodynamic equation is
 `(kappa T omega/p)_k = kappa * T_k * (omega/p)_k` (K/s), with the SAME
-`(omega/p)_k`; this is what makes the future tendency's PGF work and
+`(omega/p)_k`; this is what makes the tendency's PGF work and
 heating compensate discretely.
 
 ## 8. Horizontal pressure-gradient formulation
@@ -376,16 +373,17 @@ In the divergence equation the potential part appears as `-lap(Phi + E)`
 the `R_d T grad(ln p_s)` part joins the nonlinear vector evaluated
 pseudo-spectrally on the backend's product grid.
 
-Intended semi-implicit-ready split (deferred): `T = T_ref(sigma) + T'` moves
+The semi-implicit fast operator uses the split `T = T_ref(sigma) + T'` moves
 `R_d T_ref grad(ln p_s)` into the linear part, giving
 `-lap(Phi + E + R_d T_ref ln p_s)` with only `R_d T' grad(ln p_s)` treated
 pseudo-spectrally.
 
-Known risk (accepted, mitigated by starting with `Phi_s = 0`): over steep
-topography the two PGF terms are large and opposing, and their truncation
-errors do not cancel (the classic sigma-coordinate PGF error). This is a
-non-issue while `Phi_s = 0`; it must be re-examined before topography is
-enabled (Section 12).
+Over steep topography the two PGF terms are large and opposing, and their
+truncation errors need not cancel (the classic sigma-coordinate PGF error).
+Terrain is implemented with a band-limit gate and an isothermal resting
+balance test. That test establishes the documented equilibrium envelope,
+not arbitrary-terrain accuracy or stability; see the
+[runner guide](../../run/pe/GUIDE.md#surface-topography).
 
 ## 8a. Vector curl/divergence analysis (RESOLVED; tendency milestone)
 
@@ -479,7 +477,7 @@ geodesic residuals above are the documented accuracy envelope.
 ## 9. Expected invariants and validation rules
 
 Hard validation (raise `PrimitiveEquationsStateError`; checked on the
-initial state and, once a tendency exists, after every accepted step and on
+initial state and after every accepted step and on
 every intermediate RK stage, exactly like the SWE):
 
 1. finiteness of every spectral coefficient (NaN/Inf anywhere is fatal);
@@ -507,86 +505,64 @@ Monitored invariants (diagnostics, not hard failures):
 * vertical-transport closure — the Section 7a (SBP) residual and the
   flux-form column sum (B), expected at round-off always;
 * global dry total energy `Integral (c_p T + Phi_s + E) dm` and global
-  angular momentum — defined with the tendency milestone;
+  angular momentum are physical quantities, not whole-model conservation
+  guarantees established by the column-local tests;
 * `sigma_dot_{1/2} = sigma_dot_{K+1/2} = 0` exactly (tested, and structural).
 
-## 10. Characteristic-speed / CFL strategy
+## 10. Characteristic speed and integration
 
-The engine's model-independent controller
-(`run.engine.advective_cfl_timestep`) consumes one scalar per accepted
-step. The PE model will supply
+The model's diagnostic characteristic speed is
 
-    c_max = max_k max_grid |V_k|  +  sqrt( gamma_d * R_d * T_max )
+    c_max = max_k max_grid |V_k| + sqrt(gamma_d R_d T_max)
 
-with `T_max` the temperature maximum over the state and product samplings.
-`sqrt(gamma_d R_d T)` is an upper bound on the Lamb/external gravity-wave
-speed (~347 m/s at 300 K), which is the fastest signal of the explicit
-hydrostatic system; the sum-of-maxima form is deliberately conservative,
-matching the SWE's `max|u| + sqrt(max Phi)` philosophy. Consequence
-(accepted): explicit integration is gravity-wave-limited (dt roughly 3–4x
-smaller than an SWE run at equal resolution); semi-implicit treatment of
-the linear gravity-wave terms is the documented escape hatch, deferred.
+where the maximum covers state and product samplings. The fixed-step
+[PE runner](../../run/pe/GUIDE.md#timestep-policy) records a Courant number
+but does not use it as a controller. The separate
+[semi-implicit stepper](../SEMI_IMPLICIT.md) treats the selected linear
+gravity-wave terms implicitly; advection, RAW, forcing and damping still
+have stability and accuracy restrictions. It is not unrestricted adaptive
+integration.
 
-## 11. Integration with the engine and run-capsule architecture
+## 11. Nonlinear tendency assembly
 
-* **State = one complex array** `(3K+1, l_max+1, l_max+1)`, rows ordered
-  `[zeta_1..zeta_K, delta_1..delta_K, T_1..T_K, ln p_s]` (top to bottom).
-  RK4 stage arithmetic is then the plain array expression
-  `run.engine.rk4_step_array` already implements, including
-  `stage_validator` hooks.
-* **Scheduler/CFL**: unchanged. The runner (future) mirrors
-  `run/swe/runner.py`: `IntegrationScheduler` + `integrate` with
-  `on_step` returning `c_max` from Section 10.
-* **Run capsules**: a future `PERunConfig` mirrors `SWERunConfig`
-  (`solver: "pe"` in `to_run_config_dict()`, plus `nlev`,
-  `sigma_interfaces`, `t_ref_profile` when it exists); `make_run_id`,
-  `config.json`/`manifest.json`, and the shared `run/lifecycle.py`
-  machinery are reused as-is. The sigma-interface list is part of run
-  identity (it changes the science), exactly like `snapshot_times`.
-* **CLI**: `tropoi run pe` is **not** added in this milestone — there is
-  nothing to run without a tendency. Dispatch will follow the existing
-  `run bve` / `run swe` pattern.
-* **Backends**: all horizontal machinery is per-level reuse of the existing
-  seams — per-level Helmholtz solves and derivative synthesis use
-  `SpectralOperators` / `backend.product_space`, so both the geodesic and
-  Gauss lat-lon backends work unchanged.
+The term map below describes the implemented assembly. All products use the same product-grid continuity `G`, `dlnps_dt` and
+`sigma_dot`; state-grid diagnostic helpers are not substituted for them.
 
-## 12. Deliberately deferred features and known numerical risks
+| Term | Implemented assembly and contract |
+| --- | --- |
+| Surface pressure | Analyze `-sum(G*Dsigma)` on the product sampling and truncate once |
+| Hydrostatics | Apply the linear Simmons–Burridge recursion directly to complex spectral T and surface geopotential; synthesize on product points where needed |
+| Vertical transport | Subtract centered `vertical_advection` of T and of each wind component; the transport/SBP identities are in Section 7a |
+| Momentum | Evaluate `div(eta V)` and `curl(eta V)` with the SWE pointwise expansions. Form `Z = V_adv(V) + R_d T grad(ln p_s)` and weak-analyze only Z (Section 8a). Then `dzeta=-div(eta V)-curl(Z)` and `ddelta=curl(eta V)-div(Z)-lap(Phi+E)`; the separate paths preserve exact BVE reduction |
+| Temperature | Analyze `-V.grad(T) - V_adv(T) + kappa T omega/p` once; `omega/p` uses the same G as continuity (Section 7b) |
+| Truncation | Truncate analyzed products at the model's cut; linear spectral Laplacian terms stay exact. The default 2/3 cut and production retained-degree option are distinguished in [RETAINED_TRUNCATION.md](RETAINED_TRUNCATION.md) |
+| Monopoles | Zero zeta/delta tendencies per level; keep T and ln p_s monopoles, whose means can evolve |
+| Validation | Reject nonfinite states, invalid monopoles and nonpositive T over the state/product envelope; explicit RK4 checks intermediate stages as well as accepted states |
 
-Deferred (in intended order):
+[`test_sigma_coordinate.py`](../../../../tests/test_sigma_coordinate.py)
+checks column identities on CPU; [`test_primitive_equations.py`](../../../../tests/test_primitive_equations.py)
+and [`test_pe_tendency.py`](../../../../tests/test_pe_tendency.py) check model
+assembly, exact rest and BVE reduction on both backends.
+[`test_pe_orographic_rest.py`](../../../../tests/test_pe_orographic_rest.py) and
+[`test_pe_prepared_terrain.py`](../../../../tests/test_pe_prepared_terrain.py)
+cover terrain coupling. Semi-implicit normal modes and reduced-system
+residuals are tested in [`test_semi_implicit.py`](../../../../tests/test_semi_implicit.py).
 
-1. `PERunConfig` / PE runner / `tropoi run pe` CLI, run capsules and
-   diagnostics recording;
-2. semi-implicit gravity-wave treatment and the `T_ref(sigma)` profile;
-3. scale-selective hyperdiffusion (same `nabla^4` machinery as the SWE);
-4. topography (`Phi_s != 0`) and the PGF-error re-examination;
-5. Held–Suarez forcing, any moisture/radiation/convection/drag;
-6. mass fixer for the `ln p_s` drift;
-7. linearized normal-mode verification against the discrete K-level
-   vertical-structure matrix, and short-run invariant-drift measurements
-   (the prerequisite for any energy-conservation claim about the
-   assembled tendency).
+## 12. Validation boundaries and remaining numerical limitations
 
-(The energy-conserving discrete `omega/p`, the vertical-transport
-operators, the spectral curl/divergence pathway, and the assembled
-explicit nonlinear tendency itself are RESOLVED and implemented —
-Sections 7a, 7b, 8a, and the tendency milestone. No total-energy
-conservation claim is made for the assembled tendency: the column-local
-exchange identities close to round-off by construction and test, but
-global drift has not been measured — item 7.)
-
-Known numerical risks (accepted and recorded, not hidden):
-
-* **Lorenz-grid computational mode** in the vertical `T` structure; visible
-  as 2-grid-interval vertical noise in long runs; mitigations (vertical
-  diffusion, Charney–Phillips) deferred.
-* **Sigma-coordinate PGF error** over topography (Section 8).
-* **`ln p_s` mass drift** (Sections 2, 9).
-* **Explicit gravity-wave dt limit** (Section 10) — on the MX110-class GPU
-  this bounds practical run lengths until the semi-implicit step exists.
-* **Vertical resolution/truncation interaction** is unquantified: no
-  convergence study exists yet relating `K` and `l_max`; the first
-  linearized normal-mode tests must establish it.
+- Lorenz staggering admits a vertical temperature computational mode.
+- Sigma-coordinate pressure-gradient error over general terrain remains;
+  exact isothermal rest and the worked Mars perturbation are bounded tests.
+- `ln p_s` gives positive surface pressure but not exact global dry-mass
+  conservation. Production run 002 measured 2.016e-6 maximum relative drift
+  over 1200 days, within its predeclared B2 limit; it is not zero.
+- The discrete column transport/exchange identities do not establish
+  whole-model total-energy conservation. Forced/damped Held–Suarez energy
+  is not conserved physically either.
+- No general joint vertical/horizontal convergence study or arbitrary
+  planetary-climate validation is claimed.
+- Moist physics and radiative heating remain future work
+  ([issue #26](https://github.com/AlexandreEros/Palintropos/issues/26)).
 
 ## References
 

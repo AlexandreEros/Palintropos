@@ -53,7 +53,7 @@ def test_config_hash_is_stable_and_sensitive():
                    {"hyperdiffusion_efold_days": 0.2}, {"t_ref": 290.0},
                    {"retained_truncation": 41}):
         assert a.with_(**change).sha256() != a.sha256(), change
-    # production: store 43, retain 42 (DEALIASING_AUDIT.md); dt 900 s (S4b)
+    # production: store 43, retain 42 (src/tropoi/temporal/tendencies/RETAINED_TRUNCATION.md); dt 900 s (S4b)
     assert (a.l_max, a.retained_cut, a.dt) == (43, 42, 900.0)
     assert (a.nlat, a.nlon, a.nlev) == (64, 128, 20)
     assert a.days == 1200 and a.spinup_days == 200 and a.block_days == 200 and a.n_blocks == 5

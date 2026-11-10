@@ -296,13 +296,13 @@ from equilibrium.
   tolerance.
 * **Not shown here:** physical validation of the model climate. The
   Held–Suarez acceptance verdicts of `hs-T42L20-prod-002` (tiers A, B, C) are
-  recorded in [STATUS.md](STATUS.md) against criteria fixed in advance. This
+  recorded in [STATUS.md](../../../../docs/held_suarez/STATUS.md) against criteria fixed in advance. This
   figure draws that run's climate but adds no new acceptance claim. The fixed
   scales were chosen to cover that one run and are not a reference climatology.
 
 ## Published figure
 
-[`docs/validation/held_suarez_climate_2026-11-04/`](../validation/held_suarez_climate_2026-11-04/)
+[`docs/validation/held_suarez_climate_2026-11-04/`](../../../../docs/validation/held_suarez_climate_2026-11-04)
 holds the figure of `hs-T42L20-prod-002`, drawn by `sim.plot(path,
 sidecar=True)`, as PNG, PDF and the JSON sidecar with every number drawn. The
 production archive itself is not committed: it is about 200 MB of states. The

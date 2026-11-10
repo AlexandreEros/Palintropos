@@ -1,7 +1,7 @@
 """Sigma-coordinate vertical grid and column operators (backend-agnostic).
 
 This module owns the *vertical* half of the dry primitive-equation
-foundation (docs/PRIMITIVE_EQUATIONS_DESIGN.md):
+foundation (src/tropoi/temporal/tendencies/PRIMITIVE_EQUATIONS.md):
 
 * :class:`SigmaGrid` — immutable, validated Lorenz-staggered vertical-grid
   metadata (interfaces, full levels, thicknesses, Simmons–Burridge

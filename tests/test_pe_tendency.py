@@ -57,7 +57,7 @@ def latlon_planet():
 @pytest.fixture(scope="module")
 def geodesic_planet():
     # l_max = 10 at resolution 3 keeps the geodesic transform inside its
-    # supported points-per-basis envelope (docs/KNOWN_RISKS.md R-2).
+    # supported points-per-basis envelope (src/tropoi/spatial/CONVENTIONS.md (geodesic sampling)).
     return _make_planet(grid_type="geodesic", l_max=10)
 
 

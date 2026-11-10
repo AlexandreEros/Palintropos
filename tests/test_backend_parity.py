@@ -36,7 +36,7 @@ if _HAS_CUDA:
 L_MAX = 21
 
 # Per-backend accuracy envelopes (the lat-lon quadrature is exact; the
-# geodesic one is approximate — see docs/KNOWN_RISKS.md R-2/R-3).
+# geodesic one is approximate — see src/tropoi/spatial/CONVENTIONS.md (quadrature)).
 TOL = {
     "geodesic": {
         "roundtrip": 5e-2,

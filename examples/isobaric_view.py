@@ -51,7 +51,7 @@ for an interactive page and measures what the browser pays: start-up,
 pressure updates (interpolation apart from mesh and map work), saved-time
 switches, height selections, coordinate switches, streamline tracing (and
 the latency of a deferred trace after a slider drag), rendering and JS heap.
-See docs/ATMOSPHERE_VIEW.md.
+See src/tropoi/representation/visual/ATMOSPHERE_VIEW.md.
 """
 from __future__ import annotations
 

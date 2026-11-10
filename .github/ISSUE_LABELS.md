@@ -49,9 +49,9 @@ A few boundaries worth stating once:
   `failure-mode:silent-wrong-result` and `failure-mode:instability`.
 - **There is no severity scale.** For scientific software, failure character
   carries more information than a scalar: a plausible-but-wrong field is more
-  dangerous than a loud crash in one unusual configuration. The `S1`–`S4`
-  ratings in [`docs/KNOWN_RISKS.md`](../docs/KNOWN_RISKS.md) are a dated audit
-  artifact and are not reproduced as labels.
+  dangerous than a loud crash in one unusual configuration. Current
+  [limitations](../docs/KNOWN_LIMITATIONS.md) link to supporting evidence;
+  historical audit severity ratings are not reproduced as labels.
 - **`failure-mode:unsupported-claim`** is for the case where the implementation
   may well be correct but the *claim* made about it is not backed by evidence —
   as distinct from `failure-mode:silent-wrong-result`, where the output itself

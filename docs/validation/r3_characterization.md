@@ -1,6 +1,6 @@
 # R-3 characterization and fix record — fine-grid product evaluation
 
-Tracked record of the R-3 investigation (KNOWN_RISKS.md R-3), kept in Git because the
+Dated measurements of nonlinear-product evaluation (2026-07), kept because the
 raw run artifacts under `runs/` are Git-ignored. Every number below is reproducible from
 the cited commit + script; run IDs embed their commit hashes.
 
@@ -10,7 +10,7 @@ the cited commit + script; run IDs embed their commit hashes.
 |---|---|---|
 | `438f6bf` | `char/dt-convergence-r4` | fixed-dt sweep (dt, dt/2, dt/4): RK4 order nominal, conservation floor dt-independent → R-3 before R-4 |
 | `9fec345` | `char/r3-product-aliasing` | corrected three-level order estimator, p = log₂(R−1); R = 16.958 → p = 3.996 |
-| `c69c28b` | `char/r3-product-aliasing` | factorized-variant attribution (`tests/audit_r3_product.py`) + preregistered repair in KNOWN_RISKS |
+| `c69c28b` | `char/r3-product-aliasing` | factorized-variant attribution (`tests/audit_r3_product.py`) + preregistered repair at that commit |
 | `0678ac1` | `fix/r3-fine-product-grid` | production fix + prediction verification + P3 falsification record |
 
 Prerequisite context: R-1 Jacobian fix (`027bc14`), R-5 spectral-η fix (`89985aa`),
@@ -53,7 +53,7 @@ Artifacts: `runs/r3-product/summary_res4.txt`, `summary_res5.txt`,
 `final_states_{res4,res5}.npz` (regenerate with `python tests/audit_r3_product.py res4|res5`
 at `c69c28b`+).
 
-## Preregistered predictions (recorded in KNOWN_RISKS.md at `c69c28b`, before implementation)
+## Preregistered predictions (recorded at `c69c28b` in the then-current risk audit, before implementation)
 
 | | prediction | outcome (`0678ac1`) |
 |---|---|---|
@@ -118,3 +118,33 @@ outside R-3.
 | `r3-smoke/20260712T080551Z_rh4_rot24h_r4_l21_dt6h_0678ac18` | post-R-3 CLI end-to-end smoke |
 | `runs/r4-convergence/` | dt-sweep analysis artifacts (not a run capsule) |
 | `runs/r3-product/` | variant-attribution analysis artifacts (not a run capsule) |
+
+## Spectral absolute-vorticity mechanism (2026-07, R-5)
+
+This measurement was recorded at `89985aa` by
+`tests/audit_r5_mechanism.py` (geodesic res 4, L=21, two-vortex initial
+state, Omega=2*pi/86400). It supports constructing eta=zeta+f spectrally,
+as the current core does; the old grid round trip is not production.
+
+| Quantity | Measurement |
+| --- | --- |
+| analytic f_10 | 2.977e-4 (transform agrees to 9e-16) |
+| f round-trip leakage L2 | 2.525e-6 |
+| zeta coefficient L2 | 2.182e-5 |
+| leakage / f_10 | 8.5e-3 |
+| leakage / zeta L2 | 11.6 % |
+| f_10 / zeta L2 | 13.6 |
+| zeta-only round-trip residual / zeta L2 | 0.93 % |
+
+The peak-coefficient ratio about 48 is a different quantity and must not
+be multiplied by the 0.85 % L2 leakage. In the rotating 10-day baseline,
+absolute-enstrophy drift changed from -7.9e-3 to -3.6e-4, l=1 energy loss
+from -18.8 % to -5.7 %, half-day energy drift from +1.1e-2 to +3.5e-5,
+and total 10-day energy drift from -6.4 % to -3.8 %. RK4 transform counts
+fell from 12 forward + 24 inverse to 8 + 20, with 21 % less wall time.
+
+The residual -3.8 % was not explained by eta construction. The
+non-rotating control was quasi-steady (tendency about 1e-13), so it did
+not isolate the cause of the rotating drift. The factorized product
+experiments above provide the subsequent evidence; no total invariant
+conservation claim follows from this mechanism test.

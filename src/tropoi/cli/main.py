@@ -88,7 +88,7 @@ def _add_initial_state_argument(parser: argparse.ArgumentParser,
         "--initial-state", dest="initial_state", metavar="PATH",
         default=None,
         help=f"Run a saved {solver.upper()} initial state (a directory "
-             "written by tropoi.run.custom; docs/CUSTOM_INITIAL_STATES.md). "
+             "written by tropoi.run.custom; src/tropoi/run/custom/INITIAL_STATES.md). "
              f"The state prescribes the {prescribed}, so the options that "
              "would redefine them are refused. The grid options may "
              "override the state's recorded grid; --l-max must equal the "
@@ -116,7 +116,7 @@ def add_bve_arguments(parser: argparse.ArgumentParser) -> None:
         "--resolution", type=int, default=None,
         help="Geodesic grid subdivision level [default: 4]. "
              "The (resolution=4, l_max=21) default keeps ~10 grid points per "
-             "SH basis function (docs/KNOWN_RISKS.md R-2).")
+             "SH basis function (src/tropoi/spatial/CONVENTIONS.md (geodesic sampling)).")
     parser.add_argument(
         "--nlat", type=int, default=None,
         help="Lat-lon backend: number of Gauss-Legendre latitudes [default: 128].")
@@ -161,7 +161,7 @@ def add_bve_arguments(parser: argparse.ArgumentParser) -> None:
         "--product-quadrature", choices=["fine", "coarse"], default=None,
         help="Where nonlinear (pseudospectral) products are evaluated. "
              "'fine' [default]: on a reusable resolution-(r+1) product grid "
-             "('overresolved product quadrature', docs/KNOWN_RISKS.md R-3). "
+             "('overresolved product quadrature', docs/validation/r3_characterization.md). "
              "'coarse': the historical state-grid path, kept for A/B "
              "comparisons. An unsupported combination raises at startup.")
 
@@ -576,7 +576,7 @@ def add_pe_arguments(parser: argparse.ArgumentParser) -> None:
     parser.add_argument(
         "--terrain", metavar="DIR", default=None,
         help="Run over a saved prepared terrain (PreparedPlanet.save; e.g. "
-             "imported from an elevation file, docs/TERRAIN_IMPORT.md), "
+             "imported from an elevation file, src/tropoi/spatial/terrain/IMPORT.md), "
              "resolved with solver='pe'. Its coefficients are used exactly "
              "and copied into the capsule's terrain/. The run adopts the "
              "terrain's l_max and grid unless given; replaces --topography.")

@@ -1,6 +1,6 @@
 # Generated architecture documentation
 
-Everything below this directory, except this file, is written by
+The `current/` and `history/` snapshots are written by
 `tools/architecture` (`python -m tools.architecture.generate`). The generator
 reads the source of `src/tropoi` and records generic structural facts: module
 imports (grimp), classes, inheritance, and methods (`ast`), and statically
@@ -26,25 +26,24 @@ default `DEFAULT_LAYERS` in `tools/architecture/layers.py`: `cli`, `run`,
 - With `--no-layers`, or a declaration that matches no package,
   `packages.mmd` is a plain dependency graph with no boxes and no marking.
 
-The hand-authored `docs/class-structure.md` and `docs/call-structure.md` are
-separate and are not replaced by these files.
+Start at the [current snapshot](current/README.md) for generated files and
+extraction limits, or the [architecture reference](../ARCHITECTURE.md) for
+responsibilities. [Comparison data](review/README.md) retains measured
+before/after JSON used by the export tool. Generated inheritance/call views
+are partial static analysis: standalone classes and dynamic dispatch are
+not comprehensively covered by this version of the generator.
 
 ## Layout
 
 | Path | Status |
 |---|---|
 | `history/numerics-physics-layout/` | **Frozen.** Source commit `f879851`: the original layout, with implementation modules in `tropoi.numerics`, `tropoi.physics`, `tropoi.planet`, and `tropoi.viz`. Never regenerated; `--check` verifies it (see its README). |
-| `history/spatial-temporal-representation-layout/` | **Frozen.** Source commit `47dec90`: the same code reorganized into `tropoi.spatial`, `tropoi.temporal`, and `tropoi.representation`, with the old paths kept as aliases (see *Compatibility paths* in `docs/ARCHITECTURE.md`). Never regenerated; `--check` verifies it (see its README). |
+| `history/spatial-temporal-representation-layout/` | **Frozen.** Source commit `47dec90`: the same code reorganized into `tropoi.spatial`, `tropoi.temporal`, and `tropoi.representation`, with the old paths kept as aliases (those aliases were later retired; see the snapshot provenance). Never regenerated; `--check` verifies it (see its README). |
 | `current/` | **Live.** Default output of the generator; always describes the committed `src/tropoi`. CI fails any push where it is stale (see *Automated generation*). |
 
-`current/` and `history/spatial-temporal-representation-layout/` hold identical
-graphs when `current/` is introduced, because `src/` has not changed since
-`47dec90`. They differ only in the README and metrics provenance. The first
-source change after that updates `current/` and leaves the frozen snapshot as
-it is.
-
-Snapshots are named after what they capture, here the package layout, rather
-than after the work that produced them.
+The live snapshot changes with source; frozen layout snapshots retain their
+own source/toolchain provenance and are not current API guides. Their diagrams
+and measurements are retained for reproducible structural comparison.
 
 ### Adding a frozen snapshot
 

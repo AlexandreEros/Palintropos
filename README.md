@@ -63,7 +63,7 @@ python examples/mola_mars.py show mola/megt_4ppd.nc --lmax 42 --units m --centre
 ```
 
 The command needs CUDA and the converted MOLA grid; see
-[docs/TERRAIN_IMPORT.md](docs/TERRAIN_IMPORT.md#real-data-mars-from-mola).
+[src/tropoi/spatial/terrain/IMPORT.md](src/tropoi/spatial/terrain/IMPORT.md#real-data-mars-from-mola).
 
 Terrain for your own planet can also come from a formula or from a function
 in your own Python file. Sampling is done on the CPU and preparation on CUDA:
@@ -73,42 +73,49 @@ tropoi terrain prepare --expression "1200*cos(radians(lat))**2*cos(2*radians(lon
 tropoi terrain prepare --function "./my_terrain.py:height" --resolution-deg 2 --lmax 21 --solver pe --out terrain/my_planet
 ```
 
-See [docs/TERRAIN_IMPORT.md](docs/TERRAIN_IMPORT.md#a-height-expression-or-a-python-function).
+See [src/tropoi/spatial/terrain/IMPORT.md](src/tropoi/spatial/terrain/IMPORT.md#a-height-expression-or-a-python-function).
 
 ## What you can study with it today
 
 - **How rotating flow organizes itself.** Vortex interaction, Rossby–Haurwitz
   waves, and mountain-forced wave trains, all measured against the
   invariants the continuous equations conserve.
-- **How energy moves between scales.** Every run records spectra and per-step
-  diagnostics, so you can watch energy spread from a few modes to many while
-  mass, energy, and enstrophy drift stays small.
+- **How energy moves between scales.** Saved states and per-step diagnostics
+  show spectral redistribution and measured invariant drift. Small drift in
+  a documented benchmark is not a guarantee for every flow.
 - **How much the grid itself affects the result.** The same model can run on
   two grids that share one spectral layout, which exposes quadrature and
   grid-orientation error that a single grid would hide.
 
-Palintropos cannot yet answer questions about climate, heat transport, or how
-circulation changes with the planet's parameters. Those need forcing,
-dissipation, and validated long integrations. The foundations are the spectral
-machinery, the diagnostics, and the provenance.
+The dry PE core also supports controlled studies of forced circulation and
+eddy heat transport: its 1200-day Held–Suarez baseline passed the declared
+comparison with Dinosaur. That establishes a dry benchmark under stated
+parameters, not predictive climates for arbitrary planets. Moist physics,
+radiative heating and general planetary-climate validation remain future work
+([radiative-transfer milestone](https://github.com/AlexandreEros/Palintropos/issues/26)).
+The standalone sky prototype and expanded architecture coverage remain in
+[open PR #22](https://github.com/AlexandreEros/Palintropos/pull/22) and
+[#23](https://github.com/AlexandreEros/Palintropos/pull/23); they are outside
+the current `main` capabilities described here.
 
 ## Model cores
 
 All three cores are spectral (spherical harmonics, `float64`/`complex128`).
 BVE and SWE use explicit RK4. PE also has a semi-implicit stepper, used for
-the long forced runs ([SEMI_IMPLICIT.md](docs/held_suarez/SEMI_IMPLICIT.md)).
+the long forced runs ([SEMI_IMPLICIT.md](src/tropoi/temporal/SEMI_IMPLICIT.md)).
 
 | Core | Command | Prognostic state | Evidence so far | Limits |
 |---|---|---|---|---|
 | **Barotropic vorticity (BVE)** | `tropoi run bve` | relative vorticity | RH4 traveling wave on both grids; conservation and rotation-equivalence tests | Single layer, non-divergent. Optional Laplacian viscosity has no stability control of its own |
-| **Rotating shallow water (SWE)** | `tropoi run swe` | vorticity, divergence, perturbation thickness geopotential | Linear gravity-wave dispersion, Williamson 2, exact lake at rest over terrain, Williamson 5 compared with an external model | Inviscid, single layer. Terrain is an analytic Gaussian mountain, the benchmark cone, or imported from an elevation file through a saved initial state ([TERRAIN_IMPORT.md](docs/TERRAIN_IMPORT.md)) |
-| **Dry hydrostatic primitive equations (PE)** | `tropoi run pe` | per-level vorticity, divergence, temperature; ln surface pressure | Exact rest; smooth short evolution; analytic orographic balance (to roundoff on the Gauss grid); **Held–Suarez forced climate, 1200 days at T42L20, all three acceptance tiers passed** ([STATUS.md](docs/held_suarez/STATUS.md)) | Fixed user-chosen step, no CFL controller, no energy-conservation claim. Forcing is Held–Suarez only (Newtonian relaxation + Rayleigh friction, ∇⁸ hyperdiffusion); no moisture or radiation |
+| **Rotating shallow water (SWE)** | `tropoi run swe` | vorticity, divergence, perturbation thickness geopotential | Linear gravity-wave dispersion, Williamson 2, exact lake at rest over terrain, Williamson 5 compared with an external model | Inviscid, single layer. Terrain is an analytic Gaussian mountain, the benchmark cone, or imported from an elevation file through a saved initial state ([TERRAIN_IMPORT.md](src/tropoi/spatial/terrain/IMPORT.md)) |
+| **Dry hydrostatic primitive equations (PE)** | `tropoi run pe` (RK4); `python -m tropoi.run.held_suarez` (HS experiment) | per-level vorticity, divergence, temperature; ln surface pressure | Exact rest; smooth short evolution; analytic orographic balance (to roundoff on the Gauss grid); **Held–Suarez forced climate, 1200 days at T42L20, all three acceptance tiers passed** ([STATUS.md](docs/held_suarez/STATUS.md)) | Fixed user-chosen step, no CFL controller, no energy-conservation claim. Forcing is Held–Suarez only (Newtonian relaxation + Rayleigh friction, ∇⁸ hyperdiffusion); no moisture or radiation |
 
-BVE and SWE pick their time step adaptively from an advective CFL limit that
-is recomputed after every accepted step. The PE runner uses a fixed step.
-Details: [SHALLOW_WATER.md](docs/SHALLOW_WATER.md),
-[PRIMITIVE_EQUATIONS_RUNNER.md](docs/PRIMITIVE_EQUATIONS_RUNNER.md),
-[MATHEMATICAL_MODEL.md](docs/MATHEMATICAL_MODEL.md).
+BVE and SWE recompute their timestep ceiling after every accepted state;
+SWE includes the gravity-wave speed. The PE command uses a fixed RK4 step;
+the separate Held–Suarez driver uses fixed-step semi-implicit integration.
+Details: [SHALLOW_WATER.md](src/tropoi/temporal/tendencies/SHALLOW_WATER.md),
+[PE runner guide](src/tropoi/run/pe/GUIDE.md),
+[numerical conventions](src/tropoi/spatial/CONVENTIONS.md).
 
 **Two grids, one coefficient layout.** Every core runs on either grid, chosen
 with `--backend`:
@@ -127,8 +134,11 @@ You need Python 3.12, Git, and an NVIDIA GPU with a working CUDA driver and
 toolkit. **There is no production CPU solver.** Without CUDA you can still
 open, inspect, and read saved runs, but you cannot run a model.
 
-The validated environment is Windows, Python 3.12.12, CuPy 13.4.0, CUDA 11.8,
-and an NVIDIA GeForce MX110. The commands below are for PowerShell.
+The local numerical-test environment is Windows, Python 3.12.12, CuPy 13.4.0,
+CUDA 11.8 and an NVIDIA GeForce MX110. The completed Held–Suarez runs also
+record Colab Tesla T4 / CuPy 14.0.1 / CUDA 12.9–13.0 environments in their
+[provenance](docs/held_suarez/STATUS.md). These are measured configurations,
+not a hardware compatibility guarantee. The commands below are for PowerShell.
 
 ```powershell
 git clone https://github.com/AlexandreEros/Palintropos.git
@@ -140,10 +150,11 @@ pip install -e .
 tropoi --help
 ```
 
-`requirements.txt` pins `cupy-cuda11x==13.4.0`. For CUDA 12.x, swap that one
-line for `cupy-cuda12x==13.4.0`, and install only one CuPy package. CUDA 12 has
-not been validated by this repository's benchmarks. Reading NetCDF elevation
-files ([docs/TERRAIN_IMPORT.md](docs/TERRAIN_IMPORT.md)) also needs
+`requirements.txt` pins `cupy-cuda11x==13.4.0`. For a CUDA 12.x installation,
+the corresponding package is `cupy-cuda12x==13.4.0`; install only one CuPy
+package. That exact alternative dependency combination is not established
+by the recorded Colab benchmarks above. Reading NetCDF elevation
+files ([src/tropoi/spatial/terrain/IMPORT.md](src/tropoi/spatial/terrain/IMPORT.md)) also needs
 `pip install -e ".[terrain]"` (netCDF4). If PowerShell blocks venv
 activation, run `Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass`,
 which applies to the current session only, and activate again.
@@ -158,7 +169,7 @@ Package names:
 
 Use `tropoi` for all commands. The former `aeolus` and `psx-*` commands and
 the pre-reorganization Python import paths have been retired; see the
-[migration table](docs/ARCHITECTURE.md#retired-compatibility-paths).
+[current import conventions](docs/ARCHITECTURE.md#imports-and-persisted-historical-names).
 
 ## Quick start
 
@@ -264,7 +275,7 @@ sim.view("hs.html", times=[0, -1], levels=[0, 10, 19])
 
 *Held–Suarez run 002 at day 1200: relative vorticity on σ = 0.275 (8.8–10.0 km),
 ×20, in the exported page (browser capture). See
-[docs/ATMOSPHERE_VIEW.md](docs/ATMOSPHERE_VIEW.md).*
+[src/tropoi/representation/visual/ATMOSPHERE_VIEW.md](src/tropoi/representation/visual/ATMOSPHERE_VIEW.md).*
 
 **Draw a Held–Suarez climate.** On a Held–Suarez experiment, `sim.plot()` draws
 the six latitude–σ sections from the saved states, on the CPU, as a PNG plus a
@@ -292,7 +303,7 @@ This is a description of the run's climate, not validation evidence. Its
 acceptance verdicts are in [STATUS.md](docs/held_suarez/STATUS.md).
 Definitions, sampling, scales, and the round-off match with the production
 statistics are in
-[CLIMATE_FIGURE.md](docs/held_suarez/CLIMATE_FIGURE.md).
+[climate figure reference](src/tropoi/representation/visual/HELD_SUAREZ_CLIMATE.md).
 [PDF](docs/validation/held_suarez_climate_2026-11-04/hs-T42L20-prod-002_climate.pdf).
 
 ```powershell
@@ -324,7 +335,7 @@ tropoi plot runs --vectors streamfunction                   # psi contours (SWE/
   the level the same volume would have at rest, blue above it, red below.
 - The API does not interpolate in time or restart runs.
 
-Full reference: [docs/SAVED_RUNS.md](docs/SAVED_RUNS.md).
+Full reference: [src/tropoi/temporal/SAVED_RUNS.md](src/tropoi/temporal/SAVED_RUNS.md).
 
 **Run your own planet and initial state (BVE, SWE).** Define a planet,
 discretization, and resolved spectral state in Python, save them as
@@ -343,8 +354,8 @@ or, from the shell, `tropoi run bve|swe --initial-state my_state --days 1`.
 States are prepared from callables `f(lat, lon)`, sampled arrays or
 spherical-harmonic coefficients, with projection residuals, mean modes and
 (SWE) positive thickness checked and reported. See
-[docs/CUSTOM_INITIAL_STATES.md](docs/CUSTOM_INITIAL_STATES.md) and the
-runnable examples in [examples/](examples/).
+[src/tropoi/run/custom/INITIAL_STATES.md](src/tropoi/run/custom/INITIAL_STATES.md) and the
+runnable examples in [examples/](examples).
 
 **Terrain from elevation files.** Read a global NetCDF, 16-bit PNG or TIFF
 elevation map, resolve it on the model grid, and look at exactly what the
@@ -352,7 +363,7 @@ solver will use before running anything: `world.plot()` for a static figure,
 `world.view()` for an interactive 3D globe (one self-contained HTML file).
 The resolved terrain and its source provenance go into SWE initial states
 and the runs made from them, and into PE runs (`tropoi run pe --terrain DIR`).
-See [docs/TERRAIN_IMPORT.md](docs/TERRAIN_IMPORT.md),
+See [src/tropoi/spatial/terrain/IMPORT.md](src/tropoi/spatial/terrain/IMPORT.md),
 [examples/terrain_planet.py](examples/terrain_planet.py) (synthetic terrain),
 and [examples/mola_mars.py](examples/mola_mars.py) (real Mars topography from
 MOLA).
@@ -362,7 +373,7 @@ MOLA).
 *A BVE example: two compact vortices of opposite sign on a sphere with a
 24 h rotation break up into a turbulent, planetary-scale flow over 25 days.
 This is the published run
-[`20260926T051829Z_two-vortices_…`](docs/runs/20260926T051829Z_two-vortices_rot24h_r4_l21_dt120h_e5dfc047_50ae9e93/)
+[`20260926T051829Z_two-vortices_…`](docs/runs/20260926T051829Z_two-vortices_rot24h_r4_l21_dt120h_e5dfc047_50ae9e93)
 (Gauss–Legendre grid 128 × 256, ℓ ≤ 21, inviscid), drawn by the default
 `tropoi plot`. The lines are contours of the streamfunction ψ, the exact
 streamlines of this non-divergent flow, and closer lines mean faster flow.
@@ -382,7 +393,7 @@ are truncated.
 | Williamson 5, 15-day inviscid runs (T42, T63) | completed; mass drift **0.0** (bit-identical); energy drift **+3.4 × 10⁻⁷ / −7.9 × 10⁻⁷** | same |
 | Williamson 5, day-15 free surface vs MRI-JMA | weighted RMS difference **5.6 m / 4.7 m**, on a layer about 5620 m deep | same |
 | RH4, 5 days, matched timestep | relative energy drift: geodesic **−4.46 × 10⁻⁴**, Gauss **−1.34 × 10⁻¹⁰** | `feat/latlon-grid` review, 2026-07-12; MX110 |
-| Held–Suarez forced climate, 1200 days, T42L20, semi-implicit, criteria fixed in advance (run `hs-T42L20-prod-002`) | **A PASS, B PASS, C PASS** | solver `a52ea20`, 2026-10-03/04; Colab Tesla T4; 1200 days in 8.1 h wall |
+| Held–Suarez forced climate, 1200 days, T42L20, semi-implicit, criteria fixed in advance (run `hs-T42L20-prod-002`) | **A PASS, B PASS, C PASS** | solver `a52ea20`, 2026-10-03/04; Colab Tesla T4; 1200 days in 9.9 h wall |
 | Held–Suarez, the earlier run `hs-T42L20-prod-001` (lagged damping, Δt 900 s) | A PASS, **B FAIL** (B2 only; cause measured), C PASS | solver `206ef25`, 2026-09-30/10-01. Kept in the record: verdicts as reported, never edited |
 
 **Williamson 5 is a comparison between two numerical models.** Williamson 5
@@ -392,32 +403,18 @@ agreement with truth, identical agreement with MRI-JMA, or a convergence
 order (two resolutions cannot measure one).
 [Full report →](docs/validation/williamson5_mri_2026-07-30.md)
 
-**The day-0 check exists because an earlier comparison was wrong.** The MRI-JMA
-archive stores its mass field as `h`, documented only as "height". An earlier
-version of this comparison read it as fluid-layer depth; it is free-surface
-height, and near the mountain the two initial states differ by up to 2000 m —
-so the model and the reference were integrating different physical problems.
-The identity was pinned down three independent ways (the reference paper's own
-equations; the archived day-0 field against the analytic case-2 free surface at
-every grid point, to 2.4 × 10⁻⁴ m; and the run's reported global mean mass,
-which excludes both alternatives). That comparison was refused rather than
-reported, and the day-0 gate now runs before integration.
-[Semantic audit →](notebooks/W5_MRI_SEMANTIC_AUDIT.md)
+The day-zero field contract checks that the MRI reference and solver use
+the same free surface, fluid depth and mountain before comparing evolved
+states. The source-cited [field semantics](notebooks/W5_MRI_SEMANTIC_AUDIT.md)
+and [pinned notebooks](notebooks/README.md) preserve that reproducible contract.
 
-**Tests.** GitHub CI and local GPU runs cover different tests, so their counts
-should not be added together:
-
-| Where | What runs | Result at `8892ee6` (2026-09-23) |
-|---|---|---|
-| GitHub Actions ([`tests.yml`](.github/workflows/tests.yml)) | `ubuntu-latest`, Python 3.12, **no CuPy, no GPU**: only the CPU tests (configuration, CLI, run directories, saved-run API, provenance, layout) | 530 passed, 400 skipped (the tests that need CUDA skip themselves) |
-| Local, full suite | Windows, Python 3.12.12, CuPy 13.4.0, NVIDIA GeForce MX110 | 951 passed, 1 skipped (the opt-in 15-day Williamson-5 acceptance run, `TROPOI_W5_ACCEPTANCE=1`); took 9 min |
-
-GitHub CI **does not run** the CUDA numerics. For routine GPU regression,
-run `python -m pytest -m "not slow"`. Run the long convergence checks with
-`python -m pytest -m slow -vv -s --durations=10` when their numerical
-dependencies change, and the full suite (`python -m pytest`) before releases.
-Bare pytest still includes the long tests; tolerances are unchanged.
-See [ARCHITECTURE.md § Tests](docs/ARCHITECTURE.md#tests).
+**Tests.** [CPU CI](.github/workflows/tests.yml) runs configuration, storage,
+host reconstruction, visualization and architecture checks without CuPy;
+CUDA numerical tests skip there. For routine GPU regression use
+`python -m pytest -m "not slow"`; run the long convergence selection when
+its numerical dependencies change, and the full suite before releases.
+[Test instructions](docs/ARCHITECTURE.md#tests) explain the selections and
+environment boundaries. Historical suite counts are not current coverage.
 
 ## Limitations
 
@@ -432,38 +429,36 @@ See [ARCHITECTURE.md § Tests](docs/ARCHITECTURE.md#tests).
   explicit viscosity. The PE core has no CFL control.
 - The geodesic grid's quadrature is approximate and depends on how the grid is
   oriented. The Gauss grid is the reference.
-- The code runs on GPU only, and results depend on one GPU implementation:
-  there is no independent CPU core to cross-check against.
+- Numerical integration requires CUDA/CuPy; saved-run reading, host
+  synthesis, many views and CPU CI work without it. There is no independent
+  CPU dynamical core to cross-check the GPU solver.
 - The default dense transforms limit resolution on small GPUs. Windows display
   GPUs can hit driver timeouts (TDR) on large kernels.
 
-Details: [KNOWN_LIMITATIONS.md](docs/KNOWN_LIMITATIONS.md) and
-[KNOWN_RISKS.md](docs/KNOWN_RISKS.md).
+Details: [current limitations](docs/KNOWN_LIMITATIONS.md).
 
-## Further reading
+## Navigating the repository
 
-- [VALIDATION.md](docs/VALIDATION.md): RH4 grid comparison (with figure),
-  Williamson-5 summary, conservation and rotation-equivalence tests.
-- [Williamson 5 vs MRI-JMA, 2026-07-30](docs/validation/williamson5_mri_2026-07-30.md):
-  the full report, figures, provenance, and checksums.
-- [Held–Suarez status](docs/held_suarez/STATUS.md): both production runs,
-  stage by stage, with provenance and the verdicts as reported. Alongside it,
-  [PROTOCOL.md](docs/held_suarez/PROTOCOL.md) (acceptance criteria, frozen
-  before the runs), [DEVLOG.md](docs/held_suarez/DEVLOG.md) (the decisions and
-  corrections, dated), [SEMI_IMPLICIT.md](docs/held_suarez/SEMI_IMPLICIT.md)
-  and [DEALIASING_AUDIT.md](docs/held_suarez/DEALIASING_AUDIT.md).
-- [W5 semantic audit](notebooks/W5_MRI_SEMANTIC_AUDIT.md): how the MRI
-  reference's `h` was identified, and why the first comparison was refused.
-- [ARCHITECTURE.md](docs/ARCHITECTURE.md): package layout, grids, transform
-  flow, run directories, CPU/GPU boundaries, and tests.
-- [SAVED_RUNS.md](docs/SAVED_RUNS.md): the read-only saved-run interface.
-- [ATMOSPHERE_VIEW.md](docs/ATMOSPHERE_VIEW.md): the 3-D atmosphere page of a
-  saved PE run: geometry, snapshot requirements, size bounds.
-- [SHALLOW_WATER.md](docs/SHALLOW_WATER.md),
-  [PRIMITIVE_EQUATIONS_DESIGN.md](docs/PRIMITIVE_EQUATIONS_DESIGN.md),
-  [PRIMITIVE_EQUATIONS_RUNNER.md](docs/PRIMITIVE_EQUATIONS_RUNNER.md), and
-  [MATHEMATICAL_MODEL.md](docs/MATHEMATICAL_MODEL.md): equations and
-  conventions.
-- [VALIDATION_PLAN.md](docs/VALIDATION_PLAN.md) and
-  [docs/validation/](docs/validation/): the planned benchmarks and the dated
-  audit records.
+The [technical reference index](docs/README.md) connects current capability
+claims to equations, code, tests and dated evidence. The [source index](src/tropoi/README.md)
+explains each layer and leads to concise directory READMEs and subsystem guides:
+
+- [Spatial numerics](src/tropoi/spatial/README.md): coefficient conventions,
+  grids, transforms, operators, terrain and states.
+- [Temporal models](src/tropoi/temporal/README.md): BVE/SWE/PE formulations,
+  steppers and the saved-run interface.
+- [Representation](src/tropoi/representation/README.md): archives, diagnostics,
+  saved-atmosphere playback and climate figures.
+- [Run orchestration](src/tropoi/run/README.md): configuration, fixed-step PE,
+  custom preparation and the Held–Suarez experiment driver.
+- [Architecture](docs/ARCHITECTURE.md) and [generated diagrams](docs/architecture/README.md):
+  layer contracts, execution boundaries and static structure.
+- [Validation](docs/VALIDATION.md), [Held–Suarez](docs/held_suarez/README.md)
+  and [measurement records](docs/validation/README.md): accepted results,
+  frozen criteria, scientific limits and reproducibility assets.
+- [Examples](examples/README.md), [notebooks](notebooks/README.md) and
+  [figure recipes](docs/figures/README.md): reproducible workflows.
+
+Directories are meaningful navigation nodes when imported into a wiki.
+Historical plans and resolved reviews remain in Git history; supporting
+measurements, protocols, published capsules and figure recipes stay in the tree.

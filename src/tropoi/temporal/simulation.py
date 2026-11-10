@@ -216,7 +216,7 @@ class Simulation:
 
         Held–Suarez experiments instead draw their six-panel latitude–sigma
         climate figure (PNG plus a PDF beside it) from the saved states on
-        the CPU; see docs/held_suarez/CLIMATE_FIGURE.md.
+        the CPU; see src/tropoi/representation/visual/HELD_SUAREZ_CLIMATE.md.
 
         ``output_path=None`` writes the default overview to
         ``RUN/assets/overview.png``. Figures are derived products of the
@@ -256,7 +256,7 @@ class Simulation:
         ``allow_cuda``, ``open_browser``, initial ``field``, ``level``,
         ``time``, ``opacity``, ``exaggeration``. Reconstruction runs on the
         CPU from the saved coefficients. See
-        ``tropoi.representation.visual.atmosphere`` and docs/ATMOSPHERE_VIEW.md.
+        ``tropoi.representation.visual.atmosphere`` and src/tropoi/representation/visual/ATMOSPHERE_VIEW.md.
         """
         return _view(self._storage, path, **options)
 
