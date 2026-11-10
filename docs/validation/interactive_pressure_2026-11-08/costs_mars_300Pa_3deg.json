@@ -1,0 +1,62 @@
+{
+  "run": "docs\\runs\\20261027T175327Z_orographic-thermal-wave_rot24p62h_r3_l21_dt11080p3s_3a46f966_71c5441a",
+  "label": "20261027T175327Z_orographic-thermal-wave_rot24p62h_r3_l21_dt11080p3s_3a46f966_71c5441a",
+  "l_max": 21,
+  "nlev": 4,
+  "resolution_deg": 3.0,
+  "mesh_nodes": 7381,
+  "pressure_pa": 300.0,
+  "times": [
+    0,
+    4,
+    8
+  ],
+  "valid_fraction": [
+    0.9936322991464571,
+    0.9936322991464571,
+    0.9936322991464571
+  ],
+  "seconds_per_time": {
+    "synthesis_T_phi": 0.018628599975878995,
+    "hydrostatic_coefficients": 0.00014513335190713406,
+    "winds": 0.02291813337554534,
+    "zeta_delta_syntheses_skipped": 0.0149533332635959,
+    "reconstruct_levels_total": 0.04844213339189688,
+    "vertical_interpolation": 0.002363733326395353,
+    "streamlines": 0.0390496999801447,
+    "quantize_columns": 0.0010738000273704529
+  },
+  "seconds_total_payload": 0.7203548001125455,
+  "seconds_total_payload_per_time": 0.24011826670418182,
+  "seconds_write_page": 0.011438799789175391,
+  "estimate_bytes": 942202,
+  "file_bytes": 789823,
+  "interactive": {
+    "seconds_total_payload": 0.12016749987378716,
+    "seconds_total_payload_per_time": 0.04005583329126239,
+    "seconds_write_page": 0.01595679996535182,
+    "estimate_bytes": 1611349,
+    "file_bytes": 1510625,
+    "decoded_bytes_per_time": 597861,
+    "pressure_range_pa": [
+      35.177701446788696,
+      1092.3079625419628
+    ]
+  },
+  "ratio_interpolation_to_reconstruction": 0.04879498818255482,
+  "level_fields_native_page": [
+    "temperature",
+    "pressure",
+    "geopotential",
+    "geopotential_height",
+    "zeta",
+    "delta",
+    "u",
+    "v"
+  ],
+  "machine": {
+    "python": "3.12.12",
+    "processor": "Intel64 Family 6 Model 142 Stepping 10, GenuineIntel",
+    "system": "Windows-11-10.0.26200-SP0"
+  }
+}

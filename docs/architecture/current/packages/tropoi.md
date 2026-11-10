@@ -10,6 +10,8 @@ Index: [all packages](../index.md) · [`tropoi.cli`](tropoi.cli.md) · [`tropoi.
 |---|---|---|---|
 | `tropoi` | empty | – | – |
 
+Files shipped in this directory that are **not Python and not analysed** (templates, data): `README.md`. Their contents (for example JavaScript in an HTML template) are invisible to every graph here.
+
 ## Imports
 
 This package's modules and the import edges between them; every other package is collapsed to one dashed node (edge label: module edges merged). A dashed arrow is made only of function-scope or `TYPE_CHECKING` imports.

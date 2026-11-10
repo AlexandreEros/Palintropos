@@ -18,6 +18,8 @@ Index: [all packages](../index.md) · parent [`tropoi.representation`](tropoi.re
 | `tropoi.representation.archive.schema` | code | `SchemaError`, `StateSchema`, `UnknownSchemaVersionError`, `UnsupportedConventionError` | `canonical_field_layout`, `diagnostic_definitions_for`, `high_l_enstrophy_fraction_definition`, `infer_solver`, `infer_state_schema`, `provenance_blocks`, `state_schema_for` |
 | `tropoi.representation.archive.writer` | code | `RunDirectory`, `RunProvenanceError` | `atomic_write_text`, `create_run_dir`, `failure_record`, `make_run_id`, `update_manifest_status`, `write_run_manifest` |
 
+Files shipped in this directory that are **not Python and not analysed** (templates, data): `README.md`. Their contents (for example JavaScript in an HTML template) are invisible to every graph here.
+
 ## Imports
 
 This package's modules and the import edges between them; every other package is collapsed to one dashed node (edge label: module edges merged). A dashed arrow is made only of function-scope or `TYPE_CHECKING` imports.

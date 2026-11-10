@@ -21,7 +21,7 @@ to resolve a preset's state)::
     state = load_initial_state("my_state")       # fresh process, no CuPy
     run_dir = run_initial_state("my_state", duration_days=1.0)
 
-See docs/CUSTOM_INITIAL_STATES.md and docs/TERRAIN_IMPORT.md.
+See src/tropoi/run/custom/INITIAL_STATES.md and src/tropoi/spatial/terrain/IMPORT.md.
 """
 from tropoi.representation.archive.initial_state import (
     INITIAL_STATE_FORMAT, INITIAL_STATE_FORMAT_VERSION, InitialState,

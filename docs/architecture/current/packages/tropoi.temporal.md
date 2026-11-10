@@ -16,6 +16,8 @@ Index: [all packages](../index.md) · parent [`tropoi`](tropoi.md) · [`tropoi.t
 | `tropoi.temporal.simulation` | code | `Simulation`, `Snapshot`, `SnapshotStorage` | – |
 | `tropoi.temporal.steppers` | code | `RK4Stepper`, `TimeStepper` | – |
 
+Files shipped in this directory that are **not Python and not analysed** (templates, data): `README.md`, `SAVED_RUNS.md`, `SEMI_IMPLICIT.md`. Their contents (for example JavaScript in an HTML template) are invisible to every graph here.
+
 ## Imports
 
 This package's modules and the import edges between them; every other package is collapsed to one dashed node (edge label: module edges merged). A dashed arrow is made only of function-scope or `TYPE_CHECKING` imports.

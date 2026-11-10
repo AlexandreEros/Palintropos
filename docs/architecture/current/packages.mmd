@@ -17,7 +17,7 @@ flowchart TD
     subgraph g_representation["layer representation"]
         n_tropoi_orepresentation["representation (1 module)"]
         n_tropoi_orepresentation_oarchive["representation.archive (9 modules)"]
-        n_tropoi_orepresentation_odiagnostics["representation.diagnostics (6 modules)"]
+        n_tropoi_orepresentation_odiagnostics["representation.diagnostics (7 modules)"]
         n_tropoi_orepresentation_ovisual["representation.visual (24 modules)"]
     end
     subgraph g_temporal["layer temporal"]
@@ -52,7 +52,7 @@ flowchart TD
     n_tropoi_orepresentation_odiagnostics -->|2| n_tropoi_ospatial_otransforms
     n_tropoi_orepresentation_odiagnostics -->|2| n_tropoi_otemporal_otendencies
     n_tropoi_orepresentation_ovisual -->|5| n_tropoi_orepresentation_oarchive
-    n_tropoi_orepresentation_ovisual -->|6| n_tropoi_orepresentation_odiagnostics
+    n_tropoi_orepresentation_ovisual -->|7| n_tropoi_orepresentation_odiagnostics
     n_tropoi_orepresentation_ovisual -->|5| n_tropoi_ospatial
     n_tropoi_orepresentation_ovisual -->|9| n_tropoi_ospatial_ogrids
     n_tropoi_orepresentation_ovisual -->|1| n_tropoi_ospatial_ooperators

@@ -19,6 +19,8 @@ Index: [all packages](../index.md) · parent [`tropoi`](tropoi.md) · [`tropoi.s
 | `tropoi.spatial.truncation` | code | – | `product_truncation_cut`, `require_scenario_support`, `require_thermal_wave_support` |
 | `tropoi.spatial.williamson5` | code | – | – |
 
+Files shipped in this directory that are **not Python and not analysed** (templates, data): `CONVENTIONS.md`, `README.md`. Their contents (for example JavaScript in an HTML template) are invisible to every graph here.
+
 ## Imports
 
 This package's modules and the import edges between them; every other package is collapsed to one dashed node (edge label: module edges merged). A dashed arrow is made only of function-scope or `TYPE_CHECKING` imports.
@@ -188,6 +190,7 @@ classDiagram
     c_tropoi_ospatial_osigma__coordinate_oSigmaGrid : +alpha()
     c_tropoi_ospatial_osigma__coordinate_oSigmaGrid : +full#95;levels()
     c_tropoi_ospatial_osigma__coordinate_oSigmaGrid : +full#95;levels#95;array()
+    c_tropoi_ospatial_osigma__coordinate_oSigmaGrid : +hydrostatic#95;full#95;levels()
     c_tropoi_ospatial_osigma__coordinate_oSigmaGrid : +interface#95;log#95;ratios()
     c_tropoi_ospatial_osigma__coordinate_oSigmaGrid : +interfaces#95;array()
     c_tropoi_ospatial_osigma__coordinate_oSigmaGrid : +nlev

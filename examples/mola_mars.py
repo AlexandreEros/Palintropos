@@ -29,7 +29,7 @@ label, checks every property it relies on, and writes a CF NetCDF file that
 
 ``validate`` measures what the import path does with it (orientation against
 named landmarks, the hemispheric offset, independence from source
-resolution, resolved peaks per truncation); docs/TERRAIN_IMPORT.md records
+resolution, resolved peaks per truncation); src/tropoi/spatial/terrain/IMPORT.md records
 the numbers. ``show`` writes the static figure and the interactive globe.
 ``prepare-pe`` resolves the terrain for the primitive-equation core
 (band-limited at the dealiased cut) on a Mars-sized planet, saves it, and

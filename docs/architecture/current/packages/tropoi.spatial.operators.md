@@ -11,6 +11,8 @@ Index: [all packages](../index.md) · parent [`tropoi.spatial`](tropoi.spatial.m
 | `tropoi.spatial.operators` | empty | – | – |
 | `tropoi.spatial.operators.spectral_operators` | code | `SpectralOperators` | – |
 
+Files shipped in this directory that are **not Python and not analysed** (templates, data): `README.md`. Their contents (for example JavaScript in an HTML template) are invisible to every graph here.
+
 ## Imports
 
 This package's modules and the import edges between them; every other package is collapsed to one dashed node (edge label: module edges merged). A dashed arrow is made only of function-scope or `TYPE_CHECKING` imports.

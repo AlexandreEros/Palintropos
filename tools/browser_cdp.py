@@ -162,15 +162,15 @@ class OfflinePage:
         port_file = pathlib.Path(self.profile) / "DevToolsActivePort"
         deadline = time.monotonic() + self.timeout
 
-        def read_port() -> str:
-            # On Windows the browser holds the file open while writing it,
-            # so a read can be refused (PermissionError): treat as not ready.
+        def port_text() -> str:
+            # On Windows the file can be locked while the browser writes it
+            # (PermissionError): not ready yet, try again.
             try:
                 return port_file.read_text().strip()
-            except (FileNotFoundError, PermissionError):
+            except OSError:
                 return ""
 
-        while not (text := read_port()):
+        while not (text := port_text()):
             if self.proc.poll() is not None or time.monotonic() > deadline:
                 self.__exit__(None, None, None)
                 raise RuntimeError("the browser did not start DevTools")

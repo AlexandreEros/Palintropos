@@ -17,6 +17,8 @@ Index: [all packages](../index.md) · parent [`tropoi.run`](tropoi.run.md)
 | `tropoi.run.held_suarez.report` | code | – | `build_report`, `config_mismatches`, `load_run`, `reference_summary`, `reference_tier_b`, `render_markdown`, `tier_a`, `tier_b`, `tier_c`, `worst`, `write_report` |
 | `tropoi.run.held_suarez.statistics` | code | `OnlineStatistics` | – |
 
+Files shipped in this directory that are **not Python and not analysed** (templates, data): `README.md`. Their contents (for example JavaScript in an HTML template) are invisible to every graph here.
+
 ## Imports
 
 This package's modules and the import edges between them; every other package is collapsed to one dashed node (edge label: module edges merged). A dashed arrow is made only of function-scope or `TYPE_CHECKING` imports.

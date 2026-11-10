@@ -16,6 +16,8 @@ Index: [all packages](../index.md) · parent [`tropoi.run`](tropoi.run.md)
 | `tropoi.run.custom.presets` | code | – | `initial_state_from_config`, `initial_state_from_preset`, `planet_spec_for_run_config`, `topography_spec_for_run_config` |
 | `tropoi.run.custom.resources` | code | `PreparationError` | `base_config`, `build_spec_planet`, `check_specs`, `resolve_topography` |
 
+Files shipped in this directory that are **not Python and not analysed** (templates, data): `INITIAL_STATES.md`, `README.md`. Their contents (for example JavaScript in an HTML template) are invisible to every graph here.
+
 ## Imports
 
 This package's modules and the import edges between them; every other package is collapsed to one dashed node (edge label: module edges merged). A dashed arrow is made only of function-scope or `TYPE_CHECKING` imports.

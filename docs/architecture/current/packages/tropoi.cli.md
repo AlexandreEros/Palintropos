@@ -14,6 +14,8 @@ Index: [all packages](../index.md) · parent [`tropoi`](tropoi.md)
 | `tropoi.cli.main` | code | – | `add_bve_arguments`, `add_pe_arguments`, `add_swe_arguments`, `build_parser`, `main`, `run_bve_command`, `run_initial_state_command` |
 | `tropoi.cli.terrain` | code | – | `add_arguments`, `add_prepare_arguments`, `build_raster`, `default_gauss_grid`, `run_prepare` |
 
+Files shipped in this directory that are **not Python and not analysed** (templates, data): `README.md`. Their contents (for example JavaScript in an HTML template) are invisible to every graph here.
+
 ## Imports
 
 This package's modules and the import edges between them; every other package is collapsed to one dashed node (edge label: module edges merged). A dashed arrow is made only of function-scope or `TYPE_CHECKING` imports.

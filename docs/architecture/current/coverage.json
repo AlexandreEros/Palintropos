@@ -56,7 +56,7 @@
           "tropoi.run.custom.prepare.prepare_bve_state",
           "tropoi.run.custom.prepare.prepare_swe_state"
         ],
-        "title": "Custom initial states from Python (docs/CUSTOM_INITIAL_STATES.md)"
+        "title": "Custom initial states from Python (src/tropoi/run/custom/INITIAL_STATES.md)"
       },
       {
         "doc": null,
@@ -65,10 +65,11 @@
           "tropoi.spatial.terrain.raster.read_elevation",
           "tropoi.spatial.terrain.raster.encode_grey16"
         ],
-        "title": "Terrain rasters from Python: read an elevation file, write 16-bit grey (docs/TERRAIN_IMPORT.md)"
+        "title": "Terrain rasters from Python: read an elevation file, write 16-bit grey (src/tropoi/spatial/terrain/IMPORT.md)"
       }
     ],
     "excluded": {
+      "tropoi.representation.visual.atmosphere.dequantize_columns": "NumPy reference of the atmosphere page's browser-side dequantization, used by tests to bound the quantization error; no workflow starts here",
       "tropoi.representation.visual.swe.build_swe_snapshot_timeline": "exported timeline builder (alias build_swe_timeline) used directly by tests; no caller in the package",
       "tropoi.representation.visual.timeline.build_timeline_overview": "exported but used nowhere in src or tests; kept as API surface",
       "tropoi.run.custom.prepare.pad_coefficients": "helper that a user calls before prepare_*_state to zero-pad coefficients; no workflow starts here",
@@ -82,7 +83,7 @@
     }
   },
   "discovered": {
-    "classes": 172,
+    "classes": 178,
     "cli_handlers": {
       "cli-gen": "tropoi.cli.main._cmd_gen",
       "cli-inspect": "tropoi.cli.main._cmd_inspect",
@@ -96,6 +97,9 @@
       "cli-terrain-run-prepare": "tropoi.cli.terrain.run_prepare"
     },
     "entry_point_candidates": {
+      "tropoi.representation.visual.atmosphere.dequantize_columns": [
+        "tropoi.representation.visual.atmosphere.dequantize_columns"
+      ],
       "tropoi.representation.visual.sky.optical_depth_diagnostic": [
         "tropoi.representation.visual.sky.optical_depth_diagnostic"
       ],
@@ -178,16 +182,16 @@
         "tropoi.temporal.hooks.rk4_real_axis_limit"
       ]
     },
-    "functions": 1367,
-    "modules": 144,
+    "functions": 1409,
+    "modules": 145,
     "packages": 23
   },
   "limits": {
     "call_sites": {
-      "builtin": 3060,
-      "external": 2098,
-      "internal": 2565,
-      "unresolved": 3050
+      "builtin": 3223,
+      "external": 2223,
+      "internal": 2626,
+      "unresolved": 3143
     },
     "dynamic_import_sites": {
       "tropoi.representation.archive.writer": 1
@@ -215,13 +219,86 @@
       "tropoi.temporal.tendencies"
     ],
     "not_analysed_files": {
+      "tropoi": [
+        "README.md"
+      ],
+      "tropoi.cli": [
+        "README.md"
+      ],
+      "tropoi.representation": [
+        "README.md"
+      ],
+      "tropoi.representation.archive": [
+        "README.md"
+      ],
+      "tropoi.representation.diagnostics": [
+        "README.md"
+      ],
       "tropoi.representation.visual": [
+        "ATMOSPHERE_VIEW.md",
+        "HELD_SUAREZ_CLIMATE.md",
+        "README.md",
         "sky_view.html",
         "terrain_globe.html"
       ],
+      "tropoi.run": [
+        "README.md"
+      ],
+      "tropoi.run.bve": [
+        "README.md"
+      ],
+      "tropoi.run.custom": [
+        "INITIAL_STATES.md",
+        "README.md"
+      ],
+      "tropoi.run.held_suarez": [
+        "README.md"
+      ],
+      "tropoi.run.pe": [
+        "GUIDE.md",
+        "README.md"
+      ],
+      "tropoi.run.swe": [
+        "README.md"
+      ],
+      "tropoi.spatial": [
+        "CONVENTIONS.md",
+        "README.md"
+      ],
+      "tropoi.spatial.grids": [
+        "README.md"
+      ],
+      "tropoi.spatial.initialization": [
+        "README.md"
+      ],
+      "tropoi.spatial.operators": [
+        "README.md"
+      ],
+      "tropoi.spatial.states": [
+        "README.md"
+      ],
+      "tropoi.spatial.terrain": [
+        "IMPORT.md",
+        "README.md"
+      ],
+      "tropoi.spatial.transforms": [
+        "README.md"
+      ],
       "tropoi.spatial.transforms.cuda": [
+        "README.md",
         "legendre.cu",
         "sh_matrix.cu"
+      ],
+      "tropoi.temporal": [
+        "README.md",
+        "SAVED_RUNS.md",
+        "SEMI_IMPLICIT.md"
+      ],
+      "tropoi.temporal.tendencies": [
+        "PRIMITIVE_EQUATIONS.md",
+        "README.md",
+        "RETAINED_TRUNCATION.md",
+        "SHALLOW_WATER.md"
       ]
     },
     "not_followed": [
@@ -440,9 +517,9 @@
         ]
       }
     },
-    "classes": 172,
+    "classes": 178,
     "classes_in_inheritance_overview": 18,
-    "modules": 144,
+    "modules": 145,
     "package_pages": 23
   },
   "rules": {
@@ -452,6 +529,6 @@
   },
   "scope_file": {
     "path": "docs/architecture/entry-points.toml",
-    "sha256": "1cd1ce6a9dd537f5cbd28ddea5085a5b1592344f3ffdf595c1a071b80562d970"
+    "sha256": "20d54b5616926368336e9a7aa98abe3efbf3bd8ae34992f38fb5ae01e3193938"
   }
 }

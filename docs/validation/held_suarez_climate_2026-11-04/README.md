@@ -2,7 +2,7 @@
 
 These are the six latitude–σ climate sections of the production run
 `hs-T42L20-prod-002`, drawn on the CPU by `Simulation.plot()`
-([CLIMATE_FIGURE.md](../../held_suarez/CLIMATE_FIGURE.md)). Under them, a strip
+([climate figure reference](../../../src/tropoi/representation/visual/HELD_SUAREZ_CLIMATE.md)). Under them, a strip
 draws the run's daily global mass drift, and its area- and σ-weighted (not
 mass-weighted) kinetic energy and temperature, from its
 `series.json`, with the averaging window shaded. The run's archive

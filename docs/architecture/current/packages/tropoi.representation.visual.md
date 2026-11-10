@@ -9,7 +9,7 @@ Index: [all packages](../index.md) · parent [`tropoi.representation`](tropoi.re
 | Module | Category | Classes | Public functions |
 |---|---|---|---|
 | `tropoi.representation.visual` | empty | – | – |
-| `tropoi.representation.visual.atmosphere` | code | `AtmosphereViewWarning`, `PayloadTooLargeError` | `atmosphere_payload`, `default_resolution_deg`, `estimate_payload_bytes`, `view_atmosphere` |
+| `tropoi.representation.visual.atmosphere` | code | `AtmosphereViewWarning`, `PayloadTooLargeError` | `atmosphere_payload`, `decoded_column_bytes`, `default_resolution_deg`, `dequantize_columns`, `estimate_column_payload_bytes`, `estimate_payload_bytes`, `quantize_columns`, `streamline_cache_bytes`, `surface_height_bytes`, `view_atmosphere` |
 | `tropoi.representation.visual.bve` | code | – | `build_bve_snapshot_timeline`, `build_bve_snapshot_timeline_from_data`, `build_bve_snapshot_timelines`, `build_bve_spectral_snapshot_timeline`, `build_bve_spectral_snapshot_timeline_from_data`, `build_bve_summary_spec`, `render_bve_snapshots` |
 | `tropoi.representation.visual.complex_encoding` | code | – | `normalized_magnitude_strength`, `phase_hue`, `phase_magnitude_hsv`, `relative_magnitude_db`, `wrapped_phase` |
 | `tropoi.representation.visual.compose` | code | – | `compose_view`, `default_output_path`, `default_view`, `elapsed_label`, `pretty_units`, `render_view`, `resolve_level`, `resolve_snapshots` |
@@ -34,7 +34,7 @@ Index: [all packages](../index.md) · parent [`tropoi.representation`](tropoi.re
 | `tropoi.representation.visual.views` | code | `Arrows`, `AutoVectors`, `Complexity`, `Contours`, `Drift`, `Grid`, `Map`, `Overview`, `Sigma`, `StreamfunctionContours`, `Streamlines`, `Style` | `describe`, `parse_time` |
 | `tropoi.representation.visual.vorticity_viewer` | code | `VorticityViewer` | – |
 
-Files shipped in this directory that are **not Python and not analysed** (templates, data): `sky_view.html`, `terrain_globe.html`. Their contents (for example JavaScript in an HTML template) are invisible to every graph here.
+Files shipped in this directory that are **not Python and not analysed** (templates, data): `ATMOSPHERE_VIEW.md`, `HELD_SUAREZ_CLIMATE.md`, `README.md`, `sky_view.html`, `terrain_globe.html`. Their contents (for example JavaScript in an HTML template) are invisible to every graph here.
 
 ## Imports
 
@@ -163,7 +163,7 @@ flowchart LR
     p_tropoi_orun_ope -.->|1| n_tropoi_orepresentation_ovisual_ope__snapshots
     p_tropoi_orun_oswe -->|1| n_tropoi_orepresentation_ovisual_oswe
     n_tropoi_orepresentation_ovisual_oatmosphere -.->|1| p_tropoi_orepresentation_oarchive
-    n_tropoi_orepresentation_ovisual_oatmosphere -->|1| p_tropoi_orepresentation_odiagnostics
+    n_tropoi_orepresentation_ovisual_oatmosphere -->|2| p_tropoi_orepresentation_odiagnostics
     n_tropoi_orepresentation_ovisual_ocompose -.->|1| p_tropoi_orepresentation_odiagnostics
     n_tropoi_orepresentation_ovisual_ocompose -.->|1| p_tropoi_ospatial
     n_tropoi_orepresentation_ovisual_oevaluate -.->|2| p_tropoi_orepresentation_odiagnostics

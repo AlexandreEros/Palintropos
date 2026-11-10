@@ -22,7 +22,7 @@ times, native levels, exaggeration and opacity, a field selector and
 optional instantaneous horizontal streamlines. ``times`` are saved snapshot
 indices (negative counts back); without ``--times`` as many evenly spaced
 states as fit ``--max-mb`` are exported and a warning says which.
-See docs/ATMOSPHERE_VIEW.md.
+See src/tropoi/representation/visual/ATMOSPHERE_VIEW.md.
 """
 from __future__ import annotations
 

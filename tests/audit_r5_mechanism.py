@@ -1,4 +1,4 @@
-"""Standalone audit of the R-5 mechanism (docs/KNOWN_RISKS.md R-5).
+"""Standalone audit of the R-5 mechanism (tests/audit_r5_mechanism.py).
 
 Measures, on a fixed representative state, how the production tendency's
 grid-space construction of absolute vorticity

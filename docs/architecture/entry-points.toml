@@ -49,7 +49,7 @@ doc = "docs/architecture/subsystems/sky.md"
 
 [[entry_path]]
 name = "custom-initial-states"
-title = "Custom initial states from Python (docs/CUSTOM_INITIAL_STATES.md)"
+title = "Custom initial states from Python (src/tropoi/run/custom/INITIAL_STATES.md)"
 roots = [
   "tropoi.run.custom.execute.run_initial_state",
   "tropoi.run.custom.presets.initial_state_from_preset",
@@ -59,7 +59,7 @@ roots = [
 
 [[entry_path]]
 name = "terrain-raster"
-title = "Terrain rasters from Python: read an elevation file, write 16-bit grey (docs/TERRAIN_IMPORT.md)"
+title = "Terrain rasters from Python: read an elevation file, write 16-bit grey (src/tropoi/spatial/terrain/IMPORT.md)"
 roots = [
   "tropoi.spatial.terrain.raster.read_elevation",
   "tropoi.spatial.terrain.raster.encode_grey16",
@@ -104,3 +104,7 @@ reason = "convenience wrapper; the sky reaches cross sections through SPECIES[..
 [[excluded]]
 function = "tropoi.temporal.hooks.rk4_real_axis_limit"
 reason = "numerical helper (RK4 stability limit on the real axis) used by a stability test; no workflow starts here"
+
+[[excluded]]
+function = "tropoi.representation.visual.atmosphere.dequantize_columns"
+reason = "NumPy reference of the atmosphere page's browser-side dequantization, used by tests to bound the quantization error; no workflow starts here"

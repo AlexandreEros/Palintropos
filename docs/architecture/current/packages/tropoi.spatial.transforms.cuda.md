@@ -11,7 +11,7 @@ Index: [all packages](../index.md) · parent [`tropoi.spatial.transforms`](tropo
 | `tropoi.spatial.transforms.cuda` | namespace | – | – |
 | `tropoi.spatial.transforms.cuda.cuda_utils` | code | – | `load_cuda_source`, `raw_module_from_cuda` |
 
-Files shipped in this directory that are **not Python and not analysed** (templates, data): `legendre.cu`, `sh_matrix.cu`. Their contents (for example JavaScript in an HTML template) are invisible to every graph here.
+Files shipped in this directory that are **not Python and not analysed** (templates, data): `README.md`, `legendre.cu`, `sh_matrix.cu`. Their contents (for example JavaScript in an HTML template) are invisible to every graph here.
 
 ## Imports
 

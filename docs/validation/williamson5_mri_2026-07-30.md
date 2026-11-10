@@ -29,7 +29,7 @@ mountain (`hs0 = 2000 m`, `R0 = pi/9`, centred 30°N / 90°W), with the case-2
 height field prescribed as the **free surface**, `eta = h0 - (C/g) sin^2(lat)`,
 `h0 = 5960 m`, `C = a*Omega*u0 + u0^2/2`. Aeolus's implementation, constants,
 and the cone's coordinate-plane distance convention are documented in
-[SHALLOW_WATER.md](../SHALLOW_WATER.md).
+[SHALLOW_WATER.md](../../src/tropoi/temporal/tendencies/SHALLOW_WATER.md).
 
 **Reference.** The Meteorological Research Institute / Japan Meteorological
 Agency archive accompanying Yoshimura (2022), directory

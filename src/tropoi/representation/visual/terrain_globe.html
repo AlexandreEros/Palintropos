@@ -137,8 +137,40 @@ select:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
         <label><input type="checkbox" id="tLoop"> Loop</label>
       </div>
       <p class="note" id="timeNote"></p>
-      <div class="row"><span>Native level <span class="note">(1 = top)</span></span><span id="levelLabel" class="val"></span></div>
+      <div class="row"><span id="levelTitle">Native level <span class="note">(1 = top)</span></span><span id="levelLabel" class="val"></span></div>
       <input type="range" id="levelSlider" min="0" max="0" step="1" aria-label="Native sigma level">
+      <p class="note" id="surfaceNote" hidden></p>
+      <div class="seg" id="coordButtons" role="group" aria-label="Surface coordinate" hidden>
+        <button id="coordPressure" aria-pressed="true" title="Surfaces of constant pressure">Pressure</button>
+        <button id="coordHeight" aria-pressed="false" title="Surfaces of constant geopotential height">Geopotential height</button>
+        <button id="coordSigma" aria-pressed="false" title="Surfaces of constant σ = p/pₛ (vorticity and divergence available)">σ</button>
+      </div>
+      <div id="sigmaBlock" hidden>
+        <div class="row"><span>σ₀ = p/pₛ</span><span id="sigmaLabel" class="val"></span></div>
+        <input type="range" id="sigmaSlider" min="0" max="1000" step="1" aria-label="Sigma (linear slider)">
+        <div class="row"><label for="sigmaInput">Type a σ</label>
+          <span><input type="text" id="sigmaInput" inputmode="decimal" size="9" autocomplete="off" spellcheck="false" aria-describedby="sigmaNote" aria-label="Sigma value">
+          <button id="sigmaApply" title="Apply the typed sigma (Enter does too)">Set</button></span></div>
+        <p class="note" id="sigmaNote" aria-live="polite"></p>
+      </div>
+      <div id="heightBlock" hidden>
+        <div class="row"><span>Height Z₀</span><span id="heightLabel" class="val"></span></div>
+        <input type="range" id="heightSlider" min="0" max="1000" step="1" aria-label="Geopotential height (linear slider)">
+        <div class="row"><label for="heightInput">Type a height</label>
+          <span><input type="text" id="heightInput" inputmode="decimal" size="9" autocomplete="off" spellcheck="false" aria-describedby="heightNote" aria-label="Geopotential height value">
+          <select id="heightUnit" aria-label="Height unit"><option value="1000">km</option><option value="1">m</option></select>
+          <button id="heightApply" title="Apply the typed height (Enter does too)">Set</button></span></div>
+        <p class="note" id="heightNote" aria-live="polite"></p>
+      </div>
+      <div id="pressureBlock" hidden>
+        <div class="row"><span>Pressure p₀</span><span id="pressureLabel" class="val"></span></div>
+        <input type="range" id="pressureSlider" min="0" max="1000" step="1" aria-label="Isobar pressure (logarithmic slider)">
+        <div class="row"><label for="pressureInput">Type a pressure</label>
+          <span><input type="text" id="pressureInput" inputmode="decimal" size="9" autocomplete="off" spellcheck="false" aria-describedby="pressureNote" aria-label="Isobar pressure value">
+          <select id="pressureUnit" aria-label="Pressure unit"><option value="100">hPa</option><option value="1">Pa</option></select>
+          <button id="pressureApply" title="Apply the typed pressure (Enter does too)">Set</button></span></div>
+        <p class="note" id="pressureNote" aria-live="polite"></p>
+      </div>
       <div class="row"><span>Field</span></div>
       <div class="seg" id="fieldButtons" role="group" aria-label="Atmospheric field"></div>
       <div class="row"><span>Opacity</span><span id="opacityLabel" class="val"></span></div>
@@ -146,7 +178,7 @@ select:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
       <div class="row"><label><input type="checkbox" id="atmShow" checked> Atmospheric surface</label></div>
       <div class="row"><label><input type="checkbox" id="streams"> Wind streamlines</label></div>
       <p class="note" id="streamNote"></p>
-      <div class="row"><label><input type="checkbox" id="rangeLevel"> Colour range of this level only</label></div>
+      <div class="row" id="rangeLevelRow"><label><input type="checkbox" id="rangeLevel"> Colour range of this level only</label></div>
       <p class="note" id="atmNote"></p>
     </div>
     <div class="card section">
@@ -378,7 +410,7 @@ function initSurfaceGL(s) {
     const a = j * NO + i, b = a + 1, c = a + NO, d = c + 1;
     idx[k++] = a; idx[k++] = b; idx[k++] = d; idx[k++] = a; idx[k++] = d; idx[k++] = c;
   }
-  s.nIdx = k;
+  s.nIdx = k; s.idxAll = idx;                 // kept: a masked surface re-indexes per frame
   s.buf.idx = gl.createBuffer(); gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, s.buf.idx); gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, idx, gl.STATIC_DRAW);
   s.buf.pos = gl.createBuffer(); s.buf.nrm = gl.createBuffer(); s.buf.col = gl.createBuffer();
 }
@@ -649,24 +681,513 @@ overC.addEventListener("click", e => { const p = mapToLatLon(e); if (p) { centre
 /* ---------------- atmosphere (optional "atmosphere" payload block) ----------------
    One translucent native sigma surface at radius 1 + E * Z / R (Z = geopotential height
    of the saved state, E the same exaggeration as the terrain), coloured by one field,
-   with optional instantaneous horizontal streamlines draped on it. */
+   with optional instantaneous horizontal streamlines draped on it. With a "surface"
+   block (version 2) the one "level" is a derived isobaric surface per saved time and
+   "mask" holds one validity byte per node and time: masked nodes are not samples, so
+   no triangle touches them, the flat map greys them and hover names the reason. With a
+   "columns" block (version 3, interactive pressure) the file holds the native columns
+   of each saved state instead, and this page interpolates them to any pressure chosen
+   here (computeSurface); only the selected saved state is decoded. */
 const ATM = D.atmosphere ? (function () {
   const A = D.atmosphere, g = A.mesh;
   const u16 = b64 => new Uint16Array(decodeBytes(b64).buffer);
-  const sl = A.streamlines;
+  const sl = A.streamlines, C = A.columns || null;
   return {
     A, g, n: g.nlat * g.nlon, nt: A.times.length, nl: A.levels.length,
-    fields: A.fields.map(f => Object.assign({}, f, { q: u16(f.data) })),
-    height: { q: u16(A.height.data), bounds: A.height.bounds },
-    lines: sl.enabled ? { pts: new Int16Array(decodeBytes(sl.points).buffer),
+    fields: A.fields.map(f => Object.assign({}, f, { q: f.data ? u16(f.data) : null })),
+    height: A.height ? { q: u16(A.height.data), bounds: A.height.bounds } : null,
+    surface: A.surface || null, mask: A.mask ? decodeBytes(A.mask.data) : null,
+    cols: C, colCache: [], p0: C ? A.defaults.pressure_pa : null, derived: null, seq: 0, pending: null, raf: 0,
+    kind: C ? (A.defaults.coordinate || "pressure") : null, z0: C ? A.defaults.height_m : null, heightError: null,
+    s0: C ? A.defaults.sigma : null, sigmaError: null,
+    hs: C && C.surface_height ? decodeF32(C.surface_height.data) : null, fieldBy: null,
+    timing: C ? { decode_ms: 0, interpolate_ms: 0, mesh_ms: 0, map_ms: 0, total_ms: 0 } : null, pressureError: null,
+    lines: sl.enabled && sl.points ? { pts: new Int16Array(decodeBytes(sl.points).buffer),
                           start: new Uint32Array(decodeBytes(sl.line_start).buffer),
                           slice: sl.slice_line_start } : null,
     surf: makeSurface(g), it: A.defaults.time, il: A.defaults.level,
     field: Math.max(0, A.fields.findIndex(f => f.id === A.defaults.field)),
-    opacity: A.defaults.opacity, streams: !!(A.defaults.streamlines && sl.enabled),
+    opacity: A.defaults.opacity, streams: !!(A.defaults.streamlines && sl.enabled), canStream: !!sl.enabled,
+    sl: { gen: 0, timer: 0, key: null, lines: null, pending: false, published: 0, cache: [], timing: { integrate_ms: 0 } },
     show: true, perLevel: false, mapAtm: true, cache: {}, nStreamVerts: 0, nLinesHere: 0,
   };
 })() : null;
+
+/* ---- interactive pressure (version 3): the vertical interpolation of
+   representation.diagnostics.pe_surfaces, done here on the exported native columns ---- */
+function colDecode(it) {
+  // float32 columns of saved state `it` from the 16-bit per-level quantization
+  // (lo + q (hi - lo) / 65535, rounded to float32). At most max_decoded_times states are
+  // held, least recently used dropped, so memory is bounded by the selected state.
+  // zeta and delta are shown on sigma surfaces only, so they are decoded only while that
+  // coordinate is selected (added to a cached state when it first is).
+  const C = ATM.cols, T = C.times[it], n = ATM.n, K = C.nlev, wantZD = ATM.kind === "sigma";
+  const decodeField = (out, name) => {
+    const q = new Uint16Array(decodeBytes(T[name].data).buffer), v = new Float32Array(K * n);
+    for (let k = 0; k < K; k++) {
+      const [lo, hi] = T[name].bounds[k], step = Math.fround((hi - lo) / 65535), base = Math.fround(lo), o = k * n;
+      for (let i = 0; i < n; i++) v[o + i] = base + q[o + i] * step;
+    }
+    out[name] = v;
+  };
+  const hit = ATM.colCache.findIndex(e => e.it === it);
+  if (hit >= 0) {
+    const e = ATM.colCache.splice(hit, 1)[0]; ATM.colCache.push(e);
+    if (wantZD && !e.zeta) for (const name of ["zeta", "delta"]) if (T[name]) decodeField(e, name);
+    return e;
+  }
+  const out = { it };
+  for (const name of C.fields) if (wantZD || (name !== "zeta" && name !== "delta")) decodeField(out, name);
+  out.ps = new Float32Array(decodeBytes(T.surface_pressure.data).buffer);
+  let lo = Infinity, hi = -Infinity;
+  for (let i = 0; i < n; i++) { const x = out.ps[i]; if (x < lo) lo = x; if (x > hi) hi = x; }
+  out.psRange = [lo, hi];
+  let zlo = Infinity, zhi = -Infinity; const Pg = out.geopotential, ob = (K - 1) * n, gg = ATM.A.gravity;
+  for (let i = 0; i < n; i++) { if (Pg[ob + i] < zlo) zlo = Pg[ob + i]; if (Pg[i] > zhi) zhi = Pg[i]; }
+  out.zRange = [zlo / gg, zhi / gg];
+  ATM.colCache.push(out);
+  while (ATM.colCache.length > C.max_decoded_times) ATM.colCache.shift();
+  return out;
+}
+function computeSurface() {
+  // One pass over the nodes for ONE (coordinate, value, saved time): the fields, the height
+  // and the mask together, so geometry, colours and masks always describe the same surface.
+  const t0 = performance.now();
+  const it = ATM.it, c = colDecode(it), n = ATM.n;
+  const t1 = performance.now();
+  let d = ATM.derived;
+  if (!d) d = ATM.derived = { temperature: new Float32Array(n), geopotential_height: new Float32Array(n), wind_speed: new Float32Array(n),
+    pressure: new Float32Array(n), u: new Float32Array(n), v: new Float32Array(n), zeta: new Float32Array(n), delta: new Float32Array(n),
+    mask: new Uint8Array(n) };
+  if (ATM.kind === "geopotential_height") heightPass(d, c); else if (ATM.kind === "sigma") sigmaPass(d, c); else pressurePass(d, c);
+  d.it = it; d.psRange = c.psRange; d.zRange = c.zRange; d.nValid = d.counts[0];
+  d.key = d.kind + ":" + d.value + ":" + it;
+  const t2 = performance.now();
+  ATM.timing.decode_ms = t1 - t0; ATM.timing.interpolate_ms = t2 - t1;
+}
+function pressurePass(d, c) {
+  // The isobar p0: temperature, geopotential, u and v linear in ln sigma at sigma* = p0 / ps,
+  // then Z = Phi / g and |V|. Masks as in pe_surfaces: 1 under ground (sigma* > 1), 2 above
+  // the top level, 3 between the bottom level and the ground; the ends widened by
+  // end_tolerance; no extrapolation (the weight is clamped).
+  const S = ATM.surface, sig = S.level_positions, K = sig.length, n = ATM.n, p0 = ATM.p0;
+  const lnsig = sig.map(Math.log), top = sig[0] * (1 - S.end_tolerance), bottom = sig[K - 1] * (1 + S.end_tolerance), g = ATM.A.gravity;
+  const counts = [0, 0, 0, 0, 0], T = c.temperature, P = c.geopotential, U = c.u, V = c.v, ps = c.ps;
+  for (let i = 0; i < n; i++) {
+    const st = p0 / ps[i];
+    let m = 0;
+    if (st > 1) m = 1; else if (st < top) m = 2; else if (st > bottom) m = 3;
+    d.mask[i] = m; counts[m]++; d.pressure[i] = m === 1 ? 0 : p0;
+    if (m) {
+      // finite placeholders, never samples: the top value above the top level, the bottom
+      // value below the bottom level, 0 under ground (as the Python reference)
+      const k = m === 2 ? 0 : m === 3 ? K - 1 : -1, a = k * n + i;
+      d.temperature[i] = k < 0 ? 0 : T[a];
+      d.geopotential_height[i] = k < 0 ? 0 : P[a] / g;
+      d.wind_speed[i] = k < 0 ? 0 : Math.hypot(U[a], V[a]);
+      d.u[i] = k < 0 ? 0 : U[a]; d.v[i] = k < 0 ? 0 : V[a];
+      continue;
+    }
+    let k = 0; while (k < K - 2 && sig[k + 1] <= st) k++;              // upper bracket, clamped
+    let w = (Math.log(st) - lnsig[k]) / (lnsig[k + 1] - lnsig[k]); w = w < 0 ? 0 : w > 1 ? 1 : w;
+    const a = k * n + i, b = a + n;
+    d.temperature[i] = T[a] + w * (T[b] - T[a]);
+    d.geopotential_height[i] = (P[a] + w * (P[b] - P[a])) / g;
+    const uu = U[a] + w * (U[b] - U[a]), vv = V[a] + w * (V[b] - V[a]);
+    d.u[i] = uu; d.v[i] = vv; d.wind_speed[i] = Math.hypot(uu, vv);
+  }
+  d.counts = counts; d.kind = "pressure"; d.value = p0; d.p0 = p0; d.z0 = null;
+  d.sampled = [sig[0] * c.psRange[0], sig[K - 1] * c.psRange[1]];
+}
+function heightPass(d, c) {
+  // The geopotential-height surface Z0, as pe_surfaces.interpolate_geopotential: Phi0 = g Z0
+  // (the model's g, the datum of the terrain and the native levels). Each column's Phi is
+  // piecewise linear in ln sigma; with k the upper bracket (Phi_k >= Phi0 >= Phi_k+1),
+  // w = (Phi0 - Phi_k) / (Phi_k+1 - Phi_k) and ln sigma* between ln sigma_k and ln sigma_k+1;
+  // T, u, v take the same bracket and weight, p = ps exp(ln sigma*). Masks: 1 below the
+  // terrain (Phi0 < g hs, the physical terrain), 2 above the top full level, 3 between the
+  // terrain and the bottom full level; the ends widened by end_tolerance times |Phi_end|.
+  // A stored column that is not strictly decreasing above the terrain is never divided by:
+  // code 4 (the export refuses such columns; only an altered file has one).
+  const S = ATM.surface, sig = S.level_positions, K = sig.length, n = ATM.n, z0 = ATM.z0, tol = S.end_tolerance;
+  const g = ATM.A.gravity, phi0 = g * z0, hs = ATM.hs, lnsig = sig.map(Math.log);
+  const counts = [0, 0, 0, 0, 0], T = c.temperature, P = c.geopotential, U = c.u, V = c.v, ps = c.ps;
+  for (let i = 0; i < n; i++) {
+    const phis = hs ? g * hs[i] : 0, top = P[i], bot = P[(K - 1) * n + i];
+    let good = bot > phis;
+    for (let k = 0; good && k < K - 1; k++) good = P[k * n + i] > P[(k + 1) * n + i];
+    let m = 0;
+    if (!good) m = 4;
+    else {
+      if (phi0 > top + tol * Math.abs(top)) m = 2;
+      if (phi0 < bot - tol * Math.abs(bot)) m = 3;
+      if (phi0 < phis) m = 1;
+    }
+    d.mask[i] = m; counts[m]++; d.geopotential_height[i] = z0;
+    if (m) {
+      const k = m === 2 ? 0 : m === 3 ? K - 1 : -1, a = k * n + i;
+      d.temperature[i] = k < 0 ? 0 : T[a];
+      d.pressure[i] = k < 0 ? 0 : ps[i] * Math.exp(lnsig[k]);
+      d.u[i] = k < 0 ? 0 : U[a]; d.v[i] = k < 0 ? 0 : V[a];
+      d.wind_speed[i] = k < 0 ? 0 : Math.hypot(U[a], V[a]);
+      continue;
+    }
+    let k = 0; while (k < K - 2 && P[(k + 1) * n + i] >= phi0) k++;   // upper bracket, clamped
+    const a = k * n + i, b = a + n;
+    let w = (phi0 - P[a]) / (P[b] - P[a]); w = w < 0 ? 0 : w > 1 ? 1 : w;
+    d.pressure[i] = ps[i] * Math.exp(lnsig[k] + w * (lnsig[k + 1] - lnsig[k]));
+    d.temperature[i] = T[a] + w * (T[b] - T[a]);
+    const uu = U[a] + w * (U[b] - U[a]), vv = V[a] + w * (V[b] - V[a]);
+    d.u[i] = uu; d.v[i] = vv; d.wind_speed[i] = Math.hypot(uu, vv);
+  }
+  d.counts = counts; d.kind = "geopotential_height"; d.value = z0; d.z0 = z0; d.p0 = null;
+  d.sampled = c.zRange;
+}
+function sigmaPass(d, c) {
+  // The constant-sigma surface sigma0, as pe_surfaces (interpolate_log_sigma at sigma* = sigma0,
+  // the same at every node): linear in ln sigma between the NOMINAL level positions, so a
+  // level's own sigma_k reproduces that native level; p = sigma0 ps, Z = Phi / g. Masks 2
+  // (above the top level) and 3 (below the bottom one) cover the whole surface at once. The
+  // weight is the same everywhere, so the interpolated zeta and delta are exactly those of
+  // the interpolated wind (the one derived coordinate where they are shown).
+  const S = ATM.surface, sig = S.sigma_positions, K = sig.length, n = ATM.n, s0 = ATM.s0, g = ATM.A.gravity;
+  const lnsig = sig.map(Math.log), top = sig[0] * (1 - S.end_tolerance), bottom = sig[K - 1] * (1 + S.end_tolerance);
+  const counts = [0, 0, 0, 0, 0], T = c.temperature, P = c.geopotential, U = c.u, V = c.v, Zt = c.zeta, Dl = c.delta, ps = c.ps;
+  const m = s0 > 1 ? 1 : s0 < top ? 2 : s0 > bottom ? 3 : 0;
+  let k = 0; while (k < K - 2 && sig[k + 1] <= s0) k++;                  // upper bracket, clamped
+  let w = (Math.log(s0) - lnsig[k]) / (lnsig[k + 1] - lnsig[k]); w = w < 0 ? 0 : w > 1 ? 1 : w;
+  for (let i = 0; i < n; i++) {
+    d.mask[i] = m; counts[m]++; d.pressure[i] = s0 * ps[i];
+    if (m) {
+      const kk = m === 2 ? 0 : m === 3 ? K - 1 : -1, a = kk * n + i;     // placeholders, never samples
+      d.temperature[i] = kk < 0 ? 0 : T[a]; d.geopotential_height[i] = kk < 0 ? 0 : P[a] / g;
+      d.u[i] = kk < 0 ? 0 : U[a]; d.v[i] = kk < 0 ? 0 : V[a]; d.wind_speed[i] = kk < 0 ? 0 : Math.hypot(U[a], V[a]);
+      d.zeta[i] = kk < 0 ? 0 : Zt[a]; d.delta[i] = kk < 0 ? 0 : Dl[a];
+      continue;
+    }
+    const a = k * n + i, b = a + n;
+    d.temperature[i] = T[a] + w * (T[b] - T[a]);
+    d.geopotential_height[i] = (P[a] + w * (P[b] - P[a])) / g;
+    const uu = U[a] + w * (U[b] - U[a]), vv = V[a] + w * (V[b] - V[a]);
+    d.u[i] = uu; d.v[i] = vv; d.wind_speed[i] = Math.hypot(uu, vv);
+    d.zeta[i] = Zt[a] + w * (Zt[b] - Zt[a]); d.delta[i] = Dl[a] + w * (Dl[b] - Dl[a]);
+  }
+  d.counts = counts; d.kind = "sigma"; d.value = s0; d.s0 = s0; d.p0 = null; d.z0 = null;
+  d.sampled = [sig[0], sig[K - 1]];
+}
+function surfaceValue(kind) {
+  kind = kind || ATM.kind;
+  return kind === "geopotential_height" ? ATM.z0 : kind === "sigma" ? ATM.s0 : ATM.p0;
+}
+function ensureSurface() {
+  const d = ATM.derived;
+  if (ATM.cols && (!d || d.kind !== ATM.kind || d.value !== surfaceValue() || d.it !== ATM.it)) computeSurface();
+}
+
+/* ---- instantaneous horizontal streamlines of the selected derived surface, traced here.
+   A transcription of representation.visual.sphere_streamlines.integrate_streamlines (the
+   Python reference; the tests compare the two on identical winds and seeds): arc-length
+   parameter on the unit sphere, dx/ds = V_t/|V_t|, classical RK4 in R^3 renormalized onto
+   the sphere (regular across the poles, periodic in longitude), the wind interpolated
+   bilinearly in its Cartesian components with each pole row carrying its mean vector,
+   deterministic Fibonacci seeds, a step stops where the speed falls below the threshold or
+   leaves the cells whose four nodes are valid, and every accepted step is re-checked at
+   points closer than half a cell so a long step cannot jump a narrow masked band. The
+   arithmetic follows the NumPy expressions term by term (numpy's floored modulo, sqrt of
+   the sum of squares rather than hypot) so the two agree to the last few bits. ---- */
+function npMod(a, b) { let m = a % b; if (m !== 0 && (m < 0) !== (b < 0)) m += b; return m; }
+function unit3(x, y, z) { const s = Math.sqrt(x * x + y * y + z * z); return [x / s, y / s, z / s]; }
+function makeSampler(g, values, comps) {
+  // the reference's _MeshSampler: clip in latitude, floored modulo in longitude
+  const out = new Float64Array(comps), ymax = g.nlat - 1.000001, xmax = g.nlon - 1.000001, W = g.nlon;
+  return (lat, lon) => {
+    let y = (lat - g.lat0) / g.dlat; y = y < 0 ? 0 : y > ymax ? ymax : y;
+    let x = npMod(lon - g.lon0, 360.0) / g.dlon; x = x < 0 ? 0 : x > xmax ? xmax : x;
+    const j = Math.floor(y), i = Math.floor(x), fy = y - j, fx = x - i;
+    const a = (j * W + i) * comps, b = a + comps, c = a + W * comps, d = c + comps;
+    for (let q = 0; q < comps; q++)
+      out[q] = (values[a + q] * (1 - fx) + values[b + q] * fx) * (1 - fy) + (values[c + q] * (1 - fx) + values[d + q] * fx) * fy;
+    return out;
+  };
+}
+function fibonacciSeeds(count) {
+  const lat = new Float64Array(count), lon = new Float64Array(count), golden = Math.PI * (3.0 - Math.sqrt(5.0));
+  for (let k = 0; k < count; k++) {
+    const i = k + 0.5;
+    lat[k] = Math.asin(1.0 - 2.0 * i / count) * (180.0 / Math.PI);
+    lon[k] = npMod(golden * i, 2.0 * Math.PI) * (180.0 / Math.PI) - 180.0;
+  }
+  return { lat, lon };
+}
+function toLatLon(x) {
+  const y = x[1] < -1 ? -1 : x[1] > 1 ? 1 : x[1];
+  return [Math.asin(y) * (180.0 / Math.PI), Math.atan2(x[0], x[2]) * (180.0 / Math.PI)];
+}
+function traceStreamlines(g, u, v, valid, opt) {
+  // u, v: node winds (m/s); valid: node validity (truthy = sample) or null. Returns
+  // [{lat: Float64Array, lon: Float64Array}] upstream -> downstream, as the reference.
+  const NA = g.nlat, NO = g.nlon, n = NA * NO, wind = new Float64Array(3 * n), ind = new Float64Array(n);
+  const R = Math.PI / 180.0;
+  for (let j = 0; j < NA; j++) {
+    const la = (g.lat0 + j * g.dlat) * R, sl = Math.sin(la), cl = Math.cos(la);
+    for (let i = 0; i < NO; i++) {
+      const lo = (g.lon0 + i * g.dlon) * R, so = Math.sin(lo), co = Math.cos(lo), k = j * NO + i;
+      const ok = !valid || !!valid[k]; ind[k] = ok ? 1 : 0;
+      const uu = ok ? u[k] : 0, vv = ok ? v[k] : 0;
+      wind[3 * k] = uu * co + vv * (-sl * so);
+      wind[3 * k + 1] = uu * 0.0 + vv * cl;
+      wind[3 * k + 2] = uu * -so + vv * (-sl * co);
+    }
+  }
+  const seam = Math.abs((g.lon0 + (NO - 1) * g.dlon) - g.lon0 - 360.0) <= 1e-8 + 1e-5 * 360.0;
+  const cols = seam ? NO - 1 : NO;
+  for (let j = 0; j < NA; j++) {
+    if (Math.abs(Math.abs(g.lat0 + j * g.dlat) - 90.0) > 1e-8 + 1e-5 * 90.0) continue;
+    const m = [0, 0, 0];
+    for (let i = 0; i < cols; i++) for (let q = 0; q < 3; q++) m[q] += wind[3 * (j * NO + i) + q];
+    for (let q = 0; q < 3; q++) m[q] /= cols;
+    for (let i = 0; i < NO; i++) for (let q = 0; q < 3; q++) wind[3 * (j * NO + i) + q] = m[q];
+  }
+  let vmax = 0;
+  for (let k = 0; k < n; k++) {
+    const a = wind[3 * k], b = wind[3 * k + 1], c = wind[3 * k + 2], s = Math.sqrt(a * a + b * b + c * c);
+    if (s > vmax) vmax = s;
+  }
+  const threshold = Math.max(opt.min_speed, opt.relative_min_speed * vmax);
+  if (!(vmax > threshold)) return [];
+  const sample = makeSampler(g, wind, 3), inside = makeSampler(g, ind, 1);
+  const isInside = x => { const p = toLatLon(x); return inside(p[0], p[1])[0] > 1.0 - 1e-9; };
+  const direction = x => {
+    // one lat-lon conversion serves the wind and the validity sample (the reference
+    // converts twice; the values are identical)
+    const p = toLatLon(x), w = sample(p[0], p[1]);
+    const dot = w[0] * x[0] + w[1] * x[1] + w[2] * x[2];
+    const t0 = w[0] - dot * x[0], t1 = w[1] - dot * x[1], t2 = w[2] - dot * x[2];
+    const s = Math.sqrt(t0 * t0 + t1 * t1 + t2 * t2), ok = s > threshold && inside(p[0], p[1])[0] > 1.0 - 1e-9;
+    return ok ? [[t0 / s, t1 / s, t2 / s], true] : [[0, 0, 0], false];
+  };
+  const cell = Math.min(Math.abs(g.dlat), Math.abs(g.dlon)), count = Math.ceil(2.0 * opt.step_deg / cell) + 1;
+  // interior points and the step's end (np.linspace(0, 1, count + 1)[1:]: the last is exactly 1)
+  const fractions = []; for (let i = 1; i < count; i++) fractions.push(i * (1.0 / count)); fractions.push(1.0);
+  const segmentInside = (x0, x1) => {
+    for (const f of fractions)
+      if (!isInside(unit3(x0[0] + f * (x1[0] - x0[0]), x0[1] + f * (x1[1] - x0[1]), x0[2] + f * (x1[2] - x0[2])))) return false;
+    return true;
+  };
+  const h = opt.step_deg * (Math.PI / 180.0);
+  const add = (x, c, k) => unit3(x[0] + c * k[0], x[1] + c * k[1], x[2] + c * k[2]);
+  const trace = (start, sign) => {
+    const pts = [start]; let x = start;
+    for (let s = 0; s < opt.max_steps; s++) {
+      const [k1, a1] = direction(x), [k2, a2] = direction(add(x, 0.5 * sign * h, k1));
+      const [k3, a3] = direction(add(x, 0.5 * sign * h, k2)), [k4, a4] = direction(add(x, sign * h, k3));
+      if (!(a1 && a2 && a3 && a4)) break;
+      const c = sign * h / 6.0, xn = unit3(
+        x[0] + c * (k1[0] + 2 * k2[0] + 2 * k3[0] + k4[0]), x[1] + c * (k1[1] + 2 * k2[1] + 2 * k3[1] + k4[1]),
+        x[2] + c * (k1[2] + 2 * k2[2] + 2 * k3[2] + k4[2]));
+      if (!segmentInside(x, xn)) break;
+      x = xn; pts.push(x);
+    }
+    return pts;
+  };
+  const seeds = opt.seeds || fibonacciSeeds(opt.seed_count), lines = [];
+  for (let s = 0; s < seeds.lat.length; s++) {
+    const a = seeds.lat[s] * R, b = seeds.lon[s] * R, c = Math.cos(a);
+    const start = [c * Math.sin(b), Math.sin(a), c * Math.cos(b)];
+    if (!direction(start)[1]) continue;
+    const pts = trace(start, -1).slice(1).reverse().concat(trace(start, 1));
+    if (pts.length < 3) continue;
+    const la = new Float64Array(pts.length), lo = new Float64Array(pts.length);
+    pts.forEach((p, k) => { const q = toLatLon(p); la[k] = q[0]; lo[k] = q[1]; });
+    lines.push({ lat: la, lon: lo });
+  }
+  return lines;
+}
+/* Which lines may be drawn: only those traced for the surface now shown (its key names the
+   coordinate, value and saved time). A new surface invalidates the drawn lines at once; a
+   deferred trace (while a slider is dragged) carries a generation number and publishes only
+   if no newer request came after it. Finished line sets are kept in a small LRU. */
+function surfaceStreams(deferred) {
+  const S = ATM.sl, key = ATM.derived.key;
+  if (S.key !== key) { S.key = null; S.lines = null; }
+  if (S.timer) { clearTimeout(S.timer); S.timer = 0; }
+  S.gen++;
+  if (!ATM.streams || S.key === key) { S.pending = false; return; }
+  const hit = S.cache.findIndex(e => e.key === key);
+  if (hit >= 0) { const e = S.cache.splice(hit, 1)[0]; S.cache.push(e); S.key = key; S.lines = e.lines; S.pending = false; return; }
+  if (!deferred) { publishStreams(S.gen, key); return; }
+  S.pending = true;
+  const gen = S.gen;
+  S.timer = setTimeout(() => {
+    S.timer = 0;
+    if (gen !== S.gen || !ATM.derived || ATM.derived.key !== key) return;     // superseded
+    publishStreams(gen, key); rebuildStreams(atmHeight()); drawMap(); drawMapOverlay(lastMapHover); updateAtmLabels(atmHeight());
+  }, ATM.A.streamlines.settle_ms);
+}
+function publishStreams(gen, key) {
+  const S = ATM.sl, d = ATM.derived, t0 = performance.now();
+  const lines = traceStreamlines(ATM.g, d.u, d.v, d.mask.map(m => m === 0 ? 1 : 0), ATM.A.streamlines);
+  S.timing.integrate_ms = performance.now() - t0;
+  if (gen !== S.gen || d.key !== key) return;
+  S.key = key; S.lines = lines; S.pending = false; S.published++;
+  S.cache.push({ key, lines });
+  while (S.cache.length > ATM.A.streamlines.cache_size) S.cache.shift();
+}
+function flushStreams() {
+  // slider released: apply a pending value now and trace its lines without waiting
+  if (ATM.raf) {
+    cancelAnimationFrame(ATM.raf); ATM.raf = 0; const p = ATM.pending; ATM.pending = null;
+    if (p && (p.kind !== ATM.kind || p.v !== surfaceValue(p.kind))) { applySurface(p.kind, p.v); return; }
+  }
+  if (ATM.sl.pending) onAtmChange();
+}
+function fmtPressure(pa) { return pa >= 100 ? Number((pa / 100).toPrecision(6)) + " hPa" : Number(pa.toPrecision(6)) + " Pa"; }
+function fmtHeight(z) { return Math.abs(z) >= 1000 ? Number((z / 1000).toPrecision(6)) + " km" : Number(z.toPrecision(6)) + " m"; }
+function surfKind() { return ATM.cols ? ATM.kind : ATM.surface ? ATM.surface.kind : null; }
+function fmtSigma(x) { return "σ = " + Number(x.toPrecision(6)); }
+function atmSurfaceLabel() {
+  const S = ATM.surface; if (!S.interactive) return S.label;
+  return ATM.kind === "geopotential_height" ? fmtHeight(ATM.z0) : ATM.kind === "sigma" ? fmtSigma(ATM.s0) : fmtPressure(ATM.p0);
+}
+function fieldOn(f, kind) { return !f.coordinates || !kind || f.coordinates.includes(kind); }
+function heightRange() { return ATM.surface.coordinates.geopotential_height.range; }
+function sliderToHeight(pos) { const [lo, hi] = heightRange(); return lo + pos / 1000 * (hi - lo); }
+function heightToSlider(z) { const [lo, hi] = heightRange(); return Math.max(0, Math.min(1000, Math.round(1000 * (z - lo) / (hi - lo)))); }
+function parseHeight(text, unit) {
+  // any finite height: zero and negative values are valid (the datum is the terrain's)
+  const raw = String(text).trim(), x = Number(raw.replace(",", "."));
+  if (!raw || !Number.isFinite(x)) return { error: "not a finite number: " + JSON.stringify(raw) };
+  const z = x * unit;
+  if (!Number.isFinite(z)) return { error: "a height must be finite, got " + raw + (unit === 1000 ? " km" : " m") };
+  return { z };
+}
+function sigmaRange() { return ATM.surface.coordinates.sigma.range; }
+function sliderToSigma(pos) { const [lo, hi] = sigmaRange(); return lo + pos / 1000 * (hi - lo); }
+function sigmaToSlider(x) { const [lo, hi] = sigmaRange(); return Math.max(0, Math.min(1000, Math.round(1000 * (x - lo) / (hi - lo)))); }
+function parseSigma(text) {
+  const raw = String(text).trim(), x = Number(raw.replace(",", "."));
+  if (!raw || !Number.isFinite(x)) return { error: "not a finite number: " + JSON.stringify(raw) };
+  if (!(x > 0 && x <= 1)) return { error: "σ must be in (0, 1], got " + raw };
+  return { s: x };
+}
+function sliderToPressure(pos) { const [lo, hi] = ATM.surface.pressure_range; return Math.exp(Math.log(lo) + pos / 1000 * (Math.log(hi) - Math.log(lo))); }
+function pressureToSlider(pa) {
+  const [lo, hi] = ATM.surface.pressure_range;
+  return Math.max(0, Math.min(1000, Math.round(1000 * (Math.log(pa) - Math.log(lo)) / (Math.log(hi) - Math.log(lo)))));
+}
+function parsePressure(text, unit) {
+  const raw = String(text).trim(), x = Number(raw.replace(",", "."));
+  if (!raw || !Number.isFinite(x)) return { error: "not a finite number: " + JSON.stringify(raw) };
+  const pa = x * unit;
+  if (!(pa > 0) || !Number.isFinite(pa)) return { error: "a pressure must be finite and positive, got " + raw + (unit === 100 ? " hPa" : " Pa") };
+  return { pa };
+}
+/* The one way the surface changes: sliders, typed values, the coordinate switch and the page
+   API all come through here, synchronously. The surface is recomputed before anything is
+   drawn, so geometry, colours, masks and labels always describe one (coordinate, value,
+   saved time), and a later call always wins. Each coordinate keeps its own value: selecting
+   one never converts the other. */
+function applySurface(kind, v, deferStreams) {
+  if (kind === "geopotential_height") ATM.z0 = v; else if (kind === "sigma") ATM.s0 = v; else ATM.p0 = v;
+  ATM.seq++;
+  if (ATM.kind !== kind) setCoordinateUI(kind);
+  syncSurfaceControls();
+  onAtmChange(!!deferStreams);
+}
+function applyPressure(pa, deferStreams) { applySurface("pressure", pa, deferStreams); }
+function applyHeight(z, deferStreams) { applySurface("geopotential_height", z, deferStreams); }
+function applySigma(x, deferStreams) { applySurface("sigma", x, deferStreams); }
+function requestSurface(kind, v) {
+  // rapid slider input: one recomputation per animation frame, the newest value wins
+  ATM.pending = { kind, v };
+  if (!ATM.raf) ATM.raf = requestAnimationFrame(() => {
+    ATM.raf = 0; const p = ATM.pending; ATM.pending = null;
+    if (p && (p.kind !== ATM.kind || p.v !== surfaceValue(p.kind))) applySurface(p.kind, p.v, true);
+  });
+}
+function requestPressure(pa) { requestSurface("pressure", pa); }
+function setCoordinateUI(kind) {
+  ATM.kind = kind;
+  document.getElementById("coordPressure").setAttribute("aria-pressed", kind === "pressure" ? "true" : "false");
+  document.getElementById("coordHeight").setAttribute("aria-pressed", kind === "geopotential_height" ? "true" : "false");
+  document.getElementById("coordSigma").setAttribute("aria-pressed", kind === "sigma" ? "true" : "false");
+  document.getElementById("pressureBlock").hidden = kind !== "pressure";
+  document.getElementById("heightBlock").hidden = kind !== "geopotential_height";
+  document.getElementById("sigmaBlock").hidden = kind !== "sigma";
+  ATM.field = ATM.fieldBy[kind];
+  syncFieldButtons();
+}
+function atmSetCoordinate(kind) {
+  if (!ATM.cols || !ATM.surface.coordinates[kind]) return false;
+  if (kind !== ATM.kind) { ATM.seq++; setCoordinateUI(kind); syncSurfaceControls(); onAtmChange(); }
+  return true;
+}
+function syncSurfaceControls() {
+  document.getElementById("pressureSlider").value = pressureToSlider(ATM.p0);
+  syncPressureInput(); syncHeightInput(); syncSigmaInput();
+}
+function setSigmaFromInput() {
+  const inp = document.getElementById("sigmaInput"), r = parseSigma(inp.value);
+  if (r.error) { inp.setAttribute("aria-invalid", "true"); ATM.sigmaError = r.error; updateSigmaNote(); return false; }
+  inp.removeAttribute("aria-invalid"); ATM.sigmaError = null;
+  applySigma(r.s);
+  return true;
+}
+function syncSigmaInput() {
+  const inp = document.getElementById("sigmaInput");
+  if (document.activeElement !== inp) inp.value = String(Number(ATM.s0.toPrecision(8)));
+  document.getElementById("sigmaLabel").textContent = fmtSigma(ATM.s0);
+  document.getElementById("sigmaSlider").value = sigmaToSlider(ATM.s0);
+  updateSigmaNote();
+}
+function updateSigmaNote() {
+  const [lo, hi] = sigmaRange(), note = document.getElementById("sigmaNote");
+  note.textContent = (ATM.sigmaError ? "Not applied: " + ATM.sigmaError + ". " : "") +
+    "The slider is linear over σ = " + Number(lo.toPrecision(6)) + " – " + Number(hi.toPrecision(6)) + " (the first to last native level; 1001 positions). " +
+    "The native levels sit at σ = " + ATM.surface.sigma_positions.map(x => Number(x.toPrecision(6))).join(", ") +
+    ": typing one shows that level exactly. Any value in (0, 1] is accepted; outside the levels the surface is empty and says so.";
+}
+function setHeightFromInput() {
+  const inp = document.getElementById("heightInput"), unit = +document.getElementById("heightUnit").value;
+  const r = parseHeight(inp.value, unit);
+  if (r.error) { inp.setAttribute("aria-invalid", "true"); ATM.heightError = r.error; updateHeightNote(); return false; }
+  inp.removeAttribute("aria-invalid"); ATM.heightError = null;
+  applyHeight(r.z);
+  return true;
+}
+function syncHeightInput() {
+  const unit = +document.getElementById("heightUnit").value, inp = document.getElementById("heightInput");
+  if (document.activeElement !== inp) inp.value = String(Number((ATM.z0 / unit).toPrecision(8)));
+  document.getElementById("heightLabel").textContent = fmtHeight(ATM.z0) + " = " + Number(ATM.z0.toPrecision(8)) + " m";
+  document.getElementById("heightSlider").value = heightToSlider(ATM.z0);
+  updateHeightNote();
+}
+function updateHeightNote() {
+  const [lo, hi] = heightRange(), note = document.getElementById("heightNote");
+  note.textContent = (ATM.heightError ? "Not applied: " + ATM.heightError + ". " : "") +
+    "The slider is linear over " + fmtHeight(lo) + " – " + fmtHeight(hi) + " (from the lowest bottom to the highest top full level of the exported states; 1001 positions). " +
+    "Heights are geopotential, Z₀ = Φ₀/g, on the datum of the terrain: zero and negative values are valid. Type any finite value in the chosen unit; outside the range the surface is empty and says so.";
+}
+function setPressureFromInput() {
+  const inp = document.getElementById("pressureInput"), unit = +document.getElementById("pressureUnit").value;
+  const r = parsePressure(inp.value, unit);
+  if (r.error) { inp.setAttribute("aria-invalid", "true"); ATM.pressureError = r.error; updatePressureNote(); return false; }
+  inp.removeAttribute("aria-invalid"); ATM.pressureError = null;
+  applyPressure(r.pa);
+  return true;
+}
+function syncPressureInput() {
+  const unit = +document.getElementById("pressureUnit").value, inp = document.getElementById("pressureInput");
+  if (document.activeElement !== inp) inp.value = String(Number((ATM.p0 / unit).toPrecision(8)));
+  document.getElementById("pressureLabel").textContent = fmtPressure(ATM.p0) + " = " + Number(ATM.p0.toPrecision(8)) + " Pa";
+  updatePressureNote();
+}
+function updatePressureNote() {
+  const S = ATM.surface, [lo, hi] = S.pressure_range, note = document.getElementById("pressureNote");
+  note.textContent = (ATM.pressureError ? "Not applied: " + ATM.pressureError + ". " : "") +
+    "The slider is logarithmic over " + fmtPressure(lo) + " – " + fmtPressure(hi) + " (the pressures some node of some exported state samples; 1001 positions). " +
+    "Type any positive value in the chosen unit, between slider positions or outside their range: outside it the surface is empty and says so.";
+}
 
 function atmSlice() { return ATM.it * ATM.nl + ATM.il; }
 function atmDecode(key, q, bounds, s) {
@@ -679,8 +1200,28 @@ function atmDecode(key, q, bounds, s) {
   return out;
 }
 function atmField() { return ATM.fields[ATM.field]; }
-function atmValues(s) { const f = atmField(); return atmDecode("f" + ATM.field, f.q, f.bounds, s === undefined ? atmSlice() : s); }
-function atmHeight(s) { return atmDecode("z", ATM.height.q, ATM.height.bounds, s === undefined ? atmSlice() : s); }
+function atmValues(s) { if (ATM.cols) { ensureSurface(); return ATM.derived[atmField().id]; } const f = atmField(); return atmDecode("f" + ATM.field, f.q, f.bounds, s === undefined ? atmSlice() : s); }
+function atmHeight(s) { if (ATM.cols) { ensureSurface(); return ATM.derived.geopotential_height; } return atmDecode("z", ATM.height.q, ATM.height.bounds, s === undefined ? atmSlice() : s); }
+/* validity codes of the current slice (0 = valid), or null when every node is a sample */
+function atmMask(s) { if (ATM.cols) { ensureSurface(); return ATM.derived.mask; } if (!ATM.mask) return null; const o = (s === undefined ? atmSlice() : s) * ATM.n; return ATM.mask.subarray(o, o + ATM.n); }
+function atmMaskAt(lat, lon) {
+  // the hover answer: 0 only when every node the bilinear sample (sampleMesh) draws on
+  // is valid; otherwise the code of the nearest masked contributor. null without a mask.
+  const m = atmMask(); if (!m) return null;
+  const g = ATM.g, y = Math.max(0, Math.min(g.nlat - 1.000001, (lat - g.lat0) / g.dlat));
+  const x = Math.min(g.nlon - 1.000001, (((lon - g.lon0) % 360) + 360) % 360 / g.dlon);
+  const j = Math.floor(y), i = Math.floor(x), fy = y - j, fx = x - i, W = g.nlon;
+  const corners = [[j, i, fy + fx], [j, i + 1, fy + 1 - fx], [j + 1, i, 1 - fy + fx], [j + 1, i + 1, 2 - fy - fx]];
+  let code = 0, best = Infinity;
+  for (const [jj, ii, d] of corners) { const c = m[jj * W + ii]; if (c && d < best) { best = d; code = c; } }
+  return code;
+}
+function atmMaskLabel(code) {
+  const S = ATM.surface; if (!S) return "mask code " + code;
+  const L = S.coordinates ? S.coordinates[ATM.kind].mask_labels : S.mask_labels;
+  return L[String(code)] || ("mask code " + code);
+}
+const MASK_RGBA = [150, 150, 150, 110];
 function atmRange() { const f = atmField(); return ATM.perLevel ? f.level_ranges[ATM.il] : f.range; }
 function atmColour(v, rng, lut) {
   if (!(rng[1] > rng[0])) return lut[128];          // a constant field: the neutral middle colour
@@ -692,8 +1233,10 @@ function atmFmt(f, v) {
   return Number(x.toPrecision(4)).toLocaleString(undefined, { maximumFractionDigits: 6 });
 }
 function atmReadout(lat, lon) {
+  const code = atmMaskAt(lat, lon);
+  if (code) return "no sample on the " + atmSurfaceLabel() + " surface: " + atmMaskLabel(code);
   const f = atmField(), v = sampleMesh(ATM.g, atmValues(), lat, lon), z = sampleMesh(ATM.g, atmHeight(), lat, lon);
-  return f.label + " " + atmFmt(f, v) + " " + f.units + " · Z " + (z / 1000).toFixed(3) + " km";
+  return f.label + " " + atmFmt(f, v) + " " + f.units + " · Z " + (z / 1000).toFixed(3) + " km" + (ATM.surface ? " (interpolated)" : "");
 }
 function atmLineInk() { return atmField().scale === "diverging" ? [0.08, 0.08, 0.08, 0.9] : [1, 1, 1, 0.9]; }
 
@@ -701,8 +1244,21 @@ function rebuildAtmosphere() {
   if (!glOK || !ATM) return;
   const Z = atmHeight(), v = atmValues(), rng = atmRange(), lut = atmField().lut, R = D.radius_m;
   fillSurface(ATM.surf, k => 1 + st.exag * Z[k] / R, k => atmColour(v[k], rng, lut));
+  reindexMasked(ATM.surf, atmMask());
   rebuildStreams(Z);
   updateAtmLabels(Z);
+}
+/* Drop every triangle with a masked vertex (a masked node is not a sample, so nothing
+   is drawn across it); without a mask the full index buffer is restored. */
+function reindexMasked(s, m) {
+  if (!m) { if (s.nIdx !== s.idxAll.length) { s.nIdx = s.idxAll.length; gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, s.buf.idx); gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, s.idxAll, gl.STATIC_DRAW); } return; }
+  const all = s.idxAll, out = new Uint32Array(all.length); let k = 0;
+  for (let t = 0; t < all.length; t += 3) {
+    if (m[all[t]] || m[all[t + 1]] || m[all[t + 2]]) continue;
+    out[k++] = all[t]; out[k++] = all[t + 1]; out[k++] = all[t + 2];
+  }
+  s.nIdx = k;
+  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, s.buf.idx); gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, out.subarray(0, k), gl.DYNAMIC_DRAW);
 }
 function lineXYZ(lat, lon, Z, lift) {
   const r = (1 + st.exag * sampleMesh(ATM.g, Z, lat, lon) / D.radius_m) * lift;
@@ -711,6 +1267,12 @@ function lineXYZ(lat, lon, Z, lift) {
 }
 function eachLine(fn) {
   // fn(lats, lons) for every streamline of the current slice, upstream to downstream
+  if (ATM.cols) {
+    // traced in this page: drawn only when traced for the surface now shown
+    const S = ATM.sl; if (!S.lines || !ATM.derived || S.key !== ATM.derived.key) return 0;
+    for (const l of S.lines) fn(Array.from(l.lat), Array.from(l.lon));
+    return S.lines.length;
+  }
   const L = ATM.lines; if (!L) return 0;
   const s = atmSlice(), l0 = L.slice[s], l1 = L.slice[s + 1];
   for (let l = l0; l < l1; l++) {
@@ -768,31 +1330,92 @@ function renderAtmosphere(cl, nl) {
 }
 
 function updateAtmLabels(Z) {
-  const A = ATM.A, t = A.times[ATM.it], lv = A.levels[ATM.il], f = atmField();
+  const A = ATM.A, t = A.times[ATM.it], lv = A.levels[ATM.il], f = atmField(), S = ATM.surface, m = atmMask();
   document.getElementById("timeLabel").textContent = t.label + " · " + (ATM.it + 1) + "/" + ATM.nt;
   document.getElementById("timeNote").textContent = timeNoteText();
-  document.getElementById("levelLabel").textContent = lv.number + " / " + A.nlev + " · σ = " + lv.sigma.toFixed(4);
+  const kind = S ? surfKind() : null, isH = kind === "geopotential_height", isS = kind === "sigma";
+  const noun = isH ? " height surface" : isS ? " surface" : " isobar";
+  const pLabel = S ? atmSurfaceLabel() : null, pValue = S ? (S.interactive ? surfaceValue() : S.value) : null;
+  document.getElementById("levelLabel").textContent = S ? pLabel + noun + " (interpolated" + (S.interactive ? " here)" : ")") : lv.number + " / " + A.nlev + " · σ = " + lv.sigma.toFixed(4);
   document.getElementById("opacityLabel").textContent = Math.round(ATM.opacity * 100) + " %";
-  let zlo = Infinity, zhi = -Infinity, zsum = 0;
-  for (let k = 0; k < ATM.n; k++) { const z = Z[k]; if (z < zlo) zlo = z; if (z > zhi) zhi = z; zsum += z; }
-  const pb = ATM.fields.find(x => x.id === "pressure").bounds[atmSlice()];
-  document.getElementById("atmNote").textContent =
-    "Surface radius R + E·Z, Z = Φ/g (geopotential height, g = " + A.gravity + " m s⁻²). Here Z = " +
-    (zlo / 1000).toFixed(3) + "–" + (zhi / 1000).toFixed(3) + " km (node mean " + (zsum / ATM.n / 1000).toFixed(3) +
-    " km); p = σ·ps = " + (pb[0] / 100).toFixed(1) + "–" + (pb[1] / 100).toFixed(1) + " hPa.";
-  const sn = document.getElementById("streamNote");
-  if (!ATM.lines) sn.textContent = "Streamlines were not exported.";
+  let zlo = Infinity, zhi = -Infinity, zsum = 0, nValid = 0;
+  for (let k = 0; k < ATM.n; k++) { if (m && m[k]) continue; const z = Z[k]; if (z < zlo) zlo = z; if (z > zhi) zhi = z; zsum += z; nValid++; }
+  const zText = nValid ? "Z = " + (zlo / 1000).toFixed(3) + "–" + (zhi / 1000).toFixed(3) + " km (node mean " + (zsum / nValid / 1000).toFixed(3) + " km)" : "no Z (no valid node)";
+  const bad = S && S.interactive && ATM.derived.counts[4] ? " " + ATM.derived.counts[4] + " nodes have an invalid stored column (geopotential not decreasing downward or not above the terrain) and are masked: the file was altered." : "";
+  if (S && isS) {
+    const c = S.interactive ? { "2": ATM.derived.counts[2], "3": ATM.derived.counts[3] } : S.valid_counts[ATM.it];
+    const pos = S.interactive ? S.sigma_positions : S.level_positions;
+    document.getElementById("atmNote").textContent = !nValid
+      ? "Empty surface: " + pLabel + " lies " + (c["2"] ? "above the top full level" : "below the bottom full level") + " (the native levels sit at σ = " +
+        pos.map(x => Number(x.toPrecision(6))).join(", ") + "). Choose a σ in that range (the controls stay live)."
+      : "Constant-σ surface " + pLabel + " at this saved time: p = σ₀·pₛ, radius R + E·Z with Z = Φ(σ₀)/g interpolated" +
+        (S.interactive ? " in this page" : "") + " between the nominal level positions (g = " + A.gravity + " m s⁻²). " + zText +
+        ". Relative vorticity and divergence are shown here: the interpolation weight is the same at every node, so they are exactly those of the interpolated wind.";
+  } else if (S && S.interactive && !nValid && isH) {
+    const d = ATM.derived, hr = S.surface_height_range || [0, 0];
+    document.getElementById("atmNote").textContent =
+      "Empty surface: no node samples Z₀ = " + pLabel + " (" + Number(pValue.toPrecision(8)) + " m) at this saved time. The terrain spans " +
+      fmtHeight(hr[0]) + " – " + fmtHeight(hr[1]) + " and the full levels sample " + fmtHeight(d.sampled[0]) + " – " + fmtHeight(d.sampled[1]) +
+      "; " + d.counts[1] + " nodes are below the terrain, " + d.counts[2] + " above the highest full level, " + d.counts[3] +
+      " between the terrain and the lowest full level. Choose a height in that range (the controls stay live)." + bad;
+  } else if (S && S.interactive && !nValid) {
+    const d = ATM.derived;
+    document.getElementById("atmNote").textContent =
+      "Empty surface: no node samples p₀ = " + pLabel + " (" + Number(pValue.toPrecision(8)) + " Pa) at this saved time. Its surface pressure spans " +
+      fmtPressure(d.psRange[0]) + " – " + fmtPressure(d.psRange[1]) + " and the full levels sample " + fmtPressure(d.sampled[0]) + " – " + fmtPressure(d.sampled[1]) +
+      "; " + d.counts[1] + " nodes are under ground, " + d.counts[2] + " above the top full level, " + d.counts[3] +
+      " between the bottom full level and the ground. Choose a pressure in that range (the controls stay live)." + bad;
+  } else if (S && isH) {
+    const c = S.interactive ? { "1": ATM.derived.counts[1], "2": ATM.derived.counts[2], "3": ATM.derived.counts[3] } : S.valid_counts[ATM.it];
+    let prange = "";
+    if (S.interactive) {
+      const p = ATM.derived.pressure; let lo = Infinity, hi = -Infinity;
+      for (let k = 0; k < ATM.n; k++) { if (m[k]) continue; if (p[k] < lo) lo = p[k]; if (p[k] > hi) hi = p[k]; }
+      prange = " Over the valid nodes p = " + fmtPressure(lo) + " – " + fmtPressure(hi) + ".";
+    }
+    document.getElementById("atmNote").textContent =
+      "Geopotential-height surface Z₀ = " + pLabel + " (" + Number(pValue.toPrecision(8)) + " m) at this saved time, radius R + E·Z₀ at every valid node " +
+      "(Φ₀ = g·Z₀, g = " + A.gravity + " m s⁻², on the datum of the terrain; interpolated" + (S.interactive ? " in this page from the native columns)." : ").") +
+      prange + " " + nValid + " of " + ATM.n + " nodes valid; " + c["1"] + " below the terrain, " + c["2"] + " above the highest full level, " + c["3"] +
+      " between the terrain and the lowest full level (no triangle, grey on the map)." + bad;
+  } else if (S) {
+    const c = S.interactive ? { "1": ATM.derived.counts[1], "2": ATM.derived.counts[2], "3": ATM.derived.counts[3] } : S.valid_counts[ATM.it];
+    document.getElementById("atmNote").textContent =
+      "Isobaric surface p₀ = " + pLabel + " (" + Number(pValue.toPrecision(8)) + " Pa) at this saved time, radius R + E·Z with Z = Φ(p₀)/g interpolated" +
+      (S.interactive ? " in this page from the native columns" : "") + " (g = " + A.gravity +
+      " m s⁻²). Over the valid nodes " + zText + ". " + nValid + " of " + ATM.n + " nodes valid; " + c["1"] + " under ground, " + c["2"] +
+      " above the top full level, " + c["3"] + " between the bottom full level and the ground (no triangle, grey on the map)." + bad;
+  } else {
+    const pb = ATM.fields.find(x => x.id === "pressure").bounds[atmSlice()];
+    document.getElementById("atmNote").textContent =
+      "Surface radius R + E·Z, Z = Φ/g (geopotential height, g = " + A.gravity + " m s⁻²). Here " + zText +
+      "; p = σ·ps = " + (pb[0] / 100).toFixed(1) + "–" + (pb[1] / 100).toFixed(1) + " hPa.";
+  }
+  const sn = document.getElementById("streamNote"), on = S ? (isH ? "on this height surface" : isS ? "on this σ surface" : "on this isobaric surface") : "on this level";
+  if (ATM.cols) {
+    const P = A.streamlines;
+    if (!P.enabled) sn.textContent = "Streamlines were not requested for this page.";
+    else if (!ATM.streams) sn.textContent = "Streamlines off. When on, they are traced in this page from the interpolated wind of the surface shown.";
+    else if (ATM.sl.pending) sn.textContent = "Tracing streamlines for this surface once the selection settles (the previous surface's lines are cleared).";
+    else if (!ATM.nLinesHere) sn.textContent = "No streamlines on this surface: its wind is below the drawing threshold (" + P.min_speed * 1000 +
+      " mm/s, or " + P.relative_min_speed * 100 + " % of its maximum), or every seed lies in a masked cell.";
+    else sn.textContent = ATM.nLinesHere + " instantaneous horizontal streamlines of the wind interpolated to this surface, traced in this page at this saved time " +
+      "(chevrons point downstream), draped on the surface; clipped to cells whose four nodes are valid. Not parcel trajectories; no vertical motion.";
+  }
+  else if (!ATM.lines) sn.textContent = "Streamlines were not exported.";
   else if (!ATM.nLinesHere) sn.textContent = "No streamlines on this surface: its wind is below the drawing threshold (" +
-    A.streamlines.min_speed * 1000 + " mm/s, or 2 % of the slice maximum).";
-  else sn.textContent = ATM.nLinesHere + " instantaneous horizontal streamlines of this saved state on this level (chevrons point downstream); not trajectories, no vertical motion.";
-  const where = "Atmosphere · " + f.label + " · level " + lv.number + " (σ = " + lv.sigma.toFixed(4) + ") · " + t.label;
+    A.streamlines.min_speed * 1000 + " mm/s, or 2 % of the slice maximum)" + (S ? ", or every seed lies in a masked cell." : ".");
+  else sn.textContent = ATM.nLinesHere + " instantaneous horizontal streamlines of this saved state " + on + " (chevrons point downstream); not trajectories, no vertical motion" +
+    (S ? "; clipped to cells whose four nodes are valid." : ".");
+  const where = "Atmosphere · " + f.label + (S ? " · " + pLabel + noun + " (interpolated)" : " · level " + lv.number + " (σ = " + lv.sigma.toFixed(4) + ")") + " · " + t.label;
   if (ATM.mapAtm) document.getElementById("mapLayer").textContent = where;
 }
 function drawAtmColorbar() {
   const f = atmField(), rng = atmRange();
   document.getElementById("atmCbarTitle").textContent = f.label + " (" + f.units + ")";
   document.getElementById("atmCbarNote").textContent = (ATM.perLevel ? "Range of this level over the exported times" :
-    "Fixed over all exported times and levels") + (f.scale === "diverging" ? ", symmetric about zero." : ".");
+    ATM.cols ? "Fixed: conservative bounds from the exported native columns over all saved times and levels, so colours compare across pressures" :
+    ATM.surface ? "Fixed over all exported times, valid nodes only" : "Fixed over all exported times and levels") + (f.scale === "diverging" ? ", symmetric about zero." : ".");
   const c = document.getElementById("cbarAtm"), r = c.getBoundingClientRect(), dpr = window.devicePixelRatio || 1;
   c.width = Math.round(r.width * dpr); c.height = Math.round(r.height * dpr);
   const g = c.getContext("2d"); g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, r.width, r.height);
@@ -812,10 +1435,10 @@ function drawAtmColorbar() {
 const imgAtm = ATM ? Object.assign(document.createElement("canvas"), { width: ATM.g.nlon, height: ATM.g.nlat }) : null;
 function drawAtmMap() {
   const G = ATM.g, g = imgAtm.getContext("2d"), data = g.createImageData(G.nlon, G.nlat);
-  const v = atmValues(), rng = atmRange(), lut = atmField().lut;
+  const v = atmValues(), rng = atmRange(), lut = atmField().lut, mk = atmMask();
   for (let j = 0; j < G.nlat; j++) for (let i = 0; i < G.nlon; i++) {
-    const c = atmColour(v[j * G.nlon + i], rng, lut), k = 4 * ((G.nlat - 1 - j) * G.nlon + i);
-    data.data[k] = c[0]; data.data[k + 1] = c[1]; data.data[k + 2] = c[2]; data.data[k + 3] = 255;
+    const n = j * G.nlon + i, c = (mk && mk[n]) ? MASK_RGBA : atmColour(v[n], rng, lut), k = 4 * ((G.nlat - 1 - j) * G.nlon + i);
+    data.data[k] = c[0]; data.data[k + 1] = c[1]; data.data[k + 2] = c[2]; data.data[k + 3] = c.length > 3 ? c[3] : 255;
   }
   g.putImageData(data, 0, 0);
   const r = mapC.getBoundingClientRect(), dpr = window.devicePixelRatio || 1;
@@ -846,7 +1469,16 @@ function drawAtmMap() {
   });
   m.restore();
 }
-function onAtmChange() { rebuildAtmosphere(); drawAtmColorbar(); drawMap(); drawMapOverlay(lastMapHover); }
+function onAtmChange(deferStreams) {
+  if (!ATM.cols) { rebuildAtmosphere(); drawAtmColorbar(); drawMap(); drawMapOverlay(lastMapHover); return; }
+  // interactive surface: interpolation first (ensureSurface), then streamlines (now, or once
+  // a dragged slider settles), then mesh, then map; timed apart
+  const t0 = performance.now(); ensureSurface(); const t1 = performance.now();
+  ATM.sl.timing.integrate_ms = 0; surfaceStreams(!!deferStreams); const ts = performance.now();
+  rebuildAtmosphere(); const t2 = performance.now();
+  drawAtmColorbar(); drawMap(); drawMapOverlay(lastMapHover); const t3 = performance.now();
+  Object.assign(ATM.timing, { streams_ms: ts - t1, mesh_ms: t2 - ts, map_ms: t3 - t2, total_ms: t3 - t0 });
+}
 /* The one way a saved state is selected: slider, step buttons, playback and the page API
    all come through here, so a played frame is exactly the manually selected one. */
 function atmSetTime(i) { ATM.it = Math.max(0, Math.min(ATM.nt - 1, i | 0)); document.getElementById("timeSlider").value = ATM.it; onAtmChange(); }
@@ -909,13 +1541,23 @@ function setSpeed(fps) {
 }
 function setLoop(on) { play.loop = !!on; document.getElementById("tLoop").checked = play.loop; }
 function atmSetLevel(i) { ATM.il = Math.max(0, Math.min(ATM.nl - 1, i | 0)); document.getElementById("levelSlider").value = ATM.il; onAtmChange(); }
+function syncFieldButtons() {
+  [...document.getElementById("fieldButtons").children].forEach((b, i) => {
+    b.hidden = !fieldOn(ATM.fields[i], ATM.kind); b.setAttribute("aria-pressed", i === ATM.field ? "true" : "false");
+  });
+}
 function atmSetField(k) {
-  ATM.field = k;
-  [...document.getElementById("fieldButtons").children].forEach((b, i) => b.setAttribute("aria-pressed", i === k ? "true" : "false"));
+  // a field not offered on the current coordinate is ignored (pressure on an isobar, height on
+  // a height surface); the choice is kept per coordinate
+  if (typeof k === "string") k = ATM.fields.findIndex(f => f.id === k);
+  if (!(k >= 0 && k < ATM.fields.length) || !fieldOn(ATM.fields[k], ATM.kind)) return false;
+  ATM.field = k; if (ATM.fieldBy) ATM.fieldBy[ATM.kind] = k;
+  syncFieldButtons();
   onAtmChange();
+  return true;
 }
 function atmSetOpacity(a) { ATM.opacity = Math.max(0, Math.min(1, a)); document.getElementById("opacity").value = Math.round(ATM.opacity * 100); updateAtmLabels(atmHeight()); }
-function atmSetStreams(on) { ATM.streams = !!on && !!ATM.lines; document.getElementById("streams").checked = ATM.streams; onAtmChange(); }
+function atmSetStreams(on) { ATM.streams = !!on && ATM.canStream; document.getElementById("streams").checked = ATM.streams; onAtmChange(); }
 function atmSetMap(atm) {
   ATM.mapAtm = !!atm;
   document.getElementById("mapAtm").setAttribute("aria-pressed", ATM.mapAtm ? "true" : "false");
@@ -939,6 +1581,47 @@ function initAtmosphereUI() {
   const ts = document.getElementById("timeSlider"), ls = document.getElementById("levelSlider");
   ts.max = ATM.nt - 1; ts.value = ATM.it; ts.disabled = ATM.nt < 2;
   ls.max = ATM.nl - 1; ls.value = ATM.il; ls.disabled = ATM.nl < 2;
+  if (ATM.surface) {
+    // a derived surface: no native level to choose, one range over the exported times
+    document.getElementById("levelTitle").textContent = "Surface";
+    ls.hidden = true;
+    document.getElementById("rangeLevelRow").hidden = true;
+    const sn = document.getElementById("surfaceNote"); sn.hidden = false;
+    const where = ATM.surface.level_sigma + " level positions σ = " + ATM.surface.level_positions.map(s => s.toFixed(4)).join(", ");
+    if (ATM.cols) {
+      sn.textContent = "Any isobar, geopotential-height or constant-σ surface: interpolated in this page from the exported native columns of the selected saved state (" + where +
+        "; σ surfaces use the nominal level positions); changing the saved time recomputes the surface from that state, never between states. Each coordinate keeps its own value; " +
+        "switching never converts one into another. Vorticity and divergence are shown on σ surfaces only.";
+      document.getElementById("coordButtons").hidden = false;
+      document.getElementById("coordPressure").addEventListener("click", () => atmSetCoordinate("pressure"));
+      document.getElementById("coordHeight").addEventListener("click", () => atmSetCoordinate("geopotential_height"));
+      document.getElementById("coordSigma").addEventListener("click", () => atmSetCoordinate("sigma"));
+      const ssl = document.getElementById("sigmaSlider"), sin = document.getElementById("sigmaInput");
+      ssl.addEventListener("input", () => requestSurface("sigma", sliderToSigma(+ssl.value)));
+      ssl.addEventListener("change", flushStreams);
+      sin.addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); setSigmaFromInput(); } });
+      document.getElementById("sigmaApply").addEventListener("click", setSigmaFromInput);
+      syncSigmaInput();
+      const hsl = document.getElementById("heightSlider"), hin = document.getElementById("heightInput"), hun = document.getElementById("heightUnit");
+      hun.value = Math.abs(ATM.z0) >= 1000 ? "1000" : "1";
+      hsl.addEventListener("input", () => requestSurface("geopotential_height", sliderToHeight(+hsl.value)));
+      hsl.addEventListener("change", flushStreams);
+      hin.addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); setHeightFromInput(); } });
+      document.getElementById("heightApply").addEventListener("click", setHeightFromInput);
+      hun.addEventListener("change", () => { hin.removeAttribute("aria-invalid"); ATM.heightError = null; hin.blur(); syncHeightInput(); });
+      syncHeightInput();
+      const ps = document.getElementById("pressureSlider"), inp = document.getElementById("pressureInput"), un = document.getElementById("pressureUnit");
+      un.value = ATM.p0 >= 100 ? "100" : "1";
+      ps.addEventListener("input", () => requestPressure(sliderToPressure(+ps.value)));
+      ps.addEventListener("change", flushStreams);            // released: trace now
+      inp.addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); setPressureFromInput(); } });
+      document.getElementById("pressureApply").addEventListener("click", setPressureFromInput);
+      un.addEventListener("change", () => { inp.removeAttribute("aria-invalid"); ATM.pressureError = null; inp.blur(); syncPressureInput(); });
+      ps.value = pressureToSlider(ATM.p0); syncPressureInput();
+    } else {
+      sn.textContent = "Interpolated in ln σ from the saved native levels (" + where + "). Pressure, vorticity and divergence are not shown on this surface.";
+    }
+  }
   ts.addEventListener("input", () => atmSelectTime(+ts.value));
   document.getElementById("playRow").hidden = ATM.nt < 2;        // one saved state: nothing to play
   document.getElementById("tPrev").addEventListener("click", () => atmStep(-1));
@@ -952,10 +1635,17 @@ function initAtmosphereUI() {
     const b = document.createElement("button"); b.textContent = f.label; b.title = f.label + " (" + f.units + ")";
     b.setAttribute("aria-pressed", k === ATM.field ? "true" : "false"); b.addEventListener("click", () => atmSetField(k)); fb.append(b);
   });
+  if (ATM.cols) {
+    // the initial field on each coordinate: the requested one where it is offered
+    ATM.fieldBy = {};
+    for (const kind of Object.keys(ATM.surface.coordinates))
+      ATM.fieldBy[kind] = fieldOn(ATM.fields[ATM.field], kind) ? ATM.field : ATM.fields.findIndex(f => fieldOn(f, kind));
+    setCoordinateUI(ATM.kind);
+  }
   const op = document.getElementById("opacity");
   op.value = Math.round(ATM.opacity * 100); op.addEventListener("input", () => atmSetOpacity(+op.value / 100));
   const show = document.getElementById("atmShow"); show.addEventListener("change", () => { ATM.show = show.checked; });
-  const sb = document.getElementById("streams"); sb.checked = ATM.streams; sb.disabled = !ATM.lines;
+  const sb = document.getElementById("streams"); sb.checked = ATM.streams; sb.disabled = !ATM.canStream;
   sb.addEventListener("change", () => atmSetStreams(sb.checked));
   const rl = document.getElementById("rangeLevel"); rl.addEventListener("change", () => { ATM.perLevel = rl.checked; onAtmChange(); });
   document.getElementById("mapAtm").addEventListener("click", () => atmSetMap(true));
@@ -971,6 +1661,7 @@ if (ATM) initAtmosphereUI();
 resetView();
 updateExagLabel();
 setLayer(0);
+if (ATM && ATM.cols) onAtmChange();          // the first surface's streamlines, traced now
 onResize();
 let lastOverlay = 0;
 function loop(t) {
@@ -983,12 +1674,48 @@ requestAnimationFrame(loop);
 window.__terrainGlobe = { state: st, layers: layers.map(l => l.short), pick, sampleLayer: (lat, lon) => sampleLayer(layers[st.layer].values, lat, lon), glOK,
   atmosphere: ATM ? {
     setTime: atmSelectTime, step: atmStep, play: playStart, pause: () => setPlaying(false), setSpeed, setLoop,
-    setLevel: atmSetLevel, setField: atmSetField, setOpacity: atmSetOpacity, setStreamlines: atmSetStreams, setMap: atmSetMap,
+    setLevel: atmSetLevel, setField: k => atmSetField(k), setOpacity: atmSetOpacity, setStreamlines: atmSetStreams, setMap: atmSetMap,
     setShow: on => { ATM.show = !!on; document.getElementById("atmShow").checked = ATM.show; },
     setPerLevel: on => { ATM.perLevel = !!on; document.getElementById("rangeLevel").checked = ATM.perLevel; onAtmChange(); },
     setExaggeration: e => { st.exag = e; exag.value = exToSlider(e); updateExagLabel(); rebuildSurface(); },
     centreOn: (lat, lon) => centreOn(lat, lon), setDistance: d => { st.dist = d; },
-    sample: (lat, lon) => ({ value: sampleMesh(ATM.g, atmValues(), lat, lon), z: sampleMesh(ATM.g, atmHeight(), lat, lon) }),
+    sample: (lat, lon) => ({ value: sampleMesh(ATM.g, atmValues(), lat, lon), z: sampleMesh(ATM.g, atmHeight(), lat, lon), mask: atmMaskAt(lat, lon), readout: atmReadout(lat, lon) }),
+    /* interactive pressure (version 3 pages; null otherwise) */
+    setPressure: ATM.cols ? pa => { const r = parsePressure(pa, 1); if (r.error) return { ok: false, error: r.error, pressure_pa: ATM.p0 }; applyPressure(r.pa); return { ok: true, pressure_pa: ATM.p0, seq: ATM.seq }; } : null,
+    pressure: () => ATM.p0,
+    setHeight: ATM.cols ? z => { const r = parseHeight(z, 1); if (r.error) return { ok: false, error: r.error, height_m: ATM.z0 }; applyHeight(r.z); return { ok: true, height_m: ATM.z0, seq: ATM.seq }; } : null,
+    height: () => ATM.z0, coordinate: () => ATM.kind,
+    setSigma: ATM.cols ? x => { const r = parseSigma(x); if (r.error) return { ok: false, error: r.error, sigma: ATM.s0 }; applySigma(r.s); return { ok: true, sigma: ATM.s0, seq: ATM.seq }; } : null,
+    sigma: () => ATM.s0,
+    sigmaControls: ATM.cols ? () => ({ slider: +document.getElementById("sigmaSlider").value, input: document.getElementById("sigmaInput").value,
+      invalid: document.getElementById("sigmaInput").getAttribute("aria-invalid") === "true",
+      label: document.getElementById("sigmaLabel").textContent, note: document.getElementById("sigmaNote").textContent }) : null,
+    setCoordinate: ATM.cols ? kind => atmSetCoordinate(kind) : null,
+    heightControls: ATM.cols ? () => ({ slider: +document.getElementById("heightSlider").value, input: document.getElementById("heightInput").value,
+      unit: +document.getElementById("heightUnit").value, invalid: document.getElementById("heightInput").getAttribute("aria-invalid") === "true",
+      label: document.getElementById("heightLabel").textContent, note: document.getElementById("heightNote").textContent }) : null,
+    /* milliseconds per drawn frame (render() n times, then gl.finish()): the GPU part alone */
+    benchRender: n => { if (!glOK) return null; const t0 = performance.now(); for (let k = 0; k < n; k++) render(); gl.finish(); return (performance.now() - t0) / n; },
+    /* the drawn layer's vertex positions (unit radius = R) and the mask of the surface shown */
+    geometry: () => { const m = atmMask(); return { pos: Array.from(ATM.surf.pos), mask: m ? Array.from(m) : new Array(ATM.n).fill(0) }; },
+    surfaceArrays: ATM.cols ? () => { ensureSurface(); const d = ATM.derived; return { kind: d.kind, value: d.value, p0: d.p0, z0: d.z0, timeIndex: d.it,
+      counts: d.counts.slice(0, 4).concat(d.counts[4] ? [d.counts[4]] : []), temperature: Array.from(d.temperature), pressure: Array.from(d.pressure),
+      zeta: Array.from(d.zeta), delta: Array.from(d.delta), s0: d.s0 === undefined ? null : d.s0,
+      geopotential_height: Array.from(d.geopotential_height), wind_speed: Array.from(d.wind_speed), u: Array.from(d.u), v: Array.from(d.v),
+      mask: Array.from(d.mask), key: d.key }; } : null,
+    timing: () => Object.assign({}, ATM.timing, ATM.cols ? { integrate_ms: ATM.sl.timing.integrate_ms } : {}), decodedTimes: () => ATM.colCache.map(e => e.it), seq: () => ATM.seq,
+    /* streamlines traced in the page (interactive pages): the drawn set and its state */
+    streamlines: ATM.cols ? () => { const S = ATM.sl, here = !!(S.lines && ATM.derived && S.key === ATM.derived.key);
+      return { key: S.key, surfaceKey: ATM.derived ? ATM.derived.key : null, current: here, pending: S.pending, published: S.published, cached: S.cache.length,
+               drawnVerts: ATM.nStreamVerts, lines: here ? S.lines.map(l => ({ lat: Array.from(l.lat), lon: Array.from(l.lon) })) : [] }; } : null,
+    /* the page's integrator on given node winds (mesh of this page, its settings unless overridden) */
+    traceStreamlines: ATM.cols ? (u, v, valid, over) => traceStreamlines(ATM.g, u, v, valid, Object.assign({}, ATM.A.streamlines, over || {}))
+      .map(l => ({ lat: Array.from(l.lat), lon: Array.from(l.lon) })) : null,
+    flushStreams: ATM.cols ? () => flushStreams() : null,
+    memory: () => performance.memory ? { usedJSHeapSize: performance.memory.usedJSHeapSize, totalJSHeapSize: performance.memory.totalJSHeapSize } : null,
+    pressureControls: ATM.cols ? () => ({ slider: +document.getElementById("pressureSlider").value, input: document.getElementById("pressureInput").value,
+      unit: +document.getElementById("pressureUnit").value, invalid: document.getElementById("pressureInput").getAttribute("aria-invalid") === "true",
+      label: document.getElementById("pressureLabel").textContent, note: document.getElementById("pressureNote").textContent }) : null,
     digest: () => {
       // FNV-1a over the drawn layer (positions, colours) and streamline vertices: equal
       // digests mean the GPU buffers of two selections hold identical bytes
@@ -997,7 +1724,14 @@ window.__terrainGlobe = { state: st, layers: layers.map(l => l.short), pick, sam
         const b = new Uint8Array(a.buffer, a.byteOffset, a.byteLength);
         for (let k = 0; k < b.length; k++) { h ^= b[k]; h = Math.imul(h, 0x01000193) >>> 0; }
       }
-      return h.toString(16) + ":" + ATM.nStreamVerts;
+      return h.toString(16) + ":" + ATM.nStreamVerts + ":" + ATM.surf.nIdx;
+    },
+    maskCounts: () => {
+      // nodes per validity code of the current slice, and the triangles drawn
+      // (code 4, an invalid stored column, only when present)
+      const m = atmMask(), c = { "0": 0, "1": 0, "2": 0, "3": 0 };
+      if (m) for (let k = 0; k < ATM.n; k++) c[String(m[k])] = (c[String(m[k])] || 0) + 1; else c["0"] = ATM.n;
+      return { counts: c, triangles: ATM.surf.nIdx / 3, trianglesAll: ATM.surf.idxAll ? ATM.surf.idxAll.length / 3 : null };
     },
     info: () => {
       const P = ATM.surf.pos, T = terrainSurf.pos; let rmin = Infinity, rmax = -Infinity, rsum = 0, below = 0;
@@ -1006,6 +1740,7 @@ window.__terrainGlobe = { state: st, layers: layers.map(l => l.short), pick, sam
         const ra = 1 + st.exag * sampleMesh(ATM.g, atmHeight(), lat, lon) / D.radius_m;
         if (ra <= Math.hypot(T[3 * k], T[3 * k + 1], T[3 * k + 2])) below++; }
       return { time: ATM.A.times[ATM.it], timeIndex: ATM.it, playing: play.on, fps: play.fps, loop: play.loop, level: ATM.A.levels[ATM.il], field: atmField().id, opacity: ATM.opacity, exag: st.exag,
+               surface: ATM.surface ? atmSurfaceLabel() : null, pressure_pa: ATM.p0, height_m: ATM.z0, sigma: ATM.s0, coordinate: ATM.kind, interactive: !!ATM.cols, decodedTimes: ATM.colCache.length, triangles: ATM.surf.nIdx / 3,
                streams: ATM.streams, lines: ATM.nLinesHere, streamVerts: ATM.nStreamVerts, radius: { min: rmin, max: rmax, mean: rsum / ATM.n },
                range: atmRange(), terrainNodesAboveLayer: below, mapLabel: document.getElementById("mapLayer").textContent };
     },

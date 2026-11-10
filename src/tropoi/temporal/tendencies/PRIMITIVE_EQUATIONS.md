@@ -1,0 +1,575 @@
+# Dry hydrostatic primitive equations
+
+The implemented dry PE core is [`PrimitiveEquationsModel`](primitive_equations.py),
+with state layout in [`spatial.states`](../../spatial/states/primitive_equations.py)
+and column algebra in [`sigma_coordinate.py`](../../spatial/sigma_coordinate.py).
+This reference preserves the formulation and discrete identities. The
+[PE runner guide](../../run/pe/GUIDE.md) covers fixed-step experiments and
+terrain; [semi-implicit integration](../SEMI_IMPLICIT.md) covers the fast
+operator, startup, RAW and damping. The completed
+[Held–Suarez baseline](../../../../docs/held_suarez/README.md) adds forcing,
+Rayleigh drag, hyperdiffusion, checkpoints and long-run acceptance evidence.
+
+The full nonlinear tendency is unsplit (full T in the pressure gradient).
+The semi-implicit stepper selects a fast linear operator and evaluates the
+remainder as `N(X) = tendency(X) - L X`. That arrangement changes the time
+integration, not the governing equations below.
+
+Notation: `a` planetary radius, `Omega` rotation rate, `f = 2*Omega*sin(lat)`,
+`k` local vertical unit vector, `V = (u, v)` horizontal velocity (eastward,
+northward), `grad`/`div`/`curl`/`lap` the horizontal (spherical-surface)
+operators at constant `sigma`, `d/dt` local time derivative.
+
+---
+
+## 1. Continuous governing equations and sign conventions
+
+Vertical coordinate: **sigma**, `sigma = p / p_s`, `sigma = 0` at the model
+top, `sigma = 1` at the surface. `sigma` increases downward; `sigma_dot =
+D(sigma)/Dt` is positive for downward motion.
+
+Prognostic form is **vorticity–divergence** (vector-invariant), matching the
+shallow-water core's conventions exactly. With
+
+    zeta  = k . curl(V)          relative vorticity
+    delta = div(V)               horizontal divergence
+    eta   = zeta + f             absolute vorticity
+    E     = (u^2 + v^2) / 2      horizontal kinetic energy per unit mass
+    G     = delta + V . grad(ln p_s)      ( = div(p_s V) / p_s )
+
+the momentum equation
+
+    dV/dt = -eta k x V - sigma_dot dV/dsigma - grad(Phi + E) - R_d T grad(ln p_s)
+
+yields, after applying `k.curl` and `div`,
+
+    d(zeta)/dt  = -div(eta V) - k . curl( sigma_dot dV/dsigma + R_d T grad(ln p_s) )
+
+    d(delta)/dt =  k . curl(eta V) - div( sigma_dot dV/dsigma + R_d T grad(ln p_s) )
+                   - lap(Phi + E)
+
+Thermodynamic equation (dry, adiabatic; `kappa = R_d / c_p`):
+
+    dT/dt = -V . grad(T) - sigma_dot dT/dsigma + kappa T (omega / p)
+
+    omega / p = sigma_dot / sigma + d(ln p_s)/dt + V . grad(ln p_s)
+
+Mass continuity, integrated over the column (boundary conditions
+`sigma_dot = 0` at `sigma = 0` and `sigma = 1`):
+
+    d(ln p_s)/dt = - Integral_0^1 G dsigma
+
+    sigma_dot(sigma) = sigma * Integral_0^1 G dsigma' - Integral_0^sigma G dsigma'
+
+Hydrostatic balance (diagnostic; at fixed horizontal position `ln p =
+ln sigma + ln p_s`, so `d(ln p) = d(ln sigma)` within a column):
+
+    dPhi/d(ln sigma) = -R_d T ,        Phi(sigma = 1) = Phi_s
+
+Sign conventions are those already used by the BVE and SWE cores:
+`zeta > 0` counterclockwise seen from outside (northern-hemisphere cyclonic),
+`delta > 0` for divergent flow, `f = 2*Omega*sin(lat)` is the exact spectral
+(1,0) mode. In the pure-rotational, uniform-`ln p_s`, horizontally uniform-`T`
+limit the `zeta` equation must degenerate pointwise to the BVE, exactly as
+the SWE does (this is a tested invariant of the assembled tendency).
+
+Physical constants (values fixed here so tests and docs cannot drift):
+
+    R_d = 287.04  J kg^-1 K^-1      dry-air gas constant
+    c_p = 1004.64 J kg^-1 K^-1      dry-air isobaric heat capacity
+    kappa   = R_d / c_p           ~= 0.28572
+    gamma_d = c_p / (c_p - R_d)   ~= 1.4      (used only for the CFL bound)
+
+## 2. Prognostic and diagnostic variables, dimensions, units
+
+Prognostic (spectral, complex orthonormal-SH coefficients, `m >= 0` storage,
+layout identical to BVE/SWE: axis 0 = degree `l`, axis 1 = order `m`,
+entries with `m > l` are zero):
+
+| variable   | placement        | count | units      |
+|------------|------------------|-------|------------|
+| `zeta_k`   | full levels      | K     | s^-1       |
+| `delta_k`  | full levels      | K     | s^-1       |
+| `T_k`      | full levels      | K     | K (kelvin) |
+| `ln p_s`   | surface (2-D)    | 1     | dimensionless (`p_s` in Pa) |
+
+`T` is the **full** temperature (its `(0,0)` monopole is the global-mean
+temperature, nonzero). The reference/perturbation split `T = T_ref(sigma) +
+T'` is the implemented *semi-implicit arrangement*; it
+changes which terms are linear, not the equations.
+
+**`ln p_s`, not `p_s`, is prognostic.** Justification: (a) `p_s =
+exp(ln p_s) > 0` mathematically; finite-precision overflow/underflow and
+the state-validation envelope still constrain representable states; (b) the pressure-gradient and
+continuity terms need `grad(ln p_s)` directly; (c) it is the standard choice
+of the spectral PE literature (Bourke 1974; Hoskins & Simmons 1975). The
+known cost — the global mean of `exp(ln p_s)` (total dry mass) is not
+conserved exactly by a spectral `ln p_s` equation — is accepted and
+*monitored* (Section 9); a mass fixer is deferred.
+
+Diagnostic:
+
+| variable            | placement             | units       |
+|---------------------|-----------------------|-------------|
+| `Phi_k`             | full levels           | m^2 s^-2    |
+| `Phi_{k+1/2}`       | interfaces below each layer | m^2 s^-2 |
+| `sigma_dot_{k+1/2}` | interfaces            | s^-1        |
+| `d(ln p_s)/dt`      | surface               | s^-1        |
+| `u_k, v_k`          | full levels (grid)    | m s^-1      |
+
+`Phi_s` (surface geopotential) is a fixed spectral field owned by the model
+(default: all zeros — no topography). It is coupled through the hydrostatic boundary and pressure gradient;
+prepared imported terrain and analytic mountains are supported.
+
+## 3. Vertical placement (Lorenz staggering)
+
+`K` full levels indexed `k = 1..K` **top to bottom**; `K+1` interfaces
+`k+1/2 = 1/2 .. K+1/2` with
+
+    sigma_{1/2} = 0  (model top),   sigma_{K+1/2} = 1  (surface),
+    sigma interfaces strictly increasing, all finite.
+
+Layer thickness `Dsigma_k = sigma_{k+1/2} - sigma_{k-1/2} > 0`.
+
+Full-level coordinate: `sigma_k = (sigma_{k-1/2} + sigma_{k+1/2}) / 2`
+(arithmetic mean). Full-level pressure `p_k = sigma_k p_s`.
+
+Lorenz staggering: `zeta, delta, T, Phi` and their tendencies
+live at full levels; `sigma_dot` lives at interfaces. There is no prognostic
+variable at interfaces. The known cost of the Lorenz grid — a computational
+mode in the vertical temperature structure — is accepted for this core
+(Section 12); the Charney–Phillips alternative was rejected because every
+prognostic field staying at full levels keeps the state a single
+`(3K+1, l_max+1, l_max+1)` array that plugs directly into the existing
+`rk4_step_array` engine.
+
+## 4. Hydrostatic integration and boundary condition
+
+Simmons & Burridge (1981) discretization, specialized to sigma. Upward
+recursion from the surface boundary condition `Phi_{K+1/2} = Phi_s`:
+
+    Phi_{k-1/2} = Phi_{k+1/2} + R_d T_k ln(sigma_{k+1/2} / sigma_{k-1/2})     (k = K, ..., 2)
+
+    Phi_k = Phi_{k+1/2} + alpha_k R_d T_k
+
+    alpha_k = 1 - (sigma_{k-1/2} / Dsigma_k) ln(sigma_{k+1/2} / sigma_{k-1/2})   (k >= 2)
+    alpha_1 = ln 2                                                (top layer, sigma_{1/2} = 0)
+
+`Phi_{1/2}` (the geopotential of the `sigma = 0` interface) is **not
+defined and never computed** — it is infinite for any atmosphere with
+nonzero top-layer temperature, and nothing needs it: the PGF uses only
+full-level `Phi_k`.
+
+Exactness property used by the tests: for an isothermal column `T_k = T0`,
+the interface recursion telescopes to
+
+    Phi_{k+1/2} = Phi_s - R_d T0 ln(sigma_{k+1/2})     exactly (round-off only),
+
+which is the analytic isothermal profile. Full-level values satisfy
+`Phi_k = Phi_s - R_d T0 (ln sigma_{k+1/2} - alpha_k)`, i.e. the analytic
+profile evaluated at the effective level `ln(sigma~_k) = ln(sigma_{k+1/2}) -
+alpha_k`; for the top layer `sigma~_1 = sigma_{3/2}/2 = sigma_1` exactly.
+
+## 5. Discrete continuity equation
+
+With grid-point `G_k = delta_k + V_k . grad(ln p_s)` at full levels, the
+vertical integral is the exact layer-thickness-weighted sum:
+
+    d(ln p_s)/dt = - Sum_{j=1..K} G_j Dsigma_j
+
+## 6. Recovery of the surface-pressure tendency and sigma_dot
+
+Partial sums of the same quantity give the interface sigma-velocity:
+
+    sigma_dot_{k+1/2} = sigma_{k+1/2} * Sum_{j=1..K} G_j Dsigma_j
+                        - Sum_{j=1..k} G_j Dsigma_j          (k = 0..K)
+
+Impermeability is **structural**, not enforced by clamping:
+
+* top (`k = 0`): both terms are empty/zero, so `sigma_dot_{1/2} = 0`
+  identically;
+* bottom (`k = K`): the two sums are equal and cancel **exactly in floating
+  point** — the implementation computes the bottom entry from the same
+  cumulative sum object that appears in the first term, so the cancellation
+  is bitwise, not approximate.
+
+Discrete layer mass budget (the identity the closure diagnostics test):
+
+    Dsigma_k * d(ln p_s)/dt + G_k Dsigma_k
+        + (sigma_dot_{k+1/2} - sigma_dot_{k-1/2}) = 0     for every layer k.
+
+This holds to round-off by construction; the diagnostic reports the maximum
+absolute residual per column so any future refactoring that breaks the
+telescoping is caught immediately.
+
+## 7. Vertical-advection discretization and boundary behavior
+
+### 7a. Vertical transport (RESOLVED; implemented)
+
+Notation: `<X, Y> = Sum_k Dsigma_k X_k Y_k` is the sigma-mass-weighted
+column inner product; `sigma_dot` boundary rows are structurally zero
+(Section 6); `d(ln p_s)/dt = -Sum_j G_j Dsigma_j` from Section 5.
+
+Two operators are defined at full levels, valid on any nonuniform grid.
+Advective form (used for every prognostic transport term):
+
+    V_adv(X)_k = [ sigma_dot_{k+1/2} (X_{k+1} - X_k)
+                 + sigma_dot_{k-1/2} (X_k - X_{k-1}) ] / (2 Dsigma_k)
+
+Flux form (conservation bookkeeping), with the ARITHMETIC-MEAN interface
+value `Xhat_{k+1/2} = (X_k + X_{k+1}) / 2` — the 1/2:1/2 weights are not a
+convenience but are FORCED by identity (A) below, even on nonuniform grids:
+
+    V_flux(X)_k = [ sigma_dot_{k+1/2} Xhat_{k+1/2}
+                  - sigma_dot_{k-1/2} Xhat_{k-1/2} ] / Dsigma_k
+
+Boundary behavior: the terms multiplying `sigma_dot_{1/2}` and
+`sigma_dot_{K+1/2}` are structurally absent (never evaluated), so no ghost
+levels or extrapolated `X_0`, `X_{K+1}` values exist; for K = 1 both
+operators are identically zero.
+
+Exact discrete identities (each derived by index shifting / Abel summation
+with the zero boundary sigma-velocities, and each enforced by tests):
+
+  (A) Flux/advective compatibility, per level, ANY sigma_dot with zero
+      boundary rows:
+
+          V_flux(X)_k = V_adv(X)_k
+                        + (X_k / Dsigma_k)(sigma_dot_{k+1/2} - sigma_dot_{k-1/2})
+
+      — the discrete Leibniz rule d(sigma_dot X)/dsigma =
+      sigma_dot dX/dsigma + X d(sigma_dot)/dsigma. It holds with the
+      arithmetic interface mean ONLY (any other interface weighting breaks
+      it, and with it every identity below).
+
+  (B) Exact column conservation of the flux form:
+      `Sum_k Dsigma_k V_flux(X)_k` telescopes to the boundary fluxes,
+      which are structurally zero.
+
+  (C) Constant-field compatibility with continuity: `V_adv(c) = 0`
+      BITWISE (differences of equal values), and via the Section-6 layer
+      mass budget
+
+          V_flux(c)_k = -c (G_k + d(ln p_s)/dt) ,
+
+      i.e. flux-form transport of a constant tracer reduces exactly to
+      the discrete continuity equation — no spurious tracer source.
+
+  (SBP) Mass-weighted summation-by-parts against the CONTINUITY-CONSISTENT
+      sigma_dot (i.e. sigma_dot = interface_sigma_dot(G), Section 6):
+
+          <X, V_adv(Y)> + <Y, V_adv(X)>
+              = Sum_k Dsigma_k (X Y)_k (G_k + d(ln p_s)/dt) .        (SBP)
+
+      Proof sketch: both advection sums shift onto interior interfaces,
+      giving Sum sigma_dot_{k+1/2} [(XY)_{k+1} - (XY)_k]; Abel summation
+      moves the difference onto sigma_dot, and the layer mass budget
+      (Section 6) converts sigma-dot differences into
+      -Dsigma_k (G_k + d ln p_s/dt).
+
+      The diagonal X = Y is the KINETIC-ENERGY / SCALAR-VARIANCE EXCHANGE
+      RELATION:
+
+          2 <X, V_adv(X)> = Sum_k Dsigma_k X_k^2 (G_k + d(ln p_s)/dt) ,
+
+      the discrete analogue of X sigma_dot dX/dsigma =
+      (sigma_dot / 2) dX^2/dsigma. Its meaning: centered vertical
+      advection produces quadratic content (KE for X in {u, v}, variance
+      for T) ONLY through the mass-convergence factor that the p_s
+      weighting of the full flux-form equations hands to continuity — it
+      cannot create or destroy variance on its own.
+
+Which equation uses which form:
+
+1. Generic scalar and TEMPERATURE: `-V_adv(T)` in the advective-form
+   thermodynamic equation. (C) guarantees an isothermal atmosphere feels
+   no vertical transport; the diagonal (SBP) governs T-variance.
+2. MOMENTUM: `-V_adv(u)`, `-V_adv(v)` applied COMPONENT-WISE to the
+   reconstructed grid winds. The diagonal (SBP) with X = u and X = v is
+   the KE-consistency statement. Note: u and v are multivalued at the
+   poles; this is safe because V_adv acts level-wise at fixed horizontal
+   position (no horizontal coupling), and the components enter the
+   spectral equations only through the curl/divergence of the assembled
+   nonlinear vector (Section 1), never as scalar spectral fields.
+3. CURL/DIVERGENCE representation: the vector
+   `W_k = (V_adv(u)_k, V_adv(v)_k)` joins `R_d T_k grad(ln p_s)` in
+   the residual vector Z before its weak-form curl/divergence analysis
+   (Section 8a). The eta-V terms use separate pointwise SWE expansions,
+   preserving the exact BVE-reduction limit.
+
+The transport and Section-7b exchange identities are column-local. They
+do not establish total-energy conservation of the full assembled tendency
+with horizontal products, quadrature and time integration.
+
+### 7b. Energy-conversion term `kappa T omega/p` (RESOLVED; implemented)
+
+Notation: `beta_k = ln(sigma_{k+1/2} / sigma_{k-1/2})` (the Section-4
+interface log ratio; `beta_1` is formally infinite and never used),
+`P_k = Sum_{j<=k} G_j Dsigma_j` the discrete partial column integral
+(`P_0 = 0`), `A_k = V_k . grad(ln p_s)`.
+
+Continuous derivation. Using continuity, `omega/p` reduces to the pure
+column form
+
+    omega/p = V . grad(ln p_s) - (1/sigma) Integral_0^sigma G dsigma' .
+
+Hydrostatic balance `dPhi/dsigma = -R_d T / sigma` and integration by parts
+give the column-local ENERGY-EXCHANGE IDENTITY (valid at every instant,
+before any horizontal integration; the `p_s` mass factor is common to all
+terms):
+
+    Integral_0^1 R_d T (omega/p) dsigma
+        = Integral_0^1 [ R_d T A - (Phi - Phi_s) G ] dsigma .        (E)
+
+Globally mass-weighted, `-Integral (Phi - Phi_s) G p_s dsigma dA` turns
+into `Integral p_s V . grad(Phi)` plus the `Phi_s dp_s/dt` surface
+potential-energy term, so (E) is exactly the kinetic <-> total-potential
+energy exchange bookkeeping: heating input to `c_p T` equals the column-
+local part of the work extracted from kinetic energy by the PGF.
+
+Discrete requirement: (E) must hold EXACTLY (round-off only) with `Phi_k`
+the Section-4 Simmons–Burridge geopotential. Substituting
+`Phi_k - Phi_s = R_d (Sum_{j>k} beta_j T_j + alpha_k T_k)` into the
+discrete right side and swapping the double sum
+(`Sum_k Dsigma_k G_k Sum_{j>k} beta_j T_j = Sum_j beta_j T_j P_{j-1}`)
+forces the unique choice
+
+    (omega/p)_k = A_k - (beta_k / Dsigma_k) P_{k-1} - alpha_k G_k ,     (W)
+
+i.e. the Simmons & Burridge (1981) energy-conserving form. The `k = 1`
+beta-term is absent (`P_0 = 0`), so the infinite `beta_1` is never
+multiplied by anything — same structural rule as the hydrostatic recursion.
+With (W) the discrete identity
+
+    Sum_k Dsigma_k R_d T_k (omega/p)_k
+        = Sum_k Dsigma_k [ R_d T_k A_k - (Phi_k - Phi_s) G_k ]        (E_d)
+
+holds per column to round-off, and is enforced by tests via the
+`energy_exchange` residual diagnostics.
+
+Properties (tested):
+
+* For level-independent `G_k = c`, (W) gives `(omega/p)_k = A_k - c`
+  EXACTLY for every `k >= 2` (the alpha/beta terms telescope) — the
+  continuous value; the top layer gives `A_1 - c ln 2`, the known SB
+  top-layer approximation (alpha_1 = ln 2 is fixed by hydrostatic/energy
+  consistency, not by pointwise accuracy at k = 1).
+* `G == 0` implies `(omega/p)_k = A_k`; a resting atmosphere gives
+  exactly zero conversion and zero pressure work.
+
+The heating term entering the thermodynamic equation is
+`(kappa T omega/p)_k = kappa * T_k * (omega/p)_k` (K/s), with the SAME
+`(omega/p)_k`; this is what makes the tendency's PGF work and
+heating compensate discretely.
+
+## 8. Horizontal pressure-gradient formulation
+
+The PGF in sigma coordinates is the two-term form
+
+    PGF = - grad(Phi) - R_d T grad(ln p_s).
+
+In the divergence equation the potential part appears as `-lap(Phi + E)`
+(exact diagonal spectral operation, like `-lap(K + phi)` in the SWE), and
+the `R_d T grad(ln p_s)` part joins the nonlinear vector evaluated
+pseudo-spectrally on the backend's product grid.
+
+The semi-implicit fast operator uses the split `T = T_ref(sigma) + T'` moves
+`R_d T_ref grad(ln p_s)` into the linear part, giving
+`-lap(Phi + E + R_d T_ref ln p_s)` with only `R_d T' grad(ln p_s)` treated
+pseudo-spectrally.
+
+Over steep topography the two PGF terms are large and opposing, and their
+truncation errors need not cancel (the classic sigma-coordinate PGF error).
+Terrain is implemented with a band-limit gate and an isothermal resting
+balance test. That test establishes the documented equilibrium envelope,
+not arbitrary-terrain accuracy or stability; see the
+[runner guide](../../run/pe/GUIDE.md#surface-topography).
+
+## 8a. Vector curl/divergence analysis (RESOLVED; tendency milestone)
+
+The momentum tendency contains grid-space horizontal vectors with no
+scalar-flux pointwise expansion (component-wise vertical momentum
+transport, `R_d T grad(ln p_s)`). Mapping such a product-sampled tangent
+vector `F = (F_u east, F_v north)` to the spectra of `k.curl(F)` and
+`div(F)` is done by the **weak-form (Bourke-style) vector analysis**,
+production on BOTH backends (`SpectralOperators.vector_curl_div_spectral`).
+
+Derivation (all in the repository's conventions: latitude `phi`,
+colatitude `theta`, analysis = quadrature inner product
+`a_lm = sum_i w_i Y*_lm(x_i) f_i` on every backend). Integration by parts
+on the closed sphere moves the derivatives onto the basis:
+
+    (div F)_lm  = Int Y*_lm div F dOmega = -Int grad(Y*_lm) . F dOmega
+    (curl F)_lm = (div F')_lm   with F' = (F_v, -F_u)
+
+and the two basis identities, which hold POINTWISE at every sampling
+point,
+
+    dY_lm/dlambda        = i m Y_lm
+    sin(theta) dY_lm/dtheta = C+_lm Y_{l+1,m} + C-_lm Y_{l-1,m}
+
+turn the weak integrals into exact coefficient-space operations on the
+half-metric analyses `a = analysis(F_u / cos phi)`,
+`b = analysis(F_v / cos phi)`:
+
+    div_lm  = (i m / R) a_lm + (1/R) (S^T b)_lm
+    curl_lm = (i m / R) b_lm - (1/R) (S^T a)_lm
+
+where `(S^T x)_{l,m} = C+_{l,m} x_{l+1,m} + C-_{l,m} x_{l-1,m}` is the
+TRANSPOSE (= complex adjoint; the C are real) of the synthesis-side
+`sin_theta_d_theta` coupling — implemented as
+`SpectralOperators.adjoint_sin_theta_d_theta_coeffs` and verified by an
+inner-product adjoint identity test.
+
+**One-degree-extended analysis.** The half-metric components of a field
+built from degree-`l_max` potentials carry degree `l_max + 1` content, and
+the `l = l_max` output row reads `a/b_{l_max+1,m}`; the production
+operator therefore analyzes `F_u/cos`, `F_v/cos` with a basis extended by
+one degree on the same points and quadrature weights (Bourke 1974's
+`U, V` at degree N+1), with the true (unclipped) `C+` at `l_max`. Without
+the extension the top output row is structurally incomplete (measured as
+up to O(1) spurious top-row content); with it, recovery is exact through
+`l = l_max` for exactly-sampled fields.
+
+The ONLY continuous step is the integration by parts; every discrete
+operation equals the backend quadrature applied to the exact continuous
+weak integrand. There is NO claim of an exact discrete
+summation-by-parts on the geodesic co-grid — the geodesic error below is
+the measured quadrature error, not assumed away.
+
+Measured analytic-recovery errors, fields `F = k x grad(psi) + grad(chi)`
+from known potentials (exact answers `curl = lap psi`, `div = lap chi`),
+2026-07:
+
+* **Gauss lat-lon** (32x64, l_max 15, 3/2-rule product grid): < 1e-12
+  relative for potentials of any degree `<= l_max - 1`, all mode families
+  (zonal, nonzonal, at the 2/3 cut), pure and mixed. At degree exactly
+  `l_max` the WIND SYNTHESIS (not the operator) is the limit: the
+  repository's Helmholtz reconstruction clips the degree-(l_max+1)
+  component of `sin_theta d_theta psi` (storage is (l_max+1)^2 with
+  `C+[l_max] = 0` — the same convention the BVE/SWE winds use), so the
+  sampled field is already a truncated vector field; the deviation
+  (percent-level to ~40% for single top-degree modes, confined to the
+  same zonal wavenumber) is a property of the given field, and the
+  clipped wind is genuinely not nondivergent either. Characterized by
+  test, accepted (tendency products are truncated at 2*l_max/3 anyway).
+* **Geodesic** (res 3, l_max 10, fine res-4 co-grid): 1.0e-3 .. 1.9e-2
+  relative across single modes l = 1..9 (worst at l = 1), 3.3e-3 for the
+  mixed acceptance case.
+
+Reference pathway (kept, NOT production):
+`SpectralOperators.vector_curl_div_roundtrip` — analyze the components as
+scalars, differentiate the projections, assemble grid curl/div, re-analyze.
+Scalar components of a band-limited vector field are not band-limited
+scalars (spin-1 tail; solid-body `u = u0 cos(lat)` already has an infinite
+zonal Legendre series), so this pathway carries a representation error
+that survives exact Gauss quadrature: measured 3.1e-2 (low-degree
+rotational) to 4.2e-1 (modes at l_max) on lat-lon, and 4.6e-2 .. 3.0e-1 on
+the geodesic backend — one to two orders worse than the weak form
+everywhere. It also costs a second transform round trip.
+
+**Backend policy (decided on this evidence): the weak-form vector
+analysis is the production pathway on both the Gauss lat-lon and geodesic
+backends; the scalar round trip is retained only as an independently
+implemented cross-validation reference.** No silent fallback exists; the
+geodesic residuals above are the documented accuracy envelope.
+
+## 9. Expected invariants and validation rules
+
+Hard validation (raise `PrimitiveEquationsStateError`; checked on the
+initial state and after every accepted step and on
+every intermediate RK stage, exactly like the SWE):
+
+1. finiteness of every spectral coefficient (NaN/Inf anywhere is fatal);
+2. array layout: shape `(3K+1, l_max+1, l_max+1)`, complex;
+3. `zeta_k` monopole = 0 for every level (global circulation of a
+   single-valued velocity field is identically zero);
+4. `delta_k` monopole = 0 for every level (global integral of a divergence);
+   both monopole checks are relative to the field norm with the SWE's
+   `1e-10` tolerance;
+5. `T > 0` strictly, on **every sampling the model evaluates on** (state
+   grid and product grid — the SWE positivity-envelope precedent);
+6. `ln p_s` synthesizes to finite grid values and `p_s = exp(ln p_s)` is
+   finite (positivity is automatic) on the same samplings.
+
+Monitored invariants (diagnostics, not hard failures):
+
+* total dry mass  `M ∝ <p_s> = area-mean of exp(ln p_s)` — quadrature mean,
+  expected to drift at spectral-truncation level (the accepted `ln p_s`
+  cost; drift is the monitored quantity);
+* column mass closure — the Section 6 layer-budget residual, expected at
+  round-off always;
+* column energy-exchange closure — the Section 7b identity (E_d) residual
+  (conversion minus column-local pressure work), expected at round-off
+  always;
+* vertical-transport closure — the Section 7a (SBP) residual and the
+  flux-form column sum (B), expected at round-off always;
+* global dry total energy `Integral (c_p T + Phi_s + E) dm` and global
+  angular momentum are physical quantities, not whole-model conservation
+  guarantees established by the column-local tests;
+* `sigma_dot_{1/2} = sigma_dot_{K+1/2} = 0` exactly (tested, and structural).
+
+## 10. Characteristic speed and integration
+
+The model's diagnostic characteristic speed is
+
+    c_max = max_k max_grid |V_k| + sqrt(gamma_d R_d T_max)
+
+where the maximum covers state and product samplings. The fixed-step
+[PE runner](../../run/pe/GUIDE.md#timestep-policy) records a Courant number
+but does not use it as a controller. The separate
+[semi-implicit stepper](../SEMI_IMPLICIT.md) treats the selected linear
+gravity-wave terms implicitly; advection, RAW, forcing and damping still
+have stability and accuracy restrictions. It is not unrestricted adaptive
+integration.
+
+## 11. Nonlinear tendency assembly
+
+The term map below describes the implemented assembly. All products use the same product-grid continuity `G`, `dlnps_dt` and
+`sigma_dot`; state-grid diagnostic helpers are not substituted for them.
+
+| Term | Implemented assembly and contract |
+| --- | --- |
+| Surface pressure | Analyze `-sum(G*Dsigma)` on the product sampling and truncate once |
+| Hydrostatics | Apply the linear Simmons–Burridge recursion directly to complex spectral T and surface geopotential; synthesize on product points where needed |
+| Vertical transport | Subtract centered `vertical_advection` of T and of each wind component; the transport/SBP identities are in Section 7a |
+| Momentum | Evaluate `div(eta V)` and `curl(eta V)` with the SWE pointwise expansions. Form `Z = V_adv(V) + R_d T grad(ln p_s)` and weak-analyze only Z (Section 8a). Then `dzeta=-div(eta V)-curl(Z)` and `ddelta=curl(eta V)-div(Z)-lap(Phi+E)`; the separate paths preserve exact BVE reduction |
+| Temperature | Analyze `-V.grad(T) - V_adv(T) + kappa T omega/p` once; `omega/p` uses the same G as continuity (Section 7b) |
+| Truncation | Truncate analyzed products at the model's cut; linear spectral Laplacian terms stay exact. The default 2/3 cut and production retained-degree option are distinguished in [RETAINED_TRUNCATION.md](RETAINED_TRUNCATION.md) |
+| Monopoles | Zero zeta/delta tendencies per level; keep T and ln p_s monopoles, whose means can evolve |
+| Validation | Reject nonfinite states, invalid monopoles and nonpositive T over the state/product envelope; explicit RK4 checks intermediate stages as well as accepted states |
+
+[`test_sigma_coordinate.py`](../../../../tests/test_sigma_coordinate.py)
+checks column identities on CPU; [`test_primitive_equations.py`](../../../../tests/test_primitive_equations.py)
+and [`test_pe_tendency.py`](../../../../tests/test_pe_tendency.py) check model
+assembly, exact rest and BVE reduction on both backends.
+[`test_pe_orographic_rest.py`](../../../../tests/test_pe_orographic_rest.py) and
+[`test_pe_prepared_terrain.py`](../../../../tests/test_pe_prepared_terrain.py)
+cover terrain coupling. Semi-implicit normal modes and reduced-system
+residuals are tested in [`test_semi_implicit.py`](../../../../tests/test_semi_implicit.py).
+
+## 12. Validation boundaries and remaining numerical limitations
+
+- Lorenz staggering admits a vertical temperature computational mode.
+- Sigma-coordinate pressure-gradient error over general terrain remains;
+  exact isothermal rest and the worked Mars perturbation are bounded tests.
+- `ln p_s` gives positive surface pressure but not exact global dry-mass
+  conservation. Production run 002 measured 2.016e-6 maximum relative drift
+  over 1200 days, within its predeclared B2 limit; it is not zero.
+- The discrete column transport/exchange identities do not establish
+  whole-model total-energy conservation. Forced/damped Held–Suarez energy
+  is not conserved physically either.
+- No general joint vertical/horizontal convergence study or arbitrary
+  planetary-climate validation is claimed.
+- Moist physics and radiative heating remain future work
+  ([issue #26](https://github.com/AlexandreEros/Palintropos/issues/26)).
+
+## References
+
+* Bourke, W. (1974). A multi-level spectral model. I. Formulation and
+  hemispheric integrations. *Mon. Wea. Rev.*, 102, 687–701.
+* Hoskins, B. J., & Simmons, A. J. (1975). A multi-layer spectral model and
+  the semi-implicit method. *Quart. J. Roy. Meteor. Soc.*, 101, 637–655.
+* Simmons, A. J., & Burridge, D. M. (1981). An energy and angular-momentum
+  conserving vertical finite-difference scheme and hybrid vertical
+  coordinates. *Mon. Wea. Rev.*, 109, 758–766.

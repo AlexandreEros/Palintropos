@@ -1,6 +1,6 @@
 # Generated architecture documentation
 
-Everything below this directory, except this file, is written by
+The `current/` and `history/` snapshots are written by
 `tools/architecture` (`python -m tools.architecture.generate`). The generator
 reads the source of `src/tropoi` and records generic structural facts: module
 imports (grimp), classes, inheritance, and methods (`ast`), and statically
@@ -34,9 +34,11 @@ default `DEFAULT_LAYERS` in `tools/architecture/layers.py`: `cli`, `run`,
 | `current/packages/<package>.md` | One page per package: all modules, all classes (standalone ones included), public functions, imports in and out | Generated |
 | `current/calls/*.mmd` | Scoped static call graphs: one per CLI handler (discovered) and per declared Python entry path | Generated |
 | [`current/coverage.json`](current/coverage.json) | Discovered vs rendered, deliberate exclusions, static-analysis limits | Generated |
+| [`current/README.md`](current/README.md) | Provenance, extraction rules and limits, metric definitions | Generated |
 | [`entry-points.toml`](entry-points.toml) | Declared Python entry paths and exclusions, with reasons | Hand-written input; the generator fails if it misses or misnames a candidate |
 | [`subsystems/sky.md`](subsystems/sky.md) | The sky subsystem: optics, page assembly, the JavaScript page, both entry paths, boundaries | Hand-written; must link its generated diagrams (checked) |
-| [`../class-structure.md`](../class-structure.md), [`../call-structure.md`](../call-structure.md) | Curated BVE-era overviews with relations static analysis cannot extract | Hand-written, incomplete, not checked; reconciled 2026-11-07 |
+| [`../ARCHITECTURE.md`](../ARCHITECTURE.md) | Responsibilities and design: layers, backends, transforms, capsules | Hand-written |
+| [`review/README.md`](review/README.md) | Measured before/after comparison JSON used by the export tool | Data |
 
 ## Coverage: what is guaranteed
 
@@ -64,27 +66,22 @@ a candidate, or when a declared narrative page (`doc`) is missing or does not
 link its `calls/<name>.mmd`.
 
 What this does **not** establish: that a diagram is readable, that a
-hand-written page is still accurate prose, or that methods reached through
-objects are covered (they are not candidates; a declared path may name them
-as roots, as `sky-saved-column` does with `Simulation.sky`). The hand-drawn
-`docs/class-structure.md` and `docs/call-structure.md` are outside every check.
+hand-written page is still accurate prose, or that dynamic dispatch is
+covered. Calls through objects, `getattr`, registries and callbacks are not
+followed, and methods are not candidates (a declared path may name one as a
+root, as `sky-saved-column` does with `Simulation.sky`).
 
 ## Layout
 
 | Path | Status |
 |---|---|
 | `history/numerics-physics-layout/` | **Frozen.** Source commit `f879851`: the original layout, with implementation modules in `tropoi.numerics`, `tropoi.physics`, `tropoi.planet`, and `tropoi.viz`. Never regenerated; `--check` verifies it (see its README). |
-| `history/spatial-temporal-representation-layout/` | **Frozen.** Source commit `47dec90`: the same code reorganized into `tropoi.spatial`, `tropoi.temporal`, and `tropoi.representation`, with the old paths kept as aliases (see *Compatibility paths* in `docs/ARCHITECTURE.md`). Never regenerated; `--check` verifies it (see its README). |
+| `history/spatial-temporal-representation-layout/` | **Frozen.** Source commit `47dec90`: the same code reorganized into `tropoi.spatial`, `tropoi.temporal`, and `tropoi.representation`, with the old paths kept as aliases (those aliases were later retired; see the snapshot provenance). Never regenerated; `--check` verifies it (see its README). |
 | `current/` | **Live.** Default output of the generator; always describes the committed `src/tropoi`. CI fails any push where it is stale (see *Automated generation*). |
 
-`current/` and `history/spatial-temporal-representation-layout/` hold identical
-graphs when `current/` is introduced, because `src/` has not changed since
-`47dec90`. They differ only in the README and metrics provenance. The first
-source change after that updates `current/` and leaves the frozen snapshot as
-it is.
-
-Snapshots are named after what they capture, here the package layout, rather
-than after the work that produced them.
+The live snapshot changes with source; frozen layout snapshots retain their
+own source/toolchain provenance and are not current API guides. Their diagrams
+and measurements are retained for reproducible structural comparison.
 
 ### Adding a frozen snapshot
 

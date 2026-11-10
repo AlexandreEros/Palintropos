@@ -1,7 +1,7 @@
 """Sigma-coordinate vertical grid and column operators (CPU, NumPy).
 
 Covers the vertical half of the primitive-equation foundation
-(docs/PRIMITIVE_EQUATIONS_DESIGN.md Sections 3–6, 9) without any GPU:
+(src/tropoi/temporal/tendencies/PRIMITIVE_EQUATIONS.md Sections 3–6, 9) without any GPU:
 grid-metadata validation, Simmons–Burridge hydrostatic exactness for
 isothermal columns, structural top/bottom impermeability, discrete column
 mass closure, and the NumPy/CuPy backend-independence contract (the CuPy

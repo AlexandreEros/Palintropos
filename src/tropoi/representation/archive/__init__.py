@@ -11,7 +11,7 @@ Public entry point::
     snapshot.state["temperature"].coeffs   # read-only host view
     snapshot.plot(output_path=path)        # explicit, lazy rendering
 
-See docs/SAVED_RUNS.md.
+See src/tropoi/temporal/SAVED_RUNS.md.
 """
 from tropoi.representation.archive.capsule import (CapsuleError, CapsuleLayoutError, CapsuleStorage,
                       open_simulation, resolve_run_directory)

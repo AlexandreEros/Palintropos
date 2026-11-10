@@ -1,26 +1,16 @@
-# Held–Suarez status
+# Completed Held–Suarez baseline
 
-Plan: docs/superpowers/plans/2026-09-27-held-suarez-24h-plan.md (r3). T0 = 2026-09-27 04:25 −03:00
-(07:25 UTC), the approval commit f52ae5b. Budget is elapsed time. Branch:
-`feat/semi-implicit-integration` (the plan's `feat/held-suarez`; renamed by the user).
-**Handoff point (2026-10-04): two production runs completed. `hs-T42L20-prod-001` (lagged,
-900 s): A PASS (with the local tier-A evidence), B FAIL (B2 only, cause measured), C PASS.
-`hs-T42L20-prod-002` (centred, 720 s; PROTOCOL amendment 1): A PASS (local evidence), B PASS, C PASS; its
-climate is indistinguishable from run 001's. Verdicts stand as reported.**
+Two 1200-day T42L20 production runs completed. Run 001 (lagged damping,
+900 s) returned **A PASS, B FAIL (B2 only), C PASS**. Run 002 (centred
+damping, 720 s; protocol amendment 1) returned **A PASS, B PASS, C PASS**.
+Verdicts and measured results below remain as reported. Local tier-A
+evidence completed the initially INCOMPLETE Colab A reports.
 
-| stage | state | evidence |
-|---|---|---|
-| S0 protocol + reference | DONE | PROTOCOL.md, REFERENCE_CONFIG.json, DEVLOG.md; Dinosaur T42L20 float64 reference **COMPLETE, 1200 days** in `runs/hs-reference-dinosaur-T42L20-001/` (`series.npz` sha256 `baa7cffd…c4663`). **B2 corrected in S5**: the global mean of p_s = exp(ln p_s) changes by 3.23e−4 between day 0 (rebuilt initial state) and day 1200 (stored state) → reference B2 PASS *at the endpoints only*; daily ⟨p_s⟩ was not retained and cannot be established (DEVLOG, `REFERENCE_B2.json`). The earlier claim from mean ln p_s is withdrawn. |
-| S1 stepper interface | DONE (c9817a1) | tests/test_steppers.py |
-| S2 batched transforms | DONE (7125ddd) | tests/test_batched_transforms.py |
-| S3 SI stepper | DONE (7dc40e2, f443efd) | tests/test_semi_implicit.py, SEMI_IMPLICIT.md §§1–7 |
-| S4 forcing + ∇⁸ | DONE | §S4 below |
-| S4b complete-scheme checks | DONE, with a finding | §S4b below |
-| S5 experiment module | DONE | §S5 below |
-| S6 notebook | DONE | §S6 below |
-| S7–S9 launch, gate, production run | DONE (2026-09-30/10-01, Colab T4) | §Production run 001 |
-| S10 report | DONE; B FAIL (B2), C PASS | §Production run 001 |
-| run 002 (PROTOCOL amendment 1) | DONE (2026-10-03/04, Colab T4); B PASS, C PASS | §Production run 002 |
+Start with the [experiment README](README.md), [acceptance criteria](ACCEPTANCE.md)
+and [frozen protocol](PROTOCOL.md). Raw production/reference runs are local
+or externally backed up, not all bundled in Git; this record preserves
+their identities, measurements and evidence locations. Current code lives
+in [`run/held_suarez`](../../src/tropoi/run/held_suarez/README.md).
 
 ## Production run 001 — `hs-T42L20-prod-001` (verdicts as reported; never edited)
 
@@ -45,7 +35,7 @@ climate is indistinguishable from run 001's. Verdicts stand as reported.**
   | B | **FAIL** | B2 only: max \|Δ⟨p_s⟩\|/⟨p_s⟩ = 1.548e−3 > 1e−3. B1 (day 1200, 0 aborts), B3 (KE trend 1.8 %, T trend 0.12 K), B4 (slope −10.6 over (28, 42]), B5 (one config, one clean commit) PASS |
   | C | **PASS** | C1 corr 0.994 / RMSE 1.07 m/s; C2 jets NH 32.97 vs 32.82 m/s, SH 32.75 vs 32.63 m/s, latitude within one Gaussian row, level equal; C3 0.33 K; C4 [T′²] and [v′T′] peaks within 2 %, corr 0.993 / 0.998; C5 PASS; C6 jet 33.0 m/s at 43.3°, surface easterlies |
 
-- **B2 cause, measured (DEVLOG 2026-10-02): the lagged damping placement.** The SI solve
+- **B2 cause, measured ([DEVLOG](DEVLOG.md), 2026-10-02): the lagged damping placement.** The SI solve
   advances ln p_s with the *undamped* D\*^{n+1}; the dampers then divide D by (1 + 2Δt r). The
   ln p_s update carries −Δt Σ ν_j (D\* − D)_j per step, and divergence under high p_s (Ekman
   pumping in the drag layer) makes its mass effect one-signed. The leak is steady (−1.36e−6/day,
@@ -57,10 +47,10 @@ climate is indistinguishable from run 001's. Verdicts stand as reported.**
   centred placement (6a447d8, opt-in) solves the damped system, so ln p_s sees the same
   D^{n+1}. This is the mass-budget face of the S4b first-order lag term; climate impact on tier C:
   none detected (C PASS with margins).
-- **Stability margin.** Daily max|u| peaked at **100.3 m/s on day 1047** (mean of the daily maxima
-  over days 200–1200: 74.3 m/s), against the lagged RAW/advection bound of 105.3 m/s at 900 s (5 %
-  margin) and the reference's 94.5 m/s. The centred bound at 900 s (94.9 m/s) is below this
-  climate's peak; at 720 s it is 121.1 m/s (21 % margin).
+- **Stability.** Daily max|u| peaked at **100.3 m/s on day 1047** (mean of the
+  daily maxima over days 200–1200: 74.3 m/s; reference peak 94.5 m/s).
+  The corrected lagged frozen-coefficient non-amplification bound is
+  125.1 m/s at 900 s. See the stability interpretation below.
 - **Tier A evidence → A PASS.** Full suite at 206ef25 (src/ and tests/ verified identical to the
   commit before and after) on the MX110, 2026-10-02 23:22–00:49Z: **1131 passed, 5 skipped
   (pre-existing), 0 failed** in 87 min. `tools/held_suarez/tier_a_evidence.py` turns its JUnit XML
@@ -95,8 +85,8 @@ climate is indistinguishable from run 001's. Verdicts stand as reported.**
   one-signed, matching the 2-day restart's −2.1e−9/day; RAW α ≠ ½ and SI time-centring are the
   candidates, unattributed; 500× under B2 over 1200 days).
 - **Stability.** Daily max|u| peaked at **97.9 m/s on day 483** (mean of daily maxima, days
-  200–1200: 74.8 m/s) against the centred 720 s bound of 121.1 m/s (19 % margin). Three days
-  exceeded 94.9 m/s, the centred bound at 900 s, which confirms the choice of 720 s. Leapfrog
+  200–1200: 74.8 m/s) at the selected 720 s timestep. The corrected frozen-coefficient bound is
+  162.5 m/s; the earlier 121.1 m/s estimate was superseded (see below). Leapfrog
   computational-mode indicator 0.013 (run 001: 0.016).
 - **Run 001 vs run 002 climate** (`tools/held_suarez/compare_runs.py`, the report's weights and
   sampling error): every difference is below sampling noise: zonal-mean u RMSE 0.34 m/s
@@ -114,186 +104,43 @@ climate is indistinguishable from run 001's. Verdicts stand as reported.**
   `runs/hs-T42L20-prod-002/assets/report-with-tier-a/` (only the tier-A block differs from the
   Colab `report/`): **A PASS, B PASS, C PASS**. Evidence in `runs/hs-T42L20-prod-002/assets/tier_a/`.
 
-## S4 — HS forcing, Rayleigh drag, ∇⁸ (generic stepper hooks)
 
-`tropoi.temporal.hooks` (explicit terms in N; `DiagonalDamping` 1/(1 + 2Δt r) on X^{n+1} after
-the SI solve, before RAW; startup on the complete RHS), `tropoi.temporal.tendencies.held_suarez`
-(HS94 formulas, Newtonian relaxation on the product grid truncated at the cut, drag and ∇⁸
-dampers). `tests/test_held_suarez_forcing.py` 13 tests: hand values at 11 points (worst 2.1e−16),
-exact zero at equilibrium, k_T decay (2e−14 pointwise; 4e−15 spectral), independent product-grid
-check (1.5e−15), factors per degree (0 ulp), bitwise rest, uniform-T_eq rest (2.6e−21 s⁻¹ after
-a day), no-hook path bitwise S3. SEMI_IMPLICIT.md §8.
+## Reference and restart evidence
 
-## S4b — complete scheme (forcing + drag + ∇⁸ + SI + RAW), `tests/test_held_suarez_scheme.py`
+The matched Dinosaur reference completed 1200 days in
+`runs/hs-reference-dinosaur-T42L20-001/`; its `series.npz` SHA-256 is
+`baa7cffd…c4663`. The reference's reconstructed initial and stored final
+mean surface pressures differ by 3.23e-4: B2 passes **at those endpoints
+only**, because daily mean p_s was not retained. Mean ln p_s cannot establish
+that condition; [REFERENCE_B2.json](REFERENCE_B2.json) and [DEVLOG](DEVLOG.md)
+preserve the correction and evidence.
 
-- (a) scalar recurrence: |λ| = 0.99739925 / 0.8024 at Δt = 900 s, k_s (no RAW: 1.0026, growing);
-  max |λ| over the (k, r, ω_SI) grid 1.000000000000. RAW limits explicit oscillations to
-  ωΔt ≤ 0.4371 → with ∇⁸, peak winds ≤ 125.1 m/s (900 s) / 85.5 m/s (1200 s) at T42 (either
-  layout) are non-amplifying; Dinosaur reaches 94.5 m/s → **Δt = 900 s selected**. *Corrected
-  2026-09-28* (the bound first used ω = U l/(a cos 45°) with k = k_s: 109.5 / 80.4 m/s; see
-  "Stability-bound correction" below).
-- (b) convergence vs RK4, 2 days T21 L10: see "S4b (b)" in DEVLOG. **Finding:** the complete
-  scheme is asymptotically *first order* in time; the cause is the plan's damping placement
-  (factor on X^{n+1} ⇒ damping evaluated at n+1, local error −rΔt Ẋ), shown in isolation on the
-  real stepper (r = k_f: ratios → 1.97; r = 0: 4.000). A second, small first-order term is RAW with α = 0.53 (α = ½
-  is second order). Forcing + SI without dampers and RAW is second order at 300/150/75 s (ratios
-  3.75–4.12). Not changed: the user mandated
-  these factors; see DECISION list.
-- (c) 5-day stability at 900 and 1200 s: |X^n − X^{n−1}| peaks on day 2 and decays; computational
-  indicator flat after the day-1 spin-up (≤ 0.065 at 900 s).
-- (d) startup: n_sub = 1 from L + damping + k_T; with the complete tendency X^1 converges at
-  fourth order in n_sub (δ ratios 16.5); no early growth.
+Checkpoint/restart retains both leapfrog levels, RNG/accumulators, config
+and protocol hashes, solver/environment metadata and array checksums.
+The completed smoke tests stopped at day 1 and at mid-day step 100 and
+resumed through a fresh driver: final states were bit-identical, startup
+ran once, and online/offline block means agreed. Resume refuses incompatible
+schema/config/commit/operator/hooks/protocol and corrupted checkpoints.
+[`test_held_suarez_experiment.py`](../../tests/test_held_suarez_experiment.py)
+and [driver documentation](../../src/tropoi/run/held_suarez/README.md) define
+that supported path. These are restart tests, not climate validation.
 
-## S5 — experiment, checkpoints, statistics, report
+## Stability interpretation
 
-`tropoi.run.held_suarez` (`config`, `model`, `statistics`, `checkpoint`, `experiment`, `report`,
-`__main__`). Stepper initialized once, fixed Δt, both leapfrog levels in every checkpoint.
-Checkpoint = npz without pickle + JSON metadata (stepper state, RNG state, accumulators, config and
-sha256, protocol sha256, commit/dirty, CuPy/CUDA/device) + SHA-256 of every array and of the
-metadata; tmp + fsync + rename. Resume refuses config, commit, scheme/Δt/operator/hooks,
-schema, protocol changes, orphaned checkpoints, foreign backup dirs; hash failures stop.
-Evidence: forced stop at day 1 and at mid-day step 100, resumed in a fresh driver, final state
-**bit-identical** (sha256 `486752c9…`); one RK4 startup; online block means = offline to 0.0
-(2 samples per block); report on synthetic fixtures produces every verdict, never PASS on missing
-or incomplete data, byte-deterministic.
+The later 2026-09-28 frequency-bound correction supersedes the earlier
+94.9/105.3 m/s estimates at 900 s and 121.1 m/s at 720 s. The corrected
+frequency is `U sqrt(L(L+1))/a + 2 Omega`, with no Rayleigh drag on the
+jet-level wind rows. Non-amplification bounds for retained T42 (lagged /
+centred) are 198.8/198.7 m/s at 600 s, 162.5/162.5 at 720 s,
+125.1/125.0 at 900 s and 85.5/85.5 at 1200 s. Fast growth above 1.01/step
+at 900 s begins at 147.5/132.8 m/s. These are frozen-coefficient scalar
+recurrence bounds, not nonlinear stability guarantees.
 
-## S6 — Colab notebook
-
-`notebooks/held_suarez_colab.ipynb`: pinned SOLVER_COMMIT, GPU/float64 hard check, Drive mount,
-reference hash check, 200-step benchmark gate with projection and automatic stop, restore from
-backup, resumable run loop (backup every 10 days, keep 3), report. SOLVER_COMMIT = 21203ff (retained-T42 solver;
-must be pushed). Smoke path executed locally through the same entrypoint
-(`tests/test_held_suarez_notebook.py`): benchmark 0.147 s/step (T21 L10, MX110), forced stop at day
-1 + resume in a fresh process, backups, report. T42 timing is Colab-only (MX110 TDR).
-
-## Regression gate (final code, HEAD of the S6 follow-up)
-
-`pytest tests -q` on the MX110: **1109 passed, 5 skipped, 0 failed** in 65 min (the 5 skips are
-pre-existing: 4 run-through-subprocess placeholders in test_saved_run_overview.py and the
-TROPOI_W5_ACCEPTANCE gate). `git diff main -- tests/`: additions only (2702 lines; the one
-pre-existing file touched, test_pe_runner.py, gained 21 lines in S1). New skips: none on CUDA; the
-GPU tests skip cleanly without CuPy (CI emulation: 50 passed, 17 skipped). Slowest: the two S4b
-convergence tests (24 and 19.5 min), S3 convergence (5.5 min). Architecture snapshot regenerated
-per commit; `--check` passes; no import cycle changed.
-
-## Stability-bound correction (2026-09-28)
-
-The RAW/advection jet bound (S4b (a); centred option, DECISION 2) used the explicit frequency
-ω_l = U l/(a cos 45°) + 2Ω with the explicit damping k = k_s on every row. Both were wrong for the
-wind at jet level:
-
-- **Wavenumber.** A degree-l harmonic with zonal wavenumber m has its amplitude where
-  cos φ ≳ m/√(l(l+1)) and is evanescent poleward, so m/(a cos φ) ≤ √(l(l+1))/a wherever it lives:
-  putting m = l at 45° overstates the frequency by √2. Checked on the T42 truncation
-  (`test_advective_frequency_bound_holds_on_the_truncation`: Galerkin zonal-advection eigenvalues
-  for solid-body rotation and jets at 30/45/60°): the largest frequency is 0.75–0.99 of
-  U√(L(L+1))/a, and the former form overstated it 1.46–2.62×; the fastest mode of a 45° jet has
-  m ≈ 28, not 42.
-- **Damping.** Above σ_b = 0.7 the wind has no Rayleigh drag and the Newtonian relaxation acts on
-  T only, so the jet-level wind rows have k = 0 (∇⁸ aside).
-
-Corrected bound, ω_l = U√(l(l+1))/a + 2Ω, k = 0, ∇⁸ per degree (`jet_wind_bound`;
-`test_raw_limits_explicit_oscillations_and_the_selected_dt_covers_the_jet`,
-`test_centred_raw_explicit_oscillation_bound`), retained T42 (cut 42), lagged / centred, m/s:
-
-| Δt | non-amplifying (was) | first degree to amplify | fast growth, > 1.01/step |
-|---|---|---|---|
-| 600 s | 198.8 / 198.7 (157.5 / 146.9) | 23 | — |
-| 720 s | 162.5 / 162.5 (131.8 / 121.1) | 22 | — |
-| 900 s | **125.1 / 125.0** (105.3 / 94.9) | 21 | **147.5 / 132.8** |
-| 1200 s | 85.5 / 85.5 (77.8 / 68.1) | 19 | 108.6 / 95.4 |
-
-The legacy layout (cut 28) gives the same non-amplifying bounds (125.1 / 85.5 m/s; was
-109.5 / 80.4). What changes: the 900 s margin over the reference's 94.5 m/s peak is ≈ 30 %, not
-≈ 11 % (lagged) or ≈ 0.4 % (centred); the non-amplification bound no longer depends on the damping
-placement, because the binding mode now sits at l ≈ 21 (Δt r∇⁸ < 1e−3), limited by RAW's α = 0.53
-growth above ωΔt = 0.437, not at the leapfrog limit at l ≈ 42. Unchanged: Δt = 900 s, every
-scheme, preset, config hash and the notebook pin (tests and documents only); the S4b (c) and T42
-one-day runs; the accuracy figures. The analysis is still the frozen-coefficient scalar
-recurrence; long-run T42 behaviour is measured by the S8 gate and run.
-
-## Decisions before launch (closed by the launch of run 001; kept as the record)
-
-Run 001 launched with item 1 as resolved, item 2's recommendation (lagged, RAW(0.1, 0.53)),
-item 3 (Δt 900 s), and item 4 done (the branch is pushed to 206ef25).
-
-1. **Effective truncation — RESOLVED by the opt-in patch (user decision 2026-09-27).** The
-   production preset now stores l_max = 43 and retains 42 (DEALIASING_AUDIT.md): evolved T42, ∇⁸ at
-   l = 42, `config_mismatches` = [] against REFERENCE_CONFIG.json; product grid 65×130 vs Dinosaur's
-   64×128 (a sampling difference, not a resolution one); +4.6 % tendency cost (per-level, MX110).
-   The legacy layout (T28) remains as preset `legacy-production` and as the core default.
-2. **First-order complete scheme — evidence complete (2026-09-28), decision open.** The
-   centred (Crank–Nicolson) damping is implemented as an **opt-in** (`damping_scheme="centred"`,
-   SEMI_IMPLICIT.md §9, `tests/test_centred_damping.py`, commit 6a447d8); the default, the
-   production preset, RAW α = 0.53 and the notebook pin are unchanged. Measured (DEVLOG
-   2026-09-28): reduced solve exact to 1e−15 vs the unreduced damped system; centred + RAW off is
-   second order on T21 L10 (ratios 3.77–4.13, equal to the damper-free campaign); RAW α = 0.53
-   leaves a first-order term ¼ the size of the lag term. At **Δt = 900 s** the lag term is
-   ≈ 1.5 % of the 2-day ζ change (δ 2.3 %, T 0.07 %, q 0.45 %), the steady forced–dissipative
-   balance is exact in both placements, and the centred option **does not lower the 900 s error
-   vs RK4** (the SI/explicit transient error dominates: ζ 2.4 %, δ/q ≈ 9 %). Stability
-   (*corrected 2026-09-28*, see "Stability-bound correction"): the RAW/advection
-   non-amplification bound at the retained T42 layout is **125.1 m/s lagged vs 125.0 m/s
-   centred** at 900 s (reference peak 94.5 m/s). The first degree to amplify is l ≈ 21, where
-   RAW's α = 0.53 growth beats a negligible ∇⁸ and the placement does not matter. Above the bound
-   growth is slow (e-folding ≈ 63 d at 130 m/s) until the leapfrog limit at l ≈ 42, where the
-   placement does matter (the lagged factor extends the explicit leapfrog limit to
-   √(1 + 2Δt r), the centred one shortens it to √(1 − (Δt r)²)): growth turns fast
-   (> 1.01/step, e-folding < 1 d) above **147.5 m/s lagged vs 132.8 m/s centred** at 900 s
-   (108.6 / 95.4 at 1200 s). The earlier 94.9 / 105.3 m/s at 900 s (146.9 / 157.5 at 600 s,
-   121.1 / 131.8 at 720 s) came from an overstated advective frequency and are withdrawn;
-   corrected 198.7 / 198.8 (600 s), 162.5 / 162.5 (720 s). Cost identical (11.7 ms/step
-   non-tendency part at T42 L20 on the MX110, < 0.3 % of a step). Contracts touched by the
-   option: `HeldSuarezConfig.damping_scheme` (production `config_sha256` dc5901db… →
-   4cd2eeae… with the default; 692fadd1… centred), stepper `state_dict["damping_scheme"]`
-   (checkpoints without the key load as lagged; mismatch refuses), notebook pin unchanged
-   (21203ff does not contain the option; a centred production run would need a re-pin).
-   **Recommendation:** keep the lagged scheme with RAW(0.1, 0.53) at Δt = 900 s for the
-   production run, accepting the documented first-order term (≈ 1 % transient-response bias of
-   the damped fields, exact steady balance, climate impact unmeasured), because the centred
-   option buys no accuracy at 900 s, needs a re-pin, and has the lower fast-growth threshold
-   (132.8 vs 147.5 m/s; both ≥ 40 % above the reference's peak, so a margin, not a blocker).
-   *Withdrawn 2026-09-28:* the earlier reason that the centred option "removes the 10 %
-   advective stability margin" — the non-amplification bounds are equal. Keep the centred option
-   as a verified sensitivity switch; at 900 s it is stability-safe. Not recommended: α = 0.5 (0.4 %
-   effect, slightly less damping of explicit oscillations). Short-run numerical evidence only.
-   **Update 2026-10-02 (run 001):** the lag term's climate-run consequence is now measured: it
-   leaks mass at −1.3e−6/day and fails B2; the centred placement removes it (−1e−9/day). The
-   900 s centred bound (94.9 m/s) is below run 001's peak (100.3 m/s), so the stability argument
-   above stands at 900 s and moves the centred option to Δt ≤ 720 s. See the run-002 decision.
-3. **Δt = 900 s** (proposed from S4b): corrected bound 125.1 m/s, ≈ 30 % above the reference's
-   94.5 m/s peak. 1200 s: bound 85.5 m/s, below that peak; a 94.5 m/s jet grows weakly there
-   (e-folding 34 d, RAW-limited, not a leapfrog blow-up), but the fast-growth threshold (108.6 m/s
-   lagged, 95.4 centred) sits close to the peak, so 900 s remains the proposal.
-4. Push `feat/semi-implicit-integration` so SOLVER_COMMIT is fetchable by Colab (A4).
-
-## Run 002 setup (2026-10-03; launched and completed, see §Production run 002)
-
-**Decided (user, 2026-10-03): option 1 below.** Set up on `feat/held-suarez`:
-
-- `--damping-scheme {lagged,centred}` on every config-taking CLI command (257f8f9; default = the
-  preset's, so run 001's configuration and hash are unchanged; test
-  `test_cli_damping_scheme_flag_selects_the_run_002_configuration`).
-- PROTOCOL.md §5 amendment 1 (a52ea20): centred damping, Δt 720 s, from prod-002; protocol
-  sha256 at the pin `26a8ac31…` (prod-001 ran under `bdc77bbe…`).
-- Notebook: `SOLVER_COMMIT = a52ea20…`, `PRESET = "production"`, `EXPERIMENT_ID =
-  "hs-T42L20-prod-002"`, `DT_SECONDS = 720.0`, `DAMPING_SCHEME = "centred"` (passed as
-  `--damping-scheme`), `DEADLINE = None`. Config `d1fa645d…`, 144 000 steps, retained T42,
-  `config_mismatches` = []. Projected ≈ 10.1 h on a T4 at run 001's 0.253 s/step; the S8
-  benchmark gate re-measures it (MAX_RUN_HOURS 24, SESSION_HOURS 23.5, resume across sessions).
-  The local smoke path now runs centred too (T21 L10, 1200 s).
-- **Before Run all:** push `feat/held-suarez` (the pin must be fetchable); the Drive folder
-  `Palintropos-HS/hs-T42L20-prod-002/` is new, so run 001's backups are untouched.
-
-Options considered for the B2 failure (cost from run 001's 0.253 s/step on a T4):
-
-1. **Centred damping at Δt = 720 s** (recommended): no new code (opt-in in 206ef25, tested;
-   SEMI_IMPLICIT.md §9), leak measured −1e−9/day (B2 margin ≈ 400×), second order without RAW,
-   stability bound 121.1 m/s vs run 001's 100.3 m/s peak; ≈ 10.1 h on a T4. Needs: a production
-   preset or `--config` with `damping_scheme="centred"`, `dt=720` (a new `config_sha256`), the
-   notebook re-pinned to the solver commit that carries it, and `EXPERIMENT_ID = hs-T42L20-prod-002`.
-2. Backward-Euler damping *inside* the SI solve ("consistent lagged"): keeps 900 s and the lagged
-   stability extension, removes the leak by construction; new code, tests and a stability
-   analysis; saves ≈ 2 T4-hours per run.
-3. Global mass fixer: hides a measured cause; not recommended.
-4. Stop at run 001 (C PASS, B FAIL documented).
+The correction changes no run, timestep, configuration, protocol hash or
+acceptance verdict. In particular, the archived protocol's amendment
+retains the historical rationale for 720 s. Tests
+`test_advective_frequency_bound_holds_on_the_truncation`,
+`test_raw_limits_explicit_oscillations_and_the_selected_dt_covers_the_jet`
+and `test_centred_raw_explicit_oscillation_bound` check the corrected bounds;
+the [development evidence](DEVLOG.md) records their derivation and the
+measured damping/time-order campaign.

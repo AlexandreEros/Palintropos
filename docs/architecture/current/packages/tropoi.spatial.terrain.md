@@ -17,6 +17,8 @@ Index: [all packages](../index.md) · parent [`tropoi.spatial`](tropoi.spatial.m
 | `tropoi.spatial.terrain.terrain_spectral` | code | `SpectralTerrainParams` | `generate_spectral_terrain_gpu` |
 | `tropoi.spatial.terrain.topography` | code | `Topography`, `TopographyError` | `smoothing_record`, `spectral_smoothing_factors`, `williamson5_cone_elevation` |
 
+Files shipped in this directory that are **not Python and not analysed** (templates, data): `IMPORT.md`, `README.md`. Their contents (for example JavaScript in an HTML template) are invisible to every graph here.
+
 ## Imports
 
 This package's modules and the import edges between them; every other package is collapsed to one dashed node (edge label: module edges merged). A dashed arrow is made only of function-scope or `TYPE_CHECKING` imports.

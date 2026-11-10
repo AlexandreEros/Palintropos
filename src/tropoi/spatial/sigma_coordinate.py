@@ -1,7 +1,7 @@
 """Sigma-coordinate vertical grid and column operators (backend-agnostic).
 
 This module owns the *vertical* half of the dry primitive-equation
-foundation (docs/PRIMITIVE_EQUATIONS_DESIGN.md):
+foundation (src/tropoi/temporal/tendencies/PRIMITIVE_EQUATIONS.md):
 
 * :class:`SigmaGrid` — immutable, validated Lorenz-staggered vertical-grid
   metadata (interfaces, full levels, thicknesses, Simmons–Burridge
@@ -137,6 +137,22 @@ class SigmaGrid:
             dsig = self.thickness[k]
             out.append(1.0 - (s[k] / dsig) * self.interface_log_ratios[k])
         return tuple(out)
+
+    @cached_property
+    def hydrostatic_full_levels(self) -> tuple[float, ...]:
+        """The full-level sigma the Simmons–Burridge coefficients imply.
+
+        ``Phi_k - Phi_{k+1/2} = R_d T_k alpha_k`` is the hydrostatic step of
+        an isothermal layer from ``ln p_{k+1/2}`` to ``ln p_k = ln p_{k+1/2}
+        - alpha_k``, so the discrete scheme places level k at
+        ``sigma^h_k = sigma_{k+1/2} exp(-alpha_k)``. It equals
+        :attr:`full_levels` for the top layer exactly (``alpha_1 = ln 2``)
+        and differs slightly below it. Used when a saved state is
+        interpolated to a pressure surface; the dynamics never use it.
+        """
+        s = self.interfaces
+        return tuple(s[k + 1] * math.exp(-self.alpha[k])
+                     for k in range(self.nlev))
 
     def interfaces_array(self) -> np.ndarray:
         return np.asarray(self.interfaces, dtype=np.float64)
