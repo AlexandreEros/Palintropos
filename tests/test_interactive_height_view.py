@@ -22,7 +22,6 @@ import json
 import math
 import pathlib
 import sys
-import time
 
 import numpy as np
 import pytest
@@ -36,7 +35,7 @@ from tropoi.representation.diagnostics.pe_surfaces import (  # noqa: E402
     MASK_BELOW_SURFACE, MASK_LABELS, MASK_VALID, SurfaceUnavailableError,
     interpolate_columns, pressure_columns, pressure_surface)
 from tropoi.representation.visual.atmosphere import (  # noqa: E402
-    HEIGHT_SURFACE_FIELDS, STREAMLINE_SETTLE_MS, SURFACE_FIELDS, _mesh,
+    HEIGHT_SURFACE_FIELDS, SURFACE_FIELDS, _mesh,
     atmosphere_payload, decoded_column_bytes, dequantize_columns,
     quantize_columns)
 from test_interactive_streamlines import (RES,  # noqa: E402
@@ -475,7 +474,9 @@ def test_streamlines_on_height_surfaces_and_deferred_height_drag(
         })()""")
         assert state["pending"] and not state["current"]
         assert state["drawnVerts"] == 0
-        time.sleep(3 * STREAMLINE_SETTLE_MS / 1000)
+        # wait for the deferred trace, not a fixed time (see
+        # test_interactive_streamlines: headless frames can stall for ~1 s)
+        page.wait_for(f"!{API}.streamlines().pending")
         sl = page.eval(f"{API}.streamlines()")
         assert sl["current"] and sl["key"] == state["surfaceKey"]
         assert page.console_errors == [] and page.exceptions == []

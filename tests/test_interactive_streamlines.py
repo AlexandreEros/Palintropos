@@ -400,7 +400,10 @@ def test_dragging_defers_tracing_and_only_the_newest_publishes(windy_page):
         assert state["published"] == published
         surface_key = state["surfaceKey"]
         assert surface_key.startswith("pressure:")
-        time.sleep(3 * STREAMLINE_SETTLE_MS / 1000)
+        # wait for the deferred trace rather than a fixed time: headless
+        # Chrome with software WebGL can go over a second without a frame,
+        # which delays the settle timer and the trace well past the delay
+        page.wait_for(f"!{API}.streamlines().pending")
         after = page.eval(f"{API}.streamlines()")
         assert after["current"] and not after["pending"]
         assert after["key"] == surface_key
