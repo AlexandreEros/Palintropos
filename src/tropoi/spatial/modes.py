@@ -20,7 +20,7 @@ is exposed read-only so a view can never mutate an archive through this
 interface. Nothing here performs solver arithmetic; state and rate semantics
 are the solver's, and these views only describe the stored prognostic state.
 
-Coefficient conventions (docs/MATHEMATICAL_MODEL.md): complex orthonormal
+Coefficient conventions (src/tropoi/spatial/CONVENTIONS.md): complex orthonormal
 spherical harmonics stored for ``m >= 0`` in a dense ``(l_max+1, l_max+1)``
 array with axis 0 = degree ``l`` and axis 1 = order ``m``; entries with
 ``m > l`` are storage padding and must be exactly zero; real fields are

@@ -12,7 +12,7 @@ below measure evolution, timestep sensitivity and mass drift for this run;
 they do not establish accuracy for arbitrary topographies or Mars weather.
 
 The published run is
-[`docs/runs/20261027T175327Z_orographic-thermal-wave_rot24p62h_r3_l21_dt11080p3s_3a46f966_71c5441a`](../../runs/20261027T175327Z_orographic-thermal-wave_rot24p62h_r3_l21_dt11080p3s_3a46f966_71c5441a/).
+[`docs/runs/20261027T175327Z_orographic-thermal-wave_rot24p62h_r3_l21_dt11080p3s_3a46f966_71c5441a`](../../runs/20261027T175327Z_orographic-thermal-wave_rot24p62h_r3_l21_dt11080p3s_3a46f966_71c5441a).
 The experiment script is
 [examples/mola_mars_evolving.py](../../../examples/mola_mars_evolving.py). Its
 `PROTOCOL` (version 1) defines every quantity below. The numbers themselves are
@@ -30,7 +30,7 @@ stored separately in this folder.
 | | |
 | --- | --- |
 | initial state | `orographic_thermal_wave`: `orographic_isothermal_rest` (T = 210 K, ln p_s = ln 610 Pa − Φ_s/(R_d T)) plus a real coefficient of 1 K on the (2, 2) temperature mode at every level (pointwise peak 0.7725 K); zero vorticity and divergence |
-| terrain | MOLA MEGDR 4 px/deg ([TERRAIN_IMPORT.md](../../TERRAIN_IMPORT.md#real-data-mars-from-mola)), prepared for PE at `l_max` 21 and band-limited at degree 14 (the dealiased product cut), digest `sha256:afb016d8…c35c31b8`; model range −7.6 to 8.4 km |
+| terrain | MOLA MEGDR 4 px/deg ([terrain/IMPORT.md](../../../src/tropoi/spatial/terrain/IMPORT.md#real-data-mars-from-mola)), prepared for PE at `l_max` 21 and band-limited at degree 14 (the dealiased product cut), digest `sha256:afb016d8…c35c31b8`; model range −7.6 to 8.4 km |
 | planet | radius 0.53307 Earth radii (3,395,909 m), rotation period 24.6229 h, g = 3.71 m/s² |
 | gas | R_d = 191.8 J/(kg K), c_p = 735 J/(kg K) |
 | resolution | `l_max` 21, Gauss–Legendre grid 34 × 68, 4 uniform σ layers (full levels σ = 0.125, 0.375, 0.625, 0.875) |
@@ -45,7 +45,7 @@ is `dt_seconds` in `config.json`.
 ## Commands
 
 The terrain comes first; the conversion of the PDS3 grid is described in
-TERRAIN_IMPORT.md:
+[`src/tropoi/spatial/terrain/IMPORT.md`](../../../src/tropoi/spatial/terrain/IMPORT.md):
 
 ```bash
 python examples/mola_mars.py prepare-pe mola/megt_4ppd.nc out/mola/mola_pe_l21 --lmax 21
@@ -227,4 +227,4 @@ divergence and no streamlines.*
   rounding), insensitive to the tested timestep change and within the
   stated mass-drift screen. They do not establish physical accuracy.
 - **One machine.** One GPU, one browser build with software WebGL. The
-  checks are in [ATMOSPHERE_VIEW.md](../../ATMOSPHERE_VIEW.md#limits).
+  checks are in [ATMOSPHERE_VIEW.md](../../../src/tropoi/representation/visual/ATMOSPHERE_VIEW.md#limits).

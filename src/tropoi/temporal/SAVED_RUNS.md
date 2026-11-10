@@ -1,7 +1,7 @@
 # Saved runs: the read-only simulation interface
 
 A finished BVE, shallow-water, or primitive-equation run capsule (see
-[ARCHITECTURE.md](ARCHITECTURE.md), "Output capsules and provenance") can be
+[ARCHITECTURE.md](../../../docs/ARCHITECTURE.md), "Output capsules and provenance") can be
 opened on any host, inspected without a GPU, read through named coefficient
 views, and rendered on explicit request with the same scientific
 compositions the run itself produced.
@@ -334,12 +334,12 @@ sim.view("isobars.html", surface=("pressure", 50_000.0), interactive_pressure=Tr
 (`config.json` + `states/state-d*.npy`, `t = day × 86400 s`) as a PE
 simulation for this purpose. Such experiments have no snapshot figure
 product, so `plot` refuses them. The geometry, the snapshot requirements and
-the size bounds are in [ATMOSPHERE_VIEW.md](ATMOSPHERE_VIEW.md).
+the size bounds are in [ATMOSPHERE_VIEW.md](../representation/visual/ATMOSPHERE_VIEW.md).
 
 ## Runs started from a saved initial state
 
 Runs made with `tropoi.run.custom.run_initial_state`
-([CUSTOM_INITIAL_STATES.md](CUSTOM_INITIAL_STATES.md)) are ordinary BVE or
+([INITIAL_STATES.md](../run/custom/INITIAL_STATES.md)) are ordinary BVE or
 SWE capsules with `scenario: "custom"`. Their `run_config` carries an
 explicit `planet` block and the state's `initial_state_digest`. The
 capsule's `initial_state/` directory holds a byte-exact copy of the state,
@@ -351,7 +351,7 @@ the `planet` block, and its terrain from the copied resolved coefficients.
 ## Where the implementation lives
 
 The interface follows the package's spatial / temporal / representation
-layout ([ARCHITECTURE.md](ARCHITECTURE.md), "Package layout"):
+layout ([ARCHITECTURE.md](../../../docs/ARCHITECTURE.md), "Package layout"):
 
 | Piece | Module | Needs |
 | --- | --- | --- |

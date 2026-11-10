@@ -16,7 +16,7 @@ know nothing about any particular experiment:
   (:func:`complete_tendency`). The backward-Euler factor is not the
   exponential ``exp(-h r)``: the two differ by ``O((h r)^2)`` per step,
   i.e. the damping is first-order accurate in time and unconditionally
-  stable (docs/held_suarez/SEMI_IMPLICIT.md §8). The semi-implicit stepper
+  stable (src/tropoi/temporal/SEMI_IMPLICIT.md §8). The semi-implicit stepper
   can instead take the same rates centred inside its solve
   (``damping_scheme="centred"``, opt-in; SEMI_IMPLICIT.md §9), in which
   case ``apply_implicit`` is not called and only ``rates`` is read.

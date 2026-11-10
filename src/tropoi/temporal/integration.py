@@ -106,7 +106,7 @@ def advective_cfl_timestep(length_scale: Optional[float], max_speed: float, *,
     This is the *only* place the advective ceiling is computed. The runner
     feeds it a fresh ``max_speed`` after every accepted step, so the ceiling
     tracks the evolving flow — genuine state-adaptive advective CFL stepping
-    (see docs/KNOWN_RISKS.md R-4). It controls *only* the advective condition:
+    (see src/tropoi/temporal/integration.py (state-adaptive ceiling)). It controls *only* the advective condition:
     RK4 stability for an explicit ``ν∇²`` (diffusion) term is deliberately not
     governed here. The controller is model-independent: the physics model
     supplies its own characteristic-speed estimate (max |u| for the BVE,

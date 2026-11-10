@@ -1,24 +1,21 @@
-# The first runnable dry primitive-equation experiment
+# Fixed-step dry primitive-equation runner
 
-This documents the *runner* milestone: the smallest scientifically honest
-end-to-end path that constructs a valid dry hydrostatic primitive-equation
-initial state, evolves it with fixed-step RK4, validates every intermediate
-stage and every accepted state, persists coefficient snapshots with full
-provenance, exposes the run through the CLI, and renders a basic summary.
+`tropoi run pe` constructs a dry hydrostatic PE initial state, advances it
+with fixed-step RK4, validates every stage/accepted state, saves coefficient
+snapshots with provenance, and renders selected products. This guide covers
+that runner. The [nonlinear formulation](../../temporal/tendencies/PRIMITIVE_EQUATIONS.md)
+and the [Held–Suarez experiment driver](../held_suarez/README.md) share the
+dry model; the latter adds semi-implicit integration, Newtonian relaxation,
+Rayleigh drag, hyperdiffusion, checkpoint/resume and long-run statistics.
 
-It is an **ignition path for the primitive-equation dynamical core**, not a
-climate model. The nonlinear tendency core it drives is documented in
-[PRIMITIVE_EQUATIONS_DESIGN.md](PRIMITIVE_EQUATIONS_DESIGN.md) and
-[PRIMITIVE_EQUATIONS_TENDENCY_HANDOFF.md](PRIMITIVE_EQUATIONS_TENDENCY_HANDOFF.md).
+## Scope and failure behavior
 
-## What this runner deliberately excludes
-
-No forcing (Held–Suarez, radiative), no moist physics, no hyperdiffusion or
-filters, no semi-implicit stepping, no adaptive timestepping, no
-arbitrary-expression initial conditions, and no long climate integrations. There is **no CFL controller** and **no total-energy
-conservation claim**. The runner never adds damping, clips values, replaces
-NaNs, or forces positivity to make an unstable run appear to survive — an
-invalid state aborts the run loudly.
+This fixed-step command has no forcing, damping, semi-implicit option or CFL
+controller. Those capabilities in the separate Held–Suarez driver do not
+silently apply here. Moist physics and radiative heating are absent across
+both paths. No whole-model total-energy conservation or general planetary
+climate claim is made. Invalid stages abort; the runner does not clip values
+or replace NaNs to continue.
 
 ## Initial-condition presets
 
@@ -59,7 +56,7 @@ exact hydrostatic forcing, which is not the advertised smooth response
 the `lmax >= 2` storage boundary. The CPU config layer and the initial-
 condition factory enforce the same rule
 (`run/pe/config.require_thermal_wave_support`); measurements in
-[validation/preset_support_characterization.md](validation/preset_support_characterization.md).
+[validation/preset_support_characterization.md](../../../../docs/validation/preset_support_characterization.md).
 
 ### `orographic_isothermal_rest`
 
@@ -98,7 +95,7 @@ scenario runs over it (`orographic_isothermal_rest` is merely the first
 analytically exact one). How it enters the dynamics:
 
 * the stored terrain is the surface **elevation** `h_s` (m), band-limited
-  spectral coefficients (`physics/topography.py`, shared with the SWE);
+  spectral coefficients (`spatial/terrain/topography.py`, shared with the SWE);
 * the PE core consumes the surface **geopotential**
   `Phi_s = g h_s` (m²/s²), with `g` set by `--gravity` (default 9.80616;
   a *terrain* parameter here — nothing else in the dry sigma core uses g);
@@ -126,7 +123,7 @@ path is not. The capsule keeps a verified copy under `terrain/`, which
 `tropoi inspect` names and `tropoi plot` rebuilds the model from. A
 prepared Gaussian mountain gives a bit-identical run to `--topography
 mountain` with the same parameters (`tests/test_pe_prepared_terrain.py`).
-See [TERRAIN_IMPORT.md](TERRAIN_IMPORT.md).
+See [terrain/IMPORT.md](../../spatial/terrain/IMPORT.md).
 
 **Dealiased terrain truncation.** PE terrain is band-limited at the
 model's product-truncation cut `l = floor(2 l_max / 3)`, not at `l_max`.
@@ -271,6 +268,6 @@ equilibrated climate.
 
 The fixed timestep is the user's responsibility: the runner reports a
 diagnostic Courant number but never adapts the step. The default demonstration
-is deliberately tiny and short — it is an ignition/smoke path, not a validated
-long integration. Total-energy conservation is not diagnosed, because the PE
+is deliberately tiny and short. Long forced validation uses the separate
+[Held–Suarez driver](../held_suarez/README.md), not this demonstration. Total-energy conservation is not diagnosed, because the PE
 core has no independently tested global discrete energy diagnostic yet.

@@ -1,11 +1,15 @@
-# Semi-implicit leapfrog for the dry primitive equations (stage S3)
+# Semi-implicit leapfrog for the dry primitive equations
 
-Status: implemented on `feat/held-suarez` (module `tropoi.temporal.semi_implicit`, tests
-`tests/test_semi_implicit.py`). This document expands plan §3
-(`docs/superpowers/plans/2026-09-27-held-suarez-24h-plan.md`) into the discrete algebra the code
-actually executes, and records the S3 verification numbers. Hyperdiffusion, Rayleigh drag and
-Newtonian relaxation (stage S4) enter through generic stepper hooks described in §8; with no
-hooks the step is exactly the S3 step described in §§1–7.
+Implemented in [`semi_implicit.py`](semi_implicit.py), with the
+[`steppers.py`](steppers.py) interface and [`hooks.py`](hooks.py) for explicit
+terms and diagonal damping. This reference derives the discrete algebra
+and preserves its verification measurements. Sections 1–7 describe the
+undamped scheme, section 8 the lagged placement, and section 9 the centred
+option used by production run 002. Both placements remain implemented;
+the full scheme with RAW alpha=0.53 is not generally second order.
+
+The [Held–Suarez experiment record](../../../docs/held_suarez/README.md)
+gives the frozen criteria, actual configurations and completed verdicts.
 
 ## 1. State, operators, notation
 
@@ -26,7 +30,7 @@ Discrete column operators reused verbatim from `tropoi.spatial.sigma_coordinate`
 
 No matrix entry is hand-derived: each operator is applied to the K unit vectors and the responses
 form the columns. The reference atmosphere is isothermal (T_ref = 300 K, the initial state and
-Dinosaur's choice, DEVLOG), resting, with a flat reference surface pressure; with T_ref constant the
+Dinosaur's choice, [development evidence](../../../docs/held_suarez/DEVLOG.md)), resting, with a flat reference surface pressure; with T_ref constant the
 vertical advection of the reference vanishes and the linear thermodynamic term is purely the
 adiabatic conversion κ T_ref (ω/p).
 
@@ -42,7 +46,7 @@ For each (l, m):
 **Dealiasing mask.** The nonlinear tendency analyzes every product on the dealiasing grid and zeroes
 the result above the product cut `c = product_truncation_cut(l_max)` (2/3 rule; c = 14 at T21,
 28 at T42) — or above the model's opt-in `retained_truncation` (production: 42 with l_max 43;
-`SemiImplicitOperator.from_model` then uses it as `fast_cut`, DEALIASING_AUDIT.md). Three of the four fast terms reach the tendency through that pathway — R T_ref ∇q
+`SemiImplicitOperator.from_model` then uses it as `fast_cut`, [retained truncation](tendencies/RETAINED_TRUNCATION.md)). Three of the four fast terms reach the tendency through that pathway — R T_ref ∇q
 through the weak-form pressure-gradient analysis, κ T_ref (ω/p) and −Σ Δσ_k G_k through the
 thermodynamic and mass analyses — while −∇²(G T) is an exact diagonal spectral term. L reproduces
 this: for l > c only the −∇²(G T) coupling is kept (`mask_l = 0` multiplies τ, ν and the R T_ref q
@@ -80,8 +84,8 @@ then
     q^{n+1} = q^{n−1} + 2Δt ( N_q − mask_l νᵀ δ̄ )
     ζ^{n+1} = ζ^{n−1} + 2Δt N_ζ
 
-(the earlier "ν νᵀ" of plan r2 was wrong: q is one scalar per mode entering every level's pressure
-gradient identically, hence **1** νᵀ). `SemiImplicitSolver` assembles M_l for all l once per Δt,
+(q is one scalar per mode entering every level's pressure gradient identically,
+hence **1** νᵀ). `SemiImplicitSolver` assembles M_l for all l once per Δt,
 inverts each K×K block with LAPACK LU (`numpy.linalg.inv`, K ≤ 20), and applies the inverse as one
 batched product over (l, m) on the device that holds the state (no host round trip per step). "Exact
 per degree" is verified in two ways: the reduced solution inserted into the unreduced
@@ -110,7 +114,7 @@ startup, the SI steps and the RAW filter (tested, also with T_ref ≠ T).
 ## 4. RAW filter
 
 After X^{n+1} is formed (and, since S4, multiplied by the implicit Rayleigh and ∇⁸ factors,
-§8), Williams (2009) in the plan's normalisation:
+§8), Williams (2009) with the following normalization:
 
     d = ν_raw ( X^{n−1}_f − 2 X^n + X^{n+1} )
     X^n_f   = X^n + α d
@@ -154,7 +158,7 @@ independent read-only review (Sonnet subagent, 2026-09-27) re-derived the reduce
 Cayley spectrum, the RAW recurrence and the startup rule from the code and confirmed each; its one
 code finding (the resume check above) is fixed and tested.
 
-| plan §3 item | test | result |
+| Scheme property | test | result |
 |---|---|---|
 | (i) L equals the fast-term function from the column operators | `test_operator_matches_fast_terms_from_column_operators`, `..._on_device_...` | rel. diff < 1e−13 (CPU and CuPy) |
 | dense L_l equals `apply` on unit vectors; l = 0 has no pressure term | `test_operator_dense_matrix_reproduces_apply_on_unit_vectors` | PASS |
@@ -172,19 +176,23 @@ code finding (the resume check above) is fixed and tested.
 | both time levels serialized | `test_state_dict_serializes_both_time_levels_and_resumes_bit_identically`, `test_state_dict_before_first_step_holds_only_x0` | PASS (bit-identical resume) |
 | protocol + startup substeps | `test_stepper_satisfies_timestepper_protocol_and_startup_substeps` | PASS |
 
-## 7. Known limits and risks carried into S4
+## 7. Assumptions and stability limits
 
-- The damping factors S4 will add are backward-Euler (1/(1+2Δt k)), not exponential; documented in
-  the plan, not claimed exact in time.
-- The SI treatment assumes T_ref ≥ the actual temperature in the sense of Simmons–Hoskins–Burridge;
-  with T_ref = 300 K and the HS T_eq ≤ 315 K the tropical lower troposphere may exceed T_ref by
-  ≤ 15 K. The classical result is that the scheme stays stable for modest excess; S4b's 5-day
-  stability run at Δt ≥ 900 s is the measurement.
-- The explicit part (Coriolis, advection, and in S4 the Newtonian relaxation) is leapfrog-stable
-  for f Δt < 1 and U Δt (l_max/a) < 1; at Δt = 1200 s these are 0.17 and ≈ 0.25 for U = 30 m/s at
-  T42, so advection, not gravity waves, will set the production Δt.
-- Perturbations above the dealiasing cut are outside the verified linearization (see §2); the S5
-  experiment must seed its perturbation inside the cut (PROTOCOL: degrees 1–8).
+- The fast operator is linearized about a prescribed reference temperature,
+  normally 300 K. Nonlinear explicit terms, forcing, RAW and damping still
+  constrain timestep/stability; the implicit gravity-wave solve alone is
+  not a stability guarantee.
+- The complete lagged scheme has a measured first-order damping term.
+  Centred damping removes that term, but RAW alpha=0.53 leaves a smaller
+  first-order contribution (sections 8–9 and the measured development log).
+- The corrected frozen-coefficient RAW/advection bounds and the observed
+  long-run peaks are recorded together in
+  [production status](../../../docs/held_suarez/STATUS.md#stability-interpretation).
+  The completed nonlinear experiment supplies evidence beyond that scalar
+  analysis; neither constitutes a general parameter-space stability proof.
+- Perturbations must lie inside the model's retained band for the verified
+  linearization; storage-only derivative rows are not additional evolved
+  modes. The HS initial perturbation uses degrees 1–8.
 
 ## 8. Held–Suarez forcing and dissipation in the step (stage S4)
 
@@ -216,8 +224,9 @@ placement: multiplying X^{n+1} evaluates the damping at n+1 instead of centred a
 −rΔt Ẋ, so the damped part of the scheme is **first order** in time (an exponential factor has
 the same leading term: S4b measured identical 2-day errors to 3 digits). Together with RAW at
 α = 0.53 (a small first-order term of its own), the complete scheme converges at first order
-asymptotically; without the dampers and RAW it is second order (S4b (b), DEVLOG). A centred
-treatment would have to enter the reduced SI system; this is a pre-launch decision (STATUS.md).
+asymptotically; without the dampers and RAW it is second order (S4b (b), DEVLOG). The implemented centred
+option enters the reduced SI system (section 9) and was used by production
+run 002; see [completed results](../../../docs/held_suarez/STATUS.md).
 
 S4 evidence (`tests/test_held_suarez_forcing.py`): T_eq, k_T, k_v against Wolfram-computed hand
 values at 11 points including σ = σ_b, σ = 1, both poles and both sides of the 200 K floor (worst
@@ -272,4 +281,4 @@ Isothermal rest is preserved bitwise (every factor is exactly 1.0 and every subt
 exactly 0.0 on the rest rows). Config: `HeldSuarezConfig.damping_scheme` (default `"lagged"`; the
 canonical JSON, hence `config_sha256`, changes for every preset by the added field).
 
-The measured stability bound and the T21 L10 convergence of the option are in DEVLOG (2026-09-28).
+The measured stability bound and the T21 L10 convergence of the option are in [DEVLOG](../../../docs/held_suarez/DEVLOG.md) (2026-09-28).

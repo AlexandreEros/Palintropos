@@ -1,4 +1,4 @@
-"""Opt-in retained truncation of the PE core (docs/held_suarez/DEALIASING_AUDIT.md).
+"""Opt-in retained truncation of the PE core (src/tropoi/temporal/tendencies/RETAINED_TRUNCATION.md).
 
 ``PrimitiveEquationsModel(retained_truncation=L)`` with stored ``l_max = L + 1``
 evolves every degree <= L (Dinosaur's spectral layout) instead of the 2/3

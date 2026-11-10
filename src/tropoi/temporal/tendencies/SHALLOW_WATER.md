@@ -1,11 +1,11 @@
 # The Rotating Shallow-Water Core
 
 This document describes the inviscid rotating shallow-water dynamical core
-added in `physics/shallow_water.py` + `run/swe/`, including its optional
-fixed bottom topography (`physics/topography.py`). It coexists with the
+implemented in `temporal/tendencies/shallow_water.py` + `run/swe/`, including its optional
+fixed bottom topography (`spatial/terrain/topography.py`). It coexists with the
 barotropic-vorticity (BVE) core: both share the spherical-harmonic
 transforms, the pseudo-spectral product machinery, the model-independent
-integration engine (`run/engine.py`), and the run/provenance system.
+integration engine (`temporal/integration.py`), and the run/provenance system.
 
 ## Prognostic variables and vertical geometry
 
@@ -84,14 +84,14 @@ definitions coincide exactly.
 
 ## Bottom topography representation
 
-`physics/topography.py` provides an immutable `Topography` holding the
+`spatial/terrain/topography.py` provides an immutable `Topography` holding the
 spectral coefficients of the surface **elevation** `h_s` (metres) at
 exactly the model truncation, resident on the GPU for the model's
 lifetime. The model derives `φ_s = g·h_s` and everything the per-step
 tendency needs once at construction; integration performs **no
 host-device topography transfers** and no per-step synthesis.
 
-Two deterministic analytic presets exist:
+The flat and Gaussian-mountain presets are:
 
 - `flat` — all coefficients exactly zero (canonical default). A model
   given a flat topography is bit-for-bit identical to one given none.
@@ -111,11 +111,12 @@ Two deterministic analytic presets exist:
   evaluation. Nothing about the terrain bypasses the model's dealiasing:
   φ_s enters only linearly, where no truncation is needed.
 
-Because the terrain is deterministic given the resolved configuration and
-backend, runs persist **no terrain arrays**: the topography is
-reconstructed from `config.json`/`manifest.json` (whose topography keys
-participate in the scientific hash). This keeps snapshots small and makes
-the configuration the single source of truth.
+Analytic preset terrain is reconstructed from the resolved configuration.
+Imported terrain is resolved before integration and its coefficients and
+provenance are saved with the custom initial state/run. The canonical
+Williamson-5 cone is described below. See
+[terrain import](../../spatial/terrain/IMPORT.md) and
+[custom initial states](../../run/custom/INITIAL_STATES.md).
 
 ### Resting balance (lake at rest)
 
@@ -218,7 +219,7 @@ scheduler.
 ## Adaptive timestep (CFL)
 
 The timestep controller is unchanged and model-independent
-(`run/engine.py::advective_cfl_timestep`, ceiling `0.5·L/s_max` with the
+(`temporal/integration.py::advective_cfl_timestep`, ceiling `0.5·L/s_max` with the
 geometry-owned length scale `L`); only the characteristic-speed estimate is
 model-specific. The shallow-water model supplies
 
@@ -255,7 +256,7 @@ is well-defined relative to the lake-at-rest state.
 Each scenario has a **supported resolution boundary**, enforced identically by
 the CPU configuration layer (`SWE_SCENARIO_SUPPORT` in `run/swe/config.py`)
 and the CUDA factory; the measurements behind it are in
-[validation/preset_support_characterization.md](validation/preset_support_characterization.md).
+[validation/preset_support_characterization.md](../../../../docs/validation/preset_support_characterization.md).
 Coefficients are stored through `lmax`, but analyzed nonlinear products retain
 only degrees `<= product_truncation_cut(lmax) = 2*lmax//3`
 (`tropoi.spatial.truncation`); degrees above that cut receive no analyzed
@@ -361,7 +362,7 @@ the env-gated 15-day acceptance test in `tests/test_williamson5.py`
 (whose quoted envelope numbers and `runs/w5-acceptance` capsules predate
 the IC correction and await a fresh measurement pass). Potential enstrophy
 `Z = ∫ (zeta+f)^2/(2h) dA` is available as
-`run.swe.diagnostics.potential_enstrophy` (the correct variable-thickness
+`tropoi.representation.diagnostics.swe.potential_enstrophy` (the correct variable-thickness
 invariant; deliberately not a CSV column so historical CSVs stay
 byte-identical).
 
@@ -369,7 +370,7 @@ An **external** comparison now exists on top of those layers: 15-day T42 and
 T63 runs at commit `668e6c9a` were compared against the high-resolution
 MRI-JMA/Yoshimura reference solution after a pre-declared day-zero physical
 contract, which passed at both resolutions. See
-[docs/validation/williamson5_mri_2026-07-30.md](validation/williamson5_mri_2026-07-30.md).
+[docs/validation/williamson5_mri_2026-07-30.md](../../../../docs/validation/williamson5_mri_2026-07-30.md).
 The reference is another discrete model, not an analytic solution, so it bounds
 a model-to-model difference rather than an error against truth; no
 machine-readable reference field is bundled in the repository (checksums and an
@@ -468,24 +469,18 @@ historical invariant-drift, CFL, and norm figures.
 
 ## Current limitations
 
-- Topography is SWE-only: the primitive-equation core is untouched by this
-  feature. `Topography.surface_geopotential_lm(g)` deliberately matches
-  the `surface_geopotential_lm` input the PE constructor already reserves
-  (same dense spectral layout, m²/s²), so a later PE coupling is a data
-  handoff — but no such coupling exists or is claimed yet, and the PE
-  sigma-coordinate pressure-gradient error over terrain
-  (docs/PRIMITIVE_EQUATIONS_DESIGN.md §8) must be re-examined first.
-- Terrain is limited to the two analytic presets (flat, one Gaussian
-  mountain); no raster/NetCDF/real-Earth data, no interpolation, no
-  time-dependent terrain.
-- The projected mountain carries Gibbs-type ripples (bounded by the 0.2
-  projection-residual gate); narrow mountains at low `l_max` are rejected
-  rather than smoothed.
-- No semi-implicit gravity-wave treatment: explicit RK4 with the gravity-wave
-  CFL, so deep layers cost proportionally smaller timesteps.
-- Williamson cases 1 and 3–7 are not implemented; in particular the
-  mountain-flow demonstration is NOT Williamson case 5 (different mountain
-  shape, different jet speed, different mean depth unless configured).
-- The geodesic backend's transform is inexact (see docs/MATHEMATICAL_MODEL.md
-  §4.1); steady-state residuals there are set by quadrature error, not by
-  the formulation.
+- The core is single-layer, inviscid and unforced; explicit RK4 includes a
+  gravity-wave CFL ceiling but has no semi-implicit gravity-wave treatment.
+- Terrain is fixed and band-limited. Flat, Gaussian, Williamson-5 conical,
+  imported raster and sampled/function terrain are supported. Narrow or
+  underresolved terrain may fail the projection gate; spectral ripples are
+  measured rather than hidden. PE also supports terrain, with a different
+  band-limit rule ([PE guide](../../run/pe/GUIDE.md#surface-topography)).
+- Williamson cases 2 and 5 are implemented. Cases 1, 3, 4, 6, 7 and the
+  Galewsky unstable-jet benchmark are not claimed as completed validation.
+- The Gauss backend is the quadrature reference; geodesic residuals are set
+  by approximate quadrature. Stored-state/nonlinear-cut mismatch prevents a
+  general invariant-conservation guarantee.
+- The [Williamson-5 comparison](../../../../docs/validation/williamson5_mri_2026-07-30.md)
+  is against another numerical model. Two resolutions do not establish a
+  spatial convergence order or arbitrary-terrain accuracy.

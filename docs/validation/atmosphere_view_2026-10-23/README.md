@@ -1,7 +1,7 @@
 # Atmosphere view: browser captures and offline checks (2026-10-23)
 
 These are browser captures of pages written by `Simulation.view()`
-([docs/ATMOSPHERE_VIEW.md](../../ATMOSPHERE_VIEW.md)) from two saved runs on this
+([src/tropoi/representation/visual/ATMOSPHERE_VIEW.md](../../../src/tropoi/representation/visual/ATMOSPHERE_VIEW.md)) from two saved runs on this
 machine. Neither run is published here: both live in git-ignored directories.
 The Mars capture shows the saved orographic-rest state as a visualization only.
 These checks concern the page (geometry, controls, offline packaging), not the

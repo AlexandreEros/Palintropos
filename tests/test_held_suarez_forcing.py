@@ -1,5 +1,5 @@
 """Held–Suarez forcing, Rayleigh drag, del^8 hyperdiffusion and the stepper
-hooks that carry them (plan S4; docs/held_suarez/SEMI_IMPLICIT.md §8).
+hooks that carry them (plan S4; src/tropoi/temporal/SEMI_IMPLICIT.md §8).
 
 CPU part (NumPy, runs in CI): T_eq, k_T, k_v against independently
 computed values (Wolfram Language, exact rational constants) at

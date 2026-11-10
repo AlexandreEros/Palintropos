@@ -5,7 +5,7 @@ Measurements for the first slice of
 isobaric surface of a saved primitive-equation run per saved time, in the
 offline atmosphere page (`Simulation.view(surface=("pressure", Pa))`). The
 method is described in
-[ATMOSPHERE_VIEW.md](../../ATMOSPHERE_VIEW.md#fixed-pressure-surfaces-across-saved-times);
+[ATMOSPHERE_VIEW.md](../../../src/tropoi/representation/visual/ATMOSPHERE_VIEW.md#fixed-pressure-surfaces-across-saved-times);
 the numbers below come from the committed script
 [examples/isobaric_view.py](../../../examples/isobaric_view.py) on the same
 laptop as the earlier atmosphere-view records (Intel Core i5-8250U class
@@ -36,7 +36,7 @@ python examples/isobaric_view.py capture out/hs_500hPa_all_2deg.html docs/valida
 ```
 
 The Held–Suarez run (`runs/hs-T42L20-prod-002`, 120 states every 10 days,
-[the run record](../../held_suarez/)) is local and not committed; the Mars run
+[the run record](../../held_suarez)) is local and not committed; the Mars run
 is published under `docs/runs/`.
 
 ## The example: the 3 hPa isobar of the Mars run

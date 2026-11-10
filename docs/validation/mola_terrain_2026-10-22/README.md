@@ -3,7 +3,7 @@
 `mola_globe_l42.png` is a browser capture of the actual terrain viewer
 (`PreparedPlanet.view()`), not an illustration. It shows real Mars topography
 resolved by the import path. The measured validation of that import is in
-[docs/TERRAIN_IMPORT.md](../../TERRAIN_IMPORT.md#real-data-mars-from-mola).
+[src/tropoi/spatial/terrain/IMPORT.md](../../../src/tropoi/spatial/terrain/IMPORT.md#real-data-mars-from-mola).
 
 | | |
 | --- | --- |

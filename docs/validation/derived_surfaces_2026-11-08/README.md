@@ -7,7 +7,7 @@ browser and offers three derived coordinates, switchable without
 regenerating the file: isobars, geopotential-height surfaces and
 constant-σ surfaces (the last with relative vorticity and divergence). The
 method is described in
-[ATMOSPHERE_VIEW.md](../../ATMOSPHERE_VIEW.md#geopotential-height-surfaces).
+[ATMOSPHERE_VIEW.md](../../../src/tropoi/representation/visual/ATMOSPHERE_VIEW.md#geopotential-height-surfaces).
 Same laptop as the earlier records (Intel Core i5-8250U class CPU, Windows
 11, Python 3.12, NumPy 2.2; headless Chrome with software WebGL through
 `tools/browser_cdp.py`, networking blocked; no GPU used). All numbers below

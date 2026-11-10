@@ -1,7 +1,7 @@
 """Deterministic Held–Suarez tier A/B/C report (CPU-only).
 
-Implements plan §1–§2 (docs/superpowers/plans/2026-09-27-held-suarez-24h-
-plan.md, revision 3) with the verdict vocabulary
+Implements the frozen criteria in docs/held_suarez/ACCEPTANCE.md with the
+verdict vocabulary
 
     PASS          every criterion holds on the frozen experiment
     FAIL          a criterion is violated beyond sampling uncertainty

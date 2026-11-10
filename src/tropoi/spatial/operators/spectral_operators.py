@@ -28,7 +28,7 @@ class SpectralOperators:
             supported by every backend): on the state sampling itself — the
             historical behavior; its quadrature cannot integrate the
             degree-~2·l_max product content, and the resulting aliasing lands
-            in the retained band (docs/KNOWN_RISKS.md R-3). "fine" (where
+            in the retained band (docs/validation/r3_characterization.md). "fine" (where
             supported): a backend-chosen overresolved product sampling —
             the geodesic backend uses a resolution-(r+1) co-grid built once
             at initialization ("overresolved product quadrature"). This is
@@ -285,7 +285,7 @@ class SpectralOperators:
         policy).
 
         Construction (Bourke-style weak form; derivation recorded in
-        docs/PRIMITIVE_EQUATIONS_DESIGN.md): integration by parts on the
+        src/tropoi/temporal/tendencies/PRIMITIVE_EQUATIONS.md): integration by parts on the
         closed sphere moves the horizontal derivatives onto the basis,
 
             (div F)_lm  = -Integral grad(Y*_lm) . F dOmega

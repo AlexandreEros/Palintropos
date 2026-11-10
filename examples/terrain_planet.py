@@ -18,7 +18,7 @@ in; ``preview`` draws a saved state's terrain on a machine without CUDA.
 
 Real Mars is a separate, real-data example: examples/mola_mars.py converts
 the MOLA MEGDR topography (NASA PDS) and validates the import; the measured
-results are in docs/TERRAIN_IMPORT.md ("Real data: Mars from MOLA").
+results are in src/tropoi/spatial/terrain/IMPORT.md ("Real data: Mars from MOLA").
 """
 from __future__ import annotations
 
