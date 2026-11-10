@@ -1,0 +1,236 @@
+# Radiative–dynamical foundation ("Doing RT", issue #26)
+
+Status on 2026-11-10, branch `feat/radiative-dynamical-foundation`. This page
+is the handoff: what exists, what was measured, what failed or was cut short,
+and what is not validated. Nothing here is a claim about a real planet.
+
+## 1. What exists
+
+| Piece | Where | State |
+| --- | --- | --- |
+| Gas thermodynamics (R, c_p(T) from molecular constants, H2 ortho/para) | `src/tropoi/physics/thermodynamics.py` | implemented, tested |
+| Planet presets with per-planet stretched sigma grids | `physics/planets.py`, `SigmaGrid.stretched` | implemented, grids measured (§5); presets are bulk parameters only |
+| Two-stream solver, absorbing + scattering, thermal + stellar, adding method | `physics/radiation/twostream.py` | implemented, tested against independent ODE solutions |
+| Column contract and spectral loop | `physics/radiation/scheme.py` | implemented, tested |
+| **Gray** optics (FHZ06, SL09, Isca Mars formulas) | `physics/radiation/gray.py` | implemented, tested against analytic solutions |
+| **Correlated-k** optics machinery (tables, builder, Planck band weights) | `physics/radiation/kdist.py` | implemented, tested against line-by-line on a **synthetic** spectrum only. **No real-gas opacity data exist in the repository.** |
+| Insolation (diurnal mean, diurnal cycle, tidally locked, prescribed) | `physics/insolation.py` | implemented, tested |
+| Dry convective adjustment (closed form, enthalpy conserving) | `physics/convection.py` | implemented, tested |
+| Slab surface, bulk sensible flux (FHZ06 eqs. 1, 10, 12–14) | `physics/surface.py` | implemented, tested |
+| Column physics + single-column radiative-convective model | `physics/column_model.py` | implemented, tested |
+| PE coupling as a lagged stepper term, energy accounting | `temporal/column_coupling.py`, `temporal/semi_implicit.py` (`lagged_terms`) | implemented, tested |
+| Latitude-dependent Rayleigh drag (SL09) | `temporal/tendencies/drag.py` | implemented; exercised by the coupled test, no dedicated test |
+| Experiment driver, checkpoints, resume, CLI | `src/tropoi/run/radiative/` | implemented, tested at T9 |
+
+`tropoi.physics` imports nothing else from `tropoi` (enforced by
+`tests/test_layout.py`), so the radiation serves any future dynamical core.
+With no `lagged_terms` the stepper is bit-for-bit what it was (tested), so the
+dry and Held–Suarez experiments are unchanged.
+
+### Gray versus real-gas: the line that must not blur
+
+- **Gray radiation is a working, tested, coupled capability.** Optical depth
+  is a prescribed function of pressure; there is no spectroscopy.
+- **Real-gas radiation is an untested-on-real-data code path.** The
+  correlated-k provider runs the same solver over (band × g) points and
+  reproduces a line-by-line calculation of random Lorentz lines (§4). It has
+  never been given a real k-table, has not been compared with any reference
+  model (RRTMGP, SOCRATES, petitRADTRANS, exo_k, HARP), has no Rayleigh
+  scattering, no continuum or collision-induced absorption, and combines
+  gases only by adding k at equal g. It has not been run on the GPU or
+  coupled to the dynamics. No planet's radiation is represented.
+
+## 2. Conventions (column contract)
+
+Index 0 is the top. `K` layers, `K + 1` interfaces; `p_{k+1/2} = sigma_{k+1/2}
+p_s`, top interface at zero pressure. Fluxes are W m^-2, positive in their own
+direction; `net = down − up`; a layer gains `net[k] − net[k+1]`; heating is
+`g (net[k] − net[k+1]) / (c_p Δp)`, so the column integral of heating equals
+`net_top − net_bottom` to round-off. Lower boundary: a surface (temperature,
+emissivity, albedo) or `closed` (no surface: every downwelling watt is
+returned upward; interior heat is deposited in the lowest layer, as in SL09).
+Optics outside a k-table's (p, T) range raise an error unless clamping is
+requested.
+
+## 3. Tests run on this branch (2026-11-10, Windows, MX110, Python 3.12.12, CuPy 13.4.0)
+
+Results are recorded in §9 after the final runs. New test files:
+
+- `tests/test_radiation_twostream.py` (CPU, 6 tests)
+- `tests/test_physics_columns.py` (CPU, 17 tests)
+- `tests/test_radiation_kdist.py` (CPU, 6 tests)
+- `tests/test_radiative_dynamical.py` (2 CPU, 10 GPU tests)
+
+## 4. Radiative-transfer accuracy: what was actually compared
+
+| Check | Reference | Measured |
+| --- | --- | --- |
+| Layer reflectance/transmittance, direct beam (3 closures) | SciPy collocation solution of the same two-stream ODEs | < 1e-9 (cases where the closure itself goes negative are skipped; the code clips them) |
+| 6 scattering layers, linear sources, reflecting surface | same | < 1e-5 W m^-2 on fluxes of O(300) |
+| Gray radiative equilibrium | analytic `σT⁴ = OLR(1+τ)/2` | net-flux error 4× smaller per doubling of K (second order) |
+| SL09 solar flux | their closed form; general solver with diffuse incidence | 1e-14; Bond albedo 0.3433 (paper: 0.343) |
+| Two-stream angular approximation | exact `1 − 2E₃(τ)` | worst-case flux-emissivity error 0.032 (D = 1.66), 0.087 (D = 2). **This is the method's own error and is not removed by anything here.** |
+| Correlated-k, thermal, inhomogeneous column, 16 g/band | line-by-line of 300 random Lorentz lines, same solver | outgoing flux +0.17 %, surface down −0.25 % of in-band surface emission; heating within 3.1 % of its peak (0.3 % below the top three levels) |
+| SL09 radiative-convective column | paper's statements | OLR 14.0 W m^-2 (paper: uptake 14.0); neutral below ~0.35–0.45 bar (paper: stable above ~0.5); temperature minimum at 0.15 bar (paper: tropopause ~0.15); 169 K at 1 bar |
+
+None of these is a comparison with an independent *radiation model* on a real
+atmosphere. Requirement 1 of the brief (accuracy against independent
+references across documented conditions) is met only for the solver and the
+gray formulas.
+
+## 5. Dynamical-core applicability (no radiation involved)
+
+Evidence: `docs/radiation/evidence/regimes.json`
+(`python tools/radiation/regimes.py`, CPU) and
+`docs/radiation/evidence/adiabatic_energy.json`
+(`python tools/radiation/adiabatic_energy.py`, GPU).
+
+| Planet preset | R, c_p (J/kg/K) | depth / radius | g change over depth | c_p spread over stated T range | top full level |
+| --- | --- | --- | --- | --- | --- |
+| earth | 287.0, 1003 | 0.009 | 1.8 % | 0.3 % | 50 Pa |
+| mars | 191.2, 737 | 0.028 | 5.4 % | 21 % | 0.06 Pa |
+| venus | 191.4, 1015 | 0.026 | 5.0 % | **45 %** | 4.6 Pa |
+| titan | 303.4, 1069 | **0.096** | **16.7 %** | 0.03 % | 0.7 Pa |
+| jupiter (100 bar) | 3593, 10930 | 0.003 | 0.7 % | 20 % | 500 Pa |
+
+What this shows about the existing hydrostatic, shallow, constant-g,
+constant-c_p core: constant c_p is a ≥ 20 % approximation on Mars, Jupiter and
+Venus (45 %); the shallow, constant-gravity approximation is strained on
+Titan. **Neither a variable-c_p thermodynamic equation nor a deep-atmosphere
+core was implemented.** Non-ideal-gas effects at 100 bar were not quantified.
+
+Tested (GPU, T9, 12 stretched levels): isothermal rest has exactly zero
+tendency on Mars, Venus, Titan and Jupiter constants and grids; one-day
+integrations on all five presets stay finite; the semi-implicit operator has
+real gravity-wave speeds on every preset grid.
+
+**Vertical grids.** A 100-bar hydrogen column with `τ ∝ p²` in
+radiative-convective equilibrium:
+
+| grid | levels | T at 1 bar (K) | levels above 1 bar |
+| --- | --- | --- | --- |
+| uniform σ | 30 / 60 / 120 | 125.2 / 132.0 / 157.0 | 0 / 1 / 1 |
+| stretched (log σ, σ_top 1e-4) | 24 / 48 / 96 | 169.9 / 169.2 / 169.1 | 12 / 24 / 48 |
+
+Uniform σ is not converged at 120 levels; the stretched grid is at 24. Each
+preset therefore carries a stretched grid. What was *not* done: a convergence
+study of the coupled 3-D model in the vertical, or any check of the stretched
+grids against a stratospheric reference.
+
+## 6. Energy: coupling closure and the hyperdiffusion finding
+
+**Coupling closure (requirement 3, partly met).** The daily change of the
+model's total energy (`global_energy`: enthalpy + kinetic + surface
+potential) is compared with the flux-implied tendency accumulated by the
+coupling.
+
+| Run | flux-implied tendency | residual |
+| --- | --- | --- |
+| Jupiter SL09 physics, T21 L30, days 1–3 | −0.023 W m^-2 (OLR 14.05, absorbed 8.32, interior 5.7) | −2e-4 … −4e-5 W m^-2 |
+| Gray dry Earth, T21 L25, days 1–30 | −134 → −9 W m^-2 | +0.07 … −0.03 W m^-2 |
+
+Checkpoint/resume is bit-identical (tested). These are short runs with weak
+flow; they show the bookkeeping is consistent, not that long, eddying runs
+conserve energy.
+
+With a stronger seed the same budget does **not** close on Jupiter: T9 L12,
+1 m/s seed, one day, residual −0.058 W m^-2 with ∇⁸ against a kinetic-energy
+loss of −0.059 W m^-2; with ∇⁸ off the residual is −0.003 W m^-2
+(`test_with_hyperdiffusion_the_budget_residual_is_the_kinetic_energy_it_deletes`).
+
+Known bookkeeping gap: the single RK4 startup step applies the physics
+heating to the atmosphere but neither advances the slab nor enters the
+accumulated means (the slab's heat change equals the accumulated surface
+flux to 1e-9 over the leapfrog steps). It is one step per run and is not
+corrected.
+
+**Hyperdiffusion removes kinetic energy and does not return it as heat.**
+One day, no physics, 5 m/s seeded rotational flow, T9 L12, total-energy
+change as a fraction of the initial kinetic energy:
+
+| preset | without ∇⁸ | with ∇⁸ (0.1 day at the cut) | with ∇⁸, W m^-2 |
+| --- | --- | --- | --- |
+| earth | −1.1 % | −2.9 % | −0.043 |
+| mars | −1.0 % | −2.4 % | −0.0006 |
+| titan | −0.0 % | −1.3 % | −0.20 |
+| venus | −0.0 % | −1.2 % | −1.85 |
+| jupiter (100 bar) | −1.7 % | **−89 %** | **−52** |
+
+What is established: (a) switching ∇⁸ off removes the large Jupiter loss, so
+∇⁸ is the sink; (b) the loss is independent of time step (600 vs 300 s), of
+the RAW filter, of the vertical grid and of amplitude (5 vs 0.05 m/s give the
+same fractions); (c) with Jupiter's rotation reduced 100× the flow keeps
+98 % of its kinetic energy and nothing reaches degrees above 6, whereas at
+full rotation 10–50 % of the kinetic energy sits above degree 6 within hours.
+A deep column makes any such loss large in W m^-2 because the reservoir is
+large.
+
+What is **not** established: the mechanism in (c) (unresolved equatorial
+deformation scale) is a hypothesis consistent with those three measurements;
+it was not tested by a resolution sweep. Without ∇⁸, 18–27 % of the kinetic
+energy still disappears from the kinetic term in a day while total energy
+changes by ≤ 1.7 %; the enthalpy term rises correspondingly, but **no
+term-by-term energy-transfer diagnostic was computed, so this is not shown to
+be physical conversion.** The −1 to −2 % residual without ∇⁸ is unexplained.
+
+Consequence: a coupled energy budget on a fast rotator will show a residual
+equal to the ∇⁸ kinetic-energy loss. No frictional-heating term or energy
+fixer was added.
+
+## 7. Published comparisons: verified, and where each stands
+
+All five references were read (protocol numbers in the docstrings cite them).
+
+| Reference | Establishes | Needs beyond what exists | Status |
+| --- | --- | --- | --- |
+| Schneider & Liu 2009 (Jupiter, gray, interior heat, T213) | coupled gray radiation + convection + drag without a surface | T213 and > 28,000 days; drag shoulder shape unspecified in the paper | column structure and energy balance reproduced (§4). **3-D run not done**: the 200-day T21 run was cancelled before it started producing data. T21 cannot resolve their jets in any case. |
+| Frierson, Held & Zurita-Gotor 2006 (dry limit) | gray radiation + slab + boundary layer with eddies | their K-profile boundary layer, surface stress, T85+ | radiation, slab and bulk flux implemented; **boundary-layer diffusion and surface stress are not**, so no dry-limit comparison is claimed. A 300-day T21 run was stopped at day 30 (record in `evidence/earth-gray-dry-T21L25-partial/`); it is spin-up only. |
+| Isca Mars M-I (gray), M-C (SOCRATES) | seasonal/diurnal Mars circulation, figures only | seasons + diurnal cycle are implemented in `insolation.py` but not run; M-C needs real-gas CO2 with CIA and topography | proposed |
+| THAI Ben 1 / Ben 2 | N2 vs CO2 real-gas, tidally locked; inter-model spread 7 K / 6 K in surface temperature, fluxes within 5 % | real-gas RT with CO2 CIA and far wings, boundary layer, soil | proposed; blocked on opacity data |
+| HARP Jupiter | real-gas column heating/cooling; their correlated-k vs line-by-line agree within 10 % | HITRAN lines, H2–H2/H2–He CIA, Moses profiles | proposed; blocked on opacity data |
+
+## 8. External software and execution strategy
+
+Investigated, not integrated: pyRTE-RRTMGP (conda for Linux/macOS only;
+Earth-only gas optics), SOCRATES (Fortran, Unix build, BSD-3; has Mars
+spectral files via ROCKE-3D), petitRADTRANS 3 (needs a Fortran toolchain on
+Windows; opacities downloaded on demand), exo_k (pure Python; reads ExoMol and
+other k-tables; the most direct source of real tables for `KTable`). None was
+installed: no package or opacity file was downloaded in this session. The
+architecture does not depend on that choice: a real table enters as a
+`KTable` and an external model enters as an independent reference in tests.
+
+Performance (MX110, 2 GB): T21 L30 Jupiter 0.52–0.56 s/step, of which one
+dynamics tendency 0.37 s and one gray physics call 0.10 s; T21 L25 Earth
+0.50 s/step. No real-gas timing exists, so **the value of neural
+acceleration is unmeasured**; with gray radiation the physics is ~18 % of a
+step and `radiation_interval` already reduces it.
+
+## 9. Reproduce
+
+```bash
+python -m pytest tests/test_radiation_twostream.py tests/test_physics_columns.py tests/test_radiation_kdist.py tests/test_radiative_dynamical.py
+python tools/radiation/regimes.py
+python tools/radiation/adiabatic_energy.py
+python -m tropoi.run.radiative column --preset jupiter-schneider-liu
+python -m tropoi.run.radiative run --preset jupiter-schneider-liu --days 200 --run-dir runs/radiative/jupiter-sl09-T21L30
+python -m tropoi.run.radiative run --preset earth-gray-dry --days 300 --run-dir runs/radiative/earth-gray-dry-T21L25
+```
+
+Dependencies are unchanged (`requirements.txt`; SciPy is used by the tests).
+Run configurations are hashed (`config_sha256`) and stored with the commit in
+each run's `config.json`.
+
+Test results for this commit are in [TEST_RESULTS.md](TEST_RESULTS.md).
+
+## 10. Next steps, in order
+
+1. Obtain real k-tables (needs a decision on downloads: exo_k + ExoMol/HITRAN
+   CIA) and compare `CorrelatedKLongwave` with an independent model for one
+   Earth and one CO2 case; add Rayleigh, continua, CIA, gas overlap.
+2. Term-by-term kinetic-energy budget, and a resolution sweep for the Jupiter
+   ∇⁸ loss; decide on frictional heating.
+3. Finish the two cancelled runs (commands above) on a larger GPU.
+4. Boundary-layer diffusion and surface stress (required by FHZ06 and THAI).
+5. Variable c_p(T) (Venus, Mars, giant planets); assess a deep-atmosphere
+   core for Titan.

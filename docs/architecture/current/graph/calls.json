@@ -387,6 +387,501 @@
     },
     {
       "kind": "constructor",
+      "source": "tropoi.physics.column_model.ColumnPhysics",
+      "target": "tropoi.physics.column_model.ColumnPhysics.__init__"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.physics.column_model.ColumnPhysics.compute",
+      "target": "tropoi.physics.column_model.PhysicsOutput"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.physics.column_model.ColumnPhysics.compute",
+      "target": "tropoi.physics.column_model._xp"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.physics.column_model.ColumnPhysics.compute",
+      "target": "tropoi.physics.radiation.scheme.Column"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.physics.column_model.ColumnPhysics.compute",
+      "target": "tropoi.physics.radiation.scheme.LowerBoundary"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.physics.column_model.ColumnPhysics.compute",
+      "target": "tropoi.physics.surface.sensible_heat_flux"
+    },
+    {
+      "kind": "constructor",
+      "source": "tropoi.physics.column_model.RadiativeConvectiveColumn",
+      "target": "tropoi.physics.column_model.RadiativeConvectiveColumn.__init__"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.physics.column_model.RadiativeConvectiveColumn._stable_step",
+      "target": "tropoi.physics.column_model.RadiativeConvectiveColumn.evaluate"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.physics.column_model.RadiativeConvectiveColumn._stable_step",
+      "target": "tropoi.physics.column_model._xp"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.physics.column_model.RadiativeConvectiveColumn.equilibrate",
+      "target": "tropoi.physics.column_model.RadiativeConvectiveColumn._stable_step"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.physics.column_model.RadiativeConvectiveColumn.equilibrate",
+      "target": "tropoi.physics.column_model.RadiativeConvectiveColumn.evaluate"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.physics.column_model.RadiativeConvectiveColumn.equilibrate",
+      "target": "tropoi.physics.column_model._xp"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.physics.column_model.RadiativeConvectiveColumn.equilibrate",
+      "target": "tropoi.physics.convection.DryConvectiveAdjustment"
+    },
+    {
+      "kind": "constructor",
+      "source": "tropoi.physics.convection.DryConvectiveAdjustment",
+      "target": "tropoi.physics.convection.DryConvectiveAdjustment.__init__"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.physics.convection.DryConvectiveAdjustment.adjust",
+      "target": "tropoi.physics.convection.neutral_profile"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.physics.convection.neutral_profile",
+      "target": "tropoi.physics.convection._xp"
+    },
+    {
+      "kind": "constructor",
+      "source": "tropoi.physics.insolation.DiurnalMeanInsolation",
+      "target": "tropoi.physics.insolation.DiurnalMeanInsolation.__init__"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.physics.insolation.DiurnalMeanInsolation.__call__",
+      "target": "tropoi.physics.insolation._xp"
+    },
+    {
+      "kind": "constructor",
+      "source": "tropoi.physics.insolation.InstantaneousInsolation",
+      "target": "tropoi.physics.insolation.InstantaneousInsolation.__init__"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.physics.insolation.InstantaneousInsolation.__call__",
+      "target": "tropoi.physics.insolation._xp"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.physics.insolation.Orbit.declination",
+      "target": "tropoi.physics.insolation.Orbit.solar_longitude"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.physics.insolation.Orbit.flux_at",
+      "target": "tropoi.physics.insolation.Orbit.true_anomaly"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.physics.insolation.Orbit.solar_longitude",
+      "target": "tropoi.physics.insolation.Orbit.true_anomaly"
+    },
+    {
+      "kind": "constructor",
+      "source": "tropoi.physics.insolation.PrescribedInsolation",
+      "target": "tropoi.physics.insolation.PrescribedInsolation.__init__"
+    },
+    {
+      "kind": "constructor",
+      "source": "tropoi.physics.insolation.TidallyLockedInsolation",
+      "target": "tropoi.physics.insolation.TidallyLockedInsolation.__init__"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.physics.insolation.TidallyLockedInsolation.__call__",
+      "target": "tropoi.physics.insolation._xp"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.physics.insolation.frierson_net_surface_flux",
+      "target": "tropoi.physics.insolation.PrescribedInsolation"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.physics.insolation.frierson_net_surface_flux",
+      "target": "tropoi.physics.insolation._xp"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.physics.planets._body",
+      "target": "tropoi.physics.planets.PlanetaryBody"
+    },
+    {
+      "kind": "constructor",
+      "source": "tropoi.physics.radiation.gray.GrayLongwave",
+      "target": "tropoi.physics.radiation.gray.GrayLongwave.__init__"
+    },
+    {
+      "kind": "constructor",
+      "source": "tropoi.physics.radiation.gray.GrayShortwave",
+      "target": "tropoi.physics.radiation.gray.GrayShortwave.__init__"
+    },
+    {
+      "kind": "constructor",
+      "source": "tropoi.physics.radiation.gray.OpticalDepthProfile",
+      "target": "tropoi.physics.radiation.gray.OpticalDepthProfile.__init__"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.physics.radiation.gray.OpticalDepthProfile.cumulative",
+      "target": "tropoi.physics.radiation.gray._xp"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.physics.radiation.gray.OpticalDepthProfile.layers",
+      "target": "tropoi.physics.radiation.gray.OpticalDepthProfile.cumulative"
+    },
+    {
+      "kind": "constructor",
+      "source": "tropoi.physics.radiation.gray.SemiInfiniteScatteringShortwave",
+      "target": "tropoi.physics.radiation.gray.SemiInfiniteScatteringShortwave.__init__"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.physics.radiation.gray.SemiInfiniteScatteringShortwave.analytic_fluxes",
+      "target": "tropoi.physics.radiation.gray._xp"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.physics.radiation.gray.frierson_longwave",
+      "target": "tropoi.physics.radiation.gray.GrayLongwave"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.physics.radiation.gray.frierson_longwave",
+      "target": "tropoi.physics.radiation.gray.OpticalDepthProfile"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.physics.radiation.gray.isca_mars_longwave",
+      "target": "tropoi.physics.radiation.gray.GrayLongwave"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.physics.radiation.gray.isca_mars_longwave",
+      "target": "tropoi.physics.radiation.gray.OpticalDepthProfile"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.physics.radiation.gray.isca_mars_shortwave",
+      "target": "tropoi.physics.radiation.gray.GrayShortwave"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.physics.radiation.gray.isca_mars_shortwave",
+      "target": "tropoi.physics.radiation.gray.OpticalDepthProfile"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.physics.radiation.gray.schneider_liu_longwave",
+      "target": "tropoi.physics.radiation.gray.GrayLongwave"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.physics.radiation.gray.schneider_liu_longwave",
+      "target": "tropoi.physics.radiation.gray.OpticalDepthProfile"
+    },
+    {
+      "kind": "constructor",
+      "source": "tropoi.physics.radiation.kdist.CorrelatedKLongwave",
+      "target": "tropoi.physics.radiation.kdist.CorrelatedKLongwave.__init__"
+    },
+    {
+      "kind": "super",
+      "source": "tropoi.physics.radiation.kdist.CorrelatedKLongwave.__init__",
+      "target": "tropoi.physics.radiation.kdist._CorrelatedK.__init__"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.physics.radiation.kdist.CorrelatedKLongwave.__init__",
+      "target": "tropoi.physics.radiation.kdist.planck_band_fraction"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.physics.radiation.kdist.CorrelatedKLongwave.optical_properties",
+      "target": "tropoi.physics.radiation.kdist._CorrelatedK._tau"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.physics.radiation.kdist.CorrelatedKLongwave.planck",
+      "target": "tropoi.physics.radiation.kdist._xp"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.physics.radiation.kdist.CorrelatedKLongwave.signature",
+      "target": "tropoi.physics.radiation.kdist._CorrelatedK._signature"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.physics.radiation.kdist.CorrelatedKLongwave.spectral_coverage",
+      "target": "tropoi.physics.radiation.kdist.planck_band_fraction"
+    },
+    {
+      "kind": "constructor",
+      "source": "tropoi.physics.radiation.kdist.CorrelatedKShortwave",
+      "target": "tropoi.physics.radiation.kdist.CorrelatedKShortwave.__init__"
+    },
+    {
+      "kind": "super",
+      "source": "tropoi.physics.radiation.kdist.CorrelatedKShortwave.__init__",
+      "target": "tropoi.physics.radiation.kdist._CorrelatedK.__init__"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.physics.radiation.kdist.CorrelatedKShortwave.__init__",
+      "target": "tropoi.physics.radiation.kdist.planck_band_fraction"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.physics.radiation.kdist.CorrelatedKShortwave.optical_properties",
+      "target": "tropoi.physics.radiation.kdist._CorrelatedK._tau"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.physics.radiation.kdist.CorrelatedKShortwave.signature",
+      "target": "tropoi.physics.radiation.kdist._CorrelatedK._signature"
+    },
+    {
+      "kind": "constructor",
+      "source": "tropoi.physics.radiation.kdist._CorrelatedK",
+      "target": "tropoi.physics.radiation.kdist._CorrelatedK.__init__"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.physics.radiation.kdist._CorrelatedK._layer_k",
+      "target": "tropoi.physics.radiation.kdist._CorrelatedK._table_dev"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.physics.radiation.kdist._CorrelatedK._tau",
+      "target": "tropoi.physics.radiation.kdist._CorrelatedK._layer_k"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.physics.radiation.kdist._CorrelatedK._tau",
+      "target": "tropoi.physics.radiation.kdist._xp"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.physics.radiation.kdist.ktable_from_spectrum",
+      "target": "tropoi.physics.radiation.kdist.KTable"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.physics.radiation.kdist.ktable_from_spectrum",
+      "target": "tropoi.physics.radiation.kdist.gauss_legendre_g"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.physics.radiation.kdist.planck_band_fraction",
+      "target": "tropoi.physics.radiation.kdist._planck_cumulative"
+    },
+    {
+      "kind": "constructor",
+      "source": "tropoi.physics.radiation.scheme.Radiation",
+      "target": "tropoi.physics.radiation.scheme.Radiation.__init__"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.physics.radiation.scheme.Radiation._stellar",
+      "target": "tropoi.physics.radiation.scheme._points"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.physics.radiation.scheme.Radiation._stellar",
+      "target": "tropoi.physics.radiation.scheme._xp"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.physics.radiation.scheme.Radiation._stellar",
+      "target": "tropoi.physics.radiation.twostream.stellar_fluxes"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.physics.radiation.scheme.Radiation._thermal",
+      "target": "tropoi.physics.radiation.scheme._xp"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.physics.radiation.scheme.Radiation._thermal",
+      "target": "tropoi.physics.radiation.scheme.interface_temperature"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.physics.radiation.scheme.Radiation._thermal",
+      "target": "tropoi.physics.radiation.twostream.thermal_fluxes"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.physics.radiation.scheme.Radiation.fluxes",
+      "target": "tropoi.physics.radiation.scheme.Radiation._stellar"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.physics.radiation.scheme.Radiation.fluxes",
+      "target": "tropoi.physics.radiation.scheme.Radiation._thermal"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.physics.radiation.scheme.Radiation.fluxes",
+      "target": "tropoi.physics.radiation.scheme.RadiativeFluxes"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.physics.radiation.scheme.Radiation.fluxes",
+      "target": "tropoi.physics.radiation.scheme.heating_rate"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.physics.radiation.scheme.interface_temperature",
+      "target": "tropoi.physics.radiation.scheme._xp"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.physics.radiation.twostream.adding",
+      "target": "tropoi.physics.radiation.twostream._xp"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.physics.radiation.twostream.diffuse_layer",
+      "target": "tropoi.physics.radiation.twostream._xp"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.physics.radiation.twostream.direct_layer",
+      "target": "tropoi.physics.radiation.twostream._xp"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.physics.radiation.twostream.stellar_fluxes",
+      "target": "tropoi.physics.radiation.twostream._xp"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.physics.radiation.twostream.stellar_fluxes",
+      "target": "tropoi.physics.radiation.twostream.adding"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.physics.radiation.twostream.stellar_fluxes",
+      "target": "tropoi.physics.radiation.twostream.delta_scale"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.physics.radiation.twostream.stellar_fluxes",
+      "target": "tropoi.physics.radiation.twostream.diffuse_layer"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.physics.radiation.twostream.stellar_fluxes",
+      "target": "tropoi.physics.radiation.twostream.direct_layer"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.physics.radiation.twostream.stellar_fluxes",
+      "target": "tropoi.physics.radiation.twostream.stellar_coefficients"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.physics.radiation.twostream.thermal_fluxes",
+      "target": "tropoi.physics.radiation.twostream._xp"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.physics.radiation.twostream.thermal_fluxes",
+      "target": "tropoi.physics.radiation.twostream.adding"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.physics.radiation.twostream.thermal_fluxes",
+      "target": "tropoi.physics.radiation.twostream.diffuse_layer"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.physics.radiation.twostream.thermal_fluxes",
+      "target": "tropoi.physics.radiation.twostream.thermal_coefficients"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.physics.radiation.twostream.thermal_fluxes",
+      "target": "tropoi.physics.radiation.twostream.thermal_layer_sources"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.physics.radiation.twostream.thermal_layer_sources",
+      "target": "tropoi.physics.radiation.twostream._xp"
+    },
+    {
+      "kind": "constructor",
+      "source": "tropoi.physics.surface.SlabSurface",
+      "target": "tropoi.physics.surface.SlabSurface.__init__"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.physics.surface.drag_coefficient",
+      "target": "tropoi.physics.surface._xp"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.physics.surface.sensible_heat_flux",
+      "target": "tropoi.physics.surface._xp"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.physics.surface.sensible_heat_flux",
+      "target": "tropoi.physics.surface.drag_coefficient"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.physics.thermodynamics.GasMixture.cp_range",
+      "target": "tropoi.physics.thermodynamics.GasMixture.cp"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.physics.thermodynamics.GasMixture.kappa",
+      "target": "tropoi.physics.thermodynamics.GasMixture.cp"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.physics.thermodynamics.Species.cp_molar",
+      "target": "tropoi.physics.thermodynamics._xp"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.physics.thermodynamics.Species.cp_molar",
+      "target": "tropoi.physics.thermodynamics.hydrogen_rotational_cv"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.physics.thermodynamics.hydrogen_rotational_cv",
+      "target": "tropoi.physics.thermodynamics._xp"
+    },
+    {
+      "kind": "constructor",
       "source": "tropoi.representation.archive.capsule.CapsuleStorage",
       "target": "tropoi.representation.archive.capsule.CapsuleStorage.__init__"
     },
@@ -6622,6 +7117,501 @@
     },
     {
       "kind": "call",
+      "source": "tropoi.run.radiative.__main__._config",
+      "target": "tropoi.run.radiative.config.RadiativeConfig.from_dict"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.radiative.__main__.main",
+      "target": "tropoi.run.radiative.__main__._config"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.run.radiative.__main__.main",
+      "target": "tropoi.run.radiative.experiment.RadiativeRun"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.radiative.__main__.main",
+      "target": "tropoi.run.radiative.model.reference_column"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.run.radiative.config.RadiativeConfig.canonical_json",
+      "target": "tropoi.run.radiative.config.RadiativeConfig.to_dict"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.radiative.config.RadiativeConfig.retained_cut",
+      "target": "tropoi.spatial.truncation.product_truncation_cut"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.run.radiative.config.RadiativeConfig.sha256",
+      "target": "tropoi.run.radiative.config.RadiativeConfig.canonical_json"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.run.radiative.config.earth_gray_dry",
+      "target": "tropoi.run.radiative.config.RadiativeConfig"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.radiative.config.earth_gray_dry",
+      "target": "tropoi.run.radiative.config._t21"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.run.radiative.config.jupiter_schneider_liu",
+      "target": "tropoi.run.radiative.config.RadiativeConfig"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.radiative.config.jupiter_schneider_liu",
+      "target": "tropoi.run.radiative.config._t21"
+    },
+    {
+      "kind": "constructor",
+      "source": "tropoi.run.radiative.experiment.RadiativeRun",
+      "target": "tropoi.run.radiative.experiment.RadiativeRun.__init__"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.radiative.experiment.RadiativeRun.__init__",
+      "target": "tropoi.run.held_suarez.checkpoint.atomic_write_bytes"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.radiative.experiment.RadiativeRun.__init__",
+      "target": "tropoi.run.held_suarez.checkpoint.list_checkpoints"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.run.radiative.experiment.RadiativeRun.__init__",
+      "target": "tropoi.run.held_suarez.experiment.RunError"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.radiative.experiment.RadiativeRun.__init__",
+      "target": "tropoi.run.held_suarez.experiment._now"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.radiative.experiment.RadiativeRun.__init__",
+      "target": "tropoi.run.held_suarez.experiment.code_identity"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.radiative.experiment.RadiativeRun.__init__",
+      "target": "tropoi.run.held_suarez.experiment.environment_identity"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.run.radiative.experiment.RadiativeRun.__init__",
+      "target": "tropoi.run.radiative.experiment.RadiativeRun._event"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.run.radiative.experiment.RadiativeRun.__init__",
+      "target": "tropoi.run.radiative.experiment.RadiativeRun._resume"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.run.radiative.experiment.RadiativeRun.__init__",
+      "target": "tropoi.run.radiative.experiment.RadiativeRun._sample"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.run.radiative.experiment.RadiativeRun.__init__",
+      "target": "tropoi.run.radiative.experiment.RadiativeRun._write_checkpoint"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.radiative.experiment.RadiativeRun.__init__",
+      "target": "tropoi.run.radiative.model.build_model"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.radiative.experiment.RadiativeRun.__init__",
+      "target": "tropoi.run.radiative.model.build_physics"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.radiative.experiment.RadiativeRun.__init__",
+      "target": "tropoi.run.radiative.model.build_stepper"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.radiative.experiment.RadiativeRun.__init__",
+      "target": "tropoi.run.radiative.model.initial_state"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.run.radiative.experiment.RadiativeRun.__init__",
+      "target": "tropoi.spatial.states.primitive_equations.PrimitiveEquationsState"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.run.radiative.experiment.RadiativeRun.__init__",
+      "target": "tropoi.temporal.column_coupling.ColumnPhysicsCoupling"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.radiative.experiment.RadiativeRun._event",
+      "target": "tropoi.run.held_suarez.experiment._now"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.radiative.experiment.RadiativeRun._resume",
+      "target": "tropoi.run.held_suarez.checkpoint.read_checkpoint"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.run.radiative.experiment.RadiativeRun._resume",
+      "target": "tropoi.run.held_suarez.experiment.RunError"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.run.radiative.experiment.RadiativeRun._resume",
+      "target": "tropoi.run.radiative.experiment.RadiativeRun._event"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.radiative.experiment.RadiativeRun._sample",
+      "target": "tropoi.run.held_suarez.experiment.daily_sample"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.run.radiative.experiment.RadiativeRun._sample",
+      "target": "tropoi.run.radiative.experiment.RadiativeRun._mean_window_start"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.radiative.experiment.RadiativeRun._sample",
+      "target": "tropoi.temporal.column_coupling.global_energy"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.radiative.experiment.RadiativeRun._write_checkpoint",
+      "target": "tropoi.run.held_suarez.checkpoint.atomic_write_bytes"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.radiative.experiment.RadiativeRun._write_checkpoint",
+      "target": "tropoi.run.held_suarez.checkpoint.prune_checkpoints"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.radiative.experiment.RadiativeRun._write_checkpoint",
+      "target": "tropoi.run.held_suarez.checkpoint.write_checkpoint"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.radiative.experiment.RadiativeRun._write_checkpoint",
+      "target": "tropoi.run.held_suarez.experiment.environment_identity"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.run.radiative.experiment.RadiativeRun._write_checkpoint",
+      "target": "tropoi.run.radiative.experiment.RadiativeRun._arrays"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.run.radiative.experiment.RadiativeRun._write_checkpoint",
+      "target": "tropoi.run.radiative.experiment.RadiativeRun._event"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.run.radiative.experiment.RadiativeRun._write_checkpoint",
+      "target": "tropoi.run.radiative.experiment.RadiativeRun._write_means"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.radiative.experiment.RadiativeRun._write_means",
+      "target": "tropoi.run.held_suarez.checkpoint.atomic_write_bytes"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.radiative.experiment.RadiativeRun.run",
+      "target": "tropoi.run.held_suarez.checkpoint.atomic_write_bytes"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.run.radiative.experiment.RadiativeRun.run",
+      "target": "tropoi.run.radiative.experiment.RadiativeRun._event"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.run.radiative.experiment.RadiativeRun.run",
+      "target": "tropoi.run.radiative.experiment.RadiativeRun._sample"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.run.radiative.experiment.RadiativeRun.run",
+      "target": "tropoi.run.radiative.experiment.RadiativeRun._write_checkpoint"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.run.radiative.experiment.RadiativeRun.run",
+      "target": "tropoi.spatial.states.primitive_equations.PrimitiveEquationsState"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.run.radiative.experiment.RadiativeRun.run",
+      "target": "tropoi.spatial.states.primitive_equations.PrimitiveEquationsStateError"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.radiative.model._drag",
+      "target": "tropoi.run.radiative.model._options"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.run.radiative.model._drag",
+      "target": "tropoi.temporal.tendencies.drag.LatitudeDependentRayleighDrag"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.radiative.model._drag",
+      "target": "tropoi.temporal.tendencies.drag.schneider_liu_drag_profile"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.run.radiative.model._drag",
+      "target": "tropoi.temporal.tendencies.held_suarez.HeldSuarezParameters"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.radiative.model._drag",
+      "target": "tropoi.temporal.tendencies.held_suarez.rayleigh_drag_damping"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.run.radiative.model._global_mean_insolation",
+      "target": "tropoi.physics.insolation.PrescribedInsolation"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.radiative.model._global_mean_insolation",
+      "target": "tropoi.run.radiative.model.build_insolation"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.run.radiative.model._longwave",
+      "target": "tropoi.physics.radiation.gray.GrayLongwave"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.run.radiative.model._longwave",
+      "target": "tropoi.physics.radiation.gray.OpticalDepthProfile"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.radiative.model._longwave",
+      "target": "tropoi.physics.radiation.gray.frierson_longwave"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.radiative.model._longwave",
+      "target": "tropoi.run.radiative.model._options"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.run.radiative.model._shortwave",
+      "target": "tropoi.physics.radiation.gray.GrayShortwave"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.run.radiative.model._shortwave",
+      "target": "tropoi.physics.radiation.gray.OpticalDepthProfile"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.run.radiative.model._shortwave",
+      "target": "tropoi.physics.radiation.gray.SemiInfiniteScatteringShortwave"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.radiative.model._shortwave",
+      "target": "tropoi.run.radiative.model._options"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.run.radiative.model.build_insolation",
+      "target": "tropoi.physics.insolation.DiurnalMeanInsolation"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.run.radiative.model.build_insolation",
+      "target": "tropoi.physics.insolation.InstantaneousInsolation"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.run.radiative.model.build_insolation",
+      "target": "tropoi.physics.insolation.Orbit"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.run.radiative.model.build_insolation",
+      "target": "tropoi.physics.insolation.PrescribedInsolation"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.run.radiative.model.build_insolation",
+      "target": "tropoi.physics.insolation.TidallyLockedInsolation"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.radiative.model.build_insolation",
+      "target": "tropoi.physics.insolation.frierson_net_surface_flux"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.radiative.model.build_insolation",
+      "target": "tropoi.run.radiative.model._options"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.radiative.model.build_model",
+      "target": "tropoi.run.radiative.model.build_sigma"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.radiative.model.build_model",
+      "target": "tropoi.spatial.environment.PlanetaryParameters.ideal_sphere"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.radiative.model.build_model",
+      "target": "tropoi.spatial.planet.Planet.generate"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.run.radiative.model.build_model",
+      "target": "tropoi.temporal.tendencies.primitive_equations.PrimitiveEquationsModel"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.run.radiative.model.build_physics",
+      "target": "tropoi.physics.column_model.ColumnPhysics"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.run.radiative.model.build_physics",
+      "target": "tropoi.physics.convection.DryConvectiveAdjustment"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.run.radiative.model.build_physics",
+      "target": "tropoi.physics.surface.SlabSurface"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.radiative.model.build_physics",
+      "target": "tropoi.run.radiative.model._options"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.radiative.model.build_physics",
+      "target": "tropoi.run.radiative.model.build_insolation"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.radiative.model.build_physics",
+      "target": "tropoi.run.radiative.model.build_radiation"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.run.radiative.model.build_radiation",
+      "target": "tropoi.physics.radiation.scheme.Radiation"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.radiative.model.build_radiation",
+      "target": "tropoi.run.radiative.model._longwave"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.radiative.model.build_radiation",
+      "target": "tropoi.run.radiative.model._shortwave"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.radiative.model.build_sigma",
+      "target": "tropoi.run.radiative.model._options"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.radiative.model.build_sigma",
+      "target": "tropoi.spatial.sigma_coordinate.SigmaGrid.frierson"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.radiative.model.build_sigma",
+      "target": "tropoi.spatial.sigma_coordinate.SigmaGrid.stretched"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.radiative.model.build_sigma",
+      "target": "tropoi.spatial.sigma_coordinate.SigmaGrid.uniform"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.radiative.model.build_stepper",
+      "target": "tropoi.run.radiative.model._drag"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.run.radiative.model.build_stepper",
+      "target": "tropoi.temporal.semi_implicit.SemiImplicitLeapfrogStepper"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.radiative.model.build_stepper",
+      "target": "tropoi.temporal.semi_implicit.SemiImplicitOperator.from_model"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.radiative.model.build_stepper",
+      "target": "tropoi.temporal.tendencies.held_suarez.hyperdiffusion_damping"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.radiative.model.initial_state",
+      "target": "tropoi.run.radiative.model.build_sigma"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.radiative.model.initial_state",
+      "target": "tropoi.run.radiative.model.reference_column"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.radiative.model.initial_state",
+      "target": "tropoi.spatial.states.primitive_equations.isothermal_rest_state"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.run.radiative.model.reference_column",
+      "target": "tropoi.physics.column_model.RadiativeConvectiveColumn"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.radiative.model.reference_column",
+      "target": "tropoi.run.radiative.model._global_mean_insolation"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.radiative.model.reference_column",
+      "target": "tropoi.run.radiative.model.build_physics"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.radiative.model.reference_column",
+      "target": "tropoi.run.radiative.model.build_sigma"
+    },
+    {
+      "kind": "call",
       "source": "tropoi.run.swe.config.SWERunConfig.__post_init__",
       "target": "tropoi.spatial.truncation.require_scenario_support"
     },
@@ -7248,6 +8238,16 @@
     {
       "kind": "instantiate",
       "source": "tropoi.spatial.sigma_coordinate.SigmaGrid.__post_init__",
+      "target": "tropoi.spatial.sigma_coordinate.SigmaGridError"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.spatial.sigma_coordinate.SigmaGrid.frierson",
+      "target": "tropoi.spatial.sigma_coordinate.SigmaGridError"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.spatial.sigma_coordinate.SigmaGrid.stretched",
       "target": "tropoi.spatial.sigma_coordinate.SigmaGridError"
     },
     {
@@ -8262,6 +9262,76 @@
     },
     {
       "kind": "constructor",
+      "source": "tropoi.temporal.column_coupling.ColumnPhysicsCoupling",
+      "target": "tropoi.temporal.column_coupling.ColumnPhysicsCoupling.__init__"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.temporal.column_coupling.ColumnPhysicsCoupling.__call__",
+      "target": "tropoi.temporal.column_coupling.ColumnPhysicsCoupling._lowest_wind_speed"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.temporal.column_coupling.ColumnPhysicsCoupling.__call__",
+      "target": "tropoi.temporal.column_coupling.ColumnPhysicsCoupling.columns"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.temporal.column_coupling.ColumnPhysicsCoupling.__call__",
+      "target": "tropoi.temporal.column_coupling._analyze"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.temporal.column_coupling.ColumnPhysicsCoupling.__init__",
+      "target": "tropoi.temporal.column_coupling._area_weights"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.temporal.column_coupling.ColumnPhysicsCoupling.__init__",
+      "target": "tropoi.temporal.column_coupling._xp"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.temporal.column_coupling.ColumnPhysicsCoupling.columns",
+      "target": "tropoi.temporal.column_coupling._synthesize"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.temporal.column_coupling._analyze",
+      "target": "tropoi.temporal.column_coupling._xp"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.temporal.column_coupling._area_weights",
+      "target": "tropoi.temporal.column_coupling._xp"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.temporal.column_coupling._synthesize",
+      "target": "tropoi.temporal.column_coupling._xp"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.temporal.column_coupling.global_energy",
+      "target": "tropoi.spatial.states.primitive_equations.PrimitiveEquationsState"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.temporal.column_coupling.global_energy",
+      "target": "tropoi.temporal.column_coupling._area_weights"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.temporal.column_coupling.global_energy",
+      "target": "tropoi.temporal.column_coupling._synthesize"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.temporal.column_coupling.global_energy",
+      "target": "tropoi.temporal.column_coupling._xp"
+    },
+    {
+      "kind": "constructor",
       "source": "tropoi.temporal.hooks.DiagonalDamping",
       "target": "tropoi.temporal.hooks.DiagonalDamping.__init__"
     },
@@ -8462,6 +9532,11 @@
     },
     {
       "kind": "call",
+      "source": "tropoi.temporal.semi_implicit.SemiImplicitLeapfrogStepper._hook_signatures",
+      "target": "tropoi.temporal.hooks.hook_signatures"
+    },
+    {
+      "kind": "call",
       "source": "tropoi.temporal.semi_implicit.SemiImplicitLeapfrogStepper._stable_startup_substeps",
       "target": "tropoi.temporal.semi_implicit.rk4_gain"
     },
@@ -8476,14 +9551,14 @@
       "target": "tropoi.temporal.integration.rk4_step_array"
     },
     {
-      "kind": "call",
+      "kind": "self",
       "source": "tropoi.temporal.semi_implicit.SemiImplicitLeapfrogStepper.load_state_dict",
-      "target": "tropoi.temporal.hooks.hook_signatures"
+      "target": "tropoi.temporal.semi_implicit.SemiImplicitLeapfrogStepper._hook_signatures"
     },
     {
-      "kind": "call",
+      "kind": "self",
       "source": "tropoi.temporal.semi_implicit.SemiImplicitLeapfrogStepper.state_dict",
-      "target": "tropoi.temporal.hooks.hook_signatures"
+      "target": "tropoi.temporal.semi_implicit.SemiImplicitLeapfrogStepper._hook_signatures"
     },
     {
       "kind": "self",
@@ -8644,6 +9719,11 @@
       "kind": "call",
       "source": "tropoi.temporal.tendencies.barotropic.BarotropicVorticity.vorticity_to_streamfunction",
       "target": "tropoi.spatial.laplacian.invert_laplacian"
+    },
+    {
+      "kind": "constructor",
+      "source": "tropoi.temporal.tendencies.drag.LatitudeDependentRayleighDrag",
+      "target": "tropoi.temporal.tendencies.drag.LatitudeDependentRayleighDrag.__init__"
     },
     {
       "kind": "constructor",
@@ -9432,6 +10512,1147 @@
       "kind": "function",
       "module": "tropoi.cli.terrain",
       "qualname": "run_prepare",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.column_model.ColumnPhysics",
+      "kind": "class",
+      "module": "tropoi.physics.column_model",
+      "qualname": "ColumnPhysics",
+      "type": "class"
+    },
+    {
+      "id": "tropoi.physics.column_model.ColumnPhysics.__init__",
+      "kind": "method",
+      "module": "tropoi.physics.column_model",
+      "qualname": "ColumnPhysics.__init__",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.column_model.ColumnPhysics.adjust",
+      "kind": "method",
+      "module": "tropoi.physics.column_model",
+      "qualname": "ColumnPhysics.adjust",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.column_model.ColumnPhysics.compute",
+      "kind": "method",
+      "module": "tropoi.physics.column_model",
+      "qualname": "ColumnPhysics.compute",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.column_model.ColumnPhysics.reset",
+      "kind": "method",
+      "module": "tropoi.physics.column_model",
+      "qualname": "ColumnPhysics.reset",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.column_model.ColumnPhysics.signature",
+      "kind": "method",
+      "module": "tropoi.physics.column_model",
+      "qualname": "ColumnPhysics.signature",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.column_model.PhysicsOutput",
+      "kind": "class",
+      "module": "tropoi.physics.column_model",
+      "qualname": "PhysicsOutput",
+      "type": "class"
+    },
+    {
+      "id": "tropoi.physics.column_model.PhysicsOutput.column_energy_tendency",
+      "kind": "property",
+      "module": "tropoi.physics.column_model",
+      "qualname": "PhysicsOutput.column_energy_tendency",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.column_model.RadiativeConvectiveColumn",
+      "kind": "class",
+      "module": "tropoi.physics.column_model",
+      "qualname": "RadiativeConvectiveColumn",
+      "type": "class"
+    },
+    {
+      "id": "tropoi.physics.column_model.RadiativeConvectiveColumn.__init__",
+      "kind": "method",
+      "module": "tropoi.physics.column_model",
+      "qualname": "RadiativeConvectiveColumn.__init__",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.column_model.RadiativeConvectiveColumn._stable_step",
+      "kind": "method",
+      "module": "tropoi.physics.column_model",
+      "qualname": "RadiativeConvectiveColumn._stable_step",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.column_model.RadiativeConvectiveColumn.equilibrate",
+      "kind": "method",
+      "module": "tropoi.physics.column_model",
+      "qualname": "RadiativeConvectiveColumn.equilibrate",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.column_model.RadiativeConvectiveColumn.evaluate",
+      "kind": "method",
+      "module": "tropoi.physics.column_model",
+      "qualname": "RadiativeConvectiveColumn.evaluate",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.column_model.RadiativeConvectiveColumn.step",
+      "kind": "method",
+      "module": "tropoi.physics.column_model",
+      "qualname": "RadiativeConvectiveColumn.step",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.column_model._xp",
+      "kind": "function",
+      "module": "tropoi.physics.column_model",
+      "qualname": "_xp",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.convection.DryConvectiveAdjustment",
+      "kind": "class",
+      "module": "tropoi.physics.convection",
+      "qualname": "DryConvectiveAdjustment",
+      "type": "class"
+    },
+    {
+      "id": "tropoi.physics.convection.DryConvectiveAdjustment.__init__",
+      "kind": "method",
+      "module": "tropoi.physics.convection",
+      "qualname": "DryConvectiveAdjustment.__init__",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.convection.DryConvectiveAdjustment.adjust",
+      "kind": "method",
+      "module": "tropoi.physics.convection",
+      "qualname": "DryConvectiveAdjustment.adjust",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.convection.DryConvectiveAdjustment.signature",
+      "kind": "method",
+      "module": "tropoi.physics.convection",
+      "qualname": "DryConvectiveAdjustment.signature",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.convection._xp",
+      "kind": "function",
+      "module": "tropoi.physics.convection",
+      "qualname": "_xp",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.convection.neutral_profile",
+      "kind": "function",
+      "module": "tropoi.physics.convection",
+      "qualname": "neutral_profile",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.insolation.DiurnalMeanInsolation",
+      "kind": "class",
+      "module": "tropoi.physics.insolation",
+      "qualname": "DiurnalMeanInsolation",
+      "type": "class"
+    },
+    {
+      "id": "tropoi.physics.insolation.DiurnalMeanInsolation.__call__",
+      "kind": "method",
+      "module": "tropoi.physics.insolation",
+      "qualname": "DiurnalMeanInsolation.__call__",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.insolation.DiurnalMeanInsolation.__init__",
+      "kind": "method",
+      "module": "tropoi.physics.insolation",
+      "qualname": "DiurnalMeanInsolation.__init__",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.insolation.DiurnalMeanInsolation.signature",
+      "kind": "method",
+      "module": "tropoi.physics.insolation",
+      "qualname": "DiurnalMeanInsolation.signature",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.insolation.InstantaneousInsolation",
+      "kind": "class",
+      "module": "tropoi.physics.insolation",
+      "qualname": "InstantaneousInsolation",
+      "type": "class"
+    },
+    {
+      "id": "tropoi.physics.insolation.InstantaneousInsolation.__call__",
+      "kind": "method",
+      "module": "tropoi.physics.insolation",
+      "qualname": "InstantaneousInsolation.__call__",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.insolation.InstantaneousInsolation.__init__",
+      "kind": "method",
+      "module": "tropoi.physics.insolation",
+      "qualname": "InstantaneousInsolation.__init__",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.insolation.InstantaneousInsolation.signature",
+      "kind": "method",
+      "module": "tropoi.physics.insolation",
+      "qualname": "InstantaneousInsolation.signature",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.insolation.Orbit",
+      "kind": "class",
+      "module": "tropoi.physics.insolation",
+      "qualname": "Orbit",
+      "type": "class"
+    },
+    {
+      "id": "tropoi.physics.insolation.Orbit.__post_init__",
+      "kind": "method",
+      "module": "tropoi.physics.insolation",
+      "qualname": "Orbit.__post_init__",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.insolation.Orbit.as_dict",
+      "kind": "method",
+      "module": "tropoi.physics.insolation",
+      "qualname": "Orbit.as_dict",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.insolation.Orbit.declination",
+      "kind": "method",
+      "module": "tropoi.physics.insolation",
+      "qualname": "Orbit.declination",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.insolation.Orbit.flux_at",
+      "kind": "method",
+      "module": "tropoi.physics.insolation",
+      "qualname": "Orbit.flux_at",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.insolation.Orbit.solar_longitude",
+      "kind": "method",
+      "module": "tropoi.physics.insolation",
+      "qualname": "Orbit.solar_longitude",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.insolation.Orbit.true_anomaly",
+      "kind": "method",
+      "module": "tropoi.physics.insolation",
+      "qualname": "Orbit.true_anomaly",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.insolation.PrescribedInsolation",
+      "kind": "class",
+      "module": "tropoi.physics.insolation",
+      "qualname": "PrescribedInsolation",
+      "type": "class"
+    },
+    {
+      "id": "tropoi.physics.insolation.PrescribedInsolation.__call__",
+      "kind": "method",
+      "module": "tropoi.physics.insolation",
+      "qualname": "PrescribedInsolation.__call__",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.insolation.PrescribedInsolation.__init__",
+      "kind": "method",
+      "module": "tropoi.physics.insolation",
+      "qualname": "PrescribedInsolation.__init__",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.insolation.PrescribedInsolation.signature",
+      "kind": "method",
+      "module": "tropoi.physics.insolation",
+      "qualname": "PrescribedInsolation.signature",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.insolation.TidallyLockedInsolation",
+      "kind": "class",
+      "module": "tropoi.physics.insolation",
+      "qualname": "TidallyLockedInsolation",
+      "type": "class"
+    },
+    {
+      "id": "tropoi.physics.insolation.TidallyLockedInsolation.__call__",
+      "kind": "method",
+      "module": "tropoi.physics.insolation",
+      "qualname": "TidallyLockedInsolation.__call__",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.insolation.TidallyLockedInsolation.__init__",
+      "kind": "method",
+      "module": "tropoi.physics.insolation",
+      "qualname": "TidallyLockedInsolation.__init__",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.insolation.TidallyLockedInsolation.signature",
+      "kind": "method",
+      "module": "tropoi.physics.insolation",
+      "qualname": "TidallyLockedInsolation.signature",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.insolation._xp",
+      "kind": "function",
+      "module": "tropoi.physics.insolation",
+      "qualname": "_xp",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.insolation.frierson_net_surface_flux",
+      "kind": "function",
+      "module": "tropoi.physics.insolation",
+      "qualname": "frierson_net_surface_flux",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.planets.PlanetaryBody",
+      "kind": "class",
+      "module": "tropoi.physics.planets",
+      "qualname": "PlanetaryBody",
+      "type": "class"
+    },
+    {
+      "id": "tropoi.physics.planets.PlanetaryBody.cp",
+      "kind": "property",
+      "module": "tropoi.physics.planets",
+      "qualname": "PlanetaryBody.cp",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.planets.PlanetaryBody.gas_constant",
+      "kind": "property",
+      "module": "tropoi.physics.planets",
+      "qualname": "PlanetaryBody.gas_constant",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.planets.PlanetaryBody.kappa",
+      "kind": "property",
+      "module": "tropoi.physics.planets",
+      "qualname": "PlanetaryBody.kappa",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.planets.PlanetaryBody.regime",
+      "kind": "method",
+      "module": "tropoi.physics.planets",
+      "qualname": "PlanetaryBody.regime",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.planets.PlanetaryBody.scale_height",
+      "kind": "property",
+      "module": "tropoi.physics.planets",
+      "qualname": "PlanetaryBody.scale_height",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.planets.PlanetaryBody.with_",
+      "kind": "method",
+      "module": "tropoi.physics.planets",
+      "qualname": "PlanetaryBody.with_",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.planets.VerticalGridSpec",
+      "kind": "class",
+      "module": "tropoi.physics.planets",
+      "qualname": "VerticalGridSpec",
+      "type": "class"
+    },
+    {
+      "id": "tropoi.physics.planets.VerticalGridSpec.as_dict",
+      "kind": "method",
+      "module": "tropoi.physics.planets",
+      "qualname": "VerticalGridSpec.as_dict",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.planets._body",
+      "kind": "function",
+      "module": "tropoi.physics.planets",
+      "qualname": "_body",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.radiation.gray.GrayLongwave",
+      "kind": "class",
+      "module": "tropoi.physics.radiation.gray",
+      "qualname": "GrayLongwave",
+      "type": "class"
+    },
+    {
+      "id": "tropoi.physics.radiation.gray.GrayLongwave.__init__",
+      "kind": "method",
+      "module": "tropoi.physics.radiation.gray",
+      "qualname": "GrayLongwave.__init__",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.radiation.gray.GrayLongwave.optical_properties",
+      "kind": "method",
+      "module": "tropoi.physics.radiation.gray",
+      "qualname": "GrayLongwave.optical_properties",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.radiation.gray.GrayLongwave.planck",
+      "kind": "method",
+      "module": "tropoi.physics.radiation.gray",
+      "qualname": "GrayLongwave.planck",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.radiation.gray.GrayLongwave.signature",
+      "kind": "method",
+      "module": "tropoi.physics.radiation.gray",
+      "qualname": "GrayLongwave.signature",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.radiation.gray.GrayShortwave",
+      "kind": "class",
+      "module": "tropoi.physics.radiation.gray",
+      "qualname": "GrayShortwave",
+      "type": "class"
+    },
+    {
+      "id": "tropoi.physics.radiation.gray.GrayShortwave.__init__",
+      "kind": "method",
+      "module": "tropoi.physics.radiation.gray",
+      "qualname": "GrayShortwave.__init__",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.radiation.gray.GrayShortwave.optical_properties",
+      "kind": "method",
+      "module": "tropoi.physics.radiation.gray",
+      "qualname": "GrayShortwave.optical_properties",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.radiation.gray.GrayShortwave.signature",
+      "kind": "method",
+      "module": "tropoi.physics.radiation.gray",
+      "qualname": "GrayShortwave.signature",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.radiation.gray.GrayShortwave.stellar_fractions",
+      "kind": "method",
+      "module": "tropoi.physics.radiation.gray",
+      "qualname": "GrayShortwave.stellar_fractions",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.radiation.gray.OpticalDepthProfile",
+      "kind": "class",
+      "module": "tropoi.physics.radiation.gray",
+      "qualname": "OpticalDepthProfile",
+      "type": "class"
+    },
+    {
+      "id": "tropoi.physics.radiation.gray.OpticalDepthProfile.__init__",
+      "kind": "method",
+      "module": "tropoi.physics.radiation.gray",
+      "qualname": "OpticalDepthProfile.__init__",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.radiation.gray.OpticalDepthProfile.cumulative",
+      "kind": "method",
+      "module": "tropoi.physics.radiation.gray",
+      "qualname": "OpticalDepthProfile.cumulative",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.radiation.gray.OpticalDepthProfile.layers",
+      "kind": "method",
+      "module": "tropoi.physics.radiation.gray",
+      "qualname": "OpticalDepthProfile.layers",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.radiation.gray.OpticalDepthProfile.signature",
+      "kind": "method",
+      "module": "tropoi.physics.radiation.gray",
+      "qualname": "OpticalDepthProfile.signature",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.radiation.gray.SemiInfiniteScatteringShortwave",
+      "kind": "class",
+      "module": "tropoi.physics.radiation.gray",
+      "qualname": "SemiInfiniteScatteringShortwave",
+      "type": "class"
+    },
+    {
+      "id": "tropoi.physics.radiation.gray.SemiInfiniteScatteringShortwave.__init__",
+      "kind": "method",
+      "module": "tropoi.physics.radiation.gray",
+      "qualname": "SemiInfiniteScatteringShortwave.__init__",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.radiation.gray.SemiInfiniteScatteringShortwave.analytic_fluxes",
+      "kind": "method",
+      "module": "tropoi.physics.radiation.gray",
+      "qualname": "SemiInfiniteScatteringShortwave.analytic_fluxes",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.radiation.gray.SemiInfiniteScatteringShortwave.signature",
+      "kind": "method",
+      "module": "tropoi.physics.radiation.gray",
+      "qualname": "SemiInfiniteScatteringShortwave.signature",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.radiation.gray._xp",
+      "kind": "function",
+      "module": "tropoi.physics.radiation.gray",
+      "qualname": "_xp",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.radiation.gray.frierson_longwave",
+      "kind": "function",
+      "module": "tropoi.physics.radiation.gray",
+      "qualname": "frierson_longwave",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.radiation.gray.isca_mars_longwave",
+      "kind": "function",
+      "module": "tropoi.physics.radiation.gray",
+      "qualname": "isca_mars_longwave",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.radiation.gray.isca_mars_shortwave",
+      "kind": "function",
+      "module": "tropoi.physics.radiation.gray",
+      "qualname": "isca_mars_shortwave",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.radiation.gray.schneider_liu_longwave",
+      "kind": "function",
+      "module": "tropoi.physics.radiation.gray",
+      "qualname": "schneider_liu_longwave",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.radiation.kdist.CorrelatedKLongwave",
+      "kind": "class",
+      "module": "tropoi.physics.radiation.kdist",
+      "qualname": "CorrelatedKLongwave",
+      "type": "class"
+    },
+    {
+      "id": "tropoi.physics.radiation.kdist.CorrelatedKLongwave.__init__",
+      "kind": "method",
+      "module": "tropoi.physics.radiation.kdist",
+      "qualname": "CorrelatedKLongwave.__init__",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.radiation.kdist.CorrelatedKLongwave.optical_properties",
+      "kind": "method",
+      "module": "tropoi.physics.radiation.kdist",
+      "qualname": "CorrelatedKLongwave.optical_properties",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.radiation.kdist.CorrelatedKLongwave.planck",
+      "kind": "method",
+      "module": "tropoi.physics.radiation.kdist",
+      "qualname": "CorrelatedKLongwave.planck",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.radiation.kdist.CorrelatedKLongwave.signature",
+      "kind": "method",
+      "module": "tropoi.physics.radiation.kdist",
+      "qualname": "CorrelatedKLongwave.signature",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.radiation.kdist.CorrelatedKLongwave.spectral_coverage",
+      "kind": "method",
+      "module": "tropoi.physics.radiation.kdist",
+      "qualname": "CorrelatedKLongwave.spectral_coverage",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.radiation.kdist.CorrelatedKShortwave",
+      "kind": "class",
+      "module": "tropoi.physics.radiation.kdist",
+      "qualname": "CorrelatedKShortwave",
+      "type": "class"
+    },
+    {
+      "id": "tropoi.physics.radiation.kdist.CorrelatedKShortwave.__init__",
+      "kind": "method",
+      "module": "tropoi.physics.radiation.kdist",
+      "qualname": "CorrelatedKShortwave.__init__",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.radiation.kdist.CorrelatedKShortwave.optical_properties",
+      "kind": "method",
+      "module": "tropoi.physics.radiation.kdist",
+      "qualname": "CorrelatedKShortwave.optical_properties",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.radiation.kdist.CorrelatedKShortwave.signature",
+      "kind": "method",
+      "module": "tropoi.physics.radiation.kdist",
+      "qualname": "CorrelatedKShortwave.signature",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.radiation.kdist.CorrelatedKShortwave.stellar_fractions",
+      "kind": "method",
+      "module": "tropoi.physics.radiation.kdist",
+      "qualname": "CorrelatedKShortwave.stellar_fractions",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.radiation.kdist.KTable",
+      "kind": "class",
+      "module": "tropoi.physics.radiation.kdist",
+      "qualname": "KTable",
+      "type": "class"
+    },
+    {
+      "id": "tropoi.physics.radiation.kdist.KTable.__post_init__",
+      "kind": "method",
+      "module": "tropoi.physics.radiation.kdist",
+      "qualname": "KTable.__post_init__",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.radiation.kdist.KTable.load",
+      "kind": "classmethod",
+      "module": "tropoi.physics.radiation.kdist",
+      "qualname": "KTable.load",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.radiation.kdist.KTable.n_band",
+      "kind": "property",
+      "module": "tropoi.physics.radiation.kdist",
+      "qualname": "KTable.n_band",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.radiation.kdist.KTable.n_g",
+      "kind": "property",
+      "module": "tropoi.physics.radiation.kdist",
+      "qualname": "KTable.n_g",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.radiation.kdist.KTable.save",
+      "kind": "method",
+      "module": "tropoi.physics.radiation.kdist",
+      "qualname": "KTable.save",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.radiation.kdist._CorrelatedK",
+      "kind": "class",
+      "module": "tropoi.physics.radiation.kdist",
+      "qualname": "_CorrelatedK",
+      "type": "class"
+    },
+    {
+      "id": "tropoi.physics.radiation.kdist._CorrelatedK.__init__",
+      "kind": "method",
+      "module": "tropoi.physics.radiation.kdist",
+      "qualname": "_CorrelatedK.__init__",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.radiation.kdist._CorrelatedK._layer_k",
+      "kind": "method",
+      "module": "tropoi.physics.radiation.kdist",
+      "qualname": "_CorrelatedK._layer_k",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.radiation.kdist._CorrelatedK._signature",
+      "kind": "method",
+      "module": "tropoi.physics.radiation.kdist",
+      "qualname": "_CorrelatedK._signature",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.radiation.kdist._CorrelatedK._table_dev",
+      "kind": "method",
+      "module": "tropoi.physics.radiation.kdist",
+      "qualname": "_CorrelatedK._table_dev",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.radiation.kdist._CorrelatedK._tau",
+      "kind": "method",
+      "module": "tropoi.physics.radiation.kdist",
+      "qualname": "_CorrelatedK._tau",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.radiation.kdist._planck_cumulative",
+      "kind": "function",
+      "module": "tropoi.physics.radiation.kdist",
+      "qualname": "_planck_cumulative",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.radiation.kdist._xp",
+      "kind": "function",
+      "module": "tropoi.physics.radiation.kdist",
+      "qualname": "_xp",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.radiation.kdist.gauss_legendre_g",
+      "kind": "function",
+      "module": "tropoi.physics.radiation.kdist",
+      "qualname": "gauss_legendre_g",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.radiation.kdist.ktable_from_spectrum",
+      "kind": "function",
+      "module": "tropoi.physics.radiation.kdist",
+      "qualname": "ktable_from_spectrum",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.radiation.kdist.planck_band_fraction",
+      "kind": "function",
+      "module": "tropoi.physics.radiation.kdist",
+      "qualname": "planck_band_fraction",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.radiation.scheme.Column",
+      "kind": "class",
+      "module": "tropoi.physics.radiation.scheme",
+      "qualname": "Column",
+      "type": "class"
+    },
+    {
+      "id": "tropoi.physics.radiation.scheme.Column.__post_init__",
+      "kind": "method",
+      "module": "tropoi.physics.radiation.scheme",
+      "qualname": "Column.__post_init__",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.radiation.scheme.Column.layer_pressure",
+      "kind": "property",
+      "module": "tropoi.physics.radiation.scheme",
+      "qualname": "Column.layer_pressure",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.radiation.scheme.Column.layer_pressure_thickness",
+      "kind": "property",
+      "module": "tropoi.physics.radiation.scheme",
+      "qualname": "Column.layer_pressure_thickness",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.radiation.scheme.Column.ncol",
+      "kind": "property",
+      "module": "tropoi.physics.radiation.scheme",
+      "qualname": "Column.ncol",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.radiation.scheme.Column.nlay",
+      "kind": "property",
+      "module": "tropoi.physics.radiation.scheme",
+      "qualname": "Column.nlay",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.radiation.scheme.Column.surface_pressure",
+      "kind": "property",
+      "module": "tropoi.physics.radiation.scheme",
+      "qualname": "Column.surface_pressure",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.radiation.scheme.LowerBoundary",
+      "kind": "class",
+      "module": "tropoi.physics.radiation.scheme",
+      "qualname": "LowerBoundary",
+      "type": "class"
+    },
+    {
+      "id": "tropoi.physics.radiation.scheme.LowerBoundary.__post_init__",
+      "kind": "method",
+      "module": "tropoi.physics.radiation.scheme",
+      "qualname": "LowerBoundary.__post_init__",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.radiation.scheme.Radiation",
+      "kind": "class",
+      "module": "tropoi.physics.radiation.scheme",
+      "qualname": "Radiation",
+      "type": "class"
+    },
+    {
+      "id": "tropoi.physics.radiation.scheme.Radiation.__init__",
+      "kind": "method",
+      "module": "tropoi.physics.radiation.scheme",
+      "qualname": "Radiation.__init__",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.radiation.scheme.Radiation._stellar",
+      "kind": "method",
+      "module": "tropoi.physics.radiation.scheme",
+      "qualname": "Radiation._stellar",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.radiation.scheme.Radiation._thermal",
+      "kind": "method",
+      "module": "tropoi.physics.radiation.scheme",
+      "qualname": "Radiation._thermal",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.radiation.scheme.Radiation.fluxes",
+      "kind": "method",
+      "module": "tropoi.physics.radiation.scheme",
+      "qualname": "Radiation.fluxes",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.radiation.scheme.Radiation.signature",
+      "kind": "method",
+      "module": "tropoi.physics.radiation.scheme",
+      "qualname": "Radiation.signature",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.radiation.scheme.RadiativeFluxes",
+      "kind": "class",
+      "module": "tropoi.physics.radiation.scheme",
+      "qualname": "RadiativeFluxes",
+      "type": "class"
+    },
+    {
+      "id": "tropoi.physics.radiation.scheme.RadiativeFluxes.absorbed_stellar",
+      "kind": "property",
+      "module": "tropoi.physics.radiation.scheme",
+      "qualname": "RadiativeFluxes.absorbed_stellar",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.radiation.scheme.RadiativeFluxes.bottom_net_down",
+      "kind": "property",
+      "module": "tropoi.physics.radiation.scheme",
+      "qualname": "RadiativeFluxes.bottom_net_down",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.radiation.scheme.RadiativeFluxes.net_down",
+      "kind": "property",
+      "module": "tropoi.physics.radiation.scheme",
+      "qualname": "RadiativeFluxes.net_down",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.radiation.scheme.RadiativeFluxes.olr",
+      "kind": "property",
+      "module": "tropoi.physics.radiation.scheme",
+      "qualname": "RadiativeFluxes.olr",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.radiation.scheme.RadiativeFluxes.toa_net_down",
+      "kind": "property",
+      "module": "tropoi.physics.radiation.scheme",
+      "qualname": "RadiativeFluxes.toa_net_down",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.radiation.scheme._points",
+      "kind": "function",
+      "module": "tropoi.physics.radiation.scheme",
+      "qualname": "_points",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.radiation.scheme._xp",
+      "kind": "function",
+      "module": "tropoi.physics.radiation.scheme",
+      "qualname": "_xp",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.radiation.scheme.heating_rate",
+      "kind": "function",
+      "module": "tropoi.physics.radiation.scheme",
+      "qualname": "heating_rate",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.radiation.scheme.interface_temperature",
+      "kind": "function",
+      "module": "tropoi.physics.radiation.scheme",
+      "qualname": "interface_temperature",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.radiation.twostream._xp",
+      "kind": "function",
+      "module": "tropoi.physics.radiation.twostream",
+      "qualname": "_xp",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.radiation.twostream.adding",
+      "kind": "function",
+      "module": "tropoi.physics.radiation.twostream",
+      "qualname": "adding",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.radiation.twostream.delta_scale",
+      "kind": "function",
+      "module": "tropoi.physics.radiation.twostream",
+      "qualname": "delta_scale",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.radiation.twostream.diffuse_layer",
+      "kind": "function",
+      "module": "tropoi.physics.radiation.twostream",
+      "qualname": "diffuse_layer",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.radiation.twostream.direct_layer",
+      "kind": "function",
+      "module": "tropoi.physics.radiation.twostream",
+      "qualname": "direct_layer",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.radiation.twostream.stellar_coefficients",
+      "kind": "function",
+      "module": "tropoi.physics.radiation.twostream",
+      "qualname": "stellar_coefficients",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.radiation.twostream.stellar_fluxes",
+      "kind": "function",
+      "module": "tropoi.physics.radiation.twostream",
+      "qualname": "stellar_fluxes",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.radiation.twostream.thermal_coefficients",
+      "kind": "function",
+      "module": "tropoi.physics.radiation.twostream",
+      "qualname": "thermal_coefficients",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.radiation.twostream.thermal_fluxes",
+      "kind": "function",
+      "module": "tropoi.physics.radiation.twostream",
+      "qualname": "thermal_fluxes",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.radiation.twostream.thermal_layer_sources",
+      "kind": "function",
+      "module": "tropoi.physics.radiation.twostream",
+      "qualname": "thermal_layer_sources",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.surface.SlabSurface",
+      "kind": "class",
+      "module": "tropoi.physics.surface",
+      "qualname": "SlabSurface",
+      "type": "class"
+    },
+    {
+      "id": "tropoi.physics.surface.SlabSurface.__init__",
+      "kind": "method",
+      "module": "tropoi.physics.surface",
+      "qualname": "SlabSurface.__init__",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.surface.SlabSurface.advance",
+      "kind": "method",
+      "module": "tropoi.physics.surface",
+      "qualname": "SlabSurface.advance",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.surface.SlabSurface.signature",
+      "kind": "method",
+      "module": "tropoi.physics.surface",
+      "qualname": "SlabSurface.signature",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.surface._xp",
+      "kind": "function",
+      "module": "tropoi.physics.surface",
+      "qualname": "_xp",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.surface.drag_coefficient",
+      "kind": "function",
+      "module": "tropoi.physics.surface",
+      "qualname": "drag_coefficient",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.surface.sensible_heat_flux",
+      "kind": "function",
+      "module": "tropoi.physics.surface",
+      "qualname": "sensible_heat_flux",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.thermodynamics.GasMixture",
+      "kind": "class",
+      "module": "tropoi.physics.thermodynamics",
+      "qualname": "GasMixture",
+      "type": "class"
+    },
+    {
+      "id": "tropoi.physics.thermodynamics.GasMixture.__post_init__",
+      "kind": "method",
+      "module": "tropoi.physics.thermodynamics",
+      "qualname": "GasMixture.__post_init__",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.thermodynamics.GasMixture.as_dict",
+      "kind": "method",
+      "module": "tropoi.physics.thermodynamics",
+      "qualname": "GasMixture.as_dict",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.thermodynamics.GasMixture.cp",
+      "kind": "method",
+      "module": "tropoi.physics.thermodynamics",
+      "qualname": "GasMixture.cp",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.thermodynamics.GasMixture.cp_range",
+      "kind": "method",
+      "module": "tropoi.physics.thermodynamics",
+      "qualname": "GasMixture.cp_range",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.thermodynamics.GasMixture.gas_constant",
+      "kind": "property",
+      "module": "tropoi.physics.thermodynamics",
+      "qualname": "GasMixture.gas_constant",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.thermodynamics.GasMixture.kappa",
+      "kind": "method",
+      "module": "tropoi.physics.thermodynamics",
+      "qualname": "GasMixture.kappa",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.thermodynamics.GasMixture.mass_fraction",
+      "kind": "method",
+      "module": "tropoi.physics.thermodynamics",
+      "qualname": "GasMixture.mass_fraction",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.thermodynamics.GasMixture.molar_mass",
+      "kind": "property",
+      "module": "tropoi.physics.thermodynamics",
+      "qualname": "GasMixture.molar_mass",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.thermodynamics.Species",
+      "kind": "class",
+      "module": "tropoi.physics.thermodynamics",
+      "qualname": "Species",
+      "type": "class"
+    },
+    {
+      "id": "tropoi.physics.thermodynamics.Species.cp_molar",
+      "kind": "method",
+      "module": "tropoi.physics.thermodynamics",
+      "qualname": "Species.cp_molar",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.thermodynamics._xp",
+      "kind": "function",
+      "module": "tropoi.physics.thermodynamics",
+      "qualname": "_xp",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.thermodynamics.hydrogen_rotational_cv",
+      "kind": "function",
+      "module": "tropoi.physics.thermodynamics",
+      "qualname": "hydrogen_rotational_cv",
       "type": "function"
     },
     {
@@ -15651,6 +17872,293 @@
       "type": "function"
     },
     {
+      "id": "tropoi.run.radiative.__main__._config",
+      "kind": "function",
+      "module": "tropoi.run.radiative.__main__",
+      "qualname": "_config",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.radiative.__main__.main",
+      "kind": "function",
+      "module": "tropoi.run.radiative.__main__",
+      "qualname": "main",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.radiative.config.RadiativeConfig",
+      "kind": "class",
+      "module": "tropoi.run.radiative.config",
+      "qualname": "RadiativeConfig",
+      "type": "class"
+    },
+    {
+      "id": "tropoi.run.radiative.config.RadiativeConfig.__post_init__",
+      "kind": "method",
+      "module": "tropoi.run.radiative.config",
+      "qualname": "RadiativeConfig.__post_init__",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.radiative.config.RadiativeConfig.canonical_json",
+      "kind": "method",
+      "module": "tropoi.run.radiative.config",
+      "qualname": "RadiativeConfig.canonical_json",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.radiative.config.RadiativeConfig.from_dict",
+      "kind": "classmethod",
+      "module": "tropoi.run.radiative.config",
+      "qualname": "RadiativeConfig.from_dict",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.radiative.config.RadiativeConfig.kappa",
+      "kind": "property",
+      "module": "tropoi.run.radiative.config",
+      "qualname": "RadiativeConfig.kappa",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.radiative.config.RadiativeConfig.retained_cut",
+      "kind": "property",
+      "module": "tropoi.run.radiative.config",
+      "qualname": "RadiativeConfig.retained_cut",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.radiative.config.RadiativeConfig.sha256",
+      "kind": "method",
+      "module": "tropoi.run.radiative.config",
+      "qualname": "RadiativeConfig.sha256",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.radiative.config.RadiativeConfig.steps_per_day",
+      "kind": "property",
+      "module": "tropoi.run.radiative.config",
+      "qualname": "RadiativeConfig.steps_per_day",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.radiative.config.RadiativeConfig.to_dict",
+      "kind": "method",
+      "module": "tropoi.run.radiative.config",
+      "qualname": "RadiativeConfig.to_dict",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.radiative.config.RadiativeConfig.total_steps",
+      "kind": "property",
+      "module": "tropoi.run.radiative.config",
+      "qualname": "RadiativeConfig.total_steps",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.radiative.config.RadiativeConfig.with_",
+      "kind": "method",
+      "module": "tropoi.run.radiative.config",
+      "qualname": "RadiativeConfig.with_",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.radiative.config._t21",
+      "kind": "function",
+      "module": "tropoi.run.radiative.config",
+      "qualname": "_t21",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.radiative.config.earth_gray_dry",
+      "kind": "function",
+      "module": "tropoi.run.radiative.config",
+      "qualname": "earth_gray_dry",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.radiative.config.jupiter_schneider_liu",
+      "kind": "function",
+      "module": "tropoi.run.radiative.config",
+      "qualname": "jupiter_schneider_liu",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.radiative.experiment.RadiativeRun",
+      "kind": "class",
+      "module": "tropoi.run.radiative.experiment",
+      "qualname": "RadiativeRun",
+      "type": "class"
+    },
+    {
+      "id": "tropoi.run.radiative.experiment.RadiativeRun.__init__",
+      "kind": "method",
+      "module": "tropoi.run.radiative.experiment",
+      "qualname": "RadiativeRun.__init__",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.radiative.experiment.RadiativeRun._arrays",
+      "kind": "method",
+      "module": "tropoi.run.radiative.experiment",
+      "qualname": "RadiativeRun._arrays",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.radiative.experiment.RadiativeRun._event",
+      "kind": "method",
+      "module": "tropoi.run.radiative.experiment",
+      "qualname": "RadiativeRun._event",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.radiative.experiment.RadiativeRun._mean_window_start",
+      "kind": "method",
+      "module": "tropoi.run.radiative.experiment",
+      "qualname": "RadiativeRun._mean_window_start",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.radiative.experiment.RadiativeRun._resume",
+      "kind": "method",
+      "module": "tropoi.run.radiative.experiment",
+      "qualname": "RadiativeRun._resume",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.radiative.experiment.RadiativeRun._sample",
+      "kind": "method",
+      "module": "tropoi.run.radiative.experiment",
+      "qualname": "RadiativeRun._sample",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.radiative.experiment.RadiativeRun._write_checkpoint",
+      "kind": "method",
+      "module": "tropoi.run.radiative.experiment",
+      "qualname": "RadiativeRun._write_checkpoint",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.radiative.experiment.RadiativeRun._write_means",
+      "kind": "method",
+      "module": "tropoi.run.radiative.experiment",
+      "qualname": "RadiativeRun._write_means",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.radiative.experiment.RadiativeRun.day",
+      "kind": "property",
+      "module": "tropoi.run.radiative.experiment",
+      "qualname": "RadiativeRun.day",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.radiative.experiment.RadiativeRun.run",
+      "kind": "method",
+      "module": "tropoi.run.radiative.experiment",
+      "qualname": "RadiativeRun.run",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.radiative.experiment.RadiativeRun.step",
+      "kind": "property",
+      "module": "tropoi.run.radiative.experiment",
+      "qualname": "RadiativeRun.step",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.radiative.model._drag",
+      "kind": "function",
+      "module": "tropoi.run.radiative.model",
+      "qualname": "_drag",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.radiative.model._global_mean_insolation",
+      "kind": "function",
+      "module": "tropoi.run.radiative.model",
+      "qualname": "_global_mean_insolation",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.radiative.model._longwave",
+      "kind": "function",
+      "module": "tropoi.run.radiative.model",
+      "qualname": "_longwave",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.radiative.model._options",
+      "kind": "function",
+      "module": "tropoi.run.radiative.model",
+      "qualname": "_options",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.radiative.model._shortwave",
+      "kind": "function",
+      "module": "tropoi.run.radiative.model",
+      "qualname": "_shortwave",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.radiative.model.build_insolation",
+      "kind": "function",
+      "module": "tropoi.run.radiative.model",
+      "qualname": "build_insolation",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.radiative.model.build_model",
+      "kind": "function",
+      "module": "tropoi.run.radiative.model",
+      "qualname": "build_model",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.radiative.model.build_physics",
+      "kind": "function",
+      "module": "tropoi.run.radiative.model",
+      "qualname": "build_physics",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.radiative.model.build_radiation",
+      "kind": "function",
+      "module": "tropoi.run.radiative.model",
+      "qualname": "build_radiation",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.radiative.model.build_sigma",
+      "kind": "function",
+      "module": "tropoi.run.radiative.model",
+      "qualname": "build_sigma",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.radiative.model.build_stepper",
+      "kind": "function",
+      "module": "tropoi.run.radiative.model",
+      "qualname": "build_stepper",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.radiative.model.initial_state",
+      "kind": "function",
+      "module": "tropoi.run.radiative.model",
+      "qualname": "initial_state",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.radiative.model.reference_column",
+      "kind": "function",
+      "module": "tropoi.run.radiative.model",
+      "qualname": "reference_column",
+      "type": "function"
+    },
+    {
       "id": "tropoi.run.swe.config.SWERunConfig",
       "kind": "class",
       "module": "tropoi.run.swe.config",
@@ -16750,6 +19258,13 @@
       "type": "function"
     },
     {
+      "id": "tropoi.spatial.sigma_coordinate.SigmaGrid.frierson",
+      "kind": "classmethod",
+      "module": "tropoi.spatial.sigma_coordinate",
+      "qualname": "SigmaGrid.frierson",
+      "type": "function"
+    },
+    {
       "id": "tropoi.spatial.sigma_coordinate.SigmaGrid.full_levels",
       "kind": "method",
       "module": "tropoi.spatial.sigma_coordinate",
@@ -16789,6 +19304,13 @@
       "kind": "property",
       "module": "tropoi.spatial.sigma_coordinate",
       "qualname": "SigmaGrid.nlev",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.spatial.sigma_coordinate.SigmaGrid.stretched",
+      "kind": "classmethod",
+      "module": "tropoi.spatial.sigma_coordinate",
+      "qualname": "SigmaGrid.stretched",
       "type": "function"
     },
     {
@@ -18304,6 +20826,104 @@
       "type": "function"
     },
     {
+      "id": "tropoi.temporal.column_coupling.ColumnPhysicsCoupling",
+      "kind": "class",
+      "module": "tropoi.temporal.column_coupling",
+      "qualname": "ColumnPhysicsCoupling",
+      "type": "class"
+    },
+    {
+      "id": "tropoi.temporal.column_coupling.ColumnPhysicsCoupling.__call__",
+      "kind": "method",
+      "module": "tropoi.temporal.column_coupling",
+      "qualname": "ColumnPhysicsCoupling.__call__",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.temporal.column_coupling.ColumnPhysicsCoupling.__init__",
+      "kind": "method",
+      "module": "tropoi.temporal.column_coupling",
+      "qualname": "ColumnPhysicsCoupling.__init__",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.temporal.column_coupling.ColumnPhysicsCoupling._lowest_wind_speed",
+      "kind": "method",
+      "module": "tropoi.temporal.column_coupling",
+      "qualname": "ColumnPhysicsCoupling._lowest_wind_speed",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.temporal.column_coupling.ColumnPhysicsCoupling.budget_means",
+      "kind": "method",
+      "module": "tropoi.temporal.column_coupling",
+      "qualname": "ColumnPhysicsCoupling.budget_means",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.temporal.column_coupling.ColumnPhysicsCoupling.columns",
+      "kind": "method",
+      "module": "tropoi.temporal.column_coupling",
+      "qualname": "ColumnPhysicsCoupling.columns",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.temporal.column_coupling.ColumnPhysicsCoupling.load_state_dict",
+      "kind": "method",
+      "module": "tropoi.temporal.column_coupling",
+      "qualname": "ColumnPhysicsCoupling.load_state_dict",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.temporal.column_coupling.ColumnPhysicsCoupling.signature",
+      "kind": "method",
+      "module": "tropoi.temporal.column_coupling",
+      "qualname": "ColumnPhysicsCoupling.signature",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.temporal.column_coupling.ColumnPhysicsCoupling.state_dict",
+      "kind": "method",
+      "module": "tropoi.temporal.column_coupling",
+      "qualname": "ColumnPhysicsCoupling.state_dict",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.temporal.column_coupling._analyze",
+      "kind": "function",
+      "module": "tropoi.temporal.column_coupling",
+      "qualname": "_analyze",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.temporal.column_coupling._area_weights",
+      "kind": "function",
+      "module": "tropoi.temporal.column_coupling",
+      "qualname": "_area_weights",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.temporal.column_coupling._synthesize",
+      "kind": "function",
+      "module": "tropoi.temporal.column_coupling",
+      "qualname": "_synthesize",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.temporal.column_coupling._xp",
+      "kind": "function",
+      "module": "tropoi.temporal.column_coupling",
+      "qualname": "_xp",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.temporal.column_coupling.global_energy",
+      "kind": "function",
+      "module": "tropoi.temporal.column_coupling",
+      "qualname": "global_energy",
+      "type": "function"
+    },
+    {
       "id": "tropoi.temporal.hooks.DiagonalDamping",
       "kind": "class",
       "module": "tropoi.temporal.hooks",
@@ -18553,6 +21173,13 @@
       "kind": "method",
       "module": "tropoi.temporal.semi_implicit",
       "qualname": "SemiImplicitLeapfrogStepper.__init__",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.temporal.semi_implicit.SemiImplicitLeapfrogStepper._hook_signatures",
+      "kind": "method",
+      "module": "tropoi.temporal.semi_implicit",
+      "qualname": "SemiImplicitLeapfrogStepper._hook_signatures",
       "type": "function"
     },
     {
@@ -19204,6 +21831,41 @@
       "kind": "method",
       "module": "tropoi.temporal.tendencies.barotropic",
       "qualname": "BarotropicVorticity.vorticity_to_streamfunction",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.temporal.tendencies.drag.LatitudeDependentRayleighDrag",
+      "kind": "class",
+      "module": "tropoi.temporal.tendencies.drag",
+      "qualname": "LatitudeDependentRayleighDrag",
+      "type": "class"
+    },
+    {
+      "id": "tropoi.temporal.tendencies.drag.LatitudeDependentRayleighDrag.__call__",
+      "kind": "method",
+      "module": "tropoi.temporal.tendencies.drag",
+      "qualname": "LatitudeDependentRayleighDrag.__call__",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.temporal.tendencies.drag.LatitudeDependentRayleighDrag.__init__",
+      "kind": "method",
+      "module": "tropoi.temporal.tendencies.drag",
+      "qualname": "LatitudeDependentRayleighDrag.__init__",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.temporal.tendencies.drag.LatitudeDependentRayleighDrag.signature",
+      "kind": "method",
+      "module": "tropoi.temporal.tendencies.drag",
+      "qualname": "LatitudeDependentRayleighDrag.signature",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.temporal.tendencies.drag.schneider_liu_drag_profile",
+      "kind": "function",
+      "module": "tropoi.temporal.tendencies.drag",
+      "qualname": "schneider_liu_drag_profile",
       "type": "function"
     },
     {

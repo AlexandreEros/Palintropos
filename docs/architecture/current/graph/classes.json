@@ -3,6 +3,18 @@
     {
       "kind": "inherits",
       "position": 0,
+      "source": "tropoi.physics.radiation.kdist.CorrelatedKLongwave",
+      "target": "tropoi.physics.radiation.kdist._CorrelatedK"
+    },
+    {
+      "kind": "inherits",
+      "position": 0,
+      "source": "tropoi.physics.radiation.kdist.CorrelatedKShortwave",
+      "target": "tropoi.physics.radiation.kdist._CorrelatedK"
+    },
+    {
+      "kind": "inherits",
+      "position": 0,
       "source": "tropoi.representation.archive.capsule.CapsuleLayoutError",
       "target": "tropoi.representation.archive.capsule.CapsuleError"
     },
@@ -75,6 +87,668 @@
   ],
   "name": "classes",
   "nodes": [
+    {
+      "decorators": [],
+      "external_bases": [],
+      "id": "tropoi.physics.column_model.ColumnPhysics",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__init__"
+        },
+        {
+          "kind": "method",
+          "name": "adjust"
+        },
+        {
+          "kind": "method",
+          "name": "compute"
+        },
+        {
+          "kind": "method",
+          "name": "reset"
+        },
+        {
+          "kind": "method",
+          "name": "signature"
+        }
+      ],
+      "module": "tropoi.physics.column_model",
+      "qualname": "ColumnPhysics"
+    },
+    {
+      "decorators": [
+        "dataclass"
+      ],
+      "external_bases": [],
+      "id": "tropoi.physics.column_model.PhysicsOutput",
+      "members": [
+        {
+          "kind": "property",
+          "name": "column_energy_tendency"
+        }
+      ],
+      "module": "tropoi.physics.column_model",
+      "qualname": "PhysicsOutput"
+    },
+    {
+      "decorators": [],
+      "external_bases": [],
+      "id": "tropoi.physics.column_model.RadiativeConvectiveColumn",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__init__"
+        },
+        {
+          "kind": "method",
+          "name": "_stable_step"
+        },
+        {
+          "kind": "method",
+          "name": "equilibrate"
+        },
+        {
+          "kind": "method",
+          "name": "evaluate"
+        },
+        {
+          "kind": "method",
+          "name": "step"
+        }
+      ],
+      "module": "tropoi.physics.column_model",
+      "qualname": "RadiativeConvectiveColumn"
+    },
+    {
+      "decorators": [],
+      "external_bases": [],
+      "id": "tropoi.physics.convection.DryConvectiveAdjustment",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__init__"
+        },
+        {
+          "kind": "method",
+          "name": "adjust"
+        },
+        {
+          "kind": "method",
+          "name": "signature"
+        }
+      ],
+      "module": "tropoi.physics.convection",
+      "qualname": "DryConvectiveAdjustment"
+    },
+    {
+      "decorators": [],
+      "external_bases": [],
+      "id": "tropoi.physics.insolation.DiurnalMeanInsolation",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__call__"
+        },
+        {
+          "kind": "method",
+          "name": "__init__"
+        },
+        {
+          "kind": "method",
+          "name": "signature"
+        }
+      ],
+      "module": "tropoi.physics.insolation",
+      "qualname": "DiurnalMeanInsolation"
+    },
+    {
+      "decorators": [],
+      "external_bases": [],
+      "id": "tropoi.physics.insolation.InstantaneousInsolation",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__call__"
+        },
+        {
+          "kind": "method",
+          "name": "__init__"
+        },
+        {
+          "kind": "method",
+          "name": "signature"
+        }
+      ],
+      "module": "tropoi.physics.insolation",
+      "qualname": "InstantaneousInsolation"
+    },
+    {
+      "decorators": [
+        "dataclass(frozen=True)"
+      ],
+      "external_bases": [],
+      "id": "tropoi.physics.insolation.Orbit",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__post_init__"
+        },
+        {
+          "kind": "method",
+          "name": "as_dict"
+        },
+        {
+          "kind": "method",
+          "name": "declination"
+        },
+        {
+          "kind": "method",
+          "name": "flux_at"
+        },
+        {
+          "kind": "method",
+          "name": "solar_longitude"
+        },
+        {
+          "kind": "method",
+          "name": "true_anomaly"
+        }
+      ],
+      "module": "tropoi.physics.insolation",
+      "qualname": "Orbit"
+    },
+    {
+      "decorators": [],
+      "external_bases": [],
+      "id": "tropoi.physics.insolation.PrescribedInsolation",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__call__"
+        },
+        {
+          "kind": "method",
+          "name": "__init__"
+        },
+        {
+          "kind": "method",
+          "name": "signature"
+        }
+      ],
+      "module": "tropoi.physics.insolation",
+      "qualname": "PrescribedInsolation"
+    },
+    {
+      "decorators": [],
+      "external_bases": [],
+      "id": "tropoi.physics.insolation.TidallyLockedInsolation",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__call__"
+        },
+        {
+          "kind": "method",
+          "name": "__init__"
+        },
+        {
+          "kind": "method",
+          "name": "signature"
+        }
+      ],
+      "module": "tropoi.physics.insolation",
+      "qualname": "TidallyLockedInsolation"
+    },
+    {
+      "decorators": [
+        "dataclass(frozen=True)"
+      ],
+      "external_bases": [],
+      "id": "tropoi.physics.planets.PlanetaryBody",
+      "members": [
+        {
+          "kind": "property",
+          "name": "cp"
+        },
+        {
+          "kind": "property",
+          "name": "gas_constant"
+        },
+        {
+          "kind": "property",
+          "name": "kappa"
+        },
+        {
+          "kind": "method",
+          "name": "regime"
+        },
+        {
+          "kind": "property",
+          "name": "scale_height"
+        },
+        {
+          "kind": "method",
+          "name": "with_"
+        }
+      ],
+      "module": "tropoi.physics.planets",
+      "qualname": "PlanetaryBody"
+    },
+    {
+      "decorators": [
+        "dataclass(frozen=True)"
+      ],
+      "external_bases": [],
+      "id": "tropoi.physics.planets.VerticalGridSpec",
+      "members": [
+        {
+          "kind": "method",
+          "name": "as_dict"
+        }
+      ],
+      "module": "tropoi.physics.planets",
+      "qualname": "VerticalGridSpec"
+    },
+    {
+      "decorators": [],
+      "external_bases": [],
+      "id": "tropoi.physics.radiation.gray.GrayLongwave",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__init__"
+        },
+        {
+          "kind": "method",
+          "name": "optical_properties"
+        },
+        {
+          "kind": "method",
+          "name": "planck"
+        },
+        {
+          "kind": "method",
+          "name": "signature"
+        }
+      ],
+      "module": "tropoi.physics.radiation.gray",
+      "qualname": "GrayLongwave"
+    },
+    {
+      "decorators": [],
+      "external_bases": [],
+      "id": "tropoi.physics.radiation.gray.GrayShortwave",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__init__"
+        },
+        {
+          "kind": "method",
+          "name": "optical_properties"
+        },
+        {
+          "kind": "method",
+          "name": "signature"
+        },
+        {
+          "kind": "method",
+          "name": "stellar_fractions"
+        }
+      ],
+      "module": "tropoi.physics.radiation.gray",
+      "qualname": "GrayShortwave"
+    },
+    {
+      "decorators": [],
+      "external_bases": [],
+      "id": "tropoi.physics.radiation.gray.OpticalDepthProfile",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__init__"
+        },
+        {
+          "kind": "method",
+          "name": "cumulative"
+        },
+        {
+          "kind": "method",
+          "name": "layers"
+        },
+        {
+          "kind": "method",
+          "name": "signature"
+        }
+      ],
+      "module": "tropoi.physics.radiation.gray",
+      "qualname": "OpticalDepthProfile"
+    },
+    {
+      "decorators": [],
+      "external_bases": [],
+      "id": "tropoi.physics.radiation.gray.SemiInfiniteScatteringShortwave",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__init__"
+        },
+        {
+          "kind": "method",
+          "name": "analytic_fluxes"
+        },
+        {
+          "kind": "method",
+          "name": "signature"
+        }
+      ],
+      "module": "tropoi.physics.radiation.gray",
+      "qualname": "SemiInfiniteScatteringShortwave"
+    },
+    {
+      "decorators": [],
+      "external_bases": [],
+      "id": "tropoi.physics.radiation.kdist.CorrelatedKLongwave",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__init__"
+        },
+        {
+          "kind": "method",
+          "name": "optical_properties"
+        },
+        {
+          "kind": "method",
+          "name": "planck"
+        },
+        {
+          "kind": "method",
+          "name": "signature"
+        },
+        {
+          "kind": "method",
+          "name": "spectral_coverage"
+        }
+      ],
+      "module": "tropoi.physics.radiation.kdist",
+      "qualname": "CorrelatedKLongwave"
+    },
+    {
+      "decorators": [],
+      "external_bases": [],
+      "id": "tropoi.physics.radiation.kdist.CorrelatedKShortwave",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__init__"
+        },
+        {
+          "kind": "method",
+          "name": "optical_properties"
+        },
+        {
+          "kind": "method",
+          "name": "signature"
+        },
+        {
+          "kind": "method",
+          "name": "stellar_fractions"
+        }
+      ],
+      "module": "tropoi.physics.radiation.kdist",
+      "qualname": "CorrelatedKShortwave"
+    },
+    {
+      "decorators": [
+        "dataclass"
+      ],
+      "external_bases": [],
+      "id": "tropoi.physics.radiation.kdist.KTable",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__post_init__"
+        },
+        {
+          "kind": "classmethod",
+          "name": "load"
+        },
+        {
+          "kind": "property",
+          "name": "n_band"
+        },
+        {
+          "kind": "property",
+          "name": "n_g"
+        },
+        {
+          "kind": "method",
+          "name": "save"
+        }
+      ],
+      "module": "tropoi.physics.radiation.kdist",
+      "qualname": "KTable"
+    },
+    {
+      "decorators": [],
+      "external_bases": [],
+      "id": "tropoi.physics.radiation.kdist._CorrelatedK",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__init__"
+        },
+        {
+          "kind": "method",
+          "name": "_layer_k"
+        },
+        {
+          "kind": "method",
+          "name": "_signature"
+        },
+        {
+          "kind": "method",
+          "name": "_table_dev"
+        },
+        {
+          "kind": "method",
+          "name": "_tau"
+        }
+      ],
+      "module": "tropoi.physics.radiation.kdist",
+      "qualname": "_CorrelatedK"
+    },
+    {
+      "decorators": [
+        "dataclass"
+      ],
+      "external_bases": [],
+      "id": "tropoi.physics.radiation.scheme.Column",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__post_init__"
+        },
+        {
+          "kind": "property",
+          "name": "layer_pressure"
+        },
+        {
+          "kind": "property",
+          "name": "layer_pressure_thickness"
+        },
+        {
+          "kind": "property",
+          "name": "ncol"
+        },
+        {
+          "kind": "property",
+          "name": "nlay"
+        },
+        {
+          "kind": "property",
+          "name": "surface_pressure"
+        }
+      ],
+      "module": "tropoi.physics.radiation.scheme",
+      "qualname": "Column"
+    },
+    {
+      "decorators": [
+        "dataclass"
+      ],
+      "external_bases": [],
+      "id": "tropoi.physics.radiation.scheme.LowerBoundary",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__post_init__"
+        }
+      ],
+      "module": "tropoi.physics.radiation.scheme",
+      "qualname": "LowerBoundary"
+    },
+    {
+      "decorators": [],
+      "external_bases": [],
+      "id": "tropoi.physics.radiation.scheme.Radiation",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__init__"
+        },
+        {
+          "kind": "method",
+          "name": "_stellar"
+        },
+        {
+          "kind": "method",
+          "name": "_thermal"
+        },
+        {
+          "kind": "method",
+          "name": "fluxes"
+        },
+        {
+          "kind": "method",
+          "name": "signature"
+        }
+      ],
+      "module": "tropoi.physics.radiation.scheme",
+      "qualname": "Radiation"
+    },
+    {
+      "decorators": [
+        "dataclass"
+      ],
+      "external_bases": [],
+      "id": "tropoi.physics.radiation.scheme.RadiativeFluxes",
+      "members": [
+        {
+          "kind": "property",
+          "name": "absorbed_stellar"
+        },
+        {
+          "kind": "property",
+          "name": "bottom_net_down"
+        },
+        {
+          "kind": "property",
+          "name": "net_down"
+        },
+        {
+          "kind": "property",
+          "name": "olr"
+        },
+        {
+          "kind": "property",
+          "name": "toa_net_down"
+        }
+      ],
+      "module": "tropoi.physics.radiation.scheme",
+      "qualname": "RadiativeFluxes"
+    },
+    {
+      "decorators": [],
+      "external_bases": [],
+      "id": "tropoi.physics.surface.SlabSurface",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__init__"
+        },
+        {
+          "kind": "method",
+          "name": "advance"
+        },
+        {
+          "kind": "method",
+          "name": "signature"
+        }
+      ],
+      "module": "tropoi.physics.surface",
+      "qualname": "SlabSurface"
+    },
+    {
+      "decorators": [
+        "dataclass(frozen=True)"
+      ],
+      "external_bases": [],
+      "id": "tropoi.physics.thermodynamics.GasMixture",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__post_init__"
+        },
+        {
+          "kind": "method",
+          "name": "as_dict"
+        },
+        {
+          "kind": "method",
+          "name": "cp"
+        },
+        {
+          "kind": "method",
+          "name": "cp_range"
+        },
+        {
+          "kind": "property",
+          "name": "gas_constant"
+        },
+        {
+          "kind": "method",
+          "name": "kappa"
+        },
+        {
+          "kind": "method",
+          "name": "mass_fraction"
+        },
+        {
+          "kind": "property",
+          "name": "molar_mass"
+        }
+      ],
+      "module": "tropoi.physics.thermodynamics",
+      "qualname": "GasMixture"
+    },
+    {
+      "decorators": [
+        "dataclass(frozen=True)"
+      ],
+      "external_bases": [],
+      "id": "tropoi.physics.thermodynamics.Species",
+      "members": [
+        {
+          "kind": "method",
+          "name": "cp_molar"
+        }
+      ],
+      "module": "tropoi.physics.thermodynamics",
+      "qualname": "Species"
+    },
     {
       "decorators": [],
       "external_bases": [
@@ -2710,6 +3384,110 @@
         "dataclass(frozen=True)"
       ],
       "external_bases": [],
+      "id": "tropoi.run.radiative.config.RadiativeConfig",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__post_init__"
+        },
+        {
+          "kind": "method",
+          "name": "canonical_json"
+        },
+        {
+          "kind": "classmethod",
+          "name": "from_dict"
+        },
+        {
+          "kind": "property",
+          "name": "kappa"
+        },
+        {
+          "kind": "property",
+          "name": "retained_cut"
+        },
+        {
+          "kind": "method",
+          "name": "sha256"
+        },
+        {
+          "kind": "property",
+          "name": "steps_per_day"
+        },
+        {
+          "kind": "method",
+          "name": "to_dict"
+        },
+        {
+          "kind": "property",
+          "name": "total_steps"
+        },
+        {
+          "kind": "method",
+          "name": "with_"
+        }
+      ],
+      "module": "tropoi.run.radiative.config",
+      "qualname": "RadiativeConfig"
+    },
+    {
+      "decorators": [],
+      "external_bases": [],
+      "id": "tropoi.run.radiative.experiment.RadiativeRun",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__init__"
+        },
+        {
+          "kind": "method",
+          "name": "_arrays"
+        },
+        {
+          "kind": "method",
+          "name": "_event"
+        },
+        {
+          "kind": "method",
+          "name": "_mean_window_start"
+        },
+        {
+          "kind": "method",
+          "name": "_resume"
+        },
+        {
+          "kind": "method",
+          "name": "_sample"
+        },
+        {
+          "kind": "method",
+          "name": "_write_checkpoint"
+        },
+        {
+          "kind": "method",
+          "name": "_write_means"
+        },
+        {
+          "kind": "property",
+          "name": "day"
+        },
+        {
+          "kind": "method",
+          "name": "run"
+        },
+        {
+          "kind": "property",
+          "name": "step"
+        }
+      ],
+      "module": "tropoi.run.radiative.experiment",
+      "qualname": "RadiativeRun"
+    },
+    {
+      "decorators": [
+        "dataclass(frozen=True)"
+      ],
+      "external_bases": [],
       "id": "tropoi.run.swe.config.SWERunConfig",
       "members": [
         {
@@ -3267,6 +4045,10 @@
           "name": "alpha"
         },
         {
+          "kind": "classmethod",
+          "name": "frierson"
+        },
+        {
           "kind": "method",
           "name": "full_levels"
         },
@@ -3289,6 +4071,10 @@
         {
           "kind": "property",
           "name": "nlev"
+        },
+        {
+          "kind": "classmethod",
+          "name": "stretched"
         },
         {
           "kind": "method",
@@ -4046,6 +4832,47 @@
     {
       "decorators": [],
       "external_bases": [],
+      "id": "tropoi.temporal.column_coupling.ColumnPhysicsCoupling",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__call__"
+        },
+        {
+          "kind": "method",
+          "name": "__init__"
+        },
+        {
+          "kind": "method",
+          "name": "_lowest_wind_speed"
+        },
+        {
+          "kind": "method",
+          "name": "budget_means"
+        },
+        {
+          "kind": "method",
+          "name": "columns"
+        },
+        {
+          "kind": "method",
+          "name": "load_state_dict"
+        },
+        {
+          "kind": "method",
+          "name": "signature"
+        },
+        {
+          "kind": "method",
+          "name": "state_dict"
+        }
+      ],
+      "module": "tropoi.temporal.column_coupling",
+      "qualname": "ColumnPhysicsCoupling"
+    },
+    {
+      "decorators": [],
+      "external_bases": [],
       "id": "tropoi.temporal.hooks.DiagonalDamping",
       "members": [
         {
@@ -4109,6 +4936,10 @@
         {
           "kind": "method",
           "name": "__init__"
+        },
+        {
+          "kind": "method",
+          "name": "_hook_signatures"
         },
         {
           "kind": "method",
@@ -4513,6 +5344,27 @@
       ],
       "module": "tropoi.temporal.tendencies.barotropic",
       "qualname": "BarotropicVorticity"
+    },
+    {
+      "decorators": [],
+      "external_bases": [],
+      "id": "tropoi.temporal.tendencies.drag.LatitudeDependentRayleighDrag",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__call__"
+        },
+        {
+          "kind": "method",
+          "name": "__init__"
+        },
+        {
+          "kind": "method",
+          "name": "signature"
+        }
+      ],
+      "module": "tropoi.temporal.tendencies.drag",
+      "qualname": "LatitudeDependentRayleighDrag"
     },
     {
       "decorators": [

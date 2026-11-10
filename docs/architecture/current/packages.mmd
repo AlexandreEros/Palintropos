@@ -2,7 +2,7 @@
 %% Package-level import graph, every edge drawn, packages boxed by declared layer (top = most dependent). Layers declared in DEFAULT_LAYERS in tools/architecture/layers.py; each package is placed by name prefix (first match in declaration order), not inferred from imports. Edge label = number of module-level import edges; dashed, 'type-only' = every merged import is under if TYPE_CHECKING (never executed). Red, 'up' = edge against the declared order (layer violation). Box placement is the renderer's: read violations from colour and label.
 %%{init: {"flowchart": {"wrappingWidth": 700}}}%%
 flowchart TD
-    legend["Layers declared in DEFAULT_LAYERS in tools/architecture/layers.py,<br>assigned by package-name prefix, not inferred from imports:<br>cli = tropoi.cli<br>run = tropoi.run<br>representation = tropoi.representation<br>temporal = tropoi.temporal<br>spatial = tropoi.spatial<br>every import edge drawn; label = module-level import edges<br>red, labelled up: edge against the declared order<br>dashed, labelled type-only: only under if TYPE_CHECKING<br>box placement is the renderer's; read colour and labels"]
+    legend["Layers declared in DEFAULT_LAYERS in tools/architecture/layers.py,<br>assigned by package-name prefix, not inferred from imports:<br>cli = tropoi.cli<br>run = tropoi.run<br>representation = tropoi.representation<br>temporal = tropoi.temporal<br>spatial = tropoi.spatial<br>physics = tropoi.physics<br>every import edge drawn; label = module-level import edges<br>red, labelled up: edge against the declared order<br>dashed, labelled type-only: only under if TYPE_CHECKING<br>box placement is the renderer's; read colour and labels"]
     subgraph g_cli["layer cli"]
         n_tropoi_ocli["cli (4 modules)"]
     end
@@ -12,6 +12,7 @@ flowchart TD
         n_tropoi_orun_ocustom["run.custom (7 modules)"]
         n_tropoi_orun_oheld__suarez["run.held_suarez (7 modules)"]
         n_tropoi_orun_ope["run.pe (4 modules)"]
+        n_tropoi_orun_oradiative["run.radiative (4 modules)"]
         n_tropoi_orun_oswe["run.swe (4 modules)"]
     end
     subgraph g_representation["layer representation"]
@@ -21,8 +22,8 @@ flowchart TD
         n_tropoi_orepresentation_ovisual["representation.visual (23 modules)"]
     end
     subgraph g_temporal["layer temporal"]
-        n_tropoi_otemporal["temporal (6 modules)"]
-        n_tropoi_otemporal_otendencies["temporal.tendencies (4 modules)"]
+        n_tropoi_otemporal["temporal (7 modules)"]
+        n_tropoi_otemporal_otendencies["temporal.tendencies (5 modules)"]
     end
     subgraph g_spatial["layer spatial"]
         n_tropoi_ospatial["spatial (9 modules)"]
@@ -34,6 +35,10 @@ flowchart TD
         n_tropoi_ospatial_otransforms["spatial.transforms (4 modules)"]
         n_tropoi_ospatial_otransforms_ocuda["spatial.transforms.cuda (1 module)"]
     end
+    subgraph g_physics["layer physics"]
+        n_tropoi_ophysics["physics (6 modules)"]
+        n_tropoi_ophysics_oradiation["physics.radiation (4 modules)"]
+    end
     n_tropoi_ocli -->|4| n_tropoi_orepresentation_oarchive
     n_tropoi_ocli -->|6| n_tropoi_orepresentation_ovisual
     n_tropoi_ocli -->|3| n_tropoi_orun_obve
@@ -43,6 +48,7 @@ flowchart TD
     n_tropoi_ocli -->|3| n_tropoi_ospatial
     n_tropoi_ocli -->|4| n_tropoi_ospatial_oterrain
     n_tropoi_ocli -->|1| n_tropoi_ospatial_otransforms_ocuda
+    n_tropoi_ophysics -->|1| n_tropoi_ophysics_oradiation
     n_tropoi_orepresentation_oarchive -->|1| n_tropoi_orepresentation
     n_tropoi_orepresentation_oarchive -->|6| n_tropoi_orepresentation_ovisual
     n_tropoi_orepresentation_oarchive -->|10| n_tropoi_ospatial
@@ -95,6 +101,13 @@ flowchart TD
     n_tropoi_orun_ope -->|1| n_tropoi_ospatial_oinitialization
     n_tropoi_orun_ope -->|4| n_tropoi_otemporal
     n_tropoi_orun_ope -->|1| n_tropoi_otemporal_otendencies
+    n_tropoi_orun_oradiative -->|4| n_tropoi_ophysics
+    n_tropoi_orun_oradiative -->|2| n_tropoi_ophysics_oradiation
+    n_tropoi_orun_oradiative -->|2| n_tropoi_orun_oheld__suarez
+    n_tropoi_orun_oradiative -->|4| n_tropoi_ospatial
+    n_tropoi_orun_oradiative -->|3| n_tropoi_ospatial_ostates
+    n_tropoi_orun_oradiative -->|2| n_tropoi_otemporal
+    n_tropoi_orun_oradiative -->|3| n_tropoi_otemporal_otendencies
     n_tropoi_orun_oswe -->|2| n_tropoi_orepresentation_oarchive
     n_tropoi_orun_oswe -->|1| n_tropoi_orepresentation_odiagnostics
     n_tropoi_orun_oswe -->|1| n_tropoi_orepresentation_ovisual
@@ -119,11 +132,12 @@ flowchart TD
     n_tropoi_ospatial_otransforms -->|2| n_tropoi_ospatial_ogrids
     n_tropoi_ospatial_otransforms -->|2| n_tropoi_ospatial_otransforms_ocuda
     n_tropoi_otemporal -->|9| n_tropoi_ospatial
+    n_tropoi_otemporal -->|1| n_tropoi_ospatial_ostates
     n_tropoi_otemporal -->|1| n_tropoi_ospatial_oterrain
     n_tropoi_otemporal -->|2| n_tropoi_otemporal_otendencies
     n_tropoi_otemporal_otendencies -->|10| n_tropoi_ospatial
     n_tropoi_otemporal_otendencies -->|3| n_tropoi_ospatial_ostates
     n_tropoi_otemporal_otendencies -->|1| n_tropoi_ospatial_oterrain
     n_tropoi_otemporal_otendencies -->|1| n_tropoi_otemporal
-    linkStyle 77 stroke:#d62728,stroke-width:2px
+    linkStyle 85 stroke:#d62728,stroke-width:2px
     style legend fill:none,stroke:#999,stroke-dasharray:2 2
