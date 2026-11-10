@@ -219,7 +219,7 @@ scheduler.
 ## Adaptive timestep (CFL)
 
 The timestep controller is unchanged and model-independent
-(`run/engine.py::advective_cfl_timestep`, ceiling `0.5·L/s_max` with the
+(`temporal/integration.py::advective_cfl_timestep`, ceiling `0.5·L/s_max` with the
 geometry-owned length scale `L`); only the characteristic-speed estimate is
 model-specific. The shallow-water model supplies
 
