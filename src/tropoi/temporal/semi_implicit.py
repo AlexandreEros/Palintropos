@@ -1,6 +1,6 @@
 """Semi-implicit leapfrog stepper for the dry hydrostatic primitive equations.
 
-Formulation (docs/held_suarez/SEMI_IMPLICIT.md; plan §3): the tendency is
+Formulation (src/tropoi/temporal/SEMI_IMPLICIT.md): the tendency is
 split as ``tendency(X) = N(X) + L X`` where **L** is the fast linear
 gravity-wave operator about a resting isothermal reference atmosphere
 (temperature ``t_ref``, flat reference surface pressure) and ``N`` is

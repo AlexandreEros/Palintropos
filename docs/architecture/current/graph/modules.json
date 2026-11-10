@@ -541,6 +541,14 @@
       "scopes": [
         "module"
       ],
+      "source": "tropoi.representation.diagnostics.pe_surfaces",
+      "target": "tropoi.representation.diagnostics.pe_levels"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
       "source": "tropoi.representation.diagnostics.swe",
       "target": "tropoi.representation.diagnostics.bve"
     },
@@ -567,6 +575,15 @@
       ],
       "source": "tropoi.representation.visual.atmosphere",
       "target": "tropoi.representation.diagnostics.pe_levels"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function",
+        "module"
+      ],
+      "source": "tropoi.representation.visual.atmosphere",
+      "target": "tropoi.representation.diagnostics.pe_surfaces"
     },
     {
       "kind": "imports",
@@ -3431,6 +3448,21 @@
         "__future__",
         "collections",
         "dataclasses"
+      ],
+      "third_party_imports": [
+        "numpy"
+      ]
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.representation.diagnostics.pe_surfaces",
+      "is_package": false,
+      "path": "tropoi/representation/diagnostics/pe_surfaces.py",
+      "stdlib_imports": [
+        "__future__",
+        "dataclasses",
+        "math"
       ],
       "third_party_imports": [
         "numpy"

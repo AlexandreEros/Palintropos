@@ -4,13 +4,10 @@ This document describes how Palintropos is put together today: package layout, t
 two grid backends, the spectral transform flow, the run-capsule/provenance
 model, and how to add or compare a backend.
 
-> This file reflects the current backend/product-space design. The mermaid
-> [class diagram](class-structure.md) and [call diagram](call-structure.md) are
-> also current; equation conventions and normalizations live in
-> [MATHEMATICAL_MODEL.md](MATHEMATICAL_MODEL.md). Dated audit records
-> ([KNOWN_RISKS.md](KNOWN_RISKS.md), [VALIDATION_PLAN.md](VALIDATION_PLAN.md))
-> carry their own snapshot commits — prefer this file and the current tests
-> where they disagree.
+The [source-layer index](../src/tropoi/README.md) leads to subsystem
+READMEs and their detailed references. [Generated architecture](architecture/README.md)
+records imports, inheritance and selected static call paths. Equations and
+normalizations live in the [numerical conventions](../src/tropoi/spatial/CONVENTIONS.md).
 
 ## Package layout
 
@@ -62,13 +59,13 @@ src/tropoi/
 └── cli/                 tropoi (main.py), the single command-line entry point
 tests/                   asserting GPU tests plus standalone audit scripts
 examples/                runnable custom-planet examples (BVE, SWE, terrain import)
-docs/                    architecture, validation records, and tracked README assets
+docs/                    cross-cutting architecture/validation, experiments and tracked assets
 ```
 
 The saved-run interface (`spatial.modes`, `temporal.simulation`,
 `representation.archive`) is CPU-only; `representation.visual` is imported
 only by an explicit `Snapshot.plot` or by a runner rendering its products.
-It is documented in [SAVED_RUNS.md](SAVED_RUNS.md).
+It is documented in [SAVED_RUNS.md](../src/tropoi/temporal/SAVED_RUNS.md).
 
 ### Dependency direction
 
@@ -80,7 +77,7 @@ operators, the tendencies, the diagnostics and the configuration layer all
 consume, so no spatial operation depends on a tendency implementation. The
 initializers receive a model object but reference its class only for type
 annotations. `tests/test_layout.py` enforces this direction by parsing every
-import. There are no exceptions: every dependency points down, so the layer
+import. Every runtime dependency points down, so the runtime layer
 graph is acyclic and the layers can be levelized (`cli` -> `run` ->
 `representation` -> `temporal` -> `spatial`).
 
@@ -144,66 +141,16 @@ Matplotlib through a parent package. The one exception is
 `representation.archive`, whose initializer exposes the CPU-only reader
 API (`open_simulation`, the schema types).
 
-### Retired compatibility paths
+### Imports and persisted historical names
 
-The pre-reorganization import aliases and package re-exports were retired
-on 2026-10-27. Import implementations directly using the table below.
-This is an intentional breaking change to the Python and command interfaces;
-saved-run formats and readers are unchanged. Repository tests and scripts
-use the canonical paths.
-
-| Legacy path | Canonical module |
-| --- | --- |
-| `tropoi.support` | `tropoi.spatial.truncation` |
-| `tropoi.planet.planetary_parameters` | `tropoi.spatial.environment` |
-| `tropoi.planet.planet` | `tropoi.spatial.planet` |
-| `tropoi.planet.{elevation_data,terrain_spectral,tectonics}` | `tropoi.spatial.terrain.*` |
-| `tropoi.physics.topography` | `tropoi.spatial.terrain.topography` |
-| `tropoi.physics.sigma_coordinate` | `tropoi.spatial.sigma_coordinate` |
-| `tropoi.numerics.{grid_base,grid,geodesic_grid,latlon_grid,cartesian_to_spherical,integration,grid_interpolation}` | `tropoi.spatial.grids.*` |
-| `tropoi.numerics.{spherical_harmonics,fast_geodesic_sh,optimized_geodesic_sh}` | `tropoi.spatial.transforms.*` |
-| `tropoi.numerics.cuda.cuda_utils` | `tropoi.spatial.transforms.cuda.cuda_utils` |
-| `tropoi.numerics.spherical_backend` | `tropoi.spatial.spherical_backend` |
-| `tropoi.numerics.spectral_operators` | `tropoi.spatial.operators.spectral_operators` |
-| `tropoi.run.{bve,swe,pe}.initial_conditions` | `tropoi.spatial.initialization.{bve,swe,pe}` |
-| `tropoi.run.engine` | `tropoi.temporal.integration` |
-| `tropoi.physics.{barotropic,shallow_water,primitive_equations}` | `tropoi.temporal.tendencies.*` (states in `tropoi.spatial.states.*`) |
-| `tropoi.run.{bve,swe,pe}.diagnostics` | `tropoi.representation.diagnostics.{bve,swe,pe}` |
-| `tropoi.run.bve.io` | `tropoi.representation.archive.writer` |
-| `tropoi.run.{bve,swe,pe}.visualization` | `tropoi.representation.visual.{bve,swe,pe}` |
-| `tropoi.run.pe.snapshot_visualization` | `tropoi.representation.visual.pe_snapshots` |
-| `tropoi.viz.*` | `tropoi.representation.visual.*` |
-
-The older `tropoi.run.bve.barotropic_vorticity` module and the re-exports
-from `tropoi.run.bve` are also retired. Import `BarotropicVorticity` from
-`tropoi.temporal.tendencies.barotropic`, `BarotropicState` from
-`tropoi.spatial.states.barotropic`, and `run_bve` from `tropoi.run.bve.runner`.
-Dated records and descriptive strings in saved manifests keep the paths of
-their time; read them through this table.
-
-Use `tropoi` instead of `aeolus`, `tropoi run bve` instead of `psx-bve`,
-`tropoi gen` instead of `psx-gen`, and `tropoi recompile` instead of
-`psx-recompile`. The old commands and their standalone parser wrappers are
-removed. To reproduce the former `psx-bve` default schedule, pass
-`--snapshot-interval-seconds 21600`; the default remains five snapshots.
-The distribution is still `palintropos` and the import package is `tropoi`.
-
-Unused name aliases were also removed: use `GeodesicSphericalHarmonics`
-instead of `OptimizedGeodesicSH`, `PanelGroupSpec` instead of `PanelGroup`,
-`FigureFrame` instead of `TimelineFrame`, and `render_figure_timeline`
-instead of `render_timeline`. The uncalled `visual.maps` module,
-`SpectralOperators.laplacian_field`, `build_swe_spectral_snapshot_timeline`,
-and `prepared_terrain.describe_band_limit` were removed. SWE spectral
-frames remain available through `build_swe_snapshot_timelines` and the
-saved-run plotting interface.
-
-This cleanup used repository imports, name references (including strings
-in subprocess tests), command entry points, and the architecture graphs.
-Missing call-graph edges alone are not evidence of dead code: protocols,
-callbacks, public accessors, and numerical reference implementations need
-their consumers checked separately. In particular, the old lat–lon
-transform is still instantiated by comparison tests, and legacy capsule
-inference still reads published scientific runs; both remain supported.
+Use the canonical layer imports above and the single `tropoi` command.
+The distribution is `palintropos`, the import package is `tropoi`.
+Older numerical evidence and pinned notebooks retain the module, command
+and documentation names of their recorded commit. Descriptive strings in
+saved manifests are provenance, not instructions for importing today's
+code. They remain unchanged so published capsule identities and checksums
+continue to verify. The [notebook README](../notebooks/README.md) explains
+the pinned pre-rename Williamson-5 workflow.
 
 ### CPU and GPU requirements
 
@@ -329,7 +276,7 @@ snapshot time or on `t_end`, never lengthened past the ceiling. This governs
 only the advective condition — not explicit-viscosity (`ν∇²`) stability, and
 it is not embedded-error RK adaptivity. SI units and a perfect spherical
 surface are used throughout. Equation conventions and normalizations are
-detailed in [MATHEMATICAL_MODEL.md](MATHEMATICAL_MODEL.md).
+detailed in [spatial/CONVENTIONS.md](../src/tropoi/spatial/CONVENTIONS.md).
 
 User-facing configuration is fully validated *before* CuPy is imported or
 CUDA is initialized: the CLI parses with all defaults set to `None`, and
@@ -530,7 +477,7 @@ environment provenance) and `diagnostic_definitions` (the CSV column
 meanings, including the structured `high_l_enstrophy_frac` definition). They
 are descriptive only — never part of `run_config` or the scientific hash —
 and `open_simulation` reads them, inferring the known historical layouts for
-older capsules and saying so ([SAVED_RUNS.md](SAVED_RUNS.md)).
+older capsules and saying so ([SAVED_RUNS.md](../src/tropoi/temporal/SAVED_RUNS.md)).
 
 A capsule is reproducible only to the extent recorded by its manifest. Runs from
 a dirty tree require the uncommitted patch as well as the commit, and the

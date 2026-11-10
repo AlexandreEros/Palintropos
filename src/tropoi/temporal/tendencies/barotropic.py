@@ -50,7 +50,7 @@ class BarotropicVorticity:
         # in spectral space avoids round-tripping the state through the
         # (inexact) transform each tendency call; the transform's ~0.85%
         # leakage of the large f mode into other degrees was measured to
-        # inject errors of ~12% of ||ζ|| per call (docs/KNOWN_RISKS.md R-5,
+        # inject errors of ~12% of ||ζ|| per call (tests/audit_r5_mechanism.py,
         # tests/audit_r5_mechanism.py).
         l_max = self.sh.l_max
         self.f_lm = cp.zeros((l_max + 1, l_max + 1), dtype=cp.complex128)
@@ -131,5 +131,3 @@ class BarotropicVorticity:
         dzeta_dt[0, :] = 0.0
 
         return dzeta_dt
-
-

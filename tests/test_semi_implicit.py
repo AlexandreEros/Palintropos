@@ -1,7 +1,6 @@
 """Semi-implicit leapfrog stepper for the dry primitive equations (S3).
 
-Plan: docs/superpowers/plans/2026-09-27-held-suarez-24h-plan.md §3;
-formulation: docs/held_suarez/SEMI_IMPLICIT.md.
+Formulation: src/tropoi/temporal/SEMI_IMPLICIT.md.
 
 CPU part (NumPy, runs in CI): the fast operator L assembled from the
 discrete column operators, the reduced K×K solve against the unreduced

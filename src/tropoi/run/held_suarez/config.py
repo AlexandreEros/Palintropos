@@ -65,7 +65,7 @@ class HeldSuarezConfig:
     forcing: HeldSuarezParameters = field(default_factory=HeldSuarezParameters)
     # evolved spectral resolution: None = the core's historical 2/3 product
     # cut (l_max 42 evolves l <= 28); an int L <= l_max - 1 retains every
-    # degree <= L (store l_max = L + 1, retain L: DEALIASING_AUDIT.md)
+    # degree <= L (store l_max = L + 1, retain L: src/tropoi/temporal/tendencies/RETAINED_TRUNCATION.md)
     retained_truncation: Optional[int] = None
     # numerics of the transforms
     grid: str = "latlon"

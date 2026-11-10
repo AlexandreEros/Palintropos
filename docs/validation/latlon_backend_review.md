@@ -1,6 +1,6 @@
-# Lat-lon backend — mathematical correctness & backend-parity review
+# Gauss lat–lon quadrature and matched-timestep measurements
 
-Review record for `feat/latlon-grid` (Gauss-Legendre lat-lon backend through the
+Dated measurement record (2026-07-12) for `feat/latlon-grid` (Gauss-Legendre lat-lon backend through the
 `SphericalGridBackend` seam). Every number below is reproducible from the cited
 commit + scripts; raw `runs/` artifacts are Git-ignored, so the measurements are
 preserved here.
@@ -124,11 +124,11 @@ res-5 co-grid (4× the state points).
 
 ---
 
-## Verdict
+## Scope of the evidence
 
-* **Merge blockers:** none. Transform exact where claimed, CFL conservative in
-  every resolved config, operators backend-agnostic (20-test parity suite green),
-  locked RH4 energy value reproduced exactly.
-* **Nonblocking:** (1) redefine cfl_length_scale as a spectral scale ≈ πR/l_max;
-  (2) fixed-dt-from-initial-CFL (pre-existing R-4) shared by both backends.
-* **Recommendation: approve for merge.**
+These measurements used a fixed timestep selected from the initial state;
+the current BVE/SWE runners recompute their ceiling after every accepted
+state. The matched-timestep comparison still isolates quadrature quality.
+The mesh-owned CFL proxy remains conservative for the documented resolved
+configurations; it is not an embedded error estimator or a separate
+explicit-viscosity stability controller.

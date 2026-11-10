@@ -16,7 +16,7 @@ phase, ``Pbar_11 = -sqrt(3 / 8 pi) cos(lat)``):
 These are independent of the reduction code. They exercise the host path on
 CPU-constructible states only; the comparison against a production
 ``daily_sample``/``OnlineStatistics`` archive from a real GPU run is NOT
-here (deferred: docs/held_suarez/CLIMATE_FIGURE.md).
+here (deferred: src/tropoi/representation/visual/HELD_SUAREZ_CLIMATE.md).
 """
 from __future__ import annotations
 
@@ -594,8 +594,9 @@ def test_default_scales_are_documented_and_valid():
         assert levels[0] == -levels[-1] and 0.0 in levels
     for key in ("eke", "TsTs"):
         assert HS_SECTION_SCALES[key].levels[0] == 0.0
-    doc = (pathlib.Path(__file__).resolve().parents[1] / "docs" /
-           "held_suarez" / "CLIMATE_FIGURE.md").read_text(encoding="utf-8")
+    doc = (pathlib.Path(__file__).resolve().parents[1] / "src" / "tropoi" /
+           "representation" / "visual" / "HELD_SUAREZ_CLIMATE.md").read_text(
+               encoding="utf-8")
     for key, scale in HS_SECTION_SCALES.items():
         assert f"`{key}`" in doc
         assert f"{scale.levels[0]:g} to {scale.levels[-1]:g}" in doc, key

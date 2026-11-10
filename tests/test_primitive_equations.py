@@ -1,7 +1,7 @@
 """Primitive-equation foundation verification (model level; CUDA-gated).
 
 Covers the foundation-milestone requirements of
-docs/PRIMITIVE_EQUATIONS_DESIGN.md on real backends: state layout and
+src/tropoi/temporal/tendencies/PRIMITIVE_EQUATIONS.md on real backends: state layout and
 views, isothermal hydrostatic exactness, the exactly-resting atmosphere,
 uniform-pressure zero-wind behavior, structural sigma_dot impermeability,
 column mass closure for genuinely divergent flows, hard state-validation

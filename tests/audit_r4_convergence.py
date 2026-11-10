@@ -1,4 +1,4 @@
-"""Characterization audit for docs/KNOWN_RISKS.md R-4: fixed-dt convergence sweep.
+"""Characterization audit for src/tropoi/temporal/integration.py (state-adaptive ceiling): fixed-dt convergence sweep.
 
 This is NOT a fix and does NOT implement adaptive timestepping. It measures
 observed temporal order p, invariant histories, trajectory differences, and

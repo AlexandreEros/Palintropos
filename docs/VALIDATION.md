@@ -17,7 +17,7 @@ numerical risks that remain open.
 
 ## RH4 benchmark
 
-The strongest current evidence uses an Earth-like rotating sphere
+The BVE evidence uses an Earth-like rotating sphere
 (`day_hours=24`, `Ω≈7.272×10⁻⁵ s⁻¹`), `lmax=21`, tendency cut
 `floor(2L/3)=14`, inviscid RK4, and the analytic Rossby–Haurwitz wavenumber-4
 initial condition (`ν=K=7.848×10⁻⁶ s⁻¹`).
@@ -35,7 +35,6 @@ versus the analytic 12.260°, while its `(l,m)=(5,4)` amplitude changed by only
 | RH4 geodesic, 5 days | res-4 state (2,562 points), res-5 fine product grid (10,242 points), `dt=2204.08 s`, 196 steps | relative energy drift **−4.4555×10⁻⁴**; absolute-enstrophy drift **−8.46×10⁻⁵** |
 | RH4 Gauss lat–lon, matched timestep | `32 × 64` state/product grid, same `dt=2204.08 s`, 196 steps | energy drift **−1.34×10⁻¹⁰**; absolute-enstrophy drift **−3.12×10⁻¹¹** |
 | Transform round trip | seeded random band-limited coefficients, `L=21`; geodesic res 4 vs Gauss `32 × 64` | relative L2 residual **1.0355×10⁻²** vs **6.8418×10⁻¹⁵** |
-| Current GPU test suite | Python 3.12.12, CuPy 13.4.0, MX110; `pytest --basetemp .pytest-tmp-readme` | **105 passed**, one warning, 59.17 s |
 
 The five-day geodesic energy number is locked by
 `test_prediction_p1_5day_energy_drift`; the matched-timestep comparison and
@@ -101,6 +100,34 @@ The full generated evidence — run capsules, per-step diagnostics, field
 packages, and all eight comparison figures — is mirrored externally rather than
 committed; checksums are tracked in
 [`validation/williamson5_mri_2026-07-30/CHECKSUMS.txt`](validation/williamson5_mri_2026-07-30/CHECKSUMS.txt).
+
+## Dry PE and Held–Suarez
+
+The dry PE tests cover hydrostatic/continuity/vertical-exchange identities,
+nonlinear assembly, rest/BVE reduction, semi-implicit normal modes and
+terrain balance. [PE formulation](../src/tropoi/temporal/tendencies/PRIMITIVE_EQUATIONS.md)
+links their owning tests. These local identities and short experiments do
+not establish arbitrary-terrain accuracy or global energy conservation.
+
+The 1200-day **T42L20 Held–Suarez production run 002**, solver `a52ea20`,
+centred damping at 720 s, passed the predeclared implementation (A), stable
+execution (B) and matched-Dinosaur climate (C) tiers. Maximum relative mass
+drift was 2.016e-6 against B2's 1e-3 limit; zonal-wind correlation was
+0.9955, RMSE 0.90 m/s. Run 001 remains **B FAIL** because lagged damping
+leaked mass. [Completed results](held_suarez/STATUS.md),
+[criteria](held_suarez/ACCEPTANCE.md), [protocol](held_suarez/PROTOCOL.md)
+and [reference configuration](held_suarez/REFERENCE_CONFIG.json) define
+the claim. This is a dry forced benchmark, not general planetary-climate
+validation or evidence of implemented radiative heating.
+
+## Terrain and saved-state visualization
+
+[Validation records](validation/README.md) retain the MOLA rest test,
+Mars perturbation/timestep comparison, saved-atmosphere playback and
+derived-surface measurements. Visualizations reconstruct saved states;
+interpolation, quantization and browser parity checks do not validate the
+physical climate. The [climate figure recipe](../src/tropoi/representation/visual/HELD_SUAREZ_CLIMATE.md)
+describes sampling and agreement with production statistics.
 
 ## Conservation diagnostics and analytic guarantees
 
@@ -191,23 +218,15 @@ The displayed invariant drifts make this a qualitative Coriolis/beta-effect
 comparison rather than a conservation benchmark; exact manifests are in
 [figure provenance](assets/provenance.json).*
 
-## Known numerical risks
+## Remaining limits and test environments
 
-- Geodesic Voronoi quadrature is approximate and orientation-dependent; its
-  res-`(r+1)` product grid reduces aliasing but is not exact dealiasing.
-- The prognostic state retains modes through `L=21` while each nonlinear
-  tendency is cut at `l=14`. That is not a consistent Galerkin truncation of
-  either band, so energy/enstrophy conservation is not guaranteed when
-  nonlinear transfer reaches modes 15–21.
-- The advective CFL ceiling is recomputed from every accepted state (R-4), so
-  an accelerating flow tightens the step rather than eroding its advective
-  margin; explicit-viscosity (`ν∇²`) stability is still not controlled.
-- There is no independent CPU dynamical core, and the present tests require a
-  working CUDA GPU.
+[Current limitations](KNOWN_LIMITATIONS.md) covers the geodesic quadrature,
+state/tendency band mismatch, timestep restrictions, PE mass drift and
+scientific claims still unsupported. Fixed defects are covered by current
+regression tests rather than a surviving severity-ranked audit.
 
-For the full audit trail, severity ratings, evidence, and open items, see
-[KNOWN_RISKS.md](KNOWN_RISKS.md) and [VALIDATION_PLAN.md](VALIDATION_PLAN.md).
-Both began as audit snapshots, so use their dated fix logs and the current
-asserting tests when an older status paragraph conflicts with the
-implementation. A summary of remaining limitations is in
-[KNOWN_LIMITATIONS.md](KNOWN_LIMITATIONS.md).
+CPU CI runs configuration, storage, host reconstruction, provenance,
+visualization and architecture checks without CuPy. CUDA numerical tests
+skip there; CPU passes are not evidence that GPU numerics ran. The
+[architecture test instructions](ARCHITECTURE.md#tests) distinguish routine
+regression, long convergence tests and release checks.
