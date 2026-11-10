@@ -270,7 +270,7 @@ snapshot time or on `t_end`, never lengthened past the ceiling. This governs
 only the advective condition — not explicit-viscosity (`ν∇²`) stability, and
 it is not embedded-error RK adaptivity. SI units and a perfect spherical
 surface are used throughout. Equation conventions and normalizations are
-detailed in [MATHEMATICAL_MODEL.md](../src/tropoi/spatial/CONVENTIONS.md).
+detailed in [spatial/CONVENTIONS.md](../src/tropoi/spatial/CONVENTIONS.md).
 
 User-facing configuration is fully validated *before* CuPy is imported or
 CUDA is initialized: the CLI parses with all defaults set to `None`, and

@@ -116,7 +116,7 @@ def add_bve_arguments(parser: argparse.ArgumentParser) -> None:
         "--resolution", type=int, default=None,
         help="Geodesic grid subdivision level [default: 4]. "
              "The (resolution=4, l_max=21) default keeps ~10 grid points per "
-             "SH basis function (src/tropoi/spatial/CONVENTIONS.md (geodesic sampling)).")
+             "SH basis function (src/tropoi/spatial/CONVENTIONS.md, geodesic sampling).")
     parser.add_argument(
         "--nlat", type=int, default=None,
         help="Lat-lon backend: number of Gauss-Legendre latitudes [default: 128].")

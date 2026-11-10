@@ -89,7 +89,7 @@ elevation file (NetCDF, 16-bit PNG, TIFF) is resolved by
 returned `PreparedPlanet` as `topography`. Its specification is an
 `imported` provenance record (source name, SHA-256, reader and
 preprocessing settings), and the resolved coefficients travel with it. See
-[TERRAIN_IMPORT.md](../../spatial/terrain/IMPORT.md), which also covers `plot()` and the
+[terrain/IMPORT.md](../../spatial/terrain/IMPORT.md), which also covers `plot()` and the
 interactive `view()` globe.
 
 Terrain is projected onto the model grid, so its coefficients depend on the
@@ -117,7 +117,7 @@ support.
 | SWE | `(3, L+1, L+1)` | `zeta`, `delta` (s⁻¹); `phi`: perturbation thickness geopotential, m² s⁻² |
 
 The coefficient conventions are the repository's
-([MATHEMATICAL_MODEL.md](../../spatial/CONVENTIONS.md)): complex orthonormal
+([spatial/CONVENTIONS.md](../../spatial/CONVENTIONS.md)): complex orthonormal
 spherical harmonics stored for `m ≥ 0`, axis 0 = degree `l`, axis 1 = order
 `m`. Real fields are implied: `Im a_l0 = 0`, and `m > l` entries are exactly
 zero. A constant field `c` is the `(0, 0)` coefficient `c·√(4π)`.
@@ -341,7 +341,7 @@ the realized state.
 - BVE and SWE only; the PE core is unchanged and not supported.
 - Terrain is a preset (`flat`, `mountain`, `williamson5_cone`) or imported
   from a global latitude-longitude elevation file
-  ([TERRAIN_IMPORT.md](../../spatial/terrain/IMPORT.md)). Procedural terrain generation is
+  ([terrain/IMPORT.md](../../spatial/terrain/IMPORT.md)). Procedural terrain generation is
   out of scope.
 - Inputs are the cores' prognostic variables plus the potentials and the
   free-surface anomaly. Winds `(u, v)` are not accepted directly; give ψ and

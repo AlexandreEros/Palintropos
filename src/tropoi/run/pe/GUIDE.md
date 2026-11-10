@@ -123,7 +123,7 @@ path is not. The capsule keeps a verified copy under `terrain/`, which
 `tropoi inspect` names and `tropoi plot` rebuilds the model from. A
 prepared Gaussian mountain gives a bit-identical run to `--topography
 mountain` with the same parameters (`tests/test_pe_prepared_terrain.py`).
-See [TERRAIN_IMPORT.md](../../spatial/terrain/IMPORT.md).
+See [terrain/IMPORT.md](../../spatial/terrain/IMPORT.md).
 
 **Dealiased terrain truncation.** PE terrain is band-limited at the
 model's product-truncation cut `l = floor(2 l_max / 3)`, not at `l_max`.

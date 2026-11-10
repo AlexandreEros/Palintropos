@@ -339,7 +339,7 @@ the size bounds are in [ATMOSPHERE_VIEW.md](../representation/visual/ATMOSPHERE_
 ## Runs started from a saved initial state
 
 Runs made with `tropoi.run.custom.run_initial_state`
-([CUSTOM_INITIAL_STATES.md](../run/custom/INITIAL_STATES.md)) are ordinary BVE or
+([INITIAL_STATES.md](../run/custom/INITIAL_STATES.md)) are ordinary BVE or
 SWE capsules with `scenario: "custom"`. Their `run_config` carries an
 explicit `planet` block and the state's `initial_state_digest`. The
 capsule's `initial_state/` directory holds a byte-exact copy of the state,

@@ -60,7 +60,7 @@ def latlon_model():
 @pytest.fixture(scope="module")
 def geodesic_model():
     # l_max = 10 at resolution 3 keeps the geodesic transform inside its
-    # supported points-per-basis envelope (src/tropoi/spatial/CONVENTIONS.md (geodesic sampling)).
+    # supported points-per-basis envelope (src/tropoi/spatial/CONVENTIONS.md, geodesic sampling).
     return _make_model(grid_type="geodesic", l_max=10)
 
 

@@ -643,7 +643,7 @@ follows Tharsis and Hellas. The terrain shows through. The run is at rest
 (|V| ~ 1e−10 m/s), so no streamlines are drawn. This is a visualization of the
 saved orographic-rest state, not evidence of dynamical stability: the view
 displays states, it does not test them (the balance check of that run is in
-[TERRAIN_IMPORT.md](../../spatial/terrain/IMPORT.md#real-data-mars-from-mola)).*
+[terrain/IMPORT.md](../../spatial/terrain/IMPORT.md#real-data-mars-from-mola)).*
 
 **Fields** are exact host evaluations of the saved spherical-harmonic
 coefficients on the display mesh (`spatial.transforms.host_synthesis`, the
