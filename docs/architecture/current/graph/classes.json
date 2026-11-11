@@ -5381,10 +5381,6 @@
         },
         {
           "kind": "method",
-          "name": "_wind"
-        },
-        {
-          "kind": "method",
           "name": "signature"
         }
       ],

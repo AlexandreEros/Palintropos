@@ -9746,11 +9746,6 @@
       "target": "tropoi.temporal.tendencies.drag.MomentumSinkHeating.__init__"
     },
     {
-      "kind": "self",
-      "source": "tropoi.temporal.tendencies.drag.MomentumSinkHeating.__call__",
-      "target": "tropoi.temporal.tendencies.drag.MomentumSinkHeating._wind"
-    },
-    {
       "kind": "constructor",
       "source": "tropoi.temporal.tendencies.held_suarez.NewtonianRelaxation",
       "target": "tropoi.temporal.tendencies.held_suarez.NewtonianRelaxation.__init__"
@@ -21912,13 +21907,6 @@
       "kind": "method",
       "module": "tropoi.temporal.tendencies.drag",
       "qualname": "MomentumSinkHeating.__init__",
-      "type": "function"
-    },
-    {
-      "id": "tropoi.temporal.tendencies.drag.MomentumSinkHeating._wind",
-      "kind": "method",
-      "module": "tropoi.temporal.tendencies.drag",
-      "qualname": "MomentumSinkHeating._wind",
       "type": "function"
     },
     {

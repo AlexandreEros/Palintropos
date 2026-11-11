@@ -129,18 +129,6 @@ class MomentumSinkHeating:
     def signature(self) -> dict:
         return {"kind": "momentum_sink_heating", "cp": self.cp, "sinks": len(self.sinks)}
 
-    def _wind(self, rows):
-        import cupy as cp
-        m = self.model
-        K = m.nlev
-        us, vs = [], []
-        for k in range(K):
-            u, v = m._wind_from(m.sh, m._state_coslat, m._inv_laplacian(rows[k]),
-                                m._inv_laplacian(rows[K + k]))
-            us.append(u)
-            vs.append(v)
-        return cp.stack(us), cp.stack(vs)
-
     def __call__(self, coeffs):
         import cupy as cp
         m = self.model
@@ -148,19 +136,30 @@ class MomentumSinkHeating:
         sink = self.sinks[0](coeffs)[:3 * K]
         for other in self.sinks[1:]:
             sink = sink + other(coeffs)[:3 * K]
-        u, v = self._wind(coeffs)
-        du, dv = self._wind(sink)
-        heating = -(u * du + v * dv) / self.cp
-        out = cp.zeros_like(coeffs)
+        # One synthesis for everything: the wind derivatives of the state and
+        # of the sink tendency (4 fields x 2K levels), the sinks' temperature
+        # rows (K) and ln p_s (1).
+        psi = m._inv_laplacian(cp.concatenate([coeffs[0:K], sink[0:K]]))
+        chi = m._inv_laplacian(cp.concatenate([coeffs[K:2 * K], sink[K:2 * K]]))
+        psi_lam, psi_snt = m._stack_derivs(psi)
+        chi_lam, chi_snt = m._stack_derivs(chi)
+        fields = m.sh.inv_transform_batch(cp.concatenate(
+            [psi_lam, psi_snt, chi_lam, chi_snt, sink[2 * K:3 * K], coeffs[3 * K][None]], axis=0))
+        fields = fields.reshape(fields.shape[0], -1)
+        n = 2 * K
+        coslat = m._state_coslat.ravel()
+        wind_u = (fields[n:2 * n] / m.R + fields[2 * n:3 * n]) / coslat
+        wind_v = (fields[0:n] - fields[3 * n:4 * n] / m.R) / coslat
+        heating = -(wind_u[:K] * wind_u[K:] + wind_v[:K] * wind_v[K:]) / self.cp
+        d_temp = fields[4 * n:4 * n + K]
+        ps = cp.exp(fields[4 * n + K])
+        mass = cp.asarray(m.grid.cell_areas, dtype=cp.float64).ravel() * ps
+        uniform = -(mass * d_temp).sum(axis=1) / mass.sum()
+        spec = m.sh.transform_batch(heating)
         cut = m._trunc_cut
-        ps = cp.exp(m.sh.inv_transform(coeffs[3 * K]).real)
-        w = cp.asarray(m.grid.cell_areas, dtype=cp.float64).reshape(ps.shape)
-        mass = float((w * ps).sum())
-        for k in range(K):
-            spec = m.sh.transform(heating[k])
-            spec[cut + 1:, :] = 0.0
-            spec[:, cut + 1:] = 0.0
-            d_temp = m.sh.inv_transform(sink[2 * K + k]).real
-            spec[0, 0] -= float((w * ps * d_temp).sum()) / mass * math.sqrt(4.0 * math.pi)
-            out[2 * K + k] = spec
+        spec[:, cut + 1:, :] = 0.0
+        spec[:, :, cut + 1:] = 0.0
+        spec[:, 0, 0] += uniform * math.sqrt(4.0 * math.pi)
+        out = cp.zeros_like(coeffs)
+        out[2 * K:3 * K] = spec
         return out

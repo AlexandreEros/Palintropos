@@ -1,9 +1,9 @@
 {
   "call_graph": {
     "call_sites": {
-      "builtin": 3327,
-      "external": 2190,
-      "internal": 2755,
+      "builtin": 3323,
+      "external": 2191,
+      "internal": 2753,
       "unresolved": 3460
     },
     "edges_by_kind": {
@@ -11,10 +11,10 @@
       "constructor": 62,
       "instantiate": 472,
       "override": 6,
-      "self": 313,
+      "self": 312,
       "super": 4
     },
-    "nodes": 1726,
+    "nodes": 1725,
     "scoped": {
       "cli-gen": {
         "edges": 28,
@@ -952,7 +952,7 @@
     "package": "tropoi",
     "src": "src",
     "working_tree": {
-      "base_commit": "43cb3aa35960810d54a2d03cefa32a008df0e8e3",
+      "base_commit": "f0a40423fe490c9b1962ed69b54f41cafeb512f8",
       "generator": {
         "changes": [],
         "files": {
@@ -975,10 +975,6 @@
       },
       "source": {
         "changes": [
-          " M src/tropoi/run/radiative/__main__.py",
-          " M src/tropoi/run/radiative/config.py",
-          " M src/tropoi/run/radiative/model.py",
-          " M src/tropoi/temporal/column_coupling.py",
           " M src/tropoi/temporal/tendencies/drag.py"
         ],
         "files": {
@@ -1136,12 +1132,12 @@
           "src/tropoi/temporal/steppers.py": "d318a44ce7277cac5e43cd54d9c0f090fc8d55f4f3ea67735cfa1df6f8ad10c4",
           "src/tropoi/temporal/tendencies/__init__.py": "64ae205b8d8abf902f9b9f285faae34048856829c3be34925b3af5f94ad71a20",
           "src/tropoi/temporal/tendencies/barotropic.py": "eca288b7ac2cff04787d2cc1a5340f37364de3ee511b0ffd6598798c4201ebef",
-          "src/tropoi/temporal/tendencies/drag.py": "4d1980537d3fe40565961a0a6827820b450849e22564f5506e1e0d9026bf2c2c",
+          "src/tropoi/temporal/tendencies/drag.py": "415db97b9e43a6b36fde9d0db25db136ed63e5138c9c1c239614fdafebd922e3",
           "src/tropoi/temporal/tendencies/held_suarez.py": "87f6fc3ef3d43ba843333cf505f45950ac2b7419d9603abfb37033def959b5d1",
           "src/tropoi/temporal/tendencies/primitive_equations.py": "848c6fe9406a7c1c465c0aa9459760b01c542164c8cc9395797a3c4a60793e52",
           "src/tropoi/temporal/tendencies/shallow_water.py": "7ae521f2378824e89f88bc467fc99321d1ef4224b037c865137e076a601da3c8"
         },
-        "sha256": "146915249a28e4fd629bffaf12f85a31cb2a2a48ecd93153603b06c4b75fc7fa",
+        "sha256": "0e3e978749ca79bf6f258c9fbdfcf0a39f41e241000e8cfa6433fe339901d8fa",
         "status": "dirty"
       }
     }
