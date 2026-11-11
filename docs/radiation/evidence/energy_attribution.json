@@ -1,0 +1,275 @@
+{
+  "earth": {
+    "diffusion": {
+      "adiabatic_conversion_of_kinetic_over_initial_kinetic": -0.26061367904900923,
+      "diffusion": true,
+      "dt": 600.0,
+      "frictional_heating": false,
+      "initial_kinetic_j_m2": 127464.52662224085,
+      "integrated_rate_over_initial_kinetic": {
+        "adiabatic": -2.0750994701385526e-07,
+        "diffusion_momentum": -0.014813177810749074,
+        "diffusion_temperature": -0.0038799872085760172
+      },
+      "kinetic_change_over_initial_kinetic": -0.2787258074333275,
+      "raw_nu": 0.1,
+      "time_stepping_over_initial_kinetic": -0.010584280530408548,
+      "total_change_over_initial_kinetic": -0.029277653059680653
+    },
+    "diffusion_with_heating": {
+      "adiabatic_conversion_of_kinetic_over_initial_kinetic": -0.2606087536632946,
+      "diffusion": true,
+      "dt": 600.0,
+      "frictional_heating": true,
+      "initial_kinetic_j_m2": 127464.52662224085,
+      "integrated_rate_over_initial_kinetic": {
+        "adiabatic": -2.1671265964508086e-07,
+        "diffusion_momentum": -0.014812570431715414,
+        "diffusion_temperature": -0.0038799832805889185,
+        "heating": 0.01869253856149695
+      },
+      "kinetic_change_over_initial_kinetic": -0.27872018482794475,
+      "raw_nu": 0.1,
+      "time_stepping_over_initial_kinetic": -0.010583973855621523,
+      "total_change_over_initial_kinetic": -0.01058420571908855
+    },
+    "no_diffusion_dt150": {
+      "adiabatic_conversion_of_kinetic_over_initial_kinetic": -0.25692000350911676,
+      "diffusion": false,
+      "dt": 150.0,
+      "frictional_heating": false,
+      "initial_kinetic_j_m2": 127464.52662224085,
+      "integrated_rate_over_initial_kinetic": {
+        "adiabatic": -9.392378293991102e-07
+      },
+      "kinetic_change_over_initial_kinetic": -0.25774784194869427,
+      "raw_nu": 0.1,
+      "time_stepping_over_initial_kinetic": -0.0015345001563653777,
+      "total_change_over_initial_kinetic": -0.0015354393941947769
+    },
+    "no_diffusion_dt300": {
+      "adiabatic_conversion_of_kinetic_over_initial_kinetic": -0.25816898563040386,
+      "diffusion": false,
+      "dt": 300.0,
+      "frictional_heating": false,
+      "initial_kinetic_j_m2": 127464.52662224085,
+      "integrated_rate_over_initial_kinetic": {
+        "adiabatic": -9.252093040466322e-07
+      },
+      "kinetic_change_over_initial_kinetic": -0.2596738711441338,
+      "raw_nu": 0.1,
+      "time_stepping_over_initial_kinetic": -0.003816011951766687,
+      "total_change_over_initial_kinetic": -0.0038169371610707334
+    },
+    "no_diffusion_dt600": {
+      "adiabatic_conversion_of_kinetic_over_initial_kinetic": -0.2630344096152645,
+      "diffusion": false,
+      "dt": 600.0,
+      "frictional_heating": false,
+      "initial_kinetic_j_m2": 127464.52662224085,
+      "integrated_rate_over_initial_kinetic": {
+        "adiabatic": -9.550620059967055e-07
+      },
+      "kinetic_change_over_initial_kinetic": -0.266459115417015,
+      "raw_nu": 0.1,
+      "time_stepping_over_initial_kinetic": -0.010966950289584138,
+      "total_change_over_initial_kinetic": -0.010967905351590134
+    },
+    "no_diffusion_dt600_no_filter": {
+      "adiabatic_conversion_of_kinetic_over_initial_kinetic": -0.2627543567800212,
+      "diffusion": false,
+      "dt": 600.0,
+      "frictional_heating": false,
+      "initial_kinetic_j_m2": 127464.52662224085,
+      "integrated_rate_over_initial_kinetic": {
+        "adiabatic": -9.54164180374147e-07
+      },
+      "kinetic_change_over_initial_kinetic": -0.2646161814764905,
+      "raw_nu": 0.0,
+      "time_stepping_over_initial_kinetic": -0.005510650433471229,
+      "total_change_over_initial_kinetic": -0.005511604597651603
+    }
+  },
+  "jupiter": {
+    "diffusion": {
+      "adiabatic_conversion_of_kinetic_over_initial_kinetic": -0.13445846972859365,
+      "diffusion": true,
+      "dt": 600.0,
+      "frictional_heating": false,
+      "initial_kinetic_j_m2": 5042355.788624429,
+      "integrated_rate_over_initial_kinetic": {
+        "adiabatic": 0.00013458500683593793,
+        "diffusion_momentum": -0.7768600404035181,
+        "diffusion_temperature": -0.10894733723701207
+      },
+      "kinetic_change_over_initial_kinetic": -0.9167496973754644,
+      "raw_nu": 0.1,
+      "time_stepping_over_initial_kinetic": -0.006859980285751965,
+      "total_change_over_initial_kinetic": -0.8925327729194462
+    },
+    "diffusion_with_heating": {
+      "adiabatic_conversion_of_kinetic_over_initial_kinetic": -0.1344784692335658,
+      "diffusion": true,
+      "dt": 600.0,
+      "frictional_heating": true,
+      "initial_kinetic_j_m2": 5042355.788624429,
+      "integrated_rate_over_initial_kinetic": {
+        "adiabatic": 0.00013437729375000043,
+        "diffusion_momentum": -0.7768576567869165,
+        "diffusion_temperature": -0.10890388888857457,
+        "heating": 0.885761369191995
+      },
+      "kinetic_change_over_initial_kinetic": -0.9167673862721946,
+      "raw_nu": 0.1,
+      "time_stepping_over_initial_kinetic": -0.006882356553173836,
+      "total_change_over_initial_kinetic": -0.006748155742919944
+    },
+    "no_diffusion_dt150": {
+      "adiabatic_conversion_of_kinetic_over_initial_kinetic": -0.1695082141587233,
+      "diffusion": false,
+      "dt": 150.0,
+      "frictional_heating": false,
+      "initial_kinetic_j_m2": 5042355.788624429,
+      "integrated_rate_over_initial_kinetic": {
+        "adiabatic": 0.000465917882226564
+      },
+      "kinetic_change_over_initial_kinetic": -0.17289645432160355,
+      "raw_nu": 0.1,
+      "time_stepping_over_initial_kinetic": -0.004016018225986341,
+      "total_change_over_initial_kinetic": -0.003550100343759777
+    },
+    "no_diffusion_dt300": {
+      "adiabatic_conversion_of_kinetic_over_initial_kinetic": -0.16938971503644684,
+      "diffusion": false,
+      "dt": 300.0,
+      "frictional_heating": false,
+      "initial_kinetic_j_m2": 5042355.788624429,
+      "integrated_rate_over_initial_kinetic": {
+        "adiabatic": 0.00046394823925781397
+      },
+      "kinetic_change_over_initial_kinetic": -0.17590439692267307,
+      "raw_nu": 0.1,
+      "time_stepping_over_initial_kinetic": -0.008307789929482449,
+      "total_change_over_initial_kinetic": -0.007843841690224635
+    },
+    "no_diffusion_dt600": {
+      "adiabatic_conversion_of_kinetic_over_initial_kinetic": -0.16888253324461383,
+      "diffusion": false,
+      "dt": 600.0,
+      "frictional_heating": false,
+      "initial_kinetic_j_m2": 5042355.788624429,
+      "integrated_rate_over_initial_kinetic": {
+        "adiabatic": 0.0004568264402343765
+      },
+      "kinetic_change_over_initial_kinetic": -0.18110688746255676,
+      "raw_nu": 0.1,
+      "time_stepping_over_initial_kinetic": -0.01766552072727545,
+      "total_change_over_initial_kinetic": -0.01720869428704107
+    },
+    "no_diffusion_dt600_no_filter": {
+      "adiabatic_conversion_of_kinetic_over_initial_kinetic": -0.16853091961539815,
+      "diffusion": false,
+      "dt": 600.0,
+      "frictional_heating": false,
+      "initial_kinetic_j_m2": 5042355.788624429,
+      "integrated_rate_over_initial_kinetic": {
+        "adiabatic": 0.000459576096679689
+      },
+      "kinetic_change_over_initial_kinetic": -0.16990429929040554,
+      "raw_nu": 0.0,
+      "time_stepping_over_initial_kinetic": -0.0033550052951953234,
+      "total_change_over_initial_kinetic": -0.002895429198515634
+    }
+  },
+  "mars": {
+    "diffusion": {
+      "adiabatic_conversion_of_kinetic_over_initial_kinetic": -0.17497653352971185,
+      "diffusion": true,
+      "dt": 600.0,
+      "frictional_heating": false,
+      "initial_kinetic_j_m2": 2055.256064690026,
+      "integrated_rate_over_initial_kinetic": {
+        "adiabatic": -9.67911032379651e-08,
+        "diffusion_momentum": -0.012923708462177736,
+        "diffusion_temperature": -0.0022058246536333062
+      },
+      "kinetic_change_over_initial_kinetic": -0.1891352919108681,
+      "raw_nu": 0.1,
+      "time_stepping_over_initial_kinetic": -0.009295325279773262,
+      "total_change_over_initial_kinetic": -0.024424955186687542
+    },
+    "diffusion_with_heating": {
+      "adiabatic_conversion_of_kinetic_over_initial_kinetic": -0.174967392938282,
+      "diffusion": true,
+      "dt": 600.0,
+      "frictional_heating": true,
+      "initial_kinetic_j_m2": 2055.256064690026,
+      "integrated_rate_over_initial_kinetic": {
+        "adiabatic": -1.0652459058605261e-07,
+        "diffusion_momentum": -0.01292364451479717,
+        "diffusion_temperature": -0.0022059709822056734,
+        "heating": 0.015129609189268025
+      },
+      "kinetic_change_over_initial_kinetic": -0.18912603153250618,
+      "raw_nu": 0.1,
+      "time_stepping_over_initial_kinetic": -0.009292540500041895,
+      "total_change_over_initial_kinetic": -0.0092926533323673
+    },
+    "no_diffusion_dt150": {
+      "adiabatic_conversion_of_kinetic_over_initial_kinetic": -0.1757756570943657,
+      "diffusion": false,
+      "dt": 150.0,
+      "frictional_heating": false,
+      "initial_kinetic_j_m2": 2055.256064690026,
+      "integrated_rate_over_initial_kinetic": {
+        "adiabatic": -2.8047669129293485e-07
+      },
+      "kinetic_change_over_initial_kinetic": -0.17494258184220263,
+      "raw_nu": 0.1,
+      "time_stepping_over_initial_kinetic": -0.0015059706563881193,
+      "total_change_over_initial_kinetic": -0.0015062511330794122
+    },
+    "no_diffusion_dt300": {
+      "adiabatic_conversion_of_kinetic_over_initial_kinetic": -0.17564164181305056,
+      "diffusion": false,
+      "dt": 300.0,
+      "frictional_heating": false,
+      "initial_kinetic_j_m2": 2055.256064690026,
+      "integrated_rate_over_initial_kinetic": {
+        "adiabatic": -2.634023056655635e-07
+      },
+      "kinetic_change_over_initial_kinetic": -0.17532378760446782,
+      "raw_nu": 0.1,
+      "time_stepping_over_initial_kinetic": -0.003551185678014014,
+      "total_change_over_initial_kinetic": -0.0035514490803196797
+    },
+    "no_diffusion_dt600": {
+      "adiabatic_conversion_of_kinetic_over_initial_kinetic": -0.1756833071726857,
+      "diffusion": false,
+      "dt": 600.0,
+      "frictional_heating": false,
+      "initial_kinetic_j_m2": 2055.256064690026,
+      "integrated_rate_over_initial_kinetic": {
+        "adiabatic": -2.1799749038258545e-07
+      },
+      "kinetic_change_over_initial_kinetic": -0.17695543928291554,
+      "raw_nu": 0.1,
+      "time_stepping_over_initial_kinetic": -0.009582453647812864,
+      "total_change_over_initial_kinetic": -0.009582671645303246
+    },
+    "no_diffusion_dt600_no_filter": {
+      "adiabatic_conversion_of_kinetic_over_initial_kinetic": -0.17535016213633953,
+      "diffusion": false,
+      "dt": 600.0,
+      "frictional_heating": false,
+      "initial_kinetic_j_m2": 2055.256064690026,
+      "integrated_rate_over_initial_kinetic": {
+        "adiabatic": -2.0788336386446102e-07
+      },
+      "kinetic_change_over_initial_kinetic": -0.1750982796790403,
+      "raw_nu": 0.0,
+      "time_stepping_over_initial_kinetic": -0.0038732369703152157,
+      "total_change_over_initial_kinetic": -0.0038734448536790803
+    }
+  }
+}

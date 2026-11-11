@@ -59,6 +59,23 @@ def _planet_config(name: str, **changes) -> RadiativeConfig:
         initial={"kind": "isothermal", "temperature": body.reference_temperature}), **changes)
 
 
+def test_frictional_heating_is_opt_in_and_leaves_existing_hashes_alone():
+    """The option is written into the canonical configuration only when
+    set, so the hashes of the runs recorded before it existed (docs/
+    radiation/evidence) are still the hashes of the presets."""
+    recorded = {"earth-gray-dry": "e31ae183937da3bc9c5a63cbaf5c889bbeefc384a2f70b81e529b7a6965890d5",
+                "jupiter-schneider-liu":
+                    "80f280d2005fd86a2415f29dabbd90e126e75232b98bbe203b88fd913333d189"}
+    for name, digest in recorded.items():
+        cfg = PRESETS[name]()
+        assert cfg.frictional_heating is False
+        assert "frictional_heating" not in cfg.to_dict()
+        assert cfg.sha256() == digest
+        on = cfg.with_(frictional_heating=True)
+        assert on.sha256() != digest
+        assert RadiativeConfig.from_dict(json.loads(on.canonical_json())) == on
+
+
 # ---------------------------------------------------------------- host only
 def test_presets_are_valid_hashable_and_round_trip():
     seen = set()
@@ -257,11 +274,62 @@ def test_surface_exchange_conserves_energy_between_surface_and_atmosphere(tmp_pa
     run.run()
     series = json.loads((tmp_path / "earth" / "series.json").read_text())
     assert abs(series["energy_residual"][-1]) < 0.02 * abs(series["column_energy_tendency"][-1])
-    # The accumulator covers the leapfrog steps only: the one RK4 startup
-    # step neither advances the slab nor enters the means (its heating of
-    # the atmosphere over that single step is therefore unaccounted, once
-    # per run).
-    accumulated_seconds = 86400.0 - cfg.dt
+    # Every model step, the RK4 startup step included, advances the slab and
+    # enters the means, so the accumulated time is the whole day.
+    accumulated_seconds = 86400.0
+    assert run.coupling.budget_time == 0.0       # reset by the daily sample
     slab_heat = cfg.surface["heat_capacity"] * (series["mean_surface_temperature"][-1] - ts0)
     assert slab_heat == pytest.approx(series["surface_net"][-1] * accumulated_seconds, rel=1e-9)
     assert series["sensible"][-1] > 0.0          # the warm slab heats the air
+
+
+
+@needs_cuda
+def test_frictional_heating_returns_what_hyperdiffusion_removes_adiabatic():
+    """Jupiter constants, T9 L12, 5 m/s seed, one day, no physics. Without
+    del^8 the total energy changes by dE0; with del^8 by dE8 (89 % of the
+    kinetic energy, the documented sink). Criterion, fixed before the first
+    run: with frictional heating the change differs from dE0 by less than
+    5 % of |dE8|, i.e. at least 95 % of the deleted energy comes back."""
+    import cupy as cp
+    from tropoi.run.radiative.model import build_model, build_stepper, initial_state
+    from tropoi.temporal.column_coupling import global_energy
+    body = PLANETS["jupiter"]
+
+    def change(**options):
+        cfg = _planet_config("jupiter", perturbation_wind=5.0, perturbation_lmax=4, **options)
+        model = build_model(cfg)
+        x0, _, _ = initial_state(cfg)
+        K = model.nlev
+        profile = body.reference_temperature * model.sigma.full_levels_array() ** (0.5 * cfg.kappa)
+        x0[2 * K:3 * K, 0, 0] = cp.asarray(np.maximum(profile, 0.4 * body.reference_temperature)) \
+            * math.sqrt(4.0 * math.pi)
+        stepper = build_stepper(cfg, model, None)
+        stepper.initialize(x0, 0.0)
+        e0 = global_energy(model, x0, cfg.gravity)
+        for _ in range(cfg.steps_per_day):
+            stepper.step()
+        e1 = global_energy(model, stepper.state, cfg.gravity)
+        return e1["total"] - e0["total"], e0["kinetic"]
+
+    d_none, kinetic = change(hyperdiffusion_efold_days=1.0e9)
+    d_sink, _ = change()
+    d_heat, _ = change(frictional_heating=True)
+    assert d_sink < -0.5 * kinetic                       # the sink is there
+    assert abs(d_heat - d_none) < 0.05 * abs(d_sink)
+
+
+@needs_cuda
+def test_with_frictional_heating_the_coupled_budget_closes_with_hyperdiffusion_on(tmp_path):
+    """The run of the del^8 test above with frictional heating on. Criterion,
+    fixed before the first run: the same 5e-3 W m^-2 bound the coupling
+    meets with del^8 off (the residual without the heating is 0.058)."""
+    from tropoi.run.radiative.experiment import RadiativeRun
+    cfg = _tiny(PRESETS["jupiter-schneider-liu"](days=1), experiment_id="jup-heat",
+                vertical={"kind": "uniform", "nlev": 12}, checkpoint_every_days=1,
+                state_every_days=1, perturbation_wind=1.0, frictional_heating=True)
+    RadiativeRun(cfg, tmp_path / "run", allow_dirty=True, log=lambda s: None).run()
+    series = json.loads((tmp_path / "run" / "series.json").read_text())
+    print("residual", series["energy_residual"])
+    assert abs(series["energy_residual"][-1]) < 5e-3
+

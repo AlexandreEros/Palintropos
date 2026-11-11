@@ -100,11 +100,12 @@ def global_energy(model, coeffs, gravity: float) -> dict:
 class ColumnPhysicsCoupling:
     """Lagged stepper term evaluating column physics on the state grid.
 
-    ``dt`` is the model time step (the leapfrog window is ``2 dt``; the RK4
-    startup calls with a window of ``dt``, during which the surface is not
-    advanced and nothing is accumulated, so every model step is counted
-    once). ``surface_temperature`` (npts,) is required when the physics has a
-    surface.
+    ``dt`` is the model time step. The stepper calls once per model step
+    (with a window of ``2 dt`` in a leapfrog step and ``dt`` in the RK4
+    startup step); every call advances the surface by ``dt`` and adds ``dt``
+    of fluxes to the budget, so the surface and the accumulated time cover
+    exactly the steps taken. ``surface_temperature`` (npts,) is required when
+    the physics has a surface.
     """
 
     def __init__(self, model, physics, dt: float, *, surface_temperature=None):
@@ -174,22 +175,21 @@ class ColumnPhysicsCoupling:
         tendency = xp.zeros_like(coeffs)
         tendency[2 * K:3 * K] = spec
 
-        elapsed = window - self.dt          # dt for a leapfrog step, 0 at startup
-        if elapsed > 0.0:
-            if self.surface_temperature is not None:
-                self.surface_temperature = self.physics.surface.advance(
-                    self.surface_temperature, out.surface_net, elapsed)
-            f = out.fluxes
-            w = self.weights
-            means = {"toa_net_down": f.toa_net_down, "olr": f.olr,
-                     "absorbed_stellar": f.absorbed_stellar,
-                     "bottom_net_down": f.bottom_net_down, "sensible": out.sensible,
-                     "column_energy_tendency": out.column_energy_tendency,
-                     "surface_net": out.surface_net}
-            for key, field in means.items():
-                self.budget[key] += elapsed * float((w * field).sum())
-            self.budget["interior"] += elapsed * out.interior
-            self.budget_time += elapsed
+        elapsed = self.dt                   # one model step per call, startup included
+        if self.surface_temperature is not None:
+            self.surface_temperature = self.physics.surface.advance(
+                self.surface_temperature, out.surface_net, elapsed)
+        f = out.fluxes
+        w = self.weights
+        means = {"toa_net_down": f.toa_net_down, "olr": f.olr,
+                 "absorbed_stellar": f.absorbed_stellar,
+                 "bottom_net_down": f.bottom_net_down, "sensible": out.sensible,
+                 "column_energy_tendency": out.column_energy_tendency,
+                 "surface_net": out.surface_net}
+        for key, field in means.items():
+            self.budget[key] += elapsed * float((w * field).sum())
+        self.budget["interior"] += elapsed * out.interior
+        self.budget_time += elapsed
         self.last = out
         return tendency
 

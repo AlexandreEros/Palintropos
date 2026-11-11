@@ -7387,6 +7387,11 @@
     },
     {
       "kind": "instantiate",
+      "source": "tropoi.run.radiative.model._frictional_heating",
+      "target": "tropoi.temporal.tendencies.drag.MomentumSinkHeating"
+    },
+    {
+      "kind": "instantiate",
       "source": "tropoi.run.radiative.model._global_mean_insolation",
       "target": "tropoi.physics.insolation.PrescribedInsolation"
     },
@@ -7559,6 +7564,11 @@
       "kind": "call",
       "source": "tropoi.run.radiative.model.build_stepper",
       "target": "tropoi.run.radiative.model._drag"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.radiative.model.build_stepper",
+      "target": "tropoi.run.radiative.model._frictional_heating"
     },
     {
       "kind": "instantiate",
@@ -9729,6 +9739,16 @@
       "kind": "constructor",
       "source": "tropoi.temporal.tendencies.drag.LatitudeDependentRayleighDrag",
       "target": "tropoi.temporal.tendencies.drag.LatitudeDependentRayleighDrag.__init__"
+    },
+    {
+      "kind": "constructor",
+      "source": "tropoi.temporal.tendencies.drag.MomentumSinkHeating",
+      "target": "tropoi.temporal.tendencies.drag.MomentumSinkHeating.__init__"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.temporal.tendencies.drag.MomentumSinkHeating.__call__",
+      "target": "tropoi.temporal.tendencies.drag.MomentumSinkHeating._wind"
     },
     {
       "kind": "constructor",
@@ -18080,6 +18100,13 @@
       "type": "function"
     },
     {
+      "id": "tropoi.run.radiative.model._frictional_heating",
+      "kind": "function",
+      "module": "tropoi.run.radiative.model",
+      "qualname": "_frictional_heating",
+      "type": "function"
+    },
+    {
       "id": "tropoi.run.radiative.model._global_mean_insolation",
       "kind": "function",
       "module": "tropoi.run.radiative.model",
@@ -21864,6 +21891,41 @@
       "kind": "method",
       "module": "tropoi.temporal.tendencies.drag",
       "qualname": "LatitudeDependentRayleighDrag.signature",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.temporal.tendencies.drag.MomentumSinkHeating",
+      "kind": "class",
+      "module": "tropoi.temporal.tendencies.drag",
+      "qualname": "MomentumSinkHeating",
+      "type": "class"
+    },
+    {
+      "id": "tropoi.temporal.tendencies.drag.MomentumSinkHeating.__call__",
+      "kind": "method",
+      "module": "tropoi.temporal.tendencies.drag",
+      "qualname": "MomentumSinkHeating.__call__",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.temporal.tendencies.drag.MomentumSinkHeating.__init__",
+      "kind": "method",
+      "module": "tropoi.temporal.tendencies.drag",
+      "qualname": "MomentumSinkHeating.__init__",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.temporal.tendencies.drag.MomentumSinkHeating._wind",
+      "kind": "method",
+      "module": "tropoi.temporal.tendencies.drag",
+      "qualname": "MomentumSinkHeating._wind",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.temporal.tendencies.drag.MomentumSinkHeating.signature",
+      "kind": "method",
+      "module": "tropoi.temporal.tendencies.drag",
+      "qualname": "MomentumSinkHeating.signature",
       "type": "function"
     },
     {

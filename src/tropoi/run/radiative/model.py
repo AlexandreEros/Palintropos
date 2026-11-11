@@ -222,6 +222,15 @@ def _drag(cfg: RadiativeConfig, model):
     raise ValueError(f"unknown drag kind {kind!r}")
 
 
+def _frictional_heating(cfg: RadiativeConfig, model, dampers, lagged_drag):
+    """The heating that returns what ``dampers`` (implicit, diagonal) and
+    ``lagged_drag`` (explicit) remove from the kinetic energy."""
+    from tropoi.temporal.tendencies.drag import MomentumSinkHeating
+    sinks = [damper.tendency for damper in dampers]
+    sinks += [lambda x, term=term: term(x, 0.0, 0.0) for term in lagged_drag]
+    return MomentumSinkHeating(model, sinks, cfg.cp)
+
+
 def build_stepper(cfg: RadiativeConfig, model, coupling, *,
                   stage_validator: Optional[Callable] = None):
     """Semi-implicit leapfrog with del^(2n) hyperdiffusion, the configured
@@ -235,11 +244,14 @@ def build_stepper(cfg: RadiativeConfig, model, coupling, *,
                                    cfg.hyperdiffusion_efold_days * DAY_SECONDS,
                                    cfg.retained_cut, order=cfg.hyperdiffusion_order)
     dampers, lagged = _drag(cfg, model)
+    explicit = ()
+    if cfg.frictional_heating:
+        explicit = (_frictional_heating(cfg, model, dampers + (hyper,), lagged),)
     if coupling is not None:
         lagged = lagged + (coupling,)
     return SemiImplicitLeapfrogStepper(
         model.tendency, op, cfg.dt, raw_nu=cfg.raw_nu, raw_alpha=cfg.raw_alpha,
-        stage_validator=stage_validator, dampers=dampers + (hyper,),
+        stage_validator=stage_validator, explicit_terms=explicit, dampers=dampers + (hyper,),
         damping_scheme=cfg.damping_scheme, lagged_terms=lagged)
 
 

@@ -60,6 +60,8 @@ class RadiativeConfig:
     sensible: Optional[dict] = None
     drag: Optional[dict] = None
     internal_heat_flux: float = 0.0
+    # return the kinetic energy removed by drag and hyperdiffusion as heat
+    frictional_heating: bool = False
     radiation_interval: int = 1
     thermal_source: str = "linear"
     # initial state: {"kind": "radiative_convective"} or {"kind": "isothermal",
@@ -123,6 +125,10 @@ class RadiativeConfig:
 
     def to_dict(self) -> dict[str, Any]:
         d = asdict(self)
+        if not d["frictional_heating"]:
+            # written only when set, so configurations that predate the
+            # option keep their hash
+            del d["frictional_heating"]
         d["schema"] = CONFIG_SCHEMA
         return d
 

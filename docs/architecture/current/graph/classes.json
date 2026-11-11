@@ -5367,6 +5367,31 @@
       "qualname": "LatitudeDependentRayleighDrag"
     },
     {
+      "decorators": [],
+      "external_bases": [],
+      "id": "tropoi.temporal.tendencies.drag.MomentumSinkHeating",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__call__"
+        },
+        {
+          "kind": "method",
+          "name": "__init__"
+        },
+        {
+          "kind": "method",
+          "name": "_wind"
+        },
+        {
+          "kind": "method",
+          "name": "signature"
+        }
+      ],
+      "module": "tropoi.temporal.tendencies.drag",
+      "qualname": "MomentumSinkHeating"
+    },
+    {
       "decorators": [
         "dataclass(frozen=True)"
       ],

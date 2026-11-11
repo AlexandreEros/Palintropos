@@ -3,8 +3,12 @@
     python -m tropoi.run.radiative run    --preset jupiter-schneider-liu --run-dir DIR
                                           [--days N] [--dt S] [--until-day N]
                                           [--max-wall-hours H] [--adiabatic] [--allow-dirty]
+                                          [--frictional-heating]
     python -m tropoi.run.radiative column --preset jupiter-schneider-liu
     python -m tropoi.run.radiative show-config --preset earth-gray-dry
+
+``--frictional-heating`` returns the kinetic energy removed by drag and
+hyperdiffusion as heat (off by default; it changes the configuration hash).
 
 ``column`` solves the single-column radiative(-convective) equilibrium of a
 preset on the CPU and prints it; ``--adiabatic`` runs the same dynamical
@@ -29,6 +33,8 @@ def _config(args) -> RadiativeConfig:
         cfg = PRESETS[args.preset]()
     changes = {k: getattr(args, k) for k in ("days", "dt", "experiment_id")
                if getattr(args, k, None) is not None}
+    if getattr(args, "frictional_heating", False):
+        changes["frictional_heating"] = True
     return cfg.with_(**changes) if changes else cfg
 
 
@@ -42,6 +48,7 @@ def main(argv=None) -> int:
         p.add_argument("--experiment-id")
         p.add_argument("--days", type=int)
         p.add_argument("--dt", type=float)
+        p.add_argument("--frictional-heating", action="store_true")
         if name == "run":
             p.add_argument("--run-dir", required=True)
             p.add_argument("--until-day", type=int)

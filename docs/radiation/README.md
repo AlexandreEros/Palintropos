@@ -249,6 +249,18 @@ speeds.
 Measured speed over the whole runs: 0.50 s/step (Earth, 21,600 steps) and
 0.55 s/step (Jupiter, 14,400 steps).
 
+### Controlled comparison: the same Earth run with frictional heating
+
+Criterion written before the run was started (commit that adds
+`frictional_heating`): the 300-day dry gray Earth preset is repeated with
+`--frictional-heating` and nothing else changed in the configuration. It
+passes if the mean energy-budget residual over days 201–300 is below
+0.5 W m^-2 in magnitude (a tenth of the 5.10 W m^-2 of the run without it).
+The top-of-atmosphere balance, surface temperature and jets are reported
+next to the first run's, not judged. The code also differs from the first
+run's by the startup-step fix (the slab is advanced one extra step at the
+start), which is not expected to matter after spin-up.
+
 ## 7. Published comparisons: verified, and where each stands
 
 All five references were read (protocol numbers in the docstrings cite them).
