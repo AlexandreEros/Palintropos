@@ -52,6 +52,24 @@ rerun after the fix**; the change touches only the initial-state seed of
 `tropoi.run.radiative`. The four `slow` convergence tests and the browser
 tests were not run.
 
+## Full suite at the final code revision (2026-11-11)
+
+Run by the repository owner from the main checkout at `b2b8ea2` (clean tree;
+Windows, CUDA, Python 3.12.12, pytest 9.1.1), recorded on
+[PR #29](https://github.com/AlexandreEros/Palintropos/pull/29#issuecomment-6787079627):
+
+| Command | Passed | Skipped | Failed | Elapsed |
+| --- | ---: | ---: | ---: | ---: |
+| `python -m pytest -m "not slow" -q --durations=20` | 1651 | 5 | 0 | 22:09 |
+| `python -m pytest -m slow -vv -s --durations=10` | 4 | 0 | 0 | 1:11:33 |
+
+This supersedes the statements above that the full suite and the four slow
+convergence tests were not run after the fix. CPU-only CI (Ubuntu, Python
+3.12) also passed at `b2b8ea2`, with the CUDA tests skipped.
+
+The 300-day Earth and 200-day Jupiter runs completed at the same commit;
+their results are in README §6.
+
 ## Not tested at all
 
 - `temporal/tendencies/drag.py` has no dedicated test (it runs inside the
@@ -59,6 +77,6 @@ tests were not run.
 - The correlated-k path on the GPU, with more than one absorber, or coupled
   to the dynamics.
 - `InstantaneousInsolation` and `TidallyLockedInsolation` in a 3-D run.
-- Any run longer than 30 model days; any run at T42.
-- CPU-only CI (Linux, no CuPy): the new host tests are expected to run and
-  the GPU ones to skip, but this was not executed.
+- Any run at T42 or finer; any run longer than 300 model days.
+- `tools/radiation/summarize_run.py` has no test; it was run on the two
+  completed runs only.

@@ -177,14 +177,86 @@ Consequence: a coupled energy budget on a fast rotator will show a residual
 equal to the ∇⁸ kinetic-energy loss. No frictional-heating term or energy
 fixer was added.
 
+### Long runs completed on 2026-11-11 (commit `b2b8ea2`, MX110)
+
+Both presets were run to completion by the repository owner from a clean
+tree. Records, a summary and a figure for each are in
+`evidence/earth-gray-dry-T21L25-300d/` and `evidence/jupiter-sl09-T21L30-200d/`
+(`summary.json` is produced by `tools/radiation/summarize_run.py`). These
+are gray-radiation runs at T21; neither is a reproduction of a published
+benchmark.
+
+**Dry gray Earth, T21 L25, 300 days.** The flow spins up between days 30 and
+100 (kinetic energy 0.05 → 1.6 MJ m^-2) and is statistically steady
+afterwards. Means over days 201–300 (± standard deviation of daily values):
+
+| quantity | value |
+| --- | --- |
+| absorbed stellar / OLR / TOA net down | 234.60 / 230.38 ± 0.60 / +4.22 W m^-2 |
+| sensible heat flux, surface net | 126.6 ± 5.6, −0.1 ± 5.2 W m^-2 |
+| mean surface temperature | 301.39 ± 0.19 K |
+| kinetic energy, max \|u\| | 1.38 ± 0.06 MJ m^-2, 64 ± 5 m s^-1 |
+| energy-budget residual | **−5.10 ± 0.42 W m^-2** (largest single day: −12.1 on day 62) |
+| mean surface pressure drift over 300 days | −1.1 × 10^-6 |
+
+Zonal means over days 151–300 (150 daily samples): westerly jets of 28.2 and
+27.4 m s^-1 at 19°N and 25°S, σ = 0.34; lowest-level temperature 310 K at the
+equator and 241–242 K at the poles; lowest-level eddy heat flux peaking at
+38 K m s^-1 near 42–47° in both hemispheres. The two hemispheres differ by up
+to 16 % of the peak wind in this 150-day mean, so it is not a converged
+climatology. The model has no boundary-layer diffusion or surface stress, so
+these numbers are not comparable with Frierson et al. (2006).
+
+**Where the Earth residual goes (measured).** For each of the 11 saved states
+of days 200–300 the tool evaluates the rate at which each momentum sink
+changes `global_energy`, as a centred difference along that operator's own
+tendency:
+
+| sink | kinetic | enthalpy | total (W m^-2) |
+| --- | --- | --- | --- |
+| Rayleigh drag (σ > 0.7, 1 day^-1) | −2.42 | 0 | −2.42 |
+| ∇⁸ hyperdiffusion (all prognostic rows) | −2.70 | +0.15 | −2.54 |
+| both | | | **−4.96 ± 0.12** (standard error of 11 states) |
+
+The residual over the same 100 days is −5.10 W m^-2, leaving −0.14 W m^-2
+unaccounted, about one standard error of the sampled sinks. So in this run
+the budget residual is the kinetic energy that drag and ∇⁸ remove and the
+model does not return as heat, to within the sampling of that measurement.
+Two things follow directly from the numbers: the steady state balances at the
+top of the atmosphere with +4.2 W m^-2 net absorption (OLR is lower than the
+absorbed flux by about the size of the sink), and the sink is 2 % of the
+radiative throughput. Limits of this statement: the sinks are sampled every
+10 days against a daily-mean residual; the hyperdiffusion rate is the
+continuous `-r X` form rather than the stepper's centred factor; no
+term-by-term kinetic-energy budget (conversion, advection) was computed, so
+the −1 to −2 % adiabatic residual of the table above is still unexplained.
+
+**Jupiter gray (Schneider–Liu parameters), T21 L30 uniform σ to 3 bar, 200
+days.** The run is stable and its budget closes: residual −1.3 × 10^-6 W m^-2
+against measured sinks of −1.1 × 10^-6 W m^-2, OLR 14.047 W m^-2 against
+8.324 absorbed + 5.7 interior (a steady −0.023 W m^-2 imbalance present from
+day 1), surface-pressure drift −1.9 × 10^-10. **It has not spun up a
+circulation**: after 200 days max \|u\| is 1.0 m s^-1 and kinetic energy is
+still growing (16 J m^-2 at day 20, 89 at day 100, 321 at day 200); the
+100-day zonal mean shows 0.8 m s^-1 at 64° in the top level and no jets. This
+is a long stability and bookkeeping check of the surface-less configuration,
+nothing more. The uniform grid puts one level above the radiative-convective
+tropopause, so the stratosphere is not resolved. Because the flow is far
+weaker than in the T9 experiment above (1 against 5 m s^-1, in 3 against
+100 bar), this run says nothing about the ∇⁸ loss at realistic Jovian wind
+speeds.
+
+Measured speed over the whole runs: 0.50 s/step (Earth, 21,600 steps) and
+0.55 s/step (Jupiter, 14,400 steps).
+
 ## 7. Published comparisons: verified, and where each stands
 
 All five references were read (protocol numbers in the docstrings cite them).
 
 | Reference | Establishes | Needs beyond what exists | Status |
 | --- | --- | --- | --- |
-| Schneider & Liu 2009 (Jupiter, gray, interior heat, T213) | coupled gray radiation + convection + drag without a surface | T213 and > 28,000 days; drag shoulder shape unspecified in the paper | column structure and energy balance reproduced (§4). **3-D run not done**: the 200-day T21 run was cancelled before it started producing data. T21 cannot resolve their jets in any case. |
-| Frierson, Held & Zurita-Gotor 2006 (dry limit) | gray radiation + slab + boundary layer with eddies | their K-profile boundary layer, surface stress, T85+ | radiation, slab and bulk flux implemented; **boundary-layer diffusion and surface stress are not**, so no dry-limit comparison is claimed. A 300-day T21 run was stopped at day 30 (record in `evidence/earth-gray-dry-T21L25-partial/`); it is spin-up only. |
+| Schneider & Liu 2009 (Jupiter, gray, interior heat, T213) | coupled gray radiation + convection + drag without a surface | T213 and > 28,000 days; drag shoulder shape unspecified in the paper | column structure and energy balance reproduced (§4). A 200-day T21 run completed (§6) with a closed budget but winds below 1 m s^-1: **no jets, not a reproduction**. Their runs are T213 and tens of thousands of days; T21 cannot resolve their jets in any case. |
+| Frierson, Held & Zurita-Gotor 2006 (dry limit) | gray radiation + slab + boundary layer with eddies | their K-profile boundary layer, surface stress, T85+ | radiation, slab and bulk flux implemented; **boundary-layer diffusion and surface stress are not**, so no dry-limit comparison is claimed. A 300-day T21 run completed (§6; `evidence/earth-gray-dry-T21L25-300d/`) and shows a steady eddying circulation, but it is a different model from theirs and is not a comparison. The earlier record `evidence/earth-gray-dry-T21L25-partial/` is the first 30 days of an earlier development run made before the first commit of this branch. |
 | Isca Mars M-I (gray), M-C (SOCRATES) | seasonal/diurnal Mars circulation, figures only | seasons + diurnal cycle are implemented in `insolation.py` but not run; M-C needs real-gas CO2 with CIA and topography | proposed |
 | THAI Ben 1 / Ben 2 | N2 vs CO2 real-gas, tidally locked; inter-model spread 7 K / 6 K in surface temperature, fluxes within 5 % | real-gas RT with CO2 CIA and far wings, boundary layer, soil | proposed; blocked on opacity data |
 | HARP Jupiter | real-gas column heating/cooling; their correlated-k vs line-by-line agree within 10 % | HITRAN lines, H2–H2/H2–He CIA, Moses profiles | proposed; blocked on opacity data |
@@ -215,7 +287,13 @@ python tools/radiation/adiabatic_energy.py
 python -m tropoi.run.radiative column --preset jupiter-schneider-liu
 python -m tropoi.run.radiative run --preset jupiter-schneider-liu --days 200 --run-dir runs/radiative/jupiter-sl09-T21L30
 python -m tropoi.run.radiative run --preset earth-gray-dry --days 300 --run-dir runs/radiative/earth-gray-dry-T21L25
+python tools/radiation/summarize_run.py runs/radiative/earth-gray-dry-T21L25 --name earth-gray-dry-T21L25-300d
+python tools/radiation/summarize_run.py runs/radiative/jupiter-sl09-T21L30 --name jupiter-sl09-T21L30-200d
 ```
+
+The committed evidence was produced from run directories suffixed `-b2b8ea2`
+(config hashes `e31ae183…` Earth, `80f280d2…` Jupiter; full values in each
+`config.json`). Saved states and checkpoints are not committed.
 
 Dependencies are unchanged (`requirements.txt`; SciPy is used by the tests).
 Run configurations are hashed (`config_sha256`) and stored with the commit in
@@ -228,9 +306,12 @@ Test results for this commit are in [TEST_RESULTS.md](TEST_RESULTS.md).
 1. Obtain real k-tables (needs a decision on downloads: exo_k + ExoMol/HITRAN
    CIA) and compare `CorrelatedKLongwave` with an independent model for one
    Earth and one CO2 case; add Rayleigh, continua, CIA, gas overlap.
-2. Term-by-term kinetic-energy budget, and a resolution sweep for the Jupiter
-   ∇⁸ loss; decide on frictional heating.
-3. Finish the two cancelled runs (commands above) on a larger GPU.
+2. Decide on frictional heating: the 300-day Earth run measures a 5 W m^-2
+   sink from drag and ∇⁸ that shifts the top-of-atmosphere balance (§6).
+   Term-by-term kinetic-energy budget, and a resolution sweep for the Jupiter
+   ∇⁸ loss.
+3. A Jupiter run long and fine enough to develop a circulation (the 200-day
+   T21 run does not), on a stretched grid that resolves the stratosphere.
 4. Boundary-layer diffusion and surface stress (required by FHZ06 and THAI).
 5. Variable c_p(T) (Venus, Mars, giant planets); assess a deep-atmosphere
    core for Titan.
