@@ -70,6 +70,26 @@ convergence tests were not run after the fix. CPU-only CI (Ubuntu, Python
 The 300-day Earth and 200-day Jupiter runs completed at the same commit;
 their results are in README §6.
 
+## Startup accounting and frictional heating (2026-11-11, commit `d38d2a3`)
+
+```bash
+python -m pytest tests/test_radiative_dynamical.py tests/test_physics_columns.py tests/test_no_unreferenced_functions.py tests/test_layout.py tests/test_laplacian_eigenvalues.py -q
+```
+
+82 passed in 170 s (Windows, MX110). New or changed tests:
+
+| Test | First result | Final |
+| --- | --- | --- |
+| slab/atmosphere exchange over a full day (startup step now counted) | passed | passed; slab heat equals accumulated flux x 86400 s to 1e-9 |
+| preset hashes unchanged by the new option | passed | passed |
+| adiabatic Jupiter, del^8 + heating, within 5 % of the del^8 loss | **failed** (lagged term, momentum only) | passed after the term was made time-centred and the temperature-diffusion enthalpy was returned; criterion unchanged |
+| coupled Jupiter, del^8 + heating, residual < 5e-3 W m^-2 | **failed** at 0.016 | passed at 5.7e-4; criterion unchanged |
+
+The full suite was **not** rerun at `d38d2a3`. The change touches
+`temporal/column_coupling.py`, `temporal/tendencies/drag.py` and
+`run/radiative/`; with the option off the stepper receives the same terms as
+before, and the only behavioural change is the extra slab step at startup.
+
 ## Not tested at all
 
 - `temporal/tendencies/drag.py` has no dedicated test (it runs inside the

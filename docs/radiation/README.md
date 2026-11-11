@@ -138,11 +138,13 @@ With a stronger seed the same budget does **not** close on Jupiter: T9 L12,
 loss of −0.059 W m^-2; with ∇⁸ off the residual is −0.003 W m^-2
 (`test_with_hyperdiffusion_the_budget_residual_is_the_kinetic_energy_it_deletes`).
 
-Known bookkeeping gap: the single RK4 startup step applies the physics
-heating to the atmosphere but neither advances the slab nor enters the
-accumulated means (the slab's heat change equals the accumulated surface
-flux to 1e-9 over the leapfrog steps). It is one step per run and is not
-corrected.
+Startup step (fixed on 2026-11-11): up to `43cb3aa` the single RK4 startup
+step applied the physics heating to the atmosphere but neither advanced the
+slab nor entered the accumulated means. The coupling now advances the slab
+and accumulates on every model step, so the accumulated time is the whole
+run and the slab's heat change equals the accumulated surface flux to 1e-9
+over a full day (tested). The long runs recorded below predate the fix; they
+are missing one 1200 s slab step at day 0.
 
 **Hyperdiffusion removes kinetic energy and does not return it as heat.**
 One day, no physics, 5 m/s seeded rotational flow, T9 L12, total-energy
@@ -169,13 +171,78 @@ What is **not** established: the mechanism in (c) (unresolved equatorial
 deformation scale) is a hypothesis consistent with those three measurements;
 it was not tested by a resolution sweep. Without ∇⁸, 18–27 % of the kinetic
 energy still disappears from the kinetic term in a day while total energy
-changes by ≤ 1.7 %; the enthalpy term rises correspondingly, but **no
-term-by-term energy-transfer diagnostic was computed, so this is not shown to
-be physical conversion.** The −1 to −2 % residual without ∇⁸ is unexplained.
+changes by ≤ 1.7 %. That transfer and the residual are attributed below.
 
-Consequence: a coupled energy budget on a fast rotator will show a residual
-equal to the ∇⁸ kinetic-energy loss. No frictional-heating term or energy
-fixer was added.
+Consequence: without frictional heating, a coupled energy budget shows a
+residual equal to what the momentum sinks remove.
+
+### Attribution by operator (2026-11-11, `tools/radiation/energy_attribution.py`)
+
+The same one-day experiment, with the change of total energy split by
+operator: for an operator with tendency D(X), the centred difference of
+`global_energy` along D is its instantaneous energy rate, and its integral
+over the run is what that operator contributed. All numbers are fractions of
+the initial kinetic energy; evidence in `evidence/energy_attribution.json`.
+
+Without ∇⁸:
+
+| preset | kinetic change | integrated conversion by the adiabatic operator | total change by the adiabatic operator | total change, dt = 600 / 300 / 150 s | dt = 600 s, RAW filter off |
+| --- | --- | --- | --- | --- | --- |
+| earth | −0.267 | −0.263 | 0.0000 | −0.0110 / −0.0038 / −0.0015 | −0.0055 |
+| mars | −0.177 | −0.176 | 0.0000 | −0.0096 / −0.0036 / −0.0015 | −0.0039 |
+| jupiter | −0.181 | −0.169 | +0.0005 | −0.0172 / −0.0078 / −0.0036 | −0.0029 |
+
+Two things this establishes. (i) The kinetic energy that leaves the kinetic
+term is the conversion term of the spatial operator, which changes total
+energy by at most 5 × 10^-4: it is transferred to enthalpy by the
+discretised equations, not lost. (ii) The −1 to −2 % residual is not in the
+spatial operator: it shrinks faster than linearly with the time step and by
+a half (Earth) to five sixths (Jupiter) when the Robert–Asselin–Williams
+filter is switched off, so it belongs to the time integration. It was not
+split further between the filter, the semi-implicit scheme and the startup
+step.
+
+With ∇⁸ (0.1 day at the cut), and with `frictional_heating`:
+
+| preset | ∇⁸ on momentum | ∇⁸ on temperature | heating returned | total change without / with heating | left to time stepping |
+| --- | --- | --- | --- | --- | --- |
+| earth | −0.0148 | −0.0039 | +0.0187 | −0.0293 / −0.0106 | −0.0106 |
+| mars | −0.0129 | −0.0022 | +0.0151 | −0.0244 / −0.0093 | −0.0093 |
+| jupiter (100 bar) | −0.777 | −0.109 | +0.886 | −0.893 / −0.0067 | −0.0069 |
+
+The ∇⁸ sink has two parts: kinetic energy removed from vorticity and
+divergence, and enthalpy removed by the diffusion of temperature along
+sigma surfaces, which is not weighted by surface pressure and so changes
+the mass-weighted mean (a seventh of the total on Jupiter here).
+
+### Frictional heating (opt-in, 2026-11-11)
+
+`frictional_heating` (configuration field and `--frictional-heating`; off by
+default, and left out of the canonical configuration when off so existing
+hashes are unchanged) adds `MomentumSinkHeating`
+(`temporal/tendencies/drag.py`) as an explicit term: `Q = −V·dV / c_p` for
+the wind tendency dV of the drag and the hyperdiffusion, plus a horizontally
+uniform correction per level that cancels the enthalpy change of the
+temperature diffusion. Instantaneously it returns exactly what the sinks
+remove (table above: 0.886 of 0.886); over a run the balance holds to the
+time-stepping error.
+
+Two acceptance criteria were written into the tests before their first run
+and were not changed:
+
+| test | criterion | measured |
+| --- | --- | --- |
+| adiabatic Jupiter T9, ∇⁸ on, heating on | total change within 5 % of the ∇⁸ loss of the change without ∇⁸ | −0.0067 against −0.0172 without ∇⁸ and −0.893 with |
+| coupled Jupiter T9, ∇⁸ on, heating on | residual below the 5 × 10^-3 W m^-2 bound the coupling meets with ∇⁸ off | 5.7 × 10^-4 W m^-2 (0.058 without heating) |
+
+The first version of the term failed both (coupled residual 0.016 W m^-2):
+it was a lagged term evaluated at the old time level and did not return the
+temperature-diffusion part. The attribution above located both defects; the
+criteria were kept.
+
+Limits: the local heating is not sign-definite for a scale-selective
+diffusion; the time-stepping residual is not returned; the option has been
+exercised on the two gray presets only.
 
 ### Long runs completed on 2026-11-11 (commit `b2b8ea2`, MX110)
 
@@ -296,6 +363,7 @@ step and `radiation_interval` already reduces it.
 python -m pytest tests/test_radiation_twostream.py tests/test_physics_columns.py tests/test_radiation_kdist.py tests/test_radiative_dynamical.py
 python tools/radiation/regimes.py
 python tools/radiation/adiabatic_energy.py
+python tools/radiation/energy_attribution.py
 python -m tropoi.run.radiative column --preset jupiter-schneider-liu
 python -m tropoi.run.radiative run --preset jupiter-schneider-liu --days 200 --run-dir runs/radiative/jupiter-sl09-T21L30
 python -m tropoi.run.radiative run --preset earth-gray-dry --days 300 --run-dir runs/radiative/earth-gray-dry-T21L25
@@ -318,10 +386,9 @@ Test results for this commit are in [TEST_RESULTS.md](TEST_RESULTS.md).
 1. Obtain real k-tables (needs a decision on downloads: exo_k + ExoMol/HITRAN
    CIA) and compare `CorrelatedKLongwave` with an independent model for one
    Earth and one CO2 case; add Rayleigh, continua, CIA, gas overlap.
-2. Decide on frictional heating: the 300-day Earth run measures a 5 W m^-2
-   sink from drag and ∇⁸ that shifts the top-of-atmosphere balance (§6).
-   Term-by-term kinetic-energy budget, and a resolution sweep for the Jupiter
-   ∇⁸ loss.
+2. Decide whether `frictional_heating` becomes the default of the presets
+   (§6). A resolution sweep for the Jupiter ∇⁸ loss; split the time-stepping
+   residual between the filter and the semi-implicit scheme.
 3. A Jupiter run long and fine enough to develop a circulation (the 200-day
    T21 run does not), on a stretched grid that resolves the stratosphere.
 4. Boundary-layer diffusion and surface stress (required by FHZ06 and THAI).
