@@ -1,0 +1,251 @@
+{
+  "climate": {
+    "eddy_heat_flux_poleward_north": {
+      "latitude_deg": 2.768903007736006,
+      "sigma": 0.9833333333333334,
+      "value": 1.1139152424986217e-06
+    },
+    "eddy_heat_flux_poleward_south": {
+      "latitude_deg": -74.74454036863577,
+      "sigma": 0.9833333333333334,
+      "value": -1.941471663796823e-07
+    },
+    "eddy_momentum_flux_north": {
+      "latitude_deg": 2.768903007736006,
+      "sigma": 0.016666666666666666,
+      "value": 2.7454059309872028e-05
+    },
+    "eddy_momentum_flux_south": {
+      "latitude_deg": -69.21297616937085,
+      "sigma": 0.016666666666666666,
+      "value": -1.4386060293377311e-06
+    },
+    "hemispheric_asymmetry_of_u": 0.0032934492114263464,
+    "latitudes": 32,
+    "levels": 30,
+    "lowest_level_temperature": {
+      "near_equator": 230.570627863736,
+      "northmost": 229.70859235609353,
+      "southmost": 229.7092147799688
+    },
+    "lowest_level_wind_range": [
+      -0.1426890516529072,
+      0.014318473127282946
+    ],
+    "samples": 100,
+    "strongest_easterly": {
+      "latitude_deg": 2.768903007736006,
+      "sigma": 0.9833333333333334,
+      "value": -0.1426890516529072
+    },
+    "temperature_range": [
+      105.59302161167369,
+      230.570627863736
+    ],
+    "westerly_jet_north": {
+      "latitude_deg": 63.67863556109686,
+      "sigma": 0.016666666666666666,
+      "value": 0.7912488183622998
+    },
+    "westerly_jet_south": {
+      "latitude_deg": -63.678635561096876,
+      "sigma": 0.016666666666666666,
+      "value": 0.7911668735351631
+    }
+  },
+  "code": {
+    "git_commit": "d38d2a365b60c3528c3ba2eae76c688d453ee505",
+    "git_dirty": false
+  },
+  "config_sha256": "0d02921200136cf99915a41997ed44e33797a88ec7c25bedfc5b18e2adb8deec",
+  "environment": {
+    "cuda_driver": 13000,
+    "cuda_runtime": 13000,
+    "cupy": "14.0.1",
+    "device": "Tesla T4",
+    "numpy": "2.4.6",
+    "platform": "Linux-6.6.159+-x86_64-with-glibc2.39",
+    "python": "3.13.16"
+  },
+  "events": {
+    "first": "2026-11-12T00:46:14Z",
+    "last": "2026-11-12T01:51:11Z",
+    "last_event": "completed",
+    "resumes": 2
+  },
+  "experiment_id": "jupiter-sl09-heated-T21L30",
+  "series": {
+    "at_day": {
+      "1": {
+        "absorbed_stellar": 8.32393055151841,
+        "bottom_net_down": 7.374634826897574e-18,
+        "column_energy_tendency": -0.023095454740680203,
+        "energy_kinetic": 29.559461334606944,
+        "energy_rate": -0.0231512075441855,
+        "energy_residual": -5.575280350529621e-05,
+        "interior": 5.7,
+        "max_abs_u": 0.19306540625273275,
+        "olr": 14.047026006259099,
+        "sensible": 0.0,
+        "surface_net": 0.0,
+        "t_max": 230.3770484297019,
+        "t_min": 106.77222107206595,
+        "toa_net_down": -5.72309545474068
+      },
+      "10": {
+        "absorbed_stellar": 8.32393055151841,
+        "bottom_net_down": -2.960112455292891e-17,
+        "column_energy_tendency": -0.02293867702686786,
+        "energy_kinetic": 17.602464613757355,
+        "energy_rate": -0.022941361400816176,
+        "energy_residual": -2.6843739483160822e-06,
+        "interior": 5.7,
+        "max_abs_u": 0.1783485250206439,
+        "olr": 14.046869228545289,
+        "sensible": 0.0,
+        "surface_net": 0.0,
+        "t_max": 230.38821970814098,
+        "t_min": 106.68930992488522,
+        "toa_net_down": -5.722938677026869
+      },
+      "100": {
+        "absorbed_stellar": 8.32393055151841,
+        "bottom_net_down": -4.383301587017365e-17,
+        "column_energy_tendency": -0.022729113063595964,
+        "energy_kinetic": 89.07477877912619,
+        "energy_rate": -0.022729474835925634,
+        "energy_residual": -3.617723296697739e-07,
+        "interior": 5.7,
+        "max_abs_u": 0.5486459853540401,
+        "olr": 14.046659664582018,
+        "sensible": 0.0,
+        "surface_net": 0.0,
+        "t_max": 230.50675716815937,
+        "t_min": 105.94962759029222,
+        "toa_net_down": -5.722729113063595
+      },
+      "200": {
+        "absorbed_stellar": 8.32393055151841,
+        "bottom_net_down": 3.6316355479592975e-18,
+        "column_energy_tendency": -0.022757886231873203,
+        "energy_kinetic": 321.48264685175883,
+        "energy_rate": -0.02275791256516068,
+        "energy_residual": -2.6333287477670053e-08,
+        "interior": 5.7,
+        "max_abs_u": 1.0350730361220126,
+        "olr": 14.04668843775029,
+        "sensible": 0.0,
+        "surface_net": 0.0,
+        "t_max": 230.64148456257718,
+        "t_min": 105.26379874424252,
+        "toa_net_down": -5.722757886231873
+      },
+      "30": {
+        "absorbed_stellar": 8.32393055151841,
+        "bottom_net_down": -7.854845824953075e-18,
+        "column_energy_tendency": -0.022865608927418686,
+        "energy_kinetic": 16.525877367595804,
+        "energy_rate": -0.02286712990866767,
+        "energy_residual": -1.5209812489827557e-06,
+        "interior": 5.7,
+        "max_abs_u": 0.2133965021939816,
+        "olr": 14.04679616044583,
+        "sensible": 0.0,
+        "surface_net": 0.0,
+        "t_max": 230.4153517106943,
+        "t_min": 106.51253271138337,
+        "toa_net_down": -5.722865608927418
+      }
+    },
+    "last_day": 200,
+    "max_abs_energy_residual": 5.575280350529621e-05,
+    "mean_surface_pressure_drift": -1.8748147478930832e-10,
+    "window": {
+      "absorbed_stellar": {
+        "max": 8.32393055151841,
+        "mean": 8.323930551518412,
+        "min": 8.32393055151841,
+        "std": 1.785305796991587e-15
+      },
+      "bottom_net_down": {
+        "max": 5.3172278582641155e-17,
+        "mean": 3.0183704598424592e-18,
+        "min": -7.0265861412773e-17,
+        "std": 2.5459694209245916e-17
+      },
+      "column_energy_tendency": {
+        "max": -0.02271532072757541,
+        "mean": -0.022726684735208048,
+        "min": -0.022757886231873203,
+        "std": 1.1967949338682897e-05
+      },
+      "energy_kinetic": {
+        "max": 321.48264685175883,
+        "mean": 194.3276294771636,
+        "min": 89.94791263155061,
+        "std": 67.93487545573846
+      },
+      "energy_rate": {
+        "max": -0.022715414541739004,
+        "mean": -0.02272686624836039,
+        "min": -0.02275791256516068,
+        "std": 1.19417976028278e-05
+      },
+      "energy_residual": {
+        "max": 1.8272167459643107e-09,
+        "mean": -1.8151315233878167e-07,
+        "min": -5.095627809183212e-07,
+        "std": 9.96728767895989e-08
+      },
+      "interior": {
+        "max": 5.7,
+        "mean": 5.700000000000004,
+        "min": 5.7,
+        "std": 3.570611593983174e-15
+      },
+      "max_abs_u": {
+        "max": 1.0350730361220126,
+        "mean": 0.7938378304576901,
+        "min": 0.5496833732233682,
+        "std": 0.14291005528467082
+      },
+      "olr": {
+        "max": 14.04668843775029,
+        "mean": 14.046657236253624,
+        "min": 14.046645872245987,
+        "std": 1.1967949339133764e-05
+      },
+      "sensible": {
+        "max": 0.0,
+        "mean": 0.0,
+        "min": 0.0,
+        "std": 0.0
+      },
+      "surface_net": {
+        "max": 0.0,
+        "mean": 0.0,
+        "min": 0.0,
+        "std": 0.0
+      },
+      "t_max": {
+        "max": 230.64148456257718,
+        "mean": 230.57510909610883,
+        "min": 230.50818775291123,
+        "std": 0.039108660015539955
+      },
+      "t_min": {
+        "max": 105.94212199006967,
+        "mean": 105.59292064825358,
+        "min": 105.26379874424252,
+        "std": 0.19867956438985795
+      },
+      "toa_net_down": {
+        "max": -5.722715320727578,
+        "mean": -5.722726684735208,
+        "min": -5.722757886231873,
+        "std": 1.1967949338630227e-05
+      }
+    },
+    "window_days": 100
+  }
+}

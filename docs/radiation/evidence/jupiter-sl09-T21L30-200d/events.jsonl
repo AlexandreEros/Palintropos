@@ -1,0 +1,23 @@
+{"day": 0, "environment": {"cuda_driver": 11080, "cuda_runtime": 11080, "cupy": "13.4.0", "device": "NVIDIA GeForce MX110", "numpy": "2.2.6", "platform": "Windows-11-10.0.26200-SP0", "python": "3.12.12"}, "event": "created", "step": 0, "time": "2026-11-11T07:36:17Z"}
+{"day": 0.0, "event": "checkpoint", "file": "checkpoint-s000000000.npz", "step": 0, "time": "2026-11-11T07:36:17Z"}
+{"day": 10.0, "event": "checkpoint", "file": "checkpoint-s000000720.npz", "step": 720, "time": "2026-11-11T07:42:53Z"}
+{"day": 20.0, "event": "checkpoint", "file": "checkpoint-s000001440.npz", "step": 1440, "time": "2026-11-11T07:49:31Z"}
+{"day": 30.0, "event": "checkpoint", "file": "checkpoint-s000002160.npz", "step": 2160, "time": "2026-11-11T07:56:06Z"}
+{"day": 40.0, "event": "checkpoint", "file": "checkpoint-s000002880.npz", "step": 2880, "time": "2026-11-11T08:02:42Z"}
+{"day": 50.0, "event": "checkpoint", "file": "checkpoint-s000003600.npz", "step": 3600, "time": "2026-11-11T08:09:17Z"}
+{"day": 60.0, "event": "checkpoint", "file": "checkpoint-s000004320.npz", "step": 4320, "time": "2026-11-11T08:15:50Z"}
+{"day": 70.0, "event": "checkpoint", "file": "checkpoint-s000005040.npz", "step": 5040, "time": "2026-11-11T08:22:24Z"}
+{"day": 80.0, "event": "checkpoint", "file": "checkpoint-s000005760.npz", "step": 5760, "time": "2026-11-11T08:28:58Z"}
+{"day": 90.0, "event": "checkpoint", "file": "checkpoint-s000006480.npz", "step": 6480, "time": "2026-11-11T08:35:32Z"}
+{"day": 100.0, "event": "checkpoint", "file": "checkpoint-s000007200.npz", "step": 7200, "time": "2026-11-11T08:42:06Z"}
+{"day": 110.0, "event": "checkpoint", "file": "checkpoint-s000007920.npz", "step": 7920, "time": "2026-11-11T08:48:40Z"}
+{"day": 120.0, "event": "checkpoint", "file": "checkpoint-s000008640.npz", "step": 8640, "time": "2026-11-11T08:55:14Z"}
+{"day": 130.0, "event": "checkpoint", "file": "checkpoint-s000009360.npz", "step": 9360, "time": "2026-11-11T09:01:48Z"}
+{"day": 140.0, "event": "checkpoint", "file": "checkpoint-s000010080.npz", "step": 10080, "time": "2026-11-11T09:08:22Z"}
+{"day": 150.0, "event": "checkpoint", "file": "checkpoint-s000010800.npz", "step": 10800, "time": "2026-11-11T09:14:56Z"}
+{"day": 160.0, "event": "checkpoint", "file": "checkpoint-s000011520.npz", "step": 11520, "time": "2026-11-11T09:21:29Z"}
+{"day": 170.0, "event": "checkpoint", "file": "checkpoint-s000012240.npz", "step": 12240, "time": "2026-11-11T09:28:05Z"}
+{"day": 180.0, "event": "checkpoint", "file": "checkpoint-s000012960.npz", "step": 12960, "time": "2026-11-11T09:34:56Z"}
+{"day": 190.0, "event": "checkpoint", "file": "checkpoint-s000013680.npz", "step": 13680, "time": "2026-11-11T09:41:34Z"}
+{"day": 200.0, "event": "checkpoint", "file": "checkpoint-s000014400.npz", "step": 14400, "time": "2026-11-11T09:48:10Z"}
+{"day": 200.0, "event": "completed", "step": 14400, "time": "2026-11-11T09:48:10Z"}

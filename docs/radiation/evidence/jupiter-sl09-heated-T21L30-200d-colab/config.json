@@ -1,0 +1,118 @@
+{
+  "code": {
+    "git_commit": "d38d2a365b60c3528c3ba2eae76c688d453ee505",
+    "git_dirty": false
+  },
+  "config": {
+    "checkpoint_every_days": 10,
+    "convection": {
+      "timescale": 21600.0
+    },
+    "cp": 12619.0,
+    "damping_scheme": "centred",
+    "days": 200,
+    "drag": {
+      "cutoff_deg": 16.3,
+      "decay_deg": 2.0,
+      "k0_per_day": 0.05,
+      "kind": "schneider_liu",
+      "sigma_b": 0.8
+    },
+    "dt": 1200.0,
+    "experiment_id": "jupiter-sl09-heated-T21L30",
+    "frictional_heating": true,
+    "gas_constant": 3605.38,
+    "gravity": 26.0,
+    "hyperdiffusion_efold_days": 0.1,
+    "hyperdiffusion_order": 4,
+    "initial": {
+      "kind": "radiative_convective"
+    },
+    "insolation": {
+      "kind": "diurnal_mean",
+      "stellar_constant": 50.7
+    },
+    "internal_heat_flux": 5.7,
+    "keep_checkpoints": 2,
+    "l_max": 22,
+    "longwave": {
+      "exponent": 2.0,
+      "kind": "power_law",
+      "p0": 300000.0,
+      "tau0": 80.0
+    },
+    "mean_last_days": 0,
+    "nlat": 32,
+    "nlon": 64,
+    "omega": 0.00017587,
+    "perturbation_lmax": 8,
+    "perturbation_wind": 0.1,
+    "radiation_interval": 1,
+    "radius": 69860000.0,
+    "raw_alpha": 0.53,
+    "raw_nu": 0.1,
+    "reference_pressure": 300000.0,
+    "retained_truncation": 21,
+    "schema": "palintropos.radiative.config/1",
+    "seed": 20261110,
+    "sensible": null,
+    "shortwave": {
+      "asym": 0.204,
+      "kind": "semi_infinite_scattering",
+      "p0": 300000.0,
+      "ssa": 0.8,
+      "tau0": 3.0
+    },
+    "state_every_days": 10,
+    "surface": null,
+    "t_ref": 300.0,
+    "thermal_source": "linear",
+    "vertical": {
+      "kind": "uniform",
+      "nlev": 30
+    }
+  },
+  "config_sha256": "0d02921200136cf99915a41997ed44e33797a88ec7c25bedfc5b18e2adb8deec",
+  "created": "2026-11-12T00:46:14Z",
+  "initial_state": {
+    "absorbed_stellar": 8.323884909894048,
+    "converged": true,
+    "imbalance": 0.0009990359997691545,
+    "iterations": 3248,
+    "kind": "radiative_convective",
+    "olr": 14.04735420670157,
+    "temperature_profile": [
+      121.56758479709153,
+      106.78183789795362,
+      121.57236533206425,
+      125.28039141420636,
+      134.6067428725756,
+      142.5497730969246,
+      149.5185281231641,
+      155.75834311841834,
+      161.42911660288337,
+      166.64144438377423,
+      171.47532063528334,
+      175.99066251224832,
+      180.23362673563162,
+      184.24059929244967,
+      188.04082247635571,
+      191.6581855447207,
+      195.11248146938817,
+      198.42031132968464,
+      201.59574941058221,
+      204.6508416953098,
+      207.59598580010217,
+      210.44022489573766,
+      213.1914781423854,
+      215.8567235346757,
+      218.4421445722677,
+      220.95324908292892,
+      223.3949663597726,
+      225.77172723185072,
+      228.08753057259472,
+      230.34599893427082
+    ]
+  },
+  "physics": true
+}

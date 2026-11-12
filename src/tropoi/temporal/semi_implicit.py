@@ -51,6 +51,16 @@ added to ``N(X^n)`` (e.g. Newtonian relaxation); ``dampers`` are
 SI solve and before the RAW filter (e.g. Rayleigh drag, del^8
 hyperdiffusion). With no hooks every operation is the S3 one, bit for bit.
 
+Lagged terms (column physics, :mod:`tropoi.temporal.column_coupling`):
+``lagged_terms`` are callables ``term(X^{n-1}, t_{n-1}, 2 dt) -> dX/dt``
+evaluated at the OLD time level and added to ``N``, i.e. a forward step
+over the leapfrog interval. Dissipative physics (radiative relaxation,
+surface exchange, convective adjustment) must be lagged: evaluated at the
+middle level the leapfrog computational mode grows as ``1 + r dt`` per
+step, which the RAW filter only masks while ``r dt`` stays below its
+damping. The RK4 startup holds each lagged term at its ``X^0`` value over
+the startup interval. With no lagged terms nothing changes, bit for bit.
+
 Damping placement (``damping_scheme``, SEMI_IMPLICIT.md §9): the default
 ``"lagged"`` is the S4 placement above, which evaluates the damping at
 n+1 and makes the damped part of the scheme first order in time. The
@@ -469,7 +479,8 @@ class SemiImplicitLeapfrogStepper:
                  stage_validator: Optional[Callable] = None,
                  explicit_terms: Sequence[Callable] = (),
                  dampers: Sequence[Any] = (),
-                 damping_scheme: str = "lagged"):
+                 damping_scheme: str = "lagged",
+                 lagged_terms: Sequence[Callable] = ()):
         if not (math.isfinite(dt) and dt > 0):
             raise ValueError(f"dt must be finite and > 0, got {dt}")
         if not (0.0 <= raw_nu < 1.0):
@@ -488,6 +499,7 @@ class SemiImplicitLeapfrogStepper:
         self.stage_validator = stage_validator
         self.explicit_terms = tuple(explicit_terms)
         self.dampers = tuple(dampers)
+        self.lagged_terms = tuple(lagged_terms)
         self._startup_tendency = complete_tendency(
             tendency, self.explicit_terms, self.dampers)
         self.solver = SemiImplicitSolver(
@@ -546,8 +558,18 @@ class SemiImplicitLeapfrogStepper:
         y = self._x_curr
         h = self.dt / self.startup_substeps
         t = self._t
+        tendency = self._startup_tendency
+        if self.lagged_terms:
+            held = None
+            for term in self.lagged_terms:
+                value = term(y, t, self.dt)
+                held = value if held is None else held + value
+            base = tendency
+
+            def tendency(x):
+                return base(x) + held
         for _ in range(self.startup_substeps):
-            y = rk4_step_array(self._startup_tendency, y, t, h,
+            y = rk4_step_array(tendency, y, t, h,
                                stage_validator=self.stage_validator)
             t += h
         self._x_prev = self._x_curr
@@ -559,6 +581,8 @@ class SemiImplicitLeapfrogStepper:
         explicit = self.tendency(x_curr)
         for term in self.explicit_terms:
             explicit = explicit + term(x_curr)
+        for term in self.lagged_terms:
+            explicit = explicit + term(x_prev, self._t - self.dt, 2.0 * self.dt)
         explicit = explicit - self.operator.apply(x_curr)
         x_next = self.solver.advance(x_prev, explicit)
         if self.damping_scheme == "lagged":
@@ -572,6 +596,11 @@ class SemiImplicitLeapfrogStepper:
             x_curr_f = x_curr
         self._x_prev = x_curr_f
         self._x_curr = x_next
+
+    def _hook_signatures(self) -> list:
+        sigs = hook_signatures(self.explicit_terms, self.dampers)
+        sigs += [{"role": "lagged", **t.signature()} for t in self.lagged_terms]
+        return sigs
 
     # ------------------------------------------------------------------
     @property
@@ -598,7 +627,7 @@ class SemiImplicitLeapfrogStepper:
                 "t_ref": self.operator.t_ref,
                 "operator": self.operator.signature(),
                 "startup_substeps": self.startup_substeps,
-                "hooks": hook_signatures(self.explicit_terms, self.dampers),
+                "hooks": self._hook_signatures(),
                 "x_prev": None if self._x_prev is None else self._x_prev.copy(),
                 "x_curr": None if self._x_curr is None else self._x_curr.copy()}
 
@@ -626,7 +655,7 @@ class SemiImplicitLeapfrogStepper:
             raise ValueError(
                 "state dict was produced with a different semi-implicit operator "
                 f"({d.get('operator')}) than this stepper's ({mine_sig})")
-        mine_hooks = hook_signatures(self.explicit_terms, self.dampers)
+        mine_hooks = self._hook_signatures()
         if d.get("hooks", []) != mine_hooks:
             raise ValueError(
                 "state dict was produced with different stepper hooks "

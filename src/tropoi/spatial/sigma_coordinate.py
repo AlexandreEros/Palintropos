@@ -88,6 +88,61 @@ class SigmaGrid:
         # correctly rounded quotients.
         return cls(tuple(k / nlev for k in range(nlev + 1)))
 
+    @classmethod
+    def stretched(cls, nlev: int, sigma_top: float,
+                  linear_scale: float | None = None) -> "SigmaGrid":
+        """A grid for atmospheres spanning many pressure scale heights.
+
+        The top layer is ``[0, sigma_top]``; the other ``nlev - 1`` layers
+        are equally spaced in ``zeta = ln(sigma) + sigma / linear_scale``
+        between ``sigma_top`` and 1. For ``sigma << linear_scale`` that is
+        uniform in ``ln sigma`` (a fixed fraction of a scale height per
+        layer, which is what a stratosphere or a 100-bar column needs); for
+        ``sigma >> linear_scale`` it tends to uniform in sigma (so the
+        layers next to a surface do not become a large fraction of the
+        column). ``linear_scale=None`` is logarithmic throughout.
+        """
+        if not isinstance(nlev, int) or isinstance(nlev, bool) or nlev < 2:
+            raise SigmaGridError(f"nlev must be an int >= 2, got {nlev!r}")
+        if not (math.isfinite(sigma_top) and 0.0 < sigma_top < 1.0):
+            raise SigmaGridError(f"sigma_top must be in (0, 1), got {sigma_top!r}")
+        if linear_scale is not None and not (math.isfinite(linear_scale)
+                                             and linear_scale > 0.0):
+            raise SigmaGridError(f"linear_scale must be > 0, got {linear_scale!r}")
+        inv = 0.0 if linear_scale is None else 1.0 / linear_scale
+
+        def zeta(s: float) -> float:
+            return math.log(s) + s * inv
+
+        z0, z1 = zeta(sigma_top), zeta(1.0)
+        out = [0.0, float(sigma_top)]
+        for i in range(1, nlev - 1):
+            target = z0 + (z1 - z0) * i / (nlev - 1)
+            lo, hi = out[-1], 1.0
+            for _ in range(200):                      # zeta is increasing
+                mid = 0.5 * (lo + hi)
+                if zeta(mid) < target:
+                    lo = mid
+                else:
+                    hi = mid
+            out.append(0.5 * (lo + hi))
+        out.append(1.0)
+        return cls(tuple(out))
+
+    @classmethod
+    def frierson(cls, nlev: int = 25) -> "SigmaGrid":
+        """Frierson, Held & Zurita-Gotor (2006): interfaces ``sigma = exp[-5
+        (0.05 z + 0.95 z^3)]`` for ``z`` equally spaced in [0, 1], with the
+        top interface moved to 0 (their top is ``exp(-5)``)."""
+        if not isinstance(nlev, int) or isinstance(nlev, bool) or nlev < 2:
+            raise SigmaGridError(f"nlev must be an int >= 2, got {nlev!r}")
+        out = [0.0]
+        for i in range(nlev - 1, 0, -1):
+            z = i / nlev
+            out.append(math.exp(-5.0 * (0.05 * z + 0.95 * z ** 3)))
+        out.append(1.0)
+        return cls(tuple(out))
+
     # ------------------------------------------------------------------
     # Derived metadata (all CPU/NumPy; Python floats feed the column ops)
     # ------------------------------------------------------------------

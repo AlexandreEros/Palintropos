@@ -245,6 +245,70 @@
       "scopes": [
         "module"
       ],
+      "source": "tropoi.physics.column_model",
+      "target": "tropoi.physics.convection"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.physics.column_model",
+      "target": "tropoi.physics.radiation.scheme"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.physics.column_model",
+      "target": "tropoi.physics.surface"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.physics.planets",
+      "target": "tropoi.physics.insolation"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.physics.planets",
+      "target": "tropoi.physics.thermodynamics"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.physics.radiation.gray",
+      "target": "tropoi.physics.radiation.scheme"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.physics.radiation.kdist",
+      "target": "tropoi.physics.radiation.scheme"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.physics.radiation.scheme",
+      "target": "tropoi.physics.radiation.twostream"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
       "source": "tropoi.representation.archive",
       "target": "tropoi.representation.archive.capsule"
     },
@@ -2224,6 +2288,222 @@
       "scopes": [
         "module"
       ],
+      "source": "tropoi.run.radiative.__main__",
+      "target": "tropoi.run.radiative.config"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.run.radiative.__main__",
+      "target": "tropoi.run.radiative.experiment"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.run.radiative.__main__",
+      "target": "tropoi.run.radiative.model"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.run.radiative.__main__",
+      "target": "tropoi.spatial.states.primitive_equations"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.run.radiative.config",
+      "target": "tropoi.spatial.truncation"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.run.radiative.experiment",
+      "target": "tropoi.run.held_suarez.checkpoint"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.run.radiative.experiment",
+      "target": "tropoi.run.held_suarez.experiment"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.run.radiative.experiment",
+      "target": "tropoi.run.radiative.config"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.run.radiative.experiment",
+      "target": "tropoi.run.radiative.model"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.run.radiative.experiment",
+      "target": "tropoi.spatial.states.primitive_equations"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.run.radiative.experiment",
+      "target": "tropoi.temporal.column_coupling"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.run.radiative.model",
+      "target": "tropoi.physics.column_model"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.run.radiative.model",
+      "target": "tropoi.physics.convection"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.run.radiative.model",
+      "target": "tropoi.physics.insolation"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.run.radiative.model",
+      "target": "tropoi.physics.radiation.gray"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.run.radiative.model",
+      "target": "tropoi.physics.radiation.scheme"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.run.radiative.model",
+      "target": "tropoi.physics.surface"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.run.radiative.model",
+      "target": "tropoi.run.radiative.config"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.run.radiative.model",
+      "target": "tropoi.spatial.environment"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.run.radiative.model",
+      "target": "tropoi.spatial.laplacian"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.run.radiative.model",
+      "target": "tropoi.spatial.planet"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.run.radiative.model",
+      "target": "tropoi.spatial.sigma_coordinate"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.run.radiative.model",
+      "target": "tropoi.spatial.states.primitive_equations"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.run.radiative.model",
+      "target": "tropoi.temporal.semi_implicit"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.run.radiative.model",
+      "target": "tropoi.temporal.tendencies.drag"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.run.radiative.model",
+      "target": "tropoi.temporal.tendencies.held_suarez"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.run.radiative.model",
+      "target": "tropoi.temporal.tendencies.primitive_equations"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
       "source": "tropoi.run.swe.config",
       "target": "tropoi.run.bve.config"
     },
@@ -2746,6 +3026,14 @@
       "scopes": [
         "function"
       ],
+      "source": "tropoi.temporal.column_coupling",
+      "target": "tropoi.spatial.states.primitive_equations"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
       "source": "tropoi.temporal.models",
       "target": "tropoi.spatial.environment"
     },
@@ -3048,6 +3336,163 @@
       ],
       "third_party_imports": [
         "matplotlib"
+      ]
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.physics.column_model",
+      "is_package": false,
+      "path": "tropoi/physics/column_model.py",
+      "stdlib_imports": [
+        "__future__",
+        "dataclasses",
+        "typing"
+      ],
+      "third_party_imports": [
+        "cupy",
+        "numpy"
+      ]
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.physics.convection",
+      "is_package": false,
+      "path": "tropoi/physics/convection.py",
+      "stdlib_imports": [
+        "__future__",
+        "math"
+      ],
+      "third_party_imports": [
+        "cupy",
+        "numpy"
+      ]
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.physics.insolation",
+      "is_package": false,
+      "path": "tropoi/physics/insolation.py",
+      "stdlib_imports": [
+        "__future__",
+        "dataclasses",
+        "math",
+        "typing"
+      ],
+      "third_party_imports": [
+        "cupy",
+        "numpy"
+      ]
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.physics.planets",
+      "is_package": false,
+      "path": "tropoi/physics/planets.py",
+      "stdlib_imports": [
+        "__future__",
+        "dataclasses",
+        "math",
+        "typing"
+      ],
+      "third_party_imports": []
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.physics.radiation.gray",
+      "is_package": false,
+      "path": "tropoi/physics/radiation/gray.py",
+      "stdlib_imports": [
+        "__future__",
+        "math",
+        "typing"
+      ],
+      "third_party_imports": [
+        "cupy",
+        "numpy"
+      ]
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.physics.radiation.kdist",
+      "is_package": false,
+      "path": "tropoi/physics/radiation/kdist.py",
+      "stdlib_imports": [
+        "__future__",
+        "dataclasses",
+        "math",
+        "typing"
+      ],
+      "third_party_imports": [
+        "cupy",
+        "numpy"
+      ]
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.physics.radiation.scheme",
+      "is_package": false,
+      "path": "tropoi/physics/radiation/scheme.py",
+      "stdlib_imports": [
+        "__future__",
+        "dataclasses",
+        "typing"
+      ],
+      "third_party_imports": [
+        "cupy",
+        "numpy"
+      ]
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.physics.radiation.twostream",
+      "is_package": false,
+      "path": "tropoi/physics/radiation/twostream.py",
+      "stdlib_imports": [
+        "__future__"
+      ],
+      "third_party_imports": [
+        "cupy",
+        "numpy"
+      ]
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.physics.surface",
+      "is_package": false,
+      "path": "tropoi/physics/surface.py",
+      "stdlib_imports": [
+        "__future__",
+        "math"
+      ],
+      "third_party_imports": [
+        "cupy",
+        "numpy"
+      ]
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.physics.thermodynamics",
+      "is_package": false,
+      "path": "tropoi/physics/thermodynamics.py",
+      "stdlib_imports": [
+        "__future__",
+        "dataclasses",
+        "math",
+        "typing"
+      ],
+      "third_party_imports": [
+        "cupy",
+        "numpy"
       ]
     },
     {
@@ -4082,6 +4527,72 @@
     {
       "category": "code",
       "dynamic_import_calls": 0,
+      "id": "tropoi.run.radiative.__main__",
+      "is_package": false,
+      "path": "tropoi/run/radiative/__main__.py",
+      "stdlib_imports": [
+        "__future__",
+        "argparse",
+        "json",
+        "pathlib",
+        "sys"
+      ],
+      "third_party_imports": []
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.run.radiative.config",
+      "is_package": false,
+      "path": "tropoi/run/radiative/config.py",
+      "stdlib_imports": [
+        "__future__",
+        "dataclasses",
+        "hashlib",
+        "json",
+        "math",
+        "typing"
+      ],
+      "third_party_imports": []
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.run.radiative.experiment",
+      "is_package": false,
+      "path": "tropoi/run/radiative/experiment.py",
+      "stdlib_imports": [
+        "__future__",
+        "io",
+        "json",
+        "pathlib",
+        "time",
+        "typing"
+      ],
+      "third_party_imports": [
+        "cupy",
+        "numpy"
+      ]
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.run.radiative.model",
+      "is_package": false,
+      "path": "tropoi/run/radiative/model.py",
+      "stdlib_imports": [
+        "__future__",
+        "math",
+        "typing"
+      ],
+      "third_party_imports": [
+        "cupy",
+        "numpy"
+      ]
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
       "id": "tropoi.run.swe.config",
       "is_package": false,
       "path": "tropoi/run/swe/config.py",
@@ -4634,6 +5145,21 @@
     {
       "category": "code",
       "dynamic_import_calls": 0,
+      "id": "tropoi.temporal.column_coupling",
+      "is_package": false,
+      "path": "tropoi/temporal/column_coupling.py",
+      "stdlib_imports": [
+        "__future__",
+        "typing"
+      ],
+      "third_party_imports": [
+        "cupy",
+        "numpy"
+      ]
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
       "id": "tropoi.temporal.hooks",
       "is_package": false,
       "path": "tropoi/temporal/hooks.py",
@@ -4730,6 +5256,21 @@
       ],
       "third_party_imports": [
         "cupy"
+      ]
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.temporal.tendencies.drag",
+      "is_package": false,
+      "path": "tropoi/temporal/tendencies/drag.py",
+      "stdlib_imports": [
+        "__future__",
+        "math"
+      ],
+      "third_party_imports": [
+        "cupy",
+        "numpy"
       ]
     },
     {

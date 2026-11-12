@@ -67,6 +67,13 @@
       "kind": "imports",
       "module_edges": 1,
       "runtime_module_edges": 1,
+      "source": "tropoi.physics",
+      "target": "tropoi.physics.radiation"
+    },
+    {
+      "kind": "imports",
+      "module_edges": 1,
+      "runtime_module_edges": 1,
       "source": "tropoi.representation.archive",
       "target": "tropoi.representation"
     },
@@ -429,6 +436,55 @@
     },
     {
       "kind": "imports",
+      "module_edges": 4,
+      "runtime_module_edges": 4,
+      "source": "tropoi.run.radiative",
+      "target": "tropoi.physics"
+    },
+    {
+      "kind": "imports",
+      "module_edges": 2,
+      "runtime_module_edges": 2,
+      "source": "tropoi.run.radiative",
+      "target": "tropoi.physics.radiation"
+    },
+    {
+      "kind": "imports",
+      "module_edges": 2,
+      "runtime_module_edges": 2,
+      "source": "tropoi.run.radiative",
+      "target": "tropoi.run.held_suarez"
+    },
+    {
+      "kind": "imports",
+      "module_edges": 5,
+      "runtime_module_edges": 5,
+      "source": "tropoi.run.radiative",
+      "target": "tropoi.spatial"
+    },
+    {
+      "kind": "imports",
+      "module_edges": 3,
+      "runtime_module_edges": 3,
+      "source": "tropoi.run.radiative",
+      "target": "tropoi.spatial.states"
+    },
+    {
+      "kind": "imports",
+      "module_edges": 2,
+      "runtime_module_edges": 2,
+      "source": "tropoi.run.radiative",
+      "target": "tropoi.temporal"
+    },
+    {
+      "kind": "imports",
+      "module_edges": 3,
+      "runtime_module_edges": 3,
+      "source": "tropoi.run.radiative",
+      "target": "tropoi.temporal.tendencies"
+    },
+    {
+      "kind": "imports",
       "module_edges": 2,
       "runtime_module_edges": 2,
       "source": "tropoi.run.swe",
@@ -600,6 +656,13 @@
       "module_edges": 1,
       "runtime_module_edges": 1,
       "source": "tropoi.temporal",
+      "target": "tropoi.spatial.states"
+    },
+    {
+      "kind": "imports",
+      "module_edges": 1,
+      "runtime_module_edges": 1,
+      "source": "tropoi.temporal",
       "target": "tropoi.spatial.terrain"
     },
     {
@@ -646,6 +709,16 @@
       "modules": 4
     },
     {
+      "id": "tropoi.physics",
+      "internal_edges": 4,
+      "modules": 6
+    },
+    {
+      "id": "tropoi.physics.radiation",
+      "internal_edges": 3,
+      "modules": 4
+    },
+    {
       "id": "tropoi.representation",
       "internal_edges": 0,
       "modules": 1
@@ -688,6 +761,11 @@
     {
       "id": "tropoi.run.pe",
       "internal_edges": 4,
+      "modules": 4
+    },
+    {
+      "id": "tropoi.run.radiative",
+      "internal_edges": 6,
       "modules": 4
     },
     {
@@ -738,12 +816,12 @@
     {
       "id": "tropoi.temporal",
       "internal_edges": 3,
-      "modules": 6
+      "modules": 7
     },
     {
       "id": "tropoi.temporal.tendencies",
       "internal_edges": 0,
-      "modules": 4
+      "modules": 5
     }
   ]
 }

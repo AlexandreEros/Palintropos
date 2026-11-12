@@ -65,16 +65,18 @@ def test_negation_is_the_positive_definite_operator():
 
 
 def test_no_second_definition_of_the_eigenvalue_in_src():
-    """Nothing under src/ spells x*(x+1) except the one module and two cases
-    that are not the Laplacian's eigenvalue (a kinetic-energy weight and a
-    spectral-slope ratio in topography). A textual guard: it catches the
+    """Nothing under src/ spells x*(x+1) except the one module and three
+    cases that are not the Laplacian's eigenvalue (a kinetic-energy weight,
+    a spectral-slope ratio in topography, and the rotational energy levels
+    J(J+1) of molecular hydrogen in the gas thermodynamics). A textual guard: it catches the
     copy-pasted spelling, which is how the nine copies arose, not an
     arbitrary rewrite of the same formula."""
     root = pathlib.Path(__file__).resolve().parents[1] / "src" / "tropoi"
     # "x * (x + 1)" for any name x: the way l(l+1) is spelled when copied.
     pattern = re.compile(r"\b(\w+)\s*\*\s*\(\s*\1\s*\+\s*1(\.0*)?\s*\)")
     allowed = {("spatial", "laplacian.py"), ("run", "held_suarez", "experiment.py"),
-               ("spatial", "terrain", "topography.py")}
+               ("spatial", "terrain", "topography.py"),
+               ("physics", "thermodynamics.py")}
     found = set()
     for path in root.rglob("*.py"):
         lines = path.read_text(encoding="utf-8").splitlines()
