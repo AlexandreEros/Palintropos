@@ -358,6 +358,60 @@ This run used the per-level (unbatched) heating term. The batched version
 committed afterwards (`814bcf8`) is equivalent to round-off but has not been
 used for a long run.
 
+### The same heated runs on a Colab Tesla T4 (2026-11-11/12, commit `d38d2a3`)
+
+Run by the repository owner from a clean clone of `d38d2a3` with the
+checkpoints on Google Drive (CuPy 14.0.1, Python 3.13, Linux); evidence in
+`evidence/earth-gray-dry-heated-T21L25-300d-colab/` and
+`evidence/jupiter-sl09-heated-T21L30-200d-colab/`, each with the pilot's
+timing record. The launcher notebook and pilot script are not part of this
+branch.
+
+| | Earth heated, T4 | Earth heated, MX110 | Jupiter heated, T4 |
+| --- | --- | --- | --- |
+| configuration | `748cec4b…` | `748cec4b…` | `0d029212…` |
+| reached | day 300 | day 300 | day 200 |
+| resumes from a checkpoint | 1 (day 10) | 0 | 2 (days 1 and 10) |
+| first to last event | 1.46 h | 5.59 h | 1.08 h |
+| median wall time per 10 days | 157 s | 672 s | 189 s |
+| pilot, days 1–10, s/step all inclusive | 0.225 | – | 0.269 |
+| pilot, `nvidia-smi` GPU utilisation (mean) | 36 % | – | 36 % |
+
+Earth took 1 h 27 min on the T4 against 5 h 35 min locally, a factor of 3.8
+end to end. The T4 figure includes an 11-minute pause between the pilot and
+the resume, and the local run shared its GPU with short tests for a few
+minutes; between checkpoints the T4 is 4.3 times faster. The event logs do
+not show whether the resumes were made in a fresh runtime. Both T4 runs used
+the unbatched heating term.
+
+**Earth is a second realisation of the same configuration on different
+hardware.** Daily global energy agrees with the local run to round-off for
+about 30 days (relative differences of 1e-16 to 1e-15; 4e-11 by day 60),
+after which the two flows diverge and are decorrelated by day 300. Means
+over days 201–300:
+
+| | T4 | MX110 |
+| --- | --- | --- |
+| energy-budget residual, W m^-2 | −0.0019 ± 0.027 | −0.0016 ± 0.025 |
+| TOA net down, W m^-2 | −0.91 ± 0.55 | −0.59 ± 0.55 |
+| mean surface temperature, K | 302.61 ± 0.18 | 302.65 ± 0.11 |
+| kinetic energy, MJ m^-2 | 1.391 ± 0.061 | 1.376 ± 0.059 |
+| westerly jets, north / south, m s^-1 | 26.6 / 26.9 | 26.0 / 28.0 |
+
+The 0.5 W m^-2 criterion is met on both. The two realisations differ by
+0.05 K in surface temperature and 0.3 W m^-2 at the top of the atmosphere,
+so the 1.3 K warming from frictional heating is well outside that spread,
+while the jet differences between the heated and unheated runs are inside
+it. Two realisations are a first estimate of the spread, not a distribution.
+
+**Jupiter is the first long heated run without a surface.** Over days
+101–200 the budget residual is −1.8 × 10^-7 W m^-2 against −1.3 × 10^-6 in
+the unheated run, and the largest single-day residual falls from
+2.3 × 10^-4 to 5.6 × 10^-5 W m^-2. The flow is the same as without heating
+(kinetic energy 16, 89, 321 J m^-2 at days 20, 100, 200; winds below
+1 m s^-1; no jets), so this confirms the bookkeeping of the surface-less
+configuration and adds nothing about a Jovian circulation.
+
 ## 7. Published comparisons: verified, and where each stands
 
 All five references were read (protocol numbers in the docstrings cite them).
