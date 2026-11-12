@@ -1067,59 +1067,33 @@
     "package": "tropoi",
     "src": "src",
     "working_tree": {
-      "base_commit": "67d91dd5d017b77d221c44ee080cfa739211fd1b",
+      "base_commit": "31bc5e1bd7a32047d4ee971cfd1e1e96b3b68edb",
       "generator": {
-        "changes": [
-          "M  tools/architecture/layers.py"
-        ],
+        "changes": [],
         "files": {
-          "tools/architecture/__init__.py": "7eaab7e08118ce5c31e59abccafd6d1464c255ec7d9812e4d8bda08c461d54ab",
+          "tools/architecture/__init__.py": "16efb065ee88ec075dde9de4cdbb2cc4ce9fc0cf7aaddb553ff09090a11eae45",
           "tools/architecture/calls.py": "fe492066691403114d3adef4eade7541d55afd75bfbd02d14c72871bfd824e92",
+          "tools/architecture/class_atlas.html": "6f04d754a001a1bd76bf68677067764758d7a9a6f88c113a6f2a8acb7c1a8f58",
+          "tools/architecture/class_tree.py": "ce7bbaa0deeedd394039eebd26de63892df5e56c7d6c980eb68f28538ee410c0",
           "tools/architecture/classes.py": "9436c2df4d3cf426b8893116faecd071b0a436b6b3eb1b7e4a81bb59ccdc16d1",
-          "tools/architecture/coverage.py": "83c9189d58da8ba7f007e857bf50df686cfe982cedb172837feefafdfd1fed79",
+          "tools/architecture/coverage.py": "68a7401687d5702aaddbbf571d58037f43627e306c6056e21a5f3fc70c559813",
           "tools/architecture/export.py": "0c912ab5a81b921807c1e57796c486fc2faea5e1be23103d71eea0506a29ffef",
-          "tools/architecture/generate.py": "d1cdd7242d145d4680ab4dcf8386e0e341ca41aa3cd421555ff4ef989f4c8ce1",
+          "tools/architecture/generate.py": "cc367817e4370a6cedbe266af912d3c68caa3884df013f9623c43d295c820bd3",
           "tools/architecture/imports.py": "be1b9267ae7d2da2d87e60cb3d3abde3011e49a7cfb628fb4222f5382c92d143",
           "tools/architecture/layers.py": "09a12c6790abad61e6326321180d84f9f01dfc85f9ac798d5e7b5b5186385b23",
           "tools/architecture/mermaid.py": "ad283b0848d4a54fb27904d2d9570ef25bacc196e580b3c00950440bce04cd32",
           "tools/architecture/metrics.py": "0c449fcc932fbae378a7e1c785506c05cda47d4449225d8d14462ce0de34e4db",
           "tools/architecture/model.py": "335acf6e713ca4bf79f2884d246addc8601effae88a43b68cff46ec98f293661",
           "tools/architecture/provenance.py": "bdb799b15386224f969b9743622e781f1e5b99adffbd5d01769f3872e733375a",
-          "tools/architecture/report.py": "0afa2e4e37c1b0c850d32e320f1f41a1c8ddfbaa67d3611466eac3ecc5f68e5d",
-          "tools/architecture/sources.py": "547a080e87018ce39b7e82eefd632a20dd4cad1158c57b888d7d25255a6aece1",
-          "tools/architecture/views.py": "bfc2d188e1f519e47574f354486981762295dfe9235b3cfc4d58388c54bef3ff"
+          "tools/architecture/report.py": "53604e6454ae4b4cd8553fa8fa9942ce21b9c5129656b397035fd730e178a08b",
+          "tools/architecture/sources.py": "a528464392eba79f1ea73a9e48ac59e51d45d5493c8b79849c27fcdddaf81965",
+          "tools/architecture/views.py": "e63acbaab215d90bc5c654d585b3d57d44e11e22e44236527577c729ef9a1d32"
         },
-        "sha256": "78cff79be914ae3b9b01aa165d76cbc588300038f58cf908f942eda2aed84aa3",
-        "status": "dirty"
+        "sha256": "12bf2096e525ed239ff6acc518f78d47e5c4f7eabeb20ed06e3d44a0939a6abf",
+        "status": "clean"
       },
       "source": {
-        "changes": [
-          "M  src/tropoi/README.md",
-          "A  src/tropoi/physics/README.md",
-          "A  src/tropoi/physics/__init__.py",
-          "A  src/tropoi/physics/column_model.py",
-          "A  src/tropoi/physics/convection.py",
-          "A  src/tropoi/physics/insolation.py",
-          "A  src/tropoi/physics/planets.py",
-          "A  src/tropoi/physics/radiation/__init__.py",
-          "A  src/tropoi/physics/radiation/gray.py",
-          "A  src/tropoi/physics/radiation/kdist.py",
-          "A  src/tropoi/physics/radiation/scheme.py",
-          "A  src/tropoi/physics/radiation/twostream.py",
-          "A  src/tropoi/physics/surface.py",
-          "A  src/tropoi/physics/thermodynamics.py",
-          "M  src/tropoi/run/README.md",
-          "A  src/tropoi/run/radiative/README.md",
-          "A  src/tropoi/run/radiative/__init__.py",
-          "A  src/tropoi/run/radiative/__main__.py",
-          "A  src/tropoi/run/radiative/config.py",
-          "A  src/tropoi/run/radiative/experiment.py",
-          "A  src/tropoi/run/radiative/model.py",
-          "M  src/tropoi/spatial/sigma_coordinate.py",
-          "A  src/tropoi/temporal/column_coupling.py",
-          "M  src/tropoi/temporal/semi_implicit.py",
-          "A  src/tropoi/temporal/tendencies/drag.py"
-        ],
+        "changes": [],
         "files": {
           "src/tropoi/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
           "src/tropoi/cli/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
@@ -1290,7 +1264,7 @@
           "src/tropoi/temporal/tendencies/shallow_water.py": "7ae521f2378824e89f88bc467fc99321d1ef4224b037c865137e076a601da3c8"
         },
         "sha256": "dbb2e4890f9701f2d2df320809c0a7f8058ca5fe193dcf737f28609b7be259e1",
-        "status": "dirty"
+        "status": "clean"
       }
     }
   },
@@ -1300,6 +1274,6 @@
     "name": "tools.architecture",
     "networkx": "3.7",
     "python": "3.12",
-    "version": "2.1.0"
+    "version": "2.2.0"
   }
 }

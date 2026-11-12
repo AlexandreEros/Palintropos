@@ -5,13 +5,13 @@
 
 | | |
 |---|---|
-| Source base commit | `67d91dd5d017b77d221c44ee080cfa739211fd1b` (plus uncommitted working-tree changes) |
+| Source base commit | `31bc5e1bd7a32047d4ee971cfd1e1e96b3b68edb` (clean working tree) |
 | Analysed package | `tropoi` under `src/` |
-| Generator | `tools.architecture` 2.1.0 |
+| Generator | `tools.architecture` 2.2.0 |
 | Toolchain | Python 3.12, grimp 3.17, networkx 3.7 |
 | Command | `python -m tools.architecture.generate` |
 
-Source working tree: **dirty**. Content SHA-256: `dbb2e4890f9701f2d2df320809c0a7f8058ca5fe193dcf737f28609b7be259e1`. Generator working tree: **dirty**. Per-file hashes and scoped Git status are recorded in `metrics.json`. These describe generation time; --check verifies source and generator content hashes before reusing this context across later commits. The base commit alone does not identify uncommitted source.
+Source working tree: **clean**. Content SHA-256: `dbb2e4890f9701f2d2df320809c0a7f8058ca5fe193dcf737f28609b7be259e1`. Generator working tree: **clean**. Per-file hashes and scoped Git status are recorded in `metrics.json`. These describe generation time; --check verifies source and generator content hashes before reusing this context across later commits. The base commit alone does not identify uncommitted source.
 
 ## Reproducing
 
@@ -41,7 +41,9 @@ python -m tools.architecture.generate
 | `calls/sky-numpy-reference.mmd` | Scoped static call graph (roots and depth: see *Call graphs* below). |
 | `calls/sky-saved-column.mmd` | Scoped static call graph (roots and depth: see *Call graphs* below). |
 | `calls/terrain-raster.mmd` | Scoped static call graph (roots and depth: see *Call graphs* below). |
-| `classes.mmd` | Inheritance overview only: classes linked by inheritance between analysed classes. Every class, standalone ones included, is on its package page. |
+| `class-atlas.html` | Offline explorer for the complete source containment tree. |
+| `class-inheritance.mmd` | Classes linked by inheritance between analysed classes. |
+| `classes.mmd` | Complete source containment tree of packages, Python files and class definitions. |
 | `coverage.json` | What was discovered, what is rendered, deliberate exclusions, static-analysis limits. |
 | `graph/calls.json` | Whole-package static call graph (all resolvable edges). |
 | `graph/classes.json` | Every class with members, bases, and inheritance/nesting edges. |
@@ -134,6 +136,10 @@ The layers are the only input to this snapshot that states an expectation. They 
 * The renderer chooses where the boxes go, so an upward edge need not point up on screen; the colour and label are what mark it.
 * A package no declared prefix matches is drawn in an `unassigned` box and listed under `layer_graph.unassigned_packages`.
 * `--no-layers` renders the plain dependency graph instead.
+
+### Class containment tree (ast)
+
+The Mermaid tree and the offline atlas each contain every discovered Python file, its ancestor directories, and every class definition in those files. Class nodes belong to the nearest enclosing class, or to their file. Function-local classes include their lexical scope in the qualified name. File and line distinguish definitions that share a qualified name. Generation checks the rendered nodes and parents against a separate filesystem and AST scan.
 
 ### Class graph (ast)
 
