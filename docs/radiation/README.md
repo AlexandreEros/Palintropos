@@ -374,21 +374,22 @@ branch.
 | resumes from a checkpoint | 1 (day 10) | 0 | 2 (days 1 and 10) |
 | first to last event | 1.46 h | 5.59 h | 1.08 h |
 | median wall time per 10 days | 157 s | 672 s | 189 s |
-| pilot, days 1–10, s/step all inclusive | 0.225 | – | 0.269 |
+| pilot, s/step all inclusive | 0.225 | – | 0.269 |
 | pilot, `nvidia-smi` GPU utilisation (mean) | 36 % | – | 36 % |
 
-Earth took 1 h 27 min on the T4 against 5 h 35 min locally, a factor of 3.8
-end to end. The T4 figure includes an 11-minute pause between the pilot and
-the resume, and the local run shared its GPU with short tests for a few
-minutes; between checkpoints the T4 is 4.3 times faster. The event logs do
-not show whether the resumes were made in a fresh runtime. Both T4 runs used
+Earth took 1 h 27 min on the T4 and 5 h 35 min on the MX110, a factor of
+3.8 in elapsed time. The T4 figure includes 8 min 52 s from the pilot's
+final checkpoint to resumption. The local run briefly shared its GPU with
+short tests. The ratio of median times per 10 simulated days is 4.3. The
+pilot timed days 1–10 for Earth and 2–10 for Jupiter. The event logs do not
+show whether the resumes were made in a fresh runtime. Both T4 runs used
 the unbatched heating term.
 
 **Earth is a second realisation of the same configuration on different
 hardware.** Daily global energy agrees with the local run to round-off for
 about 30 days (relative differences of 1e-16 to 1e-15; 4e-11 by day 60),
-after which the two flows diverge and are decorrelated by day 300. Means
-over days 201–300:
+after which the trajectories diverge. Scalar means are over days 201–300.
+Jet peaks come from the 150-sample zonal means.
 
 | | T4 | MX110 |
 | --- | --- | --- |
@@ -398,19 +399,19 @@ over days 201–300:
 | kinetic energy, MJ m^-2 | 1.391 ± 0.061 | 1.376 ± 0.059 |
 | westerly jets, north / south, m s^-1 | 26.6 / 26.9 | 26.0 / 28.0 |
 
-The 0.5 W m^-2 criterion is met on both. The two realisations differ by
-0.05 K in surface temperature and 0.3 W m^-2 at the top of the atmosphere,
-so the 1.3 K warming from frictional heating is well outside that spread,
-while the jet differences between the heated and unheated runs are inside
-it. Two realisations are a first estimate of the spread, not a distribution.
+Both runs meet the 0.5 W m^-2 criterion. Their mean surface temperatures
+differ by about 0.04 K, and both are about 1.2–1.3 K warmer than the single
+unheated run. Mean TOA net flux differs by 0.32 W m^-2 between the two heated
+runs. The jet values are descriptive comparisons from the available runs.
 
 **Jupiter is the first long heated run without a surface.** Over days
 101–200 the budget residual is −1.8 × 10^-7 W m^-2 against −1.3 × 10^-6 in
 the unheated run, and the largest single-day residual falls from
 2.3 × 10^-4 to 5.6 × 10^-5 W m^-2. The flow is the same as without heating
-(kinetic energy 16, 89, 321 J m^-2 at days 20, 100, 200; winds below
-1 m s^-1; no jets), so this confirms the bookkeeping of the surface-less
-configuration and adds nothing about a Jovian circulation.
+(kinetic energy about 16, 89 and 321 J m^-2 at days 20, 100 and 200).
+Peak absolute zonal wind is about 1.04 m s^-1 over days 101–200, and no
+jets develop. This checks energy bookkeeping in the surface-less,
+weak-flow configuration.
 
 ## 7. Published comparisons: verified, and where each stands
 
