@@ -413,6 +413,62 @@ Peak absolute zonal wind is about 1.04 m s^-1 over days 101–200, and no
 jets develop. This checks energy bookkeeping in the surface-less,
 weak-flow configuration.
 
+### Acceptance criteria and supported regimes (proposed 2026-11-12)
+
+These replace "regression envelope" as the statement of what a coupled run
+must show. They were written after the runs above existed, so for those runs
+they are a record and not a prediction; they are the bar for later runs.
+`tests/test_radiation_evidence.py` applies them to the committed evidence.
+
+With F the radiative throughput (absorbed stellar flux plus interior heat
+flux), a run meets the energy criteria when:
+
+| | criterion | why this size |
+| --- | --- | --- |
+| A1 | it reaches its configured last day | |
+| A2 | \|mean budget residual over the last 100 days\| ≤ 10^-3 F | the unheated Earth run misses it by a factor of 22 and shifts its top-of-atmosphere balance by 4 W m^-2; the heated runs meet it with a margin of more than 100 |
+| A3 | largest single-day \|residual\| ≤ 10^-2 F | bounds the spin-up transient (12.1 W m^-2 unheated, 0.37 heated, of 234.6) |
+| A4 | \|relative drift of mean surface pressure\| ≤ 10^-5 | mass; the runs show 10^-6 and 10^-10 |
+
+| run | A2: residual / F | A3: peak / F | A4 | meets |
+| --- | --- | --- | --- | --- |
+| Earth heated, MX110 | 7 × 10^-6 | 1.6 × 10^-3 | 1.2 × 10^-6 | yes |
+| Earth heated, T4 | 8 × 10^-6 | 1.6 × 10^-3 | 1.3 × 10^-6 | yes |
+| Jupiter heated, T4 | 1.3 × 10^-8 | 4 × 10^-6 | 1.9 × 10^-10 | yes |
+| Earth unheated | 2.2 × 10^-2 | 5.2 × 10^-2 | 1.1 × 10^-6 | **no** (A2, A3) |
+| Jupiter unheated | 9 × 10^-8 | 1.6 × 10^-5 | 1.9 × 10^-10 | yes, because its winds stay below 1 m s^-1 |
+
+Supported by this evidence, and nothing wider:
+
+- gray radiation only, with dry convective adjustment;
+- T21, the two presets' vertical grids, dt = 1200 s, ∇⁸ with 0.1 day at the
+  cut, RAW filter 0.1 / 0.53, centred damping;
+- a slab surface with bulk sensible exchange and Held–Suarez drag (Earth), or
+  a closed bottom with interior heat and latitude-dependent drag (Jupiter to
+  3 bar);
+- `frictional_heating` **on** for any run whose energy budget or
+  top-of-atmosphere balance is to be interpreted. With it off, an eddying
+  run fails A2 and A3.
+
+Not supported, because not shown: other resolutions and time steps; deep
+(100 bar) columns in a coupled run; real-gas radiation; a run with strong
+flow on a fast rotator (the 100-bar T9 measurement was adiabatic and one day
+long); the time-stepping residual, which the heating does not return.
+
+Recommendation on the default: keep `frictional_heating` opt-in in this
+change. Turning it on in the presets changes their configuration hashes and
+would detach the unheated evidence from the preset names; it is a one-line
+follow-up once that is wanted.
+
+**The controlled comparison of this slice** is the pair of 300-day dry gray
+Earth runs, without and with frictional heating, judged by A2 as written
+before the heated run started (0.5 W m^-2, which is 2 × 10^-3 F), with the
+T4 run as a second heated realisation. Model differences between the pair:
+frictional heating, and the startup-step fix (one 1200 s slab step at day
+0). The second is not controlled for; removing it needs one more unheated
+300-day run at the current code. No comparison with a published model is
+part of this slice (§7).
+
 ## 7. Published comparisons: verified, and where each stands
 
 All five references were read (protocol numbers in the docstrings cite them).
