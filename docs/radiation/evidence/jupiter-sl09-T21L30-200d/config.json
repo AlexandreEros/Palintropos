@@ -1,0 +1,117 @@
+{
+  "code": {
+    "git_commit": "b2b8ea293f10b7c3ed9aa11381cc72cba5ae6316",
+    "git_dirty": false
+  },
+  "config": {
+    "checkpoint_every_days": 10,
+    "convection": {
+      "timescale": 21600.0
+    },
+    "cp": 12619.0,
+    "damping_scheme": "centred",
+    "days": 200,
+    "drag": {
+      "cutoff_deg": 16.3,
+      "decay_deg": 2.0,
+      "k0_per_day": 0.05,
+      "kind": "schneider_liu",
+      "sigma_b": 0.8
+    },
+    "dt": 1200.0,
+    "experiment_id": "jupiter-sl09-T21L30",
+    "gas_constant": 3605.38,
+    "gravity": 26.0,
+    "hyperdiffusion_efold_days": 0.1,
+    "hyperdiffusion_order": 4,
+    "initial": {
+      "kind": "radiative_convective"
+    },
+    "insolation": {
+      "kind": "diurnal_mean",
+      "stellar_constant": 50.7
+    },
+    "internal_heat_flux": 5.7,
+    "keep_checkpoints": 2,
+    "l_max": 22,
+    "longwave": {
+      "exponent": 2.0,
+      "kind": "power_law",
+      "p0": 300000.0,
+      "tau0": 80.0
+    },
+    "mean_last_days": 0,
+    "nlat": 32,
+    "nlon": 64,
+    "omega": 0.00017587,
+    "perturbation_lmax": 8,
+    "perturbation_wind": 0.1,
+    "radiation_interval": 1,
+    "radius": 69860000.0,
+    "raw_alpha": 0.53,
+    "raw_nu": 0.1,
+    "reference_pressure": 300000.0,
+    "retained_truncation": 21,
+    "schema": "palintropos.radiative.config/1",
+    "seed": 20261110,
+    "sensible": null,
+    "shortwave": {
+      "asym": 0.204,
+      "kind": "semi_infinite_scattering",
+      "p0": 300000.0,
+      "ssa": 0.8,
+      "tau0": 3.0
+    },
+    "state_every_days": 10,
+    "surface": null,
+    "t_ref": 300.0,
+    "thermal_source": "linear",
+    "vertical": {
+      "kind": "uniform",
+      "nlev": 30
+    }
+  },
+  "config_sha256": "80f280d2005fd86a2415f29dabbd90e126e75232b98bbe203b88fd913333d189",
+  "created": "2026-11-11T07:36:17Z",
+  "initial_state": {
+    "absorbed_stellar": 8.323884909894048,
+    "converged": true,
+    "imbalance": 0.0009990359995035844,
+    "iterations": 3248,
+    "kind": "radiative_convective",
+    "olr": 14.047354206703156,
+    "temperature_profile": [
+      121.56758479709153,
+      106.78183789796257,
+      121.57236533206425,
+      125.28039141421013,
+      134.60674287257967,
+      142.54977309692893,
+      149.5185281231686,
+      155.75834311842303,
+      161.42911660288823,
+      166.64144438377926,
+      171.4753206352885,
+      175.99066251225364,
+      180.23362673563707,
+      184.24059929245522,
+      188.04082247636137,
+      191.65818554472648,
+      195.11248146939406,
+      198.4203113296906,
+      201.59574941058827,
+      204.65084169531596,
+      207.59598580010842,
+      210.440224895744,
+      213.19147814239182,
+      215.85672353468217,
+      218.44214457227426,
+      220.95324908293557,
+      223.39496635977932,
+      225.7717272318575,
+      228.0875305726016,
+      230.34599893427776
+    ]
+  },
+  "physics": true
+}

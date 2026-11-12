@@ -31,9 +31,12 @@ def _imports(path: pathlib.Path):
 
 #: Layer -> the tropoi layers it may import (eagerly or lazily).
 ALLOWED = {
+    # Column physics is a leaf: reusable by any dynamical core, it may not
+    # know about grids, spectral states or steppers.
+    "tropoi.physics": ("tropoi.physics",),
     "tropoi.spatial": ("tropoi.spatial",),
-    "tropoi.temporal": ("tropoi.spatial", "tropoi.temporal"),
-    "tropoi.representation": ("tropoi.spatial", "tropoi.temporal",
+    "tropoi.temporal": ("tropoi.physics", "tropoi.spatial", "tropoi.temporal"),
+    "tropoi.representation": ("tropoi.physics", "tropoi.spatial", "tropoi.temporal",
                               "tropoi.representation"),
 }
 #: Deliberate, documented exceptions (docs/ARCHITECTURE.md). Empty: the
@@ -78,7 +81,16 @@ def test_documented_cpu_only_modules_import_without_cupy_or_matplotlib():
                "tropoi.spatial.terrain.height_function", "tropoi.cli.terrain",
                # gas optics / composition / columns (sky view; future RT)
                "tropoi.spatial.optics", "tropoi.spatial.optics.colour",
-               "tropoi.representation.visual.sky"]
+               "tropoi.representation.visual.sky",
+               # column physics, its single-column host and the experiment
+               # configuration are host code (NumPy only)
+               "tropoi.physics.thermodynamics", "tropoi.physics.planets",
+               "tropoi.physics.insolation", "tropoi.physics.convection",
+               "tropoi.physics.surface", "tropoi.physics.column_model",
+               "tropoi.physics.radiation.twostream", "tropoi.physics.radiation.scheme",
+               "tropoi.physics.radiation.gray", "tropoi.physics.radiation.kdist",
+               "tropoi.temporal.column_coupling", "tropoi.temporal.semi_implicit",
+               "tropoi.run.radiative.config", "tropoi.run.radiative.model"]
     probe = (
         "import importlib, sys\n"
         "sys.modules['cupy'] = None\n"

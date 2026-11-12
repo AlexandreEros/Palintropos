@@ -5,13 +5,13 @@
 
 | | |
 |---|---|
-| Source base commit | `8c200024bc56073c61f166471f37e4c0454984ee` (clean working tree) |
+| Source base commit | `10786875075a16d19951c2aeeb06d7e9c2760022` (plus uncommitted working-tree changes) |
 | Analysed package | `tropoi` under `src/` |
 | Generator | `tools.architecture` 2.0.0 |
 | Toolchain | Python 3.12, grimp 3.17, networkx 3.7 |
 | Command | `python -m tools.architecture.generate` |
 
-Source working tree: **clean**. Content SHA-256: `2dee486ada43e2240e65988cebf594a4cd293274530db618ba43b809a8eed9bd`. Generator working tree: **clean**. Per-file hashes and scoped Git status are recorded in `metrics.json`. These describe generation time; --check verifies source and generator content hashes before reusing this context across later commits. The base commit alone does not identify uncommitted source.
+Source working tree: **dirty**. Content SHA-256: `0d62897a9d3384d0516a46ce6f6df5178f2028bb8533497b8e4bfc3191cfc8cc`. Generator working tree: **clean**. Per-file hashes and scoped Git status are recorded in `metrics.json`. These describe generation time; --check verifies source and generator content hashes before reusing this context across later commits. The base commit alone does not identify uncommitted source.
 
 ## Reproducing
 
@@ -53,11 +53,11 @@ The rules are generic path and syntax rules; none names a particular subpackage.
 4. Each module gets a syntactic category: `namespace` (a namespace package directory), `empty` (no statement besides a docstring), `reexport` (only imports, `__all__` assignments, and alias assignments `A = B`), or `code`. Categories are attributes, not filters, with one exception: a `namespace` or `empty` module that no analysed module imports is dropped from the module graph, because it has no code and no edges.
 5. Imports of modules outside the package are not graph edges; they are listed per module (`stdlib_imports`, `third_party_imports` in `graph/modules.json`).
 
-Modules discovered: 145; in the module graph: 125. Categories: code 119, empty 19, namespace 1, reexport 6.
+Modules discovered: 156; in the module graph: 133. Categories: code 128, empty 22, namespace 1, reexport 5.
 
-Excluded by rule 4: `tropoi`, `tropoi.cli`, `tropoi.representation`, `tropoi.representation.diagnostics`, `tropoi.representation.visual`, `tropoi.run`, `tropoi.run.bve`, `tropoi.run.held_suarez`, `tropoi.run.pe`, `tropoi.run.swe`, `tropoi.spatial`, `tropoi.spatial.grids`, `tropoi.spatial.initialization`, `tropoi.spatial.operators`, `tropoi.spatial.states`, `tropoi.spatial.terrain`, `tropoi.spatial.transforms`, `tropoi.spatial.transforms.cuda`, `tropoi.temporal`, `tropoi.temporal.tendencies`.
+Excluded by rule 4: `tropoi`, `tropoi.cli`, `tropoi.physics`, `tropoi.physics.radiation`, `tropoi.representation`, `tropoi.representation.diagnostics`, `tropoi.representation.visual`, `tropoi.run`, `tropoi.run.bve`, `tropoi.run.held_suarez`, `tropoi.run.pe`, `tropoi.run.radiative`, `tropoi.run.swe`, `tropoi.spatial`, `tropoi.spatial.grids`, `tropoi.spatial.initialization`, `tropoi.spatial.operators`, `tropoi.spatial.states`, `tropoi.spatial.terrain`, `tropoi.spatial.transforms`, `tropoi.spatial.transforms.cuda`, `tropoi.temporal`, `tropoi.temporal.tendencies`.
 
-`reexport` modules (kept): `tropoi.representation.archive`, `tropoi.run.bve.model`, `tropoi.run.custom`, `tropoi.run.pe.model`, `tropoi.run.swe.model`, `tropoi.spatial.optics`.
+`reexport` modules (kept): `tropoi.representation.archive`, `tropoi.run.bve.model`, `tropoi.run.custom`, `tropoi.run.pe.model`, `tropoi.run.swe.model`.
 
 ## Extraction rules
 
@@ -95,7 +95,7 @@ The layers are the only input to this snapshot that states an expectation. They 
 
 ### Call graphs (ast)
 
-Each call expression inside a function or method body (nested functions, lambdas, and comprehensions are attributed to the enclosing function) is classified as `internal` (resolved to an analysed definition), `external` (resolved to a name outside the package), `builtin` (an unshadowed builtin), or `unresolved`. Totals: builtin 3223, external 2223, internal 2626, unresolved 3143.
+Each call expression inside a function or method body (nested functions, lambdas, and comprehensions are attributed to the enclosing function) is classified as `internal` (resolved to an analysed definition), `external` (resolved to a name outside the package), `builtin` (an unshadowed builtin), or `unresolved`. Totals: builtin 3326, external 2191, internal 2754, unresolved 3459.
 
 | Edge kind | Syntax | What it claims |
 |---|---|---|

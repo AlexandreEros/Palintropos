@@ -69,6 +69,11 @@ It is documented in [SAVED_RUNS.md](../src/tropoi/temporal/SAVED_RUNS.md).
 
 ### Dependency direction
 
+`physics` (column physics: gas properties, radiation, convection, surface;
+NumPy/CuPy-agnostic) imports no other `tropoi` package, so it can serve any
+dynamical core; `temporal` and the layers above may import it
+([radiation status](radiation/README.md)).
+
 `spatial` imports only `spatial`; `temporal` imports `spatial` and
 `temporal`; `representation` imports all three layers. Orchestration
 (`run`, `cli`) sits above them. Mathematical helpers stay below their

@@ -1,0 +1,92 @@
+{
+  "earth": {
+    "with_hyperdiffusion": {
+      "energy_change_over_initial_kinetic": -0.029277653059680667,
+      "energy_rate_w_m2": -0.04319284939655551,
+      "finite": true,
+      "initial_kinetic_j_m2": 127464.5266222408,
+      "kinetic_remaining": 0.7212741925666726,
+      "surface_pressure_drift": -2.7109322675578085e-07
+    },
+    "without_hyperdiffusion": {
+      "energy_change_over_initial_kinetic": -0.010967905351590139,
+      "energy_rate_w_m2": -0.01618077388516179,
+      "finite": true,
+      "initial_kinetic_j_m2": 127464.5266222408,
+      "kinetic_remaining": 0.733540884582985,
+      "surface_pressure_drift": -2.80915820383143e-07
+    }
+  },
+  "jupiter": {
+    "with_hyperdiffusion": {
+      "energy_change_over_initial_kinetic": -0.8925327729194455,
+      "energy_rate_w_m2": -52.088747616520635,
+      "finite": true,
+      "initial_kinetic_j_m2": 5042355.788624433,
+      "kinetic_remaining": 0.08325030262453553,
+      "surface_pressure_drift": -7.12075254316602e-09
+    },
+    "without_hyperdiffusion": {
+      "energy_change_over_initial_kinetic": -0.017208694287041058,
+      "energy_rate_w_m2": -1.0043097135755752,
+      "finite": true,
+      "initial_kinetic_j_m2": 5042355.788624433,
+      "kinetic_remaining": 0.8188931125374436,
+      "surface_pressure_drift": -2.4525341424386227e-08
+    }
+  },
+  "mars": {
+    "with_hyperdiffusion": {
+      "energy_change_over_initial_kinetic": -0.02442495518668754,
+      "energy_rate_w_m2": -0.0005810131629308064,
+      "finite": true,
+      "initial_kinetic_j_m2": 2055.2560646900265,
+      "kinetic_remaining": 0.8108647080891319,
+      "surface_pressure_drift": -3.818973594027497e-07
+    },
+    "without_hyperdiffusion": {
+      "energy_change_over_initial_kinetic": -0.009582671645303244,
+      "energy_rate_w_m2": -0.00022794958350628062,
+      "finite": true,
+      "initial_kinetic_j_m2": 2055.2560646900265,
+      "kinetic_remaining": 0.8230445607170845,
+      "surface_pressure_drift": -3.9386512007411056e-07
+    }
+  },
+  "titan": {
+    "with_hyperdiffusion": {
+      "energy_change_over_initial_kinetic": -0.012864424544462238,
+      "energy_rate_w_m2": -0.20194823262868103,
+      "finite": true,
+      "initial_kinetic_j_m2": 1356323.9644970393,
+      "kinetic_remaining": 0.9856236815672877,
+      "surface_pressure_drift": -2.004395538435233e-09
+    },
+    "without_hyperdiffusion": {
+      "energy_change_over_initial_kinetic": -4.822485422291727e-05,
+      "energy_rate_w_m2": -0.0007570431188300804,
+      "finite": true,
+      "initial_kinetic_j_m2": 1356323.9644970393,
+      "kinetic_remaining": 0.9984158673874591,
+      "surface_pressure_drift": -2.1475649036872824e-09
+    }
+  },
+  "venus": {
+    "with_hyperdiffusion": {
+      "energy_change_over_initial_kinetic": -0.012317698497961969,
+      "energy_rate_w_m2": -1.8483748372395834,
+      "finite": true,
+      "initial_kinetic_j_m2": 12965050.732807202,
+      "kinetic_remaining": 0.9876212529167502,
+      "surface_pressure_drift": -7.62718777025384e-11
+    },
+    "without_hyperdiffusion": {
+      "energy_change_over_initial_kinetic": -6.071630243716039e-06,
+      "energy_rate_w_m2": -0.0009110994692201967,
+      "finite": true,
+      "initial_kinetic_j_m2": 12965050.732807202,
+      "kinetic_remaining": 0.9999267004265103,
+      "surface_pressure_drift": -8.38115132850703e-11
+    }
+  }
+}
