@@ -11,6 +11,8 @@ when the repository is imported into a wiki.
 | [Validation](VALIDATION.md) | Accepted results and their scientific limits |
 | [Current limitations](KNOWN_LIMITATIONS.md) | Unresolved restrictions with source/evidence links |
 | [Radiation status](radiation/README.md) | Radiative–dynamical foundation: what is implemented, tested, measured and unvalidated |
+| [Shared physics](radiation/SHARED_PHYSICS.md) | The one description of composition, molecular properties and stellar illumination that the climate and sky calculations consume; packaged datasets and canonical choices |
+| [Sky view](SKY_VIEW.md) | Standalone single-scattering sky page: use, physics, limits and data provenance |
 | [Held–Suarez](held_suarez/README.md) | Frozen protocol, acceptance criteria, reference and completed production evidence |
 | [Validation records](validation/README.md) | Dated measurements, reproducibility records and associated assets |
 | [Generated architecture](architecture/README.md) | Current diagrams, frozen comparison snapshots and generation tooling |
