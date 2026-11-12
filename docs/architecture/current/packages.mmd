@@ -19,7 +19,7 @@ flowchart TD
         n_tropoi_orepresentation["representation (1 module)"]
         n_tropoi_orepresentation_oarchive["representation.archive (9 modules)"]
         n_tropoi_orepresentation_odiagnostics["representation.diagnostics (7 modules)"]
-        n_tropoi_orepresentation_ovisual["representation.visual (24 modules)"]
+        n_tropoi_orepresentation_ovisual["representation.visual (25 modules)"]
     end
     subgraph g_temporal["layer temporal"]
         n_tropoi_otemporal["temporal (7 modules)"]
@@ -30,14 +30,13 @@ flowchart TD
         n_tropoi_ospatial_ogrids["spatial.grids (7 modules)"]
         n_tropoi_ospatial_oinitialization["spatial.initialization (3 modules)"]
         n_tropoi_ospatial_ooperators["spatial.operators (1 module)"]
-        n_tropoi_ospatial_ooptics["spatial.optics (7 modules)"]
         n_tropoi_ospatial_ostates["spatial.states (3 modules)"]
         n_tropoi_ospatial_oterrain["spatial.terrain (7 modules)"]
         n_tropoi_ospatial_otransforms["spatial.transforms (4 modules)"]
         n_tropoi_ospatial_otransforms_ocuda["spatial.transforms.cuda (1 module)"]
     end
     subgraph g_physics["layer physics"]
-        n_tropoi_ophysics["physics (6 modules)"]
+        n_tropoi_ophysics["physics (14 modules)"]
         n_tropoi_ophysics_oradiation["physics.radiation (4 modules)"]
     end
     n_tropoi_ocli -->|4| n_tropoi_orepresentation_oarchive
@@ -57,12 +56,12 @@ flowchart TD
     n_tropoi_orepresentation_odiagnostics -->|3| n_tropoi_ospatial
     n_tropoi_orepresentation_odiagnostics -->|2| n_tropoi_ospatial_otransforms
     n_tropoi_orepresentation_odiagnostics -->|2| n_tropoi_otemporal_otendencies
+    n_tropoi_orepresentation_ovisual -->|6| n_tropoi_ophysics
     n_tropoi_orepresentation_ovisual -->|5| n_tropoi_orepresentation_oarchive
     n_tropoi_orepresentation_ovisual -->|7| n_tropoi_orepresentation_odiagnostics
     n_tropoi_orepresentation_ovisual -->|5| n_tropoi_ospatial
     n_tropoi_orepresentation_ovisual -->|9| n_tropoi_ospatial_ogrids
     n_tropoi_orepresentation_ovisual -->|1| n_tropoi_ospatial_ooperators
-    n_tropoi_orepresentation_ovisual -->|7| n_tropoi_ospatial_ooptics
     n_tropoi_orepresentation_ovisual -->|1| n_tropoi_ospatial_ostates
     n_tropoi_orepresentation_ovisual -->|3| n_tropoi_ospatial_otransforms
     n_tropoi_orepresentation_ovisual -->|1| n_tropoi_otemporal
@@ -103,7 +102,7 @@ flowchart TD
     n_tropoi_orun_ope -->|1| n_tropoi_ospatial_oinitialization
     n_tropoi_orun_ope -->|4| n_tropoi_otemporal
     n_tropoi_orun_ope -->|1| n_tropoi_otemporal_otendencies
-    n_tropoi_orun_oradiative -->|4| n_tropoi_ophysics
+    n_tropoi_orun_oradiative -->|5| n_tropoi_ophysics
     n_tropoi_orun_oradiative -->|2| n_tropoi_ophysics_oradiation
     n_tropoi_orun_oradiative -->|2| n_tropoi_orun_oheld__suarez
     n_tropoi_orun_oradiative -->|5| n_tropoi_ospatial
