@@ -49,6 +49,7 @@ flowchart LR
     p_tropoi_orun_ocustom["package run.custom"]
     p_tropoi_orun_oheld__suarez["package run.held_suarez"]
     p_tropoi_orun_ope["package run.pe"]
+    p_tropoi_orun_oradiative["package run.radiative"]
     p_tropoi_orun_oswe["package run.swe"]
     p_tropoi_ospatial_ogrids["package spatial.grids"]
     p_tropoi_ospatial_oinitialization["package spatial.initialization"]
@@ -87,6 +88,11 @@ flowchart LR
     p_tropoi_orun_oheld__suarez -->|1| n_tropoi_ospatial_otruncation
     p_tropoi_orun_ope -->|1| n_tropoi_ospatial_osigma__coordinate
     p_tropoi_orun_ope -->|1| n_tropoi_ospatial_otruncation
+    p_tropoi_orun_oradiative -.->|1| n_tropoi_ospatial_oenvironment
+    p_tropoi_orun_oradiative -.->|1| n_tropoi_ospatial_olaplacian
+    p_tropoi_orun_oradiative -.->|1| n_tropoi_ospatial_oplanet
+    p_tropoi_orun_oradiative -->|1| n_tropoi_ospatial_osigma__coordinate
+    p_tropoi_orun_oradiative -.->|1| n_tropoi_ospatial_otruncation
     p_tropoi_orun_oswe -->|1| n_tropoi_ospatial_otruncation
     p_tropoi_orun_oswe -->|1| n_tropoi_ospatial_owilliamson5
     p_tropoi_ospatial_oinitialization -->|1| n_tropoi_ospatial_oplanet
@@ -122,6 +128,7 @@ flowchart LR
     class p_tropoi_orun_ocustom other
     class p_tropoi_orun_oheld__suarez other
     class p_tropoi_orun_ope other
+    class p_tropoi_orun_oradiative other
     class p_tropoi_orun_oswe other
     class p_tropoi_ospatial_ogrids other
     class p_tropoi_ospatial_oinitialization other
@@ -188,12 +195,14 @@ classDiagram
     class c_tropoi_ospatial_osigma__coordinate_oSigmaGrid["SigmaGrid (spatial.sigma_coordinate)"]
     c_tropoi_ospatial_osigma__coordinate_oSigmaGrid : +#95;#95;post#95;init#95;#95;()
     c_tropoi_ospatial_osigma__coordinate_oSigmaGrid : +alpha()
+    c_tropoi_ospatial_osigma__coordinate_oSigmaGrid : +frierson()$
     c_tropoi_ospatial_osigma__coordinate_oSigmaGrid : +full#95;levels()
     c_tropoi_ospatial_osigma__coordinate_oSigmaGrid : +full#95;levels#95;array()
     c_tropoi_ospatial_osigma__coordinate_oSigmaGrid : +hydrostatic#95;full#95;levels()
     c_tropoi_ospatial_osigma__coordinate_oSigmaGrid : +interface#95;log#95;ratios()
     c_tropoi_ospatial_osigma__coordinate_oSigmaGrid : +interfaces#95;array()
     c_tropoi_ospatial_osigma__coordinate_oSigmaGrid : +nlev
+    c_tropoi_ospatial_osigma__coordinate_oSigmaGrid : +stretched()$
     c_tropoi_ospatial_osigma__coordinate_oSigmaGrid : +thickness()
     c_tropoi_ospatial_osigma__coordinate_oSigmaGrid : +thickness#95;array()
     c_tropoi_ospatial_osigma__coordinate_oSigmaGrid : +uniform()$

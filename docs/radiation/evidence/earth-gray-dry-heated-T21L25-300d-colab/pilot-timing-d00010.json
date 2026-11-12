@@ -1,0 +1,52 @@
+{
+  "case": "earth",
+  "checkpoints_timed": 1,
+  "code": {
+    "git_commit": "d38d2a365b60c3528c3ba2eae76c688d453ee505",
+    "git_dirty": false
+  },
+  "config_sha256": "748cec4b170c40a170cb14efbd6bac2e59618be54fafe6c7bc4a84ead23dd2be",
+  "device": {
+    "cupy": "14.0.1",
+    "name": "Tesla T4",
+    "nvidia_smi": "Tesla T4, 580.82.07, 15360 MiB",
+    "total_memory_gb": 14.56317138671875
+  },
+  "estimated_full_run_hours": 1.3513644538648153,
+  "estimated_remaining_hours": 1.3063189720693216,
+  "experiment_id": "earth-gray-dry-heated-T21L25",
+  "gpu_utilisation": {
+    "max_percent": 53.0,
+    "mean_percent": 35.98581560283688,
+    "median_percent": 37.0,
+    "min_percent": 24.0,
+    "samples": 141
+  },
+  "kind": "pilot_timing",
+  "resolution": {
+    "dt": 1200.0,
+    "l_max": 22,
+    "nlat": 32,
+    "nlev": 25,
+    "nlon": 64,
+    "retained": 21
+  },
+  "resume_events": 0,
+  "resumed_from_day": null,
+  "seconds_per_checkpoint": 0.08744804599996314,
+  "seconds_per_daily_sample": 0.1291357727778038,
+  "seconds_per_step_all_inclusive": 0.22524090404629635,
+  "seconds_per_step_stepping_only": 0.2233124009583331,
+  "simulated_days_per_wall_hour": 221.98454677540684,
+  "target_days": 300,
+  "timed": {
+    "from_day": 1,
+    "status": "reached",
+    "steps": 648,
+    "to_day": 10.0,
+    "wall_seconds": 145.95610582200004
+  },
+  "utc": "2026-11-11T21:57:27+00:00",
+  "warm_days": 1,
+  "warm_seconds": 22.179493785000034
+}

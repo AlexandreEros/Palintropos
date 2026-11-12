@@ -1,0 +1,306 @@
+{
+  "grids": {
+    "earth": {
+      "stretched": {
+        "fastest_gravity_wave_m_s": 357.54973067977164,
+        "hydrostatic_error_dry_adiabat": 0.0027426409526841197,
+        "largest_layer_in_scale_heights": 0.4639183429332778,
+        "layers_above_one_percent_of_bottom_pressure": 6,
+        "nlev": 30,
+        "slowest_gravity_wave_m_s": 0.7422591324992901,
+        "thickest_layer_sigma": 0.06077328643368318,
+        "top_full_level_pressure_pa": 50.0
+      },
+      "uniform": {
+        "fastest_gravity_wave_m_s": 353.17160279872957,
+        "hydrostatic_error_dry_adiabat": 0.0030089073309682857,
+        "largest_layer_in_scale_heights": 0.6931471805599454,
+        "layers_above_one_percent_of_bottom_pressure": 0,
+        "nlev": 30,
+        "slowest_gravity_wave_m_s": 0.29418345676539276,
+        "thickest_layer_sigma": 0.03333333333333344,
+        "top_full_level_pressure_pa": 1666.6666666666667
+      }
+    },
+    "jupiter": {
+      "stretched": {
+        "fastest_gravity_wave_m_s": 1930.6456964692075,
+        "hydrostatic_error_dry_adiabat": 0.0014035204793689637,
+        "largest_layer_in_scale_heights": 0.1959646887654536,
+        "layers_above_one_percent_of_bottom_pressure": 24,
+        "nlev": 48,
+        "slowest_gravity_wave_m_s": 3.3032677721250727,
+        "thickest_layer_sigma": 0.177958738542509,
+        "top_full_level_pressure_pa": 500.0
+      },
+      "uniform": {
+        "fastest_gravity_wave_m_s": 1900.4416386073447,
+        "hydrostatic_error_dry_adiabat": 0.002581620318287646,
+        "largest_layer_in_scale_heights": 0.6931471805599454,
+        "layers_above_one_percent_of_bottom_pressure": 0,
+        "nlev": 48,
+        "slowest_gravity_wave_m_s": 0.6436332049698084,
+        "thickest_layer_sigma": 0.02083333333333337,
+        "top_full_level_pressure_pa": 104166.66666666666
+      }
+    },
+    "mars": {
+      "stretched": {
+        "fastest_gravity_wave_m_s": 273.34215214926957,
+        "hydrostatic_error_dry_adiabat": 0.003575112459501272,
+        "largest_layer_in_scale_heights": 0.5226201432959545,
+        "layers_above_one_percent_of_bottom_pressure": 8,
+        "nlev": 30,
+        "slowest_gravity_wave_m_s": 0.6836287845494146,
+        "thickest_layer_sigma": 0.06797152308995158,
+        "top_full_level_pressure_pa": 0.061000000000000006
+      },
+      "uniform": {
+        "fastest_gravity_wave_m_s": 270.3490608621965,
+        "hydrostatic_error_dry_adiabat": 0.002852239991330782,
+        "largest_layer_in_scale_heights": 0.6931471805599454,
+        "layers_above_one_percent_of_bottom_pressure": 0,
+        "nlev": 30,
+        "slowest_gravity_wave_m_s": 0.21766839113668038,
+        "thickest_layer_sigma": 0.03333333333333344,
+        "top_full_level_pressure_pa": 10.166666666666666
+      }
+    },
+    "saturn": {
+      "stretched": {
+        "fastest_gravity_wave_m_s": 1951.5594784104906,
+        "hydrostatic_error_dry_adiabat": 0.001460628079171584,
+        "largest_layer_in_scale_heights": 0.1959646887654536,
+        "layers_above_one_percent_of_bottom_pressure": 24,
+        "nlev": 48,
+        "slowest_gravity_wave_m_s": 3.3791847793353886,
+        "thickest_layer_sigma": 0.177958738542509,
+        "top_full_level_pressure_pa": 500.0
+      },
+      "uniform": {
+        "fastest_gravity_wave_m_s": 1917.38306873766,
+        "hydrostatic_error_dry_adiabat": 0.002619046945434744,
+        "largest_layer_in_scale_heights": 0.6931471805599454,
+        "layers_above_one_percent_of_bottom_pressure": 0,
+        "nlev": 48,
+        "slowest_gravity_wave_m_s": 0.6584316921412435,
+        "thickest_layer_sigma": 0.02083333333333337,
+        "top_full_level_pressure_pa": 104166.66666666666
+      }
+    },
+    "titan": {
+      "stretched": {
+        "fastest_gravity_wave_m_s": 275.96152437114915,
+        "hydrostatic_error_dry_adiabat": 0.0031602180585964417,
+        "largest_layer_in_scale_heights": 0.4661020939419629,
+        "layers_above_one_percent_of_bottom_pressure": 15,
+        "nlev": 40,
+        "slowest_gravity_wave_m_s": 0.5587423021252363,
+        "thickest_layer_sigma": 0.0605518536226457,
+        "top_full_level_pressure_pa": 0.7335
+      },
+      "uniform": {
+        "fastest_gravity_wave_m_s": 272.51999650611157,
+        "hydrostatic_error_dry_adiabat": 0.0026370871017268815,
+        "largest_layer_in_scale_heights": 0.6931471805599454,
+        "layers_above_one_percent_of_bottom_pressure": 0,
+        "nlev": 40,
+        "slowest_gravity_wave_m_s": 0.12695476111538334,
+        "thickest_layer_sigma": 0.025000000000000022,
+        "top_full_level_pressure_pa": 1833.75
+      }
+    },
+    "venus": {
+      "stretched": {
+        "fastest_gravity_wave_m_s": 417.69065159769525,
+        "hydrostatic_error_dry_adiabat": 0.0027018220688615068,
+        "largest_layer_in_scale_heights": 0.48602436523582604,
+        "layers_above_one_percent_of_bottom_pressure": 20,
+        "nlev": 50,
+        "slowest_gravity_wave_m_s": 0.42930523391746894,
+        "thickest_layer_sigma": 0.044093540699408074,
+        "top_full_level_pressure_pa": 4.6
+      },
+      "uniform": {
+        "fastest_gravity_wave_m_s": 415.9734236513284,
+        "hydrostatic_error_dry_adiabat": 0.0019189161029647516,
+        "largest_layer_in_scale_heights": 0.6931471805599454,
+        "layers_above_one_percent_of_bottom_pressure": 0,
+        "nlev": 50,
+        "slowest_gravity_wave_m_s": 0.1065766679802369,
+        "thickest_layer_sigma": 0.020000000000000018,
+        "top_full_level_pressure_pa": 92000.0
+      }
+    }
+  },
+  "regimes": {
+    "earth": {
+      "R": 287.0457438974027,
+      "cp": 1002.9815949447732,
+      "cp_max": 1005.5052515242921,
+      "cp_min": 1002.0604029869078,
+      "cp_relative_spread": 0.003434201240189628,
+      "depth_over_radius": 0.009079487572733995,
+      "gravity_change_over_depth": 0.01791462419498524,
+      "kappa": 0.28619243398300664,
+      "lamb_speed": 323.3490999633333,
+      "model_depth_m": 57845.41532588828,
+      "name": "earth",
+      "rotational_speed_equator": 464.58064665,
+      "scale_height_m": 7610.335171880786,
+      "top_full_level_pressure": 50.0
+    },
+    "jupiter": {
+      "R": 3592.9148890476617,
+      "cp": 10929.973115181281,
+      "cp_max": 12156.214439259204,
+      "cp_min": 9751.089758335182,
+      "cp_relative_spread": 0.20375202816972368,
+      "depth_over_radius": 0.003387637976089951,
+      "gravity_change_over_depth": 0.00674100253053922,
+      "kappa": 0.32872129246660736,
+      "lamb_speed": 939.7536061341474,
+      "model_depth_m": 236833.15854642456,
+      "name": "jupiter",
+      "rotational_speed_equator": 12293.849349999999,
+      "scale_height_m": 23914.116849248254,
+      "top_full_level_pressure": 500.0
+    },
+    "mars": {
+      "R": 191.24311938329396,
+      "cp": 737.0027706139516,
+      "cp_max": 833.4968306962908,
+      "cp_min": 678.0529458504494,
+      "cp_relative_spread": 0.20723772228625603,
+      "depth_over_radius": 0.028014440080629747,
+      "gravity_change_over_depth": 0.05375941814993124,
+      "kappa": 0.2594876532471935,
+      "lamb_speed": 227.26981334696777,
+      "model_depth_m": 94954.94465329453,
+      "name": "mars",
+      "rotational_speed_equator": 240.25453900000002,
+      "scale_height_m": 10309.602123088624,
+      "top_full_level_pressure": 0.061000000000000006
+    },
+    "saturn": {
+      "R": 3592.3582469793796,
+      "cp": 10440.878569731118,
+      "cp_max": 12267.897277833552,
+      "cp_min": 9287.525789887428,
+      "cp_relative_spread": 0.25273695920767403,
+      "depth_over_radius": 0.007900223241223006,
+      "gravity_change_over_depth": 0.015615158929577988,
+      "kappa": 0.3440666628758515,
+      "lamb_speed": 859.8582297276627,
+      "model_depth_m": 460045.79978289816,
+      "name": "saturn",
+      "rotational_speed_equator": 9537.23696,
+      "scale_height_m": 46452.90836611267,
+      "top_full_level_pressure": 500.0
+    },
+    "titan": {
+      "R": 303.4383887080308,
+      "cp": 1069.209047034619,
+      "cp_max": 1069.5400379556668,
+      "cp_min": 1069.1790167239744,
+      "cp_relative_spread": 0.00033762233440000794,
+      "depth_over_radius": 0.09576033544930615,
+      "gravity_change_over_depth": 0.16714605236291946,
+      "kappa": 0.28379706433423585,
+      "lamb_speed": 195.27132272314128,
+      "model_depth_m": 246554.13568132854,
+      "name": "titan",
+      "rotational_speed_equator": 11.74243429,
+      "scale_height_m": 20199.301023463588,
+      "top_full_level_pressure": 0.7335
+    },
+    "venus": {
+      "R": 191.3586231763582,
+      "cp": 1015.2245269151532,
+      "cp_max": 1142.2478886615854,
+      "cp_min": 711.8570304167507,
+      "cp_relative_spread": 0.44672685858630634,
+      "depth_over_radius": 0.025860510320473474,
+      "gravity_change_over_depth": 0.0497817323013926,
+      "kappa": 0.18848896781268454,
+      "lamb_speed": 343.369571747581,
+      "model_depth_m": 156502.63635744137,
+      "name": "venus",
+      "rotational_speed_equator": 1.810940632,
+      "scale_height_m": 10786.84459844184,
+      "top_full_level_pressure": 4.6
+    }
+  },
+  "resolution": {
+    "stretched": [
+      {
+        "absorbed_plus_interior": 14.023803295230191,
+        "converged": true,
+        "iterations": 69874,
+        "levels_above_1bar": 12,
+        "nlev": 24,
+        "olr": 14.018834042753332,
+        "temperature_1bar": 169.8600251240812,
+        "top_full_level_pressure_pa": 500.0,
+        "tropopause_pressure_pa": 6183.816147632673
+      },
+      {
+        "absorbed_plus_interior": 14.023803295230191,
+        "converged": true,
+        "iterations": 72812,
+        "levels_above_1bar": 24,
+        "nlev": 48,
+        "olr": 14.01482476997773,
+        "temperature_1bar": 169.23087449328492,
+        "top_full_level_pressure_pa": 500.0,
+        "tropopause_pressure_pa": 11638.880005518915
+      },
+      {
+        "absorbed_plus_interior": 14.023803295230191,
+        "converged": true,
+        "iterations": 66166,
+        "levels_above_1bar": 48,
+        "nlev": 96,
+        "olr": 14.006740731652267,
+        "temperature_1bar": 169.11671952559817,
+        "top_full_level_pressure_pa": 500.0,
+        "tropopause_pressure_pa": 10766.858755359564
+      }
+    ],
+    "uniform": [
+      {
+        "absorbed_plus_interior": 14.023803295230191,
+        "converged": true,
+        "iterations": 21338,
+        "levels_above_1bar": 0,
+        "nlev": 30,
+        "olr": 14.070706423255425,
+        "temperature_1bar": 125.20379488875315,
+        "top_full_level_pressure_pa": 166666.66666666666,
+        "tropopause_pressure_pa": 166666.66666666666
+      },
+      {
+        "absorbed_plus_interior": 14.023803295230191,
+        "converged": true,
+        "iterations": 36884,
+        "levels_above_1bar": 1,
+        "nlev": 60,
+        "olr": 14.117374265908902,
+        "temperature_1bar": 132.02508392189873,
+        "top_full_level_pressure_pa": 83333.33333333333,
+        "tropopause_pressure_pa": 83333.33333333333
+      },
+      {
+        "absorbed_plus_interior": 14.023803295230191,
+        "converged": true,
+        "iterations": 38558,
+        "levels_above_1bar": 1,
+        "nlev": 120,
+        "olr": 14.210697947128697,
+        "temperature_1bar": 156.97174534620333,
+        "top_full_level_pressure_pa": 41666.666666666664,
+        "tropopause_pressure_pa": 41666.666666666664
+      }
+    ]
+  }
+}

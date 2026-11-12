@@ -37,6 +37,7 @@ flowchart LR
         n_tropoi_orun_oheld__suarez_oreport["run.held_suarez.report"]
         n_tropoi_orun_oheld__suarez_ostatistics["run.held_suarez.statistics"]
     end
+    p_tropoi_orun_oradiative["package run.radiative"]
     p_tropoi_ospatial["package spatial"]
     p_tropoi_ospatial_ostates["package spatial.states"]
     p_tropoi_otemporal["package temporal"]
@@ -50,6 +51,8 @@ flowchart LR
     n_tropoi_orun_oheld__suarez_oexperiment -.-> n_tropoi_orun_oheld__suarez_omodel
     n_tropoi_orun_oheld__suarez_oexperiment --> n_tropoi_orun_oheld__suarez_ostatistics
     n_tropoi_orun_oheld__suarez_omodel --> n_tropoi_orun_oheld__suarez_oconfig
+    p_tropoi_orun_oradiative -->|1| n_tropoi_orun_oheld__suarez_ocheckpoint
+    p_tropoi_orun_oradiative -->|1| n_tropoi_orun_oheld__suarez_oexperiment
     n_tropoi_orun_oheld__suarez_o____main____ -.->|1| p_tropoi_ospatial_ostates
     n_tropoi_orun_oheld__suarez_oconfig -->|1| p_tropoi_ospatial
     n_tropoi_orun_oheld__suarez_oconfig -->|1| p_tropoi_otemporal_otendencies
@@ -59,6 +62,7 @@ flowchart LR
     n_tropoi_orun_oheld__suarez_omodel -.->|1| p_tropoi_otemporal
     n_tropoi_orun_oheld__suarez_omodel -->|2| p_tropoi_otemporal_otendencies
     classDef other fill:none,stroke-dasharray:3 3
+    class p_tropoi_orun_oradiative other
     class p_tropoi_ospatial other
     class p_tropoi_ospatial_ostates other
     class p_tropoi_otemporal other

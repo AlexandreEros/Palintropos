@@ -1,0 +1,112 @@
+{
+  "code": {
+    "git_commit": "86372f977549e3a48ca460e73f67d0a3d64b48e3",
+    "git_dirty": true
+  },
+  "config": {
+    "checkpoint_every_days": 10,
+    "convection": {
+      "timescale": 0.0
+    },
+    "cp": 1004.64,
+    "damping_scheme": "centred",
+    "days": 300,
+    "drag": {
+      "k_f_per_day": 1.0,
+      "kind": "held_suarez",
+      "sigma_b": 0.7
+    },
+    "dt": 1200.0,
+    "experiment_id": "earth-gray-dry-T21L25",
+    "gas_constant": 287.04,
+    "gravity": 9.8,
+    "hyperdiffusion_efold_days": 0.1,
+    "hyperdiffusion_order": 4,
+    "initial": {
+      "kind": "isothermal",
+      "temperature": 264.0
+    },
+    "insolation": {
+      "delta_s": 1.4,
+      "kind": "frierson",
+      "net_solar_constant": 938.4
+    },
+    "internal_heat_flux": 0.0,
+    "keep_checkpoints": 2,
+    "l_max": 22,
+    "longwave": {
+      "kind": "frierson",
+      "linear_fraction": 0.1,
+      "tau_equator": 6.0,
+      "tau_pole": 1.5
+    },
+    "mean_last_days": 0,
+    "nlat": 32,
+    "nlon": 64,
+    "omega": 7.292e-05,
+    "perturbation_lmax": 8,
+    "perturbation_wind": 0.1,
+    "radiation_interval": 1,
+    "radius": 6376000.0,
+    "raw_alpha": 0.53,
+    "raw_nu": 0.1,
+    "reference_pressure": 100000.0,
+    "retained_truncation": 21,
+    "schema": "palintropos.radiative.config/1",
+    "seed": 20261110,
+    "sensible": {
+      "critical_richardson": 1.0,
+      "gustiness": 1.0,
+      "roughness_length": 3.21e-05
+    },
+    "shortwave": {
+      "kind": "transparent"
+    },
+    "state_every_days": 10,
+    "surface": {
+      "albedo": 0.0,
+      "emissivity": 1.0,
+      "heat_capacity": 10000000.0,
+      "initial_temperature": 285.0
+    },
+    "t_ref": 300.0,
+    "thermal_source": "linear",
+    "vertical": {
+      "kind": "frierson",
+      "nlev": 25
+    }
+  },
+  "config_sha256": "e31ae183937da3bc9c5a63cbaf5c889bbeefc384a2f70b81e529b7a6965890d5",
+  "created": "2026-11-10T18:56:23Z",
+  "initial_state": {
+    "kind": "isothermal",
+    "temperature_profile": [
+      264.0,
+      264.0,
+      264.0,
+      264.0,
+      264.0,
+      264.0,
+      264.0,
+      264.0,
+      264.0,
+      264.0,
+      264.0,
+      264.0,
+      264.0,
+      264.0,
+      264.0,
+      264.0,
+      264.0,
+      264.0,
+      264.0,
+      264.0,
+      264.0,
+      264.0,
+      264.0,
+      264.0,
+      264.0
+    ]
+  },
+  "physics": true
+}

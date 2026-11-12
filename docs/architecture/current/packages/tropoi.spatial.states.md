@@ -33,14 +33,18 @@ flowchart LR
     p_tropoi_orun_obve["package run.bve"]
     p_tropoi_orun_ocustom["package run.custom"]
     p_tropoi_orun_oheld__suarez["package run.held_suarez"]
+    p_tropoi_orun_oradiative["package run.radiative"]
     p_tropoi_ospatial_oinitialization["package spatial.initialization"]
+    p_tropoi_otemporal["package temporal"]
     p_tropoi_otemporal_otendencies["package temporal.tendencies"]
     p_tropoi_orepresentation_ovisual -.->|1| n_tropoi_ospatial_ostates_oprimitive__equations
     p_tropoi_orun_obve -->|1| n_tropoi_ospatial_ostates_obarotropic
     p_tropoi_orun_ocustom -.->|2| n_tropoi_ospatial_ostates_oshallow__water
     p_tropoi_orun_oheld__suarez -.->|3| n_tropoi_ospatial_ostates_oprimitive__equations
+    p_tropoi_orun_oradiative -.->|3| n_tropoi_ospatial_ostates_oprimitive__equations
     p_tropoi_ospatial_oinitialization -->|1| n_tropoi_ospatial_ostates_oprimitive__equations
     p_tropoi_ospatial_oinitialization -->|1| n_tropoi_ospatial_ostates_oshallow__water
+    p_tropoi_otemporal -.->|1| n_tropoi_ospatial_ostates_oprimitive__equations
     p_tropoi_otemporal_otendencies -->|1| n_tropoi_ospatial_ostates_obarotropic
     p_tropoi_otemporal_otendencies -->|1| n_tropoi_ospatial_ostates_oprimitive__equations
     p_tropoi_otemporal_otendencies -->|1| n_tropoi_ospatial_ostates_oshallow__water
@@ -49,7 +53,9 @@ flowchart LR
     class p_tropoi_orun_obve other
     class p_tropoi_orun_ocustom other
     class p_tropoi_orun_oheld__suarez other
+    class p_tropoi_orun_oradiative other
     class p_tropoi_ospatial_oinitialization other
+    class p_tropoi_otemporal other
     class p_tropoi_otemporal_otendencies other
 ```
 

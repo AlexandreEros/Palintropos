@@ -2,6 +2,23 @@
 %% Classes that take part in an inheritance edge between analysed classes, with the functions defined in each class body.
 classDiagram
     direction LR
+    class c_tropoi_ophysics_oradiation_okdist_oCorrelatedKLongwave["CorrelatedKLongwave (physics.radiation.kdist)"]
+    c_tropoi_ophysics_oradiation_okdist_oCorrelatedKLongwave : +#95;#95;init#95;#95;()
+    c_tropoi_ophysics_oradiation_okdist_oCorrelatedKLongwave : +optical#95;properties()
+    c_tropoi_ophysics_oradiation_okdist_oCorrelatedKLongwave : +planck()
+    c_tropoi_ophysics_oradiation_okdist_oCorrelatedKLongwave : +signature()
+    c_tropoi_ophysics_oradiation_okdist_oCorrelatedKLongwave : +spectral#95;coverage()
+    class c_tropoi_ophysics_oradiation_okdist_oCorrelatedKShortwave["CorrelatedKShortwave (physics.radiation.kdist)"]
+    c_tropoi_ophysics_oradiation_okdist_oCorrelatedKShortwave : +#95;#95;init#95;#95;()
+    c_tropoi_ophysics_oradiation_okdist_oCorrelatedKShortwave : +optical#95;properties()
+    c_tropoi_ophysics_oradiation_okdist_oCorrelatedKShortwave : +signature()
+    c_tropoi_ophysics_oradiation_okdist_oCorrelatedKShortwave : +stellar#95;fractions()
+    class c_tropoi_ophysics_oradiation_okdist_o__CorrelatedK["_CorrelatedK (physics.radiation.kdist)"]
+    c_tropoi_ophysics_oradiation_okdist_o__CorrelatedK : +#95;#95;init#95;#95;()
+    c_tropoi_ophysics_oradiation_okdist_o__CorrelatedK : +#95;layer#95;k()
+    c_tropoi_ophysics_oradiation_okdist_o__CorrelatedK : +#95;signature()
+    c_tropoi_ophysics_oradiation_okdist_o__CorrelatedK : +#95;table#95;dev()
+    c_tropoi_ophysics_oradiation_okdist_o__CorrelatedK : +#95;tau()
     class c_tropoi_orepresentation_oarchive_ocapsule_oCapsuleError["CapsuleError (representation.archive.capsule)"]
     c_tropoi_orepresentation_oarchive_ocapsule_oCapsuleError : external base ValueError
     class c_tropoi_orepresentation_oarchive_ocapsule_oCapsuleLayoutError["CapsuleLayoutError (representation.archive.capsule)"]
@@ -81,6 +98,8 @@ classDiagram
     c_tropoi_ospatial_oterrain_oelevation__import_oElevationImportError : external base ValueError
     class c_tropoi_ospatial_oterrain_oheight__function_oHeightExpressionError["HeightExpressionError (spatial.terrain.height_function)"]
     class c_tropoi_ospatial_oterrain_oheight__function_oHeightFunctionError["HeightFunctionError (spatial.terrain.height_function)"]
+    c_tropoi_ophysics_oradiation_okdist_o__CorrelatedK <|-- c_tropoi_ophysics_oradiation_okdist_oCorrelatedKLongwave
+    c_tropoi_ophysics_oradiation_okdist_o__CorrelatedK <|-- c_tropoi_ophysics_oradiation_okdist_oCorrelatedKShortwave
     c_tropoi_orepresentation_oarchive_ocapsule_oCapsuleError <|-- c_tropoi_orepresentation_oarchive_ocapsule_oCapsuleLayoutError
     c_tropoi_orepresentation_oarchive_oinitial__state_oInitialStateError <|-- c_tropoi_orepresentation_oarchive_oprepared__terrain_oPreparedTerrainError
     c_tropoi_orepresentation_oarchive_oschema_oSchemaError <|-- c_tropoi_orepresentation_oarchive_oschema_oUnknownSchemaVersionError

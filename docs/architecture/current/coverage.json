@@ -69,6 +69,10 @@
       }
     ],
     "excluded": {
+      "tropoi.physics.radiation.gray.isca_mars_longwave": "gray Mars longwave optical-depth profile; no caller in the package; used by tests",
+      "tropoi.physics.radiation.gray.isca_mars_shortwave": "gray Mars shortwave optical-depth profile; no caller in the package; used by tests",
+      "tropoi.physics.radiation.gray.schneider_liu_longwave": "gray longwave optical-depth profile (Schneider & Liu 2009); no caller in the package; used by tests and tools/radiation/regimes.py",
+      "tropoi.physics.radiation.kdist.ktable_from_spectrum": "builds a correlated-k table from a user-supplied absorption function; no caller in the package; used by tests",
       "tropoi.representation.visual.atmosphere.dequantize_columns": "NumPy reference of the atmosphere page's browser-side dequantization, used by tests to bound the quantization error; no workflow starts here",
       "tropoi.representation.visual.swe.build_swe_snapshot_timeline": "exported timeline builder (alias build_swe_timeline) used directly by tests; no caller in the package",
       "tropoi.representation.visual.timeline.build_timeline_overview": "exported but used nowhere in src or tests; kept as API surface",
@@ -77,13 +81,15 @@
       "tropoi.run.held_suarez.config.legacy_production_config": "reached by name through the held_suarez.config.PRESETS registry (a dict lookup static analysis does not follow)",
       "tropoi.run.held_suarez.config.production_config": "reached by name through the held_suarez.config.PRESETS registry (a dict lookup static analysis does not follow)",
       "tropoi.run.held_suarez.config.smoke_config": "reached by name through the held_suarez.config.PRESETS registry (a dict lookup static analysis does not follow)",
+      "tropoi.run.radiative.config.earth_gray_dry": "reached by name through the run.radiative.config.PRESETS registry (a dict lookup static analysis does not follow)",
+      "tropoi.run.radiative.config.jupiter_schneider_liu": "reached by name through the run.radiative.config.PRESETS registry (a dict lookup static analysis does not follow)",
       "tropoi.spatial.optics.colour.srgb_encode": "colour helper; the sky page encodes sRGB in JavaScript, so no Python caller exists",
       "tropoi.spatial.optics.rayleigh.rayleigh_cross_section": "convenience wrapper; the sky reaches cross sections through SPECIES[...].cross_section",
       "tropoi.temporal.hooks.rk4_real_axis_limit": "numerical helper (RK4 stability limit on the real axis) used by a stability test; no workflow starts here"
     }
   },
   "discovered": {
-    "classes": 178,
+    "classes": 209,
     "cli_handlers": {
       "cli-gen": "tropoi.cli.main._cmd_gen",
       "cli-inspect": "tropoi.cli.main._cmd_inspect",
@@ -97,6 +103,18 @@
       "cli-terrain-run-prepare": "tropoi.cli.terrain.run_prepare"
     },
     "entry_point_candidates": {
+      "tropoi.physics.radiation.gray.isca_mars_longwave": [
+        "tropoi.physics.radiation.gray.isca_mars_longwave"
+      ],
+      "tropoi.physics.radiation.gray.isca_mars_shortwave": [
+        "tropoi.physics.radiation.gray.isca_mars_shortwave"
+      ],
+      "tropoi.physics.radiation.gray.schneider_liu_longwave": [
+        "tropoi.physics.radiation.gray.schneider_liu_longwave"
+      ],
+      "tropoi.physics.radiation.kdist.ktable_from_spectrum": [
+        "tropoi.physics.radiation.kdist.ktable_from_spectrum"
+      ],
       "tropoi.representation.visual.atmosphere.dequantize_columns": [
         "tropoi.representation.visual.atmosphere.dequantize_columns"
       ],
@@ -155,6 +173,12 @@
       "tropoi.run.held_suarez.config.smoke_config": [
         "tropoi.run.held_suarez.config.smoke_config"
       ],
+      "tropoi.run.radiative.config.earth_gray_dry": [
+        "tropoi.run.radiative.config.earth_gray_dry"
+      ],
+      "tropoi.run.radiative.config.jupiter_schneider_liu": [
+        "tropoi.run.radiative.config.jupiter_schneider_liu"
+      ],
       "tropoi.spatial.optics.colour.srgb_encode": [
         "tropoi.spatial.optics.colour.srgb_encode"
       ],
@@ -182,16 +206,16 @@
         "tropoi.temporal.hooks.rk4_real_axis_limit"
       ]
     },
-    "functions": 1409,
-    "modules": 145,
-    "packages": 23
+    "functions": 1609,
+    "modules": 164,
+    "packages": 26
   },
   "limits": {
     "call_sites": {
-      "builtin": 3223,
-      "external": 2223,
-      "internal": 2626,
-      "unresolved": 3143
+      "builtin": 3510,
+      "external": 2372,
+      "internal": 2854,
+      "unresolved": 3561
     },
     "dynamic_import_sites": {
       "tropoi.representation.archive.writer": 1
@@ -199,6 +223,8 @@
     "modules_excluded_from_import_graph": [
       "tropoi",
       "tropoi.cli",
+      "tropoi.physics",
+      "tropoi.physics.radiation",
       "tropoi.representation",
       "tropoi.representation.diagnostics",
       "tropoi.representation.visual",
@@ -206,6 +232,7 @@
       "tropoi.run.bve",
       "tropoi.run.held_suarez",
       "tropoi.run.pe",
+      "tropoi.run.radiative",
       "tropoi.run.swe",
       "tropoi.spatial",
       "tropoi.spatial.grids",
@@ -223,6 +250,9 @@
         "README.md"
       ],
       "tropoi.cli": [
+        "README.md"
+      ],
+      "tropoi.physics": [
         "README.md"
       ],
       "tropoi.representation": [
@@ -256,6 +286,9 @@
       ],
       "tropoi.run.pe": [
         "GUIDE.md",
+        "README.md"
+      ],
+      "tropoi.run.radiative": [
         "README.md"
       ],
       "tropoi.run.swe": [
@@ -517,10 +550,10 @@
         ]
       }
     },
-    "classes": 178,
-    "classes_in_inheritance_overview": 18,
-    "modules": 145,
-    "package_pages": 23
+    "classes": 209,
+    "classes_in_inheritance_overview": 21,
+    "modules": 164,
+    "package_pages": 26
   },
   "rules": {
     "cli_handlers": "every <parser>.set_defaults(<keyword>=<function>) handler gets calls/cli-<name>.mmd",
@@ -529,6 +562,6 @@
   },
   "scope_file": {
     "path": "docs/architecture/entry-points.toml",
-    "sha256": "20d54b5616926368336e9a7aa98abe3efbf3bd8ae34992f38fb5ae01e3193938"
+    "sha256": "e61bab516c6f6f5d7d3e23c871903da260c29206c4a66746f46398a7dbd719d7"
   }
 }
