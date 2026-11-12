@@ -158,3 +158,52 @@ produced at commit `71c5441a` on 2026-10-27, on an NVIDIA GeForce MX110.
   `results.json`.
 - **Assets:** none. The figures and browser captures combine this run with the
   others, so they live in the validation folder.
+
+## Additional preserved evidence (2026-11-12)
+
+These 24 capsules supplement the HS run 002 entry above. Every full capsule is
+in the owner's Drive collection and has been downloaded afresh and verified
+against its committed `SHA256SUMS`. `archive.json` provides the file IDs used by
+`tropoi capsule fetch <id>` and the exact Git file list. All original bytes are
+unchanged. Original dirty-worktree flags and failed/incomplete verdicts remain
+part of the evidence; preservation is not a new scientific validation.
+
+The Dinosaur entry is explicitly an **external-reference** capsule. Its pickle
+checkpoint is archived as opaque bytes, never loaded or executed by fetch/verify.
+Its large `series.npz` and `checkpoint.pkl`, the HS/radiative states/checkpoints,
+and four large R5 montage PNGs stay in Drive. Every omission is named in its
+descriptor; the older compact RH4 and orientation capsules are committed whole.
+
+The [preservation record](../validation/run_archive_2026-11-12/README.md) records
+the selection, exact sizes, source paths, verification, and config-hash matching.
+The original R3/R4 analysis bundles live with that validation record rather than
+being labelled simulation runs. The rescued W5 explorer is in its source
+capsule's `assets/w5_interactive.html`; the HS interactive-pressure page is beside
+its [cost measurements](../validation/interactive_pressure_2026-11-08/README.md).
+
+| Capsule | Evidence | Git bytes (including receipts) | Full archive bytes |
+| --- | --- | ---: | ---: |
+| `hs-T42L20-prod-001` | Held–Suarez failed B2 baseline (lagged damping), compared with passing run 002; retain the failure verdict. [Drive](https://drive.google.com/drive/folders/1wjk0yT3a_HmNCTM3e7VH2vVi0Q1CnJz9) | 1,104,925 | 240,842,357 |
+| `hs-reference-dinosaur-T42L20-001` | External Dinosaur T42L20 reference used for the HS climate comparison; not a Palintropos simulation. [Drive](https://drive.google.com/drive/folders/1vvahNZIv_6tamBW0DvH6IYEQBLuFTqWd) | 13,721 | 174,273,168 |
+| `20260712T033832Z_two-vortices_norot_r4_l21_dt10h_89985aaa` | Post-R5 non-rotating control; documents the absolute-vorticity construction correction. [Drive](https://drive.google.com/drive/folders/1wf37QDAaCVCepwrcu5xOTt5Gb0TXV4I6) | 2,370,601 | 16,914,842 |
+| `20260712T033635Z_two-vortices_rot24h_r4_l21_dt10h_89985aaa` | Post-R5 rotating baseline; documents the absolute-vorticity construction correction. [Drive](https://drive.google.com/drive/folders/1gtwGNJpGo7YCEVm4arZwioRcIttOrJ3Q) | 2,499,316 | 17,669,522 |
+| `20260712T032424Z_two-vortices_norot_r4_l21_dt10h_0b6c1351` | Pre-R5 non-rotating control; documents the absolute-vorticity construction correction. [Drive](https://drive.google.com/drive/folders/12MR88QW1NwYNc9lb8zwySVB6K2feuWbI) | 2,393,924 | 16,901,300 |
+| `20260712T023305Z_two-vortices_rot24h_r4_l21_dt10h_501bce43` | Pre-R5 rotating baseline; documents the absolute-vorticity construction correction. [Drive](https://drive.google.com/drive/folders/1yxVVAWY6qJPDgmZo14YOR8_u_HdYowVE) | 2,500,341 | 17,674,127 |
+| `20260923T225840Z_rh4_rot24h_r4_l21_dt6h_9e5d0eb1` | Additional historical RH4 validation capsule; retained with the complete validation series, without assigning it the five-day comparison claims. [Drive](https://drive.google.com/drive/folders/1VlI4JvsGsnYCvVxBMQuAxnr35IbE3z4B) | 7,452,763 | 7,446,262 |
+| `20260717T004614Z_rh4_rot24h_r4_l21_dt6h_bb87c06a` | Additional historical RH4 validation capsule; retained with the complete validation series, without assigning it the five-day comparison claims. [Drive](https://drive.google.com/drive/folders/1TWVeD41WORgiGTykcblYVw8CgH6sYVRn) | 4,560,960 | 4,557,568 |
+| `20260717T004524Z_rh4_rot24h_r4_l21_dt6h_bb87c06a` | Additional historical RH4 validation capsule; retained with the complete validation series, without assigning it the five-day comparison claims. [Drive](https://drive.google.com/drive/folders/1IXvhfcPlxJ5AJWZ0gtfQPrwEmdRoYgUq) | 4,560,661 | 4,557,269 |
+| `20260713T022542Z_rh4_rot24h_r4_l21_dt6h_4a840226` | One-day geodesic RH4 source of the published backend-comparison figure (not the five-day matched-timestep experiment). [Drive](https://drive.google.com/drive/folders/1_g1OWLCVW2-QcyRoFclxg-vZV2UM6-pE) | 4,561,526 | 4,558,134 |
+| `20260713T022748Z_rh4_rot24h_r4_l21_dt6h_4a840226` | One-day Gauss lat–lon RH4 partner of the published backend-comparison figure. [Drive](https://drive.google.com/drive/folders/1_cO4tfpshNd0HfS0LdT2MkPSaYEtsxKS) | 4,392,248 | 4,388,852 |
+| `20260712T080551Z_rh4_rot24h_r4_l21_dt6h_0678ac18` | Post-R3 RH4 CLI smoke named in the fine-product-grid characterization. [Drive](https://drive.google.com/drive/folders/143avDu8dpldaSvdBPM462f7r0OCcqfLf) | 4,561,828 | 4,558,442 |
+| `20260713T024914Z_two-vortices-equator-90e_norot_r4_l21_dt12h_4a840226` | Non-rotating orientation comparison, explicitly cited by VALIDATION.md and the legacy figure provenance. [Drive](https://drive.google.com/drive/folders/1T9xnzE0M_e6Dz4KqSBIAVBujmAT01rgG) | 3,117,864 | 3,114,379 |
+| `20260713T024900Z_two-vortices-equator-0e_norot_r4_l21_dt12h_4a840226` | Non-rotating orientation comparison, explicitly cited by VALIDATION.md and the legacy figure provenance. [Drive](https://drive.google.com/drive/folders/1FJXCauK1m87UaWkPIj5iWV80egPiGviW) | 3,115,205 | 3,111,724 |
+| `20260713T024849Z_two-vortices-north-pole_norot_r4_l21_dt12h_4a840226` | Non-rotating orientation comparison, explicitly cited by VALIDATION.md and the legacy figure provenance. [Drive](https://drive.google.com/drive/folders/1g_lzQ9xzBaB5x_cY2-MRAoIIBdZB1j-Q) | 1,550,066 | 1,546,587 |
+| `20260713T044053Z_two-vortices-equator-90e_rot24h_r4_l21_dt24h_4a840226` | Rotating orientation comparison, explicitly cited by VALIDATION.md and the legacy figure provenance. [Drive](https://drive.google.com/drive/folders/1huDUL6l-Q0pMDhgK6lw8FiEiHNSznIVY) | 5,276,305 | 5,272,813 |
+| `20260713T044027Z_two-vortices-equator-0e_rot24h_r4_l21_dt24h_4a840226` | Rotating orientation comparison, explicitly cited by VALIDATION.md and the legacy figure provenance. [Drive](https://drive.google.com/drive/folders/1x4JNWglgnKwMw98M9n01KE6agASWMmd1) | 5,234,448 | 5,230,960 |
+| `20260713T044006Z_two-vortices-north-pole_rot24h_r4_l21_dt24h_4a840226` | Rotating orientation comparison, explicitly cited by VALIDATION.md and the legacy figure provenance. [Drive](https://drive.google.com/drive/folders/1jCNd2x29r4GEkictaeyNdA19KHAsbfaI) | 2,399,116 | 2,395,629 |
+| `earth-gray-dry-T21L25-b2b8ea2` | Completed 300-day Earth gray-radiation baseline before dissipative heating. [Drive](https://drive.google.com/drive/folders/1c7uqL8Y5Wegg1JPqqFnmNqW7rpsOuRLp) | 180,061 | 22,872,407 |
+| `jupiter-sl09-T21L30-b2b8ea2` | Completed 200-day Jupiter gray-radiation baseline before dissipative heating. [Drive](https://drive.google.com/drive/folders/1R5mbp1WfvmiKuV6tSWScdz5Vu9-sh0C4) | 127,507 | 18,835,779 |
+| `earth-gray-dry-heated-T21L25-d38d2a3` | Completed 300-day heated Earth run on MX110; energy-budget correction comparison. [Drive](https://drive.google.com/drive/folders/1ndQqRmVulKjmJyh70aG92nEmABnXNuKI) | 180,809 | 22,874,896 |
+| `earth-gray-dry-heated-T21L25-d38d2a3-colab` | Completed heated Earth run on Colab T4; cross-hardware and checkpoint-resume evidence. [Drive](https://drive.google.com/drive/folders/1WYOLLDPrEs5zUmi4okbNsgtru3FiWVbm) | 209,321 | 22,901,845 |
+| `earth-gray-dry-T21L25` | Earlier 30-day Earth development run, explicitly published as partial evidence; not the later 300-day run. [Drive](https://drive.google.com/drive/folders/1xZMOPpGXDcACwQOB1n_1YDmcj6mDJ13D) | 21,802 | 4,635,034 |
+| `jupiter-sl09-heated-T21L30-d38d2a3-colab` | Completed heated Jupiter run on Colab T4; checkpoint-resume evidence. [Drive](https://drive.google.com/drive/folders/1SMmZ1M7K05E6g5on0eRWyTMhXHPGWMO7) | 131,397 | 18,839,186 |

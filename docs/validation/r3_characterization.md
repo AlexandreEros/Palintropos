@@ -6,6 +6,12 @@ the cited commit + script; run IDs embed their commit hashes.
 
 ## Commit trail
 
+**Archive update (2026-11-12):** the five capsules listed below are now indexed
+under [published runs](../runs/README.md#additional-preserved-evidence-2026-11-12).
+The [preservation record](run_archive_2026-11-12/README.md) also retains the
+`r3-product` and `r4-convergence` analysis bundles, with full checksums and verified
+Drive copies. The historical measurements and qualifications below are unchanged.
+
 | commit | branch | content |
 |---|---|---|
 | `438f6bf` | `char/dt-convergence-r4` | fixed-dt sweep (dt, dt/2, dt/4): RK4 order nominal, conservation floor dt-independent → R-3 before R-4 |

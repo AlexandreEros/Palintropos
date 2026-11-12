@@ -1,0 +1,145 @@
+{
+  "schema_version": 1,
+  "provider": "google-drive",
+  "kind": "palintropos-run",
+  "folder_url": "https://drive.google.com/drive/folders/1R5mbp1WfvmiKuV6tSWScdz5Vu9-sh0C4",
+  "collection_url": "https://drive.google.com/drive/folders/1Yjig-jolvU15gvCqTq-19kyjCbJi9iX1",
+  "original_local_path": "runs/radiative/jupiter-sl09-T21L30-b2b8ea2",
+  "provenance_note": "Original local bytes preserved unchanged; full copy in the owner's November 12 bulk upload. Scientific conclusions retain the qualifications of their original validation records.",
+  "included_files": [
+    "config.json",
+    "events.jsonl",
+    "means.npz",
+    "series.json"
+  ],
+  "omitted_files": {
+    "checkpoints/checkpoint-s000013680.npz": "Full state/checkpoint data retained in the external archive.",
+    "checkpoints/checkpoint-s000014400.npz": "Full state/checkpoint data retained in the external archive.",
+    "states/state-d00010.npy": "Full state/checkpoint data retained in the external archive.",
+    "states/state-d00020.npy": "Full state/checkpoint data retained in the external archive.",
+    "states/state-d00030.npy": "Full state/checkpoint data retained in the external archive.",
+    "states/state-d00040.npy": "Full state/checkpoint data retained in the external archive.",
+    "states/state-d00050.npy": "Full state/checkpoint data retained in the external archive.",
+    "states/state-d00060.npy": "Full state/checkpoint data retained in the external archive.",
+    "states/state-d00070.npy": "Full state/checkpoint data retained in the external archive.",
+    "states/state-d00080.npy": "Full state/checkpoint data retained in the external archive.",
+    "states/state-d00090.npy": "Full state/checkpoint data retained in the external archive.",
+    "states/state-d00100.npy": "Full state/checkpoint data retained in the external archive.",
+    "states/state-d00110.npy": "Full state/checkpoint data retained in the external archive.",
+    "states/state-d00120.npy": "Full state/checkpoint data retained in the external archive.",
+    "states/state-d00130.npy": "Full state/checkpoint data retained in the external archive.",
+    "states/state-d00140.npy": "Full state/checkpoint data retained in the external archive.",
+    "states/state-d00150.npy": "Full state/checkpoint data retained in the external archive.",
+    "states/state-d00160.npy": "Full state/checkpoint data retained in the external archive.",
+    "states/state-d00170.npy": "Full state/checkpoint data retained in the external archive.",
+    "states/state-d00180.npy": "Full state/checkpoint data retained in the external archive.",
+    "states/state-d00190.npy": "Full state/checkpoint data retained in the external archive.",
+    "states/state-d00200.npy": "Full state/checkpoint data retained in the external archive."
+  },
+  "files": {
+    "checkpoints/checkpoint-s000013680.npz": {
+      "drive_id": "1O-ah8C9W_C-mpKqrce8SvYcLIpoZf97I",
+      "size": 1652899
+    },
+    "checkpoints/checkpoint-s000014400.npz": {
+      "drive_id": "1P1kUWkiHJJ3Izh7Ypy5P302T1v7EcV-R",
+      "size": 1656451
+    },
+    "config.json": {
+      "drive_id": "1puqkIaT-diTXLpiKuMF-Zpvk6jusPkhF",
+      "size": 2832
+    },
+    "events.jsonl": {
+      "drive_id": "1c6xnkd0mm9QSzTu7qt_AOZSB8oLx1ZYx",
+      "size": 2908
+    },
+    "means.npz": {
+      "drive_id": "1zalIosNdQFF20U4_CSBc0FcUeDPW8ShG",
+      "size": 42132
+    },
+    "series.json": {
+      "drive_id": "1wEokxfDnr-eqdc7atGdLJSnHN7ns3dSp",
+      "size": 71517
+    },
+    "states/state-d00010.npy": {
+      "drive_id": "1ecfl98keJ-sTyTmsyhoiXwKzTfZOLGJh",
+      "size": 770352
+    },
+    "states/state-d00020.npy": {
+      "drive_id": "135hvWz5Ot8wlIk60TRCphnJNlz8pcPVv",
+      "size": 770352
+    },
+    "states/state-d00030.npy": {
+      "drive_id": "1HTLa1tPROpzANAmn82HHt8digyyDK7R7",
+      "size": 770352
+    },
+    "states/state-d00040.npy": {
+      "drive_id": "1a4RQ4BbEzc6gaBBJfadDOVRxQvfZTVIA",
+      "size": 770352
+    },
+    "states/state-d00050.npy": {
+      "drive_id": "1v-W6kU6jk-EFfPsr4toxOOpk2f1dlzUj",
+      "size": 770352
+    },
+    "states/state-d00060.npy": {
+      "drive_id": "1Lq-I2Efgvpd5Wx_8WuTCMx3qitCmG8XP",
+      "size": 770352
+    },
+    "states/state-d00070.npy": {
+      "drive_id": "1Txd1okyaCtO1-f5DYfQYCUu6fbdv0R6p",
+      "size": 770352
+    },
+    "states/state-d00080.npy": {
+      "drive_id": "1Ep9orXShI_4H-WJlJ_9eztTBZzYqqEBY",
+      "size": 770352
+    },
+    "states/state-d00090.npy": {
+      "drive_id": "11aGnEN2EcJnXR250Hg7S7nQrHWfSIjJ-",
+      "size": 770352
+    },
+    "states/state-d00100.npy": {
+      "drive_id": "1x9Jufrmar4G5QzRcjFHJPl-RVr4tQCoM",
+      "size": 770352
+    },
+    "states/state-d00110.npy": {
+      "drive_id": "1imbsT6fO5luRXI40Zqg9fP1sx9gwK70p",
+      "size": 770352
+    },
+    "states/state-d00120.npy": {
+      "drive_id": "18AQjtK9vJsBjnd_Oepp7R9i9erYsw-4m",
+      "size": 770352
+    },
+    "states/state-d00130.npy": {
+      "drive_id": "158oVM-ybcavwfQc7bpqtKvE3OqgFWyLO",
+      "size": 770352
+    },
+    "states/state-d00140.npy": {
+      "drive_id": "1RbZuGOfj8oH_30MSm00Sw9ZgbS4Va8bm",
+      "size": 770352
+    },
+    "states/state-d00150.npy": {
+      "drive_id": "1ri7PGp28-fS6EIkVdaKLP-RFgmRKwreF",
+      "size": 770352
+    },
+    "states/state-d00160.npy": {
+      "drive_id": "14-Pv-x8hEMFeTiK6f55eyzTdSQSlmpPl",
+      "size": 770352
+    },
+    "states/state-d00170.npy": {
+      "drive_id": "1ipPpoEF6dqXlKoMowik25xS4_sQCTDyL",
+      "size": 770352
+    },
+    "states/state-d00180.npy": {
+      "drive_id": "1fWwWPCBDxiGlXAB7TzLaCwVZ1nqj6VdS",
+      "size": 770352
+    },
+    "states/state-d00190.npy": {
+      "drive_id": "1YtOLYYLddavyLqzM6VTyQCJquDoVj6ze",
+      "size": 770352
+    },
+    "states/state-d00200.npy": {
+      "drive_id": "1os1d5qkf6edUoUB7FFEaLDd8YTkhqvFx",
+      "size": 770352
+    }
+  }
+}

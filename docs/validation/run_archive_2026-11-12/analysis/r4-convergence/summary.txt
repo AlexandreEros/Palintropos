@@ -1,0 +1,61 @@
+# R-4 vs R-3 attribution — dt-convergence characterization
+
+config: res=4, l_max=21, day_hours=24.0, IC=rh4, viscosity=0
+horizon: T = 5.0 days = 432000 s (5.000 planet rotations)
+base CFL dt (from initial state) = 2207.5 s
+
+  dt_scale  N steps     dt (s)   wall (s)   ms/step
+      1.00      196     2204.1       8.79      44.9
+      0.50      392     1102.0      17.69      45.1
+      0.25      784      551.0      34.62      44.2
+
+Energy drift (E(t)-E(0))/|E(0)| at aligned sample times:
+ t/days         dt*1.00         dt*0.50         dt*0.25
+   0.00     +0.0000e+00     +0.0000e+00     +0.0000e+00
+   1.25     -3.6411e-03     -3.6411e-03     -3.6411e-03
+   2.50     -3.6901e-03     -3.6901e-03     -3.6901e-03
+   3.75     -1.7776e-04     -1.7775e-04     -1.7775e-04
+   5.00     -2.6423e-03     -2.6423e-03     -2.6423e-03
+
+Absolute-enstrophy drift (Zabs(t)-Zabs(0))/Zabs(0):
+ t/days         dt*1.00         dt*0.50         dt*0.25
+   0.00     +0.0000e+00     +0.0000e+00     +0.0000e+00
+   1.25     -7.9521e-04     -7.9521e-04     -7.9521e-04
+   2.50     -7.8746e-04     -7.8746e-04     -7.8746e-04
+   3.75     -2.2429e-05     -2.2428e-05     -2.2428e-05
+   5.00     -6.3681e-04     -6.3681e-04     -6.3681e-04
+
+l=1 energy at final time (rotating solid-body content):
+  dt*1.00:  E_l1(0)=4.2408e+17  E_l1(T)=4.2446e+17  ratio=1.000917
+  dt*0.50:  E_l1(0)=4.2408e+17  E_l1(T)=4.2446e+17  ratio=1.000917
+  dt*0.25:  E_l1(0)=4.2408e+17  E_l1(T)=4.2446e+17  ratio=1.000917
+
+Trajectory L2 (coefficient norm) differences at t=T:
+  ||zeta(dt)   - zeta(dt/4)||_2 = 8.5892e-11 (9.950e-07 rel to ||zeta_ref||)
+  ||zeta(dt/2) - zeta(dt/4)||_2 = 5.0648e-12 (5.867e-08 rel)
+  ratio (dt / dt-half) = 16.958
+  observed order p = log2(ratio) = 4.084
+
+Verdict
+------------------------------------------------------------
+Test A (temporal order): observed p = 4.08  (RK4 ideal ~4 achieved)
+Test B (conservation floor):
+  final |E drift|  dt/dt/2/dt/4:  2.642e-03  2.642e-03  2.642e-03   shrink 1.00x, 1.00x
+  final |Za drift| dt/dt/2/dt/4:  6.368e-04  6.368e-04  6.368e-04   shrink 1.00x, 1.00x
+Trajectory sensitivity to dt: ||dt run - dt/4 run||/||ref|| = 9.95e-07
+vs invariant drift ~ 2.64e-03 -> ratio 2655.5x  (temporal error is small vs the conservation error)
+
+RECOMMENDATION: fix R-3 next.
+RK4 achieves its nominal order (temporal integration is fine), but
+halving dt does NOT reduce the invariant drift -- the drift is at
+its spatial-error floor. Further dt shrinkage or adaptive stepping
+(R-4) would not improve conservation; the binding constraint is the
+pseudospectral product's truncation-only 'dealiasing' (R-3), whose
+aliasing does not shrink with dt.
+
+
+CORRECTION (2026-07-12, char/r3-product-aliasing): the three-level order
+estimator above used p = log2(R); the correct estimator for a shared-finest
+comparison is p = log2(R - 1) since R = d1/dh = 2^p + 1.
+  R = 16.958  ->  p = log2(R-1) = 3.996  (previously reported 4.084)
+Conclusion unchanged: p ~= 4.0 (RK4 nominal), conservation floor dt-independent.

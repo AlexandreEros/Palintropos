@@ -1,0 +1,75 @@
+{
+  "schema_version": 1,
+  "provider": "google-drive",
+  "kind": "palintropos-run",
+  "folder_url": "https://drive.google.com/drive/folders/1yxVVAWY6qJPDgmZo14YOR8_u_HdYowVE",
+  "collection_url": "https://drive.google.com/drive/folders/1Yjig-jolvU15gvCqTq-19kyjCbJi9iX1",
+  "original_local_path": "runs/20260712T023305Z_two-vortices_rot24h_r4_l21_dt10h_501bce43",
+  "provenance_note": "Original local bytes preserved unchanged; full copy in the owner's November 12 bulk upload. Scientific conclusions retain the qualifications of their original validation records.",
+  "included_files": [
+    "bve_summary.png",
+    "config.json",
+    "diagnostics/spectra.npz",
+    "diagnostics/timeseries.csv",
+    "figures/cfl_history.png",
+    "figures/invariant_drift.png",
+    "figures/spectra.png",
+    "figures/spectral_health.png",
+    "manifest.json",
+    "vorticity_coeffs.npy",
+    "vorticity_grid.npy"
+  ],
+  "omitted_files": {
+    "two_vortices_t0.00h-240.00h-10.00h.png": "Large all-time montage retained externally; coefficients, diagnostics and compact figures are in Git."
+  },
+  "files": {
+    "bve_summary.png": {
+      "drive_id": "1cCEO_8to1Q7_QnlZn51AMVEnHXyzu6_h",
+      "size": 1391468
+    },
+    "config.json": {
+      "drive_id": "1o20tya0UkX3XMv3E13DznhvhldCbMLOj",
+      "size": 367
+    },
+    "diagnostics/spectra.npz": {
+      "drive_id": "1PhQuuZPzznsr-IOyjz4g819RzzjtLayF",
+      "size": 5446
+    },
+    "diagnostics/timeseries.csv": {
+      "drive_id": "1ntfL9MvlFat5RuDZNo_pxF9OsGCVtNdH",
+      "size": 30825
+    },
+    "figures/cfl_history.png": {
+      "drive_id": "1yna-ARB54zd1wKh8GmKG-uriRR5mREFa",
+      "size": 112596
+    },
+    "figures/invariant_drift.png": {
+      "drive_id": "13At-R6MZm-GkYNDfkzZED-77Giu1oz8S",
+      "size": 67765
+    },
+    "figures/spectra.png": {
+      "drive_id": "1TayEcgNrWfauAFUQ2BIhvC6NrY9VZLh4",
+      "size": 141396
+    },
+    "figures/spectral_health.png": {
+      "drive_id": "1doknoCWPN0nOKwy1RqZWdXwoqYJgcmhk",
+      "size": 39340
+    },
+    "manifest.json": {
+      "drive_id": "1fyaldy6_4hlPhQ8X5X32Hu-d8s1-kVR_",
+      "size": 1352
+    },
+    "two_vortices_t0.00h-240.00h-10.00h.png": {
+      "drive_id": "1EA1-4wc4ihy3sOAKx5prQmh4Sp3eL8bV",
+      "size": 15177316
+    },
+    "vorticity_coeffs.npy": {
+      "drive_id": "1M9oh5eyvpd9wk1H7j0mD2AlagOY03hi_",
+      "size": 193728
+    },
+    "vorticity_grid.npy": {
+      "drive_id": "1Der5gVJ6e4ub-uQSfgSJ6rGBxa43_1DG",
+      "size": 512528
+    }
+  }
+}
