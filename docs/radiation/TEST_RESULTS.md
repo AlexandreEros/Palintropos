@@ -90,6 +90,43 @@ The full suite was **not** rerun at `d38d2a3`. The change touches
 `run/radiative/`; with the option off the stepper receives the same terms as
 before, and the only behavioural change is the extra slab step at startup.
 
+## Full suite on Linux/CUDA at `341acfe` (2026-11-12, Colab Tesla T4)
+
+Run by the repository owner with `notebooks/Palintropos-Colab-CUDA-Regression.ipynb`
+on a clone of `341acfeb9e9331d3a9a53e0eecceb966177cebf4`. Counts below were
+re-read from the run's JUnit report and `result.json`.
+
+| | |
+| --- | --- |
+| Command | `python -m pytest -q -ra --durations=20` (no marker filter: routine and slow together) |
+| Result | **1624 passed, 39 skipped, 0 failed, 0 errors, 0 deselected** in 23 min 55 s |
+| GPU | Tesla T4 (15 GB), driver 580.82.07, CUDA runtime 13.0 |
+| Software | Linux (glibc 2.39), Python 3.13.16, CuPy 14.0.1, NumPy 2.2.6, SciPy 1.16.3, pytest 8.4.2 |
+
+- All 16 tests of `tests/test_radiative_dynamical.py` passed, including the
+  coupled budget with resume and both frictional-heating criteria.
+- The four `slow` convergence tests passed (336, 227, 227 and 66 s).
+- No test skipped for want of CUDA. The 39 skips:
+
+| Skips | Reason |
+| ---: | --- |
+| 17 | browser tests: no Chrome, Chromium or Edge on the machine |
+| 17 | need run directories or capsules that exist only on the development machine (saved-run compatibility, overview, plotting and provenance tests; one Held–Suarez view test) |
+| 4 | executed inside `test_canonical_t63_checks_run_in_a_fresh_cuda_context`, which passed; pytest reports the four in-process copies as skipped |
+| 1 | the 15-day Williamson 5 acceptance run, opt-in through `TROPOI_W5_ACCEPTANCE=1` |
+
+`341acfe` is the head of the branch at the time of writing, and the only
+commits after the batching change `814bcf8` are documentation and evidence,
+so the solver and the tests run here are the ones on the branch.
+
+What this is and is not: Linux/CUDA evidence with CuPy 14.0.1 and
+Python 3.13, the repository's NumPy and SciPy pins, and Colab's CuPy. It is
+not a run of the pinned `cupy-cuda11x==13.4.0` / Python 3.12 environment. On
+Windows in that environment the full suite was last run at `b2b8ea2`, the
+radiative files at `d38d2a3` (82 targeted tests), and after `814bcf8` only
+the three frictional-heating tests and the guards. The browser tests and the
+17 data-dependent tests have not run at this head on any machine.
+
 ## Not tested at all
 
 - `temporal/tendencies/drag.py` has no dedicated test (it runs inside the
