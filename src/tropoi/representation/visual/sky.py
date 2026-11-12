@@ -217,6 +217,11 @@ class SkySpec:
         if not isinstance(self.star, ApparentStar):
             raise TypeError("star must be an ApparentStar (a temperature and "
                             "an angular radius; Star.seen_from gives one)")
+        if self.star.spectrum is not None:
+            raise ValueError(
+                "the sky page renders the star as a blackbody at its "
+                "temperature; a supplied spectrum object is not exported to "
+                "the page and would be silently replaced, so it is refused")
         if self.altitude_m is not None and self.pressure_pa is not None:
             raise ValueError("give altitude_m or pressure_pa, not both")
         if (self.observer_lat_deg is None) != (self.observer_lon_deg is None):

@@ -111,14 +111,18 @@ class StellarIllumination:
     def from_components(cls, star: Star, orbit: KeplerOrbit,
                         rotation: Rotation, *,
                         gravitational_parameter: float | None = None,
-                        time_of_periapsis: float = 0.0,
+                        time_of_periapsis: float | None = None,
                         irradiance_at_semimajor: float | None = None
                         ) -> "StellarIllumination":
         """Combine the shared objects. The period comes from Kepler's third
         law with ``mu`` taken from ``gravitational_parameter`` or the star's
         mass; the irradiance at r = a from the star's luminosity, unless a
         measured value is stated explicitly (then the stated value wins and
-        the star's luminosity is provenance only)."""
+        the star's luminosity is provenance only). By default the timing
+        honours the orbit's epoch (``true_anomaly_epoch_rad``: the planet is
+        there at t = 0, so ``flux_at(t)`` agrees with
+        ``orbit.radius_at_time(t)``); an explicit ``time_of_periapsis``
+        overrides it."""
         mu = gravitational_parameter
         if mu is None:
             mu = star.gravitational_parameter
@@ -130,7 +134,13 @@ class StellarIllumination:
         s = (star.irradiance_at(orbit.semimajor_axis_m)
              if irradiance_at_semimajor is None
              else float(irradiance_at_semimajor))
-        return cls(s, orbit.period(mu), orbit.eccentricity,
+        period = orbit.period(mu)
+        if time_of_periapsis is None:
+            # Mean anomaly M0 at t = 0 means the last periapsis passage was
+            # M0 / n before the epoch.
+            time_of_periapsis = (-orbit.mean_anomaly_epoch_rad * period
+                                 / (2.0 * math.pi))
+        return cls(s, period, orbit.eccentricity,
                    rotation.obliquity_rad,
                    orbit.periapsis_longitude_rad
                    - rotation.equinox_longitude_rad,

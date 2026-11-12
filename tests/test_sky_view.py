@@ -361,6 +361,13 @@ def test_spec_refusals():
         sky.SkySpec(AIR, observer_lat_deg=10.0)
     with pytest.raises(ValueError, match="exposure_reference_cd_m2 > 0"):
         _hyp_spec(exposure_mode="fixed")
+    # A star carrying a supplied spectrum is refused: the page always
+    # renders a blackbody, so the spectrum would be silently replaced.
+    class Flat:
+        def radiance(self, wavelength_nm):
+            return wavelength_nm
+    with pytest.raises(ValueError, match="spectrum"):
+        _hyp_spec(star=ApparentStar(3200.0, 0.87, spectrum=Flat()))
     with pytest.raises(ValueError, match="'auto' uses"):
         _hyp_spec(exposure_reference_cd_m2=100.0)
     with pytest.raises(ValueError, match="exposure_mode"):

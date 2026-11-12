@@ -323,6 +323,26 @@ def test_illumination_from_components_matches_the_prescribed_form():
         StellarIllumination.from_components(STARS["sirius_a"], orbit, rotation)
 
 
+def test_illumination_honours_the_orbits_epoch():
+    # An orbit stated at apoapsis (nu_0 = pi): the illumination's flux at any
+    # time must agree with the star's irradiance at the orbit's own position.
+    sun = STARS["sun"]
+    orbit = KeplerOrbit.from_au(1.0, eccentricity=0.3,
+                                true_anomaly_epoch_rad=math.pi)
+    rotation = Rotation.of(7.292115e-5)
+    ill = StellarIllumination.from_components(sun, orbit, rotation)
+    mu = sun.gravitational_parameter
+    for t in (0.0, 0.25 * ill.period_s, 0.6 * ill.period_s):
+        r = orbit.radius_at_time(t, gravitational_parameter=mu)
+        assert ill.flux_at(t) == pytest.approx(sun.irradiance_at(r), rel=1e-9)
+    # An explicit time_of_periapsis still overrides the orbit's epoch.
+    forced = StellarIllumination.from_components(sun, orbit, rotation,
+                                                 time_of_periapsis=0.0)
+    assert forced.time_of_periapsis_s == 0.0
+    assert forced.flux_at(0.0) == pytest.approx(
+        forced.irradiance_at_semimajor / (1.0 - 0.3) ** 2, rel=1e-12)
+
+
 def test_forcing_conventions_are_preserved():
     ill = StellarIllumination.prescribed(1000.0, 100.0, 0.3, 25.0, 90.0)
     # at perihelion (t = 0): flux = S / (1 - e)^2
