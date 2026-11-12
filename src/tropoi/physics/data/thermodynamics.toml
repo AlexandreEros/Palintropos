@@ -1,0 +1,62 @@
+# Thermodynamic property records: what the rigid-rotor/harmonic-oscillator
+# heat-capacity model (tropoi.physics.thermodynamics) needs per species.
+#
+# rotational_dof: 0 (atom), 2 (linear molecule) or 3 (nonlinear molecule).
+# vibrations_cm: fundamental wavenumbers in cm^-1, one entry per degenerate
+# mode. quantum_rotor_theta_k (H2 only): the rotational characteristic
+# temperature in K; its rotational heat capacity is then summed explicitly
+# over ortho and para levels instead of the classical value.
+#
+# Provenance: the vibrational fundamentals are the usual spectroscopic
+# values, carried over unchanged from the module that introduced them
+# (tropoi.physics.thermodynamics, PR #29); NH3's inversion doubling is
+# ignored (RRHO). Measured agreement of the resulting c_p with reference
+# 298.15 K values is asserted in tests/test_physics_thermodynamics.py.
+
+schema = "palintropos.thermodynamics/1"
+source = "fundamental wavenumbers: usual spectroscopic values as introduced with the gray-radiation foundation (PR #29); H2 theta_rot = 85.3 K"
+
+[species.H2]
+rotational_dof = 2
+vibrations_cm = [4161.2]
+quantum_rotor_theta_k = 85.3
+
+[species.He]
+rotational_dof = 0
+vibrations_cm = []
+
+[species.Ar]
+rotational_dof = 0
+vibrations_cm = []
+
+[species.N2]
+rotational_dof = 2
+vibrations_cm = [2329.9]
+
+[species.O2]
+rotational_dof = 2
+vibrations_cm = [1556.4]
+
+[species.CO]
+rotational_dof = 2
+vibrations_cm = [2143.3]
+
+[species.CO2]
+rotational_dof = 2
+vibrations_cm = [667.4, 667.4, 1333.0, 2349.1]
+
+[species.H2O]
+rotational_dof = 3
+vibrations_cm = [1594.7, 3657.1, 3755.9]
+
+[species.CH4]
+rotational_dof = 3
+vibrations_cm = [1306.0, 1306.0, 1306.0, 1534.0, 1534.0, 2916.5, 3019.5, 3019.5, 3019.5]
+
+[species.NH3]
+rotational_dof = 3
+vibrations_cm = [950.0, 1627.0, 1627.0, 3337.0, 3444.0, 3444.0]
+
+[species.SO2]
+rotational_dof = 3
+vibrations_cm = [517.7, 1151.4, 1362.0]

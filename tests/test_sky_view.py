@@ -22,16 +22,20 @@ import sys
 import numpy as np
 import pytest
 
-from tropoi.spatial.optics import (COMPOSITION_PRESETS, SPECIES,
-                                   AtmosphericColumn, ColumnError,
-                                   Composition, CompositionError, Star,
-                                   gas_constant_report)
-from tropoi.spatial.optics.colour import (CIE_SHA256, bin_weights, cie_1931,
-                                          omitted_fraction)
-from tropoi.spatial.optics.constants import K_B, R_MOLAR
+from tropoi.physics.column import (AtmosphericColumn, ColumnError,
+                                   thin_atmosphere_mass_kg,
+                                   thin_atmosphere_surface_pressure_pa)
+from tropoi.physics.composition import (COMPOSITIONS, Composition,
+                                        CompositionError, gas_constant_report)
+from tropoi.physics.constants import K_B, R_UNIVERSAL
+from tropoi.physics.rayleigh import (OPTICS, composition_cross_section,
+                                     optical_records)
+from tropoi.physics.star import ApparentStar
+from tropoi.representation.visual.colour import (CIE_SHA256, bin_weights,
+                                                 cie_1931, omitted_fraction)
 from tropoi.representation.visual import sky
 
-AIR = COMPOSITION_PRESETS["earth_dry_air_illustrative"]
+AIR = COMPOSITIONS["earth_dry_air_illustrative"]
 REPO = pathlib.Path(__file__).resolve().parents[1]
 
 
@@ -39,13 +43,13 @@ REPO = pathlib.Path(__file__).resolve().parents[1]
 
 def test_cross_sections_positive_and_refuse_extrapolation():
     lam = sky.WAVELENGTHS_NM
-    for name, species in SPECIES.items():
-        s = species.cross_section(lam)
+    for name, records in OPTICS.items():
+        s = records[0].cross_section(lam)
         assert np.all(s > 0) and np.all(np.diff(s) < 0), name   # falls with lambda
         with pytest.raises(ValueError, match="measured range"):
-            species.cross_section([2000.0])      # beyond every record
+            records[0].cross_section([2000.0])      # beyond every record
     with pytest.raises(ValueError, match="measured range"):
-        SPECIES["N2"].cross_section([390.0])
+        optical_records("N2")[0].cross_section([390.0])
     with pytest.raises(ValueError, match="no optical data"):
         sky.SkySpec(Composition.of(He=1.0))
 
@@ -55,18 +59,18 @@ def test_cross_section_scales_as_inverse_square_reference_density():
     # to twice the density means a quarter of the cross section, so the
     # recorded measurement conditions matter and are carried with the data.
     import dataclasses
-    n2 = SPECIES["N2"]
+    n2 = optical_records("N2")[0]
     s0 = n2.cross_section(550.0)
     twice = dataclasses.replace(n2, ref_pressure_pa=2 * n2.ref_pressure_pa)
     assert float(twice.cross_section(550.0)) == pytest.approx(float(s0) / 4)
 
 
 def test_every_species_records_its_sources_and_checked_king_factor():
-    for species in SPECIES.values():
-        text = species.describe()
+    for records in OPTICS.values():
+        text = records[0].describe()
         assert "refractiveindex.info" in text and "Bates (1984)" in text
         assert "eqs. 5-6" in text
-        assert species.king_verified is True
+        assert records[0].king_verified is True
         assert "not yet checked" not in text
 
 
@@ -75,15 +79,15 @@ def test_king_factors_are_those_printed_by_bodhaine_1999():
     # printed: eq. 5 F(N2) = 1.034 + 3.17e-4 / lambda^2, eq. 6 F(O2) = 1.096
     # + 1.385e-3 / lambda^2 + 1.448e-4 / lambda^4, then "F(Ar) = 1.00,
     # F(CO2) = 1.15" (checked against the paper 2026-11-07).
-    assert SPECIES["N2"].king == (1.034, 3.17e-4, 0.0)
-    assert SPECIES["O2"].king == (1.096, 1.385e-3, 1.448e-4)
-    assert SPECIES["Ar"].king == (1.0, 0.0, 0.0)
-    assert SPECIES["CO2"].king == (1.15, 0.0, 0.0)
+    assert optical_records("N2")[0].king == (1.034, 3.17e-4, 0.0)
+    assert optical_records("O2")[0].king == (1.096, 1.385e-3, 1.448e-4)
+    assert optical_records("Ar")[0].king == (1.0, 0.0, 0.0)
+    assert optical_records("CO2")[0].king == (1.15, 0.0, 0.0)
 
     # lambda in micrometres: the paper's eq. 23 for 360 ppm CO2 air
     # reproduces its Fig. 1 (about 1.080 at 0.2 um, 1.047 at 1 um)
     def f_air(um):
-        n2, o2 = (SPECIES[k].king_factor(um) for k in ("N2", "O2"))
+        n2, o2 = (optical_records(k)[0].king_factor(um) for k in ("N2", "O2"))
         return float((78.084 * n2 + 20.946 * o2 + 0.934 * 1.00
                       + 0.036 * 1.15) / (78.084 + 20.946 + 0.934 + 0.036))
     assert f_air(0.2) == pytest.approx(1.080, abs=1.5e-3)
@@ -98,14 +102,14 @@ def test_dry_air_cross_section_agrees_with_bodhaine_eq_29():
     um = lam / 1000.0
     eq29 = ((1.0455996 - 341.29061 * um ** -2 - 0.90230850 * um ** 2)
             / (1 + 0.0027059889 * um ** -2 - 85.968563 * um ** 2)) * 1e-32
-    rel = AIR.cross_section(lam) / eq29 - 1.0
+    rel = composition_cross_section(AIR, lam) / eq29 - 1.0
     # measured 2026-11-07: -0.094 % .. -0.054 % over 410-750 nm
     assert np.max(np.abs(rel)) < 1.5e-3
 
 
 def test_cie_table_is_the_verbatim_cie_dataset():
-    raw = (pathlib.Path(sky.__file__).parents[2] / "spatial" / "optics"
-           / "data" / "CIE_xyz_1931_2deg.csv").read_bytes()
+    raw = (pathlib.Path(sky.__file__).parent / "data"
+           / "CIE_xyz_1931_2deg.csv").read_bytes()
     assert hashlib.sha256(raw).hexdigest() == CIE_SHA256
     lam, cmf = cie_1931()
     assert lam[0] == 360 and lam[-1] == 830 and cmf.shape == (471, 3)
@@ -117,13 +121,13 @@ def test_cie_table_is_the_verbatim_cie_dataset():
 
 
 def test_star_irradiance_is_planck_times_solid_angle():
-    sun = Star.sun_at_1au()
+    sun = ApparentStar.sun_at_1au()
     lam = np.array([500.0])
     assert sun.irradiance(lam)[0] == pytest.approx(
         sun.radiance(lam)[0] * 2 * math.pi
         * (1 - math.cos(math.radians(sun.angular_radius_deg))))
     with pytest.raises(ValueError):
-        Star(5000.0, 0.0)
+        ApparentStar(5000.0, 0.0)
 
 
 # -- composition --------------------------------------------------------------
@@ -131,19 +135,20 @@ def test_star_irradiance_is_planck_times_solid_angle():
 def test_composition_is_explicit_and_never_renormalized():
     with pytest.raises(CompositionError, match="never renormalized"):
         Composition.of(N2=0.78, O2=0.21)
+    co = Composition.of(N2=0.9, CO=0.1)       # CO is a known species identity
     with pytest.raises(CompositionError, match="no optical data"):
-        Composition.of(N2=0.9, CO=0.1)
+        composition_cross_section(co, 500.0)   # but it has no Rayleigh record
     with pytest.raises(CompositionError, match="> 0"):
         Composition.of(N2=1.0, O2=0.0)
     with pytest.raises(TypeError, match="ever inferred"):
         sky.SkySpec(composition=None)
     c = Composition.of(CO2=1.0)
     assert c.molar_mass_kg_per_mol == pytest.approx(0.044009)
-    assert c.gas_constant == pytest.approx(R_MOLAR / 0.044009)
+    assert c.gas_constant == pytest.approx(R_UNIVERSAL / 0.044009)
     mix = Composition.of(N2=0.5, Ar=0.5)
-    assert float(mix.cross_section(500.0)) == pytest.approx(
-        0.5 * float(SPECIES["N2"].cross_section(500.0))
-        + 0.5 * float(SPECIES["Ar"].cross_section(500.0)))
+    assert float(composition_cross_section(mix, 500.0)) == pytest.approx(
+        0.5 * float(optical_records("N2")[0].cross_section(500.0))
+        + 0.5 * float(optical_records("Ar")[0].cross_section(500.0)))
 
 
 def test_gas_constant_report_compares_without_changing_anything():
@@ -244,12 +249,12 @@ def test_column_from_levels_nodes_and_ceiling():
 # -- reference radiance -----------------------------------------------------------
 
 def _irradiance():
-    return Star.sun_at_1au().irradiance(sky.WAVELENGTHS_NM)
+    return ApparentStar.sun_at_1au().irradiance(sky.WAVELENGTHS_NM)
 
 
 def _table(column, **kw):
     args = dict(radius_m=6.371e6, observer_z_m=2.0, star_elevation_deg=30.0,
-                cross_section_m2=AIR.cross_section(sky.WAVELENGTHS_NM),
+                cross_section_m2=composition_cross_section(AIR, sky.WAVELENGTHS_NM),
                 irradiance=_irradiance(), n_zenith=31, n_azimuth=13)
     args.update(kw)
     return sky.radiance_table((column.z_m, column.ln_p, column.temperature_k),
@@ -310,7 +315,7 @@ def test_star_path_column_overhead_is_the_zenith_column():
 
 
 def test_optical_depth_diagnostic_levels():
-    sig = AIR.cross_section(sky.WAVELENGTHS_NM)
+    sig = composition_cross_section(AIR, sky.WAVELENGTHS_NM)
     unit = 1.0 / float(sig.max())                   # tau = 1 at 410 nm
     for column, level in ((0.05 * unit, "ok"), (0.5 * unit, "caution"),
                           (2.0 * unit, "unreliable")):
@@ -335,7 +340,7 @@ def _hyp(**kw):
 
 def _hyp_spec(**kw):
     args = dict(composition=Composition.of(N2=1.0, label="N2"),
-                star=Star(3200.0, 0.87), hypothetical=_hyp())
+                star=ApparentStar(3200.0, 0.87), hypothetical=_hyp())
     args.update(kw)
     return sky.SkySpec(**args)
 
@@ -379,11 +384,11 @@ def test_write_sky_page_hypothetical_block(tmp_path):
     assert block["consistency"]["status"] == "consistent"   # R from it
     assert block["exposure"] == {"mode": "auto", "ev": 0.0,
                                  "reference_cd_m2": None}
-    assert set(block["species"]) == set(SPECIES)
+    assert set(block["species"]) == set(OPTICS)
     for name, sp in block["species"].items():
         np.testing.assert_array_equal(
             sp["cross_section_m2"],
-            SPECIES[name].cross_section(sky.WAVELENGTHS_NM))
+            optical_records(name)[0].cross_section(sky.WAVELENGTHS_NM))
     assert block["diagnostic"] == {"tau_caution": sky.TAU_CAUTION,
                                    "tau_unreliable": sky.TAU_UNRELIABLE}
     assert any("aerosols" in u for u in block["unsupported"])
@@ -406,7 +411,7 @@ def test_numeric_gas_constant_is_reported_not_replaced(tmp_path):
         tmp_path / "r.html"))
     assert block["column"]["gas_constant"] == 287.0     # kept as given
     assert block["consistency"]["status"] == "inconsistent"
-    assert block["consistency"]["r_mix"] == pytest.approx(R_MOLAR / 0.028014)
+    assert block["consistency"]["r_mix"] == pytest.approx(R_UNIVERSAL / 0.028014)
 
 
 def test_globe_pages_carry_no_sky():
@@ -507,7 +512,7 @@ def test_presets_are_sourced_hypothetical_skies_that_build(tmp_path):
             preset.to_dict()
     earth = sky.SKY_PRESETS["earth"].spec
     assert earth.composition is AIR
-    assert earth.star == Star.sun_at_1au()
+    assert earth.star == ApparentStar.sun_at_1au()
     mars = sky.SKY_PRESETS["mars"].spec
     assert "NSSDCA" in mars.composition.source
     assert sum(x for _, x in mars.composition.mole_fractions) == \
@@ -520,30 +525,30 @@ def test_presets_are_sourced_hypothetical_skies_that_build(tmp_path):
 
 
 def test_sun_at_a_distance_and_equal_irradiance_star():
-    assert Star.sun_at(1.0, where="Earth", distance_source="1 au") \
-        .angular_radius_deg == Star.sun_at_1au().angular_radius_deg
-    far = Star.sun_at(1.52366231, where="Mars", distance_source="NSSDCA")
+    assert ApparentStar.sun_at(1.0, where="Earth", distance_source="1 au") \
+        .angular_radius_deg == ApparentStar.sun_at_1au().angular_radius_deg
+    far = ApparentStar.sun_at(1.52366231, where="Mars", distance_source="NSSDCA")
     assert math.sin(math.radians(far.angular_radius_deg)) * 1.52366231 == \
         pytest.approx(math.sin(math.radians(
-            Star.sun_at_1au().angular_radius_deg)), rel=1e-14)
+            ApparentStar.sun_at_1au().angular_radius_deg)), rel=1e-14)
     # the acceptance star: the example script's own formula
     sys.path.insert(0, str(REPO / "examples"))
     try:
         import sky_hypothetical
     finally:
         sys.path.pop(0)
-    red = Star.with_sun_irradiance_at_1au(3200.0)
+    red = ApparentStar.with_sun_irradiance_at_1au(3200.0)
     assert red.angular_radius_deg == \
         sky_hypothetical.equal_irradiance_radius_deg(3200.0)
-    sun = Star.sun_at_1au()
+    sun = ApparentStar.sun_at_1au()
     # same bolometric irradiance: T^4 sin^2 alpha
     assert (3200.0 ** 4 * math.sin(math.radians(red.angular_radius_deg)) ** 2
             == pytest.approx(5772.0 ** 4 * math.sin(math.radians(
                 sun.angular_radius_deg)) ** 2, rel=1e-12))
     with pytest.raises(ValueError, match="no such star"):
-        Star.with_sun_irradiance_at_1au(100.0)
+        ApparentStar.with_sun_irradiance_at_1au(100.0)
     with pytest.raises(ValueError, match="distance_au"):
-        Star.sun_at(0.0, where="x", distance_source="x")
+        ApparentStar.sun_at(0.0, where="x", distance_source="x")
 
 
 def test_committed_standalone_page_is_current():
@@ -575,35 +580,35 @@ def test_committed_standalone_page_is_current():
 # -- stars by radius and distance; amounts by mass -----------------------------
 
 def test_star_of_radius_and_distance():
-    from tropoi.spatial.optics.star import (AU_KM, L_SUN_W, R_SUN_KM,
-                                            SIGMA_SB, SOLAR_CONSTANT)
+    from tropoi.physics.star import (AU_KM, L_SUN_W, R_SUN_KM, SIGMA_SB,
+                                     SOLAR_CONSTANT)
     # sigma from the exact SI constants
     assert SIGMA_SB == pytest.approx(5.670374419e-8, rel=1e-9)
-    sun = Star.sun_at_1au()
+    sun = ApparentStar.sun_at_1au()
     assert (sun.radius_rsun, sun.distance_au) == (1.0, 1.0)
-    assert Star.of(5772.0, 1.0, 1.0).angular_radius_deg == \
+    assert ApparentStar.of(5772.0, 1.0, 1.0).angular_radius_deg == \
         sun.angular_radius_deg
     # the IAU nominal values are consistent to their rounding
     assert sun.luminosity_lsun == pytest.approx(1.0, rel=1e-5)
     assert sun.bolometric_irradiance_w_m2 == pytest.approx(SOLAR_CONSTANT,
                                                            rel=1e-3)
     # S = L / (4 pi d^2) for any star given by radius and distance
-    s = Star.of(4000.0, 0.7, 0.3)
+    s = ApparentStar.of(4000.0, 0.7, 0.3)
     d_m = 0.3 * AU_KM * 1e3
     assert s.bolometric_irradiance_w_m2 == pytest.approx(
         s.luminosity_lsun * L_SUN_W / (4 * math.pi * d_m ** 2), rel=1e-12)
     assert math.sin(math.radians(s.angular_radius_deg)) == pytest.approx(
         0.7 * R_SUN_KM / (0.3 * AU_KM), rel=1e-14)
     with pytest.raises(ValueError, match="more than 30 degrees"):
-        Star.of(5000.0, 50.0, 0.1)
+        ApparentStar.of(5000.0, 50.0, 0.1)
     with pytest.raises(ValueError, match="together"):
-        Star(5000.0, 1.0, radius_rsun=1.0)
+        ApparentStar(5000.0, 1.0, radius_rsun=1.0)
     # an angle alone is still a star (no radius, no luminosity)
-    assert Star(5000.0, 1.0).luminosity_lsun is None
+    assert ApparentStar(5000.0, 1.0).luminosity_lsun is None
 
 
 def test_star_catalogue_is_sourced_and_self_consistent():
-    from tropoi.spatial.optics import STARS, StellarBody
+    from tropoi.physics.star import STARS, Star
     assert list(STARS) == ["proxima_centauri", "epsilon_eridani", "sun",
                            "procyon_a", "sirius_a"]
     temps = [b.temperature_k for b in STARS.values()]
@@ -624,7 +629,7 @@ def test_star_catalogue_is_sourced_and_self_consistent():
     assert STARS["epsilon_eridani"].temperature_k == pytest.approx(5085.0,
                                                                    abs=30)
     assert "preprint" in STARS["proxima_centauri"].source
-    assert isinstance(STARS["sun"], StellarBody)
+    assert isinstance(STARS["sun"], Star)
 
 
 def test_mass_fractions_convert_exactly_and_are_never_rescaled():
@@ -637,13 +642,12 @@ def test_mass_fractions_convert_exactly_and_are_never_rescaled():
     assert w["Ar"] > dict(AIR.mole_fractions)["Ar"]
     with pytest.raises(CompositionError, match="never renormalized"):
         Composition.from_mass_fractions(N2=0.5, O2=0.4)
+    helium = Composition.from_mass_fractions(He=1.0)   # known identity
     with pytest.raises(CompositionError, match="no optical data"):
-        Composition.from_mass_fractions(He=1.0)
+        composition_cross_section(helium, 500.0)       # no Rayleigh record
 
 
 def test_thin_atmosphere_mass_and_pressure_invert():
-    from tropoi.spatial.optics import (thin_atmosphere_mass_kg,
-                                       thin_atmosphere_surface_pressure_pa)
     m = thin_atmosphere_mass_kg(101325.0, 9.80665, 6.371e6)
     assert m == pytest.approx(5.27e18, rel=1e-3)     # 4 pi R^2 p / g
     assert thin_atmosphere_surface_pressure_pa(m, 9.80665, 6.371e6) == \
@@ -651,7 +655,7 @@ def test_thin_atmosphere_mass_and_pressure_invert():
 
 
 def test_sky_block_carries_the_star_catalogue(tmp_path):
-    from tropoi.spatial.optics import STARS
+    from tropoi.physics.star import STARS
     block = _block(sky.write_sky_page(_hyp_spec(), tmp_path / "s.html"))
     assert [s["key"] for s in block["stars"]] == list(STARS)
     assert block["star_constants"]["solar_constant_w_m2"] == 1361.0

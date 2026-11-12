@@ -32,7 +32,7 @@ from dataclasses import dataclass, field
 
 import numpy as np
 
-from tropoi.spatial.optics.constants import K_B
+from tropoi.physics.constants import K_B
 
 __all__ = ["AtmosphericColumn", "ColumnError", "DEFAULT_TOP_RATIO",
            "thin_atmosphere_mass_kg", "thin_atmosphere_surface_pressure_pa"]

@@ -19,13 +19,14 @@ Two entry points, neither needs CUDA:
 Physics (stated in the page; this is NOT a validated sky colour):
 
 * a horizontally uniform, spherically symmetric column above the observer
-  (:class:`~tropoi.spatial.optics.AtmosphericColumn`), of radius R + z;
+  (:class:`~tropoi.physics.column.AtmosphericColumn`), of radius R + z;
 * Rayleigh scattering only, by an explicit
-  :class:`~tropoi.spatial.optics.Composition` (no mixture is ever
+  :class:`~tropoi.physics.composition.Composition` (no mixture is ever
   inferred), with the phase function 3/(16 pi) (1 + cos^2 Theta)
   (depolarization neglected in the phase function, kept in the King
   factor of the cross section);
-* single scattering of a blackbody star (:class:`~tropoi.spatial.optics.Star`)
+* single scattering of a blackbody star
+  (:class:`~tropoi.physics.star.ApparentStar`)
   with attenuation along the view and star paths; the solid sphere at the
   column base shadows star paths and ends view paths;
 * spectral bins of 20 nm from 400 to 760 nm (inside every refractive-index
@@ -64,18 +65,21 @@ from dataclasses import dataclass, field
 
 import numpy as np
 
-from tropoi.spatial.optics import (COMPOSITION_PRESETS, SPECIES,
-                                   AtmosphericColumn, Composition, Star,
-                                   gas_constant_report)
-from tropoi.spatial.optics.colour import (CIE_SOURCE, XYZ_TO_LINEAR_SRGB,
-                                          bin_weights, omitted_fraction)
-from tropoi.spatial.optics.column import DEFAULT_TOP_RATIO
-from tropoi.spatial.optics.composition import R_DRY_TOLERANCE, SUM_TOLERANCE
-from tropoi.spatial.optics.constants import (ATOMIC_WEIGHT_SOURCE, C, H,
-                                             K_B, LUMINOUS_EFFICACY, R_MOLAR)
-from tropoi.spatial.optics.rayleigh import KING_CHECK
-from tropoi.spatial.optics.star import (AU_KM, L_SUN_W, R_SUN_KM, SIGMA_SB,
-                                        SOLAR_CONSTANT, STARS)
+from tropoi.physics.column import DEFAULT_TOP_RATIO, AtmosphericColumn
+from tropoi.physics.composition import (COMPOSITIONS, Composition,
+                                        R_DRY_TOLERANCE, SUM_TOLERANCE,
+                                        gas_constant_report)
+from tropoi.physics.constants import (C, H, K_B, LUMINOUS_EFFICACY,
+                                      R_UNIVERSAL)
+from tropoi.physics.rayleigh import (KING_CHECK, OPTICS,
+                                     rayleigh_cross_section)
+from tropoi.physics.species import ATOMIC_WEIGHT_SOURCE, SPECIES
+from tropoi.physics.star import (AU_KM, L_SUN_W, R_SUN_KM, SIGMA_SB,
+                                 SOLAR_CONSTANT, STARS, ApparentStar)
+from tropoi.representation.visual.colour import (CIE_SOURCE,
+                                                 XYZ_TO_LINEAR_SRGB,
+                                                 bin_weights,
+                                                 omitted_fraction)
 
 __all__ = ["BIN_EDGES_NM", "EXPOSURE_MODES", "HypotheticalColumn",
            "SKY_PRESETS", "STANDALONE_PRESET", "SkyPreset", "SkySpec",
@@ -188,7 +192,7 @@ class SkySpec:
     """
 
     composition: Composition
-    star: Star = field(default_factory=Star.sun_at_1au)
+    star: ApparentStar = field(default_factory=ApparentStar.sun_at_1au)
     observer_lat_deg: float | None = None
     observer_lon_deg: float | None = None
     altitude_m: float | None = None
@@ -207,8 +211,12 @@ class SkySpec:
         if not isinstance(self.composition, Composition):
             raise TypeError("SkySpec needs an explicit Composition; no gas "
                             "mixture is ever inferred")
-        if not isinstance(self.star, Star):
-            raise TypeError("star must be a Star")
+        # The sky needs Rayleigh optics for every constituent; refuse the
+        # unsupported ones here, by name, rather than drawing without them.
+        self.composition.require_coverage(OPTICS, "optical")
+        if not isinstance(self.star, ApparentStar):
+            raise TypeError("star must be an ApparentStar (a temperature and "
+                            "an angular radius; Star.seen_from gives one)")
         if self.altitude_m is not None and self.pressure_pa is not None:
             raise ValueError("give altitude_m or pressure_pa, not both")
         if (self.observer_lat_deg is None) != (self.observer_lon_deg is None):
@@ -291,8 +299,8 @@ def _presets() -> dict[str, SkyPreset]:
         "1976 troposphere (288.15 K, 6.5 K/km, isothermal from 216.65 K), "
         "standard gravity, Earth's mean radius and the Sun at 1 au. No water "
         "vapour, aerosols or ozone.",
-        SkySpec(COMPOSITION_PRESETS["earth_dry_air_illustrative"],
-                star=Star.sun_at_1au(), **view,
+        SkySpec(COMPOSITIONS["earth_dry_air_illustrative"],
+                star=ApparentStar.sun_at_1au(), **view,
                 hypothetical=HypotheticalColumn(
                     surface_pressure_pa=101325.0, temperature_k=288.15,
                     gravity=9.80665, gas_constant="from_composition",
@@ -307,7 +315,7 @@ def _presets() -> dict[str, SkyPreset]:
         SkySpec(Composition.of(label="pure N₂",
                                source="stated for the acceptance case",
                                N2=1.0),
-                star=Star.with_sun_irradiance_at_1au(3200.0), **view,
+                star=ApparentStar.with_sun_irradiance_at_1au(3200.0), **view,
                 hypothetical=HypotheticalColumn(
                     surface_pressure_pa=1.0e4, temperature_k=250.0,
                     gravity=9.80665, gas_constant="from_composition",
@@ -319,8 +327,8 @@ def _presets() -> dict[str, SkyPreset]:
         "1.52366 au (NASA NSSDCA Mars Fact Sheet). The real Martian sky is "
         "coloured by dust, which this page does not model: expect a faint, "
         "dark blue sky, not butterscotch.",
-        SkySpec(COMPOSITION_PRESETS["mars_illustrative"],
-                star=Star.sun_at(1.52366231, where="Mars",
+        SkySpec(COMPOSITIONS["mars_illustrative"],
+                star=ApparentStar.sun_at(1.52366231, where="Mars",
                                  distance_source="Mars semimajor axis, NASA "
                                  "NSSDCA Mars Fact Sheet"), **view,
                 hypothetical=HypotheticalColumn(
@@ -508,12 +516,13 @@ def _optics_block() -> dict:
 def _species_block() -> dict:
     """Every gas with optical data: its cross sections at the bin centres
     (computed here from the sourced records) and molar mass; the page mixes
-    them as sum x_i sigma_i, exactly as ``Composition.cross_section``."""
-    return {name: {"cross_section_m2": sp.cross_section(WAVELENGTHS_NM)
-                   .tolist(),
-                   "molar_mass_g_per_mol": sp.molar_mass_g_per_mol,
-                   "source": sp.describe()}
-            for name, sp in SPECIES.items()}
+    them as sum x_i sigma_i, exactly as
+    ``tropoi.physics.rayleigh.composition_cross_section``."""
+    return {name: {"cross_section_m2":
+                   rayleigh_cross_section(name, WAVELENGTHS_NM).tolist(),
+                   "molar_mass_g_per_mol": SPECIES[name].molar_mass_g_per_mol,
+                   "source": records[0].describe()}
+            for name, records in OPTICS.items()}
 
 
 def sky_block(spec: SkySpec, *, column: AtmosphericColumn,
@@ -596,7 +605,7 @@ def sky_block(spec: SkySpec, *, column: AtmosphericColumn,
         "composition": spec.composition.to_dict(),
         "composition_rules": {"sum_tolerance": SUM_TOLERANCE,
                               "r_tolerance": R_DRY_TOLERANCE,
-                              "r_molar": R_MOLAR},
+                              "r_molar": R_UNIVERSAL},
         "consistency": report,
         "species": _species_block(),
         "star": dict(spec.star.to_dict(), azimuth_deg=spec.star_azimuth_deg,

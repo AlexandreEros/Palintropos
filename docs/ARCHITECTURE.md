@@ -30,8 +30,6 @@ src/tropoi/
 │   ├── operators/           SpectralOperators (Laplacian, derivatives, velocity, Jacobian)
 │   ├── sigma_coordinate.py  PE vertical coordinate and column operators
 │   ├── states/              BVE / SWE / PE state dataclasses over packed coefficient stacks
-│   ├── optics/              gas optics (sourced Rayleigh data), explicit Composition, 1-D AtmosphericColumn,
-│   │                        blackbody Star, CIE 1931 table (CPU-only; the sky view; a future RT tendency)
 │   ├── modes.py             immutable field specifications and read-only host coefficient views
 │   ├── initialization/      named preset initial states (bve, swe, pe)
 │   └── truncation.py        the 2/3 product cut and the preset support guards (stdlib)
@@ -69,10 +67,14 @@ It is documented in [SAVED_RUNS.md](../src/tropoi/temporal/SAVED_RUNS.md).
 
 ### Dependency direction
 
-`physics` (column physics: gas properties, radiation, convection, surface;
+`physics` (the shared physical world: species/composition/star/orbit data
+and the column physics — gas properties, radiation, convection, surface;
 NumPy/CuPy-agnostic) imports no other `tropoi` package, so it can serve any
-dynamical core; `temporal` and the layers above may import it
-([radiation status](radiation/README.md)).
+dynamical core and the sky view alike; `temporal` and the layers above may
+import it ([radiation status](radiation/README.md),
+[shared physics](radiation/SHARED_PHYSICS.md)). Its scientific data are
+packaged TOML/CSV files loaded through `importlib.resources` and identified
+by SHA-256 in run provenance.
 
 `spatial` imports only `spatial`; `temporal` imports `spatial` and
 `temporal`; `representation` imports all three layers. Orchestration
@@ -178,8 +180,9 @@ the pinned pre-rename Williamson-5 workflow.
   `.view()`, Matplotlib for `plot` only); opening Held–Suarez experiment
   directories and the 3-D atmosphere page of a saved PE run
   (`Simulation.view`, Matplotlib for colour tables; a preset-mountain
-  terrain is rebuilt on the GPU only with `allow_cuda=True`); gas optics,
-  compositions and columns (`spatial.optics`) and the sky page
+  terrain is rebuilt on the GPU only with `allow_cuda=True`); the shared
+  physics (`tropoi.physics`: species/composition data, Rayleigh optics,
+  columns, stars, orbits, rotation) and the sky page
   (`sky.write_sky_page` for a hypothetical atmosphere, which needs no run,
   planet, terrain or archive; `Simulation.sky` for a saved PE column). Fresh-interpreter tests enforce these boundaries.
 - **CUDA required**: running any solver (including `run_initial_state`); resolving terrain

@@ -35,7 +35,7 @@ _CACHE: dict = {}
 def cie_1931() -> tuple[np.ndarray, np.ndarray]:
     """(wavelength_nm, cmf[:, xyz]) from the packaged CIE table."""
     if "cmf" not in _CACHE:
-        raw = importlib.resources.files("tropoi.spatial.optics").joinpath(
+        raw = importlib.resources.files("tropoi.representation.visual").joinpath(
             "data/CIE_xyz_1931_2deg.csv").read_bytes()
         digest = hashlib.sha256(raw).hexdigest()
         if digest != CIE_SHA256:

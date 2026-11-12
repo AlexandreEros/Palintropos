@@ -1,0 +1,75 @@
+# Preset gas compositions (mole fractions), with their provenance.
+#
+# Two families are kept deliberately distinct; sharing a planet's name does
+# not make them the same mixture, and they must not be merged:
+#
+# * the climate presets (earth_dry_air, mars, venus, titan, jupiter, saturn,
+#   thai_ben1, thai_ben2): prescribed round numbers for configuring
+#   idealized experiments, not retrievals (introduced with the
+#   gray-radiation foundation, PR #29). Where the stated round numbers do
+#   not sum to exactly 1 they carry normalize = true: the loader applies the
+#   explicit normalization factory, which records the stated fractions and
+#   their total instead of rescaling silently.
+# * the illustrative sky presets (*_illustrative): each states exactly where
+#   its numbers come from and sums to 1 as stated (introduced with the sky
+#   page, PR #22). They list only species with Rayleigh optical data.
+#
+# Trace radiatively active gases are added per experiment.
+
+schema = "palintropos.mixtures/1"
+
+[mixtures.earth_dry_air]
+label = "earth_dry_air"
+mole_fractions = { N2 = 0.7809, O2 = 0.2095, Ar = 0.0093, CO2 = 0.0004 }
+normalize = true
+source = "prescribed round numbers for idealized configurations, not a retrieval (PR #29)"
+notes = ["climate preset: stated fractions sum to 1.0001 and are explicitly normalized"]
+
+[mixtures.mars]
+label = "mars"
+mole_fractions = { CO2 = 0.951, N2 = 0.026, Ar = 0.019, O2 = 0.002, CO = 0.001 }
+normalize = true
+source = "prescribed round numbers for idealized configurations, not a retrieval (PR #29)"
+notes = ["climate preset: stated fractions sum to 0.999 and are explicitly normalized"]
+
+[mixtures.venus]
+label = "venus"
+mole_fractions = { CO2 = 0.965, N2 = 0.035 }
+source = "prescribed round numbers for idealized configurations, not a retrieval (PR #29)"
+
+[mixtures.titan]
+label = "titan"
+mole_fractions = { N2 = 0.95, CH4 = 0.049, H2 = 0.001 }
+source = "prescribed round numbers for idealized configurations, not a retrieval (PR #29)"
+
+[mixtures.jupiter]
+label = "jupiter"
+mole_fractions = { H2 = 0.862, He = 0.136, CH4 = 0.002 }
+source = "prescribed round numbers for idealized configurations, not a retrieval (PR #29)"
+
+[mixtures.saturn]
+label = "saturn"
+mole_fractions = { H2 = 0.88, He = 0.115, CH4 = 0.005 }
+source = "prescribed round numbers for idealized configurations, not a retrieval (PR #29)"
+
+[mixtures.thai_ben1]
+label = "thai_ben1"
+mole_fractions = { N2 = 0.9996, CO2 = 0.0004 }
+source = "THAI Ben 1 benchmark composition (prescribed round numbers, PR #29)"
+
+[mixtures.thai_ben2]
+label = "thai_ben2"
+mole_fractions = { CO2 = 1.0 }
+source = "THAI Ben 2 benchmark composition (prescribed round numbers, PR #29)"
+
+[mixtures.earth_dry_air_illustrative]
+label = "Earth-like dry air (illustrative)"
+mole_fractions = { N2 = 0.78084, O2 = 0.20946, Ar = 0.00934, CO2 = 0.00036 }
+source = "commonly tabulated dry-air volume fractions N2 78.084 %, O2 20.946 %, Ar 0.934 %; CO2 set to 360 ppm so the four species sum to 1. Ne, He, CH4 and other trace gases are omitted. Not a reference composition"
+notes = ["illustrative preset: not a validated reference mixture"]
+
+[mixtures.mars_illustrative]
+label = "Mars-like gas (illustrative)"
+mole_fractions = { CO2 = 0.9531, N2 = 0.0259, Ar = 0.0194, O2 = 0.0016 }
+source = "NASA NSSDCA Mars Fact Sheet (D. R. Williams, updated 2025-05-19) volume fractions N2 2.59 %, Ar 1.94 %, O2 0.16 %, CO2 95.1 %; CO (0.06 %, no optical data), the trace gases and the rounding remainder (0.21 % in all) are added to CO2 so the four species sum to 1. Not a reference composition"
+notes = ["illustrative preset: not a validated reference mixture", "the real Martian sky colour is set by dust, which is not modelled"]

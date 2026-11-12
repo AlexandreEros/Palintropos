@@ -51,11 +51,12 @@ The same from Python:
 
 ```python
 from tropoi.representation.visual.sky import HypotheticalColumn, SkySpec, write_sky_page
-from tropoi.spatial.optics import Composition, Star
+from tropoi.physics.composition import Composition
+from tropoi.physics.star import ApparentStar
 
 spec = SkySpec(
     Composition.of(N2=1.0, label="pure N2", source="stated for this example"),
-    star=Star(3200.0, 0.867, label="3200 K star"),
+    star=ApparentStar(3200.0, 0.867, label="3200 K star"),
     star_azimuth_deg=135.0, star_elevation_deg=30.0,
     hypothetical=HypotheticalColumn(surface_pressure_pa=1e4, temperature_k=250.0,
                                     gravity=9.80665, gas_constant="from_composition",
@@ -72,10 +73,10 @@ reconstructed exactly on the CPU from one saved state:
 
 ```python
 from tropoi.representation.archive import open_simulation
-from tropoi.spatial.optics import COMPOSITION_PRESETS
+from tropoi.physics.composition import COMPOSITIONS
 
 sim = open_simulation("runs/hs-T42L20-prod-002")
-sim.sky(SkySpec(COMPOSITION_PRESETS["earth_dry_air_illustrative"],
+sim.sky(SkySpec(COMPOSITIONS["earth_dry_air_illustrative"],
                 observer_lat_deg=40.0, observer_lon_deg=-105.0),
         "sky.html", time=-1)          # saved index; gravity=... if the run records none
 ```
@@ -201,17 +202,21 @@ keeps the masses and moves the pressure.
 
 The number density is the ideal-gas `n = p/(k_B T)`, which needs no
 composition. The composition supplies only the cross section per molecule,
-`σ = Σ xᵢσᵢ`. `c_p` is not compared yet: that needs sourced,
-temperature-dependent heat capacities. No solver reads a composition.
-`config.json`, scientific hashes and run ids are unchanged (a test hashes the
-capsule before and after).
+`σ = Σ xᵢσᵢ`. Temperature-dependent heat capacities now exist in the shared
+layer (`tropoi.physics.thermodynamics`, the RRHO model the climate presets
+use), but the page does not compare `c_p` yet. No solver reads a
+composition: the gray radiative transfer coupled to the PE core
+(docs/radiation/README.md) takes prescribed optical-depth profiles, not a
+composition. `config.json`, scientific hashes and run ids are unchanged (a
+test hashes the capsule before and after).
 
-When radiative transfer arrives:
+When gas optics drive a solver:
 - composition becomes a solver input the way topography did: emitted into the config only when present, so existing runs keep byte-identical hashes;
 - a composition that disagrees with `r_dry`/`cp_dry` will be an error to resolve, not a silent override.
 
-The optics live in `spatial.optics`, independent of either page, so a
-`temporal` tendency can import them.
+The optics, composition, star, orbit and rotation live in `tropoi.physics`
+(docs/radiation/SHARED_PHYSICS.md), independent of either page and of every
+solver, so the radiation schemes and the sky consume the same data.
 
 ## Physics and its limits
 
@@ -224,7 +229,7 @@ The optics live in `spatial.optics`, independent of either page, so a
 - **Star.** A uniform blackbody disk (Planck radiance × solid angle), placed by hand. A star of radius `R` seen from distance `d` has `sin α = R/d`, luminosity `L = 4πR²σT⁴` and irradiance `S = σT⁴ sin²α`, with the IAU 2015 B3 nominal Sun (T = 5772 K, R☉ = 695 700 km, L☉ = 3.828e26 W, 1361 W m⁻²) and the IAU 2012 au; σ comes from the exact SI constants.
   - What you give stays put: with the size as a luminosity, a new temperature keeps `L` (the radius follows); with the distance as an irradiance, a new temperature or size keeps `S` (the distance follows).
   - The disk is drawn at full screen resolution with 4×4 samples per pixel, behind the ground below the horizon. A disk under half a pixel in radius is drawn at half a pixel and marked enlarged.
-- **Stars** (`spatial.optics.STARS`), as blackbodies. Where one paper gives both radius and luminosity, `T` follows from them:
+- **Stars** (`tropoi.physics.star.STARS`, from the packaged catalogue `tropoi/physics/data/stars.toml`), as blackbodies. Where one paper gives both radius and luminosity, `T` follows from them:
 
   | star | T (K) | R (R☉) | source |
   | --- | --- | --- | --- |
@@ -310,21 +315,23 @@ radiative-transfer code (for example libRadtran or DISORT) for a standard
 atmosphere. None of the colours or optical depths shown is an acceptance
 target.
 
-## Deriving the star from time and an orbit (not implemented)
+## Deriving the star from time and an orbit (not wired to the page)
 
-The star's azimuth and elevation are set by hand. Deriving them needs:
-- the rotation period, obliquity, sense of rotation, and the prime-meridian angle at an epoch;
-- the orbital elements (a, e, i, Ω, ω, mean anomaly at the epoch) and the mapping from model `t = 0` to that epoch;
-- the star's luminosity and radius, for irradiance and angular size.
-
-None of the current PE scenarios has insolation or a diurnal cycle, so a
-time-derived star would not be related to a saved run's temperatures.
+The star's azimuth and elevation are set by hand. The ingredients now exist
+as shared objects in `tropoi.physics` — `Rotation` (rate, obliquity, phase),
+`KeplerOrbit` (the six elements) and `Star` (luminosity and radius, hence
+irradiance and angular size at a distance), combined by
+`StellarIllumination` — and the radiative experiments already drive their
+insolation from them. The sky page does not derive its star position from
+them yet: that needs the mapping from a saved run's `t = 0` to an orbital
+epoch, which no current PE scenario defines.
 
 ## Where it lives
 
 | layer | module |
 | --- | --- |
-| optics (CPU, spatial layer; independent of both pages) | `spatial.optics`: `rayleigh`, `composition`, `column`, `star`, `colour`, `constants`, `data/CIE_xyz_1931_2deg.csv` |
+| shared physics (CPU; independent of both pages and of every solver) | `tropoi.physics`: `rayleigh`, `composition`, `species`, `column`, `star`, `orbit`, `rotation`, `constants`, with the datasets in `tropoi/physics/data/*.toml` |
+| colour (CPU, representation layer) | `representation.visual.colour` with `data/CIE_xyz_1931_2deg.csv` |
 | reference, page block and writers | `representation.visual.sky`: `SkySpec`, `HypotheticalColumn`, `radiance_table`, `star_path_column`, `optical_depth_diagnostic`, `write_sky_page`, `saved_sky_page` |
 | entry points | `examples/sky_hypothetical.py`; `sky.write_sky_page`; `Simulation.sky` → `saved_sky_page` |
 | page | `representation.visual.sky_view.html` (test API `window.__sky`) |
