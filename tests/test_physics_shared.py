@@ -52,6 +52,14 @@ def test_molar_masses_follow_from_the_one_atomic_weight_table():
         assert SPECIES[name].molar_mass == pytest.approx(old, rel=1e-4), name
 
 
+def test_species_formula_reports_atom_counts_without_mutating_the_registry():
+    carbon_dioxide = SPECIES["CO2"]
+    formula = carbon_dioxide.formula_dict()
+    assert formula == {"C": 1, "O": 2}
+    formula["O"] = 1
+    assert carbon_dioxide.formula_dict() == {"C": 1, "O": 2}
+
+
 def test_species_identity_is_separate_from_property_coverage():
     # every identity has thermodynamic data today; only four have optics
     assert set(THERMO) == set(SPECIES)
@@ -123,7 +131,8 @@ def test_preset_families_stay_distinct_with_their_own_provenance():
     assert sky_.normalization is None                 # sums to 1 as stated
     assert "NSSDCA" in sky_.source
     # the normalized climate mixture reproduces the retired GasMixture
-    assert dict(climate.mole_fractions)["CO2"] == pytest.approx(0.951 / 0.999, rel=1e-14)
+    assert climate.mole_fraction("CO2") == pytest.approx(0.951 / 0.999, rel=1e-14)
+    assert climate.mole_fraction("CH4") == 0.0
 
 
 # ---------------------------------------------------------------- orbits
@@ -135,8 +144,10 @@ def test_kepler_equation_round_trips_and_period_factory():
             assert back % (2 * math.pi) == pytest.approx(
                 float(nu) % (2 * math.pi), abs=1e-9), (e, nu)
     mu = 1.3271244e20
-    orbit = KeplerOrbit.from_period(365.256 * 86400.0, mu)
-    assert orbit.period(mu) == pytest.approx(365.256 * 86400.0, rel=1e-14)
+    period_s = 365.256 * 86400.0
+    orbit = KeplerOrbit.from_period(period_s, mu)
+    assert orbit.period(mu) == pytest.approx(period_s, rel=1e-14)
+    assert orbit.mean_motion(mu) == pytest.approx(math.tau / period_s, rel=1e-14)
     assert orbit.semimajor_axis_m == pytest.approx(AU_M, rel=1e-3)  # ~1 au
 
 
