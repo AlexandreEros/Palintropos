@@ -138,6 +138,20 @@ All loading goes through `importlib.resources`;
 declarations against the files on disk, and the CIE table's SHA-256 is
 checked on every load.
 
+## Test evidence at the integration head
+
+At `fa73a41` (branch `reconcile/sky-radiative-physics`, 2026-11-12):
+
+| Environment | Selection | Result |
+| --- | --- | --- |
+| Colab, NVIDIA L4, CUDA 13.0, CuPy 14.0.1, Python 3.13.16, Linux | full suite (`all`, routine + slow) via `notebooks/Palintropos-Colab-CUDA-Regression.ipynb` | **1696 passed, 50 skipped** (all skips environmental: 28 need a browser, the rest local-only capsules and the opt-in W5 acceptance run); evidence ZIP `palintropos-cuda-fa73a41026a6-all-20261112T143540570728Z` |
+| Local Windows, GeForce MX110, CUDA 11.8, CuPy 13.4.0, Python 3.12 | full suite minus the browser file (collected at `caa048f^`; the three test files edited afterwards re-ran separately and pass) | **1705 passed, 5 skipped** in 1 h 44 min |
+| Local Windows (same) | `tests/test_sky_view_browser.py` (headless Chrome parity) | **11 passed** |
+| GitHub Actions | CPU-only CI and the architecture check run per push | per push |
+
+`python -m tools.architecture.generate --check` passes on the committed
+snapshot.
+
 ## Deliberately out of scope
 
 No spectroscopic opacity collection (the correlated-k module still carries
