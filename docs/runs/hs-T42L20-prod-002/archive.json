@@ -1,0 +1,594 @@
+{
+  "schema_version": 1,
+  "provider": "google-drive",
+  "folder_url": "https://drive.google.com/drive/folders/1ID1ZhJJP2NoFPzWus4627dzwUBTgbEqQ",
+  "collection_url": "https://drive.google.com/drive/folders/1Yjig-jolvU15gvCqTq-19kyjCbJi9iX1",
+  "historical_source_url": "https://drive.google.com/drive/folders/1dBYGmQ9YsjQjrkh17cUbFpMX0MaSZDmr",
+  "provenance_note": "The owner identifies the historical folder as the incremental Colab output. The local capsule was downloaded from Drive; assets were added later. Retrieval uses the November 12 bulk upload, which includes those assets.",
+  "included_files": [
+    "assets/compare/prod-001-vs-002.json",
+    "assets/overview.json",
+    "assets/overview.pdf",
+    "assets/overview.png",
+    "assets/report-with-tier-a/REPORT.md",
+    "assets/report-with-tier-a/report.json",
+    "assets/tier_a/suite-a52ea20.log",
+    "assets/tier_a/suite-a52ea20.xml",
+    "assets/tier_a/suite-commit.txt",
+    "assets/tier_a/suite-start.txt",
+    "assets/tier_a/tier_a.json",
+    "config.json",
+    "events.jsonl",
+    "progress.json",
+    "report/REPORT.md",
+    "report/report.json",
+    "series.json",
+    "statistics.npz"
+  ],
+  "files": {
+    "assets/compare/prod-001-vs-002.json": {
+      "drive_id": "1USQHHD9rGObtn_6g0wUcdY9Yx6PXatXx",
+      "size": 1296
+    },
+    "assets/overview.json": {
+      "drive_id": "1IbfPKPDCmgZL917suxo6hAhxmI4tuIOY",
+      "size": 261516
+    },
+    "assets/overview.pdf": {
+      "drive_id": "18FjETs7hMobqTlu85OvJ0jYduLPm3i01",
+      "size": 111043
+    },
+    "assets/overview.png": {
+      "drive_id": "1oizLCRBIAQpX75TqPFLlq5lSDlVle1VB",
+      "size": 737182
+    },
+    "assets/report-with-tier-a/REPORT.md": {
+      "drive_id": "1n4-tjNKtQe_Rq6IBxZTV3GkSyOi5ZZix",
+      "size": 4027
+    },
+    "assets/report-with-tier-a/report.json": {
+      "drive_id": "1744MY89fqON9I85gYvxipDwWqfsXLEAG",
+      "size": 10278
+    },
+    "assets/tier_a/suite-a52ea20.log": {
+      "drive_id": "189bauHb0dNyrmh0wuBuwNDwLSH17e3zv",
+      "size": 2581
+    },
+    "assets/tier_a/suite-a52ea20.xml": {
+      "drive_id": "1ya4WQEOHrPkYVSY7nN0D7nwOqsO_Si_n",
+      "size": 144001
+    },
+    "assets/tier_a/suite-commit.txt": {
+      "drive_id": "1phgPD18DAFEgiT_UFKFPXRGdURl-O3an",
+      "size": 41
+    },
+    "assets/tier_a/suite-start.txt": {
+      "drive_id": "1B1JlW2H1x2YjB6BoqrdcEiliHFtDYEOA",
+      "size": 42
+    },
+    "assets/tier_a/tier_a.json": {
+      "drive_id": "1E9_4c1Sm9SVhg2hos-d7l-8PJP0vuIPT",
+      "size": 11993
+    },
+    "checkpoints/checkpoint-s000141600.npz": {
+      "drive_id": "1yzdVA_Zfs3L5r4QifpdvkeQMnG-QI5iI",
+      "size": 4339293
+    },
+    "checkpoints/checkpoint-s000142800.npz": {
+      "drive_id": "1wQq5R9NvUdU6wiWBmcX1GJQWK-TJ9Kam",
+      "size": 4340013
+    },
+    "checkpoints/checkpoint-s000144000.npz": {
+      "drive_id": "1lu6R8OUPKsU91jNYO1ztmGvbv9gZ1l3v",
+      "size": 4340733
+    },
+    "config.json": {
+      "drive_id": "1jVcOHuZhnxI7GiRGyG9AWE8LZFYmlfth",
+      "size": 1618
+    },
+    "events.jsonl": {
+      "drive_id": "1--Q4cB3RrP4cIP6fqBJ-Mz4EBqmbtyaP",
+      "size": 25430
+    },
+    "progress.json": {
+      "drive_id": "11PJ03GUhI01KiRhiizd_flovVhe5KfKO",
+      "size": 166
+    },
+    "report/REPORT.md": {
+      "drive_id": "1fynWqtpgKwjPSDh5TBaaK00RnvS-ZO-R",
+      "size": 3841
+    },
+    "report/report.json": {
+      "drive_id": "1aXnhsTNxLL8lbCVkTcIme3UUZ47pdiOc",
+      "size": 9630
+    },
+    "series.json": {
+      "drive_id": "1tQWOXF2RF1V69Inqi5lLD-Jdj1cNvy66",
+      "size": 197993
+    },
+    "states/state-d00010.npy": {
+      "drive_id": "1GDq882Ne6Sg1S9RcvEe_t8Xonn-nnH6s",
+      "size": 1889664
+    },
+    "states/state-d00020.npy": {
+      "drive_id": "1u65iWEERem12glQU1FxRXs4E-tT040YM",
+      "size": 1889664
+    },
+    "states/state-d00030.npy": {
+      "drive_id": "1YbkMt2geAGAy3raBbjnfBMsFAD9I3Y0S",
+      "size": 1889664
+    },
+    "states/state-d00040.npy": {
+      "drive_id": "11a8nI08wrmNYG8tWQqbVW3UNAr7UDxWw",
+      "size": 1889664
+    },
+    "states/state-d00050.npy": {
+      "drive_id": "1vrerG--Hc_IW7lKH5PFizVdegemI2CWv",
+      "size": 1889664
+    },
+    "states/state-d00060.npy": {
+      "drive_id": "1sEDLbXLnb9nL9F_AhdTZzjEFOkyhrrNb",
+      "size": 1889664
+    },
+    "states/state-d00070.npy": {
+      "drive_id": "1mDFRMfNoA0YFhQ9yq0YckzbfcmpMd9vL",
+      "size": 1889664
+    },
+    "states/state-d00080.npy": {
+      "drive_id": "184RHujNfaA81QNPXA_7T8e-tGfMntJ1v",
+      "size": 1889664
+    },
+    "states/state-d00090.npy": {
+      "drive_id": "1Jzabp2M5QBxHiwXUPnrP8wNEGWau9eag",
+      "size": 1889664
+    },
+    "states/state-d00100.npy": {
+      "drive_id": "1pvbobPUNuGxyy5XvHmpRTEzfpDCYknlz",
+      "size": 1889664
+    },
+    "states/state-d00110.npy": {
+      "drive_id": "1kbDbs5JULa0X1W8owM8dYu4tYwHNjKFC",
+      "size": 1889664
+    },
+    "states/state-d00120.npy": {
+      "drive_id": "1VWo5JOqMDyI34yD_PqIaxB2RuP1GNUBl",
+      "size": 1889664
+    },
+    "states/state-d00130.npy": {
+      "drive_id": "1OoH25yWJ-974pZ-cTIfrS9kYnRSsnFI5",
+      "size": 1889664
+    },
+    "states/state-d00140.npy": {
+      "drive_id": "1IfwdO895HziyQsl7Z-m5YRmEbQtrDr92",
+      "size": 1889664
+    },
+    "states/state-d00150.npy": {
+      "drive_id": "1UAbNcMl8DFO4EUqCId4pRoA4YUMlTzNR",
+      "size": 1889664
+    },
+    "states/state-d00160.npy": {
+      "drive_id": "1oSBs58P0zWuug7r1KZ3AKfDMOhjdO_bd",
+      "size": 1889664
+    },
+    "states/state-d00170.npy": {
+      "drive_id": "1evps77ws2IOhzq-ldiv6BQACUGkSsfoo",
+      "size": 1889664
+    },
+    "states/state-d00180.npy": {
+      "drive_id": "1hPGPTYAKD7pjFzAa7Vgo7cMng2nAMTZK",
+      "size": 1889664
+    },
+    "states/state-d00190.npy": {
+      "drive_id": "1xaB5dOBRiCC-AUvsvGqmkBM-SDS9VcpO",
+      "size": 1889664
+    },
+    "states/state-d00200.npy": {
+      "drive_id": "1e8fy45kLuvNMMk9iWfMKJsyayg5d6Q4Z",
+      "size": 1889664
+    },
+    "states/state-d00210.npy": {
+      "drive_id": "1o7kHRkwf8IC-iJ5Ouwok3o0aTpO_Vmii",
+      "size": 1889664
+    },
+    "states/state-d00220.npy": {
+      "drive_id": "1HFUVgpz2vLv1ef4JYIasloB5v18Zn5jK",
+      "size": 1889664
+    },
+    "states/state-d00230.npy": {
+      "drive_id": "1qR9UndBHXL5-G0DR3NHUyIdULx-Sis_j",
+      "size": 1889664
+    },
+    "states/state-d00240.npy": {
+      "drive_id": "1YOqESVZPBy9T43v08jlDYfvTk-yLcTHy",
+      "size": 1889664
+    },
+    "states/state-d00250.npy": {
+      "drive_id": "1p4vJchjrG_9xVKVGddhnFP3Svrf3GjrO",
+      "size": 1889664
+    },
+    "states/state-d00260.npy": {
+      "drive_id": "1XQS2zSFJmebUQkNX4fKqvfwdXSoey_fu",
+      "size": 1889664
+    },
+    "states/state-d00270.npy": {
+      "drive_id": "1EcrOgkGihYesucRoOf9QfGng-ueNOHcs",
+      "size": 1889664
+    },
+    "states/state-d00280.npy": {
+      "drive_id": "1Zrf2Wlr9mqGPlWTAxU4YlaVDsbss1Wn9",
+      "size": 1889664
+    },
+    "states/state-d00290.npy": {
+      "drive_id": "1J1Y17MVcIEibokvtpPcZNP23MYHnjL90",
+      "size": 1889664
+    },
+    "states/state-d00300.npy": {
+      "drive_id": "1VcLFiuGplWKrFpnROVPDhzD-Vh5oXGaa",
+      "size": 1889664
+    },
+    "states/state-d00310.npy": {
+      "drive_id": "172smjknr2U13f60R3M3KGKrm9zaOWExT",
+      "size": 1889664
+    },
+    "states/state-d00320.npy": {
+      "drive_id": "1ACAX-AFIqsZeKhk4nhZf8A9Qrnm3RZ_M",
+      "size": 1889664
+    },
+    "states/state-d00330.npy": {
+      "drive_id": "1b3CC7IWR7p7VFh8z13quvRQnIUnCWfa1",
+      "size": 1889664
+    },
+    "states/state-d00340.npy": {
+      "drive_id": "1RjB03BKRHY11DZwiiJRr5xSY6ARxVREL",
+      "size": 1889664
+    },
+    "states/state-d00350.npy": {
+      "drive_id": "1HBeRNcJJyZ7FAt79HQoEmO42P7ZSDd0K",
+      "size": 1889664
+    },
+    "states/state-d00360.npy": {
+      "drive_id": "1O5A1iayZeAc7g5SIH7bgT_2FGWYQC8XE",
+      "size": 1889664
+    },
+    "states/state-d00370.npy": {
+      "drive_id": "13iMWKCOq28IXa5rB7QrHuDtqfPyeL1ed",
+      "size": 1889664
+    },
+    "states/state-d00380.npy": {
+      "drive_id": "1QlJuiW0vuyrJW6ICGtDewcLVAHLvRFmd",
+      "size": 1889664
+    },
+    "states/state-d00390.npy": {
+      "drive_id": "1ab9T8ydg0BdkmCwRX4mKZNVqTsA3oAwT",
+      "size": 1889664
+    },
+    "states/state-d00400.npy": {
+      "drive_id": "1HNJ6DllTk4upCSe6fFXbwdbdud3otkDG",
+      "size": 1889664
+    },
+    "states/state-d00410.npy": {
+      "drive_id": "1DClfLjNNOWaq5GRLutNeiVtQKQx6WFvc",
+      "size": 1889664
+    },
+    "states/state-d00420.npy": {
+      "drive_id": "12Fk44Mdcr5JLcUp92DE0R_P3Zj7vX5YK",
+      "size": 1889664
+    },
+    "states/state-d00430.npy": {
+      "drive_id": "1BoZq9E-RhRqtTGzwd0Nqj0C4fmkoe44C",
+      "size": 1889664
+    },
+    "states/state-d00440.npy": {
+      "drive_id": "1meBldH4bsKGbgH6931O257hXvcqCQ9rE",
+      "size": 1889664
+    },
+    "states/state-d00450.npy": {
+      "drive_id": "1dD4QT6Fq-6FLqooYoH55JMDygTMc3QpF",
+      "size": 1889664
+    },
+    "states/state-d00460.npy": {
+      "drive_id": "1a0lfP7gdoDi1IYqLcf9kx_13S7qvtrI_",
+      "size": 1889664
+    },
+    "states/state-d00470.npy": {
+      "drive_id": "1IwEzhfRxDwZYeut38ZBhV7BYFtLTT-6b",
+      "size": 1889664
+    },
+    "states/state-d00480.npy": {
+      "drive_id": "1z94KOYPuDFhJTJBYbd0aKEHC8YQfSGbI",
+      "size": 1889664
+    },
+    "states/state-d00490.npy": {
+      "drive_id": "1l75WublQ0Xj4ACAeNfLxXQh6LGRDJsuP",
+      "size": 1889664
+    },
+    "states/state-d00500.npy": {
+      "drive_id": "1s2tWXUytyBZwnT1CvWNT2ucmQDNUd_7V",
+      "size": 1889664
+    },
+    "states/state-d00510.npy": {
+      "drive_id": "1U42cN2LlFh6yJzo4BJfqazzlgwI0FWfS",
+      "size": 1889664
+    },
+    "states/state-d00520.npy": {
+      "drive_id": "1D9Z1zScGdJ4cqGLpaQrIzaYufroSyg_9",
+      "size": 1889664
+    },
+    "states/state-d00530.npy": {
+      "drive_id": "1tfZROli9fTZXCwwETTETyj6Cj6Keqsb8",
+      "size": 1889664
+    },
+    "states/state-d00540.npy": {
+      "drive_id": "1Dwr8osLqN7l6EExu9Opd3qqiehNURCSg",
+      "size": 1889664
+    },
+    "states/state-d00550.npy": {
+      "drive_id": "1z9xetxYs02bVDV7sGiywQNUxbKptFaPA",
+      "size": 1889664
+    },
+    "states/state-d00560.npy": {
+      "drive_id": "1pVnRAeLettDb-ARMnWCFYiMNRk9_OmQH",
+      "size": 1889664
+    },
+    "states/state-d00570.npy": {
+      "drive_id": "1rG53DZ057hajN72Kz9YYWolflKfZ1aGm",
+      "size": 1889664
+    },
+    "states/state-d00580.npy": {
+      "drive_id": "1-Lc8Bh-X_f2tMcyy9YBl3akYEdWGoxE1",
+      "size": 1889664
+    },
+    "states/state-d00590.npy": {
+      "drive_id": "1Sz7ts1aRRSWbT5ETDFSa6w8So1hUewIz",
+      "size": 1889664
+    },
+    "states/state-d00600.npy": {
+      "drive_id": "1gIlhHh2-sFPIzKtvo12r4df2FgK7iawB",
+      "size": 1889664
+    },
+    "states/state-d00610.npy": {
+      "drive_id": "1OapXyxm6oSQnePEegY45zgbhKjv_MyB2",
+      "size": 1889664
+    },
+    "states/state-d00620.npy": {
+      "drive_id": "1on-EvLDeFRLfHiLH_XKQHy2C3gHvD4LG",
+      "size": 1889664
+    },
+    "states/state-d00630.npy": {
+      "drive_id": "1xzuohox31spyZezkhEbIS4WHaV_M6D8_",
+      "size": 1889664
+    },
+    "states/state-d00640.npy": {
+      "drive_id": "1xIhWfuYyVy01QmKWxAJjxC-ZmL3dBE88",
+      "size": 1889664
+    },
+    "states/state-d00650.npy": {
+      "drive_id": "1d6y9qea0W23yUCSlgeH8z_1OaYnoSbDa",
+      "size": 1889664
+    },
+    "states/state-d00660.npy": {
+      "drive_id": "1-DRU3sTbGNWERwk09ut4Cj_i1vPYZ4lh",
+      "size": 1889664
+    },
+    "states/state-d00670.npy": {
+      "drive_id": "1XknBdHx4tRFlP1JN3DCxZ__PMXbkywRD",
+      "size": 1889664
+    },
+    "states/state-d00680.npy": {
+      "drive_id": "17Djk-Y1Wy2eu7SJyEbRncXtD51IWNGxj",
+      "size": 1889664
+    },
+    "states/state-d00690.npy": {
+      "drive_id": "1nuPIBNLGVhRN9loZ6HiPKLn1GEnQTlwg",
+      "size": 1889664
+    },
+    "states/state-d00700.npy": {
+      "drive_id": "13wPskIL3FIbVZGa-SGN32jrvYIiabpc7",
+      "size": 1889664
+    },
+    "states/state-d00710.npy": {
+      "drive_id": "1iRa2glvtfy7w6Po8w_oY_uwaxNGBIK-o",
+      "size": 1889664
+    },
+    "states/state-d00720.npy": {
+      "drive_id": "1wTfN0KEdtjwBytM0rKY0T5NQUsMAGz0G",
+      "size": 1889664
+    },
+    "states/state-d00730.npy": {
+      "drive_id": "1_J7IqPry0l4w2LbKIezuKF3eFSv_hnCZ",
+      "size": 1889664
+    },
+    "states/state-d00740.npy": {
+      "drive_id": "17AGONtz9hRIwgY6gtmp0iupTqi0EdSFU",
+      "size": 1889664
+    },
+    "states/state-d00750.npy": {
+      "drive_id": "1KyUrv5piPcGccS4BGLswqhtF16vi2h2y",
+      "size": 1889664
+    },
+    "states/state-d00760.npy": {
+      "drive_id": "1gInXPv8ARCASGzaYl1C_WLmUyc6qk29i",
+      "size": 1889664
+    },
+    "states/state-d00770.npy": {
+      "drive_id": "1TvXQ9Ol765YIDf2faF4owAA8_SzoxeGl",
+      "size": 1889664
+    },
+    "states/state-d00780.npy": {
+      "drive_id": "1opNVneCpvqfXFLnlkByogM_EDCSzjSTV",
+      "size": 1889664
+    },
+    "states/state-d00790.npy": {
+      "drive_id": "1P2vptBZy7G32nXQORsfgXyQ5e1mE537-",
+      "size": 1889664
+    },
+    "states/state-d00800.npy": {
+      "drive_id": "1QlH9odJVEeS5k_XbSnaePoEFmN6UEpT3",
+      "size": 1889664
+    },
+    "states/state-d00810.npy": {
+      "drive_id": "1Am5cdX_sKmwXC3Xb3mY_qEYFDEe-1sgq",
+      "size": 1889664
+    },
+    "states/state-d00820.npy": {
+      "drive_id": "1UleGfl6AV-j8bZw99HEQH-q4BsU3VhbR",
+      "size": 1889664
+    },
+    "states/state-d00830.npy": {
+      "drive_id": "1pByL48lLNpTGTzSgl4GCqOEcKopaKvOn",
+      "size": 1889664
+    },
+    "states/state-d00840.npy": {
+      "drive_id": "1Dw16ZkJhm3ZiWI5HyVyVj_s5V6rq_iHX",
+      "size": 1889664
+    },
+    "states/state-d00850.npy": {
+      "drive_id": "1AeEPPAMnKEwxCEZOjE8Np6gFOgXOHPmS",
+      "size": 1889664
+    },
+    "states/state-d00860.npy": {
+      "drive_id": "1YbWn-fmKjMAjN7f77eGm2gQHYHEj0Af-",
+      "size": 1889664
+    },
+    "states/state-d00870.npy": {
+      "drive_id": "1D3iSeGxdFgZ9ZwQUARy9Q_C6brG1l5SI",
+      "size": 1889664
+    },
+    "states/state-d00880.npy": {
+      "drive_id": "1aWmyrPjNg3dvHeNe65IMUYJKuL1jqCPM",
+      "size": 1889664
+    },
+    "states/state-d00890.npy": {
+      "drive_id": "1ShZ0H0fu_J7bLVa5oM0T33GB_4ExcqkS",
+      "size": 1889664
+    },
+    "states/state-d00900.npy": {
+      "drive_id": "1VOg_DCbiLloPALaunV7wOhqvrfzpngFS",
+      "size": 1889664
+    },
+    "states/state-d00910.npy": {
+      "drive_id": "1sjTce2bud0A1zzXNhDxNfXJTvi_KN48J",
+      "size": 1889664
+    },
+    "states/state-d00920.npy": {
+      "drive_id": "129hv47MGwoKFiwvRS6ABaLZHQaYTfd_5",
+      "size": 1889664
+    },
+    "states/state-d00930.npy": {
+      "drive_id": "1DgfuqmXQeGYwtYan0Tv6m8TgBsmb1DPt",
+      "size": 1889664
+    },
+    "states/state-d00940.npy": {
+      "drive_id": "1IKbqXYxmsFh-6xcSm24Lj2r2XFDXwO9Q",
+      "size": 1889664
+    },
+    "states/state-d00950.npy": {
+      "drive_id": "1wGw5DLYP1DbMMZzD9eTgXX6xlDA7091i",
+      "size": 1889664
+    },
+    "states/state-d00960.npy": {
+      "drive_id": "126MnF-UshcjpPcXip1-KditcAZKs4Ffn",
+      "size": 1889664
+    },
+    "states/state-d00970.npy": {
+      "drive_id": "1sdlYGnWkBgALHa_mTcMWl4MxlH7dO_E7",
+      "size": 1889664
+    },
+    "states/state-d00980.npy": {
+      "drive_id": "13AO6OyT9LADbWjjM9KdoTPBlSCssj_XZ",
+      "size": 1889664
+    },
+    "states/state-d00990.npy": {
+      "drive_id": "1hHn9Lh-v0BE8mKDAf7zdttxy28Y3UZIO",
+      "size": 1889664
+    },
+    "states/state-d01000.npy": {
+      "drive_id": "1C5c_RcRBcO4GK-K4eMv7DxMP2k5CIBJT",
+      "size": 1889664
+    },
+    "states/state-d01010.npy": {
+      "drive_id": "1JRKUjaSYWQ_0zom-o8vCrmApnlVXwlC6",
+      "size": 1889664
+    },
+    "states/state-d01020.npy": {
+      "drive_id": "1utTixbtCbPpa3lPoI7eWrJoleOyMBSFf",
+      "size": 1889664
+    },
+    "states/state-d01030.npy": {
+      "drive_id": "1CRmSNdNVFM-uBgfoWBDA_azyz6rmE7dV",
+      "size": 1889664
+    },
+    "states/state-d01040.npy": {
+      "drive_id": "1ecLhfCaun_L8a5qjjSmndpHs-A2gvtIk",
+      "size": 1889664
+    },
+    "states/state-d01050.npy": {
+      "drive_id": "1-cxCYz1gvd_hd_bdy4l-ARJMYkkNOm1o",
+      "size": 1889664
+    },
+    "states/state-d01060.npy": {
+      "drive_id": "1fw4YUg4l0lbgcXUOUtsmzwkpmoDZy-WT",
+      "size": 1889664
+    },
+    "states/state-d01070.npy": {
+      "drive_id": "12gKpRsBCwAJD95d3G9z-tyIslHr0n9C4",
+      "size": 1889664
+    },
+    "states/state-d01080.npy": {
+      "drive_id": "1YkmSOD_JrFjpPkyYiT83fvMwnmsLjw6-",
+      "size": 1889664
+    },
+    "states/state-d01090.npy": {
+      "drive_id": "12O3zme9OVP5814tMf1NzUZc6ZOchiD4I",
+      "size": 1889664
+    },
+    "states/state-d01100.npy": {
+      "drive_id": "1atBxpN_ZQDN20WWtUcFxuHf4QWayXltF",
+      "size": 1889664
+    },
+    "states/state-d01110.npy": {
+      "drive_id": "1z_tGBj0A8UwZSAyyWf_eWYFo_G-b1CZO",
+      "size": 1889664
+    },
+    "states/state-d01120.npy": {
+      "drive_id": "1pjkGlh7xG4Mxlzpr-aBLMcLDIG652TS0",
+      "size": 1889664
+    },
+    "states/state-d01130.npy": {
+      "drive_id": "1qUiTJTy82Y4MqpwJv_xWNEIcIXIy6Gha",
+      "size": 1889664
+    },
+    "states/state-d01140.npy": {
+      "drive_id": "1m4tJJy7a_lo9dJfU_GfE5ooUuWL8NllB",
+      "size": 1889664
+    },
+    "states/state-d01150.npy": {
+      "drive_id": "161ndPZ8Z0MSrx9tMyLsxoFFiBoxdowVH",
+      "size": 1889664
+    },
+    "states/state-d01160.npy": {
+      "drive_id": "16laCT6ydfGj7SvsaFBt8BeNh4bGq5Vuj",
+      "size": 1889664
+    },
+    "states/state-d01170.npy": {
+      "drive_id": "1VB4PLACvSQ1kSWsBDYE_UPVIw-kuPOiH",
+      "size": 1889664
+    },
+    "states/state-d01180.npy": {
+      "drive_id": "13ns69VRKq1yg6hEEx2HX0O4XCRsUKCqW",
+      "size": 1889664
+    },
+    "states/state-d01190.npy": {
+      "drive_id": "10oiyPd5MmlXNv4pqkRvb9fwaqVIhx_xn",
+      "size": 1889664
+    },
+    "states/state-d01200.npy": {
+      "drive_id": "13EHj91TuPTEA7ZLOqaHNHR8Ac3mJKU7n",
+      "size": 1889664
+    },
+    "statistics.npz": {
+      "drive_id": "1u-3sw1D1g4wSF9fwl9T9-JBggyLT-e_e",
+      "size": 556504
+    }
+  }
+}

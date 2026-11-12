@@ -712,8 +712,8 @@
   "nodes": [
     {
       "id": "tropoi.cli",
-      "internal_edges": 3,
-      "modules": 4
+      "internal_edges": 4,
+      "modules": 5
     },
     {
       "id": "tropoi.physics",

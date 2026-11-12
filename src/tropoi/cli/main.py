@@ -40,6 +40,7 @@ from typing import Optional, Sequence
 from tropoi.cli import clear_cache, generate_planet
 from tropoi.run.bve.presets import PRESETS
 from tropoi.cli import terrain as terrain_cli
+from tropoi.cli import capsule as capsule_cli
 from tropoi.run.bve.config import (  # import-light (stdlib only)
     BASE_DEFAULTS, PLOT_TYPES, BVERunConfig)
 
@@ -1267,6 +1268,8 @@ def build_parser() -> argparse.ArgumentParser:
         epilog=_TOP_EXAMPLES,
         formatter_class=argparse.RawDescriptionHelpFormatter)
     commands = parser.add_subparsers(dest="command", metavar="COMMAND")
+    capsule_parser = commands.add_parser("capsule", help="Fetch and verify published evidence capsules")
+    capsule_cli.add_arguments(capsule_parser)
 
     # tropoi run <solver>
     run_parser = commands.add_parser(

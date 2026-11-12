@@ -54,6 +54,14 @@
         "module"
       ],
       "source": "tropoi.cli.main",
+      "target": "tropoi.cli.capsule"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.cli.main",
       "target": "tropoi.cli.clear_cache"
     },
     {
@@ -3529,6 +3537,26 @@
   ],
   "name": "modules",
   "nodes": [
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.cli.capsule",
+      "is_package": false,
+      "path": "tropoi/cli/capsule.py",
+      "stdlib_imports": [
+        "__future__",
+        "argparse",
+        "hashlib",
+        "json",
+        "os",
+        "pathlib",
+        "re",
+        "sys",
+        "tempfile",
+        "urllib"
+      ],
+      "third_party_imports": []
+    },
     {
       "category": "code",
       "dynamic_import_calls": 0,

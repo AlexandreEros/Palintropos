@@ -2,6 +2,86 @@
   "edges": [
     {
       "kind": "call",
+      "source": "tropoi.cli.capsule._catalogue",
+      "target": "tropoi.cli.capsule._safe_name"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.cli.capsule._command",
+      "target": "tropoi.cli.capsule._catalogue"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.cli.capsule._command",
+      "target": "tropoi.cli.capsule.fetch_capsule"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.cli.capsule._command",
+      "target": "tropoi.cli.capsule.verify_capsule"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.cli.capsule._file",
+      "target": "tropoi.cli.capsule._safe_name"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.cli.capsule.fetch_capsule",
+      "target": "tropoi.cli.capsule._digest"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.cli.capsule.fetch_capsule",
+      "target": "tropoi.cli.capsule._download"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.cli.capsule.fetch_capsule",
+      "target": "tropoi.cli.capsule._file"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.cli.capsule.fetch_capsule",
+      "target": "tropoi.cli.capsule.read_archive"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.cli.capsule.fetch_capsule",
+      "target": "tropoi.cli.capsule.read_receipt"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.cli.capsule.fetch_capsule",
+      "target": "tropoi.cli.capsule.verify_capsule"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.cli.capsule.read_receipt",
+      "target": "tropoi.cli.capsule._safe_name"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.cli.capsule.verify_capsule",
+      "target": "tropoi.cli.capsule._digest"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.cli.capsule.verify_capsule",
+      "target": "tropoi.cli.capsule._file"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.cli.capsule.verify_capsule",
+      "target": "tropoi.cli.capsule.read_archive"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.cli.capsule.verify_capsule",
+      "target": "tropoi.cli.capsule.read_receipt"
+    },
+    {
+      "kind": "call",
       "source": "tropoi.cli.clear_cache.run",
       "target": "tropoi.cli.clear_cache.clear_cupy_cache"
     },
@@ -249,6 +329,11 @@
       "kind": "call",
       "source": "tropoi.cli.main.add_swe_arguments",
       "target": "tropoi.cli.main._add_initial_state_argument"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.cli.main.build_parser",
+      "target": "tropoi.cli.capsule.add_arguments"
     },
     {
       "kind": "call",
@@ -10803,6 +10888,83 @@
   ],
   "name": "calls",
   "nodes": [
+    {
+      "id": "tropoi.cli.capsule._catalogue",
+      "kind": "function",
+      "module": "tropoi.cli.capsule",
+      "qualname": "_catalogue",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.cli.capsule._command",
+      "kind": "function",
+      "module": "tropoi.cli.capsule",
+      "qualname": "_command",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.cli.capsule._digest",
+      "kind": "function",
+      "module": "tropoi.cli.capsule",
+      "qualname": "_digest",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.cli.capsule._download",
+      "kind": "function",
+      "module": "tropoi.cli.capsule",
+      "qualname": "_download",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.cli.capsule._file",
+      "kind": "function",
+      "module": "tropoi.cli.capsule",
+      "qualname": "_file",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.cli.capsule._safe_name",
+      "kind": "function",
+      "module": "tropoi.cli.capsule",
+      "qualname": "_safe_name",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.cli.capsule.add_arguments",
+      "kind": "function",
+      "module": "tropoi.cli.capsule",
+      "qualname": "add_arguments",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.cli.capsule.fetch_capsule",
+      "kind": "function",
+      "module": "tropoi.cli.capsule",
+      "qualname": "fetch_capsule",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.cli.capsule.read_archive",
+      "kind": "function",
+      "module": "tropoi.cli.capsule",
+      "qualname": "read_archive",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.cli.capsule.read_receipt",
+      "kind": "function",
+      "module": "tropoi.cli.capsule",
+      "qualname": "read_receipt",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.cli.capsule.verify_capsule",
+      "kind": "function",
+      "module": "tropoi.cli.capsule",
+      "qualname": "verify_capsule",
+      "type": "function"
+    },
     {
       "id": "tropoi.cli.clear_cache.add_arguments",
       "kind": "function",

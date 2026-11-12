@@ -4,10 +4,10 @@ CPU only. The rules (docs/runs/README.md, docs/assets/README.md):
 
 * ``docs/runs/<run-id>/`` is a published run: its primary files are
   evidence, covered by a ``SHA256SUMS`` receipt that lists every primary file
-  and nothing under ``assets/``; line endings are never converted;
-* ``<run>/assets/`` holds derived products of that run only, and every
-  derived figure records the SHA-256 of the run files it read, which must
-  match the receipt;
+  (including derived products for full archive receipts); line endings are never converted;
+* ``<run>/assets/`` holds derived products of that run only. Historical full
+  archive receipts preserve these bytes; older published figures retain
+  their embedded input hashes;
 * ``docs/assets/`` is for material that belongs to no single run; every file
   there must be listed in its README inventory, so nothing lands there
   unclassified.
@@ -47,13 +47,19 @@ def test_there_is_at_least_one_published_run():
 
 
 @pytest.mark.parametrize("run", RUNS, ids=lambda path: path.name[:40])
-def test_a_published_runs_receipt_covers_its_evidence_and_nothing_derived(
+def test_a_published_runs_receipt_covers_its_evidence(
         run):
+    from tropoi.cli.capsule import read_archive, read_receipt, verify_capsule
+    if (run / "archive.json").exists():
+        sums = read_receipt(run / "SHA256SUMS")
+        archive = read_archive(run, sums)
+        assert _files(run) - {"SHA256SUMS", "archive.json"} == set(archive["included_files"])
+        verify_capsule(run, run, core=True)
+        return
     sums = _receipt(run)
-    assert not any(name.startswith("assets/") for name in sums)
     primary = {name for name in _files(run)
                if not name.startswith("assets/")} - {"SHA256SUMS"}
-    assert set(sums) == primary
+    assert primary <= set(sums) <= _files(run) - {"SHA256SUMS"}
     for name, digest in sums.items():
         assert hashlib.sha256((run / name).read_bytes()).hexdigest() == (
             digest), name
@@ -63,6 +69,11 @@ def test_a_published_runs_receipt_covers_its_evidence_and_nothing_derived(
 def test_a_published_runs_figures_name_the_evidence_they_read(run):
     from PIL import Image
     sums = _receipt(run)
+    if (run / "archive.json").exists():
+        # Historical assets are preserved byte-for-byte together with their
+        # capsule, without rewriting metadata to manufacture provenance.
+        assert {name for name in _files(run) if name.startswith("assets/")} <= set(sums)
+        return
     coefficients = [name for name in sums if name.endswith("_coeffs.npy")]
     assert len(coefficients) == 1
     for figure in sorted((run / "assets").glob("*.png")):

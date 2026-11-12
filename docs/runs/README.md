@@ -10,24 +10,49 @@ docs/runs/<run-id>/
     *_coeffs.npy                    saved spectral states
     *_snapshot_times.npy            their time axis (s)
     diagnostics/                    per-step diagnostics
-    SHA256SUMS                      receipt for the files above, and only those
+    SHA256SUMS                      byte-level evidence receipt
+    archive.json                    optional full-cloud-capsule index
     assets/                         derived products: figures, sidecars, ...
 ```
 
-`SHA256SUMS` covers the run's evidence and nothing derived from it. Nothing
-under `assets/` is listed there. Each derived product records instead the
-SHA-256 of the files it read: the PNG metadata and JSON sidecar of an
-overview carry `CoefficientsSHA256` and `DiagnosticsSHA256`. Verify a
-receipt from inside the run directory with `sha256sum -c SHA256SUMS`.
-`tests/test_published_layout.py` checks every published run on every CI
-run. For each run it checks that:
+Receipts identify preserved bytes and may include derived figures. Older fully
+committed capsules retain their original primary-file receipts and embedded
+figure-input hashes. Checksums prove byte identity, not scientific correctness
+or faithful plotting: preserve source capsules and plotting recipes too.
 
-- the receipt lists every primary file and nothing under `assets/`;
-- every digest matches the file;
-- every figure under `assets/` names the coefficient and diagnostics hashes
-  in the receipt;
-- the run is listed in the index below;
-- Git never converts its line endings.
+Large capsules have a complete cloud copy and a smaller Git core. Their receipt
+covers **every original file**, including states, checkpoints, reports and assets.
+`archive.json` records a Drive file ID and size for each entry, the exact
+`included_files` in Git, and provenance links. These two metadata files are not
+original payload. CI checks every committed byte and requires an archive record
+for every omitted file; it does not download external data.
+
+From the repository root (no CUDA needed):
+
+```sh
+tropoi capsule verify hs-T42L20-prod-002 --core
+tropoi capsule fetch hs-T42L20-prod-002
+tropoi capsule verify hs-T42L20-prod-002
+```
+
+`fetch` downloads into `runs/<id>/`, verifies before publishing each file, and
+reuses matching files after interruption. It refuses differing local files.
+`verify` is offline and fails for missing or corrupt files. `--core` explicitly
+checks the Git subset and reports absent archive files; this is not a full pass.
+Use `--path DIR` for another full-capsule location and `--catalog PATH` for a
+different local catalogue. Passing a receipt directory directly to `verify`
+checks that directory unless `--path` is supplied.
+
+The catalogue currently requires a repository checkout; it is not in the wheel.
+Drive files must be downloadable through the shared link. Private/quota-limited
+downloads fail without accepting sign-in pages as evidence. No credentials or
+permissions are changed. Private data can be downloaded through your own Drive
+access and checked with `verify --path DIR`. Fetch is explicit, never triggered
+by plotting. The receipt pins bytes: changes in the cloud fail verification.
+
+For a full local copy, `sha256sum -c /absolute/path/to/SHA256SUMS` also works from
+inside that capsule. All published runs are indexed and Git preserves their
+line endings byte-for-byte.
 
 Other directories hold different material:
 
@@ -37,6 +62,27 @@ Other directories hold different material:
   combine several runs, or a run and an external reference.
 
 ## Index
+
+### `hs-T42L20-prod-002`
+
+Held–Suarez T42L20 production run: the historical passing climate evidence,
+including its report and later assets. Full capsule: 141 files, 241,858,901 bytes.
+Git core: 18 original files, 2,079,182 bytes, plus receipt and archive descriptor.
+Only `states/` and `checkpoints/` are omitted; the receipt covers all files.
+
+- [Full capsule on Drive](https://drive.google.com/drive/folders/1ID1ZhJJP2NoFPzWus4627dzwUBTgbEqQ):
+  the owner's November 12 bulk upload, including later figures.
+- [Historical Colab output](https://drive.google.com/drive/folders/1dBYGmQ9YsjQjrkh17cUbFpMX0MaSZDmr):
+  identified by the owner as the incrementally saved source of the local download.
+  This older folder has no `assets/`; it is provenance, not a full mirror of the
+  later capsule.
+- [Climate validation record](../validation/held_suarez_climate_2026-11-04/).
+  Preservation does not independently revalidate the historical scientific claims.
+- **Archive read-back verified 2026-11-12:** `capsule fetch` downloaded all
+  141 files from the new Drive copy into an empty directory. Every SHA-256
+  matched the receipt generated from the local original, including all 120
+  states and three checkpoints (241,858,901 bytes total). The historical
+  Colab folder was inspected for provenance, not fully downloaded or hashed.
 
 ### `20260730T011700Z_williamson5_rot23p93h_r4_l63_dt120h_45406d82_668e6c9a`
 

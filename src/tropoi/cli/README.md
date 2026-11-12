@@ -5,6 +5,10 @@ It parses arguments and dispatches to [run orchestration](../run/README.md);
 `terrain.py` prepares terrain, `generate_planet.py` builds the procedural
 planet view and `clear_cache.py` manages compiled CUDA cache files.
 
+`capsule.py` implements explicit `tropoi capsule fetch` and offline
+`tropoi capsule verify`. The [published-run catalogue](../../../docs/runs/README.md)
+owns archive locations, full checksums, core file lists and retrieval examples.
+
 Run `tropoi --help`, `tropoi run --help`, `tropoi list presets` and
 `tropoi inspect RUN_PATH` for discovery. Help, configuration validation and
 inspection work without CUDA. Numerical runs and terrain projection require
