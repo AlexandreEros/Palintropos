@@ -328,6 +328,36 @@ next to the first run's, not judged. The code also differs from the first
 run's by the startup-step fix (the slab is advanced one extra step at the
 start), which is not expected to matter after spin-up.
 
+**Result (run completed 2026-11-12, commit `d38d2a3`, MX110, configuration
+`748cec4b…`; evidence in `evidence/earth-gray-dry-heated-T21L25-300d/`).**
+The criterion is met: the mean residual over days 201–300 is
+−0.002 W m^-2.
+
+| days 201–300, mean ± standard deviation of daily values | without heating (`b2b8ea2`) | with heating (`d38d2a3`) |
+| --- | --- | --- |
+| energy-budget residual, W m^-2 | −5.10 ± 0.42 | −0.002 ± 0.025 |
+| largest single-day residual in the whole run, W m^-2 | 12.1 | 0.37 |
+| TOA net down, W m^-2 | +4.22 ± 0.60 | −0.59 ± 0.55 |
+| OLR, W m^-2 (absorbed 234.60) | 230.38 | 235.19 |
+| mean surface temperature, K | 301.39 ± 0.19 | 302.65 ± 0.11 |
+| kinetic energy, MJ m^-2 | 1.378 ± 0.058 | 1.376 ± 0.059 |
+| max \|u\|, m s^-1 | 64 ± 5 | 62 ± 5 |
+| westerly jets, north / south (150-day zonal mean), m s^-1 | 28.2 at 19° / 27.4 at 25° | 26.0 at 25° / 28.0 at 25° |
+| surface-pressure drift over 300 days | −1.1 × 10^-6 | −1.2 × 10^-6 |
+
+With the heating the budget closes, the top-of-atmosphere imbalance of
++4.2 W m^-2 is replaced by −0.6 W m^-2 (about one standard deviation of the
+daily values from zero), and the surface is 1.3 K warmer. Kinetic energy and
+jet strength are the same within their day-to-day spread. Not done for this
+run: the per-state measurement of the sinks and of the heating
+(`summarize_run.py` was run with `--no-sinks`). The comparison is with one
+realisation of each run, and it is not strictly single-variable because of
+the startup-step fix noted above.
+
+This run used the per-level (unbatched) heating term. The batched version
+committed afterwards (`814bcf8`) is equivalent to round-off but has not been
+used for a long run.
+
 ## 7. Published comparisons: verified, and where each stands
 
 All five references were read (protocol numbers in the docstrings cite them).
