@@ -1,4 +1,5 @@
 """Offline integrity and interruption behavior of published capsule retrieval."""
+import errno
 import hashlib
 import io
 import json
@@ -164,3 +165,200 @@ def test_concurrent_file_is_not_overwritten(catalogue, tmp_path, monkeypatch):
                                   ["capsule", "verify", "--help"]])
 def test_capsule_help_is_import_light(args):
     assert_probe_passes("from tropoi.cli.main import main", f"main({args!r})")
+
+
+# --- Publication on filesystems without hard links ------------------------------
+# These tests simulate POSIX filesystem behaviour with mocks on any host; they do
+# not exercise a real Linux kernel, FUSE mount or Colab Drive.
+
+def _unsupported_link(*args, **kwargs):
+    raise OSError(errno.EPERM, "Operation not permitted")
+
+
+def _noreplace_rename(source, target):
+    # Simulates renameat2(RENAME_NOREPLACE) honouring its flag.
+    if Path(target).exists():
+        raise FileExistsError(errno.EEXIST, "File exists", str(target))
+    Path(source).rename(target)
+
+
+def _hidden_capsule_files(root):
+    return list(root.rglob(".capsule-*"))
+
+
+def _serve(files):
+    return lambda url, timeout: io.BytesIO(
+        files["config.json"] if "id=id0&" in url else files["states/state.npy"])
+
+
+def _quiet(*args):
+    pass
+
+
+@pytest.fixture
+def posix(monkeypatch):
+    monkeypatch.setattr(capsule, "_NT", False)
+    return monkeypatch
+
+
+def test_unsupported_destination_refused_before_network(catalogue, tmp_path, posix):
+    root, _ = catalogue
+    parent = tmp_path / "drive-mount"
+    parent.mkdir()
+    destination = parent / "demo"
+    posix.setattr(capsule.os, "link", _unsupported_link)
+    def no_renameat2(source, target):
+        raise OSError(errno.EINVAL, "Invalid argument")
+    posix.setattr(capsule, "_renameat2_noreplace", no_renameat2)
+    posix.setattr(capsule.urllib.request, "urlopen",
+                  lambda *a, **k: pytest.fail("Must not download to an unsafe destination"))
+    with pytest.raises(ValueError, match="/content/runs") as raised:
+        capsule.fetch_capsule(root, destination, progress=_quiet)
+    assert str(parent) in str(raised.value)
+    assert not destination.exists()
+    assert not list(parent.iterdir())  # Probe files cleaned up.
+
+
+def test_cli_reports_unsupported_destination(catalogue, tmp_path, posix, capsys):
+    root, _ = catalogue
+    posix.setattr(capsule.os, "link", _unsupported_link)
+    posix.setattr(capsule, "_renameat2_noreplace", _unsupported_link)
+    assert main(["capsule", "fetch", "demo", "--catalog", str(root.parent),
+                 "--path", str(tmp_path / "out")]) == 1
+    error = capsys.readouterr().err
+    assert "neither hard links nor atomic no-overwrite renames" in error
+    assert "/content/runs" in error
+    assert not _hidden_capsule_files(tmp_path)
+
+
+def test_renameat2_fallback_publishes_verified_files(catalogue, tmp_path, posix):
+    root, files = catalogue
+    destination = tmp_path / "download"
+    published = []
+    def renameat2(source, target):
+        published.append(Path(target).name)
+        _noreplace_rename(source, target)
+    posix.setattr(capsule.os, "link", _unsupported_link)
+    posix.setattr(capsule, "_renameat2_noreplace", renameat2)
+    posix.setattr(capsule.urllib.request, "urlopen", _serve(files))
+    assert capsule.fetch_capsule(root, destination, progress=_quiet)["checked"] == 2
+    assert {"config.json", "state.npy"} <= set(published)
+    assert not _hidden_capsule_files(tmp_path)
+
+
+def test_renameat2_fallback_never_overwrites(catalogue, tmp_path, posix):
+    root, files = catalogue
+    destination = tmp_path / "download"
+    posix.setattr(capsule.os, "link", _unsupported_link)
+    posix.setattr(capsule, "_renameat2_noreplace", _noreplace_rename)
+    def download(*args, **kwargs):
+        (destination / "config.json").write_bytes(b"concurrent content")
+        return io.BytesIO(files["config.json"])
+    posix.setattr(capsule.urllib.request, "urlopen", download)
+    with pytest.raises(FileExistsError):
+        capsule.fetch_capsule(root, destination, progress=_quiet)
+    assert (destination / "config.json").read_bytes() == b"concurrent content"
+    assert not _hidden_capsule_files(tmp_path)
+
+
+def test_rename_that_ignores_noreplace_is_rejected(catalogue, tmp_path, posix):
+    root, _ = catalogue
+    posix.setattr(capsule.os, "link", _unsupported_link)
+    posix.setattr(capsule, "_renameat2_noreplace", lambda s, t: Path(s).replace(t))
+    posix.setattr(capsule.urllib.request, "urlopen",
+                  lambda *a, **k: pytest.fail("Must not download"))
+    with pytest.raises(ValueError, match="replaced an existing file"):
+        capsule.fetch_capsule(root, tmp_path / "out", progress=_quiet)
+    assert not _hidden_capsule_files(tmp_path)
+
+
+def test_partial_download_never_visible_under_final_name(catalogue, tmp_path, posix):
+    root, files = catalogue
+    destination = tmp_path / "download"
+    posix.setattr(capsule.os, "link", _unsupported_link)
+    posix.setattr(capsule, "_renameat2_noreplace", _noreplace_rename)
+    seen = []
+    class Trickle(io.BytesIO):
+        def read(self, n=-1):
+            seen.append((destination / "config.json").exists())
+            return super().read(1)
+    posix.setattr(capsule.urllib.request, "urlopen", lambda url, timeout: Trickle(
+        files["config.json"] if "id=id0&" in url else files["states/state.npy"]))
+    capsule.fetch_capsule(root, destination, progress=_quiet)
+    # Every read of config.json (its bytes plus the EOF read) precedes publication.
+    assert len(seen) > len(files["config.json"])
+    assert not any(seen[:len(files["config.json"]) + 1])
+
+
+def test_hard_link_strategy_used_when_supported(catalogue, tmp_path, posix):
+    # os.link is real here (NTFS and POSIX test hosts both support it).
+    root, files = catalogue
+    posix.setattr(capsule, "_renameat2_noreplace",
+                  lambda *a: pytest.fail("Fallback must not be used when links work"))
+    posix.setattr(capsule.urllib.request, "urlopen", _serve(files))
+    assert capsule.fetch_capsule(root, tmp_path / "download", progress=_quiet)["checked"] == 2
+    assert not _hidden_capsule_files(tmp_path)
+
+
+def test_unwritable_destination_reported_clearly(catalogue, tmp_path, posix):
+    root, _ = catalogue
+    def read_only(*args, **kwargs):
+        raise PermissionError(errno.EACCES, "Permission denied")
+    posix.setattr(capsule.tempfile, "NamedTemporaryFile", read_only)
+    posix.setattr(capsule.urllib.request, "urlopen",
+                  lambda *a, **k: pytest.fail("Must not download"))
+    with pytest.raises(ValueError, match="Cannot write to"):
+        capsule.fetch_capsule(root, tmp_path / "out", progress=_quiet)
+
+
+def test_complete_capsule_reuse_needs_no_write_access(catalogue, tmp_path, monkeypatch):
+    root, files = catalogue
+    destination = tmp_path / "complete"
+    for name, data in files.items():
+        (destination / name).parent.mkdir(parents=True, exist_ok=True)
+        (destination / name).write_bytes(data)
+    def forbidden(*args, **kwargs):
+        pytest.fail("Complete capsules must not probe, write or download")
+    monkeypatch.setattr(capsule, "_probe_directory", forbidden)
+    monkeypatch.setattr(capsule.tempfile, "NamedTemporaryFile", forbidden)
+    monkeypatch.setattr(capsule.urllib.request, "urlopen", forbidden)
+    assert capsule.fetch_capsule(root, destination, progress=_quiet)["checked"] == 2
+    assert capsule.verify_capsule(destination, root)["checked"] == 2
+
+
+# --- Verifying a capsule directory that does not exist ---------------------------
+
+def test_missing_capsule_directory_is_one_clear_error(catalogue, tmp_path):
+    root, _ = catalogue
+    absent = tmp_path / "runs" / "demo"
+    for core in (False, True):
+        with pytest.raises(ValueError) as raised:
+            capsule.verify_capsule(absent, root, core=core)
+        message = str(raised.value)
+        assert str(absent) in message and "does not exist" in message
+        assert "tropoi capsule fetch demo" in message and "--path" in message
+        assert "missing:" not in message
+
+
+def test_cli_missing_directory_single_line(catalogue, tmp_path, capsys, monkeypatch):
+    root, _ = catalogue
+    monkeypatch.chdir(tmp_path)  # The default destination runs/demo does not exist.
+    assert main(["capsule", "verify", "demo", "--catalog", str(root.parent)]) == 1
+    error = capsys.readouterr().err
+    assert error.count("\n") == 1 and "runs" in error and "fetch demo" in error
+    assert main(["capsule", "verify", "demo", "--catalog", str(root.parent), "--core",
+                 "--path", str(tmp_path / "elsewhere")]) == 1
+    error = capsys.readouterr().err
+    assert error.count("\n") == 1 and "elsewhere" in error
+    # Directories that exist still get per-file detail.
+    (tmp_path / "runs" / "demo").mkdir(parents=True)
+    assert main(["capsule", "verify", "demo", "--catalog", str(root.parent)]) == 1
+    error = capsys.readouterr().err
+    assert "missing: config.json" in error and "missing: states/state.npy" in error
+
+
+def test_capsule_path_that_is_a_file_is_rejected(catalogue, tmp_path):
+    root, _ = catalogue
+    (tmp_path / "file").write_text("x")
+    with pytest.raises(ValueError, match="is not a directory"):
+        capsule.verify_capsule(tmp_path / "file", root)

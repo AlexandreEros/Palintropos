@@ -6,6 +6,7 @@ Drive IDs identify bytes to retrieve; SHA256SUMS determines whether to accept th
 from __future__ import annotations
 
 import argparse
+import errno
 import hashlib
 import json
 import os
@@ -98,6 +99,12 @@ def verify_capsule(root: Path, catalogue: Path, *, core: bool = False) -> dict:
     archive = read_archive(catalogue, sums) if (catalogue / "archive.json").exists() else None
     if core and archive is None:
         raise ValueError("--core requires archive.json with an explicit included_files list")
+    if not root.is_dir():
+        # One actionable message instead of one "missing:" line per archived file.
+        state = "is not a directory" if root.exists() else "does not exist"
+        raise ValueError(
+            f"Capsule directory {root} {state}. Run `tropoi capsule fetch {catalogue.name}` "
+            "to download it, or pass --path DIR to verify a copy stored elsewhere.")
     required = set(archive["included_files"]) if core else set(sums)
     problems = []
     checked = 0
@@ -113,7 +120,7 @@ def verify_capsule(root: Path, catalogue: Path, *, core: bool = False) -> dict:
             problems.append(f"checksum mismatch: {name}")
         else:
             checked += 1
-    if archive and root.exists():
+    if archive:
         for path in root.rglob("*"):
             name = path.relative_to(root).as_posix()
             _file(root, name)
@@ -124,7 +131,109 @@ def verify_capsule(root: Path, catalogue: Path, *, core: bool = False) -> dict:
     return {"checked": checked, "missing": missing, "total": len(sums)}
 
 
-def _download(drive_id: str, destination: Path, size: int, digest: str) -> None:
+# Verified bytes are published atomically and never over an existing file (a
+# concurrent writer wins). POSIX rename/replace silently overwrite, so they are
+# never used. Strategies, in order of preference:
+#   "rename"    Windows os.rename, which refuses an existing destination;
+#   "link"      POSIX hard link (EEXIST if present), then drop the temporary name;
+#   "renameat2" Linux renameat2(RENAME_NOREPLACE), for filesystems without links.
+_UNSUPPORTED = {errno.EPERM, errno.ENOSYS, errno.EINVAL, errno.EXDEV, errno.EMLINK,
+                getattr(errno, "ENOTSUP", errno.EOPNOTSUPP), errno.EOPNOTSUPP}
+_NT = os.name == "nt"
+_LOCAL_HINT = ("Fetch to local storage instead (for example --path /content/runs/<id> "
+               "on Colab), then copy the verified capsule and re-run "
+               "`tropoi capsule verify <id> --path COPY`.")
+
+
+def _renameat2_noreplace(source: Path, target: Path) -> None:
+    """Atomically rename, failing with EEXIST rather than replacing ``target``."""
+    if not sys.platform.startswith("linux"):
+        raise OSError(errno.ENOSYS, "renameat2 is Linux-only")
+    import ctypes  # Local: keeps `tropoi --help` import-light.
+    function = getattr(ctypes.CDLL(None, use_errno=True), "renameat2", None)
+    if function is None:
+        raise OSError(errno.ENOSYS, "libc has no renameat2")
+    function.argtypes = [ctypes.c_int, ctypes.c_char_p, ctypes.c_int, ctypes.c_char_p,
+                         ctypes.c_uint]
+    at_fdcwd, rename_noreplace = -100, 1
+    if function(at_fdcwd, os.fsencode(source), at_fdcwd, os.fsencode(target),
+                rename_noreplace) != 0:
+        code = ctypes.get_errno()
+        raise OSError(code, os.strerror(code), str(source), None, str(target))
+
+
+def _publish(temporary: Path, destination: Path, strategy: str) -> None:
+    if strategy == "rename":
+        os.rename(temporary, destination)
+    elif strategy == "link":
+        os.link(temporary, destination)
+    elif strategy == "renameat2":
+        _renameat2_noreplace(temporary, destination)
+    else:
+        raise ValueError(f"Unknown publication strategy: {strategy}")
+
+
+def _probe_directory(directory: Path) -> str:
+    """Choose a no-overwrite strategy that ``directory``'s filesystem honours.
+
+    Probe files are hidden temporaries that are always removed. A rename strategy
+    is accepted only after it is seen refusing an existing name.
+    """
+    if _NT:
+        return "rename"
+    probes = []
+    def scratch(suffix: str) -> Path:
+        with tempfile.NamedTemporaryFile(dir=directory, prefix=".capsule-probe-",
+                                         suffix=suffix, delete=False) as stream:
+            probes.append(Path(stream.name))
+        return probes[-1]
+    reasons = []
+    try:
+        try:
+            source = scratch(".src")
+        except OSError as error:
+            raise ValueError(f"Cannot write to {directory}: {error}") from error
+        for strategy in ("link", "renameat2"):
+            target = source.with_suffix(".dst")
+            probes.append(target)
+            try:
+                _publish(source, target, strategy)
+            except OSError as error:
+                if error.errno not in _UNSUPPORTED:
+                    raise ValueError(f"Cannot publish files in {directory}: {error}") from error
+                reasons.append(f"{strategy}: {error.strerror or error}")
+                continue
+            if strategy == "link":
+                return strategy
+            # The source name is gone; prove the flag is honoured, not ignored.
+            source, occupied = scratch(".src"), scratch(".occupied")
+            try:
+                _publish(source, occupied, strategy)
+            except FileExistsError:
+                return strategy
+            except OSError as error:
+                reasons.append(f"{strategy}: {error.strerror or error}")
+                continue
+            reasons.append(f"{strategy}: replaced an existing file")
+        raise ValueError(
+            f"{directory} supports neither hard links nor atomic no-overwrite renames "
+            f"({'; '.join(reasons)}), so verified downloads cannot be published safely. "
+            + _LOCAL_HINT)
+    finally:
+        for probe in probes:
+            probe.unlink(missing_ok=True)
+
+
+def _existing_ancestor(path: Path) -> Path:
+    # A directory that does not exist yet cannot be a mount point, so it will be
+    # created on the filesystem of its nearest existing ancestor.
+    while not path.exists():
+        path = path.parent
+    return path
+
+
+def _download(drive_id: str, destination: Path, size: int, digest: str,
+              strategy: str) -> None:
     url = f"https://drive.usercontent.google.com/download?id={drive_id}&export=download&confirm=t"
     # Temporary bytes are never published under their final name before verification.
     with tempfile.NamedTemporaryFile(dir=destination.parent, prefix=".capsule-",
@@ -144,12 +253,7 @@ def _download(drive_id: str, destination: Path, size: int, digest: str) -> None:
                 raise ValueError(f"Download checksum/size mismatch: {destination.name}; "
                                  "Drive may have returned a sign-in/quota page or changed bytes")
             stream.close()
-            # Atomic no-clobber publication (unlike replace, a concurrent file wins).
-            if os.name == "nt":
-                # Windows rename is atomic and refuses an existing destination.
-                os.rename(temporary, destination)
-            else:
-                os.link(temporary, destination)
+            _publish(temporary, destination, strategy)
         finally:
             stream.close()
             temporary.unlink(missing_ok=True)
@@ -174,13 +278,18 @@ def fetch_capsule(catalogue: Path, destination: Path, *, progress=print) -> dict
             _file(destination, name)
             if path.is_file() and name not in sums and name not in {"archive.json", "SHA256SUMS"}:
                 raise ValueError(f"Unlisted local file: {path}")
+    # Probe every filesystem that will receive files before spending bandwidth.
+    # A complete capsule has nothing pending, so reuse needs no write access.
+    ancestors = {name: _existing_ancestor(_file(destination, name).parent) for name in pending}
+    probed = {directory: _probe_directory(directory) for directory in set(ancestors.values())}
     progress(f"Fetching {len(pending)} files; reusing {len(sums) - len(pending)} verified files")
     for i, name in enumerate(pending, 1):
         path = _file(destination, name)
+        strategy = probed[ancestors[name]]
         path.parent.mkdir(parents=True, exist_ok=True)
         record = archive["files"][name]
         progress(f"[{i}/{len(pending)}] {name}")
-        _download(record["drive_id"], path, record["size"], sums[name])
+        _download(record["drive_id"], path, record["size"], sums[name], strategy)
     return verify_capsule(destination, catalogue)
 
 

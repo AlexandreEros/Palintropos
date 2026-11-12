@@ -37,11 +37,23 @@ tropoi capsule verify hs-T42L20-prod-002
 
 `fetch` downloads into `runs/<id>/`, verifies before publishing each file, and
 reuses matching files after interruption. It refuses differing local files.
-`verify` is offline and fails for missing or corrupt files. `--core` explicitly
-checks the Git subset and reports absent archive files; this is not a full pass.
-Use `--path DIR` for another full-capsule location and `--catalog PATH` for a
-different local catalogue. Passing a receipt directory directly to `verify`
-checks that directory unless `--path` is supplied.
+A verified file appears under its final name in one atomic step that never
+replaces an existing file: a rename on Windows, a hard link on POSIX, or Linux
+`renameat2(RENAME_NOREPLACE)` where hard links are unsupported. Before any
+download, `fetch` probes each destination filesystem with hidden probe files it
+removes again; if neither method works (for example some FUSE or network
+mounts, possibly Colab's `/content/drive`), it stops with an error recommending
+local storage such as `--path /content/runs/<id>`. Copy the verified capsule
+afterwards and check the copy with `verify --path`. Reusing an already complete
+capsule probes and writes nothing.
+
+`verify` is offline, needs no write access, and fails for missing or corrupt
+files. If the capsule directory does not exist it reports that once, suggesting
+`fetch` or `--path`. `--core` explicitly checks the Git subset and reports
+absent archive files; this is not a full pass. Use `--path DIR` for another
+full-capsule location and `--catalog PATH` for a different local catalogue.
+Passing a receipt directory directly to `verify` checks that directory unless
+`--path` is supplied.
 
 The catalogue currently requires a repository checkout; it is not in the wheel.
 Drive files must be downloadable through the shared link. Private/quota-limited

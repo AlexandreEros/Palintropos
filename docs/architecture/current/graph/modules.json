@@ -3546,6 +3546,8 @@
       "stdlib_imports": [
         "__future__",
         "argparse",
+        "ctypes",
+        "errno",
         "hashlib",
         "json",
         "os",

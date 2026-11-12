@@ -1,20 +1,20 @@
 {
   "call_graph": {
     "call_sites": {
-      "builtin": 3661,
-      "external": 2440,
-      "internal": 2924,
-      "unresolved": 3665
+      "builtin": 3673,
+      "external": 2448,
+      "internal": 2931,
+      "unresolved": 3680
     },
     "edges_by_kind": {
-      "call": 1285,
+      "call": 1290,
       "constructor": 62,
       "instantiate": 492,
       "override": 6,
       "self": 328,
       "super": 4
     },
-    "nodes": 1888,
+    "nodes": 1892,
     "scoped": {
       "cli-gen": {
         "edges": 28,
@@ -952,7 +952,7 @@
     "package": "tropoi",
     "src": "src",
     "working_tree": {
-      "base_commit": "91747d75a88de774a277a32ca8b14b385e39051e",
+      "base_commit": "9cf3e6f08e011b7bd863928b5bb5e4f1e33b7ecf",
       "generator": {
         "changes": [],
         "files": {
@@ -975,14 +975,12 @@
       },
       "source": {
         "changes": [
-          " M src/tropoi/cli/README.md",
-          " M src/tropoi/cli/main.py",
-          "?? src/tropoi/cli/capsule.py"
+          " M src/tropoi/cli/capsule.py"
         ],
         "files": {
           "src/tropoi/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
           "src/tropoi/cli/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-          "src/tropoi/cli/capsule.py": "d6f8e34f517f2b97f49d36e053ec65179bde852fd689ad3bb6c593bb9b926d38",
+          "src/tropoi/cli/capsule.py": "8a74dc26bba1b2281c53e255bdd36a53f2c9b9adfea7a5fad39d2c4ddd9cbc7e",
           "src/tropoi/cli/clear_cache.py": "9f214cd2654208e4478b65ee537d4bc7c7ccbb2b3ed3f87bc897d1ead0bbbbc4",
           "src/tropoi/cli/generate_planet.py": "797b1d7d528c9bb2bd210ec95313772ffc5d090ab2e740d07b339aa66132b116",
           "src/tropoi/cli/main.py": "f62c055e294c85fea3304bcdadec4891087752f6e343dbe08cb9f94a8ff0332d",
@@ -1151,7 +1149,7 @@
           "src/tropoi/temporal/tendencies/primitive_equations.py": "848c6fe9406a7c1c465c0aa9459760b01c542164c8cc9395797a3c4a60793e52",
           "src/tropoi/temporal/tendencies/shallow_water.py": "7ae521f2378824e89f88bc467fc99321d1ef4224b037c865137e076a601da3c8"
         },
-        "sha256": "ef025f6d8b96592844b0573b445eef90570b98501d8c8a572219390b2beeea4a",
+        "sha256": "c82a8277cdf1c75afc5233d3c9e290c7314605ea6e42364ae57e8a5ea5f385c2",
         "status": "dirty"
       }
     }
