@@ -1,7 +1,7 @@
 {
   "call_graph": {
     "call_sites": {
-      "builtin": 3603,
+      "builtin": 3604,
       "external": 2423,
       "internal": 2904,
       "unresolved": 3593
@@ -948,11 +948,11 @@
     }
   },
   "source": {
-    "commit": "295808706dc34e8b09fdfb7904ea46096c58e028",
+    "commit": "ec118c728c4eb76d6ecea47b9749d2f4c99a9327",
     "package": "tropoi",
     "src": "src",
     "working_tree": {
-      "base_commit": "295808706dc34e8b09fdfb7904ea46096c58e028",
+      "base_commit": "ec118c728c4eb76d6ecea47b9749d2f4c99a9327",
       "generator": {
         "changes": [],
         "files": {
@@ -988,7 +988,7 @@
           "src/tropoi/physics/composition.py": "3c83a7abe1060f4b8209f13819420b9b97fccf2bc29348d2663ea1b3400921e2",
           "src/tropoi/physics/constants.py": "97c07ad424b13bc018c45a2b5036054e2ce0d2107281a814109aa62cd20cff93",
           "src/tropoi/physics/convection.py": "593c1a1ac1b1974c98ca84acb2727a2f1d57260996b832ba75779354b516e09e",
-          "src/tropoi/physics/insolation.py": "b19ce1ae7e34e44ab06a0fe61f11c92983b715acde9dc29b5dbce431ddf16358",
+          "src/tropoi/physics/insolation.py": "3758f32239a6a2e1ab579975b54dd7c902aaab28624c25eba159db81125cdf13",
           "src/tropoi/physics/orbit.py": "6c2135c5c4b8a3dfd88ac688db2c1d498f8bf156501c873b464ac2caf214597d",
           "src/tropoi/physics/planets.py": "4568cb1fc41c1bbf5529d215e5e3f31df04266d36fb68b62b0c0c0b023cf8aec",
           "src/tropoi/physics/radiation/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
@@ -1038,7 +1038,7 @@
           "src/tropoi/representation/visual/planet_viewer.py": "4baa300f43c62e925944b2adf134cc82091102bffc4e6858c1c23fe4f6265fd0",
           "src/tropoi/representation/visual/quantities.py": "bf9c4b1bdb4563ec51a22138629d148c4e6ccb0356413ee4a11ff87551a9c563",
           "src/tropoi/representation/visual/renderers.py": "9f6173f49588029f1404914b1fd3edd7ef1559688b02e3a056e67fa121cb261e",
-          "src/tropoi/representation/visual/sky.py": "9ee561a2b246013bf6059d9eb6c9b79e42ef6c1ff5c2c94c1e4969412fd16f52",
+          "src/tropoi/representation/visual/sky.py": "2dbe88b929e8606a5b5f07b511d7a4735fb86509fcdc4f88dea4b0e2175c2701",
           "src/tropoi/representation/visual/sky_view.html": "a385492ffd5c352de1cb0d4f42f85ced2534a8fb014f21e0b6725771fb8a5e03",
           "src/tropoi/representation/visual/snapshot.py": "2aa254f731fdf0caadab5a960fcffbbabca6319c20fe21f79dba967beb7eb3ae",
           "src/tropoi/representation/visual/specs.py": "f43a3bff6371425f177d9f8d0d2f03823bd038af5c830cf4214a1174ed6ba68e",
@@ -1146,7 +1146,7 @@
           "src/tropoi/temporal/tendencies/primitive_equations.py": "848c6fe9406a7c1c465c0aa9459760b01c542164c8cc9395797a3c4a60793e52",
           "src/tropoi/temporal/tendencies/shallow_water.py": "7ae521f2378824e89f88bc467fc99321d1ef4224b037c865137e076a601da3c8"
         },
-        "sha256": "27d66b1e530ad33b6098ddef713df5f5a668b89bab1b17a795a346e6a9b2e057",
+        "sha256": "5baf2bfe65b94f11bfa159c004728193741c8fb3950b96f0ae663210dc1e2d9f",
         "status": "clean"
       }
     }
