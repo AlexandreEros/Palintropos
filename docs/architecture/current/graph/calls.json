@@ -413,6 +413,11 @@
     {
       "kind": "call",
       "source": "tropoi.physics.column_model.ColumnPhysics.compute",
+      "target": "tropoi.physics.radiation.scheme.heating_rate"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.physics.column_model.ColumnPhysics.compute",
       "target": "tropoi.physics.surface.sensible_heat_flux"
     },
     {

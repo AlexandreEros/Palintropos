@@ -76,6 +76,16 @@ def test_frictional_heating_is_opt_in_and_leaves_existing_hashes_alone():
         assert RadiativeConfig.from_dict(json.loads(on.canonical_json())) == on
 
 
+def test_radiation_interval_must_divide_a_day_so_that_resume_is_exact():
+    """Held radiative fluxes are not checkpointed; runs stop at whole days.
+    72 steps a day with an interval of 5 would resume off the schedule."""
+    cfg = PRESETS["earth-gray-dry"]()
+    assert cfg.steps_per_day == 72
+    assert cfg.with_(radiation_interval=4).radiation_interval == 4
+    with pytest.raises(ValueError, match="must divide"):
+        cfg.with_(radiation_interval=5)
+
+
 # ---------------------------------------------------------------- host only
 def test_presets_are_valid_hashable_and_round_trip():
     seen = set()
@@ -332,4 +342,24 @@ def test_with_frictional_heating_the_coupled_budget_closes_with_hyperdiffusion_o
     series = json.loads((tmp_path / "run" / "series.json").read_text())
     print("residual", series["energy_residual"])
     assert abs(series["energy_residual"][-1]) < 5e-3
+
+
+@needs_cuda
+def test_a_resumed_run_with_held_radiation_is_identical(tmp_path):
+    """radiation_interval = 4 (fluxes held for three of every four steps),
+    stopped after day 1 and resumed: same bits as the uninterrupted run."""
+    from tropoi.run.radiative.experiment import RadiativeRun
+    cfg = _tiny(PRESETS["earth-gray-dry"](days=2), experiment_id="earth-held",
+                vertical={"kind": "frierson", "nlev": 10}, checkpoint_every_days=1,
+                state_every_days=1, radiation_interval=4)
+    RadiativeRun(cfg, tmp_path / "full", allow_dirty=True, log=lambda s: None).run()
+    RadiativeRun(cfg, tmp_path / "split", allow_dirty=True, log=lambda s: None).run(until_day=1)
+    resumed = RadiativeRun(cfg, tmp_path / "split", allow_dirty=True, log=lambda s: None)
+    assert resumed.run()["status"] == "completed"
+    for name in ("state", "surface"):
+        a = np.load(tmp_path / "full" / "states" / f"{name}-d00002.npy")
+        b = np.load(tmp_path / "split" / "states" / f"{name}-d00002.npy")
+        assert np.array_equal(a, b)
+    series = json.loads((tmp_path / "full" / "series.json").read_text())
+    assert abs(series["energy_residual"][-1]) < 0.02 * abs(series["column_energy_tendency"][-1])
 

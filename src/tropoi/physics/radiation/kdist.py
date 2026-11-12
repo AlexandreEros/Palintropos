@@ -318,7 +318,8 @@ class CorrelatedKLongwave(_CorrelatedK):
         x = xp.clip(temperature - t0, 0.0, self._t_grid.size - 1.000001)
         i = x.astype(np.int64)
         w = (x - i)[..., None]
-        frac = (1.0 - w) * table[i][..., points] + w * table[i + 1][..., points]
+        table = table[:, points]           # spectral slice first: bounded by the chunk
+        frac = (1.0 - w) * table[i] + w * table[i + 1]
         return frac * (STEFAN_BOLTZMANN * temperature ** 4)[..., None]
 
     def spectral_coverage(self, temperature: float) -> float:

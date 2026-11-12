@@ -95,6 +95,13 @@ class RadiativeConfig:
             raise ValueError(f"dt = {self.dt} s must divide 86400 s")
         if self.days < 1 or self.radiation_interval < 1:
             raise ValueError("days and radiation_interval must be >= 1")
+        if round(spd) % self.radiation_interval:
+            # Held radiative fluxes are not checkpointed. Runs stop and resume
+            # at whole days, so a day must be a whole number of radiation
+            # intervals for a resumed run to recompute them exactly where an
+            # uninterrupted one does.
+            raise ValueError(f"radiation_interval = {self.radiation_interval} must divide the "
+                             f"{round(spd)} steps of a day")
         if self.damping_scheme not in ("lagged", "centred"):
             raise ValueError("damping_scheme must be 'lagged' or 'centred'")
         if "kind" not in self.vertical or "kind" not in self.longwave:

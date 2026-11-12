@@ -142,9 +142,11 @@ def direct_layer(tau, ssa, g1, g2, g3, mu0):
     # Floor k at 1e-6: the closed form loses digits as k -> 0 (conservative
     # scattering); the floor costs O(k^2) = 1e-12 and keeps ~1e-10 accuracy.
     k = xp.sqrt(xp.maximum((g1 - g2) * (g1 + g2), 1e-12))
-    # The closed form is singular at k mu0 = 1; step off it.
+    # The closed form has a removable singularity at k mu0 = 1. Step the
+    # incidence cosine itself off it and use that value everywhere below, so
+    # the numerator still cancels (a relative change of 2e-6 in mu0).
+    mu0 = xp.where(xp.abs(1.0 - k * mu0) < 1e-6, mu0 * (1.0 + 2e-6), mu0)
     kmu = k * mu0
-    kmu = xp.where(xp.abs(1.0 - kmu) < 1e-6, kmu + 2e-6, kmu)
     a1 = g1 * g4 + g2 * g3
     a2 = g1 * g3 + g2 * g4
     e1 = xp.exp(-k * tau)

@@ -175,3 +175,16 @@ def test_table_file_round_trip(table, tmp_path):
     again = KTable.load(path)
     assert again.species == "synthetic" and again.provenance == table.provenance
     assert np.array_equal(again.k, table.k) and np.array_equal(again.band_edges, BANDS)
+
+
+def test_planck_source_of_a_spectral_chunk_is_the_chunk_of_the_full_source(table):
+    """The Planck source is gathered per spectral chunk (so its memory is
+    bounded by the chunk); every chunk must equal that slice of the whole."""
+    lw = CorrelatedKLongwave([table], {"synthetic": MASS_FRACTION}, gravity=G)
+    temperature = np.array([[150.0, 231.7], [288.2, 301.0], [199.9, 260.4]])
+    full = lw.planck(temperature, slice(0, lw.n_points))
+    assert full.shape == temperature.shape + (lw.n_points,)
+    for start in range(0, lw.n_points, 5):
+        pts = slice(start, min(start + 5, lw.n_points))
+        assert np.array_equal(lw.planck(temperature, pts), full[..., pts])
+

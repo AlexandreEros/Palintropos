@@ -32,7 +32,7 @@ import numpy as np
 
 from tropoi.physics.convection import DryConvectiveAdjustment
 from tropoi.physics.radiation.scheme import (STEFAN_BOLTZMANN, Column, LowerBoundary,
-                                             Radiation, RadiativeFluxes)
+                                             Radiation, RadiativeFluxes, heating_rate)
 from tropoi.physics.surface import SlabSurface, sensible_heat_flux
 
 __all__ = ["PhysicsOutput", "ColumnPhysics", "RadiativeConvectiveColumn"]
@@ -67,8 +67,10 @@ class ColumnPhysics:
     """Radiation + lower boundary + optional dry convection.
 
     ``surface=None`` is a closed bottom (no surface). ``radiation_interval``
-    recomputes the radiative fluxes every that many calls and holds them in
-    between. ``sensible`` is None or a dict of :func:`~tropoi.physics.surface.
+    recomputes the radiative fluxes every that many calls and holds the
+    interface fluxes in between (the heating is re-derived from them on
+    every call). The held fluxes are not part of a checkpoint: a host that
+    resumes must do so on a call where they are recomputed. ``sensible`` is None or a dict of :func:`~tropoi.physics.surface.
     sensible_heat_flux` keyword options (bulk exchange is then active).
     """
 
@@ -130,7 +132,11 @@ class ColumnPhysics:
             self._cached = self.radiation.fluxes(column, boundary, toa_flux=toa, mu0=mu0)
         self._calls += 1
         fluxes = self._cached
-        heating = fluxes.heating.copy()
+        # The interface fluxes are what is held between radiation calls; the
+        # heating is their divergence over the *current* layer masses, so the
+        # column integral equals the reported boundary fluxes whatever the
+        # surface pressure has done since they were computed.
+        heating = heating_rate(fluxes.net_down, pressure_interfaces, self.gravity, self.cp)
         dp_low = pressure_interfaces[-1] - pressure_interfaces[-2]
         per_flux = self.gravity / (self.cp * dp_low)        # K/s per W m^-2
         zero = xp.zeros_like(temperature[0])

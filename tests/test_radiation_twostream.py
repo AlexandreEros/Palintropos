@@ -127,3 +127,31 @@ def test_adding_is_independent_of_how_a_homogeneous_slab_is_split():
             ref = (up[0, 0], down[-1, 0])
         assert up[0, 0] == pytest.approx(ref[0], rel=1e-12)
         assert down[-1, 0] == pytest.approx(ref[1], rel=1e-12)
+
+
+@pytest.mark.parametrize("closure,ssa,asym", [("hemispheric", 0.5, 0.0), ("quadrature", 0.3, 0.0),
+                                              ("eddington", 0.2, 0.0)])
+def test_direct_beam_at_the_removable_singularity_k_mu0_equal_one(closure, ssa, asym):
+    """At ``k mu0 = 1`` the closed form is 0/0. A transparent layer must
+    scatter nothing, and a finite one must agree with the incidence angles on
+    either side of the singular one (the response is smooth through it)."""
+    mu = np.sqrt(0.5)
+    for _ in range(50):                      # solve k(mu0) mu0 = 1 (g3 may depend on mu0)
+        g1, g2, g3 = ts.stellar_coefficients(ssa, asym, mu, closure)
+        mu = 1.0 / np.sqrt((g1 - g2) * (g1 + g2))
+    assert 0.0 < mu <= 1.0
+
+    def layer(tau, mu0):
+        g1, g2, g3 = ts.stellar_coefficients(ssa, asym, mu0, closure)
+        return np.array(ts.direct_layer(np.float64(tau), ssa, g1, g2, g3, mu0))
+
+    for tau in (0.0, 1e-8):
+        r_dir, t_dir, t_beam = layer(tau, mu)
+        assert r_dir <= 1e-7 and t_dir <= 1e-7
+        assert t_beam == pytest.approx(1.0, abs=1e-7)
+    for tau in (0.1, 1.0, 5.0):
+        at = layer(tau, mu)
+        around = 0.5 * (layer(tau, mu * (1 - 1e-3)) + layer(tau, mu * (1 + 1e-3)))
+        np.testing.assert_allclose(at, around, rtol=0, atol=2e-6)
+        assert at[0] > 0.0 and at[1] > 0.0
+

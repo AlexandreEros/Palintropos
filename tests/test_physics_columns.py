@@ -296,3 +296,35 @@ def test_schneider_liu_column_reproduces_the_published_energy_balance_and_struct
     assert mid[np.argmin(model.temperature[:, 0])] == pytest.approx(0.15e5)
     t_1bar = np.interp(1.0e5, mid, model.temperature[:, 0])
     assert 160.0 < t_1bar < 175.0                         # Jupiter: ~165 K at 1 bar
+
+
+def test_held_fluxes_heat_the_current_layer_masses():
+    """With ``radiation_interval > 1`` the interface fluxes are held. If the
+    surface pressure changes meanwhile, the heating must still integrate to
+    the held boundary fluxes over the *new* layer masses."""
+    from tropoi.physics.column_model import ColumnPhysics
+    from tropoi.physics.radiation.gray import schneider_liu_longwave
+    gravity, cp = 9.8, 1004.0
+    sigma = np.linspace(0.0, 1.0, 9)[:, None]
+    temperature = np.linspace(210.0, 285.0, 8)[:, None] * np.ones((1, 2))
+
+    def physics(interval):
+        radiation = Radiation(schneider_liu_longwave(tau0=3.0, p0=1.0e5))
+        return ColumnPhysics(radiation, gravity=gravity, cp=cp, gas_constant=287.0,
+                             internal_heat_flux=4.0, radiation_interval=interval)
+
+    held = physics(4)
+    p0 = sigma * np.array([[1.0e5, 0.9e5]])
+    p1 = sigma * np.array([[1.01e5, 0.93e5]])            # the dynamics moved mass
+    first = held.compute(p0, temperature, 0.0)
+    second = held.compute(p1, temperature, 0.0)
+    assert second.fluxes is first.fluxes                  # fluxes held, not recomputed
+    for out, p in ((first, p0), (second, p1)):
+        column_heating = (cp * (p[1:] - p[:-1]) / gravity * out.heating).sum(axis=0)
+        np.testing.assert_allclose(column_heating, out.column_energy_tendency, rtol=1e-12)
+    # with the default interval nothing changes: same bits as the scheme's own heating
+    every = physics(1).compute(p0, temperature, 0.0)
+    expected = every.fluxes.heating.copy()
+    expected[-1] += gravity / (cp * (p0[-1] - p0[-2])) * 4.0
+    assert np.array_equal(every.heating, expected)
+
