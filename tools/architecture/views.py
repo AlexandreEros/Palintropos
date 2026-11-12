@@ -105,6 +105,10 @@ def index_page(title: str, package_rows: list[dict], cli: dict[str, str],
            "[`coverage.json`](coverage.json) records what was discovered, what is "
            "rendered, what is deliberately excluded, and what static analysis cannot "
            "see. Narrative pages are linked from [the architecture README](../README.md).",
+           "",
+           "Explore class definitions in the [offline HTML atlas](class-atlas.html) or the "
+           "[Mermaid containment tree](classes.mmd). "
+           "The [inheritance overview](class-inheritance.mmd) shows the class hierarchy.",
            "", "## Packages", "",
            "| Package | Modules | Classes | Public functions | Not analysed (non-Python files) |",
            "|---|---|---|---|---|"]
@@ -130,12 +134,17 @@ def index_page(title: str, package_rows: list[dict], cli: dict[str, str],
     out += ["", "## Coverage", "",
             f"* Packages: {cov['discovered']['packages']} discovered, "
             f"{cov['rendered']['package_pages']} with a page.",
-            f"* Modules: {cov['discovered']['modules']} discovered, "
-            f"{cov['rendered']['modules']} listed on a package page.",
+            f"* Import module records: {cov['discovered']['modules']} discovered "
+            f"(including namespace placeholders), {cov['rendered']['modules']} listed on "
+            "a package page.",
             f"* Classes: {cov['discovered']['classes']} discovered, "
             f"{cov['rendered']['classes']} drawn on a package page "
-            f"({cov['rendered']['classes_in_inheritance_overview']} also in `classes.mmd`, "
-            "which shows inheritance only).",
+            f"({cov['rendered']['classes_in_inheritance_overview']} in "
+            "[the inheritance overview](class-inheritance.mmd)).",
+            "* Both containment views cover "
+            + ", ".join(f"{cov['rendered']['containment'].get(kind, 0)} {name}"
+                        for kind, name in (("package", "packages"), ("module", "Python files"),
+                                           ("class", "class definitions"))) + ".",
             f"* CLI handlers: {len(cov['discovered']['cli_handlers'])} discovered, each "
             "with a call graph.",
             f"* Public Python entry-point candidates: "
@@ -147,7 +156,7 @@ def index_page(title: str, package_rows: list[dict], cli: dict[str, str],
         or ["None."]
     out += ["", "**Static-analysis limits** (counts in `coverage.json`): calls through "
             "objects, `getattr`, callbacks and decorators are not edges; dynamic imports "
-            "are counted, not followed; classes defined inside functions are not "
-            "recorded; non-Python files are listed, never read. A missing edge does not "
+            "are counted, not followed; function-local classes are recorded only in the "
+            "containment views; non-Python files are listed, never read. A missing edge does not "
             "mean \"never called\".", ""]
     return "\n".join(out)

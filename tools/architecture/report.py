@@ -17,8 +17,9 @@ FILE_DESCRIPTIONS = {
     "packages.mmd": "Package-level import graph, every edge drawn; boxed by declared layer "
                     "when a declaration applies (see *Package graph*).",
     "modules-cycles.mmd": "Module-level import graph restricted to modules in import cycles (nontrivial SCCs).",
-    "classes.mmd": "Inheritance overview only: classes linked by inheritance between analysed "
-                   "classes. Every class, standalone ones included, is on its package page.",
+    "classes.mmd": "Complete source containment tree of packages, Python files and class definitions.",
+    "class-atlas.html": "Offline explorer for the complete source containment tree.",
+    "class-inheritance.mmd": "Classes linked by inheritance between analysed classes.",
     "graph/modules.json": "Full module import graph: every analysed module and import edge.",
     "graph/packages.json": "Package-aggregated import graph.",
     "graph/layers.json": "The declared layers as a graph: one node per layer, with upward edges marked.",
@@ -200,7 +201,7 @@ def render_metrics_md(metrics: dict, opts) -> str:
         "## Class graph",
         "",
         f"* Classes: {cl['classes']}",
-        f"* Classes in at least one `inherits` edge (drawn in `classes.mmd`): "
+        f"* Classes in at least one `inherits` edge (drawn in `class-inheritance.mmd`): "
         f"{cl['classes_in_inherits_edges']}; with neither an analysed base nor an "
         f"analysed subclass: {cl['classes'] - cl['classes_in_inherits_edges']}",
         f"* `inherits` edges between analysed classes: {cl['inherits_edges']}",
@@ -433,6 +434,15 @@ def render_readme(metrics: dict, opts, files: list[str], generated_marker: str,
            "* `--no-layers` renders the plain dependency graph instead.",
            ""]
           if metrics.get("layer_graph") else []),
+        "### Class containment tree (ast)",
+        "",
+        "The Mermaid tree and the offline atlas each contain every discovered Python file, "
+        "its ancestor directories, and every class definition in those files. Class nodes "
+        "belong to the nearest enclosing class, or to their file. Function-local classes "
+        "include their lexical scope in the qualified name. File and line distinguish "
+        "definitions that share a qualified name. Generation checks the rendered nodes "
+        "and parents against a separate filesystem and AST scan.",
+        "",
         "### Class graph (ast)",
         "",
         "* Every `class` statement at module scope or inside another class body; classes "

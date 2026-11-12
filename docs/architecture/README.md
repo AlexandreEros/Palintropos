@@ -31,7 +31,10 @@ default `DEFAULT_LAYERS` in `tools/architecture/layers.py`: `cli`, `run`,
 | Page | What it is | Authority |
 |---|---|---|
 | [`current/index.md`](current/index.md) | Generated index: every package page, every entry path, the coverage summary | Generated from `src/`; CI fails if stale |
-| `current/packages/<package>.md` | One page per package: all modules, all classes (standalone ones included), public functions, imports in and out | Generated |
+| [`current/class-atlas.html`](current/class-atlas.html) | Interactive containment tree. Save the HTML and open it in a browser for offline search and subtree navigation. | Generated |
+| [`current/classes.mmd`](current/classes.mmd) | Complete Mermaid containment tree | Generated |
+| [`current/class-inheritance.mmd`](current/class-inheritance.mmd) | Class inheritance overview | Generated |
+| `current/packages/<package>.md` | Per-package class and module index, public functions, imports in and out | Generated |
 | `current/calls/*.mmd` | Scoped static call graphs: one per CLI handler (discovered) and per declared Python entry path | Generated |
 | [`current/coverage.json`](current/coverage.json) | Discovered vs rendered, deliberate exclusions, static-analysis limits | Generated |
 | [`current/README.md`](current/README.md) | Provenance, extraction rules and limits, metric definitions | Generated |
@@ -64,6 +67,18 @@ Generation, and therefore `--check` and CI, fails when a candidate is
 undeclared, when a declared root or exclusion no longer exists or is no longer
 a candidate, or when a declared narrative page (`doc`) is missing or does not
 link its `calls/<name>.mmd`.
+
+The class tree and atlas each contain one node per source package directory,
+Python file, and AST class definition. Classless files and `__init__.py` get
+their own nodes. A nested class belongs to its nearest enclosing class.
+Function-local classes include the function scope in their qualified names.
+Source file and line identify separate definitions with the same name.
+Generation compares both serialized views against an independent filesystem
+and AST scan and checks every parent edge. The scope is the analyzed Python
+source tree. Classes created dynamically at runtime are outside that scope.
+Use the atlas to explore a subtree or search for a qualified name in a large
+snapshot. For Mermaid renderers, very large snapshots may require the host to
+raise [`maxTextSize` and `maxEdges`](https://mermaid.js.org/config/schema-docs/config.html).
 
 What this does **not** establish: that a diagram is readable, that a
 hand-written page is still accurate prose, or that dynamic dispatch is
