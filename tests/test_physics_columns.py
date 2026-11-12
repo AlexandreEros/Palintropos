@@ -10,8 +10,10 @@ import pytest
 
 from tropoi.physics.column_model import ColumnPhysics, RadiativeConvectiveColumn
 from tropoi.physics.convection import DryConvectiveAdjustment, neutral_profile
+from tropoi.physics.composition import COMPOSITIONS, Composition, CompositionError
 from tropoi.physics.insolation import (DiurnalMeanInsolation, InstantaneousInsolation,
-                                       Orbit, PrescribedInsolation, TidallyLockedInsolation,
+                                       PrescribedInsolation, StellarIllumination,
+                                       TidallyLockedInsolation,
                                        frierson_net_surface_flux)
 from tropoi.physics.planets import PLANETS
 from tropoi.physics.radiation.gray import (GrayLongwave, GrayShortwave, OpticalDepthProfile,
@@ -21,7 +23,8 @@ from tropoi.physics.radiation.gray import (GrayLongwave, GrayShortwave, OpticalD
 from tropoi.physics.radiation.scheme import (STEFAN_BOLTZMANN, Column, LowerBoundary,
                                              Radiation)
 from tropoi.physics.surface import SlabSurface, drag_coefficient, sensible_heat_flux
-from tropoi.physics.thermodynamics import MIXTURES, R_UNIVERSAL, SPECIES, GasMixture
+from tropoi.physics.thermodynamics import (R_UNIVERSAL, cp_molar, heat_capacity,
+                                           heat_capacity_range)
 from tropoi.spatial.sigma_coordinate import SigmaGrid
 
 SB = STEFAN_BOLTZMANN
@@ -32,34 +35,33 @@ def test_heat_capacities_match_reference_values_at_298K():
     reference = {"N2": 29.12, "O2": 29.38, "CO2": 37.13, "CH4": 35.70, "H2": 28.84,
                  "H2O": 33.59, "He": 20.786, "Ar": 20.786, "NH3": 35.65, "CO": 29.14}
     for name, value in reference.items():
-        assert float(SPECIES[name].cp_molar(298.15)) == pytest.approx(value, rel=6e-3), name
+        assert float(cp_molar(name, 298.15)) == pytest.approx(value, rel=6e-3), name
 
 
 def test_mixture_constants_and_the_published_thai_heat_capacities():
-    air = MIXTURES["earth_dry_air"]
+    air = COMPOSITIONS["earth_dry_air"]
     assert air.gas_constant == pytest.approx(287.05, abs=0.1)
-    assert float(air.cp(300.0)) == pytest.approx(1004.6, rel=2e-3)
+    assert float(heat_capacity(air, 300.0)) == pytest.approx(1004.6, rel=2e-3)
     # absorber amounts for gas optics are per kg of air: 400 ppmv CO2 = 608 ppm by mass
     assert air.mass_fraction("CO2") == pytest.approx(6.08e-4, rel=2e-3)
     assert air.mass_fraction("CH4") == 0.0
     # Turbet et al. (2022) quote ~1040 and ~850 J/kg/K for Ben 1 and Ben 2
-    assert float(MIXTURES["thai_ben1"].cp(300.0)) == pytest.approx(1040.0, rel=5e-3)
-    assert float(MIXTURES["thai_ben2"].cp(300.0)) == pytest.approx(850.0, rel=1e-2)
-    with pytest.raises(ValueError):
-        GasMixture({"N2": 0.5})
-    with pytest.raises(ValueError):
-        GasMixture({"Xe": 1.0})
+    assert float(heat_capacity(COMPOSITIONS["thai_ben1"], 300.0)) == pytest.approx(1040.0, rel=5e-3)
+    assert float(heat_capacity(COMPOSITIONS["thai_ben2"], 300.0)) == pytest.approx(850.0, rel=1e-2)
+    with pytest.raises(CompositionError):
+        Composition.normalized({"N2": 0.5}, label="incomplete", source="test")
+    with pytest.raises(CompositionError):
+        Composition.of(Xe=1.0)
 
 
 def test_hydrogen_heat_capacity_depends_on_the_ortho_para_assumption():
-    h2 = SPECIES["H2"]
-    normal = float(h2.cp_molar(60.0)) / R_UNIVERSAL
-    equilibrium = float(h2.cp_molar(60.0, ortho_para="equilibrium")) / R_UNIVERSAL
+    normal = float(cp_molar("H2", 60.0)) / R_UNIVERSAL
+    equilibrium = float(cp_molar("H2", 60.0, ortho_para="equilibrium")) / R_UNIVERSAL
     assert normal == pytest.approx(2.52, abs=0.02)        # rotation nearly frozen out
     assert equilibrium > normal + 1.5                     # conversion heat
-    assert float(h2.cp_molar(100.0)) / R_UNIVERSAL == pytest.approx(2.71, abs=0.02)
-    assert float(h2.cp_molar(600.0)) / R_UNIVERSAL == pytest.approx(3.5, abs=0.03)
-    spread = MIXTURES["jupiter"].cp_range(105.0, 700.0)["relative_spread"]
+    assert float(cp_molar("H2", 100.0)) / R_UNIVERSAL == pytest.approx(2.71, abs=0.02)
+    assert float(cp_molar("H2", 600.0)) / R_UNIVERSAL == pytest.approx(3.5, abs=0.03)
+    spread = heat_capacity_range(COMPOSITIONS["jupiter"], 105.0, 700.0)["relative_spread"]
     assert 0.15 < spread < 0.30      # constant c_p is a ~20 % statement on Jupiter
 
 
@@ -177,10 +179,10 @@ def test_published_gray_optical_depths():
 def test_insolation_geometries_integrate_to_the_right_global_means():
     lat = np.arcsin(np.linspace(-1, 1, 4001)[1::2])          # equal-area latitudes
     s0 = 1361.0
-    equinox, mu = DiurnalMeanInsolation(Orbit(s0))(lat, 0 * lat, 0.0)
+    equinox, mu = DiurnalMeanInsolation(StellarIllumination.prescribed(s0))(lat, 0 * lat, 0.0)
     assert np.allclose(equinox, s0 * np.cos(lat) / math.pi)          # SL09 form
     assert equinox.mean() == pytest.approx(s0 / 4, rel=1e-5)
-    orbit = Orbit(s0, 100.0, 0.0, 25.0)
+    orbit = StellarIllumination.prescribed(s0, 100.0, 0.0, 25.0)
     for t in (0.0, 25.0, 60.0):          # any season: global mean stays S0 / 4
         flux, mu = DiurnalMeanInsolation(orbit)(lat, 0 * lat, t)
         assert flux.mean() == pytest.approx(s0 / 4, rel=1e-5)
@@ -193,7 +195,7 @@ def test_insolation_geometries_integrate_to_the_right_global_means():
     locked, _ = TidallyLockedInsolation(900.0)(la, lo, 0.0)
     weights = np.ones_like(la) / la.size
     assert (locked * weights).sum() == pytest.approx(225.0, rel=5e-3)   # coarse test mesh
-    ecc = Orbit(s0, 100.0, 0.3)
+    ecc = StellarIllumination.prescribed(s0, 100.0, 0.3)
     mean_flux = np.mean([ecc.flux_at(t) for t in np.linspace(0, 100, 20001)[:-1]])
     assert mean_flux == pytest.approx(s0 / math.sqrt(1 - 0.09), rel=1e-4)
     fhz, _ = frierson_net_surface_flux()(lat, 0 * lat, 0.0)

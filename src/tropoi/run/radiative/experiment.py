@@ -105,9 +105,13 @@ class RadiativeRun:
             self._resume(found[-1][1])
         else:
             self.stepper.initialize(x0, 0.0)
+            from tropoi.physics.species import dataset_identities
             doc = {"config": cfg.to_dict(), "config_sha256": self.config_sha256,
                    "physics": self.with_physics, "code": self.code, "created": _now(),
-                   "initial_state": info}
+                   "initial_state": info,
+                   # Which packaged physics datasets produced this run
+                   # (descriptive provenance; never part of config_sha256).
+                   "physics_datasets": dataset_identities()}
             atomic_write_bytes(cfg_file, json.dumps(doc, indent=2, sort_keys=True).encode())
             self._event("created", day=0, step=0, environment=environment_identity())
             self._sample(0)

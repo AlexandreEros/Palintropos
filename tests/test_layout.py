@@ -79,6 +79,14 @@ def test_documented_cpu_only_modules_import_without_cupy_or_matplotlib():
                "tropoi.representation.archive.initial_state",
                "tropoi.run.custom",
                "tropoi.spatial.terrain.height_function", "tropoi.cli.terrain",
+               # the shared physical world: species/composition data, gas
+               # optics, stars, orbits, rotation, columns and the sky view
+               "tropoi.physics.constants", "tropoi.physics.species",
+               "tropoi.physics.composition", "tropoi.physics.rayleigh",
+               "tropoi.physics.column", "tropoi.physics.star",
+               "tropoi.physics.orbit", "tropoi.physics.rotation",
+               "tropoi.representation.visual.colour",
+               "tropoi.representation.visual.sky",
                # column physics, its single-column host and the experiment
                # configuration are host code (NumPy only)
                "tropoi.physics.thermodynamics", "tropoi.physics.planets",

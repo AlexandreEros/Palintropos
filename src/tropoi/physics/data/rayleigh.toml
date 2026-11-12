@@ -1,0 +1,66 @@
+# Optical property records: Rayleigh scattering of individual gases.
+#
+# Each species may carry several records with different validity ranges; a
+# record names the dispersion-formula model by identifier (the
+# refractiveindex.info formula number), never by executable code. The
+# equations themselves (formula 2, formula 6, the Lorentz-Lorenz cross
+# section, the King factor polynomial) live in tropoi.physics.rayleigh.
+#
+# refractive-index records: dispersion formulas of the refractiveindex.info
+# database (M. N. Polyanskiy, Sci. Data 11, 94 (2024);
+# https://github.com/polyanskiy/refractiveindex.info-database, files
+# data/main/<gas>/nk/<record>.yml, fetched 2026-11-07), transcribed verbatim
+# with their measurement conditions and valid wavelength ranges.
+# Wavelengths outside a record's range are refused, never extrapolated.
+#
+# King factors F = a + b/lambda^2 + c/lambda^4 (lambda in micrometres):
+# Bates (1984), Planet. Space Sci. 32, 785, as given by Bodhaine et al.
+# (1999), J. Atmos. Oceanic Technol. 16, 1854, eqs. 5-6 and the text after
+# eq. 6. Coefficients checked 2026-11-07 against the printed text of
+# Bodhaine et al.; the micrometre unit is confirmed by its Fig. 1. Bates
+# (1984) itself was not re-read.
+
+schema = "palintropos.rayleigh/1"
+database = "refractiveindex.info database (Polyanskiy, Sci. Data 11, 94, 2024), data/main/{path}.yml, fetched 2026-11-07"
+king_source = "Bates (1984), Planet. Space Sci. 32, 785, as given by Bodhaine et al. (1999), J. Atmos. Oceanic Technol. 16, 1854, eqs. 5-6 and the text after eq. 6"
+king_check = "King-factor coefficients checked 2026-11-07 against the printed text of Bodhaine et al. (1999), eqs. 5-6 and the text after eq. 6; micrometre unit confirmed by its Fig. 1. Bates (1984) not re-read."
+
+[[species.N2.records]]
+formula = 2
+coefficients = [0.0, 39209.95e-8, 1146.24e-6, 18806.48e-8, 13.476e-3]
+range_um = [0.4, 1.0]
+ref_temperature_k = 273.0
+ref_pressure_pa = 100000.0
+refractive_source = "Börzsönyi et al. (2008), Appl. Opt. 47, 4856; refractiveindex.info data/main/N2/nk/Borzsonyi.yml (fetched 2026-11-07)"
+king = [1.034, 3.17e-4, 0.0]
+king_verified = true
+
+[[species.O2.records]]
+formula = 6
+coefficients = [1.181494e-4, 9.708931e-3, 75.4]
+range_um = [0.4, 1.8]
+ref_temperature_k = 293.0
+ref_pressure_pa = 101325.0
+refractive_source = "Zhang, Lu & Wang (2008), Appl. Opt. 47, 3143 (with Křen 2011, Appl. Opt. 50, 6484); refractiveindex.info data/main/O2/nk/Zhang.yml (fetched 2026-11-07)"
+king = [1.096, 1.385e-3, 1.448e-4]
+king_verified = true
+
+[[species.Ar.records]]
+formula = 2
+coefficients = [0.0, 20332.29e-8, 206.12e-6, 34458.31e-8, 8.066e-3]
+range_um = [0.4, 1.0]
+ref_temperature_k = 273.0
+ref_pressure_pa = 100000.0
+refractive_source = "Börzsönyi et al. (2008), Appl. Opt. 47, 4856; refractiveindex.info data/main/Ar/nk/Borzsonyi.yml (fetched 2026-11-07)"
+king = [1.0, 0.0, 0.0]
+king_verified = true
+
+[[species.CO2.records]]
+formula = 6
+coefficients = [0.0, 6.99100e-2, 166.175, 1.44720e-3, 79.609, 6.42941e-5, 56.3064, 5.21306e-5, 46.0196, 1.46847e-6, 0.0584738]
+range_um = [0.1807, 1.6945]
+ref_temperature_k = 273.15
+ref_pressure_pa = 101325.0
+refractive_source = "Bideau-Mehu et al. (1973), Opt. Commun. 9, 432; refractiveindex.info data/main/CO2/nk/Bideau-Mehu.yml (fetched 2026-11-07)"
+king = [1.15, 0.0, 0.0]
+king_verified = true

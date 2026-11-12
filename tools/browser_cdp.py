@@ -170,12 +170,12 @@ class OfflinePage:
             except OSError:
                 return ""
 
-        while not port_text():
+        while not (text := port_text()):
             if self.proc.poll() is not None or time.monotonic() > deadline:
                 self.__exit__(None, None, None)
                 raise RuntimeError("the browser did not start DevTools")
             time.sleep(0.05)
-        port = int(port_text().split()[0])
+        port = int(text.split()[0])
         opener = urllib.request.build_opener(urllib.request.ProxyHandler({}))
         base = f"http://127.0.0.1:{port}"
         self.version = json.loads(opener.open(f"{base}/json/version",
@@ -240,10 +240,17 @@ class OfflinePage:
                 "description", d.get("text")))
         return r["result"].get("value")
 
-    def open(self, path: pathlib.Path) -> str:
+    def open(self, path: pathlib.Path, fragment: str = "") -> str:
+        """Load ``path`` (with ``#fragment`` if given) and wait for it.
+
+        Returns the file URL without the fragment (what the network sees).
+        Navigating to the page already shown with only a new fragment does
+        not reload it, so open a fragment in a fresh page or another file.
+        """
         url = pathlib.Path(path).resolve().as_uri()
         self.events.clear()
-        self.call("Page.navigate", url=url)
+        self.call("Page.navigate",
+                  url=url + ("#" + fragment if fragment else ""))
         deadline = time.monotonic() + self.timeout
         while not any(e.get("method") == "Page.loadEventFired"
                       for e in self.events):

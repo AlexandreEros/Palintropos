@@ -49,7 +49,8 @@ src/tropoi/
 │   ├── diagnostics/pe_levels.py  native-level PE fields of a saved state on the CPU (Simulation.view)
 │   └── visual/              figure fields/specs/timelines/renderers, per-core compositions, Snapshot.plot adapter,
 │                            terrain previews (terrain.py: static figure and self-contained HTML globe),
-│                            the 3-D atmosphere page (atmosphere.py, sphere_streamlines.py; same globe template)
+│                            the 3-D atmosphere page (atmosphere.py, sphere_streamlines.py; same globe template),
+│                            the standalone sky page (sky.py + sky_view.html; its own template, no globe)
 ├── run/{bve,swe,pe}/    orchestration: resolved run configuration and the runners
 ├── run/custom/          custom planets/initial states: preparation, configuration, execution, preset export,
 │                        prepared planets with terrain previews (planet.py)
@@ -66,10 +67,14 @@ It is documented in [SAVED_RUNS.md](../src/tropoi/temporal/SAVED_RUNS.md).
 
 ### Dependency direction
 
-`physics` (column physics: gas properties, radiation, convection, surface;
+`physics` (the shared physical world: species/composition/star/orbit data
+and the column physics — gas properties, radiation, convection, surface;
 NumPy/CuPy-agnostic) imports no other `tropoi` package, so it can serve any
-dynamical core; `temporal` and the layers above may import it
-([radiation status](radiation/README.md)).
+dynamical core and the sky view alike; `temporal` and the layers above may
+import it ([radiation status](radiation/README.md),
+[shared physics](radiation/SHARED_PHYSICS.md)). Its scientific data are
+packaged TOML/CSV files loaded through `importlib.resources` and identified
+by SHA-256 in run provenance.
 
 `spatial` imports only `spatial`; `temporal` imports `spatial` and
 `temporal`; `representation` imports all three layers. Orchestration
@@ -175,7 +180,11 @@ the pinned pre-rename Williamson-5 workflow.
   `.view()`, Matplotlib for `plot` only); opening Held–Suarez experiment
   directories and the 3-D atmosphere page of a saved PE run
   (`Simulation.view`, Matplotlib for colour tables; a preset-mountain
-  terrain is rebuilt on the GPU only with `allow_cuda=True`). Fresh-interpreter tests enforce these boundaries.
+  terrain is rebuilt on the GPU only with `allow_cuda=True`); the shared
+  physics (`tropoi.physics`: species/composition data, Rayleigh optics,
+  columns, stars, orbits, rotation) and the sky page
+  (`sky.write_sky_page` for a hypothetical atmosphere, which needs no run,
+  planet, terrain or archive; `Simulation.sky` for a saved PE column). Fresh-interpreter tests enforce these boundaries.
 - **CUDA required**: running any solver (including `run_initial_state`); resolving terrain
   (`prepare_planet`); anything that builds grids,
   transforms, backends, operators, states, initial conditions or
