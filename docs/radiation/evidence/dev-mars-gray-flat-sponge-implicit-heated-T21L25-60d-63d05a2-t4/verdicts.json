@@ -1,0 +1,95 @@
+{
+  "H": {
+    "F": 99.07666890827399,
+    "M1": false,
+    "M2": true,
+    "M3": true,
+    "M6": false,
+    "last_day": 60.0,
+    "max_abs_u": 181.52571778565886,
+    "ps_drift": -1.9737336446667975e-05,
+    "residual_max_abs": 0.012426097423193894,
+    "residual_window_mean": -0.011975356232593794,
+    "residual_window_std": 0.00027191536431669206,
+    "slab_max_relative_error": 8.626432901337466e-14,
+    "surface_temperature_last": 222.34699553052673,
+    "system_residual_max_abs": 0.012426097423791305,
+    "system_residual_window_mean": -0.011975356232509426,
+    "t_max": 306.12145328702223,
+    "t_min": 141.11105161694175,
+    "toa_window_mean": -51.06107998772335
+  },
+  "M4": {
+    "difference": -0.00982423528609562,
+    "met": true,
+    "sinks_standard_error": 0.002356690333469306,
+    "states": 20,
+    "tolerance": 0.09907344734594443,
+    "unheated_residual": -0.11058430243236708,
+    "unheated_sinks": -0.10076006714627146
+  },
+  "M5": {
+    "met": false,
+    "s1_at_least_3x_noise": true,
+    "s1_at_least_5e-4": true,
+    "surface_temperature_max_between_11_and_16_h": false
+  },
+  "U": {
+    "F": 99.07344734594443,
+    "M1": false,
+    "M2": false,
+    "M3": false,
+    "M6": false,
+    "last_day": 60.0,
+    "max_abs_u": 177.79037024697357,
+    "ps_drift": -1.888810294659038e-05,
+    "residual_max_abs": 0.12506613808862194,
+    "residual_window_mean": -0.11058430243236708,
+    "residual_window_std": 0.010694852517680976,
+    "slab_max_relative_error": 1.0180745135812685e-13,
+    "surface_temperature_last": 222.33407556670096,
+    "system_residual_max_abs": 0.12506613808807288,
+    "system_residual_window_mean": -0.11058430243243542,
+    "t_max": 306.1138939200149,
+    "t_min": 136.40175967734035,
+    "toa_window_mean": -50.98969394638784
+  },
+  "criteria_commit": "fba92fb",
+  "reported": {
+    "H_minus_U_surface_temperature_last": 0.01291996382576599,
+    "H_minus_U_toa_window_mean": -0.07138604133551496,
+    "tides": {
+      "config_sha256": "18ee5dc59989c65f879d09edfa92c0a92c5a66dd434a0517a4e4d7237fff023e",
+      "equatorial_latitude_deg": 2.768903007736006,
+      "equatorial_lowest_air_temperature_s1_amplitude_k": 2.7124995487947174,
+      "equatorial_surface_temperature_max_local_hour": 17.03333333333333,
+      "equatorial_surface_temperature_s1_amplitude_k": 0.2515962124444724,
+      "platform_rounding_accepted": false,
+      "replay_max_relative_departure_by_day": {},
+      "restored_checkpoint": "checkpoint-s000008640.npz",
+      "run": "dev-mars-gray-flat-sponge-implicit-heated-T21L25-63d05a2",
+      "solar_day": 88440.0,
+      "sols": 2.0,
+      "start_seconds": 5184000.0,
+      "steps": 295,
+      "tropical_surface_pressure_noise_rms_over_ps": 0.0032718886738292738,
+      "tropical_surface_pressure_s1_max_local_hour": 5.571802439195469,
+      "tropical_surface_pressure_s1_over_ps": 0.013303222523090628,
+      "tropical_surface_pressure_s2_over_ps": 0.006260261804809339,
+      "window": "after"
+    }
+  },
+  "tides_file": "tides.json",
+  "verdict": {
+    "M1": false,
+    "M2": true,
+    "M3": true,
+    "M4": true,
+    "M5": false,
+    "M6": false
+  },
+  "window_days": [
+    41,
+    60
+  ]
+}

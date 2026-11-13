@@ -31,7 +31,8 @@ does not state, and each such use is marked "Isca default/test case".
 | boundary layer, heat | Monin–Obukhov surface fluxes plus vertical turbulent diffusion; roughness 3.21 × 10⁻⁵ m; no gustiness (Isca test case) | bulk sensible flux into the lowest layer, same roughness, gustiness 0 allowed | **partial**: no vertical diffusion |
 | momentum exchange | surface stress plus vertical diffusion of momentum | none; only Rayleigh drag is available | **dependency (new physics)**: bulk surface stress + implicit vertical diffusion. Pilot substitute: Held–Suarez Rayleigh drag, 1 day⁻¹ below σ = 0.7, **labelled** |
 | convection | "None" (Table 1): the boundary-layer diffusion removes instability | dry convective adjustment | **dependency (follows from the row above)**. Pilot substitute: instantaneous dry adjustment, **labelled** |
-| sponge | Rayleigh 0.125 day above 0.5 Pa, energy-conserving (Isca test case) | none | **gap**: a top-level `DiagonalDamping` using the existing hook. Not in the pilot |
+| sponge | Rayleigh 0.125 day above 0.5 Pa, energy-conserving (Isca test case) | none in the pilot | ✓ since §2b (`rayleigh_sponge_damping`, p = σ × 610 Pa) |
+| global fixers | Isca `spectral_dynamics_nml` defaults `do_mass_correction` and `do_energy_correction` to `.true.`, and the grey-Mars namelist overrides neither (it sets only `do_water_correction: False`). Every step, p_s is rescaled to the previous global mean, and a uniform temperature increment makes the mass-weighted ⟨½\|v\|² + c_p T⟩ of the new level equal the previous one plus the step's tendencies | none: mass is conserved to the core's truncation, and the energy residual is measured, not removed | **gap, found after §2d** (read 2026-11-13). It bears on M6 and on any energy comparison with Isca (§2d results) |
 | diffusion and filter | ∇⁴ at 0.1 day (Isca default `damping_order` 2); Robert–Asselin 0.04 | ∇⁸ at 0.1 day; RAW 0.1 / 0.53 | numerics differ. The pilot keeps the project's validated settings |
 | temperature floor | none ("energetically closed") | none | ✓ |
 | initial state | isothermal 264 K, at rest (Isca default); surface 285 − 40(3 sin²φ − 1)/3 K (Isca test case) | isothermal atmosphere plus a 0.1 m s⁻¹ seed; uniform surface | **small gap**: the surface profile. The pilot uses uniform 285 K |
@@ -275,15 +276,122 @@ instability, and it is reported that way. Reported, not judged: the
 largest implicit-relaxation number, the lowest-level winds, and the
 day-30 differences from Hs.
 
+### Implicit-exchange results (2026-11-13; criteria and predictions unchanged)
+
+Hi (`18ee5dc5…`) and Ui (`7d28666a…`) ran from `63d05a2` with a clean
+tree, one after the other in one Colab session, without resuming (14.1
+and 11.1 min, 0.098 and 0.077 s/step). The GPU was a **Tesla T4**, as
+each run's `created` event records, although the cell was written for an
+L4. The evidence directories are named `-t4` accordingly. Evidence is in
+`evidence/dev-mars-gray-flat-sponge-implicit{-heated,}-T21L25-60d-63d05a2-t4/`.
+`verdicts.json` names `fba92fb` (M1–M6) and the 41–60 window of §2d, and
+`state_diagnostics.json` holds the reported quantities below
+(`tools/radiation/mars_state_diagnostics.py`, from the saved states).
+
+| | measured | verdict | predicted |
+| --- | --- | --- | --- |
+| I1, I2 | unit tests; every earlier test and hash unchanged | met | met |
+| N1 | the continuation past day 60 ran all 295 steps finite | **met** | met |
+| M1 | completed; T 136–306 K; **max \|u\| 182 (Hi, day 44) / 178 (Ui, day 43) m s⁻¹**, above 150 on 7 days of each run, none before day 36 | **not met** | met |
+| M2, M3 | residual over days 41–60 −0.0120 W m⁻² (1.2 × 10⁻⁴ F); largest daily value 0.0124; slab exact (9 × 10⁻¹⁴) | met | met |
+| M4 | Ui residual −0.111 against sinks −0.101 (tolerance 0.099) | met | met |
+| M5 | p_s S1 1.33 % (≥ 5 × 10⁻⁴ ✓, 4.1 × noise ✓); T_s maximum 17.0 h ✗ | not met (window only) | not met (window only) |
+| M6 | **−1.97 × 10⁻⁵ (Hi), −1.89 × 10⁻⁵ (Ui) over 60 days** | **not met** | met |
+
+Two predictions failed: M1 and M6. Both failures are reported as measured.
+Neither comes from the change under test.
+
+**The implicit exchange does what it was for.** Over the 30 days the
+explicit runs survived, it changes nothing that matters. At day 30, max
+\|u\| is 106.6 against Hs's 104.6 m s⁻¹, with the largest daily difference
+5.7. T_s differs by 0.004 K, TOA by 0.03 W m⁻², the residual by less than
+0.001 W m⁻², and the mean p_s by less than 10⁻⁷. The one term it alters,
+the global-mean sensible flux, differs most: −0.040 against +0.024 W m⁻²
+at day 30. That is consistent with the explicit exchange oscillating at
+its unstable points. The stiffness that broke the explicit step persists
+and grows. k w / C_a exceeds 2 somewhere on 41 of the 60 daily states,
+from day 20 on, at up to 403 of the 2048 points, with a maximum of **6.1**
+(Hi, day 59; Ui 6.0, day 54). An explicit step is unstable at every one
+of those points. The implicit one ran through them and through the
+continuation. Lowest-level winds reach 63 m s⁻¹ (Hi) and 61 m s⁻¹ (Ui).
+
+**M1: a strengthening jet after day 35, not an instability.** Through day
+30 the largest \|u\| is 112 m s⁻¹ (at 0.48 Pa), and below 6 Pa it is 79,
+as in Hs. Then the spin-up continues: kinetic energy goes from 27 to
+44 kJ m⁻², T_s from 240 to 222 K, and TOA is still −41 W m⁻² at day 60.
+The southern high-latitude westerly (52–69° S) strengthens through 0.5–4
+Pa. In Hi, the levels at 0.48, 1.06, 2.2 and 4.2 Pa all pass 150 m s⁻¹,
+and below 6 Pa the maximum rises from 79 to 125 m s⁻¹ (Ui: 136). Most
+daily maxima sit at 0.48 Pa, just below the sponge's 0.5 Pa base. There
+the sponge's rate is (0.04)² of its full value (e-folding ≈ 80 days), as
+in Isca, whose profile is the same. Temperatures stay inside the bounds,
+the budget closes at 10⁻⁴ F, and N1 holds. So the 150 m s⁻¹ bound,
+written for a 30-day spin-up, is crossed by a jet that is still
+strengthening. Whether that jet is too strong cannot be decided here.
+One measured hint is the drag stand-in, which damps the bottom layer at
+1 day⁻¹. Where the exchange is strongest, a bulk surface stress with the
+same coefficient as the heat exchange would damp it at x / w ≈ (200
+s)⁻¹. Lowest-level winds of 60 m s⁻¹ are what a missing surface stress
+would produce. That points to the boundary layer again (§3), and it is
+untested.
+
+**M6: the core's mass error, not the change.** The mean-p_s drift is the
+same to two digits in all six Mars runs through day 20 (−1.8 × 10⁻⁶ at
+day 10, −3.6 × 10⁻⁶ to −3.7 × 10⁻⁶ at day 20), whatever the sponge,
+exchange or heating. After
+that it depends on the flow: −6.0 × 10⁻⁶ at day 30 without the sponge,
+−8.0 × 10⁻⁶ with it, under either exchange. It does not level off: days
+31–60 alone give −1.17 × 10⁻⁵. So the bound fails at the 30-day rate as
+well as over 60 days. (Extending M6 to 60 days without scaling its bound
+was an oversight in §2d. It changes nothing, because days 31–60 alone
+exceed the 30-day bound.) In the saved states the drift is the small
+remainder of two larger, opposing changes. ⟨ln p_s⟩ falls by
+2.3 × 10⁻⁴ while half the variance of ln p_s grows by 2.1 × 10⁻⁴ (Hi,
+day 60). The ln p_s form conserves neither mean exactly, and nothing here
+corrects it; this is the ln-p_s mass drift already listed in
+`docs/KNOWN_LIMITATIONS.md` ("PE accuracy"), now measured on Mars. Isca
+does correct it (§1, "global fixers"): every step it rescales p_s
+to the previous global mean.
+
+**Energy.** Hi's residual is −0.0120 W m⁻² (1.2 × 10⁻⁴ F), the same size
+as in every earlier Mars run. The sinks have grown with the flow to
+0.101 W m⁻², about 10⁻³ F. M4 is now a test rather than a consistency
+check: the unheated residual is distinguishable from zero at the
+tolerance, and it agrees with the measured sinks to 0.010 W m⁻², close to
+Hi's own residual. The pair therefore splits the residual as before.
+0.10 W m⁻² is the sinks, which the heating returns. About −0.011 W m⁻² is
+the time-integration part, which the heating does not address. Isca's
+`do_energy_correction` removes exactly that kind of remainder every step,
+as a uniform temperature increment. In an energy comparison with Isca,
+the residual measured here therefore corresponds to the size of Isca's
+correction, not to a closure Isca demonstrates.
+
+**What this establishes.** The implicit exchange removes the §2c
+instability without changing the first 30 days. The configuration now
+integrates 60 days and continues finite, and its energy closes to
+1.2 × 10⁻⁴ F, with the frictional-heating split now resolved by M4. **What
+it does not establish:** an M-I reproduction, the wind bound over 60
+days, mass conservation over 60 days, or anything about the jet's
+realism.
+
 ## 3. After the pilot, in order
 
 1. ~~The energy-conserving top sponge~~: done (§2b). M1 met as predicted.
-2. The boundary layer: bulk surface stress and implicit vertical diffusion
-   of heat and momentum, **with the surface fluxes solved implicitly**
-   (§2c), their dissipation in the frictional heating. Then remove the
-   two substitutes. This is the gating dependency for any M-I claim and
-   for any run longer than ~30 days. Isca's ∇⁴ / RA numerics as an option,
-   if the comparison needs them.
-3. T42, one Mars year plus the L_s 225°–315° average; compare with Fig. 4b.
-4. Then MOLA terrain with nothing else changed (the existing terrain
+2. ~~An implicit surface exchange~~: done (§2d, opt-in). The §2c
+   instability is gone and runs reach 60 days and beyond. M1 and M6 failed
+   on the wind bound and the mass drift, neither caused by the change.
+3. The boundary layer: bulk surface stress and implicit vertical diffusion
+   of heat and momentum, with the implicit exchange of §2d as its surface
+   condition, and their dissipation in the frictional heating. Then remove
+   the two substitutes. This is still the gating dependency for any M-I
+   claim. The 60 m s⁻¹ lowest-level winds and the M1 jet of §2d are its
+   measured symptoms. Isca's ∇⁴ / RA numerics as an option, if the
+   comparison needs them.
+4. Isca's global fixers, as opt-ins that record what they remove: the mass
+   correction (it would close M6 by construction, so its per-step factor
+   is the diagnostic), and a log of the energy correction Isca would apply,
+   without applying it. That log is the like-for-like quantity for an
+   energy comparison with M-I.
+5. T42, one Mars year plus the L_s 225°–315° average; compare with Fig. 4b.
+6. Then MOLA terrain with nothing else changed (the existing terrain
    import), for the flat-to-topography comparison.

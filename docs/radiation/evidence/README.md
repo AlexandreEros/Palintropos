@@ -26,3 +26,7 @@ and the [preservation record](../../validation/run_archive_2026-11-12/README.md)
 - [Sponge rerun Hs](dev-mars-gray-flat-sponge-heated-T21L25-30d-e38890e-l4/README.md) and
   [Us](dev-mars-gray-flat-sponge-T21L25-30d-e38890e-l4/README.md): the same pilot with
   M-I's top sponge, judged by M1-M6 against predictions fixed before the code.
+- [Implicit-exchange run Hi](dev-mars-gray-flat-sponge-implicit-heated-T21L25-60d-63d05a2-t4/README.md)
+  and [Ui](dev-mars-gray-flat-sponge-implicit-T21L25-60d-63d05a2-t4/README.md): the sponge
+  rerun with a backward-Euler surface exchange, 60 days on a T4. N1 and M2-M4 met; M1, M5
+  and M6 not met (M1 and M6 against the prediction).
