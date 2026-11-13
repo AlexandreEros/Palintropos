@@ -11,6 +11,10 @@ from pathlib import Path, PurePosixPath
 from .mermaid import HEADER, label
 from .sources import Project
 
+# Mermaid's defaults. Hosts such as GitHub cannot raise them, so the tree must fit.
+MERMAID_MAX_TEXT_SIZE = 50_000
+MERMAID_MAX_EDGES = 500
+
 
 @dataclass(frozen=True)
 class Node:

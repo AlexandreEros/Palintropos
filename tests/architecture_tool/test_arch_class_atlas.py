@@ -116,3 +116,33 @@ def test_unrecognized_mermaid_edges_cannot_bypass_coverage(atlas_repo, monkeypat
                         lambda nodes: original(nodes) + '  unexpected["Extra node"]\n')
     with pytest.raises(CoverageError, match=r"classes.mmd: unexpected statement"):
         _render(atlas_repo)
+
+
+@pytest.mark.parametrize("limit,message", [
+    ("MERMAID_MAX_TEXT_SIZE", "exceed Mermaid's default maxTextSize"),
+    ("MERMAID_MAX_EDGES", "exceed Mermaid's default maxEdges"),
+])
+def test_mermaid_tree_must_fit_default_host_limits(atlas_repo, monkeypatch, limit, message):
+    files = _render(atlas_repo)
+    edges = files["classes.mmd"].count(" --> ")
+    actual = len(files["classes.mmd"]) if limit == "MERMAID_MAX_TEXT_SIZE" else edges
+    monkeypatch.setattr(class_tree, limit, actual)
+    _render(atlas_repo)  # exactly at the limit still renders
+    monkeypatch.setattr(class_tree, limit, actual - 1)
+    with pytest.raises(CoverageError, match=rf"classes.mmd: {actual} .*{re.escape(message)}"):
+        _render(atlas_repo)
+
+
+def test_symlinked_subpackage_is_covered(atlas_repo, tmp_path):
+    shared = tmp_path / "shared"
+    shared.mkdir()
+    (shared / "__init__.py").write_text("", encoding="utf-8")
+    (shared / "linked.py").write_text("class ThroughLink: pass\n", encoding="utf-8")
+    try:
+        (atlas_repo / "atlaspkg/shared").symlink_to(shared, target_is_directory=True)
+    except OSError as error:
+        pytest.skip(f"symlinks unavailable: {error}")
+    files = _render(atlas_repo)
+    (node,) = [n for n in _nodes(files["class-atlas.html"]) if n["name"] == "ThroughLink"]
+    assert node["path"] == "atlaspkg.shared.linked.ThroughLink"
+    assert node["source"] == "atlaspkg/shared/linked.py"

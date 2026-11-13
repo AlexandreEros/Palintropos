@@ -52,6 +52,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 from .calls import TRAVERSED_KINDS
+from . import class_tree
 from .class_tree import Node, mermaid_id, mermaid_label
 from .model import Graph
 from .sources import Project, dotted
@@ -281,7 +282,8 @@ def _expected_containment(project: Project) -> list[Node]:
     """Audit the files and ASTs without using the discovery or rendering indexes."""
     root = project.src_root / project.package
     expected = {}
-    for directory, subdirs, filenames in os.walk(root):
+    # Follow directory links, as discovery does through Path.is_dir() and iterdir().
+    for directory, subdirs, filenames in os.walk(root, followlinks=True):
         subdirs[:] = [name for name in subdirs
                       if not name.startswith(".") and name != "__pycache__"]
         for name in filenames:
@@ -382,6 +384,14 @@ def containment_problems(project: Project, mermaid: str, html: str) -> list[str]
         if actual_parents != expected_parents:
             problems.append(f"{diagram}: wrong parent for {node.id}: {actual_parents}")
     problems.extend(f"{diagram}: unexpected edge to {child}" for child in sorted(parents))
+    # Mermaid measures JavaScript string length, in UTF-16 code units.
+    size = len(mermaid.encode("utf-16-le")) // 2
+    if size > class_tree.MERMAID_MAX_TEXT_SIZE:
+        problems.append(f"{diagram}: {size} characters exceed Mermaid's default maxTextSize "
+                        f"of {class_tree.MERMAID_MAX_TEXT_SIZE}")
+    if len(edges) > class_tree.MERMAID_MAX_EDGES:
+        problems.append(f"{diagram}: {len(edges)} edges exceed Mermaid's default maxEdges "
+                        f"of {class_tree.MERMAID_MAX_EDGES}")
 
     atlas = "class-atlas.html"
     payloads = re.findall(r'<script id="tree-data" type="application/json">\s*(.*?)\s*</script>',
