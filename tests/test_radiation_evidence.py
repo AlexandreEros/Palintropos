@@ -311,3 +311,128 @@ def test_the_sponge_pair_is_preserved_and_is_the_source_of_its_evidence(capsule,
         assert (root / name).read_bytes().replace(b"\r\n", b"\n") == \
             (published / name).read_bytes().replace(b"\r\n", b"\n"), name
     assert (root / "means.npz").read_bytes() == (published / "means.npz").read_bytes()
+
+
+# The implicit surface exchange (MARS_MI_PLAN.md section 2d; criteria and
+# predictions committed in 6701d02 before the code). Hi/Ui ran 60 days from
+# 63d05a2, consecutively in one Colab session on a Tesla T4.
+IMPLICIT_H = "dev-mars-gray-flat-sponge-implicit-heated-T21L25-60d-63d05a2-t4"
+IMPLICIT_U = "dev-mars-gray-flat-sponge-implicit-T21L25-60d-63d05a2-t4"
+IMPLICIT_CAPSULES = {"dev-mars-gray-flat-sponge-implicit-heated-T21L25-63d05a2": IMPLICIT_H,
+                     "dev-mars-gray-flat-sponge-implicit-T21L25-63d05a2": IMPLICIT_U}
+
+
+def test_the_implicit_pair_ran_from_one_commit_on_the_machine_its_names_record():
+    s1, s2 = _summary(IMPLICIT_H), _summary(IMPLICIT_U)
+    for s in (s1, s2):
+        assert s["code"]["git_commit"].startswith("63d05a2") and s["code"]["git_dirty"] is False
+        assert s["environment"]["device"] == "Tesla T4"          # the "-t4" in the names
+        assert s["events"]["resumes"] == 0 and s["events"]["last_event"] == "completed"
+    assert s1["config_sha256"].startswith("18ee5dc5") and s2["config_sha256"].startswith("7d28666a")
+    assert s1["events"]["last"] <= s2["events"]["first"]          # one after the other
+
+
+def test_the_implicit_presets_reproduce_the_run_identities():
+    from tropoi.run.radiative.config import PRESETS
+    preset = PRESETS["dev-mars-gray-flat-sponge-implicit"]
+    assert preset().sha256() == _summary(IMPLICIT_H)["config_sha256"]
+    assert preset(frictional_heating=False).sha256() == _summary(IMPLICIT_U)["config_sha256"]
+
+
+def test_the_implicit_energy_verdicts_follow_from_the_committed_series():
+    """M2 and M3 recomputed from series.json over days 41-60 (section 2d)."""
+    import numpy as np
+    s = _mars_series(IMPLICIT_H)
+    res, day = s["energy_residual"], s["day"][1:]
+    win = (day >= 41) & (day <= 60)
+    F = s["absorbed_stellar"][1:][win].mean()
+    assert abs(res[win].mean()) <= 1e-3 * F and np.abs(res).max() <= 1e-2 * F       # M2
+    cap = json.loads((EVIDENCE / IMPLICIT_H / "config.json").read_text(
+        encoding="utf-8"))["config"]["surface"]["heat_capacity"]
+    system = (np.diff(s["energy_total"]) + cap * np.diff(s["mean_surface_temperature"])) \
+        / 86400.0 - s["toa_net_down"][1:]
+    assert abs(system[win].mean()) <= 1e-3 * F and np.abs(system).max() <= 1e-2 * F  # M3
+
+
+def test_the_implicit_wind_and_mass_failures_follow_from_the_committed_series():
+    """M1 fails on the wind bound alone, and only after day 35; M6 fails over
+    60 days and also over days 31-60 alone, so the 30-day bound fails at the
+    30-day rate as well. Neither bound is relaxed."""
+    import numpy as np
+    for name in (IMPLICIT_H, IMPLICIT_U):
+        s = _mars_series(name)
+        u, day = s["max_abs_u"], s["day"]
+        assert u.max() > 150.0 and day[u > 150.0].min() > 35 and u[day <= 30].max() < 150.0
+        assert s["t_min"].min() > 100.0 and s["t_max"].max() < 400.0 and day[-1] == 60
+        ps = s["mean_ps"]
+        assert abs(ps[60] / ps[0] - 1.0) > 1e-5 and abs(ps[60] / ps[30] - 1.0) > 1e-5
+        assert abs(ps[30] / ps[0] - 1.0) <= 1e-5
+
+
+def test_the_implicit_verdict_record_is_the_one_reported_including_its_failures():
+    """Predicted M1-M4, M6 and N1 met, M5 not met on the window alone. Measured:
+    M1 and M6 not met as well. N1 is met: the continuation past day 60 ran all
+    its steps (the tool aborts on any non-finite state)."""
+    import math
+    t = _evidence_json(IMPLICIT_H, "tides.json")
+    assert t["window"] == "after" and t["restored_checkpoint"] == "checkpoint-s000008640.npz"
+    assert t["steps"] == 295 and t["start_seconds"] == 60 * 86400.0
+    assert all(math.isfinite(t[k]) for k in t if k.startswith(("tropical_", "equatorial_")))
+    assert t["M5"] == {"met": False, "s1_at_least_3x_noise": True, "s1_at_least_5e-4": True,
+                       "surface_temperature_max_between_11_and_16_h": False}
+    v = _evidence_json(IMPLICIT_H, "verdicts.json")
+    assert v["window_days"] == [41, 60] and v["tides_file"] == "tides.json"
+    assert v["verdict"] == {"M1": False, "M2": True, "M3": True, "M4": True, "M5": False,
+                            "M6": False}
+    assert v["M4"]["unheated_sinks"] < -v["M4"]["tolerance"]       # M4 now discriminates
+
+
+def test_the_implicit_state_diagnostics_are_the_runs_own_states():
+    """state_diagnostics.json (tools/radiation/mars_state_diagnostics.py) agrees
+    with each run's series, and its numbers are the ones the plan reports."""
+    import math
+    for name in (IMPLICIT_H, IMPLICIT_U):
+        d = _evidence_json(name, "state_diagnostics.json")
+        s = _mars_series(name)
+        assert d["config_sha256"] == _summary(name)["config_sha256"]
+        assert sorted(map(int, d["days"])) == list(range(1, 61))
+        for day, o in d["days"].items():
+            assert math.isclose(o["max_abs_u"], s["max_abs_u"][int(day)], rel_tol=1e-9)
+            assert math.isclose(o["mean_ps"], s["mean_ps"][int(day)], rel_tol=1e-12)
+        # the explicit exchange would be unstable (> 2) on many states; the runs went on
+        assert d["largest_exchange_air_number"]["value"] > 6.0
+        assert sum(o["exchange_air_points_above_2"] > 0 for o in d["days"].values()) == 41
+        # the mass drift is the small remainder of two larger, opposing changes
+        last, ln0 = d["days"]["60"], math.log(s["mean_ps"][0])
+        drift = last["mean_ps"] / s["mean_ps"][0] - 1.0
+        assert drift < 0 and last["mean_ln_ps"] - ln0 < 10 * drift            # <ln p_s> falls
+        assert last["variance_ln_ps"] / 2 > 10 * abs(drift)                   # variance grows
+        # the excess winds are at 0.5-4 Pa over the southern high latitudes
+        over = [o for o in d["days"].values() if o["max_abs_u"] > 150.0]
+        assert all(-70 < o["max_latitude_deg"] < -50 and o["max_sigma"] * 610 < 5 for o in over)
+
+
+def test_the_implicit_exchange_left_the_first_30_days_as_the_sponge_run_had_them():
+    """Reported, not judged (section 2d): the day-30 differences from Hs."""
+    import numpy as np
+    hi, hs = _mars_series(IMPLICIT_H), _mars_series(SPONGE_H)
+    assert np.abs(hi["max_abs_u"][:31] - hs["max_abs_u"]).max() < 6.0
+    assert abs(hi["mean_surface_temperature"][30] - hs["mean_surface_temperature"][30]) < 0.01
+    assert np.abs(hi["mean_ps"][:31] / hs["mean_ps"] - 1.0).max() < 1e-7
+    assert np.abs(hi["energy_residual"][:30] - hs["energy_residual"]).max() < 1e-3
+
+
+@pytest.mark.parametrize("capsule, evidence", sorted(IMPLICIT_CAPSULES.items()))
+def test_the_implicit_pair_is_preserved_and_is_the_source_of_its_evidence(capsule, evidence):
+    from tropoi.cli.capsule import read_archive, read_receipt, verify_capsule
+    root = CAPSULES / capsule
+    sums = read_receipt(root / "SHA256SUMS")
+    archive = read_archive(root, sums)
+    assert len(sums) == 126
+    assert set(archive["omitted_files"]) == set(sums) - set(archive["included_files"])
+    assert verify_capsule(root, root, core=True)["checked"] == 4
+    published = EVIDENCE / evidence
+    for name in ("config.json", "events.jsonl", "series.json"):
+        assert (root / name).read_bytes().replace(b"\r\n", b"\n") == \
+            (published / name).read_bytes().replace(b"\r\n", b"\n"), name
+    assert (root / "means.npz").read_bytes() == (published / "means.npz").read_bytes()

@@ -275,7 +275,7 @@ def _time_of_perihelion_for_equinox_start(period: float, eccentricity: float,
 
 def mars_gray_flat_dev(experiment_id: Optional[str] = None, *, days: int = 30,
                        dt: float = 600.0, frictional_heating: bool = True,
-                       sponge: bool = False) -> RadiativeConfig:
+                       sponge: bool = False, implicit_surface: bool = False) -> RadiativeConfig:
     """DEVELOPMENT EXPERIMENT, not a reproduction of Thomson & Vallis (2019)
     M-I (docs/radiation/MARS_MI_PLAN.md).
 
@@ -294,15 +294,21 @@ def mars_gray_flat_dev(experiment_id: Optional[str] = None, *, days: int = 30,
     stands in for the turbulent diffusion of heat (M-I has no convection
     scheme). ``sponge=True`` (preset ``dev-mars-gray-flat-sponge``) adds
     M-I's top sponge, 1 / 0.125 day ((0.5 Pa - p) / 0.5 Pa)^2 above 0.5 Pa
-    (Isca damping_driver). NOT matched: T21 (M-I: T42), del^8 and RAW (Isca:
+    (Isca damping_driver). ``implicit_surface=True`` (preset
+    ``dev-mars-gray-flat-sponge-implicit``) solves the bulk sensible exchange
+    backward-Euler between bottom layer and slab (MARS_MI_PLAN.md §2c-2d;
+    the explicit exchange is unstable in Isca's 0.73 Pa bottom layer once
+    low-level winds pass ~25 m/s). NOT matched: T21 (M-I: T42), del^8 and RAW (Isca:
     del^4 and Robert-Asselin 0.04), a uniform 285 K initial surface (Isca
     test case: 285 - 40 (3 sin^2 lat - 1) / 3).
     """
     year, ecc, ls_peri = 59166360.0, 0.0935, 250.85
+    name = "dev-mars-gray-flat" + ("-sponge" if sponge else "") +         ("-implicit" if implicit_surface else "")
+    sensible = {"roughness_length": 3.21e-5, "critical_richardson": 1.0, "gustiness": 0.0}
+    if implicit_surface:
+        sensible["implicit"] = True
     return RadiativeConfig(
-        experiment_id=_preset_id(experiment_id,
-                                 "dev-mars-gray-flat-sponge" if sponge else "dev-mars-gray-flat",
-                                 "T21L25", frictional_heating),
+        experiment_id=_preset_id(experiment_id, name, "T21L25", frictional_heating),
         sponge={"bottom_pressure": 0.5, "efold_days": 0.125} if sponge else None,
         frictional_heating=frictional_heating, radius=3.396e6,
         omega=2.0 * math.pi / 88308.0, gravity=3.71, gas_constant=192.0,
@@ -319,7 +325,7 @@ def mars_gray_flat_dev(experiment_id: Optional[str] = None, *, days: int = 30,
         convection={"timescale": 0.0},
         surface={"heat_capacity": 2.0 * _ISCA_RHO_CP, "albedo": 0.3, "emissivity": 1.0,
                  "initial_temperature": 285.0},
-        sensible={"roughness_length": 3.21e-5, "critical_richardson": 1.0, "gustiness": 0.0},
+        sensible=sensible,
         drag={"kind": "held_suarez", "k_f_per_day": 1.0, "sigma_b": 0.7},
         initial={"kind": "isothermal", "temperature": 264.0},
         checkpoint_every_days=10, state_every_days=1,
@@ -328,4 +334,6 @@ def mars_gray_flat_dev(experiment_id: Optional[str] = None, *, days: int = 30,
 
 PRESETS = {"jupiter-schneider-liu": jupiter_schneider_liu, "earth-gray-dry": earth_gray_dry,
            "dev-mars-gray-flat": mars_gray_flat_dev,
-           "dev-mars-gray-flat-sponge": functools.partial(mars_gray_flat_dev, sponge=True)}
+           "dev-mars-gray-flat-sponge": functools.partial(mars_gray_flat_dev, sponge=True),
+           "dev-mars-gray-flat-sponge-implicit": functools.partial(
+               mars_gray_flat_dev, sponge=True, implicit_surface=True, days=60)}

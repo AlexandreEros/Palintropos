@@ -560,3 +560,39 @@ def test_flat_mars_with_the_sponge_returns_its_loss_and_closes_the_budget(tmp_pa
     series = json.loads((tmp_path / "run" / "series.json").read_text())
     assert abs(series["energy_residual"][-1]) < 1e-2 * series["absorbed_stellar"][-1]
     assert series["max_abs_u"][-1] < 150.0
+
+
+def test_the_implicit_exchange_preset_moves_no_recorded_identity():
+    """MARS_MI_PLAN §2d, I2: the flag lives only in the new preset. The
+    pilot and sponge runs keep their recorded hashes."""
+    ev = pathlib.Path(__file__).resolve().parents[1] / "docs" / "radiation" / "evidence"
+    for preset, kw, run in (
+            ("dev-mars-gray-flat", {}, "dev-mars-gray-flat-heated-T21L25-30d-b3aaef8-l4"),
+            ("dev-mars-gray-flat-sponge", {}, "dev-mars-gray-flat-sponge-heated-T21L25-30d-e38890e-l4"),
+            ("dev-mars-gray-flat-sponge", {"frictional_heating": False},
+             "dev-mars-gray-flat-sponge-T21L25-30d-e38890e-l4")):
+        cfg = PRESETS[preset](**kw)
+        assert "implicit" not in cfg.sensible
+        assert cfg.sha256() == json.loads((ev / run / "config.json").read_text())["config_sha256"]
+    cfg = PRESETS["dev-mars-gray-flat-sponge-implicit"]()
+    assert cfg.experiment_id == "dev-mars-gray-flat-sponge-implicit-heated-T21L25"
+    assert cfg.days == 60 and cfg.sensible["implicit"] is True
+    base = PRESETS["dev-mars-gray-flat-sponge"]()
+    assert cfg.with_(sensible={k: v for k, v in cfg.sensible.items() if k != "implicit"},
+                     days=30, experiment_id=base.experiment_id) == base
+
+
+@needs_cuda
+def test_flat_mars_with_the_implicit_exchange_closes_the_budget(tmp_path):
+    """One T9 day of the implicit preset: the coupling passes its window, the
+    same flux leaves the slab, and the budgets close as for the explicit one."""
+    from tropoi.run.radiative.experiment import RadiativeRun
+    cfg = _tiny(PRESETS["dev-mars-gray-flat-sponge-implicit"](days=1),
+                experiment_id="mars-implicit-test")
+    run = RadiativeRun(cfg, tmp_path / "run", allow_dirty=True, log=lambda s: None)
+    ts0 = float((run.coupling.weights * run.coupling.surface_temperature).sum())
+    run.run()
+    series = json.loads((tmp_path / "run" / "series.json").read_text())
+    assert abs(series["energy_residual"][-1]) < 1e-2 * series["absorbed_stellar"][-1]
+    slab_heat = cfg.surface["heat_capacity"] * (series["mean_surface_temperature"][-1] - ts0)
+    assert slab_heat == pytest.approx(series["surface_net"][-1] * 86400.0, rel=1e-9)

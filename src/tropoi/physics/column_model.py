@@ -94,6 +94,9 @@ class ColumnPhysics:
         self.internal_heat_flux = float(internal_heat_flux)
         self.radiation_interval = int(radiation_interval)
         self.sensible = None if sensible is None else dict(sensible)
+        # opt-in backward-Euler exchange (see compute); not a flux option
+        self._implicit_exchange = bool((self.sensible or {}).get("implicit", False))
+        self._flux_options = {k: v for k, v in (self.sensible or {}).items() if k != "implicit"}
         self._cached: Optional[RadiativeFluxes] = None
         self._calls = 0
 
@@ -113,7 +116,16 @@ class ColumnPhysics:
 
     # ------------------------------------------------------------------
     def compute(self, pressure_interfaces, temperature, t: float, *, latitude=None,
-                longitude=None, surface_temperature=None, wind_speed=None) -> PhysicsOutput:
+                longitude=None, surface_temperature=None, wind_speed=None,
+                exchange_window=None, surface_step=None) -> PhysicsOutput:
+        """``exchange_window`` (s) is the interval over which the host applies
+        the heating to the air, ``surface_step`` the one over which it
+        advances the slab. With ``"implicit": true`` in the sensible options
+        and both given, the bulk exchange is the backward-Euler flux between
+        the two reservoirs with the exchange coefficient k = rho C |v| c_p
+        frozen: F' = F / (1 + k w / Ca + k s / Cs), Ca = c_p dp / g. The same
+        F' enters the air and leaves the slab. Without them, the flux is the
+        explicit one, bit for bit."""
         xp = _xp(temperature)
         column = Column(pressure_interfaces, temperature, self.gravity, self.cp,
                         latitude=latitude)
@@ -150,8 +162,16 @@ class ColumnPhysics:
             height = alpha * self.gas_constant * t_air / self.gravity
             density = 0.5 * (p_top + p_bot) / (self.gas_constant * t_air)
             speed = zero if wind_speed is None else wind_speed
-            sensible, _ = sensible_heat_flux(surface_temperature, t_air, height, speed,
-                                             density, self.cp, self.gravity, **self.sensible)
+            sensible, coefficient = sensible_heat_flux(surface_temperature, t_air, height, speed,
+                                                       density, self.cp, self.gravity,
+                                                       **self._flux_options)
+            if self._implicit_exchange and exchange_window is not None:
+                gust = float(self._flux_options.get("gustiness", 0.0))
+                k = density * coefficient * xp.sqrt(speed * speed + gust * gust) * self.cp
+                ca = self.cp * dp_low / self.gravity
+                cs = self.surface.heat_capacity
+                step = 0.0 if surface_step is None else float(surface_step)
+                sensible = sensible / (1.0 + k * (float(exchange_window) / ca + step / cs))
             heating[-1] += per_flux * sensible
         interior = 0.0
         if self.internal_heat_flux:

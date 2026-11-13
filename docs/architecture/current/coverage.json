@@ -223,10 +223,10 @@
   },
   "limits": {
     "call_sites": {
-      "builtin": 3685,
+      "builtin": 3689,
       "external": 2456,
       "internal": 2946,
-      "unresolved": 3686
+      "unresolved": 3690
     },
     "dynamic_import_sites": {
       "tropoi.representation.archive.writer": 1

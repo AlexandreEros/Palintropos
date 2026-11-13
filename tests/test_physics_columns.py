@@ -354,3 +354,81 @@ def test_vertical_path_shortwave_is_iscas_frierson_scheme():
     absorbed_atm = (f.sw_down[0] - f.sw_up[0]) - (f.sw_down[-1] - f.sw_up[-1])
     np.testing.assert_allclose(absorbed_atm, toa * (1.0 - math.exp(-0.2)), rtol=1e-13)
     assert sw.signature()["kind"] == "vertical_path_shortwave"
+
+
+def _mars_bottom_exchange(implicit: bool):
+    """A column with Isca's 0.73 Pa bottom layer over the M-I slab, a 130 m/s
+    lowest-level wind (k w / Ca ~ 13, the value measured in MARS_MI_PLAN §2c)."""
+    sensible = {"roughness_length": 3.21e-5, "critical_richardson": 1.0, "gustiness": 0.0}
+    if implicit:
+        sensible["implicit"] = True
+    physics = ColumnPhysics(Radiation(isca_mars_longwave(), None), gravity=3.71, cp=844.8,
+                            gas_constant=192.0, surface=SlabSurface(8.257737e6, albedo=0.3),
+                            sensible=sensible)
+    sigma = np.array(SigmaGrid.stretched(25, 1e-4, None).interfaces)
+    sigma[-2] = 1.0 - 0.73 / 610.0                     # Isca's bottom layer
+    p = (sigma * 610.0)[:, None]
+    return physics, p
+
+
+def _exchange_numbers(physics, p, t_air, t_sfc, wind, window):
+    out = physics.compute(p, np.vstack([np.full((24, 1), 200.0), [[t_air]]]), 0.0,
+                          latitude=np.zeros(1), longitude=np.zeros(1),
+                          surface_temperature=np.array([t_sfc]), wind_speed=np.array([wind]),
+                          exchange_window=window, surface_step=window / 2.0)
+    ca = physics.cp * (p[-1, 0] - p[-2, 0]) / physics.gravity
+    return float(out.sensible[0]), ca
+
+
+def test_implicit_surface_exchange_is_stable_where_the_explicit_one_diverges():
+    """MARS_MI_PLAN §2d, I1. A leapfrog-like host: the air gets the flux over
+    w = 2 dt, the slab over dt, from the same state."""
+    w = 1200.0
+    histories = {}
+    for implicit in (False, True):
+        physics, p = _mars_bottom_exchange(implicit)
+        ta, ts = 200.0, 230.0
+        hist = []
+        for _ in range(20):
+            f, ca = _exchange_numbers(physics, p, ta, ts, 130.0, w)
+            ta += w * f / ca
+            ts -= (w / 2.0) * f / physics.surface.heat_capacity
+            hist.append(ta)
+        histories[implicit] = np.array(hist)
+    explicit, implicit = histories[False], histories[True]
+    # explicit: overshoots past equilibrium to a non-physical temperature at once
+    assert np.abs(explicit[0] - 200.0) > 100.0
+    assert not np.all(np.isfinite(explicit)) or explicit.min() <= 0.0
+    # implicit: finite, monotone towards the slab, never past it
+    assert np.all(np.isfinite(implicit))
+    assert np.all(np.diff(implicit) >= -1e-9) and implicit.max() < 230.0 + 1e-9
+
+
+def test_implicit_surface_exchange_conserves_energy_on_every_call():
+    """I1: with one step for air and slab, Ca dT_a + Cs dT_s = 0 to round-off."""
+    physics, p = _mars_bottom_exchange(True)
+    dt = 600.0
+    for t_air, t_sfc, wind in ((200.0, 230.0, 130.0), (250.0, 210.0, 5.0), (215.0, 215.5, 40.0)):
+        out = physics.compute(p, np.vstack([np.full((24, 1), 200.0), [[t_air]]]), 0.0,
+                              latitude=np.zeros(1), longitude=np.zeros(1),
+                              surface_temperature=np.array([t_sfc]),
+                              wind_speed=np.array([wind]), exchange_window=dt, surface_step=dt)
+        f = float(out.sensible[0])
+        ca = physics.cp * (p[-1, 0] - p[-2, 0]) / physics.gravity
+        d_air = dt * f / ca
+        d_sfc = -dt * f / physics.surface.heat_capacity
+        assert abs(ca * d_air + physics.surface.heat_capacity * d_sfc) <= 1e-12 * abs(dt * f) + 1e-300
+        # and it never overshoots the shared equilibrium of the two reservoirs
+        assert (t_air + d_air - (t_sfc + d_sfc)) * (t_air - t_sfc) >= -1e-9
+
+
+def test_the_implicit_flag_is_off_by_default_and_leaves_the_explicit_flux_unchanged():
+    """I2: no flag, no window -> the explicit flux, bit for bit."""
+    a, p = _mars_bottom_exchange(False)
+    b, _ = _mars_bottom_exchange(True)
+    fa, _ = _exchange_numbers(a, p, 200.0, 230.0, 30.0, 1200.0)
+    out = b.compute(p, np.vstack([np.full((24, 1), 200.0), [[200.0]]]), 0.0,
+                    latitude=np.zeros(1), longitude=np.zeros(1),
+                    surface_temperature=np.array([230.0]), wind_speed=np.array([30.0]))
+    assert float(out.sensible[0]) == fa                 # implicit without a window = explicit
+    assert "implicit" not in a.signature()["sensible"]

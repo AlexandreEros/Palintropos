@@ -165,7 +165,8 @@ class ColumnPhysicsCoupling:
         out = self.physics.compute(p_int, temperature, t, latitude=self.latitude,
                                    longitude=self.longitude,
                                    surface_temperature=self.surface_temperature,
-                                   wind_speed=wind)
+                                   wind_speed=wind, exchange_window=window,
+                                   surface_step=self.dt)
         provisional = temperature + window * out.heating
         adjusted = self.physics.adjust(p_int, provisional, window)
         spec = _analyze(m.sh, (adjusted - temperature) / window)

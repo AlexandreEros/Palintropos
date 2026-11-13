@@ -20,7 +20,8 @@ import pathlib
 import numpy as np
 
 EVIDENCE = pathlib.Path(__file__).resolve().parents[2] / "docs" / "radiation" / "evidence"
-WINDOW = (11, 30)          # days whose daily records enter the window means
+WINDOW = (11, 30)          # default: days whose daily records enter the window means
+DAYS = 30                  # default: the configured last day (M1)
 
 
 def _load(name):
@@ -60,7 +61,7 @@ def _assess(series, config):
         "toa_window_mean": float(toa[win].mean()),
         "surface_temperature_last": float(ts[-1]),
     }
-    out["M1"] = (out["last_day"] == 30.0 and out["max_abs_u"] < 150.0
+    out["M1"] = (out["last_day"] == float(DAYS) and out["max_abs_u"] < 150.0
                  and 100.0 < out["t_min"] and out["t_max"] < 400.0)
     out["M2"] = (abs(out["residual_window_mean"]) <= 1e-3 * F
                  and out["residual_max_abs"] <= 1e-2 * F)
@@ -77,7 +78,11 @@ def main() -> None:
     ap.add_argument("u_evidence")
     ap.add_argument("--tides", default="tides.json")
     ap.add_argument("--out-file", default="verdicts.json")
+    ap.add_argument("--window", type=int, nargs=2, default=list(WINDOW),
+                    metavar=("FIRST", "LAST"), help="days of the M2-M4 window means")
+    ap.add_argument("--days", type=int, default=DAYS, help="configured last day (M1)")
     args = ap.parse_args()
+    globals()["WINDOW"], globals()["DAYS"] = tuple(args.window), args.days
     h_name, u_name = args.h_evidence, args.u_evidence
     (hs, hsum, hcfg), (us, usum, ucfg) = _load(h_name), _load(u_name)
     h, u = _assess(hs, hcfg), _assess(us, ucfg)
