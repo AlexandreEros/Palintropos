@@ -232,6 +232,49 @@ mixing them upward, but nothing catches a cooling one. So:
 Restoration itself is exact: replaying from the day-20 checkpoint
 reproduces the saved day-21 state to 1.6 × 10⁻¹³ across platforms.
 
+## 2d. Implicit surface exchange (criteria fixed 2026-11-13, before the code)
+
+The change addresses §2c. The bulk sensible exchange becomes a
+backward-Euler step between the bottom layer (Ca = c_p Δp / g) and the
+slab (Cs), with the exchange coefficient k = ρ C |v| c_p frozen over the
+step:
+
+  F′ = F / (1 + k w / Ca + k Δt / Cs),
+
+where w is the window over which the coupling applies the heating (2 Δt
+in a leapfrog step) and Δt the slab step. The same F′ leaves the slab and
+enters the air, so the exchange conserves energy exactly, and the bottom
+layer's relaxation per step, x / (1 + x), never exceeds 1. This is a
+numerical treatment of the existing flux, not new physics, and it is
+opt-in (`"implicit": true` in the sensible spec), so every existing
+configuration is bit-identical. There is still no vertical diffusion or
+surface stress. The preset is `dev-mars-gray-flat-sponge-implicit`, with
+Hi heated and Ui `--no-frictional-heating`, from one commit, on one
+machine, **60 days** (twice the former lifetime).
+
+Unit criteria:
+
+- I1: a column at the Mars bottom-layer values measured in §2c
+  (k w / Ca ≈ 13) oscillates with growing amplitude under the explicit
+  exchange, and relaxes monotonically to equilibrium under the implicit
+  one. Ca ΔT_a + Cs ΔT_s = 0 to round-off on every implicit call.
+- I2: without the flag, every existing test and hash is unchanged.
+
+Run criteria (M1–M6 as in §2, with the windows moved to the end of the
+longer run):
+
+- M1 and M6 over all 60 days; M2–M4 over days 41–60 (same length as
+  before).
+- **N1**: the 2-sol continuation of Hi past day 60 stays finite (the test
+  Hs failed).
+- M5 from that continuation (the original protocol).
+
+Stated now: M1–M4, M6 and N1 met; M5 not met on the 11–16 h window alone
+(slab lag, untouched). If N1 fails, the explicit exchange was not the only
+instability, and it is reported that way. Reported, not judged: the
+largest implicit-relaxation number, the lowest-level winds, and the
+day-30 differences from Hs.
+
 ## 3. After the pilot, in order
 
 1. ~~The energy-conserving top sponge~~: done (§2b). M1 met as predicted.
