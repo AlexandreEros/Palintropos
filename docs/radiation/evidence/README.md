@@ -15,3 +15,8 @@ and the [preservation record](../../validation/run_archive_2026-11-12/README.md)
   [heated Earth on Colab](earth-gray-dry-heated-T21L25-300d-colab/README.md),
   and [heated Jupiter on Colab](jupiter-sl09-heated-T21L30-200d-colab/README.md)
   preserve summaries for the frictional-heating runs.
+- [time_stepping_residual.json](time_stepping_residual.json) splits the adiabatic
+  time-stepping residual.
+- [R1, heated preset on an L4](earth-gray-dry-heated-T21L25-300d-d376c67-l4/README.md)
+  and [R2, unheated on the same L4](earth-gray-dry-T21L25-300d-d376c67-l4/README.md)
+  are the controlled pair of 2026-11-13, judged by criteria fixed before they ran.

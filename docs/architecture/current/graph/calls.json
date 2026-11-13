@@ -7833,12 +7833,22 @@
     {
       "kind": "call",
       "source": "tropoi.run.radiative.config.earth_gray_dry",
+      "target": "tropoi.run.radiative.config._preset_id"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.radiative.config.earth_gray_dry",
       "target": "tropoi.run.radiative.config._t21"
     },
     {
       "kind": "instantiate",
       "source": "tropoi.run.radiative.config.jupiter_schneider_liu",
       "target": "tropoi.run.radiative.config.RadiativeConfig"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.radiative.config.jupiter_schneider_liu",
+      "target": "tropoi.run.radiative.config._preset_id"
     },
     {
       "kind": "call",
@@ -19822,6 +19832,13 @@
       "kind": "method",
       "module": "tropoi.run.radiative.config",
       "qualname": "RadiativeConfig.with_",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.radiative.config._preset_id",
+      "kind": "function",
+      "module": "tropoi.run.radiative.config",
+      "qualname": "_preset_id",
       "type": "function"
     },
     {

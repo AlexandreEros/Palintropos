@@ -5,6 +5,8 @@
 - [adiabatic_energy.py](adiabatic_energy.py) measures energy drift with and
   without hyperdiffusion. [energy_attribution.py](energy_attribution.py)
   examines the contributions to the energy budget.
+  [time_stepping_residual.py](time_stepping_residual.py) splits what is left
+  to the time integration (RAW filter, step size, startup) over three days.
 - [regimes.py](regimes.py) measures idealized radiative regimes.
 
 The [evidence index](../../docs/radiation/evidence/README.md) links the

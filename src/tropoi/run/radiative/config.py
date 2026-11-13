@@ -60,7 +60,10 @@ class RadiativeConfig:
     sensible: Optional[dict] = None
     drag: Optional[dict] = None
     internal_heat_flux: float = 0.0
-    # return the kinetic energy removed by drag and hyperdiffusion as heat
+    # return the kinetic energy removed by drag and hyperdiffusion as heat.
+    # The field default stays False: configurations recorded before the
+    # option existed omit it and must keep meaning (and hashing as) the
+    # unheated experiment. The presets pass True explicitly.
     frictional_heating: bool = False
     radiation_interval: int = 1
     thermal_source: str = "linear"
@@ -161,8 +164,19 @@ def _t21() -> dict:
     return {"l_max": 22, "retained_truncation": 21, "nlat": 32, "nlon": 64}
 
 
-def jupiter_schneider_liu(experiment_id: str = "jupiter-sl09-T21L30", *, days: int = 200,
-                          dt: float = 1200.0) -> RadiativeConfig:
+def _preset_id(experiment_id: Optional[str], name: str, resolution: str,
+               frictional_heating: bool) -> str:
+    """The preset's default experiment id: ``<name>-heated-<resolution>``
+    with frictional heating, ``<name>-<resolution>`` without. These are the
+    ids of the runs recorded for each formulation (docs/radiation/evidence),
+    so each default reproduces a recorded configuration hash."""
+    if experiment_id is not None:
+        return experiment_id
+    return f"{name}-heated-{resolution}" if frictional_heating else f"{name}-{resolution}"
+
+
+def jupiter_schneider_liu(experiment_id: Optional[str] = None, *, days: int = 200,
+                          dt: float = 1200.0, frictional_heating: bool = True) -> RadiativeConfig:
     """The physics of Schneider & Liu (2009), appendix B and Table 1, at T21.
 
     Matched to the paper: planetary constants, gray thermal optical depth
@@ -174,9 +188,14 @@ def jupiter_schneider_liu(experiment_id: str = "jupiter-sl09-T21L30", *, days: i
     3 bar. NOT matched: horizontal resolution (T21, not T213), the form of
     the hyperdiffusion, the drag's equatorial shoulder (not specified in the
     paper), and the integration length (theirs: > 28,000 days).
+
+    ``frictional_heating`` (default on) returns what drag and
+    hyperdiffusion remove as heat; ``frictional_heating=False`` is the
+    configuration of the recorded unheated run (``80f280d2…``).
     """
     return RadiativeConfig(
-        experiment_id=experiment_id, radius=69.86e6, omega=1.7587e-4, gravity=26.0,
+        experiment_id=_preset_id(experiment_id, "jupiter-sl09", "T21L30", frictional_heating),
+        frictional_heating=frictional_heating, radius=69.86e6, omega=1.7587e-4, gravity=26.0,
         gas_constant=3605.38, cp=12619.0, reference_pressure=3.0e5,
         vertical={"kind": "uniform", "nlev": 30}, dt=dt, days=days,
         longwave={"kind": "power_law", "tau0": 80.0, "p0": 3.0e5, "exponent": 2.0},
@@ -189,8 +208,8 @@ def jupiter_schneider_liu(experiment_id: str = "jupiter-sl09-T21L30", *, days: i
         **_t21())
 
 
-def earth_gray_dry(experiment_id: str = "earth-gray-dry-T21L25", *, days: int = 300,
-                   dt: float = 1200.0) -> RadiativeConfig:
+def earth_gray_dry(experiment_id: Optional[str] = None, *, days: int = 300,
+                   dt: float = 1200.0, frictional_heating: bool = True) -> RadiativeConfig:
     """A dry Earth with the gray radiation, slab surface and bulk sensible
     exchange of Frierson, Held & Zurita-Gotor (2006), Table 1.
 
@@ -202,9 +221,16 @@ def earth_gray_dry(experiment_id: str = "earth-gray-dry-T21L25", *, days: int = 
     (Held-Suarez Rayleigh drag instead of surface stress), del^4 vs del^8
     diffusion, and resolution (T21, theirs T85/T170). This is therefore not
     the FHZ06 dry limit and is not presented as a reproduction of it.
+
+    ``frictional_heating`` (default on) returns what drag and
+    hyperdiffusion remove as heat; without it the eddying run fails the
+    energy criteria A2/A3 (docs/radiation/README.md §6).
+    ``frictional_heating=False`` is the configuration of the recorded
+    unheated run (``e31ae183…``).
     """
     return RadiativeConfig(
-        experiment_id=experiment_id, radius=6.376e6, omega=7.292e-5, gravity=9.8,
+        experiment_id=_preset_id(experiment_id, "earth-gray-dry", "T21L25", frictional_heating),
+        frictional_heating=frictional_heating, radius=6.376e6, omega=7.292e-5, gravity=9.8,
         gas_constant=287.04, cp=1004.64, reference_pressure=1.0e5,
         vertical={"kind": "frierson", "nlev": 25}, dt=dt, days=days,
         longwave={"kind": "frierson", "tau_equator": 6.0, "tau_pole": 1.5,
