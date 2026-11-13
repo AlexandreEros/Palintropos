@@ -1,0 +1,344 @@
+{
+  "schema_version": 1,
+  "provider": "google-drive",
+  "kind": "palintropos-run",
+  "folder_url": "https://drive.google.com/drive/folders/1RyermSsVur-uPO_jCH1vjuJWpD-5uNyt",
+  "original_local_path": "runs/radiative/dev-mars-gray-flat-sponge-T21L25-e38890e",
+  "provenance_note": "Original Colab run directory, copied unchanged by the owner; Drive names and sizes matched the local bytes file by file. Flat-Mars sponge rerun Us (2026-11-13): dev-mars-gray-flat-sponge --no-frictional-heating (1f91ab18), Colab L4. Development experiment, not Thomson & Vallis M-I.",
+  "included_files": [
+    "config.json",
+    "events.jsonl",
+    "means.npz",
+    "series.json"
+  ],
+  "omitted_files": {
+    "checkpoints/checkpoint-s000002880.npz": "Full state/checkpoint data retained in the external archive.",
+    "checkpoints/checkpoint-s000004320.npz": "Full state/checkpoint data retained in the external archive.",
+    "states/state-d00001.npy": "Full state/checkpoint data retained in the external archive.",
+    "states/state-d00002.npy": "Full state/checkpoint data retained in the external archive.",
+    "states/state-d00003.npy": "Full state/checkpoint data retained in the external archive.",
+    "states/state-d00004.npy": "Full state/checkpoint data retained in the external archive.",
+    "states/state-d00005.npy": "Full state/checkpoint data retained in the external archive.",
+    "states/state-d00006.npy": "Full state/checkpoint data retained in the external archive.",
+    "states/state-d00007.npy": "Full state/checkpoint data retained in the external archive.",
+    "states/state-d00008.npy": "Full state/checkpoint data retained in the external archive.",
+    "states/state-d00009.npy": "Full state/checkpoint data retained in the external archive.",
+    "states/state-d00010.npy": "Full state/checkpoint data retained in the external archive.",
+    "states/state-d00011.npy": "Full state/checkpoint data retained in the external archive.",
+    "states/state-d00012.npy": "Full state/checkpoint data retained in the external archive.",
+    "states/state-d00013.npy": "Full state/checkpoint data retained in the external archive.",
+    "states/state-d00014.npy": "Full state/checkpoint data retained in the external archive.",
+    "states/state-d00015.npy": "Full state/checkpoint data retained in the external archive.",
+    "states/state-d00016.npy": "Full state/checkpoint data retained in the external archive.",
+    "states/state-d00017.npy": "Full state/checkpoint data retained in the external archive.",
+    "states/state-d00018.npy": "Full state/checkpoint data retained in the external archive.",
+    "states/state-d00019.npy": "Full state/checkpoint data retained in the external archive.",
+    "states/state-d00020.npy": "Full state/checkpoint data retained in the external archive.",
+    "states/state-d00021.npy": "Full state/checkpoint data retained in the external archive.",
+    "states/state-d00022.npy": "Full state/checkpoint data retained in the external archive.",
+    "states/state-d00023.npy": "Full state/checkpoint data retained in the external archive.",
+    "states/state-d00024.npy": "Full state/checkpoint data retained in the external archive.",
+    "states/state-d00025.npy": "Full state/checkpoint data retained in the external archive.",
+    "states/state-d00026.npy": "Full state/checkpoint data retained in the external archive.",
+    "states/state-d00027.npy": "Full state/checkpoint data retained in the external archive.",
+    "states/state-d00028.npy": "Full state/checkpoint data retained in the external archive.",
+    "states/state-d00029.npy": "Full state/checkpoint data retained in the external archive.",
+    "states/state-d00030.npy": "Full state/checkpoint data retained in the external archive.",
+    "states/surface-d00001.npy": "Full state/checkpoint data retained in the external archive.",
+    "states/surface-d00002.npy": "Full state/checkpoint data retained in the external archive.",
+    "states/surface-d00003.npy": "Full state/checkpoint data retained in the external archive.",
+    "states/surface-d00004.npy": "Full state/checkpoint data retained in the external archive.",
+    "states/surface-d00005.npy": "Full state/checkpoint data retained in the external archive.",
+    "states/surface-d00006.npy": "Full state/checkpoint data retained in the external archive.",
+    "states/surface-d00007.npy": "Full state/checkpoint data retained in the external archive.",
+    "states/surface-d00008.npy": "Full state/checkpoint data retained in the external archive.",
+    "states/surface-d00009.npy": "Full state/checkpoint data retained in the external archive.",
+    "states/surface-d00010.npy": "Full state/checkpoint data retained in the external archive.",
+    "states/surface-d00011.npy": "Full state/checkpoint data retained in the external archive.",
+    "states/surface-d00012.npy": "Full state/checkpoint data retained in the external archive.",
+    "states/surface-d00013.npy": "Full state/checkpoint data retained in the external archive.",
+    "states/surface-d00014.npy": "Full state/checkpoint data retained in the external archive.",
+    "states/surface-d00015.npy": "Full state/checkpoint data retained in the external archive.",
+    "states/surface-d00016.npy": "Full state/checkpoint data retained in the external archive.",
+    "states/surface-d00017.npy": "Full state/checkpoint data retained in the external archive.",
+    "states/surface-d00018.npy": "Full state/checkpoint data retained in the external archive.",
+    "states/surface-d00019.npy": "Full state/checkpoint data retained in the external archive.",
+    "states/surface-d00020.npy": "Full state/checkpoint data retained in the external archive.",
+    "states/surface-d00021.npy": "Full state/checkpoint data retained in the external archive.",
+    "states/surface-d00022.npy": "Full state/checkpoint data retained in the external archive.",
+    "states/surface-d00023.npy": "Full state/checkpoint data retained in the external archive.",
+    "states/surface-d00024.npy": "Full state/checkpoint data retained in the external archive.",
+    "states/surface-d00025.npy": "Full state/checkpoint data retained in the external archive.",
+    "states/surface-d00026.npy": "Full state/checkpoint data retained in the external archive.",
+    "states/surface-d00027.npy": "Full state/checkpoint data retained in the external archive.",
+    "states/surface-d00028.npy": "Full state/checkpoint data retained in the external archive.",
+    "states/surface-d00029.npy": "Full state/checkpoint data retained in the external archive.",
+    "states/surface-d00030.npy": "Full state/checkpoint data retained in the external archive."
+  },
+  "files": {
+    "checkpoints/checkpoint-s000002880.npz": {
+      "drive_id": "1vKpY7A7Gq9RUI0-H_MqNMRq3np91hkvR",
+      "size": 1351086
+    },
+    "checkpoints/checkpoint-s000004320.npz": {
+      "drive_id": "1XliIunfb7aRLgEvUJ0Tkc51xhA36K0b3",
+      "size": 1355046
+    },
+    "config.json": {
+      "drive_id": "1BEu8vjjaFPMEyvD6c5_fpv6fotiMjIH-",
+      "size": 4001
+    },
+    "events.jsonl": {
+      "drive_id": "1bNzo5MsyhyseGxAWp5IJb2WN-RJ4xAys",
+      "size": 826
+    },
+    "means.npz": {
+      "drive_id": "1ChAyatlSGgs3qY2PObiVL2FxxrWlJ37x",
+      "size": 35652
+    },
+    "series.json": {
+      "drive_id": "1aH-G4ge9bNZXcpi417-593PN4I54w_GG",
+      "size": 12492
+    },
+    "states/state-d00001.npy": {
+      "drive_id": "1cJ6YfzgHzhPC19QwJiHVKkeWiQ0UcN_z",
+      "size": 643392
+    },
+    "states/state-d00002.npy": {
+      "drive_id": "1k292Xsq8yneaaXdiIiBmplGOmYHn1YGh",
+      "size": 643392
+    },
+    "states/state-d00003.npy": {
+      "drive_id": "1oR19eZifqOdork_9cJxlDSHY8UwR0Hai",
+      "size": 643392
+    },
+    "states/state-d00004.npy": {
+      "drive_id": "1pPeVA6nN5AlR_GjDymIXLmMDlLrp2-Xy",
+      "size": 643392
+    },
+    "states/state-d00005.npy": {
+      "drive_id": "1QDUCEfCrdm0qrzORy3TiJhaIScira5bs",
+      "size": 643392
+    },
+    "states/state-d00006.npy": {
+      "drive_id": "1n7IV_CqDnpHYvxcC4lErgpm4fkoV7hHY",
+      "size": 643392
+    },
+    "states/state-d00007.npy": {
+      "drive_id": "1hbNksmwR-GXmb4-5XrKqg20uht2qLxbP",
+      "size": 643392
+    },
+    "states/state-d00008.npy": {
+      "drive_id": "1m5MVW3bOXdaEv9u2ndeACzj-Xd-BRsmw",
+      "size": 643392
+    },
+    "states/state-d00009.npy": {
+      "drive_id": "1J-eGOknZGqrK_QrWOWUMJ5qXrp7LTqm5",
+      "size": 643392
+    },
+    "states/state-d00010.npy": {
+      "drive_id": "10xlqaMkTnADYeIDNthZh1ei9n2r13yJo",
+      "size": 643392
+    },
+    "states/state-d00011.npy": {
+      "drive_id": "1Q4F_4hlUmML9mjJVXjKLGGbd7xOE6w9i",
+      "size": 643392
+    },
+    "states/state-d00012.npy": {
+      "drive_id": "1xgyEShz3Egbq9qsF77TBSV7LrUPFmhQu",
+      "size": 643392
+    },
+    "states/state-d00013.npy": {
+      "drive_id": "1ncS0wE3xoBPVuftUdg2W9y1uTt6Fie_0",
+      "size": 643392
+    },
+    "states/state-d00014.npy": {
+      "drive_id": "1H3HrWm7BgaaynAZESPSU5WgqWPGwfGKJ",
+      "size": 643392
+    },
+    "states/state-d00015.npy": {
+      "drive_id": "1faku2X5uYvz1vXn2hR69BaV-SQyH3Ywc",
+      "size": 643392
+    },
+    "states/state-d00016.npy": {
+      "drive_id": "1kCf_9h_pGvrWJM-sn0-8bvYRAj7GXFJh",
+      "size": 643392
+    },
+    "states/state-d00017.npy": {
+      "drive_id": "19mxK87TWkivGeqvayhf_eQ7DwmaMYqDf",
+      "size": 643392
+    },
+    "states/state-d00018.npy": {
+      "drive_id": "12RVQvJITvcIRio5jAjpx1OIItn8Xjnx9",
+      "size": 643392
+    },
+    "states/state-d00019.npy": {
+      "drive_id": "1YQBSwdyjNAb1VWwmTFhC_LBPAIHhn7lB",
+      "size": 643392
+    },
+    "states/state-d00020.npy": {
+      "drive_id": "1MjrStXvuF5IqTDMBHmvli9kX3rlygYKs",
+      "size": 643392
+    },
+    "states/state-d00021.npy": {
+      "drive_id": "1VhFmotsSLGOngc2M_zibr7MAYFobXUG1",
+      "size": 643392
+    },
+    "states/state-d00022.npy": {
+      "drive_id": "1kVkEsbwSuu6DWc1nzDDsSf0TCSJRdcQk",
+      "size": 643392
+    },
+    "states/state-d00023.npy": {
+      "drive_id": "1xTuVOGhoMp1LBHvIRtYmy6ZMaBFZ5jLS",
+      "size": 643392
+    },
+    "states/state-d00024.npy": {
+      "drive_id": "1iKhsqVlBG26MjvGZBq-a_Dz8njr5GH6R",
+      "size": 643392
+    },
+    "states/state-d00025.npy": {
+      "drive_id": "14DSic5gT2agPJf5E_jyLyBxlYkyOvgfT",
+      "size": 643392
+    },
+    "states/state-d00026.npy": {
+      "drive_id": "1wTUQPN2memEppc3UstGcbVWzFWpW_NP8",
+      "size": 643392
+    },
+    "states/state-d00027.npy": {
+      "drive_id": "1Td8PvXIos7eaJrfNWxmzFp_BiYV5DEpq",
+      "size": 643392
+    },
+    "states/state-d00028.npy": {
+      "drive_id": "1mn6rf801bHQy-iUGKv-I-rOnawmLa9fl",
+      "size": 643392
+    },
+    "states/state-d00029.npy": {
+      "drive_id": "1q6fARI11HL7ceAaTZN70lC7NgPQv8Fd2",
+      "size": 643392
+    },
+    "states/state-d00030.npy": {
+      "drive_id": "1U7wSslBehj5Gm10X-mN7ACUAnhvZXHpd",
+      "size": 643392
+    },
+    "states/surface-d00001.npy": {
+      "drive_id": "1ze3J1aPNY5mY8cPVlyUcV_EQUTlGMiBH",
+      "size": 16512
+    },
+    "states/surface-d00002.npy": {
+      "drive_id": "1kKKzzpmSy7ycit7zZMcChqIX3t-Co66D",
+      "size": 16512
+    },
+    "states/surface-d00003.npy": {
+      "drive_id": "17V16204GrUAPxwHMxUgpMP3VtxTJsxkH",
+      "size": 16512
+    },
+    "states/surface-d00004.npy": {
+      "drive_id": "1Vee5jvfeAo9-PHxcYSbeD8hlPVne3lWw",
+      "size": 16512
+    },
+    "states/surface-d00005.npy": {
+      "drive_id": "1zGHqAnnqAcPnDd_n54QcqdRcfoxGipzq",
+      "size": 16512
+    },
+    "states/surface-d00006.npy": {
+      "drive_id": "1c0mxPd5tXvQL-qSJvNGVEjr-K4FbYP9R",
+      "size": 16512
+    },
+    "states/surface-d00007.npy": {
+      "drive_id": "19sV6SRzjChmzP7hxqhBmRgSE4X2CIIt_",
+      "size": 16512
+    },
+    "states/surface-d00008.npy": {
+      "drive_id": "1Wc26NsZR_Bkm5y7PhPrRjUmU-dfjJm6a",
+      "size": 16512
+    },
+    "states/surface-d00009.npy": {
+      "drive_id": "1p6ZUtIilJzd4_KOHuLJvEqEoBv2OhwnS",
+      "size": 16512
+    },
+    "states/surface-d00010.npy": {
+      "drive_id": "1pV066UfdXcvlVacR8s0JfUADnufLP3wc",
+      "size": 16512
+    },
+    "states/surface-d00011.npy": {
+      "drive_id": "1Y3i8UlQZ7HVV3Q0nHtTLhMiufhmzBoyu",
+      "size": 16512
+    },
+    "states/surface-d00012.npy": {
+      "drive_id": "1JP7Eeecn54g3cBi_WNmqVdk19Su0Xgvi",
+      "size": 16512
+    },
+    "states/surface-d00013.npy": {
+      "drive_id": "1UGHATSV0YKtRl9iMj6ODUFPmUuOYM954",
+      "size": 16512
+    },
+    "states/surface-d00014.npy": {
+      "drive_id": "1deTRTe_q1g8CxEnXlkxjJttusMhQjtHj",
+      "size": 16512
+    },
+    "states/surface-d00015.npy": {
+      "drive_id": "1j2vMxvN64R8nJR-JE8-ln5iene8Zcn_k",
+      "size": 16512
+    },
+    "states/surface-d00016.npy": {
+      "drive_id": "1WwOWPYNp4ifjVA_R_8JxXKdfJFdpPbcm",
+      "size": 16512
+    },
+    "states/surface-d00017.npy": {
+      "drive_id": "1O6xI0qLwBtqGt3puS9oB6T6DllM4Mn36",
+      "size": 16512
+    },
+    "states/surface-d00018.npy": {
+      "drive_id": "1hHDgR5d46IMgNujWgJBgzP_GRy_st9WH",
+      "size": 16512
+    },
+    "states/surface-d00019.npy": {
+      "drive_id": "1q6IChozkUzQKPSw6VqZkp-6KCTYaM_Rr",
+      "size": 16512
+    },
+    "states/surface-d00020.npy": {
+      "drive_id": "1K58b9589vDCcp4u7fqUSxcxA7KCRSmky",
+      "size": 16512
+    },
+    "states/surface-d00021.npy": {
+      "drive_id": "1jwPfCg0s2X32ba2Yzy0GqDtISTr758Fu",
+      "size": 16512
+    },
+    "states/surface-d00022.npy": {
+      "drive_id": "1yYmCS-x3uyce8d7eUXDuY8JSYfWwwHAX",
+      "size": 16512
+    },
+    "states/surface-d00023.npy": {
+      "drive_id": "1ZF-Z_PVDod7ZzNLRlvok-1AFpnHwzeDg",
+      "size": 16512
+    },
+    "states/surface-d00024.npy": {
+      "drive_id": "1CILazKoKzCul9kyHOdaBJTWBhtFe2xXP",
+      "size": 16512
+    },
+    "states/surface-d00025.npy": {
+      "drive_id": "1vZBZkj1uhZZo_NSslDslSYSm7bhpMsUd",
+      "size": 16512
+    },
+    "states/surface-d00026.npy": {
+      "drive_id": "1XZsEGXu4Z1YsR-SCn7FTWNhrIyBSMeCU",
+      "size": 16512
+    },
+    "states/surface-d00027.npy": {
+      "drive_id": "18lAVCtCwMf6C2iv0t0QuhGMKd-tDZ64q",
+      "size": 16512
+    },
+    "states/surface-d00028.npy": {
+      "drive_id": "1jEYQajuvhd9sW62LNnjDR-EcNBB-VSRD",
+      "size": 16512
+    },
+    "states/surface-d00029.npy": {
+      "drive_id": "1vCBKUQP1bHOiQFKUHQmUVGL__O4HjAZi",
+      "size": 16512
+    },
+    "states/surface-d00030.npy": {
+      "drive_id": "1wppB_es7MFt6Ex0VLzTaQIUStSSit3iw",
+      "size": 16512
+    }
+  }
+}

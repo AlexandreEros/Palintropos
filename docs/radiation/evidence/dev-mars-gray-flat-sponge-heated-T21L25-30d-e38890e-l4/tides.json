@@ -1,0 +1,702 @@
+{
+  "M5": {
+    "met": false,
+    "s1_at_least_3x_noise": false,
+    "s1_at_least_5e-4": false,
+    "surface_temperature_max_between_11_and_16_h": false
+  },
+  "by_latitude": {
+    "lowest_air_temperature": {
+      "-13.84": {
+        "mean": NaN,
+        "noise_rms": NaN,
+        "s1_amplitude": NaN,
+        "s1_h_of_max": NaN,
+        "s2_amplitude": NaN
+      },
+      "-19.38": {
+        "mean": NaN,
+        "noise_rms": NaN,
+        "s1_amplitude": NaN,
+        "s1_h_of_max": NaN,
+        "s2_amplitude": NaN
+      },
+      "-2.77": {
+        "mean": NaN,
+        "noise_rms": NaN,
+        "s1_amplitude": NaN,
+        "s1_h_of_max": NaN,
+        "s2_amplitude": NaN
+      },
+      "-24.92": {
+        "mean": NaN,
+        "noise_rms": NaN,
+        "s1_amplitude": NaN,
+        "s1_h_of_max": NaN,
+        "s2_amplitude": NaN
+      },
+      "-30.46": {
+        "mean": NaN,
+        "noise_rms": NaN,
+        "s1_amplitude": NaN,
+        "s1_h_of_max": NaN,
+        "s2_amplitude": NaN
+      },
+      "-36.00": {
+        "mean": NaN,
+        "noise_rms": NaN,
+        "s1_amplitude": NaN,
+        "s1_h_of_max": NaN,
+        "s2_amplitude": NaN
+      },
+      "-41.53": {
+        "mean": NaN,
+        "noise_rms": NaN,
+        "s1_amplitude": NaN,
+        "s1_h_of_max": NaN,
+        "s2_amplitude": NaN
+      },
+      "-47.07": {
+        "mean": NaN,
+        "noise_rms": NaN,
+        "s1_amplitude": NaN,
+        "s1_h_of_max": NaN,
+        "s2_amplitude": NaN
+      },
+      "-52.61": {
+        "mean": NaN,
+        "noise_rms": NaN,
+        "s1_amplitude": NaN,
+        "s1_h_of_max": NaN,
+        "s2_amplitude": NaN
+      },
+      "-58.14": {
+        "mean": NaN,
+        "noise_rms": NaN,
+        "s1_amplitude": NaN,
+        "s1_h_of_max": NaN,
+        "s2_amplitude": NaN
+      },
+      "-63.68": {
+        "mean": NaN,
+        "noise_rms": NaN,
+        "s1_amplitude": NaN,
+        "s1_h_of_max": NaN,
+        "s2_amplitude": NaN
+      },
+      "-69.21": {
+        "mean": NaN,
+        "noise_rms": NaN,
+        "s1_amplitude": NaN,
+        "s1_h_of_max": NaN,
+        "s2_amplitude": NaN
+      },
+      "-74.74": {
+        "mean": NaN,
+        "noise_rms": NaN,
+        "s1_amplitude": NaN,
+        "s1_h_of_max": NaN,
+        "s2_amplitude": NaN
+      },
+      "-8.31": {
+        "mean": NaN,
+        "noise_rms": NaN,
+        "s1_amplitude": NaN,
+        "s1_h_of_max": NaN,
+        "s2_amplitude": NaN
+      },
+      "-80.27": {
+        "mean": NaN,
+        "noise_rms": NaN,
+        "s1_amplitude": NaN,
+        "s1_h_of_max": NaN,
+        "s2_amplitude": NaN
+      },
+      "-85.76": {
+        "mean": NaN,
+        "noise_rms": NaN,
+        "s1_amplitude": NaN,
+        "s1_h_of_max": NaN,
+        "s2_amplitude": NaN
+      },
+      "13.84": {
+        "mean": NaN,
+        "noise_rms": NaN,
+        "s1_amplitude": NaN,
+        "s1_h_of_max": NaN,
+        "s2_amplitude": NaN
+      },
+      "19.38": {
+        "mean": NaN,
+        "noise_rms": NaN,
+        "s1_amplitude": NaN,
+        "s1_h_of_max": NaN,
+        "s2_amplitude": NaN
+      },
+      "2.77": {
+        "mean": NaN,
+        "noise_rms": NaN,
+        "s1_amplitude": NaN,
+        "s1_h_of_max": NaN,
+        "s2_amplitude": NaN
+      },
+      "24.92": {
+        "mean": NaN,
+        "noise_rms": NaN,
+        "s1_amplitude": NaN,
+        "s1_h_of_max": NaN,
+        "s2_amplitude": NaN
+      },
+      "30.46": {
+        "mean": NaN,
+        "noise_rms": NaN,
+        "s1_amplitude": NaN,
+        "s1_h_of_max": NaN,
+        "s2_amplitude": NaN
+      },
+      "36.00": {
+        "mean": NaN,
+        "noise_rms": NaN,
+        "s1_amplitude": NaN,
+        "s1_h_of_max": NaN,
+        "s2_amplitude": NaN
+      },
+      "41.53": {
+        "mean": NaN,
+        "noise_rms": NaN,
+        "s1_amplitude": NaN,
+        "s1_h_of_max": NaN,
+        "s2_amplitude": NaN
+      },
+      "47.07": {
+        "mean": NaN,
+        "noise_rms": NaN,
+        "s1_amplitude": NaN,
+        "s1_h_of_max": NaN,
+        "s2_amplitude": NaN
+      },
+      "52.61": {
+        "mean": NaN,
+        "noise_rms": NaN,
+        "s1_amplitude": NaN,
+        "s1_h_of_max": NaN,
+        "s2_amplitude": NaN
+      },
+      "58.14": {
+        "mean": NaN,
+        "noise_rms": NaN,
+        "s1_amplitude": NaN,
+        "s1_h_of_max": NaN,
+        "s2_amplitude": NaN
+      },
+      "63.68": {
+        "mean": NaN,
+        "noise_rms": NaN,
+        "s1_amplitude": NaN,
+        "s1_h_of_max": NaN,
+        "s2_amplitude": NaN
+      },
+      "69.21": {
+        "mean": NaN,
+        "noise_rms": NaN,
+        "s1_amplitude": NaN,
+        "s1_h_of_max": NaN,
+        "s2_amplitude": NaN
+      },
+      "74.74": {
+        "mean": NaN,
+        "noise_rms": NaN,
+        "s1_amplitude": NaN,
+        "s1_h_of_max": NaN,
+        "s2_amplitude": NaN
+      },
+      "8.31": {
+        "mean": NaN,
+        "noise_rms": NaN,
+        "s1_amplitude": NaN,
+        "s1_h_of_max": NaN,
+        "s2_amplitude": NaN
+      },
+      "80.27": {
+        "mean": NaN,
+        "noise_rms": NaN,
+        "s1_amplitude": NaN,
+        "s1_h_of_max": NaN,
+        "s2_amplitude": NaN
+      },
+      "85.76": {
+        "mean": NaN,
+        "noise_rms": NaN,
+        "s1_amplitude": NaN,
+        "s1_h_of_max": NaN,
+        "s2_amplitude": NaN
+      }
+    },
+    "surface_pressure": {
+      "-13.84": {
+        "mean": NaN,
+        "noise_rms": NaN,
+        "s1_amplitude": NaN,
+        "s1_h_of_max": NaN,
+        "s2_amplitude": NaN
+      },
+      "-19.38": {
+        "mean": NaN,
+        "noise_rms": NaN,
+        "s1_amplitude": NaN,
+        "s1_h_of_max": NaN,
+        "s2_amplitude": NaN
+      },
+      "-2.77": {
+        "mean": NaN,
+        "noise_rms": NaN,
+        "s1_amplitude": NaN,
+        "s1_h_of_max": NaN,
+        "s2_amplitude": NaN
+      },
+      "-24.92": {
+        "mean": NaN,
+        "noise_rms": NaN,
+        "s1_amplitude": NaN,
+        "s1_h_of_max": NaN,
+        "s2_amplitude": NaN
+      },
+      "-30.46": {
+        "mean": NaN,
+        "noise_rms": NaN,
+        "s1_amplitude": NaN,
+        "s1_h_of_max": NaN,
+        "s2_amplitude": NaN
+      },
+      "-36.00": {
+        "mean": NaN,
+        "noise_rms": NaN,
+        "s1_amplitude": NaN,
+        "s1_h_of_max": NaN,
+        "s2_amplitude": NaN
+      },
+      "-41.53": {
+        "mean": NaN,
+        "noise_rms": NaN,
+        "s1_amplitude": NaN,
+        "s1_h_of_max": NaN,
+        "s2_amplitude": NaN
+      },
+      "-47.07": {
+        "mean": NaN,
+        "noise_rms": NaN,
+        "s1_amplitude": NaN,
+        "s1_h_of_max": NaN,
+        "s2_amplitude": NaN
+      },
+      "-52.61": {
+        "mean": NaN,
+        "noise_rms": NaN,
+        "s1_amplitude": NaN,
+        "s1_h_of_max": NaN,
+        "s2_amplitude": NaN
+      },
+      "-58.14": {
+        "mean": NaN,
+        "noise_rms": NaN,
+        "s1_amplitude": NaN,
+        "s1_h_of_max": NaN,
+        "s2_amplitude": NaN
+      },
+      "-63.68": {
+        "mean": NaN,
+        "noise_rms": NaN,
+        "s1_amplitude": NaN,
+        "s1_h_of_max": NaN,
+        "s2_amplitude": NaN
+      },
+      "-69.21": {
+        "mean": NaN,
+        "noise_rms": NaN,
+        "s1_amplitude": NaN,
+        "s1_h_of_max": NaN,
+        "s2_amplitude": NaN
+      },
+      "-74.74": {
+        "mean": NaN,
+        "noise_rms": NaN,
+        "s1_amplitude": NaN,
+        "s1_h_of_max": NaN,
+        "s2_amplitude": NaN
+      },
+      "-8.31": {
+        "mean": NaN,
+        "noise_rms": NaN,
+        "s1_amplitude": NaN,
+        "s1_h_of_max": NaN,
+        "s2_amplitude": NaN
+      },
+      "-80.27": {
+        "mean": NaN,
+        "noise_rms": NaN,
+        "s1_amplitude": NaN,
+        "s1_h_of_max": NaN,
+        "s2_amplitude": NaN
+      },
+      "-85.76": {
+        "mean": NaN,
+        "noise_rms": NaN,
+        "s1_amplitude": NaN,
+        "s1_h_of_max": NaN,
+        "s2_amplitude": NaN
+      },
+      "13.84": {
+        "mean": NaN,
+        "noise_rms": NaN,
+        "s1_amplitude": NaN,
+        "s1_h_of_max": NaN,
+        "s2_amplitude": NaN
+      },
+      "19.38": {
+        "mean": NaN,
+        "noise_rms": NaN,
+        "s1_amplitude": NaN,
+        "s1_h_of_max": NaN,
+        "s2_amplitude": NaN
+      },
+      "2.77": {
+        "mean": NaN,
+        "noise_rms": NaN,
+        "s1_amplitude": NaN,
+        "s1_h_of_max": NaN,
+        "s2_amplitude": NaN
+      },
+      "24.92": {
+        "mean": NaN,
+        "noise_rms": NaN,
+        "s1_amplitude": NaN,
+        "s1_h_of_max": NaN,
+        "s2_amplitude": NaN
+      },
+      "30.46": {
+        "mean": NaN,
+        "noise_rms": NaN,
+        "s1_amplitude": NaN,
+        "s1_h_of_max": NaN,
+        "s2_amplitude": NaN
+      },
+      "36.00": {
+        "mean": NaN,
+        "noise_rms": NaN,
+        "s1_amplitude": NaN,
+        "s1_h_of_max": NaN,
+        "s2_amplitude": NaN
+      },
+      "41.53": {
+        "mean": NaN,
+        "noise_rms": NaN,
+        "s1_amplitude": NaN,
+        "s1_h_of_max": NaN,
+        "s2_amplitude": NaN
+      },
+      "47.07": {
+        "mean": NaN,
+        "noise_rms": NaN,
+        "s1_amplitude": NaN,
+        "s1_h_of_max": NaN,
+        "s2_amplitude": NaN
+      },
+      "52.61": {
+        "mean": NaN,
+        "noise_rms": NaN,
+        "s1_amplitude": NaN,
+        "s1_h_of_max": NaN,
+        "s2_amplitude": NaN
+      },
+      "58.14": {
+        "mean": NaN,
+        "noise_rms": NaN,
+        "s1_amplitude": NaN,
+        "s1_h_of_max": NaN,
+        "s2_amplitude": NaN
+      },
+      "63.68": {
+        "mean": NaN,
+        "noise_rms": NaN,
+        "s1_amplitude": NaN,
+        "s1_h_of_max": NaN,
+        "s2_amplitude": NaN
+      },
+      "69.21": {
+        "mean": NaN,
+        "noise_rms": NaN,
+        "s1_amplitude": NaN,
+        "s1_h_of_max": NaN,
+        "s2_amplitude": NaN
+      },
+      "74.74": {
+        "mean": NaN,
+        "noise_rms": NaN,
+        "s1_amplitude": NaN,
+        "s1_h_of_max": NaN,
+        "s2_amplitude": NaN
+      },
+      "8.31": {
+        "mean": NaN,
+        "noise_rms": NaN,
+        "s1_amplitude": NaN,
+        "s1_h_of_max": NaN,
+        "s2_amplitude": NaN
+      },
+      "80.27": {
+        "mean": NaN,
+        "noise_rms": NaN,
+        "s1_amplitude": NaN,
+        "s1_h_of_max": NaN,
+        "s2_amplitude": NaN
+      },
+      "85.76": {
+        "mean": NaN,
+        "noise_rms": NaN,
+        "s1_amplitude": NaN,
+        "s1_h_of_max": NaN,
+        "s2_amplitude": NaN
+      }
+    },
+    "surface_temperature": {
+      "-13.84": {
+        "mean": NaN,
+        "noise_rms": NaN,
+        "s1_amplitude": NaN,
+        "s1_h_of_max": NaN,
+        "s2_amplitude": NaN
+      },
+      "-19.38": {
+        "mean": NaN,
+        "noise_rms": NaN,
+        "s1_amplitude": NaN,
+        "s1_h_of_max": NaN,
+        "s2_amplitude": NaN
+      },
+      "-2.77": {
+        "mean": NaN,
+        "noise_rms": NaN,
+        "s1_amplitude": NaN,
+        "s1_h_of_max": NaN,
+        "s2_amplitude": NaN
+      },
+      "-24.92": {
+        "mean": NaN,
+        "noise_rms": NaN,
+        "s1_amplitude": NaN,
+        "s1_h_of_max": NaN,
+        "s2_amplitude": NaN
+      },
+      "-30.46": {
+        "mean": NaN,
+        "noise_rms": NaN,
+        "s1_amplitude": NaN,
+        "s1_h_of_max": NaN,
+        "s2_amplitude": NaN
+      },
+      "-36.00": {
+        "mean": NaN,
+        "noise_rms": NaN,
+        "s1_amplitude": NaN,
+        "s1_h_of_max": NaN,
+        "s2_amplitude": NaN
+      },
+      "-41.53": {
+        "mean": NaN,
+        "noise_rms": NaN,
+        "s1_amplitude": NaN,
+        "s1_h_of_max": NaN,
+        "s2_amplitude": NaN
+      },
+      "-47.07": {
+        "mean": NaN,
+        "noise_rms": NaN,
+        "s1_amplitude": NaN,
+        "s1_h_of_max": NaN,
+        "s2_amplitude": NaN
+      },
+      "-52.61": {
+        "mean": NaN,
+        "noise_rms": NaN,
+        "s1_amplitude": NaN,
+        "s1_h_of_max": NaN,
+        "s2_amplitude": NaN
+      },
+      "-58.14": {
+        "mean": NaN,
+        "noise_rms": NaN,
+        "s1_amplitude": NaN,
+        "s1_h_of_max": NaN,
+        "s2_amplitude": NaN
+      },
+      "-63.68": {
+        "mean": NaN,
+        "noise_rms": NaN,
+        "s1_amplitude": NaN,
+        "s1_h_of_max": NaN,
+        "s2_amplitude": NaN
+      },
+      "-69.21": {
+        "mean": NaN,
+        "noise_rms": NaN,
+        "s1_amplitude": NaN,
+        "s1_h_of_max": NaN,
+        "s2_amplitude": NaN
+      },
+      "-74.74": {
+        "mean": NaN,
+        "noise_rms": NaN,
+        "s1_amplitude": NaN,
+        "s1_h_of_max": NaN,
+        "s2_amplitude": NaN
+      },
+      "-8.31": {
+        "mean": NaN,
+        "noise_rms": NaN,
+        "s1_amplitude": NaN,
+        "s1_h_of_max": NaN,
+        "s2_amplitude": NaN
+      },
+      "-80.27": {
+        "mean": NaN,
+        "noise_rms": NaN,
+        "s1_amplitude": NaN,
+        "s1_h_of_max": NaN,
+        "s2_amplitude": NaN
+      },
+      "-85.76": {
+        "mean": NaN,
+        "noise_rms": NaN,
+        "s1_amplitude": NaN,
+        "s1_h_of_max": NaN,
+        "s2_amplitude": NaN
+      },
+      "13.84": {
+        "mean": NaN,
+        "noise_rms": NaN,
+        "s1_amplitude": NaN,
+        "s1_h_of_max": NaN,
+        "s2_amplitude": NaN
+      },
+      "19.38": {
+        "mean": NaN,
+        "noise_rms": NaN,
+        "s1_amplitude": NaN,
+        "s1_h_of_max": NaN,
+        "s2_amplitude": NaN
+      },
+      "2.77": {
+        "mean": NaN,
+        "noise_rms": NaN,
+        "s1_amplitude": NaN,
+        "s1_h_of_max": NaN,
+        "s2_amplitude": NaN
+      },
+      "24.92": {
+        "mean": NaN,
+        "noise_rms": NaN,
+        "s1_amplitude": NaN,
+        "s1_h_of_max": NaN,
+        "s2_amplitude": NaN
+      },
+      "30.46": {
+        "mean": NaN,
+        "noise_rms": NaN,
+        "s1_amplitude": NaN,
+        "s1_h_of_max": NaN,
+        "s2_amplitude": NaN
+      },
+      "36.00": {
+        "mean": NaN,
+        "noise_rms": NaN,
+        "s1_amplitude": NaN,
+        "s1_h_of_max": NaN,
+        "s2_amplitude": NaN
+      },
+      "41.53": {
+        "mean": NaN,
+        "noise_rms": NaN,
+        "s1_amplitude": NaN,
+        "s1_h_of_max": NaN,
+        "s2_amplitude": NaN
+      },
+      "47.07": {
+        "mean": NaN,
+        "noise_rms": NaN,
+        "s1_amplitude": NaN,
+        "s1_h_of_max": NaN,
+        "s2_amplitude": NaN
+      },
+      "52.61": {
+        "mean": NaN,
+        "noise_rms": NaN,
+        "s1_amplitude": NaN,
+        "s1_h_of_max": NaN,
+        "s2_amplitude": NaN
+      },
+      "58.14": {
+        "mean": NaN,
+        "noise_rms": NaN,
+        "s1_amplitude": NaN,
+        "s1_h_of_max": NaN,
+        "s2_amplitude": NaN
+      },
+      "63.68": {
+        "mean": NaN,
+        "noise_rms": NaN,
+        "s1_amplitude": NaN,
+        "s1_h_of_max": NaN,
+        "s2_amplitude": NaN
+      },
+      "69.21": {
+        "mean": NaN,
+        "noise_rms": NaN,
+        "s1_amplitude": NaN,
+        "s1_h_of_max": NaN,
+        "s2_amplitude": NaN
+      },
+      "74.74": {
+        "mean": NaN,
+        "noise_rms": NaN,
+        "s1_amplitude": NaN,
+        "s1_h_of_max": NaN,
+        "s2_amplitude": NaN
+      },
+      "8.31": {
+        "mean": NaN,
+        "noise_rms": NaN,
+        "s1_amplitude": NaN,
+        "s1_h_of_max": NaN,
+        "s2_amplitude": NaN
+      },
+      "80.27": {
+        "mean": NaN,
+        "noise_rms": NaN,
+        "s1_amplitude": NaN,
+        "s1_h_of_max": NaN,
+        "s2_amplitude": NaN
+      },
+      "85.76": {
+        "mean": NaN,
+        "noise_rms": NaN,
+        "s1_amplitude": NaN,
+        "s1_h_of_max": NaN,
+        "s2_amplitude": NaN
+      }
+    }
+  },
+  "config_sha256": "d2e440587e958a319d2b0107e65a87f26ae17f15fbcf3932bcb97ab8ce9991dc",
+  "equatorial_latitude_deg": 2.768903007736006,
+  "equatorial_lowest_air_temperature_s1_amplitude_k": NaN,
+  "equatorial_surface_temperature_max_local_hour": 0.0,
+  "equatorial_surface_temperature_s1_amplitude_k": NaN,
+  "run": "dev-mars-gray-flat-sponge-heated-T21L25-e38890e",
+  "solar_day": 88440.0,
+  "sols": 2.0,
+  "start_seconds": 2592000.0,
+  "steps": 295,
+  "tropical_surface_pressure_noise_rms_over_ps": NaN,
+  "tropical_surface_pressure_s1_max_local_hour": NaN,
+  "tropical_surface_pressure_s1_over_ps": NaN,
+  "tropical_surface_pressure_s2_over_ps": NaN
+}

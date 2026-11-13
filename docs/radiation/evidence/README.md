@@ -23,3 +23,6 @@ and the [preservation record](../../validation/run_archive_2026-11-12/README.md)
 - [Flat-Mars pilot H](dev-mars-gray-flat-heated-T21L25-30d-b3aaef8-l4/README.md) and
   [pilot U](dev-mars-gray-flat-T21L25-30d-b3aaef8-l4/README.md): the 30-day gray
   development experiment toward Isca M-I, judged by M1-M6 (not an M-I reproduction).
+- [Sponge rerun Hs](dev-mars-gray-flat-sponge-heated-T21L25-30d-e38890e-l4/README.md) and
+  [Us](dev-mars-gray-flat-sponge-T21L25-30d-e38890e-l4/README.md): the same pilot with
+  M-I's top sponge, judged by M1-M6 against predictions fixed before the code.
