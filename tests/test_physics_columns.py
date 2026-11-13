@@ -330,3 +330,27 @@ def test_held_fluxes_heat_the_current_layer_masses():
     expected[-1] += gravity / (cp * (p0[-1] - p0[-2])) * 4.0
     assert np.array_equal(every.heating, expected)
 
+
+
+def test_vertical_path_shortwave_is_iscas_frierson_scheme():
+    """Isca two_stream_gray_rad (frierson case, commit d1321ac3):
+    ``sw_down(k) = insolation exp(-sw_tau(k))`` with no slant path, and
+    ``sw_up(k) = albedo sw_down(surface)`` at every level, so the reflected
+    beam leaves unabsorbed. With tau = 0.2 (p / 610 Pa)^4 (Thomson & Vallis
+    2019 eq. 15) the atmosphere absorbs 1 - exp(-0.2) of the insolation
+    whatever the zenith angle."""
+    from tropoi.physics.radiation.gray import VerticalPathShortwave
+    sw = VerticalPathShortwave(OpticalDepthProfile([(1.0, 4.0)], equator=0.2, reference=610.0))
+    col = _column(25, ps=610.0, gravity=3.71, cp=844.8)
+    rad = Radiation(isca_mars_longwave(), sw)
+    toa = np.array([300.0, 40.0])
+    mu0 = np.array([0.9, 0.05])                   # must not matter
+    f = rad.fluxes(col, LowerBoundary("surface", temperature=np.full(2, 220.0), emissivity=1.0,
+                                      albedo=0.3), toa_flux=toa, mu0=mu0)
+    tau = 0.2 * (col.pressure_interfaces / 610.0) ** 4
+    np.testing.assert_allclose(f.sw_down, toa[None, :] * np.exp(-tau), rtol=1e-14)
+    np.testing.assert_allclose(f.sw_up, 0.3 * f.sw_down[-1][None, :] * np.ones_like(tau),
+                               rtol=1e-14)
+    absorbed_atm = (f.sw_down[0] - f.sw_up[0]) - (f.sw_down[-1] - f.sw_up[-1])
+    np.testing.assert_allclose(absorbed_atm, toa * (1.0 - math.exp(-0.2)), rtol=1e-13)
+    assert sw.signature()["kind"] == "vertical_path_shortwave"

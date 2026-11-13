@@ -1,21 +1,21 @@
 {
   "atlas": {
-    "call_edges": 2184,
+    "call_edges": 2192,
     "call_sites_omitted_by_cap": 32,
-    "call_sites_recorded": 2910,
+    "call_sites_recorded": 2920,
     "import_edges": 441,
     "import_sites_omitted_by_cap": 0,
     "import_sites_recorded": 499,
     "max_sites_per_edge": 8,
-    "nodes": 2060,
+    "nodes": 2066,
     "proposal": {
       "call_edges_by_direction": {
-        "downward": 402,
+        "downward": 404,
         "lateral": 0,
         "upward": 0
       },
       "call_group_cycles_without_exceptions": [],
-      "crossing_call_edges": 422,
+      "crossing_call_edges": 424,
       "crossing_import_edges": 260,
       "exceptions_used": [
         11,
@@ -54,9 +54,9 @@
         "cli": 65,
         "dynamics": 109,
         "integration": 92,
-        "physics": 193,
+        "physics": 197,
         "run": 90,
-        "setup": 285,
+        "setup": 287,
         "spectral": 232,
         "world": 150
       },
@@ -149,24 +149,24 @@
         "sha256": "1dcfeb9400fd06152e45cd607c8648f54d8fa8f41c02b0fcd8ee9310a03c28a4"
       }
     ],
-    "source_lines_embedded": 17221
+    "source_lines_embedded": 17272
   },
   "call_graph": {
     "call_sites": {
-      "builtin": 3674,
-      "external": 2448,
-      "internal": 2933,
-      "unresolved": 3680
+      "builtin": 3677,
+      "external": 2453,
+      "internal": 2943,
+      "unresolved": 3685
     },
     "edges_by_kind": {
-      "call": 1292,
-      "constructor": 62,
-      "instantiate": 492,
+      "call": 1296,
+      "constructor": 63,
+      "instantiate": 495,
       "override": 6,
       "self": 328,
       "super": 4
     },
-    "nodes": 1893,
+    "nodes": 1899,
     "scoped": {
       "cli-capsule-command": {
         "edges": 21,
@@ -343,7 +343,7 @@
     }
   },
   "class_graph": {
-    "classes": 211,
+    "classes": 212,
     "classes_in_inherits_edges": 21,
     "external_bases": {
       "RuntimeError": 6,
@@ -1226,7 +1226,7 @@
     "package": "tropoi",
     "src": "src",
     "working_tree": {
-      "base_commit": "19e92f095b3ae0dc1e410b54b7a6c0b17c832314",
+      "base_commit": "812e22568957ff247223c5049a4cb0efd9d93811",
       "generator": {
         "changes": [],
         "files": {
@@ -1256,10 +1256,7 @@
         "status": "clean"
       },
       "source": {
-        "changes": [
-          " M src/tropoi/run/radiative/__main__.py",
-          " M src/tropoi/run/radiative/config.py"
-        ],
+        "changes": [],
         "files": {
           "src/tropoi/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
           "src/tropoi/cli/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
@@ -1278,7 +1275,7 @@
           "src/tropoi/physics/orbit.py": "6c2135c5c4b8a3dfd88ac688db2c1d498f8bf156501c873b464ac2caf214597d",
           "src/tropoi/physics/planets.py": "4568cb1fc41c1bbf5529d215e5e3f31df04266d36fb68b62b0c0c0b023cf8aec",
           "src/tropoi/physics/radiation/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-          "src/tropoi/physics/radiation/gray.py": "cd1ce227eb2ba65ab1f73cfceacd56c39d4c3d11ee752b6ac9648a683e61633a",
+          "src/tropoi/physics/radiation/gray.py": "1c32cb04dd77aa8129b2225a2a250515bfa5cb6522244ac6b606cb51016ab6b4",
           "src/tropoi/physics/radiation/kdist.py": "e661d9ba0eb07ad3bbf20b427c03996a26149c710990e970f884623afbd0edec",
           "src/tropoi/physics/radiation/scheme.py": "f01f813bdcabceef639ca95d890232fc378e6c873786152438717d882605b729",
           "src/tropoi/physics/radiation/twostream.py": "a2a34eed1686945be47171465006711dc8e9ff2ff7cafd6c733057fe7c50d125",
@@ -1365,9 +1362,9 @@
           "src/tropoi/run/pe/runner.py": "1f3dc50308832c8d5a9a75fe77c98f0284462cac6e697a78a52b3ea8e0ccab07",
           "src/tropoi/run/radiative/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
           "src/tropoi/run/radiative/__main__.py": "f5a10b53a468a0f496352b4c4ba2d8ed4c5f607497c459c68f9004ef69ff9d73",
-          "src/tropoi/run/radiative/config.py": "f284b54103af194ef4c04221556643a0c4a16c937171021de538c3e412337880",
+          "src/tropoi/run/radiative/config.py": "99a30ca408a9e52e18db2732f398928bb3ec6d0929556266b896ace17deed8ec",
           "src/tropoi/run/radiative/experiment.py": "30bcfc692fb5d61d9e65eaeeb9dc345cd8f4ac52d15b31056e271705c4445ab2",
-          "src/tropoi/run/radiative/model.py": "9e853596e0b59670f53e5c5496f9a3e7f5d1846e3e3c0125fb806aec6ab38953",
+          "src/tropoi/run/radiative/model.py": "93c4216327e15a530c44d0f9664efd33567a4c155a3118bb1b48f8dc2e6b9ce2",
           "src/tropoi/run/swe/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
           "src/tropoi/run/swe/config.py": "9b805bbd6c41bdf91368be9925ef64fc19f5c4e7b0497a4e83a468ed811b5ac4",
           "src/tropoi/run/swe/execution.py": "987607c40667c58fd94192dd3157f8c7d6e58facbc6c96920d71eca5c6afe7b9",
@@ -1432,8 +1429,8 @@
           "src/tropoi/temporal/tendencies/primitive_equations.py": "848c6fe9406a7c1c465c0aa9459760b01c542164c8cc9395797a3c4a60793e52",
           "src/tropoi/temporal/tendencies/shallow_water.py": "7ae521f2378824e89f88bc467fc99321d1ef4224b037c865137e076a601da3c8"
         },
-        "sha256": "c6db3720b28530d807ff5c3316954a059ffd20bbb448dc9a369d871f538b0bea",
-        "status": "dirty"
+        "sha256": "84acae9e9a9481b58338fb04b9a1c370479aa381107e1695cdb0488dbb4a7782",
+        "status": "clean"
       }
     }
   },

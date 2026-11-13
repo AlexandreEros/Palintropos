@@ -15,7 +15,7 @@ import math
 from dataclasses import asdict, dataclass, field, replace
 from typing import Any, Optional
 
-__all__ = ["RadiativeConfig", "PRESETS", "CONFIG_SCHEMA", "DAY_SECONDS",
+__all__ = ["RadiativeConfig", "PRESETS", "CONFIG_SCHEMA", "DAY_SECONDS", "mars_gray_flat_dev",
            "jupiter_schneider_liu", "earth_gray_dry"]
 
 CONFIG_SCHEMA = "palintropos.radiative.config/1"
@@ -246,4 +246,74 @@ def earth_gray_dry(experiment_id: Optional[str] = None, *, days: int = 300,
         **_t21())
 
 
-PRESETS = {"jupiter-schneider-liu": jupiter_schneider_liu, "earth-gray-dry": earth_gray_dry}
+# Isca exp/test_cases/grey_mars `bk` (25 levels, commit d1321ac3)
+ISCA_GREY_MARS_SIGMA = (
+    0.0, 1.53008955e-04, 4.63790800e-04, 1.10977640e-03, 2.37044150e-03, 4.74479200e-03,
+    9.12245300e-03, 1.70677050e-02, 3.12516100e-02, 5.59939500e-02, 9.76165000e-02,
+    1.63754900e-01, 2.60315150e-01, 3.85974250e-01, 5.28084800e-01, 6.65956600e-01,
+    7.81088000e-01, 8.65400050e-01, 9.21109250e-01, 9.55343500e-01, 9.75416950e-01,
+    9.86856800e-01, 9.93269300e-01, 9.96830200e-01, 9.98799150e-01, 1.0)
+_ISCA_RHO_CP = 1.035e3 * 3989.24495292815      # Isca constants RHO0 * CP_OCEAN
+
+
+def _time_of_perihelion_for_equinox_start(period: float, eccentricity: float,
+                                          ls_perihelion_deg: float) -> float:
+    """The ``time_of_perihelion`` that puts t = 0 at L_s = 0 (northern spring
+    equinox), from Kepler's equation."""
+    nu = math.radians((0.0 - ls_perihelion_deg) % 360.0)        # true anomaly at L_s = 0
+    e = eccentricity
+    ecc_anomaly = 2.0 * math.atan(math.sqrt((1.0 - e) / (1.0 + e)) * math.tan(nu / 2.0))
+    mean = (ecc_anomaly - e * math.sin(ecc_anomaly)) % (2.0 * math.pi)
+    return -mean / (2.0 * math.pi) * period
+
+
+def mars_gray_flat_dev(experiment_id: Optional[str] = None, *, days: int = 30,
+                       dt: float = 600.0, frictional_heating: bool = True) -> RadiativeConfig:
+    """DEVELOPMENT EXPERIMENT, not a reproduction of Thomson & Vallis (2019)
+    M-I (docs/radiation/MARS_MI_PLAN.md).
+
+    Matched to M-I (Table 1, section 4.2) and, where the paper is silent, to
+    Isca (commit d1321ac3): constants, 610 Pa, the 25-level grid, gray
+    longwave 0.2 (p / 610 Pa) and shortwave 0.2 (p / 610 Pa)^4 along the
+    vertical path, diurnal and seasonal insolation (589 W m^-2, e = 0.0935,
+    obliquity 25.19 degrees, perihelion at L_s = 250.85 degrees, sol 88440 s,
+    year 59166360 s, t = 0 at L_s = 0), a 2 m "land depth" slab
+    (8.26e6 J m^-2 K^-1), albedo 0.3, roughness 3.21e-5 m, no gustiness, a
+    264 K isothermal start, no topography.
+
+    SUBSTITUTES for physics M-I has and this code lacks: Held-Suarez Rayleigh
+    drag (1 day^-1 below sigma = 0.7) stands in for surface stress and
+    vertical momentum diffusion, and instantaneous dry convective adjustment
+    stands in for the turbulent diffusion of heat (M-I has no convection
+    scheme). NOT matched: T21 (M-I: T42), no sponge, del^8 and RAW (Isca:
+    del^4 and Robert-Asselin 0.04), a uniform 285 K initial surface (Isca
+    test case: 285 - 40 (3 sin^2 lat - 1) / 3).
+    """
+    year, ecc, ls_peri = 59166360.0, 0.0935, 250.85
+    return RadiativeConfig(
+        experiment_id=_preset_id(experiment_id, "dev-mars-gray-flat", "T21L25",
+                                 frictional_heating),
+        frictional_heating=frictional_heating, radius=3.396e6,
+        omega=2.0 * math.pi / 88308.0, gravity=3.71, gas_constant=192.0,
+        cp=192.0 / 0.22727, reference_pressure=610.0,
+        vertical={"kind": "interfaces", "sigma": list(ISCA_GREY_MARS_SIGMA)}, dt=dt, days=days,
+        longwave={"kind": "power_law", "tau0": 0.2, "exponent": 1.0, "p0": 610.0},
+        shortwave={"kind": "vertical_path", "tau0": 0.2, "exponent": 4.0, "p0": 610.0},
+        insolation={"kind": "instantaneous", "stellar_constant": 589.0, "period": year,
+                    "eccentricity": ecc, "obliquity_deg": 25.19,
+                    "perihelion_longitude_deg": ls_peri,
+                    "time_of_perihelion": _time_of_perihelion_for_equinox_start(year, ecc,
+                                                                                ls_peri),
+                    "solar_day": 88440.0},
+        convection={"timescale": 0.0},
+        surface={"heat_capacity": 2.0 * _ISCA_RHO_CP, "albedo": 0.3, "emissivity": 1.0,
+                 "initial_temperature": 285.0},
+        sensible={"roughness_length": 3.21e-5, "critical_richardson": 1.0, "gustiness": 0.0},
+        drag={"kind": "held_suarez", "k_f_per_day": 1.0, "sigma_b": 0.7},
+        initial={"kind": "isothermal", "temperature": 264.0},
+        checkpoint_every_days=10, state_every_days=1,
+        **_t21())
+
+
+PRESETS = {"jupiter-schneider-liu": jupiter_schneider_liu, "earth-gray-dry": earth_gray_dry,
+           "dev-mars-gray-flat": mars_gray_flat_dev}

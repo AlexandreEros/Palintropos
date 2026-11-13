@@ -1,0 +1,90 @@
+{
+  "H": {
+    "F": 102.96141972431762,
+    "M1": false,
+    "M2": true,
+    "M3": true,
+    "M6": true,
+    "last_day": 30.0,
+    "max_abs_u": 281.6840088835757,
+    "ps_drift": -6.05213754112377e-06,
+    "residual_max_abs": 0.012268327140826263,
+    "residual_window_mean": -0.011438483906068646,
+    "residual_window_std": 0.0003321984751345079,
+    "slab_max_relative_error": 7.494005416219807e-14,
+    "surface_temperature_last": 240.48464883200043,
+    "system_residual_max_abs": 0.012268327135529944,
+    "system_residual_window_mean": -0.011438483906476194,
+    "t_max": 312.43092968714507,
+    "t_min": 138.1490434489264,
+    "toa_window_mean": -115.72139987072617
+  },
+  "M4": {
+    "difference": -0.010075818880354588,
+    "met": true,
+    "sinks_standard_error": 0.004090739904749249,
+    "states": 20,
+    "tolerance": 0.10295831697464007,
+    "unheated_residual": -0.04756881439954562,
+    "unheated_sinks": -0.03749299551919103
+  },
+  "M5": {
+    "met": false,
+    "s1_at_least_3x_noise": true,
+    "s1_at_least_5e-4": true,
+    "surface_temperature_max_between_11_and_16_h": false
+  },
+  "U": {
+    "F": 102.95831697464007,
+    "M1": false,
+    "M2": true,
+    "M3": true,
+    "M6": true,
+    "last_day": 30.0,
+    "max_abs_u": 294.98623928014695,
+    "ps_drift": -6.011885101186998e-06,
+    "residual_max_abs": 0.07586448642374899,
+    "residual_window_mean": -0.04756881439954562,
+    "residual_window_std": 0.017534168525600705,
+    "slab_max_relative_error": 6.683542608243442e-14,
+    "surface_temperature_last": 240.48073027768083,
+    "system_residual_max_abs": 0.075864486419988,
+    "system_residual_window_mean": -0.04756881439943968,
+    "t_max": 314.3389049275492,
+    "t_min": 133.56446538945306,
+    "toa_window_mean": -115.70756373432326
+  },
+  "criteria_commit": "fba92fb",
+  "reported": {
+    "H_minus_U_surface_temperature_last": 0.0039185543195969785,
+    "H_minus_U_toa_window_mean": -0.013836136402915145,
+    "tides": {
+      "config_sha256": "9f7eaa0a44612eeab10981b94648473da1bbe7b55b7f8797fa0a814021a2abea",
+      "equatorial_latitude_deg": 2.768903007736006,
+      "equatorial_lowest_air_temperature_s1_amplitude_k": 3.052462604489028,
+      "equatorial_surface_temperature_max_local_hour": 17.022222222222222,
+      "equatorial_surface_temperature_s1_amplitude_k": 0.26476070303393545,
+      "run": "dev-mars-gray-flat-heated-T21L25-b3aaef8",
+      "solar_day": 88440.0,
+      "sols": 2.0,
+      "start_seconds": 2592000.0,
+      "steps": 295,
+      "tropical_surface_pressure_noise_rms_over_ps": 0.0021968378585217317,
+      "tropical_surface_pressure_s1_max_local_hour": 5.444369236434738,
+      "tropical_surface_pressure_s1_over_ps": 0.012936023459899847,
+      "tropical_surface_pressure_s2_over_ps": 0.006074500421850523
+    }
+  },
+  "verdict": {
+    "M1": false,
+    "M2": true,
+    "M3": true,
+    "M4": true,
+    "M5": false,
+    "M6": true
+  },
+  "window_days": [
+    11,
+    30
+  ]
+}

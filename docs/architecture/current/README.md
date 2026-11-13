@@ -5,13 +5,13 @@
 
 | | |
 |---|---|
-| Source base commit | `19e92f095b3ae0dc1e410b54b7a6c0b17c832314` (plus uncommitted working-tree changes) |
+| Source base commit | `812e22568957ff247223c5049a4cb0efd9d93811` (clean working tree) |
 | Analysed package | `tropoi` under `src/` |
 | Generator | `tools.architecture` 2.3.0 |
 | Toolchain | Python 3.12, grimp 3.17, networkx 3.7 |
 | Command | `python -m tools.architecture.generate` |
 
-Source working tree: **dirty**. Content SHA-256: `c6db3720b28530d807ff5c3316954a059ffd20bbb448dc9a369d871f538b0bea`. Generator working tree: **clean**. Per-file hashes and scoped Git status are recorded in `metrics.json`. These describe generation time; --check verifies source and generator content hashes before reusing this context across later commits. The base commit alone does not identify uncommitted source.
+Source working tree: **clean**. Content SHA-256: `84acae9e9a9481b58338fb04b9a1c370479aa381107e1695cdb0488dbb4a7782`. Generator working tree: **clean**. Per-file hashes and scoped Git status are recorded in `metrics.json`. These describe generation time; --check verifies source and generator content hashes before reusing this context across later commits. The base commit alone does not identify uncommitted source.
 
 ## Reproducing
 
@@ -88,11 +88,11 @@ Generated files contain no timestamps, absolute paths, or source line numbers, s
 
 Three generic rules decide what must be documented (`tools/architecture/coverage.py`):
 
-1. **Packages:** every analysed package gets packages/<package>.md with all of its modules, classes and public module-level functions. 25 packages, 25 pages; 167 of 167 modules and 211 of 211 classes rendered (generation fails if any is missing).
+1. **Packages:** every analysed package gets packages/<package>.md with all of its modules, classes and public module-level functions. 25 packages, 25 pages; 167 of 167 modules and 212 of 212 classes rendered (generation fails if any is missing).
 2. **CLI handlers:** every <parser>.set_defaults(<keyword>=<function>) handler gets calls/cli-<name>.mmd. 11 discovered.
-3. **Public Python entry points:** module-level functions exported through some __all__ (re-exports followed) that no analysed function calls; each must be declared as an entry path root or excluded with a reason. 32 candidates: 14 are roots of declared entry paths, 18 excluded with a reason.
+3. **Public Python entry points:** module-level functions exported through some __all__ (re-exports followed) that no analysed function calls; each must be declared as an entry path root or excluded with a reason. 33 candidates: 14 are roots of declared entry paths, 19 excluded with a reason.
 
-The declarations are read from `docs/architecture/entry-points.toml` (SHA-256 `b7fcc928dbfde3302ffaf9242f85ad1495e99cec4abd37eb9f8bbbb27dfd859c`). Like the layer declaration, they state expectations; unlike it, a gap fails generation: an undeclared candidate, a declared root or exclusion that no longer exists, or a declared narrative page that is missing or does not link its diagram. `--check` therefore fails on any of these too.
+The declarations are read from `docs/architecture/entry-points.toml` (SHA-256 `efd0a3f141985265980cfca15c1c02414f5df5e67a4cf0f136de29a160420c05`). Like the layer declaration, they state expectations; unlike it, a gap fails generation: an undeclared candidate, a declared root or exclusion that no longer exists, or a declared narrative page that is missing or does not link its diagram. `--check` therefore fails on any of these too.
 
 What CI establishes: the committed outputs equal what these rules produce from the committed source, and the rules found no undeclared entry point. It does not establish that a diagram is easy to read or that a narrative page is still accurate prose.
 
@@ -152,7 +152,7 @@ The Mermaid tree and the offline atlas each contain every class definition, the 
 
 ### Call graphs (ast)
 
-Each call expression inside a function or method body (nested functions, lambdas, and comprehensions are attributed to the enclosing function) is classified as `internal` (resolved to an analysed definition), `external` (resolved to a name outside the package), `builtin` (an unshadowed builtin), or `unresolved`. Totals: builtin 3674, external 2448, internal 2933, unresolved 3680.
+Each call expression inside a function or method body (nested functions, lambdas, and comprehensions are attributed to the enclosing function) is classified as `internal` (resolved to an analysed definition), `external` (resolved to a name outside the package), `builtin` (an unshadowed builtin), or `unresolved`. Totals: builtin 3677, external 2453, internal 2943, unresolved 3685.
 
 | Edge kind | Syntax | What it claims |
 |---|---|---|

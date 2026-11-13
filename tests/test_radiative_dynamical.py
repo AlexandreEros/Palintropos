@@ -162,9 +162,10 @@ def test_presets_are_valid_hashable_and_round_trip():
         cfg = factory()
         again = RadiativeConfig.from_dict(json.loads(json.dumps(cfg.to_dict())))
         assert again == cfg and again.sha256() == cfg.sha256()
-        assert cfg.with_(dt=600.0).sha256() != cfg.sha256()
+        assert cfg.with_(dt=2.0 * cfg.dt).sha256() != cfg.sha256()
         seen.add(cfg.sha256())
-        assert build_sigma(cfg).nlev == cfg.vertical["nlev"]
+        expected = cfg.vertical.get("nlev", len(cfg.vertical.get("sigma", ())) - 1)
+        assert build_sigma(cfg).nlev == expected
         assert build_physics(cfg).signature()["kind"] == "column_physics"
     assert len(seen) == len(PRESETS)
     with pytest.raises(ValueError):
@@ -433,3 +434,74 @@ def test_a_resumed_run_with_held_radiation_is_identical(tmp_path):
     series = json.loads((tmp_path / "full" / "series.json").read_text())
     assert abs(series["energy_residual"][-1]) < 0.02 * abs(series["column_energy_tendency"][-1])
 
+
+
+ISCA_GREY_MARS_BK = [  # Isca exp/test_cases/grey_mars, commit d1321ac3
+    0.0, 1.53008955e-04, 4.63790800e-04, 1.10977640e-03, 2.37044150e-03, 4.74479200e-03,
+    9.12245300e-03, 1.70677050e-02, 3.12516100e-02, 5.59939500e-02, 9.76165000e-02,
+    1.63754900e-01, 2.60315150e-01, 3.85974250e-01, 5.28084800e-01, 6.65956600e-01,
+    7.81088000e-01, 8.65400050e-01, 9.21109250e-01, 9.55343500e-01, 9.75416950e-01,
+    9.86856800e-01, 9.93269300e-01, 9.96830200e-01, 9.98799150e-01, 1.0]
+
+
+def test_the_flat_mars_development_preset_matches_m_i_where_it_claims_to():
+    """docs/radiation/MARS_MI_PLAN.md section 1: Table 1 of Thomson & Vallis
+    (2019) and the Isca values it leaves implicit. The two substitutes for
+    the missing boundary layer are present and are not hidden."""
+    from tropoi.physics.radiation.gray import VerticalPathShortwave
+    from tropoi.run.radiative.model import build_insolation
+    cfg = PRESETS["dev-mars-gray-flat"]()
+    assert cfg.experiment_id == "dev-mars-gray-flat-heated-T21L25"
+    assert PRESETS["dev-mars-gray-flat"](frictional_heating=False).experiment_id == \
+        "dev-mars-gray-flat-T21L25"
+    assert cfg.frictional_heating is True
+    assert (cfg.radius, cfg.gravity, cfg.gas_constant, cfg.reference_pressure) == \
+        (3.396e6, 3.71, 192.0, 610.0)
+    assert cfg.kappa == pytest.approx(0.22727, rel=1e-12)
+    assert cfg.omega == pytest.approx(2.0 * math.pi / 88308.0, rel=1e-15)
+    assert cfg.omega == pytest.approx(7.12e-5, rel=1e-3)                      # Table 1
+    assert cfg.surface["heat_capacity"] == pytest.approx(2.0 * 1.035e3 * 3989.24495292815)
+    assert cfg.surface["albedo"] == 0.3
+    assert cfg.initial == {"kind": "isothermal", "temperature": 264.0}
+    assert list(build_sigma(cfg).interfaces) == ISCA_GREY_MARS_BK
+    assert build_sigma(cfg).nlev == 25
+    # labelled substitutes (no boundary-layer diffusion or surface stress yet)
+    assert cfg.drag == {"kind": "held_suarez", "k_f_per_day": 1.0, "sigma_b": 0.7}
+    assert cfg.convection == {"timescale": 0.0}
+    # radiation: eq. 14 and eq. 15 with Isca's fixed 610 Pa reference
+    physics = build_physics(cfg)
+    assert isinstance(physics.radiation.shortwave, VerticalPathShortwave)
+    assert physics.radiation.shortwave.profile.terms == ((1.0, 4.0),)
+    assert physics.radiation.shortwave.profile.reference == 610.0
+    assert physics.radiation.longwave.profile.terms == ((1.0, 1.0),)
+    assert physics.radiation.longwave.profile.reference == 610.0
+    # diurnal + seasonal forcing, year starting at the northern spring equinox
+    ins = build_insolation(cfg.insolation)
+    assert ins.solar_day == 88440.0
+    ill = ins.illumination
+    assert ill.solar_longitude(0.0) % (2.0 * math.pi) == pytest.approx(0.0, abs=1e-12)
+    assert math.degrees(ill.solar_longitude(ill.time_of_periapsis_s)) % 360.0 == \
+        pytest.approx(250.85, abs=1e-9)
+    assert ill.as_dict()["eccentricity"] == 0.0935
+    assert RadiativeConfig.from_dict(json.loads(cfg.canonical_json())) == cfg
+
+
+@needs_cuda
+def test_flat_mars_one_day_is_stable_and_closes_atmosphere_and_slab_budgets(tmp_path):
+    """The development preset at T9 for one day (diurnal and seasonal
+    forcing, vertical-path shortwave, 610 Pa). Measured before this test
+    was written: residual -0.0056 W m^-2 against 106 W m^-2 absorbed. The
+    bound is the pilot's M2 daily bound, 1e-2 F."""
+    from tropoi.run.radiative.experiment import RadiativeRun
+    cfg = _tiny(PRESETS["dev-mars-gray-flat"](days=1), experiment_id="mars-test")
+    run = RadiativeRun(cfg, tmp_path / "mars", allow_dirty=True, log=lambda s: None)
+    ts0 = float((run.coupling.weights * run.coupling.surface_temperature).sum())
+    assert run.run()["status"] == "completed"
+    series = json.loads((tmp_path / "mars" / "series.json").read_text())
+    absorbed = series["absorbed_stellar"][-1]
+    assert absorbed == pytest.approx(105.0, rel=0.05)
+    assert abs(series["energy_residual"][-1]) < 1e-2 * absorbed
+    assert series["max_abs_u"][-1] < 150.0
+    assert 100.0 < series["t_min"][-1] and series["t_max"][-1] < 400.0
+    slab_heat = cfg.surface["heat_capacity"] * (series["mean_surface_temperature"][-1] - ts0)
+    assert slab_heat == pytest.approx(series["surface_net"][-1] * 86400.0, rel=1e-9)

@@ -137,3 +137,79 @@ def test_the_controlled_pair_is_preserved_and_is_the_source_of_its_evidence(caps
     assert (root / "means.npz").read_bytes() == (published / "means.npz").read_bytes()
     assert _summary(evidence)["config_sha256"] == json.loads(
         (root / "config.json").read_text(encoding="utf-8"))["config_sha256"]
+
+
+# The flat-Mars development pilot (docs/radiation/MARS_MI_PLAN.md). Criteria M1-M6
+# were committed in fba92fb before any pilot code; H and U ran from b3aaef8 on
+# one Colab L4. A development experiment, not a reproduction of Thomson & Vallis M-I.
+MARS_H = "dev-mars-gray-flat-heated-T21L25-30d-b3aaef8-l4"
+MARS_U = "dev-mars-gray-flat-T21L25-30d-b3aaef8-l4"
+MARS_CAPSULES = {"dev-mars-gray-flat-heated-T21L25-b3aaef8": MARS_H,
+                 "dev-mars-gray-flat-T21L25-b3aaef8": MARS_U}
+
+
+def _mars_series(name):
+    import numpy as np
+    s = json.loads((EVIDENCE / name / "series.json").read_text(encoding="utf-8"))
+    return {k: np.asarray(v, dtype=float) for k, v in s.items() if isinstance(v, list)}
+
+
+def test_the_mars_pair_ran_from_one_commit_on_one_machine_after_its_criteria():
+    s1, s2 = _summary(MARS_H), _summary(MARS_U)
+    for s in (s1, s2):
+        assert s["code"]["git_commit"].startswith("b3aaef8") and s["code"]["git_dirty"] is False
+        assert s["environment"]["device"] == "NVIDIA L4"
+    assert s1["config_sha256"].startswith("9f7eaa0a")       # dev-mars-gray-flat
+    assert s2["config_sha256"].startswith("28281209")       # --no-frictional-heating
+    assert s1["experiment_id"].startswith("dev-") and s2["experiment_id"].startswith("dev-")
+
+
+def test_the_mars_energy_and_mass_verdicts_follow_from_the_committed_series():
+    """M2, M3 and M6 recomputed here from series.json, independently of
+    tools/radiation/judge_mars_pilot.py: days 11-30, F = mean absorbed flux."""
+    import numpy as np
+    s = _mars_series(MARS_H)
+    res, day = s["energy_residual"], s["day"][1:]
+    win = (day >= 11) & (day <= 30)
+    F = s["absorbed_stellar"][1:][win].mean()
+    assert abs(res[win].mean()) <= 1e-3 * F and np.abs(res).max() <= 1e-2 * F       # M2
+    cap = json.loads((EVIDENCE / MARS_H / "config.json").read_text(
+        encoding="utf-8"))["config"]["surface"]["heat_capacity"]
+    system = (np.diff(s["energy_total"]) + cap * np.diff(s["mean_surface_temperature"])) \
+        / 86400.0 - s["toa_net_down"][1:]
+    assert abs(system[win].mean()) <= 1e-3 * F and np.abs(system).max() <= 1e-2 * F  # M3
+    for name in (MARS_H, MARS_U):
+        ps = _mars_series(name)["mean_ps"]
+        assert abs(ps[-1] / ps[0] - 1.0) <= 1e-5                                       # M6
+
+
+def test_the_mars_verdict_record_is_the_one_reported_including_its_failures():
+    """M1 fails on the wind bound alone (282 / 295 m/s, confined to the two
+    levels above 0.2 Pa, where M-I has a sponge this pilot lacks); M5 fails
+    on the 11-16 h window alone (17.0 h, the lag of M-I's 8.26e6 J m^-2 K^-1
+    slab). Neither criterion is relaxed; this test records the outcome."""
+    v = json.loads((EVIDENCE / MARS_H / "verdicts.json").read_text(encoding="utf-8"))
+    assert v["criteria_commit"] == "fba92fb"
+    assert v["verdict"] == {"M1": False, "M2": True, "M3": True, "M4": True, "M5": False,
+                            "M6": True}
+    for run in ("H", "U"):
+        assert 100.0 < v[run]["t_min"] and v[run]["t_max"] < 400.0 and v[run]["last_day"] == 30
+        assert v[run]["max_abs_u"] > 150.0
+    assert v["M5"] == {"met": False, "s1_at_least_3x_noise": True, "s1_at_least_5e-4": True,
+                       "surface_temperature_max_between_11_and_16_h": False}
+
+
+@pytest.mark.parametrize("capsule, evidence", sorted(MARS_CAPSULES.items()))
+def test_the_mars_pair_is_preserved_and_is_the_source_of_its_evidence(capsule, evidence):
+    from tropoi.cli.capsule import read_archive, read_receipt, verify_capsule
+    root = CAPSULES / capsule
+    sums = read_receipt(root / "SHA256SUMS")
+    archive = read_archive(root, sums)
+    assert len(sums) == 66
+    assert set(archive["omitted_files"]) == set(sums) - set(archive["included_files"])
+    assert verify_capsule(root, root, core=True)["checked"] == 4
+    published = EVIDENCE / evidence
+    for name in ("config.json", "events.jsonl", "series.json"):
+        assert (root / name).read_bytes().replace(b"\r\n", b"\n") == \
+            (published / name).read_bytes().replace(b"\r\n", b"\n"), name
+    assert (root / "means.npz").read_bytes() == (published / "means.npz").read_bytes()
