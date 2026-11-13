@@ -1,0 +1,5496 @@
+{
+ "attachments": {},
+ "boundaries": [
+  {
+   "args": {},
+   "call_index": 1,
+   "function": "tropoi.run.radiative.config._t21",
+   "mutations": {},
+   "phase": "preset-resolution",
+   "return": {
+    "fields": {
+     "l_max": {
+      "type": "int",
+      "value": 22
+     },
+     "nlat": {
+      "type": "int",
+      "value": 32
+     },
+     "nlon": {
+      "type": "int",
+      "value": 64
+     },
+     "retained_truncation": {
+      "type": "int",
+      "value": 21
+     }
+    },
+    "id": 2869542546496,
+    "length": 4,
+    "type": "builtins.dict"
+   },
+   "unverified": []
+  },
+  {
+   "args": {
+    ".0": {
+     "id": 2869259720144,
+     "type": "builtins.str_ascii_iterator"
+    }
+   },
+   "call_index": 1,
+   "function": "tropoi.run.radiative.config.RadiativeConfig.__post_init__.<locals>.<genexpr>",
+   "mutations": {},
+   "phase": "preset-resolution",
+   "return": {
+    "type": "bool",
+    "value": false
+   },
+   "unverified": []
+  },
+  {
+   "args": {},
+   "call_index": 1,
+   "function": "tropoi.run.radiative.config.RadiativeConfig.__post_init__",
+   "mutations": {},
+   "phase": "preset-resolution",
+   "return": {
+    "type": "NoneType",
+    "value": null
+   },
+   "self_before": {
+    "fields": {
+     "checkpoint_every_days": {
+      "type": "int",
+      "value": 10
+     },
+     "convection": {
+      "fields_omitted": 1,
+      "id": 2869541976192,
+      "length": 1,
+      "type": "builtins.dict"
+     },
+     "cp": {
+      "type": "float",
+      "value": 1004.64
+     },
+     "damping_scheme": {
+      "type": "str",
+      "value": "centred"
+     },
+     "days": {
+      "type": "int",
+      "value": 300
+     },
+     "drag": {
+      "fields_omitted": 3,
+      "id": 2869541971904,
+      "length": 3,
+      "type": "builtins.dict"
+     },
+     "dt": {
+      "type": "float",
+      "value": 1200.0
+     },
+     "experiment_id": {
+      "type": "str",
+      "value": "earth-gray-dry-T21L25"
+     },
+     "frictional_heating": {
+      "type": "bool",
+      "value": false
+     },
+     "gas_constant": {
+      "type": "float",
+      "value": 287.04
+     },
+     "gravity": {
+      "type": "float",
+      "value": 9.8
+     },
+     "hyperdiffusion_efold_days": {
+      "type": "float",
+      "value": 0.1
+     },
+     "hyperdiffusion_order": {
+      "type": "int",
+      "value": 4
+     },
+     "initial": {
+      "fields_omitted": 2,
+      "id": 2869541976384,
+      "length": 2,
+      "type": "builtins.dict"
+     },
+     "insolation": {
+      "fields_omitted": 3,
+      "id": 2869541975296,
+      "length": 3,
+      "type": "builtins.dict"
+     },
+     "internal_heat_flux": {
+      "type": "float",
+      "value": 0.0
+     },
+     "keep_checkpoints": {
+      "type": "int",
+      "value": 2
+     },
+     "l_max": {
+      "type": "int",
+      "value": 22
+     },
+     "longwave": {
+      "fields_omitted": 4,
+      "id": 2869547859264,
+      "length": 4,
+      "type": "builtins.dict"
+     },
+     "mean_last_days": {
+      "type": "int",
+      "value": 0
+     },
+     "nlat": {
+      "type": "int",
+      "value": 32
+     },
+     "nlon": {
+      "type": "int",
+      "value": 64
+     },
+     "omega": {
+      "type": "float",
+      "value": 7.292e-05
+     },
+     "perturbation_lmax": {
+      "type": "int",
+      "value": 8
+     }
+    },
+    "id": 2869545429728,
+    "omitted": 15,
+    "type": "tropoi.run.radiative.config.RadiativeConfig"
+   },
+   "unverified": []
+  },
+  {
+   "args": {
+    "cp": {
+     "type": "float",
+     "value": 1004.64
+    },
+    "days": {
+     "type": "int",
+     "value": 300
+    },
+    "dt": {
+     "type": "float",
+     "value": 1200.0
+    },
+    "experiment_id": {
+     "type": "str",
+     "value": "earth-gray-dry-T21L25"
+    },
+    "gas_constant": {
+     "type": "float",
+     "value": 287.04
+    },
+    "gravity": {
+     "type": "float",
+     "value": 9.8
+    },
+    "l_max": {
+     "type": "int",
+     "value": 22
+    },
+    "nlat": {
+     "type": "int",
+     "value": 32
+    },
+    "nlon": {
+     "type": "int",
+     "value": 64
+    },
+    "omega": {
+     "type": "float",
+     "value": 7.292e-05
+    },
+    "radius": {
+     "type": "float",
+     "value": 6376000.0
+    },
+    "reference_pressure": {
+     "type": "float",
+     "value": 100000.0
+    },
+    "retained_truncation": {
+     "type": "int",
+     "value": 21
+    },
+    "t_ref": {
+     "type": "float",
+     "value": 300.0
+    },
+    "vertical": {
+     "fields": {
+      "kind": {
+       "type": "str",
+       "value": "frierson"
+      },
+      "nlev": {
+       "type": "int",
+       "value": 25
+      }
+     },
+     "id": 2869567871680,
+     "length": 2,
+     "type": "builtins.dict"
+    }
+   },
+   "call_index": 1,
+   "function": "tropoi.run.radiative.config.__create_fn__.<locals>.__init__",
+   "mutations": {
+    "self.checkpoint_every_days": {
+     "after": {
+      "type": "int",
+      "value": 10
+     },
+     "kind": "added"
+    },
+    "self.convection": {
+     "after": {
+      "fields_omitted": 1,
+      "id": 2869541976192,
+      "length": 1,
+      "type": "builtins.dict"
+     },
+     "kind": "added"
+    },
+    "self.cp": {
+     "after": {
+      "type": "float",
+      "value": 1004.64
+     },
+     "kind": "added"
+    },
+    "self.damping_scheme": {
+     "after": {
+      "type": "str",
+      "value": "centred"
+     },
+     "kind": "added"
+    },
+    "self.days": {
+     "after": {
+      "type": "int",
+      "value": 300
+     },
+     "kind": "added"
+    },
+    "self.drag": {
+     "after": {
+      "fields_omitted": 3,
+      "id": 2869541971904,
+      "length": 3,
+      "type": "builtins.dict"
+     },
+     "kind": "added"
+    },
+    "self.dt": {
+     "after": {
+      "type": "float",
+      "value": 1200.0
+     },
+     "kind": "added"
+    },
+    "self.experiment_id": {
+     "after": {
+      "type": "str",
+      "value": "earth-gray-dry-T21L25"
+     },
+     "kind": "added"
+    },
+    "self.frictional_heating": {
+     "after": {
+      "type": "bool",
+      "value": false
+     },
+     "kind": "added"
+    },
+    "self.gas_constant": {
+     "after": {
+      "type": "float",
+      "value": 287.04
+     },
+     "kind": "added"
+    },
+    "self.gravity": {
+     "after": {
+      "type": "float",
+      "value": 9.8
+     },
+     "kind": "added"
+    },
+    "self.hyperdiffusion_efold_days": {
+     "after": {
+      "type": "float",
+      "value": 0.1
+     },
+     "kind": "added"
+    },
+    "self.hyperdiffusion_order": {
+     "after": {
+      "type": "int",
+      "value": 4
+     },
+     "kind": "added"
+    },
+    "self.initial": {
+     "after": {
+      "fields_omitted": 2,
+      "id": 2869541976384,
+      "length": 2,
+      "type": "builtins.dict"
+     },
+     "kind": "added"
+    },
+    "self.insolation": {
+     "after": {
+      "fields_omitted": 3,
+      "id": 2869541975296,
+      "length": 3,
+      "type": "builtins.dict"
+     },
+     "kind": "added"
+    },
+    "self.internal_heat_flux": {
+     "after": {
+      "type": "float",
+      "value": 0.0
+     },
+     "kind": "added"
+    },
+    "self.keep_checkpoints": {
+     "after": {
+      "type": "int",
+      "value": 2
+     },
+     "kind": "added"
+    },
+    "self.l_max": {
+     "after": {
+      "type": "int",
+      "value": 22
+     },
+     "kind": "added"
+    },
+    "self.longwave": {
+     "after": {
+      "fields_omitted": 4,
+      "id": 2869547859264,
+      "length": 4,
+      "type": "builtins.dict"
+     },
+     "kind": "added"
+    },
+    "self.mean_last_days": {
+     "after": {
+      "type": "int",
+      "value": 0
+     },
+     "kind": "added"
+    },
+    "self.nlat": {
+     "after": {
+      "type": "int",
+      "value": 32
+     },
+     "kind": "added"
+    },
+    "self.nlon": {
+     "after": {
+      "type": "int",
+      "value": 64
+     },
+     "kind": "added"
+    },
+    "self.omega": {
+     "after": {
+      "type": "float",
+      "value": 7.292e-05
+     },
+     "kind": "added"
+    },
+    "self.perturbation_lmax": {
+     "after": {
+      "type": "int",
+      "value": 8
+     },
+     "kind": "added"
+    }
+   },
+   "phase": "preset-resolution",
+   "return": {
+    "type": "NoneType",
+    "value": null
+   },
+   "self_before": {
+    "fields": {},
+    "id": 2869545429728,
+    "type": "tropoi.run.radiative.config.RadiativeConfig"
+   },
+   "unverified": []
+  },
+  {
+   "args": {
+    "days": {
+     "type": "int",
+     "value": 300
+    },
+    "dt": {
+     "type": "float",
+     "value": 1200.0
+    },
+    "experiment_id": {
+     "type": "str",
+     "value": "earth-gray-dry-T21L25"
+    }
+   },
+   "call_index": 1,
+   "function": "tropoi.run.radiative.config.earth_gray_dry",
+   "mutations": {},
+   "phase": "preset-resolution",
+   "return": {
+    "fields": {
+     "checkpoint_every_days": {
+      "type": "int",
+      "value": 10
+     },
+     "convection": {
+      "fields_omitted": 1,
+      "id": 2869541976192,
+      "length": 1,
+      "type": "builtins.dict"
+     },
+     "cp": {
+      "type": "float",
+      "value": 1004.64
+     },
+     "damping_scheme": {
+      "type": "str",
+      "value": "centred"
+     },
+     "days": {
+      "type": "int",
+      "value": 300
+     },
+     "drag": {
+      "fields_omitted": 3,
+      "id": 2869541971904,
+      "length": 3,
+      "type": "builtins.dict"
+     },
+     "dt": {
+      "type": "float",
+      "value": 1200.0
+     },
+     "experiment_id": {
+      "type": "str",
+      "value": "earth-gray-dry-T21L25"
+     },
+     "frictional_heating": {
+      "type": "bool",
+      "value": false
+     },
+     "gas_constant": {
+      "type": "float",
+      "value": 287.04
+     },
+     "gravity": {
+      "type": "float",
+      "value": 9.8
+     },
+     "hyperdiffusion_efold_days": {
+      "type": "float",
+      "value": 0.1
+     },
+     "hyperdiffusion_order": {
+      "type": "int",
+      "value": 4
+     },
+     "initial": {
+      "fields_omitted": 2,
+      "id": 2869541976384,
+      "length": 2,
+      "type": "builtins.dict"
+     },
+     "insolation": {
+      "fields_omitted": 3,
+      "id": 2869541975296,
+      "length": 3,
+      "type": "builtins.dict"
+     },
+     "internal_heat_flux": {
+      "type": "float",
+      "value": 0.0
+     },
+     "keep_checkpoints": {
+      "type": "int",
+      "value": 2
+     },
+     "l_max": {
+      "type": "int",
+      "value": 22
+     },
+     "longwave": {
+      "fields_omitted": 4,
+      "id": 2869547859264,
+      "length": 4,
+      "type": "builtins.dict"
+     },
+     "mean_last_days": {
+      "type": "int",
+      "value": 0
+     },
+     "nlat": {
+      "type": "int",
+      "value": 32
+     },
+     "nlon": {
+      "type": "int",
+      "value": 64
+     },
+     "omega": {
+      "type": "float",
+      "value": 7.292e-05
+     },
+     "perturbation_lmax": {
+      "type": "int",
+      "value": 8
+     }
+    },
+    "id": 2869545429728,
+    "omitted": 15,
+    "type": "tropoi.run.radiative.config.RadiativeConfig"
+   },
+   "unverified": []
+  },
+  {
+   "args": {
+    "changes": {
+     "fields": {
+      "experiment_id": {
+       "type": "str",
+       "value": "earth-gray-dry-heated-T21L25"
+      },
+      "frictional_heating": {
+       "type": "bool",
+       "value": true
+      }
+     },
+     "id": 2869567871296,
+     "length": 2,
+     "type": "builtins.dict"
+    }
+   },
+   "call_index": 1,
+   "function": "tropoi.run.radiative.config.RadiativeConfig.with_",
+   "mutations": {},
+   "phase": "preset-resolution",
+   "return": {
+    "fields": {
+     "checkpoint_every_days": {
+      "type": "int",
+      "value": 10
+     },
+     "convection": {
+      "fields_omitted": 1,
+      "id": 2869541976192,
+      "length": 1,
+      "type": "builtins.dict"
+     },
+     "cp": {
+      "type": "float",
+      "value": 1004.64
+     },
+     "damping_scheme": {
+      "type": "str",
+      "value": "centred"
+     },
+     "days": {
+      "type": "int",
+      "value": 300
+     },
+     "drag": {
+      "fields_omitted": 3,
+      "id": 2869541971904,
+      "length": 3,
+      "type": "builtins.dict"
+     },
+     "dt": {
+      "type": "float",
+      "value": 1200.0
+     },
+     "experiment_id": {
+      "type": "str",
+      "value": "earth-gray-dry-heated-T21L25"
+     },
+     "frictional_heating": {
+      "type": "bool",
+      "value": true
+     },
+     "gas_constant": {
+      "type": "float",
+      "value": 287.04
+     },
+     "gravity": {
+      "type": "float",
+      "value": 9.8
+     },
+     "hyperdiffusion_efold_days": {
+      "type": "float",
+      "value": 0.1
+     },
+     "hyperdiffusion_order": {
+      "type": "int",
+      "value": 4
+     },
+     "initial": {
+      "fields_omitted": 2,
+      "id": 2869541976384,
+      "length": 2,
+      "type": "builtins.dict"
+     },
+     "insolation": {
+      "fields_omitted": 3,
+      "id": 2869541975296,
+      "length": 3,
+      "type": "builtins.dict"
+     },
+     "internal_heat_flux": {
+      "type": "float",
+      "value": 0.0
+     },
+     "keep_checkpoints": {
+      "type": "int",
+      "value": 2
+     },
+     "l_max": {
+      "type": "int",
+      "value": 22
+     },
+     "longwave": {
+      "fields_omitted": 4,
+      "id": 2869547859264,
+      "length": 4,
+      "type": "builtins.dict"
+     },
+     "mean_last_days": {
+      "type": "int",
+      "value": 0
+     },
+     "nlat": {
+      "type": "int",
+      "value": 32
+     },
+     "nlon": {
+      "type": "int",
+      "value": 64
+     },
+     "omega": {
+      "type": "float",
+      "value": 7.292e-05
+     },
+     "perturbation_lmax": {
+      "type": "int",
+      "value": 8
+     }
+    },
+    "id": 2869547874304,
+    "omitted": 15,
+    "type": "tropoi.run.radiative.config.RadiativeConfig"
+   },
+   "self_before": {
+    "fields": {
+     "checkpoint_every_days": {
+      "type": "int",
+      "value": 10
+     },
+     "convection": {
+      "fields_omitted": 1,
+      "id": 2869541976192,
+      "length": 1,
+      "type": "builtins.dict"
+     },
+     "cp": {
+      "type": "float",
+      "value": 1004.64
+     },
+     "damping_scheme": {
+      "type": "str",
+      "value": "centred"
+     },
+     "days": {
+      "type": "int",
+      "value": 300
+     },
+     "drag": {
+      "fields_omitted": 3,
+      "id": 2869541971904,
+      "length": 3,
+      "type": "builtins.dict"
+     },
+     "dt": {
+      "type": "float",
+      "value": 1200.0
+     },
+     "experiment_id": {
+      "type": "str",
+      "value": "earth-gray-dry-T21L25"
+     },
+     "frictional_heating": {
+      "type": "bool",
+      "value": false
+     },
+     "gas_constant": {
+      "type": "float",
+      "value": 287.04
+     },
+     "gravity": {
+      "type": "float",
+      "value": 9.8
+     },
+     "hyperdiffusion_efold_days": {
+      "type": "float",
+      "value": 0.1
+     },
+     "hyperdiffusion_order": {
+      "type": "int",
+      "value": 4
+     },
+     "initial": {
+      "fields_omitted": 2,
+      "id": 2869541976384,
+      "length": 2,
+      "type": "builtins.dict"
+     },
+     "insolation": {
+      "fields_omitted": 3,
+      "id": 2869541975296,
+      "length": 3,
+      "type": "builtins.dict"
+     },
+     "internal_heat_flux": {
+      "type": "float",
+      "value": 0.0
+     },
+     "keep_checkpoints": {
+      "type": "int",
+      "value": 2
+     },
+     "l_max": {
+      "type": "int",
+      "value": 22
+     },
+     "longwave": {
+      "fields_omitted": 4,
+      "id": 2869547859264,
+      "length": 4,
+      "type": "builtins.dict"
+     },
+     "mean_last_days": {
+      "type": "int",
+      "value": 0
+     },
+     "nlat": {
+      "type": "int",
+      "value": 32
+     },
+     "nlon": {
+      "type": "int",
+      "value": 64
+     },
+     "omega": {
+      "type": "float",
+      "value": 7.292e-05
+     },
+     "perturbation_lmax": {
+      "type": "int",
+      "value": 8
+     }
+    },
+    "id": 2869545429728,
+    "omitted": 15,
+    "type": "tropoi.run.radiative.config.RadiativeConfig"
+   },
+   "unverified": []
+  },
+  {
+   "args": {},
+   "call_index": 1,
+   "function": "tropoi.run.radiative.config.RadiativeConfig.to_dict",
+   "mutations": {},
+   "phase": "preset-resolution",
+   "return": {
+    "fields": {
+     "cp": {
+      "type": "float",
+      "value": 1004.64
+     },
+     "experiment_id": {
+      "type": "str",
+      "value": "earth-gray-dry-heated-T21L25-tiny"
+     },
+     "gas_constant": {
+      "type": "float",
+      "value": 287.04
+     },
+     "gravity": {
+      "type": "float",
+      "value": 9.8
+     },
+     "omega": {
+      "type": "float",
+      "value": 7.292e-05
+     },
+     "radius": {
+      "type": "float",
+      "value": 6376000.0
+     }
+    },
+    "id": 2869566589376,
+    "length": 40,
+    "omitted": 34,
+    "type": "builtins.dict"
+   },
+   "self_before": {
+    "fields": {
+     "checkpoint_every_days": {
+      "type": "int",
+      "value": 10
+     },
+     "convection": {
+      "fields_omitted": 1,
+      "id": 2869541976192,
+      "length": 1,
+      "type": "builtins.dict"
+     },
+     "cp": {
+      "type": "float",
+      "value": 1004.64
+     },
+     "damping_scheme": {
+      "type": "str",
+      "value": "centred"
+     },
+     "days": {
+      "type": "int",
+      "value": 300
+     },
+     "drag": {
+      "fields_omitted": 3,
+      "id": 2869541971904,
+      "length": 3,
+      "type": "builtins.dict"
+     },
+     "dt": {
+      "type": "float",
+      "value": 1200.0
+     },
+     "experiment_id": {
+      "type": "str",
+      "value": "earth-gray-dry-heated-T21L25-tiny"
+     },
+     "frictional_heating": {
+      "type": "bool",
+      "value": true
+     },
+     "gas_constant": {
+      "type": "float",
+      "value": 287.04
+     },
+     "gravity": {
+      "type": "float",
+      "value": 9.8
+     },
+     "hyperdiffusion_efold_days": {
+      "type": "float",
+      "value": 0.1
+     },
+     "hyperdiffusion_order": {
+      "type": "int",
+      "value": 4
+     },
+     "initial": {
+      "fields_omitted": 2,
+      "id": 2869541976384,
+      "length": 2,
+      "type": "builtins.dict"
+     },
+     "insolation": {
+      "fields_omitted": 3,
+      "id": 2869541975296,
+      "length": 3,
+      "type": "builtins.dict"
+     },
+     "internal_heat_flux": {
+      "type": "float",
+      "value": 0.0
+     },
+     "keep_checkpoints": {
+      "type": "int",
+      "value": 2
+     },
+     "l_max": {
+      "type": "int",
+      "value": 10
+     },
+     "longwave": {
+      "fields_omitted": 4,
+      "id": 2869547859264,
+      "length": 4,
+      "type": "builtins.dict"
+     },
+     "mean_last_days": {
+      "type": "int",
+      "value": 0
+     },
+     "nlat": {
+      "type": "int",
+      "value": 16
+     },
+     "nlon": {
+      "type": "int",
+      "value": 32
+     },
+     "omega": {
+      "type": "float",
+      "value": 7.292e-05
+     },
+     "perturbation_lmax": {
+      "type": "int",
+      "value": 8
+     }
+    },
+    "id": 2869542123616,
+    "omitted": 15,
+    "type": "tropoi.run.radiative.config.RadiativeConfig"
+   },
+   "unverified": []
+  },
+  {
+   "args": {},
+   "call_index": 1,
+   "function": "tropoi.run.radiative.config.RadiativeConfig.canonical_json",
+   "mutations": {},
+   "phase": "preset-resolution",
+   "return": {
+    "length": 1229,
+    "truncated": true,
+    "type": "str",
+    "value": "{\"checkpoint_every_days\":10,\"convection\":{\"timescale\":0.0},\"cp\":1004.64,\"damping_scheme\":\"centred\",\"days\":300,\"drag\":{\"k_f_per_day\":1.0,\"kind\":\"held_suarez\",\"si"
+   },
+   "self_before": {
+    "fields": {
+     "checkpoint_every_days": {
+      "type": "int",
+      "value": 10
+     },
+     "convection": {
+      "fields_omitted": 1,
+      "id": 2869541976192,
+      "length": 1,
+      "type": "builtins.dict"
+     },
+     "cp": {
+      "type": "float",
+      "value": 1004.64
+     },
+     "damping_scheme": {
+      "type": "str",
+      "value": "centred"
+     },
+     "days": {
+      "type": "int",
+      "value": 300
+     },
+     "drag": {
+      "fields_omitted": 3,
+      "id": 2869541971904,
+      "length": 3,
+      "type": "builtins.dict"
+     },
+     "dt": {
+      "type": "float",
+      "value": 1200.0
+     },
+     "experiment_id": {
+      "type": "str",
+      "value": "earth-gray-dry-heated-T21L25-tiny"
+     },
+     "frictional_heating": {
+      "type": "bool",
+      "value": true
+     },
+     "gas_constant": {
+      "type": "float",
+      "value": 287.04
+     },
+     "gravity": {
+      "type": "float",
+      "value": 9.8
+     },
+     "hyperdiffusion_efold_days": {
+      "type": "float",
+      "value": 0.1
+     },
+     "hyperdiffusion_order": {
+      "type": "int",
+      "value": 4
+     },
+     "initial": {
+      "fields_omitted": 2,
+      "id": 2869541976384,
+      "length": 2,
+      "type": "builtins.dict"
+     },
+     "insolation": {
+      "fields_omitted": 3,
+      "id": 2869541975296,
+      "length": 3,
+      "type": "builtins.dict"
+     },
+     "internal_heat_flux": {
+      "type": "float",
+      "value": 0.0
+     },
+     "keep_checkpoints": {
+      "type": "int",
+      "value": 2
+     },
+     "l_max": {
+      "type": "int",
+      "value": 10
+     },
+     "longwave": {
+      "fields_omitted": 4,
+      "id": 2869547859264,
+      "length": 4,
+      "type": "builtins.dict"
+     },
+     "mean_last_days": {
+      "type": "int",
+      "value": 0
+     },
+     "nlat": {
+      "type": "int",
+      "value": 16
+     },
+     "nlon": {
+      "type": "int",
+      "value": 32
+     },
+     "omega": {
+      "type": "float",
+      "value": 7.292e-05
+     },
+     "perturbation_lmax": {
+      "type": "int",
+      "value": 8
+     }
+    },
+    "id": 2869542123616,
+    "omitted": 15,
+    "type": "tropoi.run.radiative.config.RadiativeConfig"
+   },
+   "unverified": []
+  },
+  {
+   "args": {},
+   "call_index": 1,
+   "function": "tropoi.run.radiative.config.RadiativeConfig.sha256",
+   "mutations": {},
+   "phase": "preset-resolution",
+   "return": {
+    "type": "str",
+    "value": "a5bed515694d4b05a32163bfa1c2499642461b9040fba1fa603ff6db14fa78df"
+   },
+   "self_before": {
+    "fields": {
+     "checkpoint_every_days": {
+      "type": "int",
+      "value": 10
+     },
+     "convection": {
+      "fields_omitted": 1,
+      "id": 2869541976192,
+      "length": 1,
+      "type": "builtins.dict"
+     },
+     "cp": {
+      "type": "float",
+      "value": 1004.64
+     },
+     "damping_scheme": {
+      "type": "str",
+      "value": "centred"
+     },
+     "days": {
+      "type": "int",
+      "value": 300
+     },
+     "drag": {
+      "fields_omitted": 3,
+      "id": 2869541971904,
+      "length": 3,
+      "type": "builtins.dict"
+     },
+     "dt": {
+      "type": "float",
+      "value": 1200.0
+     },
+     "experiment_id": {
+      "type": "str",
+      "value": "earth-gray-dry-heated-T21L25-tiny"
+     },
+     "frictional_heating": {
+      "type": "bool",
+      "value": true
+     },
+     "gas_constant": {
+      "type": "float",
+      "value": 287.04
+     },
+     "gravity": {
+      "type": "float",
+      "value": 9.8
+     },
+     "hyperdiffusion_efold_days": {
+      "type": "float",
+      "value": 0.1
+     },
+     "hyperdiffusion_order": {
+      "type": "int",
+      "value": 4
+     },
+     "initial": {
+      "fields_omitted": 2,
+      "id": 2869541976384,
+      "length": 2,
+      "type": "builtins.dict"
+     },
+     "insolation": {
+      "fields_omitted": 3,
+      "id": 2869541975296,
+      "length": 3,
+      "type": "builtins.dict"
+     },
+     "internal_heat_flux": {
+      "type": "float",
+      "value": 0.0
+     },
+     "keep_checkpoints": {
+      "type": "int",
+      "value": 2
+     },
+     "l_max": {
+      "type": "int",
+      "value": 10
+     },
+     "longwave": {
+      "fields_omitted": 4,
+      "id": 2869547859264,
+      "length": 4,
+      "type": "builtins.dict"
+     },
+     "mean_last_days": {
+      "type": "int",
+      "value": 0
+     },
+     "nlat": {
+      "type": "int",
+      "value": 16
+     },
+     "nlon": {
+      "type": "int",
+      "value": 32
+     },
+     "omega": {
+      "type": "float",
+      "value": 7.292e-05
+     },
+     "perturbation_lmax": {
+      "type": "int",
+      "value": 8
+     }
+    },
+    "id": 2869542123616,
+    "omitted": 15,
+    "type": "tropoi.run.radiative.config.RadiativeConfig"
+   },
+   "unverified": []
+  },
+  {
+   "args": {
+    "d": {
+     "fields": {
+      "cp": {
+       "type": "float",
+       "value": 1004.64
+      },
+      "experiment_id": {
+       "type": "str",
+       "value": "earth-gray-dry-heated-T21L25-tiny"
+      },
+      "gas_constant": {
+       "type": "float",
+       "value": 287.04
+      },
+      "gravity": {
+       "type": "float",
+       "value": 9.8
+      },
+      "omega": {
+       "type": "float",
+       "value": 7.292e-05
+      },
+      "radius": {
+       "type": "float",
+       "value": 6376000.0
+      }
+     },
+     "id": 2869567865408,
+     "length": 40,
+     "omitted": 34,
+     "type": "builtins.dict"
+    }
+   },
+   "call_index": 1,
+   "function": "tropoi.run.radiative.config.RadiativeConfig.from_dict",
+   "mutations": {},
+   "phase": "preset-resolution",
+   "return": {
+    "fields": {
+     "checkpoint_every_days": {
+      "type": "int",
+      "value": 10
+     },
+     "convection": {
+      "fields_omitted": 1,
+      "id": 2869566589632,
+      "length": 1,
+      "type": "builtins.dict"
+     },
+     "cp": {
+      "type": "float",
+      "value": 1004.64
+     },
+     "damping_scheme": {
+      "type": "str",
+      "value": "centred"
+     },
+     "days": {
+      "type": "int",
+      "value": 300
+     },
+     "drag": {
+      "fields_omitted": 3,
+      "id": 2869566590208,
+      "length": 3,
+      "type": "builtins.dict"
+     },
+     "dt": {
+      "type": "float",
+      "value": 1200.0
+     },
+     "experiment_id": {
+      "type": "str",
+      "value": "earth-gray-dry-heated-T21L25-tiny"
+     },
+     "frictional_heating": {
+      "type": "bool",
+      "value": true
+     },
+     "gas_constant": {
+      "type": "float",
+      "value": 287.04
+     },
+     "gravity": {
+      "type": "float",
+      "value": 9.8
+     },
+     "hyperdiffusion_efold_days": {
+      "type": "float",
+      "value": 0.1
+     },
+     "hyperdiffusion_order": {
+      "type": "int",
+      "value": 4
+     },
+     "initial": {
+      "fields_omitted": 2,
+      "id": 2869566590336,
+      "length": 2,
+      "type": "builtins.dict"
+     },
+     "insolation": {
+      "fields_omitted": 3,
+      "id": 2869566589888,
+      "length": 3,
+      "type": "builtins.dict"
+     },
+     "internal_heat_flux": {
+      "type": "float",
+      "value": 0.0
+     },
+     "keep_checkpoints": {
+      "type": "int",
+      "value": 2
+     },
+     "l_max": {
+      "type": "int",
+      "value": 10
+     },
+     "longwave": {
+      "fields_omitted": 4,
+      "id": 2869566588032,
+      "length": 4,
+      "type": "builtins.dict"
+     },
+     "mean_last_days": {
+      "type": "int",
+      "value": 0
+     },
+     "nlat": {
+      "type": "int",
+      "value": 16
+     },
+     "nlon": {
+      "type": "int",
+      "value": 32
+     },
+     "omega": {
+      "type": "float",
+      "value": 7.292e-05
+     },
+     "perturbation_lmax": {
+      "type": "int",
+      "value": 8
+     }
+    },
+    "id": 2869547874304,
+    "omitted": 15,
+    "type": "tropoi.run.radiative.config.RadiativeConfig"
+   },
+   "unverified": []
+  },
+  {
+   "args": {
+    ".0": {
+     "id": 2869565437408,
+     "type": "builtins.str_ascii_iterator"
+    }
+   },
+   "call_index": 1,
+   "function": "tropoi.run.radiative.config.RadiativeConfig.__post_init__.<locals>.<genexpr>",
+   "mutations": {},
+   "phase": "validation",
+   "return": {
+    "type": "bool",
+    "value": false
+   },
+   "unverified": []
+  },
+  {
+   "args": {},
+   "call_index": 1,
+   "function": "tropoi.run.radiative.config.RadiativeConfig.__post_init__",
+   "mutations": {},
+   "phase": "validation",
+   "return": {
+    "type": "NoneType",
+    "value": null
+   },
+   "self_before": {
+    "fields": {
+     "checkpoint_every_days": {
+      "type": "int",
+      "value": 10
+     },
+     "convection": {
+      "fields_omitted": 1,
+      "id": 2869541976192,
+      "length": 1,
+      "type": "builtins.dict"
+     },
+     "cp": {
+      "type": "float",
+      "value": 1004.64
+     },
+     "damping_scheme": {
+      "type": "str",
+      "value": "centred"
+     },
+     "days": {
+      "type": "int",
+      "value": 300
+     },
+     "drag": {
+      "fields_omitted": 3,
+      "id": 2869541971904,
+      "length": 3,
+      "type": "builtins.dict"
+     },
+     "dt": {
+      "type": "float",
+      "value": 1200.0
+     },
+     "experiment_id": {
+      "type": "str",
+      "value": "earth-gray-dry-heated-T21L25-tiny"
+     },
+     "frictional_heating": {
+      "type": "bool",
+      "value": true
+     },
+     "gas_constant": {
+      "type": "float",
+      "value": 287.04
+     },
+     "gravity": {
+      "type": "float",
+      "value": 9.8
+     },
+     "hyperdiffusion_efold_days": {
+      "type": "float",
+      "value": 0.1
+     },
+     "hyperdiffusion_order": {
+      "type": "int",
+      "value": 4
+     },
+     "initial": {
+      "fields_omitted": 2,
+      "id": 2869541976384,
+      "length": 2,
+      "type": "builtins.dict"
+     },
+     "insolation": {
+      "fields_omitted": 3,
+      "id": 2869541975296,
+      "length": 3,
+      "type": "builtins.dict"
+     },
+     "internal_heat_flux": {
+      "type": "float",
+      "value": 0.0
+     },
+     "keep_checkpoints": {
+      "type": "int",
+      "value": 2
+     },
+     "l_max": {
+      "type": "int",
+      "value": 10
+     },
+     "longwave": {
+      "fields_omitted": 4,
+      "id": 2869547859264,
+      "length": 4,
+      "type": "builtins.dict"
+     },
+     "mean_last_days": {
+      "type": "int",
+      "value": 0
+     },
+     "nlat": {
+      "type": "int",
+      "value": 16
+     },
+     "nlon": {
+      "type": "int",
+      "value": 32
+     },
+     "omega": {
+      "type": "float",
+      "value": 7.292e-05
+     },
+     "perturbation_lmax": {
+      "type": "int",
+      "value": 8
+     }
+    },
+    "id": 2869565437328,
+    "omitted": 15,
+    "type": "tropoi.run.radiative.config.RadiativeConfig"
+   },
+   "unverified": []
+  },
+  {
+   "args": {
+    "cp": {
+     "type": "float",
+     "value": 1004.64
+    },
+    "days": {
+     "type": "int",
+     "value": 300
+    },
+    "dt": {
+     "type": "float",
+     "value": 1200.0
+    },
+    "experiment_id": {
+     "type": "str",
+     "value": "earth-gray-dry-heated-T21L25-tiny"
+    },
+    "gas_constant": {
+     "type": "float",
+     "value": 287.04
+    },
+    "gravity": {
+     "type": "float",
+     "value": 9.8
+    },
+    "l_max": {
+     "type": "int",
+     "value": 10
+    },
+    "nlat": {
+     "type": "int",
+     "value": 16
+    },
+    "nlon": {
+     "type": "int",
+     "value": 32
+    },
+    "omega": {
+     "type": "float",
+     "value": 7.292e-05
+    },
+    "radius": {
+     "type": "float",
+     "value": 6376000.0
+    },
+    "reference_pressure": {
+     "type": "float",
+     "value": 100000.0
+    },
+    "retained_truncation": {
+     "type": "int",
+     "value": 9
+    },
+    "t_ref": {
+     "type": "float",
+     "value": 300.0
+    },
+    "vertical": {
+     "fields": {
+      "kind": {
+       "type": "str",
+       "value": "frierson"
+      },
+      "nlev": {
+       "type": "int",
+       "value": 25
+      }
+     },
+     "id": 2869567871680,
+     "length": 2,
+     "type": "builtins.dict"
+    }
+   },
+   "call_index": 1,
+   "function": "tropoi.run.radiative.config.__create_fn__.<locals>.__init__",
+   "mutations": {
+    "self.checkpoint_every_days": {
+     "after": {
+      "type": "int",
+      "value": 10
+     },
+     "kind": "added"
+    },
+    "self.convection": {
+     "after": {
+      "fields_omitted": 1,
+      "id": 2869541976192,
+      "length": 1,
+      "type": "builtins.dict"
+     },
+     "kind": "added"
+    },
+    "self.cp": {
+     "after": {
+      "type": "float",
+      "value": 1004.64
+     },
+     "kind": "added"
+    },
+    "self.damping_scheme": {
+     "after": {
+      "type": "str",
+      "value": "centred"
+     },
+     "kind": "added"
+    },
+    "self.days": {
+     "after": {
+      "type": "int",
+      "value": 300
+     },
+     "kind": "added"
+    },
+    "self.drag": {
+     "after": {
+      "fields_omitted": 3,
+      "id": 2869541971904,
+      "length": 3,
+      "type": "builtins.dict"
+     },
+     "kind": "added"
+    },
+    "self.dt": {
+     "after": {
+      "type": "float",
+      "value": 1200.0
+     },
+     "kind": "added"
+    },
+    "self.experiment_id": {
+     "after": {
+      "type": "str",
+      "value": "earth-gray-dry-heated-T21L25-tiny"
+     },
+     "kind": "added"
+    },
+    "self.frictional_heating": {
+     "after": {
+      "type": "bool",
+      "value": true
+     },
+     "kind": "added"
+    },
+    "self.gas_constant": {
+     "after": {
+      "type": "float",
+      "value": 287.04
+     },
+     "kind": "added"
+    },
+    "self.gravity": {
+     "after": {
+      "type": "float",
+      "value": 9.8
+     },
+     "kind": "added"
+    },
+    "self.hyperdiffusion_efold_days": {
+     "after": {
+      "type": "float",
+      "value": 0.1
+     },
+     "kind": "added"
+    },
+    "self.hyperdiffusion_order": {
+     "after": {
+      "type": "int",
+      "value": 4
+     },
+     "kind": "added"
+    },
+    "self.initial": {
+     "after": {
+      "fields_omitted": 2,
+      "id": 2869541976384,
+      "length": 2,
+      "type": "builtins.dict"
+     },
+     "kind": "added"
+    },
+    "self.insolation": {
+     "after": {
+      "fields_omitted": 3,
+      "id": 2869541975296,
+      "length": 3,
+      "type": "builtins.dict"
+     },
+     "kind": "added"
+    },
+    "self.internal_heat_flux": {
+     "after": {
+      "type": "float",
+      "value": 0.0
+     },
+     "kind": "added"
+    },
+    "self.keep_checkpoints": {
+     "after": {
+      "type": "int",
+      "value": 2
+     },
+     "kind": "added"
+    },
+    "self.l_max": {
+     "after": {
+      "type": "int",
+      "value": 10
+     },
+     "kind": "added"
+    },
+    "self.longwave": {
+     "after": {
+      "fields_omitted": 4,
+      "id": 2869547859264,
+      "length": 4,
+      "type": "builtins.dict"
+     },
+     "kind": "added"
+    },
+    "self.mean_last_days": {
+     "after": {
+      "type": "int",
+      "value": 0
+     },
+     "kind": "added"
+    },
+    "self.nlat": {
+     "after": {
+      "type": "int",
+      "value": 16
+     },
+     "kind": "added"
+    },
+    "self.nlon": {
+     "after": {
+      "type": "int",
+      "value": 32
+     },
+     "kind": "added"
+    },
+    "self.omega": {
+     "after": {
+      "type": "float",
+      "value": 7.292e-05
+     },
+     "kind": "added"
+    },
+    "self.perturbation_lmax": {
+     "after": {
+      "type": "int",
+      "value": 8
+     },
+     "kind": "added"
+    }
+   },
+   "phase": "validation",
+   "return": {
+    "type": "NoneType",
+    "value": null
+   },
+   "self_before": {
+    "fields": {},
+    "id": 2869565437328,
+    "type": "tropoi.run.radiative.config.RadiativeConfig"
+   },
+   "unverified": []
+  },
+  {
+   "args": {
+    "changes": {
+     "fields": {
+      "radiation_interval": {
+       "type": "int",
+       "value": 0
+      }
+     },
+     "id": 2869567865408,
+     "length": 1,
+     "type": "builtins.dict"
+    }
+   },
+   "call_index": 1,
+   "function": "tropoi.run.radiative.config.RadiativeConfig.with_",
+   "mutations": {},
+   "phase": "validation",
+   "return": {
+    "type": "NoneType",
+    "value": null
+   },
+   "self_before": {
+    "fields": {
+     "checkpoint_every_days": {
+      "type": "int",
+      "value": 10
+     },
+     "convection": {
+      "fields_omitted": 1,
+      "id": 2869541976192,
+      "length": 1,
+      "type": "builtins.dict"
+     },
+     "cp": {
+      "type": "float",
+      "value": 1004.64
+     },
+     "damping_scheme": {
+      "type": "str",
+      "value": "centred"
+     },
+     "days": {
+      "type": "int",
+      "value": 300
+     },
+     "drag": {
+      "fields_omitted": 3,
+      "id": 2869541971904,
+      "length": 3,
+      "type": "builtins.dict"
+     },
+     "dt": {
+      "type": "float",
+      "value": 1200.0
+     },
+     "experiment_id": {
+      "type": "str",
+      "value": "earth-gray-dry-heated-T21L25-tiny"
+     },
+     "frictional_heating": {
+      "type": "bool",
+      "value": true
+     },
+     "gas_constant": {
+      "type": "float",
+      "value": 287.04
+     },
+     "gravity": {
+      "type": "float",
+      "value": 9.8
+     },
+     "hyperdiffusion_efold_days": {
+      "type": "float",
+      "value": 0.1
+     },
+     "hyperdiffusion_order": {
+      "type": "int",
+      "value": 4
+     },
+     "initial": {
+      "fields_omitted": 2,
+      "id": 2869541976384,
+      "length": 2,
+      "type": "builtins.dict"
+     },
+     "insolation": {
+      "fields_omitted": 3,
+      "id": 2869541975296,
+      "length": 3,
+      "type": "builtins.dict"
+     },
+     "internal_heat_flux": {
+      "type": "float",
+      "value": 0.0
+     },
+     "keep_checkpoints": {
+      "type": "int",
+      "value": 2
+     },
+     "l_max": {
+      "type": "int",
+      "value": 10
+     },
+     "longwave": {
+      "fields_omitted": 4,
+      "id": 2869547859264,
+      "length": 4,
+      "type": "builtins.dict"
+     },
+     "mean_last_days": {
+      "type": "int",
+      "value": 0
+     },
+     "nlat": {
+      "type": "int",
+      "value": 16
+     },
+     "nlon": {
+      "type": "int",
+      "value": 32
+     },
+     "omega": {
+      "type": "float",
+      "value": 7.292e-05
+     },
+     "perturbation_lmax": {
+      "type": "int",
+      "value": 8
+     }
+    },
+    "id": 2869542123616,
+    "omitted": 15,
+    "type": "tropoi.run.radiative.config.RadiativeConfig"
+   },
+   "unverified": []
+  },
+  {
+   "args": {
+    "cfg": {
+     "fields": {
+      "checkpoint_every_days": {
+       "type": "int",
+       "value": 10
+      },
+      "convection": {
+       "fields_omitted": 1,
+       "id": 2869541976192,
+       "length": 1,
+       "type": "builtins.dict"
+      },
+      "cp": {
+       "type": "float",
+       "value": 1004.64
+      },
+      "damping_scheme": {
+       "type": "str",
+       "value": "centred"
+      },
+      "days": {
+       "type": "int",
+       "value": 300
+      },
+      "drag": {
+       "fields_omitted": 3,
+       "id": 2869541971904,
+       "length": 3,
+       "type": "builtins.dict"
+      },
+      "dt": {
+       "type": "float",
+       "value": 1200.0
+      },
+      "experiment_id": {
+       "type": "str",
+       "value": "earth-gray-dry-heated-T21L25-tiny"
+      },
+      "frictional_heating": {
+       "type": "bool",
+       "value": true
+      },
+      "gas_constant": {
+       "type": "float",
+       "value": 287.04
+      },
+      "gravity": {
+       "type": "float",
+       "value": 9.8
+      },
+      "hyperdiffusion_efold_days": {
+       "type": "float",
+       "value": 0.1
+      },
+      "hyperdiffusion_order": {
+       "type": "int",
+       "value": 4
+      },
+      "initial": {
+       "fields_omitted": 2,
+       "id": 2869541976384,
+       "length": 2,
+       "type": "builtins.dict"
+      },
+      "insolation": {
+       "fields_omitted": 3,
+       "id": 2869541975296,
+       "length": 3,
+       "type": "builtins.dict"
+      },
+      "internal_heat_flux": {
+       "type": "float",
+       "value": 0.0
+      },
+      "keep_checkpoints": {
+       "type": "int",
+       "value": 2
+      },
+      "l_max": {
+       "type": "int",
+       "value": 10
+      },
+      "longwave": {
+       "fields_omitted": 4,
+       "id": 2869547859264,
+       "length": 4,
+       "type": "builtins.dict"
+      },
+      "mean_last_days": {
+       "type": "int",
+       "value": 0
+      },
+      "nlat": {
+       "type": "int",
+       "value": 16
+      },
+      "nlon": {
+       "type": "int",
+       "value": 32
+      },
+      "omega": {
+       "type": "float",
+       "value": 7.292e-05
+      },
+      "perturbation_lmax": {
+       "type": "int",
+       "value": 8
+      }
+     },
+     "id": 2869542123616,
+     "omitted": 15,
+     "type": "tropoi.run.radiative.config.RadiativeConfig"
+    }
+   },
+   "call_index": 1,
+   "function": "tropoi.run.radiative.model.build_sigma",
+   "mutations": {},
+   "phase": "component-construction-cpu",
+   "return": {
+    "fields": {
+     "interfaces": {
+      "fields_omitted": 6,
+      "id": 2869566387008,
+      "length": 26,
+      "omitted": 20,
+      "type": "builtins.tuple"
+     }
+    },
+    "id": 2869565437328,
+    "type": "tropoi.spatial.sigma_coordinate.SigmaGrid"
+   },
+   "unverified": []
+  },
+  {
+   "args": {},
+   "call_index": 1,
+   "function": "tropoi.run.radiative.config.RadiativeConfig.kappa",
+   "mutations": {},
+   "phase": "component-construction-cpu",
+   "return": {
+    "type": "float",
+    "value": 0.28571428571428575
+   },
+   "self_before": {
+    "fields": {
+     "checkpoint_every_days": {
+      "type": "int",
+      "value": 10
+     },
+     "convection": {
+      "fields_omitted": 1,
+      "id": 2869541976192,
+      "length": 1,
+      "type": "builtins.dict"
+     },
+     "cp": {
+      "type": "float",
+      "value": 1004.64
+     },
+     "damping_scheme": {
+      "type": "str",
+      "value": "centred"
+     },
+     "days": {
+      "type": "int",
+      "value": 300
+     },
+     "drag": {
+      "fields_omitted": 3,
+      "id": 2869541971904,
+      "length": 3,
+      "type": "builtins.dict"
+     },
+     "dt": {
+      "type": "float",
+      "value": 1200.0
+     },
+     "experiment_id": {
+      "type": "str",
+      "value": "earth-gray-dry-heated-T21L25-tiny"
+     },
+     "frictional_heating": {
+      "type": "bool",
+      "value": true
+     },
+     "gas_constant": {
+      "type": "float",
+      "value": 287.04
+     },
+     "gravity": {
+      "type": "float",
+      "value": 9.8
+     },
+     "hyperdiffusion_efold_days": {
+      "type": "float",
+      "value": 0.1
+     },
+     "hyperdiffusion_order": {
+      "type": "int",
+      "value": 4
+     },
+     "initial": {
+      "fields_omitted": 2,
+      "id": 2869541976384,
+      "length": 2,
+      "type": "builtins.dict"
+     },
+     "insolation": {
+      "fields_omitted": 3,
+      "id": 2869541975296,
+      "length": 3,
+      "type": "builtins.dict"
+     },
+     "internal_heat_flux": {
+      "type": "float",
+      "value": 0.0
+     },
+     "keep_checkpoints": {
+      "type": "int",
+      "value": 2
+     },
+     "l_max": {
+      "type": "int",
+      "value": 10
+     },
+     "longwave": {
+      "fields_omitted": 4,
+      "id": 2869547859264,
+      "length": 4,
+      "type": "builtins.dict"
+     },
+     "mean_last_days": {
+      "type": "int",
+      "value": 0
+     },
+     "nlat": {
+      "type": "int",
+      "value": 16
+     },
+     "nlon": {
+      "type": "int",
+      "value": 32
+     },
+     "omega": {
+      "type": "float",
+      "value": 7.292e-05
+     },
+     "perturbation_lmax": {
+      "type": "int",
+      "value": 8
+     }
+    },
+    "id": 2869542123616,
+    "omitted": 15,
+    "type": "tropoi.run.radiative.config.RadiativeConfig"
+   },
+   "unverified": []
+  },
+  {
+   "args": {
+    "spec": {
+     "fields": {
+      "delta_s": {
+       "type": "float",
+       "value": 1.4
+      },
+      "kind": {
+       "type": "str",
+       "value": "frierson"
+      },
+      "net_solar_constant": {
+       "type": "float",
+       "value": 938.4
+      }
+     },
+     "id": 2869541975296,
+     "length": 3,
+     "type": "builtins.dict"
+    }
+   },
+   "call_index": 1,
+   "function": "tropoi.run.radiative.model.build_insolation",
+   "mutations": {},
+   "phase": "component-construction-cpu",
+   "return": {
+    "fields": {
+     "function": {
+      "fields_omitted": 0,
+      "id": 2869303473664,
+      "type": "builtins.function"
+     },
+     "mu0": {
+      "type": "float",
+      "value": 0.5
+     },
+     "name": {
+      "type": "str",
+      "value": "frierson_net_surface_flux"
+     },
+     "params": {
+      "fields_omitted": 2,
+      "id": 2869566198272,
+      "length": 2,
+      "type": "builtins.dict"
+     }
+    },
+    "id": 2869565438144,
+    "type": "tropoi.physics.insolation.PrescribedInsolation"
+   },
+   "unverified": []
+  },
+  {
+   "args": {
+    "cfg": {
+     "fields": {
+      "checkpoint_every_days": {
+       "type": "int",
+       "value": 10
+      },
+      "convection": {
+       "fields_omitted": 1,
+       "id": 2869541976192,
+       "length": 1,
+       "type": "builtins.dict"
+      },
+      "cp": {
+       "type": "float",
+       "value": 1004.64
+      },
+      "damping_scheme": {
+       "type": "str",
+       "value": "centred"
+      },
+      "days": {
+       "type": "int",
+       "value": 300
+      },
+      "drag": {
+       "fields_omitted": 3,
+       "id": 2869541971904,
+       "length": 3,
+       "type": "builtins.dict"
+      },
+      "dt": {
+       "type": "float",
+       "value": 1200.0
+      },
+      "experiment_id": {
+       "type": "str",
+       "value": "earth-gray-dry-heated-T21L25-tiny"
+      },
+      "frictional_heating": {
+       "type": "bool",
+       "value": true
+      },
+      "gas_constant": {
+       "type": "float",
+       "value": 287.04
+      },
+      "gravity": {
+       "type": "float",
+       "value": 9.8
+      },
+      "hyperdiffusion_efold_days": {
+       "type": "float",
+       "value": 0.1
+      },
+      "hyperdiffusion_order": {
+       "type": "int",
+       "value": 4
+      },
+      "initial": {
+       "fields_omitted": 2,
+       "id": 2869541976384,
+       "length": 2,
+       "type": "builtins.dict"
+      },
+      "insolation": {
+       "fields_omitted": 3,
+       "id": 2869541975296,
+       "length": 3,
+       "type": "builtins.dict"
+      },
+      "internal_heat_flux": {
+       "type": "float",
+       "value": 0.0
+      },
+      "keep_checkpoints": {
+       "type": "int",
+       "value": 2
+      },
+      "l_max": {
+       "type": "int",
+       "value": 10
+      },
+      "longwave": {
+       "fields_omitted": 4,
+       "id": 2869547859264,
+       "length": 4,
+       "type": "builtins.dict"
+      },
+      "mean_last_days": {
+       "type": "int",
+       "value": 0
+      },
+      "nlat": {
+       "type": "int",
+       "value": 16
+      },
+      "nlon": {
+       "type": "int",
+       "value": 32
+      },
+      "omega": {
+       "type": "float",
+       "value": 7.292e-05
+      },
+      "perturbation_lmax": {
+       "type": "int",
+       "value": 8
+      }
+     },
+     "id": 2869542123616,
+     "omitted": 15,
+     "type": "tropoi.run.radiative.config.RadiativeConfig"
+    }
+   },
+   "call_index": 1,
+   "function": "tropoi.run.radiative.model.build_radiation",
+   "mutations": {},
+   "phase": "component-construction-cpu",
+   "return": {
+    "fields": {
+     "chunk": {
+      "type": "int",
+      "value": 16
+     },
+     "longwave": {
+      "fields_omitted": 2,
+      "id": 2869565438000,
+      "type": "tropoi.physics.radiation.gray.GrayLongwave"
+     },
+     "shortwave": {
+      "fields_omitted": 6,
+      "id": 2869565439296,
+      "type": "tropoi.physics.radiation.gray.GrayShortwave"
+     },
+     "source": {
+      "type": "str",
+      "value": "linear"
+     }
+    },
+    "id": 2869565439344,
+    "type": "tropoi.physics.radiation.scheme.Radiation"
+   },
+   "unverified": []
+  },
+  {
+   "args": {
+    "cfg": {
+     "fields": {
+      "checkpoint_every_days": {
+       "type": "int",
+       "value": 10
+      },
+      "convection": {
+       "fields_omitted": 1,
+       "id": 2869541976192,
+       "length": 1,
+       "type": "builtins.dict"
+      },
+      "cp": {
+       "type": "float",
+       "value": 1004.64
+      },
+      "damping_scheme": {
+       "type": "str",
+       "value": "centred"
+      },
+      "days": {
+       "type": "int",
+       "value": 300
+      },
+      "drag": {
+       "fields_omitted": 3,
+       "id": 2869541971904,
+       "length": 3,
+       "type": "builtins.dict"
+      },
+      "dt": {
+       "type": "float",
+       "value": 1200.0
+      },
+      "experiment_id": {
+       "type": "str",
+       "value": "earth-gray-dry-heated-T21L25-tiny"
+      },
+      "frictional_heating": {
+       "type": "bool",
+       "value": true
+      },
+      "gas_constant": {
+       "type": "float",
+       "value": 287.04
+      },
+      "gravity": {
+       "type": "float",
+       "value": 9.8
+      },
+      "hyperdiffusion_efold_days": {
+       "type": "float",
+       "value": 0.1
+      },
+      "hyperdiffusion_order": {
+       "type": "int",
+       "value": 4
+      },
+      "initial": {
+       "fields_omitted": 2,
+       "id": 2869541976384,
+       "length": 2,
+       "type": "builtins.dict"
+      },
+      "insolation": {
+       "fields_omitted": 3,
+       "id": 2869541975296,
+       "length": 3,
+       "type": "builtins.dict"
+      },
+      "internal_heat_flux": {
+       "type": "float",
+       "value": 0.0
+      },
+      "keep_checkpoints": {
+       "type": "int",
+       "value": 2
+      },
+      "l_max": {
+       "type": "int",
+       "value": 10
+      },
+      "longwave": {
+       "fields_omitted": 4,
+       "id": 2869547859264,
+       "length": 4,
+       "type": "builtins.dict"
+      },
+      "mean_last_days": {
+       "type": "int",
+       "value": 0
+      },
+      "nlat": {
+       "type": "int",
+       "value": 16
+      },
+      "nlon": {
+       "type": "int",
+       "value": 32
+      },
+      "omega": {
+       "type": "float",
+       "value": 7.292e-05
+      },
+      "perturbation_lmax": {
+       "type": "int",
+       "value": 8
+      }
+     },
+     "id": 2869542123616,
+     "omitted": 15,
+     "type": "tropoi.run.radiative.config.RadiativeConfig"
+    },
+    "insolation": {
+     "type": "str",
+     "value": "configured"
+    }
+   },
+   "call_index": 1,
+   "function": "tropoi.run.radiative.model.build_physics",
+   "mutations": {},
+   "phase": "component-construction-cpu",
+   "return": {
+    "fields": {
+     "_cached": {
+      "type": "NoneType",
+      "value": null
+     },
+     "_calls": {
+      "type": "int",
+      "value": 0
+     },
+     "convection": {
+      "fields_omitted": 3,
+      "id": 2869565438240,
+      "type": "tropoi.physics.convection.DryConvectiveAdjustment"
+     },
+     "cp": {
+      "type": "float",
+      "value": 1004.64
+     },
+     "gas_constant": {
+      "type": "float",
+      "value": 287.04
+     },
+     "gravity": {
+      "type": "float",
+      "value": 9.8
+     },
+     "insolation": {
+      "fields_omitted": 4,
+      "id": 2869565438144,
+      "type": "tropoi.physics.insolation.PrescribedInsolation"
+     },
+     "internal_heat_flux": {
+      "type": "float",
+      "value": 0.0
+     },
+     "radiation": {
+      "fields_omitted": 4,
+      "id": 2869565439344,
+      "type": "tropoi.physics.radiation.scheme.Radiation"
+     },
+     "radiation_interval": {
+      "type": "int",
+      "value": 1
+     },
+     "sensible": {
+      "fields_omitted": 3,
+      "id": 2869566231744,
+      "length": 3,
+      "type": "builtins.dict"
+     },
+     "surface": {
+      "fields_omitted": 3,
+      "id": 2869565438336,
+      "type": "tropoi.physics.surface.SlabSurface"
+     }
+    },
+    "id": 2869565439872,
+    "type": "tropoi.physics.column_model.ColumnPhysics"
+   },
+   "unverified": []
+  },
+  {
+   "args": {},
+   "call_index": 1,
+   "function": "tropoi.spatial.specification.PlanetSpec.__post_init__",
+   "mutations": {},
+   "phase": "planet-specification",
+   "return": {
+    "type": "NoneType",
+    "value": null
+   },
+   "self_before": {
+    "fields": {
+     "construction": {
+      "type": "str",
+      "value": "ideal_sphere"
+     },
+     "mass_kg": {
+      "type": "float",
+      "value": 5.972e+24
+     },
+     "reference_radius_m": {
+      "type": "float",
+      "value": 6371220.0
+     },
+     "sidereal_day_s": {
+      "type": "float",
+      "value": 86164.0
+     }
+    },
+    "id": 2869565439872,
+    "type": "tropoi.spatial.specification.PlanetSpec"
+   },
+   "unverified": []
+  },
+  {
+   "args": {
+    "mass_kg": {
+     "type": "float",
+     "value": 5.972e+24
+    },
+    "radius_m": {
+     "type": "float",
+     "value": 6371220.0
+    },
+    "sidereal_day_s": {
+     "type": "float",
+     "value": 86164.0
+    }
+   },
+   "call_index": 1,
+   "function": "tropoi.spatial.specification.PlanetSpec.ideal_sphere",
+   "mutations": {},
+   "phase": "planet-specification",
+   "return": {
+    "fields": {
+     "construction": {
+      "type": "str",
+      "value": "ideal_sphere"
+     },
+     "mass_kg": {
+      "type": "float",
+      "value": 5.972e+24
+     },
+     "reference_radius_m": {
+      "type": "float",
+      "value": 6371220.0
+     },
+     "sidereal_day_s": {
+      "type": "float",
+      "value": 86164.0
+     }
+    },
+    "id": 2869565439872,
+    "type": "tropoi.spatial.specification.PlanetSpec"
+   },
+   "unverified": []
+  },
+  {
+   "args": {},
+   "call_index": 1,
+   "function": "tropoi.spatial.environment.PlanetaryParameters._calculate_oblateness",
+   "mutations": {},
+   "phase": "planet-specification",
+   "return": {
+    "type": "float",
+    "value": 0.00172512400813179
+   },
+   "self_before": {
+    "fields": {
+     "angular_velocity": {
+      "type": "float",
+      "value": 7.292123516990375e-05
+     },
+     "equatorial_radius": {
+      "type": "float",
+      "value": 6371220.0
+     },
+     "mass": {
+      "type": "float",
+      "value": 5.972e+24
+     },
+     "sidereal_day": {
+      "type": "float",
+      "value": 86164.0
+     }
+    },
+    "id": 2869565438336,
+    "type": "tropoi.spatial.environment.PlanetaryParameters"
+   },
+   "unverified": []
+  },
+  {
+   "args": {},
+   "call_index": 1,
+   "function": "tropoi.spatial.environment.PlanetaryParameters.__post_init__",
+   "mutations": {
+    "self.angular_velocity": {
+     "after": {
+      "type": "float",
+      "value": 7.292123516990375e-05
+     },
+     "kind": "added"
+    },
+    "self.density": {
+     "after": {
+      "type": "float",
+      "value": 5522.214139423367
+     },
+     "kind": "added"
+    },
+    "self.oblateness": {
+     "after": {
+      "type": "float",
+      "value": 0.00172512400813179
+     },
+     "kind": "added"
+    },
+    "self.polar_radius": {
+     "after": {
+      "type": "float",
+      "value": 6360228.855416911
+     },
+     "kind": "added"
+    },
+    "self.radius": {
+     "after": {
+      "type": "float",
+      "value": 6367554.176330008
+     },
+     "kind": "added"
+    },
+    "self.volume": {
+     "after": {
+      "type": "float",
+      "value": 1.0814502750564469e+21
+     },
+     "kind": "added"
+    }
+   },
+   "phase": "planet-specification",
+   "return": {
+    "type": "NoneType",
+    "value": null
+   },
+   "self_before": {
+    "fields": {
+     "equatorial_radius": {
+      "type": "float",
+      "value": 6371220.0
+     },
+     "mass": {
+      "type": "float",
+      "value": 5.972e+24
+     },
+     "sidereal_day": {
+      "type": "float",
+      "value": 86164.0
+     }
+    },
+    "id": 2869565438336,
+    "type": "tropoi.spatial.environment.PlanetaryParameters"
+   },
+   "unverified": []
+  },
+  {
+   "args": {
+    "mass_kg": {
+     "type": "float",
+     "value": 5.972e+24
+    },
+    "radius_m": {
+     "type": "float",
+     "value": 6371220.0
+    },
+    "sidereal_day_s": {
+     "type": "float",
+     "value": 86164.0
+    }
+   },
+   "call_index": 1,
+   "function": "tropoi.spatial.environment.PlanetaryParameters.ideal_sphere",
+   "mutations": {},
+   "phase": "planet-specification",
+   "return": {
+    "fields": {
+     "angular_velocity": {
+      "type": "float",
+      "value": 7.292123516990375e-05
+     },
+     "density": {
+      "type": "float",
+      "value": 5512.687635233404
+     },
+     "equatorial_radius": {
+      "type": "float",
+      "value": 6371220.0
+     },
+     "mass": {
+      "type": "float",
+      "value": 5.972e+24
+     },
+     "oblateness": {
+      "type": "float",
+      "value": 0.0
+     },
+     "polar_radius": {
+      "type": "float",
+      "value": 6371220.0
+     },
+     "radius": {
+      "type": "float",
+      "value": 6371220.0
+     },
+     "sidereal_day": {
+      "type": "float",
+      "value": 86164.0
+     },
+     "volume": {
+      "type": "float",
+      "value": 1.0833191349045392e+21
+     }
+    },
+    "id": 2869565438336,
+    "type": "tropoi.spatial.environment.PlanetaryParameters"
+   },
+   "unverified": []
+  },
+  {
+   "args": {},
+   "call_index": 1,
+   "function": "tropoi.spatial.specification.PlanetSpec.to_parameters",
+   "mutations": {},
+   "phase": "planet-specification",
+   "return": {
+    "fields": {
+     "angular_velocity": {
+      "type": "float",
+      "value": 7.292123516990375e-05
+     },
+     "density": {
+      "type": "float",
+      "value": 5512.687635233404
+     },
+     "equatorial_radius": {
+      "type": "float",
+      "value": 6371220.0
+     },
+     "mass": {
+      "type": "float",
+      "value": 5.972e+24
+     },
+     "oblateness": {
+      "type": "float",
+      "value": 0.0
+     },
+     "polar_radius": {
+      "type": "float",
+      "value": 6371220.0
+     },
+     "radius": {
+      "type": "float",
+      "value": 6371220.0
+     },
+     "sidereal_day": {
+      "type": "float",
+      "value": 86164.0
+     },
+     "volume": {
+      "type": "float",
+      "value": 1.0833191349045392e+21
+     }
+    },
+    "id": 2869565438336,
+    "type": "tropoi.spatial.environment.PlanetaryParameters"
+   },
+   "self_before": {
+    "fields": {
+     "construction": {
+      "type": "str",
+      "value": "ideal_sphere"
+     },
+     "mass_kg": {
+      "type": "float",
+      "value": 5.972e+24
+     },
+     "reference_radius_m": {
+      "type": "float",
+      "value": 6371220.0
+     },
+     "sidereal_day_s": {
+      "type": "float",
+      "value": 86164.0
+     }
+    },
+    "id": 2869565439872,
+    "type": "tropoi.spatial.specification.PlanetSpec"
+   },
+   "unverified": []
+  },
+  {
+   "args": {},
+   "call_index": 1,
+   "function": "tropoi.spatial.specification.PlanetSpec.derived",
+   "mutations": {},
+   "phase": "planet-specification",
+   "return": {
+    "fields": {
+     "angular_velocity_rad_s": {
+      "type": "float",
+      "value": 7.292123516990375e-05
+     },
+     "dynamical_radius_m": {
+      "type": "float",
+      "value": 6371220.0
+     },
+     "oblateness": {
+      "type": "float",
+      "value": 0.0
+     }
+    },
+    "id": 2869566154432,
+    "length": 3,
+    "type": "builtins.dict"
+   },
+   "self_before": {
+    "fields": {
+     "construction": {
+      "type": "str",
+      "value": "ideal_sphere"
+     },
+     "mass_kg": {
+      "type": "float",
+      "value": 5.972e+24
+     },
+     "reference_radius_m": {
+      "type": "float",
+      "value": 6371220.0
+     },
+     "sidereal_day_s": {
+      "type": "float",
+      "value": 86164.0
+     }
+    },
+    "id": 2869565439872,
+    "type": "tropoi.spatial.specification.PlanetSpec"
+   },
+   "unverified": []
+  },
+  {
+   "args": {},
+   "call_index": 1,
+   "function": "tropoi.spatial.specification.PlanetSpec.to_dict",
+   "mutations": {},
+   "phase": "planet-specification",
+   "return": {
+    "fields": {
+     "construction": {
+      "type": "str",
+      "value": "ideal_sphere"
+     },
+     "mass_kg": {
+      "type": "float",
+      "value": 5.972e+24
+     },
+     "radius_convention": {
+      "type": "str",
+      "value": "perfect sphere: the dynamical radius is reference_radius_m exactly (PlanetaryParameters.ideal_sphere)"
+     },
+     "reference_radius_m": {
+      "type": "float",
+      "value": 6371220.0
+     },
+     "sidereal_day_s": {
+      "type": "float",
+      "value": 86164.0
+     },
+     "version": {
+      "type": "int",
+      "value": 1
+     }
+    },
+    "id": 2869567867392,
+    "length": 7,
+    "omitted": 1,
+    "type": "builtins.dict"
+   },
+   "self_before": {
+    "fields": {
+     "construction": {
+      "type": "str",
+      "value": "ideal_sphere"
+     },
+     "mass_kg": {
+      "type": "float",
+      "value": 5.972e+24
+     },
+     "reference_radius_m": {
+      "type": "float",
+      "value": 6371220.0
+     },
+     "sidereal_day_s": {
+      "type": "float",
+      "value": 86164.0
+     }
+    },
+    "id": 2869565439872,
+    "type": "tropoi.spatial.specification.PlanetSpec"
+   },
+   "unverified": []
+  },
+  {
+   "args": {
+    "data": {
+     "fields": {
+      "construction": {
+       "type": "str",
+       "value": "ideal_sphere"
+      },
+      "mass_kg": {
+       "type": "float",
+       "value": 5.972e+24
+      },
+      "radius_convention": {
+       "type": "str",
+       "value": "perfect sphere: the dynamical radius is reference_radius_m exactly (PlanetaryParameters.ideal_sphere)"
+      },
+      "reference_radius_m": {
+       "type": "float",
+       "value": 6371220.0
+      },
+      "sidereal_day_s": {
+       "type": "float",
+       "value": 86164.0
+      },
+      "version": {
+       "type": "int",
+       "value": 1
+      }
+     },
+     "id": 2869567867392,
+     "length": 7,
+     "omitted": 1,
+     "type": "builtins.dict"
+    }
+   },
+   "call_index": 1,
+   "function": "tropoi.spatial.specification.PlanetSpec.from_dict",
+   "mutations": {},
+   "phase": "planet-specification",
+   "return": {
+    "fields": {
+     "construction": {
+      "type": "str",
+      "value": "ideal_sphere"
+     },
+     "mass_kg": {
+      "type": "float",
+      "value": 5.972e+24
+     },
+     "reference_radius_m": {
+      "type": "float",
+      "value": 6371220.0
+     },
+     "sidereal_day_s": {
+      "type": "float",
+      "value": 86164.0
+     }
+    },
+    "id": 2869565438336,
+    "type": "tropoi.spatial.specification.PlanetSpec"
+   },
+   "unverified": []
+  },
+  {
+   "args": {
+    "equatorial_radius_m": {
+     "type": "float",
+     "value": 6371000.0
+    },
+    "mass_kg": {
+     "type": "float",
+     "value": 5.972e+24
+    },
+    "sidereal_day_s": {
+     "type": "float",
+     "value": 86400.0
+    }
+   },
+   "call_index": 1,
+   "function": "tropoi.spatial.specification.PlanetSpec.oblate",
+   "mutations": {},
+   "phase": "planet-specification",
+   "return": {
+    "fields": {
+     "construction": {
+      "type": "str",
+      "value": "oblate_volumetric_mean"
+     },
+     "mass_kg": {
+      "type": "float",
+      "value": 5.972e+24
+     },
+     "reference_radius_m": {
+      "type": "float",
+      "value": 6371000.0
+     },
+     "sidereal_day_s": {
+      "type": "float",
+      "value": 86400.0
+     }
+    },
+    "id": 2869565438576,
+    "type": "tropoi.spatial.specification.PlanetSpec"
+   },
+   "unverified": []
+  },
+  {
+   "args": {
+    "day_hours": {
+     "type": "float",
+     "value": 24.0
+    },
+    "mass_earth_units": {
+     "type": "float",
+     "value": 1.0
+    },
+    "radius_earth_units": {
+     "type": "float",
+     "value": 1.0
+    }
+   },
+   "call_index": 1,
+   "function": "tropoi.spatial.specification.PlanetSpec.earth_like",
+   "mutations": {},
+   "phase": "planet-specification",
+   "return": {
+    "fields": {
+     "construction": {
+      "type": "str",
+      "value": "oblate_volumetric_mean"
+     },
+     "mass_kg": {
+      "type": "float",
+      "value": 5.972e+24
+     },
+     "reference_radius_m": {
+      "type": "float",
+      "value": 6371000.0
+     },
+     "sidereal_day_s": {
+      "type": "float",
+      "value": 86400.0
+     }
+    },
+    "id": 2869565438576,
+    "type": "tropoi.spatial.specification.PlanetSpec"
+   },
+   "unverified": []
+  },
+  {
+   "args": {
+    "height": {
+     "fields": {},
+     "id": 2869303454400,
+     "type": "builtins.function"
+    },
+    "lon_start_deg": {
+     "type": "float",
+     "value": -180.0
+    },
+    "name": {
+     "type": "str",
+     "value": "atlas-scenario"
+    },
+    "pointwise": {
+     "type": "bool",
+     "value": false
+    },
+    "provenance": {
+     "type": "NoneType",
+     "value": null
+    },
+    "resolution_deg": {
+     "type": "float",
+     "value": 10.0
+    }
+   },
+   "call_index": 1,
+   "function": "tropoi.spatial.terrain.raster.ElevationRaster.from_function",
+   "mutations": {},
+   "phase": "terrain-preparation-cpu",
+   "return": {
+    "fields": {
+     "_dlat": {
+      "type": "float",
+      "value": 10.0
+     },
+     "_dlon": {
+      "type": "float",
+      "value": 10.0
+     },
+     "_registration": {
+      "type": "str",
+      "value": "cell"
+     },
+     "elevation_m": {
+      "bytes": 5184,
+      "dtype": "float64",
+      "id": 2869566098288,
+      "location": "CPU",
+      "ptr": 2869264896784,
+      "shape": [
+       18,
+       36
+      ],
+      "type": "numpy.ndarray"
+     },
+     "lat_deg": {
+      "bytes": 144,
+      "dtype": "float64",
+      "fingerprint": "954c390895b012ea519bfd072f4419050652496a45535acce8ac7ec2f707346f",
+      "id": 2869566097328,
+      "location": "CPU",
+      "ptr": 2869260539616,
+      "shape": [
+       18
+      ],
+      "type": "numpy.ndarray"
+     },
+     "lon_deg": {
+      "bytes": 288,
+      "dtype": "float64",
+      "fingerprint": "0611664bddef2a0ccc2e5842d50933090108ceae32c7cccf8c1c438cb66f0a0b",
+      "id": 2869566098480,
+      "location": "CPU",
+      "ptr": 2869270808624,
+      "shape": [
+       36
+      ],
+      "type": "numpy.ndarray"
+     },
+     "provenance": {
+      "fields_omitted": 6,
+      "id": 2869565963520,
+      "length": 11,
+      "omitted": 5,
+      "type": "builtins.dict"
+     }
+    },
+    "id": 2869565438576,
+    "type": "tropoi.spatial.terrain.raster.ElevationRaster"
+   },
+   "unverified": []
+  },
+  {
+   "args": {},
+   "call_index": 1,
+   "function": "tropoi.physics.planets.PlanetaryBody.regime",
+   "mutations": {},
+   "phase": "physical-descriptor-inspection",
+   "return": {
+    "fields": {
+     "R": {
+      "type": "float",
+      "value": 287.0425796302366
+     },
+     "cp": {
+      "type": "float",
+      "value": 1002.9705385105415
+     },
+     "kappa": {
+      "type": "float",
+      "value": 0.28619243398366256
+     },
+     "model_depth_m": {
+      "type": "float",
+      "value": 57844.777663242814
+     },
+     "name": {
+      "type": "str",
+      "value": "earth"
+     },
+     "scale_height_m": {
+      "type": "float",
+      "value": 7610.251278862968
+     }
+    },
+    "id": 2869565953088,
+    "length": 14,
+    "omitted": 8,
+    "type": "builtins.dict"
+   },
+   "self_before": {
+    "fields": {
+     "bond_albedo": {
+      "type": "float",
+      "value": 0.3
+     },
+     "composition": {
+      "fields_omitted": 6,
+      "id": 2869303014464,
+      "type": "tropoi.physics.composition.Composition"
+     },
+     "gravity": {
+      "type": "float",
+      "value": 9.80665
+     },
+     "has_surface": {
+      "type": "bool",
+      "value": true
+     },
+     "illumination": {
+      "fields_omitted": 9,
+      "id": 2869547874448,
+      "type": "tropoi.physics.insolation.StellarIllumination"
+     },
+     "internal_heat_flux": {
+      "type": "float",
+      "value": 0.0
+     },
+     "name": {
+      "type": "str",
+      "value": "earth"
+     },
+     "notes": {
+      "type": "str",
+      "value": "dry air; no water vapour, ozone or clouds unless an experiment adds them"
+     },
+     "orbit": {
+      "fields_omitted": 6,
+      "id": 2869565421280,
+      "type": "tropoi.physics.orbit.KeplerOrbit"
+     },
+     "radius": {
+      "type": "float",
+      "value": 6371000.0
+     },
+     "reference_pressure": {
+      "type": "float",
+      "value": 100000.0
+     },
+     "reference_temperature": {
+      "type": "float",
+      "value": 260.0
+     },
+     "rotation": {
+      "fields_omitted": 4,
+      "id": 2869564869760,
+      "type": "tropoi.physics.rotation.Rotation"
+     },
+     "star": {
+      "fields_omitted": 10,
+      "id": 2869542192816,
+      "type": "tropoi.physics.star.Star"
+     },
+     "temperature_range": {
+      "fields_omitted": 2,
+      "id": 2869566390720,
+      "length": 2,
+      "type": "builtins.tuple"
+     },
+     "vertical_grid": {
+      "fields_omitted": 3,
+      "id": 2869564895744,
+      "type": "tropoi.physics.planets.VerticalGridSpec"
+     }
+    },
+    "id": 2869565434064,
+    "type": "tropoi.physics.planets.PlanetaryBody"
+   },
+   "unverified": []
+  },
+  {
+   "args": {},
+   "call_index": 1,
+   "function": "tropoi.run.radiative.config.RadiativeConfig.to_dict",
+   "mutations": {},
+   "phase": "default",
+   "return": {
+    "fields": {
+     "cp": {
+      "type": "float",
+      "value": 1004.64
+     },
+     "experiment_id": {
+      "type": "str",
+      "value": "earth-gray-dry-heated-T21L25-tiny"
+     },
+     "gas_constant": {
+      "type": "float",
+      "value": 287.04
+     },
+     "gravity": {
+      "type": "float",
+      "value": 9.8
+     },
+     "omega": {
+      "type": "float",
+      "value": 7.292e-05
+     },
+     "radius": {
+      "type": "float",
+      "value": 6376000.0
+     }
+    },
+    "id": 2869566144640,
+    "length": 40,
+    "omitted": 34,
+    "type": "builtins.dict"
+   },
+   "self_before": {
+    "fields": {
+     "checkpoint_every_days": {
+      "type": "int",
+      "value": 10
+     },
+     "convection": {
+      "fields_omitted": 1,
+      "id": 2869541976192,
+      "length": 1,
+      "type": "builtins.dict"
+     },
+     "cp": {
+      "type": "float",
+      "value": 1004.64
+     },
+     "damping_scheme": {
+      "type": "str",
+      "value": "centred"
+     },
+     "days": {
+      "type": "int",
+      "value": 300
+     },
+     "drag": {
+      "fields_omitted": 3,
+      "id": 2869541971904,
+      "length": 3,
+      "type": "builtins.dict"
+     },
+     "dt": {
+      "type": "float",
+      "value": 1200.0
+     },
+     "experiment_id": {
+      "type": "str",
+      "value": "earth-gray-dry-heated-T21L25-tiny"
+     },
+     "frictional_heating": {
+      "type": "bool",
+      "value": true
+     },
+     "gas_constant": {
+      "type": "float",
+      "value": 287.04
+     },
+     "gravity": {
+      "type": "float",
+      "value": 9.8
+     },
+     "hyperdiffusion_efold_days": {
+      "type": "float",
+      "value": 0.1
+     },
+     "hyperdiffusion_order": {
+      "type": "int",
+      "value": 4
+     },
+     "initial": {
+      "fields_omitted": 2,
+      "id": 2869541976384,
+      "length": 2,
+      "type": "builtins.dict"
+     },
+     "insolation": {
+      "fields_omitted": 3,
+      "id": 2869541975296,
+      "length": 3,
+      "type": "builtins.dict"
+     },
+     "internal_heat_flux": {
+      "type": "float",
+      "value": 0.0
+     },
+     "keep_checkpoints": {
+      "type": "int",
+      "value": 2
+     },
+     "l_max": {
+      "type": "int",
+      "value": 10
+     },
+     "longwave": {
+      "fields_omitted": 4,
+      "id": 2869547859264,
+      "length": 4,
+      "type": "builtins.dict"
+     },
+     "mean_last_days": {
+      "type": "int",
+      "value": 0
+     },
+     "nlat": {
+      "type": "int",
+      "value": 16
+     },
+     "nlon": {
+      "type": "int",
+      "value": 32
+     },
+     "omega": {
+      "type": "float",
+      "value": 7.292e-05
+     },
+     "perturbation_lmax": {
+      "type": "int",
+      "value": 8
+     }
+    },
+    "id": 2869542123616,
+    "omitted": 15,
+    "type": "tropoi.run.radiative.config.RadiativeConfig"
+   },
+   "unverified": []
+  },
+  {
+   "args": {},
+   "call_index": 1,
+   "function": "tropoi.run.radiative.config.RadiativeConfig.canonical_json",
+   "mutations": {},
+   "phase": "default",
+   "return": {
+    "length": 1229,
+    "truncated": true,
+    "type": "str",
+    "value": "{\"checkpoint_every_days\":10,\"convection\":{\"timescale\":0.0},\"cp\":1004.64,\"damping_scheme\":\"centred\",\"days\":300,\"drag\":{\"k_f_per_day\":1.0,\"kind\":\"held_suarez\",\"si"
+   },
+   "self_before": {
+    "fields": {
+     "checkpoint_every_days": {
+      "type": "int",
+      "value": 10
+     },
+     "convection": {
+      "fields_omitted": 1,
+      "id": 2869541976192,
+      "length": 1,
+      "type": "builtins.dict"
+     },
+     "cp": {
+      "type": "float",
+      "value": 1004.64
+     },
+     "damping_scheme": {
+      "type": "str",
+      "value": "centred"
+     },
+     "days": {
+      "type": "int",
+      "value": 300
+     },
+     "drag": {
+      "fields_omitted": 3,
+      "id": 2869541971904,
+      "length": 3,
+      "type": "builtins.dict"
+     },
+     "dt": {
+      "type": "float",
+      "value": 1200.0
+     },
+     "experiment_id": {
+      "type": "str",
+      "value": "earth-gray-dry-heated-T21L25-tiny"
+     },
+     "frictional_heating": {
+      "type": "bool",
+      "value": true
+     },
+     "gas_constant": {
+      "type": "float",
+      "value": 287.04
+     },
+     "gravity": {
+      "type": "float",
+      "value": 9.8
+     },
+     "hyperdiffusion_efold_days": {
+      "type": "float",
+      "value": 0.1
+     },
+     "hyperdiffusion_order": {
+      "type": "int",
+      "value": 4
+     },
+     "initial": {
+      "fields_omitted": 2,
+      "id": 2869541976384,
+      "length": 2,
+      "type": "builtins.dict"
+     },
+     "insolation": {
+      "fields_omitted": 3,
+      "id": 2869541975296,
+      "length": 3,
+      "type": "builtins.dict"
+     },
+     "internal_heat_flux": {
+      "type": "float",
+      "value": 0.0
+     },
+     "keep_checkpoints": {
+      "type": "int",
+      "value": 2
+     },
+     "l_max": {
+      "type": "int",
+      "value": 10
+     },
+     "longwave": {
+      "fields_omitted": 4,
+      "id": 2869547859264,
+      "length": 4,
+      "type": "builtins.dict"
+     },
+     "mean_last_days": {
+      "type": "int",
+      "value": 0
+     },
+     "nlat": {
+      "type": "int",
+      "value": 16
+     },
+     "nlon": {
+      "type": "int",
+      "value": 32
+     },
+     "omega": {
+      "type": "float",
+      "value": 7.292e-05
+     },
+     "perturbation_lmax": {
+      "type": "int",
+      "value": 8
+     }
+    },
+    "id": 2869542123616,
+    "omitted": 15,
+    "type": "tropoi.run.radiative.config.RadiativeConfig"
+   },
+   "unverified": []
+  },
+  {
+   "args": {},
+   "call_index": 1,
+   "function": "tropoi.run.radiative.config.RadiativeConfig.sha256",
+   "mutations": {},
+   "phase": "default",
+   "return": {
+    "type": "str",
+    "value": "a5bed515694d4b05a32163bfa1c2499642461b9040fba1fa603ff6db14fa78df"
+   },
+   "self_before": {
+    "fields": {
+     "checkpoint_every_days": {
+      "type": "int",
+      "value": 10
+     },
+     "convection": {
+      "fields_omitted": 1,
+      "id": 2869541976192,
+      "length": 1,
+      "type": "builtins.dict"
+     },
+     "cp": {
+      "type": "float",
+      "value": 1004.64
+     },
+     "damping_scheme": {
+      "type": "str",
+      "value": "centred"
+     },
+     "days": {
+      "type": "int",
+      "value": 300
+     },
+     "drag": {
+      "fields_omitted": 3,
+      "id": 2869541971904,
+      "length": 3,
+      "type": "builtins.dict"
+     },
+     "dt": {
+      "type": "float",
+      "value": 1200.0
+     },
+     "experiment_id": {
+      "type": "str",
+      "value": "earth-gray-dry-heated-T21L25-tiny"
+     },
+     "frictional_heating": {
+      "type": "bool",
+      "value": true
+     },
+     "gas_constant": {
+      "type": "float",
+      "value": 287.04
+     },
+     "gravity": {
+      "type": "float",
+      "value": 9.8
+     },
+     "hyperdiffusion_efold_days": {
+      "type": "float",
+      "value": 0.1
+     },
+     "hyperdiffusion_order": {
+      "type": "int",
+      "value": 4
+     },
+     "initial": {
+      "fields_omitted": 2,
+      "id": 2869541976384,
+      "length": 2,
+      "type": "builtins.dict"
+     },
+     "insolation": {
+      "fields_omitted": 3,
+      "id": 2869541975296,
+      "length": 3,
+      "type": "builtins.dict"
+     },
+     "internal_heat_flux": {
+      "type": "float",
+      "value": 0.0
+     },
+     "keep_checkpoints": {
+      "type": "int",
+      "value": 2
+     },
+     "l_max": {
+      "type": "int",
+      "value": 10
+     },
+     "longwave": {
+      "fields_omitted": 4,
+      "id": 2869547859264,
+      "length": 4,
+      "type": "builtins.dict"
+     },
+     "mean_last_days": {
+      "type": "int",
+      "value": 0
+     },
+     "nlat": {
+      "type": "int",
+      "value": 16
+     },
+     "nlon": {
+      "type": "int",
+      "value": 32
+     },
+     "omega": {
+      "type": "float",
+      "value": 7.292e-05
+     },
+     "perturbation_lmax": {
+      "type": "int",
+      "value": 8
+     }
+    },
+    "id": 2869542123616,
+    "omitted": 15,
+    "type": "tropoi.run.radiative.config.RadiativeConfig"
+   },
+   "unverified": []
+  }
+ ],
+ "description": "Configuration and setup on a CPU: radiative preset resolution and validation, CPU column-physics construction, PlanetSpec persistence, terrain sampling, and a direct look at the PLANETS descriptors.",
+ "device_events": [],
+ "edges": [
+  {
+   "count": 5,
+   "lines": [
+    [
+     216,
+     "direct"
+    ]
+   ],
+   "phases": {
+    "physical-descriptor-inspection": 5
+   },
+   "source": "tropoi.physics.composition.Composition.gas_constant",
+   "target": "tropoi.physics.composition.Composition.molar_mass",
+   "wall_ns_inclusive": 1593400
+  },
+  {
+   "count": 50,
+   "lines": [
+    [
+     203,
+     "direct"
+    ]
+   ],
+   "phases": {
+    "physical-descriptor-inspection": 50
+   },
+   "source": "tropoi.physics.composition.Composition.molar_mass",
+   "target": "tropoi.physics.composition.Composition.molar_mass.<locals>.<genexpr>",
+   "wall_ns_inclusive": 83900
+  },
+  {
+   "count": 1,
+   "lines": [
+    [
+     296,
+     "direct"
+    ]
+   ],
+   "phases": {
+    "component-construction-cpu": 1
+   },
+   "source": "tropoi.physics.insolation.frierson_net_surface_flux",
+   "target": "tropoi.physics.insolation.PrescribedInsolation.__init__",
+   "wall_ns_inclusive": 2300
+  },
+  {
+   "count": 4,
+   "lines": [
+    [
+     105,
+     "direct"
+    ]
+   ],
+   "phases": {
+    "physical-descriptor-inspection": 4
+   },
+   "source": "tropoi.physics.planets.PlanetaryBody.cp",
+   "target": "tropoi.physics.thermodynamics.heat_capacity",
+   "wall_ns_inclusive": 787300
+  },
+  {
+   "count": 5,
+   "lines": [
+    [
+     99,
+     "direct"
+    ]
+   ],
+   "phases": {
+    "physical-descriptor-inspection": 5
+   },
+   "source": "tropoi.physics.planets.PlanetaryBody.gas_constant",
+   "target": "tropoi.physics.composition.Composition.gas_constant",
+   "wall_ns_inclusive": 1621800
+  },
+  {
+   "count": 1,
+   "lines": [
+    [
+     109,
+     "direct"
+    ]
+   ],
+   "phases": {
+    "physical-descriptor-inspection": 1
+   },
+   "source": "tropoi.physics.planets.PlanetaryBody.kappa",
+   "target": "tropoi.physics.planets.PlanetaryBody.cp",
+   "wall_ns_inclusive": 167500
+  },
+  {
+   "count": 1,
+   "lines": [
+    [
+     109,
+     "direct"
+    ]
+   ],
+   "phases": {
+    "physical-descriptor-inspection": 1
+   },
+   "source": "tropoi.physics.planets.PlanetaryBody.kappa",
+   "target": "tropoi.physics.planets.PlanetaryBody.gas_constant",
+   "wall_ns_inclusive": 32900
+  },
+  {
+   "count": 3,
+   "lines": [
+    [
+     127,
+     "direct"
+    ],
+    [
+     134,
+     "direct"
+    ]
+   ],
+   "phases": {
+    "physical-descriptor-inspection": 3
+   },
+   "source": "tropoi.physics.planets.PlanetaryBody.regime",
+   "target": "tropoi.physics.planets.PlanetaryBody.cp",
+   "wall_ns_inclusive": 654200
+  },
+  {
+   "count": 3,
+   "lines": [
+    [
+     127,
+     "direct"
+    ],
+    [
+     134,
+     "direct"
+    ],
+    [
+     135,
+     "direct"
+    ]
+   ],
+   "phases": {
+    "physical-descriptor-inspection": 3
+   },
+   "source": "tropoi.physics.planets.PlanetaryBody.regime",
+   "target": "tropoi.physics.planets.PlanetaryBody.gas_constant",
+   "wall_ns_inclusive": 1574700
+  },
+  {
+   "count": 1,
+   "lines": [
+    [
+     127,
+     "direct"
+    ]
+   ],
+   "phases": {
+    "physical-descriptor-inspection": 1
+   },
+   "source": "tropoi.physics.planets.PlanetaryBody.regime",
+   "target": "tropoi.physics.planets.PlanetaryBody.kappa",
+   "wall_ns_inclusive": 215700
+  },
+  {
+   "count": 1,
+   "lines": [
+    [
+     136,
+     "direct"
+    ]
+   ],
+   "phases": {
+    "physical-descriptor-inspection": 1
+   },
+   "source": "tropoi.physics.planets.PlanetaryBody.regime",
+   "target": "tropoi.physics.planets.PlanetaryBody.rotation_rate",
+   "wall_ns_inclusive": 5600
+  },
+  {
+   "count": 1,
+   "lines": [
+    [
+     123,
+     "direct"
+    ]
+   ],
+   "phases": {
+    "physical-descriptor-inspection": 1
+   },
+   "source": "tropoi.physics.planets.PlanetaryBody.regime",
+   "target": "tropoi.physics.planets.PlanetaryBody.scale_height",
+   "wall_ns_inclusive": 57700
+  },
+  {
+   "count": 1,
+   "lines": [
+    [
+     122,
+     "direct"
+    ]
+   ],
+   "phases": {
+    "physical-descriptor-inspection": 1
+   },
+   "source": "tropoi.physics.planets.PlanetaryBody.regime",
+   "target": "tropoi.physics.thermodynamics.heat_capacity_range",
+   "wall_ns_inclusive": 547200
+  },
+  {
+   "count": 1,
+   "lines": [
+    [
+     113,
+     "direct"
+    ]
+   ],
+   "phases": {
+    "physical-descriptor-inspection": 1
+   },
+   "source": "tropoi.physics.planets.PlanetaryBody.scale_height",
+   "target": "tropoi.physics.planets.PlanetaryBody.gas_constant",
+   "wall_ns_inclusive": 45500
+  },
+  {
+   "count": 10,
+   "lines": [
+    [
+     57,
+     "direct"
+    ],
+    [
+     58,
+     "direct"
+    ]
+   ],
+   "phases": {
+    "component-construction-cpu": 10
+   },
+   "source": "tropoi.physics.radiation.gray.OpticalDepthProfile.__init__",
+   "target": "tropoi.physics.radiation.gray.OpticalDepthProfile.__init__.<locals>.<genexpr>",
+   "wall_ns_inclusive": 15200
+  },
+  {
+   "count": 1,
+   "lines": [
+    [
+     181,
+     "direct"
+    ]
+   ],
+   "phases": {
+    "component-construction-cpu": 1
+   },
+   "source": "tropoi.physics.radiation.gray.frierson_longwave",
+   "target": "tropoi.physics.radiation.gray.GrayLongwave.__init__",
+   "wall_ns_inclusive": 1700
+  },
+  {
+   "count": 1,
+   "lines": [
+    [
+     181,
+     "direct"
+    ]
+   ],
+   "phases": {
+    "component-construction-cpu": 1
+   },
+   "source": "tropoi.physics.radiation.gray.frierson_longwave",
+   "target": "tropoi.physics.radiation.gray.OpticalDepthProfile.__init__",
+   "wall_ns_inclusive": 50600
+  },
+  {
+   "count": 20,
+   "lines": [
+    [
+     68,
+     "direct"
+    ]
+   ],
+   "phases": {
+    "physical-descriptor-inspection": 20
+   },
+   "source": "tropoi.physics.thermodynamics.ThermoRecord.cp_molar",
+   "target": "tropoi.physics.thermodynamics._xp",
+   "wall_ns_inclusive": 68100
+  },
+  {
+   "count": 5,
+   "lines": [
+    [
+     157,
+     "direct"
+    ]
+   ],
+   "phases": {
+    "physical-descriptor-inspection": 5
+   },
+   "source": "tropoi.physics.thermodynamics.heat_capacity",
+   "target": "tropoi.physics.composition.Composition.molar_mass",
+   "wall_ns_inclusive": 165400
+  },
+  {
+   "count": 5,
+   "lines": [
+    [
+     152,
+     "direct"
+    ]
+   ],
+   "phases": {
+    "physical-descriptor-inspection": 5
+   },
+   "source": "tropoi.physics.thermodynamics.heat_capacity",
+   "target": "tropoi.physics.composition.Composition.require_coverage",
+   "wall_ns_inclusive": 19900
+  },
+  {
+   "count": 20,
+   "lines": [
+    [
+     155,
+     "direct"
+    ]
+   ],
+   "phases": {
+    "physical-descriptor-inspection": 20
+   },
+   "source": "tropoi.physics.thermodynamics.heat_capacity",
+   "target": "tropoi.physics.thermodynamics.ThermoRecord.cp_molar",
+   "wall_ns_inclusive": 713700
+  },
+  {
+   "count": 1,
+   "lines": [
+    [
+     171,
+     "direct"
+    ]
+   ],
+   "phases": {
+    "physical-descriptor-inspection": 1
+   },
+   "source": "tropoi.physics.thermodynamics.heat_capacity_range",
+   "target": "tropoi.physics.thermodynamics.heat_capacity",
+   "wall_ns_inclusive": 354800
+  },
+  {
+   "count": 20,
+   "lines": [
+    [
+     80,
+     "direct"
+    ]
+   ],
+   "phases": {
+    "preset-resolution": 16,
+    "validation": 4
+   },
+   "source": "tropoi.run.radiative.config.RadiativeConfig.__post_init__",
+   "target": "tropoi.run.radiative.config.RadiativeConfig.__post_init__.<locals>.<genexpr>",
+   "wall_ns_inclusive": 34600
+  },
+  {
+   "count": 3,
+   "lines": [
+    [
+     151,
+     "direct"
+    ]
+   ],
+   "phases": {
+    "default": 1,
+    "preset-resolution": 2
+   },
+   "source": "tropoi.run.radiative.config.RadiativeConfig.canonical_json",
+   "target": "tropoi.run.radiative.config.RadiativeConfig.to_dict",
+   "wall_ns_inclusive": 1022600
+  },
+  {
+   "count": 1,
+   "lines": [
+    [
+     148,
+     "direct"
+    ]
+   ],
+   "phases": {
+    "preset-resolution": 1
+   },
+   "source": "tropoi.run.radiative.config.RadiativeConfig.from_dict",
+   "target": "tropoi.run.radiative.config.__create_fn__.<locals>.__init__",
+   "wall_ns_inclusive": 65900
+  },
+  {
+   "count": 3,
+   "lines": [
+    [
+     154,
+     "direct"
+    ]
+   ],
+   "phases": {
+    "default": 1,
+    "preset-resolution": 2
+   },
+   "source": "tropoi.run.radiative.config.RadiativeConfig.sha256",
+   "target": "tropoi.run.radiative.config.RadiativeConfig.canonical_json",
+   "wall_ns_inclusive": 1764400
+  },
+  {
+   "count": 3,
+   "lines": [
+    [
+     157,
+     "indirect"
+    ]
+   ],
+   "phases": {
+    "preset-resolution": 2,
+    "validation": 1
+   },
+   "source": "tropoi.run.radiative.config.RadiativeConfig.with_",
+   "target": "tropoi.run.radiative.config.__create_fn__.<locals>.__init__",
+   "wall_ns_inclusive": 583900
+  },
+  {
+   "count": 5,
+   "lines": [
+    [
+     42,
+     "direct"
+    ]
+   ],
+   "phases": {
+    "preset-resolution": 4,
+    "validation": 1
+   },
+   "source": "tropoi.run.radiative.config.__create_fn__.<locals>.__init__",
+   "target": "tropoi.run.radiative.config.RadiativeConfig.__post_init__",
+   "wall_ns_inclusive": 489200
+  },
+  {
+   "count": 1,
+   "lines": [
+    [
+     206,
+     "direct"
+    ]
+   ],
+   "phases": {
+    "preset-resolution": 1
+   },
+   "source": "tropoi.run.radiative.config.earth_gray_dry",
+   "target": "tropoi.run.radiative.config.__create_fn__.<locals>.__init__",
+   "wall_ns_inclusive": 389900
+  },
+  {
+   "count": 1,
+   "lines": [
+    [
+     220,
+     "direct"
+    ]
+   ],
+   "phases": {
+    "preset-resolution": 1
+   },
+   "source": "tropoi.run.radiative.config.earth_gray_dry",
+   "target": "tropoi.run.radiative.config._t21",
+   "wall_ns_inclusive": 3700
+  },
+  {
+   "count": 1,
+   "lines": [
+    [
+     59,
+     "direct"
+    ]
+   ],
+   "phases": {
+    "component-construction-cpu": 1
+   },
+   "source": "tropoi.run.radiative.model._longwave",
+   "target": "tropoi.physics.radiation.gray.frierson_longwave",
+   "wall_ns_inclusive": 82700
+  },
+  {
+   "count": 1,
+   "lines": [
+    [
+     59,
+     "direct"
+    ]
+   ],
+   "phases": {
+    "component-construction-cpu": 1
+   },
+   "source": "tropoi.run.radiative.model._longwave",
+   "target": "tropoi.run.radiative.model._options",
+   "wall_ns_inclusive": 9700
+  },
+  {
+   "count": 1,
+   "lines": [
+    [
+     75,
+     "direct"
+    ]
+   ],
+   "phases": {
+    "component-construction-cpu": 1
+   },
+   "source": "tropoi.run.radiative.model._shortwave",
+   "target": "tropoi.physics.radiation.gray.GrayShortwave.__init__",
+   "wall_ns_inclusive": 2100
+  },
+  {
+   "count": 1,
+   "lines": [
+    [
+     75,
+     "direct"
+    ]
+   ],
+   "phases": {
+    "component-construction-cpu": 1
+   },
+   "source": "tropoi.run.radiative.model._shortwave",
+   "target": "tropoi.physics.radiation.gray.OpticalDepthProfile.__init__",
+   "wall_ns_inclusive": 26100
+  },
+  {
+   "count": 1,
+   "lines": [
+    [
+     74,
+     "direct"
+    ]
+   ],
+   "phases": {
+    "component-construction-cpu": 1
+   },
+   "source": "tropoi.run.radiative.model._shortwave",
+   "target": "tropoi.run.radiative.model._options",
+   "wall_ns_inclusive": 7500
+  },
+  {
+   "count": 1,
+   "lines": [
+    [
+     100,
+     "direct"
+    ]
+   ],
+   "phases": {
+    "component-construction-cpu": 1
+   },
+   "source": "tropoi.run.radiative.model.build_insolation",
+   "target": "tropoi.physics.insolation.frierson_net_surface_flux",
+   "wall_ns_inclusive": 19000
+  },
+  {
+   "count": 1,
+   "lines": [
+    [
+     100,
+     "direct"
+    ]
+   ],
+   "phases": {
+    "component-construction-cpu": 1
+   },
+   "source": "tropoi.run.radiative.model.build_insolation",
+   "target": "tropoi.run.radiative.model._options",
+   "wall_ns_inclusive": 8400
+  },
+  {
+   "count": 1,
+   "lines": [
+    [
+     150,
+     "direct"
+    ]
+   ],
+   "phases": {
+    "component-construction-cpu": 1
+   },
+   "source": "tropoi.run.radiative.model.build_physics",
+   "target": "tropoi.physics.column_model.ColumnPhysics.__init__",
+   "wall_ns_inclusive": 3900
+  },
+  {
+   "count": 1,
+   "lines": [
+    [
+     141,
+     "direct"
+    ]
+   ],
+   "phases": {
+    "component-construction-cpu": 1
+   },
+   "source": "tropoi.run.radiative.model.build_physics",
+   "target": "tropoi.physics.convection.DryConvectiveAdjustment.__init__",
+   "wall_ns_inclusive": 3200
+  },
+  {
+   "count": 1,
+   "lines": [
+    [
+     147,
+     "direct"
+    ]
+   ],
+   "phases": {
+    "component-construction-cpu": 1
+   },
+   "source": "tropoi.run.radiative.model.build_physics",
+   "target": "tropoi.physics.surface.SlabSurface.__init__",
+   "wall_ns_inclusive": 4000
+  },
+  {
+   "count": 1,
+   "lines": [
+    [
+     141,
+     "direct"
+    ]
+   ],
+   "phases": {
+    "component-construction-cpu": 1
+   },
+   "source": "tropoi.run.radiative.model.build_physics",
+   "target": "tropoi.run.radiative.config.RadiativeConfig.kappa",
+   "wall_ns_inclusive": 3000
+  },
+  {
+   "count": 2,
+   "lines": [
+    [
+     139,
+     "direct"
+    ],
+    [
+     145,
+     "direct"
+    ]
+   ],
+   "phases": {
+    "component-construction-cpu": 2
+   },
+   "source": "tropoi.run.radiative.model.build_physics",
+   "target": "tropoi.run.radiative.model._options",
+   "wall_ns_inclusive": 19600
+  },
+  {
+   "count": 1,
+   "lines": [
+    [
+     149,
+     "direct"
+    ]
+   ],
+   "phases": {
+    "component-construction-cpu": 1
+   },
+   "source": "tropoi.run.radiative.model.build_physics",
+   "target": "tropoi.run.radiative.model.build_insolation",
+   "wall_ns_inclusive": 54000
+  },
+  {
+   "count": 1,
+   "lines": [
+    [
+     150,
+     "direct"
+    ]
+   ],
+   "phases": {
+    "component-construction-cpu": 1
+   },
+   "source": "tropoi.run.radiative.model.build_physics",
+   "target": "tropoi.run.radiative.model.build_radiation",
+   "wall_ns_inclusive": 230400
+  },
+  {
+   "count": 1,
+   "lines": [
+    [
+     91,
+     "direct"
+    ]
+   ],
+   "phases": {
+    "component-construction-cpu": 1
+   },
+   "source": "tropoi.run.radiative.model.build_radiation",
+   "target": "tropoi.physics.radiation.scheme.Radiation.__init__",
+   "wall_ns_inclusive": 2700
+  },
+  {
+   "count": 1,
+   "lines": [
+    [
+     91,
+     "direct"
+    ]
+   ],
+   "phases": {
+    "component-construction-cpu": 1
+   },
+   "source": "tropoi.run.radiative.model.build_radiation",
+   "target": "tropoi.run.radiative.model._longwave",
+   "wall_ns_inclusive": 118200
+  },
+  {
+   "count": 1,
+   "lines": [
+    [
+     91,
+     "direct"
+    ]
+   ],
+   "phases": {
+    "component-construction-cpu": 1
+   },
+   "source": "tropoi.run.radiative.model.build_radiation",
+   "target": "tropoi.run.radiative.model._shortwave",
+   "wall_ns_inclusive": 65400
+  },
+  {
+   "count": 1,
+   "lines": [
+    [
+     49,
+     "direct"
+    ]
+   ],
+   "phases": {
+    "component-construction-cpu": 1
+   },
+   "source": "tropoi.run.radiative.model.build_sigma",
+   "target": "tropoi.run.radiative.model._options",
+   "wall_ns_inclusive": 11600
+  },
+  {
+   "count": 1,
+   "lines": [
+    [
+     49,
+     "direct"
+    ]
+   ],
+   "phases": {
+    "component-construction-cpu": 1
+   },
+   "source": "tropoi.run.radiative.model.build_sigma",
+   "target": "tropoi.spatial.sigma_coordinate.SigmaGrid.frierson",
+   "wall_ns_inclusive": 260900
+  },
+  {
+   "count": 4,
+   "lines": [
+    [
+     15,
+     "direct"
+    ]
+   ],
+   "phases": {
+    "planet-specification": 4
+   },
+   "source": "tropoi.spatial.environment.PlanetaryParameters.__post_init__",
+   "target": "tropoi.spatial.environment.PlanetaryParameters._calculate_oblateness",
+   "wall_ns_inclusive": 165300
+  },
+  {
+   "count": 3,
+   "lines": [
+    [
+     80,
+     "direct"
+    ]
+   ],
+   "phases": {
+    "planet-specification": 3
+   },
+   "source": "tropoi.spatial.environment.PlanetaryParameters.ideal_sphere",
+   "target": "tropoi.spatial.environment.__create_fn__.<locals>.__init__",
+   "wall_ns_inclusive": 282600
+  },
+  {
+   "count": 4,
+   "lines": [
+    [
+     6,
+     "direct"
+    ]
+   ],
+   "phases": {
+    "planet-specification": 4
+   },
+   "source": "tropoi.spatial.environment.__create_fn__.<locals>.__init__",
+   "target": "tropoi.spatial.environment.PlanetaryParameters.__post_init__",
+   "wall_ns_inclusive": 279400
+  },
+  {
+   "count": 27,
+   "lines": [
+    [
+     57,
+     "direct"
+    ]
+   ],
+   "phases": {
+    "component-construction-cpu": 27
+   },
+   "source": "tropoi.spatial.sigma_coordinate.SigmaGrid.__post_init__",
+   "target": "tropoi.spatial.sigma_coordinate.SigmaGrid.__post_init__.<locals>.<genexpr>",
+   "wall_ns_inclusive": 38200
+  },
+  {
+   "count": 1,
+   "lines": [
+    [
+     144,
+     "direct"
+    ]
+   ],
+   "phases": {
+    "component-construction-cpu": 1
+   },
+   "source": "tropoi.spatial.sigma_coordinate.SigmaGrid.frierson",
+   "target": "tropoi.spatial.sigma_coordinate.__create_fn__.<locals>.__init__",
+   "wall_ns_inclusive": 195500
+  },
+  {
+   "count": 1,
+   "lines": [
+    [
+     4,
+     "direct"
+    ]
+   ],
+   "phases": {
+    "component-construction-cpu": 1
+   },
+   "source": "tropoi.spatial.sigma_coordinate.__create_fn__.<locals>.__init__",
+   "target": "tropoi.spatial.sigma_coordinate.SigmaGrid.__post_init__",
+   "wall_ns_inclusive": 176500
+  },
+  {
+   "count": 9,
+   "lines": [
+    [
+     206,
+     "direct"
+    ],
+    [
+     210,
+     "direct"
+    ],
+    [
+     212,
+     "direct"
+    ]
+   ],
+   "phases": {
+    "planet-specification": 9
+   },
+   "source": "tropoi.spatial.specification.PlanetSpec.__post_init__",
+   "target": "tropoi.spatial.specification._positive",
+   "wall_ns_inclusive": 90000
+  },
+  {
+   "count": 2,
+   "lines": [
+    [
+     276,
+     "direct"
+    ]
+   ],
+   "phases": {
+    "planet-specification": 2
+   },
+   "source": "tropoi.spatial.specification.PlanetSpec.derived",
+   "target": "tropoi.spatial.specification.PlanetSpec.to_parameters",
+   "wall_ns_inclusive": 327200
+  },
+  {
+   "count": 1,
+   "lines": [
+    [
+     240,
+     "direct"
+    ]
+   ],
+   "phases": {
+    "planet-specification": 1
+   },
+   "source": "tropoi.spatial.specification.PlanetSpec.earth_like",
+   "target": "tropoi.spatial.specification.PlanetSpec.oblate",
+   "wall_ns_inclusive": 68400
+  },
+  {
+   "count": 1,
+   "lines": [
+    [
+     322,
+     "direct"
+    ]
+   ],
+   "phases": {
+    "planet-specification": 1
+   },
+   "source": "tropoi.spatial.specification.PlanetSpec.from_dict",
+   "target": "tropoi.spatial.specification.PlanetSpec.derived",
+   "wall_ns_inclusive": 73600
+  },
+  {
+   "count": 1,
+   "lines": [
+    [
+     311,
+     "direct"
+    ]
+   ],
+   "phases": {
+    "planet-specification": 1
+   },
+   "source": "tropoi.spatial.specification.PlanetSpec.from_dict",
+   "target": "tropoi.spatial.specification.__create_fn__.<locals>.__init__",
+   "wall_ns_inclusive": 51600
+  },
+  {
+   "count": 1,
+   "lines": [
+    [
+     306,
+     "direct"
+    ]
+   ],
+   "phases": {
+    "planet-specification": 1
+   },
+   "source": "tropoi.spatial.specification.PlanetSpec.from_dict",
+   "target": "tropoi.spatial.specification._check_document",
+   "wall_ns_inclusive": 14300
+  },
+  {
+   "count": 1,
+   "lines": [
+    [
+     318,
+     "direct"
+    ]
+   ],
+   "phases": {
+    "planet-specification": 1
+   },
+   "source": "tropoi.spatial.specification.PlanetSpec.from_dict",
+   "target": "tropoi.spatial.specification._check_statement",
+   "wall_ns_inclusive": 1600
+  },
+  {
+   "count": 1,
+   "lines": [
+    [
+     220,
+     "direct"
+    ]
+   ],
+   "phases": {
+    "planet-specification": 1
+   },
+   "source": "tropoi.spatial.specification.PlanetSpec.ideal_sphere",
+   "target": "tropoi.spatial.specification.__create_fn__.<locals>.__init__",
+   "wall_ns_inclusive": 136700
+  },
+  {
+   "count": 1,
+   "lines": [
+    [
+     220,
+     "direct"
+    ]
+   ],
+   "phases": {
+    "planet-specification": 1
+   },
+   "source": "tropoi.spatial.specification.PlanetSpec.ideal_sphere",
+   "target": "tropoi.spatial.specification._day_or_none",
+   "wall_ns_inclusive": 5600
+  },
+  {
+   "count": 1,
+   "lines": [
+    [
+     227,
+     "direct"
+    ]
+   ],
+   "phases": {
+    "planet-specification": 1
+   },
+   "source": "tropoi.spatial.specification.PlanetSpec.oblate",
+   "target": "tropoi.spatial.specification.__create_fn__.<locals>.__init__",
+   "wall_ns_inclusive": 46600
+  },
+  {
+   "count": 1,
+   "lines": [
+    [
+     228,
+     "direct"
+    ]
+   ],
+   "phases": {
+    "planet-specification": 1
+   },
+   "source": "tropoi.spatial.specification.PlanetSpec.oblate",
+   "target": "tropoi.spatial.specification._day_or_none",
+   "wall_ns_inclusive": 4500
+  },
+  {
+   "count": 1,
+   "lines": [
+    [
+     301,
+     "direct"
+    ]
+   ],
+   "phases": {
+    "planet-specification": 1
+   },
+   "source": "tropoi.spatial.specification.PlanetSpec.to_dict",
+   "target": "tropoi.spatial.specification.PlanetSpec.derived",
+   "wall_ns_inclusive": 338900
+  },
+  {
+   "count": 3,
+   "lines": [
+    [
+     252,
+     "direct"
+    ]
+   ],
+   "phases": {
+    "planet-specification": 3
+   },
+   "source": "tropoi.spatial.specification.PlanetSpec.to_parameters",
+   "target": "tropoi.spatial.environment.PlanetaryParameters.ideal_sphere",
+   "wall_ns_inclusive": 318000
+  },
+  {
+   "count": 1,
+   "lines": [
+    [
+     255,
+     "direct"
+    ]
+   ],
+   "phases": {
+    "planet-specification": 1
+   },
+   "source": "tropoi.spatial.specification.PlanetSpec.to_parameters",
+   "target": "tropoi.spatial.environment.__create_fn__.<locals>.__init__",
+   "wall_ns_inclusive": 94000
+  },
+  {
+   "count": 3,
+   "lines": [
+    [
+     7,
+     "direct"
+    ]
+   ],
+   "phases": {
+    "planet-specification": 3
+   },
+   "source": "tropoi.spatial.specification.__create_fn__.<locals>.__init__",
+   "target": "tropoi.spatial.specification.PlanetSpec.__post_init__",
+   "wall_ns_inclusive": 149500
+  },
+  {
+   "count": 9,
+   "lines": [
+    [
+     142,
+     "direct"
+    ]
+   ],
+   "phases": {
+    "planet-specification": 9
+   },
+   "source": "tropoi.spatial.specification._positive",
+   "target": "tropoi.spatial.specification._number",
+   "wall_ns_inclusive": 30400
+  },
+  {
+   "count": 1,
+   "lines": [
+    [
+     265,
+     "direct"
+    ]
+   ],
+   "phases": {
+    "terrain-preparation-cpu": 1
+   },
+   "source": "tropoi.spatial.terrain.height_function.sample_height_function",
+   "target": "tropoi.spatial.terrain.height_function._check_result",
+   "wall_ns_inclusive": 92200
+  },
+  {
+   "count": 1,
+   "lines": [
+    [
+     227,
+     "direct"
+    ]
+   ],
+   "phases": {
+    "terrain-preparation-cpu": 1
+   },
+   "source": "tropoi.spatial.terrain.height_function.sample_height_function",
+   "target": "tropoi.spatial.terrain.height_function.sampling_grid",
+   "wall_ns_inclusive": 32500
+  },
+  {
+   "count": 2,
+   "lines": [
+    [
+     176,
+     "direct"
+    ],
+    [
+     177,
+     "direct"
+    ]
+   ],
+   "phases": {
+    "terrain-preparation-cpu": 2
+   },
+   "source": "tropoi.spatial.terrain.raster.ElevationRaster.__post_init__",
+   "target": "tropoi.spatial.terrain.raster._uniform_step",
+   "wall_ns_inclusive": 335800
+  },
+  {
+   "count": 1,
+   "lines": [
+    [
+     230,
+     "direct"
+    ]
+   ],
+   "phases": {
+    "terrain-preparation-cpu": 1
+   },
+   "source": "tropoi.spatial.terrain.raster.ElevationRaster.from_array",
+   "target": "tropoi.spatial.terrain.raster.__create_fn__.<locals>.__init__",
+   "wall_ns_inclusive": 435000
+  },
+  {
+   "count": 1,
+   "lines": [
+    [
+     221,
+     "direct"
+    ]
+   ],
+   "phases": {
+    "terrain-preparation-cpu": 1
+   },
+   "source": "tropoi.spatial.terrain.raster.ElevationRaster.from_array",
+   "target": "tropoi.spatial.terrain.raster._normalize_axes",
+   "wall_ns_inclusive": 238400
+  },
+  {
+   "count": 1,
+   "lines": [
+    [
+     262,
+     "direct"
+    ]
+   ],
+   "phases": {
+    "terrain-preparation-cpu": 1
+   },
+   "source": "tropoi.spatial.terrain.raster.ElevationRaster.from_function",
+   "target": "tropoi.spatial.terrain.height_function.sample_height_function",
+   "wall_ns_inclusive": 344900
+  },
+  {
+   "count": 1,
+   "lines": [
+    [
+     268,
+     "direct"
+    ]
+   ],
+   "phases": {
+    "terrain-preparation-cpu": 1
+   },
+   "source": "tropoi.spatial.terrain.raster.ElevationRaster.from_function",
+   "target": "tropoi.spatial.terrain.raster.ElevationRaster.from_array",
+   "wall_ns_inclusive": 850400
+  },
+  {
+   "count": 1,
+   "lines": [
+    [
+     7,
+     "direct"
+    ]
+   ],
+   "phases": {
+    "terrain-preparation-cpu": 1
+   },
+   "source": "tropoi.spatial.terrain.raster.__create_fn__.<locals>.__init__",
+   "target": "tropoi.spatial.terrain.raster.ElevationRaster.__post_init__",
+   "wall_ns_inclusive": 412100
+  },
+  {
+   "count": 1,
+   "lines": [
+    [
+     467,
+     "direct"
+    ]
+   ],
+   "phases": {
+    "terrain-preparation-cpu": 1
+   },
+   "source": "tropoi.spatial.terrain.raster._normalize_axes",
+   "target": "tropoi.spatial.terrain.raster._uniform_step",
+   "wall_ns_inclusive": 121300
+  }
+ ],
+ "error": null,
+ "functions": {
+  "tropoi.physics.column_model.ColumnPhysics.__init__": {
+   "component-construction-cpu": 1
+  },
+  "tropoi.physics.composition.Composition.gas_constant": {
+   "physical-descriptor-inspection": 5
+  },
+  "tropoi.physics.composition.Composition.molar_mass": {
+   "physical-descriptor-inspection": 10
+  },
+  "tropoi.physics.composition.Composition.molar_mass.<locals>.<genexpr>": {
+   "physical-descriptor-inspection": 50
+  },
+  "tropoi.physics.composition.Composition.require_coverage": {
+   "physical-descriptor-inspection": 5
+  },
+  "tropoi.physics.convection.DryConvectiveAdjustment.__init__": {
+   "component-construction-cpu": 1
+  },
+  "tropoi.physics.insolation.PrescribedInsolation.__init__": {
+   "component-construction-cpu": 1
+  },
+  "tropoi.physics.insolation.frierson_net_surface_flux": {
+   "component-construction-cpu": 1
+  },
+  "tropoi.physics.planets.PlanetaryBody.cp": {
+   "physical-descriptor-inspection": 4
+  },
+  "tropoi.physics.planets.PlanetaryBody.gas_constant": {
+   "physical-descriptor-inspection": 5
+  },
+  "tropoi.physics.planets.PlanetaryBody.kappa": {
+   "physical-descriptor-inspection": 1
+  },
+  "tropoi.physics.planets.PlanetaryBody.regime": {
+   "physical-descriptor-inspection": 1
+  },
+  "tropoi.physics.planets.PlanetaryBody.rotation_rate": {
+   "physical-descriptor-inspection": 1
+  },
+  "tropoi.physics.planets.PlanetaryBody.scale_height": {
+   "physical-descriptor-inspection": 1
+  },
+  "tropoi.physics.radiation.gray.GrayLongwave.__init__": {
+   "component-construction-cpu": 1
+  },
+  "tropoi.physics.radiation.gray.GrayShortwave.__init__": {
+   "component-construction-cpu": 1
+  },
+  "tropoi.physics.radiation.gray.OpticalDepthProfile.__init__": {
+   "component-construction-cpu": 2
+  },
+  "tropoi.physics.radiation.gray.OpticalDepthProfile.__init__.<locals>.<genexpr>": {
+   "component-construction-cpu": 10
+  },
+  "tropoi.physics.radiation.gray.frierson_longwave": {
+   "component-construction-cpu": 1
+  },
+  "tropoi.physics.radiation.scheme.Radiation.__init__": {
+   "component-construction-cpu": 1
+  },
+  "tropoi.physics.surface.SlabSurface.__init__": {
+   "component-construction-cpu": 1
+  },
+  "tropoi.physics.thermodynamics.ThermoRecord.cp_molar": {
+   "physical-descriptor-inspection": 20
+  },
+  "tropoi.physics.thermodynamics._xp": {
+   "physical-descriptor-inspection": 20
+  },
+  "tropoi.physics.thermodynamics.heat_capacity": {
+   "physical-descriptor-inspection": 5
+  },
+  "tropoi.physics.thermodynamics.heat_capacity_range": {
+   "physical-descriptor-inspection": 1
+  },
+  "tropoi.run.radiative.config.RadiativeConfig.__post_init__": {
+   "preset-resolution": 4,
+   "validation": 1
+  },
+  "tropoi.run.radiative.config.RadiativeConfig.__post_init__.<locals>.<genexpr>": {
+   "preset-resolution": 16,
+   "validation": 4
+  },
+  "tropoi.run.radiative.config.RadiativeConfig.canonical_json": {
+   "default": 1,
+   "preset-resolution": 2
+  },
+  "tropoi.run.radiative.config.RadiativeConfig.from_dict": {
+   "preset-resolution": 1
+  },
+  "tropoi.run.radiative.config.RadiativeConfig.kappa": {
+   "component-construction-cpu": 1
+  },
+  "tropoi.run.radiative.config.RadiativeConfig.sha256": {
+   "default": 1,
+   "preset-resolution": 2
+  },
+  "tropoi.run.radiative.config.RadiativeConfig.to_dict": {
+   "default": 2,
+   "preset-resolution": 3
+  },
+  "tropoi.run.radiative.config.RadiativeConfig.with_": {
+   "preset-resolution": 2,
+   "validation": 1
+  },
+  "tropoi.run.radiative.config.__create_fn__.<locals>.__init__": {
+   "preset-resolution": 4,
+   "validation": 1
+  },
+  "tropoi.run.radiative.config._t21": {
+   "preset-resolution": 1
+  },
+  "tropoi.run.radiative.config.earth_gray_dry": {
+   "preset-resolution": 1
+  },
+  "tropoi.run.radiative.model._longwave": {
+   "component-construction-cpu": 1
+  },
+  "tropoi.run.radiative.model._options": {
+   "component-construction-cpu": 6
+  },
+  "tropoi.run.radiative.model._shortwave": {
+   "component-construction-cpu": 1
+  },
+  "tropoi.run.radiative.model.build_insolation": {
+   "component-construction-cpu": 1
+  },
+  "tropoi.run.radiative.model.build_physics": {
+   "component-construction-cpu": 1
+  },
+  "tropoi.run.radiative.model.build_radiation": {
+   "component-construction-cpu": 1
+  },
+  "tropoi.run.radiative.model.build_sigma": {
+   "component-construction-cpu": 1
+  },
+  "tropoi.spatial.environment.PlanetaryParameters.__post_init__": {
+   "planet-specification": 4
+  },
+  "tropoi.spatial.environment.PlanetaryParameters._calculate_oblateness": {
+   "planet-specification": 4
+  },
+  "tropoi.spatial.environment.PlanetaryParameters.ideal_sphere": {
+   "planet-specification": 3
+  },
+  "tropoi.spatial.environment.__create_fn__.<locals>.__init__": {
+   "planet-specification": 4
+  },
+  "tropoi.spatial.sigma_coordinate.SigmaGrid.__post_init__": {
+   "component-construction-cpu": 1
+  },
+  "tropoi.spatial.sigma_coordinate.SigmaGrid.__post_init__.<locals>.<genexpr>": {
+   "component-construction-cpu": 27
+  },
+  "tropoi.spatial.sigma_coordinate.SigmaGrid.frierson": {
+   "component-construction-cpu": 1
+  },
+  "tropoi.spatial.sigma_coordinate.SigmaGrid.nlev": {
+   "component-construction-cpu": 1
+  },
+  "tropoi.spatial.sigma_coordinate.__create_fn__.<locals>.__init__": {
+   "component-construction-cpu": 1
+  },
+  "tropoi.spatial.specification.PlanetSpec.__post_init__": {
+   "planet-specification": 3
+  },
+  "tropoi.spatial.specification.PlanetSpec.derived": {
+   "planet-specification": 2
+  },
+  "tropoi.spatial.specification.PlanetSpec.earth_like": {
+   "planet-specification": 1
+  },
+  "tropoi.spatial.specification.PlanetSpec.from_dict": {
+   "planet-specification": 1
+  },
+  "tropoi.spatial.specification.PlanetSpec.ideal_sphere": {
+   "planet-specification": 1
+  },
+  "tropoi.spatial.specification.PlanetSpec.oblate": {
+   "planet-specification": 1
+  },
+  "tropoi.spatial.specification.PlanetSpec.to_dict": {
+   "planet-specification": 1
+  },
+  "tropoi.spatial.specification.PlanetSpec.to_parameters": {
+   "planet-specification": 4
+  },
+  "tropoi.spatial.specification.__create_fn__.<locals>.__init__": {
+   "planet-specification": 3
+  },
+  "tropoi.spatial.specification._check_document": {
+   "planet-specification": 1
+  },
+  "tropoi.spatial.specification._check_statement": {
+   "planet-specification": 1
+  },
+  "tropoi.spatial.specification._day_or_none": {
+   "planet-specification": 2
+  },
+  "tropoi.spatial.specification._number": {
+   "planet-specification": 9
+  },
+  "tropoi.spatial.specification._positive": {
+   "planet-specification": 9
+  },
+  "tropoi.spatial.terrain.height_function._check_result": {
+   "terrain-preparation-cpu": 1
+  },
+  "tropoi.spatial.terrain.height_function.sample_height_function": {
+   "terrain-preparation-cpu": 1
+  },
+  "tropoi.spatial.terrain.height_function.sampling_grid": {
+   "terrain-preparation-cpu": 1
+  },
+  "tropoi.spatial.terrain.raster.ElevationRaster.__post_init__": {
+   "terrain-preparation-cpu": 1
+  },
+  "tropoi.spatial.terrain.raster.ElevationRaster.from_array": {
+   "terrain-preparation-cpu": 1
+  },
+  "tropoi.spatial.terrain.raster.ElevationRaster.from_function": {
+   "terrain-preparation-cpu": 1
+  },
+  "tropoi.spatial.terrain.raster.__create_fn__.<locals>.__init__": {
+   "terrain-preparation-cpu": 1
+  },
+  "tropoi.spatial.terrain.raster._normalize_axes": {
+   "terrain-preparation-cpu": 1
+  },
+  "tropoi.spatial.terrain.raster._uniform_step": {
+   "terrain-preparation-cpu": 3
+  }
+ },
+ "id": "setup-cpu",
+ "provenance": {
+  "capture": {
+   "boundaries": [
+    "tropoi.run.radiative.config.*",
+    "tropoi.run.radiative.model.build_*",
+    "tropoi.spatial.specification.PlanetSpec.*",
+    "tropoi.spatial.environment.PlanetaryParameters.*",
+    "tropoi.spatial.terrain.raster.ElevationRaster.from_function",
+    "tropoi.physics.planets.PlanetaryBody.regime"
+   ],
+   "limits": {
+    "fingerprint_bytes": 4096,
+    "max_attrs": 24,
+    "max_boundaries": 300,
+    "max_boundary_examples": 1,
+    "max_depth": 2,
+    "max_edges": 20000,
+    "max_items": 6,
+    "max_json_bytes": 3000000,
+    "max_lines_per_edge": 4,
+    "max_str": 160,
+    "stored_depth": 1
+   },
+   "method": "sys.setprofile: Python call/return events in the scenario thread; selected boundary metadata; device events from visible CuPy calls",
+   "phases": [
+    "default",
+    "preset-resolution",
+    "validation",
+    "component-construction-cpu",
+    "planet-specification",
+    "terrain-preparation-cpu",
+    "physical-descriptor-inspection"
+   ],
+   "threads": "scenario thread only"
+  },
+  "code": {
+   "branch": "feat/architecture-interactive-atlas",
+   "commit": "08e6f223923851fb738fbd837581b36f9826a47d",
+   "source_changes": [],
+   "source_dirty": false,
+   "source_hash_method": "tools.architecture.provenance.working_tree: SHA-256 over LF-normalized .py/.cu/.html files (comparable with a snapshot's metrics.json)",
+   "source_sha256": "363d3660bc218585aeefd2db5af8eb805f1302519728829901d72fe77c55b32b",
+   "tools_changes": [
+    "M tools/architecture/__init__.py",
+    " M tools/architecture/generate.py",
+    " M tools/architecture/report.py",
+    " M tools/architecture/views.py",
+    "?? tools/architecture/EXTENSION_README.md",
+    "?? tools/architecture/interactive.py",
+    "?? tools/architecture/interactive_atlas.html",
+    "?? tools/architecture/runtime_capture.py",
+    "?? tools/architecture/scenarios.py"
+   ],
+   "tools_dirty": true
+  },
+  "configuration": {
+   "config": {
+    "checkpoint_every_days": 10,
+    "convection": {
+     "timescale": 0.0
+    },
+    "cp": 1004.64,
+    "damping_scheme": "centred",
+    "days": 300,
+    "drag": {
+     "k_f_per_day": 1.0,
+     "kind": "held_suarez",
+     "sigma_b": 0.7
+    },
+    "dt": 1200.0,
+    "experiment_id": "earth-gray-dry-heated-T21L25-tiny",
+    "frictional_heating": true,
+    "gas_constant": 287.04,
+    "gravity": 9.8,
+    "hyperdiffusion_efold_days": 0.1,
+    "hyperdiffusion_order": 4,
+    "initial": {
+     "kind": "isothermal",
+     "temperature": 264.0
+    },
+    "insolation": {
+     "delta_s": 1.4,
+     "kind": "frierson",
+     "net_solar_constant": 938.4
+    },
+    "internal_heat_flux": 0.0,
+    "keep_checkpoints": 2,
+    "l_max": 10,
+    "longwave": {
+     "kind": "frierson",
+     "linear_fraction": 0.1,
+     "tau_equator": 6.0,
+     "tau_pole": 1.5
+    },
+    "mean_last_days": 0,
+    "nlat": 16,
+    "nlon": 32,
+    "omega": 7.292e-05,
+    "perturbation_lmax": 8,
+    "perturbation_wind": 0.1,
+    "radiation_interval": 1,
+    "radius": 6376000.0,
+    "raw_alpha": 0.53,
+    "raw_nu": 0.1,
+    "reference_pressure": 100000.0,
+    "retained_truncation": 9,
+    "schema": "palintropos.radiative.config/1",
+    "seed": 20261110,
+    "sensible": {
+     "critical_richardson": 1.0,
+     "gustiness": 1.0,
+     "roughness_length": 3.21e-05
+    },
+    "shortwave": {
+     "kind": "transparent"
+    },
+    "state_every_days": 10,
+    "surface": {
+     "albedo": 0.0,
+     "emissivity": 1.0,
+     "heat_capacity": 10000000.0,
+     "initial_temperature": 285.0
+    },
+    "t_ref": 300.0,
+    "thermal_source": "linear",
+    "vertical": {
+     "kind": "frierson",
+     "nlev": 25
+    }
+   },
+   "derived_from": "tools/colab/radiative_pilot.py config('earth', 'tiny')",
+   "experiment_id": "earth-gray-dry-heated-T21L25-tiny",
+   "hash_method": "RadiativeConfig.sha256() (the run's own configuration identity, also stored in config.json and every checkpoint)",
+   "pilot_case": [
+    "earth-gray-dry",
+    "earth-gray-dry-heated-T21L25"
+   ],
+   "pilot_resolution": {
+    "l_max": 10,
+    "nlat": 16,
+    "nlon": 32,
+    "retained_truncation": 9
+   },
+   "sha256": "a5bed515694d4b05a32163bfa1c2499642461b9040fba1fa603ff6db14fa78df"
+  },
+  "environment": {
+   "device": null,
+   "implementation": "CPython",
+   "machine": "AMD64",
+   "nvidia_smi": "NVIDIA GeForce MX110, 522.06, 2048 MiB",
+   "packages": {
+    "numpy": "2.2.6",
+    "scipy": "1.16.3"
+   },
+   "platform": "Windows-11-10.0.26200-SP0",
+   "python": "3.12.12",
+   "variables": {}
+  },
+  "invocation": {
+   "argv": [
+    "<repo>\\tools\\architecture\\runtime_capture.py",
+    "--scenario",
+    "setup-cpu",
+    "--measure-overhead",
+    "--out",
+    "docs/architecture/evidence/runtime/setup-cpu.json",
+    "--scratch",
+    "<home>/AppData/Local/Temp/claude/2ee7ccb894829e18/94d2d856-1a24-4f9c-9532-3de8eeafe543/scratchpad/scen"
+   ],
+   "command": "python -m tools.architecture.runtime_capture --scenario setup-cpu --measure-overhead --out docs/architecture/evidence/runtime/setup-cpu.json --scratch <home>/AppData/Local/Temp/claude/2ee7ccb894829e18/94d2d856-1a24-4f9c-9532-3de8eeafe543/scratchpad/scen",
+   "cwd": "<repo>"
+  },
+  "synchronization": {
+   "device_memory_read_by_collector": false,
+   "inserted_by_collector": false,
+   "note": "CPU-only scenario; no device is used.",
+   "observed": {},
+   "observed_is_lower_bound": true
+  },
+  "timing": {
+   "gpu_execution_time": "not measured by this capture",
+   "instrumented_wall_ns": 17208300,
+   "overhead_measured": true,
+   "overhead_protocol": "cold uninstrumented run, warm uninstrumented run, traced run, in one process; ratio = traced / warm",
+   "overhead_ratio": 6.921,
+   "uninstrumented_cold_wall_ns": 683435400,
+   "uninstrumented_wall_ns": 2486400
+  }
+ },
+ "scenario": "setup-cpu",
+ "schema": 2,
+ "semantics": {
+  "gpu_execution_time": "NOT MEASURED; use a synchronized profile or Nsight in a separate run",
+  "units": "none inferred; only explicit source contracts are shown by the atlas",
+  "unobserved": "a function absent from this capture was not called in THIS scenario; it is not evidence of unused code",
+  "wall_ns_inclusive": "host wall time from call to return, including callees, tracing overhead and asynchronous GPU launches; recursive calls count their time at every level"
+ },
+ "summary": {
+  "boundaries": 35,
+  "boundaries_dropped_for_size": 0,
+  "calls_seen": 306,
+  "dropped_boundaries": 0,
+  "dropped_edges": 0,
+  "functions": 75,
+  "observed_edges": 80
+ },
+ "verification": {
+  "checks": {
+   "config_round_trip_same_sha256": true,
+   "earth_like_dynamical_radius_m": 6367354.690444991,
+   "earth_like_is_oblate_volumetric_mean": true,
+   "heavy_modules_imported": {
+    "cupy": false,
+    "matplotlib": false,
+    "scipy": true
+   },
+   "ideal_sphere_oblateness_zero": true,
+   "ideal_sphere_radius_exact": true,
+   "invalid_radiation_interval_rejected": true,
+   "planets_earth_radius_m": 6371000.0,
+   "planets_vs_radiative_radius_equal": false,
+   "radiative_earth_radius_m": 6376000.0,
+   "raster_shape": [
+    18,
+    36
+   ],
+   "regime_keys": [
+    "R",
+    "cp",
+    "cp_max",
+    "cp_min",
+    "cp_relative_spread",
+    "depth_over_radius",
+    "gravity_change_over_depth",
+    "kappa"
+   ],
+   "rejection_message": "days and radiation_interval must be >= 1",
+   "sigma_levels": 25
+  },
+  "passed": true
+ }
+}

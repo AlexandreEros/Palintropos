@@ -1,0 +1,288 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Architecture Atlas</title>
+<style>
+:root{--bg:#0b1020;--panel:#111a2c;--panel2:#18233a;--line:#2d3e5a;--text:#e4ebf7;--muted:#9fb0c9;--accent:#88ccf8;
+--certain:#6fb8ff;--structural:#8d9bb3;--lookup:#5fdcc4;--possible:#ffc966;--observed:#93e07f;--import:#c6a4ff;--tc:#7d8aa3;--bad:#ff8a8a;--exc:#e7a3ff}
+*{box-sizing:border-box}html,body{height:100%}body{margin:0;background:var(--bg);color:var(--text);font:13px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}
+header{padding:12px 18px 10px;border-bottom:1px solid var(--line);background:#0e1628}h1{margin:0;font-size:18px}h2{font-size:14px;margin:0 0 8px}h3{font-size:12px;color:#a8efd9;margin:14px 0 6px;text-transform:uppercase;letter-spacing:.04em}
+.meta{font-size:12px;color:var(--muted);margin-top:2px}.bar{display:flex;gap:10px;flex-wrap:wrap;align-items:end;margin-top:10px}.control{display:flex;flex-direction:column;gap:2px}.control label{font-size:11px;color:var(--muted)}
+select,input[type=search]{background:#18253d;color:var(--text);border:1px solid #3a4f6e;border-radius:6px;padding:6px 8px;font:inherit}input[type=search]{width:min(340px,80vw)}
+.checks{display:flex;gap:8px;flex-wrap:wrap;font-size:12px}.checks label{display:flex;gap:4px;align-items:center;white-space:nowrap}
+.layout{display:grid;grid-template-columns:minmax(240px,24%) minmax(340px,1fr) minmax(320px,32%);height:calc(100vh - 118px);min-height:520px}
+.panel{min-width:0;overflow:auto;padding:12px 14px;border-right:1px solid var(--line)}.panel:last-child{border-right:0}
+button{font:inherit;background:#18263f;border:1px solid transparent;color:var(--text);border-radius:5px;padding:3px 7px;text-align:left;cursor:pointer;overflow-wrap:anywhere}
+button:hover,button:focus-visible{border-color:var(--accent);outline:0}.chosen{background:#21456a!important;color:#fff}
+.link{background:none;padding:0 2px;color:var(--accent)}.tabs{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap}.tabs button{background:#1b2c48}
+.grp{margin-bottom:4px}.grp>button{width:100%;display:flex;justify-content:space-between;gap:6px;font-weight:600;background:#17253d}
+.mod{display:block;width:calc(100% - 10px);margin:2px 0 2px 10px;font-size:12px}.sym{display:block;width:calc(100% - 24px);margin:1px 0 1px 24px;font-size:12px;color:#d3ddf0;background:#141f33}
+.sym.m{margin-left:38px;width:calc(100% - 38px)}.pill{border-radius:4px;padding:0 5px;font-size:10px;white-space:nowrap;background:#283b58;color:#c7d6ee;margin-left:4px}
+.note{border-left:3px solid #50709a;padding:6px 10px;background:#15213a;margin:8px 0;color:#c7d3e7;font-size:12px}.warn{border-left-color:var(--possible)}.bad{border-left-color:var(--bad)}
+.muted{color:var(--muted)}.small{font-size:11px}code,.mono{font:12px/1.5 ui-monospace,Consolas,monospace}
+pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#0b1526;border:1px solid #22344f;border-radius:6px;padding:8px;font:12px/1.5 ui-monospace,Consolas,monospace;color:#d6e4fb;max-height:320px;overflow:auto;margin:6px 0}
+.src{display:block;white-space:pre}.src .n{color:#6d7f9c;display:inline-block;min-width:4.2em;user-select:none}.src .hit{background:#2a3d18}.gap{color:#6d7f9c}
+table{border-collapse:collapse;width:100%;font-size:12px}td,th{border-bottom:1px solid #22344f;padding:3px 5px;text-align:left;vertical-align:top}th{color:var(--muted);font-weight:600}
+.ev{display:inline-block;font:10px/1.6 ui-monospace,Consolas,monospace;border-radius:3px;padding:0 4px;border:1px solid}.ev.static-certain{color:var(--certain);border-color:var(--certain)}
+.ev.structural{color:var(--structural);border-color:var(--structural)}.ev.receiver-lookup{color:var(--lookup);border-color:var(--lookup)}.ev.possible-dispatch{color:var(--possible);border:1px dashed var(--possible)}
+.ev.observed{color:#0b1020;background:var(--observed);border-color:var(--observed)}.ev.import{color:var(--import);border-color:var(--import)}.ev.type-only{color:var(--tc);border:1px dotted var(--tc)}
+.ev.unresolved{color:#b9c2d3;border:1px dashed #6d7f9c;font-style:italic}.ev.cross{color:var(--bad);border-color:var(--bad)}.ev.upward{color:#0b1020;background:var(--bad);border-color:var(--bad)}
+.ev.excepted{color:var(--exc);border-color:var(--exc)}.row{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:3px 0;border-bottom:1px solid #1f2f49}
+.row>button{flex:1}.matrix td{text-align:center;min-width:30px;cursor:pointer}.matrix th{font-size:10px;max-width:90px;overflow-wrap:anywhere}
+.matrix td.d-downward{background:#173055}.matrix td.d-upward{background:#5a2030}.matrix td.d-lateral{background:#3c3a1c}.matrix td.d-undeclared{background:#2c2c3c}.matrix td.d-internal{color:#55657f}.matrix td.d-excepted{background:#3a2550}.matrix td.sel{outline:2px solid var(--accent)}
+svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#18263f;stroke:#3a4f6e}svg .nb:hover rect{stroke:var(--accent)}svg .center rect{fill:#21456a;stroke:var(--accent)}
+.legend span{margin-right:8px}@media(max-width:1100px){.layout{grid-template-columns:260px 1fr;height:auto}.panel:last-child{grid-column:1/-1;border-top:1px solid var(--line)}}
+@media(max-width:700px){.layout{display:block}.panel{max-height:none;border-right:0;border-bottom:1px solid var(--line)}}
+</style></head><body>
+<header><h1>Architecture Atlas <span class="muted" id="pkgname"></span></h1><div class="meta" id="meta"></div>
+<div class="bar">
+<div class="control"><label for="q">Search module, class, function, method or source path</label><input id="q" type="search" placeholder="e.g. RadiativeRun, spatial/planet.py, transform" autocomplete="off"></div>
+<div class="control"><label for="grouping">Group by</label><select id="grouping"><option value="package">Current package</option><option value="top">Current top-level package</option><option value="proposal">Proposed owner</option></select></div>
+<div class="control"><label for="entry">Entry path (CLI handler or declared path)</label><select id="entry"><option value="">No entry filter</option></select></div>
+<div class="control"><label for="trace">Runtime evidence</label><select id="trace"><option value="">All captures</option></select></div>
+<div class="control"><label>Show relations</label><div class="checks" id="show"></div></div>
+</div></header>
+<div class="layout">
+<section class="panel" id="navPanel"><div id="nav"></div></section>
+<section class="panel"><div class="tabs" id="tabs"></div><div id="main"></div></section>
+<section class="panel"><div id="inspector"></div></section>
+</div>
+<script id="architecture-data" type="application/json">__ATLAS_DATA__</script>
+<script>
+'use strict';
+const D=JSON.parse(document.getElementById('architecture-data').textContent);
+const ID=D.ids,N=D.nodes,P=D.proposal,EVI=D.meta.evidence,TRAV=new Set(D.meta.traversed);
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const of=new Map(ID.map((x,i)=>[x,i]));
+const kindOf=i=>N[i][0],modOf=i=>N[i][1],lineOf=i=>N[i][2],pkgOf=i=>N[i][3],pathOf=i=>N[modOf(i)][4];
+const isMod=i=>['module','package','namespace'].includes(kindOf(i));
+const shortName=i=>isMod(i)?ID[i]:ID[i].slice(ID[modOf(i)].length+1);
+const tail=i=>{const p=ID[i].split('.');return p.slice(-2).join('.')};
+const evClass=k=>(EVI[k]||['unknown'])[0];
+// ---------- indexes ----------
+const callOut=new Map(),callIn=new Map(),impOut=new Map(),impIn=new Map(),children=new Map();
+const push=(m,k,v)=>{let a=m.get(k);if(!a)m.set(k,a=[]);a.push(v)};
+D.calls.forEach((e,i)=>{push(callOut,e[0],i);push(callIn,e[1],i)});
+D.imports.forEach((e,i)=>{push(impOut,e[0],i);push(impIn,e[1],i)});
+for(let i=0;i<ID.length;i++)if(!isMod(i))push(children,modOf(i),i);
+const obsBy=new Map(),obsOf=new Map();   // static node -> [[trace,edge]]; static call edge -> [[trace,edge]]
+D.traces.forEach((t,ti)=>t.edges.forEach((e,ei)=>{for(const n of [e.s,e.t])if(typeof n==='number')push(obsBy,n,[ti,ei]);for(const [k,ci] of e.static)push(obsOf,ci,[ti,ei])}));
+const boundaryBy=new Map();
+D.traces.forEach((t,ti)=>(t.boundaries||[]).forEach((b,bi)=>{const [sid]=staticOf(b.function);if(sid!=null)push(boundaryBy,sid,[ti,bi])}));
+function staticOf(name){if(of.has(name))return [of.get(name),'exact'];const o=name.split('.<locals>.')[0];if(of.has(o))return [of.get(o),'enclosing'];const h=name.split('.<')[0];if(of.has(h))return [of.get(h),'scope'];return [null,'none']}
+// ---------- state ----------
+const S={sel:null,tab:'neighborhood',grouping:'package',entry:'',trace:'',q:'',expanded:new Set(),cell:null,rel:'imports',
+ show:{'static-certain':true,'structural':true,'receiver-lookup':true,'possible-dispatch':true,'observed':true,'import':true,'type-only':true},obsPhase:'',obsCat:''};
+const SHOW=[['static-certain','certain static'],['receiver-lookup','receiver lookup'],['possible-dispatch','possible dispatch'],['structural','constructor'],['observed','observed'],['import','imports'],['type-only','type-only imports']];
+function group(i){if(S.grouping==='proposal')return P.group_names[P.assign[i]];if(S.grouping==='top'){const m=ID[modOf(i)].split('.');return m.slice(0,2).join('.')}return ID[pkgOf(i)]}
+const pgroup=i=>P.group_names[P.assign[i]];
+function direction(a,b){if(a===b)return 'internal';const r={};(P.layers||[]).forEach((t,k)=>t.forEach(g=>r[g]=k));if(!(a in r)||!(b in r))return 'undeclared';return r[a]<r[b]?'downward':r[a]===r[b]?'lateral':'upward'}
+function matchPrefix(id,p){return id===p||id.startsWith(p+'.')}
+function exceptionFor(s,t){return (P.exceptions||[]).findIndex(x=>matchPrefix(ID[s],x.source)&&matchPrefix(ID[t],x.target))}
+// ---------- entry reach (mirrors calls.scoped: BFS distance <= depth over traversed kinds) ----------
+function reach(name){const e=D.entries[name];if(!e)return null;const max=e.max_depth??D.meta.call_depth;const depth=new Map();const q=[...e.roots].sort((a,b)=>ID[a]<ID[b]?-1:1);q.forEach(r=>depth.set(r,0));
+ for(let h=0;h<q.length;h++){const n=q[h];if(depth.get(n)>=max)continue;for(const ci of callOut.get(n)||[]){const c=D.calls[ci];if(!TRAV.has(c[2]))continue;if(!depth.has(c[1])){depth.set(c[1],depth.get(n)+1);q.push(c[1])}}}
+ const truncated=new Set();for(const [n,d] of depth)if(d>=max&&(callOut.get(n)||[]).some(ci=>TRAV.has(D.calls[ci][2])&&!depth.has(D.calls[ci][1])))truncated.add(n);
+ return {depth,truncated,max,leaving:[...depth.keys()].reduce((a,n)=>a+(callOut.get(n)||[]).filter(ci=>!depth.has(D.calls[ci][1])).length,0)}}
+let REACH=null;
+function inScope(i){if(!REACH)return true;if(REACH.depth.has(i))return true;if(isMod(i))return [...REACH.depth.keys()].some(n=>modOf(n)===i);return false}
+// ---------- search ----------
+function search(q){q=q.trim().toLowerCase();if(!q)return [];const terms=q.split(/\s+/);const out=[];
+ for(let i=0;i<ID.length;i++){const hay=(ID[i]+' '+(pathOf(i)||'')).toLowerCase();if(terms.every(t=>hay.includes(t))&&inScope(i)){const last=ID[i].split('.').pop().toLowerCase();out.push([last===q?0:last.startsWith(q)?1:2,ID[i].length,i])}}
+ out.sort((a,b)=>a[0]-b[0]||a[1]-b[1]);return out.map(x=>x[2])}
+// ---------- rendering helpers ----------
+const nodeBtn=(i,label)=>`<button class="link ${S.sel&&S.sel.t==='node'&&S.sel.i===i?'chosen':''}" data-node="${i}" title="${esc(ID[i])}">${esc(label??ID[i])}</button>`;
+const ev=(cls,label)=>`<span class="ev ${esc(cls)}">${esc(label??cls)}</span>`;
+function srcLines(path,lo,hi,hits){const tbl=D.lines[path]||{};let out='',prev=null;for(let n=lo;n<=hi;n++){const t=tbl[n];if(t===undefined)continue;if(prev!==null&&n>prev+1)out+='<span class="gap">     …</span>\n';out+=`<span class="src${hits&&hits.includes(n)?' hit':''}"><span class="n">${n}</span>${esc(t)}</span>`;prev=n}return out?`<pre class="mono">${out}</pre>`:'<div class="note">Source line not embedded.</div>'}
+function sigText(i){const s=D.signatures[i];if(!s)return '';if(kindOf(i)==='class')return `class ${s[0]}(${(s[6]||[]).join(', ')})`;
+ const ps=[];let star=false;for(const p of s[1]){if(p[0]==='*')star=true;if(p[0]==='kw'&&!star){ps.push('*');star=true}ps.push((p[0]==='*'?'*':p[0]==='**'?'**':'')+p[1]+(p[2]?': '+p[2]:'')+(p[3]!=null?' = '+p[3]:''))}
+ return (s[4]||[]).map(d=>'@'+d+'\n').join('')+'def '+s[0]+'('+ps.join(', ')+')'+(s[2]?' -> '+s[2]:'')}
+function paramAnn(fi,name){const s=D.signatures[fi];if(!s)return null;const p=s[1].find(p=>p[1]===name.replace(/^\*+/,''));return p?p[2]:null}
+function ctorOf(cls){const ci=(callOut.get(cls)||[]).find(ci=>D.calls[ci][2]==='constructor');return ci==null?null:D.calls[ci][1]}
+function crossBadge(s,t){const a=pgroup(s),b=pgroup(t);if(a===b)return '';const d=direction(a,b),x=exceptionFor(s,t);return ev(x>=0?'excepted':d==='upward'?'upward':'cross',`${a}→${b}${x>=0?' (exception)':d==='upward'?' ↑':''}`)}
+function traceOk(ti){return !S.trace||S.trace===String(ti)}
+// ---------- navigator ----------
+function renderNav(){const nav=$('nav');REACH=S.entry?reach(S.entry):null;
+ if(S.q.trim()){const hits=search(S.q);let h=`<div class="small muted">${hits.length} matches${hits.length>250?' · first 250 shown':''}</div>`;for(const i of hits.slice(0,250))h+=`<button class="sym ${sel(i)}" style="margin-left:0;width:100%" data-node="${i}" title="${esc(ID[i])}">${esc(ID[i])}<span class="pill">${esc(kindOf(i))}</span></button>`;nav.innerHTML=h;return}
+ const groups=new Map();for(let i=0;i<ID.length;i++)if(isMod(i)&&inScope(i))push(groups,group(i),i);
+ let h=`<div class="small muted">${[...groups.values()].reduce((a,b)=>a+b.length,0)} modules in ${groups.size} groups${REACH?' · entry scope '+esc(S.entry):''}. Click a group to expand.</div>`;
+ for(const [g,mods] of [...groups.entries()].sort((a,b)=>a[0].localeCompare(b[0]))){const open=S.expanded.has(g)||groups.size===1;
+  h+=`<div class="grp"><button data-group="${esc(g)}"><span>${open?'▾':'▸'} ${esc(g)}</span><span class="pill">${mods.length}</span></button>`;
+  if(open)for(const m of mods.sort((a,b)=>ID[a]<ID[b]?-1:1)){h+=`<button class="mod ${sel(m)}" data-node="${m}" data-mod="${m}">${S.expanded.has('m'+m)?'▾':'▸'} ${esc(ID[m].split('.').pop())}<span class="pill">${esc(kindOf(m))}</span></button>`;
+   if(S.expanded.has('m'+m))for(const c of (children.get(m)||[]).filter(inScope)){const nested=ID[c].slice(ID[m].length+1).includes('.');const own=pgroup(c)!==pgroup(m)&&S.grouping==='proposal'?`<span class="pill">→ ${esc(pgroup(c))}</span>`:'';
+    h+=`<button class="sym ${nested?'m':''} ${sel(c)}" data-node="${c}" title="${esc(ID[c])}">${esc(shortName(c))}<span class="pill">${esc(kindOf(c))}</span>${own}${REACH&&REACH.depth.has(c)?`<span class="pill">d${REACH.depth.get(c)}${REACH.truncated.has(c)?'+':''}</span>`:''}</button>`}}
+  h+='</div>'}
+ nav.innerHTML=h}
+const sel=i=>S.sel&&S.sel.t==='node'&&S.sel.i===i?'chosen':'';
+// ---------- neighborhood ----------
+function relationsOf(i){const out=[],inc=[];const sh=S.show;
+ if(isMod(i)){if(sh.import||sh['type-only'])for(const [list,dst] of [[impOut.get(i)||[],out],[impIn.get(i)||[],inc]])for(const k of list){const tc=D.imports[k][2]==='type_checking';if(tc?sh['type-only']:sh.import)dst.push({rel:'import',k,other:dst===out?D.imports[k][1]:D.imports[k][0],cls:tc?'type-only':'import',label:D.imports[k][2]})}}
+ else for(const [list,dst] of [[callOut.get(i)||[],out],[callIn.get(i)||[],inc]])for(const k of list){const c=D.calls[k],cls=evClass(c[2]);if(sh[cls])dst.push({rel:'call',k,other:dst===out?c[1]:c[0],cls,label:c[2]})}
+ if(S.show.observed)for(const [ti,ei] of obsBy.get(i)||[]){if(!traceOk(ti))continue;const e=D.traces[ti].edges[ei];if(e.category==='corroborated'&&!isMod(i))continue;if(e.s===i&&typeof e.t==='number'&&e.t!==i)out.push({rel:'obs',ti,ei,other:e.t,cls:'observed',label:`observed ×${e.count}`});else if(e.t===i&&typeof e.s==='number'&&e.s!==i)inc.push({rel:'obs',ti,ei,other:e.s,cls:'observed',label:`observed ×${e.count}`})}
+ return {out,inc}}
+const STROKE={'static-certain':['var(--certain)',''],'structural':['var(--structural)',''],'receiver-lookup':['var(--lookup)',''],'possible-dispatch':['var(--possible)','6 4'],'observed':['var(--observed)',''],'import':['var(--import)',''],'type-only':['var(--tc)','2 3']};
+function egoSvg(i,rel){const cap=12,W=760,BW=230,BH=22;const L=rel.inc.slice(0,cap),R=rel.out.slice(0,cap);const rows=Math.max(L.length,R.length,1);const H=Math.max(rows*(BH+8)+40,90),cy=H/2;
+ let s=`<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="neighbourhood of ${esc(ID[i])}">`;
+ const place=(list,x,right)=>list.map((r,k)=>{const y=20+k*(BH+8)+(rows-list.length)*(BH+8)/2;const [col,dash]=STROKE[r.cls]||['#888',''];
+  const x1=right?W/2+BW/2:W/2-BW/2,x2=right?x:x+BW;s+=`<path d="M${x1} ${cy} C ${(x1+x2)/2} ${cy}, ${(x1+x2)/2} ${y+BH/2}, ${x2} ${y+BH/2}" fill="none" stroke="${col}" stroke-width="${r.cls==='observed'?3:1.6}" ${dash?`stroke-dasharray="${dash}"`:''}><title>${esc(r.label)}</title></path>`;
+  s+=`<g class="nb" data-node="${r.other}" style="cursor:pointer"><rect x="${x}" y="${y}" width="${BW}" height="${BH}" rx="4"/><text x="${x+6}" y="${y+15}">${esc(tail(r.other).slice(0,34))}</text><title>${esc(ID[r.other])} (${esc(r.label)})</title></g>`});
+ place(L,8,false);place(R,W-BW-8,true);
+ s+=`<g class="center"><rect x="${W/2-BW/2}" y="${cy-BH/2-2}" width="${BW}" height="${BH+4}" rx="5"/><text x="${W/2-BW/2+8}" y="${cy+5}">${esc(tail(i).slice(0,34))}</text></g>`;
+ if(rel.inc.length>cap)s+=`<text x="8" y="${H-4}" class="muted">+${rel.inc.length-cap} more incoming (listed below)</text>`;if(rel.out.length>cap)s+=`<text x="${W-BW-8}" y="${H-4}">+${rel.out.length-cap} more outgoing (listed below)</text>`;
+ return s+'</svg>'}
+function relRow(r,side){const label=r.rel==='call'?ev(r.cls,D.calls[r.k][2]):r.rel==='import'?ev(r.cls,'import '+r.label):ev('observed',r.label);
+ const sites=r.rel==='call'?D.call_site_totals[r.k]:r.rel==='import'?D.import_sites[r.k].length+D.import_omitted[r.k]:null;const obs=r.rel==='call'?(obsOf.get(r.k)||[]).filter(([ti])=>traceOk(ti)).reduce((a,[ti,ei])=>a+D.traces[ti].edges[ei].count,0):0;
+ const [s,t]=side==='out'?[S.sel.i,r.other]:[r.other,S.sel.i];
+ return `<div class="row"><button data-edge="${r.rel}:${r.rel==='obs'?r.ti+':'+r.ei:r.k}" title="${esc(ID[s]+' → '+ID[t])}">${esc(side==='out'?'→ ':'← ')}${esc(ID[r.other])}</button>${label}${sites!=null?`<span class="pill">${sites} site${sites===1?'':'s'}</span>`:''}${obs?ev('observed','×'+obs):''}${crossBadge(s,t)}</div>`}
+function renderNeighborhood(){if(!S.sel)return intro();const i=S.sel.t==='node'?S.sel.i:edgeEnds(S.sel)[0];if(i==null)return '<div class="note">This runtime observation has no static node to centre on.</div>';
+ const rel=relationsOf(i);let h=`<h2>${esc(ID[i])}</h2><div class="small muted">Immediate neighbourhood: incoming on the left, outgoing on the right. Click a box to move there. ${isMod(i)?'Module view shows import edges; select a function or class for calls.':'Function/class view shows static and observed calls.'}</div>`;
+ h+=egoSvg(i,rel);if(isMod(i)){const defs=(children.get(i)||[]);const agg=new Map();for(const d of defs)for(const ci of callOut.get(d)||[]){const t=modOf(D.calls[ci][1]);if(t!==i)agg.set(t,(agg.get(t)||0)+1)}
+  h+=`<h3>Definitions (${defs.length})</h3>`+defs.slice(0,80).map(d=>nodeBtn(d,shortName(d))).join(' ')+(defs.length>80?` <span class="muted">+${defs.length-80} more</span>`:'');
+  if(agg.size)h+=`<h3>Static calls leaving this module, by target module</h3>`+[...agg.entries()].sort((a,b)=>b[1]-a[1]).map(([m,c])=>`<div class="row">${nodeBtn(m)}<span class="pill">${c} edge${c>1?'s':''}</span>${crossBadge(i,m)}</div>`).join('')}
+ h+=`<h3>Outgoing (${rel.out.length})</h3>`+(rel.out.map(r=>relRow(r,'out')).join('')||'<div class="muted small">none in the selected relation kinds</div>');
+ h+=`<h3>Incoming (${rel.inc.length})</h3>`+(rel.inc.map(r=>relRow(r,'in')).join('')||'<div class="muted small">none in the selected relation kinds</div>');
+ const u=D.unresolved[i];if(u)h+=`<h3>Call sites that are not edges</h3><div class="note">${Object.entries(u[0]).map(([k,v])=>ev(k==='unresolved'?'unresolved':'structural',`${k} ${v}`)).join(' ')} · static analysis could not (or need not) bind these to an analysed definition; absence of an edge is not absence of a call.</div>`;
+ return h}
+function edgeEnds(sel){if(sel.t==='call')return [D.calls[sel.k][0],D.calls[sel.k][1]];if(sel.t==='import')return [D.imports[sel.k][0],D.imports[sel.k][1]];const e=D.traces[sel.ti].edges[sel.ei];return [typeof e.s==='number'?e.s:null,typeof e.t==='number'?e.t:null]}
+function intro(){return `<h2>Start from one package, workflow or function</h2><div class="note">Search above, expand a group on the left, or pick an entry path. The atlas shows the immediate neighbourhood of the selection instead of the whole graph. ${D.ids.length} nodes, ${D.calls.length} static call edges, ${D.imports.length} import edges, ${D.traces.length} runtime capture(s).</div>`+legend()}
+function legend(){return `<h3>Evidence classes</h3><table>${Object.entries(EVI).map(([k,v])=>`<tr><td>${ev(v[0],k)}</td><td>${esc(v[1])}</td></tr>`).join('')}
+ <tr><td>${ev('observed','observed')}</td><td>A Python call seen in a named runtime capture (its own revision and provenance). Absence from a capture is not evidence of unused code.</td></tr>
+ <tr><td>${ev('unresolved','unresolved')}</td><td>Call sites the static resolver did not bind (objects, parameters, callbacks, getattr, decorators). Counted per caller, never drawn as edges.</td></tr>
+ <tr><td>${ev('import','import')} ${ev('type-only','type-only')}</td><td>Import edges (grimp), with statement scope: module, function, or TYPE_CHECKING (never executed).</td></tr></table>
+ <h3>Static limits</h3><div class="note">${(D.meta.limits||[]).map(esc).join('; ')}. Dynamic import sites: ${Object.keys(D.meta.dynamic_import_sites||{}).length} module(s). Sites are capped at ${D.meta.max_sites} per edge; omissions are counted on each edge.</div>`}
+// ---------- inspector ----------
+function inspectNode(i){const k=kindOf(i);let h=`<div class="small muted">${esc(k)} · package ${esc(ID[pkgOf(i)])} · proposed ${esc(pgroup(i))}</div><h2>${esc(ID[i])}</h2>`;
+ const path=pathOf(i);if(path)h+=`<div class="mono small">${esc(path)}${isMod(i)?'':':'+lineOf(i)}</div>`;
+ const r=P.rule[i];h+=`<div class="note">Proposed owner <b>${esc(pgroup(i))}</b>: ${r>=0?`rule <code>${esc(P.rules[r].prefix)}</code>${P.rules[r].why?' — '+esc(P.rules[r].why):''}`:'no rule matches (unassigned)'}. Overlay only; nothing has moved.</div>`;
+ if(!isMod(i)){const s=D.signatures[i];h+=`<h3>Definition</h3><pre class="mono">${esc(sigText(i))}</pre>`;if(s&&s[3])h+=`<div class="small">${esc(s[3])}</div>`;
+  h+=srcLines(path,lineOf(i)-(s&&s[4]?s[4].length:0),lineOf(i)+12,[lineOf(i)]);
+  const f=D.fields[i];if(f)h+=`<h3>Annotated fields (source contracts, verbatim)</h3><table><tr><th>field</th><th>annotation</th><th>default</th><th>comment on the line</th></tr>${f.map(r=>`<tr><td class="mono">${esc(r[0])}</td><td class="mono">${esc(r[1])}</td><td class="mono">${esc(r[2]??'')}</td><td>${esc(r[3]??'')}</td></tr>`).join('')}</table><div class="small muted">Units and meanings are shown only where the source states them; nothing is inferred from names.</div>`;
+  const u=D.unresolved[i];if(u)h+=`<h3>Calls without an edge</h3><div>${Object.entries(u[0]).map(([k,v])=>ev(k==='unresolved'?'unresolved':'structural',`${k} ${v}`)).join(' ')}</div>`+(u[1].length?`<table>${u[1].map(x=>`<tr><td class="mono">${x[0]}</td><td>${ev('unresolved',x[1])}</td><td class="mono">${esc(x[2])}</td></tr>`).join('')}</table>`:'');
+ }else{const n=N[i];h+=`<div class="small">category ${esc(n[5])}${n[6]?` · <span style="color:var(--possible)">${n[6]} dynamic import site(s) not followed</span>`:''}</div>`}
+ const inc=(isMod(i)?impIn:callIn).get(i)||[],out=(isMod(i)?impOut:callOut).get(i)||[];h+=`<div class="note">${out.length} outgoing · ${inc.length} incoming static ${isMod(i)?'import':'call'} edges.</div>`;
+ h+=runtimeForNode(i);return h}
+function describe(v,depth=0){if(v==null)return '<span class="muted">—</span>';if(typeof v!=='object')return esc(String(v));
+ if('shape' in v)return `<span class="mono">${esc(v.type)} ${esc(JSON.stringify(v.shape))} ${esc(v.dtype||'')} <b>${esc(v.location||'')}</b>${v.fingerprint?' sha256:'+esc(v.fingerprint.slice(0,12)):''}</span>`;
+ if('value' in v)return `<span class="mono">${esc(v.type)} ${esc(JSON.stringify(v.value))}${v.truncated?'…':''}${v.redacted?' (redacted)':''}</span>`;
+ let s=`<span class="mono">${esc(v.type||'?')}${v.length!=null?' len '+v.length:''}</span>`;if(v.fields&&depth<2)s+='<table>'+Object.entries(v.fields).map(([k,x])=>`<tr><td class="mono">${esc(k)}</td><td>${describe(x,depth+1)}</td></tr>`).join('')+'</table>';if(v.omitted)s+=` <span class="muted">(+${v.omitted} omitted)</span>`;return s}
+function boundaryHtml(b){let h=`<div class="small muted">phase ${esc(b.phase)} · call #${b.call_index} of ${esc(b.function)}</div>`;
+ const row=(k,v)=>`<tr><td class="mono">${esc(k)}</td><td>${describe(v)}</td></tr>`;
+ if(b.args)h+=`<table><tr><th colspan="2">arguments (at entry)</th></tr>${Object.entries(b.args).map(([k,v])=>row(k,v)).join('')}</table>`;
+ if('return' in b)h+=`<table><tr><th colspan="2">return value</th></tr>${row('return',b.return)}</table>`;
+ if(b.self_before)h+=`<table><tr><th colspan="2">receiver state before</th></tr>${row('self',b.self_before)}</table>`;
+ if(b.mutations&&Object.keys(b.mutations).length)h+=`<table><tr><th colspan="2">observed changes (receiver attributes and arguments)</th></tr>${Object.entries(b.mutations).map(([k,v])=>`<tr><td class="mono">${esc(k)}</td><td>${esc(v.kind)}${v.after?' → '+describe(v.after):''}</td></tr>`).join('')}</table>`;
+ if(b.unverified&&b.unverified.length)h+=`<div class="note warn small">Same object before and after, content not inspected (device or large array): ${esc(b.unverified.join(', '))}. In-place changes there are invisible to this capture.</div>`;
+ return h}
+function runtimeForNode(i){let h='';const rows=(obsBy.get(i)||[]).filter(([ti])=>traceOk(ti));const bnds=(boundaryBy.get(i)||[]).filter(([ti])=>traceOk(ti));
+ const fn=[];D.traces.forEach((t,ti)=>{if(!traceOk(ti))return;for(const [name,c] of Object.entries(t.functions||{})){const [sid]=staticOf(name);if(sid===i)fn.push([ti,name,c])}});
+ if(!rows.length&&!fn.length)return `<h3>Runtime</h3><div class="note">Not observed in ${S.trace?'the selected capture':'any committed capture'}. Unobserved is not unused: captures cover only their named scenarios.</div>`;
+ h+=`<h3>Runtime</h3>`;for(const [ti,name,c] of fn)h+=`<div class="row"><span class="mono">${esc(D.traces[ti].scenario)}</span><span>${esc(Object.entries(c).map(([p,n])=>p+' ×'+n).join(', '))}</span></div>`;
+ if(rows.length)h+=`<div class="small muted">${rows.length} observed caller/callee relation(s) touch this node.</div>`+rows.slice(0,30).map(([ti,ei])=>{const e=D.traces[ti].edges[ei];return `<div class="row"><button data-edge="obs:${ti}:${ei}">${esc(e.rs)} → ${esc(e.rt)}</button>${ev('observed','×'+e.count)}<span class="pill">${esc(e.category)}</span></div>`}).join('');
+ if(bnds.length)h+=`<h3>Data at this boundary (selected capture boundaries)</h3>`+bnds.slice(0,4).map(([ti,bi])=>`<div class="note"><b>${esc(D.traces[ti].scenario)}</b>${boundaryHtml(D.traces[ti].boundaries[bi])}</div>`).join('');
+ return h}
+function inspectCall(k){const [s,t,kind]=D.calls[k],cls=evClass(kind);let h=`<div>${ev(cls,kind)} ${crossBadge(s,t)}</div><h2>${nodeBtn(s)} → ${nodeBtn(t)}</h2><div class="note">${esc((EVI[kind]||[])[1]||'')}${cls!=='observed'?' Static syntax resolution: not proof that this path ran, nor that it is the runtime target.':''}</div>`;
+ const sites=D.call_sites[k]||[],om=D.call_omitted[k];const target=kind==='instantiate'?ctorOf(t):t;
+ if(kind==='constructor')h+=`<div class="note">Structural relation: no call expression corresponds to it.</div>`;
+ if(target!=null&&D.signatures[target])h+=`<h3>Callee signature</h3><pre class="mono">${esc(sigText(target))}</pre>`;
+ if(sites.length){h+=`<h3>Call sites (${sites.length}${om?` shown, ${om} more omitted by the per-edge cap of ${D.meta.max_sites}`:''})</h3>`;
+  for(const st of sites){h+=`<div class="small mono">${esc(pathOf(s))}:${st[0]}:${st[1]}</div>`+srcLines(pathOf(s),st[0]-2,st[0]+2,[st[0]]);
+   if(st[3].length)h+=`<table><tr><th>parameter</th><th>argument expression</th><th>annotation (as written)</th></tr>${st[3].map(b=>`<tr><td class="mono">${esc(b[0])}</td><td class="mono">${esc(b[1])}</td><td class="mono">${esc(target!=null?paramAnn(target,b[0])??'':'')}</td></tr>`).join('')}</table>`;
+   const ret=target!=null&&D.signatures[target]?D.signatures[target][2]:null;if(ret)h+=`<div class="small">return annotation: <code>${esc(ret)}</code></div>`;
+   if(st[4])h+=`<div class="note warn">Possible dispatch targets at this site (subclass redefinitions): ${st[4].map(x=>nodeBtn(x)).join(', ')}</div>`}}
+ else if(kind!=='constructor')h+='<div class="note">No call expression recorded for this edge.</div>';
+ if(kind==='override')h+=`<div class="note warn">Derived from a self-call resolved in a base class; listed because the subclass redefines the method. Whether it is reached depends on the receiver.</div>`;
+ const obs=(obsOf.get(k)||[]).filter(([ti])=>traceOk(ti));h+=`<h3>Runtime corroboration</h3>`+(obs.length?obs.map(([ti,ei])=>{const e=D.traces[ti].edges[ei];return `<div class="row"><button data-edge="obs:${ti}:${ei}">${esc(D.traces[ti].scenario)}</button>${ev('observed','×'+e.count)}<span class="small">${esc(Object.entries(e.phases||{}).map(([p,n])=>p+' '+n).join(', '))}</span></div>`}).join(''):'<div class="note">Not observed in the committed captures. Unobserved is not unused.</div>');
+ const b=(boundaryBy.get(t)||[]).filter(([ti])=>traceOk(ti));if(b.length)h+=`<h3>Observed data at the callee boundary</h3>`+b.slice(0,3).map(([ti,bi])=>`<div class="note"><b>${esc(D.traces[ti].scenario)}</b>${boundaryHtml(D.traces[ti].boundaries[bi])}</div>`).join('');
+ return h}
+function inspectImport(k){const [s,t,scopes]=D.imports[k];let h=`<div>${ev(scopes==='type_checking'?'type-only':'import','imports')} <span class="pill">scopes ${esc(scopes)}</span> ${crossBadge(s,t)}</div><h2>${nodeBtn(s)} → ${nodeBtn(t)}</h2>`;
+ const sites=D.import_sites[k]||[];h+=`<h3>Import statements (${sites.length}${D.import_omitted[k]?`, ${D.import_omitted[k]} omitted`:''})</h3>`;
+ for(const st of sites)h+=`<div class="row"><span class="mono small">${esc(pathOf(s))}:${st[0]}</span>${ev(st[1]==='type_checking'?'type-only':'import',st[1])}</div><div class="small">symbols: ${st[2].length?st[2].map(x=>`<code>${esc(x)}</code>`).join(', '):'<span class="muted">module import</span>'}</div>`+srcLines(pathOf(s),st[0]-1,st[0]+1,[st[0]]);
+ if(!sites.length)h+='<div class="note">grimp reported the edge but no statement spelling the target was matched (re-export resolution).</div>';
+ return h}
+function inspectObs(ti,ei){const t=D.traces[ti],e=t.edges[ei];let h=`<div>${ev('observed','observed ×'+e.count)} <span class="pill">${esc(e.category)}</span></div><h2>${typeof e.s==='number'?nodeBtn(e.s,e.rs):esc(e.rs)} → ${typeof e.t==='number'?nodeBtn(e.t,e.rt):esc(e.rt)}</h2>`;
+ const CAT={corroborated:'A static edge connects the same two definitions.','runtime-only':'No static edge connects them: the call went through something the resolver does not follow (an attribute, parameter, callback, registry or wrapper). This is the static graph\'s blind spot, made visible.',unmapped:'At least one side is not an analysed definition at the static revision (renamed, removed, or outside the package).','generated-code':'At least one side is code generated at run time (a dataclass __init__): it has no source definition to align with.','same-static-node':'Both sides map to one static node (e.g. a nested function calling its parent).'};
+ h+=`<div class="note">${esc(CAT[e.category]||'')}</div>`;
+ if(e.static.length)h+=`<h3>Static counterpart</h3>`+e.static.map(([k,ci])=>`<div class="row"><button data-edge="call:${ci}">${esc(ID[D.calls[ci][0]])} → ${esc(ID[D.calls[ci][1]])}</button>${ev(evClass(D.calls[ci][2])||'static-certain',k)}</div>`).join('');
+ const prov=t.provenance||{},code=prov.code||{};const same=code.source_sha256&&code.source_sha256===D.meta.source_sha256;
+ h+=`<h3>Capture</h3><div class="note">${esc(t.scenario)} · commit <code>${esc((code.commit||'?').slice(0,12))}</code>${code.source_dirty?' <b style="color:var(--possible)">(source dirty)</b>':''} · ${same?'same source content as this static snapshot':'<b style="color:var(--possible)">source content differs from (or is not comparable with) this static snapshot; compare separately</b>'}</div>`;
+ if(e.phases)h+=`<table><tr><th>phase</th><th>calls</th></tr>${Object.entries(e.phases).map(([p,n])=>`<tr><td>${esc(p)}</td><td>${n}</td></tr>`).join('')}</table>`;
+ if(e.wall_ns_inclusive!=null)h+=`<div class="small">Python wall time inclusive of callees and of tracing overhead: ${(e.wall_ns_inclusive/1e6).toFixed(3)} ms total. ${esc((t.semantics||{}).gpu_execution_time||'GPU execution time not measured by this capture.')}</div>`;
+ if(e.lines&&typeof e.s==='number'){h+=`<h3>Caller lines at the moment of the call</h3>`;for(const [ln,how] of e.lines)h+=`<div class="small">${ln} (${esc(how)})</div>`+(same?srcLines(pathOf(e.s),ln-1,ln+1,[ln]):'<div class="note warn small">Line numbers are from the capture revision.</div>')}
+ return h}
+function renderInspector(){const el=$('inspector');const s=S.sel;let h='';
+ if(!s)h=`<div class="note">Select a node or relationship to see its source, metadata, proposed owner and runtime evidence.</div>`+legend();
+ else if(s.t==='node')h=inspectNode(s.i);else if(s.t==='call')h=inspectCall(s.k);else if(s.t==='import')h=inspectImport(s.k);else h=inspectObs(s.ti,s.ei);el.innerHTML=h}
+// ---------- boundaries ----------
+function matrix(grouping,rel){const save=S.grouping;S.grouping=grouping;const cells=new Map(),names=new Set();
+ const idx=rel==='calls'?D.calls.map((e,i)=>i).filter(i=>D.calls[i][2]!=='constructor'):D.imports.map((e,i)=>i).filter(i=>rel==='imports-type-only'?D.imports[i][2]==='type_checking':D.imports[i][2]!=='type_checking');
+ for(const i of idx){const e=rel==='calls'?D.calls[i]:D.imports[i];const a=group(e[0]),b=group(e[1]);names.add(a);names.add(b);const key=a+'|'+b;let c=cells.get(key);if(!c)cells.set(key,c={n:0,edges:[],excepted:0});c.n++;c.edges.push(i);if(a!==b&&exceptionFor(e[0],e[1])>=0)c.excepted++}
+ S.grouping=save;return {names:[...names].sort(),cells}}
+function renderBoundaries(){const rel=S.rel,g=S.grouping;const M=matrix(g,rel);const A=P.analysis||{};
+ let h=`<h2>Dependencies across ${g==='proposal'?'proposed owners':'current packages'}</h2><div class="tabs">${[['imports','imports (executed)'],['imports-type-only','imports (TYPE_CHECKING only)'],['calls','static calls']].map(([k,l])=>`<button data-rel="${k}" class="${S.rel===k?'chosen':''}">${l}</button>`).join('')}</div>`;
+ if(g!=='proposal')h+=`<div class="note">Switch “Group by” to <b>Proposed owner</b> to test the proposal: cells are then coloured by the declared dependency order (blue downward, yellow lateral, red upward, purple: every edge covered by a declared exception, grey undeclared).</div>`;
+ else h+=`<div class="note">Declared order (top depends on lower): ${(P.layers||[]).map(t=>t.map(esc).join(' | ')).join(' → ')}. Crossing edges are not failures in themselves: shared utilities, adapters and orchestration cross boundaries by design. Red cells are the ones to read.</div>`;
+ h+=`<div style="overflow:auto"><table class="matrix"><tr><th>from \\ to</th>${M.names.map(n=>`<th title="${esc(n)}">${esc(n.replace(/^tropoi\./,''))}</th>`).join('')}</tr>`;
+ for(const a of M.names){h+=`<tr><th title="${esc(a)}">${esc(a.replace(/^tropoi\./,''))}</th>`;for(const b of M.names){const c=M.cells.get(a+'|'+b);let d=g==='proposal'?direction(a,b):(a===b?'internal':'');if(c&&g==='proposal'&&d!=='internal'&&d!=='downward'&&c.excepted===c.n)d='excepted';h+=c?`<td class="d-${d} ${S.cell===a+'|'+b?'sel':''}" data-cell="${esc(a+'|'+b)}" title="${esc(a+' → '+b)}: ${c.n} edge(s)${c.excepted?', '+c.excepted+' under declared exceptions':''}">${c.n}${c.excepted&&c.excepted<c.n?'<sup>'+c.excepted+'x</sup>':''}</td>`:'<td></td>'}h+='</tr>'}
+ h+='</table></div>';
+ if(S.cell&&M.cells.get(S.cell)){const [a,b]=S.cell.split('|');const c=M.cells.get(S.cell);h+=`<h3>${esc(a)} → ${esc(b)}: ${c.n} edge(s)</h3>`;
+  h+=c.edges.slice(0,400).map(i=>{const e=rel==='calls'?D.calls[i]:D.imports[i];const x=exceptionFor(e[0],e[1]);return `<div class="row"><button data-edge="${rel==='calls'?'call':'import'}:${i}">${esc(ID[e[0]])} → ${esc(ID[e[1]])}</button>${rel==='calls'?ev(evClass(e[2]),e[2]):ev(e[2]==='type_checking'?'type-only':'import',e[2])}${x>=0?ev('excepted','exception: '+P.exceptions[x].reason.slice(0,60)):''}</div>`}).join('')}
+ if(g==='proposal'){const a=A[rel==='calls'?'calls':'imports']||{};h+=`<h3>Group cycles (${rel==='calls'?'static calls':'executed imports'})</h3>`+((a.group_cycles||[]).length?a.group_cycles.map(c=>`<div class="note warn">${c.map(esc).join(' ⇄ ')} <span class="small">(including declared exceptions)</span></div>`).join(''):'<div class="note">No cycle between proposed groups.</div>')+`<h3>Residual cycles (declared exceptions removed)</h3>`+((a.residual_group_cycles||[]).length?a.residual_group_cycles.map(c=>`<div class="note bad">${c.map(esc).join(' ⇄ ')}</div>`).join(''):'<div class="note">None: every remaining crossing edge follows the declared order.</div>');
+  h+=`<h3>By direction</h3><div>${Object.entries(a.by_direction||{}).map(([k,v])=>ev(k==='upward'?'upward':'structural',`${k} ${v}`)).join(' ')}</div>`;
+  h+=`<h3>Declared exceptions</h3>`+((P.exceptions||[]).map((x,i)=>`<div class="note"><code>${esc(x.source)}</code> → <code>${esc(x.target)}</code>: ${esc(x.reason)} <span class="pill">${(A.exceptions_used||[])[i]||0} edges</span></div>`).join('')||'<div class="muted">none</div>');
+  h+=`<h3>Groups</h3><table>${P.group_names.map(n=>`<tr><td class="mono">${esc(n)}</td><td>${(A.members||{})[n]||0}</td><td>${esc((P.groups[n]||{}).role||'')}</td></tr>`).join('')}</table>`}
+ return h}
+// ---------- runtime ----------
+function renderRuntime(){if(!D.traces.length)return `<h2>Runtime evidence</h2><div class="note">No committed capture. Record one with <code>python -m tools.architecture.runtime_capture</code> and regenerate.</div>`;
+ let h='<h2>Runtime evidence</h2><div class="note">Each capture is a separate observation of a named scenario at its own revision. Python wall times include tracing overhead and asynchronous GPU launches; they are never GPU execution times.</div>';
+ D.traces.forEach((t,ti)=>{if(!traceOk(ti))return;const p=t.provenance||{},c=p.code||{},env=p.environment||{},cap=p.capture||{},sy=p.synchronization||{},tm=p.timing||{};const same=c.source_sha256&&c.source_sha256===D.meta.source_sha256;
+  h+=`<h3>${esc(t.scenario)}</h3><div class="small">${esc(t.description||'')}</div><table>
+  <tr><td>revision</td><td class="mono">${esc(c.commit||'?')}${c.source_dirty?' · source dirty':' · source clean'}${c.tools_dirty?' · tools dirty':''} · ${same?'same source content as static snapshot':'<b style="color:var(--possible)">differs from static snapshot</b>'}</td></tr>
+  <tr><td>invocation</td><td class="mono">${esc((p.invocation||{}).command||'')}</td></tr>
+  <tr><td>configuration</td><td class="mono">${esc((p.configuration||{}).sha256?'sha256 '+(p.configuration.sha256||'').slice(0,16)+' ('+(p.configuration.hash_method||'')+')':'none recorded')}</td></tr>
+  <tr><td>environment</td><td class="mono">${esc([env.python,env.platform,Object.entries(env.packages||{}).map(([k,v])=>k+' '+v).join(', ')].filter(Boolean).join(' · '))}</td></tr>
+  <tr><td>device</td><td class="mono">${esc(JSON.stringify(env.device||'none'))}</td></tr>
+  <tr><td>capture</td><td>${esc(cap.method||'')}; boundaries ${esc((cap.boundaries||[]).join(', ')||'none')}; limits ${esc(JSON.stringify(cap.limits||{}))}</td></tr>
+  <tr><td>synchronization</td><td>inserted by collector: <b>${esc(String(sy.inserted_by_collector))}</b>; observed in scenario: ${esc(JSON.stringify(sy.observed||{}))}; ${esc(sy.note||'')}</td></tr>
+  <tr><td>timing</td><td>${esc(JSON.stringify(tm))}</td></tr>
+  <tr><td>alignment</td><td>${Object.entries(t.alignment||{}).map(([k,v])=>`<span class="pill">${esc(k)} ${v}</span>`).join(' ')}</td></tr></table>`;
+  if(t.verification)h+=`<div class="note ${t.verification.passed?'':'bad'}"><b>Verification:</b> ${esc(JSON.stringify(t.verification))}</div>`;
+  if(t.error)h+=`<div class="note bad">Scenario failed: ${esc(JSON.stringify(t.error))}</div>`;
+  const phases=[...new Set(t.edges.flatMap(e=>Object.keys(e.phases||{})))];h+=`<div class="small">phases: ${phases.map(p=>`<button data-phase="${esc(p)}" class="${S.obsPhase===p?'chosen':''}">${esc(p)}</button>`).join(' ')} <button data-phase="">all</button> · <select data-cat="1"><option value="">all categories</option>${['corroborated','runtime-only','generated-code','unmapped','same-static-node'].map(c=>`<option ${S.obsCat===c?'selected':''}>${c}</option>`).join('')}</select></div>`;
+  const rows=t.edges.map((e,ei)=>[e,ei]).filter(([e])=>(!S.obsPhase||(e.phases||{})[S.obsPhase])&&(!S.obsCat||e.category===S.obsCat));
+  h+=`<div class="small muted">${rows.length} relation(s)${rows.length>200?' · first 200':''}</div>`+rows.slice(0,200).map(([e,ei])=>`<div class="row"><button data-edge="obs:${ti}:${ei}">${esc(e.rs.replace(/^tropoi\./,''))} → ${esc(e.rt.replace(/^tropoi\./,''))}</button>${ev('observed','×'+(S.obsPhase?(e.phases||{})[S.obsPhase]:e.count))}<span class="pill">${esc(e.category)}</span></div>`).join('')});
+ return h}
+// ---------- entry ----------
+function renderEntry(){if(!S.entry)return `<h2>Entry paths</h2><div class="note">Choose a CLI handler or declared entry path above. The navigator then shows only what that path reaches statically within the documented depth.</div><table>${Object.entries(D.entries).map(([n,e])=>`<tr><td><button data-entry="${esc(n)}">${esc(n)}</button></td><td>${esc(e.kind)}</td><td>${e.nodes} nodes · depth ≤ ${e.max_depth}${e.truncated_nodes?' · '+e.truncated_nodes+' cut':''}</td></tr>`).join('')}</table>`;
+ const e=D.entries[S.entry],R=REACH||reach(S.entry);let h=`<h2>${esc(S.entry)}</h2><div class="small">${esc(e.title||'')} ${e.doc?'· narrative '+esc(e.doc):''}</div><div class="note">Static reach within depth ≤ ${R.max}: <b>${R.depth.size}</b> nodes (generator: ${e.nodes}), ${R.truncated.size} with further calls cut by the depth limit (marked +), ${R.leaving} edges leave the scope. Unbounded static reach: ${e.reachable_nodes_unbounded} nodes. Dynamic dispatch and callbacks are outside static reach.</div>`;
+ const byD=new Map();for(const [n,d] of R.depth)push(byD,d,n);for(const [d,ns] of [...byD.entries()].sort((a,b)=>a[0]-b[0]))h+=`<h3>depth ${d} (${ns.length})</h3>`+ns.sort((a,b)=>ID[a]<ID[b]?-1:1).map(n=>nodeBtn(n,ID[n].replace(/^tropoi\./,'')+(R.truncated.has(n)?' +':''))).join(' ');
+ return h}
+// ---------- main ----------
+const TABS=[['neighborhood','Neighbourhood'],['boundaries','Boundaries'],['runtime','Runtime'],['entry','Entry path'],['legend','Legend & limits']];
+function renderMain(){$('tabs').innerHTML=TABS.map(([k,l])=>`<button data-tab="${k}" class="${S.tab===k?'chosen':''}">${l}</button>`).join('');
+ $('main').innerHTML=S.tab==='neighborhood'?renderNeighborhood():S.tab==='boundaries'?renderBoundaries():S.tab==='runtime'?renderRuntime():S.tab==='entry'?renderEntry():legend()}
+function render(){renderNav();renderMain();renderInspector();writeHash()}
+function writeHash(){const s=S.sel;let h='';if(s)h=s.t==='node'?'node='+encodeURIComponent(ID[s.i]):s.t==='obs'?`obs=${s.ti}:${s.ei}`:`${s.t}=${s.k}`;const parts=[h,S.tab!=='neighborhood'?'tab='+S.tab:'',S.grouping!=='package'?'group='+S.grouping:'',S.entry?'entry='+encodeURIComponent(S.entry):''].filter(Boolean).join('&');try{history.replaceState(null,'',parts?'#'+parts:location.pathname)}catch(e){}}
+function readHash(){const h=new URLSearchParams(location.hash.slice(1));if(h.get('node')&&of.has(h.get('node')))S.sel={t:'node',i:of.get(h.get('node'))};for(const t of ['call','import'])if(h.get(t)!=null)S.sel={t,k:+h.get(t)};if(h.get('obs')){const [ti,ei]=h.get('obs').split(':').map(Number);if(D.traces[ti]&&D.traces[ti].edges[ei])S.sel={t:'obs',ti,ei}}
+ if(h.get('tab'))S.tab=h.get('tab');if(h.get('group'))S.grouping=h.get('group');if(h.get('entry')&&D.entries[h.get('entry')])S.entry=h.get('entry');$('grouping').value=S.grouping;$('entry').value=S.entry}
+function selectNode(i){S.sel={t:'node',i};if(S.tab!=='neighborhood'&&S.tab!=='entry')S.tab='neighborhood';const m=isMod(i)?i:modOf(i);S.expanded.add(group(m));if(!isMod(i))S.expanded.add('m'+m);render()}
+function selectEdge(spec){const [t,a,b]=spec.split(':');S.sel=t==='obs'?{t:'obs',ti:+a,ei:+b}:{t,k:+a};renderMain();renderInspector();writeHash()}
+document.addEventListener('click',ev=>{const t=ev.target.closest('[data-node],[data-edge],[data-group],[data-tab],[data-cell],[data-rel],[data-phase],[data-entry]');if(!t)return;
+ if(t.dataset.group!=null){const g=t.dataset.group;S.expanded.has(g)?S.expanded.delete(g):S.expanded.add(g);renderNav();return}
+ if(t.dataset.mod!=null&&ev.target.closest('#nav')){const k='m'+t.dataset.mod;S.expanded.has(k)?S.expanded.delete(k):S.expanded.add(k)}
+ if(t.dataset.node!=null)return selectNode(+t.dataset.node);if(t.dataset.edge)return selectEdge(t.dataset.edge);
+ if(t.dataset.tab){S.tab=t.dataset.tab;return render()}if(t.dataset.cell!=null){S.cell=t.dataset.cell;return renderMain()}if(t.dataset.rel){S.rel=t.dataset.rel;S.cell=null;return renderMain()}
+ if(t.dataset.phase!=null){S.obsPhase=t.dataset.phase;return renderMain()}if(t.dataset.entry!=null){S.entry=t.dataset.entry;$('entry').value=S.entry;return render()}});
+document.addEventListener('change',ev=>{if(ev.target.dataset&&ev.target.dataset.cat){S.obsCat=ev.target.value;renderMain()}});
+$('q').addEventListener('input',()=>{S.q=$('q').value;renderNav()});
+$('grouping').addEventListener('change',()=>{S.grouping=$('grouping').value;S.cell=null;render()});
+$('entry').addEventListener('change',()=>{S.entry=$('entry').value;if(S.entry)S.tab='entry';render()});
+$('trace').addEventListener('change',()=>{S.trace=$('trace').value;render()});
+$('show').innerHTML=SHOW.map(([k,l])=>`<label><input type="checkbox" data-show="${k}" checked> ${ev(k==='import'?'import':k,l)}</label>`).join('');
+$('show').addEventListener('change',e=>{const k=e.target.dataset.show;if(k){S.show[k]=e.target.checked;renderMain()}});
+for(const [n,e] of Object.entries(D.entries)){const o=document.createElement('option');o.value=n;o.textContent=`${n} (${e.kind}, ${e.nodes} nodes)`;$('entry').append(o)}
+D.traces.forEach((t,ti)=>{const o=document.createElement('option');o.value=String(ti);o.textContent=t.scenario;$('trace').append(o)});
+$('pkgname').textContent='· '+(D.meta.package||'');
+$('meta').textContent=`Static source ${D.meta.source_commit||D.meta.base_commit||'unrecorded'} (${D.meta.source_status||'status unrecorded'}, content ${String(D.meta.source_sha256||'').slice(0,12)}) · tools.architecture ${D.meta.tool_version} · ${D.traces.length} runtime capture(s), each with its own revision · proposal ${P.source?P.source.path+' ('+(P.status||'')+')':'none'} · offline page, no network`;
+readHash();render();
+window.__atlas={D,S,ID,of,reach,matrix,search,selectNode,selectEdge,render,relationsOf,staticOf};
+</script></body></html>

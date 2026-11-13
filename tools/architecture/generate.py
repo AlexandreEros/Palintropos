@@ -30,6 +30,7 @@ from .calls import build_call_graph, scoped
 from . import class_tree
 from .classes import build_class_graph
 from . import coverage as cov
+from . import interactive as atlas
 from .views import index_page, package_page, page_name, public_functions
 from .imports import (aggregate_by_package, build_import_graph, containing_package,
                       excluded_modules, import_time_subgraph)
@@ -52,6 +53,12 @@ FROZEN_MARKER = "<!-- architecture-snapshot: frozen -->"
 DEFAULT_CALL_DEPTH = 4
 #: The scope file: declared Python entry paths and deliberate exclusions.
 DEFAULT_SCOPE = "docs/architecture/entry-points.toml"
+#: Proposed-package overlay shown by ``interactive.html`` (a hypothesis under
+#: review; it changes no measurement of the current code).
+DEFAULT_PROPOSAL = "docs/architecture/proposed-packages.json"
+#: Committed runtime traces (``tools.architecture.runtime_capture``) joined
+#: into ``interactive.html``; each keeps its own revision.
+DEFAULT_EVIDENCE = "docs/architecture/evidence/runtime"
 
 
 @dataclass
@@ -79,6 +86,11 @@ class Options:
     generator_commit: str | None = None  # full sha, verified by the caller
     freeze: bool = False
     command: str = "python -m tools.architecture.generate"
+    #: Repository-relative proposal overlay / runtime-trace directory for
+    #: ``interactive.html``; ``None``: none.
+    proposal: str | None = None
+    evidence: str | None = None
+    max_sites: int = atlas.DEFAULT_MAX_SITES
 
 
 def render(opts: Options, root: Path = REPO_ROOT) -> dict[str, str]:
@@ -217,6 +229,12 @@ def render(opts: Options, root: Path = REPO_ROOT) -> dict[str, str]:
     problems += cov.rendered_problems(project, rendered_classes, rendered_modules,
                                       set(by_package))
     problems += tree_problems
+    try:
+        proposal, proposal_source = atlas.load_proposal(root, opts.proposal)
+        traces = atlas.load_traces(root, opts.evidence)
+    except atlas.AtlasInputError as exc:
+        problems.append(f"atlas input: {exc}")
+        proposal, proposal_source, traces = None, None, []
     if problems:
         raise cov.CoverageError(problems)
     rooted = {r for p in scope.entry_paths for r in p.roots}
@@ -268,6 +286,33 @@ def render(opts: Options, root: Path = REPO_ROOT) -> dict[str, str]:
         },
     }
     files["coverage.json"] = dumps(coverage)
+
+    # -- interactive atlas (same model, plus AST site detail and the inputs) --
+    declared_paths = {p.name: p for p in scope.entry_paths}
+    entries = {}
+    for name, roots in sorted(graphs.items()):
+        path = declared_paths.get(name)
+        entries[name] = {"kind": "declared" if path else "cli",
+                         "title": path.title if path else f"CLI handler {roots[0]}",
+                         "doc": path.doc if path else None,
+                         **{k: v for k, v in scoped_summary[name].items() if k != "roots"},
+                         "roots": roots}
+    tree_state = (opts.working_tree or {}).get("source", {})
+    data = atlas.build_atlas(
+        project, modules=modules, calls=calls, classes=classes,
+        packages_of={m: cov.package_of(project, m) for m in project.modules},
+        entries=entries, call_depth=opts.call_depth, max_sites=opts.max_sites,
+        meta={"package": pkg, "title": opts.title, "tool_version": TOOL_VERSION,
+              "source_commit": opts.source_commit,
+              "base_commit": (opts.working_tree or {}).get("base_commit"),
+              "source_status": tree_state.get("status"),
+              "source_sha256": tree_state.get("sha256"),
+              "command": opts.command,
+              "limits": coverage["limits"]["not_followed"],
+              "dynamic_import_sites": coverage["limits"]["dynamic_import_sites"]},
+        proposal=proposal, proposal_source=proposal_source, traces=traces)
+    files["interactive.html"] = atlas.render_html(data)
+    atlas_summary = atlas.summary(data)
     files["index.md"] = index_page(opts.title, rows, {n: r[0] for n, r in cli_roots.items()},
                                    coverage["declared"]["entry_paths"], coverage)
 
@@ -322,6 +367,7 @@ def render(opts: Options, root: Path = REPO_ROOT) -> dict[str, str]:
             "nests_edges": len(classes.edges_of_kind("nests")),
             "external_bases": dict(sorted(external_bases.items())),
         },
+        "atlas": atlas_summary,
         "call_graph": {
             "nodes": len(calls.nodes),
             "edges_by_kind": dict(sorted(edge_kinds.items())),
@@ -439,6 +485,9 @@ def command_line(args: argparse.Namespace, source_commit: str | None) -> str:
                                  ("--title", args.title, "current"),
                                  ("--call-depth", args.call_depth, DEFAULT_CALL_DEPTH),
                                  ("--scope", args.scope, DEFAULT_SCOPE),
+                                 ("--proposal", args.proposal, DEFAULT_PROPOSAL),
+                                 ("--evidence", args.evidence, DEFAULT_EVIDENCE),
+                                 ("--max-sites", args.max_sites, atlas.DEFAULT_MAX_SITES),
                                  ("--source-commit", source_commit, None)):
         if value != default:
             command.append(f"{flag} {value!s}" if " " not in str(value) else f'{flag} "{value}"')
@@ -465,6 +514,15 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--scope", default=DEFAULT_SCOPE,
                         help="scope file (declared entry paths and exclusions), relative "
                              "to the repo root; 'none' for no declarations")
+    parser.add_argument("--proposal", default=DEFAULT_PROPOSAL,
+                        help="proposed-package overlay for interactive.html, relative to "
+                             "the repo root; 'none' for no overlay")
+    parser.add_argument("--evidence", default=DEFAULT_EVIDENCE,
+                        help="directory of runtime traces joined into interactive.html; "
+                             "'none' for no runtime evidence")
+    parser.add_argument("--max-sites", type=int, default=atlas.DEFAULT_MAX_SITES,
+                        help="call/import sites recorded per edge in interactive.html "
+                             "(the rest are counted)")
     layer_group = parser.add_mutually_exclusive_group()
     layer_group.add_argument("--layer", action="append", default=[],
                              metavar="NAME=PREFIX[,PREFIX]",
@@ -496,6 +554,19 @@ def main(argv: list[str] | None = None) -> int:
         declared.append((name, tuple(p for p in prefixes.split(",") if p)))
     if args.freeze and not args.source_commit:
         parser.error("--freeze requires --source-commit")
+    if args.max_sites < 1:
+        parser.error("--max-sites must be positive")
+
+    def optional_input(value: str, default: str, kind: str) -> str | None:
+        # Like the scope file: a missing *default* means "none"; a missing
+        # file named explicitly is an error.
+        if value == "none":
+            return None
+        if (REPO_ROOT / value).exists():
+            return value
+        if value == default:
+            return None
+        parser.error(f"{kind} {value!r} does not exist")
 
     opts = Options(src=args.src, package=args.package, out=args.out, title=args.title,
                    call_roots=roots or None, call_depth=args.call_depth,
@@ -507,7 +578,10 @@ def main(argv: list[str] | None = None) -> int:
                        else args.scope),
                    layers=([] if args.no_layers else declared or list(layering.DEFAULT_LAYERS)),
                    layers_source=layering.COMMAND_LINE_SOURCE if declared else None,
-                   freeze=args.freeze)
+                   freeze=args.freeze,
+                   proposal=optional_input(args.proposal, DEFAULT_PROPOSAL, "--proposal"),
+                   evidence=optional_input(args.evidence, DEFAULT_EVIDENCE, "--evidence"),
+                   max_sites=args.max_sites)
     if args.source_commit:
         opts.source_commit = verify_source_commit(REPO_ROOT, args.source_commit,
                                                   args.src, args.package)
