@@ -28,7 +28,8 @@ from tropoi.physics.radiation.scheme import STEFAN_BOLTZMANN
 
 __all__ = ["OpticalDepthProfile", "GrayLongwave", "GrayShortwave",
            "SemiInfiniteScatteringShortwave", "frierson_longwave",
-           "schneider_liu_longwave", "isca_mars_longwave", "isca_mars_shortwave"]
+           "schneider_liu_longwave", "isca_mars_longwave", "isca_mars_shortwave",
+           "VerticalPathShortwave"]
 
 
 def _xp(*arrays):
@@ -171,6 +172,33 @@ class SemiInfiniteScatteringShortwave:
         xp = _xp(column.pressure_interfaces)
         down = toa_flux[None, :] * xp.exp(-self.attenuation * self.profile.cumulative(column))
         return self.bond_albedo * down, down, 0.0 * down
+
+
+class VerticalPathShortwave:
+    """Pure gray absorption along the vertical, as in Isca's Frierson-type
+    scheme (``two_stream_gray_rad``, used by Thomson & Vallis 2019 M-I):
+
+        down(p) = S exp(-tau(p)),   up(p) = albedo down(p_s)   at every level,
+
+    where ``S`` already includes the zenith-angle factor. There is no slant
+    path (``mu0`` is ignored) and the reflected beam leaves without being
+    absorbed, so the atmosphere absorbs ``S (1 - exp(-tau_s))``. The
+    two-stream :class:`GrayShortwave` takes the slant path ``tau / mu0`` and
+    re-absorbs the reflection. On diurnally forced Mars with tau_s = 0.2 it
+    absorbs about 30 % of the insolation against this scheme's 18 %.
+    """
+
+    def __init__(self, profile: OpticalDepthProfile):
+        self.profile = profile
+
+    def signature(self) -> dict:
+        return {"kind": "vertical_path_shortwave", "profile": self.profile.signature()}
+
+    def analytic_fluxes(self, column, toa_flux, mu0, albedo):
+        xp = _xp(column.pressure_interfaces)
+        down = toa_flux[None, :] * xp.exp(-self.profile.cumulative(column))
+        up = (albedo * down[-1])[None, :] * xp.ones_like(down)
+        return up, down, down.copy()
 
 
 def frierson_longwave(tau_equator: float = 6.0, tau_pole: float = 1.5,

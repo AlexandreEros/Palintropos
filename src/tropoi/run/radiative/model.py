@@ -18,7 +18,7 @@ from tropoi.physics.insolation import (DiurnalMeanInsolation, InstantaneousInsol
                                        PrescribedInsolation, StellarIllumination,
                                        TidallyLockedInsolation, frierson_net_surface_flux)
 from tropoi.physics.radiation.gray import (GrayLongwave, GrayShortwave, OpticalDepthProfile,
-                                           SemiInfiniteScatteringShortwave,
+                                           SemiInfiniteScatteringShortwave, VerticalPathShortwave,
                                            frierson_longwave)
 from tropoi.physics.radiation.scheme import Radiation
 from tropoi.physics.surface import SlabSurface
@@ -50,6 +50,9 @@ def build_sigma(cfg: RadiativeConfig) -> SigmaGrid:
     if kind == "stretched":
         o = _options(v, "nlev", "sigma_top", linear_scale=None)
         return SigmaGrid.stretched(int(o["nlev"]), float(o["sigma_top"]), o["linear_scale"])
+    if kind == "interfaces":
+        # an explicit list of the K+1 interfaces, top (0) to bottom (1)
+        return SigmaGrid(tuple(float(s) for s in _options(v, "sigma")["sigma"]))
     raise ValueError(f"unknown vertical grid kind {kind!r}")
 
 
@@ -78,6 +81,10 @@ def _shortwave(spec: Optional[dict]):
         return SemiInfiniteScatteringShortwave(
             OpticalDepthProfile([(1.0, o["exponent"])], equator=o["tau0"], reference=o["p0"]),
             ssa=o["ssa"], asym=o["asym"])
+    if kind == "vertical_path":
+        o = _options(spec, "tau0", exponent=1.0, p0="surface")
+        return VerticalPathShortwave(
+            OpticalDepthProfile([(1.0, o["exponent"])], equator=o["tau0"], reference=o["p0"]))
     if kind == "power_law":
         o = _options(spec, "tau0", exponent=1.0, p0="surface", ssa=0.0, asym=0.0,
                      closure="quadrature")
