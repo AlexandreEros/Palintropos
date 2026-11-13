@@ -31,6 +31,7 @@ default `DEFAULT_LAYERS` in `tools/architecture/layers.py`: `cli`, `run`,
 | Page | What it is | Authority |
 |---|---|---|
 | [`current/index.md`](current/index.md) | Generated index: every package page, every entry path, the coverage summary | Generated from `src/`; CI fails if stale |
+| [`current/interactive.html`](current/interactive.html) | Interactive architecture atlas: start from one package, workflow or function and explore its imports, static calls, possible dispatch, call sites with argument bindings, runtime observations and proposed package ownership. One offline HTML file; open it from disk. | Generated (includes the two inputs below) |
 | [`current/class-atlas.html`](current/class-atlas.html) | Interactive containment tree. Save the HTML and open it in a browser for offline search and subtree navigation. | Generated |
 | [`current/structure.mmd`](current/structure.mmd) | Complete Mermaid containment tree | Generated |
 | [`current/class-inheritance.mmd`](current/class-inheritance.mmd) | Class inheritance overview | Generated |
@@ -39,6 +40,9 @@ default `DEFAULT_LAYERS` in `tools/architecture/layers.py`: `cli`, `run`,
 | [`current/coverage.json`](current/coverage.json) | Discovered vs rendered, deliberate exclusions, static-analysis limits | Generated |
 | [`current/README.md`](current/README.md) | Provenance, extraction rules and limits, metric definitions | Generated |
 | [`entry-points.toml`](entry-points.toml) | Declared Python entry paths and exclusions, with reasons | Hand-written input; the generator fails if it misses or misnames a candidate |
+| [`proposed-packages.json`](proposed-packages.json) | Proposed lifecycle ownership: groups, intended order, prefix rules, declared exceptions (schema 2) | Hand-written hypothesis; shown by the atlas, changes no measurement |
+| [`evidence/`](evidence/README.md) | Runtime traces (joined into the atlas) and a separate synchronized profile, with reproduction commands | Recorded data, each with its own revision |
+| [`LIFECYCLE_MIGRATION_PROPOSAL.md`](LIFECYCLE_MIGRATION_PROPOSAL.md) | Evidence-based package proposal, planet data model decisions and staged migration issues | Hand-written, for review |
 | [`subsystems/sky.md`](subsystems/sky.md) | The sky subsystem: optics, page assembly, the JavaScript page, both entry paths, boundaries | Hand-written; must link its generated diagrams (checked) |
 | [`../ARCHITECTURE.md`](../ARCHITECTURE.md) | Responsibilities and design: layers, backends, transforms, capsules | Hand-written |
 | [`review/README.md`](review/README.md) | Measured before/after comparison JSON used by the export tool | Data |

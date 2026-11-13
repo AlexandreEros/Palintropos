@@ -1,0 +1,356 @@
+{
+  "schema": 2,
+  "status": "hypothesis-for-review",
+  "revision": "2026-11-13.2",
+  "principle": "Classify code by scientific responsibility and lifecycle role, not by execution frequency or device. Labels never authorize moving production code; the overlay is evaluated against the current import/call graph and runtime captures before any migration.",
+  "groups": {
+    "world": {
+      "role": "Prescribed physical descriptions and the reference data they are stated in: planet, star, orbit, rotation, composition, species identity, fundamental constants, prescribed fluid layer and terrain specification. Immutable, CPU-only; no grids, device buffers, integrators or evaluated physics."
+    },
+    "setup": {
+      "role": "Configuration resolution, presets, terrain preparation, initial conditions and construction of numerical components."
+    },
+    "spectral": {
+      "role": "Grids, quadrature, basis and truncation conventions, transforms, spectral and vertical numerical operators, transform-specific kernels, and the prepared numerical-resource bundle (current Planet class) with its discretization description."
+    },
+    "dynamics": {
+      "role": "Prognostic state schemas, the equations that turn a state into tendencies, and the tendency-term/damping contract (temporal.hooks) those terms implement."
+    },
+    "physics": {
+      "role": "Physical relationships and parameterizations: radiation, convection, surface exchange, thermodynamic and optical data."
+    },
+    "integration": {
+      "role": "Time advancement: steppers, stage/history management, numerical filters, hooks and physics coupling schedules."
+    },
+    "run": {
+      "role": "Experiment orchestration, output schedules and checkpoint coordination."
+    },
+    "analysis": {
+      "role": "Saved-run access, diagnostics, reductions and visualization."
+    },
+    "archive": {
+      "role": "Persistence formats, reconstruction, run identity/provenance and checkpoint encoding."
+    },
+    "cli": {
+      "role": "Public command routing and compatibility."
+    }
+  },
+  "layers": [
+    [
+      "cli"
+    ],
+    [
+      "run"
+    ],
+    [
+      "setup",
+      "analysis"
+    ],
+    [
+      "archive",
+      "integration"
+    ],
+    [
+      "dynamics",
+      "physics"
+    ],
+    [
+      "spectral"
+    ],
+    [
+      "world"
+    ]
+  ],
+  "rules": [
+    {
+      "prefix": "tropoi",
+      "exact": true,
+      "group": "cli",
+      "why": "the empty root package: the public import surface"
+    },
+    {
+      "prefix": "tropoi.cli",
+      "group": "cli"
+    },
+    {
+      "prefix": "tropoi.run",
+      "group": "run"
+    },
+    {
+      "prefix": "tropoi.run.bve.config",
+      "group": "setup"
+    },
+    {
+      "prefix": "tropoi.run.swe.config",
+      "group": "setup"
+    },
+    {
+      "prefix": "tropoi.run.pe.config",
+      "group": "setup"
+    },
+    {
+      "prefix": "tropoi.run.bve.presets",
+      "group": "setup"
+    },
+    {
+      "prefix": "tropoi.run.bve.model",
+      "group": "setup",
+      "why": "re-export shim of the temporal.models builders"
+    },
+    {
+      "prefix": "tropoi.run.swe.model",
+      "group": "setup",
+      "why": "re-export shim of the temporal.models builders"
+    },
+    {
+      "prefix": "tropoi.run.pe.model",
+      "group": "setup",
+      "why": "re-export shim of the temporal.models builders"
+    },
+    {
+      "prefix": "tropoi.run.radiative.config",
+      "group": "setup"
+    },
+    {
+      "prefix": "tropoi.run.radiative.model",
+      "group": "setup",
+      "why": "build_sigma/build_radiation/build_physics/build_model/build_stepper/initial_state: construction, not evaluation"
+    },
+    {
+      "prefix": "tropoi.run.held_suarez.config",
+      "group": "setup"
+    },
+    {
+      "prefix": "tropoi.run.held_suarez.model",
+      "group": "setup"
+    },
+    {
+      "prefix": "tropoi.run.held_suarez.checkpoint",
+      "group": "archive",
+      "why": "checkpoint encoding (atomic write, read, prune) used by both HS and radiative runs"
+    },
+    {
+      "prefix": "tropoi.run.held_suarez.report",
+      "group": "analysis"
+    },
+    {
+      "prefix": "tropoi.run.held_suarez.statistics",
+      "group": "analysis"
+    },
+    {
+      "prefix": "tropoi.run.custom.config",
+      "group": "setup"
+    },
+    {
+      "prefix": "tropoi.run.custom.prepare",
+      "group": "setup"
+    },
+    {
+      "prefix": "tropoi.run.custom.presets",
+      "group": "setup"
+    },
+    {
+      "prefix": "tropoi.run.custom.planet",
+      "group": "setup",
+      "why": "PreparedPlanet: a planet, its discretization and resolved terrain"
+    },
+    {
+      "prefix": "tropoi.run.custom.resources",
+      "group": "setup"
+    },
+    {
+      "prefix": "tropoi.representation",
+      "group": "analysis"
+    },
+    {
+      "prefix": "tropoi.representation.archive",
+      "group": "archive"
+    },
+    {
+      "prefix": "tropoi.representation.identity",
+      "group": "archive",
+      "why": "scientific identity of a run configuration (the run-id hash rule)"
+    },
+    {
+      "prefix": "tropoi.temporal",
+      "group": "integration"
+    },
+    {
+      "prefix": "tropoi.temporal.tendencies",
+      "group": "dynamics"
+    },
+    {
+      "prefix": "tropoi.temporal.models",
+      "group": "setup",
+      "why": "build_planet/build_swe_model/build_pe_model: construction shared by runners and the saved-run interface"
+    },
+    {
+      "prefix": "tropoi.temporal.simulation",
+      "group": "analysis",
+      "why": "read-only Simulation/Snapshot over stored frames"
+    },
+    {
+      "prefix": "tropoi.spatial",
+      "group": "spectral"
+    },
+    {
+      "prefix": "tropoi.spatial.environment",
+      "group": "world"
+    },
+    {
+      "prefix": "tropoi.spatial.williamson5",
+      "group": "world",
+      "why": "Williamson et al. (1992) case 5: 'the benchmark's prescribed world' (its docstring); TopographySpec imports W5_CONE_HEIGHT_M (world->setup otherwise). Exact benchmark constants stay prescribed, never derived."
+    },
+    {
+      "prefix": "tropoi.spatial.initialization",
+      "group": "setup"
+    },
+    {
+      "prefix": "tropoi.spatial.terrain",
+      "group": "setup"
+    },
+    {
+      "prefix": "tropoi.spatial.states",
+      "group": "dynamics"
+    },
+    {
+      "prefix": "tropoi.physics",
+      "group": "physics"
+    },
+    {
+      "prefix": "tropoi.physics.planets",
+      "group": "world"
+    },
+    {
+      "prefix": "tropoi.physics.planets.VerticalGridSpec",
+      "group": "setup",
+      "why": "a numerical vertical-grid choice carried by the physical body"
+    },
+    {
+      "prefix": "tropoi.physics.star",
+      "group": "world"
+    },
+    {
+      "prefix": "tropoi.physics.orbit",
+      "group": "world"
+    },
+    {
+      "prefix": "tropoi.physics.rotation",
+      "group": "world"
+    },
+    {
+      "prefix": "tropoi.physics.constants",
+      "group": "world",
+      "why": "reference data: orbit and star import it at module scope (world->physics otherwise)"
+    },
+    {
+      "prefix": "tropoi.physics.species",
+      "group": "world",
+      "why": "species identity and atomic weights; star catalogue loading calls load_dataset (world->physics otherwise)"
+    },
+    {
+      "prefix": "tropoi.physics.composition",
+      "group": "world",
+      "why": "a STATED mixture (its docstring): prescribed description; PlanetaryBody imports it"
+    },
+    {
+      "prefix": "tropoi.spatial.specification",
+      "group": "world",
+      "why": "PlanetSpec, FluidLayerSpec, TopographySpec and their validators: persisted prescribed descriptions that archive must decode (archive->setup and world->setup otherwise)"
+    },
+    {
+      "prefix": "tropoi.spatial.specification.DiscretizationSpec",
+      "group": "spectral",
+      "why": "truncation, grid family and product sampling: a numerical description, decoded by archive"
+    },
+    {
+      "prefix": "tropoi.spatial.planet",
+      "group": "spectral",
+      "why": "the cores (barotropic, shallow_water, primitive_equations tendencies) import Planet at module scope: it is the prepared numerical-resource bundle (grid, transform, operators, elevation), not construction"
+    },
+    {
+      "prefix": "tropoi.spatial.planet.Planet.generate",
+      "group": "setup",
+      "why": "construction of the resource bundle, including procedural terrain"
+    },
+    {
+      "prefix": "tropoi.temporal.hooks",
+      "group": "dynamics",
+      "why": "DiagonalDamping / explicit-term contract implemented by tendency terms (held_suarez instantiates DiagonalDamping) and consumed by steppers"
+    },
+    {
+      "prefix": "tropoi.temporal.tendencies.held_suarez.hyperdiffusion_damping",
+      "group": "integration",
+      "why": "a numerical filter, not an equation term"
+    },
+    {
+      "prefix": "tropoi.temporal.tendencies.held_suarez.hyperdiffusion_coefficient",
+      "group": "integration",
+      "why": "a numerical filter, not an equation term"
+    },
+    {
+      "prefix": "tropoi.representation.archive.capsule.open_simulation",
+      "group": "analysis",
+      "why": "constructs the analysis facade (Simulation) over a storage: saved-run access"
+    },
+    {
+      "prefix": "tropoi.spatial.terrain.elevation_data",
+      "group": "spectral",
+      "why": "ElevationData is a field of the Planet resource bundle (device arrays), not a preparation step"
+    }
+  ],
+  "exceptions": [
+    {
+      "source": "tropoi.representation.archive.capsule",
+      "target": "tropoi.representation.visual",
+      "reason": "SnapshotStorage protocol delegates plot/view/sky/quantities/resources to the storage; function-scope imports keep the archive import-light. Intended to be inverted (migration issue M7)."
+    },
+    {
+      "source": "tropoi.representation.archive.held_suarez",
+      "target": "tropoi.representation.visual",
+      "reason": "as capsule: presentation delegated to the storage (M7)."
+    },
+    {
+      "source": "tropoi.representation.archive.capsule",
+      "target": "tropoi.temporal.simulation",
+      "reason": "open_simulation builds the Simulation facade at module import of capsule; disappears when open_simulation moves to analysis (M7)."
+    },
+    {
+      "source": "tropoi.representation.visual.snapshot",
+      "target": "tropoi.temporal.models",
+      "reason": "saved-run figures rebuild the run's model with the runner's own builders (temporal.models docstring: one construction for both callers). Lateral by design."
+    },
+    {
+      "source": "tropoi.run.custom.planet",
+      "target": "tropoi.representation.visual.terrain",
+      "reason": "PreparedPlanet.plot/view preview conveniences, imported on use."
+    },
+    {
+      "source": "tropoi.physics.planets",
+      "target": "tropoi.physics.insolation",
+      "reason": "TEMPORARY: PlanetaryBody stores a StellarIllumination; the canonical descriptor keeps star/orbit/rotation and derives illumination in physics (M2)."
+    },
+    {
+      "source": "tropoi.physics.planets",
+      "target": "tropoi.physics.thermodynamics",
+      "reason": "TEMPORARY: PlanetaryBody.cp/kappa/regime evaluate heat capacity; evaluation moves to physics helpers behind compatibility properties (M2)."
+    },
+    {
+      "source": "tropoi.temporal.tendencies.shallow_water",
+      "target": "tropoi.spatial.terrain.topography",
+      "reason": "UNRESOLVED: the SWE core consumes a prepared Topography (Topography.flat default). Ownership of prepared boundary fields is open (proposal section 5)."
+    },
+    {
+      "source": "tropoi.spatial.planet",
+      "target": "tropoi.spatial.terrain",
+      "reason": "TEMPORARY: the bundle's module imports Planet.generate's procedural-terrain dependencies at module scope; disappears when generate moves to a setup factory (M3)."
+    }
+  ],
+  "evidence_base": {
+    "static_source_commit": "08e6f223923851fb738fbd837581b36f9826a47d",
+    "runtime_traces": "docs/architecture/evidence/runtime/*.json",
+    "profile": "docs/architecture/evidence/profile/profile-earth-tiny-sync.json",
+    "how_to_review": "Open docs/architecture/current/interactive.html, Group by: Proposed owner, Boundaries tab. Every amendment below cites the edges that motivated it in its 'why'."
+  }
+}

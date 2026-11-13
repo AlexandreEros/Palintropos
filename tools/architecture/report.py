@@ -19,6 +19,9 @@ FILE_DESCRIPTIONS = {
     "modules-cycles.mmd": "Module-level import graph restricted to modules in import cycles (nontrivial SCCs).",
     "structure.mmd": "Every class definition, with the Python files and directories that contain it.",
     "class-atlas.html": "Offline explorer for the class containment tree.",
+    "interactive.html": "Offline architecture atlas: imports, static calls, possible dispatch, "
+                        "runtime observations and proposed ownership, with source sites "
+                        "(see *Interactive atlas*).",
     "class-inheritance.mmd": "Classes linked by inheritance between analysed classes.",
     "graph/modules.json": "Full module import graph: every analysed module and import edge.",
     "graph/packages.json": "Package-aggregated import graph.",
@@ -335,8 +338,10 @@ def render_readme(metrics: dict, opts, files: list[str], generated_marker: str,
     out += [
         "",
         "Generated files contain no timestamps, absolute paths, or source line numbers, "
-        "so they change only when the extracted structure changes (the call-site totals "
-        "in `metrics.json` are the exception: they count call expressions).",
+        "so they change only when the extracted structure changes, with two exceptions: "
+        "the call-site totals in `metrics.json` count call expressions, and "
+        "`interactive.html` embeds source lines and line numbers, so it changes with any "
+        "edit to a line it shows.",
         "",
         *_coverage_section(coverage),
         "## Inclusion and exclusion rules",
@@ -501,6 +506,39 @@ def render_readme(metrics: dict, opts, files: list[str], generated_marker: str,
         out.append(f"| `calls/{name}.mmd` | " + ", ".join(f"`{r}`" for r in s["roots"])
                    + f" | {s['max_depth']} |")
     out += [
+        "",
+        "## Interactive atlas",
+        "",
+        "`interactive.html` is one self-contained page (no network, CDN or library; open "
+        "it from disk). It is built from the same graphs as the files above plus detail "
+        "read from the same in-memory AST, and adds no extraction rule:",
+        "",
+        "* **Import statements** behind each import edge: imported symbols and aliases, "
+        "line, and scope (`module`, `function`, `type_checking`).",
+        "* **Call sites** behind each call edge, at most "
+        f"{(metrics.get('atlas') or {}).get('max_sites_per_edge', '?')} per edge (the rest "
+        "are counted on the edge): the expression, its arguments bound syntactically to "
+        "the callee's parameter names, and the callee's parameter, default and return "
+        "annotations as written. Constructor edges have no call site. A `self` site lists "
+        "the `override` targets it may dispatch to.",
+        "* **Calls without an edge**, per caller: counts of `external`, `builtin` and "
+        "`unresolved` sites with a few examples. They are never drawn as edges.",
+        "* **Annotated class fields** with the comment on their line, verbatim. Units and "
+        "meanings appear only where the source states them; none is inferred.",
+        "* **Entry paths**: the same roots and depth as `calls/*.mmd`; the page recomputes "
+        "the reach and marks nodes cut by the depth limit.",
+        "* **Proposed ownership** (input, when given): a hypothesis file assigning "
+        "responsibility groups by id prefix (most specific wins; module, class or function "
+        "ids), with an intended group order and declared exceptions. The page groups the "
+        "current code by it and aggregates crossing imports and calls, with direction and "
+        "group cycles. It never changes a measurement of the current code; its path and "
+        "SHA-256 are recorded under `atlas.proposal` in `metrics.json`.",
+        "* **Runtime evidence** (input, when given): traces recorded by "
+        "`python -m tools.architecture.runtime_capture`, each keeping its own revision, "
+        "source content hash, environment and limits. Observed calls are aligned with "
+        "static edges by name only (`corroborated`, `runtime-only`, `unmapped`). An "
+        "unobserved call is not evidence of unused code. Files and hashes are listed under "
+        "`atlas.runtime_traces` in `metrics.json`.",
         "",
         "## Metric definitions",
         "",

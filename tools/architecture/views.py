@@ -106,6 +106,9 @@ def index_page(title: str, package_rows: list[dict], cli: dict[str, str],
            "rendered, what is deliberately excluded, and what static analysis cannot "
            "see. Narrative pages are linked from [the architecture README](../README.md).",
            "",
+           "Explore dependencies, call sites, possible dispatch, runtime observations and "
+           "proposed package ownership in the [interactive architecture atlas]"
+           "(interactive.html) (one offline HTML file: open it from disk). "
            "Explore class definitions in the [offline HTML atlas](class-atlas.html) or the "
            "[Mermaid containment tree](structure.mmd). "
            "The [inheritance overview](class-inheritance.mmd) shows the class hierarchy.",

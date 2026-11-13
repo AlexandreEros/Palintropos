@@ -5,9 +5,9 @@
 
 | | |
 |---|---|
-| Source base commit | `b35dba92f896b13f8068b192e90bf765954eabf6` (clean working tree) |
+| Source base commit | `ecd59b00d471c70e060bd44cc227309b3bd2fee4` (clean working tree) |
 | Analysed package | `tropoi` under `src/` |
-| Generator | `tools.architecture` 2.2.0 |
+| Generator | `tools.architecture` 2.3.0 |
 | Toolchain | Python 3.12, grimp 3.17, networkx 3.7 |
 | Command | `python -m tools.architecture.generate` |
 
@@ -51,6 +51,7 @@ python -m tools.architecture.generate
 | `graph/modules.json` | Full module import graph: every analysed module and import edge. |
 | `graph/packages.json` | Package-aggregated import graph. |
 | `index.md` | Start here: every package page, every entry path, and the coverage summary. |
+| `interactive.html` | Offline architecture atlas: imports, static calls, possible dispatch, runtime observations and proposed ownership, with source sites (see *Interactive atlas*). |
 | `metrics.json` | All measurements, machine-readable. |
 | `metrics.md` | The same measurements as tables, with definitions. |
 | `packages.mmd` | Package-level import graph, every edge drawn; boxed by declared layer when a declaration applies (see *Package graph*). |
@@ -81,7 +82,7 @@ python -m tools.architecture.generate
 | `packages/tropoi.temporal.tendencies.md` | Package page: all of its modules, classes and public functions; imports in and out. |
 | `structure.mmd` | Every class definition, with the Python files and directories that contain it. |
 
-Generated files contain no timestamps, absolute paths, or source line numbers, so they change only when the extracted structure changes (the call-site totals in `metrics.json` are the exception: they count call expressions).
+Generated files contain no timestamps, absolute paths, or source line numbers, so they change only when the extracted structure changes, with two exceptions: the call-site totals in `metrics.json` count call expressions, and `interactive.html` embeds source lines and line numbers, so it changes with any edit to a line it shows.
 
 ## Scope and coverage
 
@@ -186,6 +187,18 @@ Scoped graphs follow edges of kinds `call`, `instantiate`, `constructor`, `self`
 | `calls/sky-numpy-reference.mmd` | `tropoi.representation.visual.sky.radiance_table`, `tropoi.representation.visual.sky.star_path_column`, `tropoi.representation.visual.sky.optical_depth_diagnostic`, `tropoi.physics.column.thin_atmosphere_mass_kg`, `tropoi.physics.column.thin_atmosphere_surface_pressure_pa`, `tropoi.physics.rayleigh.composition_cross_section` | 4 |
 | `calls/sky-saved-column.mmd` | `tropoi.temporal.simulation.Simulation.sky`, `tropoi.representation.archive.capsule.CapsuleStorage.sky`, `tropoi.representation.archive.held_suarez.HeldSuarezStorage.sky` | 4 |
 | `calls/terrain-raster.mmd` | `tropoi.spatial.terrain.raster.read_elevation`, `tropoi.spatial.terrain.raster.encode_grey16` | 4 |
+
+## Interactive atlas
+
+`interactive.html` is one self-contained page (no network, CDN or library; open it from disk). It is built from the same graphs as the files above plus detail read from the same in-memory AST, and adds no extraction rule:
+
+* **Import statements** behind each import edge: imported symbols and aliases, line, and scope (`module`, `function`, `type_checking`).
+* **Call sites** behind each call edge, at most 8 per edge (the rest are counted on the edge): the expression, its arguments bound syntactically to the callee's parameter names, and the callee's parameter, default and return annotations as written. Constructor edges have no call site. A `self` site lists the `override` targets it may dispatch to.
+* **Calls without an edge**, per caller: counts of `external`, `builtin` and `unresolved` sites with a few examples. They are never drawn as edges.
+* **Annotated class fields** with the comment on their line, verbatim. Units and meanings appear only where the source states them; none is inferred.
+* **Entry paths**: the same roots and depth as `calls/*.mmd`; the page recomputes the reach and marks nodes cut by the depth limit.
+* **Proposed ownership** (input, when given): a hypothesis file assigning responsibility groups by id prefix (most specific wins; module, class or function ids), with an intended group order and declared exceptions. The page groups the current code by it and aggregates crossing imports and calls, with direction and group cycles. It never changes a measurement of the current code; its path and SHA-256 are recorded under `atlas.proposal` in `metrics.json`.
+* **Runtime evidence** (input, when given): traces recorded by `python -m tools.architecture.runtime_capture`, each keeping its own revision, source content hash, environment and limits. Observed calls are aligned with static edges by name only (`corroborated`, `runtime-only`, `unmapped`). An unobserved call is not evidence of unused code. Files and hashes are listed under `atlas.runtime_traces` in `metrics.json`.
 
 ## Metric definitions
 
