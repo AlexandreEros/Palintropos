@@ -5,13 +5,13 @@
 
 | | |
 |---|---|
-| Source base commit | `ca1c44301f8829a24520a0df06a7a4ecbd4bebbd` (plus uncommitted working-tree changes) |
+| Source base commit | `b35dba92f896b13f8068b192e90bf765954eabf6` (clean working tree) |
 | Analysed package | `tropoi` under `src/` |
-| Generator | `tools.architecture` 2.1.0 |
+| Generator | `tools.architecture` 2.2.0 |
 | Toolchain | Python 3.12, grimp 3.17, networkx 3.7 |
 | Command | `python -m tools.architecture.generate` |
 
-Source working tree: **dirty**. Content SHA-256: `363d3660bc218585aeefd2db5af8eb805f1302519728829901d72fe77c55b32b`. Generator working tree: **clean**. Per-file hashes and scoped Git status are recorded in `metrics.json`. These describe generation time; --check verifies source and generator content hashes before reusing this context across later commits. The base commit alone does not identify uncommitted source.
+Source working tree: **clean**. Content SHA-256: `363d3660bc218585aeefd2db5af8eb805f1302519728829901d72fe77c55b32b`. Generator working tree: **clean**. Per-file hashes and scoped Git status are recorded in `metrics.json`. These describe generation time; --check verifies source and generator content hashes before reusing this context across later commits. The base commit alone does not identify uncommitted source.
 
 ## Reproducing
 
@@ -42,7 +42,8 @@ python -m tools.architecture.generate
 | `calls/sky-numpy-reference.mmd` | Scoped static call graph (roots and depth: see *Call graphs* below). |
 | `calls/sky-saved-column.mmd` | Scoped static call graph (roots and depth: see *Call graphs* below). |
 | `calls/terrain-raster.mmd` | Scoped static call graph (roots and depth: see *Call graphs* below). |
-| `classes.mmd` | Inheritance overview only: classes linked by inheritance between analysed classes. Every class, standalone ones included, is on its package page. |
+| `class-atlas.html` | Offline explorer for the class containment tree. |
+| `class-inheritance.mmd` | Classes linked by inheritance between analysed classes. |
 | `coverage.json` | What was discovered, what is rendered, deliberate exclusions, static-analysis limits. |
 | `graph/calls.json` | Whole-package static call graph (all resolvable edges). |
 | `graph/classes.json` | Every class with members, bases, and inheritance/nesting edges. |
@@ -78,6 +79,7 @@ python -m tools.architecture.generate
 | `packages/tropoi.spatial.transforms.md` | Package page: all of its modules, classes and public functions; imports in and out. |
 | `packages/tropoi.temporal.md` | Package page: all of its modules, classes and public functions; imports in and out. |
 | `packages/tropoi.temporal.tendencies.md` | Package page: all of its modules, classes and public functions; imports in and out. |
+| `structure.mmd` | Every class definition, with the Python files and directories that contain it. |
 
 Generated files contain no timestamps, absolute paths, or source line numbers, so they change only when the extracted structure changes (the call-site totals in `metrics.json` are the exception: they count call expressions).
 
@@ -134,6 +136,10 @@ The layers are the only input to this snapshot that states an expectation. They 
 * The renderer chooses where the boxes go, so an upward edge need not point up on screen; the colour and label are what mark it.
 * A package no declared prefix matches is drawn in an `unassigned` box and listed under `layer_graph.unassigned_packages`.
 * `--no-layers` renders the plain dependency graph instead.
+
+### Class containment tree (ast)
+
+The Mermaid tree and the offline atlas each contain every class definition, the Python files that define classes, and the directories above those files. Files and directories without classes are left out. Mermaid labels show each node's own name; the atlas also shows its qualified path and source line. Class nodes belong to the nearest enclosing class, or to their file. Function-local classes include their lexical scope in the qualified name. File and line distinguish definitions that share a qualified name. Generation checks the rendered nodes and parents against a separate filesystem and AST scan.
 
 ### Class graph (ast)
 
