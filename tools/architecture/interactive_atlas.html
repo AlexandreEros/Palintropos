@@ -130,17 +130,17 @@ function egoSvg(i,rel){const cap=12,W=760,BW=230,BH=22;const L=rel.inc.slice(0,c
  s+=`<g class="center"><rect x="${W/2-BW/2}" y="${cy-BH/2-2}" width="${BW}" height="${BH+4}" rx="5"/><text x="${W/2-BW/2+8}" y="${cy+5}">${esc(tail(i).slice(0,34))}</text></g>`;
  if(rel.inc.length>cap)s+=`<text x="8" y="${H-4}" class="muted">+${rel.inc.length-cap} more incoming (listed below)</text>`;if(rel.out.length>cap)s+=`<text x="${W-BW-8}" y="${H-4}">+${rel.out.length-cap} more outgoing (listed below)</text>`;
  return s+'</svg>'}
-function relRow(r,side){const label=r.rel==='call'?ev(r.cls,D.calls[r.k][2]):r.rel==='import'?ev(r.cls,'import '+r.label):ev('observed',r.label);
+function relRow(r,side,center){const label=r.rel==='call'?ev(r.cls,D.calls[r.k][2]):r.rel==='import'?ev(r.cls,'import '+r.label):ev('observed',r.label);
  const sites=r.rel==='call'?D.call_site_totals[r.k]:r.rel==='import'?D.import_sites[r.k].length+D.import_omitted[r.k]:null;const obs=r.rel==='call'?(obsOf.get(r.k)||[]).filter(([ti])=>traceOk(ti)).reduce((a,[ti,ei])=>a+D.traces[ti].edges[ei].count,0):0;
- const [s,t]=side==='out'?[S.sel.i,r.other]:[r.other,S.sel.i];
+ const [s,t]=side==='out'?[center,r.other]:[r.other,center];
  return `<div class="row"><button data-edge="${r.rel}:${r.rel==='obs'?r.ti+':'+r.ei:r.k}" title="${esc(ID[s]+' → '+ID[t])}">${esc(side==='out'?'→ ':'← ')}${esc(ID[r.other])}</button>${label}${sites!=null?`<span class="pill">${sites} site${sites===1?'':'s'}</span>`:''}${obs?ev('observed','×'+obs):''}${crossBadge(s,t)}</div>`}
 function renderNeighborhood(){if(!S.sel)return intro();const i=S.sel.t==='node'?S.sel.i:edgeEnds(S.sel)[0];if(i==null)return '<div class="note">This runtime observation has no static node to centre on.</div>';
  const rel=relationsOf(i);let h=`<h2>${esc(ID[i])}</h2><div class="small muted">Immediate neighbourhood: incoming on the left, outgoing on the right. Click a box to move there. ${isMod(i)?'Module view shows import edges; select a function or class for calls.':'Function/class view shows static and observed calls.'}</div>`;
  h+=egoSvg(i,rel);if(isMod(i)){const defs=(children.get(i)||[]);const agg=new Map();for(const d of defs)for(const ci of callOut.get(d)||[]){const t=modOf(D.calls[ci][1]);if(t!==i)agg.set(t,(agg.get(t)||0)+1)}
   h+=`<h3>Definitions (${defs.length})</h3>`+defs.slice(0,80).map(d=>nodeBtn(d,shortName(d))).join(' ')+(defs.length>80?` <span class="muted">+${defs.length-80} more</span>`:'');
   if(agg.size)h+=`<h3>Static calls leaving this module, by target module</h3>`+[...agg.entries()].sort((a,b)=>b[1]-a[1]).map(([m,c])=>`<div class="row">${nodeBtn(m)}<span class="pill">${c} edge${c>1?'s':''}</span>${crossBadge(i,m)}</div>`).join('')}
- h+=`<h3>Outgoing (${rel.out.length})</h3>`+(rel.out.map(r=>relRow(r,'out')).join('')||'<div class="muted small">none in the selected relation kinds</div>');
- h+=`<h3>Incoming (${rel.inc.length})</h3>`+(rel.inc.map(r=>relRow(r,'in')).join('')||'<div class="muted small">none in the selected relation kinds</div>');
+ h+=`<h3>Outgoing (${rel.out.length})</h3>`+(rel.out.map(r=>relRow(r,'out',i)).join('')||'<div class="muted small">none in the selected relation kinds</div>');
+ h+=`<h3>Incoming (${rel.inc.length})</h3>`+(rel.inc.map(r=>relRow(r,'in',i)).join('')||'<div class="muted small">none in the selected relation kinds</div>');
  const u=D.unresolved[i];if(u)h+=`<h3>Call sites that are not edges</h3><div class="note">${Object.entries(u[0]).map(([k,v])=>ev(k==='unresolved'?'unresolved':'structural',`${k} ${v}`)).join(' ')} · static analysis could not (or need not) bind these to an analysed definition; absence of an edge is not absence of a call.</div>`;
  return h}
 function edgeEnds(sel){if(sel.t==='call')return [D.calls[sel.k][0],D.calls[sel.k][1]];if(sel.t==='import')return [D.imports[sel.k][0],D.imports[sel.k][1]];const e=D.traces[sel.ti].edges[sel.ei];return [typeof e.s==='number'?e.s:null,typeof e.t==='number'?e.t:null]}

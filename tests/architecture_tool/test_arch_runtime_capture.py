@@ -120,6 +120,12 @@ def test_secrets_are_redacted_and_paths_scrubbed(archrt, tmp_path):
     d = rt.Describer(rt.Limits(), rt._scrub_pairs(tmp_path))
     out = d({"api_key": "s3cr3t", "token_file": "x", "path": str(tmp_path / "run"),
              "nlat": 8})
+    secrets = d({"auth": ["private-value"], "password": 1234,
+                 "credentials": {"user": "u", "pin": 42}})
+    dumped = json.dumps(secrets)
+    for leaked in ("private-value", "1234", "pin", '"u"'):
+        assert leaked not in dumped, leaked
+    assert all(secrets["fields"][k]["redacted"] for k in ("auth", "password", "credentials"))
     assert out["fields"]["api_key"]["value"] == "<redacted>"
     assert out["fields"]["token_file"]["redacted"]
     assert out["fields"]["path"]["value"] == "<repo>" + ("\\run" if "\\" in str(tmp_path)

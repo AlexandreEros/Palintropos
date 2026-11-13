@@ -258,7 +258,8 @@ def _radiative_lifecycle(scratch: Path):
         notes.configuration = _config_identity(cfg, origin)
         notes.verification = {
             "passed": bool(exact and comparison["stepper_scalars_equal"]
-                           and comparison["budget_time_equal"]),
+                           and comparison["budget_time_equal"]
+                           and comparison["budget_sums_equal"]),
             "claim": f"a run resumed from its day-1 checkpoint and advanced {RESUME_STEPS} "
                      f"steps equals the uninterrupted run advanced {RESUME_STEPS} steps "
                      "(time levels, step count, surface temperature, coupling budget)",

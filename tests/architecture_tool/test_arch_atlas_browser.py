@@ -41,7 +41,11 @@ def page_file(fixture_src, tmp_path_factory):
                 "layers": [["app"], ["core"]],
                 "rules": [{"prefix": "archfixture", "group": "core"},
                           {"prefix": "archfixture.a", "group": "app"},
-                          {"prefix": "archfixture.b", "group": "app"}]}
+                          {"prefix": "archfixture.b", "group": "app"}],
+                # A declared exception makes every crossing badge consult
+                # exceptionFor (a selected edge once crashed it).
+                "exceptions": [{"source": "archfixture.b", "target": "archfixture.a",
+                                "reason": "test"}]}
     (tmp / "proposal.json").write_text(json.dumps(proposal), encoding="utf-8")
     evidence = tmp / "evidence"
     evidence.mkdir()
@@ -115,6 +119,9 @@ def test_edges_show_kinds_sites_and_possible_dispatch(page_file):
                              f"A.ID[c[1]]==={json.dumps(t)}&&c[2]==={json.dumps(k)})")
         k = edge("archfixture.a.make_child", "archfixture.child.Child", "instantiate")
         _js(page, f"A.selectEdge('call:{k}');return 1")
+        # the Neighbourhood tab re-centres on the edge's source
+        assert "archfixture.a.make_child" in page.eval(
+            "document.getElementById('main').innerText")
         text = page.eval("document.getElementById('inspector').innerText")
         assert "instantiate" in text and "call sites (1)" in text.lower()
         assert "def __init__(self, n)" in text  # constructor signature behind the class
@@ -212,6 +219,8 @@ def test_repository_atlas_in_the_browser(tmp_path):
             _js(page, f"A.S.tab='{tab}';A.render();return 1")
         _js(page, "A.selectNode(A.of.get('tropoi.spatial.planet.Planet'));return 1")
         assert "Planet" in page.eval("document.getElementById('inspector').innerText")
+        for spec in ("call:0", "import:0", "obs:0:0"):   # edge selections, default tab
+            _js(page, f"A.S.tab='neighborhood';A.selectEdge('{spec}');return 1")
         n = _js(page, "return A.D.traces.reduce((a,t)=>a+t.edges.length,0)")
         assert n == sum(t["observed_edges"] for t in metrics["atlas"]["runtime_traces"])
         _clean(page, url)

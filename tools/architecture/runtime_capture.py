@@ -146,6 +146,10 @@ class Describer:
 
     def __call__(self, value, depth: int = 0, key: str | None = None) -> dict:
         L = self.limits
+        if key is not None and _SENSITIVE.search(key):
+            # Before any type dispatch: a secret may be a number, a list or an
+            # object, and none of its contents may reach the trace.
+            return {"type": type(value).__name__, "value": "<redacted>", "redacted": True}
         if value is None or isinstance(value, bool):
             return {"type": type(value).__name__, "value": value}
         if isinstance(value, int):
