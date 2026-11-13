@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import ast
+import html
 import json
 from base64 import b32encode
 from dataclasses import asdict, dataclass
@@ -102,8 +103,9 @@ def render_mermaid(nodes: list[Node]) -> str:
     return "\n".join(lines) + "\n"
 
 
-def render_html(nodes: list[Node]) -> str:
+def render_html(nodes: list[Node], title: str) -> str:
     template = Path(__file__).with_name("class_atlas.html").read_text(encoding="utf-8")
     data = json.dumps([asdict(node) for node in nodes], ensure_ascii=False, indent=None)
     # Escape the HTML parser's script delimiters, including in paths from the filesystem.
-    return template.replace("__TREE_DATA__", data.replace("<", r"\u003c"), 1)
+    return (template.replace("__TITLE__", html.escape(title))
+            .replace("__TREE_DATA__", data.replace("<", r"\u003c"), 1))

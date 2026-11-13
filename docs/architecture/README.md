@@ -32,7 +32,7 @@ default `DEFAULT_LAYERS` in `tools/architecture/layers.py`: `cli`, `run`,
 |---|---|---|
 | [`current/index.md`](current/index.md) | Generated index: every package page, every entry path, the coverage summary | Generated from `src/`; CI fails if stale |
 | [`current/class-atlas.html`](current/class-atlas.html) | Interactive containment tree. Save the HTML and open it in a browser for offline search and subtree navigation. | Generated |
-| [`current/classes.mmd`](current/classes.mmd) | Complete Mermaid containment tree | Generated |
+| [`current/structure.mmd`](current/structure.mmd) | Complete Mermaid containment tree | Generated |
 | [`current/class-inheritance.mmd`](current/class-inheritance.mmd) | Class inheritance overview | Generated |
 | `current/packages/<package>.md` | Per-package class and module index, public functions, imports in and out | Generated |
 | `current/calls/*.mmd` | Scoped static call graphs: one per CLI handler (discovered) and per declared Python entry path | Generated |

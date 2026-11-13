@@ -343,7 +343,7 @@ def _count_problems(expected: list, actual: list, artifact: str, item: str) -> l
 def containment_problems(project: Project, mermaid: str, html: str) -> list[str]:
     """Read back the serialized nodes and edges and compare with source facts."""
     expected = _expected_containment(project)
-    diagram = "classes.mmd"
+    diagram = "structure.mmd"
     declarations = []
     edges = []
     problems = []

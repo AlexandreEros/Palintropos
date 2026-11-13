@@ -107,7 +107,7 @@ def test_new_subpackage_with_standalone_class_gets_a_page(make_tree, tmp_path):
     assert "Lens" in page and "focus()" in page              # standalone class drawn
     assert "`table.csv`" in page and "not analysed" in page  # data file listed
     assert "covpkg.optics" in files["index.md"]
-    assert "covpkg.optics.lens.Lens" in files["classes.mmd"]
+    assert "covpkg.optics.lens.Lens" in files["structure.mmd"]
     assert "Lens" not in files["class-inheritance.mmd"] and "Square" in files["class-inheritance.mmd"]
     cov = json.loads(files["coverage.json"])
     assert cov["discovered"]["classes"] == cov["rendered"]["classes"] == 3

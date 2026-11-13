@@ -1,16 +1,16 @@
 <!DOCTYPE html>
 <html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Palintropos — Class Atlas</title>
+<title>__TITLE__ — class atlas</title>
 <style>
 :root{--bg:#f6f8fc;--surface:#fff;--ink:#1e2635;--muted:#697487;--line:#dce4ef;--accent:#5d50b0;--folder:#eee9fc;--folder-b:#baafe6;--file:#e5f2ff;--file-b:#a5caea;--class:#e3f5ea;--class-b:#a0d1b5}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);font:14px/1.45 Inter,system-ui,-apple-system,'Segoe UI',sans-serif;color:var(--ink)}
-header{height:auto;min-height:75px;padding:16px 24px;background:white;border-bottom:1px solid var(--line);display:flex;flex-wrap:wrap;gap:8px 25px;align-items:center;justify-content:space-between}
+body{margin:0;height:100vh;display:flex;flex-direction:column;background:var(--bg);font:14px/1.45 Inter,system-ui,-apple-system,'Segoe UI',sans-serif;color:var(--ink)}
+header{flex:none;min-height:75px;padding:16px 24px;background:white;border-bottom:1px solid var(--line);display:flex;flex-wrap:wrap;gap:8px 25px;align-items:center;justify-content:space-between}
 h1{font-size:20px;letter-spacing:-.04em;margin:0}header p{margin:3px 0 0;color:var(--muted);font-size:12px}
 .stats{display:flex;gap:8px;flex-wrap:wrap}
 .stat{padding:7px 12px;border:1px solid var(--line);border-radius:9px;background:#fafcff;font-size:12px}
 .stat strong{font-size:15px;margin-right:4px}
-.shell{display:grid;grid-template-columns:340px minmax(0,1fr);height:calc(100vh - 88px);min-height:560px}
+.shell{flex:1;min-height:0;display:grid;grid-template-columns:340px minmax(0,1fr)}
 aside{border-right:1px solid var(--line);background:white;display:flex;flex-direction:column;min-height:0}aside .tools{padding:15px;border-bottom:1px solid var(--line)}
 label{font-size:12px;font-weight:650;color:var(--muted)}
 input{border:1px solid #cbd5e4;border-radius:8px;padding:10px 12px;width:100%;outline:none;background:#fff;margin-top:6px;font:inherit}
@@ -19,6 +19,7 @@ input:focus{border-color:var(--accent);box-shadow:0 0 0 2px #dbd5ff}
 .result{width:100%;background:transparent;border:0;text-align:left;padding:8px;cursor:pointer;border-radius:7px}
 .result:hover{background:#f0f4ff}
 .result small{display:block;color:var(--muted)}
+.more{width:100%;margin-top:4px}
 .nav{overflow:auto;flex:1;padding:12px 8px}
 .navbutton{cursor:pointer;border:0;background:transparent;display:flex;width:100%;text-align:left;gap:7px;align-items:center;padding:6px 6px;border-radius:7px;color:var(--ink);font:inherit}
 .navbutton:hover{background:#f3f4fc}
@@ -27,7 +28,7 @@ input:focus{border-color:var(--accent);box-shadow:0 0 0 2px #dbd5ff}
 .indent{margin-left:13px;border-left:1px solid #e5eaf2;padding-left:6px}
 .glyph{width:18px;text-align:center;color:#7165ba}
 .navhint{font-size:11px;color:var(--muted);margin:0 0 10px;padding:0 8px}
-main{min-width:0;display:flex;flex-direction:column}
+main{min-width:0;min-height:0;display:flex;flex-direction:column}
 .toolbar{background:white;border-bottom:1px solid var(--line);display:flex;flex-wrap:wrap;align-items:center;gap:9px;padding:11px 16px}
 button.control{background:white;color:var(--ink);border:1px solid #cbd4e2;border-radius:8px;padding:7px 11px;cursor:pointer;font:inherit}
 button.control:hover{background:#f2f3ff}
@@ -35,7 +36,7 @@ button.control:hover{background:#f2f3ff}
 .hint{font-size:12px;color:var(--muted)}
 .toggle{display:flex;align-items:center;gap:5px;font-size:12px;cursor:pointer}
 .toggle input{width:auto;margin:0}
-.viewport{flex:1;min-height:100px;overflow:auto;background-image:radial-gradient(#d8deea .8px,transparent .8px);background-size:21px 21px;position:relative}
+.viewport{flex:1;min-height:100px;overflow:auto;background-image:radial-gradient(#d8deea .8px,transparent .8px);background-size:21px 21px;position:relative;cursor:grab;touch-action:none}
 .diagram{transform-origin:0 0;display:block}
 .details{background:white;border-top:1px solid var(--line);padding:10px 20px;min-height:82px;font-size:13px}
 .details strong{font-weight:750}
@@ -48,36 +49,32 @@ button.control:hover{background:#f2f3ff}
 .node.selected rect{stroke:#5d50b0;stroke-width:2.3}
 .node text{pointer-events:none;font:12px Inter,system-ui,sans-serif}
 .connection{stroke:#a6b2c7;stroke-width:1.25;fill:none}
-@media (max-width:800px){.shell{grid-template-columns:180px 1fr;height:calc(100vh - 125px)}
+@media (max-width:800px){.shell{grid-template-columns:180px 1fr}
 header{padding:11px}
 .stats{gap:4px}
 .stat{padding:4px;font-size:10px}aside .tools{padding:7px}
 .nav{padding:5px}
 .navbutton{font-size:11px}
 .hint{display:none}}
-body{display:flex;flex-direction:column;min-height:100vh}
-.shell{height:auto;min-height:0;flex:1}
-body{height:100vh}
-header{flex:none}
-main{min-height:0}
-.viewport{cursor:grab;touch-action:none}
 .viewport.dragging{cursor:grabbing;user-select:none}
 .node:focus-visible rect{stroke:var(--accent);stroke-width:2.3}
 .result small{overflow-wrap:anywhere}
 @media (max-width:550px){
-  body{height:auto}
+  body{height:auto;min-height:100vh}
   .shell{grid-template-columns:1fr}
   aside{max-height:260px;border-right:0;border-bottom:1px solid var(--line)}
+  .searchResults{max-height:150px}
+  .nav{min-height:0}
   .viewport{height:55vh;flex:auto}
 }
 </style></head><body>
-<header><div><h1>Palintropos <span style="font-weight:400;color:#817899">/</span> class atlas</h1><p>Browse packages, Python files, and class definitions.</p></div>
-<div class="stats"><span class="stat"><strong id="package-count"></strong>packages</span><span class="stat"><strong id="module-count"></strong>modules</span><span class="stat"><strong id="class-count"></strong>classes</span></div></header>
-<div class="shell"><aside><div class="tools"><label for="search">Find a package, module, or class</label><input id="search" placeholder="e.g. SpectralState" autocomplete="off"/><div id="results" aria-live="polite" class="searchResults"></div></div>
+<header><div><h1>__TITLE__ <span style="font-weight:400;color:#817899">/</span> class atlas</h1><p>Browse packages, Python files, and class definitions.</p></div>
+<div class="stats"><span class="stat"><strong id="package-count"></strong>packages</span><span class="stat"><strong id="module-count"></strong>Python files</span><span class="stat"><strong id="class-count"></strong>classes</span></div></header>
+<div class="shell"><aside><div class="tools"><label for="search">Find a package, Python file, or class</label><input id="search" placeholder="e.g. SpectralState" autocomplete="off"/><div id="results" aria-live="polite" class="searchResults"></div></div>
 <div class="nav"><p class="navhint">Select a folder to draw its complete subtree.</p><div id="nav"></div></div></aside>
 <main><div class="toolbar"><div id="crumb" class="crumb"></div><button id="up" class="control">↑ Parent</button><label class="toggle"><input id="foldersOnly" type="checkbox" checked/> Package overview</label><button class="control" id="minus" aria-label="Zoom out">−</button><span id="zoomLabel" class="hint">100%</span><button class="control" id="plus" aria-label="Zoom in">+</button><button class="control" id="fit">Fit width</button><span class="hint">Drag the canvas to pan</span></div>
-<div class="viewport" id="viewport" tabindex="0" aria-label="Scrollable class tree"><svg id="svg" class="diagram" xmlns="http://www.w3.org/2000/svg" role="group" aria-label="Tree of Python packages, modules and classes"></svg></div>
-<div id="details" aria-live="polite" class="details"><strong></strong><div class="path">Choose a node to see its fully qualified path.</div></div><div class="legend"><span><i class="dot" style="background:var(--folder-b)"></i>Directory / package</span><span><i class="dot" style="background:var(--file-b)"></i>Python module / file</span><span><i class="dot" style="background:var(--class-b)"></i>Class definition</span><span>Lines mean <b>contains</b></span></div>
+<div class="viewport" id="viewport" tabindex="0" aria-label="Scrollable class tree"><svg id="svg" class="diagram" xmlns="http://www.w3.org/2000/svg" role="group" aria-label="Tree of packages, Python files and classes"></svg></div>
+<div id="details" aria-live="polite" class="details"><strong></strong><div class="path">Choose a node to see its fully qualified path.</div></div><div class="legend"><span><i class="dot" style="background:var(--folder-b)"></i>Directory / package</span><span><i class="dot" style="background:var(--file-b)"></i>Python file</span><span><i class="dot" style="background:var(--class-b)"></i>Class definition</span><span>Lines mean <b>contains</b></span></div>
 </main></div>
 <script id="tree-data" type="application/json">
 __TREE_DATA__
@@ -324,6 +321,31 @@ viewport.addEventListener("click", event => {
   suppressClick = false;
 }, true);
 
+const resultPage = 50;
+function resultButton(node) {
+  const button = element("button", "", "result");
+  button.append(element("strong", node.name), element("small", node.path +
+    (node.line === null ? "" : " · " + node.source + ":" + node.line)));
+  button.onclick = () => {
+    const folder = ancestors(node.id).find(item => item.kind === "package");
+    openFolder(folder.id, node.id);
+    selectedElement?.focus({preventScroll: true});
+    results.replaceChildren();
+    search.value = "";
+  };
+  return button;
+}
+function showResults(matches, shown) {
+  results.querySelector(".more")?.remove();
+  results.append(...matches.slice(shown, shown + resultPage).map(resultButton));
+  const rest = matches.length - shown - resultPage;
+  if (rest > 0) {
+    const more = element("button", "Show " + Math.min(rest, resultPage) + " more of " + rest,
+                         "control more");
+    more.onclick = () => showResults(matches, shown + resultPage);
+    results.append(more);
+  }
+}
 search.addEventListener("input", () => {
   const query = search.value.trim().toLowerCase();
   results.replaceChildren();
@@ -333,21 +355,8 @@ search.addEventListener("input", () => {
   matches.sort((a, b) => Number(b.kind === "class") - Number(a.kind === "class") ||
     a.path.localeCompare(b.path) || a.line - b.line);
   if (!matches.length) results.textContent = "No match.";
-  for (const node of matches) {
-    const button = element("button", "", "result");
-    button.append(element("strong", node.name), element("small", node.path +
-      (node.line === null ? "" : " · " + node.source + ":" + node.line)));
-    button.onclick = () => {
-      const folder = ancestors(node.id).find(item => item.kind === "package");
-      openFolder(folder.id, node.id);
-      selectedElement?.focus({preventScroll: true});
-      results.replaceChildren();
-      search.value = "";
-    };
-    results.append(button);
-  }
+  else showResults(matches, 0);
 });
-
 renderNav();
 draw();
 </script>

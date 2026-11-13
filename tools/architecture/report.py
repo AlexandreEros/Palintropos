@@ -17,7 +17,7 @@ FILE_DESCRIPTIONS = {
     "packages.mmd": "Package-level import graph, every edge drawn; boxed by declared layer "
                     "when a declaration applies (see *Package graph*).",
     "modules-cycles.mmd": "Module-level import graph restricted to modules in import cycles (nontrivial SCCs).",
-    "classes.mmd": "Complete source containment tree of packages, Python files and class definitions.",
+    "structure.mmd": "Complete source containment tree of packages, Python files and class definitions.",
     "class-atlas.html": "Offline explorer for the complete source containment tree.",
     "class-inheritance.mmd": "Classes linked by inheritance between analysed classes.",
     "graph/modules.json": "Full module import graph: every analysed module and import edge.",

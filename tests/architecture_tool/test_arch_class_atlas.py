@@ -58,10 +58,19 @@ def test_lexical_containment_in_both_outputs(atlas_repo):
         (node,) = [node for node in classes if node["name"] == name]
         assert node["path"] == path
         assert by_id[node["parent"]]["path"] == parent
-        assert class_tree.mermaid_id(node["id"]) in files["classes.mmd"]
+        assert class_tree.mermaid_id(node["id"]) in files["structure.mmd"]
     assert any(node["source"] == "atlaspkg/empty.py" for node in nodes)
     assert not any(node["source"] == "atlaspkg/ns/__init__.py" for node in nodes)
     assert "Standalone" not in files["class-inheritance.mmd"]
+    assert "<title>atlaspkg — class atlas</title>" in files["class-atlas.html"]
+    assert "Palintropos" not in files["class-atlas.html"]
+    assert "classes.mmd" not in files  # the containment tree is structure.mmd
+
+
+def test_atlas_title_is_escaped(atlas_repo):
+    page = class_tree.render_html(class_tree.build_tree(generate.Project(atlas_repo, "atlaspkg")),
+                                  "<b>&")
+    assert "<title>&lt;b&gt;&amp; — class atlas</title>" in page and "<b>&" not in page
 
 
 def test_new_file_and_class_make_both_artifacts_stale(atlas_repo):
@@ -69,14 +78,14 @@ def test_new_file_and_class_make_both_artifacts_stale(atlas_repo):
     generate.write(_render(atlas_repo), out, overwrite_frozen=False)
     (atlas_repo / "atlaspkg/new.py").write_text("class NewlyDefined: pass\n", encoding="utf-8")
     files = _render(atlas_repo)
-    assert {"differs: classes.mmd", "differs: class-atlas.html"} <= set(generate.check(files, out))
-    assert "atlaspkg.new.NewlyDefined" in files["classes.mmd"]
+    assert {"differs: structure.mmd", "differs: class-atlas.html"} <= set(generate.check(files, out))
+    assert "atlaspkg.new.NewlyDefined" in files["structure.mmd"]
     assert any(node["path"] == "atlaspkg.new.NewlyDefined"
                for node in _nodes(files["class-atlas.html"]))
 
 
 @pytest.mark.parametrize("renderer,artifact", [
-    ("render_mermaid", "classes.mmd"),
+    ("render_mermaid", "structure.mmd"),
     ("render_html", "class-atlas.html"),
 ])
 @pytest.mark.parametrize("kind", ["package", "module", "class"])
@@ -84,7 +93,7 @@ def test_new_file_and_class_make_both_artifacts_stale(atlas_repo):
 def test_rendered_coverage_rejects_defects(atlas_repo, monkeypatch, renderer, artifact, kind, defect):
     original = getattr(class_tree, renderer)
 
-    def broken(nodes):
+    def broken(nodes, *args):
         edited = list(nodes)
         index = next(i for i, node in enumerate(edited) if node.kind == kind and node.parent)
         if defect == "missing":
@@ -93,7 +102,7 @@ def test_rendered_coverage_rejects_defects(atlas_repo, monkeypatch, renderer, ar
             edited.append(edited[index])
         else:
             edited[index] = replace(edited[index], parent=edited[index].id)
-        return original(edited)
+        return original(edited, *args)
 
     monkeypatch.setattr(class_tree, renderer, broken)
     with pytest.raises(CoverageError, match=rf"{re.escape(artifact)}:.*{defect}"):
@@ -106,7 +115,7 @@ def test_coverage_is_independent_of_the_tree_builder(atlas_repo, monkeypatch):
                         lambda project: [n for n in original(project) if n.name != "Inner"])
     with pytest.raises(CoverageError) as error:
         _render(atlas_repo)
-    assert "classes.mmd: missing" in str(error.value)
+    assert "structure.mmd: missing" in str(error.value)
     assert "class-atlas.html: missing" in str(error.value)
 
 
@@ -114,7 +123,7 @@ def test_unrecognized_mermaid_edges_cannot_bypass_coverage(atlas_repo, monkeypat
     original = class_tree.render_mermaid
     monkeypatch.setattr(class_tree, "render_mermaid",
                         lambda nodes: original(nodes) + '  unexpected["Extra node"]\n')
-    with pytest.raises(CoverageError, match=r"classes.mmd: unexpected statement"):
+    with pytest.raises(CoverageError, match=r"structure.mmd: unexpected statement"):
         _render(atlas_repo)
 
 
@@ -124,12 +133,12 @@ def test_unrecognized_mermaid_edges_cannot_bypass_coverage(atlas_repo, monkeypat
 ])
 def test_mermaid_tree_must_fit_default_host_limits(atlas_repo, monkeypatch, limit, message):
     files = _render(atlas_repo)
-    edges = files["classes.mmd"].count(" --> ")
-    actual = len(files["classes.mmd"]) if limit == "MERMAID_MAX_TEXT_SIZE" else edges
+    edges = files["structure.mmd"].count(" --> ")
+    actual = len(files["structure.mmd"]) if limit == "MERMAID_MAX_TEXT_SIZE" else edges
     monkeypatch.setattr(class_tree, limit, actual)
     _render(atlas_repo)  # exactly at the limit still renders
     monkeypatch.setattr(class_tree, limit, actual - 1)
-    with pytest.raises(CoverageError, match=rf"classes.mmd: {actual} .*{re.escape(message)}"):
+    with pytest.raises(CoverageError, match=rf"structure.mmd: {actual} .*{re.escape(message)}"):
         _render(atlas_repo)
 
 

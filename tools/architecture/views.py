@@ -107,7 +107,7 @@ def index_page(title: str, package_rows: list[dict], cli: dict[str, str],
            "see. Narrative pages are linked from [the architecture README](../README.md).",
            "",
            "Explore class definitions in the [offline HTML atlas](class-atlas.html) or the "
-           "[Mermaid containment tree](classes.mmd). "
+           "[Mermaid containment tree](structure.mmd). "
            "The [inheritance overview](class-inheritance.mmd) shows the class hierarchy.",
            "", "## Packages", "",
            "| Package | Modules | Classes | Public functions | Not analysed (non-Python files) |",

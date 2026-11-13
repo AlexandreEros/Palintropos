@@ -160,9 +160,9 @@ def render(opts: Options, root: Path = REPO_ROOT) -> dict[str, str]:
         "Classes that take part in an inheritance edge between analysed classes, "
         "with the functions defined in each class body.")
     tree = class_tree.build_tree(project)
-    files["classes.mmd"] = class_tree.render_mermaid(tree)
-    files["class-atlas.html"] = class_tree.render_html(tree)
-    tree_problems = cov.containment_problems(project, files["classes.mmd"], files["class-atlas.html"])
+    files["structure.mmd"] = class_tree.render_mermaid(tree)
+    files["class-atlas.html"] = class_tree.render_html(tree, opts.package)
+    tree_problems = cov.containment_problems(project, files["structure.mmd"], files["class-atlas.html"])
 
     # -- scope: discovered entry points, declared paths, coverage problems --
     handlers = cov.cli_handlers(project)
