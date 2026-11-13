@@ -110,3 +110,30 @@ def test_c4_the_batched_heating_behaves_like_the_unbatched_term_over_a_long_run(
     window = _summary(R1)["series"]["window"]
     assert abs(window["energy_residual"]["mean"]) <= 0.5
     assert abs(window["mean_surface_temperature"]["mean"] - 302.65) <= 0.3
+
+
+CAPSULES = pathlib.Path(__file__).resolve().parents[1] / "docs" / "runs"
+
+
+@pytest.mark.parametrize("capsule, evidence", [("earth-gray-dry-heated-T21L25-d376c67", R1),
+                                               ("earth-gray-dry-T21L25-d376c67", R2)])
+def test_the_controlled_pair_is_preserved_and_is_the_source_of_its_evidence(capsule, evidence):
+    """The capsule's receipt covers every original file (66: core, 60 states,
+    2 checkpoints) with a Drive record for each, its Git core verifies, and
+    the published summary inputs are the capsule's bytes."""
+    from tropoi.cli.capsule import read_archive, read_receipt, verify_capsule
+    root = CAPSULES / capsule
+    sums = read_receipt(root / "SHA256SUMS")
+    archive = read_archive(root, sums)
+    assert len(sums) == 66
+    assert sorted(archive["included_files"]) == ["config.json", "events.jsonl", "means.npz",
+                                                 "series.json"]
+    assert set(archive["omitted_files"]) == set(sums) - set(archive["included_files"])
+    assert verify_capsule(root, root, core=True)["checked"] == 4
+    published = EVIDENCE / evidence
+    for name in ("config.json", "events.jsonl", "series.json"):
+        assert (root / name).read_bytes().replace(b"\r\n", b"\n") == \
+            (published / name).read_bytes().replace(b"\r\n", b"\n"), name
+    assert (root / "means.npz").read_bytes() == (published / "means.npz").read_bytes()
+    assert _summary(evidence)["config_sha256"] == json.loads(
+        (root / "config.json").read_text(encoding="utf-8"))["config_sha256"]

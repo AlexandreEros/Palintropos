@@ -7,5 +7,6 @@ Run R2 of the controlled comparison in the [radiation report](../../README.md)
 days at T21L25 on the same L4 as R1, run without resuming in 30 minutes.
 
 See the [summary](summary.json) (per-state sinks included) and the
-[climate figure](climate.png). The full run directory, with states and
-checkpoints, is held by the owner and is not yet archived as a capsule.
+[climate figure](climate.png). The [preserved run capsule](../../../runs/earth-gray-dry-T21L25-d376c67/)
+holds the receipt for all 66 original files and the Drive index of the
+states and checkpoints.

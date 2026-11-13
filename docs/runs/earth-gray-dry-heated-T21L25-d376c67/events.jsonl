@@ -1,0 +1,33 @@
+{"day": 0, "environment": {"cuda_driver": 13000, "cuda_runtime": 13000, "cupy": "14.0.1", "device": "NVIDIA L4", "numpy": "2.4.6", "platform": "Linux-6.6.159+-x86_64-with-glibc2.39", "python": "3.13.16"}, "event": "created", "step": 0, "time": "2026-11-13T14:35:05Z"}
+{"day": 0.0, "event": "checkpoint", "file": "checkpoint-s000000000.npz", "step": 0, "time": "2026-11-13T14:35:07Z"}
+{"day": 10.0, "event": "checkpoint", "file": "checkpoint-s000000720.npz", "step": 720, "time": "2026-11-13T14:36:27Z"}
+{"day": 20.0, "event": "checkpoint", "file": "checkpoint-s000001440.npz", "step": 1440, "time": "2026-11-13T14:37:40Z"}
+{"day": 30.0, "event": "checkpoint", "file": "checkpoint-s000002160.npz", "step": 2160, "time": "2026-11-13T14:38:53Z"}
+{"day": 40.0, "event": "checkpoint", "file": "checkpoint-s000002880.npz", "step": 2880, "time": "2026-11-13T14:40:07Z"}
+{"day": 50.0, "event": "checkpoint", "file": "checkpoint-s000003600.npz", "step": 3600, "time": "2026-11-13T14:41:20Z"}
+{"day": 60.0, "event": "checkpoint", "file": "checkpoint-s000004320.npz", "step": 4320, "time": "2026-11-13T14:42:33Z"}
+{"day": 70.0, "event": "checkpoint", "file": "checkpoint-s000005040.npz", "step": 5040, "time": "2026-11-13T14:43:46Z"}
+{"day": 80.0, "event": "checkpoint", "file": "checkpoint-s000005760.npz", "step": 5760, "time": "2026-11-13T14:44:59Z"}
+{"day": 90.0, "event": "checkpoint", "file": "checkpoint-s000006480.npz", "step": 6480, "time": "2026-11-13T14:46:12Z"}
+{"day": 100.0, "event": "checkpoint", "file": "checkpoint-s000007200.npz", "step": 7200, "time": "2026-11-13T14:47:25Z"}
+{"day": 110.0, "event": "checkpoint", "file": "checkpoint-s000007920.npz", "step": 7920, "time": "2026-11-13T14:48:38Z"}
+{"day": 120.0, "event": "checkpoint", "file": "checkpoint-s000008640.npz", "step": 8640, "time": "2026-11-13T14:49:51Z"}
+{"day": 130.0, "event": "checkpoint", "file": "checkpoint-s000009360.npz", "step": 9360, "time": "2026-11-13T14:51:05Z"}
+{"day": 140.0, "event": "checkpoint", "file": "checkpoint-s000010080.npz", "step": 10080, "time": "2026-11-13T14:52:18Z"}
+{"day": 150.0, "event": "checkpoint", "file": "checkpoint-s000010800.npz", "step": 10800, "time": "2026-11-13T14:53:31Z"}
+{"day": 160.0, "event": "checkpoint", "file": "checkpoint-s000011520.npz", "step": 11520, "time": "2026-11-13T14:54:44Z"}
+{"day": 170.0, "event": "checkpoint", "file": "checkpoint-s000012240.npz", "step": 12240, "time": "2026-11-13T14:55:57Z"}
+{"day": 180.0, "event": "checkpoint", "file": "checkpoint-s000012960.npz", "step": 12960, "time": "2026-11-13T14:57:11Z"}
+{"day": 190.0, "event": "checkpoint", "file": "checkpoint-s000013680.npz", "step": 13680, "time": "2026-11-13T14:58:25Z"}
+{"day": 200.0, "event": "checkpoint", "file": "checkpoint-s000014400.npz", "step": 14400, "time": "2026-11-13T14:59:39Z"}
+{"day": 210.0, "event": "checkpoint", "file": "checkpoint-s000015120.npz", "step": 15120, "time": "2026-11-13T15:00:53Z"}
+{"day": 220.0, "event": "checkpoint", "file": "checkpoint-s000015840.npz", "step": 15840, "time": "2026-11-13T15:02:06Z"}
+{"day": 230.0, "event": "checkpoint", "file": "checkpoint-s000016560.npz", "step": 16560, "time": "2026-11-13T15:03:20Z"}
+{"day": 240.0, "event": "checkpoint", "file": "checkpoint-s000017280.npz", "step": 17280, "time": "2026-11-13T15:04:34Z"}
+{"day": 250.0, "event": "checkpoint", "file": "checkpoint-s000018000.npz", "step": 18000, "time": "2026-11-13T15:05:48Z"}
+{"day": 260.0, "event": "checkpoint", "file": "checkpoint-s000018720.npz", "step": 18720, "time": "2026-11-13T15:07:02Z"}
+{"day": 270.0, "event": "checkpoint", "file": "checkpoint-s000019440.npz", "step": 19440, "time": "2026-11-13T15:08:15Z"}
+{"day": 280.0, "event": "checkpoint", "file": "checkpoint-s000020160.npz", "step": 20160, "time": "2026-11-13T15:09:29Z"}
+{"day": 290.0, "event": "checkpoint", "file": "checkpoint-s000020880.npz", "step": 20880, "time": "2026-11-13T15:10:43Z"}
+{"day": 300.0, "event": "checkpoint", "file": "checkpoint-s000021600.npz", "step": 21600, "time": "2026-11-13T15:11:57Z"}
+{"day": 300.0, "event": "completed", "step": 21600, "time": "2026-11-13T15:11:57Z"}
