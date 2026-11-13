@@ -28,9 +28,9 @@ does not state, and each such use is marked "Isca default/test case".
 | shortwave | τ = 0.2 e^(−4z/H) = 0.2 σ⁴ (eq. 15), absorbing. Isca: `insolation · exp(−τ)` (vertical path); the reflected `albedo · sw_down_sfc` escapes unabsorbed | `GrayShortwave` takes a slant path `exp(−τ/μ₀)` and re-absorbs the reflected beam | **gap**: atmospheric absorption is 29.6 % of insolation (global and diurnal mean, equinox) against Isca's 18.1 %. Fixed here with a small analytic provider on the existing hook |
 | insolation | seasons + diurnal cycle; S₀ = 589 W m⁻², e = 0.0935, obliquity 25.19°, perihelion at L_s = 251° (Isca `per` 70.85° + 180°), year 59 166 360 s, sol 88 440 s | `InstantaneousInsolation` | ✓ (never run in 3-D) |
 | surface | "land depth 2 m" = 2 m × ρc_p of seawater (Isca `RHO_CP` = 4.129 × 10⁶ J m⁻³ K⁻¹) = **8.26 × 10⁶ J m⁻² K⁻¹**; albedo 0.3 (Isca test case); no topography | `SlabSurface` | ✓ |
-| boundary layer, heat | Monin–Obukhov surface fluxes plus vertical turbulent diffusion; roughness 3.21 × 10⁻⁵ m; no gustiness (Isca test case) | bulk sensible flux into the lowest layer, same roughness, gustiness 0 allowed | **partial**: no vertical diffusion |
-| momentum exchange | surface stress plus vertical diffusion of momentum | none; only Rayleigh drag is available | **dependency (new physics)**: bulk surface stress + implicit vertical diffusion. Pilot substitute: Held–Suarez Rayleigh drag, 1 day⁻¹ below σ = 0.7, **labelled** |
-| convection | "None" (Table 1): the boundary-layer diffusion removes instability | dry convective adjustment | **dependency (follows from the row above)**. Pilot substitute: instantaneous dry adjustment, **labelled** |
+| boundary layer, heat | Monin–Obukhov surface fluxes plus vertical turbulent diffusion; roughness 3.21 × 10⁻⁵ m; no gustiness (Isca test case). **Full** MO drag and similarity (`use_frierson_mo_drag` false by default; read 2026-11-13, after §2d) | bulk sensible flux into the lowest layer, FHZ06-simplified coefficient, same roughness, gustiness 0 allowed; vertical diffusion since §2e | **partial**: FHZ06-simplified vs full MO (stated in §2e) |
+| momentum exchange | surface stress plus vertical diffusion of momentum (full MO) | §2e: bulk surface stress + implicit vertical diffusion, FHZ06-simplified coefficient, neutral K profile | **partial since §2e** (was: Held–Suarez Rayleigh drag substitute, **labelled**) |
+| convection | "None" (Table 1): the boundary-layer diffusion removes instability | none since §2e (`convection: None` in the preset; was: instantaneous dry adjustment, **labelled**) | ✓ since §2e |
 | sponge | Rayleigh 0.125 day above 0.5 Pa, energy-conserving (Isca test case) | none in the pilot | ✓ since §2b (`rayleigh_sponge_damping`, p = σ × 610 Pa) |
 | global fixers | Isca `spectral_dynamics_nml` defaults `do_mass_correction` and `do_energy_correction` to `.true.`, and the grey-Mars namelist overrides neither (it sets only `do_water_correction: False`). Every step, p_s is rescaled to the previous global mean, and a uniform temperature increment makes the mass-weighted ⟨½\|v\|² + c_p T⟩ of the new level equal the previous one plus the step's tendencies | none: mass is conserved to the core's truncation, and the energy residual is measured, not removed | **gap, found after §2d** (read 2026-11-13). It bears on M6 and on any energy comparison with Isca (§2d results) |
 | diffusion and filter | ∇⁴ at 0.1 day (Isca default `damping_order` 2); Robert–Asselin 0.04 | ∇⁸ at 0.1 day; RAW 0.1 / 0.53 | numerics differ. The pilot keeps the project's validated settings |
@@ -374,19 +374,93 @@ it does not establish:** an M-I reproduction, the wind bound over 60
 days, mass conservation over 60 days, or anything about the jet's
 realism.
 
+## 2e. The boundary layer (pre-registered 2026-11-13, before any run)
+
+The gating dependency of §1 and §3: bulk surface stress plus implicit
+vertical diffusion of heat and momentum, replacing the two labelled
+substitutes (Held–Suarez drag and the dry adjustment; M-I Table 1 has
+`convection: None`). Preset `dev-mars-gray-flat-bl` = the §2d implicit
+configuration with `drag: None`, `convection: None` and the boundary
+layer on. Nothing else changes.
+
+**The scheme** (FHZ06 inside Isca's structure; Isca sources as in §1):
+
+- Exchange coefficient: FHZ06 eqs. 12–14 (`tropoi.physics.surface.
+  drag_coefficient`, the one the heat exchange already uses), roughness
+  3.21 × 10⁻⁵ m, Ri_c = 1, gustiness 0; u\* = √C \|v₁\|.
+- Depth h: the lowest height where the bulk Richardson number of the dry
+  static energy reaches 1.0 (Isca `diffusivity` `rich_crit_pbl` default,
+  `do_simple` branch), interpolated linearly in Ri between the bracketing
+  full levels.
+- Diffusivity at the interior interfaces, momentum and heat alike
+  (neutral Prandtl 1): K = κ u\* z below 0.1 h (`frac_inner`), then
+  K = κ u\* z (1 − (z − 0.1h)/(0.9h))² up to h, zero above.
+- One backward-Euler tridiagonal solve per column over the stepper
+  window for u, v and the dry static energy (geopotential frozen); the
+  temperature change is ΔDSE / c_p. Bottom boundary: the stress
+  −ρ₁ C \|v₁\| u₁ⁿ⁺¹, implicit in the new lowest-level wind exactly as
+  §2d's heat exchange (measured need: at \|v₁\| = 60 m s⁻¹ the stress
+  stiffness k w / m₁ ≈ 8 and the first interior diffusion stiffness
+  ≈ 10²; both explicit-unstable). The dry static energy has a zero-flux
+  bottom: the surface sensible flux stays where §2d put it.
+- With frictional heating on, the layer heats by
+  −[(u + u′) Δu + (v + v′) Δv] / (2 c_p w), whose mass-weighted column
+  integral equals the kinetic energy the solve removed, identically.
+- Evaluated on the product grid like every other nonlinear momentum term
+  (weak-form vector analysis, product cut); the slab temperature it sees
+  is the spectral synthesis of the state-grid field.
+
+**Differences from Isca, stated up front:** Isca's grey Mars runs the
+full Monin–Obukhov drag and similarity functions (`use_frierson_mo_drag`
+defaults to false; `monin_obukhov_nml` rich_crit 2.0, stable_option 1,
+drag_min 10⁻⁵) — found 2026-11-13; §1's "same roughness" row glossed
+this. Here both the surface exchange and the K profile use the
+FHZ06-simplified forms (neutral φ). Isca also solves the surface heat
+flux jointly with the diffusion (one down-up sweep); here they are
+split: §2d's implicit exchange first, diffusion with zero surface flux
+after, both unconditionally stable alone. Isca's vertical diffusion
+returns its dissipation as heat unconditionally (`idealized_moist_phys`
+hard-codes it); here it follows `frictional_heating` like every other
+sink.
+
+**Run pair and criteria.** Hb (heated) and Ub (unheated), 60 days of
+86 400 s, T21L25, dt 600 s, states daily, judged exactly as §2d with
+these changes:
+
+| | criterion | prediction |
+| --- | --- | --- |
+| N1 | day 60 reached, no abort; a restarted continuation stays finite | met |
+| M1 | daily max \|u\| < 150 m s⁻¹, 100 K < T < 400 K | **not met** on the wind (the §2d jet lives at 0.5–4 Pa, far above any h the scheme can produce; the stress does not reach it directly), temperatures met |
+| M7 (new) | daily max lowest-full-level \|u\| ≤ 40 m s⁻¹ over days 11–60 | met (this is what the stress is for; §2d measured 63 m s⁻¹ without it) |
+| M2, M3 | as §2 (residual ≤ 10⁻³ F windowed, ≤ 10⁻² F daily; whole-system same; slab 10⁻⁹) | met |
+| M4 | Ub's residual equals its measured sinks (now drag-free but including the boundary layer's kinetic-energy removal) within max(2 se, 10⁻³ F) | met |
+| M5 | as §2 over a 2-sol hourly sample of Hb | amplitude met; T_s peak window **not met** (the 17.0 h peak is slab inertia, which the boundary layer does not touch) |
+| M6 | \|mean-p_s drift\| ≤ 10⁻⁵ over days 0–30 **and** ≤ 2 × 10⁻⁵ over days 0–60 (the 30-day bound, scaled, fixing §2d's oversight) | 30-day met; 60-day met at low confidence (§2d measured −1.97 × 10⁻⁵, 1.5 % under the bound, and the drift tracks the flow the boundary layer now changes) |
+
+Reported, not judged: s/step; daily maximum and median h; the daily
+exchange and diffusion stiffnesses; the boundary layer's kinetic-energy
+sink (accumulated in-run like the coupling's budget); the jet's level
+and latitude; and the two **fixer-equivalent series** derived from the
+existing records with no new run-time code — the per-day mass factor
+Isca's `do_mass_correction` would have applied (⟨p_s⟩_{d−1}/⟨p_s⟩_d from
+`series.json`) and the uniform temperature increment per day its
+`do_energy_correction` would have applied (−residual · g /(c_p ⟨p_s⟩)).
+Neither correction is applied; §3 item 4 stays open for the opt-in
+versions.
+
 ## 3. After the pilot, in order
 
 1. ~~The energy-conserving top sponge~~: done (§2b). M1 met as predicted.
 2. ~~An implicit surface exchange~~: done (§2d, opt-in). The §2c
    instability is gone and runs reach 60 days and beyond. M1 and M6 failed
    on the wind bound and the mass drift, neither caused by the change.
-3. The boundary layer: bulk surface stress and implicit vertical diffusion
-   of heat and momentum, with the implicit exchange of §2d as its surface
-   condition, and their dissipation in the frictional heating. Then remove
-   the two substitutes. This is still the gating dependency for any M-I
-   claim. The 60 m s⁻¹ lowest-level winds and the M1 jet of §2d are its
-   measured symptoms. Isca's ∇⁴ / RA numerics as an option, if the
-   comparison needs them.
+3. The boundary layer: pre-registered in §2e (bulk surface stress and
+   implicit vertical diffusion of heat and momentum, the §2d exchange as
+   the surface heat condition, dissipation in the frictional heating,
+   both substitutes removed). This is still the gating dependency for
+   any M-I claim. The 60 m s⁻¹ lowest-level winds and the M1 jet of §2d
+   are its measured symptoms. Isca's ∇⁴ / RA numerics as an option, if
+   the comparison needs them.
 4. Isca's global fixers, as opt-ins that record what they remove: the mass
    correction (it would close M6 by construction, so its per-step factor
    is the diagnostic), and a log of the energy correction Isca would apply,
