@@ -16,6 +16,10 @@ The sky has its own page (`sky_view.html`) and entry points. The globe pages
 (`terrain_globe.html`, `PreparedPlanet.view`, `Simulation.view`) carry no
 sky; they are exactly as on `main`.
 
+How the code is organised (optics, page assembly, the JavaScript page, the
+hypothetical and saved-column paths) is in
+[architecture/subsystems/sky.md](architecture/subsystems/sky.md).
+
 ## Use
 
 **Without Python: open [`docs/sky.html`](sky.html).** Double-click it, or

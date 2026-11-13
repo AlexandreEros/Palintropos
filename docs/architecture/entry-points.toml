@@ -1,0 +1,139 @@
+# Documentation scope for tools.architecture: declared Python entry paths and
+# deliberate exclusions. Read by `python -m tools.architecture.generate`.
+#
+# The generator discovers every *public Python entry-point candidate*: a
+# module-level function exported through some __all__ (re-exports followed)
+# that no analysed function calls, so it is reached only from outside the
+# package (scripts, notebooks, tests, users). Each candidate must appear here
+# exactly once: as a root of an [[entry_path]] (which then gets
+# docs/architecture/current/calls/<name>.mmd) or under [[excluded]] with a
+# reason. An undeclared candidate, a root or exclusion that no longer exists,
+# or a declared `doc` page that is missing or does not link its diagram makes
+# generation and `--check` fail. CLI handlers need no entry here: they are
+# discovered from set_defaults(...) and always drawn.
+#
+# Roots may also be methods (e.g. Simulation.sky): a declared path can start
+# where the candidate rule cannot see, because calls through objects and
+# getattr are not followed statically.
+
+[[entry_path]]
+name = "sky-hypothetical"
+title = "Sky page of a hypothetical atmosphere (no run, no planet)"
+roots = [
+  "tropoi.representation.visual.sky.write_sky_page",
+  "tropoi.representation.visual.sky.standalone_page",
+]
+doc = "docs/architecture/subsystems/sky.md"
+
+[[entry_path]]
+name = "sky-saved-column"
+title = "Sky page above one column of a saved primitive-equation run"
+roots = [
+  "tropoi.temporal.simulation.Simulation.sky",
+  "tropoi.representation.archive.capsule.CapsuleStorage.sky",
+  "tropoi.representation.archive.held_suarez.HeldSuarezStorage.sky",
+]
+doc = "docs/architecture/subsystems/sky.md"
+
+[[entry_path]]
+name = "sky-numpy-reference"
+title = "NumPy reference of the sky page's arithmetic (parity tests; the page never calls it)"
+roots = [
+  "tropoi.representation.visual.sky.radiance_table",
+  "tropoi.representation.visual.sky.star_path_column",
+  "tropoi.representation.visual.sky.optical_depth_diagnostic",
+  "tropoi.physics.column.thin_atmosphere_mass_kg",
+  "tropoi.physics.column.thin_atmosphere_surface_pressure_pa",
+  "tropoi.physics.rayleigh.composition_cross_section",
+]
+doc = "docs/architecture/subsystems/sky.md"
+
+[[entry_path]]
+name = "custom-initial-states"
+title = "Custom initial states from Python (src/tropoi/run/custom/INITIAL_STATES.md)"
+roots = [
+  "tropoi.run.custom.execute.run_initial_state",
+  "tropoi.run.custom.presets.initial_state_from_preset",
+  "tropoi.run.custom.prepare.prepare_bve_state",
+  "tropoi.run.custom.prepare.prepare_swe_state",
+]
+
+[[entry_path]]
+name = "terrain-raster"
+title = "Terrain rasters from Python: read an elevation file, write 16-bit grey (src/tropoi/spatial/terrain/IMPORT.md)"
+roots = [
+  "tropoi.spatial.terrain.raster.read_elevation",
+  "tropoi.spatial.terrain.raster.encode_grey16",
+]
+
+[[excluded]]
+function = "tropoi.run.held_suarez.config.production_config"
+reason = "reached by name through the held_suarez.config.PRESETS registry (a dict lookup static analysis does not follow)"
+
+[[excluded]]
+function = "tropoi.run.held_suarez.config.legacy_production_config"
+reason = "reached by name through the held_suarez.config.PRESETS registry (a dict lookup static analysis does not follow)"
+
+[[excluded]]
+function = "tropoi.run.held_suarez.config.smoke_config"
+reason = "reached by name through the held_suarez.config.PRESETS registry (a dict lookup static analysis does not follow)"
+
+[[excluded]]
+function = "tropoi.run.custom.prepare.pad_coefficients"
+reason = "helper that a user calls before prepare_*_state to zero-pad coefficients; no workflow starts here"
+
+[[excluded]]
+function = "tropoi.run.custom.prepare.state_sampling"
+reason = "helper returning the grid coordinates a prepared state is sampled on; no workflow starts here"
+
+[[excluded]]
+function = "tropoi.representation.visual.swe.build_swe_snapshot_timeline"
+reason = "exported timeline builder (alias build_swe_timeline) used directly by tests; no caller in the package"
+
+[[excluded]]
+function = "tropoi.representation.visual.timeline.build_timeline_overview"
+reason = "exported but used nowhere in src or tests; kept as API surface"
+
+[[excluded]]
+function = "tropoi.representation.visual.colour.srgb_encode"
+reason = "colour helper; the sky page encodes sRGB in JavaScript, so no Python caller exists"
+
+[[excluded]]
+function = "tropoi.temporal.hooks.rk4_real_axis_limit"
+reason = "numerical helper (RK4 stability limit on the real axis) used by a stability test; no workflow starts here"
+
+[[excluded]]
+function = "tropoi.representation.visual.atmosphere.dequantize_columns"
+reason = "NumPy reference of the atmosphere page's browser-side dequantization, used by tests to bound the quantization error; no workflow starts here"
+
+[[excluded]]
+function = "tropoi.run.radiative.config.earth_gray_dry"
+reason = "reached by name through the run.radiative.config.PRESETS registry (a dict lookup static analysis does not follow)"
+
+[[excluded]]
+function = "tropoi.run.radiative.config.jupiter_schneider_liu"
+reason = "reached by name through the run.radiative.config.PRESETS registry (a dict lookup static analysis does not follow)"
+
+[[excluded]]
+function = "tropoi.physics.radiation.gray.schneider_liu_longwave"
+reason = "gray longwave optical-depth profile (Schneider & Liu 2009); no caller in the package; used by tests and tools/radiation/regimes.py"
+
+[[excluded]]
+function = "tropoi.physics.radiation.gray.isca_mars_longwave"
+reason = "gray Mars longwave optical-depth profile; no caller in the package; used by tests"
+
+[[excluded]]
+function = "tropoi.physics.radiation.gray.isca_mars_shortwave"
+reason = "gray Mars shortwave optical-depth profile; no caller in the package; used by tests"
+
+[[excluded]]
+function = "tropoi.physics.radiation.kdist.ktable_from_spectrum"
+reason = "builds a correlated-k table from a user-supplied absorption function; no caller in the package; used by tests"
+
+[[excluded]]
+function = "tropoi.physics.thermodynamics.cp_molar"
+reason = "isobaric molar heat capacity of one named species; no caller in the package; used by tests"
+
+[[excluded]]
+function = "tropoi.physics.thermodynamics.kappa"
+reason = "R / c_p(T) of a mixture; no caller in the package"

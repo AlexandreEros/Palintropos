@@ -158,18 +158,73 @@ def module_flowchart(graph: Graph, nodes: list[str], root: str, title: str,
     return _lines(*out)
 
 
+def package_module_flowchart(graph: Graph, members: list[str], package_of, root: str,
+                             title: str) -> str:
+    """The modules of one package and their import edges, with every other
+    package collapsed to one node: imports out of the package point at the
+    target's package, imports into it come from the importer's package.
+
+    Edge label on a collapsed edge = number of module edges merged. Dashed:
+    every merged import is function-scope or ``TYPE_CHECKING`` (none runs
+    when the importing module is imported).
+    """
+    keep = set(members)
+    out = [HEADER, f"%% {title}", "flowchart LR"]
+    pkg = package_of(members[0])
+    out.append(f"    subgraph {node_id(pkg, 'g')}[{label(_short(pkg, root) if pkg != root else root)}]")
+    for m in sorted(keep):
+        out.append(f"        {node_id(m)}[{label(_short(m, root))}]")
+    out.append("    end")
+    merged: dict[tuple[str, str], list[int]] = {}
+    inner = []
+    for (s, t, _k) in sorted(graph.edges):
+        runtime = "module" in graph.edges[(s, t, _k)]["scopes"]
+        if s in keep and t in keep:
+            inner.append((s, t, runtime))
+        elif s in keep:
+            merged.setdefault((s, "p:" + package_of(t)), [0, 0])
+            merged[(s, "p:" + package_of(t))][0] += 1
+            merged[(s, "p:" + package_of(t))][1] += runtime
+        elif t in keep:
+            merged.setdefault(("p:" + package_of(s), t), [0, 0])
+            merged[("p:" + package_of(s), t)][0] += 1
+            merged[("p:" + package_of(s), t)][1] += runtime
+    others = sorted({n[2:] for pair in merged for n in pair if n.startswith("p:")})
+    for other in others:
+        out.append(f"    {node_id(other, 'p')}[{label('package ' + _short(other, root))}]")
+
+    def ref(n: str) -> str:
+        return node_id(n[2:], "p") if n.startswith("p:") else node_id(n)
+    for s, t, runtime in inner:
+        out.append(f"    {node_id(s)} {'-->' if runtime else '-.->'} {node_id(t)}")
+    for (s, t), (count, runtime) in sorted(merged.items()):
+        arrow = "-->" if runtime else "-.->"
+        out.append(f"    {ref(s)} {arrow}|{count}| {ref(t)}")
+    out.append("    classDef other fill:none,stroke-dasharray:3 3")
+    for other in others:
+        out.append(f"    class {node_id(other, 'p')} other")
+    return _lines(*out)
+
+
 # -- class graph -----------------------------------------------------------
 _MEMBER_MARK = {"classmethod": "$", "staticmethod": "$"}
 
 
 def class_diagram(graph: Graph, classes: list[str], root: str, title: str,
-                  with_members: bool = True) -> str:
-    """Mermaid ``classDiagram`` of the given classes and edges among them."""
-    keep = set(classes)
+                  with_members: bool = True, stubs: frozenset[str] = frozenset()) -> str:
+    """Mermaid ``classDiagram`` of the given classes and edges among them.
+
+    Classes in ``stubs`` are drawn by name only (no members), marked as
+    defined elsewhere: a base or nested class outside the drawn scope.
+    """
+    keep = set(classes) | set(stubs)
     out = [HEADER, f"%% {title}", "classDiagram", "    direction LR"]
     for cid in sorted(keep):
         attrs = graph.nodes[cid]
         text = f"{attrs['qualname']} ({_short(attrs['module'], root)})"
+        if cid in stubs:
+            out.append(f"    class {node_id(cid, 'c')}[{label(text + ', defined elsewhere')}]")
+            continue
         out.append(f"    class {node_id(cid, 'c')}[{label(text)}]")
         if with_members:
             for member in attrs["members"]:

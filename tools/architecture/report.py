@@ -10,12 +10,15 @@ from .metrics import DEFINITIONS, TOP_K
 
 FILE_DESCRIPTIONS = {
     "README.md": "This file: provenance, extraction rules, exclusions, limitations, metric definitions.",
+    "index.md": "Start here: every package page, every entry path, and the coverage summary.",
+    "coverage.json": "What was discovered, what is rendered, deliberate exclusions, static-analysis limits.",
     "metrics.json": "All measurements, machine-readable.",
     "metrics.md": "The same measurements as tables, with definitions.",
     "packages.mmd": "Package-level import graph, every edge drawn; boxed by declared layer "
                     "when a declaration applies (see *Package graph*).",
     "modules-cycles.mmd": "Module-level import graph restricted to modules in import cycles (nontrivial SCCs).",
-    "classes.mmd": "Classes linked by inheritance between analysed classes, with their methods.",
+    "classes.mmd": "Inheritance overview only: classes linked by inheritance between analysed "
+                   "classes. Every class, standalone ones included, is on its package page.",
     "graph/modules.json": "Full module import graph: every analysed module and import edge.",
     "graph/packages.json": "Package-aggregated import graph.",
     "graph/layers.json": "The declared layers as a graph: one node per layer, with upward edges marked.",
@@ -29,6 +32,8 @@ def _describe_file(name: str) -> str:
         return FILE_DESCRIPTIONS[name]
     if name.startswith("calls/"):
         return "Scoped static call graph (roots and depth: see *Call graphs* below)."
+    if name.startswith("packages/"):
+        return "Package page: all of its modules, classes and public functions; imports in and out."
     return ""
 
 
@@ -233,8 +238,45 @@ def _source_row(source: dict) -> str:
     return f"| Source base commit | `{tree['base_commit']}` ({state}) |"
 
 
+def _coverage_section(coverage: dict | None) -> list[str]:
+    if coverage is None:
+        return []
+    d, r, dec = coverage["discovered"], coverage["rendered"], coverage["declared"]
+    scope = coverage["scope_file"]
+    return [
+        "## Scope and coverage",
+        "",
+        "Three generic rules decide what must be documented (`tools/architecture/coverage.py`):",
+        "",
+        f"1. **Packages:** {coverage['rules']['packages']}. {d['packages']} packages, "
+        f"{r['package_pages']} pages; {r['modules']} of {d['modules']} modules and "
+        f"{r['classes']} of {d['classes']} classes rendered (generation fails if any is "
+        "missing).",
+        f"2. **CLI handlers:** {coverage['rules']['cli_handlers']}. "
+        f"{len(d['cli_handlers'])} discovered.",
+        f"3. **Public Python entry points:** {coverage['rules']['entry_point_candidates']}. "
+        f"{len(d['entry_point_candidates'])} candidates: "
+        f"{len(dec['candidates_as_roots'])} are roots of declared entry paths, "
+        f"{len(dec['excluded'])} excluded with a reason.",
+        "",
+        ("The declarations are read from "
+         + (f"`{scope['path']}` (SHA-256 `{scope['sha256']}`)" if scope["path"]
+            else "no scope file")
+         + ". Like the layer declaration, they state expectations; unlike it, a gap "
+         "fails generation: an undeclared candidate, a declared root or exclusion that "
+         "no longer exists, or a declared narrative page that is missing or does not "
+         "link its diagram. `--check` therefore fails on any of these too."),
+        "",
+        "What CI establishes: the committed outputs equal what these rules produce from "
+        "the committed source, and the rules found no undeclared entry point. It does not "
+        "establish that a diagram is easy to read or that a narrative page is still "
+        "accurate prose.",
+        "",
+    ]
+
+
 def render_readme(metrics: dict, opts, files: list[str], generated_marker: str,
-                  frozen_marker: str) -> str:
+                  frozen_marker: str, coverage: dict | None = None) -> str:
     tool, source, inc = metrics["tool"], metrics["source"], metrics["inclusion"]
     out = [generated_marker]
     if opts.freeze:
@@ -295,6 +337,7 @@ def render_readme(metrics: dict, opts, files: list[str], generated_marker: str,
         "so they change only when the extracted structure changes (the call-site totals "
         "in `metrics.json` are the exception: they count call expressions).",
         "",
+        *_coverage_section(coverage),
         "## Inclusion and exclusion rules",
         "",
         "The rules are generic path and syntax rules; none names a particular subpackage.",
@@ -305,7 +348,9 @@ def render_readme(metrics: dict, opts, files: list[str], generated_marker: str,
         "lacking one, contains `*.py` files at any depth (an implicit namespace package, "
         "PEP 420, which Python imports all the same). `__pycache__` and dot-directories "
         "are skipped.",
-        "3. Only `*.py` files are modules; other files (`*.bak`, `*.cu`, data) are ignored.",
+        "3. Only `*.py` files are modules; other files (`*.bak`, `*.cu`, data, HTML "
+        "templates) are never read. Those in a package directory are listed on its page and "
+        "under `limits.not_analysed_files` in `coverage.json`.",
         "4. Each module gets a syntactic category: `namespace` (a namespace package "
         "directory), `empty` (no statement besides a docstring), `reexport` (only imports, "
         "`__all__` assignments, and alias assignments `A = B`), or `code`. Categories are "

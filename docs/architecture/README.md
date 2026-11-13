@@ -26,12 +26,50 @@ default `DEFAULT_LAYERS` in `tools/architecture/layers.py`: `cli`, `run`,
 - With `--no-layers`, or a declaration that matches no package,
   `packages.mmd` is a plain dependency graph with no boxes and no marking.
 
-Start at the [current snapshot](current/README.md) for generated files and
-extraction limits, or the [architecture reference](../ARCHITECTURE.md) for
-responsibilities. [Comparison data](review/README.md) retains measured
-before/after JSON used by the export tool. Generated inheritance/call views
-are partial static analysis: standalone classes and dynamic dispatch are
-not comprehensively covered by this version of the generator.
+## Where to start
+
+| Page | What it is | Authority |
+|---|---|---|
+| [`current/index.md`](current/index.md) | Generated index: every package page, every entry path, the coverage summary | Generated from `src/`; CI fails if stale |
+| `current/packages/<package>.md` | One page per package: all modules, all classes (standalone ones included), public functions, imports in and out | Generated |
+| `current/calls/*.mmd` | Scoped static call graphs: one per CLI handler (discovered) and per declared Python entry path | Generated |
+| [`current/coverage.json`](current/coverage.json) | Discovered vs rendered, deliberate exclusions, static-analysis limits | Generated |
+| [`current/README.md`](current/README.md) | Provenance, extraction rules and limits, metric definitions | Generated |
+| [`entry-points.toml`](entry-points.toml) | Declared Python entry paths and exclusions, with reasons | Hand-written input; the generator fails if it misses or misnames a candidate |
+| [`subsystems/sky.md`](subsystems/sky.md) | The sky subsystem: optics, page assembly, the JavaScript page, both entry paths, boundaries | Hand-written; must link its generated diagrams (checked) |
+| [`../ARCHITECTURE.md`](../ARCHITECTURE.md) | Responsibilities and design: layers, backends, transforms, capsules | Hand-written |
+| [`review/README.md`](review/README.md) | Measured before/after comparison JSON used by the export tool | Data |
+
+## Coverage: what is guaranteed
+
+Three generic rules (`tools/architecture/coverage.py`) decide what must be
+documented, and none of them names a subsystem:
+
+1. **Every package gets a page** with all of its modules, classes and public
+   module-level functions. A new subpackage or a new standalone class appears
+   without any configuration; generation fails if anything discovered is
+   missing from the pages.
+2. **Every CLI handler gets a call graph.** Handlers are discovered from
+   `<parser>.set_defaults(<keyword>=<function>)`, the argparse dispatch the call
+   graph cannot follow. A new subcommand gets `calls/cli-<name>.mmd`.
+3. **Every public Python entry point is declared.** A candidate is a
+   module-level function exported through some `__all__` (re-exports
+   followed) that no analysed function calls: it is reached only from outside
+   the package. Each must be a root of an `[[entry_path]]` in
+   `entry-points.toml` (and then gets `calls/<name>.mmd`) or listed under
+   `[[excluded]]` with a reason. Not all functionality is CLI-reachable; the
+   sky, custom initial states and terrain rasters are reached from Python.
+
+Generation, and therefore `--check` and CI, fails when a candidate is
+undeclared, when a declared root or exclusion no longer exists or is no longer
+a candidate, or when a declared narrative page (`doc`) is missing or does not
+link its `calls/<name>.mmd`.
+
+What this does **not** establish: that a diagram is readable, that a
+hand-written page is still accurate prose, or that dynamic dispatch is
+covered. Calls through objects, `getattr`, registries and callbacks are not
+followed, and methods are not candidates (a declared path may name one as a
+root, as `sky-saved-column` does with `Simulation.sky`).
 
 ## Layout
 
@@ -44,6 +82,8 @@ not comprehensively covered by this version of the generator.
 The live snapshot changes with source; frozen layout snapshots retain their
 own source/toolchain provenance and are not current API guides. Their diagrams
 and measurements are retained for reproducible structural comparison.
+The snapshot READMEs inventory the contents of their generated subdirectories.
+Use the [history index](history/README.md) to navigate the frozen snapshots.
 
 ### Adding a frozen snapshot
 

@@ -16,6 +16,16 @@
     },
     "nodes": 1892,
     "scoped": {
+      "cli-capsule-command": {
+        "edges": 21,
+        "max_depth": 4,
+        "nodes": 14,
+        "reachable_nodes_unbounded": 14,
+        "roots": [
+          "tropoi.cli.capsule._command"
+        ],
+        "truncated_nodes": 0
+      },
       "cli-gen": {
         "edges": 28,
         "max_depth": 4,
@@ -35,6 +45,46 @@
           "tropoi.cli.main._cmd_inspect"
         ],
         "truncated_nodes": 2
+      },
+      "cli-list-presets": {
+        "edges": 0,
+        "max_depth": 4,
+        "nodes": 1,
+        "reachable_nodes_unbounded": 1,
+        "roots": [
+          "tropoi.cli.main._cmd_list_presets"
+        ],
+        "truncated_nodes": 0
+      },
+      "cli-list-scenarios": {
+        "edges": 0,
+        "max_depth": 4,
+        "nodes": 1,
+        "reachable_nodes_unbounded": 1,
+        "roots": [
+          "tropoi.cli.main._cmd_list_scenarios"
+        ],
+        "truncated_nodes": 0
+      },
+      "cli-plot": {
+        "edges": 76,
+        "max_depth": 4,
+        "nodes": 57,
+        "reachable_nodes_unbounded": 71,
+        "roots": [
+          "tropoi.cli.main._cmd_plot"
+        ],
+        "truncated_nodes": 4
+      },
+      "cli-recompile": {
+        "edges": 5,
+        "max_depth": 4,
+        "nodes": 6,
+        "reachable_nodes_unbounded": 6,
+        "roots": [
+          "tropoi.cli.main._cmd_recompile"
+        ],
+        "truncated_nodes": 0
       },
       "cli-run-bve": {
         "edges": 60,
@@ -65,6 +115,78 @@
           "tropoi.cli.main._cmd_run_swe"
         ],
         "truncated_nodes": 15
+      },
+      "cli-terrain-run-prepare": {
+        "edges": 62,
+        "max_depth": 4,
+        "nodes": 45,
+        "reachable_nodes_unbounded": 89,
+        "roots": [
+          "tropoi.cli.terrain.run_prepare"
+        ],
+        "truncated_nodes": 4
+      },
+      "custom-initial-states": {
+        "edges": 209,
+        "max_depth": 4,
+        "nodes": 133,
+        "reachable_nodes_unbounded": 244,
+        "roots": [
+          "tropoi.run.custom.execute.run_initial_state",
+          "tropoi.run.custom.presets.initial_state_from_preset",
+          "tropoi.run.custom.prepare.prepare_bve_state",
+          "tropoi.run.custom.prepare.prepare_swe_state"
+        ],
+        "truncated_nodes": 12
+      },
+      "sky-hypothetical": {
+        "edges": 17,
+        "max_depth": 4,
+        "nodes": 15,
+        "reachable_nodes_unbounded": 16,
+        "roots": [
+          "tropoi.representation.visual.sky.write_sky_page",
+          "tropoi.representation.visual.sky.standalone_page"
+        ],
+        "truncated_nodes": 1
+      },
+      "sky-numpy-reference": {
+        "edges": 8,
+        "max_depth": 4,
+        "nodes": 11,
+        "reachable_nodes_unbounded": 11,
+        "roots": [
+          "tropoi.representation.visual.sky.radiance_table",
+          "tropoi.representation.visual.sky.star_path_column",
+          "tropoi.representation.visual.sky.optical_depth_diagnostic",
+          "tropoi.physics.column.thin_atmosphere_mass_kg",
+          "tropoi.physics.column.thin_atmosphere_surface_pressure_pa",
+          "tropoi.physics.rayleigh.composition_cross_section"
+        ],
+        "truncated_nodes": 0
+      },
+      "sky-saved-column": {
+        "edges": 36,
+        "max_depth": 4,
+        "nodes": 32,
+        "reachable_nodes_unbounded": 34,
+        "roots": [
+          "tropoi.temporal.simulation.Simulation.sky",
+          "tropoi.representation.archive.capsule.CapsuleStorage.sky",
+          "tropoi.representation.archive.held_suarez.HeldSuarezStorage.sky"
+        ],
+        "truncated_nodes": 2
+      },
+      "terrain-raster": {
+        "edges": 32,
+        "max_depth": 4,
+        "nodes": 19,
+        "reachable_nodes_unbounded": 19,
+        "roots": [
+          "tropoi.spatial.terrain.raster.read_elevation",
+          "tropoi.spatial.terrain.raster.encode_grey16"
+        ],
+        "truncated_nodes": 0
       }
     }
   },
@@ -952,30 +1074,63 @@
     "package": "tropoi",
     "src": "src",
     "working_tree": {
-      "base_commit": "f349fdbe4263573f01f9b2f7517d5baf49886021",
+      "base_commit": "ca1c44301f8829a24520a0df06a7a4ecbd4bebbd",
       "generator": {
         "changes": [],
         "files": {
-          "tools/architecture/__init__.py": "6f2e1ed1942acefac9d057573af3c361e3dba22ef4df08984b8bfaa2a5934da9",
+          "tools/architecture/__init__.py": "7eaab7e08118ce5c31e59abccafd6d1464c255ec7d9812e4d8bda08c461d54ab",
           "tools/architecture/calls.py": "fe492066691403114d3adef4eade7541d55afd75bfbd02d14c72871bfd824e92",
           "tools/architecture/classes.py": "9436c2df4d3cf426b8893116faecd071b0a436b6b3eb1b7e4a81bb59ccdc16d1",
+          "tools/architecture/coverage.py": "83c9189d58da8ba7f007e857bf50df686cfe982cedb172837feefafdfd1fed79",
           "tools/architecture/export.py": "0c912ab5a81b921807c1e57796c486fc2faea5e1be23103d71eea0506a29ffef",
-          "tools/architecture/generate.py": "b621ceeb2b029729faf10a83677b2146e11db6ca4b8ff0453a6f86646a65033e",
+          "tools/architecture/generate.py": "d1cdd7242d145d4680ab4dcf8386e0e341ca41aa3cd421555ff4ef989f4c8ce1",
           "tools/architecture/imports.py": "be1b9267ae7d2da2d87e60cb3d3abde3011e49a7cfb628fb4222f5382c92d143",
           "tools/architecture/layers.py": "09a12c6790abad61e6326321180d84f9f01dfc85f9ac798d5e7b5b5186385b23",
-          "tools/architecture/mermaid.py": "de985a54bb56346a3bacdc2fe62ad922af42223d3cbe0408c09c3fe2f8eab965",
+          "tools/architecture/mermaid.py": "ad283b0848d4a54fb27904d2d9570ef25bacc196e580b3c00950440bce04cd32",
           "tools/architecture/metrics.py": "0c449fcc932fbae378a7e1c785506c05cda47d4449225d8d14462ce0de34e4db",
           "tools/architecture/model.py": "335acf6e713ca4bf79f2884d246addc8601effae88a43b68cff46ec98f293661",
           "tools/architecture/provenance.py": "bdb799b15386224f969b9743622e781f1e5b99adffbd5d01769f3872e733375a",
-          "tools/architecture/report.py": "001bc0593a870395da84f014480d675541bbb5739695b6f78ac50b38ea61614d",
-          "tools/architecture/sources.py": "547a080e87018ce39b7e82eefd632a20dd4cad1158c57b888d7d25255a6aece1"
+          "tools/architecture/report.py": "0afa2e4e37c1b0c850d32e320f1f41a1c8ddfbaa67d3611466eac3ecc5f68e5d",
+          "tools/architecture/sources.py": "547a080e87018ce39b7e82eefd632a20dd4cad1158c57b888d7d25255a6aece1",
+          "tools/architecture/views.py": "bfc2d188e1f519e47574f354486981762295dfe9235b3cfc4d58388c54bef3ff"
         },
-        "sha256": "eeb680c57f8dc9f4cb01ff8fd16c073436f1da2085518497bab6f32617fb4cfa",
+        "sha256": "78cff79be914ae3b9b01aa165d76cbc588300038f58cf908f942eda2aed84aa3",
         "status": "clean"
       },
       "source": {
         "changes": [
-          " M src/tropoi/cli/capsule.py"
+          "M  src/tropoi/README.md",
+          "M  src/tropoi/cli/README.md",
+          "A  src/tropoi/cli/capsule.py",
+          "M  src/tropoi/cli/main.py",
+          "M  src/tropoi/physics/README.md",
+          "R  src/tropoi/spatial/optics/column.py -> src/tropoi/physics/column.py",
+          "A  src/tropoi/physics/composition.py",
+          "A  src/tropoi/physics/constants.py",
+          "A  src/tropoi/physics/data/mixtures.toml",
+          "A  src/tropoi/physics/data/rayleigh.toml",
+          "A  src/tropoi/physics/data/species.toml",
+          "A  src/tropoi/physics/data/stars.toml",
+          "A  src/tropoi/physics/data/thermodynamics.toml",
+          "M  src/tropoi/physics/insolation.py",
+          "A  src/tropoi/physics/orbit.py",
+          "M  src/tropoi/physics/planets.py",
+          "A  src/tropoi/physics/rayleigh.py",
+          "A  src/tropoi/physics/rotation.py",
+          "A  src/tropoi/physics/species.py",
+          "A  src/tropoi/physics/star.py",
+          "M  src/tropoi/physics/thermodynamics.py",
+          "M  src/tropoi/representation/visual/README.md",
+          "R  src/tropoi/spatial/optics/colour.py -> src/tropoi/representation/visual/colour.py",
+          "R  src/tropoi/spatial/optics/data/CIE_xyz_1931_2deg.csv -> src/tropoi/representation/visual/data/CIE_xyz_1931_2deg.csv",
+          "M  src/tropoi/representation/visual/sky.py",
+          "M  src/tropoi/run/radiative/experiment.py",
+          "M  src/tropoi/run/radiative/model.py",
+          "D  src/tropoi/spatial/optics/__init__.py",
+          "D  src/tropoi/spatial/optics/composition.py",
+          "D  src/tropoi/spatial/optics/constants.py",
+          "D  src/tropoi/spatial/optics/rayleigh.py",
+          "D  src/tropoi/spatial/optics/star.py"
         ],
         "files": {
           "src/tropoi/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
@@ -1160,6 +1315,6 @@
     "name": "tools.architecture",
     "networkx": "3.7",
     "python": "3.12",
-    "version": "2.0.0"
+    "version": "2.1.0"
   }
 }

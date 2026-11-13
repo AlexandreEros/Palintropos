@@ -6,8 +6,11 @@ model, and how to add or compare a backend.
 
 The [source-layer index](../src/tropoi/README.md) leads to subsystem
 READMEs and their detailed references. [Generated architecture](architecture/README.md)
-records imports, inheritance and selected static call paths. Equations and
-normalizations live in the [numerical conventions](../src/tropoi/spatial/CONVENTIONS.md).
+covers every package and class and every CLI or declared Python entry path,
+checked in CI: start at [its index](architecture/current/index.md). Subsystem
+narratives such as [the sky](architecture/subsystems/sky.md) are linked from
+there. Equations and normalizations live in the
+[numerical conventions](../src/tropoi/spatial/CONVENTIONS.md).
 
 ## Package layout
 
