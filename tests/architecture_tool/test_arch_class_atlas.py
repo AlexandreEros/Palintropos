@@ -29,6 +29,8 @@ def atlas_repo(make_tree, tmp_path):
         """,
         "atlaspkg/ns/b.py": "class Standalone: pass",
         "atlaspkg/.hidden/ignored.py": "class Hidden: pass",
+        "atlaspkg/noclass/__init__.py": "",
+        "atlaspkg/noclass/helpers.py": "def helper(): pass",
     })
 
 
@@ -46,7 +48,7 @@ def test_lexical_containment_in_both_outputs(atlas_repo):
     assert files == _render(atlas_repo)
     nodes = _nodes(files["class-atlas.html"])
     by_id = {node["id"]: node for node in nodes}
-    assert len(by_id) == len(nodes) == 14
+    assert len(by_id) == len(nodes) == 12
     classes = [node for node in nodes if node["kind"] == "class"]
     assert len(classes) == 6
     assert sum(node["name"] == "Standalone" for node in classes) == 3
@@ -59,12 +61,34 @@ def test_lexical_containment_in_both_outputs(atlas_repo):
         assert node["path"] == path
         assert by_id[node["parent"]]["path"] == parent
         assert class_tree.mermaid_id(node["id"]) in files["structure.mmd"]
-    assert any(node["source"] == "atlaspkg/empty.py" for node in nodes)
-    assert not any(node["source"] == "atlaspkg/ns/__init__.py" for node in nodes)
+    # Only classes and what contains them: classless files and directories are left out.
+    sources = {node["source"] for node in nodes}
+    assert sources == {"atlaspkg", "atlaspkg/sub", "atlaspkg/ns", "atlaspkg/__init__.py",
+                       "atlaspkg/sub/a.py", "atlaspkg/ns/b.py"}
+    # Mermaid labels carry only each node's own name; the edges give its location.
+    mermaid = files["structure.mmd"]
+    labels = re.findall(r'\["([^"]*)"\]:::', mermaid)
+    assert sorted(labels) == sorted(node["name"].replace("_", "#95;") for node in nodes)
+    assert labels.count("Standalone") == 3 and "atlaspkg.sub" not in mermaid
     assert "Standalone" not in files["class-inheritance.mmd"]
     assert "<title>atlaspkg — class atlas</title>" in files["class-atlas.html"]
     assert "Palintropos" not in files["class-atlas.html"]
     assert "classes.mmd" not in files  # the containment tree is structure.mmd
+
+
+def test_classless_file_from_the_builder_is_rejected(atlas_repo, monkeypatch):
+    original = class_tree.build_tree
+
+    def unpruned(project):
+        empty = class_tree.Node("m:atlaspkg/empty.py", "empty.py", "module", "d:atlaspkg",
+                                "atlaspkg.empty", "atlaspkg/empty.py")
+        return original(project) + [empty]
+
+    monkeypatch.setattr(class_tree, "build_tree", unpruned)
+    with pytest.raises(CoverageError) as error:
+        _render(atlas_repo)
+    assert "structure.mmd: unexpected node" in str(error.value)
+    assert "class-atlas.html: unexpected node m:atlaspkg/empty.py" in str(error.value)
 
 
 def test_atlas_title_is_escaped(atlas_repo):
@@ -79,7 +103,7 @@ def test_new_file_and_class_make_both_artifacts_stale(atlas_repo):
     (atlas_repo / "atlaspkg/new.py").write_text("class NewlyDefined: pass\n", encoding="utf-8")
     files = _render(atlas_repo)
     assert {"differs: structure.mmd", "differs: class-atlas.html"} <= set(generate.check(files, out))
-    assert "atlaspkg.new.NewlyDefined" in files["structure.mmd"]
+    assert '["NewlyDefined"]' in files["structure.mmd"]
     assert any(node["path"] == "atlaspkg.new.NewlyDefined"
                for node in _nodes(files["class-atlas.html"]))
 

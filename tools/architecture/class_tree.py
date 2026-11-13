@@ -74,7 +74,16 @@ def build_tree(project: Project) -> list[Node]:
              ".".join(directory.parts), directory.as_posix())
         for directory in sorted(directories)
     ]
-    return folders + nodes
+    # Keep the classes and the directories and files above them, plus the root.
+    tree = folders + nodes
+    by_id = {node.id: node for node in tree}
+    keep = {f"d:{root}"}
+    for node in nodes:
+        if node.kind == "class":
+            while node is not None and node.id not in keep:
+                keep.add(node.id)
+                node = by_id.get(node.parent)
+    return [node for node in tree if node.id in keep]
 
 
 def mermaid_id(identity: str) -> str:
@@ -83,14 +92,13 @@ def mermaid_id(identity: str) -> str:
 
 
 def mermaid_label(node: Node) -> str:
-    if node.kind == "module":
-        return label(node.source)
-    return label(node.path if node.line is None else f"{node.path} (L{node.line})")
+    # The edges already give the location; the atlas shows the qualified path and line.
+    return label(node.name)
 
 
 def render_mermaid(nodes: list[Node]) -> str:
     lines = [HEADER, "%% Source containment. Open class-atlas.html to explore subtrees.",
-             "%% Large trees may need higher maxTextSize and maxEdges in the Mermaid host.",
+             "%% Only classes and the directories and files that contain them are drawn.",
              "flowchart LR",
              "    classDef packageNode fill:#eee9fc,color:#423781,stroke:#b9abe5",
              "    classDef moduleNode fill:#e5f2ff,color:#28567c,stroke:#a5c9e8",

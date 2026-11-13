@@ -326,7 +326,15 @@ def _expected_containment(project: Project) -> list[Node]:
                 identity = f"c:{source}:{cls.lineno}"
                 expected[identity] = Node(identity, cls.name, "class", owner, path, source,
                                           cls.lineno)
-    return list(expected.values())
+    # Only classes, their ancestors and the package root belong in the views.
+    wanted = {f"d:{project.package}"}
+    for node in expected.values():
+        if node.kind == "class":
+            ancestor = node
+            while ancestor is not None:
+                wanted.add(ancestor.id)
+                ancestor = expected.get(ancestor.parent)
+    return [node for node in expected.values() if node.id in wanted]
 
 
 def _count_problems(expected: list, actual: list, artifact: str, item: str) -> list[str]:

@@ -17,8 +17,8 @@ FILE_DESCRIPTIONS = {
     "packages.mmd": "Package-level import graph, every edge drawn; boxed by declared layer "
                     "when a declaration applies (see *Package graph*).",
     "modules-cycles.mmd": "Module-level import graph restricted to modules in import cycles (nontrivial SCCs).",
-    "structure.mmd": "Complete source containment tree of packages, Python files and class definitions.",
-    "class-atlas.html": "Offline explorer for the complete source containment tree.",
+    "structure.mmd": "Every class definition, with the Python files and directories that contain it.",
+    "class-atlas.html": "Offline explorer for the class containment tree.",
     "class-inheritance.mmd": "Classes linked by inheritance between analysed classes.",
     "graph/modules.json": "Full module import graph: every analysed module and import edge.",
     "graph/packages.json": "Package-aggregated import graph.",
@@ -436,8 +436,10 @@ def render_readme(metrics: dict, opts, files: list[str], generated_marker: str,
           if metrics.get("layer_graph") else []),
         "### Class containment tree (ast)",
         "",
-        "The Mermaid tree and the offline atlas each contain every discovered Python file, "
-        "its ancestor directories, and every class definition in those files. Class nodes "
+        "The Mermaid tree and the offline atlas each contain every class definition, the "
+        "Python files that define classes, and the directories above those files. Files "
+        "and directories without classes are left out. Mermaid labels show each node's own "
+        "name; the atlas also shows its qualified path and source line. Class nodes "
         "belong to the nearest enclosing class, or to their file. Function-local classes "
         "include their lexical scope in the qualified name. File and line distinguish "
         "definitions that share a qualified name. Generation checks the rendered nodes "

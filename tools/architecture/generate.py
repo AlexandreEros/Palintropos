@@ -224,8 +224,9 @@ def render(opts: Options, root: Path = REPO_ROOT) -> dict[str, str]:
         "rules": {
             "packages": "every analysed package gets packages/<package>.md with all of its "
                         "modules, classes and public module-level functions",
-            "containment": "both views contain each package directory, physical Python file "
-                           "and class definition once, with parents verified from the source AST",
+            "containment": "both views contain each class definition, and each Python file "
+                           "and package directory that contains one, once, with parents "
+                           "verified from the source AST",
             "cli_handlers": "every <parser>.set_defaults(<keyword>=<function>) handler gets "
                             "calls/cli-<name>.mmd",
             "entry_point_candidates": "module-level functions exported through some "

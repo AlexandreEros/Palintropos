@@ -143,8 +143,9 @@ def index_page(title: str, package_rows: list[dict], cli: dict[str, str],
             "[the inheritance overview](class-inheritance.mmd)).",
             "* Both containment views cover "
             + ", ".join(f"{cov['rendered']['containment'].get(kind, 0)} {name}"
-                        for kind, name in (("package", "packages"), ("module", "Python files"),
-                                           ("class", "class definitions"))) + ".",
+                        for kind, name in (("package", "directories"), ("module", "Python files"),
+                                           ("class", "class definitions"))) + ", leaving out files and "
+            "directories that define no class.",
             f"* CLI handlers: {len(cov['discovered']['cli_handlers'])} discovered, each "
             "with a call graph.",
             f"* Public Python entry-point candidates: "
