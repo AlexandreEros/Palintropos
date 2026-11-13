@@ -571,8 +571,57 @@ only the heating flag different:
 | C4 | the R1 mean residual is ≤ 0.5 W m^-2 in magnitude, and the R1 mean surface temperature is within 0.3 K of 302.65 K | the batched heating term behaves like the unbatched one over a long run |
 
 The surface temperature, the top-of-atmosphere balance and the jets of R1
-minus R2 are reported, not judged. Results are appended here when the runs
-exist. Until then, the batched term has no long-run evidence.
+minus R2 are reported, not judged.
+
+**Result (2026-11-13; both runs from `d376c67`, clean tree, on one Colab
+NVIDIA L4, CuPy 14.0.1, no resumes, 37 and 30 min; evidence in
+`evidence/earth-gray-dry-heated-T21L25-300d-d376c67-l4/` and
+`evidence/earth-gray-dry-T21L25-300d-d376c67-l4/`).** All four criteria are
+met, unchanged. `tests/test_radiation_evidence.py` checks them against the
+committed summaries.
+
+| | criterion | measured | verdict |
+| --- | --- | --- | --- |
+| C1 | R1 meets A1–A4 | residual −0.0016 W m^-2 (A2 bound 0.23), peak 0.37 on day 62 (A3 bound 2.35), p_s drift −1.2 × 10^-6 | met |
+| C2 | R2 meets A1, A4; fails A2, A3 | residual −5.23, peak 11.94 on day 62, p_s drift −1.2 × 10^-6 | met |
+| C3 | R2 within 0.5 of −5.10 | −5.23 (difference 0.13) | met |
+| C4 | \|R1\| ≤ 0.5; R1 Ts within 0.3 K of 302.65 K | −0.0016; 302.652 K (difference 0.002 K) | met |
+
+Days 201–300, mean ± standard deviation of daily values (jets from the
+150-day zonal means):
+
+| | R1 heated | R2 unheated | R1 − R2 |
+| --- | --- | --- | --- |
+| energy-budget residual, W m^-2 | −0.0016 ± 0.028 | −5.23 ± 0.43 | |
+| measured sinks (drag + ∇⁸, 11 states), W m^-2 | −5.07 ± 0.10 | −5.15 ± 0.12 | |
+| TOA net down, W m^-2 | −0.61 ± 0.58 | +4.30 ± 0.48 | −4.91 |
+| OLR, W m^-2 (absorbed 234.60) | 235.21 | 230.30 | +4.91 |
+| mean surface temperature, K | 302.65 ± 0.14 | 301.25 ± 0.17 | +1.40 |
+| kinetic energy, MJ m^-2 | 1.389 ± 0.054 | 1.383 ± 0.073 | +0.006 |
+| westerly jets north / south, m s^-1 | 27.2 / 28.0 at 25° | 27.9 / 27.4 at 25° | |
+
+What this establishes, with one realisation of each:
+
+- **The sinks are the whole unheated residual.** In R2 they are −5.15 ±
+  0.12 W m^-2 against a −5.23 residual, which leaves −0.08 (under one
+  standard error). In R1 sinks of the same size are present, and the
+  heating returns all but 0.0016 W m^-2 of them.
+- **The heating effect, isolated.** Between runs of the same code, machine
+  and seed, the only change is the heating. It moves the TOA balance by
+  −4.9 W m^-2 to within one standard deviation of zero and warms the
+  surface by 1.4 K. Kinetic energy and jets are unchanged within their
+  spread.
+- **The startup-step fix is immaterial after spin-up.** R2 matches the
+  2026-11-11 unheated run (−5.10, 301.39 K, MX110) within its day-to-day
+  spread.
+- **The batched heating term now has long-run evidence.** R1 reproduces
+  the unbatched MX110 run (302.654 K, −0.002 W m^-2) to 0.002 K.
+
+Not established: anything about other resolutions, time steps or
+presets, and anything about a single heated run's climate beyond the
+second decimal of these means. The L4 is a third device. The trajectories
+of the three heated runs are different realisations, not bitwise
+repetitions.
 
 ## 7. Published comparisons: verified, and where each stands
 
@@ -637,9 +686,9 @@ Test results for this commit are in [TEST_RESULTS.md](TEST_RESULTS.md).
 1. Obtain real k-tables (needs a decision on downloads: exo_k + ExoMol/HITRAN
    CIA) and compare `CorrelatedKLongwave` with an independent model for one
    Earth and one CO2 case; add Rayleigh, continua, CIA, gas overlap.
-2. Run the controlled comparison R1/R2 of §6 and append its verdicts
-   (C1–C4). A resolution sweep for the Jupiter ∇⁸ loss. (Done 2026-11-13:
-   heating is the preset default; the time-stepping residual is split.)
+2. A resolution sweep for the Jupiter ∇⁸ loss. (Done 2026-11-13: heating
+   is the preset default, the time-stepping residual is split, and the
+   controlled R1/R2 comparison met C1–C4.)
 3. A Jupiter run long and fine enough to develop a circulation (the 200-day
    T21 run does not), on a stretched grid that resolves the stratosphere.
 4. Boundary-layer diffusion and surface stress (required by FHZ06 and THAI).

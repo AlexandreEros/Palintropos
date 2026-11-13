@@ -1,0 +1,457 @@
+{
+  "climate": {
+    "eddy_heat_flux_poleward_north": {
+      "latitude_deg": 47.06964205968767,
+      "sigma": 0.9837833154406865,
+      "value": 38.70163201804511
+    },
+    "eddy_heat_flux_poleward_south": {
+      "latitude_deg": -35.9950784112716,
+      "sigma": 0.9948744521716477,
+      "value": -39.488939862957565
+    },
+    "eddy_momentum_flux_north": {
+      "latitude_deg": 24.919928629948608,
+      "sigma": 0.34300680160815716,
+      "value": 33.962906931706435
+    },
+    "eddy_momentum_flux_south": {
+      "latitude_deg": -24.919928629948622,
+      "sigma": 0.34300680160815716,
+      "value": -20.090839350980108
+    },
+    "hemispheric_asymmetry_of_u": 0.1167831873642935,
+    "latitudes": 32,
+    "levels": 25,
+    "lowest_level_temperature": {
+      "near_equator": 311.9048845937689,
+      "northmost": 241.73567683313965,
+      "southmost": 243.86222449261157
+    },
+    "lowest_level_wind_range": [
+      -9.194582816781205,
+      2.087035256596934
+    ],
+    "samples": 150,
+    "strongest_easterly": {
+      "latitude_deg": -63.678635561096876,
+      "sigma": 0.00588326628554841,
+      "value": -10.345125529399514
+    },
+    "temperature_range": [
+      205.90645032540178,
+      311.9048845937689
+    ],
+    "westerly_jet_north": {
+      "latitude_deg": 24.919928629948608,
+      "sigma": 0.34300680160815716,
+      "value": 27.232970930557496
+    },
+    "westerly_jet_south": {
+      "latitude_deg": -24.919928629948622,
+      "sigma": 0.34300680160815716,
+      "value": 27.975254311332144
+    }
+  },
+  "code": {
+    "git_commit": "d376c67a3eeaa2c91527e8eccfabeac4489eda46",
+    "git_dirty": false
+  },
+  "config_sha256": "748cec4b170c40a170cb14efbd6bac2e59618be54fafe6c7bc4a84ead23dd2be",
+  "environment": {
+    "cuda_driver": 13000,
+    "cuda_runtime": 13000,
+    "cupy": "14.0.1",
+    "device": "NVIDIA L4",
+    "numpy": "2.4.6",
+    "platform": "Linux-6.6.159+-x86_64-with-glibc2.39",
+    "python": "3.13.16"
+  },
+  "events": {
+    "first": "2026-11-13T14:35:05Z",
+    "last": "2026-11-13T15:11:57Z",
+    "last_event": "completed",
+    "resumes": 0
+  },
+  "experiment_id": "earth-gray-dry-heated-T21L25",
+  "series": {
+    "at_day": {
+      "1": {
+        "absorbed_stellar": 234.59999999999997,
+        "bottom_net_down": 136.28472585641393,
+        "column_energy_tendency": -159.20175585328963,
+        "energy_kinetic": 415.95431573164416,
+        "energy_rate": -159.29666089956407,
+        "energy_residual": -0.09490504627444807,
+        "interior": 0.0,
+        "max_abs_u": 1.4001510914939737,
+        "mean_surface_temperature": 286.0351946572452,
+        "olr": 273.9875594128779,
+        "sensible": 16.470529416002258,
+        "surface_net": 119.81419644041168,
+        "t_max": 273.80964416843824,
+        "t_min": 260.0527288515106,
+        "toa_net_down": -39.3875594128779
+      },
+      "10": {
+        "absorbed_stellar": 234.59999999999997,
+        "bottom_net_down": 111.22333285239556,
+        "column_energy_tendency": -84.71480175086683,
+        "energy_kinetic": 21268.29590170235,
+        "energy_rate": -84.65864218135123,
+        "energy_residual": 0.05615956951560008,
+        "interior": 0.0,
+        "max_abs_u": 11.13987768369764,
+        "mean_surface_temperature": 294.90152903563194,
+        "olr": 228.86829454004862,
+        "sensible": 20.776825641577638,
+        "surface_net": 90.44650721081798,
+        "t_max": 283.01979291692294,
+        "t_min": 239.05234029779746,
+        "toa_net_down": 5.7317054599511446
+      },
+      "100": {
+        "absorbed_stellar": 234.59999999999997,
+        "bottom_net_down": 124.72997653424474,
+        "column_energy_tendency": 0.0026314980987906036,
+        "energy_kinetic": 1363252.2298813732,
+        "energy_rate": -0.03485133454203606,
+        "energy_residual": -0.03748283264082666,
+        "interior": 0.0,
+        "max_abs_u": 65.89745967199849,
+        "mean_surface_temperature": 303.1824077264474,
+        "olr": 238.20367431200907,
+        "sensible": 128.33628234435272,
+        "surface_net": -3.606305810108014,
+        "t_max": 315.5377028390317,
+        "t_min": 205.68552927367693,
+        "toa_net_down": -3.6036743120092236
+      },
+      "200": {
+        "absorbed_stellar": 234.59999999999997,
+        "bottom_net_down": 124.69813679390921,
+        "column_energy_tendency": 2.930358129319733,
+        "energy_kinetic": 1367700.0584684836,
+        "energy_rate": 2.9091524745965445,
+        "energy_residual": -0.021205654723188694,
+        "interior": 0.0,
+        "max_abs_u": 56.043614966165634,
+        "mean_surface_temperature": 302.7591262647086,
+        "olr": 235.37471399697196,
+        "sensible": 128.4032089202009,
+        "surface_net": -3.705072126291695,
+        "t_max": 314.88267670566734,
+        "t_min": 202.78915742527306,
+        "toa_net_down": -0.7747139969719615
+      },
+      "30": {
+        "absorbed_stellar": 234.59999999999997,
+        "bottom_net_down": 76.39631681762341,
+        "column_energy_tendency": -9.23039032504946,
+        "energy_kinetic": 129455.65960664308,
+        "energy_rate": -9.222865834854268,
+        "energy_residual": 0.007524490195191191,
+        "interior": 0.0,
+        "max_abs_u": 20.11311099642604,
+        "mean_surface_temperature": 303.6134594494709,
+        "olr": 216.14091714206177,
+        "sensible": 48.70684363463594,
+        "surface_net": 27.6894731829875,
+        "t_max": 294.3145767036766,
+        "t_min": 224.5923647303368,
+        "toa_net_down": 18.459082857938032
+      },
+      "300": {
+        "absorbed_stellar": 234.59999999999997,
+        "bottom_net_down": 127.49026098950975,
+        "column_energy_tendency": 0.06921378512975353,
+        "energy_kinetic": 1430467.0180629762,
+        "energy_rate": 0.036589559697442584,
+        "energy_residual": -0.032624225432310944,
+        "interior": 0.0,
+        "max_abs_u": 59.690476778998956,
+        "mean_surface_temperature": 302.52144213687615,
+        "olr": 235.26852091229995,
+        "sensible": 128.2279956869395,
+        "surface_net": -0.7377346974297768,
+        "t_max": 314.72407579756793,
+        "t_min": 202.27942583959242,
+        "toa_net_down": -0.6685209123000235
+      }
+    },
+    "last_day": 300,
+    "max_abs_energy_residual": 0.3650602003702659,
+    "mean_surface_pressure_drift": -1.2152744288673745e-06,
+    "window": {
+      "absorbed_stellar": {
+        "max": 234.59999999999997,
+        "mean": 234.59999999999988,
+        "min": 234.59999999999997,
+        "std": 8.569467825559617e-14
+      },
+      "bottom_net_down": {
+        "max": 129.25435527420805,
+        "mean": 125.97633071589435,
+        "min": 121.93363172817214,
+        "std": 1.535434516592172
+      },
+      "column_energy_tendency": {
+        "max": 15.319271797042294,
+        "mean": -0.3379838754136312,
+        "min": -12.535889869402052,
+        "std": 5.16431448317014
+      },
+      "energy_kinetic": {
+        "max": 1496868.9024890023,
+        "mean": 1389316.7485067653,
+        "min": 1277221.0319338853,
+        "std": 54330.6111378924
+      },
+      "energy_rate": {
+        "max": 15.323628348272155,
+        "mean": -0.33957387573652803,
+        "min": -12.541040340457801,
+        "std": 5.164567712504721
+      },
+      "energy_residual": {
+        "max": 0.07568316073243286,
+        "mean": -0.0015900003228968322,
+        "min": -0.06420065207693249,
+        "std": 0.027622734305904784
+      },
+      "interior": {
+        "max": 0.0,
+        "mean": 0.0,
+        "min": 0.0,
+        "std": 0.0
+      },
+      "max_abs_u": {
+        "max": 76.51527012101275,
+        "mean": 62.56993831672454,
+        "min": 55.257096150382644,
+        "std": 4.270886060829551
+      },
+      "mean_surface_temperature": {
+        "max": 302.9929891113095,
+        "mean": 302.65174174109404,
+        "min": 302.3079735077665,
+        "std": 0.14175804093729885
+      },
+      "olr": {
+        "max": 236.34404497521214,
+        "mean": 235.2130812455899,
+        "min": 234.01948044214078,
+        "std": 0.5816703766724926
+      },
+      "sensible": {
+        "max": 140.14095034076703,
+        "mean": 126.25142808607076,
+        "min": 113.91475297864852,
+        "std": 5.410947066363207
+      },
+      "surface_net": {
+        "max": 11.62140555280772,
+        "mean": -0.2750973701764178,
+        "min": -15.6121420470774,
+        "std": 5.212556407470701
+      },
+      "t_max": {
+        "max": 316.2995876258795,
+        "mean": 314.46431146039674,
+        "min": 313.11248546406705,
+        "std": 0.6314087796418363
+      },
+      "t_min": {
+        "max": 203.63166866573522,
+        "mean": 200.81047706109825,
+        "min": 195.72720057117706,
+        "std": 1.595394556108166
+      },
+      "toa_net_down": {
+        "max": 0.580519557859116,
+        "mean": -0.6130812455900487,
+        "min": -1.7440449752123526,
+        "std": 0.5816703766725037
+      }
+    },
+    "window_days": 100
+  },
+  "sinks": {
+    "all_sinks_total_mean": -5.065153894857928,
+    "all_sinks_total_standard_error": 0.10435879508244728,
+    "energy_residual_window_mean": -0.0015900003228968322,
+    "mean": {
+      "held_suarez_rayleigh": {
+        "enthalpy": 0.0,
+        "kinetic": -2.4992917740679435,
+        "total": -2.499291774142872
+      },
+      "hyperdiffusion_del8": {
+        "enthalpy": 0.16712225914001466,
+        "kinetic": -2.7329843798954974,
+        "total": -2.5658621207150545
+      }
+    },
+    "operators": [
+      "held_suarez_rayleigh",
+      "hyperdiffusion_del8"
+    ],
+    "states": [
+      {
+        "all_sinks_total": -5.293312768936158,
+        "day": 200,
+        "held_suarez_rayleigh": {
+          "enthalpy": 0.0,
+          "kinetic": -2.5633601885079407,
+          "total": -2.5633601903915406
+        },
+        "hyperdiffusion_del8": {
+          "enthalpy": 0.1930122995376587,
+          "kinetic": -2.9229648812348024,
+          "total": -2.7299525785446166
+        }
+      },
+      {
+        "all_sinks_total": -5.1280327844619755,
+        "day": 210,
+        "held_suarez_rayleigh": {
+          "enthalpy": 0.0,
+          "kinetic": -2.5005626839306205,
+          "total": -2.500562686920166
+        },
+        "hyperdiffusion_del8": {
+          "enthalpy": 0.18194642543792724,
+          "kinetic": -2.8094165224209426,
+          "total": -2.627470097541809
+        }
+      },
+      {
+        "all_sinks_total": -5.342221388816833,
+        "day": 220,
+        "held_suarez_rayleigh": {
+          "enthalpy": 0.0,
+          "kinetic": -2.6880627605551854,
+          "total": -2.68806275844574
+        },
+        "hyperdiffusion_del8": {
+          "enthalpy": 0.18851367473602296,
+          "kinetic": -2.8426723020570352,
+          "total": -2.654158630371094
+        }
+      },
+      {
+        "all_sinks_total": -4.392048840522766,
+        "day": 230,
+        "held_suarez_rayleigh": {
+          "enthalpy": 0.0,
+          "kinetic": -2.1360716035566294,
+          "total": -2.136071605682373
+        },
+        "hyperdiffusion_del8": {
+          "enthalpy": 0.13072267532348633,
+          "kinetic": -2.3866999122546986,
+          "total": -2.255977234840393
+        }
+      },
+      {
+        "all_sinks_total": -5.42952929019928,
+        "day": 240,
+        "held_suarez_rayleigh": {
+          "enthalpy": 0.0,
+          "kinetic": -2.753146475998219,
+          "total": -2.7531464767456053
+        },
+        "hyperdiffusion_del8": {
+          "enthalpy": 0.20874907970428466,
+          "kinetic": -2.8851318899635228,
+          "total": -2.6763828134536745
+        }
+      },
+      {
+        "all_sinks_total": -4.846676778793334,
+        "day": 250,
+        "held_suarez_rayleigh": {
+          "enthalpy": 0.0,
+          "kinetic": -2.4503631458757447,
+          "total": -2.4503631448745726
+        },
+        "hyperdiffusion_del8": {
+          "enthalpy": 0.14741086483001709,
+          "kinetic": -2.543724497403018,
+          "total": -2.396313633918762
+        }
+      },
+      {
+        "all_sinks_total": -4.695563869476318,
+        "day": 260,
+        "held_suarez_rayleigh": {
+          "enthalpy": 0.0,
+          "kinetic": -2.3572252411115913,
+          "total": -2.3572252416610717
+        },
+        "hyperdiffusion_del8": {
+          "enthalpy": 0.15596399307250977,
+          "kinetic": -2.4943026221962645,
+          "total": -2.3383386278152467
+        }
+      },
+      {
+        "all_sinks_total": -4.943326096534729,
+        "day": 270,
+        "held_suarez_rayleigh": {
+          "enthalpy": 0.0,
+          "kinetic": -2.2728031184431163,
+          "total": -2.2728031158447264
+        },
+        "hyperdiffusion_del8": {
+          "enthalpy": 0.13541497707366942,
+          "kinetic": -2.805937959749717,
+          "total": -2.6705229806900026
+        }
+      },
+      {
+        "all_sinks_total": -4.856365232467651,
+        "day": 280,
+        "held_suarez_rayleigh": {
+          "enthalpy": 0.0,
+          "kinetic": -2.5430185286467895,
+          "total": -2.5430185270309447
+        },
+        "hyperdiffusion_del8": {
+          "enthalpy": 0.16129886150360107,
+          "kinetic": -2.4746455668169074,
+          "total": -2.3133467054367065
+        }
+      },
+      {
+        "all_sinks_total": -5.296676225662232,
+        "day": 290,
+        "held_suarez_rayleigh": {
+          "enthalpy": 0.0,
+          "kinetic": -2.5084573269682005,
+          "total": -2.508457326889038
+        },
+        "hyperdiffusion_del8": {
+          "enthalpy": 0.13500243186950683,
+          "kinetic": -2.92322132864967,
+          "total": -2.7882188987731933
+        }
+      },
+      {
+        "all_sinks_total": -5.492939567565918,
+        "day": 300,
+        "held_suarez_rayleigh": {
+          "enthalpy": 0.0,
+          "kinetic": -2.719138441153336,
+          "total": -2.7191384410858155
+        },
+        "hyperdiffusion_del8": {
+          "enthalpy": 0.20030956745147704,
+          "kinetic": -2.9741106961038897,
+          "total": -2.7738011264801026
+        }
+      }
+    ],
+    "unexplained": 5.063563894535031
+  }
+}

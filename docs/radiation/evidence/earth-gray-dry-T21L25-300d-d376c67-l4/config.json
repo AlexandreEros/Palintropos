@@ -1,0 +1,134 @@
+{
+  "code": {
+    "git_commit": "d376c67a3eeaa2c91527e8eccfabeac4489eda46",
+    "git_dirty": false
+  },
+  "config": {
+    "checkpoint_every_days": 10,
+    "convection": {
+      "timescale": 0.0
+    },
+    "cp": 1004.64,
+    "damping_scheme": "centred",
+    "days": 300,
+    "drag": {
+      "k_f_per_day": 1.0,
+      "kind": "held_suarez",
+      "sigma_b": 0.7
+    },
+    "dt": 1200.0,
+    "experiment_id": "earth-gray-dry-T21L25",
+    "gas_constant": 287.04,
+    "gravity": 9.8,
+    "hyperdiffusion_efold_days": 0.1,
+    "hyperdiffusion_order": 4,
+    "initial": {
+      "kind": "isothermal",
+      "temperature": 264.0
+    },
+    "insolation": {
+      "delta_s": 1.4,
+      "kind": "frierson",
+      "net_solar_constant": 938.4
+    },
+    "internal_heat_flux": 0.0,
+    "keep_checkpoints": 2,
+    "l_max": 22,
+    "longwave": {
+      "kind": "frierson",
+      "linear_fraction": 0.1,
+      "tau_equator": 6.0,
+      "tau_pole": 1.5
+    },
+    "mean_last_days": 0,
+    "nlat": 32,
+    "nlon": 64,
+    "omega": 7.292e-05,
+    "perturbation_lmax": 8,
+    "perturbation_wind": 0.1,
+    "radiation_interval": 1,
+    "radius": 6376000.0,
+    "raw_alpha": 0.53,
+    "raw_nu": 0.1,
+    "reference_pressure": 100000.0,
+    "retained_truncation": 21,
+    "schema": "palintropos.radiative.config/1",
+    "seed": 20261110,
+    "sensible": {
+      "critical_richardson": 1.0,
+      "gustiness": 1.0,
+      "roughness_length": 3.21e-05
+    },
+    "shortwave": {
+      "kind": "transparent"
+    },
+    "state_every_days": 10,
+    "surface": {
+      "albedo": 0.0,
+      "emissivity": 1.0,
+      "heat_capacity": 10000000.0,
+      "initial_temperature": 285.0
+    },
+    "t_ref": 300.0,
+    "thermal_source": "linear",
+    "vertical": {
+      "kind": "frierson",
+      "nlev": 25
+    }
+  },
+  "config_sha256": "e31ae183937da3bc9c5a63cbaf5c889bbeefc384a2f70b81e529b7a6965890d5",
+  "created": "2026-11-13T15:11:58Z",
+  "initial_state": {
+    "kind": "isothermal",
+    "temperature_profile": [
+      264.0,
+      264.0,
+      264.0,
+      264.0,
+      264.0,
+      264.0,
+      264.0,
+      264.0,
+      264.0,
+      264.0,
+      264.0,
+      264.0,
+      264.0,
+      264.0,
+      264.0,
+      264.0,
+      264.0,
+      264.0,
+      264.0,
+      264.0,
+      264.0,
+      264.0,
+      264.0,
+      264.0,
+      264.0
+    ]
+  },
+  "physics": true,
+  "physics_datasets": {
+    "mixtures.toml": {
+      "schema": "palintropos.mixtures/1",
+      "sha256": "c531d18021b2cb0a31322d6da72ec6bb3a3148962aec6e999b41d2a8777ec68d"
+    },
+    "rayleigh.toml": {
+      "schema": "palintropos.rayleigh/1",
+      "sha256": "936c5093bb614fdb6f321c1952a518fbfc71c9a17be7ff23c703e6e1e8d0646e"
+    },
+    "species.toml": {
+      "schema": "palintropos.species/1",
+      "sha256": "5e9e1f2f86fbf004321306f44230fca8ea5ceb4e5966c17a3e2bed5c12431d8c"
+    },
+    "stars.toml": {
+      "schema": "palintropos.stars/1",
+      "sha256": "b9f037e3f0a41940c5e9e5a9ecaa71b4f4d1b891b8a16955a81111aca1bfea91"
+    },
+    "thermodynamics.toml": {
+      "schema": "palintropos.thermodynamics/1",
+      "sha256": "a9132848db44b20945ca66f88e02a76773a08ab2f048ced31ed147bd43b6b7e9"
+    }
+  }
+}
