@@ -84,14 +84,78 @@ an M-I reproduction (no boundary layer, T21, 30 days, no seasonal mean).
 A closed global budget also does not show that each operator conserves
 energy locally.
 
+### Results (2026-11-13; criteria above unchanged)
+
+Both runs came from `b3aaef8` with a clean tree, on one Colab NVIDIA L4
+(CuPy 14.0.1). They ran without resuming and took 6.5 min (H, `9f7eaa0a…`)
+and 5.0 min (U, `28281209…`), against about 44 min each on the MX110
+(0.61 s/step, measured first). Evidence is in
+`evidence/dev-mars-gray-flat{-heated,}-T21L25-30d-b3aaef8-l4/`, with
+capsules in `docs/runs/`. `verdicts.json` comes from
+`tools/radiation/judge_mars_pilot.py`, and
+`tests/test_radiation_evidence.py` recomputes M2, M3 and M6 from the series.
+
+| | criterion | measured | verdict |
+| --- | --- | --- | --- |
+| M1 | stability, max \|u\| < 150 m s⁻¹, 100–400 K | completed; T 134–314 K; **max \|u\| 282 (H), 295 (U) m s⁻¹** | **not met** |
+| M2 | atmosphere residual, days 11–30 | −0.0114 W m⁻² (1.1 × 10⁻⁴ F); largest daily value 0.012 | met |
+| M3 | atmosphere + slab − TOA | equal to M2 to round-off; slab balance exact | met |
+| M4 | U residual = U sinks | −0.048 against −0.037 (tolerance 0.10) | met |
+| M5 | diurnal response | p_s S1 = 1.29 % of p_s (≥ 5 × 10⁻⁴ ✓, 5.9 × noise ✓); T_s maximum at **17.0 h** | **not met** |
+| M6 | p_s drift | −6 × 10⁻⁶ (H and U) | met |
+
+**M1.** The winds above the bound are confined to the top two levels
+(p < 0.2 Pa). They grow through the run (98, 187 and 209 m s⁻¹ in the
+day-5, day-15 and day-30 states of H). Below 6 Pa (σ > 0.01) the maximum
+stays at or below 77 m s⁻¹. That is the layer where M-I applies its
+0.125-day Rayleigh sponge (above 0.5 Pa), which this pilot does not have
+(§1, "sponge"). The run did not blow up: temperatures stay inside the
+bounds, the budget closes, and the top-level Courant number is about 0.5.
+The sponge as the cause is consistent with this but untested: no run with
+a sponge exists.
+
+**M5.** The tide is there. The migrating diurnal surface-pressure
+component is 1.29 % of p_s in the tropics, peaking near 05:30 local time,
+and the semidiurnal is 0.61 %. The lowest-level air temperature has a
+3.1 K diurnal amplitude at the equator, but the surface only 0.26 K. The
+equatorial T_s maximum falls at 17.0 h, outside the 11–16 h window. That
+window was written with real, low-thermal-inertia Mars in mind. M-I's
+2 m slab (Cω ≈ 590 W m⁻² K⁻¹ against ≈ 2 W m⁻² K⁻¹ of restoring) lags
+the insolation by close to a quarter sol, which predicts this. The
+shortfall was noticed on a 3-day development run before H and U started,
+and the criterion was not changed. So in this configuration the tide is
+driven by shortwave absorption in the air, not by the ground.
+
+**Energy, separated from equilibration.** The drag and ∇⁸ sinks are the
+same in both runs (−0.036 and −0.037 W m⁻², 70 % drag). The heating
+returns them: U's residual minus H's is 0.036 W m⁻². What both runs keep
+is about −0.011 W m⁻² (10⁻⁴ F) that the heating does not address. It is
+of the same kind as the Earth time-integration residual; it was not split
+here. The runs are far from equilibrium: TOA −116 W m⁻², T_s 285 → 240 K.
+That spin-up is no evidence about M-I's climate, and the H − U
+differences (0.004 K, 0.01 W m⁻²) are too small to read anything from.
+The sinks are 4 × 10⁻⁴ F, so on this short, weak-flow run the heating's
+effect is below the M4 tolerance. M4 shows consistency, not sensitivity.
+
+**What this establishes.** With Martian constants, diurnal and seasonal
+forcing and M-I's radiation, the coupled model integrates 30 days. It
+closes the atmosphere and the whole-system (atmosphere + surface) budget
+to 10⁻⁴ F, keeps mass to 6 × 10⁻⁶, and develops a diurnal thermal tide.
+**What it does not.** Any M-I reproduction (no boundary layer or sponge,
+T21, 30 days, no seasonal mean); stability of the top levels; local
+energy conservation by each operator.
+
 ## 3. After the pilot, in order
 
-1. The boundary layer: bulk surface stress and implicit vertical diffusion
+1. The energy-conserving top sponge (existing `DiagonalDamping` hook, its
+   kinetic-energy loss returned by the frictional heating). It is cheap,
+   and the pilot's M1 result gives it a direct test: rerun H with the
+   sponge, with the same criteria.
+2. The boundary layer: bulk surface stress and implicit vertical diffusion
    of heat and momentum, with their dissipation in the frictional heating.
    Then remove the two substitutes. This is the gating dependency for any
-   M-I claim.
-2. The energy-conserving top sponge (existing `DiagonalDamping` hook);
-   Isca's ∇⁴ / RA numerics as an option, if the comparison needs them.
+   M-I claim. Isca's ∇⁴ / RA numerics as an option, if the comparison needs
+   them.
 3. T42, one Mars year plus the L_s 225°–315° average; compare with Fig. 4b.
 4. Then MOLA terrain with nothing else changed (the existing terrain
    import), for the flat-to-topography comparison.

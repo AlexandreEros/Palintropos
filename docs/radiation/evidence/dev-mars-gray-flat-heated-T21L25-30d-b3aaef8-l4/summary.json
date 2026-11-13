@@ -1,0 +1,546 @@
+{
+  "climate": {
+    "eddy_heat_flux_poleward_north": {
+      "latitude_deg": 47.06964205968767,
+      "sigma": 7.65044775e-05,
+      "value": 287.44692519445016
+    },
+    "eddy_heat_flux_poleward_south": {
+      "latitude_deg": -47.06964205968767,
+      "sigma": 7.65044775e-05,
+      "value": -291.7479122135528
+    },
+    "eddy_momentum_flux_north": {
+      "latitude_deg": 19.38223134643437,
+      "sigma": 7.65044775e-05,
+      "value": 217.4890128726972
+    },
+    "eddy_momentum_flux_south": {
+      "latitude_deg": -30.45755396115208,
+      "sigma": 7.65044775e-05,
+      "value": -221.97323324239537
+    },
+    "hemispheric_asymmetry_of_u": 0.17102308018020496,
+    "latitudes": 32,
+    "levels": 25,
+    "lowest_level_temperature": {
+      "near_equator": 253.24969138070827,
+      "northmost": 234.1984443711651,
+      "southmost": 220.23672361566742
+    },
+    "lowest_level_wind_range": [
+      -6.8642975962429755,
+      3.1516806567402162
+    ],
+    "samples": 15,
+    "strongest_easterly": {
+      "latitude_deg": 8.3067028565188,
+      "sigma": 7.65044775e-05,
+      "value": -90.2630862809289
+    },
+    "temperature_range": [
+      191.8259637923142,
+      276.69803304359556
+    ],
+    "westerly_jet_north": {
+      "latitude_deg": 63.67863556109686,
+      "sigma": 7.65044775e-05,
+      "value": 87.80265106628774
+    },
+    "westerly_jet_south": {
+      "latitude_deg": -69.21297616937085,
+      "sigma": 7.65044775e-05,
+      "value": 93.24668489027272
+    }
+  },
+  "code": {
+    "git_commit": "b3aaef830cb11da38d1cbb20e73897adf1b8035b",
+    "git_dirty": false
+  },
+  "config_sha256": "9f7eaa0a44612eeab10981b94648473da1bbe7b55b7f8797fa0a814021a2abea",
+  "environment": {
+    "cuda_driver": 13000,
+    "cuda_runtime": 13000,
+    "cupy": "14.0.1",
+    "device": "NVIDIA L4",
+    "numpy": "2.4.6",
+    "platform": "Linux-6.6.159+-x86_64-with-glibc2.39",
+    "python": "3.13.16"
+  },
+  "events": {
+    "first": "2026-11-13T18:28:01Z",
+    "last": "2026-11-13T18:34:31Z",
+    "last_event": "completed",
+    "resumes": 0
+  },
+  "experiment_id": "dev-mars-gray-flat-heated-T21L25",
+  "series": {
+    "at_day": {
+      "1": {
+        "absorbed_stellar": 106.08316059370043,
+        "bottom_net_down": -237.5752869128178,
+        "column_energy_tendency": -5.876620555650898,
+        "energy_kinetic": 1711.7189954492421,
+        "energy_rate": -5.88223806116066,
+        "energy_residual": -0.005617505509762033,
+        "interior": 0.0,
+        "max_abs_u": 28.85578265183452,
+        "mean_surface_temperature": 282.5125731475382,
+        "olr": 349.6972450973855,
+        "sensible": 0.1621770352163725,
+        "surface_net": -237.7374639480342,
+        "t_max": 302.9147657794619,
+        "t_min": 238.41713732844087,
+        "toa_net_down": -243.61408450368498
+      },
+      "10": {
+        "absorbed_stellar": 104.54190105401025,
+        "bottom_net_down": -161.70745989889235,
+        "column_energy_tendency": -1.920916583231837,
+        "energy_kinetic": 7777.929988775755,
+        "energy_rate": -1.9315066152880038,
+        "energy_residual": -0.010590032056166931,
+        "interior": 0.0,
+        "max_abs_u": 151.7053394747744,
+        "mean_surface_temperature": 264.4368209076282,
+        "olr": 268.1851667078542,
+        "sensible": 0.014889171719857123,
+        "surface_net": -161.72234907061227,
+        "t_max": 301.0913870952981,
+        "t_min": 157.1275590348246,
+        "toa_net_down": -163.64326565384403
+      },
+      "30": {
+        "absorbed_stellar": 101.62306652902807,
+        "bottom_net_down": -83.71489087120095,
+        "column_energy_tendency": -0.7931290293794574,
+        "energy_kinetic": 27748.997416824724,
+        "energy_rate": -0.8043926358518312,
+        "energy_residual": -0.011263606472373788,
+        "interior": 0.0,
+        "max_abs_u": 208.15371676836034,
+        "mean_surface_temperature": 240.48464883200043,
+        "olr": 186.1896599094972,
+        "sensible": 0.05857347988885412,
+        "surface_net": -83.77346435108981,
+        "t_max": 284.97071891158936,
+        "t_min": 139.9873762849186,
+        "toa_net_down": -84.56659338046927
+      }
+    },
+    "last_day": 30,
+    "max_abs_energy_residual": 0.012268327140826263,
+    "mean_surface_pressure_drift": -6.05213754112377e-06,
+    "window": {
+      "absorbed_stellar": {
+        "max": 104.39007475554607,
+        "mean": 102.96141972431762,
+        "min": 101.62306652902807,
+        "std": 0.8648719475555535
+      },
+      "bottom_net_down": {
+        "max": -83.71489087120095,
+        "mean": -114.4609102009465,
+        "min": -155.59641999011677,
+        "std": 22.191122101635145
+      },
+      "column_energy_tendency": {
+        "max": -0.7931290293794574,
+        "mean": -1.2591667467480685,
+        "min": -1.8170286823070028,
+        "std": 0.30681973306961624
+      },
+      "energy_kinetic": {
+        "max": 27748.997416824724,
+        "mean": 16305.854881095594,
+        "min": 8382.178983673155,
+        "std": 6016.315630036253
+      },
+      "energy_rate": {
+        "max": -0.8043926358518312,
+        "mean": -1.270605230654137,
+        "min": -1.8285134866404245,
+        "std": 0.306854922311559
+      },
+      "energy_residual": {
+        "max": -0.010793099832960729,
+        "mean": -0.011438483906068646,
+        "min": -0.012268327140826263,
+        "std": 0.0003321984751345079
+      },
+      "interior": {
+        "max": 0.0,
+        "mean": 0.0,
+        "min": 0.0,
+        "std": 0.0
+      },
+      "max_abs_u": {
+        "max": 281.6840088835757,
+        "mean": 216.7852636040198,
+        "min": 137.62930596747344,
+        "std": 47.165256203109266
+      },
+      "mean_surface_temperature": {
+        "max": 262.8087338471467,
+        "mean": 250.5677745131672,
+        "min": 240.48464883200043,
+        "std": 6.9198110904392385
+      },
+      "olr": {
+        "max": 261.81259931902275,
+        "mean": 218.68281959504375,
+        "min": 186.1896599094972,
+        "std": 23.348780146260275
+      },
+      "sensible": {
+        "max": 0.05857347988885412,
+        "mean": 0.0013229230315672392,
+        "min": -0.020344221169173157,
+        "std": 0.02140826553385608
+      },
+      "surface_net": {
+        "max": -83.77346435108981,
+        "mean": -114.46223312397805,
+        "min": -155.60549588116965,
+        "std": 22.18154905610022
+      },
+      "t_max": {
+        "max": 312.43092968714507,
+        "mean": 292.2126397134281,
+        "min": 284.83211419277706,
+        "std": 6.7621565306894
+      },
+      "t_min": {
+        "max": 160.98800268015975,
+        "mean": 150.03806436649353,
+        "min": 138.1490434489264,
+        "std": 7.148153614316223
+      },
+      "toa_net_down": {
+        "max": -84.56659338046927,
+        "mean": -115.72139987072617,
+        "min": -157.42252456347663,
+        "std": 22.48793064806486
+      }
+    },
+    "window_days": 20
+  },
+  "sinks": {
+    "all_sinks_total_mean": -0.0360359312452021,
+    "all_sinks_total_standard_error": 0.0037216429385590836,
+    "energy_residual_window_mean": -0.011438483906068646,
+    "mean": {
+      "held_suarez_rayleigh": {
+        "enthalpy": 0.0,
+        "kinetic": -0.024982359664696297,
+        "total": -0.024982359664780747
+      },
+      "hyperdiffusion_del8": {
+        "enthalpy": 0.0004787809738800639,
+        "kinetic": -0.011532352548820199,
+        "total": -0.011053571580421357
+      }
+    },
+    "operators": [
+      "held_suarez_rayleigh",
+      "hyperdiffusion_del8"
+    ],
+    "states": [
+      {
+        "all_sinks_total": -0.021475474387407302,
+        "day": 10,
+        "held_suarez_rayleigh": {
+          "enthalpy": 0.0,
+          "kinetic": -0.017695056789680166,
+          "total": -0.017695056796073912
+        },
+        "hyperdiffusion_del8": {
+          "enthalpy": 2.751186490058899e-05,
+          "kinetic": -0.0038079294627095805,
+          "total": -0.0037804175913333893
+        }
+      },
+      {
+        "all_sinks_total": -0.02120301730930805,
+        "day": 11,
+        "held_suarez_rayleigh": {
+          "enthalpy": 0.0,
+          "kinetic": -0.017488310502558307,
+          "total": -0.01748831048607826
+        },
+        "hyperdiffusion_del8": {
+          "enthalpy": 3.0134096741676332e-05,
+          "kinetic": -0.003744840890249179,
+          "total": -0.00371470682322979
+        }
+      },
+      {
+        "all_sinks_total": -0.021128629595041273,
+        "day": 12,
+        "held_suarez_rayleigh": {
+          "enthalpy": 0.0,
+          "kinetic": -0.017079131768641672,
+          "total": -0.017079131752252577
+        },
+        "hyperdiffusion_del8": {
+          "enthalpy": 3.436058759689331e-05,
+          "kinetic": -0.00408385840972187,
+          "total": -0.0040494978427886965
+        }
+      },
+      {
+        "all_sinks_total": -0.021282954178750514,
+        "day": 13,
+        "held_suarez_rayleigh": {
+          "enthalpy": 0.0,
+          "kinetic": -0.017355660333159904,
+          "total": -0.01735566034913063
+        },
+        "hyperdiffusion_del8": {
+          "enthalpy": 3.465801477432251e-05,
+          "kinetic": -0.003961951862311253,
+          "total": -0.003927293829619884
+        }
+      },
+      {
+        "all_sinks_total": -0.021739482916891574,
+        "day": 14,
+        "held_suarez_rayleigh": {
+          "enthalpy": 0.0,
+          "kinetic": -0.017546358939343917,
+          "total": -0.017546358965337277
+        },
+        "hyperdiffusion_del8": {
+          "enthalpy": 3.616243600845337e-05,
+          "kinetic": -0.004229286391964706,
+          "total": -0.004193123951554298
+        }
+      },
+      {
+        "all_sinks_total": -0.021463825516402718,
+        "day": 15,
+        "held_suarez_rayleigh": {
+          "enthalpy": 0.0,
+          "kinetic": -0.017252275027949508,
+          "total": -0.017252275012433527
+        },
+        "hyperdiffusion_del8": {
+          "enthalpy": 3.8116537034511566e-05,
+          "kinetic": -0.004249667047170078,
+          "total": -0.0042115505039691924
+        }
+      },
+      {
+        "all_sinks_total": -0.0212613682821393,
+        "day": 16,
+        "held_suarez_rayleigh": {
+          "enthalpy": 0.0,
+          "kinetic": -0.016893379388384346,
+          "total": -0.016893379390239716
+        },
+        "hyperdiffusion_del8": {
+          "enthalpy": 4.095226526260376e-05,
+          "kinetic": -0.004408941164856514,
+          "total": -0.004367988891899586
+        }
+      },
+      {
+        "all_sinks_total": -0.02133625008165836,
+        "day": 17,
+        "held_suarez_rayleigh": {
+          "enthalpy": 0.0,
+          "kinetic": -0.016769533369952114,
+          "total": -0.01676953338086605
+        },
+        "hyperdiffusion_del8": {
+          "enthalpy": 5.48059493303299e-05,
+          "kinetic": -0.0046215226464664735,
+          "total": -0.004566716700792312
+        }
+      },
+      {
+        "all_sinks_total": -0.022263950034976006,
+        "day": 18,
+        "held_suarez_rayleigh": {
+          "enthalpy": 0.0,
+          "kinetic": -0.01713790374164091,
+          "total": -0.017137903720140457
+        },
+        "hyperdiffusion_del8": {
+          "enthalpy": 9.693395346403121e-05,
+          "kinetic": -0.005222980296421156,
+          "total": -0.005126046314835549
+        }
+      },
+      {
+        "all_sinks_total": -0.02421962484717369,
+        "day": 19,
+        "held_suarez_rayleigh": {
+          "enthalpy": 0.0,
+          "kinetic": -0.018101764014500078,
+          "total": -0.018101764023303987
+        },
+        "hyperdiffusion_del8": {
+          "enthalpy": 0.000233941413462162,
+          "kinetic": -0.006351802210265305,
+          "total": -0.006117860823869705
+        }
+      },
+      {
+        "all_sinks_total": -0.028905284591019154,
+        "day": 20,
+        "held_suarez_rayleigh": {
+          "enthalpy": 0.0,
+          "kinetic": -0.020341337536629,
+          "total": -0.0203413375467062
+        },
+        "hyperdiffusion_del8": {
+          "enthalpy": 0.0004702426865696907,
+          "kinetic": -0.009034189710673672,
+          "total": -0.008563947044312953
+        }
+      },
+      {
+        "all_sinks_total": -0.03325476001948118,
+        "day": 21,
+        "held_suarez_rayleigh": {
+          "enthalpy": 0.0,
+          "kinetic": -0.02179219109848418,
+          "total": -0.021792191118001937
+        },
+        "hyperdiffusion_del8": {
+          "enthalpy": 0.0007596336305141449,
+          "kinetic": -0.012222202506927715,
+          "total": -0.011462568901479245
+        }
+      },
+      {
+        "all_sinks_total": -0.0352284798771143,
+        "day": 22,
+        "held_suarez_rayleigh": {
+          "enthalpy": 0.0,
+          "kinetic": -0.022635794235065988,
+          "total": -0.02263579420745373
+        },
+        "hyperdiffusion_del8": {
+          "enthalpy": 0.0009500876441597938,
+          "kinetic": -0.013542773300632688,
+          "total": -0.012592685669660568
+        }
+      },
+      {
+        "all_sinks_total": -0.03965093422681093,
+        "day": 23,
+        "held_suarez_rayleigh": {
+          "enthalpy": 0.0,
+          "kinetic": -0.024748121943848674,
+          "total": -0.024748121947050096
+        },
+        "hyperdiffusion_del8": {
+          "enthalpy": 0.0009413700923323631,
+          "kinetic": -0.015844182370783527,
+          "total": -0.014902812279760837
+        }
+      },
+      {
+        "all_sinks_total": -0.04537314478307962,
+        "day": 24,
+        "held_suarez_rayleigh": {
+          "enthalpy": 0.0,
+          "kinetic": -0.028209560266550398,
+          "total": -0.02820956028997898
+        },
+        "hyperdiffusion_del8": {
+          "enthalpy": 0.0008791030198335648,
+          "kinetic": -0.01804268751733616,
+          "total": -0.017163584493100643
+        }
+      },
+      {
+        "all_sinks_total": -0.05024301040917635,
+        "day": 25,
+        "held_suarez_rayleigh": {
+          "enthalpy": 0.0,
+          "kinetic": -0.030795500460917537,
+          "total": -0.030795500464737415
+        },
+        "hyperdiffusion_del8": {
+          "enthalpy": 0.001108180470764637,
+          "kinetic": -0.020555690401452012,
+          "total": -0.019447509944438935
+        }
+      },
+      {
+        "all_sinks_total": -0.05392365865409375,
+        "day": 26,
+        "held_suarez_rayleigh": {
+          "enthalpy": 0.0,
+          "kinetic": -0.03375989463584119,
+          "total": -0.03375989463180304
+        },
+        "hyperdiffusion_del8": {
+          "enthalpy": 0.0008185660839080811,
+          "kinetic": -0.020982330114056823,
+          "total": -0.020163764022290708
+        }
+      },
+      {
+        "all_sinks_total": -0.05672497332096099,
+        "day": 27,
+        "held_suarez_rayleigh": {
+          "enthalpy": 0.0,
+          "kinetic": -0.03674927460342588,
+          "total": -0.03674927461892366
+        },
+        "hyperdiffusion_del8": {
+          "enthalpy": 0.0008920283243060112,
+          "kinetic": -0.02086772700513393,
+          "total": -0.019975698702037335
+        }
+      },
+      {
+        "all_sinks_total": -0.058457853160798545,
+        "day": 28,
+        "held_suarez_rayleigh": {
+          "enthalpy": 0.0,
+          "kinetic": -0.040193888162284565,
+          "total": -0.04019388813525438
+        },
+        "hyperdiffusion_del8": {
+          "enthalpy": 0.0007139262929558754,
+          "kinetic": -0.018977891296199232,
+          "total": -0.018263965025544168
+        }
+      },
+      {
+        "all_sinks_total": -0.06726763866841792,
+        "day": 29,
+        "held_suarez_rayleigh": {
+          "enthalpy": 0.0,
+          "kinetic": -0.04541659953916678,
+          "total": -0.04541659954935312
+        },
+        "hyperdiffusion_del8": {
+          "enthalpy": 0.0009555049613118172,
+          "kinetic": -0.02280654409201816,
+          "total": -0.02185103911906481
+        }
+      },
+      {
+        "all_sinks_total": -0.07035024128854275,
+        "day": 30,
+        "held_suarez_rayleigh": {
+          "enthalpy": 0.0,
+          "kinetic": -0.04666801660059718,
+          "total": -0.046668016575276854
+        },
+        "hyperdiffusion_del8": {
+          "enthalpy": 0.0009381801262497902,
+          "kinetic": -0.024620404827874153,
+          "total": -0.023682224713265896
+        }
+      }
+    ],
+    "unexplained": 0.024597447339133455
+  }
+}
