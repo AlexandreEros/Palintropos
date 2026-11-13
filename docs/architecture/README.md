@@ -82,6 +82,8 @@ root, as `sky-saved-column` does with `Simulation.sky`).
 The live snapshot changes with source; frozen layout snapshots retain their
 own source/toolchain provenance and are not current API guides. Their diagrams
 and measurements are retained for reproducible structural comparison.
+The snapshot READMEs inventory the contents of their generated subdirectories.
+Use the [history index](history/README.md) to navigate the frozen snapshots.
 
 ### Adding a frozen snapshot
 

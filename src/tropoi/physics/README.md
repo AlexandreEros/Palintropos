@@ -5,7 +5,7 @@ The physical world every consumer shares — the radiation schemes
 (`representation.visual.sky`) and the experiment drivers — plus the column
 physics itself. This package imports nothing else from `tropoi` and runs on
 NumPy or CuPy arrays (level axis first, index 0 at the top). Its scientific
-data are packaged files under [`data/`](data) (TOML; loaded once through
+data are packaged files under [`data/`](data/README.md) (TOML; loaded once through
 `importlib.resources`, SHA-256-identified for run provenance); equations,
 fits, validation and loading stay in Python. See
 [docs/radiation/SHARED_PHYSICS.md](../../../docs/radiation/SHARED_PHYSICS.md).
@@ -32,4 +32,5 @@ fits, validation and loading stay in Python. See
 | `column_model.py` | `ColumnPhysics` (shared by all hosts) and the single-column model |
 
 The PE host is [`temporal/column_coupling.py`](../temporal/column_coupling.py).
+See the [column radiation package](radiation/README.md) for its module boundaries.
 Conventions, measurements and limits: [status page](../../../docs/radiation/README.md).

@@ -88,7 +88,7 @@ def test_every_packaged_dataset_is_declared_as_package_data():
     on_disk = {p.name for p in physics_data.glob("*.toml")}
     assert on_disk == set(DATASETS)
     stray = [p.name for p in physics_data.iterdir()
-             if p.is_file() and p.suffix != ".toml"]
+             if p.is_file() and p.suffix != ".toml" and p.name != "README.md"]
     assert not stray, f"undeclared data files would not ship: {stray}"
 
 

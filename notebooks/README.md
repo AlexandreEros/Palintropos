@@ -1,4 +1,37 @@
-# Williamson Test Case 5 — MRI-JMA vs Aeolus validation notebooks
+# Palintropos notebooks
+
+| Notebook | Runtime and use | Evidence |
+| --- | --- | --- |
+| [Heated radiative runs](radiative_colab_pilot.ipynb) | Colab GPU. Time a warmed-up Earth or Jupiter run, profile it, or resume from a checkpoint. | [Colab run results](../docs/radiation/README.md#the-same-heated-runs-on-a-colab-tesla-t4-2026-11-1112-commit-d38d2a3), [full capsule catalogue](../docs/runs/README.md) |
+| [CUDA regression suite](Palintropos-Colab-CUDA-Regression.ipynb) | Colab GPU. Run pytest against a selected revision and download the logs and JUnit results. | [Recorded Linux/CUDA regression](../docs/radiation/TEST_RESULTS.md#full-suite-on-linuxcuda-at-341acfe-2026-11-12-colab-tesla-t4) |
+| [Held–Suarez launcher](held_suarez_colab.ipynb) | Colab GPU and Google Drive. Launch or resume the pinned 1200-day T42L20 experiment with a verified Dinosaur reference and a runtime budget gate. | [Protocol and acceptance record](../docs/held_suarez/README.md), [preserved production run](../docs/runs/README.md#hs-t42l20-prod-002) |
+| [Williamson 5 reference preparation](mri_w5_reference_preparation.ipynb) | CPU. Prepare and verify the MRI-JMA reference package for T42 and T63. | [Williamson 5 validation report](../docs/validation/williamson5_mri_2026-07-30.md) |
+| [Williamson 5 comparison](w5_mri_validation_colab.ipynb) | GPU for verification and integration, CPU for postprocessing. Compare the pinned Palintropos predecessor with the MRI-JMA reference. | [Williamson 5 validation report](../docs/validation/williamson5_mri_2026-07-30.md) |
+
+## Radiative timing and production runs
+
+Select a GPU runtime, choose `CASE = "earth"` or `"jupiter"`, and run the
+setup and timing cells (1–4). The notebook checks out `d38d2a3` and uses
+the production loop with frictional heating enabled. The pilot stops at a
+checkpoint. Keep the same case and run directory to resume with the optional
+production cell. The default Google Drive location keeps checkpoints across
+Colab sessions. The optional profiling cells use scratch runs. Their
+synchronised timings describe component cost, while the uninstrumented pilot
+measures throughput. See the [pilot tooling](../tools/colab/README.md).
+
+## CUDA regression
+
+Set `REF` to a branch or commit and `SUITE` to `routine`, `slow` or
+`all`. Set `REF` explicitly if the default PR #29 branch has been deleted.
+The notebook records the resolved SHA, runs pytest using Colab's CuPy, and
+downloads an evidence ZIP containing the environment, log, JUnit XML when
+available, and per-test skip reasons. For the historical full run, select
+`341acfeb9e9331d3a9a53e0eecceb966177cebf4` and `all`. The documented
+result applies to Linux with Python 3.13 and CuPy 14. The
+[test record](../docs/radiation/TEST_RESULTS.md) also lists the separate
+Windows Python 3.12/CuPy 13.4 runs and their coverage.
+
+## Williamson Test Case 5 — MRI-JMA vs Aeolus
 
 > **Project name:** Aeolus is now Palintropos (distribution `palintropos`,
 > import package `tropoi`, command `tropoi`). The historical model name,
@@ -30,11 +63,10 @@ finding was that they did **not**: Aeolus prescribed the Williamson case-2 field
 as layer *thickness*, while MRI and Williamson prescribe it as the *free
 surface*. Notebook B's day-zero gate failed by design and refused the 15-day
 runs until the initial condition was corrected — which it was, in commit
-`668e6c9a`, *fix(swe): canonicalize Williamson-5 initial state*. Everything in
-this directory is downstream of that correction; every pre-correction W5
-trajectory is superseded.
+`668e6c9a`, *fix(swe): canonicalize Williamson-5 initial state*. Every
+pre-correction W5 trajectory is superseded.
 
-## Workflow
+### Workflow
 
 ```
 Notebook A (CPU)                        Notebook B (GPU except postprocess)
@@ -58,7 +90,7 @@ The reference package moves from A to B through the browser: Notebook A writes
 `mri-w5-reference.zip` and downloads it; Notebook B uploads and extracts it. No
 Google Drive mount is required.
 
-## Field contract (what is compared)
+### Field contract
 
 ```
 MRI:     free_surface_height = archived h
@@ -76,7 +108,7 @@ and the reference an **analytic** one, the raw `layer_depth` difference includes
 a large static terrain-representation term; removing it returns the free-surface
 difference identically. See § 6 of the validation report.
 
-## Usage
+### Usage
 
 1. Run Notebook A once (any runtime; ~320 MB download from
    `climate.mri-jma.go.jp`). Output: `mri-w5-reference/` with two `.npz`

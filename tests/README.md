@@ -7,10 +7,12 @@ validate the GPU solvers.
 
 The [architecture test instructions](../docs/ARCHITECTURE.md#tests) define
 routine GPU regression (`-m "not slow"`), long convergence (`-m slow`) and
-release selections. `architecture_tool/` tests source extraction, graph
+release selections. [`architecture_tool/`](architecture_tool/README.md) tests source extraction, graph
 generation, layers, provenance and export. Browser tests verify offline
-saved-state pages when a supported browser is available. `fixtures/`
+saved-state pages when a supported browser is available. [`fixtures/`](fixtures/README.md)
 contains small data contracts, not substitutes for production acceptance.
+See [`cli/`](cli/README.md) for command tests and
+[`integration/`](integration/README.md) for runner and controller tests.
 
 [Validation](../docs/VALIDATION.md) links measured numerical evidence;
 [Held–Suarez criteria](../docs/held_suarez/ACCEPTANCE.md) define its experiment

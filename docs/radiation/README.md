@@ -370,8 +370,11 @@ Run by the repository owner from a clean clone of `d38d2a3` with the
 checkpoints on Google Drive (CuPy 14.0.1, Python 3.13, Linux); evidence in
 `evidence/earth-gray-dry-heated-T21L25-300d-colab/` and
 `evidence/jupiter-sl09-heated-T21L30-200d-colab/`, each with the pilot's
-timing record. The launcher notebook and pilot script are not part of this
-branch.
+timing record. See the [Colab notebook](../../notebooks/radiative_colab_pilot.ipynb)
+and [pilot script](../../tools/colab/radiative_pilot.py) for the launch and
+checkpoint workflow.
+The [evidence index](evidence/README.md) maps the summaries to the preserved
+run capsules.
 
 | | Earth heated, T4 | Earth heated, MX110 | Jupiter heated, T4 |
 | --- | --- | --- | --- |

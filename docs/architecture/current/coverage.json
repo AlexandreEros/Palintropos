@@ -262,6 +262,9 @@
       "tropoi.physics": [
         "README.md"
       ],
+      "tropoi.physics.radiation": [
+        "README.md"
+      ],
       "tropoi.representation": [
         "README.md"
       ],
