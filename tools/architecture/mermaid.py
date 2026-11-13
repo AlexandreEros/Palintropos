@@ -249,7 +249,7 @@ def class_diagram(graph: Graph, classes: list[str], root: str, title: str,
 _ARROWS = {
     "call": "-->",
     "instantiate": "-->|instantiate|",
-    "constructor": "-->|__init__|",
+    "constructor": "-->|#95;#95;init#95;#95;|",  # "__init__", not bold "init"
     "super": "-->|super|",
     "self": "-.->|self|",
     "override": "-.->|override?|",
