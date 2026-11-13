@@ -1897,6 +1897,8 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 0,
 0,
 0,
+0,
+0,
 4,
 0,
 0,
@@ -1946,6 +1948,7 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 0,
 0,
 1,
+0,
 0,
 0,
 0,
@@ -3914,6 +3917,8 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 1,
 1,
 1,
+1,
+1,
 2,
 8,
 1,
@@ -4337,6 +4342,7 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 1,
 0,
 0,
+1,
 0,
 1,
 1,
@@ -34569,7 +34575,7 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ],
 [
 [
-154,
+160,
 26,
 "self.to_dict()",
 []
@@ -34577,7 +34583,7 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ],
 [
 [
-133,
+137,
 19,
 "product_truncation_cut(self.l_max)",
 [
@@ -34590,7 +34596,7 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ],
 [
 [
-157,
+163,
 30,
 "self.canonical_json()",
 []
@@ -34598,7 +34604,7 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ],
 [
 [
-231,
+237,
 11,
 "RadiativeConfig(experiment_id=_preset_id(experiment_id, 'earth-gray-dry', 'T21L25', frictional_heating), frictional_heating=frictional_heating, radius=6376000.0, omega=7.292e-05, gravity=9.8, gas_constant=287.04, cp=1004.64, reference_pres…",
 []
@@ -34606,7 +34612,7 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ],
 [
 [
-232,
+238,
 22,
 "_preset_id(experiment_id, 'earth-gray-dry', 'T21L25', frictional_heating)",
 [
@@ -34631,7 +34637,7 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ],
 [
 [
-246,
+252,
 10,
 "_t21()",
 []
@@ -34639,7 +34645,7 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ],
 [
 [
-196,
+202,
 11,
 "RadiativeConfig(experiment_id=_preset_id(experiment_id, 'jupiter-sl09', 'T21L30', frictional_heating), frictional_heating=frictional_heating, radius=69860000.0, omega=0.00017587, gravity=26.0, gas_constant=3605.38, cp=12619.0, reference_pr…",
 []
@@ -34647,7 +34653,7 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ],
 [
 [
-197,
+203,
 22,
 "_preset_id(experiment_id, 'jupiter-sl09', 'T21L30', frictional_heating)",
 [
@@ -34672,7 +34678,7 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ],
 [
 [
-208,
+214,
 10,
 "_t21()",
 []
@@ -34680,17 +34686,17 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ],
 [
 [
-293,
+302,
 11,
-"RadiativeConfig(experiment_id=_preset_id(experiment_id, 'dev-mars-gray-flat', 'T21L25', frictional_heating), frictional_heating=frictional_heating, radius=3396000.0, omega=2.0 * math.pi / 88308.0, gravity=3.71, gas_constant=192.0, cp=192.0…",
+"RadiativeConfig(experiment_id=_preset_id(experiment_id, 'dev-mars-gray-flat-sponge' if sponge else 'dev-mars-gray-flat', 'T21L25', frictional_heating), sponge={'bottom_pressure': 0.5, 'efold_days': 0.125} if sponge else None, frictional_he…",
 []
 ]
 ],
 [
 [
-294,
+303,
 22,
-"_preset_id(experiment_id, 'dev-mars-gray-flat', 'T21L25', frictional_heating)",
+"_preset_id(experiment_id, 'dev-mars-gray-flat-sponge' if sponge else 'dev-mars-gray-flat', 'T21L25', frictional_heating)",
 [
 [
 "experiment_id",
@@ -34698,7 +34704,7 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ],
 [
 "name",
-"'dev-mars-gray-flat'"
+"'dev-mars-gray-flat-sponge' if sponge else 'dev-mars-gray-flat'"
 ],
 [
 "resolution",
@@ -34713,7 +34719,7 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ],
 [
 [
-315,
+326,
 10,
 "_t21()",
 []
@@ -34721,7 +34727,7 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ],
 [
 [
-305,
+316,
 42,
 "_time_of_perihelion_for_equinox_start(year, ecc, ls_peri)",
 [
@@ -36493,7 +36499,7 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ],
 [
 [
-256,
+263,
 20,
 "_frictional_heating(cfg, model, dampers + (hyper,), lagged)",
 [
@@ -36518,7 +36524,28 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ],
 [
 [
-259,
+256,
+12,
+"_options({'kind': 'sponge', **cfg.sponge}, 'bottom_pressure', 'efold_days')",
+[
+[
+"spec",
+"{'kind': 'sponge', **cfg.sponge}"
+],
+[
+"*required",
+"'bottom_pressure'"
+],
+[
+"*required",
+"'efold_days'"
+]
+]
+]
+],
+[
+[
+266,
 11,
 "SemiImplicitLeapfrogStepper(model.tendency, op, cfg.dt, raw_nu=cfg.raw_nu, raw_alpha=cfg.raw_alpha, stage_validator=stage_validator, explicit_terms=explicit, dampers=dampers + (hyper,), damping_scheme=cfg.damping_scheme, lagged_terms=lagge…",
 [
@@ -36584,6 +36611,35 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ],
 [
 [
+257,
+29,
+"rayleigh_sponge_damping(model.sigma.full_levels_array(), cfg.l_max + 1, reference_pressure=cfg.reference_pressure, bottom_pressure=o['bottom_pressure'], efold_days=o['efold_days'])",
+[
+[
+"sigma_full",
+"model.sigma.full_levels_array()"
+],
+[
+"n_degrees",
+"cfg.l_max + 1"
+],
+[
+"reference_pressure",
+"cfg.reference_pressure"
+],
+[
+"bottom_pressure",
+"o['bottom_pressure']"
+],
+[
+"efold_days",
+"o['efold_days']"
+]
+]
+]
+],
+[
+[
 250,
 12,
 "hyperdiffusion_damping(model.nlev, cfg.l_max, cfg.radius, cfg.hyperdiffusion_efold_days * DAY_SECONDS, cfg.retained_cut, order=cfg.hyperdiffusion_order)",
@@ -36617,7 +36673,7 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ],
 [
 [
-273,
+280,
 12,
 "build_sigma(cfg)",
 [
@@ -36630,7 +36686,7 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ],
 [
 [
-283,
+290,
 14,
 "reference_column(cfg)",
 [
@@ -36643,7 +36699,7 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ],
 [
 [
-294,
+301,
 11,
 "laplacian_eigenvalues(cfg.l_max, cfg.radius)",
 [
@@ -36660,7 +36716,7 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ],
 [
 [
-290,
+297,
 9,
 "isothermal_rest_state(cfg.l_max, K, temperature=float(profile[0]), surface_pressure=cfg.reference_pressure)",
 [
@@ -45054,6 +45110,27 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ],
 [],
 [],
+[
+[
+54,
+11,
+"DiagonalDamping('rayleigh_sponge', rates, params={'reference_pressure': float(reference_pressure), 'bottom_pressure': p_b, 'efold_days': float(efold_days), 'sigma_full': [float(s) for s in sigma]})",
+[
+[
+"name",
+"'rayleigh_sponge'"
+],
+[
+"rates",
+"rates"
+],
+[
+"params",
+"{'reference_pressure': float(reference_pressure), 'bottom_pressure': p_b, 'efold_days': float(efold_days), 'sigma_full'…"
+]
+]
+]
+],
 [],
 [
 [
@@ -53699,7 +53776,7 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ],
 [
 1216,
-2051,
+2052,
 "instantiate"
 ],
 [
@@ -53969,7 +54046,7 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ],
 [
 1252,
-2009,
+2010,
 "instantiate"
 ],
 [
@@ -53979,7 +54056,7 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ],
 [
 1254,
-2009,
+2010,
 "instantiate"
 ],
 [
@@ -54319,22 +54396,22 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ],
 [
 1293,
-2027,
+2028,
 "instantiate"
 ],
 [
 1294,
-2012,
+2013,
 "instantiate"
 ],
 [
 1294,
-2021,
+2022,
 "call"
 ],
 [
 1294,
-2024,
+2025,
 "call"
 ],
 [
@@ -55109,17 +55186,17 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ],
 [
 1400,
-2007,
+2008,
 "call"
 ],
 [
 1400,
-2009,
+2010,
 "instantiate"
 ],
 [
 1400,
-2024,
+2025,
 "call"
 ],
 [
@@ -55234,7 +55311,7 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ],
 [
 1407,
-2027,
+2028,
 "instantiate"
 ],
 [
@@ -55319,6 +55396,11 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ],
 [
 1411,
+1404,
+"call"
+],
+[
+1411,
 1897,
 "instantiate"
 ],
@@ -55329,7 +55411,12 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ],
 [
 1411,
-2021,
+2007,
+"call"
+],
+[
+1411,
+2022,
 "call"
 ],
 [
@@ -57214,7 +57301,7 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ],
 [
 1893,
-2027,
+2028,
 "instantiate"
 ],
 [
@@ -57269,7 +57356,7 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ],
 [
 1895,
-2051,
+2052,
 "instantiate"
 ],
 [
@@ -57493,178 +57580,148 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 "constructor"
 ],
 [
-2012,
-2014,
-"constructor"
+2007,
+1860,
+"instantiate"
 ],
 [
 2013,
 2015,
+"constructor"
+],
+[
+2014,
+2016,
 "self"
 ],
 [
-2013,
-2018,
-"call"
-],
-[
-2013,
-2023,
+2014,
+2019,
 "call"
 ],
 [
 2014,
-2018,
-"call"
-],
-[
-2014,
-2022,
+2024,
 "call"
 ],
 [
 2015,
-2018,
-"call"
-],
-[
-2019,
-2018,
-"call"
-],
-[
-2020,
-1536,
-"call"
-],
-[
-2021,
-1536,
-"call"
-],
-[
-2021,
-1860,
-"instantiate"
-],
-[
-2021,
-2020,
-"call"
-],
-[
-2022,
-2017,
-"call"
-],
-[
-2022,
-2018,
-"call"
-],
-[
-2023,
-2018,
-"call"
-],
-[
-2023,
 2019,
 "call"
 ],
 [
+2015,
 2023,
-2022,
 "call"
 ],
 [
-2024,
+2016,
+2019,
+"call"
+],
+[
+2020,
+2019,
+"call"
+],
+[
+2021,
+1536,
+"call"
+],
+[
+2022,
+1536,
+"call"
+],
+[
+2022,
 1860,
 "instantiate"
 ],
 [
-2024,
-2025,
+2022,
+2021,
 "call"
 ],
 [
-2025,
-2017,
-"call"
-],
-[
-2025,
+2023,
 2018,
 "call"
 ],
 [
-2027,
+2023,
+2019,
+"call"
+],
+[
+2024,
+2019,
+"call"
+],
+[
+2024,
+2020,
+"call"
+],
+[
+2024,
+2023,
+"call"
+],
+[
+2025,
+1860,
+"instantiate"
+],
+[
+2025,
+2026,
+"call"
+],
+[
+2026,
+2018,
+"call"
+],
+[
+2026,
+2019,
+"call"
+],
+[
 2028,
+2029,
 "constructor"
 ],
 [
-2028,
+2029,
 1536,
 "call"
 ],
 [
-2028,
+2029,
 1838,
 "call"
 ],
 [
-2030,
+2031,
 1535,
 "call"
 ],
 [
-2031,
-1615,
-"call"
-],
-[
-2031,
-2029,
-"self"
-],
-[
-2031,
-2036,
-"self"
-],
-[
-2033,
-1612,
-"call"
-],
-[
-2033,
-1615,
-"call"
-],
-[
-2033,
-1617,
-"call"
-],
-[
-2033,
-1619,
-"call"
-],
-[
-2033,
-1620,
-"call"
-],
-[
-2033,
-2030,
-"self"
-],
-[
-2033,
 2032,
+1615,
+"call"
+],
+[
+2032,
+2030,
+"self"
+],
+[
+2032,
+2037,
 "self"
 ],
 [
@@ -57694,167 +57751,182 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ],
 [
 2034,
-2029,
+2031,
 "self"
 ],
 [
 2034,
-2030,
-"self"
-],
-[
-2034,
-2037,
+2033,
 "self"
 ],
 [
 2035,
-2029,
-"self"
-],
-[
-2035,
-2036,
-"self"
-],
-[
-2037,
-2029,
-"self"
-],
-[
-2038,
 1612,
 "call"
 ],
 [
-2038,
+2035,
+1615,
+"call"
+],
+[
+2035,
 1617,
 "call"
 ],
 [
+2035,
+1619,
+"call"
+],
+[
+2035,
+1620,
+"call"
+],
+[
+2035,
+2030,
+"self"
+],
+[
+2035,
+2031,
+"self"
+],
+[
+2035,
 2038,
+"self"
+],
+[
+2036,
+2030,
+"self"
+],
+[
+2036,
+2037,
+"self"
+],
+[
+2038,
+2030,
+"self"
+],
+[
+2039,
+1612,
+"call"
+],
+[
+2039,
+1617,
+"call"
+],
+[
+2039,
 1618,
 "call"
 ],
 [
-2038,
-2029,
-"self"
-],
-[
-2038,
-2049,
+2039,
+2030,
 "self"
 ],
 [
 2039,
+2050,
+"self"
+],
+[
+2040,
 1611,
 "call"
 ],
 [
-2039,
+2040,
 1613,
 "call"
 ],
 [
-2039,
+2040,
 1619,
 "call"
 ],
 [
-2039,
-2038,
-"self"
-],
-[
-2039,
 2040,
-"self"
-],
-[
 2039,
-2044,
 "self"
 ],
 [
 2040,
+2041,
+"self"
+],
+[
+2040,
+2045,
+"self"
+],
+[
+2041,
 1615,
 "call"
 ],
 [
-2040,
+2041,
+2045,
+"self"
+],
+[
+2042,
 2044,
 "self"
 ],
 [
-2041,
-2043,
+2042,
+2050,
 "self"
 ],
 [
-2041,
-2049,
+2046,
+2032,
 "self"
 ],
 [
-2045,
-2031,
-"self"
-],
-[
-2045,
-2033,
-"self"
-],
-[
-2045,
+2046,
 2034,
 "self"
 ],
 [
-2045,
+2046,
 2035,
 "self"
 ],
 [
 2046,
+2036,
+"self"
+],
+[
+2047,
 1693,
 "instantiate"
 ],
 [
+2047,
 2046,
-2045,
 "self"
 ],
 [
-2047,
+2048,
 1702,
 "instantiate"
 ],
 [
-2047,
-2042,
-"self"
-],
-[
-2047,
+2048,
 2043,
-"self"
-],
-[
-2048,
-1620,
-"call"
-],
-[
-2048,
-1622,
-"call"
-],
-[
-2048,
-2038,
 "self"
 ],
 [
@@ -57863,118 +57935,138 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 "self"
 ],
 [
-2048,
 2049,
+1620,
+"call"
+],
+[
+2049,
+1622,
+"call"
+],
+[
+2049,
+2039,
 "self"
 ],
 [
 2049,
-2030,
+2045,
 "self"
 ],
 [
 2049,
-2037,
+2050,
 "self"
 ],
 [
-2051,
+2050,
+2031,
+"self"
+],
+[
+2050,
+2038,
+"self"
+],
+[
 2052,
+2053,
 "constructor"
 ],
 [
-2052,
+2053,
 1536,
 "call"
 ],
 [
-2052,
+2053,
 1781,
 "call"
 ],
 [
-2052,
+2053,
 1838,
 "call"
 ],
 [
-2054,
+2055,
 1535,
 "call"
 ],
 [
-2056,
-2053,
-"self"
-],
-[
 2057,
-2063,
-"self"
-],
-[
-2057,
-2065,
+2054,
 "self"
 ],
 [
 2058,
-2054,
+2064,
+"self"
+],
+[
+2058,
+2066,
 "self"
 ],
 [
 2059,
-2057,
-"self"
-],
-[
-2061,
-2053,
-"self"
-],
-[
-2061,
-2054,
-"self"
-],
-[
-2061,
 2055,
 "self"
 ],
 [
-2061,
+2060,
+2058,
+"self"
+],
+[
+2062,
+2054,
+"self"
+],
+[
+2062,
+2055,
+"self"
+],
+[
+2062,
 2056,
 "self"
 ],
 [
 2062,
+2057,
+"self"
+],
+[
+2063,
 1705,
 "instantiate"
 ],
 [
+2063,
 2062,
-2061,
 "self"
 ],
 [
-2064,
+2065,
 1711,
 "instantiate"
 ],
 [
+2065,
 2064,
-2063,
 "self"
 ],
 [
-2065,
-2056,
+2066,
+2057,
 "self"
 ],
 [
-2065,
-2058,
+2066,
+2059,
 "self"
 ]
 ],
@@ -60186,273 +60278,280 @@ null,
 "str",
 null,
 null,
-30
+31
 ],
 [
 "radius",
 "float",
 null,
 null,
-32
+33
 ],
 [
 "omega",
 "float",
 null,
 null,
-33
+34
 ],
 [
 "gravity",
 "float",
 null,
 null,
-34
+35
 ],
 [
 "gas_constant",
 "float",
 null,
 null,
-35
+36
 ],
 [
 "cp",
 "float",
 null,
 null,
-36
+37
 ],
 [
 "reference_pressure",
 "float",
 null,
 null,
-37
+38
 ],
 [
 "l_max",
 "int",
 null,
 null,
-39
+40
 ],
 [
 "retained_truncation",
 "Optional[int]",
 null,
 null,
-40
+41
 ],
 [
 "nlat",
 "int",
 null,
 null,
-41
+42
 ],
 [
 "nlon",
 "int",
 null,
 null,
-42
+43
 ],
 [
 "vertical",
 "dict",
 null,
 null,
-44
+45
 ],
 [
 "dt",
 "float",
 null,
 null,
-46
+47
 ],
 [
 "days",
 "int",
 null,
 null,
-47
+48
 ],
 [
 "t_ref",
 "float",
 "300.0",
 null,
-48
+49
 ],
 [
 "raw_nu",
 "float",
 "0.1",
 null,
-49
+50
 ],
 [
 "raw_alpha",
 "float",
 "0.53",
 null,
-50
+51
 ],
 [
 "damping_scheme",
 "str",
 "'centred'",
 null,
-51
+52
 ],
 [
 "hyperdiffusion_order",
 "int",
 "4",
 null,
-52
+53
 ],
 [
 "hyperdiffusion_efold_days",
 "float",
 "0.1",
 null,
-53
+54
 ],
 [
 "longwave",
 "dict",
 "field(default_factory=dict)",
 null,
-55
+56
 ],
 [
 "shortwave",
 "Optional[dict]",
 "None",
 null,
-56
+57
 ],
 [
 "insolation",
 "Optional[dict]",
 "None",
 null,
-57
+58
 ],
 [
 "convection",
 "Optional[dict]",
 "None",
 null,
-58
+59
 ],
 [
 "surface",
 "Optional[dict]",
 "None",
 null,
-59
+60
 ],
 [
 "sensible",
 "Optional[dict]",
 "None",
 null,
-60
+61
 ],
 [
 "drag",
 "Optional[dict]",
 "None",
 null,
-61
+62
+],
+[
+"sponge",
+"Optional[dict]",
+"None",
+null,
+65
 ],
 [
 "internal_heat_flux",
 "float",
 "0.0",
 null,
-62
+66
 ],
 [
 "frictional_heating",
 "bool",
 "False",
 null,
-67
+71
 ],
 [
 "radiation_interval",
 "int",
 "1",
 null,
-68
+72
 ],
 [
 "thermal_source",
 "str",
 "'linear'",
 null,
-69
+73
 ],
 [
 "initial",
 "dict",
 "field(default_factory=lambda: {'kind': 'radiative_convective'})",
 null,
-72
+76
 ],
 [
 "perturbation_wind",
 "float",
 "0.1",
 "m/s, grid RMS wind scale of the seed",
-73
+77
 ],
 [
 "perturbation_lmax",
 "int",
 "8",
 null,
-74
+78
 ],
 [
 "seed",
 "int",
 "20261110",
 null,
-75
+79
 ],
 [
 "checkpoint_every_days",
 "int",
 "10",
 null,
-77
+81
 ],
 [
 "keep_checkpoints",
 "int",
 "2",
 null,
-78
+82
 ],
 [
 "state_every_days",
 "int",
 "10",
 null,
-79
+83
 ],
 [
 "mean_last_days",
 "int",
 "0",
 "0 = second half of the run",
-80
+84
 ]
 ],
 "1416":[
@@ -61329,7 +61428,7 @@ null,
 31
 ]
 ],
-"2009":[
+"2010":[
 [
 "sigma_b",
 "float",
@@ -66043,6 +66142,7 @@ null,
 "tropoi.temporal.tendencies.drag.MomentumSinkHeating.__call__",
 "tropoi.temporal.tendencies.drag.MomentumSinkHeating.__init__",
 "tropoi.temporal.tendencies.drag.MomentumSinkHeating.signature",
+"tropoi.temporal.tendencies.drag.rayleigh_sponge_damping",
 "tropoi.temporal.tendencies.drag.schneider_liu_drag_profile",
 "tropoi.temporal.tendencies.held_suarez",
 "tropoi.temporal.tendencies.held_suarez.HeldSuarezParameters",
@@ -66104,6 +66204,7 @@ null,
 "tropoi.temporal.tendencies.shallow_water.ShallowWaterModel.wind_on_state_grid"
 ],
 "import_omitted":[
+0,
 0,
 0,
 0,
@@ -70482,7 +70583,7 @@ null,
 ],
 [
 [
-131,
+135,
 "function",
 [
 "product_truncation_cut"
@@ -70684,7 +70785,7 @@ null,
 ],
 [
 [
-293,
+300,
 "function",
 [
 "laplacian_eigenvalues"
@@ -70714,7 +70815,7 @@ null,
 ],
 [
 [
-272,
+279,
 "function",
 [
 "isothermal_rest_state"
@@ -70750,6 +70851,14 @@ null,
 "MomentumSinkHeating"
 ],
 "from tropoi.temporal.tendencies.drag import MomentumSinkHeating"
+],
+[
+255,
+"function",
+[
+"rayleigh_sponge_damping"
+],
+"from tropoi.temporal.tendencies.drag import rayleigh_sponge_damping"
 ]
 ],
 [
@@ -71752,6 +71861,16 @@ null,
 ],
 [
 [
+43,
+"function",
+[
+"DiagonalDamping"
+],
+"from tropoi.temporal.hooks import DiagonalDamping"
+]
+],
+[
+[
 46,
 "module",
 [
@@ -72353,7 +72472,7 @@ null,
 ],
 [
 583,
-2026,
+2027,
 "module"
 ],
 [
@@ -72378,7 +72497,7 @@ null,
 ],
 [
 642,
-2050,
+2051,
 "module"
 ],
 [
@@ -72538,7 +72657,7 @@ null,
 ],
 [
 747,
-2050,
+2051,
 "function"
 ],
 [
@@ -72823,7 +72942,7 @@ null,
 ],
 [
 1027,
-2050,
+2051,
 "function"
 ],
 [
@@ -73183,7 +73302,7 @@ null,
 ],
 [
 1180,
-2050,
+2051,
 "function"
 ],
 [
@@ -73283,7 +73402,7 @@ null,
 ],
 [
 1250,
-2008,
+2009,
 "module"
 ],
 [
@@ -73343,12 +73462,12 @@ null,
 ],
 [
 1292,
-2008,
+2009,
 "module"
 ],
 [
 1292,
-2026,
+2027,
 "function"
 ],
 [
@@ -73473,7 +73592,7 @@ null,
 ],
 [
 1362,
-2026,
+2027,
 "module"
 ],
 [
@@ -73608,12 +73727,12 @@ null,
 ],
 [
 1399,
-2008,
+2009,
 "function"
 ],
 [
 1399,
-2026,
+2027,
 "function"
 ],
 [
@@ -73703,7 +73822,7 @@ null,
 ],
 [
 1432,
-2050,
+2051,
 "module"
 ],
 [
@@ -73758,7 +73877,7 @@ null,
 ],
 [
 1521,
-2026,
+2027,
 "type_checking"
 ],
 [
@@ -73778,7 +73897,7 @@ null,
 ],
 [
 1528,
-2050,
+2051,
 "type_checking"
 ],
 [
@@ -73978,12 +74097,12 @@ null,
 ],
 [
 1891,
-2026,
+2027,
 "function"
 ],
 [
 1891,
-2050,
+2051,
 "function"
 ],
 [
@@ -74037,62 +74156,67 @@ null,
 "module"
 ],
 [
-2008,
+1998,
+1859,
+"function"
+],
+[
+2009,
 1534,
 "module"
 ],
 [
-2008,
+2009,
 1859,
 "module"
 ],
 [
-2026,
+2027,
 1534,
 "module"
 ],
 [
-2026,
+2027,
 1584,
 "module"
 ],
 [
-2026,
+2027,
 1592,
 "module"
 ],
 [
-2026,
+2027,
 1692,
 "module"
 ],
 [
-2026,
+2027,
 1836,
 "module"
 ],
 [
-2050,
+2051,
 1534,
 "module"
 ],
 [
-2050,
+2051,
 1584,
 "module"
 ],
 [
-2050,
+2051,
 1704,
 "module"
 ],
 [
-2050,
+2051,
 1775,
 "module"
 ],
 [
-2050,
+2051,
 1836,
 "module"
 ]
@@ -86365,125 +86489,128 @@ null,
 "87":"        print(f\"REFUSED: {exc}\")"
 },
 "tropoi/run/radiative/config.py":{
-"117":"    @property",
-"118":"    def kappa(self) -\u003e float:",
-"119":"        return self.gas_constant / self.cp",
 "121":"    @property",
-"122":"    def steps_per_day(self) -\u003e int:",
-"123":"        return int(round(DAY_SECONDS / self.dt))",
+"122":"    def kappa(self) -\u003e float:",
+"123":"        return self.gas_constant / self.cp",
 "125":"    @property",
-"126":"    def total_steps(self) -\u003e int:",
-"127":"        return self.days * self.steps_per_day",
+"126":"    def steps_per_day(self) -\u003e int:",
+"127":"        return int(round(DAY_SECONDS / self.dt))",
 "129":"    @property",
-"130":"    def retained_cut(self) -\u003e int:",
-"131":"        from tropoi.spatial.truncation import product_truncation_cut",
-"132":"        if self.retained_truncation is None:",
-"133":"            return product_truncation_cut(self.l_max)",
-"134":"        return int(self.retained_truncation)",
-"135":"",
-"136":"    def to_dict(self) -\u003e dict[str, Any]:",
-"137":"        d = asdict(self)",
-"145":"    @classmethod",
-"146":"    def from_dict(cls, d: dict[str, Any]) -\u003e \"RadiativeConfig\":",
-"147":"        d = dict(d)",
-"148":"        schema = d.pop(\"schema\", CONFIG_SCHEMA)",
-"151":"        return cls(**d)",
-"152":"",
-"153":"    def canonical_json(self) -\u003e str:",
-"154":"        return json.dumps(self.to_dict(), sort_keys=True, separators=(\",\", \":\"))",
-"155":"",
-"156":"    def sha256(self) -\u003e str:",
-"157":"        return hashlib.sha256(self.canonical_json().encode(\"utf-8\")).hexdigest()",
+"130":"    def total_steps(self) -\u003e int:",
+"131":"        return self.days * self.steps_per_day",
+"133":"    @property",
+"134":"    def retained_cut(self) -\u003e int:",
+"135":"        from tropoi.spatial.truncation import product_truncation_cut",
+"136":"        if self.retained_truncation is None:",
+"137":"            return product_truncation_cut(self.l_max)",
+"138":"        return int(self.retained_truncation)",
+"139":"",
+"140":"    def to_dict(self) -\u003e dict[str, Any]:",
+"141":"        d = asdict(self)",
+"151":"    @classmethod",
+"152":"    def from_dict(cls, d: dict[str, Any]) -\u003e \"RadiativeConfig\":",
+"153":"        d = dict(d)",
+"154":"        schema = d.pop(\"schema\", CONFIG_SCHEMA)",
+"157":"        return cls(**d)",
 "158":"",
-"159":"    def with_(self, **changes) -\u003e \"RadiativeConfig\":",
-"160":"        return replace(self, **changes)",
-"163":"def _t21() -\u003e dict:",
-"164":"    return {\"l_max\": 22, \"retained_truncation\": 21, \"nlat\": 32, \"nlon\": 64}",
-"167":"def _preset_id(experiment_id: Optional[str], name: str, resolution: str,",
-"168":"               frictional_heating: bool) -\u003e str:",
-"169":"    \"\"\"The preset's default experiment id: ``\u003cname\u003e-heated-\u003cresolution\u003e``",
-"178":"def jupiter_schneider_liu(experiment_id: Optional[str] = None, *, days: int = 200,",
-"179":"                          dt: float = 1200.0, frictional_heating: bool = True) -\u003e RadiativeConfig:",
-"180":"    \"\"\"The physics of Schneider \u0026 Liu (2009), appendix B and Table 1, at T21.",
-"194":"    configuration of the recorded unheated run (``80f280d2…``).",
-"195":"    \"\"\"",
-"196":"    return RadiativeConfig(",
-"197":"        experiment_id=_preset_id(experiment_id, \"jupiter-sl09\", \"T21L30\", frictional_heating),",
-"198":"        frictional_heating=frictional_heating, radius=69.86e6, omega=1.7587e-4, gravity=26.0,",
-"199":"        gas_constant=3605.38, cp=12619.0, reference_pressure=3.0e5,",
-"200":"        vertical={\"kind\": \"uniform\", \"nlev\": 30}, dt=dt, days=days,",
-"201":"        longwave={\"kind\": \"power_law\", \"tau0\": 80.0, \"p0\": 3.0e5, \"exponent\": 2.0},",
-"202":"        shortwave={\"kind\": \"semi_infinite_scattering\", \"tau0\": 3.0, \"p0\": 3.0e5,",
-"203":"                   \"ssa\": 0.8, \"asym\": 0.204},",
-"204":"        insolation={\"kind\": \"diurnal_mean\", \"stellar_constant\": 50.7},",
-"205":"        convection={\"timescale\": 21600.0}, internal_heat_flux=5.7,",
-"206":"        drag={\"kind\": \"schneider_liu\", \"k0_per_day\": 0.05, \"sigma_b\": 0.8,",
-"207":"              \"cutoff_deg\": 16.3, \"decay_deg\": 2.0},",
-"208":"        **_t21())",
-"209":"",
-"210":"",
-"211":"def earth_gray_dry(experiment_id: Optional[str] = None, *, days: int = 300,",
-"212":"                   dt: float = 1200.0, frictional_heating: bool = True) -\u003e RadiativeConfig:",
-"213":"    \"\"\"A dry Earth with the gray radiation, slab surface and bulk sensible",
-"229":"    unheated run (``e31ae183…``).",
-"230":"    \"\"\"",
-"231":"    return RadiativeConfig(",
-"232":"        experiment_id=_preset_id(experiment_id, \"earth-gray-dry\", \"T21L25\", frictional_heating),",
-"233":"        frictional_heating=frictional_heating, radius=6.376e6, omega=7.292e-5, gravity=9.8,",
-"234":"        gas_constant=287.04, cp=1004.64, reference_pressure=1.0e5,",
-"235":"        vertical={\"kind\": \"frierson\", \"nlev\": 25}, dt=dt, days=days,",
-"236":"        longwave={\"kind\": \"frierson\", \"tau_equator\": 6.0, \"tau_pole\": 1.5,",
-"237":"                  \"linear_fraction\": 0.1},",
-"238":"        shortwave={\"kind\": \"transparent\"},",
-"239":"        insolation={\"kind\": \"frierson\", \"net_solar_constant\": 938.4, \"delta_s\": 1.4},",
-"240":"        convection={\"timescale\": 0.0},",
-"241":"        surface={\"heat_capacity\": 1.0e7, \"albedo\": 0.0, \"emissivity\": 1.0,",
-"242":"                 \"initial_temperature\": 285.0},",
-"243":"        sensible={\"roughness_length\": 3.21e-5, \"critical_richardson\": 1.0, \"gustiness\": 1.0},",
-"244":"        drag={\"kind\": \"held_suarez\", \"k_f_per_day\": 1.0, \"sigma_b\": 0.7},",
-"245":"        initial={\"kind\": \"isothermal\", \"temperature\": 264.0},",
-"246":"        **_t21())",
-"247":"",
-"248":"",
-"25":"@dataclass(frozen=True)",
-"259":"def _time_of_perihelion_for_equinox_start(period: float, eccentricity: float,",
-"26":"class RadiativeConfig:",
-"260":"                                          ls_perihelion_deg: float) -\u003e float:",
-"261":"    \"\"\"The ``time_of_perihelion`` that puts t = 0 at L_s = 0 (northern spring",
-"270":"def mars_gray_flat_dev(experiment_id: Optional[str] = None, *, days: int = 30,",
-"271":"                       dt: float = 600.0, frictional_heating: bool = True) -\u003e RadiativeConfig:",
-"272":"    \"\"\"DEVELOPMENT EXPERIMENT, not a reproduction of Thomson \u0026 Vallis (2019)",
-"291":"    \"\"\"",
-"292":"    year, ecc, ls_peri = 59166360.0, 0.0935, 250.85",
-"293":"    return RadiativeConfig(",
-"294":"        experiment_id=_preset_id(experiment_id, \"dev-mars-gray-flat\", \"T21L25\",",
-"295":"                                 frictional_heating),",
-"296":"        frictional_heating=frictional_heating, radius=3.396e6,",
-"297":"        omega=2.0 * math.pi / 88308.0, gravity=3.71, gas_constant=192.0,",
-"298":"        cp=192.0 / 0.22727, reference_pressure=610.0,",
-"299":"        vertical={\"kind\": \"interfaces\", \"sigma\": list(ISCA_GREY_MARS_SIGMA)}, dt=dt, days=days,",
-"300":"        longwave={\"kind\": \"power_law\", \"tau0\": 0.2, \"exponent\": 1.0, \"p0\": 610.0},",
-"301":"        shortwave={\"kind\": \"vertical_path\", \"tau0\": 0.2, \"exponent\": 4.0, \"p0\": 610.0},",
-"302":"        insolation={\"kind\": \"instantaneous\", \"stellar_constant\": 589.0, \"period\": year,",
-"303":"                    \"eccentricity\": ecc, \"obliquity_deg\": 25.19,",
-"304":"                    \"perihelion_longitude_deg\": ls_peri,",
-"305":"                    \"time_of_perihelion\": _time_of_perihelion_for_equinox_start(year, ecc,",
-"306":"                                                                                ls_peri),",
-"307":"                    \"solar_day\": 88440.0},",
-"308":"        convection={\"timescale\": 0.0},",
-"309":"        surface={\"heat_capacity\": 2.0 * _ISCA_RHO_CP, \"albedo\": 0.3, \"emissivity\": 1.0,",
-"310":"                 \"initial_temperature\": 285.0},",
-"311":"        sensible={\"roughness_length\": 3.21e-5, \"critical_richardson\": 1.0, \"gustiness\": 0.0},",
-"312":"        drag={\"kind\": \"held_suarez\", \"k_f_per_day\": 1.0, \"sigma_b\": 0.7},",
-"313":"        initial={\"kind\": \"isothermal\", \"temperature\": 264.0},",
-"314":"        checkpoint_every_days=10, state_every_days=1,",
-"315":"        **_t21())",
-"316":"",
-"317":"",
-"73":"    perturbation_wind: float = 0.1          # m/s, grid RMS wind scale of the seed",
-"80":"    mean_last_days: int = 0                 # 0 = second half of the run",
-"82":"    def __post_init__(self):",
-"83":"        if not self.experiment_id or any(c in self.experiment_id for c in \"/\\\\ \"):"
+"159":"    def canonical_json(self) -\u003e str:",
+"160":"        return json.dumps(self.to_dict(), sort_keys=True, separators=(\",\", \":\"))",
+"161":"",
+"162":"    def sha256(self) -\u003e str:",
+"163":"        return hashlib.sha256(self.canonical_json().encode(\"utf-8\")).hexdigest()",
+"164":"",
+"165":"    def with_(self, **changes) -\u003e \"RadiativeConfig\":",
+"166":"        return replace(self, **changes)",
+"169":"def _t21() -\u003e dict:",
+"170":"    return {\"l_max\": 22, \"retained_truncation\": 21, \"nlat\": 32, \"nlon\": 64}",
+"173":"def _preset_id(experiment_id: Optional[str], name: str, resolution: str,",
+"174":"               frictional_heating: bool) -\u003e str:",
+"175":"    \"\"\"The preset's default experiment id: ``\u003cname\u003e-heated-\u003cresolution\u003e``",
+"184":"def jupiter_schneider_liu(experiment_id: Optional[str] = None, *, days: int = 200,",
+"185":"                          dt: float = 1200.0, frictional_heating: bool = True) -\u003e RadiativeConfig:",
+"186":"    \"\"\"The physics of Schneider \u0026 Liu (2009), appendix B and Table 1, at T21.",
+"200":"    configuration of the recorded unheated run (``80f280d2…``).",
+"201":"    \"\"\"",
+"202":"    return RadiativeConfig(",
+"203":"        experiment_id=_preset_id(experiment_id, \"jupiter-sl09\", \"T21L30\", frictional_heating),",
+"204":"        frictional_heating=frictional_heating, radius=69.86e6, omega=1.7587e-4, gravity=26.0,",
+"205":"        gas_constant=3605.38, cp=12619.0, reference_pressure=3.0e5,",
+"206":"        vertical={\"kind\": \"uniform\", \"nlev\": 30}, dt=dt, days=days,",
+"207":"        longwave={\"kind\": \"power_law\", \"tau0\": 80.0, \"p0\": 3.0e5, \"exponent\": 2.0},",
+"208":"        shortwave={\"kind\": \"semi_infinite_scattering\", \"tau0\": 3.0, \"p0\": 3.0e5,",
+"209":"                   \"ssa\": 0.8, \"asym\": 0.204},",
+"210":"        insolation={\"kind\": \"diurnal_mean\", \"stellar_constant\": 50.7},",
+"211":"        convection={\"timescale\": 21600.0}, internal_heat_flux=5.7,",
+"212":"        drag={\"kind\": \"schneider_liu\", \"k0_per_day\": 0.05, \"sigma_b\": 0.8,",
+"213":"              \"cutoff_deg\": 16.3, \"decay_deg\": 2.0},",
+"214":"        **_t21())",
+"215":"",
+"216":"",
+"217":"def earth_gray_dry(experiment_id: Optional[str] = None, *, days: int = 300,",
+"218":"                   dt: float = 1200.0, frictional_heating: bool = True) -\u003e RadiativeConfig:",
+"219":"    \"\"\"A dry Earth with the gray radiation, slab surface and bulk sensible",
+"235":"    unheated run (``e31ae183…``).",
+"236":"    \"\"\"",
+"237":"    return RadiativeConfig(",
+"238":"        experiment_id=_preset_id(experiment_id, \"earth-gray-dry\", \"T21L25\", frictional_heating),",
+"239":"        frictional_heating=frictional_heating, radius=6.376e6, omega=7.292e-5, gravity=9.8,",
+"240":"        gas_constant=287.04, cp=1004.64, reference_pressure=1.0e5,",
+"241":"        vertical={\"kind\": \"frierson\", \"nlev\": 25}, dt=dt, days=days,",
+"242":"        longwave={\"kind\": \"frierson\", \"tau_equator\": 6.0, \"tau_pole\": 1.5,",
+"243":"                  \"linear_fraction\": 0.1},",
+"244":"        shortwave={\"kind\": \"transparent\"},",
+"245":"        insolation={\"kind\": \"frierson\", \"net_solar_constant\": 938.4, \"delta_s\": 1.4},",
+"246":"        convection={\"timescale\": 0.0},",
+"247":"        surface={\"heat_capacity\": 1.0e7, \"albedo\": 0.0, \"emissivity\": 1.0,",
+"248":"                 \"initial_temperature\": 285.0},",
+"249":"        sensible={\"roughness_length\": 3.21e-5, \"critical_richardson\": 1.0, \"gustiness\": 1.0},",
+"250":"        drag={\"kind\": \"held_suarez\", \"k_f_per_day\": 1.0, \"sigma_b\": 0.7},",
+"251":"        initial={\"kind\": \"isothermal\", \"temperature\": 264.0},",
+"252":"        **_t21())",
+"253":"",
+"254":"",
+"26":"@dataclass(frozen=True)",
+"265":"def _time_of_perihelion_for_equinox_start(period: float, eccentricity: float,",
+"266":"                                          ls_perihelion_deg: float) -\u003e float:",
+"267":"    \"\"\"The ``time_of_perihelion`` that puts t = 0 at L_s = 0 (northern spring",
+"27":"class RadiativeConfig:",
+"276":"def mars_gray_flat_dev(experiment_id: Optional[str] = None, *, days: int = 30,",
+"277":"                       dt: float = 600.0, frictional_heating: bool = True,",
+"278":"                       sponge: bool = False) -\u003e RadiativeConfig:",
+"279":"    \"\"\"DEVELOPMENT EXPERIMENT, not a reproduction of Thomson \u0026 Vallis (2019)",
+"300":"    \"\"\"",
+"301":"    year, ecc, ls_peri = 59166360.0, 0.0935, 250.85",
+"302":"    return RadiativeConfig(",
+"303":"        experiment_id=_preset_id(experiment_id,",
+"304":"                                 \"dev-mars-gray-flat-sponge\" if sponge else \"dev-mars-gray-flat\",",
+"305":"                                 \"T21L25\", frictional_heating),",
+"306":"        sponge={\"bottom_pressure\": 0.5, \"efold_days\": 0.125} if sponge else None,",
+"307":"        frictional_heating=frictional_heating, radius=3.396e6,",
+"308":"        omega=2.0 * math.pi / 88308.0, gravity=3.71, gas_constant=192.0,",
+"309":"        cp=192.0 / 0.22727, reference_pressure=610.0,",
+"310":"        vertical={\"kind\": \"interfaces\", \"sigma\": list(ISCA_GREY_MARS_SIGMA)}, dt=dt, days=days,",
+"311":"        longwave={\"kind\": \"power_law\", \"tau0\": 0.2, \"exponent\": 1.0, \"p0\": 610.0},",
+"312":"        shortwave={\"kind\": \"vertical_path\", \"tau0\": 0.2, \"exponent\": 4.0, \"p0\": 610.0},",
+"313":"        insolation={\"kind\": \"instantaneous\", \"stellar_constant\": 589.0, \"period\": year,",
+"314":"                    \"eccentricity\": ecc, \"obliquity_deg\": 25.19,",
+"315":"                    \"perihelion_longitude_deg\": ls_peri,",
+"316":"                    \"time_of_perihelion\": _time_of_perihelion_for_equinox_start(year, ecc,",
+"317":"                                                                                ls_peri),",
+"318":"                    \"solar_day\": 88440.0},",
+"319":"        convection={\"timescale\": 0.0},",
+"320":"        surface={\"heat_capacity\": 2.0 * _ISCA_RHO_CP, \"albedo\": 0.3, \"emissivity\": 1.0,",
+"321":"                 \"initial_temperature\": 285.0},",
+"322":"        sensible={\"roughness_length\": 3.21e-5, \"critical_richardson\": 1.0, \"gustiness\": 0.0},",
+"323":"        drag={\"kind\": \"held_suarez\", \"k_f_per_day\": 1.0, \"sigma_b\": 0.7},",
+"324":"        initial={\"kind\": \"isothermal\", \"temperature\": 264.0},",
+"325":"        checkpoint_every_days=10, state_every_days=1,",
+"326":"        **_t21())",
+"327":"",
+"328":"",
+"77":"    perturbation_wind: float = 0.1          # m/s, grid RMS wind scale of the seed",
+"84":"    mean_last_days: int = 0                 # 0 = second half of the run",
+"86":"    def __post_init__(self):",
+"87":"        if not self.experiment_id or any(c in self.experiment_id for c in \"/\\\\ \"):"
 },
 "tropoi/run/radiative/experiment.py":{
 "100":"        self.series: dict[str, list] = {}",
@@ -86812,43 +86939,50 @@ null,
 "251":"                                   cfg.hyperdiffusion_efold_days * DAY_SECONDS,",
 "252":"                                   cfg.retained_cut, order=cfg.hyperdiffusion_order)",
 "253":"    dampers, lagged = _drag(cfg, model)",
-"254":"    explicit = ()",
-"255":"    if cfg.frictional_heating:",
-"256":"        explicit = (_frictional_heating(cfg, model, dampers + (hyper,), lagged),)",
-"257":"    if coupling is not None:",
-"258":"        lagged = lagged + (coupling,)",
-"259":"    return SemiImplicitLeapfrogStepper(",
+"254":"    if cfg.sponge is not None:",
+"255":"        from tropoi.temporal.tendencies.drag import rayleigh_sponge_damping",
+"256":"        o = _options({\"kind\": \"sponge\", **cfg.sponge}, \"bottom_pressure\", \"efold_days\")",
+"257":"        dampers = dampers + (rayleigh_sponge_damping(",
+"258":"            model.sigma.full_levels_array(), cfg.l_max + 1,",
+"259":"            reference_pressure=cfg.reference_pressure, bottom_pressure=o[\"bottom_pressure\"],",
 "26":"from tropoi.spatial.sigma_coordinate import SigmaGrid",
-"260":"        model.tendency, op, cfg.dt, raw_nu=cfg.raw_nu, raw_alpha=cfg.raw_alpha,",
-"261":"        stage_validator=stage_validator, explicit_terms=explicit, dampers=dampers + (hyper,),",
-"262":"        damping_scheme=cfg.damping_scheme, lagged_terms=lagged)",
-"263":"",
-"264":"",
-"265":"def initial_state(cfg: RadiativeConfig):",
-"266":"    \"\"\"A resting, horizontally uniform state plus a seeded rotational",
+"260":"            efold_days=o[\"efold_days\"]),)",
+"261":"    explicit = ()",
+"262":"    if cfg.frictional_heating:",
+"263":"        explicit = (_frictional_heating(cfg, model, dampers + (hyper,), lagged),)",
+"264":"    if coupling is not None:",
+"265":"        lagged = lagged + (coupling,)",
+"266":"    return SemiImplicitLeapfrogStepper(",
+"267":"        model.tendency, op, cfg.dt, raw_nu=cfg.raw_nu, raw_alpha=cfg.raw_alpha,",
+"268":"        stage_validator=stage_validator, explicit_terms=explicit, dampers=dampers + (hyper,),",
+"269":"        damping_scheme=cfg.damping_scheme, lagged_terms=lagged)",
 "27":"",
-"271":"    import cupy as cp",
-"272":"    from tropoi.spatial.states.primitive_equations import isothermal_rest_state",
-"273":"    sigma = build_sigma(cfg)",
-"274":"    K, n = sigma.nlev, cfg.l_max + 1",
-"275":"    kind = cfg.initial[\"kind\"]",
-"281":"            surface_t = float(cfg.surface.get(\"initial_temperature\") or profile[-1])",
-"282":"    elif kind == \"radiative_convective\":",
-"283":"        ref = reference_column(cfg)",
-"284":"        profile = ref[\"temperature\"]",
-"285":"        surface_t = ref[\"surface_temperature\"]",
-"286":"        info.update({k: ref[k] for k in (\"olr\", \"absorbed_stellar\", \"iterations\",",
-"288":"    else:",
-"289":"        raise ValueError(f\"unknown initial kind {kind!r}\")",
-"290":"    x0 = isothermal_rest_state(cfg.l_max, K, temperature=float(profile[0]),",
-"291":"                               surface_pressure=cfg.reference_pressure).coeffs",
-"292":"    x0[2 * K:3 * K, 0, 0] = cp.asarray(profile) * math.sqrt(4.0 * math.pi)",
-"293":"    from tropoi.spatial.laplacian import laplacian_eigenvalues",
-"294":"    c_l = -laplacian_eigenvalues(cfg.l_max, cfg.radius)        # l (l+1) / a^2",
-"295":"    rng = np.random.Generator(np.random.PCG64(cfg.seed))",
-"296":"    zeta = np.zeros((n, n), dtype=np.complex128)",
-"299":"            re, im = rng.standard_normal(2)",
-"305":"    mean_v2 = (power[:, 0].sum() + 2.0 * power[:, 1:].sum()) / (4.0 * math.pi)",
+"270":"",
+"271":"",
+"272":"def initial_state(cfg: RadiativeConfig):",
+"273":"    \"\"\"A resting, horizontally uniform state plus a seeded rotational",
+"278":"    import cupy as cp",
+"279":"    from tropoi.spatial.states.primitive_equations import isothermal_rest_state",
+"280":"    sigma = build_sigma(cfg)",
+"281":"    K, n = sigma.nlev, cfg.l_max + 1",
+"282":"    kind = cfg.initial[\"kind\"]",
+"288":"            surface_t = float(cfg.surface.get(\"initial_temperature\") or profile[-1])",
+"289":"    elif kind == \"radiative_convective\":",
+"290":"        ref = reference_column(cfg)",
+"291":"        profile = ref[\"temperature\"]",
+"292":"        surface_t = ref[\"surface_temperature\"]",
+"293":"        info.update({k: ref[k] for k in (\"olr\", \"absorbed_stellar\", \"iterations\",",
+"295":"    else:",
+"296":"        raise ValueError(f\"unknown initial kind {kind!r}\")",
+"297":"    x0 = isothermal_rest_state(cfg.l_max, K, temperature=float(profile[0]),",
+"298":"                               surface_pressure=cfg.reference_pressure).coeffs",
+"299":"    x0[2 * K:3 * K, 0, 0] = cp.asarray(profile) * math.sqrt(4.0 * math.pi)",
+"300":"    from tropoi.spatial.laplacian import laplacian_eigenvalues",
+"301":"    c_l = -laplacian_eigenvalues(cfg.l_max, cfg.radius)        # l (l+1) / a^2",
+"302":"    rng = np.random.Generator(np.random.PCG64(cfg.seed))",
+"303":"    zeta = np.zeros((n, n), dtype=np.complex128)",
+"306":"            re, im = rng.standard_normal(2)",
+"312":"    mean_v2 = (power[:, 0].sum() + 2.0 * power[:, 1:].sum()) / (4.0 * math.pi)",
 "32":"def _options(spec: dict, *required, **defaults) -\u003e dict:",
 "33":"    \"\"\"The entries of a ``{\"kind\": ...}`` spec other than the kind, with",
 "35":"    given = {k: v for k, v in spec.items() if k != \"kind\"}",
@@ -91081,37 +91215,51 @@ null,
 "87":"        \"\"\""
 },
 "tropoi/temporal/tendencies/drag.py":{
-"122":"    def __init__(self, model, sinks, cp: float):",
-"123":"        self.model = model",
-"129":"    def signature(self) -\u003e dict:",
-"130":"        return {\"kind\": \"momentum_sink_heating\", \"cp\": self.cp, \"sinks\": len(self.sinks)}",
-"132":"    def __call__(self, coeffs):",
-"133":"        import cupy as cp",
-"136":"        sink = self.sinks[0](coeffs)[:3 * K]",
-"138":"            sink = sink + other(coeffs)[:3 * K]",
-"142":"        psi = m._inv_laplacian(cp.concatenate([coeffs[0:K], sink[0:K]]))",
-"143":"        chi = m._inv_laplacian(cp.concatenate([coeffs[K:2 * K], sink[K:2 * K]]))",
-"30":"def schneider_liu_drag_profile(latitude, k0: float, cutoff_deg: float = 16.3,",
-"31":"                               decay_deg: float = 2.0):",
-"32":"    \"\"\"``k0`` poleward of ``cutoff_deg``, ``k0 exp(-((cutoff - |lat|) /",
-"40":"    if type(latitude).__module__.split(\".\")[0] == \"cupy\":",
-"42":"    lat = xp.abs(latitude) * (180.0 / math.pi)",
-"43":"    shoulder = xp.exp(-((cutoff_deg - lat) / decay_deg) ** 2)",
-"44":"    return k0 * xp.where(lat \u003e= cutoff_deg, 1.0, shoulder)",
-"47":"class LatitudeDependentRayleighDrag:",
-"50":"    def __init__(self, model, k0_of_latitude, *, sigma_b: float, params: dict):",
-"51":"        import cupy as cp",
-"57":"        self._k0 = cp.asarray(k0_of_latitude(geometry.point_latitudes)).ravel()",
-"58":"        sigma = model.sigma.full_levels_array()",
-"62":"        self.max_rate = float(self._k0.max() * ramp.max()) if self._levels else 0.0",
-"64":"    def signature(self) -\u003e dict:",
-"65":"        return {\"kind\": \"latitude_dependent_rayleigh_drag\", \"sigma_b\": self.sigma_b,",
-"68":"    def __call__(self, coeffs, t: float, window: float):",
-"69":"        import cupy as cp",
-"78":"            u, v = m._wind_from(ps.sh, ps.coslat, m._inv_laplacian(coeffs[k]),",
-"80":"            us.append(u.ravel())",
-"81":"            vs.append(v.ravel())",
-"93":"class MomentumSinkHeating:"
+"108":"            u, v = m._wind_from(ps.sh, ps.coslat, m._inv_laplacian(coeffs[k]),",
+"110":"            us.append(u.ravel())",
+"111":"            vs.append(v.ravel())",
+"123":"class MomentumSinkHeating:",
+"152":"    def __init__(self, model, sinks, cp: float):",
+"153":"        self.model = model",
+"159":"    def signature(self) -\u003e dict:",
+"160":"        return {\"kind\": \"momentum_sink_heating\", \"cp\": self.cp, \"sinks\": len(self.sinks)}",
+"162":"    def __call__(self, coeffs):",
+"163":"        import cupy as cp",
+"166":"        sink = self.sinks[0](coeffs)[:3 * K]",
+"168":"            sink = sink + other(coeffs)[:3 * K]",
+"172":"        psi = m._inv_laplacian(cp.concatenate([coeffs[0:K], sink[0:K]]))",
+"173":"        chi = m._inv_laplacian(cp.concatenate([coeffs[K:2 * K], sink[K:2 * K]]))",
+"30":"def rayleigh_sponge_damping(sigma_full, n_degrees: int, *, reference_pressure: float,",
+"31":"                            bottom_pressure: float, efold_days: float):",
+"32":"    \"\"\"Isca's top sponge (``damping_driver`` ``rayleigh``, commit d1321ac3) as a",
+"42":"    ``do_conserve_energy``).\"\"\"",
+"43":"    from tropoi.temporal.hooks import DiagonalDamping",
+"44":"    sigma = np.asarray(sigma_full, dtype=np.float64)",
+"52":"    rates[0:K, :] = rate[:, None]",
+"53":"    rates[K:2 * K, :] = rate[:, None]",
+"54":"    return DiagonalDamping(\"rayleigh_sponge\", rates,",
+"55":"                           params={\"reference_pressure\": float(reference_pressure),",
+"56":"                                   \"bottom_pressure\": p_b, \"efold_days\": float(efold_days),",
+"57":"                                   \"sigma_full\": [float(s) for s in sigma]})",
+"58":"",
+"59":"",
+"60":"def schneider_liu_drag_profile(latitude, k0: float, cutoff_deg: float = 16.3,",
+"61":"                               decay_deg: float = 2.0):",
+"62":"    \"\"\"``k0`` poleward of ``cutoff_deg``, ``k0 exp(-((cutoff - |lat|) /",
+"70":"    if type(latitude).__module__.split(\".\")[0] == \"cupy\":",
+"72":"    lat = xp.abs(latitude) * (180.0 / math.pi)",
+"73":"    shoulder = xp.exp(-((cutoff_deg - lat) / decay_deg) ** 2)",
+"74":"    return k0 * xp.where(lat \u003e= cutoff_deg, 1.0, shoulder)",
+"77":"class LatitudeDependentRayleighDrag:",
+"80":"    def __init__(self, model, k0_of_latitude, *, sigma_b: float, params: dict):",
+"81":"        import cupy as cp",
+"87":"        self._k0 = cp.asarray(k0_of_latitude(geometry.point_latitudes)).ravel()",
+"88":"        sigma = model.sigma.full_levels_array()",
+"92":"        self.max_rate = float(self._k0.max() * ramp.max()) if self._levels else 0.0",
+"94":"    def signature(self) -\u003e dict:",
+"95":"        return {\"kind\": \"latitude_dependent_rayleigh_drag\", \"sigma_b\": self.sigma_b,",
+"98":"    def __call__(self, coeffs, t: float, window: float):",
+"99":"        import cupy as cp"
 },
 "tropoi/temporal/tendencies/held_suarez.py":{
 "100":"def equilibrium_temperature(lat, p, params: HeldSuarezParameters):",
@@ -91714,7 +91862,7 @@ null,
 }
 },
 "meta":{
-"base_commit":"812e22568957ff247223c5049a4cb0efd9d93811",
+"base_commit":"2bdf13f246dd337c0a3d8547f89df4a598e2fb3f",
 "call_depth":4,
 "command":"python -m tools.architecture.generate",
 "dynamic_import_sites":{
@@ -91758,8 +91906,8 @@ null,
 "max_sites":8,
 "package":"tropoi",
 "source_commit":null,
-"source_sha256":"84acae9e9a9481b58338fb04b9a1c370479aa381107e1695cdb0488dbb4a7782",
-"source_status":"clean",
+"source_sha256":"181134b07d242d982e6fee86a2a96a4fe4c2f060c3e104d16489baa9f631e83e",
+"source_status":"dirty",
 "title":"current",
 "tool_version":"2.3.0",
 "traversed":[
@@ -100298,43 +100446,25 @@ null,
 [
 "class",
 1368,
-26,
+27,
 1364
 ],
 [
 "method",
 1368,
-82,
+86,
 1364
 ],
 [
 "method",
 1368,
-153,
+159,
 1364
 ],
 [
 "classmethod",
 1368,
-146,
-1364
-],
-[
-"property",
-1368,
-118,
-1364
-],
-[
-"property",
-1368,
-130,
-1364
-],
-[
-"method",
-1368,
-156,
+152,
 1364
 ],
 [
@@ -100344,9 +100474,15 @@ null,
 1364
 ],
 [
+"property",
+1368,
+134,
+1364
+],
+[
 "method",
 1368,
-136,
+162,
 1364
 ],
 [
@@ -100358,43 +100494,55 @@ null,
 [
 "method",
 1368,
-159,
+140,
+1364
+],
+[
+"property",
+1368,
+130,
+1364
+],
+[
+"method",
+1368,
+165,
 1364
 ],
 [
 "function",
 1368,
-167,
+173,
 1364
 ],
 [
 "function",
 1368,
-163,
+169,
 1364
 ],
 [
 "function",
 1368,
-259,
+265,
 1364
 ],
 [
 "function",
 1368,
-211,
+217,
 1364
 ],
 [
 "function",
 1368,
-178,
+184,
 1364
 ],
 [
 "function",
 1368,
-270,
+276,
 1364
 ],
 [
@@ -100562,7 +100710,7 @@ null,
 [
 "function",
 1399,
-265,
+272,
 1364
 ],
 [
@@ -104261,49 +104409,49 @@ null,
 [
 "class",
 1998,
-47,
+77,
 1992
 ],
 [
 "method",
 1998,
-68,
+98,
 1992
 ],
 [
 "method",
 1998,
-50,
+80,
 1992
 ],
 [
 "method",
 1998,
-64,
+94,
 1992
 ],
 [
 "class",
 1998,
-93,
+123,
 1992
 ],
 [
 "method",
 1998,
-132,
+162,
 1992
 ],
 [
 "method",
 1998,
-122,
+152,
 1992
 ],
 [
 "method",
 1998,
-129,
+159,
 1992
 ],
 [
@@ -104313,8 +104461,14 @@ null,
 1992
 ],
 [
+"function",
+1998,
+60,
+1992
+],
+[
 "module",
-2008,
+2009,
 1,
 1992,
 "tropoi/temporal/tendencies/held_suarez.py",
@@ -104323,109 +104477,109 @@ null,
 ],
 [
 "class",
-2008,
+2009,
 66,
 1992
 ],
 [
 "method",
-2008,
+2009,
 80,
 1992
 ],
 [
 "method",
-2008,
+2009,
 92,
 1992
 ],
 [
 "class",
-2008,
+2009,
 147,
 1992
 ],
 [
 "method",
-2008,
+2009,
 188,
 1992
 ],
 [
 "method",
-2008,
+2009,
 155,
 1992
 ],
 [
 "method",
-2008,
+2009,
 174,
 1992
 ],
 [
 "method",
-2008,
+2009,
 170,
 1992
 ],
 [
 "function",
-2008,
+2009,
 96,
 1992
 ],
 [
 "function",
-2008,
+2009,
 56,
 1992
 ],
 [
 "function",
-2008,
+2009,
 100,
 1992
 ],
 [
 "function",
-2008,
+2009,
 221,
 1992
 ],
 [
 "function",
-2008,
+2009,
 229,
 1992
 ],
 [
 "function",
-2008,
+2009,
 113,
 1992
 ],
 [
 "function",
-2008,
+2009,
 130,
 1992
 ],
 [
 "function",
-2008,
+2009,
 207,
 1992
 ],
 [
 "function",
-2008,
+2009,
 123,
 1992
 ],
 [
 "module",
-2026,
+2027,
 1,
 1992,
 "tropoi/temporal/tendencies/primitive_equations.py",
@@ -104434,145 +104588,145 @@ null,
 ],
 [
 "class",
-2026,
+2027,
 75,
 1992
 ],
 [
 "method",
-2026,
+2027,
 91,
 1992
 ],
 [
 "method",
-2026,
+2027,
 213,
 1992
 ],
 [
 "method",
-2026,
+2027,
 209,
 1992
 ],
 [
 "method",
-2026,
+2027,
 578,
 1992
 ],
 [
 "method",
-2026,
+2027,
 704,
 1992
 ],
 [
 "method",
-2026,
+2027,
 710,
 1992
 ],
 [
 "method",
-2026,
+2027,
 423,
 1992
 ],
 [
 "method",
-2026,
+2027,
 537,
 1992
 ],
 [
 "method",
-2026,
+2027,
 530,
 1992
 ],
 [
 "method",
-2026,
+2027,
 221,
 1992
 ],
 [
 "method",
-2026,
+2027,
 273,
 1992
 ],
 [
 "method",
-2026,
+2027,
 317,
 1992
 ],
 [
 "method",
-2026,
+2027,
 256,
 1992
 ],
 [
 "method",
-2026,
+2027,
 837,
 1992
 ],
 [
 "method",
-2026,
+2027,
 413,
 1992
 ],
 [
 "method",
-2026,
+2027,
 817,
 1992
 ],
 [
 "method",
-2026,
+2027,
 250,
 1992
 ],
 [
 "method",
-2026,
+2027,
 668,
 1992
 ],
 [
 "method",
-2026,
+2027,
 808,
 1992
 ],
 [
 "method",
-2026,
+2027,
 861,
 1992
 ],
 [
 "method",
-2026,
+2027,
 363,
 1992
 ],
 [
 "method",
-2026,
+2027,
 230,
 1992
 ],
 [
 "module",
-2050,
+2051,
 1,
 1992,
 "tropoi/temporal/tendencies/shallow_water.py",
@@ -104581,91 +104735,91 @@ null,
 ],
 [
 "class",
-2050,
+2051,
 101,
 1992
 ],
 [
 "method",
-2050,
+2051,
 129,
 1992
 ],
 [
 "method",
-2050,
+2051,
 246,
 1992
 ],
 [
 "method",
-2050,
+2051,
 233,
 1992
 ],
 [
 "method",
-2050,
+2051,
 294,
 1992
 ],
 [
 "method",
-2050,
+2051,
 259,
 1992
 ],
 [
 "method",
-2050,
+2051,
 410,
 1992
 ],
 [
 "method",
-2050,
+2051,
 237,
 1992
 ],
 [
 "method",
-2050,
+2051,
 424,
 1992
 ],
 [
 "method",
-2050,
+2051,
 281,
 1992
 ],
 [
 "method",
-2050,
+2051,
 301,
 1992
 ],
 [
 "method",
-2050,
+2051,
 374,
 1992
 ],
 [
 "method",
-2050,
+2051,
 382,
 1992
 ],
 [
 "method",
-2050,
+2051,
 448,
 1992
 ],
 [
 "method",
-2050,
+2051,
 275,
 1992
 ]
@@ -104674,7 +104828,7 @@ null,
 "analysis":{
 "calls":{
 "by_direction":{
-"downward":404,
+"downward":405,
 "lateral":0,
 "upward":0
 },
@@ -104849,9 +105003,9 @@ null,
 },
 "setup|dynamics":{
 "direction":"downward",
-"edges":24,
+"edges":25,
 "excepted":0,
-"runtime_edges":24
+"runtime_edges":25
 },
 "setup|integration":{
 "direction":"downward",
@@ -104890,7 +105044,7 @@ null,
 "runtime_edges":3
 }
 },
-"crossing_edges":424,
+"crossing_edges":425,
 "group_cycles":[
 [
 "analysis",
@@ -105168,7 +105322,7 @@ null,
 "analysis":663,
 "archive":181,
 "cli":65,
-"dynamics":109,
+"dynamics":110,
 "integration":92,
 "physics":197,
 "run":90,
@@ -107172,6 +107326,7 @@ null,
 4,
 4,
 4,
+3,
 3,
 3,
 3,
@@ -109362,6 +109517,7 @@ null,
 25,
 25,
 25,
+26,
 26,
 26,
 26,
@@ -117489,7 +117645,7 @@ null,
 [
 "dataclass(frozen=True)"
 ],
-160,
+166,
 []
 ],
 "137":[
@@ -117514,7 +117670,7 @@ null
 null,
 "",
 [],
-115
+119
 ],
 "1371":[
 "canonical_json",
@@ -117529,7 +117685,7 @@ null
 "str",
 "",
 [],
-154
+160
 ],
 "1372":[
 "from_dict",
@@ -117552,7 +117708,7 @@ null
 [
 "classmethod"
 ],
-151
+157
 ],
 "1373":[
 "kappa",
@@ -117569,7 +117725,7 @@ null
 [
 "property"
 ],
-119
+123
 ],
 "1374":[
 "retained_cut",
@@ -117586,7 +117742,7 @@ null
 [
 "property"
 ],
-134
+138
 ],
 "1375":[
 "sha256",
@@ -117601,7 +117757,7 @@ null
 "str",
 "",
 [],
-157
+163
 ],
 "1376":[
 "steps_per_day",
@@ -117618,7 +117774,7 @@ null
 [
 "property"
 ],
-123
+127
 ],
 "1377":[
 "to_dict",
@@ -117633,7 +117789,7 @@ null
 "dict[str, Any]",
 "",
 [],
-143
+149
 ],
 "1378":[
 "total_steps",
@@ -117650,7 +117806,7 @@ null
 [
 "property"
 ],
-127
+131
 ],
 "1379":[
 "with_",
@@ -117671,7 +117827,7 @@ null
 "'RadiativeConfig'",
 "",
 [],
-160
+166
 ],
 "138":[
 "__call__",
@@ -117737,7 +117893,7 @@ null
 "str",
 "The preset's default experiment id: ``\u003cname\u003e-heated-\u003cresolution\u003e`` with frictional heating, ``\u003cname\u003e-\u003cresolution\u003e`` without. These are the ids of the runs recorded for each formulation (docs/radiation/evidence), so each default reproduces a recorded configuration hash.",
 [],
-175
+181
 ],
 "1381":[
 "_t21",
@@ -117745,7 +117901,7 @@ null
 "dict",
 "",
 [],
-164
+170
 ],
 "1382":[
 "_time_of_perihelion_for_equinox_start",
@@ -117772,7 +117928,7 @@ null
 "float",
 "The ``time_of_perihelion`` that puts t = 0 at L_s = 0 (northern spring equinox), from Kepler's equation.",
 [],
-267
+273
 ],
 "1383":[
 "earth_gray_dry",
@@ -117805,7 +117961,7 @@ null
 "RadiativeConfig",
 "A dry Earth with the gray radiation, slab surface and bulk sensible exchange of Frierson, Held \u0026 Zurita-Gotor (2006), Table 1.",
 [],
-246
+252
 ],
 "1384":[
 "jupiter_schneider_liu",
@@ -117838,7 +117994,7 @@ null
 "RadiativeConfig",
 "The physics of Schneider \u0026 Liu (2009), appendix B and Table 1, at T21.",
 [],
-208
+214
 ],
 "1385":[
 "mars_gray_flat_dev",
@@ -117866,12 +118022,18 @@ null
 "frictional_heating",
 "bool",
 "True"
+],
+[
+"kw",
+"sponge",
+"bool",
+"False"
 ]
 ],
 "RadiativeConfig",
 "DEVELOPMENT EXPERIMENT, not a reproduction of Thomson \u0026 Vallis (2019) M-I (docs/radiation/MARS_MI_PLAN.md).",
 [],
-315
+326
 ],
 "1387":[
 "RadiativeRun",
@@ -118433,7 +118595,7 @@ null
 null,
 "Semi-implicit leapfrog with del^(2n) hyperdiffusion, the configured drag and the column physics as a lagged term (``coupling=None`` gives the adiabatic model with the same numerics).",
 [],
-262
+269
 ],
 "1412":[
 "initial_state",
@@ -118448,7 +118610,7 @@ null
 null,
 "A resting, horizontally uniform state plus a seeded rotational perturbation. Returns ``(coeffs (CuPy), surface_temperature or None, info)``. The perturbation is vertically uniform (so it carries no vertical shear to radiate as gravity waves) with a grid RMS wind of about ``perturbation_wind``.",
 [],
-309
+316
 ],
 "1413":[
 "reference_column",
@@ -130920,7 +131082,7 @@ null
 null,
 "``-k0(lat) ramp(sigma_k) V_k`` as vorticity/divergence tendencies.",
 [],
-90,
+120,
 []
 ],
 "20":[
@@ -130996,7 +131158,7 @@ null
 null,
 "",
 [],
-90
+120
 ],
 "2001":[
 "__init__",
@@ -131035,7 +131197,7 @@ null
 null,
 "",
 [],
-62
+92
 ],
 "2002":[
 "signature",
@@ -131050,7 +131212,7 @@ null
 "dict",
 "",
 [],
-66
+96
 ],
 "2003":[
 "MomentumSinkHeating",
@@ -131058,7 +131220,7 @@ null
 null,
 "Return the energy removed by momentum sinks and diffusion as heat.",
 [],
-165,
+195,
 []
 ],
 "2004":[
@@ -131080,7 +131242,7 @@ null
 null,
 "",
 [],
-165
+195
 ],
 "2005":[
 "__init__",
@@ -131113,7 +131275,7 @@ null
 null,
 "",
 [],
-127
+157
 ],
 "2006":[
 "signature",
@@ -131128,9 +131290,48 @@ null
 "dict",
 "",
 [],
-130
+160
 ],
 "2007":[
+"rayleigh_sponge_damping",
+[
+[
+"pos",
+"sigma_full",
+null,
+null
+],
+[
+"pos",
+"n_degrees",
+"int",
+null
+],
+[
+"kw",
+"reference_pressure",
+"float",
+null
+],
+[
+"kw",
+"bottom_pressure",
+"float",
+null
+],
+[
+"kw",
+"efold_days",
+"float",
+null
+]
+],
+null,
+"Isca's top sponge (``damping_driver`` ``rayleigh``, commit d1321ac3) as a :class:`~tropoi.temporal.hooks.DiagonalDamping` on vorticity and divergence:",
+[],
+57
+],
+"2008":[
 "schneider_liu_drag_profile",
 [
 [
@@ -131161,18 +131362,7 @@ null
 null,
 "``k0`` poleward of ``cutoff_deg``, ``k0 exp(-((cutoff - |lat|) / decay)^2)`` equatorward of it.",
 [],
-44
-],
-"2009":[
-"HeldSuarezParameters",
-[],
-null,
-"HS94 constants (PROTOCOL.md §1.1). Rates in s^-1, temperatures in K.",
-[
-"dataclass(frozen=True)"
-],
-93,
-[]
+74
 ],
 "201":[
 "optical_properties",
@@ -131202,6 +131392,17 @@ null,
 109
 ],
 "2010":[
+"HeldSuarezParameters",
+[],
+null,
+"HS94 constants (PROTOCOL.md §1.1). Rates in s^-1, temperatures in K.",
+[
+"dataclass(frozen=True)"
+],
+93,
+[]
+],
+"2011":[
 "__post_init__",
 [
 [
@@ -131216,7 +131417,7 @@ null,
 [],
 90
 ],
-"2011":[
+"2012":[
 "as_dict",
 [
 [
@@ -131231,7 +131432,7 @@ null
 [],
 93
 ],
-"2012":[
+"2013":[
 "NewtonianRelaxation",
 [],
 null,
@@ -131240,7 +131441,7 @@ null,
 204,
 []
 ],
-"2013":[
+"2014":[
 "__call__",
 [
 [
@@ -131261,7 +131462,7 @@ null,
 [],
 204
 ],
-"2014":[
+"2015":[
 "__init__",
 [
 [
@@ -131288,7 +131489,7 @@ null,
 [],
 168
 ],
-"2015":[
+"2016":[
 "grid_fields",
 [
 [
@@ -131309,7 +131510,7 @@ null,
 [],
 186
 ],
-"2016":[
+"2017":[
 "signature",
 [
 [
@@ -131324,7 +131525,7 @@ null
 [],
 172
 ],
-"2017":[
+"2018":[
 "_sigma_ramp",
 [
 [
@@ -131351,7 +131552,7 @@ null,
 [],
 97
 ],
-"2018":[
+"2019":[
 "_xp",
 [
 [
@@ -131365,33 +131566,6 @@ null,
 "CuPy if any argument is a CuPy array, else NumPy (no eager CuPy import).",
 [],
 62
-],
-"2019":[
-"equilibrium_temperature",
-[
-[
-"pos",
-"lat",
-null,
-null
-],
-[
-"pos",
-"p",
-null,
-null
-],
-[
-"pos",
-"params",
-"HeldSuarezParameters",
-null
-]
-],
-null,
-"T_eq(phi, p) in K; ``lat`` in radians, ``p`` in Pa (broadcastable).",
-[],
-110
 ],
 "202":[
 "planck",
@@ -131421,6 +131595,33 @@ null,
 112
 ],
 "2020":[
+"equilibrium_temperature",
+[
+[
+"pos",
+"lat",
+null,
+null
+],
+[
+"pos",
+"p",
+null,
+null
+],
+[
+"pos",
+"params",
+"HeldSuarezParameters",
+null
+]
+],
+null,
+"T_eq(phi, p) in K; ``lat`` in radians, ``p`` in Pa (broadcastable).",
+[],
+110
+],
+"2021":[
 "hyperdiffusion_coefficient",
 [
 [
@@ -131453,7 +131654,7 @@ null
 [],
 226
 ],
-"2021":[
+"2022":[
 "hyperdiffusion_damping",
 [
 [
@@ -131498,7 +131699,7 @@ null
 [],
 251
 ],
-"2022":[
+"2023":[
 "newtonian_rate",
 [
 [
@@ -131525,7 +131726,7 @@ null,
 [],
 120
 ],
-"2023":[
+"2024":[
 "newtonian_tendency_grid",
 [
 [
@@ -131570,7 +131771,7 @@ null,
 [],
 144
 ],
-"2024":[
+"2025":[
 "rayleigh_drag_damping",
 [
 [
@@ -131597,7 +131798,7 @@ null
 [],
 218
 ],
-"2025":[
+"2026":[
 "rayleigh_rate",
 [
 [
@@ -131618,7 +131819,7 @@ null,
 [],
 127
 ],
-"2027":[
+"2028":[
 "PrimitiveEquationsModel",
 [],
 null,
@@ -131627,7 +131828,7 @@ null,
 907,
 []
 ],
-"2028":[
+"2029":[
 "__init__",
 [
 [
@@ -131684,7 +131885,22 @@ null,
 [],
 203
 ],
-"2029":[
+"203":[
+"signature",
+[
+[
+"pos",
+"self",
+null,
+null
+]
+],
+"dict",
+"",
+[],
+106
+],
+"2030":[
 "_deriv_fields",
 [
 [
@@ -131711,22 +131927,7 @@ null
 [],
 219
 ],
-"203":[
-"signature",
-[
-[
-"pos",
-"self",
-null,
-null
-]
-],
-"dict",
-"",
-[],
-106
-],
-"2030":[
+"2031":[
 "_inv_laplacian",
 [
 [
@@ -131747,7 +131948,7 @@ null
 [],
 211
 ],
-"2031":[
+"2032":[
 "_momentum_tendencies",
 [
 [
@@ -131774,7 +131975,7 @@ null
 [],
 661
 ],
-"2032":[
+"2033":[
 "_stack_derivs",
 [
 [
@@ -131795,7 +131996,7 @@ null
 [],
 708
 ],
-"2033":[
+"2034":[
 "_tendency_batched",
 [
 [
@@ -131816,7 +132017,7 @@ null
 [],
 806
 ],
-"2034":[
+"2035":[
 "_tendency_product_fields",
 [
 [
@@ -131837,7 +132038,7 @@ null
 [],
 528
 ],
-"2035":[
+"2036":[
 "_thermo_mass_tendencies",
 [
 [
@@ -131864,7 +132065,7 @@ null
 [],
 576
 ],
-"2036":[
+"2037":[
 "_truncate",
 [
 [
@@ -131885,7 +132086,7 @@ null
 [],
 535
 ],
-"2037":[
+"2038":[
 "_wind_from",
 [
 [
@@ -131924,7 +132125,7 @@ null
 [],
 228
 ],
-"2038":[
+"2039":[
 "continuity_diagnostics",
 [
 [
@@ -131945,7 +132146,16 @@ null
 [],
 315
 ],
-"2039":[
+"204":[
+"GrayShortwave",
+[],
+null,
+"Gray stellar extinction with optional scattering (two-stream solve).",
+[],
+141,
+[]
+],
+"2040":[
 "energy_exchange_diagnostics",
 [
 [
@@ -131972,16 +132182,7 @@ null
 [],
 361
 ],
-"204":[
-"GrayShortwave",
-[],
-null,
-"Gray stellar extinction with optional scattering (two-stream solve).",
-[],
-141,
-[]
-],
-"2040":[
+"2041":[
 "geopotential_fields",
 [
 [
@@ -132002,7 +132203,7 @@ null
 [],
 271
 ],
-"2041":[
+"2042":[
 "max_characteristic_speed",
 [
 [
@@ -132023,7 +132224,7 @@ null
 [],
 851
 ],
-"2042":[
+"2043":[
 "surface_pressure_on_state_grid",
 [
 [
@@ -132044,7 +132245,7 @@ null
 [],
 416
 ],
-"2043":[
+"2044":[
 "temperature_extrema",
 [
 [
@@ -132065,7 +132266,7 @@ null
 [],
 835
 ],
-"2044":[
+"2045":[
 "temperature_on_state_grid",
 [
 [
@@ -132086,7 +132287,7 @@ null
 [],
 254
 ],
-"2045":[
+"2046":[
 "tendency",
 [
 [
@@ -132107,7 +132308,7 @@ null
 [],
 696
 ],
-"2046":[
+"2047":[
 "tendency_state",
 [
 [
@@ -132128,7 +132329,7 @@ null
 [],
 811
 ],
-"2047":[
+"2048":[
 "validate_state",
 [
 [
@@ -132155,7 +132356,7 @@ null
 [],
 907
 ],
-"2048":[
+"2049":[
 "vertical_transport_diagnostics",
 [
 [
@@ -132181,27 +132382,6 @@ null
 "Lorenz-grid vertical transport of u, v, T on the state grid.",
 [],
 411
-],
-"2049":[
-"wind_on_state_grid",
-[
-[
-"pos",
-"self",
-null,
-null
-],
-[
-"pos",
-"state",
-"PrimitiveEquationsState",
-null
-]
-],
-"tuple[cp.ndarray, cp.ndarray]",
-"Per-level eastward/northward velocity on the state sampling.",
-[],
-244
 ],
 "205":[
 "__init__",
@@ -132254,7 +132434,28 @@ null,
 [],
 128
 ],
-"2051":[
+"2050":[
+"wind_on_state_grid",
+[
+[
+"pos",
+"self",
+null,
+null
+],
+[
+"pos",
+"state",
+"PrimitiveEquationsState",
+null
+]
+],
+"tuple[cp.ndarray, cp.ndarray]",
+"Per-level eastward/northward velocity on the state sampling.",
+[],
+244
+],
+"2052":[
 "ShallowWaterModel",
 [],
 null,
@@ -132263,7 +132464,7 @@ null,
 493,
 []
 ],
-"2052":[
+"2053":[
 "__init__",
 [
 [
@@ -132308,7 +132509,7 @@ null,
 [],
 227
 ],
-"2053":[
+"2054":[
 "_deriv_fields",
 [
 [
@@ -132335,7 +132536,7 @@ null
 [],
 257
 ],
-"2054":[
+"2055":[
 "_inv_laplacian",
 [
 [
@@ -132356,7 +132557,7 @@ null
 [],
 235
 ],
-"2055":[
+"2056":[
 "_truncate",
 [
 [
@@ -132377,7 +132578,7 @@ null
 [],
 299
 ],
-"2056":[
+"2057":[
 "_wind_from",
 [
 [
@@ -132416,7 +132617,7 @@ null
 [],
 273
 ],
-"2057":[
+"2058":[
 "characteristic_fields",
 [
 [
@@ -132437,7 +132638,7 @@ null
 [],
 422
 ],
-"2058":[
+"2059":[
 "helmholtz",
 [
 [
@@ -132457,27 +132658,6 @@ null
 "Return (psi_lm, chi_lm): streamfunction and velocity potential.",
 [],
 244
-],
-"2059":[
-"max_characteristic_speed",
-[
-[
-"pos",
-"self",
-null,
-null
-],
-[
-"pos",
-"state",
-"ShallowWaterState",
-null
-]
-],
-"float",
-"max|u| + sqrt(max(Phi0 + phi)) over all model samplings (m/s).",
-[],
-438
 ],
 "206":[
 "optical_properties",
@@ -132507,6 +132687,27 @@ null,
 141
 ],
 "2060":[
+"max_characteristic_speed",
+[
+[
+"pos",
+"self",
+null,
+null
+],
+[
+"pos",
+"state",
+"ShallowWaterState",
+null
+]
+],
+"float",
+"max|u| + sqrt(max(Phi0 + phi)) over all model samplings (m/s).",
+[],
+438
+],
+"2061":[
 "surface_geopotential_on_state_grid",
 [
 [
@@ -132521,7 +132722,7 @@ null
 [],
 288
 ],
-"2061":[
+"2062":[
 "tendency",
 [
 [
@@ -132542,7 +132743,7 @@ null
 [],
 372
 ],
-"2062":[
+"2063":[
 "tendency_state",
 [
 [
@@ -132563,7 +132764,7 @@ null
 [],
 376
 ],
-"2063":[
+"2064":[
 "total_geopotential_extrema",
 [
 [
@@ -132584,7 +132785,7 @@ null
 [],
 408
 ],
-"2064":[
+"2065":[
 "validate_state",
 [
 [
@@ -132611,7 +132812,7 @@ null
 [],
 493
 ],
-"2065":[
+"2066":[
 "wind_on_state_grid",
 [
 [
@@ -155255,7 +155456,7 @@ null
 "rt":"tropoi.temporal.tendencies.shallow_water.ShallowWaterModel.surface_geopotential_on_state_grid",
 "s":646,
 "static":[],
-"t":2060,
+"t":2061,
 "wall_ns_inclusive":4700
 },
 {
@@ -155314,7 +155515,7 @@ null
 "rt":"tropoi.temporal.tendencies.shallow_water.ShallowWaterModel.characteristic_fields",
 "s":648,
 "static":[],
-"t":2057,
+"t":2058,
 "wall_ns_inclusive":89681800
 },
 {
@@ -156985,7 +157186,7 @@ null
 "static":[
 [
 "call",
-1671
+1673
 ]
 ],
 "t":1839,
@@ -157025,7 +157226,7 @@ null
 "static":[
 [
 "call",
-1673
+1675
 ]
 ],
 "t":1882,
@@ -157053,7 +157254,7 @@ null
 "static":[
 [
 "self",
-1674
+1676
 ]
 ],
 "t":1418,
@@ -157104,7 +157305,7 @@ null
 "static":[
 [
 "call",
-1675
+1677
 ]
 ],
 "t":1882,
@@ -157132,7 +157333,7 @@ null
 "static":[
 [
 "call",
-1678
+1680
 ]
 ],
 "t":1884,
@@ -157160,7 +157361,7 @@ null
 "static":[
 [
 "self",
-1680
+1682
 ]
 ],
 "t":1421,
@@ -157188,7 +157389,7 @@ null
 "static":[
 [
 "self",
-1682
+1684
 ]
 ],
 "t":1421,
@@ -157285,7 +157486,7 @@ null
 "static":[
 [
 "call",
-1685
+1687
 ]
 ],
 "t":511,
@@ -157336,7 +157537,7 @@ null
 "static":[
 [
 "call",
-1686
+1688
 ]
 ],
 "t":534,
@@ -157387,7 +157588,7 @@ null
 "static":[
 [
 "call",
-1687
+1689
 ]
 ],
 "t":1428,
@@ -157438,7 +157639,7 @@ null
 "static":[
 [
 "call",
-1688
+1690
 ]
 ],
 "t":1433,
@@ -157512,7 +157713,7 @@ null
 "static":[
 [
 "call",
-1689
+1691
 ]
 ],
 "t":1533,
@@ -157563,7 +157764,7 @@ null
 "static":[
 [
 "call",
-1690
+1692
 ]
 ],
 "t":1895,
@@ -157591,7 +157792,7 @@ null
 "static":[
 [
 "call",
-1691
+1693
 ]
 ],
 "t":1339,
@@ -157619,7 +157820,7 @@ null
 "static":[
 [
 "call",
-1692
+1694
 ]
 ],
 "t":1338,
@@ -157647,7 +157848,7 @@ null
 "static":[
 [
 "call",
-1695
+1697
 ]
 ],
 "t":1428,
@@ -157675,7 +157876,7 @@ null
 "static":[
 [
 "call",
-1694
+1696
 ]
 ],
 "t":1427,
@@ -157703,7 +157904,7 @@ null
 "static":[
 [
 "call",
-1696
+1698
 ]
 ],
 "t":1429,
@@ -157867,7 +158068,7 @@ null
 "rt":"tropoi.temporal.tendencies.shallow_water.\u003cmodule\u003e",
 "s":1432,
 "static":[],
-"t":2050,
+"t":2051,
 "wall_ns_inclusive":348271800
 },
 {
@@ -157892,7 +158093,7 @@ null
 "static":[
 [
 "instantiate+constructor",
-1697
+1699
 ]
 ],
 "t":646,
@@ -158012,7 +158213,7 @@ null
 "static":[
 [
 "instantiate+constructor",
-1702
+1704
 ]
 ],
 "t":1875,
@@ -158040,7 +158241,7 @@ null
 "static":[
 [
 "call",
-1703
+1705
 ]
 ],
 "t":1883,
@@ -158068,7 +158269,7 @@ null
 "static":[
 [
 "call",
-1704
+1706
 ]
 ],
 "t":1885,
@@ -158096,7 +158297,7 @@ null
 "static":[
 [
 "call",
-1706
+1708
 ]
 ],
 "t":1890,
@@ -158122,7 +158323,7 @@ null
 "rt":"tropoi.temporal.tendencies.shallow_water.ShallowWaterModel.validate_state",
 "s":1433,
 "static":[],
-"t":2064,
+"t":2065,
 "wall_ns_inclusive":4728800
 },
 {
@@ -158193,7 +158394,7 @@ null
 "static":[
 [
 "call",
-1705
+1707
 ]
 ],
 "t":1888,
@@ -158219,7 +158420,7 @@ null
 "rt":"tropoi.temporal.tendencies.shallow_water.ShallowWaterModel.validate_state",
 "s":1433,
 "static":[],
-"t":2064,
+"t":2065,
 "wall_ns_inclusive":80649300
 },
 {
@@ -158265,7 +158466,7 @@ null
 "rt":"tropoi.temporal.tendencies.shallow_water.ShallowWaterModel.validate_state",
 "s":1433,
 "static":[],
-"t":2064,
+"t":2065,
 "wall_ns_inclusive":239591600
 },
 {
@@ -158359,7 +158560,7 @@ null
 "static":[
 [
 "self",
-1707
+1709
 ]
 ],
 "t":1438,
@@ -158502,7 +158703,7 @@ null
 "static":[
 [
 "call",
-1709
+1711
 ]
 ],
 "t":1444,
@@ -158530,7 +158731,7 @@ null
 "static":[
 [
 "self",
-1710
+1712
 ]
 ],
 "t":1450,
@@ -158558,7 +158759,7 @@ null
 "static":[
 [
 "self",
-1711
+1713
 ]
 ],
 "t":1453,
@@ -158736,7 +158937,7 @@ null
 "static":[
 [
 "self",
-1712
+1714
 ]
 ],
 "t":1448,
@@ -158772,7 +158973,7 @@ null
 "static":[
 [
 "self",
-1713
+1715
 ]
 ],
 "t":1449,
@@ -158938,7 +159139,7 @@ null
 "static":[
 [
 "call",
-1747
+1749
 ]
 ],
 "t":1709,
@@ -158964,7 +159165,7 @@ null
 "rt":"tropoi.temporal.tendencies.shallow_water.ShallowWaterModel.validate_state",
 "s":1531,
 "static":[],
-"t":2064,
+"t":2065,
 "wall_ns_inclusive":15223100
 },
 {
@@ -159012,7 +159213,7 @@ null
 "static":[
 [
 "call",
-1749
+1751
 ]
 ],
 "t":1839,
@@ -159370,7 +159571,7 @@ null
 "static":[
 [
 "call",
-1762
+1764
 ]
 ],
 "t":1536,
@@ -159398,7 +159599,7 @@ null
 "static":[
 [
 "self",
-1763
+1765
 ]
 ],
 "t":1572,
@@ -159637,7 +159838,7 @@ null
 "static":[
 [
 "instantiate+constructor",
-1783
+1785
 ]
 ],
 "t":1447,
@@ -159665,7 +159866,7 @@ null
 "static":[
 [
 "instantiate+constructor",
-1786
+1788
 ]
 ],
 "t":1571,
@@ -159716,7 +159917,7 @@ null
 "static":[
 [
 "self",
-1787
+1789
 ]
 ],
 "t":1588,
@@ -159744,7 +159945,7 @@ null
 "static":[
 [
 "self",
-1788
+1790
 ]
 ],
 "t":1589,
@@ -159795,7 +159996,7 @@ null
 "static":[
 [
 "instantiate+constructor",
-1789
+1791
 ]
 ],
 "t":1670,
@@ -159892,7 +160093,7 @@ null
 "static":[
 [
 "call",
-1794
+1796
 ]
 ],
 "t":1774,
@@ -159920,7 +160121,7 @@ null
 "static":[
 [
 "instantiate+constructor",
-1795
+1797
 ]
 ],
 "t":1818,
@@ -160247,7 +160448,7 @@ null
 "static":[
 [
 "super",
-1861
+1863
 ]
 ],
 "t":1682,
@@ -160275,7 +160476,7 @@ null
 "static":[
 [
 "instantiate+constructor",
-1862
+1864
 ]
 ],
 "t":1447,
@@ -160303,7 +160504,7 @@ null
 "static":[
 [
 "self",
-1864
+1866
 ]
 ],
 "t":1684,
@@ -160358,7 +160559,7 @@ null
 "static":[
 [
 "instantiate+constructor",
-1865
+1867
 ]
 ],
 "t":1818,
@@ -160390,7 +160591,7 @@ null
 "static":[
 [
 "self",
-1876
+1878
 ]
 ],
 "t":1686,
@@ -160418,7 +160619,7 @@ null
 "static":[
 [
 "override",
-1877
+1879
 ]
 ],
 "t":1671,
@@ -160446,7 +160647,7 @@ null
 "static":[
 [
 "override",
-1878
+1880
 ]
 ],
 "t":1672,
@@ -160888,7 +161089,7 @@ null
 "static":[
 [
 "call",
-1972
+1974
 ]
 ],
 "t":1800,
@@ -160962,7 +161163,7 @@ null
 "static":[
 [
 "call",
-1974
+1976
 ]
 ],
 "t":1801,
@@ -161128,7 +161329,7 @@ null
 "static":[
 [
 "instantiate+constructor",
-1980
+1982
 ]
 ],
 "t":1804,
@@ -161156,7 +161357,7 @@ null
 "static":[
 [
 "call",
-1984
+1986
 ]
 ],
 "t":1825,
@@ -161230,7 +161431,7 @@ null
 "static":[
 [
 "call",
-1999
+2001
 ]
 ],
 "t":1838,
@@ -161304,7 +161505,7 @@ null
 "static":[
 [
 "call",
-2024
+2026
 ]
 ],
 "t":1877,
@@ -161355,7 +161556,7 @@ null
 "static":[
 [
 "call",
-2026
+2028
 ]
 ],
 "t":1878,
@@ -161383,7 +161584,7 @@ null
 "static":[
 [
 "call",
-2027
+2029
 ]
 ],
 "t":1881,
@@ -161411,7 +161612,7 @@ null
 "static":[
 [
 "call",
-2028
+2030
 ]
 ],
 "t":1881,
@@ -161443,7 +161644,7 @@ null
 "static":[
 [
 "call",
-2029
+2031
 ]
 ],
 "t":1880,
@@ -161540,7 +161741,7 @@ null
 "static":[
 [
 "call",
-2030
+2032
 ]
 ],
 "t":1883,
@@ -161609,7 +161810,7 @@ null
 "rt":"tropoi.temporal.tendencies.shallow_water.ShallowWaterModel.tendency",
 "s":1888,
 "static":[],
-"t":2061,
+"t":2062,
 "wall_ns_inclusive":514725200
 },
 {
@@ -161657,7 +161858,7 @@ null
 "static":[
 [
 "call",
-2043
+2045
 ]
 ],
 "t":1439,
@@ -161685,7 +161886,7 @@ null
 "static":[
 [
 "call",
-2044
+2046
 ]
 ],
 "t":1590,
@@ -161713,10 +161914,10 @@ null
 "static":[
 [
 "instantiate+constructor",
-2050
+2052
 ]
 ],
-"t":2052,
+"t":2053,
 "wall_ns_inclusive":243230000
 },
 {
@@ -161806,7 +162007,7 @@ null
 },
 "rs":"tropoi.temporal.tendencies.shallow_water.\u003cmodule\u003e",
 "rt":"tropoi.spatial.planet.\u003cmodule\u003e",
-"s":2050,
+"s":2051,
 "static":[],
 "t":1584,
 "wall_ns_inclusive":342931200
@@ -161829,7 +162030,7 @@ null
 },
 "rs":"tropoi.temporal.tendencies.shallow_water.\u003cmodule\u003e",
 "rt":"tropoi.spatial.terrain.\u003cmodule\u003e",
-"s":2050,
+"s":2051,
 "static":[],
 "t":1712,
 "wall_ns_inclusive":4400
@@ -161852,7 +162053,7 @@ null
 },
 "rs":"tropoi.temporal.tendencies.shallow_water.\u003cmodule\u003e",
 "rt":"tropoi.spatial.terrain.topography.\u003cmodule\u003e",
-"s":2050,
+"s":2051,
 "static":[],
 "t":1775,
 "wall_ns_inclusive":103900
@@ -161875,9 +162076,9 @@ null
 },
 "rs":"tropoi.temporal.tendencies.shallow_water.\u003cmodule\u003e",
 "rt":"tropoi.temporal.tendencies.shallow_water.ShallowWaterModel",
-"s":2050,
+"s":2051,
 "static":[],
-"t":2051,
+"t":2052,
 "wall_ns_inclusive":11100
 },
 {
@@ -161898,11 +162099,11 @@ null
 },
 "rs":"tropoi.temporal.tendencies.shallow_water.ShallowWaterModel.__init__",
 "rt":"tropoi.spatial.laplacian.laplacian_eigenvalues",
-"s":2052,
+"s":2053,
 "static":[
 [
 "call",
-2173
+2176
 ]
 ],
 "t":1536,
@@ -161926,7 +162127,7 @@ null
 },
 "rs":"tropoi.temporal.tendencies.shallow_water.ShallowWaterModel.__init__",
 "rt":"tropoi.spatial.spherical_backend.SphericalGridBackend.product_space",
-"s":2052,
+"s":2053,
 "static":[],
 "t":1686,
 "wall_ns_inclusive":12500
@@ -161949,11 +162150,11 @@ null
 },
 "rs":"tropoi.temporal.tendencies.shallow_water.ShallowWaterModel.__init__",
 "rt":"tropoi.spatial.terrain.topography.Topography.flat",
-"s":2052,
+"s":2053,
 "static":[
 [
 "call",
-2174
+2177
 ]
 ],
 "t":1781,
@@ -161977,7 +162178,7 @@ null
 },
 "rs":"tropoi.temporal.tendencies.shallow_water.ShallowWaterModel.__init__",
 "rt":"tropoi.spatial.terrain.topography.Topography.is_flat",
-"s":2052,
+"s":2053,
 "static":[],
 "t":1783,
 "wall_ns_inclusive":1600
@@ -162000,7 +162201,7 @@ null
 },
 "rs":"tropoi.temporal.tendencies.shallow_water.ShallowWaterModel.__init__",
 "rt":"tropoi.spatial.terrain.topography.Topography.l_max",
-"s":2052,
+"s":2053,
 "static":[],
 "t":1784,
 "wall_ns_inclusive":2100
@@ -162023,11 +162224,11 @@ null
 },
 "rs":"tropoi.temporal.tendencies.shallow_water.ShallowWaterModel.__init__",
 "rt":"tropoi.spatial.truncation.product_truncation_cut",
-"s":2052,
+"s":2053,
 "static":[
 [
 "call",
-2175
+2178
 ]
 ],
 "t":1838,
@@ -162051,7 +162252,7 @@ null
 },
 "rs":"tropoi.temporal.tendencies.shallow_water.ShallowWaterModel._deriv_fields",
 "rt":"tropoi.spatial.operators.spectral_operators.SpectralOperators.d_lambda_coeffs",
-"s":2053,
+"s":2054,
 "static":[],
 "t":1576,
 "wall_ns_inclusive":22076500
@@ -162074,7 +162275,7 @@ null
 },
 "rs":"tropoi.temporal.tendencies.shallow_water.ShallowWaterModel._deriv_fields",
 "rt":"tropoi.spatial.operators.spectral_operators.SpectralOperators.sin_theta_d_theta_coeffs",
-"s":2053,
+"s":2054,
 "static":[],
 "t":1579,
 "wall_ns_inclusive":55329400
@@ -162101,7 +162302,7 @@ null
 },
 "rs":"tropoi.temporal.tendencies.shallow_water.ShallowWaterModel._deriv_fields",
 "rt":"tropoi.spatial.transforms.optimized_geodesic_sh.GeodesicSphericalHarmonics.inv_transform",
-"s":2053,
+"s":2054,
 "static":[],
 "t":1823,
 "wall_ns_inclusive":205793200
@@ -162124,11 +162325,11 @@ null
 },
 "rs":"tropoi.temporal.tendencies.shallow_water.ShallowWaterModel._inv_laplacian",
 "rt":"tropoi.spatial.laplacian.invert_laplacian",
-"s":2054,
+"s":2055,
 "static":[
 [
 "call",
-2176
+2179
 ]
 ],
 "t":1535,
@@ -162156,14 +162357,14 @@ null
 },
 "rs":"tropoi.temporal.tendencies.shallow_water.ShallowWaterModel._wind_from",
 "rt":"tropoi.temporal.tendencies.shallow_water.ShallowWaterModel._deriv_fields",
-"s":2056,
+"s":2057,
 "static":[
 [
 "self",
-2177
+2180
 ]
 ],
-"t":2053,
+"t":2054,
 "wall_ns_inclusive":177704300
 },
 {
@@ -162184,7 +162385,7 @@ null
 },
 "rs":"tropoi.temporal.tendencies.shallow_water.ShallowWaterModel.characteristic_fields",
 "rt":"tropoi.spatial.transforms.optimized_geodesic_sh.GeodesicSphericalHarmonics.inv_transform",
-"s":2057,
+"s":2058,
 "static":[],
 "t":1823,
 "wall_ns_inclusive":5595700
@@ -162207,14 +162408,14 @@ null
 },
 "rs":"tropoi.temporal.tendencies.shallow_water.ShallowWaterModel.characteristic_fields",
 "rt":"tropoi.temporal.tendencies.shallow_water.ShallowWaterModel.total_geopotential_extrema",
-"s":2057,
+"s":2058,
 "static":[
 [
 "self",
-2178
+2181
 ]
 ],
-"t":2063,
+"t":2064,
 "wall_ns_inclusive":34066300
 },
 {
@@ -162235,14 +162436,14 @@ null
 },
 "rs":"tropoi.temporal.tendencies.shallow_water.ShallowWaterModel.characteristic_fields",
 "rt":"tropoi.temporal.tendencies.shallow_water.ShallowWaterModel.wind_on_state_grid",
-"s":2057,
+"s":2058,
 "static":[
 [
 "self",
-2179
+2182
 ]
 ],
-"t":2065,
+"t":2066,
 "wall_ns_inclusive":46102900
 },
 {
@@ -162267,14 +162468,14 @@ null
 },
 "rs":"tropoi.temporal.tendencies.shallow_water.ShallowWaterModel.helmholtz",
 "rt":"tropoi.temporal.tendencies.shallow_water.ShallowWaterModel._inv_laplacian",
-"s":2058,
+"s":2059,
 "static":[
 [
 "self",
-2180
+2183
 ]
 ],
-"t":2054,
+"t":2055,
 "wall_ns_inclusive":5688400
 },
 {
@@ -162307,7 +162508,7 @@ null
 },
 "rs":"tropoi.temporal.tendencies.shallow_water.ShallowWaterModel.tendency",
 "rt":"tropoi.spatial.transforms.optimized_geodesic_sh.GeodesicSphericalHarmonics.inv_transform",
-"s":2061,
+"s":2062,
 "static":[],
 "t":1823,
 "wall_ns_inclusive":84703800
@@ -162342,7 +162543,7 @@ null
 },
 "rs":"tropoi.temporal.tendencies.shallow_water.ShallowWaterModel.tendency",
 "rt":"tropoi.spatial.transforms.optimized_geodesic_sh.GeodesicSphericalHarmonics.transform",
-"s":2061,
+"s":2062,
 "static":[],
 "t":1824,
 "wall_ns_inclusive":73540300
@@ -162369,14 +162570,14 @@ null
 },
 "rs":"tropoi.temporal.tendencies.shallow_water.ShallowWaterModel.tendency",
 "rt":"tropoi.temporal.tendencies.shallow_water.ShallowWaterModel._deriv_fields",
-"s":2061,
+"s":2062,
 "static":[
 [
 "self",
-2182
+2185
 ]
 ],
-"t":2053,
+"t":2054,
 "wall_ns_inclusive":126358200
 },
 {
@@ -162401,14 +162602,14 @@ null
 },
 "rs":"tropoi.temporal.tendencies.shallow_water.ShallowWaterModel.tendency",
 "rt":"tropoi.temporal.tendencies.shallow_water.ShallowWaterModel._inv_laplacian",
-"s":2061,
+"s":2062,
 "static":[
 [
 "self",
-2183
+2186
 ]
 ],
-"t":2054,
+"t":2055,
 "wall_ns_inclusive":16970400
 },
 {
@@ -162441,14 +162642,14 @@ null
 },
 "rs":"tropoi.temporal.tendencies.shallow_water.ShallowWaterModel.tendency",
 "rt":"tropoi.temporal.tendencies.shallow_water.ShallowWaterModel._truncate",
-"s":2061,
+"s":2062,
 "static":[
 [
 "self",
-2184
+2187
 ]
 ],
-"t":2055,
+"t":2056,
 "wall_ns_inclusive":16508300
 },
 {
@@ -162469,14 +162670,14 @@ null
 },
 "rs":"tropoi.temporal.tendencies.shallow_water.ShallowWaterModel.tendency",
 "rt":"tropoi.temporal.tendencies.shallow_water.ShallowWaterModel._wind_from",
-"s":2061,
+"s":2062,
 "static":[
 [
 "self",
-2185
+2188
 ]
 ],
-"t":2056,
+"t":2057,
 "wall_ns_inclusive":143856100
 },
 {
@@ -162497,7 +162698,7 @@ null
 },
 "rs":"tropoi.temporal.tendencies.shallow_water.ShallowWaterModel.total_geopotential_extrema",
 "rt":"tropoi.spatial.transforms.optimized_geodesic_sh.GeodesicSphericalHarmonics.inv_transform",
-"s":2063,
+"s":2064,
 "static":[],
 "t":1823,
 "wall_ns_inclusive":59522900
@@ -162520,14 +162721,14 @@ null
 },
 "rs":"tropoi.temporal.tendencies.shallow_water.ShallowWaterModel.validate_state",
 "rt":"tropoi.temporal.tendencies.shallow_water.ShallowWaterModel.total_geopotential_extrema",
-"s":2064,
+"s":2065,
 "static":[
 [
 "self",
-2189
+2192
 ]
 ],
-"t":2063,
+"t":2064,
 "wall_ns_inclusive":139643800
 },
 {
@@ -162548,14 +162749,14 @@ null
 },
 "rs":"tropoi.temporal.tendencies.shallow_water.ShallowWaterModel.wind_on_state_grid",
 "rt":"tropoi.temporal.tendencies.shallow_water.ShallowWaterModel._wind_from",
-"s":2065,
+"s":2066,
 "static":[
 [
 "self",
-2190
+2193
 ]
 ],
-"t":2056,
+"t":2057,
 "wall_ns_inclusive":39463000
 },
 {
@@ -162576,14 +162777,14 @@ null
 },
 "rs":"tropoi.temporal.tendencies.shallow_water.ShallowWaterModel.wind_on_state_grid",
 "rt":"tropoi.temporal.tendencies.shallow_water.ShallowWaterModel.helmholtz",
-"s":2065,
+"s":2066,
 "static":[
 [
 "self",
-2191
+2194
 ]
 ],
-"t":2058,
+"t":2059,
 "wall_ns_inclusive":6291200
 }
 ],
@@ -174275,7 +174476,7 @@ null
 "rt":"tropoi.temporal.tendencies.shallow_water.ShallowWaterModel.surface_geopotential_on_state_grid",
 "s":646,
 "static":[],
-"t":2060,
+"t":2061,
 "wall_ns_inclusive":2600
 },
 {
@@ -174334,7 +174535,7 @@ null
 "rt":"tropoi.temporal.tendencies.shallow_water.ShallowWaterModel.characteristic_fields",
 "s":648,
 "static":[],
-"t":2057,
+"t":2058,
 "wall_ns_inclusive":112128800
 },
 {
@@ -176807,7 +177008,7 @@ null
 1336
 ]
 ],
-"t":2052,
+"t":2053,
 "wall_ns_inclusive":3439200
 },
 {
@@ -176830,7 +177031,7 @@ null
 "rt":"tropoi.temporal.tendencies.shallow_water.ShallowWaterModel.total_geopotential_extrema",
 "s":1216,
 "static":[],
-"t":2063,
+"t":2064,
 "wall_ns_inclusive":2829600
 },
 {
@@ -176853,7 +177054,7 @@ null
 "rt":"tropoi.temporal.tendencies.shallow_water.ShallowWaterModel.validate_state",
 "s":1216,
 "static":[],
-"t":2064,
+"t":2065,
 "wall_ns_inclusive":4790000
 },
 {
@@ -177286,7 +177487,7 @@ null
 "static":[
 [
 "call",
-1691
+1693
 ]
 ],
 "t":1339,
@@ -177314,7 +177515,7 @@ null
 "static":[
 [
 "instantiate+constructor",
-1697
+1699
 ]
 ],
 "t":646,
@@ -177434,7 +177635,7 @@ null
 "static":[
 [
 "instantiate+constructor",
-1702
+1704
 ]
 ],
 "t":1875,
@@ -177462,7 +177663,7 @@ null
 "static":[
 [
 "call",
-1703
+1705
 ]
 ],
 "t":1883,
@@ -177490,7 +177691,7 @@ null
 "static":[
 [
 "call",
-1704
+1706
 ]
 ],
 "t":1885,
@@ -177518,7 +177719,7 @@ null
 "static":[
 [
 "call",
-1706
+1708
 ]
 ],
 "t":1890,
@@ -177544,7 +177745,7 @@ null
 "rt":"tropoi.temporal.tendencies.shallow_water.ShallowWaterModel.validate_state",
 "s":1433,
 "static":[],
-"t":2064,
+"t":2065,
 "wall_ns_inclusive":3761700
 },
 {
@@ -177615,7 +177816,7 @@ null
 "static":[
 [
 "call",
-1705
+1707
 ]
 ],
 "t":1888,
@@ -177641,7 +177842,7 @@ null
 "rt":"tropoi.temporal.tendencies.shallow_water.ShallowWaterModel.validate_state",
 "s":1433,
 "static":[],
-"t":2064,
+"t":2065,
 "wall_ns_inclusive":63595000
 },
 {
@@ -177687,7 +177888,7 @@ null
 "rt":"tropoi.temporal.tendencies.shallow_water.ShallowWaterModel.validate_state",
 "s":1433,
 "static":[],
-"t":2064,
+"t":2065,
 "wall_ns_inclusive":162888300
 },
 {
@@ -177717,7 +177918,7 @@ null
 "static":[
 [
 "self",
-1707
+1709
 ]
 ],
 "t":1438,
@@ -177853,7 +178054,7 @@ null
 "static":[
 [
 "instantiate+constructor",
-1719
+1721
 ]
 ],
 "t":1804,
@@ -177983,7 +178184,7 @@ null
 "static":[
 [
 "call",
-1752
+1754
 ]
 ],
 "t":1567,
@@ -178113,7 +178314,7 @@ null
 "static":[
 [
 "call",
-1760
+1762
 ]
 ],
 "t":1567,
@@ -178195,7 +178396,7 @@ null
 "static":[
 [
 "call",
-1762
+1764
 ]
 ],
 "t":1536,
@@ -178225,7 +178426,7 @@ null
 "static":[
 [
 "self",
-1763
+1765
 ]
 ],
 "t":1572,
@@ -178309,7 +178510,7 @@ null
 "static":[
 [
 "instantiate+constructor",
-1784
+1786
 ]
 ],
 "t":1491,
@@ -178339,7 +178540,7 @@ null
 "static":[
 [
 "instantiate+constructor",
-1785
+1787
 ]
 ],
 "t":1502,
@@ -178394,7 +178595,7 @@ null
 "static":[
 [
 "instantiate+constructor",
-1786
+1788
 ]
 ],
 "t":1571,
@@ -178449,7 +178650,7 @@ null
 "static":[
 [
 "self",
-1787
+1789
 ]
 ],
 "t":1588,
@@ -178479,7 +178680,7 @@ null
 "static":[
 [
 "self",
-1788
+1790
 ]
 ],
 "t":1589,
@@ -178509,7 +178710,7 @@ null
 "static":[
 [
 "instantiate+constructor",
-1790
+1792
 ]
 ],
 "t":1674,
@@ -178614,7 +178815,7 @@ null
 "static":[
 [
 "call",
-1794
+1796
 ]
 ],
 "t":1774,
@@ -178656,7 +178857,7 @@ null
 "static":[
 [
 "call",
-1826
+1828
 ]
 ],
 "t":1665,
@@ -178709,7 +178910,7 @@ null
 "static":[
 [
 "call",
-1828
+1830
 ]
 ],
 "t":1662,
@@ -178762,7 +178963,7 @@ null
 "static":[
 [
 "self",
-1829
+1831
 ]
 ],
 "t":1630,
@@ -178796,7 +178997,7 @@ null
 "static":[
 [
 "call",
-1830
+1832
 ]
 ],
 "t":1667,
@@ -178849,7 +179050,7 @@ null
 "static":[
 [
 "call",
-1832
+1834
 ]
 ],
 "t":1662,
@@ -178878,7 +179079,7 @@ null
 "static":[
 [
 "call",
-1833
+1835
 ]
 ],
 "t":1663,
@@ -178918,7 +179119,7 @@ null
 "static":[
 [
 "call",
-1835
+1837
 ]
 ],
 "t":1667,
@@ -178951,7 +179152,7 @@ null
 "static":[
 [
 "self",
-1837
+1839
 ]
 ],
 "t":1650,
@@ -178979,7 +179180,7 @@ null
 "static":[
 [
 "self",
-1839
+1841
 ]
 ],
 "t":1641,
@@ -179062,7 +179263,7 @@ null
 "static":[
 [
 "call",
-1842
+1844
 ]
 ],
 "t":1662,
@@ -179093,7 +179294,7 @@ null
 "static":[
 [
 "call",
-1843
+1845
 ]
 ],
 "t":1663,
@@ -179144,7 +179345,7 @@ null
 "static":[
 [
 "call",
-1844
+1846
 ]
 ],
 "t":1664,
@@ -179177,7 +179378,7 @@ null
 "static":[
 [
 "self",
-1846
+1848
 ]
 ],
 "t":1641,
@@ -179210,7 +179411,7 @@ null
 "static":[
 [
 "call",
-1848
+1850
 ]
 ],
 "t":1441,
@@ -179263,7 +179464,7 @@ null
 "static":[
 [
 "call",
-1853
+1855
 ]
 ],
 "t":1662,
@@ -179420,7 +179621,7 @@ null
 "static":[
 [
 "call",
-1859
+1861
 ]
 ],
 "t":1666,
@@ -179450,7 +179651,7 @@ null
 "static":[
 [
 "super",
-1867
+1869
 ]
 ],
 "t":1682,
@@ -179480,7 +179681,7 @@ null
 "static":[
 [
 "instantiate+constructor",
-1868
+1870
 ]
 ],
 "t":1491,
@@ -179510,7 +179711,7 @@ null
 "static":[
 [
 "instantiate+constructor",
-1869
+1871
 ]
 ],
 "t":1502,
@@ -179538,7 +179739,7 @@ null
 "static":[
 [
 "self",
-1871
+1873
 ]
 ],
 "t":1684,
@@ -179599,7 +179800,7 @@ null
 "static":[
 [
 "self",
-1876
+1878
 ]
 ],
 "t":1686,
@@ -179629,7 +179830,7 @@ null
 "static":[
 [
 "override",
-1879
+1881
 ]
 ],
 "t":1675,
@@ -179659,7 +179860,7 @@ null
 "static":[
 [
 "override",
-1880
+1882
 ]
 ],
 "t":1676,
@@ -179687,7 +179888,7 @@ null
 "static":[
 [
 "call",
-1907
+1909
 ]
 ],
 "t":1728,
@@ -179715,7 +179916,7 @@ null
 "static":[
 [
 "call",
-1908
+1910
 ]
 ],
 "t":1736,
@@ -179748,7 +179949,7 @@ null
 "static":[
 [
 "call",
-1911
+1913
 ]
 ],
 "t":1765,
@@ -179822,7 +180023,7 @@ null
 "static":[
 [
 "call",
-1914
+1916
 ]
 ],
 "t":1752,
@@ -179873,7 +180074,7 @@ null
 "static":[
 [
 "call",
-1915
+1917
 ]
 ],
 "t":1760,
@@ -179901,7 +180102,7 @@ null
 "static":[
 [
 "call",
-1918
+1920
 ]
 ],
 "t":1735,
@@ -179929,7 +180130,7 @@ null
 "static":[
 [
 "self",
-1919
+1921
 ]
 ],
 "t":1743,
@@ -179957,7 +180158,7 @@ null
 "static":[
 [
 "self",
-1920
+1922
 ]
 ],
 "t":1741,
@@ -180082,7 +180283,7 @@ null
 "static":[
 [
 "call",
-1928
+1930
 ]
 ],
 "t":1765,
@@ -180324,7 +180525,7 @@ null
 "static":[
 [
 "call",
-1957
+1959
 ]
 ],
 "t":1769,
@@ -180375,7 +180576,7 @@ null
 "static":[
 [
 "call",
-1959
+1961
 ]
 ],
 "t":1792,
@@ -180403,7 +180604,7 @@ null
 "static":[
 [
 "call",
-1960
+1962
 ]
 ],
 "t":1793,
@@ -180431,7 +180632,7 @@ null
 "static":[
 [
 "call",
-1961
+1963
 ]
 ],
 "t":1795,
@@ -180460,7 +180661,7 @@ null
 "static":[
 [
 "call",
-1965
+1967
 ]
 ],
 "t":1793,
@@ -180536,7 +180737,7 @@ null
 "static":[
 [
 "call",
-1972
+1974
 ]
 ],
 "t":1800,
@@ -180566,7 +180767,7 @@ null
 "static":[
 [
 "call",
-1974
+1976
 ]
 ],
 "t":1801,
@@ -180594,7 +180795,7 @@ null
 "static":[
 [
 "call",
-2024
+2026
 ]
 ],
 "t":1877,
@@ -180645,7 +180846,7 @@ null
 "static":[
 [
 "call",
-2026
+2028
 ]
 ],
 "t":1878,
@@ -180673,7 +180874,7 @@ null
 "static":[
 [
 "call",
-2027
+2029
 ]
 ],
 "t":1881,
@@ -180701,7 +180902,7 @@ null
 "static":[
 [
 "call",
-2028
+2030
 ]
 ],
 "t":1881,
@@ -180733,7 +180934,7 @@ null
 "static":[
 [
 "call",
-2029
+2031
 ]
 ],
 "t":1880,
@@ -180830,7 +181031,7 @@ null
 "static":[
 [
 "call",
-2030
+2032
 ]
 ],
 "t":1883,
@@ -180899,7 +181100,7 @@ null
 "rt":"tropoi.temporal.tendencies.shallow_water.ShallowWaterModel.tendency",
 "s":1888,
 "static":[],
-"t":2061,
+"t":2062,
 "wall_ns_inclusive":727226600
 },
 {
@@ -180948,7 +181149,7 @@ null
 "static":[
 [
 "call",
-2041
+2043
 ]
 ],
 "t":1590,
@@ -180977,7 +181178,7 @@ null
 "static":[
 [
 "call",
-2042
+2044
 ]
 ],
 "t":1645,
@@ -181029,7 +181230,7 @@ null
 "static":[
 [
 "call",
-2044
+2046
 ]
 ],
 "t":1590,
@@ -181057,7 +181258,7 @@ null
 "static":[
 [
 "call",
-2045
+2047
 ]
 ],
 "t":1645,
@@ -181108,7 +181309,7 @@ null
 "static":[
 [
 "instantiate+constructor",
-2046
+2048
 ]
 ],
 "t":1777,
@@ -181136,10 +181337,10 @@ null
 "static":[
 [
 "instantiate+constructor",
-2050
+2052
 ]
 ],
-"t":2052,
+"t":2053,
 "wall_ns_inclusive":3489100
 },
 {
@@ -181184,7 +181385,7 @@ null
 },
 "rs":"tropoi.temporal.tendencies.shallow_water.ShallowWaterModel.__init__",
 "rt":"tropoi.spatial.grids.latlon_grid.GaussLatLonSphericalHarmonics.inv_transform",
-"s":2052,
+"s":2053,
 "static":[],
 "t":1503,
 "wall_ns_inclusive":1164200
@@ -181208,11 +181409,11 @@ null
 },
 "rs":"tropoi.temporal.tendencies.shallow_water.ShallowWaterModel.__init__",
 "rt":"tropoi.spatial.laplacian.laplacian_eigenvalues",
-"s":2052,
+"s":2053,
 "static":[
 [
 "call",
-2173
+2176
 ]
 ],
 "t":1536,
@@ -181237,7 +181438,7 @@ null
 },
 "rs":"tropoi.temporal.tendencies.shallow_water.ShallowWaterModel.__init__",
 "rt":"tropoi.spatial.spherical_backend.SphericalGridBackend.product_space",
-"s":2052,
+"s":2053,
 "static":[],
 "t":1686,
 "wall_ns_inclusive":29800
@@ -181261,7 +181462,7 @@ null
 },
 "rs":"tropoi.temporal.tendencies.shallow_water.ShallowWaterModel.__init__",
 "rt":"tropoi.spatial.terrain.topography.Topography.elevation_on",
-"s":2052,
+"s":2053,
 "static":[],
 "t":1780,
 "wall_ns_inclusive":2030000
@@ -181285,7 +181486,7 @@ null
 },
 "rs":"tropoi.temporal.tendencies.shallow_water.ShallowWaterModel.__init__",
 "rt":"tropoi.spatial.terrain.topography.Topography.is_flat",
-"s":2052,
+"s":2053,
 "static":[],
 "t":1783,
 "wall_ns_inclusive":2600
@@ -181309,7 +181510,7 @@ null
 },
 "rs":"tropoi.temporal.tendencies.shallow_water.ShallowWaterModel.__init__",
 "rt":"tropoi.spatial.terrain.topography.Topography.l_max",
-"s":2052,
+"s":2053,
 "static":[],
 "t":1784,
 "wall_ns_inclusive":3100
@@ -181333,7 +181534,7 @@ null
 },
 "rs":"tropoi.temporal.tendencies.shallow_water.ShallowWaterModel.__init__",
 "rt":"tropoi.spatial.terrain.topography.Topography.surface_geopotential_lm",
-"s":2052,
+"s":2053,
 "static":[],
 "t":1789,
 "wall_ns_inclusive":113800
@@ -181357,11 +181558,11 @@ null
 },
 "rs":"tropoi.temporal.tendencies.shallow_water.ShallowWaterModel.__init__",
 "rt":"tropoi.spatial.truncation.product_truncation_cut",
-"s":2052,
+"s":2053,
 "static":[
 [
 "call",
-2175
+2178
 ]
 ],
 "t":1838,
@@ -181389,7 +181590,7 @@ null
 },
 "rs":"tropoi.temporal.tendencies.shallow_water.ShallowWaterModel._deriv_fields",
 "rt":"tropoi.spatial.grids.latlon_grid.GaussLatLonSphericalHarmonics.inv_transform",
-"s":2053,
+"s":2054,
 "static":[],
 "t":1503,
 "wall_ns_inclusive":291395300
@@ -181412,7 +181613,7 @@ null
 },
 "rs":"tropoi.temporal.tendencies.shallow_water.ShallowWaterModel._deriv_fields",
 "rt":"tropoi.spatial.operators.spectral_operators.SpectralOperators.d_lambda_coeffs",
-"s":2053,
+"s":2054,
 "static":[],
 "t":1576,
 "wall_ns_inclusive":42073700
@@ -181435,7 +181636,7 @@ null
 },
 "rs":"tropoi.temporal.tendencies.shallow_water.ShallowWaterModel._deriv_fields",
 "rt":"tropoi.spatial.operators.spectral_operators.SpectralOperators.sin_theta_d_theta_coeffs",
-"s":2053,
+"s":2054,
 "static":[],
 "t":1579,
 "wall_ns_inclusive":70313000
@@ -181458,11 +181659,11 @@ null
 },
 "rs":"tropoi.temporal.tendencies.shallow_water.ShallowWaterModel._inv_laplacian",
 "rt":"tropoi.spatial.laplacian.invert_laplacian",
-"s":2054,
+"s":2055,
 "static":[
 [
 "call",
-2176
+2179
 ]
 ],
 "t":1535,
@@ -181490,14 +181691,14 @@ null
 },
 "rs":"tropoi.temporal.tendencies.shallow_water.ShallowWaterModel._wind_from",
 "rt":"tropoi.temporal.tendencies.shallow_water.ShallowWaterModel._deriv_fields",
-"s":2056,
+"s":2057,
 "static":[
 [
 "self",
-2177
+2180
 ]
 ],
-"t":2053,
+"t":2054,
 "wall_ns_inclusive":239011000
 },
 {
@@ -181518,7 +181719,7 @@ null
 },
 "rs":"tropoi.temporal.tendencies.shallow_water.ShallowWaterModel.characteristic_fields",
 "rt":"tropoi.spatial.grids.latlon_grid.GaussLatLonSphericalHarmonics.inv_transform",
-"s":2057,
+"s":2058,
 "static":[],
 "t":1503,
 "wall_ns_inclusive":8414800
@@ -181541,14 +181742,14 @@ null
 },
 "rs":"tropoi.temporal.tendencies.shallow_water.ShallowWaterModel.characteristic_fields",
 "rt":"tropoi.temporal.tendencies.shallow_water.ShallowWaterModel.total_geopotential_extrema",
-"s":2057,
+"s":2058,
 "static":[
 [
 "self",
-2178
+2181
 ]
 ],
-"t":2063,
+"t":2064,
 "wall_ns_inclusive":32125100
 },
 {
@@ -181569,14 +181770,14 @@ null
 },
 "rs":"tropoi.temporal.tendencies.shallow_water.ShallowWaterModel.characteristic_fields",
 "rt":"tropoi.temporal.tendencies.shallow_water.ShallowWaterModel.wind_on_state_grid",
-"s":2057,
+"s":2058,
 "static":[
 [
 "self",
-2179
+2182
 ]
 ],
-"t":2065,
+"t":2066,
 "wall_ns_inclusive":67948300
 },
 {
@@ -181601,14 +181802,14 @@ null
 },
 "rs":"tropoi.temporal.tendencies.shallow_water.ShallowWaterModel.helmholtz",
 "rt":"tropoi.temporal.tendencies.shallow_water.ShallowWaterModel._inv_laplacian",
-"s":2058,
+"s":2059,
 "static":[
 [
 "self",
-2180
+2183
 ]
 ],
-"t":2054,
+"t":2055,
 "wall_ns_inclusive":4855800
 },
 {
@@ -181641,7 +181842,7 @@ null
 },
 "rs":"tropoi.temporal.tendencies.shallow_water.ShallowWaterModel.tendency",
 "rt":"tropoi.spatial.grids.latlon_grid.GaussLatLonSphericalHarmonics.inv_transform",
-"s":2061,
+"s":2062,
 "static":[],
 "t":1503,
 "wall_ns_inclusive":119313800
@@ -181676,7 +181877,7 @@ null
 },
 "rs":"tropoi.temporal.tendencies.shallow_water.ShallowWaterModel.tendency",
 "rt":"tropoi.spatial.grids.latlon_grid.GaussLatLonSphericalHarmonics.transform",
-"s":2061,
+"s":2062,
 "static":[],
 "t":1505,
 "wall_ns_inclusive":109449200
@@ -181703,14 +181904,14 @@ null
 },
 "rs":"tropoi.temporal.tendencies.shallow_water.ShallowWaterModel.tendency",
 "rt":"tropoi.temporal.tendencies.shallow_water.ShallowWaterModel._deriv_fields",
-"s":2061,
+"s":2062,
 "static":[
 [
 "self",
-2182
+2185
 ]
 ],
-"t":2053,
+"t":2054,
 "wall_ns_inclusive":191888700
 },
 {
@@ -181735,14 +181936,14 @@ null
 },
 "rs":"tropoi.temporal.tendencies.shallow_water.ShallowWaterModel.tendency",
 "rt":"tropoi.temporal.tendencies.shallow_water.ShallowWaterModel._inv_laplacian",
-"s":2061,
+"s":2062,
 "static":[
 [
 "self",
-2183
+2186
 ]
 ],
-"t":2054,
+"t":2055,
 "wall_ns_inclusive":19730900
 },
 {
@@ -181775,14 +181976,14 @@ null
 },
 "rs":"tropoi.temporal.tendencies.shallow_water.ShallowWaterModel.tendency",
 "rt":"tropoi.temporal.tendencies.shallow_water.ShallowWaterModel._truncate",
-"s":2061,
+"s":2062,
 "static":[
 [
 "self",
-2184
+2187
 ]
 ],
-"t":2055,
+"t":2056,
 "wall_ns_inclusive":22421600
 },
 {
@@ -181803,14 +182004,14 @@ null
 },
 "rs":"tropoi.temporal.tendencies.shallow_water.ShallowWaterModel.tendency",
 "rt":"tropoi.temporal.tendencies.shallow_water.ShallowWaterModel._wind_from",
-"s":2061,
+"s":2062,
 "static":[
 [
 "self",
-2185
+2188
 ]
 ],
-"t":2056,
+"t":2057,
 "wall_ns_inclusive":200825400
 },
 {
@@ -181832,7 +182033,7 @@ null
 },
 "rs":"tropoi.temporal.tendencies.shallow_water.ShallowWaterModel.total_geopotential_extrema",
 "rt":"tropoi.spatial.grids.latlon_grid.GaussLatLonSphericalHarmonics.inv_transform",
-"s":2063,
+"s":2064,
 "static":[],
 "t":1503,
 "wall_ns_inclusive":81087100
@@ -181856,14 +182057,14 @@ null
 },
 "rs":"tropoi.temporal.tendencies.shallow_water.ShallowWaterModel.validate_state",
 "rt":"tropoi.temporal.tendencies.shallow_water.ShallowWaterModel.total_geopotential_extrema",
-"s":2064,
+"s":2065,
 "static":[
 [
 "self",
-2189
+2192
 ]
 ],
-"t":2063,
+"t":2064,
 "wall_ns_inclusive":131285200
 },
 {
@@ -181884,14 +182085,14 @@ null
 },
 "rs":"tropoi.temporal.tendencies.shallow_water.ShallowWaterModel.wind_on_state_grid",
 "rt":"tropoi.temporal.tendencies.shallow_water.ShallowWaterModel._wind_from",
-"s":2065,
+"s":2066,
 "static":[
 [
 "self",
-2190
+2193
 ]
 ],
-"t":2056,
+"t":2057,
 "wall_ns_inclusive":44593500
 },
 {
@@ -181912,14 +182113,14 @@ null
 },
 "rs":"tropoi.temporal.tendencies.shallow_water.ShallowWaterModel.wind_on_state_grid",
 "rt":"tropoi.temporal.tendencies.shallow_water.ShallowWaterModel.helmholtz",
-"s":2065,
+"s":2066,
 "static":[
 [
 "self",
-2191
+2194
 ]
 ],
-"t":2058,
+"t":2059,
 "wall_ns_inclusive":5567000
 }
 ],
@@ -201598,7 +201799,7 @@ null
 "rt":"tropoi.temporal.tendencies.primitive_equations.PrimitiveEquationsModel.temperature_on_state_grid",
 "s":1289,
 "static":[],
-"t":2044,
+"t":2045,
 "wall_ns_inclusive":68591300
 },
 {
@@ -201622,7 +201823,7 @@ null
 "rt":"tropoi.temporal.tendencies.primitive_equations.PrimitiveEquationsModel.wind_on_state_grid",
 "s":1289,
 "static":[],
-"t":2049,
+"t":2050,
 "wall_ns_inclusive":398760700
 },
 {
@@ -202391,7 +202592,7 @@ null
 "rt":"tropoi.temporal.tendencies.primitive_equations.PrimitiveEquationsModel.validate_state",
 "s":1388,
 "static":[],
-"t":2047,
+"t":2048,
 "wall_ns_inclusive":362939400
 },
 {
@@ -203452,7 +203653,7 @@ null
 "rt":"tropoi.temporal.tendencies.primitive_equations.PrimitiveEquationsModel.validate_state",
 "s":1397,
 "static":[],
-"t":2047,
+"t":2048,
 "wall_ns_inclusive":175102000
 },
 {
@@ -203583,7 +203784,7 @@ null
 1620
 ]
 ],
-"t":2024,
+"t":2025,
 "wall_ns_inclusive":383500
 },
 {
@@ -203931,7 +204132,7 @@ null
 1643
 ]
 ],
-"t":2028,
+"t":2029,
 "wall_ns_inclusive":1902300
 },
 {
@@ -204386,7 +204587,7 @@ null
 "static":[
 [
 "instantiate+constructor",
-1660
+1661
 ]
 ],
 "t":1898,
@@ -204415,7 +204616,7 @@ null
 "static":[
 [
 "call",
-1661
+1662
 ]
 ],
 "t":1917,
@@ -204444,10 +204645,10 @@ null
 "static":[
 [
 "call",
-1662
+1664
 ]
 ],
-"t":2021,
+"t":2022,
 "wall_ns_inclusive":368900
 },
 {
@@ -204472,7 +204673,7 @@ null
 "static":[
 [
 "call",
-1663
+1665
 ]
 ],
 "t":1410,
@@ -204500,7 +204701,7 @@ null
 "static":[
 [
 "call",
-1665
+1667
 ]
 ],
 "t":1536,
@@ -204551,7 +204752,7 @@ null
 "static":[
 [
 "call",
-1666
+1668
 ]
 ],
 "t":1703,
@@ -204580,7 +204781,7 @@ null
 "static":[
 [
 "self",
-1707
+1709
 ]
 ],
 "t":1438,
@@ -204705,7 +204906,7 @@ null
 "static":[
 [
 "instantiate+constructor",
-1719
+1721
 ]
 ],
 "t":1804,
@@ -204818,7 +205019,7 @@ null
 "static":[
 [
 "call",
-1762
+1764
 ]
 ],
 "t":1536,
@@ -204847,7 +205048,7 @@ null
 "static":[
 [
 "self",
-1763
+1765
 ]
 ],
 "t":1572,
@@ -204924,7 +205125,7 @@ null
 "static":[
 [
 "instantiate+constructor",
-1766
+1768
 ]
 ],
 "t":1804,
@@ -204955,7 +205156,7 @@ null
 "static":[
 [
 "self",
-1778
+1780
 ]
 ],
 "t":1574,
@@ -204990,7 +205191,7 @@ null
 "static":[
 [
 "self",
-1779
+1781
 ]
 ],
 "t":1576,
@@ -205107,7 +205308,7 @@ null
 "static":[
 [
 "instantiate+constructor",
-1784
+1786
 ]
 ],
 "t":1491,
@@ -205136,7 +205337,7 @@ null
 "static":[
 [
 "instantiate+constructor",
-1785
+1787
 ]
 ],
 "t":1502,
@@ -205189,7 +205390,7 @@ null
 "static":[
 [
 "instantiate+constructor",
-1786
+1788
 ]
 ],
 "t":1571,
@@ -205242,7 +205443,7 @@ null
 "static":[
 [
 "self",
-1787
+1789
 ]
 ],
 "t":1588,
@@ -205271,7 +205472,7 @@ null
 "static":[
 [
 "self",
-1788
+1790
 ]
 ],
 "t":1589,
@@ -205300,7 +205501,7 @@ null
 "static":[
 [
 "instantiate+constructor",
-1790
+1792
 ]
 ],
 "t":1674,
@@ -205401,7 +205602,7 @@ null
 "static":[
 [
 "call",
-1794
+1796
 ]
 ],
 "t":1774,
@@ -205780,7 +205981,7 @@ null
 "static":[
 [
 "call",
-1800
+1802
 ]
 ],
 "t":1609,
@@ -205811,7 +206012,7 @@ null
 "static":[
 [
 "call",
-1803
+1805
 ]
 ],
 "t":1610,
@@ -205920,7 +206121,7 @@ null
 "static":[
 [
 "call",
-1808
+1810
 ]
 ],
 "t":1609,
@@ -205989,7 +206190,7 @@ null
 "static":[
 [
 "call",
-1810
+1812
 ]
 ],
 "t":1610,
@@ -206050,7 +206251,7 @@ null
 "static":[
 [
 "call",
-1814
+1816
 ]
 ],
 "t":1609,
@@ -206083,7 +206284,7 @@ null
 "static":[
 [
 "call",
-1815
+1817
 ]
 ],
 "t":1610,
@@ -206140,7 +206341,7 @@ null
 "static":[
 [
 "call",
-1816
+1818
 ]
 ],
 "t":1608,
@@ -206171,7 +206372,7 @@ null
 "static":[
 [
 "call",
-1817
+1819
 ]
 ],
 "t":1609,
@@ -206200,7 +206401,7 @@ null
 "static":[
 [
 "super",
-1867
+1869
 ]
 ],
 "t":1682,
@@ -206229,7 +206430,7 @@ null
 "static":[
 [
 "instantiate+constructor",
-1868
+1870
 ]
 ],
 "t":1491,
@@ -206258,7 +206459,7 @@ null
 "static":[
 [
 "instantiate+constructor",
-1869
+1871
 ]
 ],
 "t":1502,
@@ -206311,7 +206512,7 @@ null
 "static":[
 [
 "override",
-1879
+1881
 ]
 ],
 "t":1675,
@@ -206340,7 +206541,7 @@ null
 "static":[
 [
 "override",
-1880
+1882
 ]
 ],
 "t":1676,
@@ -206567,7 +206768,7 @@ null
 "static":[
 [
 "call",
-1889
+1891
 ]
 ],
 "t":1700,
@@ -206622,7 +206823,7 @@ null
 "static":[
 [
 "call",
-1972
+1974
 ]
 ],
 "t":1800,
@@ -206653,7 +206854,7 @@ null
 "static":[
 [
 "call",
-1974
+1976
 ]
 ],
 "t":1801,
@@ -206892,7 +207093,7 @@ null
 "static":[
 [
 "self",
-2002
+2004
 ]
 ],
 "t":1848,
@@ -206923,7 +207124,7 @@ null
 "static":[
 [
 "self",
-2003
+2005
 ]
 ],
 "t":1850,
@@ -206954,7 +207155,7 @@ null
 "static":[
 [
 "call",
-2004
+2006
 ]
 ],
 "t":1854,
@@ -207059,7 +207260,7 @@ null
 "static":[
 [
 "call",
-2005
+2007
 ]
 ],
 "t":1855,
@@ -207088,7 +207289,7 @@ null
 "static":[
 [
 "call",
-2006
+2008
 ]
 ],
 "t":1857,
@@ -207121,7 +207322,7 @@ null
 "rt":"tropoi.temporal.tendencies.primitive_equations.PrimitiveEquationsModel._inv_laplacian",
 "s":1848,
 "static":[],
-"t":2030,
+"t":2031,
 "wall_ns_inclusive":36182300
 },
 {
@@ -207147,7 +207348,7 @@ null
 "rt":"tropoi.temporal.tendencies.primitive_equations.PrimitiveEquationsModel._wind_from",
 "s":1848,
 "static":[],
-"t":2037,
+"t":2038,
 "wall_ns_inclusive":354190000
 },
 {
@@ -207201,7 +207402,7 @@ null
 "static":[
 [
 "call",
-2007
+2009
 ]
 ],
 "t":1856,
@@ -207356,7 +207557,7 @@ null
 "static":[
 [
 "call",
-2009
+2011
 ]
 ],
 "t":1857,
@@ -207489,7 +207690,7 @@ null
 "static":[
 [
 "call",
-2012
+2014
 ]
 ],
 "t":1855,
@@ -207518,7 +207719,7 @@ null
 "static":[
 [
 "call",
-2013
+2015
 ]
 ],
 "t":1856,
@@ -207547,7 +207748,7 @@ null
 "static":[
 [
 "call",
-2014
+2016
 ]
 ],
 "t":1857,
@@ -207574,7 +207775,7 @@ null
 "rt":"tropoi.temporal.tendencies.primitive_equations.PrimitiveEquationsModel.wind_on_state_grid",
 "s":1858,
 "static":[],
-"t":2049,
+"t":2050,
 "wall_ns_inclusive":378073800
 },
 {
@@ -207602,7 +207803,7 @@ null
 "static":[
 [
 "self",
-2020
+2022
 ]
 ],
 "t":1862,
@@ -207633,7 +207834,7 @@ null
 "static":[
 [
 "self",
-2021
+2023
 ]
 ],
 "t":1863,
@@ -207664,7 +207865,7 @@ null
 "static":[
 [
 "call",
-2022
+2024
 ]
 ],
 "t":1869,
@@ -207736,7 +207937,7 @@ null
 "rt":"tropoi.temporal.tendencies.primitive_equations.PrimitiveEquationsModel.tendency",
 "s":1870,
 "static":[],
-"t":2045,
+"t":2046,
 "wall_ns_inclusive":658600200
 },
 {
@@ -207903,7 +208104,7 @@ null
 "static":[
 [
 "call",
-2052
+2054
 ]
 ],
 "t":1870,
@@ -207932,7 +208133,7 @@ null
 "static":[
 [
 "self",
-2053
+2055
 ]
 ],
 "t":1901,
@@ -207961,7 +208162,7 @@ null
 "static":[
 [
 "instantiate+constructor",
-2054
+2056
 ]
 ],
 "t":1922,
@@ -208018,7 +208219,7 @@ null
 "static":[
 [
 "call",
-2055
+2057
 ]
 ],
 "t":1871,
@@ -208146,7 +208347,7 @@ null
 "rt":"tropoi.temporal.tendencies.primitive_equations.PrimitiveEquationsModel.tendency",
 "s":1900,
 "static":[],
-"t":2045,
+"t":2046,
 "wall_ns_inclusive":11446297000
 },
 {
@@ -208248,7 +208449,7 @@ null
 "static":[
 [
 "call",
-2057
+2059
 ]
 ],
 "t":1933,
@@ -208277,7 +208478,7 @@ null
 "static":[
 [
 "call",
-2056
+2058
 ]
 ],
 "t":1932,
@@ -208328,7 +208529,7 @@ null
 "static":[
 [
 "call",
-2058
+2060
 ]
 ],
 "t":1888,
@@ -208379,7 +208580,7 @@ null
 "static":[
 [
 "self",
-2059
+2061
 ]
 ],
 "t":1899,
@@ -208432,7 +208633,7 @@ null
 "static":[
 [
 "self",
-2060
+2062
 ]
 ],
 "t":1899,
@@ -208487,7 +208688,7 @@ null
 "static":[
 [
 "self",
-2061
+2063
 ]
 ],
 "t":1900,
@@ -208515,7 +208716,7 @@ null
 "static":[
 [
 "self",
-2062
+2064
 ]
 ],
 "t":1902,
@@ -208544,7 +208745,7 @@ null
 "static":[
 [
 "call",
-2064
+2066
 ]
 ],
 "t":1536,
@@ -208621,7 +208822,7 @@ null
 "static":[
 [
 "call",
-2065
+2067
 ]
 ],
 "t":1615,
@@ -208650,7 +208851,7 @@ null
 "static":[
 [
 "call",
-2066
+2068
 ]
 ],
 "t":1619,
@@ -208679,7 +208880,7 @@ null
 "static":[
 [
 "self",
-2068
+2070
 ]
 ],
 "t":1918,
@@ -208709,7 +208910,7 @@ null
 "static":[
 [
 "self",
-2069
+2071
 ]
 ],
 "t":1913,
@@ -208739,7 +208940,7 @@ null
 "static":[
 [
 "call",
-2070
+2072
 ]
 ],
 "t":1931,
@@ -208768,7 +208969,7 @@ null
 "static":[
 [
 "self",
-2071
+2073
 ]
 ],
 "t":1918,
@@ -208845,7 +209046,7 @@ null
 "static":[
 [
 "self",
-2072
+2074
 ]
 ],
 "t":1916,
@@ -208875,7 +209076,7 @@ null
 "static":[
 [
 "self",
-2074
+2076
 ]
 ],
 "t":1924,
@@ -208930,7 +209131,7 @@ null
 "static":[
 [
 "self",
-2075
+2077
 ]
 ],
 "t":1923,
@@ -208960,7 +209161,7 @@ null
 "static":[
 [
 "self",
-2076
+2078
 ]
 ],
 "t":1925,
@@ -208990,7 +209191,7 @@ null
 "static":[
 [
 "call",
-2077
+2079
 ]
 ],
 "t":1931,
@@ -209131,7 +209332,7 @@ null
 "rt":"tropoi.temporal.tendencies.primitive_equations.PrimitiveEquationsModel._inv_laplacian",
 "s":2004,
 "static":[],
-"t":2030,
+"t":2031,
 "wall_ns_inclusive":33039800
 },
 {
@@ -209161,7 +209362,7 @@ null
 "rt":"tropoi.temporal.tendencies.primitive_equations.PrimitiveEquationsModel._stack_derivs",
 "s":2004,
 "static":[],
-"t":2032,
+"t":2033,
 "wall_ns_inclusive":5076856700
 },
 {
@@ -209185,7 +209386,7 @@ null
 "rt":"tropoi.temporal.tendencies.held_suarez.HeldSuarezParameters.__post_init__",
 "s":"tropoi.temporal.tendencies.held_suarez.__create_fn__.\u003clocals\u003e.__init__",
 "static":[],
-"t":2010,
+"t":2011,
 "wall_ns_inclusive":218800
 },
 {
@@ -209207,11 +209408,11 @@ null
 },
 "rs":"tropoi.temporal.tendencies.held_suarez.hyperdiffusion_coefficient",
 "rt":"tropoi.spatial.laplacian.laplacian_eigenvalues",
-"s":2020,
+"s":2021,
 "static":[
 [
 "call",
-2103
+2106
 ]
 ],
 "t":1536,
@@ -209236,11 +209437,11 @@ null
 },
 "rs":"tropoi.temporal.tendencies.held_suarez.hyperdiffusion_damping",
 "rt":"tropoi.spatial.laplacian.laplacian_eigenvalues",
-"s":2021,
+"s":2022,
 "static":[
 [
 "call",
-2104
+2107
 ]
 ],
 "t":1536,
@@ -209265,11 +209466,11 @@ null
 },
 "rs":"tropoi.temporal.tendencies.held_suarez.hyperdiffusion_damping",
 "rt":"tropoi.temporal.hooks.DiagonalDamping.__init__",
-"s":2021,
+"s":2022,
 "static":[
 [
 "instantiate+constructor",
-2105
+2108
 ]
 ],
 "t":1861,
@@ -209294,14 +209495,14 @@ null
 },
 "rs":"tropoi.temporal.tendencies.held_suarez.hyperdiffusion_damping",
 "rt":"tropoi.temporal.tendencies.held_suarez.hyperdiffusion_coefficient",
-"s":2021,
+"s":2022,
 "static":[
 [
 "call",
-2106
+2109
 ]
 ],
-"t":2020,
+"t":2021,
 "wall_ns_inclusive":65400
 },
 {
@@ -209323,11 +209524,11 @@ null
 },
 "rs":"tropoi.temporal.tendencies.held_suarez.rayleigh_drag_damping",
 "rt":"tropoi.temporal.hooks.DiagonalDamping.__init__",
-"s":2024,
+"s":2025,
 "static":[
 [
 "instantiate+constructor",
-2112
+2115
 ]
 ],
 "t":1861,
@@ -209352,14 +209553,14 @@ null
 },
 "rs":"tropoi.temporal.tendencies.held_suarez.rayleigh_drag_damping",
 "rt":"tropoi.temporal.tendencies.held_suarez.rayleigh_rate",
-"s":2024,
+"s":2025,
 "static":[
 [
 "call",
-2113
+2116
 ]
 ],
-"t":2025,
+"t":2026,
 "wall_ns_inclusive":118400
 },
 {
@@ -209381,14 +209582,14 @@ null
 },
 "rs":"tropoi.temporal.tendencies.held_suarez.rayleigh_rate",
 "rt":"tropoi.temporal.tendencies.held_suarez._sigma_ramp",
-"s":2025,
+"s":2026,
 "static":[
 [
 "call",
-2114
+2117
 ]
 ],
-"t":2017,
+"t":2018,
 "wall_ns_inclusive":39400
 },
 {
@@ -209410,14 +209611,14 @@ null
 },
 "rs":"tropoi.temporal.tendencies.held_suarez.rayleigh_rate",
 "rt":"tropoi.temporal.tendencies.held_suarez._xp",
-"s":2025,
+"s":2026,
 "static":[
 [
 "call",
-2115
+2118
 ]
 ],
-"t":2018,
+"t":2019,
 "wall_ns_inclusive":10900
 },
 {
@@ -209439,11 +209640,11 @@ null
 },
 "rs":"tropoi.temporal.tendencies.primitive_equations.PrimitiveEquationsModel.__init__",
 "rt":"tropoi.spatial.laplacian.laplacian_eigenvalues",
-"s":2028,
+"s":2029,
 "static":[
 [
 "call",
-2117
+2120
 ]
 ],
 "t":1536,
@@ -209468,7 +209669,7 @@ null
 },
 "rs":"tropoi.temporal.tendencies.primitive_equations.PrimitiveEquationsModel.__init__",
 "rt":"tropoi.spatial.sigma_coordinate.SigmaGrid.nlev",
-"s":2028,
+"s":2029,
 "static":[],
 "t":1602,
 "wall_ns_inclusive":12700
@@ -209492,7 +209693,7 @@ null
 },
 "rs":"tropoi.temporal.tendencies.primitive_equations.PrimitiveEquationsModel.__init__",
 "rt":"tropoi.spatial.spherical_backend.SphericalGridBackend.product_space",
-"s":2028,
+"s":2029,
 "static":[],
 "t":1686,
 "wall_ns_inclusive":57900
@@ -209524,7 +209725,7 @@ null
 },
 "rs":"tropoi.temporal.tendencies.primitive_equations.PrimitiveEquationsModel._deriv_fields",
 "rt":"tropoi.spatial.grids.latlon_grid.GaussLatLonSphericalHarmonics.inv_transform",
-"s":2029,
+"s":2030,
 "static":[],
 "t":1503,
 "wall_ns_inclusive":695087100
@@ -209552,7 +209753,7 @@ null
 },
 "rs":"tropoi.temporal.tendencies.primitive_equations.PrimitiveEquationsModel._deriv_fields",
 "rt":"tropoi.spatial.operators.spectral_operators.SpectralOperators.d_lambda_coeffs",
-"s":2029,
+"s":2030,
 "static":[],
 "t":1576,
 "wall_ns_inclusive":63520100
@@ -209580,7 +209781,7 @@ null
 },
 "rs":"tropoi.temporal.tendencies.primitive_equations.PrimitiveEquationsModel._deriv_fields",
 "rt":"tropoi.spatial.operators.spectral_operators.SpectralOperators.sin_theta_d_theta_coeffs",
-"s":2029,
+"s":2030,
 "static":[],
 "t":1579,
 "wall_ns_inclusive":167212700
@@ -209608,11 +209809,11 @@ null
 },
 "rs":"tropoi.temporal.tendencies.primitive_equations.PrimitiveEquationsModel._inv_laplacian",
 "rt":"tropoi.spatial.laplacian.invert_laplacian",
-"s":2030,
+"s":2031,
 "static":[
 [
 "call",
-2119
+2122
 ]
 ],
 "t":1535,
@@ -209639,7 +209840,7 @@ null
 },
 "rs":"tropoi.temporal.tendencies.primitive_equations.PrimitiveEquationsModel._stack_derivs",
 "rt":"tropoi.spatial.operators.spectral_operators.SpectralOperators.d_lambda_coeffs",
-"s":2032,
+"s":2033,
 "static":[],
 "t":1576,
 "wall_ns_inclusive":2185180300
@@ -209665,7 +209866,7 @@ null
 },
 "rs":"tropoi.temporal.tendencies.primitive_equations.PrimitiveEquationsModel._stack_derivs",
 "rt":"tropoi.spatial.operators.spectral_operators.SpectralOperators.sin_theta_d_theta_coeffs",
-"s":2032,
+"s":2033,
 "static":[],
 "t":1579,
 "wall_ns_inclusive":5738023900
@@ -209691,7 +209892,7 @@ null
 },
 "rs":"tropoi.temporal.tendencies.primitive_equations.PrimitiveEquationsModel._tendency_batched",
 "rt":"tropoi.spatial.grids.latlon_grid.GaussLatLonSphericalHarmonics.inv_transform_batch",
-"s":2033,
+"s":2034,
 "static":[],
 "t":1504,
 "wall_ns_inclusive":76512100
@@ -209717,7 +209918,7 @@ null
 },
 "rs":"tropoi.temporal.tendencies.primitive_equations.PrimitiveEquationsModel._tendency_batched",
 "rt":"tropoi.spatial.grids.latlon_grid.GaussLatLonSphericalHarmonics.transform_batch",
-"s":2033,
+"s":2034,
 "static":[],
 "t":1506,
 "wall_ns_inclusive":53534200
@@ -209743,7 +209944,7 @@ null
 },
 "rs":"tropoi.temporal.tendencies.primitive_equations.PrimitiveEquationsModel._tendency_batched",
 "rt":"tropoi.spatial.operators.spectral_operators.SpectralOperators.d_lambda_coeffs",
-"s":2033,
+"s":2034,
 "static":[],
 "t":1576,
 "wall_ns_inclusive":11228800
@@ -209769,7 +209970,7 @@ null
 },
 "rs":"tropoi.temporal.tendencies.primitive_equations.PrimitiveEquationsModel._tendency_batched",
 "rt":"tropoi.spatial.operators.spectral_operators.SpectralOperators.sin_theta_d_theta_coeffs",
-"s":2033,
+"s":2034,
 "static":[],
 "t":1579,
 "wall_ns_inclusive":34597700
@@ -209795,7 +209996,7 @@ null
 },
 "rs":"tropoi.temporal.tendencies.primitive_equations.PrimitiveEquationsModel._tendency_batched",
 "rt":"tropoi.spatial.operators.spectral_operators.SpectralOperators.vector_curl_div_spectral_batch",
-"s":2033,
+"s":2034,
 "static":[],
 "t":1582,
 "wall_ns_inclusive":2275402200
@@ -209821,11 +210022,11 @@ null
 },
 "rs":"tropoi.temporal.tendencies.primitive_equations.PrimitiveEquationsModel._tendency_batched",
 "rt":"tropoi.spatial.sigma_coordinate.column_mass_tendency",
-"s":2033,
+"s":2034,
 "static":[
 [
 "call",
-2123
+2126
 ]
 ],
 "t":1612,
@@ -209852,11 +210053,11 @@ null
 },
 "rs":"tropoi.temporal.tendencies.primitive_equations.PrimitiveEquationsModel._tendency_batched",
 "rt":"tropoi.spatial.sigma_coordinate.hydrostatic_geopotential",
-"s":2033,
+"s":2034,
 "static":[
 [
 "call",
-2124
+2127
 ]
 ],
 "t":1615,
@@ -209883,11 +210084,11 @@ null
 },
 "rs":"tropoi.temporal.tendencies.primitive_equations.PrimitiveEquationsModel._tendency_batched",
 "rt":"tropoi.spatial.sigma_coordinate.interface_sigma_dot",
-"s":2033,
+"s":2034,
 "static":[
 [
 "call",
-2125
+2128
 ]
 ],
 "t":1617,
@@ -209914,11 +210115,11 @@ null
 },
 "rs":"tropoi.temporal.tendencies.primitive_equations.PrimitiveEquationsModel._tendency_batched",
 "rt":"tropoi.spatial.sigma_coordinate.omega_over_p",
-"s":2033,
+"s":2034,
 "static":[
 [
 "call",
-2126
+2129
 ]
 ],
 "t":1619,
@@ -209953,11 +210154,11 @@ null
 },
 "rs":"tropoi.temporal.tendencies.primitive_equations.PrimitiveEquationsModel._tendency_batched",
 "rt":"tropoi.spatial.sigma_coordinate.vertical_advection",
-"s":2033,
+"s":2034,
 "static":[
 [
 "call",
-2127
+2130
 ]
 ],
 "t":1620,
@@ -209988,14 +210189,14 @@ null
 },
 "rs":"tropoi.temporal.tendencies.primitive_equations.PrimitiveEquationsModel._tendency_batched",
 "rt":"tropoi.temporal.tendencies.primitive_equations.PrimitiveEquationsModel._inv_laplacian",
-"s":2033,
+"s":2034,
 "static":[
 [
 "self",
-2128
+2131
 ]
 ],
-"t":2030,
+"t":2031,
 "wall_ns_inclusive":33727000
 },
 {
@@ -210031,14 +210232,14 @@ null
 },
 "rs":"tropoi.temporal.tendencies.primitive_equations.PrimitiveEquationsModel._tendency_batched",
 "rt":"tropoi.temporal.tendencies.primitive_equations.PrimitiveEquationsModel._stack_derivs",
-"s":2033,
+"s":2034,
 "static":[
 [
 "self",
-2129
+2132
 ]
 ],
-"t":2032,
+"t":2033,
 "wall_ns_inclusive":5049684500
 },
 {
@@ -210074,9 +210275,9 @@ null
 },
 "rs":"tropoi.temporal.tendencies.primitive_equations.PrimitiveEquationsModel._tendency_batched",
 "rt":"tropoi.temporal.tendencies.primitive_equations.PrimitiveEquationsModel._tendency_batched.\u003clocals\u003e.\u003clambda\u003e",
-"s":2033,
+"s":2034,
 "static":[],
-"t":2033,
+"t":2034,
 "wall_ns_inclusive":13356000
 },
 {
@@ -210112,9 +210313,9 @@ null
 },
 "rs":"tropoi.temporal.tendencies.primitive_equations.PrimitiveEquationsModel._tendency_batched",
 "rt":"tropoi.temporal.tendencies.primitive_equations.PrimitiveEquationsModel._tendency_batched.\u003clocals\u003e.trunc",
-"s":2033,
+"s":2034,
 "static":[],
-"t":2033,
+"t":2034,
 "wall_ns_inclusive":40717800
 },
 {
@@ -210144,14 +210345,14 @@ null
 },
 "rs":"tropoi.temporal.tendencies.primitive_equations.PrimitiveEquationsModel._wind_from",
 "rt":"tropoi.temporal.tendencies.primitive_equations.PrimitiveEquationsModel._deriv_fields",
-"s":2037,
+"s":2038,
 "static":[
 [
 "self",
-2140
+2143
 ]
 ],
-"t":2029,
+"t":2030,
 "wall_ns_inclusive":991326700
 },
 {
@@ -210173,7 +210374,7 @@ null
 },
 "rs":"tropoi.temporal.tendencies.primitive_equations.PrimitiveEquationsModel.surface_pressure_on_state_grid",
 "rt":"tropoi.spatial.grids.latlon_grid.GaussLatLonSphericalHarmonics.inv_transform",
-"s":2042,
+"s":2043,
 "static":[],
 "t":1503,
 "wall_ns_inclusive":3818000
@@ -210197,7 +210398,7 @@ null
 },
 "rs":"tropoi.temporal.tendencies.primitive_equations.PrimitiveEquationsModel.surface_pressure_on_state_grid",
 "rt":"tropoi.spatial.states.primitive_equations.PrimitiveEquationsState.ln_ps",
-"s":2042,
+"s":2043,
 "static":[],
 "t":1697,
 "wall_ns_inclusive":327000
@@ -210221,7 +210422,7 @@ null
 },
 "rs":"tropoi.temporal.tendencies.primitive_equations.PrimitiveEquationsModel.temperature_extrema",
 "rt":"tropoi.spatial.grids.latlon_grid.GaussLatLonSphericalHarmonics.inv_transform",
-"s":2043,
+"s":2044,
 "static":[],
 "t":1503,
 "wall_ns_inclusive":170917200
@@ -210245,7 +210446,7 @@ null
 },
 "rs":"tropoi.temporal.tendencies.primitive_equations.PrimitiveEquationsModel.temperature_extrema",
 "rt":"tropoi.spatial.states.primitive_equations.PrimitiveEquationsState.temperature",
-"s":2043,
+"s":2044,
 "static":[],
 "t":1699,
 "wall_ns_inclusive":13149000
@@ -210269,7 +210470,7 @@ null
 },
 "rs":"tropoi.temporal.tendencies.primitive_equations.PrimitiveEquationsModel.temperature_on_state_grid",
 "rt":"tropoi.spatial.grids.latlon_grid.GaussLatLonSphericalHarmonics.inv_transform",
-"s":2044,
+"s":2045,
 "static":[],
 "t":1503,
 "wall_ns_inclusive":58572900
@@ -210293,7 +210494,7 @@ null
 },
 "rs":"tropoi.temporal.tendencies.primitive_equations.PrimitiveEquationsModel.temperature_on_state_grid",
 "rt":"tropoi.spatial.states.primitive_equations.PrimitiveEquationsState.temperature",
-"s":2044,
+"s":2045,
 "static":[],
 "t":1699,
 "wall_ns_inclusive":3477900
@@ -210319,14 +210520,14 @@ null
 },
 "rs":"tropoi.temporal.tendencies.primitive_equations.PrimitiveEquationsModel.tendency",
 "rt":"tropoi.temporal.tendencies.primitive_equations.PrimitiveEquationsModel._tendency_batched",
-"s":2045,
+"s":2046,
 "static":[
 [
 "self",
-2157
+2160
 ]
 ],
-"t":2033,
+"t":2034,
 "wall_ns_inclusive":12096857400
 },
 {
@@ -210348,7 +210549,7 @@ null
 },
 "rs":"tropoi.temporal.tendencies.primitive_equations.PrimitiveEquationsModel.validate_state",
 "rt":"tropoi.spatial.states.primitive_equations.PrimitiveEquationsState.delta",
-"s":2047,
+"s":2048,
 "static":[],
 "t":1695,
 "wall_ns_inclusive":185800
@@ -210372,7 +210573,7 @@ null
 },
 "rs":"tropoi.temporal.tendencies.primitive_equations.PrimitiveEquationsModel.validate_state",
 "rt":"tropoi.spatial.states.primitive_equations.PrimitiveEquationsState.zeta",
-"s":2047,
+"s":2048,
 "static":[],
 "t":1701,
 "wall_ns_inclusive":232400
@@ -210396,14 +210597,14 @@ null
 },
 "rs":"tropoi.temporal.tendencies.primitive_equations.PrimitiveEquationsModel.validate_state",
 "rt":"tropoi.temporal.tendencies.primitive_equations.PrimitiveEquationsModel.surface_pressure_on_state_grid",
-"s":2047,
+"s":2048,
 "static":[
 [
 "self",
-2163
+2166
 ]
 ],
-"t":2042,
+"t":2043,
 "wall_ns_inclusive":4501300
 },
 {
@@ -210425,14 +210626,14 @@ null
 },
 "rs":"tropoi.temporal.tendencies.primitive_equations.PrimitiveEquationsModel.validate_state",
 "rt":"tropoi.temporal.tendencies.primitive_equations.PrimitiveEquationsModel.temperature_extrema",
-"s":2047,
+"s":2048,
 "static":[
 [
 "self",
-2164
+2167
 ]
 ],
-"t":2043,
+"t":2044,
 "wall_ns_inclusive":368229300
 },
 {
@@ -210454,7 +210655,7 @@ null
 },
 "rs":"tropoi.temporal.tendencies.primitive_equations.PrimitiveEquationsModel.wind_on_state_grid",
 "rt":"tropoi.spatial.states.primitive_equations.PrimitiveEquationsState.delta",
-"s":2049,
+"s":2050,
 "static":[],
 "t":1695,
 "wall_ns_inclusive":5387800
@@ -210478,7 +210679,7 @@ null
 },
 "rs":"tropoi.temporal.tendencies.primitive_equations.PrimitiveEquationsModel.wind_on_state_grid",
 "rt":"tropoi.spatial.states.primitive_equations.PrimitiveEquationsState.zeta",
-"s":2049,
+"s":2050,
 "static":[],
 "t":1701,
 "wall_ns_inclusive":5005700
@@ -210506,14 +210707,14 @@ null
 },
 "rs":"tropoi.temporal.tendencies.primitive_equations.PrimitiveEquationsModel.wind_on_state_grid",
 "rt":"tropoi.temporal.tendencies.primitive_equations.PrimitiveEquationsModel._inv_laplacian",
-"s":2049,
+"s":2050,
 "static":[
 [
 "self",
-2170
+2173
 ]
 ],
-"t":2030,
+"t":2031,
 "wall_ns_inclusive":70146900
 },
 {
@@ -210535,14 +210736,14 @@ null
 },
 "rs":"tropoi.temporal.tendencies.primitive_equations.PrimitiveEquationsModel.wind_on_state_grid",
 "rt":"tropoi.temporal.tendencies.primitive_equations.PrimitiveEquationsModel._wind_from",
-"s":2049,
+"s":2050,
 "static":[
 [
 "self",
-2171
+2174
 ]
 ],
-"t":2037,
+"t":2038,
 "wall_ns_inclusive":668678300
 }
 ],
@@ -225651,7 +225852,7 @@ null
 "static":[
 [
 "call",
-1760
+1762
 ]
 ],
 "t":1567,
@@ -225892,7 +226093,7 @@ null
 "static":[
 [
 "call",
-1975
+1977
 ]
 ],
 "t":1810,
@@ -225925,7 +226126,7 @@ null
 "static":[
 [
 "call",
-1976
+1978
 ]
 ],
 "t":1811,
@@ -225958,7 +226159,7 @@ null
 "static":[
 [
 "call",
-1977
+1979
 ]
 ],
 "t":1812,
@@ -225991,7 +226192,7 @@ null
 "static":[
 [
 "call",
-1978
+1980
 ]
 ],
 "t":1813,
@@ -226111,7 +226312,7 @@ null
 "static":[
 [
 "instantiate+constructor",
-2080
+2082
 ]
 ],
 "t":1952,
@@ -226139,7 +226340,7 @@ null
 "static":[
 [
 "call",
-2081
+2083
 ]
 ],
 "t":1972,
@@ -226397,7 +226598,7 @@ null
 "static":[
 [
 "instantiate+constructor",
-2085
+2087
 ]
 ],
 "t":1561,
@@ -249959,7 +250160,7 @@ null
 "static":[
 [
 "self",
-1707
+1709
 ]
 ],
 "t":1438,
@@ -250219,7 +250420,7 @@ null
 "static":[
 [
 "call",
-1715
+1717
 ]
 ],
 "t":1484,
@@ -250408,7 +250609,7 @@ null
 "static":[
 [
 "instantiate+constructor",
-1719
+1721
 ]
 ],
 "t":1804,
@@ -250652,7 +250853,7 @@ null
 "static":[
 [
 "call",
-1752
+1754
 ]
 ],
 "t":1567,
@@ -250891,7 +251092,7 @@ null
 "static":[
 [
 "call",
-1762
+1764
 ]
 ],
 "t":1536,
@@ -250919,7 +251120,7 @@ null
 "static":[
 [
 "self",
-1763
+1765
 ]
 ],
 "t":1572,
@@ -251158,7 +251359,7 @@ null
 "static":[
 [
 "instantiate+constructor",
-1784
+1786
 ]
 ],
 "t":1491,
@@ -251186,7 +251387,7 @@ null
 "static":[
 [
 "instantiate+constructor",
-1785
+1787
 ]
 ],
 "t":1502,
@@ -251237,7 +251438,7 @@ null
 "static":[
 [
 "instantiate+constructor",
-1786
+1788
 ]
 ],
 "t":1571,
@@ -251288,7 +251489,7 @@ null
 "static":[
 [
 "self",
-1787
+1789
 ]
 ],
 "t":1588,
@@ -251316,7 +251517,7 @@ null
 "static":[
 [
 "self",
-1788
+1790
 ]
 ],
 "t":1589,
@@ -251367,7 +251568,7 @@ null
 "static":[
 [
 "instantiate+constructor",
-1790
+1792
 ]
 ],
 "t":1674,
@@ -251464,7 +251665,7 @@ null
 "static":[
 [
 "call",
-1794
+1796
 ]
 ],
 "t":1774,
@@ -251887,7 +252088,7 @@ null
 "static":[
 [
 "call",
-1808
+1810
 ]
 ],
 "t":1609,
@@ -252136,7 +252337,7 @@ null
 "static":[
 [
 "call",
-1826
+1828
 ]
 ],
 "t":1665,
@@ -252189,7 +252390,7 @@ null
 "static":[
 [
 "call",
-1828
+1830
 ]
 ],
 "t":1662,
@@ -252218,7 +252419,7 @@ null
 "static":[
 [
 "self",
-1829
+1831
 ]
 ],
 "t":1630,
@@ -252255,7 +252456,7 @@ null
 "static":[
 [
 "call",
-1835
+1837
 ]
 ],
 "t":1667,
@@ -252284,7 +252485,7 @@ null
 "static":[
 [
 "self",
-1837
+1839
 ]
 ],
 "t":1650,
@@ -252361,7 +252562,7 @@ null
 "static":[
 [
 "call",
-1842
+1844
 ]
 ],
 "t":1662,
@@ -252390,7 +252591,7 @@ null
 "static":[
 [
 "call",
-1843
+1845
 ]
 ],
 "t":1663,
@@ -252419,7 +252620,7 @@ null
 "static":[
 [
 "self",
-1846
+1848
 ]
 ],
 "t":1641,
@@ -252496,7 +252697,7 @@ null
 "static":[
 [
 "call",
-1853
+1855
 ]
 ],
 "t":1662,
@@ -252597,7 +252798,7 @@ null
 "static":[
 [
 "call",
-1859
+1861
 ]
 ],
 "t":1666,
@@ -252809,7 +253010,7 @@ null
 "static":[
 [
 "super",
-1867
+1869
 ]
 ],
 "t":1682,
@@ -252837,7 +253038,7 @@ null
 "static":[
 [
 "instantiate+constructor",
-1868
+1870
 ]
 ],
 "t":1491,
@@ -252865,7 +253066,7 @@ null
 "static":[
 [
 "instantiate+constructor",
-1869
+1871
 ]
 ],
 "t":1502,
@@ -252916,7 +253117,7 @@ null
 "static":[
 [
 "override",
-1879
+1881
 ]
 ],
 "t":1675,
@@ -252944,7 +253145,7 @@ null
 "static":[
 [
 "override",
-1880
+1882
 ]
 ],
 "t":1676,
@@ -253340,7 +253541,7 @@ null
 "static":[
 [
 "call",
-1972
+1974
 ]
 ],
 "t":1800,
@@ -253414,7 +253615,7 @@ null
 "static":[
 [
 "call",
-1974
+1976
 ]
 ],
 "t":1801,
@@ -253442,7 +253643,7 @@ null
 "static":[
 [
 "call",
-1975
+1977
 ]
 ],
 "t":1810,
@@ -253474,7 +253675,7 @@ null
 "static":[
 [
 "call",
-1976
+1978
 ]
 ],
 "t":1811,
@@ -253506,7 +253707,7 @@ null
 "static":[
 [
 "call",
-1977
+1979
 ]
 ],
 "t":1812,
@@ -253538,7 +253739,7 @@ null
 "static":[
 [
 "call",
-1978
+1980
 ]
 ],
 "t":1813,
@@ -253635,7 +253836,7 @@ null
 "static":[
 [
 "call",
-2033
+2035
 ]
 ],
 "t":1439,
@@ -253686,7 +253887,7 @@ null
 "static":[
 [
 "call",
-2034
+2036
 ]
 ],
 "t":1590,
@@ -253804,7 +254005,7 @@ null
 "rt":"tropoi.temporal.tendencies.primitive_equations.\u003cmodule\u003e",
 "s":1893,
 "static":[],
-"t":2026,
+"t":2027,
 "wall_ns_inclusive":3692100
 },
 {
@@ -253829,10 +254030,10 @@ null
 "static":[
 [
 "instantiate+constructor",
-2039
+2041
 ]
 ],
-"t":2028,
+"t":2029,
 "wall_ns_inclusive":259795300
 },
 {
@@ -253949,7 +254150,7 @@ null
 "static":[
 [
 "instantiate+constructor",
-2080
+2082
 ]
 ],
 "t":1952,
@@ -253977,7 +254178,7 @@ null
 "static":[
 [
 "call",
-2081
+2083
 ]
 ],
 "t":1972,
@@ -254028,7 +254229,7 @@ null
 "static":[
 [
 "call",
-2083
+2085
 ]
 ],
 "t":1973,
@@ -254144,7 +254345,7 @@ null
 },
 "rs":"tropoi.temporal.tendencies.primitive_equations.\u003cmodule\u003e",
 "rt":"tropoi.spatial.states.\u003cmodule\u003e",
-"s":2026,
+"s":2027,
 "static":[],
 "t":1689,
 "wall_ns_inclusive":4700
@@ -254167,7 +254368,7 @@ null
 },
 "rs":"tropoi.temporal.tendencies.primitive_equations.\u003cmodule\u003e",
 "rt":"tropoi.spatial.states.primitive_equations.\u003cmodule\u003e",
-"s":2026,
+"s":2027,
 "static":[],
 "t":1692,
 "wall_ns_inclusive":672000
@@ -254190,9 +254391,9 @@ null
 },
 "rs":"tropoi.temporal.tendencies.primitive_equations.\u003cmodule\u003e",
 "rt":"tropoi.temporal.tendencies.primitive_equations.PrimitiveEquationsModel",
-"s":2026,
+"s":2027,
 "static":[],
-"t":2027,
+"t":2028,
 "wall_ns_inclusive":9100
 },
 {
@@ -254213,11 +254414,11 @@ null
 },
 "rs":"tropoi.temporal.tendencies.primitive_equations.PrimitiveEquationsModel.__init__",
 "rt":"tropoi.spatial.laplacian.laplacian_eigenvalues",
-"s":2028,
+"s":2029,
 "static":[
 [
 "call",
-2117
+2120
 ]
 ],
 "t":1536,
@@ -254241,7 +254442,7 @@ null
 },
 "rs":"tropoi.temporal.tendencies.primitive_equations.PrimitiveEquationsModel.__init__",
 "rt":"tropoi.spatial.sigma_coordinate.SigmaGrid.nlev",
-"s":2028,
+"s":2029,
 "static":[],
 "t":1602,
 "wall_ns_inclusive":2400
@@ -254264,7 +254465,7 @@ null
 },
 "rs":"tropoi.temporal.tendencies.primitive_equations.PrimitiveEquationsModel.__init__",
 "rt":"tropoi.spatial.spherical_backend.SphericalGridBackend.product_space",
-"s":2028,
+"s":2029,
 "static":[],
 "t":1686,
 "wall_ns_inclusive":14100
@@ -254287,11 +254488,11 @@ null
 },
 "rs":"tropoi.temporal.tendencies.primitive_equations.PrimitiveEquationsModel.__init__",
 "rt":"tropoi.spatial.truncation.product_truncation_cut",
-"s":2028,
+"s":2029,
 "static":[
 [
 "call",
-2118
+2121
 ]
 ],
 "t":1838,
@@ -260926,7 +261127,7 @@ null
 "static":[
 [
 "self",
-1707
+1709
 ]
 ],
 "t":1438,
@@ -261077,7 +261278,7 @@ null
 "static":[
 [
 "call",
-1835
+1837
 ]
 ],
 "t":1667,
@@ -261105,7 +261306,7 @@ null
 "static":[
 [
 "self",
-1837
+1839
 ]
 ],
 "t":1650,
@@ -261133,7 +261334,7 @@ null
 "static":[
 [
 "self",
-1840
+1842
 ]
 ],
 "t":1647,
@@ -261207,7 +261408,7 @@ null
 "static":[
 [
 "call",
-1842
+1844
 ]
 ],
 "t":1662,
@@ -261235,7 +261436,7 @@ null
 "static":[
 [
 "call",
-1843
+1845
 ]
 ],
 "t":1663,
@@ -261286,7 +261487,7 @@ null
 "static":[
 [
 "call",
-1844
+1846
 ]
 ],
 "t":1664,
@@ -261337,7 +261538,7 @@ null
 "static":[
 [
 "call",
-1845
+1847
 ]
 ],
 "t":1664,
@@ -261365,7 +261566,7 @@ null
 "static":[
 [
 "self",
-1846
+1848
 ]
 ],
 "t":1641,
@@ -261393,7 +261594,7 @@ null
 "static":[
 [
 "call",
-1848
+1850
 ]
 ],
 "t":1441,
@@ -261467,7 +261668,7 @@ null
 "static":[
 [
 "call",
-1859
+1861
 ]
 ],
 "t":1666,
@@ -261495,7 +261696,7 @@ null
 "static":[
 [
 "call",
-1907
+1909
 ]
 ],
 "t":1728,
@@ -261523,7 +261724,7 @@ null
 "static":[
 [
 "call",
-1908
+1910
 ]
 ],
 "t":1736,
@@ -261555,7 +261756,7 @@ null
 "static":[
 [
 "call",
-1911
+1913
 ]
 ],
 "t":1765,
@@ -261606,7 +261807,7 @@ null
 "static":[
 [
 "call",
-1915
+1917
 ]
 ],
 "t":1760,
@@ -261634,7 +261835,7 @@ null
 "static":[
 [
 "call",
-1918
+1920
 ]
 ],
 "t":1735,
@@ -261662,7 +261863,7 @@ null
 "static":[
 [
 "self",
-1919
+1921
 ]
 ],
 "t":1743,
@@ -261713,7 +261914,7 @@ null
 "static":[
 [
 "call",
-1928
+1930
 ]
 ],
 "t":1765,
@@ -276673,12 +276874,12 @@ null
 },
 [
 [
-148,
+154,
 "unresolved",
 "d.pop"
 ],
 [
-151,
+157,
 "unresolved",
 "cls"
 ]
@@ -276697,12 +276898,12 @@ null
 },
 [
 [
-157,
+163,
 "unresolved",
 "hashlib.sha256(self.canonical_json().encode('utf-8')).hexdigest"
 ],
 [
-157,
+163,
 "unresolved",
 "self.canonical_json().encode"
 ]
@@ -277057,6 +277258,18 @@ null
 },
 []
 ],
+"1411":[
+{
+"unresolved":1
+},
+[
+[
+258,
+"unresolved",
+"model.sigma.full_levels_array"
+]
+]
+],
 "1412":[
 {
 "builtin":8,
@@ -277065,22 +277278,22 @@ null
 },
 [
 [
-286,
+293,
 "unresolved",
 "info.update"
 ],
 [
-281,
+288,
 "unresolved",
 "cfg.surface.get"
 ],
 [
-299,
+306,
 "unresolved",
 "rng.standard_normal"
 ],
 [
-305,
+312,
 "unresolved",
 "power[:, 0].sum"
 ]
@@ -281810,22 +282023,22 @@ null
 },
 [
 [
-78,
+108,
 "unresolved",
 "m._wind_from"
 ],
 [
-80,
+110,
 "unresolved",
 "us.append"
 ],
 [
-81,
+111,
 "unresolved",
 "vs.append"
 ],
 [
-78,
+108,
 "unresolved",
 "m._inv_laplacian"
 ]
@@ -281839,22 +282052,22 @@ null
 },
 [
 [
-57,
+87,
 "unresolved",
 "cp.asarray(k0_of_latitude(geometry.point_latitudes)).ravel"
 ],
 [
-57,
+87,
 "unresolved",
 "k0_of_latitude"
 ],
 [
-58,
+88,
 "unresolved",
 "model.sigma.full_levels_array"
 ],
 [
-62,
+92,
 "unresolved",
 "self._k0.max"
 ]
@@ -281867,22 +282080,22 @@ null
 },
 [
 [
-136,
+166,
 "unresolved",
 "self.sinks[0]"
 ],
 [
-138,
+168,
 "unresolved",
 "other"
 ],
 [
-142,
+172,
 "unresolved",
 "m._inv_laplacian"
 ],
 [
-143,
+173,
 "unresolved",
 "m._inv_laplacian"
 ]
@@ -281902,33 +282115,40 @@ null
 ],
 "2007":[
 {
+"builtin":8,
+"external":3
+},
+[]
+],
+"2008":[
+{
 "builtin":1,
 "unresolved":4
 },
 [
 [
-40,
+70,
 "unresolved",
 "type(latitude).__module__.split"
 ],
 [
-42,
+72,
 "unresolved",
 "xp.abs"
 ],
 [
-43,
+73,
 "unresolved",
 "xp.exp"
 ],
 [
-44,
+74,
 "unresolved",
 "xp.where"
 ]
 ]
 ],
-"2010":[
+"2011":[
 {
 "builtin":5,
 "external":2,
@@ -281942,13 +282162,13 @@ null
 ]
 ]
 ],
-"2011":[
+"2012":[
 {
 "external":1
 },
 []
 ],
-"2013":[
+"2014":[
 {
 "builtin":1,
 "unresolved":4
@@ -281976,7 +282196,7 @@ null
 ]
 ]
 ],
-"2014":[
+"2015":[
 {
 "builtin":3,
 "unresolved":3
@@ -281999,7 +282219,7 @@ null
 ]
 ]
 ],
-"2015":[
+"2016":[
 {
 "builtin":1,
 "unresolved":5
@@ -282027,7 +282247,7 @@ null
 ]
 ]
 ],
-"2016":[
+"2017":[
 {
 "builtin":1,
 "unresolved":1
@@ -282040,7 +282260,7 @@ null
 ]
 ]
 ],
-"2017":[
+"2018":[
 {
 "unresolved":1
 },
@@ -282052,7 +282272,7 @@ null
 ]
 ]
 ],
-"2018":[
+"2019":[
 {
 "builtin":1,
 "unresolved":1
@@ -282065,7 +282285,7 @@ null
 ]
 ]
 ],
-"2019":[
+"2020":[
 {
 "unresolved":6
 },
@@ -282092,20 +282312,20 @@ null
 ]
 ]
 ],
-"2020":[
+"2021":[
 {
 "builtin":1
 },
 []
 ],
-"2021":[
+"2022":[
 {
 "builtin":10,
 "external":2
 },
 []
 ],
-"2022":[
+"2023":[
 {
 "unresolved":3
 },
@@ -282127,7 +282347,7 @@ null
 ]
 ]
 ],
-"2023":[
+"2024":[
 {
 "unresolved":2
 },
@@ -282144,14 +282364,14 @@ null
 ]
 ]
 ],
-"2024":[
+"2025":[
 {
 "builtin":2,
 "external":2
 },
 []
 ],
-"2025":[
+"2026":[
 {
 "unresolved":1
 },
@@ -282163,7 +282383,7 @@ null
 ]
 ]
 ],
-"2028":[
+"2029":[
 {
 "builtin":16,
 "external":14,
@@ -282182,7 +282402,7 @@ null
 ]
 ]
 ],
-"2029":[
+"2030":[
 {
 "unresolved":4
 },
@@ -282209,7 +282429,7 @@ null
 ]
 ]
 ],
-"2031":[
+"2032":[
 {
 "builtin":1,
 "external":2,
@@ -282238,7 +282458,7 @@ null
 ]
 ]
 ],
-"2032":[
+"2033":[
 {
 "external":2,
 "unresolved":2
@@ -282256,7 +282476,7 @@ null
 ]
 ]
 ],
-"2033":[
+"2034":[
 {
 "external":3,
 "unresolved":22
@@ -282284,7 +282504,7 @@ null
 ]
 ]
 ],
-"2034":[
+"2035":[
 {
 "builtin":1,
 "external":7,
@@ -282313,7 +282533,7 @@ null
 ]
 ]
 ],
-"2035":[
+"2036":[
 {
 "builtin":1,
 "external":1,
@@ -282337,7 +282557,7 @@ null
 ]
 ]
 ],
-"2038":[
+"2039":[
 {
 "builtin":2,
 "external":3,
@@ -282366,7 +282586,7 @@ null
 ]
 ]
 ],
-"2039":[
+"2040":[
 {
 "builtin":1,
 "external":1,
@@ -282380,7 +282600,7 @@ null
 ]
 ]
 ],
-"2040":[
+"2041":[
 {
 "unresolved":1
 },
@@ -282392,7 +282612,7 @@ null
 ]
 ]
 ],
-"2041":[
+"2042":[
 {
 "builtin":2,
 "external":2,
@@ -282406,7 +282626,7 @@ null
 ]
 ]
 ],
-"2042":[
+"2043":[
 {
 "external":1,
 "unresolved":1
@@ -282419,7 +282639,7 @@ null
 ]
 ]
 ],
-"2043":[
+"2044":[
 {
 "builtin":5,
 "unresolved":4
@@ -282447,7 +282667,7 @@ null
 ]
 ]
 ],
-"2044":[
+"2045":[
 {
 "builtin":1,
 "external":1,
@@ -282461,13 +282681,13 @@ null
 ]
 ]
 ],
-"2045":[
+"2046":[
 {
 "external":1
 },
 []
 ],
-"2047":[
+"2048":[
 {
 "builtin":6,
 "external":4,
@@ -282486,7 +282706,7 @@ null
 ]
 ]
 ],
-"2048":[
+"2049":[
 {
 "builtin":1,
 "external":1,
@@ -282500,7 +282720,7 @@ null
 ]
 ]
 ],
-"2049":[
+"2050":[
 {
 "builtin":1,
 "external":2,
@@ -282519,7 +282739,7 @@ null
 ]
 ]
 ],
-"2052":[
+"2053":[
 {
 "builtin":14,
 "external":12,
@@ -282548,7 +282768,7 @@ null
 ]
 ]
 ],
-"2053":[
+"2054":[
 {
 "unresolved":4
 },
@@ -282575,7 +282795,7 @@ null
 ]
 ]
 ],
-"2057":[
+"2058":[
 {
 "external":1,
 "unresolved":1
@@ -282588,7 +282808,7 @@ null
 ]
 ]
 ],
-"2059":[
+"2060":[
 {
 "builtin":2,
 "external":1,
@@ -282602,7 +282822,7 @@ null
 ]
 ]
 ],
-"2061":[
+"2062":[
 {
 "external":1,
 "unresolved":8
@@ -282630,7 +282850,7 @@ null
 ]
 ]
 ],
-"2063":[
+"2064":[
 {
 "builtin":4,
 "unresolved":4
@@ -282658,7 +282878,7 @@ null
 ]
 ]
 ],
-"2064":[
+"2065":[
 {
 "builtin":5,
 "external":3,

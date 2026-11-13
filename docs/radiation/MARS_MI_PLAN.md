@@ -145,17 +145,102 @@ to 10⁻⁴ F, keeps mass to 6 × 10⁻⁶, and develops a diurnal thermal tide.
 T21, 30 days, no seasonal mean); stability of the top levels; local
 energy conservation by each operator.
 
+## 2b. Sponge rerun (criteria fixed 2026-11-13, before the sponge code)
+
+The change: M-I's top sponge, Isca `damping_driver` `rayleigh` at
+`d1321ac3`. It acts on momentum only, at rate (1 / 0.125 day) ((p_b −
+p) / p_b)² for p < p_b = 0.5 Pa. With frictional heating on, its
+kinetic-energy loss returns as heat (Isca `do_conserve_energy`). The
+existing `DiagonalDamping` hook needs level-only rates, so p is taken as
+σ × 610 Pa, where Isca uses the local full-level pressure. On flat Mars
+the two differ by the surface-pressure variation. Nothing else changes.
+The preset is `dev-mars-gray-flat-sponge`, with Hs heated and Us
+`--no-frictional-heating`, from one commit, on one machine, for 30 days.
+
+Hs and Us are judged by **M1–M6 exactly as written in §2**. Stated now:
+
+- **If the missing sponge caused M1's failure, M1 is met**: daily max
+  \|u\| stays below 150 m s⁻¹. If M1 still fails, that explanation is
+  refuted or the sponge is insufficient, and it is reported that way.
+- **M5 is expected to fail again** on the 11–16 h window (the slab lag of
+  §2's results is untouched by a sponge). The window is not changed.
+- M2–M4 and M6 are expected to stay met. A failure of M2 would mean the
+  heating does not return the sponge's loss.
+
+Reported, not judged: H − Hs differences in max \|u\| below 6 Pa, in the
+S1 tide and in the residual; and the sponge's share of the measured sinks.
+
+### Sponge results (2026-11-13; criteria and predictions unchanged)
+
+Hs (`d2e44058…`) and Us (`1f91ab18…`) ran from `e38890e`, clean tree, on
+one Colab L4, without resuming (6.3 and 5.0 min).
+
+| | measured | verdict | predicted |
+| --- | --- | --- | --- |
+| M1 | max \|u\| 118 / 118 m s⁻¹ (H, U: 282 / 295); T 161–306 K | **met** | met |
+| M2, M3 | residual −0.0115 W m⁻² (1.1 × 10⁻⁴ F); slab exact | met | met |
+| M4 | Us residual −0.047 against sinks −0.037 | met | met |
+| M5 | p_s S1 1.29 % (≥ 5 × 10⁻⁴ ✓, 3.7 × noise ✓); T_s maximum 17.0 h ✗ | not met (window only) | not met (window only) |
+| M6 | −8 × 10⁻⁶ | met | met |
+
+Every prediction held. The sponge does exactly what it is for: the
+top-two-level maximum falls from 288 to 90 m s⁻¹, winds below 6 Pa are
+unchanged (77 → 80 m s⁻¹), and the residual is unchanged (−0.0114 →
+−0.0115 W m⁻²). Its own sink, 0.0022 W m⁻² or 6 % of the measured sinks,
+is returned by the frictional heating like the others. The sponge layer
+holds almost no mass.
+
+**The M5 sample had to be redone.** The pre-registered sample continued
+2 sols past the end of the run. For Hs that continuation went non-finite
+at step 146 (§2c), so the first Colab `tides.json` is all NaN, and its
+00:00 "maximum" is `np.argmax` of a NaN curve. Both files are kept
+unchanged as the record. The valid sample, `tides-last2sols.json`, is the
+last two sols of Hs (days 27.95–30.0). It was replayed from the run's
+day-20 checkpoint on the MX110 and checked against all ten saved daily
+states in the interval: the departure grows from 1.6 × 10⁻¹³ on day 21 to
+5.9 × 10⁻¹⁰ on day 30, inside the tool's 10⁻⁹ tolerance. This changes
+the sampling window, not the thresholds. The tool now aborts on any
+non-finite state, field or fit coefficient. The same replay for H departs
+by 1.4 × 10⁻⁸ (without the sponge, the fast top levels amplify the
+cross-platform rounding faster). The tool refuses it, so H's in-run M5
+needs the L4. H's recorded M5 came from a continuation that stayed finite.
+
+### 2c. Bottom-layer sensible-heat instability (found 2026-11-13)
+
+Diagnosing the non-finite continuation exposed a defect that the 30-day
+criteria did not test. The coupling applies the bulk sensible exchange as
+a forward (lagged) step into the lowest layer, and that layer holds
+Δp ≈ 0.73 Pa (Isca's grid, σ = 0.9988–1). Its forward-Euler number
+2 Δt ρ C |v| g / Δp must stay below 2. On the saved states of **both**
+heated runs it crosses 2 near day 20, as the lowest-level winds pass
+≈ 25 m s⁻¹. By day 30, H has 141 points above 2 (maximum 6.4) and Hs has
+223 (maximum 4.3). In Hs's continuation the maximum reaches 13, and the
+lowest-level temperature oscillates with growing amplitude until it is
+negative at step 145. The dry adjustment hides warming overshoots by
+mixing them upward, but nothing catches a cooling one. So:
+
+- **The sponge did not cause it.** It is present in H too, which survived
+  its 2-sol continuation.
+- **This configuration has an effective lifetime of about 30 days.** No
+  run of it beyond ~30 days, and none at T42 or over a season, is valid
+  until the surface exchange is implicit.
+- **The fix is part of the boundary-layer dependency:** surface fluxes
+  solved implicitly with the vertical diffusion, as Isca does. The 46–51
+  m s⁻¹ lowest-level winds at day 30 are a second symptom of the weak
+  Rayleigh-drag stand-in for surface stress.
+
+Restoration itself is exact: replaying from the day-20 checkpoint
+reproduces the saved day-21 state to 1.6 × 10⁻¹³ across platforms.
+
 ## 3. After the pilot, in order
 
-1. The energy-conserving top sponge (existing `DiagonalDamping` hook, its
-   kinetic-energy loss returned by the frictional heating). It is cheap,
-   and the pilot's M1 result gives it a direct test: rerun H with the
-   sponge, with the same criteria.
+1. ~~The energy-conserving top sponge~~: done (§2b). M1 met as predicted.
 2. The boundary layer: bulk surface stress and implicit vertical diffusion
-   of heat and momentum, with their dissipation in the frictional heating.
-   Then remove the two substitutes. This is the gating dependency for any
-   M-I claim. Isca's ∇⁴ / RA numerics as an option, if the comparison needs
-   them.
+   of heat and momentum, **with the surface fluxes solved implicitly**
+   (§2c), their dissipation in the frictional heating. Then remove the
+   two substitutes. This is the gating dependency for any M-I claim and
+   for any run longer than ~30 days. Isca's ∇⁴ / RA numerics as an option,
+   if the comparison needs them.
 3. T42, one Mars year plus the L_s 225°–315° average; compare with Fig. 4b.
 4. Then MOLA terrain with nothing else changed (the existing terrain
    import), for the flat-to-topography comparison.

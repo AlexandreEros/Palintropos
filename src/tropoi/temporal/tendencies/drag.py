@@ -24,7 +24,37 @@ import math
 import numpy as np
 
 __all__ = ["schneider_liu_drag_profile", "LatitudeDependentRayleighDrag",
-           "MomentumSinkHeating"]
+           "MomentumSinkHeating", "rayleigh_sponge_damping"]
+
+
+def rayleigh_sponge_damping(sigma_full, n_degrees: int, *, reference_pressure: float,
+                            bottom_pressure: float, efold_days: float):
+    """Isca's top sponge (``damping_driver`` ``rayleigh``, commit d1321ac3) as a
+    :class:`~tropoi.temporal.hooks.DiagonalDamping` on vorticity and divergence:
+
+        rate = (1 / efold) ((p_b - p) / p_b)^2   for p < p_b,  0 below,
+
+    with ``p = sigma_k * reference_pressure``. Isca uses the local full-level
+    pressure; a diagonal damping needs one rate per level, and on a flat
+    planet the two differ by the surface-pressure variation. Temperature and
+    ln p_s are untouched. Its kinetic-energy loss is returned as heat by
+    :class:`MomentumSinkHeating` like any other damper (Isca's
+    ``do_conserve_energy``)."""
+    from tropoi.temporal.hooks import DiagonalDamping
+    sigma = np.asarray(sigma_full, dtype=np.float64)
+    p_b = float(bottom_pressure)
+    if not (p_b > 0.0 and efold_days > 0.0 and reference_pressure > 0.0):
+        raise ValueError("sponge pressures and e-folding time must be positive")
+    p = sigma * float(reference_pressure)
+    rate = np.where(p < p_b, ((p_b - p) / p_b) ** 2 / (float(efold_days) * 86400.0), 0.0)
+    K = sigma.size
+    rates = np.zeros((3 * K + 1, int(n_degrees)))
+    rates[0:K, :] = rate[:, None]
+    rates[K:2 * K, :] = rate[:, None]
+    return DiagonalDamping("rayleigh_sponge", rates,
+                           params={"reference_pressure": float(reference_pressure),
+                                   "bottom_pressure": p_b, "efold_days": float(efold_days),
+                                   "sigma_full": [float(s) for s in sigma]})
 
 
 def schneider_liu_drag_profile(latitude, k0: float, cutoff_deg: float = 16.3,

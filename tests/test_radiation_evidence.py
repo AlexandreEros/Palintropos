@@ -213,3 +213,101 @@ def test_the_mars_pair_is_preserved_and_is_the_source_of_its_evidence(capsule, e
         assert (root / name).read_bytes().replace(b"\r\n", b"\n") == \
             (published / name).read_bytes().replace(b"\r\n", b"\n"), name
     assert (root / "means.npz").read_bytes() == (published / "means.npz").read_bytes()
+
+
+def test_the_tide_diagnostic_refuses_non_finite_data_instead_of_reporting_it():
+    """The sponge run's first Colab tide sample came from a continuation that
+    went non-finite; the fit then reported NaN amplitudes and np.argmax picked
+    index 0 (a spurious 00:00 maximum). The tool must abort instead."""
+    import importlib.util
+    import numpy as np
+    path = pathlib.Path(__file__).resolve().parents[1] / "tools" / "radiation" / "mars_tides.py"
+    spec = importlib.util.spec_from_file_location("mars_tides", path)
+    tides = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(tides)
+    lat = np.repeat([0.1, 0.2], 4); lon = np.tile(np.linspace(0, 6, 4), 2)
+    t = np.arange(10) * 600.0
+    field = np.ones((10, 8))
+    assert tides._fit(lat, lon, t, field, 88440.0)            # finite data is fitted
+    field[3, 2] = np.nan
+    with pytest.raises(SystemExit, match="non-finite field"):
+        tides._fit(lat, lon, t, field, 88440.0)
+
+
+# The sponge rerun (MARS_MI_PLAN.md section 2b; predictions committed in 2bdf13f
+# before the sponge code). Hs/Us ran from e38890e on one Colab L4.
+SPONGE_H = "dev-mars-gray-flat-sponge-heated-T21L25-30d-e38890e-l4"
+SPONGE_U = "dev-mars-gray-flat-sponge-T21L25-30d-e38890e-l4"
+SPONGE_CAPSULES = {"dev-mars-gray-flat-sponge-heated-T21L25-e38890e": SPONGE_H,
+                   "dev-mars-gray-flat-sponge-T21L25-e38890e": SPONGE_U}
+
+
+def _evidence_json(name, file):
+    return json.loads((EVIDENCE / name / file).read_text(encoding="utf-8"))
+
+
+def test_the_sponge_pair_ran_from_one_commit_on_one_machine_after_its_predictions():
+    s1, s2 = _summary(SPONGE_H), _summary(SPONGE_U)
+    for s in (s1, s2):
+        assert s["code"]["git_commit"].startswith("e38890e") and s["code"]["git_dirty"] is False
+        assert s["environment"]["device"] == "NVIDIA L4"
+        assert s["experiment_id"].startswith("dev-mars-gray-flat-sponge")
+    assert s1["config_sha256"].startswith("d2e44058") and s2["config_sha256"].startswith("1f91ab18")
+
+
+def test_the_sponge_energy_and_mass_verdicts_follow_from_the_committed_series():
+    import numpy as np
+    s = _mars_series(SPONGE_H)
+    res, day = s["energy_residual"], s["day"][1:]
+    win = (day >= 11) & (day <= 30)
+    F = s["absorbed_stellar"][1:][win].mean()
+    assert abs(res[win].mean()) <= 1e-3 * F and np.abs(res).max() <= 1e-2 * F
+    for name in (SPONGE_H, SPONGE_U):
+        ps = _mars_series(name)["mean_ps"]
+        assert abs(ps[-1] / ps[0] - 1.0) <= 1e-5
+
+
+def test_the_first_sponge_tide_sample_is_kept_as_the_record_of_a_non_finite_continuation():
+    """Colab's tides.json continued past day 30; that continuation goes
+    non-finite (the explicit bottom-layer sensible exchange, see the plan),
+    so every amplitude is NaN and its 00:00 maximum is np.argmax of a NaN
+    curve. It is kept, unchanged, and superseded by tides-last2sols.json."""
+    import math
+    t = _evidence_json(SPONGE_H, "tides.json")
+    assert math.isnan(t["tropical_surface_pressure_s1_over_ps"])
+    assert t["equatorial_surface_temperature_max_local_hour"] == 0.0
+
+
+def test_the_sponge_rerun_met_exactly_its_predictions_on_valid_data():
+    """M1 met (the missing sponge was the cause), M5 not met on the
+    11-16 h window alone (the slab lag), everything else met. The M5 sample
+    is the last two sols of Hs, replayed from its day-20 checkpoint and
+    verified against its saved daily states."""
+    t = _evidence_json(SPONGE_H, "tides-last2sols.json")
+    assert t["window"] == "last" and t["restored_checkpoint"] == "checkpoint-s000002880.npz"
+    replay = t["replay_max_relative_departure_by_day"]
+    assert sorted(map(int, replay)) == list(range(21, 31)) and max(replay.values()) <= 1e-9
+    assert not 11.0 <= t["equatorial_surface_temperature_max_local_hour"] <= 16.0
+    assert t["M5"] == {"met": False, "s1_at_least_3x_noise": True, "s1_at_least_5e-4": True,
+                       "surface_temperature_max_between_11_and_16_h": False}
+    v = _evidence_json(SPONGE_H, "verdicts-last2sols.json")
+    assert v["tides_file"] == "tides-last2sols.json"
+    assert v["verdict"] == {"M1": True, "M2": True, "M3": True, "M4": True, "M5": False,
+                            "M6": True}
+    assert v["H"]["max_abs_u"] < 150.0 and v["U"]["max_abs_u"] < 150.0
+
+
+@pytest.mark.parametrize("capsule, evidence", sorted(SPONGE_CAPSULES.items()))
+def test_the_sponge_pair_is_preserved_and_is_the_source_of_its_evidence(capsule, evidence):
+    from tropoi.cli.capsule import read_archive, read_receipt, verify_capsule
+    root = CAPSULES / capsule
+    sums = read_receipt(root / "SHA256SUMS")
+    archive = read_archive(root, sums)
+    assert len(sums) == 66
+    assert set(archive["omitted_files"]) == set(sums) - set(archive["included_files"])
+    assert verify_capsule(root, root, core=True)["checked"] == 4
+    published = EVIDENCE / evidence
+    for name in ("config.json", "events.jsonl", "series.json"):
+        assert (root / name).read_bytes().replace(b"\r\n", b"\n") == \
+            (published / name).read_bytes().replace(b"\r\n", b"\n"), name
+    assert (root / "means.npz").read_bytes() == (published / "means.npz").read_bytes()

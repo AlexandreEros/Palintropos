@@ -1,0 +1,6 @@
+{"day": 0, "environment": {"cuda_driver": 13000, "cuda_runtime": 13000, "cupy": "14.0.1", "device": "NVIDIA L4", "numpy": "2.4.6", "platform": "Linux-6.6.159+-x86_64-with-glibc2.39", "python": "3.13.16"}, "event": "created", "step": 0, "time": "2026-11-13T19:19:30Z"}
+{"day": 0.0, "event": "checkpoint", "file": "checkpoint-s000000000.npz", "step": 0, "time": "2026-11-13T19:19:30Z"}
+{"day": 10.0, "event": "checkpoint", "file": "checkpoint-s000001440.npz", "step": 1440, "time": "2026-11-13T19:21:10Z"}
+{"day": 20.0, "event": "checkpoint", "file": "checkpoint-s000002880.npz", "step": 2880, "time": "2026-11-13T19:22:50Z"}
+{"day": 30.0, "event": "checkpoint", "file": "checkpoint-s000004320.npz", "step": 4320, "time": "2026-11-13T19:24:30Z"}
+{"day": 30.0, "event": "completed", "step": 4320, "time": "2026-11-13T19:24:30Z"}

@@ -5,13 +5,17 @@ CPU only. Reads the two evidence summaries written by ``summarize_run.py``
 run's ``tides.json``; writes ``verdicts.json`` next to H's summary. The
 criteria are applied exactly as fixed in commit fba92fb.
 
-    python tools/radiation/judge_mars_pilot.py H_EVIDENCE U_EVIDENCE
+    python tools/radiation/judge_mars_pilot.py H_EVIDENCE U_EVIDENCE [--tides FILE --out-file FILE]
+
+``--tides`` names the M5 sample inside H's evidence directory (default
+``tides.json``); ``--out-file`` the verdict file (default
+``verdicts.json``). An existing verdict file is never overwritten.
 """
 from __future__ import annotations
 
+import argparse
 import json
 import pathlib
-import sys
 
 import numpy as np
 
@@ -68,7 +72,13 @@ def _assess(series, config):
 
 
 def main() -> None:
-    h_name, u_name = sys.argv[1], sys.argv[2]
+    ap = argparse.ArgumentParser()
+    ap.add_argument("h_evidence")
+    ap.add_argument("u_evidence")
+    ap.add_argument("--tides", default="tides.json")
+    ap.add_argument("--out-file", default="verdicts.json")
+    args = ap.parse_args()
+    h_name, u_name = args.h_evidence, args.u_evidence
     (hs, hsum, hcfg), (us, usum, ucfg) = _load(h_name), _load(u_name)
     h, u = _assess(hs, hcfg), _assess(us, ucfg)
     sinks = usum["sinks"]
@@ -81,9 +91,12 @@ def main() -> None:
           "sinks_standard_error": sink_se, "states": int(totals.size), "tolerance": tolerance,
           "difference": u["residual_window_mean"] - sink_mean,
           "met": bool(abs(u["residual_window_mean"] - sink_mean) <= tolerance and h["M2"])}
-    tides = json.loads((EVIDENCE / h_name / "tides.json").read_text(encoding="utf-8"))
+    tides = json.loads((EVIDENCE / h_name / args.tides).read_text(encoding="utf-8"))
+    target = EVIDENCE / h_name / args.out_file
+    if target.exists():
+        raise SystemExit(f"{target} exists; choose another --out-file (evidence is not overwritten)")
     verdicts = {
-        "criteria_commit": "fba92fb", "window_days": list(WINDOW),
+        "criteria_commit": "fba92fb", "window_days": list(WINDOW), "tides_file": args.tides,
         "H": h, "U": u, "M4": m4, "M5": tides["M5"],
         "verdict": {"M1": bool(h["M1"] and u["M1"]), "M2": bool(h["M2"]), "M3": bool(h["M3"]),
                     "M4": m4["met"], "M5": bool(tides["M5"]["met"]),
@@ -93,7 +106,7 @@ def main() -> None:
                      "H_minus_U_toa_window_mean": h["toa_window_mean"] - u["toa_window_mean"],
                      "tides": {k: v for k, v in tides.items() if k not in ("by_latitude", "M5")}},
     }
-    (EVIDENCE / h_name / "verdicts.json").write_text(
+    target.write_text(
         json.dumps(verdicts, indent=2, sort_keys=True, default=float) + "\n", encoding="utf-8")
     print(json.dumps(verdicts["verdict"], indent=2))
     print(json.dumps({"H": h, "U": u, "M4": m4}, indent=2, default=float))
