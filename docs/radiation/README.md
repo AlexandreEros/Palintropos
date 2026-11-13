@@ -204,9 +204,9 @@ energy by at most 5 × 10^-4: it is transferred to enthalpy by the
 discretised equations, not lost. (ii) The −1 to −2 % residual is not in the
 spatial operator: it shrinks faster than linearly with the time step and by
 a half (Earth) to five sixths (Jupiter) when the Robert–Asselin–Williams
-filter is switched off, so it belongs to the time integration. It was not
-split further between the filter, the semi-implicit scheme and the startup
-step.
+filter is switched off, so it belongs to the time integration. Its split
+between the filter, the adjustment of the seed and the startup step is
+measured in "The time-stepping residual, split" below.
 
 With ∇⁸ (0.1 day at the cut), and with `frictional_heating`:
 
@@ -223,9 +223,10 @@ the mass-weighted mean (a seventh of the total on Jupiter here).
 
 ### Frictional heating (opt-in, 2026-11-11)
 
-`frictional_heating` (configuration field and `--frictional-heating`; off by
-default, and left out of the canonical configuration when off so existing
-hashes are unchanged) adds `MomentumSinkHeating`
+`frictional_heating` (configuration field and
+`--frictional-heating / --no-frictional-heating`; on in the presets since
+2026-11-13, off as the field default, and left out of the canonical
+configuration when off so existing hashes are unchanged) adds `MomentumSinkHeating`
 (`temporal/tendencies/drag.py`) as an explicit term: `Q = −V·dV / c_p` for
 the wind tendency dV of the drag and the hyperdiffusion, plus a horizontally
 uniform correction per level that cancels the enthalpy change of the
@@ -456,18 +457,17 @@ Supported by this evidence, and nothing wider:
   a closed bottom with interior heat and latitude-dependent drag (Jupiter to
   3 bar);
 - `frictional_heating` **on** for any run whose energy budget or
-  top-of-atmosphere balance is to be interpreted. With it off, an eddying
-  run fails A2 and A3.
+  top-of-atmosphere balance is to be interpreted (the presets' default since
+  2026-11-13). With it off, an eddying run fails A2 and A3.
 
 Not supported, because not shown: other resolutions and time steps; deep
 (100 bar) columns in a coupled run; real-gas radiation; a run with strong
 flow on a fast rotator (the 100-bar T9 measurement was adiabatic and one day
 long); the time-stepping residual, which the heating does not return.
 
-Recommendation on the default: keep `frictional_heating` opt-in in this
-change. Turning it on in the presets changes their configuration hashes and
-would detach the unheated evidence from the preset names; it is a one-line
-follow-up once that is wanted.
+Default (changed 2026-11-13, below): the presets now turn
+`frictional_heating` on, and the unheated evidence stays reachable by name
+with `frictional_heating=False`, hash for hash.
 
 **The controlled comparison of this slice** is the pair of 300-day dry gray
 Earth runs, without and with frictional heating, judged by A2 as written
@@ -477,6 +477,102 @@ frictional heating, and the startup-step fix (one 1200 s slab step at day
 0). The second is not controlled for; removing it needs one more unheated
 300-day run at the current code. No comparison with a published model is
 part of this slice (§7).
+
+### The time-stepping residual, split (2026-11-13)
+
+`tools/radiation/time_stepping_residual.py` repeats the adiabatic Earth
+experiment of the attribution table (T9 L12, 5 m/s seed, ∇⁸ off) for three
+days with the total energy recorded at every step. Total-energy change as a
+fraction of the initial kinetic energy (evidence in
+`evidence/time_stepping_residual.json`):
+
+| variant | day 1 | day 2 | day 3 |
+| --- | --- | --- | --- |
+| dt 600 s, RAW ν 0.1, α 0.53 (as above) | −0.0110 | −0.0044 | −0.0044 |
+| RAW filter off | −0.0055 | +0.0005 | +0.0002 |
+| RAW α = 0.5 | −0.0064 | +0.0004 | −0.0000 |
+| dt 300 s | −0.0038 | −0.0023 | −0.0022 |
+| lagged damping placement | identical to the first row | | |
+
+The RK4 startup step changes the total energy by 7 × 10^-9 of the kinetic
+energy, so it is not part of the residual. What remains has two parts:
+
+1. **A steady loss from the filter's α.** It persists from day to day,
+   halves with the step (first order), and disappears with the filter off
+   or with α = 0.5. With α > 0.5 the RAW filter damps the physical mode
+   slightly; that is the reason α = 0.53 is chosen (Williams 2009), so this
+   is the designed behaviour of the scheme, not a defect.
+2. **A one-time loss in the first hours.** With the filter off the energy
+   drops by about 0.009 within four hours, then oscillates (±0.002 of the
+   kinetic energy, gravity-wave time scales) about a level that no longer
+   trends. Between
+   600 s and 300 s the day-1 excess over the steady rate falls from
+   0.0066 to 0.0016 (about dt²). This fits the semi-implicit scheme's
+   O((ω dt)²) distortion of the gravity waves radiated while the unbalanced
+   rotational seed adjusts (ω dt ≈ 0.3 for the fastest T9 mode at 600 s).
+   That mechanism is consistent with the scaling but was not isolated
+   further.
+
+**Consequence for the long runs.** Neither part is visible at the precision
+of the heated 300-day Earth run, whose residual over days 201–300 is
+−0.002 ± 0.025 W m^-2 (all numerical sinks included). That bounds the
+time-stepping residual of the T21, dt = 1200 s production configuration
+at below about 10^-4 of the radiative throughput. It no longer needs to be
+returned to interpret those runs. The bound is specific to that
+configuration.
+
+### Frictional heating becomes the preset default (2026-11-13)
+
+**Defect.** The shipped presets and the reproduce commands of §9 produced
+the unheated formulation. The repository's own criteria (A2, A3) reject it
+for an eddying run, which shifted the Earth top-of-atmosphere balance by
+4 W m^-2 and the surface by −1.3 K. Since this change the presets turn the
+heating on.
+
+**Identities preserved.** The configuration field default stays `False`, so
+configuration files written before the option existed (no
+`frictional_heating` key) still load as the unheated experiment with their
+recorded hash. Checkpoints written by those runs are therefore not
+reinterpreted. Each preset's default experiment id now follows the heating
+(`…-heated-…` when on), which makes every recorded run reachable by name:
+
+| call | config_sha256 | recorded run |
+| --- | --- | --- |
+| `earth_gray_dry()` / `--preset earth-gray-dry` | `748cec4b…` | `earth-gray-dry-heated-T21L25-300d` (MX110 and T4) |
+| `earth_gray_dry(frictional_heating=False)` / `--no-frictional-heating` | `e31ae183…` | `earth-gray-dry-T21L25-300d` |
+| `jupiter_schneider_liu()` | `0d029212…` | `jupiter-sl09-heated-T21L30-200d-colab` |
+| `jupiter_schneider_liu(frictional_heating=False)` | `80f280d2…` | `jupiter-sl09-T21L30-200d` |
+
+Tests pin all four hashes to the committed `config.json` files. One
+behaviour does change: `--preset earth-gray-dry --frictional-heating`
+without `--experiment-id` used to mean the heated configuration under the
+unheated id (`7aa7c3fa…`). No recorded run used it, and it now resolves to
+`748cec4b…`. A run directory created that way is refused (different hash)
+rather than mixed. Resuming across commits was already refused.
+
+**Runtime budget (measured before launching, MX110, simulated days 1–3,
+driver sampling included).** The heated Earth preset takes 0.67 s/step and
+the unheated one 0.65 s/step, about 4.0 and 3.9 h per 300 days. The batched
+heating term (`814bcf8`) costs about 3 % of a step. The unbatched term of
+the recorded heated run took about 0.43 s of its 0.93 s/step.
+
+**Controlled comparison (criteria fixed before either run starts).** Two
+300-day runs of the Earth preset from the same commit and machine, with
+only the heating flag different:
+
+- R1: `--preset earth-gray-dry` (heated, `748cec4b…`);
+- R2: `--preset earth-gray-dry --no-frictional-heating` (`e31ae183…`).
+
+| | criterion | what it tests |
+| --- | --- | --- |
+| C1 | R1 meets A1–A4 | the new default produces an interpretable run |
+| C2 | R2 meets A1 and A4 and fails A2 and A3 | the defect is reproduced at the current code |
+| C3 | the R2 mean residual over days 201–300 is within 0.5 W m^-2 of −5.10 | the startup-step fix does not matter after spin-up; this removes the confound of the earlier pair |
+| C4 | the R1 mean residual is ≤ 0.5 W m^-2 in magnitude, and the R1 mean surface temperature is within 0.3 K of 302.65 K | the batched heating term behaves like the unbatched one over a long run |
+
+The surface temperature, the top-of-atmosphere balance and the jets of R1
+minus R2 are reported, not judged. Results are appended here when the runs
+exist. Until then, the batched term has no long-run evidence.
 
 ## 7. Published comparisons: verified, and where each stands
 
@@ -514,9 +610,14 @@ python -m pytest tests/test_radiation_twostream.py tests/test_physics_columns.py
 python tools/radiation/regimes.py
 python tools/radiation/adiabatic_energy.py
 python tools/radiation/energy_attribution.py
+python tools/radiation/time_stepping_residual.py
 python -m tropoi.run.radiative column --preset jupiter-schneider-liu
-python -m tropoi.run.radiative run --preset jupiter-schneider-liu --days 200 --run-dir runs/radiative/jupiter-sl09-T21L30
-python -m tropoi.run.radiative run --preset earth-gray-dry --days 300 --run-dir runs/radiative/earth-gray-dry-T21L25
+# the presets (frictional heating on): 0d029212… and 748cec4b…
+python -m tropoi.run.radiative run --preset jupiter-schneider-liu --days 200 --run-dir runs/radiative/jupiter-sl09-heated-T21L30
+python -m tropoi.run.radiative run --preset earth-gray-dry --days 300 --run-dir runs/radiative/earth-gray-dry-heated-T21L25
+# the unheated runs recorded on 2026-11-11: 80f280d2… and e31ae183…
+python -m tropoi.run.radiative run --preset jupiter-schneider-liu --no-frictional-heating --days 200 --run-dir runs/radiative/jupiter-sl09-T21L30
+python -m tropoi.run.radiative run --preset earth-gray-dry --no-frictional-heating --days 300 --run-dir runs/radiative/earth-gray-dry-T21L25
 python tools/radiation/summarize_run.py runs/radiative/earth-gray-dry-T21L25 --name earth-gray-dry-T21L25-300d
 python tools/radiation/summarize_run.py runs/radiative/jupiter-sl09-T21L30 --name jupiter-sl09-T21L30-200d
 ```
@@ -536,9 +637,9 @@ Test results for this commit are in [TEST_RESULTS.md](TEST_RESULTS.md).
 1. Obtain real k-tables (needs a decision on downloads: exo_k + ExoMol/HITRAN
    CIA) and compare `CorrelatedKLongwave` with an independent model for one
    Earth and one CO2 case; add Rayleigh, continua, CIA, gas overlap.
-2. Decide whether `frictional_heating` becomes the default of the presets
-   (§6). A resolution sweep for the Jupiter ∇⁸ loss; split the time-stepping
-   residual between the filter and the semi-implicit scheme.
+2. Run the controlled comparison R1/R2 of §6 and append its verdicts
+   (C1–C4). A resolution sweep for the Jupiter ∇⁸ loss. (Done 2026-11-13:
+   heating is the preset default; the time-stepping residual is split.)
 3. A Jupiter run long and fine enough to develop a circulation (the 200-day
    T21 run does not), on a stretched grid that resolves the stratosphere.
 4. Boundary-layer diffusion and surface stress (required by FHZ06 and THAI).

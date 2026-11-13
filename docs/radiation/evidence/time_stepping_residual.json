@@ -1,0 +1,121 @@
+{
+  "days": 3,
+  "experiment": "earth T9 L12 stretched, 5 m/s seed, adiabatic, del^8 off",
+  "variants": {
+    "alpha_0.5": {
+      "after_hours_over_initial_kinetic": {
+        "1": 0.00048622155100318975,
+        "12": -0.007348708762260352,
+        "2": -0.001489601041708891,
+        "24": -0.006396936617542047,
+        "3": -0.007081230857206793,
+        "4": -0.01025772911860988,
+        "6": -0.005568597068054646
+      },
+      "daily_total_change_over_initial_kinetic": [
+        -0.006396936617542047,
+        0.00035743487367754026,
+        -2.473473303029987e-05
+      ],
+      "damping_scheme": "centred",
+      "dt": 600.0,
+      "initial_kinetic_j_m2": 127464.52662224085,
+      "raw_alpha": 0.5,
+      "raw_nu": 0.1,
+      "seconds_per_step_with_energy_every_step": 0.10050228333333237,
+      "startup_step_over_initial_kinetic": -6.763619689941416e-09
+    },
+    "base": {
+      "after_hours_over_initial_kinetic": {
+        "1": 0.0003896250047809034,
+        "12": -0.009723572608986066,
+        "2": -0.0017929177738589693,
+        "24": -0.010968171702783885,
+        "3": -0.007608514014144889,
+        "4": -0.01095006852303539,
+        "6": -0.006676127248910417
+      },
+      "daily_total_change_over_initial_kinetic": [
+        -0.010968171702783885,
+        -0.00435688422323382,
+        -0.004414196551496779
+      ],
+      "damping_scheme": "centred",
+      "dt": 600.0,
+      "initial_kinetic_j_m2": 127464.52662224085,
+      "raw_alpha": 0.53,
+      "raw_nu": 0.1,
+      "seconds_per_step_with_energy_every_step": 0.10203873796298366,
+      "startup_step_over_initial_kinetic": -6.763619689941416e-09
+    },
+    "dt_300": {
+      "after_hours_over_initial_kinetic": {
+        "1": 7.548815332714091e-05,
+        "12": -0.0030191958828941386,
+        "2": -0.0005488377504629525,
+        "24": -0.0038170092377635247,
+        "3": -0.0020747595758034924,
+        "4": -0.002921566642677025,
+        "6": -0.0019418516693776539
+      },
+      "daily_total_change_over_initial_kinetic": [
+        -0.0038170092377635247,
+        -0.0023072206205998645,
+        -0.0021739752477090857
+      ],
+      "damping_scheme": "centred",
+      "dt": 300.0,
+      "initial_kinetic_j_m2": 127464.52662224085,
+      "raw_alpha": 0.53,
+      "raw_nu": 0.1,
+      "seconds_per_step_with_energy_every_step": 0.103411344212957,
+      "startup_step_over_initial_kinetic": -7.855974197387706e-11
+    },
+    "lagged_damping": {
+      "after_hours_over_initial_kinetic": {
+        "1": 0.0003896250047809034,
+        "12": -0.009723572605245126,
+        "2": -0.0017929177738589693,
+        "24": -0.010968171695302006,
+        "3": -0.007608514014144889,
+        "4": -0.01095006852303539,
+        "6": -0.006676127248910417
+      },
+      "daily_total_change_over_initial_kinetic": [
+        -0.010968171695302006,
+        -0.0043568842307157,
+        -0.0044141965440148995
+      ],
+      "damping_scheme": "lagged",
+      "dt": 600.0,
+      "initial_kinetic_j_m2": 127464.52662224085,
+      "raw_alpha": 0.53,
+      "raw_nu": 0.1,
+      "seconds_per_step_with_energy_every_step": 0.09375959675927098,
+      "startup_step_over_initial_kinetic": -6.763619689941416e-09
+    },
+    "raw_off": {
+      "after_hours_over_initial_kinetic": {
+        "1": 0.00017196012624429727,
+        "12": -0.006645179816955938,
+        "2": -0.0018322872590658594,
+        "24": -0.005511862460652283,
+        "3": -0.0065501957730336475,
+        "4": -0.00901372695540004,
+        "6": -0.005101363387981841
+      },
+      "daily_total_change_over_initial_kinetic": [
+        -0.005511862460652283,
+        0.0004863021121481138,
+        0.0001989905919095999
+      ],
+      "damping_scheme": "centred",
+      "dt": 600.0,
+      "initial_kinetic_j_m2": 127464.52662224085,
+      "raw_alpha": 0.53,
+      "raw_nu": 0.0,
+      "seconds_per_step_with_energy_every_step": 0.14295208773149137,
+      "startup_step_over_initial_kinetic": -6.763619689941416e-09
+    }
+  }
+}
