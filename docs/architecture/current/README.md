@@ -5,7 +5,7 @@
 
 | | |
 |---|---|
-| Source base commit | `e2f626dfee16fed064d9704101fc416d7e6139d4` (clean working tree) |
+| Source base commit | `74729f475aa2d21dc48ab1ee3bb2c72aca13e71c` (clean working tree) |
 | Analysed package | `tropoi` under `src/` |
 | Generator | `tools.architecture` 2.2.0 |
 | Toolchain | Python 3.12, grimp 3.17, networkx 3.7 |
@@ -43,7 +43,6 @@ python -m tools.architecture.generate
 | `calls/terrain-raster.mmd` | Scoped static call graph (roots and depth: see *Call graphs* below). |
 | `class-atlas.html` | Offline explorer for the complete source containment tree. |
 | `class-inheritance.mmd` | Classes linked by inheritance between analysed classes. |
-| `classes.mmd` | Complete source containment tree of packages, Python files and class definitions. |
 | `coverage.json` | What was discovered, what is rendered, deliberate exclusions, static-analysis limits. |
 | `graph/calls.json` | Whole-package static call graph (all resolvable edges). |
 | `graph/classes.json` | Every class with members, bases, and inheritance/nesting edges. |
@@ -80,6 +79,7 @@ python -m tools.architecture.generate
 | `packages/tropoi.spatial.transforms.md` | Package page: all of its modules, classes and public functions; imports in and out. |
 | `packages/tropoi.temporal.md` | Package page: all of its modules, classes and public functions; imports in and out. |
 | `packages/tropoi.temporal.tendencies.md` | Package page: all of its modules, classes and public functions; imports in and out. |
+| `structure.mmd` | Complete source containment tree of packages, Python files and class definitions. |
 
 Generated files contain no timestamps, absolute paths, or source line numbers, so they change only when the extracted structure changes (the call-site totals in `metrics.json` are the exception: they count call expressions).
 

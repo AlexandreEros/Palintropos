@@ -1067,29 +1067,29 @@
     "package": "tropoi",
     "src": "src",
     "working_tree": {
-      "base_commit": "e2f626dfee16fed064d9704101fc416d7e6139d4",
+      "base_commit": "74729f475aa2d21dc48ab1ee3bb2c72aca13e71c",
       "generator": {
         "changes": [],
         "files": {
           "tools/architecture/__init__.py": "16efb065ee88ec075dde9de4cdbb2cc4ce9fc0cf7aaddb553ff09090a11eae45",
           "tools/architecture/calls.py": "fe492066691403114d3adef4eade7541d55afd75bfbd02d14c72871bfd824e92",
-          "tools/architecture/class_atlas.html": "6f04d754a001a1bd76bf68677067764758d7a9a6f88c113a6f2a8acb7c1a8f58",
-          "tools/architecture/class_tree.py": "77eca46c2e7f2ddb4ff5946840bf12f216afb620399f73afc44934a730a37418",
+          "tools/architecture/class_atlas.html": "1b96f8e8ccbd1e65d0ba12973d7e68c6d9fe75220c7411f36e0267ca036c8e56",
+          "tools/architecture/class_tree.py": "6cf6f9144670c0e2edf94886b97eff881e5181e2ab6e1fb607df4422e2639d74",
           "tools/architecture/classes.py": "9436c2df4d3cf426b8893116faecd071b0a436b6b3eb1b7e4a81bb59ccdc16d1",
-          "tools/architecture/coverage.py": "0c24dce8b3327c43ffc7c3e5baea8c8f734ca8670aff37107c1c9120dd270a08",
+          "tools/architecture/coverage.py": "d7bbb25f16735cf5e07a9b57d50ae997fd8b167db25d077087c01576a7cf0730",
           "tools/architecture/export.py": "0c912ab5a81b921807c1e57796c486fc2faea5e1be23103d71eea0506a29ffef",
-          "tools/architecture/generate.py": "cc367817e4370a6cedbe266af912d3c68caa3884df013f9623c43d295c820bd3",
+          "tools/architecture/generate.py": "eea2a40542e00dc76122d497cb5226b4f4c6ece30b86986d172af3b65fdfb7ce",
           "tools/architecture/imports.py": "be1b9267ae7d2da2d87e60cb3d3abde3011e49a7cfb628fb4222f5382c92d143",
           "tools/architecture/layers.py": "09a12c6790abad61e6326321180d84f9f01dfc85f9ac798d5e7b5b5186385b23",
           "tools/architecture/mermaid.py": "ad283b0848d4a54fb27904d2d9570ef25bacc196e580b3c00950440bce04cd32",
           "tools/architecture/metrics.py": "0c449fcc932fbae378a7e1c785506c05cda47d4449225d8d14462ce0de34e4db",
           "tools/architecture/model.py": "335acf6e713ca4bf79f2884d246addc8601effae88a43b68cff46ec98f293661",
           "tools/architecture/provenance.py": "bdb799b15386224f969b9743622e781f1e5b99adffbd5d01769f3872e733375a",
-          "tools/architecture/report.py": "53604e6454ae4b4cd8553fa8fa9942ce21b9c5129656b397035fd730e178a08b",
+          "tools/architecture/report.py": "e0fa24d8c671f6194669c643d0278173e5311b4dcc51dba1e14d2e577fb8579f",
           "tools/architecture/sources.py": "a528464392eba79f1ea73a9e48ac59e51d45d5493c8b79849c27fcdddaf81965",
-          "tools/architecture/views.py": "e63acbaab215d90bc5c654d585b3d57d44e11e22e44236527577c729ef9a1d32"
+          "tools/architecture/views.py": "14f6090f10485e5ad6355dc6af2ac04d9567a7c513c0f01b20774d016381b730"
         },
-        "sha256": "2e5fc18827d5ffa73d35c95e33f24f48ba926627210d9f3fb4d62e412430af58",
+        "sha256": "ecb9470b597535204fdf8355c62743289209ed36e292807a1f09a8bad3b1a3cb",
         "status": "clean"
       },
       "source": {
