@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>__TITLE__ — class atlas</title>
+<style>
+:root{--bg:#f6f8fc;--surface:#fff;--ink:#1e2635;--muted:#697487;--line:#dce4ef;--accent:#5d50b0;--folder:#eee9fc;--folder-b:#baafe6;--file:#e5f2ff;--file-b:#a5caea;--class:#e3f5ea;--class-b:#a0d1b5}
+*{box-sizing:border-box}
+body{margin:0;height:100vh;display:flex;flex-direction:column;background:var(--bg);font:14px/1.45 Inter,system-ui,-apple-system,'Segoe UI',sans-serif;color:var(--ink)}
+header{flex:none;min-height:75px;padding:16px 24px;background:white;border-bottom:1px solid var(--line);display:flex;flex-wrap:wrap;gap:8px 25px;align-items:center;justify-content:space-between}
+h1{font-size:20px;letter-spacing:-.04em;margin:0}header p{margin:3px 0 0;color:var(--muted);font-size:12px}
+.stats{display:flex;gap:8px;flex-wrap:wrap}
+.stat{padding:7px 12px;border:1px solid var(--line);border-radius:9px;background:#fafcff;font-size:12px}
+.stat strong{font-size:15px;margin-right:4px}
+.shell{flex:1;min-height:0;display:grid;grid-template-columns:340px minmax(0,1fr)}
+aside{border-right:1px solid var(--line);background:white;display:flex;flex-direction:column;min-height:0}aside .tools{padding:15px;border-bottom:1px solid var(--line)}
+label{font-size:12px;font-weight:650;color:var(--muted)}
+input{border:1px solid #cbd5e4;border-radius:8px;padding:10px 12px;width:100%;outline:none;background:#fff;margin-top:6px;font:inherit}
+input:focus{border-color:var(--accent);box-shadow:0 0 0 2px #dbd5ff}
+.searchResults{max-height:210px;overflow:auto;padding:4px 0}
+.result{width:100%;background:transparent;border:0;text-align:left;padding:8px;cursor:pointer;border-radius:7px}
+.result:hover{background:#f0f4ff}
+.result small{display:block;color:var(--muted)}
+.more{width:100%;margin-top:4px}
+.nav{overflow:auto;flex:1;padding:12px 8px}
+.navbutton{cursor:pointer;border:0;background:transparent;display:flex;width:100%;text-align:left;gap:7px;align-items:center;padding:6px 6px;border-radius:7px;color:var(--ink);font:inherit}
+.navbutton:hover{background:#f3f4fc}
+.navbutton.active{background:#eeeafb;color:#3e337e;font-weight:700}
+.navbutton .count{margin-left:auto;font-size:11px;color:#738198}
+.indent{margin-left:13px;border-left:1px solid #e5eaf2;padding-left:6px}
+.glyph{width:18px;text-align:center;color:#7165ba}
+.navhint{font-size:11px;color:var(--muted);margin:0 0 10px;padding:0 8px}
+main{min-width:0;min-height:0;display:flex;flex-direction:column}
+.toolbar{background:white;border-bottom:1px solid var(--line);display:flex;flex-wrap:wrap;align-items:center;gap:9px;padding:11px 16px}
+button.control{background:white;color:var(--ink);border:1px solid #cbd4e2;border-radius:8px;padding:7px 11px;cursor:pointer;font:inherit}
+button.control:hover{background:#f2f3ff}
+.crumb{font-size:12px;color:#454e63;margin-right:auto;font-weight:650}
+.hint{font-size:12px;color:var(--muted)}
+.toggle{display:flex;align-items:center;gap:5px;font-size:12px;cursor:pointer}
+.toggle input{width:auto;margin:0}
+.viewport{flex:1;min-height:100px;overflow:auto;background-image:radial-gradient(#d8deea .8px,transparent .8px);background-size:21px 21px;position:relative;cursor:grab;touch-action:none}
+.diagram{transform-origin:0 0;display:block}
+.details{background:white;border-top:1px solid var(--line);padding:10px 20px;min-height:82px;font-size:13px}
+.details strong{font-weight:750}
+.details .path{font:12px ui-monospace,Consolas,monospace;color:#556176;overflow-wrap:anywhere;margin:3px 0}
+.details .source{color:var(--muted);overflow-wrap:anywhere}
+.legend{display:flex;gap:13px;flex-wrap:wrap;padding:9px 16px;background:#fff;border-top:1px solid var(--line);font-size:12px;color:var(--muted)}
+.dot{width:11px;height:11px;border-radius:3px;display:inline-block;margin-right:5px;vertical-align:-1px}
+.node{cursor:pointer}
+.node:hover rect{stroke-width:2.1}
+.node.selected rect{stroke:#5d50b0;stroke-width:2.3}
+.node text{pointer-events:none;font:12px Inter,system-ui,sans-serif}
+.connection{stroke:#a6b2c7;stroke-width:1.25;fill:none}
+@media (max-width:800px){.shell{grid-template-columns:180px 1fr}
+header{padding:11px}
+.stats{gap:4px}
+.stat{padding:4px;font-size:10px}aside .tools{padding:7px}
+.nav{padding:5px}
+.navbutton{font-size:11px}
+.hint{display:none}}
+.viewport.dragging{cursor:grabbing;user-select:none}
+.node:focus-visible rect{stroke:var(--accent);stroke-width:2.3}
+.result small{overflow-wrap:anywhere}
+@media (max-width:550px){
+  body{height:auto;min-height:100vh}
+  .shell{grid-template-columns:1fr}
+  aside{max-height:260px;border-right:0;border-bottom:1px solid var(--line)}
+  .searchResults{max-height:150px}
+  .nav{min-height:0}
+  .viewport{height:55vh;flex:auto}
+}
+</style></head><body>
+<header><div><h1>__TITLE__ <span style="font-weight:400;color:#817899">/</span> class atlas</h1><p>Browse packages, Python files, and class definitions.</p></div>
+<div class="stats"><span class="stat"><strong id="package-count"></strong>packages</span><span class="stat"><strong id="module-count"></strong>Python files</span><span class="stat"><strong id="class-count"></strong>classes</span></div></header>
+<div class="shell"><aside><div class="tools"><label for="search">Find a package, Python file, or class</label><input id="search" placeholder="e.g. SpectralState" autocomplete="off"/><div id="results" aria-live="polite" class="searchResults"></div></div>
+<div class="nav"><p class="navhint">Select a folder to draw its complete subtree.</p><div id="nav"></div></div></aside>
+<main><div class="toolbar"><div id="crumb" class="crumb"></div><button id="up" class="control">↑ Parent</button><label class="toggle"><input id="foldersOnly" type="checkbox" checked/> Package overview</label><button class="control" id="minus" aria-label="Zoom out">−</button><span id="zoomLabel" class="hint">100%</span><button class="control" id="plus" aria-label="Zoom in">+</button><button class="control" id="fit">Fit width</button><span class="hint">Drag the canvas to pan</span></div>
+<div class="viewport" id="viewport" tabindex="0" aria-label="Scrollable class tree"><svg id="svg" class="diagram" xmlns="http://www.w3.org/2000/svg" role="group" aria-label="Tree of packages, Python files and classes"></svg></div>
+<div id="details" aria-live="polite" class="details"><strong></strong><div class="path">Choose a node to see its fully qualified path.</div></div><div class="legend"><span><i class="dot" style="background:var(--folder-b)"></i>Directory / package</span><span><i class="dot" style="background:var(--file-b)"></i>Python file</span><span><i class="dot" style="background:var(--class-b)"></i>Class definition</span><span>Lines mean <b>contains</b></span></div>
+</main></div>
+<script id="tree-data" type="application/json">
+__TREE_DATA__
+</script>
+<script>
+"use strict";
+
+const get = id => document.getElementById(id);
+const nodes = JSON.parse(get("tree-data").textContent);
+const byId = new Map(nodes.map(node => [node.id, node]));
+const root = nodes.find(node => node.parent === null).id;
+const children = new Map(nodes.map(node => [node.id, []]));
+const totals = {package: 0, module: 0, class: 0};
+for (const node of nodes) {
+  totals[node.kind]++;
+  if (node.parent) children.get(node.parent).push(node);
+}
+const kindOrder = {package: 0, module: 1, class: 2};
+for (const siblings of children.values()) {
+  siblings.sort((a, b) => kindOrder[a.kind] - kindOrder[b.kind] || a.name.localeCompare(b.name));
+}
+for (const [kind, total] of Object.entries(totals)) get(kind + "-count").textContent = total;
+
+const counts = new Map();
+function countSubtree(id) {
+  const count = {classes: 0, files: 0};
+  for (const node of children.get(id)) {
+    const nested = countSubtree(node.id);
+    count.classes += nested.classes + Number(node.kind === "class");
+    count.files += nested.files + Number(node.kind === "module");
+  }
+  counts.set(id, count);
+  return count;
+}
+countSubtree(root);
+
+const svg = get("svg");
+const viewport = get("viewport");
+const foldersOnly = get("foldersOnly");
+const search = get("search");
+const results = get("results");
+const colors = {
+  package: ["#eee9fc", "#b9abe5", "#423781"],
+  module: ["#e5f2ff", "#a5c9e8", "#28567c"],
+  class: ["#e3f5ea", "#a3d3b5", "#1f6441"]
+};
+let current = root;
+let selected = root;
+let selectedElement;
+let zoom = 1;
+let width;
+let height;
+
+function element(tag, text, className) {
+  const item = document.createElement(tag);
+  item.textContent = text;
+  if (className) item.className = className;
+  return item;
+}
+
+function svgElement(tag, attrs, parent = svg) {
+  const item = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [key, value] of Object.entries(attrs)) item.setAttribute(key, value);
+  parent.append(item);
+  return item;
+}
+
+function ancestors(id) {
+  const path = [];
+  for (let node = byId.get(id); node; node = byId.get(node.parent)) path.push(node);
+  return path;
+}
+
+function renderNav() {
+  const expanded = new Set(ancestors(current).map(node => node.id));
+  function entry(node) {
+    const block = document.createElement("div");
+    const packages = children.get(node.id).filter(child => child.kind === "package");
+    const active = node.id === current;
+    const button = element("button", "", "navbutton" + (active ? " active" : ""));
+    button.setAttribute("aria-current", active ? "true" : "false");
+    const open = expanded.has(node.id);
+    const glyph = element("span", packages.length && open ? "▾" : "▸", "glyph");
+    glyph.setAttribute("aria-hidden", "true");
+    button.append(glyph, element("span", node.name),
+                  element("span", counts.get(node.id).classes, "count"));
+    button.onclick = () => openFolder(node.id);
+    block.append(button);
+    if (packages.length && open) {
+      const nested = element("div", "", "indent");
+      nested.append(...packages.map(entry));
+      block.append(nested);
+    }
+    return block;
+  }
+  get("nav").replaceChildren(entry(byId.get(root)));
+}
+
+function select(node, shape) {
+  selected = node.id;
+  selectedElement?.classList.remove("selected");
+  selectedElement = shape;
+  shape?.classList.add("selected");
+  const {classes, files} = counts.get(node.id);
+  const summary = node.kind === "package" ? classes + " classes in " + files + " files"
+    : node.source + (node.line === null ? "" : ":" + node.line);
+  get("details").replaceChildren(element("strong", node.name),
+    element("div", node.path, "path"), element("span", summary, "source"));
+}
+
+function openFolder(id, selection = id) {
+  current = id;
+  selected = selection;
+  foldersOnly.checked = id === root && selection === id;
+  viewport.scrollTo(0, 0);
+  renderNav();
+  draw();
+}
+
+function updateSize() {
+  svg.setAttribute("width", width * zoom);
+  svg.setAttribute("height", height * zoom);
+  get("zoomLabel").textContent = Math.round(zoom * 100) + "%";
+}
+
+function draw() {
+  svg.replaceChildren();
+  selectedElement = undefined;
+  get("crumb").textContent = byId.get(current).source.split("/").join(" / ") + " /";
+  get("up").disabled = current === root;
+  const positions = new Map();
+  const boxWidth = 204;
+  const boxHeight = 29;
+  const column = 264;
+  let row = 0;
+  let maxDepth = 0;
+
+  function layout(id, depth) {
+    maxDepth = Math.max(maxDepth, depth);
+    const visible = children.get(id).filter(node => !foldersOnly.checked || node.kind === "package");
+    const rows = visible.map(node => layout(node.id, depth + 1));
+    const y = rows.length ? (rows[0] + rows.at(-1)) / 2 : row++ * 39 + 30;
+    positions.set(id, {x: 22 + depth * column, y});
+    return y;
+  }
+  layout(current, 0);
+  width = 22 + maxDepth * column + boxWidth + 22;
+  height = Math.max(200, row * 39 + 35);
+  svg.setAttribute("viewBox", [0, 0, width, height].join(" "));
+  updateSize();
+
+  for (const [id, {x, y}] of positions) {
+    const parent = positions.get(byId.get(id).parent);
+    if (!parent) continue;
+    const start = parent.x + boxWidth;
+    svgElement("path", {
+      d: ["M", start, parent.y, "C", start + 18, parent.y, x - 18, y, x, y].join(" "),
+      class: "connection"
+    });
+  }
+
+  let reveal;
+  for (const [id, {x, y}] of positions) {
+    const node = byId.get(id);
+    const [fill, stroke, textColor] = colors[node.kind];
+    const accessibleName = node.path + (node.line === null ? "" : " at line " + node.line);
+    const shape = svgElement("g", {
+      class: "node", tabindex: 0, role: "button", "aria-label": accessibleName,
+      transform: "translate(" + x + "," + (y - boxHeight / 2) + ")"
+    });
+    svgElement("rect", {width: boxWidth, height: boxHeight, rx: 7, fill, stroke}, shape);
+    const caption = svgElement("text", {x: 11, y: 18, fill: textColor,
+      "font-weight": node.kind === "package" ? 700 : 500}, shape);
+    const characters = Array.from(node.name);
+    caption.textContent = node.name;
+    while (caption.getComputedTextLength() > boxWidth - 22 && characters.length) {
+      characters.pop();
+      caption.textContent = characters.join("") + "…";
+    }
+    svgElement("title", {}, shape).textContent = accessibleName;
+    const activate = () => node.kind === "package" ? openFolder(id) : select(node, shape);
+    shape.addEventListener("click", activate);
+    shape.addEventListener("keydown", event => {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        activate();
+      }
+    });
+    if (id === selected) {
+      select(node, shape);
+      if (id !== current) reveal = shape;
+    }
+  }
+  if (reveal) reveal.scrollIntoView({block: "nearest", inline: "nearest"});
+}
+
+get("up").onclick = () => openFolder(byId.get(current).parent);
+foldersOnly.onchange = () => {
+  if (foldersOnly.checked) selected = current;
+  draw();
+};
+function setZoom(next) {
+  const old = zoom;
+  zoom = Math.min(2.2, Math.max(0.1, next));
+  const left = viewport.scrollLeft * zoom / old;
+  const top = viewport.scrollTop * zoom / old;
+  updateSize();
+  viewport.scrollTo(left, top);
+}
+get("plus").onclick = () => setZoom(zoom * 1.2);
+get("minus").onclick = () => setZoom(zoom / 1.2);
+get("fit").onclick = () => setZoom(Math.min(1, (viewport.clientWidth - 4) / width));
+
+let drag;
+let suppressClick = false;
+viewport.addEventListener("pointerdown", event => {
+  if (event.button !== 0 || !event.target.closest("svg") && event.target !== viewport) return;
+  suppressClick = false;
+  drag = {id: event.pointerId, x: event.clientX, y: event.clientY,
+          left: viewport.scrollLeft, top: viewport.scrollTop, moved: false};
+});
+viewport.addEventListener("pointermove", event => {
+  if (drag?.id !== event.pointerId) return;
+  const dx = event.clientX - drag.x;
+  const dy = event.clientY - drag.y;
+  if (!drag.moved && Math.hypot(dx, dy) < 5) return;
+  if (!drag.moved) {
+    viewport.setPointerCapture(event.pointerId);
+    viewport.classList.add("dragging");
+    drag.moved = true;
+  }
+  viewport.scrollTo(drag.left - dx, drag.top - dy);
+});
+function finishDrag(event) {
+  if (drag?.id !== event.pointerId) return;
+  suppressClick = drag.moved;
+  drag = undefined;
+  viewport.classList.remove("dragging");
+}
+window.addEventListener("pointerup", finishDrag);
+window.addEventListener("pointercancel", finishDrag);
+viewport.addEventListener("click", event => {
+  if (suppressClick && event.detail > 0) event.stopPropagation();
+  suppressClick = false;
+}, true);
+
+const resultPage = 50;
+function resultButton(node) {
+  const button = element("button", "", "result");
+  button.append(element("strong", node.name), element("small", node.path +
+    (node.line === null ? "" : " · " + node.source + ":" + node.line)));
+  button.onclick = () => {
+    const folder = ancestors(node.id).find(item => item.kind === "package");
+    openFolder(folder.id, node.id);
+    selectedElement?.focus({preventScroll: true});
+    results.replaceChildren();
+    search.value = "";
+  };
+  return button;
+}
+function showResults(matches, shown) {
+  results.querySelector(".more")?.remove();
+  results.append(...matches.slice(shown, shown + resultPage).map(resultButton));
+  const rest = matches.length - shown - resultPage;
+  if (rest > 0) {
+    const more = element("button", "Show " + Math.min(rest, resultPage) + " more of " + rest,
+                         "control more");
+    more.onclick = () => showResults(matches, shown + resultPage);
+    results.append(more);
+  }
+}
+search.addEventListener("input", () => {
+  const query = search.value.trim().toLowerCase();
+  results.replaceChildren();
+  if (!query) return;
+  const matches = nodes.filter(node => [node.name, node.path, node.source]
+    .some(value => value.toLowerCase().includes(query)));
+  matches.sort((a, b) => Number(b.kind === "class") - Number(a.kind === "class") ||
+    a.path.localeCompare(b.path) || a.line - b.line);
+  if (!matches.length) results.textContent = "No match.";
+  else showResults(matches, 0);
+});
+renderNav();
+draw();
+</script>
+</body></html>

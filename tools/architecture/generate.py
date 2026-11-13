@@ -20,12 +20,14 @@ import argparse
 import json
 import subprocess
 import sys
+from collections import Counter
 from dataclasses import dataclass, field
 from importlib import metadata
 from pathlib import Path
 
 from . import TOOL_VERSION
 from .calls import build_call_graph, scoped
+from . import class_tree
 from .classes import build_class_graph
 from . import coverage as cov
 from .views import index_page, package_page, page_name, public_functions
@@ -153,10 +155,14 @@ def render(opts: Options, root: Path = REPO_ROOT) -> dict[str, str]:
 
     # -- class diagrams --
     in_hierarchy = sorted({c for (s, t, k) in classes.edges if k == "inherits" for c in (s, t)})
-    files["classes.mmd"] = class_diagram(
+    files["class-inheritance.mmd"] = class_diagram(
         classes, in_hierarchy, pkg,
         "Classes that take part in an inheritance edge between analysed classes, "
         "with the functions defined in each class body.")
+    tree = class_tree.build_tree(project)
+    files["structure.mmd"] = class_tree.render_mermaid(tree)
+    files["class-atlas.html"] = class_tree.render_html(tree, opts.package)
+    tree_problems = cov.containment_problems(project, files["structure.mmd"], files["class-atlas.html"])
 
     # -- scope: discovered entry points, declared paths, coverage problems --
     handlers = cov.cli_handlers(project)
@@ -210,6 +216,7 @@ def render(opts: Options, root: Path = REPO_ROOT) -> dict[str, str]:
                      "data_files": data_files.get(package, [])})
     problems += cov.rendered_problems(project, rendered_classes, rendered_modules,
                                       set(by_package))
+    problems += tree_problems
     if problems:
         raise cov.CoverageError(problems)
     rooted = {r for p in scope.entry_paths for r in p.roots}
@@ -217,6 +224,9 @@ def render(opts: Options, root: Path = REPO_ROOT) -> dict[str, str]:
         "rules": {
             "packages": "every analysed package gets packages/<package>.md with all of its "
                         "modules, classes and public module-level functions",
+            "containment": "both views contain each class definition, and each Python file "
+                           "and package directory that contains one, once, with parents "
+                           "verified from the source AST",
             "cli_handlers": "every <parser>.set_defaults(<keyword>=<function>) handler gets "
                             "calls/cli-<name>.mmd",
             "entry_point_candidates": "module-level functions exported through some "
@@ -235,6 +245,7 @@ def render(opts: Options, root: Path = REPO_ROOT) -> dict[str, str]:
             "package_pages": len(by_package), "modules": len(rendered_modules),
             "classes": len(rendered_classes),
             "classes_in_inheritance_overview": len(in_hierarchy),
+            "containment": dict(sorted(Counter(node.kind for node in tree).items())),
             "call_graphs": {n: {"roots": r, "packages": packages_by_graph[n]}
                             for n, r in sorted(graphs.items())},
         },

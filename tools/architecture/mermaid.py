@@ -38,9 +38,14 @@ _ESCAPES = {'"': "#quot;", "<": "#lt;", ">": "#gt;", "#": "#35;", "|": "#124;",
             "[": "#91;", "]": "#93;", "{": "#123;", "}": "#125;", "\n": " "}
 
 
+def _label_text(text: str) -> str:
+    # Quoted labels are markdown too: ``__init__`` would render as bold "init".
+    return "".join("#95;" if ch == "_" else _ESCAPES.get(ch, ch) for ch in text)
+
+
 def label(text: str) -> str:
     """Quoted Mermaid label text with Mermaid-significant characters escaped."""
-    return '"' + "".join(_ESCAPES.get(ch, ch) for ch in text) + '"'
+    return '"' + _label_text(text) + '"'
 
 
 def member_text(text: str) -> str:
@@ -71,8 +76,7 @@ LAYERED_WRAPPING = '%%{init: {"flowchart": {"wrappingWidth": 700}}}%%'
 
 def label_lines(lines: list[str]) -> str:
     """Quoted label of several lines: each escaped, joined by ``<br>``."""
-    return '"' + "<br>".join("".join(_ESCAPES.get(ch, ch) for ch in line)
-                             for line in lines) + '"'
+    return '"' + "<br>".join(_label_text(line) for line in lines) + '"'
 
 
 def _package_node(agg: Graph, pkg: str, root: str) -> str:
@@ -245,7 +249,7 @@ def class_diagram(graph: Graph, classes: list[str], root: str, title: str,
 _ARROWS = {
     "call": "-->",
     "instantiate": "-->|instantiate|",
-    "constructor": "-->|__init__|",
+    "constructor": "-->|#95;#95;init#95;#95;|",  # "__init__", not bold "init"
     "super": "-->|super|",
     "self": "-.->|self|",
     "override": "-.->|override?|",

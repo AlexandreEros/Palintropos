@@ -207,7 +207,7 @@ Module-level import edges involved: 2.
 ## Class graph
 
 * Classes: 211
-* Classes in at least one `inherits` edge (drawn in `classes.mmd`): 21; with neither an analysed base nor an analysed subclass: 190
+* Classes in at least one `inherits` edge (drawn in `class-inheritance.mmd`): 21; with neither an analysed base nor an analysed subclass: 190
 * `inherits` edges between analysed classes: 14
 * `nests` edges (class defined in a class body): 0
 * Bases outside the analysed package: `RuntimeError` x6, `UserWarning` x1, `ValueError` x20, `abc.ABC` x2, `collections.abc.Mapping` x1, `enum.Enum` x2, `str` x2, `typing.Protocol` x3

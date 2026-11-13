@@ -190,6 +190,9 @@ class Project:
         self.src_root = Path(src_root)
         self.package = package
         self.modules: dict[str, ModuleInfo] = {}
+        # Physical files are distinct even if their import names collide.
+        # Namespace placeholders have no corresponding file.
+        self.files: dict[str, ModuleInfo] = {}
         self.classes: dict[str, ClassInfo] = {}
         self.functions: dict[str, FunctionInfo] = {}
         self._discover()
@@ -226,8 +229,9 @@ class Project:
                     text = entry.read_text(encoding="utf-8")
                     tree = ast.parse(text, filename=str(entry))
                     rel = entry.relative_to(self.src_root).as_posix()
-                    self.modules[name] = ModuleInfo(name, rel, is_package, tree,
-                                                    category=classify(tree))
+                    info = ModuleInfo(name, rel, is_package, tree, category=classify(tree))
+                    self.files[rel] = info
+                    self.modules[name] = info
         self.namespace_packages.sort()
         self.modules = dict(sorted(self.modules.items()))
 

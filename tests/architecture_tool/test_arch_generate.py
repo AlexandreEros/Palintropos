@@ -25,7 +25,7 @@ def test_render_is_deterministic(repo):
     first = render(_opts(), root=repo)
     second = render(_opts(), root=repo)
     assert first == second
-    assert {"README.md", "metrics.json", "metrics.md", "packages.mmd", "classes.mmd",
+    assert {"README.md", "metrics.json", "metrics.md", "packages.mmd", "structure.mmd",
             "calls/entry.mmd", "calls/uses.mmd", "graph/modules.json", "graph/calls.json"} <= set(first)
     assert "modules-cycles.mmd" in first  # a <-> b via a function-scope import
 

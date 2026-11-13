@@ -26,4 +26,4 @@ for the extraction rules and metric definitions as rendered for a snapshot.
 """
 
 #: Bumped whenever a change to the tool can change generated output.
-TOOL_VERSION = "2.1.0"
+TOOL_VERSION = "2.2.0"

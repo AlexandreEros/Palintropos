@@ -43,12 +43,17 @@ from __future__ import annotations
 
 import ast
 import hashlib
+import json
+import os
 import re
 import tomllib
+from collections import Counter
 from dataclasses import dataclass, field
 from pathlib import Path
 
 from .calls import TRAVERSED_KINDS
+from . import class_tree
+from .class_tree import Node, mermaid_id, mermaid_label
 from .model import Graph
 from .sources import Project, dotted
 
@@ -270,4 +275,149 @@ def rendered_problems(project: Project, rendered_classes: set[str],
                  for c in sorted(set(project.classes) - rendered_classes)]
     problems += [f"module {m} is in no package view"
                  for m in sorted(set(project.modules) - rendered_modules)]
+    return problems
+
+
+def _expected_containment(project: Project) -> list[Node]:
+    """Audit the files and ASTs without using the discovery or rendering indexes."""
+    root = project.src_root / project.package
+    expected = {}
+    # Follow directory links, as discovery does through Path.is_dir() and iterdir().
+    for directory, subdirs, filenames in os.walk(root, followlinks=True):
+        subdirs[:] = [name for name in subdirs
+                      if not name.startswith(".") and name != "__pycache__"]
+        for name in filenames:
+            file = Path(directory) / name
+            if file.suffix != ".py" or not file.is_file():
+                continue
+            relative = file.relative_to(project.src_root)
+            source = relative.as_posix()
+            for folder in relative.parents:
+                if not folder.parts:
+                    break
+                identity = f"d:{folder.as_posix()}"
+                expected[identity] = Node(
+                    identity, folder.name, "package",
+                    None if len(folder.parts) == 1 else f"d:{folder.parent.as_posix()}",
+                    ".".join(folder.parts), folder.as_posix())
+
+            module_id = f"m:{source}"
+            qualified = ".".join(relative.with_suffix("").parts)
+            expected[module_id] = Node(module_id, name, "module",
+                                       f"d:{relative.parent.as_posix()}", qualified, source)
+            module = ".".join(relative.parent.parts if name == "__init__.py"
+                              else relative.with_suffix("").parts)
+            tree = ast.parse(file.read_text(encoding="utf-8"), filename=str(file))
+            parents = {child: parent for parent in ast.walk(tree)
+                       for child in ast.iter_child_nodes(parent)}
+            for cls in (node for node in parents if isinstance(node, ast.ClassDef)):
+                parts = [cls.name]
+                owner = module_id
+                ancestor = parents[cls]
+                while ancestor is not tree:
+                    if isinstance(ancestor, ast.ClassDef):
+                        parts.append(ancestor.name)
+                        if owner == module_id:
+                            owner = f"c:{source}:{ancestor.lineno}"
+                    elif isinstance(ancestor, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                        parts.extend(("<locals>", ancestor.name))
+                    ancestor = parents[ancestor]
+                path = ".".join([module, *reversed(parts)])
+                identity = f"c:{source}:{cls.lineno}"
+                expected[identity] = Node(identity, cls.name, "class", owner, path, source,
+                                          cls.lineno)
+    # Only classes, their ancestors and the package root belong in the views.
+    wanted = {f"d:{project.package}"}
+    for node in expected.values():
+        if node.kind == "class":
+            ancestor = node
+            while ancestor is not None:
+                wanted.add(ancestor.id)
+                ancestor = expected.get(ancestor.parent)
+    return [node for node in expected.values() if node.id in wanted]
+
+
+def _count_problems(expected: list, actual: list, artifact: str, item: str) -> list[str]:
+    counts = Counter(actual)
+    wanted = set(expected)
+    return (
+        [f"{artifact}: missing {item} {value}" for value in sorted(wanted - counts.keys())]
+        + [f"{artifact}: duplicate {item} {value}" for value, count in sorted(counts.items())
+           if count > 1]
+        + [f"{artifact}: unexpected {item} {value}" for value in sorted(counts.keys() - wanted)]
+    )
+
+
+def containment_problems(project: Project, mermaid: str, html: str) -> list[str]:
+    """Read back the serialized nodes and edges and compare with source facts."""
+    expected = _expected_containment(project)
+    diagram = "structure.mmd"
+    declarations = []
+    edges = []
+    problems = []
+    lines = mermaid.splitlines()
+    if [line.strip() for line in lines if line.startswith("flowchart")] != ["flowchart LR"]:
+        problems.append(f"{diagram}: expected one left-to-right flowchart")
+    for line in lines:
+        line = line.strip()
+        if not line or line == "flowchart LR" or (line.startswith("%% ") and "%%{" not in line):
+            continue
+        if re.fullmatch(r"classDef (?:package|module|class)Node [\w:#,-]+", line):
+            continue
+        declaration = re.fullmatch(r'(\w+)\[("[^"]*")\]:::(\w+)Node', line)
+        edge = re.fullmatch(r"(\w+) --> (\w+)", line)
+        if declaration:
+            declarations.append(declaration.groups())
+        elif edge:
+            edges.append(edge.groups())
+        else:
+            problems.append(f"{diagram}: unexpected statement {line}")
+    expected_ids = [mermaid_id(n.id) for n in expected]
+    if len(set(expected_ids)) != len(expected_ids):
+        problems.append(f"{diagram}: source identities produce a Mermaid identifier collision")
+    problems += _count_problems(expected_ids, [identity for identity, _, _ in declarations],
+                                diagram, "node")
+    by_id = {identity: (text, kind) for identity, text, kind in declarations}
+    for node in expected:
+        identity = mermaid_id(node.id)
+        if identity in by_id and by_id[identity] != (mermaid_label(node), node.kind):
+            problems.append(f"{diagram}: incorrect label or kind for {node.id}")
+
+    parents: dict[str, list[str]] = {}
+    for parent, child in edges:
+        parents.setdefault(child, []).append(parent)
+    for node in expected:
+        actual_parents = parents.pop(mermaid_id(node.id), [])
+        expected_parents = [mermaid_id(node.parent)] if node.parent else []
+        if actual_parents != expected_parents:
+            problems.append(f"{diagram}: wrong parent for {node.id}: {actual_parents}")
+    problems.extend(f"{diagram}: unexpected edge to {child}" for child in sorted(parents))
+    # Mermaid measures JavaScript string length, in UTF-16 code units.
+    size = len(mermaid.encode("utf-16-le")) // 2
+    if size > class_tree.MERMAID_MAX_TEXT_SIZE:
+        problems.append(f"{diagram}: {size} characters exceed Mermaid's default maxTextSize "
+                        f"of {class_tree.MERMAID_MAX_TEXT_SIZE}")
+    if len(edges) > class_tree.MERMAID_MAX_EDGES:
+        problems.append(f"{diagram}: {len(edges)} edges exceed Mermaid's default maxEdges "
+                        f"of {class_tree.MERMAID_MAX_EDGES}")
+
+    atlas = "class-atlas.html"
+    payloads = re.findall(r'<script id="tree-data" type="application/json">\s*(.*?)\s*</script>',
+                          html, re.DOTALL)
+    if len(payloads) != 1:
+        return problems + [f"{atlas}: expected exactly one tree-data payload"]
+    try:
+        data = json.loads(payloads[0])
+        if not isinstance(data, list):
+            raise ValueError("tree-data is not a list")
+        nodes = [Node(**record) for record in data]
+    except (ValueError, TypeError) as error:
+        return problems + [f"{atlas}: invalid tree-data: {error}"]
+    problems += _count_problems([n.id for n in expected], [n.id for n in nodes], atlas, "node")
+    html_by_id = {node.id: node for node in nodes}
+    for node in expected:
+        actual = html_by_id.get(node.id)
+        if actual is not None and actual != node:
+            detail = "wrong parent" if actual.parent != node.parent else "incorrect node data"
+            problems.append(f"{atlas}: {detail} for {node.id}")
     return problems
