@@ -53,8 +53,8 @@ class RadiativeRun:
     def __init__(self, cfg: RadiativeConfig, run_dir, *, physics: bool = True,
                  allow_dirty: bool = False, log: Callable[[str], None] = print):
         import cupy as cp
-        from tropoi.run.radiative.model import (build_model, build_physics, build_stepper,
-                                                initial_state)
+        from tropoi.run.radiative.model import (build_boundary_layer, build_model,
+                                                build_physics, build_stepper, initial_state)
         from tropoi.spatial.states.primitive_equations import PrimitiveEquationsState
         from tropoi.temporal.column_coupling import ColumnPhysicsCoupling
 
@@ -96,7 +96,10 @@ class RadiativeRun:
                 ts0 = cp.full(npts, 280.0 if surface_t is None else float(surface_t))
             self.coupling = ColumnPhysicsCoupling(model, physics_obj, cfg.dt,
                                                   surface_temperature=ts0)
-        self.stepper = build_stepper(cfg, model, self.coupling, stage_validator=validator)
+        self.boundary_layer = build_boundary_layer(cfg, model, self.coupling)
+        self.stepper = build_stepper(cfg, model, self.coupling,
+                                     boundary_layer=self.boundary_layer,
+                                     stage_validator=validator)
         self.series: dict[str, list] = {}
         self._sums = None
         self._count = 0
@@ -151,6 +154,14 @@ class RadiativeRun:
             ts = self.coupling.surface_temperature
             if ts is not None:
                 row["mean_surface_temperature"] = float((self.coupling.weights * ts).sum())
+            # lowest-full-level wind speed (plan §2e, M7); an upper bound on
+            # |u| there, so the criterion can be judged from the series alone
+            row["max_wind_bottom"] = float(
+                self.coupling._lowest_wind_speed(self.stepper.state).max())
+        if self.boundary_layer is not None:
+            bl = self.boundary_layer.budget_means(reset=True)
+            row["bl_kinetic_sink"] = bl["kinetic_sink"]
+            row["bl_max_depth"] = bl["max_depth"]
         if self._energy_prev is not None:
             rate = (energy["total"] - self._energy_prev["total"]) / DAY_SECONDS
             row["energy_rate"] = rate
@@ -188,7 +199,9 @@ class RadiativeRun:
         if self.coupling is not None:
             c = self.coupling.state_dict()
             coupling = {"budget_time": c["budget_time"], "budget": c["budget"]}
-        meta = {"day": self.day, "stepper": sd, "coupling": coupling, "count": self._count,
+        bl_state = None if self.boundary_layer is None else self.boundary_layer.state_dict()
+        meta = {"day": self.day, "stepper": sd, "coupling": coupling,
+                "boundary_layer": bl_state, "count": self._count,
                 "series": self.series, "energy_prev": self._energy_prev,
                 "config_sha256": self.config_sha256, "code": self.code,
                 "environment": environment_identity()}
@@ -231,6 +244,8 @@ class RadiativeRun:
             c = dict(meta["coupling"] or {})
             c["surface_temperature"] = arrays.get("surface_temperature")
             self.coupling.load_state_dict(c)
+        if self.boundary_layer is not None:
+            self.boundary_layer.load_state_dict(meta.get("boundary_layer") or {})
         self.series = {k: list(v) for k, v in meta["series"].items()}
         self._energy_prev = meta["energy_prev"]
         self._count = int(meta["count"])

@@ -26,7 +26,8 @@ from tropoi.run.radiative.config import DAY_SECONDS, RadiativeConfig
 from tropoi.spatial.sigma_coordinate import SigmaGrid
 
 __all__ = ["build_sigma", "build_radiation", "build_insolation", "build_physics",
-           "build_model", "build_stepper", "reference_column", "initial_state"]
+           "build_model", "build_boundary_layer", "build_stepper", "reference_column",
+           "initial_state"]
 
 
 def _options(spec: dict, *required, **defaults) -> dict:
@@ -238,11 +239,28 @@ def _frictional_heating(cfg: RadiativeConfig, model, dampers, lagged_drag):
     return MomentumSinkHeating(model, sinks, cfg.cp)
 
 
+def build_boundary_layer(cfg: RadiativeConfig, model, coupling):
+    """The configured §2e boundary layer as a lagged term, or None.
+
+    Needs the coupling's slab temperature, so an adiabatic run
+    (``coupling=None``) runs without it like without any other physics.
+    """
+    if cfg.boundary_layer is None or coupling is None:
+        return None
+    from tropoi.temporal.tendencies.boundary_layer import BoundaryLayerDiffusion
+    o = _options({"kind": "boundary_layer", **cfg.boundary_layer}, "roughness_length",
+                 critical_richardson=1.0, rich_crit_pbl=1.0, frac_inner=0.1, gustiness=0.0)
+    return BoundaryLayerDiffusion(model, coupling, gravity=cfg.gravity, cp=cfg.cp,
+                                  gas_constant=cfg.gas_constant, dt=cfg.dt,
+                                  heating=cfg.frictional_heating, **o)
+
+
 def build_stepper(cfg: RadiativeConfig, model, coupling, *,
-                  stage_validator: Optional[Callable] = None):
+                  boundary_layer=None, stage_validator: Optional[Callable] = None):
     """Semi-implicit leapfrog with del^(2n) hyperdiffusion, the configured
-    drag and the column physics as a lagged term (``coupling=None`` gives
-    the adiabatic model with the same numerics)."""
+    drag, the optional boundary layer and the column physics as lagged
+    terms (``coupling=None`` gives the adiabatic model with the same
+    numerics)."""
     from tropoi.temporal.semi_implicit import (SemiImplicitLeapfrogStepper,
                                                SemiImplicitOperator)
     from tropoi.temporal.tendencies.held_suarez import hyperdiffusion_damping
@@ -261,6 +279,9 @@ def build_stepper(cfg: RadiativeConfig, model, coupling, *,
     explicit = ()
     if cfg.frictional_heating:
         explicit = (_frictional_heating(cfg, model, dampers + (hyper,), lagged),)
+    if boundary_layer is not None:
+        # before the coupling, so both see the same slab temperature
+        lagged = lagged + (boundary_layer,)
     if coupling is not None:
         lagged = lagged + (coupling,)
     return SemiImplicitLeapfrogStepper(
