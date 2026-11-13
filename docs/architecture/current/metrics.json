@@ -1067,16 +1067,16 @@
     "package": "tropoi",
     "src": "src",
     "working_tree": {
-      "base_commit": "31bc5e1bd7a32047d4ee971cfd1e1e96b3b68edb",
+      "base_commit": "e2f626dfee16fed064d9704101fc416d7e6139d4",
       "generator": {
         "changes": [],
         "files": {
           "tools/architecture/__init__.py": "16efb065ee88ec075dde9de4cdbb2cc4ce9fc0cf7aaddb553ff09090a11eae45",
           "tools/architecture/calls.py": "fe492066691403114d3adef4eade7541d55afd75bfbd02d14c72871bfd824e92",
           "tools/architecture/class_atlas.html": "6f04d754a001a1bd76bf68677067764758d7a9a6f88c113a6f2a8acb7c1a8f58",
-          "tools/architecture/class_tree.py": "ce7bbaa0deeedd394039eebd26de63892df5e56c7d6c980eb68f28538ee410c0",
+          "tools/architecture/class_tree.py": "77eca46c2e7f2ddb4ff5946840bf12f216afb620399f73afc44934a730a37418",
           "tools/architecture/classes.py": "9436c2df4d3cf426b8893116faecd071b0a436b6b3eb1b7e4a81bb59ccdc16d1",
-          "tools/architecture/coverage.py": "68a7401687d5702aaddbbf571d58037f43627e306c6056e21a5f3fc70c559813",
+          "tools/architecture/coverage.py": "0c24dce8b3327c43ffc7c3e5baea8c8f734ca8670aff37107c1c9120dd270a08",
           "tools/architecture/export.py": "0c912ab5a81b921807c1e57796c486fc2faea5e1be23103d71eea0506a29ffef",
           "tools/architecture/generate.py": "cc367817e4370a6cedbe266af912d3c68caa3884df013f9623c43d295c820bd3",
           "tools/architecture/imports.py": "be1b9267ae7d2da2d87e60cb3d3abde3011e49a7cfb628fb4222f5382c92d143",
@@ -1089,7 +1089,7 @@
           "tools/architecture/sources.py": "a528464392eba79f1ea73a9e48ac59e51d45d5493c8b79849c27fcdddaf81965",
           "tools/architecture/views.py": "e63acbaab215d90bc5c654d585b3d57d44e11e22e44236527577c729ef9a1d32"
         },
-        "sha256": "12bf2096e525ed239ff6acc518f78d47e5c4f7eabeb20ed06e3d44a0939a6abf",
+        "sha256": "2e5fc18827d5ffa73d35c95e33f24f48ba926627210d9f3fb4d62e412430af58",
         "status": "clean"
       },
       "source": {
