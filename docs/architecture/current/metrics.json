@@ -1226,7 +1226,7 @@
     "package": "tropoi",
     "src": "src",
     "working_tree": {
-      "base_commit": "3d94d03910e9731153ee8654dfff551fe15ad7f9",
+      "base_commit": "ecd59b00d471c70e060bd44cc227309b3bd2fee4",
       "generator": {
         "changes": [],
         "files": {
@@ -1240,19 +1240,19 @@
           "tools/architecture/generate.py": "fea9c1242317ce391af6cceaa327f94f377ba11eed42531d16bc0fb94613654e",
           "tools/architecture/imports.py": "be1b9267ae7d2da2d87e60cb3d3abde3011e49a7cfb628fb4222f5382c92d143",
           "tools/architecture/interactive.py": "77ba7f99cc13567a7c6c9fe9de7965b6da3fb6dd0f787a47340aade7faa83e49",
-          "tools/architecture/interactive_atlas.html": "18f4c27270454a7ef2bfc25d6e87cf3a23d8f958767e949a687aa87401be6603",
+          "tools/architecture/interactive_atlas.html": "a7ea96fa0780916c52c889becd088cbfb7dfd44b1e3b479f444b8961c5bc2a10",
           "tools/architecture/layers.py": "09a12c6790abad61e6326321180d84f9f01dfc85f9ac798d5e7b5b5186385b23",
           "tools/architecture/mermaid.py": "22550f697f536b96d9adbcd65933841fde6932afdcf5360cbc428f6ec5568184",
           "tools/architecture/metrics.py": "0c449fcc932fbae378a7e1c785506c05cda47d4449225d8d14462ce0de34e4db",
           "tools/architecture/model.py": "335acf6e713ca4bf79f2884d246addc8601effae88a43b68cff46ec98f293661",
           "tools/architecture/provenance.py": "bdb799b15386224f969b9743622e781f1e5b99adffbd5d01769f3872e733375a",
           "tools/architecture/report.py": "bc40165bed484d004a0555e2c59c0ee015ff29f8000e68fc663f007c579ddd5f",
-          "tools/architecture/runtime_capture.py": "4c0160779fa65338aecc047a4080a51657461730ccfb29a406ad8a3f0050b681",
-          "tools/architecture/scenarios.py": "51c9cd8335144dab59983042e24f97908e02da8d71ade739708d384fd856c0b1",
+          "tools/architecture/runtime_capture.py": "bd6b4f8d763e6f5554a522633ac332d0a84a63919e67f8c6a58d891877301c18",
+          "tools/architecture/scenarios.py": "c0ca470cba8450f9151afa1d255de316d3e4d898e65a5e5127e1a637a45a5962",
           "tools/architecture/sources.py": "a528464392eba79f1ea73a9e48ac59e51d45d5493c8b79849c27fcdddaf81965",
           "tools/architecture/views.py": "a1b595a64f60367c0f6a475593d2f310d72104d0445eacec5552c63fe3aeb5d2"
         },
-        "sha256": "425c92f5793253c8908224845f0e11dc3a11e1f186a058f7df70e265544c989e",
+        "sha256": "3760fb47fba493ea108ef1454a884172f8504ea8876e2b9df396d257e5849eab",
         "status": "clean"
       },
       "source": {
