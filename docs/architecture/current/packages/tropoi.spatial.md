@@ -111,7 +111,7 @@ flowchart LR
     p_tropoi_otemporal -.->|1| n_tropoi_ospatial_owilliamson5
     p_tropoi_otemporal_otendencies -->|4| n_tropoi_ospatial_olaplacian
     p_tropoi_otemporal_otendencies -->|3| n_tropoi_ospatial_oplanet
-    p_tropoi_otemporal_otendencies -->|1| n_tropoi_ospatial_osigma__coordinate
+    p_tropoi_otemporal_otendencies -->|2| n_tropoi_ospatial_osigma__coordinate
     p_tropoi_otemporal_otendencies -->|2| n_tropoi_ospatial_otruncation
     n_tropoi_ospatial_oplanet -->|3| p_tropoi_ospatial_ogrids
     n_tropoi_ospatial_oplanet -->|1| p_tropoi_ospatial_ooperators

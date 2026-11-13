@@ -253,6 +253,14 @@
       "scopes": [
         "module"
       ],
+      "source": "tropoi.physics.boundary_layer",
+      "target": "tropoi.physics.surface"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
       "source": "tropoi.physics.column",
       "target": "tropoi.physics.constants"
     },
@@ -2746,6 +2754,14 @@
         "function"
       ],
       "source": "tropoi.run.radiative.model",
+      "target": "tropoi.temporal.tendencies.boundary_layer"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.run.radiative.model",
       "target": "tropoi.temporal.tendencies.drag"
     },
     {
@@ -3441,6 +3457,22 @@
     {
       "kind": "imports",
       "scopes": [
+        "module"
+      ],
+      "source": "tropoi.temporal.tendencies.boundary_layer",
+      "target": "tropoi.physics.boundary_layer"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.temporal.tendencies.boundary_layer",
+      "target": "tropoi.spatial.sigma_coordinate"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
         "function"
       ],
       "source": "tropoi.temporal.tendencies.drag",
@@ -3631,6 +3663,20 @@
       ],
       "third_party_imports": [
         "matplotlib"
+      ]
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.physics.boundary_layer",
+      "is_package": false,
+      "path": "tropoi/physics/boundary_layer.py",
+      "stdlib_imports": [
+        "__future__"
+      ],
+      "third_party_imports": [
+        "cupy",
+        "numpy"
       ]
     },
     {
@@ -5700,6 +5746,21 @@
       ],
       "third_party_imports": [
         "cupy"
+      ]
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.temporal.tendencies.boundary_layer",
+      "is_package": false,
+      "path": "tropoi/temporal/tendencies/boundary_layer.py",
+      "stdlib_imports": [
+        "__future__",
+        "math"
+      ],
+      "third_party_imports": [
+        "cupy",
+        "numpy"
       ]
     },
     {

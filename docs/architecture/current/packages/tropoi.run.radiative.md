@@ -12,7 +12,7 @@ Index: [all packages](../index.md) · parent [`tropoi.run`](tropoi.run.md)
 | `tropoi.run.radiative.__main__` | code | – | `main` |
 | `tropoi.run.radiative.config` | code | `RadiativeConfig` | `earth_gray_dry`, `jupiter_schneider_liu`, `mars_gray_flat_dev` |
 | `tropoi.run.radiative.experiment` | code | `RadiativeRun` | – |
-| `tropoi.run.radiative.model` | code | – | `build_insolation`, `build_model`, `build_physics`, `build_radiation`, `build_sigma`, `build_stepper`, `initial_state`, `reference_column` |
+| `tropoi.run.radiative.model` | code | – | `build_boundary_layer`, `build_insolation`, `build_model`, `build_physics`, `build_radiation`, `build_sigma`, `build_stepper`, `initial_state`, `reference_column` |
 
 Files shipped in this directory that are **not Python and not analysed** (templates, data): `README.md`. Their contents (for example JavaScript in an HTML template) are invisible to every graph here.
 
@@ -55,7 +55,7 @@ flowchart LR
     n_tropoi_orun_oradiative_omodel -->|4| p_tropoi_ospatial
     n_tropoi_orun_oradiative_omodel -.->|1| p_tropoi_ospatial_ostates
     n_tropoi_orun_oradiative_omodel -.->|1| p_tropoi_otemporal
-    n_tropoi_orun_oradiative_omodel -.->|3| p_tropoi_otemporal_otendencies
+    n_tropoi_orun_oradiative_omodel -.->|4| p_tropoi_otemporal_otendencies
     classDef other fill:none,stroke-dasharray:3 3
     class p_tropoi_ophysics other
     class p_tropoi_ophysics_oradiation other

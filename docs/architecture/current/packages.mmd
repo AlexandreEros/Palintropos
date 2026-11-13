@@ -23,7 +23,7 @@ flowchart TD
     end
     subgraph g_temporal["layer temporal"]
         n_tropoi_otemporal["temporal (7 modules)"]
-        n_tropoi_otemporal_otendencies["temporal.tendencies (5 modules)"]
+        n_tropoi_otemporal_otendencies["temporal.tendencies (6 modules)"]
     end
     subgraph g_spatial["layer spatial"]
         n_tropoi_ospatial["spatial (9 modules)"]
@@ -36,7 +36,7 @@ flowchart TD
         n_tropoi_ospatial_otransforms_ocuda["spatial.transforms.cuda (1 module)"]
     end
     subgraph g_physics["layer physics"]
-        n_tropoi_ophysics["physics (14 modules)"]
+        n_tropoi_ophysics["physics (15 modules)"]
         n_tropoi_ophysics_oradiation["physics.radiation (4 modules)"]
     end
     n_tropoi_ocli -->|4| n_tropoi_orepresentation_oarchive
@@ -108,7 +108,7 @@ flowchart TD
     n_tropoi_orun_oradiative -->|5| n_tropoi_ospatial
     n_tropoi_orun_oradiative -->|3| n_tropoi_ospatial_ostates
     n_tropoi_orun_oradiative -->|2| n_tropoi_otemporal
-    n_tropoi_orun_oradiative -->|3| n_tropoi_otemporal_otendencies
+    n_tropoi_orun_oradiative -->|4| n_tropoi_otemporal_otendencies
     n_tropoi_orun_oswe -->|2| n_tropoi_orepresentation_oarchive
     n_tropoi_orun_oswe -->|1| n_tropoi_orepresentation_odiagnostics
     n_tropoi_orun_oswe -->|1| n_tropoi_orepresentation_ovisual
@@ -136,7 +136,8 @@ flowchart TD
     n_tropoi_otemporal -->|1| n_tropoi_ospatial_ostates
     n_tropoi_otemporal -->|1| n_tropoi_ospatial_oterrain
     n_tropoi_otemporal -->|2| n_tropoi_otemporal_otendencies
-    n_tropoi_otemporal_otendencies -->|10| n_tropoi_ospatial
+    n_tropoi_otemporal_otendencies -->|1| n_tropoi_ophysics
+    n_tropoi_otemporal_otendencies -->|11| n_tropoi_ospatial
     n_tropoi_otemporal_otendencies -->|3| n_tropoi_ospatial_ostates
     n_tropoi_otemporal_otendencies -->|1| n_tropoi_ospatial_oterrain
     n_tropoi_otemporal_otendencies -->|2| n_tropoi_otemporal
