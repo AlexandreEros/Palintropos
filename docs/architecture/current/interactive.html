@@ -6579,7 +6579,7 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 [],
 [
 [
-161,
+181,
 15,
 "PhysicsOutput(heating=heating, fluxes=fluxes, sensible=sensible, interior=interior, surface_net=surface_net)",
 []
@@ -6587,7 +6587,7 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ],
 [
 [
-117,
+129,
 13,
 "_xp(temperature)",
 [
@@ -6600,7 +6600,7 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ],
 [
 [
-118,
+130,
 17,
 "Column(pressure_interfaces, temperature, self.gravity, self.cp, latitude=latitude)",
 []
@@ -6608,13 +6608,13 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ],
 [
 [
-122,
+134,
 27,
 "LowerBoundary('closed')",
 []
 ],
 [
-126,
+138,
 27,
 "LowerBoundary('surface', temperature=surface_temperature, emissivity=self.surface.emissivity, albedo=self.surface.albedo)",
 []
@@ -6622,7 +6622,7 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ],
 [
 [
-139,
+151,
 18,
 "heating_rate(fluxes.net_down, pressure_interfaces, self.gravity, self.cp)",
 [
@@ -6647,9 +6647,9 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ],
 [
 [
-153,
-26,
-"sensible_heat_flux(surface_temperature, t_air, height, speed, density, self.cp, self.gravity, **self.sensible)",
+165,
+36,
+"sensible_heat_flux(surface_temperature, t_air, height, speed, density, self.cp, self.gravity, **self._flux_options)",
 [
 [
 "surface_temperature",
@@ -6681,7 +6681,7 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ],
 [
 "**",
-"self.sensible"
+"self._flux_options"
 ]
 ]
 ]
@@ -6689,13 +6689,13 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 [],
 [
 [
-225,
+245,
 15,
 "self.evaluate()",
 []
 ],
 [
-232,
+252,
 19,
 "self.evaluate()",
 []
@@ -6703,7 +6703,7 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ],
 [
 [
-224,
+244,
 13,
 "_xp(self.temperature)",
 [
@@ -6716,13 +6716,13 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ],
 [
 [
-263,
+283,
 20,
 "self._stable_step()",
 []
 ],
 [
-266,
+286,
 28,
 "self._stable_step()",
 []
@@ -6730,7 +6730,7 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ],
 [
 [
-267,
+287,
 18,
 "self.evaluate()",
 []
@@ -6738,7 +6738,7 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ],
 [
 [
-253,
+273,
 13,
 "_xp(self.temperature)",
 [
@@ -6751,7 +6751,7 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ],
 [
 [
-259,
+279,
 19,
 "DryConvectiveAdjustment(phys.convection.kappa, timescale=0.0, lapse_fraction=phys.convection.lapse_fraction)",
 [
@@ -34686,17 +34686,17 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ],
 [
 [
-302,
+310,
 11,
-"RadiativeConfig(experiment_id=_preset_id(experiment_id, 'dev-mars-gray-flat-sponge' if sponge else 'dev-mars-gray-flat', 'T21L25', frictional_heating), sponge={'bottom_pressure': 0.5, 'efold_days': 0.125} if sponge else None, frictional_he…",
+"RadiativeConfig(experiment_id=_preset_id(experiment_id, name, 'T21L25', frictional_heating), sponge={'bottom_pressure': 0.5, 'efold_days': 0.125} if sponge else None, frictional_heating=frictional_heating, radius=3396000.0, omega=2.0 * mat…",
 []
 ]
 ],
 [
 [
-303,
+311,
 22,
-"_preset_id(experiment_id, 'dev-mars-gray-flat-sponge' if sponge else 'dev-mars-gray-flat', 'T21L25', frictional_heating)",
+"_preset_id(experiment_id, name, 'T21L25', frictional_heating)",
 [
 [
 "experiment_id",
@@ -34704,7 +34704,7 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ],
 [
 "name",
-"'dev-mars-gray-flat-sponge' if sponge else 'dev-mars-gray-flat'"
+"name"
 ],
 [
 "resolution",
@@ -34719,7 +34719,7 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ],
 [
 [
-326,
+332,
 10,
 "_t21()",
 []
@@ -34727,7 +34727,7 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ],
 [
 [
-316,
+322,
 42,
 "_time_of_perihelion_for_equinox_start(year, ecc, ls_peri)",
 [
@@ -43723,7 +43723,7 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ],
 [
 [
-171,
+172,
 15,
 "_analyze(m.sh, (adjusted - temperature) / window)",
 [
@@ -75200,105 +75200,110 @@ null,
 "99":"        if not np.all(np.diff(lp) \u003c 0.0):"
 },
 "tropoi/physics/column_model.py":{
-"100":"    def signature(self) -\u003e dict:",
-"101":"        return {\"kind\": \"column_physics\", \"radiation\": self.radiation.signature(),",
-"103":"                \"insolation\": None if self.insolation is None else self.insolation.signature(),",
-"104":"                \"convection\": None if self.convection is None else self.convection.signature(),",
-"105":"                \"surface\": None if self.surface is None else self.surface.signature(),",
-"109":"    def reset(self) -\u003e None:",
-"110":"        \"\"\"Forget the held radiative fluxes (after a restart or a state jump).\"\"\"",
-"115":"    def compute(self, pressure_interfaces, temperature, t: float, *, latitude=None,",
-"116":"                longitude=None, surface_temperature=None, wind_speed=None) -\u003e PhysicsOutput:",
-"117":"        xp = _xp(temperature)",
-"118":"        column = Column(pressure_interfaces, temperature, self.gravity, self.cp,",
-"119":"                        latitude=latitude)",
-"120":"        if self._cached is None or self._calls % self.radiation_interval == 0:",
-"121":"            if self.surface is None:",
-"122":"                boundary = LowerBoundary(\"closed\")",
-"123":"            else:",
-"124":"                if surface_temperature is None:",
-"125":"                    raise ValueError(\"a surface needs surface_temperature\")",
-"126":"                boundary = LowerBoundary(\"surface\", temperature=surface_temperature,",
-"127":"                                         emissivity=self.surface.emissivity,",
-"128":"                                         albedo=self.surface.albedo)",
-"129":"            toa = mu0 = None",
-"130":"            if self.insolation is not None:",
-"131":"                toa, mu0 = self.insolation(latitude, longitude, t)",
-"132":"            self._cached = self.radiation.fluxes(column, boundary, toa_flux=toa, mu0=mu0)",
-"137":"        # column integral equals the reported boundary fluxes whatever the",
-"138":"        # surface pressure has done since they were computed.",
-"139":"        heating = heating_rate(fluxes.net_down, pressure_interfaces, self.gravity, self.cp)",
-"140":"        dp_low = pressure_interfaces[-1] - pressure_interfaces[-2]",
-"141":"        per_flux = self.gravity / (self.cp * dp_low)        # K/s per W m^-2",
-"142":"        zero = xp.zeros_like(temperature[0])",
-"149":"            alpha = 1.0 - (p_top / dp_low) * xp.log(p_bot / p_top)",
-"151":"            density = 0.5 * (p_top + p_bot) / (self.gas_constant * t_air)",
-"152":"            speed = zero if wind_speed is None else wind_speed",
-"153":"            sensible, _ = sensible_heat_flux(surface_temperature, t_air, height, speed,",
-"154":"                                             density, self.cp, self.gravity, **self.sensible)",
-"155":"            heating[-1] += per_flux * sensible",
-"156":"        interior = 0.0",
-"159":"            heating[-1] += per_flux * interior",
-"160":"        surface_net = zero if self.surface is None else fluxes.bottom_net_down - sensible",
-"161":"        return PhysicsOutput(heating=heating, fluxes=fluxes, sensible=sensible,",
-"162":"                             interior=interior, surface_net=surface_net)",
-"163":"",
-"164":"    def adjust(self, pressure_interfaces, temperature, dt: float):",
-"165":"        \"\"\"Dry convective adjustment over ``dt`` (identity when disabled).\"\"\"",
-"170":"        return self.convection.adjust(temperature, p_mid, dp, dt)",
-"173":"class RadiativeConvectiveColumn:",
-"185":"    def __init__(self, physics: ColumnPhysics, pressure_interfaces, temperature, *,",
-"186":"                 latitude=None, longitude=None, surface_temperature=None, wind_speed=None):",
-"187":"        self.physics = physics",
-"189":"        self.temperature = temperature.copy()",
-"193":"                                    else surface_temperature.copy())",
-"197":"    def evaluate(self) -\u003e PhysicsOutput:",
-"198":"        self.physics.reset()",
-"199":"        return self.physics.compute(self.pressure_interfaces, self.temperature, self.time,",
-"204":"    def step(self, dt: float) -\u003e PhysicsOutput:",
-"205":"        \"\"\"Forward step of length ``dt`` s: physics tendency, surface update,",
-"207":"        out = self.physics.compute(self.pressure_interfaces, self.temperature, self.time,",
-"213":"            self.surface_temperature = self.physics.surface.advance(",
-"215":"        self.temperature = self.physics.adjust(self.pressure_interfaces, self.temperature, dt)",
-"219":"    def _stable_step(self, factor: float = 0.4) -\u003e float:",
-"220":"        \"\"\"An explicit time step (s) that keeps every layer's own radiative",
-"222":"        diagonal sensitivity measured by warming the even and the odd layers",
-"223":"        by 1 K in turn (two extra evaluations).\"\"\"",
-"224":"        xp = _xp(self.temperature)",
-"225":"        base = self.evaluate().heating",
-"226":"        saved = self.temperature",
-"227":"        rate = 0.0",
-"229":"            bump = xp.zeros_like(saved)",
-"230":"            bump[parity::2] = 1.0",
-"231":"            self.temperature = saved + bump",
-"232":"            diff = self.evaluate().heating - base",
-"233":"            rate = max(rate, float(xp.abs(diff[parity::2]).max()))",
-"234":"        self.temperature = saved",
-"238":"                       * float(self.surface_temperature.max()) ** 3 / c)",
-"241":"    def equilibrate(self, *, tolerance: float = 1e-3, max_iterations: int = 400000,",
-"242":"                    max_change: float = 0.5, refresh: int = 500) -\u003e dict:",
-"243":"        \"\"\"March in physical time to steady state.",
-"251":"        its heat content faster than ``tolerance`` W m^-2.",
-"252":"        \"\"\"",
-"253":"        xp = _xp(self.temperature)",
-"254":"        phys = self.physics",
-"255":"        dp = self.pressure_interfaces[1:] - self.pressure_interfaces[:-1]",
-"257":"        hard = None",
-"258":"        if phys.convection is not None:",
-"259":"            hard = DryConvectiveAdjustment(phys.convection.kappa, timescale=0.0,",
-"260":"                                           lapse_fraction=phys.convection.lapse_fraction)",
-"261":"        p_mid = 0.5 * (self.pressure_interfaces[1:] + self.pressure_interfaces[:-1])",
-"262":"        imbalance = float(\"inf\")",
-"263":"        dt_stable = self._stable_step()",
-"264":"        for it in range(1, max_iterations + 1):",
-"265":"            if it % refresh == 0:",
-"266":"                dt_stable = self._stable_step()",
-"267":"            out = self.evaluate()",
-"268":"            peak = float(xp.abs(out.heating).max())",
-"269":"            dt = min(dt_stable, max_change / max(peak, 1e-300))",
-"272":"                new = hard.adjust(new, p_mid, dp, 0.0)",
-"273":"            resid = float(xp.abs((new - self.temperature) * mass_cp).max()) / dt",
-"277":"                self.surface_temperature = phys.surface.advance(",
+"103":"    def signature(self) -\u003e dict:",
+"104":"        return {\"kind\": \"column_physics\", \"radiation\": self.radiation.signature(),",
+"106":"                \"insolation\": None if self.insolation is None else self.insolation.signature(),",
+"107":"                \"convection\": None if self.convection is None else self.convection.signature(),",
+"108":"                \"surface\": None if self.surface is None else self.surface.signature(),",
+"112":"    def reset(self) -\u003e None:",
+"113":"        \"\"\"Forget the held radiative fluxes (after a restart or a state jump).\"\"\"",
+"118":"    def compute(self, pressure_interfaces, temperature, t: float, *, latitude=None,",
+"119":"                longitude=None, surface_temperature=None, wind_speed=None,",
+"120":"                exchange_window=None, surface_step=None) -\u003e PhysicsOutput:",
+"121":"        \"\"\"``exchange_window`` (s) is the interval over which the host applies",
+"127":"        F' enters the air and leaves the slab. Without them, the flux is the",
+"128":"        explicit one, bit for bit.\"\"\"",
+"129":"        xp = _xp(temperature)",
+"130":"        column = Column(pressure_interfaces, temperature, self.gravity, self.cp,",
+"131":"                        latitude=latitude)",
+"132":"        if self._cached is None or self._calls % self.radiation_interval == 0:",
+"133":"            if self.surface is None:",
+"134":"                boundary = LowerBoundary(\"closed\")",
+"135":"            else:",
+"136":"                if surface_temperature is None:",
+"137":"                    raise ValueError(\"a surface needs surface_temperature\")",
+"138":"                boundary = LowerBoundary(\"surface\", temperature=surface_temperature,",
+"139":"                                         emissivity=self.surface.emissivity,",
+"140":"                                         albedo=self.surface.albedo)",
+"141":"            toa = mu0 = None",
+"142":"            if self.insolation is not None:",
+"143":"                toa, mu0 = self.insolation(latitude, longitude, t)",
+"144":"            self._cached = self.radiation.fluxes(column, boundary, toa_flux=toa, mu0=mu0)",
+"149":"        # column integral equals the reported boundary fluxes whatever the",
+"150":"        # surface pressure has done since they were computed.",
+"151":"        heating = heating_rate(fluxes.net_down, pressure_interfaces, self.gravity, self.cp)",
+"152":"        dp_low = pressure_interfaces[-1] - pressure_interfaces[-2]",
+"153":"        per_flux = self.gravity / (self.cp * dp_low)        # K/s per W m^-2",
+"154":"        zero = xp.zeros_like(temperature[0])",
+"161":"            alpha = 1.0 - (p_top / dp_low) * xp.log(p_bot / p_top)",
+"163":"            density = 0.5 * (p_top + p_bot) / (self.gas_constant * t_air)",
+"164":"            speed = zero if wind_speed is None else wind_speed",
+"165":"            sensible, coefficient = sensible_heat_flux(surface_temperature, t_air, height, speed,",
+"166":"                                                       density, self.cp, self.gravity,",
+"167":"                                                       **self._flux_options)",
+"168":"            if self._implicit_exchange and exchange_window is not None:",
+"169":"                gust = float(self._flux_options.get(\"gustiness\", 0.0))",
+"179":"            heating[-1] += per_flux * interior",
+"180":"        surface_net = zero if self.surface is None else fluxes.bottom_net_down - sensible",
+"181":"        return PhysicsOutput(heating=heating, fluxes=fluxes, sensible=sensible,",
+"182":"                             interior=interior, surface_net=surface_net)",
+"183":"",
+"184":"    def adjust(self, pressure_interfaces, temperature, dt: float):",
+"185":"        \"\"\"Dry convective adjustment over ``dt`` (identity when disabled).\"\"\"",
+"190":"        return self.convection.adjust(temperature, p_mid, dp, dt)",
+"193":"class RadiativeConvectiveColumn:",
+"205":"    def __init__(self, physics: ColumnPhysics, pressure_interfaces, temperature, *,",
+"206":"                 latitude=None, longitude=None, surface_temperature=None, wind_speed=None):",
+"207":"        self.physics = physics",
+"209":"        self.temperature = temperature.copy()",
+"213":"                                    else surface_temperature.copy())",
+"217":"    def evaluate(self) -\u003e PhysicsOutput:",
+"218":"        self.physics.reset()",
+"219":"        return self.physics.compute(self.pressure_interfaces, self.temperature, self.time,",
+"224":"    def step(self, dt: float) -\u003e PhysicsOutput:",
+"225":"        \"\"\"Forward step of length ``dt`` s: physics tendency, surface update,",
+"227":"        out = self.physics.compute(self.pressure_interfaces, self.temperature, self.time,",
+"233":"            self.surface_temperature = self.physics.surface.advance(",
+"235":"        self.temperature = self.physics.adjust(self.pressure_interfaces, self.temperature, dt)",
+"239":"    def _stable_step(self, factor: float = 0.4) -\u003e float:",
+"240":"        \"\"\"An explicit time step (s) that keeps every layer's own radiative",
+"242":"        diagonal sensitivity measured by warming the even and the odd layers",
+"243":"        by 1 K in turn (two extra evaluations).\"\"\"",
+"244":"        xp = _xp(self.temperature)",
+"245":"        base = self.evaluate().heating",
+"246":"        saved = self.temperature",
+"247":"        rate = 0.0",
+"249":"            bump = xp.zeros_like(saved)",
+"250":"            bump[parity::2] = 1.0",
+"251":"            self.temperature = saved + bump",
+"252":"            diff = self.evaluate().heating - base",
+"253":"            rate = max(rate, float(xp.abs(diff[parity::2]).max()))",
+"254":"        self.temperature = saved",
+"258":"                       * float(self.surface_temperature.max()) ** 3 / c)",
+"261":"    def equilibrate(self, *, tolerance: float = 1e-3, max_iterations: int = 400000,",
+"262":"                    max_change: float = 0.5, refresh: int = 500) -\u003e dict:",
+"263":"        \"\"\"March in physical time to steady state.",
+"271":"        its heat content faster than ``tolerance`` W m^-2.",
+"272":"        \"\"\"",
+"273":"        xp = _xp(self.temperature)",
+"274":"        phys = self.physics",
+"275":"        dp = self.pressure_interfaces[1:] - self.pressure_interfaces[:-1]",
+"277":"        hard = None",
+"278":"        if phys.convection is not None:",
+"279":"            hard = DryConvectiveAdjustment(phys.convection.kappa, timescale=0.0,",
+"280":"                                           lapse_fraction=phys.convection.lapse_fraction)",
+"281":"        p_mid = 0.5 * (self.pressure_interfaces[1:] + self.pressure_interfaces[:-1])",
+"282":"        imbalance = float(\"inf\")",
+"283":"        dt_stable = self._stable_step()",
+"284":"        for it in range(1, max_iterations + 1):",
+"285":"            if it % refresh == 0:",
+"286":"                dt_stable = self._stable_step()",
+"287":"            out = self.evaluate()",
+"288":"            peak = float(xp.abs(out.heating).max())",
+"289":"            dt = min(dt_stable, max_change / max(peak, 1e-300))",
+"292":"                new = hard.adjust(new, p_mid, dp, 0.0)",
+"293":"            resid = float(xp.abs((new - self.temperature) * mass_cp).max()) / dt",
+"297":"                self.surface_temperature = phys.surface.advance(",
 "32":"",
 "33":"from tropoi.physics.convection import DryConvectiveAdjustment",
 "34":"from tropoi.physics.radiation.scheme import (STEFAN_BOLTZMANN, Column, LowerBoundary,",
@@ -75324,7 +75329,9 @@ null,
 "80":"                 surface: Optional[SlabSurface] = None,",
 "81":"                 internal_heat_flux: float = 0.0, radiation_interval: int = 1,",
 "82":"                 sensible: Optional[dict] = None):",
-"83":"        if radiation_interval \u003c 1:"
+"83":"        if radiation_interval \u003c 1:",
+"98":"        self._implicit_exchange = bool((self.sensible or {}).get(\"implicit\", False))",
+"99":"        self._flux_options = {k: v for k, v in (self.sensible or {}).items() if k != \"implicit\"}"
 },
 "tropoi/physics/composition.py":{
 "103":"",
@@ -86576,37 +86583,35 @@ null,
 "27":"class RadiativeConfig:",
 "276":"def mars_gray_flat_dev(experiment_id: Optional[str] = None, *, days: int = 30,",
 "277":"                       dt: float = 600.0, frictional_heating: bool = True,",
-"278":"                       sponge: bool = False) -\u003e RadiativeConfig:",
+"278":"                       sponge: bool = False, implicit_surface: bool = False) -\u003e RadiativeConfig:",
 "279":"    \"\"\"DEVELOPMENT EXPERIMENT, not a reproduction of Thomson \u0026 Vallis (2019)",
-"300":"    \"\"\"",
-"301":"    year, ecc, ls_peri = 59166360.0, 0.0935, 250.85",
-"302":"    return RadiativeConfig(",
-"303":"        experiment_id=_preset_id(experiment_id,",
-"304":"                                 \"dev-mars-gray-flat-sponge\" if sponge else \"dev-mars-gray-flat\",",
-"305":"                                 \"T21L25\", frictional_heating),",
-"306":"        sponge={\"bottom_pressure\": 0.5, \"efold_days\": 0.125} if sponge else None,",
-"307":"        frictional_heating=frictional_heating, radius=3.396e6,",
-"308":"        omega=2.0 * math.pi / 88308.0, gravity=3.71, gas_constant=192.0,",
-"309":"        cp=192.0 / 0.22727, reference_pressure=610.0,",
-"310":"        vertical={\"kind\": \"interfaces\", \"sigma\": list(ISCA_GREY_MARS_SIGMA)}, dt=dt, days=days,",
-"311":"        longwave={\"kind\": \"power_law\", \"tau0\": 0.2, \"exponent\": 1.0, \"p0\": 610.0},",
-"312":"        shortwave={\"kind\": \"vertical_path\", \"tau0\": 0.2, \"exponent\": 4.0, \"p0\": 610.0},",
-"313":"        insolation={\"kind\": \"instantaneous\", \"stellar_constant\": 589.0, \"period\": year,",
-"314":"                    \"eccentricity\": ecc, \"obliquity_deg\": 25.19,",
-"315":"                    \"perihelion_longitude_deg\": ls_peri,",
-"316":"                    \"time_of_perihelion\": _time_of_perihelion_for_equinox_start(year, ecc,",
-"317":"                                                                                ls_peri),",
-"318":"                    \"solar_day\": 88440.0},",
-"319":"        convection={\"timescale\": 0.0},",
-"320":"        surface={\"heat_capacity\": 2.0 * _ISCA_RHO_CP, \"albedo\": 0.3, \"emissivity\": 1.0,",
-"321":"                 \"initial_temperature\": 285.0},",
-"322":"        sensible={\"roughness_length\": 3.21e-5, \"critical_richardson\": 1.0, \"gustiness\": 0.0},",
-"323":"        drag={\"kind\": \"held_suarez\", \"k_f_per_day\": 1.0, \"sigma_b\": 0.7},",
-"324":"        initial={\"kind\": \"isothermal\", \"temperature\": 264.0},",
-"325":"        checkpoint_every_days=10, state_every_days=1,",
-"326":"        **_t21())",
-"327":"",
-"328":"",
+"308":"    if implicit_surface:",
+"309":"        sensible[\"implicit\"] = True",
+"310":"    return RadiativeConfig(",
+"311":"        experiment_id=_preset_id(experiment_id, name, \"T21L25\", frictional_heating),",
+"312":"        sponge={\"bottom_pressure\": 0.5, \"efold_days\": 0.125} if sponge else None,",
+"313":"        frictional_heating=frictional_heating, radius=3.396e6,",
+"314":"        omega=2.0 * math.pi / 88308.0, gravity=3.71, gas_constant=192.0,",
+"315":"        cp=192.0 / 0.22727, reference_pressure=610.0,",
+"316":"        vertical={\"kind\": \"interfaces\", \"sigma\": list(ISCA_GREY_MARS_SIGMA)}, dt=dt, days=days,",
+"317":"        longwave={\"kind\": \"power_law\", \"tau0\": 0.2, \"exponent\": 1.0, \"p0\": 610.0},",
+"318":"        shortwave={\"kind\": \"vertical_path\", \"tau0\": 0.2, \"exponent\": 4.0, \"p0\": 610.0},",
+"319":"        insolation={\"kind\": \"instantaneous\", \"stellar_constant\": 589.0, \"period\": year,",
+"320":"                    \"eccentricity\": ecc, \"obliquity_deg\": 25.19,",
+"321":"                    \"perihelion_longitude_deg\": ls_peri,",
+"322":"                    \"time_of_perihelion\": _time_of_perihelion_for_equinox_start(year, ecc,",
+"323":"                                                                                ls_peri),",
+"324":"                    \"solar_day\": 88440.0},",
+"325":"        convection={\"timescale\": 0.0},",
+"326":"        surface={\"heat_capacity\": 2.0 * _ISCA_RHO_CP, \"albedo\": 0.3, \"emissivity\": 1.0,",
+"327":"                 \"initial_temperature\": 285.0},",
+"328":"        sensible=sensible,",
+"329":"        drag={\"kind\": \"held_suarez\", \"k_f_per_day\": 1.0, \"sigma_b\": 0.7},",
+"330":"        initial={\"kind\": \"isothermal\", \"temperature\": 264.0},",
+"331":"        checkpoint_every_days=10, state_every_days=1,",
+"332":"        **_t21())",
+"333":"",
+"334":"",
 "77":"    perturbation_wind: float = 0.1          # m/s, grid RMS wind scale of the seed",
 "84":"    mean_last_days: int = 0                 # 0 = second half of the run",
 "86":"    def __post_init__(self):",
@@ -90443,24 +90448,24 @@ null,
 "164":"        wind = self._lowest_wind_speed(coeffs) if self.physics.sensible is not None else None",
 "165":"        out = self.physics.compute(p_int, temperature, t, latitude=self.latitude,",
 "166":"                                   longitude=self.longitude,",
-"169":"        provisional = temperature + window * out.heating",
-"170":"        adjusted = self.physics.adjust(p_int, provisional, window)",
-"171":"        spec = _analyze(m.sh, (adjusted - temperature) / window)",
-"172":"        cut = self._cut",
-"173":"        spec[:, cut + 1:, :] = 0.0",
-"175":"        tendency = xp.zeros_like(coeffs)",
-"180":"            self.surface_temperature = self.physics.surface.advance(",
-"197":"    def budget_means(self, *, reset: bool = False) -\u003e dict:",
-"198":"        \"\"\"Time- and area-mean fluxes (W m^-2) since the last reset, plus the",
-"201":"        out = {k: (v / t if t \u003e 0 else 0.0) for k, v in self.budget.items()}",
-"208":"    def state_dict(self) -\u003e dict:",
-"209":"        xp = self._xp",
-"212":"            ts = xp.asnumpy(ts)",
-"216":"    def load_state_dict(self, d: dict) -\u003e None:",
-"217":"        ts = d.get(\"surface_temperature\")",
-"221":"            self.surface_temperature = self._xp.asarray(ts, dtype=np.float64)",
-"222":"        self.budget_time = float(d.get(\"budget_time\", 0.0))",
-"223":"        self.budget = {k: float(d.get(\"budget\", {}).get(k, 0.0)) for k in _BUDGET_KEYS}",
+"170":"        provisional = temperature + window * out.heating",
+"171":"        adjusted = self.physics.adjust(p_int, provisional, window)",
+"172":"        spec = _analyze(m.sh, (adjusted - temperature) / window)",
+"173":"        cut = self._cut",
+"174":"        spec[:, cut + 1:, :] = 0.0",
+"176":"        tendency = xp.zeros_like(coeffs)",
+"181":"            self.surface_temperature = self.physics.surface.advance(",
+"198":"    def budget_means(self, *, reset: bool = False) -\u003e dict:",
+"199":"        \"\"\"Time- and area-mean fluxes (W m^-2) since the last reset, plus the",
+"202":"        out = {k: (v / t if t \u003e 0 else 0.0) for k, v in self.budget.items()}",
+"209":"    def state_dict(self) -\u003e dict:",
+"210":"        xp = self._xp",
+"213":"            ts = xp.asnumpy(ts)",
+"217":"    def load_state_dict(self, d: dict) -\u003e None:",
+"218":"        ts = d.get(\"surface_temperature\")",
+"222":"            self.surface_temperature = self._xp.asarray(ts, dtype=np.float64)",
+"223":"        self.budget_time = float(d.get(\"budget_time\", 0.0))",
+"224":"        self.budget = {k: float(d.get(\"budget\", {}).get(k, 0.0)) for k in _BUDGET_KEYS}",
 "43":"def _xp(a):",
 "44":"    if type(a).__module__.split(\".\")[0] == \"cupy\":",
 "50":"def _synthesize(sh, coeffs):",
@@ -91862,7 +91867,7 @@ null,
 }
 },
 "meta":{
-"base_commit":"2bdf13f246dd337c0a3d8547f89df4a598e2fb3f",
+"base_commit":"6701d022ef3c442ad11dcf4df432a56255fc7825",
 "call_depth":4,
 "command":"python -m tools.architecture.generate",
 "dynamic_import_sites":{
@@ -91906,7 +91911,7 @@ null,
 "max_sites":8,
 "package":"tropoi",
 "source_commit":null,
-"source_sha256":"181134b07d242d982e6fee86a2a96a4fe4c2f060c3e104d16489baa9f631e83e",
+"source_sha256":"dc609341da2e8f27be2ee6796827f4f23d14b68d50562c1167e5c243852a7009",
 "source_status":"dirty",
 "title":"current",
 "tool_version":"2.3.0",
@@ -92481,25 +92486,25 @@ null,
 [
 "method",
 85,
-164,
+184,
 65
 ],
 [
 "method",
 85,
-115,
+118,
 65
 ],
 [
 "method",
 85,
-109,
+112,
 65
 ],
 [
 "method",
 85,
-100,
+103,
 65
 ],
 [
@@ -92517,37 +92522,37 @@ null,
 [
 "class",
 85,
-173,
+193,
 65
 ],
 [
 "method",
 85,
-185,
+205,
 65
 ],
 [
 "method",
 85,
-219,
+239,
 65
 ],
 [
 "method",
 85,
-241,
+261,
 65
 ],
 [
 "method",
 85,
-197,
+217,
 65
 ],
 [
 "method",
 85,
-204,
+224,
 65
 ],
 [
@@ -103482,7 +103487,7 @@ null,
 [
 "method",
 1844,
-197,
+198,
 1843
 ],
 [
@@ -103494,7 +103499,7 @@ null,
 [
 "method",
 1844,
-216,
+217,
 1843
 ],
 [
@@ -103506,7 +103511,7 @@ null,
 [
 "method",
 1844,
-208,
+209,
 1843
 ],
 [
@@ -118028,12 +118033,18 @@ null
 "sponge",
 "bool",
 "False"
+],
+[
+"kw",
+"implicit_surface",
+"bool",
+"False"
 ]
 ],
 "RadiativeConfig",
 "DEVELOPMENT EXPERIMENT, not a reproduction of Thomson \u0026 Vallis (2019) M-I (docs/radiation/MARS_MI_PLAN.md).",
 [],
-326
+332
 ],
 "1387":[
 "RadiativeRun",
@@ -127759,7 +127770,7 @@ null
 null,
 "Lagged stepper term evaluating column physics on the state grid.",
 [],
-224,
+225,
 []
 ],
 "1846":[
@@ -127793,7 +127804,7 @@ null
 null,
 "",
 [],
-194
+195
 ],
 "1847":[
 "__init__",
@@ -127874,7 +127885,7 @@ null
 "dict",
 "Time- and area-mean fluxes (W m^-2) since the last reset, plus the accumulated time (s).",
 [],
-206
+207
 ],
 "1850":[
 "columns",
@@ -127916,7 +127927,7 @@ null
 "None",
 "",
 [],
-224
+225
 ],
 "1852":[
 "signature",
@@ -127946,7 +127957,7 @@ null
 "dict",
 "",
 [],
-214
+215
 ],
 "1854":[
 "_analyze",
@@ -147652,7 +147663,7 @@ null
 null,
 "Radiation + lower boundary + optional dry convection.",
 [],
-170,
+190,
 []
 ],
 "860":[
@@ -148052,7 +148063,7 @@ null,
 null,
 "",
 [],
-98
+101
 ],
 "870":[
 "_latitude_edges",
@@ -148239,7 +148250,7 @@ null
 null,
 "Dry convective adjustment over ``dt`` (identity when disabled).",
 [],
-170
+190
 ],
 "880":[
 "fixed",
@@ -148478,12 +148489,24 @@ null,
 "wind_speed",
 null,
 "None"
+],
+[
+"kw",
+"exchange_window",
+null,
+"None"
+],
+[
+"kw",
+"surface_step",
+null,
+"None"
 ]
 ],
 "PhysicsOutput",
-"",
+"``exchange_window`` (s) is the interval over which the host applies the heating to the air, ``surface_step`` the one over which it advances the slab. With ``\"implicit\": true`` in the sensible options and both given, the bulk exchange is the backward-Euler flux between the two reservoirs with the exchange coefficient k = rho C |v| c_p frozen: F' = F / (1 + k w / Ca + k s / Cs), Ca = c_p dp / g. Th…",
 [],
-162
+182
 ],
 "890":[
 "_host",
@@ -148742,7 +148765,7 @@ null
 "None",
 "Forget the held radiative fluxes (after a restart or a state jump).",
 [],
-112
+115
 ],
 "900":[
 "_area_weighted_mean",
@@ -149027,7 +149050,7 @@ null
 "dict",
 "",
 [],
-107
+110
 ],
 "910":[
 "build_pe_snapshot_timeline_from_data",
@@ -149712,7 +149735,7 @@ null
 null,
 "A single-column (or many independent columns) model on a fixed pressure grid: the reference host for the column physics.",
 [],
-285,
+305,
 []
 ],
 "940":[
@@ -149923,7 +149946,7 @@ null,
 null,
 "",
 [],
-195
+215
 ],
 "950":[
 "_presets",
@@ -150278,7 +150301,7 @@ null
 "float",
 "An explicit time step (s) that keeps every layer's own radiative relaxation stable: ``factor / max |d heating_k / d T_k|``, with the diagonal sensitivity measured by warming the even and the odd layers by 1 K in turn (two extra evaluations).",
 [],
-239
+259
 ],
 "960":[
 "standalone_page",
@@ -150495,7 +150518,7 @@ null
 "dict",
 "March in physical time to steady state.",
 [],
-285
+305
 ],
 "970":[
 "_custom_terrain",
@@ -150703,7 +150726,7 @@ null
 "PhysicsOutput",
 "",
 [],
-202
+222
 ],
 "980":[
 "__post_init__",
@@ -150854,7 +150877,7 @@ null
 "PhysicsOutput",
 "Forward step of length ``dt`` s: physics tendency, surface update, then convective adjustment.",
 [],
-217
+237
 ],
 "990":[
 "__post_init__",
@@ -263740,9 +263763,21 @@ null
 ],
 "87":[
 {
-"builtin":8
+"builtin":9,
+"unresolved":2
 },
-[]
+[
+[
+98,
+"unresolved",
+"(self.sensible or {}).get"
+],
+[
+99,
+"unresolved",
+"(self.sensible or {}).items"
+]
+]
 ],
 "88":[
 {
@@ -263750,7 +263785,7 @@ null
 },
 [
 [
-170,
+190,
 "unresolved",
 "self.convection.adjust"
 ]
@@ -263758,27 +263793,27 @@ null
 ],
 "89":[
 {
-"builtin":1,
-"unresolved":4
+"builtin":4,
+"unresolved":6
 },
 [
 [
-132,
+144,
 "unresolved",
 "self.radiation.fluxes"
 ],
 [
-131,
+143,
 "unresolved",
 "self.insolation"
 ],
 [
-142,
+154,
 "unresolved",
 "xp.zeros_like"
 ],
 [
-149,
+161,
 "unresolved",
 "xp.log"
 ]
@@ -263790,22 +263825,22 @@ null
 },
 [
 [
-101,
+104,
 "unresolved",
 "self.radiation.signature"
 ],
 [
-103,
+106,
 "unresolved",
 "self.insolation.signature"
 ],
 [
-104,
+107,
 "unresolved",
 "self.convection.signature"
 ],
 [
-105,
+108,
 "unresolved",
 "self.surface.signature"
 ]
@@ -263817,12 +263852,12 @@ null
 },
 [
 [
-189,
+209,
 "unresolved",
 "temperature.copy"
 ],
 [
-193,
+213,
 "unresolved",
 "surface_temperature.copy"
 ]
@@ -263835,22 +263870,22 @@ null
 },
 [
 [
-229,
+249,
 "unresolved",
 "xp.zeros_like"
 ],
 [
-233,
+253,
 "unresolved",
 "xp.abs(diff[parity::2]).max"
 ],
 [
-233,
+253,
 "unresolved",
 "xp.abs"
 ],
 [
-238,
+258,
 "unresolved",
 "self.surface_temperature.max"
 ]
@@ -263863,22 +263898,22 @@ null
 },
 [
 [
-268,
+288,
 "unresolved",
 "xp.abs(out.heating).max"
 ],
 [
-272,
+292,
 "unresolved",
 "hard.adjust"
 ],
 [
-277,
+297,
 "unresolved",
 "phys.surface.advance"
 ],
 [
-273,
+293,
 "unresolved",
 "xp.abs((new - self.temperature) * mass_cp).max"
 ]
@@ -263890,12 +263925,12 @@ null
 },
 [
 [
-198,
+218,
 "unresolved",
 "self.physics.reset"
 ],
 [
-199,
+219,
 "unresolved",
 "self.physics.compute"
 ]
@@ -263907,17 +263942,17 @@ null
 },
 [
 [
-207,
+227,
 "unresolved",
 "self.physics.compute"
 ],
 [
-213,
+233,
 "unresolved",
 "self.physics.surface.advance"
 ],
 [
-215,
+235,
 "unresolved",
 "self.physics.adjust"
 ]
@@ -280658,17 +280693,17 @@ null
 "self.physics.compute"
 ],
 [
-170,
+171,
 "unresolved",
 "self.physics.adjust"
 ],
 [
-175,
+176,
 "unresolved",
 "xp.zeros_like"
 ],
 [
-180,
+181,
 "unresolved",
 "self.physics.surface.advance"
 ]
@@ -280735,7 +280770,7 @@ null
 },
 [
 [
-201,
+202,
 "unresolved",
 "self.budget.items"
 ]
@@ -280775,22 +280810,22 @@ null
 },
 [
 [
-217,
+218,
 "unresolved",
 "d.get"
-],
-[
-221,
-"unresolved",
-"self._xp.asarray"
 ],
 [
 222,
 "unresolved",
-"d.get"
+"self._xp.asarray"
 ],
 [
 223,
+"unresolved",
+"d.get"
+],
+[
+224,
 "unresolved",
 "d.get('budget', {}).get"
 ]
@@ -280816,7 +280851,7 @@ null
 },
 [
 [
-212,
+213,
 "unresolved",
 "xp.asnumpy"
 ]
