@@ -195,7 +195,6 @@ def _probe_directory(directory: Path) -> str:
             raise ValueError(f"Cannot write to {directory}: {error}") from error
         for strategy in ("link", "renameat2"):
             target = source.with_suffix(".dst")
-            probes.append(target)
             try:
                 _publish(source, target, strategy)
             except OSError as error:
@@ -203,6 +202,7 @@ def _probe_directory(directory: Path) -> str:
                     raise ValueError(f"Cannot publish files in {directory}: {error}") from error
                 reasons.append(f"{strategy}: {error.strerror or error}")
                 continue
+            probes.append(target)
             if strategy == "link":
                 return strategy
             # The source name is gone; prove the flag is honoured, not ignored.
@@ -228,6 +228,8 @@ def _existing_ancestor(path: Path) -> Path:
     # A directory that does not exist yet cannot be a mount point, so it will be
     # created on the filesystem of its nearest existing ancestor.
     while not path.exists():
+        if path == path.parent:
+            raise ValueError(f"Destination root {path} is unavailable. " + _LOCAL_HINT)
         path = path.parent
     return path
 

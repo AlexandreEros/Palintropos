@@ -1,7 +1,7 @@
 {
   "call_graph": {
     "call_sites": {
-      "builtin": 3673,
+      "builtin": 3674,
       "external": 2448,
       "internal": 2931,
       "unresolved": 3680
@@ -952,7 +952,7 @@
     "package": "tropoi",
     "src": "src",
     "working_tree": {
-      "base_commit": "9cf3e6f08e011b7bd863928b5bb5e4f1e33b7ecf",
+      "base_commit": "f349fdbe4263573f01f9b2f7517d5baf49886021",
       "generator": {
         "changes": [],
         "files": {
@@ -980,7 +980,7 @@
         "files": {
           "src/tropoi/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
           "src/tropoi/cli/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-          "src/tropoi/cli/capsule.py": "8a74dc26bba1b2281c53e255bdd36a53f2c9b9adfea7a5fad39d2c4ddd9cbc7e",
+          "src/tropoi/cli/capsule.py": "36e1b58a146bfee85d3471e08b90358cd9ee026341f696ac506e2677dbedfc21",
           "src/tropoi/cli/clear_cache.py": "9f214cd2654208e4478b65ee537d4bc7c7ccbb2b3ed3f87bc897d1ead0bbbbc4",
           "src/tropoi/cli/generate_planet.py": "797b1d7d528c9bb2bd210ec95313772ffc5d090ab2e740d07b339aa66132b116",
           "src/tropoi/cli/main.py": "f62c055e294c85fea3304bcdadec4891087752f6e343dbe08cb9f94a8ff0332d",
@@ -1149,7 +1149,7 @@
           "src/tropoi/temporal/tendencies/primitive_equations.py": "848c6fe9406a7c1c465c0aa9459760b01c542164c8cc9395797a3c4a60793e52",
           "src/tropoi/temporal/tendencies/shallow_water.py": "7ae521f2378824e89f88bc467fc99321d1ef4224b037c865137e076a601da3c8"
         },
-        "sha256": "c82a8277cdf1c75afc5233d3c9e290c7314605ea6e42364ae57e8a5ea5f385c2",
+        "sha256": "363d3660bc218585aeefd2db5af8eb805f1302519728829901d72fe77c55b32b",
         "status": "dirty"
       }
     }

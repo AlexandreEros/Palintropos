@@ -300,6 +300,34 @@ def test_hard_link_strategy_used_when_supported(catalogue, tmp_path, posix):
     assert not _hidden_capsule_files(tmp_path)
 
 
+def test_probe_collision_preserves_the_other_process_file(tmp_path, posix):
+    collided = []
+
+    def link_collision(source, target):
+        target.write_bytes(b"another process")
+        collided.append(target)
+        raise FileExistsError(errno.EEXIST, "Destination already exists")
+
+    posix.setattr(capsule.os, "link", link_collision)
+    with pytest.raises(ValueError, match="Cannot publish"):
+        capsule._probe_directory(tmp_path)
+    assert collided[0].read_bytes() == b"another process"
+    assert list(tmp_path.iterdir()) == collided
+
+
+def test_existing_ancestor_stops_at_unavailable_root(tmp_path, monkeypatch):
+    seen = set()
+
+    def absent(path):
+        assert path not in seen, f"Ancestor search revisited {path}"
+        seen.add(path)
+        return False
+
+    monkeypatch.setattr(Path, "exists", absent)
+    with pytest.raises(ValueError, match="Destination root .* is unavailable"):
+        capsule._existing_ancestor(tmp_path / "missing")
+
+
 def test_unwritable_destination_reported_clearly(catalogue, tmp_path, posix):
     root, _ = catalogue
     def read_only(*args, **kwargs):
