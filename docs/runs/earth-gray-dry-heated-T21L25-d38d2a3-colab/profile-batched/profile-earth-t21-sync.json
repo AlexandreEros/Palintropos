@@ -1,0 +1,268 @@
+{
+  "case": "earth",
+  "code": {
+    "git_commit": "d38d2a365b60c3528c3ba2eae76c688d453ee505",
+    "git_dirty": true
+  },
+  "config_sha256": "748cec4b170c40a170cb14efbd6bac2e59618be54fafe6c7bc4a84ead23dd2be",
+  "device": {
+    "cupy": "14.0.1",
+    "name": "Tesla T4",
+    "nvidia_smi": "Tesla T4, 580.82.07, 15360 MiB",
+    "total_memory_gb": 14.56317138671875
+  },
+  "experiment_id": "earth-gray-dry-heated-T21L25",
+  "instrumented": [
+    "GaussLatLonSphericalHarmonics.transform",
+    "GaussLatLonSphericalHarmonics.transform_batch",
+    "GaussLatLonSphericalHarmonics.inv_transform",
+    "GaussLatLonSphericalHarmonics.inv_transform_batch",
+    "GaussLatLonSphericalHarmonics.transform",
+    "GaussLatLonSphericalHarmonics.transform_batch",
+    "GaussLatLonSphericalHarmonics.inv_transform",
+    "GaussLatLonSphericalHarmonics.inv_transform_batch",
+    "so.vector_curl_div_spectral_batch"
+  ],
+  "kind": "profile",
+  "labels": {
+    "diagnostics.daily_sample": {
+      "calls": 1,
+      "calls_per_step": 0.027777777777777776,
+      "exclusive_fraction_of_step": 0.008412041168940834,
+      "exclusive_ms_per_step": 1.1072075278535622,
+      "exclusive_seconds": 0.03985947100272824,
+      "inclusive_ms_per_step": 3.21390430555842,
+      "inclusive_seconds": 0.11570055500010312
+    },
+    "dynamics.implicit_solve": {
+      "calls": 36,
+      "calls_per_step": 1.0,
+      "exclusive_fraction_of_step": 0.01505466914383792,
+      "exclusive_ms_per_step": 1.9815218055454251,
+      "exclusive_seconds": 0.0713347849996353,
+      "inclusive_ms_per_step": 1.9815218055454251,
+      "inclusive_seconds": 0.0713347849996353
+    },
+    "dynamics.tendency": {
+      "calls": 36,
+      "calls_per_step": 1.0,
+      "exclusive_fraction_of_step": 0.2784963114690382,
+      "exclusive_ms_per_step": 36.65617016669861,
+      "exclusive_seconds": 1.3196221260011498,
+      "inclusive_ms_per_step": 62.30688358332751,
+      "inclusive_seconds": 2.2430478089997905
+    },
+    "output.checkpoint": {
+      "calls": 1,
+      "calls_per_step": 0.027777777777777776,
+      "exclusive_fraction_of_step": 0.006071070309829334,
+      "exclusive_ms_per_step": 0.799084861114352,
+      "exclusive_seconds": 0.02876705500011667,
+      "inclusive_ms_per_step": 0.799084861114352,
+      "inclusive_seconds": 0.02876705500011667
+    },
+    "physics.convection": {
+      "calls": 36,
+      "calls_per_step": 1.0,
+      "exclusive_fraction_of_step": 0.01976020308753901,
+      "exclusive_ms_per_step": 2.6008723888821805,
+      "exclusive_seconds": 0.0936314059997585,
+      "inclusive_ms_per_step": 2.6008723888821805,
+      "inclusive_seconds": 0.0936314059997585
+    },
+    "physics.radiation_and_boundary": {
+      "calls": 36,
+      "calls_per_step": 1.0,
+      "exclusive_fraction_of_step": 0.21615993198276462,
+      "exclusive_ms_per_step": 28.451347194460496,
+      "exclusive_seconds": 1.0242484990005778,
+      "inclusive_ms_per_step": 28.451347194460496,
+      "inclusive_seconds": 1.0242484990005778
+    },
+    "step": {
+      "calls": 36,
+      "calls_per_step": 1.0,
+      "exclusive_fraction_of_step": 0.011334447324406523,
+      "exclusive_ms_per_step": 1.4918597222251466,
+      "exclusive_seconds": 0.05370695000010528,
+      "inclusive_ms_per_step": 131.62174383330694,
+      "inclusive_seconds": 4.73838277799905
+    },
+    "term.column_physics_coupling": {
+      "calls": 36,
+      "calls_per_step": 1.0,
+      "exclusive_fraction_of_step": 0.015558124881435946,
+      "exclusive_ms_per_step": 2.0477875276709607,
+      "exclusive_seconds": 0.0737203509961546,
+      "inclusive_ms_per_step": 37.680536666666995,
+      "inclusive_seconds": 1.3564993200000117
+    },
+    "term.momentum_sink_heating": {
+      "calls": 36,
+      "calls_per_step": 1.0,
+      "exclusive_fraction_of_step": 0.13426730908110177,
+      "exclusive_ms_per_step": 17.672497361060223,
+      "exclusive_seconds": 0.636209904998168,
+      "inclusive_ms_per_step": 28.16094205554186,
+      "inclusive_seconds": 1.013793913999507
+    },
+    "transform.analysis.batch@dynamics.tendency": {
+      "calls": 36,
+      "calls_per_step": 1.0,
+      "exclusive_fraction_of_step": 0.024889738023277833,
+      "exclusive_ms_per_step": 3.2760307221779943,
+      "exclusive_seconds": 0.11793710599840779,
+      "inclusive_ms_per_step": 3.2760307221779943,
+      "inclusive_seconds": 0.11793710599840779
+    },
+    "transform.analysis.batch@term.column_physics_coupling": {
+      "calls": 36,
+      "calls_per_step": 1.0,
+      "exclusive_fraction_of_step": 0.007402679699705561,
+      "exclusive_ms_per_step": 0.9743536111146669,
+      "exclusive_seconds": 0.03507673000012801,
+      "inclusive_ms_per_step": 0.9743536111146669,
+      "inclusive_seconds": 0.03507673000012801
+    },
+    "transform.analysis.batch@term.momentum_sink_heating": {
+      "calls": 36,
+      "calls_per_step": 1.0,
+      "exclusive_fraction_of_step": 0.007336187604294708,
+      "exclusive_ms_per_step": 0.9656018055655599,
+      "exclusive_seconds": 0.034761665000360153,
+      "inclusive_ms_per_step": 0.9656018055655599,
+      "inclusive_seconds": 0.034761665000360153
+    },
+    "transform.synthesis.batch@diagnostics.daily_sample": {
+      "calls": 1,
+      "calls_per_step": 0.027777777777777776,
+      "exclusive_fraction_of_step": 0.0004225825758731144,
+      "exclusive_ms_per_step": 0.055621055549990056,
+      "exclusive_seconds": 0.002002357999799642,
+      "inclusive_ms_per_step": 0.055621055549990056,
+      "inclusive_seconds": 0.002002357999799642
+    },
+    "transform.synthesis.batch@dynamics.tendency": {
+      "calls": 36,
+      "calls_per_step": 1.0,
+      "exclusive_fraction_of_step": 0.10702439687968529,
+      "exclusive_ms_per_step": 14.086737750012112,
+      "exclusive_seconds": 0.507122559000436,
+      "inclusive_ms_per_step": 14.086737750012112,
+      "inclusive_seconds": 0.507122559000436
+    },
+    "transform.synthesis.batch@term.column_physics_coupling": {
+      "calls": 36,
+      "calls_per_step": 1.0,
+      "exclusive_fraction_of_step": 0.014494005068602381,
+      "exclusive_ms_per_step": 1.907726222258235,
+      "exclusive_seconds": 0.06867814400129646,
+      "inclusive_ms_per_step": 1.907726222258235,
+      "inclusive_seconds": 0.06867814400129646
+    },
+    "transform.synthesis.batch@term.momentum_sink_heating": {
+      "calls": 36,
+      "calls_per_step": 1.0,
+      "exclusive_fraction_of_step": 0.07235007386755438,
+      "exclusive_ms_per_step": 9.522842888916077,
+      "exclusive_seconds": 0.3428223440009788,
+      "inclusive_ms_per_step": 9.522842888916077,
+      "inclusive_seconds": 0.3428223440009788
+    },
+    "transform.synthesis.scalar@diagnostics.daily_sample": {
+      "calls": 228,
+      "calls_per_step": 6.333333333333333,
+      "exclusive_fraction_of_step": 0.015583107033990247,
+      "exclusive_ms_per_step": 2.051075722154868,
+      "exclusive_seconds": 0.07383872599757524,
+      "inclusive_ms_per_step": 2.051075722154868,
+      "inclusive_seconds": 0.07383872599757524
+    },
+    "transform.synthesis.scalar@term.column_physics_coupling": {
+      "calls": 180,
+      "calls_per_step": 5.0,
+      "exclusive_fraction_of_step": 0.012904020816130998,
+      "exclusive_ms_per_step": 1.6984497222804547,
+      "exclusive_seconds": 0.061144190002096366,
+      "inclusive_ms_per_step": 1.6984497222804547,
+      "inclusive_seconds": 0.061144190002096366
+    },
+    "transform.vector_curl_div@dynamics.tendency": {
+      "calls": 36,
+      "calls_per_step": 1.0,
+      "exclusive_fraction_of_step": 0.06296790107062489,
+      "exclusive_ms_per_step": 8.287944944438802,
+      "exclusive_seconds": 0.2983660179997969,
+      "inclusive_ms_per_step": 8.287944944438802,
+      "inclusive_seconds": 0.2983660179997969
+    }
+  },
+  "mode": "sync",
+  "resolution": {
+    "dt": 1200.0,
+    "l_max": 22,
+    "nlat": 32,
+    "nlev": 25,
+    "nlon": 64,
+    "retained": 21
+  },
+  "steps": 36,
+  "synchronised_seconds_per_step": 0.13162174383330694,
+  "transforms_by_caller": {
+    "diagnostics.daily_sample": {
+      "synthesis.batch": {
+        "calls_per_step": 0.027777777777777776,
+        "ms_per_step": 0.055621055549990056
+      },
+      "synthesis.scalar": {
+        "calls_per_step": 6.333333333333333,
+        "ms_per_step": 2.051075722154868
+      },
+      "total_ms_per_step": 2.1066967777048577
+    },
+    "dynamics.tendency": {
+      "analysis.batch": {
+        "calls_per_step": 1.0,
+        "ms_per_step": 3.2760307221779943
+      },
+      "synthesis.batch": {
+        "calls_per_step": 1.0,
+        "ms_per_step": 14.086737750012112
+      },
+      "total_ms_per_step": 25.65071341662891,
+      "vector_curl_div": {
+        "calls_per_step": 1.0,
+        "ms_per_step": 8.287944944438802
+      }
+    },
+    "term.column_physics_coupling": {
+      "analysis.batch": {
+        "calls_per_step": 1.0,
+        "ms_per_step": 0.9743536111146669
+      },
+      "synthesis.batch": {
+        "calls_per_step": 1.0,
+        "ms_per_step": 1.907726222258235
+      },
+      "synthesis.scalar": {
+        "calls_per_step": 5.0,
+        "ms_per_step": 1.6984497222804547
+      },
+      "total_ms_per_step": 4.5805295556533565
+    },
+    "term.momentum_sink_heating": {
+      "analysis.batch": {
+        "calls_per_step": 1.0,
+        "ms_per_step": 0.9656018055655599
+      },
+      "synthesis.batch": {
+        "calls_per_step": 1.0,
+        "ms_per_step": 9.522842888916077
+      },
+      "total_ms_per_step": 10.488444694481638
+    }
+  },
+  "utc": "2026-11-11T22:54:16+00:00",
+  "wall_seconds": 4.88318088699998,
+  "warm_steps": 6
+}

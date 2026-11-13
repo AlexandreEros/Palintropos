@@ -6,6 +6,12 @@ and what is not validated. Nothing here is a claim about a real planet.
 
 ## 1. What exists
 
+**Archive update (2026-11-12):** the six original run capsules behind this page
+(the partial Earth run, the Earth/Jupiter baselines, heated Earth on MX110, and
+heated Earth/Jupiter on Colab) now have [published cores and full-cloud receipts](../runs/README.md#additional-preserved-evidence-2026-11-12).
+The [preservation record](../validation/run_archive_2026-11-12/README.md) verifies
+their association with the evidence below, including config line-ending differences.
+
 | Piece | Where | State |
 | --- | --- | --- |
 | Gas thermodynamics (R, c_p(T) from molecular constants, H2 ortho/para) | `src/tropoi/physics/thermodynamics.py` | implemented, tested |

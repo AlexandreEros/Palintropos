@@ -1,0 +1,27 @@
+{"day": 0, "environment": {"cuda_driver": 13000, "cuda_runtime": 13000, "cupy": "14.0.1", "device": "Tesla T4", "numpy": "2.4.6", "platform": "Linux-6.6.159+-x86_64-with-glibc2.39", "python": "3.13.16"}, "event": "created", "step": 0, "time": "2026-11-12T00:46:14Z"}
+{"day": 0.0, "event": "checkpoint", "file": "checkpoint-s000000000.npz", "step": 0, "time": "2026-11-12T00:46:15Z"}
+{"day": 1.0, "event": "checkpoint", "file": "checkpoint-s000000072.npz", "step": 72, "time": "2026-11-12T00:46:41Z"}
+{"checkpoint": "checkpoint-s000000072.npz", "day": 1.0, "event": "resumed", "step": 72, "time": "2026-11-12T00:47:22Z"}
+{"day": 2.0, "event": "checkpoint", "file": "checkpoint-s000000144.npz", "step": 144, "time": "2026-11-12T00:47:41Z"}
+{"day": 10.0, "event": "checkpoint", "file": "checkpoint-s000000720.npz", "step": 720, "time": "2026-11-12T00:50:16Z"}
+{"checkpoint": "checkpoint-s000000720.npz", "day": 10.0, "event": "resumed", "step": 720, "time": "2026-11-12T00:51:18Z"}
+{"day": 20.0, "event": "checkpoint", "file": "checkpoint-s000001440.npz", "step": 1440, "time": "2026-11-12T00:54:29Z"}
+{"day": 30.0, "event": "checkpoint", "file": "checkpoint-s000002160.npz", "step": 2160, "time": "2026-11-12T00:57:37Z"}
+{"day": 40.0, "event": "checkpoint", "file": "checkpoint-s000002880.npz", "step": 2880, "time": "2026-11-12T01:00:46Z"}
+{"day": 50.0, "event": "checkpoint", "file": "checkpoint-s000003600.npz", "step": 3600, "time": "2026-11-12T01:03:54Z"}
+{"day": 60.0, "event": "checkpoint", "file": "checkpoint-s000004320.npz", "step": 4320, "time": "2026-11-12T01:06:59Z"}
+{"day": 70.0, "event": "checkpoint", "file": "checkpoint-s000005040.npz", "step": 5040, "time": "2026-11-12T01:10:04Z"}
+{"day": 80.0, "event": "checkpoint", "file": "checkpoint-s000005760.npz", "step": 5760, "time": "2026-11-12T01:13:08Z"}
+{"day": 90.0, "event": "checkpoint", "file": "checkpoint-s000006480.npz", "step": 6480, "time": "2026-11-12T01:16:17Z"}
+{"day": 100.0, "event": "checkpoint", "file": "checkpoint-s000007200.npz", "step": 7200, "time": "2026-11-12T01:19:23Z"}
+{"day": 110.0, "event": "checkpoint", "file": "checkpoint-s000007920.npz", "step": 7920, "time": "2026-11-12T01:22:30Z"}
+{"day": 120.0, "event": "checkpoint", "file": "checkpoint-s000008640.npz", "step": 8640, "time": "2026-11-12T01:25:39Z"}
+{"day": 130.0, "event": "checkpoint", "file": "checkpoint-s000009360.npz", "step": 9360, "time": "2026-11-12T01:28:50Z"}
+{"day": 140.0, "event": "checkpoint", "file": "checkpoint-s000010080.npz", "step": 10080, "time": "2026-11-12T01:32:01Z"}
+{"day": 150.0, "event": "checkpoint", "file": "checkpoint-s000010800.npz", "step": 10800, "time": "2026-11-12T01:35:15Z"}
+{"day": 160.0, "event": "checkpoint", "file": "checkpoint-s000011520.npz", "step": 11520, "time": "2026-11-12T01:38:32Z"}
+{"day": 170.0, "event": "checkpoint", "file": "checkpoint-s000012240.npz", "step": 12240, "time": "2026-11-12T01:41:43Z"}
+{"day": 180.0, "event": "checkpoint", "file": "checkpoint-s000012960.npz", "step": 12960, "time": "2026-11-12T01:44:53Z"}
+{"day": 190.0, "event": "checkpoint", "file": "checkpoint-s000013680.npz", "step": 13680, "time": "2026-11-12T01:48:03Z"}
+{"day": 200.0, "event": "checkpoint", "file": "checkpoint-s000014400.npz", "step": 14400, "time": "2026-11-12T01:51:11Z"}
+{"day": 200.0, "event": "completed", "step": 14400, "time": "2026-11-12T01:51:11Z"}

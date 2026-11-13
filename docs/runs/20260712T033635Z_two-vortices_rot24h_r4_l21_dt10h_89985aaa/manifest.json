@@ -1,0 +1,50 @@
+{
+  "created_utc": "2026-07-12T03:36:37.057954+00:00",
+  "run_id": "20260712T033635Z_two-vortices_rot24h_r4_l21_dt10h_89985aaa",
+  "experiment": null,
+  "argv": [
+    "C:\\Users\\User\\Projects\\PlanetarySandbox\\venv\\Scripts\\psx-bve",
+    "--duration-days",
+    "10",
+    "--day-hours",
+    "24",
+    "--dt-snapshots",
+    "36000",
+    "--out",
+    "runs"
+  ],
+  "run_config": {
+    "lmax": 21,
+    "resolution": 4,
+    "nlat": 128,
+    "nlon": 256,
+    "day_hours": 24.0,
+    "radius_earth_units": 1.0,
+    "duration_days": 10.0,
+    "dt_snapshots": 36000.0,
+    "scenario": "two_vortices",
+    "viscosity": 0.0,
+    "out": "runs",
+    "experiment": null,
+    "overwrite": false,
+    "run_id": "20260712T033635Z_two-vortices_rot24h_r4_l21_dt10h_89985aaa"
+  },
+  "git": {
+    "commit": "89985aaa24e44345f7d9f327b7bab28a30a640e0",
+    "branch": "fix/r5-spectral-absolute-vorticity",
+    "dirty": true
+  },
+  "versions": {
+    "python": "3.12.12",
+    "numpy": "2.2.6",
+    "scipy": "1.16.3",
+    "cupy": "13.4.0",
+    "matplotlib": "3.10.8"
+  },
+  "gpu": "NVIDIA GeForce MX110",
+  "notes": {
+    "equations": "barotropic vorticity equation on a rotating sphere (see MATHEMATICAL_MODEL.md)",
+    "timestep_policy": "fixed dt from initial CFL (KNOWN_RISKS.md R-4)",
+    "diagnostics": "see diagnostics.py module docstring for definitions"
+  }
+}

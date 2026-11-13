@@ -1,0 +1,27 @@
+{
+  "b2_endpoints_verdict": "PASS",
+  "b2_threshold": 0.001,
+  "cannot_establish": "daily <p_s> (only daily <ln p_s> was stored); B2 is established at the endpoints day 0 and day 1200 only",
+  "checkpoint_sha256": "d80f5b7fb85d1a623b77a67d4961dcfc3208a4a4b3ff36431bd5bdf0aa11801b",
+  "day0": {
+    "ln_mean_ps_pa": 11.512925464969365,
+    "max_ps_pa": 101774.46319970387,
+    "mean_lnps_nondim": 44.84622692761614,
+    "mean_ps_pa": 99999.99999991365,
+    "min_ps_pa": 98224.71632826253
+  },
+  "day_final": {
+    "ln_mean_ps_pa": 11.512602813809622,
+    "max_ps_pa": 102370.71926330499,
+    "mean_lnps_nondim": 44.84585846258973,
+    "mean_ps_pa": 99967.7400885682,
+    "min_ps_pa": 95311.12612385573
+  },
+  "day_final_index": 1200,
+  "final_state_source": "checkpoint.pkl (stored day-1200 state)",
+  "initial_state_source": "rebuilt: dino_reference.build(config, dt) init_fn(PRNGKey(seed))",
+  "mean_lnps_series_drift_nondim": -0.0003689902780195098,
+  "quantity": "Gaussian-weighted global mean of p_s = exp(ln p_s)",
+  "rel_change": 0.00032259911345476784,
+  "series_sha256": "baa7cffd59f833d4560f23de426a2932ca574744ee4afc6df68ad60034cc4663"
+}

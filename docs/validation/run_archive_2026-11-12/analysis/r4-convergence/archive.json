@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "provider": "google-drive",
+  "kind": "computational-analysis",
+  "folder_url": "https://drive.google.com/drive/folders/1vDYmxdQzXRlum7y1XvGyp2MbO0Ftd9PA",
+  "collection_url": "https://drive.google.com/drive/folders/1Yjig-jolvU15gvCqTq-19kyjCbJi9iX1",
+  "original_local_path": "runs/r4-convergence",
+  "provenance_note": "Original local bytes preserved unchanged; full copy in the owner's November 12 bulk upload. Scientific conclusions retain the qualifications of their original validation records.",
+  "included_files": [
+    "aligned.npz",
+    "summary.txt"
+  ],
+  "omitted_files": {},
+  "files": {
+    "aligned.npz": {
+      "drive_id": "11di01PldKpPwKboaKBFzI56rhg_0UYFY",
+      "size": 24732
+    },
+    "summary.txt": {
+      "drive_id": "1NKtLd4prsHCJs-ZkDyouxhuOlZpFpT-8",
+      "size": 3073
+    }
+  }
+}

@@ -1,0 +1,34 @@
+{"day": 0, "environment": {"cuda_driver": 11080, "cuda_runtime": 11080, "cupy": "13.4.0", "device": "NVIDIA GeForce MX110", "numpy": "2.2.6", "platform": "Windows-11-10.0.26200-SP0", "python": "3.12.12"}, "event": "created", "step": 0, "time": "2026-11-11T04:35:43Z"}
+{"day": 0.0, "event": "checkpoint", "file": "checkpoint-s000000000.npz", "step": 0, "time": "2026-11-11T04:35:44Z"}
+{"checkpoint": "checkpoint-s000000000.npz", "day": 0.0, "event": "resumed", "step": 0, "time": "2026-11-11T04:37:26Z"}
+{"day": 10.0, "event": "checkpoint", "file": "checkpoint-s000000720.npz", "step": 720, "time": "2026-11-11T04:43:24Z"}
+{"day": 20.0, "event": "checkpoint", "file": "checkpoint-s000001440.npz", "step": 1440, "time": "2026-11-11T04:49:21Z"}
+{"day": 30.0, "event": "checkpoint", "file": "checkpoint-s000002160.npz", "step": 2160, "time": "2026-11-11T04:55:27Z"}
+{"day": 40.0, "event": "checkpoint", "file": "checkpoint-s000002880.npz", "step": 2880, "time": "2026-11-11T05:01:37Z"}
+{"day": 50.0, "event": "checkpoint", "file": "checkpoint-s000003600.npz", "step": 3600, "time": "2026-11-11T05:07:40Z"}
+{"day": 60.0, "event": "checkpoint", "file": "checkpoint-s000004320.npz", "step": 4320, "time": "2026-11-11T05:13:45Z"}
+{"day": 70.0, "event": "checkpoint", "file": "checkpoint-s000005040.npz", "step": 5040, "time": "2026-11-11T05:19:52Z"}
+{"day": 80.0, "event": "checkpoint", "file": "checkpoint-s000005760.npz", "step": 5760, "time": "2026-11-11T05:26:01Z"}
+{"day": 90.0, "event": "checkpoint", "file": "checkpoint-s000006480.npz", "step": 6480, "time": "2026-11-11T05:32:02Z"}
+{"day": 100.0, "event": "checkpoint", "file": "checkpoint-s000007200.npz", "step": 7200, "time": "2026-11-11T05:37:57Z"}
+{"day": 110.0, "event": "checkpoint", "file": "checkpoint-s000007920.npz", "step": 7920, "time": "2026-11-11T05:43:51Z"}
+{"day": 120.0, "event": "checkpoint", "file": "checkpoint-s000008640.npz", "step": 8640, "time": "2026-11-11T05:49:45Z"}
+{"day": 130.0, "event": "checkpoint", "file": "checkpoint-s000009360.npz", "step": 9360, "time": "2026-11-11T05:55:39Z"}
+{"day": 140.0, "event": "checkpoint", "file": "checkpoint-s000010080.npz", "step": 10080, "time": "2026-11-11T06:01:33Z"}
+{"day": 150.0, "event": "checkpoint", "file": "checkpoint-s000010800.npz", "step": 10800, "time": "2026-11-11T06:07:28Z"}
+{"day": 160.0, "event": "checkpoint", "file": "checkpoint-s000011520.npz", "step": 11520, "time": "2026-11-11T06:13:22Z"}
+{"day": 170.0, "event": "checkpoint", "file": "checkpoint-s000012240.npz", "step": 12240, "time": "2026-11-11T06:19:16Z"}
+{"day": 180.0, "event": "checkpoint", "file": "checkpoint-s000012960.npz", "step": 12960, "time": "2026-11-11T06:25:10Z"}
+{"day": 190.0, "event": "checkpoint", "file": "checkpoint-s000013680.npz", "step": 13680, "time": "2026-11-11T06:31:04Z"}
+{"day": 200.0, "event": "checkpoint", "file": "checkpoint-s000014400.npz", "step": 14400, "time": "2026-11-11T06:36:58Z"}
+{"day": 210.0, "event": "checkpoint", "file": "checkpoint-s000015120.npz", "step": 15120, "time": "2026-11-11T06:42:53Z"}
+{"day": 220.0, "event": "checkpoint", "file": "checkpoint-s000015840.npz", "step": 15840, "time": "2026-11-11T06:48:46Z"}
+{"day": 230.0, "event": "checkpoint", "file": "checkpoint-s000016560.npz", "step": 16560, "time": "2026-11-11T06:54:40Z"}
+{"day": 240.0, "event": "checkpoint", "file": "checkpoint-s000017280.npz", "step": 17280, "time": "2026-11-11T07:00:33Z"}
+{"day": 250.0, "event": "checkpoint", "file": "checkpoint-s000018000.npz", "step": 18000, "time": "2026-11-11T07:06:28Z"}
+{"day": 260.0, "event": "checkpoint", "file": "checkpoint-s000018720.npz", "step": 18720, "time": "2026-11-11T07:12:21Z"}
+{"day": 270.0, "event": "checkpoint", "file": "checkpoint-s000019440.npz", "step": 19440, "time": "2026-11-11T07:18:15Z"}
+{"day": 280.0, "event": "checkpoint", "file": "checkpoint-s000020160.npz", "step": 20160, "time": "2026-11-11T07:24:09Z"}
+{"day": 290.0, "event": "checkpoint", "file": "checkpoint-s000020880.npz", "step": 20880, "time": "2026-11-11T07:30:03Z"}
+{"day": 300.0, "event": "checkpoint", "file": "checkpoint-s000021600.npz", "step": 21600, "time": "2026-11-11T07:35:58Z"}
+{"day": 300.0, "event": "completed", "step": 21600, "time": "2026-11-11T07:35:58Z"}

@@ -1,0 +1,212 @@
+{
+  "created_utc": "2026-09-23T22:58:45.148916+00:00",
+  "run_id": "20260923T225840Z_rh4_rot24h_r4_l21_dt6h_9e5d0eb1",
+  "experiment": "validation-rh4",
+  "status": "completed",
+  "argv": [
+    "C:\\Users\\User\\Projects\\PlanetarySandbox\\venv\\Scripts\\tropoi",
+    "run",
+    "bve",
+    "--preset",
+    "rh4"
+  ],
+  "run_config": {
+    "lmax": 21,
+    "grid": "geodesic",
+    "resolution": 4,
+    "nlat": 128,
+    "nlon": 256,
+    "day_hours": 24.0,
+    "radius_earth_units": 1.0,
+    "duration_days": 1.0,
+    "dt_snapshots": 21600.0,
+    "scenario": "rh4",
+    "viscosity": 0.0,
+    "product_quadrature": "fine",
+    "out": "runs",
+    "experiment": "validation-rh4",
+    "overwrite": false,
+    "snapshot_mode": "interval",
+    "n_snapshots": null,
+    "snapshot_times": [
+      0.0,
+      21600.0,
+      43200.0,
+      64800.0,
+      86400.0
+    ],
+    "plots": [
+      "diagnostics",
+      "snapshots",
+      "summary"
+    ],
+    "run_id": "20260923T225840Z_rh4_rot24h_r4_l21_dt6h_9e5d0eb1"
+  },
+  "numerics": {
+    "backend": "GeodesicBackend",
+    "grid": "GeodesicGridGeometry",
+    "state_sampling": "geodesic-res4-state",
+    "product_quadrature": "fine",
+    "product_sampling": "geodesic-res5-voronoi",
+    "transform": "GeodesicSphericalHarmonics",
+    "l_max": 21
+  },
+  "git": {
+    "commit": "9e5d0eb145403c7d79bc635a93c830533b445c4d",
+    "branch": "docs/readme-rewrite",
+    "dirty": true
+  },
+  "versions": {
+    "python": "3.12.12",
+    "numpy": "2.2.6",
+    "scipy": "1.16.3",
+    "cupy": "13.4.0",
+    "matplotlib": "3.10.8"
+  },
+  "gpu": "NVIDIA GeForce MX110",
+  "notes": {
+    "equations": "barotropic vorticity equation on a rotating sphere (see docs/MATHEMATICAL_MODEL.md)",
+    "timestep_policy": "state-adaptive advective CFL ceiling (0.5*cfl_length_scale/max|u|) recomputed from every accepted state; individual steps may be shortened to land exactly on output times and t_end; controls only the advective condition, not explicit-viscosity stability (docs/KNOWN_RISKS.md R-4)",
+    "diagnostics": "see diagnostics.py module docstring for definitions"
+  },
+  "state_schema": {
+    "version": 1,
+    "solver": "bve",
+    "coefficient_file": "vorticity_coeffs.npy",
+    "time_file": "bve_snapshot_times.npy",
+    "time_units": "s",
+    "storage_axes": [
+      "time",
+      "l",
+      "m"
+    ],
+    "rows": null,
+    "fields": [
+      {
+        "name": "zeta",
+        "units": "s^-1",
+        "description": "relative vorticity; the BVE prognostic (docs/MATHEMATICAL_MODEL.md)",
+        "rows": null,
+        "levels": false,
+        "dimensions": [
+          "l",
+          "m"
+        ],
+        "monopole": "conserved",
+        "normalization": "orthonormal-complex-m>=0-real-field",
+        "layout": "unpacked-l-m-nonnegative"
+      }
+    ],
+    "support": {
+      "l_max": 21,
+      "product_truncation_cut": 14,
+      "triangle": "0 <= m <= l <= l_max"
+    },
+    "normalization": "orthonormal-complex-m>=0-real-field",
+    "layout": "unpacked-l-m-nonnegative",
+    "reality": "real field implied: coefficients stored for m >= 0 only, Im(a_l0) == 0, m > l entries are zero padding",
+    "nlev": null,
+    "vertical": null,
+    "geometry": {
+      "grid": "geodesic",
+      "resolution": 4,
+      "radius_earth_units": 1.0,
+      "day_hours": 24.0,
+      "planet": "from_earth_like",
+      "reference_radius_m": 6371000.0
+    },
+    "environment": {
+      "scenario": "rh4",
+      "viscosity": 0.0,
+      "product_quadrature": "fine"
+    },
+    "provenance": {
+      "source": "manifest"
+    }
+  },
+  "diagnostic_definitions": {
+    "version": 1,
+    "solver": "bve",
+    "timeseries": "diagnostics/timeseries.csv (one row per accepted step, columns in file order)",
+    "columns": [
+      {
+        "name": "time_s",
+        "meaning": "model time (s)"
+      },
+      {
+        "name": "dt_s",
+        "meaning": "accepted step length (s)"
+      },
+      {
+        "name": "step",
+        "meaning": "accepted step index"
+      },
+      {
+        "name": "max_speed_ms",
+        "meaning": "max |u| over the state grid (m/s)"
+      },
+      {
+        "name": "cfl",
+        "meaning": "max_speed * dt / cfl_length_scale (advective Courant number)"
+      },
+      {
+        "name": "circulation",
+        "meaning": "R^2 sqrt(4 pi) Re a_00(zeta)"
+      },
+      {
+        "name": "energy",
+        "meaning": "1/2 R^4 sum_{l>=1} P_l(zeta) / (l(l+1))"
+      },
+      {
+        "name": "enstrophy_rel",
+        "meaning": "1/2 R^2 sum_l P_l(zeta)"
+      },
+      {
+        "name": "enstrophy_abs",
+        "meaning": "1/2 R^2 sum_l P_l(zeta + f), f a pure (1,0) mode"
+      },
+      {
+        "name": "zeta_max",
+        "meaning": "max |zeta| on the state grid (s^-1)"
+      },
+      {
+        "name": "zeta_rms",
+        "meaning": "RMS zeta on the state grid (s^-1)"
+      },
+      {
+        "name": "energy_l1",
+        "meaning": "energy in degree l = 1"
+      },
+      {
+        "name": "high_l_enstrophy_frac",
+        "meaning": "see the structured definition"
+      },
+      {
+        "name": "roundtrip_residual",
+        "meaning": "periodic transform round-trip residual"
+      }
+    ],
+    "source": "run/bve/diagnostics.py",
+    "spectra": "diagnostics/spectra.npz: times, energy_l, enstrophy_l per recorded step",
+    "high_l_enstrophy_frac": {
+      "version": 1,
+      "definition": "sum_{l > cut} Z_l / sum_{l} Z_l",
+      "band": {
+        "degrees": "cut < l <= l_max",
+        "cut": 14,
+        "cut_rule": "product_truncation_cut(l_max) = floor(2 * l_max / 3)",
+        "l_max": 21
+      },
+      "domain": "triangular 0 <= m <= l <= l_max (m > l padding excluded)",
+      "mode_power": {
+        "m == 0": "Re(a_l0)^2",
+        "m > 0": "2 * |a_lm|^2 (positive-order multiplicity)"
+      },
+      "per_degree": "Z_l = 1/2 R^2 sum_m P_lm",
+      "denominator": "sum over ALL degrees 0..l_max of Z_l",
+      "zero_power": "0.0 when the denominator is zero",
+      "source": "run/bve/diagnostics.py::spectral_diagnostics"
+    }
+  },
+  "updated_utc": "2026-09-23T22:59:18.771235+00:00"
+}

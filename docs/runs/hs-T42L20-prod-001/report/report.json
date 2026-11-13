@@ -1,0 +1,343 @@
+{
+  "config_sha256": "4cd2eeae9b89ba095609f2675f1951a0e33f1025ee9e67e0b52bc1546e155802",
+  "effective_truncation": 42,
+  "experiment_id": "hs-T42L20-prod-001",
+  "git_commit": "206ef25f6503f4e8f7230bae00eb6c79fb639341",
+  "reference_tier_b": {
+    "failed": [],
+    "notes": [
+      "B4 not checkable (no KE spectrum stored)",
+      "B5 by construction (single unmodified run, meta.json script_sha256)",
+      "B2 at endpoints only: rel. change 3.226e-04"
+    ],
+    "verdict": "PASS"
+  },
+  "thresholds": {
+    "B2_rel_ps": 0.001,
+    "B3_T_K": 0.5,
+    "B3_ke_frac": 0.1,
+    "C1_corr": 0.98,
+    "C1_rmse_ms": 2.0,
+    "C2_lat_deg": 4.0,
+    "C2_level": 1,
+    "C2_mag_frac": 0.1,
+    "C3_rmse_K": 1.5,
+    "C4_corr": 0.9,
+    "C4_lat_deg": 5.0,
+    "C4_mag_frac": 0.2,
+    "C5_frac": 0.1,
+    "C5_sigmas": 3.0,
+    "noise_sigmas": 2.0
+  },
+  "tiers": [
+    {
+      "criteria": [
+        {
+          "detail": "no full-suite result / tests diff evidence",
+          "id": "A1",
+          "values": {},
+          "verdict": "INCOMPLETE"
+        },
+        {
+          "detail": "no new-test results",
+          "id": "A2",
+          "values": {},
+          "verdict": "INCOMPLETE"
+        },
+        {
+          "detail": "T21 L10 2-day SI smoke, forced stop + resume at day 1, bit-identical",
+          "id": "A3",
+          "values": {
+            "bit_identical": null
+          },
+          "verdict": "INCOMPLETE"
+        },
+        {
+          "detail": "branch pushed; notebook SOLVER_COMMIT is a pushed ancestor of HEAD",
+          "id": "A4",
+          "values": {
+            "pushed_ancestor": null,
+            "solver_commit": null
+          },
+          "verdict": "INCOMPLETE"
+        }
+      ],
+      "tier": "A",
+      "verdict": "INCOMPLETE"
+    },
+    {
+      "criteria": [
+        {
+          "detail": "reaches day 1200 without abort/NaN; every resume hash-verified",
+          "id": "B1",
+          "values": {
+            "aborted": 0,
+            "days_completed": 1200,
+            "days_total": 1200,
+            "resumes": 0,
+            "unverified_resumes": 0
+          },
+          "verdict": "PASS"
+        },
+        {
+          "detail": "max_d |<p_s>(d) - <p_s>(0)| / <p_s>(0) <= 1e-3 (Gaussian-weighted mean of exp(ln p_s))",
+          "id": "B2",
+          "values": {
+            "final_rel_change": 0.0015477875074459033,
+            "max_rel_change": 0.0015477875074459033,
+            "threshold": 0.001
+          },
+          "verdict": "FAIL"
+        },
+        {
+          "detail": "linear trend across block means: KE <= 10 % of mean, <T> <= 0.5 K",
+          "id": "B3",
+          "values": {
+            "T_block_means": [
+              246.25119387752721,
+              246.20278087974629,
+              246.18206713215338,
+              246.12232418709507,
+              246.17634652742626
+            ],
+            "T_trend_K": 0.11507569642655824,
+            "ke_block_means": [
+              126.77510946289738,
+              128.69307026630977,
+              129.40826347974541,
+              131.80147912868748,
+              127.52700092139548
+            ],
+            "ke_trend": 2.306095889686958,
+            "ke_trend_frac": 0.01789877573443873
+          },
+          "verdict": "PASS"
+        },
+        {
+          "detail": "log-log KE slope over (28, 42] < 0 and KE(42) < KE(28); L = retained (effective) truncation",
+          "id": "B4",
+          "values": {
+            "L": 42,
+            "ke_L": 0.0029030455506259363,
+            "ke_l0": 0.18124522794819456,
+            "l0": 28,
+            "slope": -10.552633414064667
+          },
+          "verdict": "PASS"
+        },
+        {
+          "detail": "one configuration hash and one clean commit across every resume",
+          "id": "B5",
+          "values": {
+            "config_sha256": [
+              "4cd2eeae9b89ba095609f2675f1951a0e33f1025ee9e67e0b52bc1546e155802"
+            ],
+            "event_log": true,
+            "git_commits": [
+              "206ef25f6503f4e8f7230bae00eb6c79fb639341"
+            ],
+            "git_dirty": false
+          },
+          "verdict": "PASS"
+        }
+      ],
+      "tier": "B",
+      "verdict": "FAIL"
+    },
+    {
+      "criteria": [
+        {
+          "detail": "zonal-mean u: pattern corr >= 0.98, mass-weighted RMSE <= 2.0 m/s",
+          "id": "C1",
+          "values": {
+            "corr": 0.9936489169961608,
+            "corr_verdict": "PASS",
+            "rmse": 1.0727862164462312,
+            "rmse_verdict": "PASS",
+            "sampling_rms": 1.0900847529213762
+          },
+          "verdict": "PASS"
+        },
+        {
+          "detail": "jet max: magnitude +-10 %, latitude +-4 deg, level +-1 (per hemisphere)",
+          "id": "C2",
+          "values": {
+            "NH": {
+              "noise": [
+                0.6608017462533687,
+                2.232429202976492,
+                0.0
+              ],
+              "ours": [
+                32.965952540940556,
+                43.25419466535093,
+                4
+              ],
+              "reference": [
+                32.823398545823316,
+                46.04472663110168,
+                4
+              ],
+              "verdicts": [
+                "PASS",
+                "PASS",
+                "PASS"
+              ]
+            },
+            "SH": {
+              "noise": [
+                0.5689457161178403,
+                2.9532362530895293,
+                0.0
+              ],
+              "ours": [
+                32.74579997123922,
+                43.25419466535093,
+                4
+              ],
+              "reference": [
+                32.63193684446325,
+                40.46364817811504,
+                4
+              ],
+              "verdicts": [
+                "PASS",
+                "PASS",
+                "PASS"
+              ]
+            }
+          },
+          "verdict": "PASS"
+        },
+        {
+          "detail": "zonal-mean T mass-weighted RMSE <= 1.5 K",
+          "id": "C3",
+          "values": {
+            "rmse": 0.3279747788430267,
+            "sampling_rms": 0.2701500314147693
+          },
+          "verdict": "PASS"
+        },
+        {
+          "detail": "[T'^2], [v'T']: peak +-20 %, peak lat +-5 deg, pattern corr >= 0.9",
+          "id": "C4",
+          "values": {
+            "TsTs": {
+              "NH": {
+                "ours": [
+                  41.31652345180553,
+                  40.46364817811504
+                ],
+                "reference": [
+                  41.82644073540222,
+                  40.46364817811504
+                ],
+                "verdicts": [
+                  "PASS",
+                  "PASS"
+                ]
+              },
+              "SH": {
+                "ours": [
+                  39.629227016477294,
+                  37.673089629045336
+                ],
+                "reference": [
+                  40.23238379268746,
+                  37.673089629045336
+                ],
+                "verdicts": [
+                  "PASS",
+                  "PASS"
+                ]
+              },
+              "corr": 0.9927726747530152,
+              "corr_verdict": "PASS"
+            },
+            "vsTs": {
+              "NH": {
+                "ours": [
+                  21.582370895825086,
+                  37.673089629045336
+                ],
+                "reference": [
+                  21.461683363702164,
+                  37.673089629045336
+                ],
+                "verdicts": [
+                  "PASS",
+                  "PASS"
+                ]
+              },
+              "SH": {
+                "ours": [
+                  21.142669819867432,
+                  37.673089629045336
+                ],
+                "reference": [
+                  21.43974253009994,
+                  34.882520993773454
+                ],
+                "verdicts": [
+                  "PASS",
+                  "PASS"
+                ]
+              },
+              "corr": 0.9980049960377191,
+              "corr_verdict": "PASS"
+            }
+          },
+          "verdict": "PASS"
+        },
+        {
+          "detail": "|NH - SH| jet: FAIL only if > 10 % and > 3 sigma_block",
+          "id": "C5",
+          "values": {
+            "latitude": {
+              "mean": 0.5581092974471786,
+              "per_block": [
+                0.0,
+                0.0,
+                2.7905464872358934,
+                0.0,
+                0.0
+              ],
+              "sigma_block": 1.247970327966541,
+              "verdict": "PASS"
+            },
+            "magnitude": {
+              "mean": 0.4591721763690515,
+              "per_block": [
+                0.9350467258504906,
+                0.7382241100455076,
+                0.4056108973208836,
+                0.04141346846191851,
+                0.17556568016645713
+              ],
+              "sigma_block": 0.3748834358392476,
+              "verdict": "PASS"
+            }
+          },
+          "verdict": "PASS"
+        },
+        {
+          "detail": "paper figures 1-3 (no verdict weight)",
+          "id": "C6",
+          "values": {
+            "jet_consistent": true,
+            "jet_lat": 43.25419466535093,
+            "jet_ms": 32.965952540940556,
+            "jet_sigma": 0.225,
+            "surface_easterlies": true,
+            "tropical_surface_u_mean": -5.555004028911841,
+            "vT_peak_lat": 37.673089629045336,
+            "vT_peak_sigma": 0.875
+          },
+          "verdict": "INFO"
+        }
+      ],
+      "tier": "C",
+      "verdict": "PASS"
+    }
+  ]
+}

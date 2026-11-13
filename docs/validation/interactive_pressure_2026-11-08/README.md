@@ -22,7 +22,8 @@ the Held–Suarez run an idealized forcing benchmark.
 | `costs_mars_300Pa_3deg.json` | per-part export costs on three states of the published Mars run at 3° (`measure`): the fixed-surface parts as before, plus `quantize_columns` and the whole column export (`interactive`) |
 | `costs_hs-T42L20-prod-002_500hPa_2deg.json` | the same on three states of the Held–Suarez T42L20 run at 2° |
 | `mars_isobars_interactive_bench.json` | the browser bench of the committed Mars page: start-up, five pressures × 5 updates with the page's own split (decode, interpolation, mesh, map), 18 saved-time switches with the decoded-state list, heap, a refused typed value, one request, no errors |
-| `hs_isobars_2deg_8states_bench.json` | the same on the 29.3 MB eight-state Held–Suarez page (not committed; rebuilt by the command below) |
+| `hs_isobars_2deg_8states_bench.json` | the same on the 29.3 MB eight-state Held–Suarez page, now preserved as `hs_isobars_interactive.html` |
+| `hs_isobars_interactive.html` | rescued unchanged on 2026-11-12; interactive eight-state HS evidence, with its SHA-256 in the [preservation inventory](../run_archive_2026-11-12/inventory.json) |
 | `mars_isobars_interactive_p300Pa.png`, `…_p600Pa.png` | captures of the Mars page at 3 hPa and 6 hPa over Tharsis (the bench also captured 150, 1000 and 50 Pa; not kept) |
 | `hs_isobars_2deg_8states_p50000Pa.png` | the Held–Suarez page at 500 hPa (the other three captures not kept) |
 
@@ -39,8 +40,9 @@ python examples/isobaric_view.py bench out/hs_isobars_2deg_8states.html docs/val
 ```
 
 The Held–Suarez run (`runs/hs-T42L20-prod-002`, 120 states every 10 days,
-[the run record](../../held_suarez)) is local and not committed; the Mars run
-is published under `docs/runs/`. `times="all"` on it is refused at the
+[the run record](../../held_suarez)) now has a published core and a verified full
+Drive archive: `tropoi capsule fetch hs-T42L20-prod-002` retrieves it. The Mars run
+is fully published under `docs/runs/`. `times="all"` on HS is refused at the
 default budget: 433 MB at 2°, 194 MB at 3° (the message names the
 alternatives; 8 states fit at 2°, 19 at 3°).
 

@@ -1,0 +1,25 @@
+# R-3 product attribution — part res4 (res=4, l_max=21, cut=14, N=196, dt=2204.1 s, T=5.0 d, IC=rh4, nu=0, day=24.0 h)
+
+Instantaneous discrete production (per day, normalized):
+ variant    state      dE/dt / E  dZa/dt / Zrel
+       A       t0     -4.364e-04     -6.265e-04
+       A  20-step     -3.216e-03     -6.051e-03
+       B       t0     -3.655e-04     -5.157e-04
+       B  20-step     -1.819e-03     -3.310e-03
+       C       t0     -3.652e-04     -5.254e-04
+       C  20-step     -1.822e-03     -3.381e-03
+       D       t0     -6.127e-05     -9.757e-05
+       D  20-step     -4.644e-04     -8.262e-04
+
+5-day integrations (standard orientation):
+ variant      E drift   Zabs drift   spurE(T)/E   wall s
+       A  -2.6423e-03  -6.3681e-04    8.812e-05      8.6
+       B  -2.8356e-03  -5.6329e-04    3.900e-04      6.4
+       C  -2.2926e-03  -4.6444e-04    2.540e-05      6.4
+       D  -4.4555e-04  -8.4605e-05    3.617e-04     22.6
+
+Orientation sensitivity (variant A; tilted RH4 is not a rigid solution — magnitudes indicative only):
+  tilt      E drift   Zabs drift   spurE(T)/E
+     0  -2.6423e-03  -6.3681e-04    8.812e-05
+    30  -1.1077e-02  -1.6775e-03    4.200e-04
+    60  +1.7457e-02  +6.2594e-03    4.422e-04
