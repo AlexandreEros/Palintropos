@@ -47,10 +47,13 @@ include = ["tropoi*"]
 # distribution needs no source checkout.
 [tool.setuptools.package-data]
 "tropoi.spatial.transforms.cuda" = ["*.cu"]
-# The self-contained terrain-globe page template (read via importlib.resources).
-"tropoi.representation.visual" = ["*.html"]
-# The verbatim CIE 1931 colour-matching table (checked by SHA-256 on load).
-"tropoi.spatial.optics" = ["data/*.csv"]
+# The self-contained page templates (read via importlib.resources) and the
+# verbatim CIE 1931 colour-matching table (checked by SHA-256 on load).
+"tropoi.representation.visual" = ["*.html", "data/*.csv"]
+# The packaged scientific datasets of the shared physics layer: species
+# identities and molar masses, thermodynamic records, Rayleigh optical
+# records, mixture presets and the star catalogue.
+"tropoi.physics" = ["data/*.toml"]
 
 [tool.deptry]
 # Treat the "dev" PEP 621 optional-dependency group as development-only.

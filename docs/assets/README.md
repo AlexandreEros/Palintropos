@@ -19,13 +19,17 @@ for Williamson 5 are kept outside Git; their SHA-256 sums are in
 inventory, and when a published run's receipt or figure hashes disagree with
 its files.
 
-## Legacy figures awaiting published source runs
+## Legacy figures with preserved source runs
 
 The files below predate this layout. `docs/readme_figures.py` drew them from
 local runs made at commit `4a840226` with uncommitted changes
-([provenance.json](provenance.json) records `dirty: true` for every one). No
-committed run can reproduce them, so they cannot honestly be assigned to a run
-and stay here until each is replaced by a figure drawn from a published run.
+([provenance.json](provenance.json) records `dirty: true` for every one).
+Their eight source capsules (two RH4 and six orientation runs) are now preserved
+under [docs/runs](../runs/README.md#additional-preserved-evidence-2026-11-12), with
+full checksums and verified Drive copies. This recovers the input data, not the
+uncommitted source changes. These multi-run figures retain their historical
+locations; the [archive record](../validation/run_archive_2026-11-12/README.md)
+documents the provenance without claiming a new redraw or scientific validation.
 
 | File | Used by | Source runs | Replacement |
 | --- | --- | --- | --- |

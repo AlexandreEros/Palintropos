@@ -1,5 +1,10 @@
 # Completed Held–Suarez baseline
 
+**Preservation update (2026-11-12):** both production capsules and the external
+Dinosaur reference now have [published evidence and full-archive receipts](../runs/README.md).
+The [archive record](../validation/run_archive_2026-11-12/README.md) documents
+byte verification and retrieval; the original verdicts below remain unchanged.
+
 Two 1200-day T42L20 production runs completed. Run 001 (lagged damping,
 900 s) returned **A PASS, B FAIL (B2 only), C PASS**. Run 002 (centred
 damping, 720 s; protocol amendment 1) returned **A PASS, B PASS, C PASS**.

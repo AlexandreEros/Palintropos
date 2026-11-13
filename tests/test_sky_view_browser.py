@@ -1,7 +1,7 @@
 """Standalone sky page in a real headless browser (Chrome, Chromium or Edge).
 
 * The page's float64 JavaScript equals the NumPy reference
-  (``representation.visual.sky``, ``spatial.optics``) to a relative 1e-9:
+  (``representation.visual.sky``, ``tropoi.physics``) to a relative 1e-9:
   the hypothetical column, the mixture cross section, the spectral
   radiance in sampled directions, the zenith and star-path columns and the
   optical-depth diagnostic -- for the acceptance case (0.1 bar N2, 3200 K
@@ -35,10 +35,11 @@ from tools.browser_cdp import OfflinePage, find_browser  # noqa: E402
 from test_atmosphere_view import write_pe_capsule  # noqa: E402
 
 from tropoi.representation.visual import sky  # noqa: E402
-from tropoi.spatial.optics import (COMPOSITION_PRESETS, Composition,  # noqa: E402
-                                   Star)
-from tropoi.spatial.optics.colour import bin_weights  # noqa: E402
-from tropoi.spatial.optics.constants import LUMINOUS_EFFICACY  # noqa: E402
+from tropoi.physics.composition import COMPOSITIONS, Composition  # noqa: E402
+from tropoi.physics.constants import LUMINOUS_EFFICACY  # noqa: E402
+from tropoi.physics.rayleigh import composition_cross_section  # noqa: E402
+from tropoi.physics.star import ApparentStar  # noqa: E402
+from tropoi.representation.visual.colour import bin_weights  # noqa: E402
 
 BROWSER = find_browser()
 pytestmark = pytest.mark.skipif(BROWSER is None,
@@ -74,7 +75,7 @@ def _parity(page, *, hypothetical: dict | None):
     col = page.eval(f"{API}.column()")
     mix = page.eval(f"{API}.mixture()")
     composition = Composition(tuple((k, x) for k, x in mix["rows"]))
-    sigma = composition.cross_section(WL)
+    sigma = composition_cross_section(composition, WL)
     np.testing.assert_allclose(mix["sigma"], sigma, rtol=1e-12)
     assert mix["R"] == pytest.approx(composition.gas_constant, rel=1e-14)
     if hypothetical is not None:
@@ -83,7 +84,7 @@ def _parity(page, *, hypothetical: dict | None):
                           (col["T"], ref_col.temperature_k)):
             np.testing.assert_allclose(got, want, rtol=1e-12, atol=1e-9)
     nodes = (col["z"], col["lnp"], col["T"])
-    star = Star(info["star"]["T"], info["star"]["alpha"])
+    star = ApparentStar(info["star"]["T"], info["star"]["alpha"])
     kw = dict(radius_m=info["radius"], observer_z_m=info["place"]["z"],
               star_elevation_deg=info["star"]["el"])
     ref = sky.radiance_table(nodes, cross_section_m2=sigma,
@@ -221,7 +222,7 @@ def test_optical_depth_warnings_and_refusals(acceptance_page):
         page.eval(f"{API}.set({{}})")
         assert page.exceptions == [], page.exceptions
         # Earth-like column: zenith tau(410 nm) ~ 0.32 -> caution
-        air = dict(COMPOSITION_PRESETS["earth_dry_air_illustrative"]
+        air = dict(COMPOSITIONS["earth_dry_air_illustrative"]
                    .mole_fractions)
         info = page.eval(f"{API}.set({{composition: {json.dumps(air)}, "
                          "atmosphere: {surface_pressure_pa: 101325}})")
@@ -256,7 +257,7 @@ def test_optical_depth_warnings_and_refusals(acceptance_page):
 def test_saved_state_sky_page(tmp_path):
     from tropoi.representation.archive import open_simulation
     root, _, _ = write_pe_capsule(tmp_path / "cap", frames=2)
-    spec = sky.SkySpec(COMPOSITION_PRESETS["earth_dry_air_illustrative"],
+    spec = sky.SkySpec(COMPOSITIONS["earth_dry_air_illustrative"],
                        observer_lat_deg=20.0, observer_lon_deg=10.0)
     path = open_simulation(root).sky(spec, tmp_path / "saved.html",
                                      open_browser=False)
@@ -443,9 +444,9 @@ def test_gas_constant_follows_the_composition(tmp_path):
 
 
 def test_amounts_as_mass_fractions_and_masses():
-    from tropoi.spatial.optics import (thin_atmosphere_mass_kg,
+    from tropoi.physics.column import (thin_atmosphere_mass_kg,
                                        thin_atmosphere_surface_pressure_pa)
-    air = COMPOSITION_PRESETS["earth_dry_air_illustrative"]
+    air = COMPOSITIONS["earth_dry_air_illustrative"]
     with OfflinePage(BROWSER) as page:
         url = page.open(STANDALONE)
         # mass fractions: the same mixture, shown converted
@@ -493,13 +494,12 @@ def test_amounts_as_mass_fractions_and_masses():
 
 
 def test_star_by_radius_luminosity_distance_and_irradiance():
-    from tropoi.spatial.optics import STARS
-    from tropoi.spatial.optics.star import SOLAR_CONSTANT
+    from tropoi.physics.star import SOLAR_CONSTANT, STARS
     with OfflinePage(BROWSER) as page:
         url = page.open(STANDALONE)
         info = page.eval(f"{API}.info()")
         assert info["starKey"] == "sun"
-        sun = Star.sun_at_1au()
+        sun = ApparentStar.sun_at_1au()
         assert info["star"]["alpha"] == pytest.approx(
             sun.angular_radius_deg, rel=1e-14)
         assert info["irradiance"] == pytest.approx(
@@ -517,7 +517,7 @@ def test_star_by_radius_luminosity_distance_and_irradiance():
             info = page.eval(f"{API}.info()")
             assert info["irradiance"] == pytest.approx(SOLAR_CONSTANT,
                                                        rel=1e-12)
-            ref = Star.of(body.temperature_k, body.radius_rsun,
+            ref = ApparentStar.of(body.temperature_k, body.radius_rsun,
                           info["star"]["d"])
             assert info["star"]["alpha"] == pytest.approx(
                 ref.angular_radius_deg, rel=1e-13)

@@ -9,6 +9,7 @@ Index: [all packages](../index.md) · parent [`tropoi`](tropoi.md)
 | Module | Category | Classes | Public functions |
 |---|---|---|---|
 | `tropoi.cli` | empty | – | – |
+| `tropoi.cli.capsule` | code | – | `add_arguments`, `fetch_capsule`, `read_archive`, `read_receipt`, `verify_capsule` |
 | `tropoi.cli.clear_cache` | code | – | `add_arguments`, `clear_cupy_cache`, `run`, `verify_kernel_source` |
 | `tropoi.cli.generate_planet` | code | – | `add_arguments`, `resolve_output_path`, `run` |
 | `tropoi.cli.main` | code | – | `add_bve_arguments`, `add_pe_arguments`, `add_swe_arguments`, `build_parser`, `main`, `run_bve_command`, `run_initial_state_command` |
@@ -26,6 +27,7 @@ This package's modules and the import edges between them; every other package is
 flowchart LR
     subgraph g_tropoi_ocli["cli"]
         n_tropoi_ocli["cli"]
+        n_tropoi_ocli_ocapsule["cli.capsule"]
         n_tropoi_ocli_oclear__cache["cli.clear_cache"]
         n_tropoi_ocli_ogenerate__planet["cli.generate_planet"]
         n_tropoi_ocli_omain["cli.main"]
@@ -40,6 +42,7 @@ flowchart LR
     p_tropoi_ospatial["package spatial"]
     p_tropoi_ospatial_oterrain["package spatial.terrain"]
     p_tropoi_ospatial_otransforms_ocuda["package spatial.transforms.cuda"]
+    n_tropoi_ocli_omain --> n_tropoi_ocli_ocapsule
     n_tropoi_ocli_omain --> n_tropoi_ocli_oclear__cache
     n_tropoi_ocli_omain --> n_tropoi_ocli_ogenerate__planet
     n_tropoi_ocli_omain --> n_tropoi_ocli_oterrain
@@ -75,6 +78,7 @@ No classes.
 
 ## Entry paths through this package
 
+* [`calls/cli-capsule-command.mmd`](../calls/cli-capsule-command.mmd)
 * [`calls/cli-gen.mmd`](../calls/cli-gen.mmd)
 * [`calls/cli-inspect.mmd`](../calls/cli-inspect.mmd)
 * [`calls/cli-list-presets.mmd`](../calls/cli-list-presets.mmd)

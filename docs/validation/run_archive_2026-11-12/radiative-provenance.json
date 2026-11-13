@@ -1,0 +1,92 @@
+[
+  {
+    "id": "earth-gray-dry-T21L25-b2b8ea2",
+    "published_evidence": "docs/radiation/evidence/earth-gray-dry-T21L25-300d",
+    "config_json_equal": true,
+    "config_equal_after_lf": true,
+    "capsule_config_sha256": "68ecf76c18753fb19c954225469d073cf9a4a707e47b86d7d7910b6417a5ba82",
+    "published_config_sha256": "57de864b12dfaa99971d2a7f68b4feabe348b9644df924c242a3b86c06196297",
+    "byte_identical_outputs": [
+      "means.npz",
+      "series.json",
+      "events.jsonl"
+    ],
+    "outputs_equal_after_lf": [],
+    "differing_outputs": []
+  },
+  {
+    "id": "jupiter-sl09-T21L30-b2b8ea2",
+    "published_evidence": "docs/radiation/evidence/jupiter-sl09-T21L30-200d",
+    "config_json_equal": true,
+    "config_equal_after_lf": true,
+    "capsule_config_sha256": "e8d5cc241bc783fb2e2fda1fbf41e423e0e18dd0786a7867f1440408f074a26f",
+    "published_config_sha256": "97d678ec2a46a5375a392b6057d6e8529098a7b368d3bac6fe0de8f19ff50aab",
+    "byte_identical_outputs": [
+      "means.npz",
+      "series.json",
+      "events.jsonl"
+    ],
+    "outputs_equal_after_lf": [],
+    "differing_outputs": []
+  },
+  {
+    "id": "earth-gray-dry-heated-T21L25-d38d2a3",
+    "published_evidence": "docs/radiation/evidence/earth-gray-dry-heated-T21L25-300d",
+    "config_json_equal": true,
+    "config_equal_after_lf": true,
+    "capsule_config_sha256": "beff2cc495de6f619c1c207bef06dbe860dbf3a92bcef9ac2f3ac01fd3a967b6",
+    "published_config_sha256": "3034e092563395b22585932cd351bb1b8b68867c52788770a91afd818c34c3dd",
+    "byte_identical_outputs": [
+      "means.npz",
+      "series.json",
+      "events.jsonl"
+    ],
+    "outputs_equal_after_lf": [],
+    "differing_outputs": []
+  },
+  {
+    "id": "earth-gray-dry-heated-T21L25-d38d2a3-colab",
+    "published_evidence": "docs/radiation/evidence/earth-gray-dry-heated-T21L25-300d-colab",
+    "config_json_equal": true,
+    "config_equal_after_lf": true,
+    "capsule_config_sha256": "a499c939cb29b30e7ec084c43638838ae2e28344323b867a9b07be78368f72b7",
+    "published_config_sha256": "adc96312b24078090343e72fcd5377f0dddeedb281bf44d93f903dd7b2a1e542",
+    "byte_identical_outputs": [
+      "means.npz",
+      "series.json"
+    ],
+    "outputs_equal_after_lf": [
+      "events.jsonl"
+    ],
+    "differing_outputs": []
+  },
+  {
+    "id": "earth-gray-dry-T21L25",
+    "published_evidence": "docs/radiation/evidence/earth-gray-dry-T21L25-partial",
+    "config_json_equal": true,
+    "config_equal_after_lf": true,
+    "capsule_config_sha256": "0059115b658563ed6495715a29a374f1e8761c04151380741fcf4b5f6af1c53f",
+    "published_config_sha256": "125696ba96444d45fd345a1d93453480a7553eebdb435a540fec835bb5268fbd",
+    "byte_identical_outputs": [
+      "series.json"
+    ],
+    "outputs_equal_after_lf": [],
+    "differing_outputs": []
+  },
+  {
+    "id": "jupiter-sl09-heated-T21L30-d38d2a3-colab",
+    "published_evidence": "docs/radiation/evidence/jupiter-sl09-heated-T21L30-200d-colab",
+    "config_json_equal": true,
+    "config_equal_after_lf": true,
+    "capsule_config_sha256": "66043680031031b8eead79b9c8e53b2741c174338175ebc6ceb496017fc68f4d",
+    "published_config_sha256": "df336aa61881ec39e87e824fb1ff03ba73c5431da5c99f50950be6d5724be889",
+    "byte_identical_outputs": [
+      "means.npz",
+      "series.json"
+    ],
+    "outputs_equal_after_lf": [
+      "events.jsonl"
+    ],
+    "differing_outputs": []
+  }
+]

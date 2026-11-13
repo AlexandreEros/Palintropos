@@ -1,0 +1,74 @@
+{
+  "schema_version": 1,
+  "provider": "google-drive",
+  "kind": "palintropos-run",
+  "folder_url": "https://drive.google.com/drive/folders/1_g1OWLCVW2-QcyRoFclxg-vZV2UM6-pE",
+  "collection_url": "https://drive.google.com/drive/folders/1Yjig-jolvU15gvCqTq-19kyjCbJi9iX1",
+  "original_local_path": "runs/validation-rh4/20260713T022542Z_rh4_rot24h_r4_l21_dt6h_4a840226",
+  "provenance_note": "Original local bytes preserved unchanged; full copy in the owner's November 12 bulk upload. Scientific conclusions retain the qualifications of their original validation records.",
+  "included_files": [
+    "bve_summary.png",
+    "config.json",
+    "diagnostics/spectra.npz",
+    "diagnostics/timeseries.csv",
+    "figures/cfl_history.png",
+    "figures/invariant_drift.png",
+    "figures/spectra.png",
+    "figures/spectral_health.png",
+    "manifest.json",
+    "rh4_t0.00h-24.00h-6.00h.png",
+    "vorticity_coeffs.npy",
+    "vorticity_grid.npy"
+  ],
+  "omitted_files": {},
+  "files": {
+    "bve_summary.png": {
+      "drive_id": "1_eDCmkKAwCauMMzPMQDZU1apr8ld0kHh",
+      "size": 1245566
+    },
+    "config.json": {
+      "drive_id": "1mXOq_vVx0Hzv8hcQftBtfiPXHaZIMpJr",
+      "size": 415
+    },
+    "diagnostics/spectra.npz": {
+      "drive_id": "1dXYAvnSXF1ZVxLVTy7P1aMzu6IU8MgtU",
+      "size": 2566
+    },
+    "diagnostics/timeseries.csv": {
+      "drive_id": "1HnN_0CnONF5JJL-isEP05K77PbC2cDUc",
+      "size": 10437
+    },
+    "figures/cfl_history.png": {
+      "drive_id": "1kXAw7g08AXihdhFZHWtb1wVoRXUDWcSW",
+      "size": 79597
+    },
+    "figures/invariant_drift.png": {
+      "drive_id": "1jC0svp_6WTEsNwHw_Q45dw12ApmZjlXV",
+      "size": 63021
+    },
+    "figures/spectra.png": {
+      "drive_id": "1LYF7WHqJDgy4PMTV_Zf0sFgEWgmP3K3w",
+      "size": 129736
+    },
+    "figures/spectral_health.png": {
+      "drive_id": "1TsoTAknTm2KfjVz6U_6QeYDfaC1F_gCT",
+      "size": 32994
+    },
+    "manifest.json": {
+      "drive_id": "169SepH4i8zsc8Y-tpcw0DRY-BDuomnLR",
+      "size": 1943
+    },
+    "rh4_t0.00h-24.00h-6.00h.png": {
+      "drive_id": "1xkAMFYqT_q4wIPokGoO21r0dSIxgbmxu",
+      "size": 2850403
+    },
+    "vorticity_coeffs.npy": {
+      "drive_id": "1RDp6Rn_qSWL1Zf91aXyL-C3-qtJCfTL5",
+      "size": 38848
+    },
+    "vorticity_grid.npy": {
+      "drive_id": "1vFu_kpO0WZuE3dwOoUVszAOwHMWg8VnB",
+      "size": 102608
+    }
+  }
+}

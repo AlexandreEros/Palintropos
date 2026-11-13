@@ -11,6 +11,7 @@ Index: [all packages](../index.md) · parent [`tropoi.representation`](tropoi.re
 | `tropoi.representation.visual` | empty | – | – |
 | `tropoi.representation.visual.atmosphere` | code | `AtmosphereViewWarning`, `PayloadTooLargeError` | `atmosphere_payload`, `decoded_column_bytes`, `default_resolution_deg`, `dequantize_columns`, `estimate_column_payload_bytes`, `estimate_payload_bytes`, `quantize_columns`, `streamline_cache_bytes`, `surface_height_bytes`, `view_atmosphere` |
 | `tropoi.representation.visual.bve` | code | – | `build_bve_snapshot_timeline`, `build_bve_snapshot_timeline_from_data`, `build_bve_snapshot_timelines`, `build_bve_spectral_snapshot_timeline`, `build_bve_spectral_snapshot_timeline_from_data`, `build_bve_summary_spec`, `render_bve_snapshots` |
+| `tropoi.representation.visual.colour` | code | – | `bin_weights`, `cie_1931`, `omitted_fraction`, `srgb_encode` |
 | `tropoi.representation.visual.complex_encoding` | code | – | `normalized_magnitude_strength`, `phase_hue`, `phase_magnitude_hsv`, `relative_magnitude_db`, `wrapped_phase` |
 | `tropoi.representation.visual.compose` | code | – | `compose_view`, `default_output_path`, `default_view`, `elapsed_label`, `pretty_units`, `render_view`, `resolve_level`, `resolve_snapshots` |
 | `tropoi.representation.visual.evaluate` | code | `DisplayVectors`, `RunFields`, `SeriesData` | – |
@@ -48,6 +49,7 @@ flowchart LR
         n_tropoi_orepresentation_ovisual["representation.visual"]
         n_tropoi_orepresentation_ovisual_oatmosphere["representation.visual.atmosphere"]
         n_tropoi_orepresentation_ovisual_obve["representation.visual.bve"]
+        n_tropoi_orepresentation_ovisual_ocolour["representation.visual.colour"]
         n_tropoi_orepresentation_ovisual_ocomplex__encoding["representation.visual.complex_encoding"]
         n_tropoi_orepresentation_ovisual_ocompose["representation.visual.compose"]
         n_tropoi_orepresentation_ovisual_oevaluate["representation.visual.evaluate"]
@@ -72,6 +74,7 @@ flowchart LR
         n_tropoi_orepresentation_ovisual_ovorticity__viewer["representation.visual.vorticity_viewer"]
     end
     p_tropoi_ocli["package cli"]
+    p_tropoi_ophysics["package physics"]
     p_tropoi_orepresentation_oarchive["package representation.archive"]
     p_tropoi_orepresentation_odiagnostics["package representation.diagnostics"]
     p_tropoi_orun_obve["package run.bve"]
@@ -81,7 +84,6 @@ flowchart LR
     p_tropoi_ospatial["package spatial"]
     p_tropoi_ospatial_ogrids["package spatial.grids"]
     p_tropoi_ospatial_ooperators["package spatial.operators"]
-    p_tropoi_ospatial_ooptics["package spatial.optics"]
     p_tropoi_ospatial_ostates["package spatial.states"]
     p_tropoi_ospatial_otransforms["package spatial.transforms"]
     p_tropoi_otemporal["package temporal"]
@@ -126,6 +128,7 @@ flowchart LR
     n_tropoi_orepresentation_ovisual_orenderers -.-> n_tropoi_orepresentation_ovisual_omatplotlib__renderer
     n_tropoi_orepresentation_ovisual_orenderers --> n_tropoi_orepresentation_ovisual_ospecs
     n_tropoi_orepresentation_ovisual_osky -.-> n_tropoi_orepresentation_ovisual_oatmosphere
+    n_tropoi_orepresentation_ovisual_osky --> n_tropoi_orepresentation_ovisual_ocolour
     n_tropoi_orepresentation_ovisual_osnapshot -.-> n_tropoi_orepresentation_ovisual_obve
     n_tropoi_orepresentation_ovisual_osnapshot -.-> n_tropoi_orepresentation_ovisual_ope__snapshots
     n_tropoi_orepresentation_ovisual_osnapshot -.-> n_tropoi_orepresentation_ovisual_orenderers
@@ -179,8 +182,8 @@ flowchart LR
     n_tropoi_orepresentation_ovisual_oplanet__viewer -->|1| p_tropoi_ospatial
     n_tropoi_orepresentation_ovisual_oplanet__viewer -->|3| p_tropoi_ospatial_ogrids
     n_tropoi_orepresentation_ovisual_oplanet__viewer -->|1| p_tropoi_ospatial_ooperators
+    n_tropoi_orepresentation_ovisual_osky -->|6| p_tropoi_ophysics
     n_tropoi_orepresentation_ovisual_osky -.->|1| p_tropoi_orepresentation_odiagnostics
-    n_tropoi_orepresentation_ovisual_osky -->|7| p_tropoi_ospatial_ooptics
     n_tropoi_orepresentation_ovisual_osky -.->|1| p_tropoi_ospatial_otransforms
     n_tropoi_orepresentation_ovisual_osnapshot -.->|2| p_tropoi_orepresentation_oarchive
     n_tropoi_orepresentation_ovisual_osnapshot -.->|1| p_tropoi_otemporal
@@ -190,6 +193,7 @@ flowchart LR
     n_tropoi_orepresentation_ovisual_ovorticity__viewer -->|2| p_tropoi_ospatial_ogrids
     classDef other fill:none,stroke-dasharray:3 3
     class p_tropoi_ocli other
+    class p_tropoi_ophysics other
     class p_tropoi_orepresentation_oarchive other
     class p_tropoi_orepresentation_odiagnostics other
     class p_tropoi_orun_obve other
@@ -199,7 +203,6 @@ flowchart LR
     class p_tropoi_ospatial other
     class p_tropoi_ospatial_ogrids other
     class p_tropoi_ospatial_ooperators other
-    class p_tropoi_ospatial_ooptics other
     class p_tropoi_ospatial_ostates other
     class p_tropoi_ospatial_otransforms other
     class p_tropoi_otemporal other

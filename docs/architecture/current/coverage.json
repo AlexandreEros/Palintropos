@@ -1,6 +1,9 @@
 {
   "declared": {
     "candidates_as_roots": [
+      "tropoi.physics.column.thin_atmosphere_mass_kg",
+      "tropoi.physics.column.thin_atmosphere_surface_pressure_pa",
+      "tropoi.physics.rayleigh.composition_cross_section",
       "tropoi.representation.visual.sky.optical_depth_diagnostic",
       "tropoi.representation.visual.sky.radiance_table",
       "tropoi.representation.visual.sky.standalone_page",
@@ -10,8 +13,6 @@
       "tropoi.run.custom.prepare.prepare_bve_state",
       "tropoi.run.custom.prepare.prepare_swe_state",
       "tropoi.run.custom.presets.initial_state_from_preset",
-      "tropoi.spatial.optics.column.thin_atmosphere_mass_kg",
-      "tropoi.spatial.optics.column.thin_atmosphere_surface_pressure_pa",
       "tropoi.spatial.terrain.raster.encode_grey16",
       "tropoi.spatial.terrain.raster.read_elevation"
     ],
@@ -42,8 +43,9 @@
           "tropoi.representation.visual.sky.radiance_table",
           "tropoi.representation.visual.sky.star_path_column",
           "tropoi.representation.visual.sky.optical_depth_diagnostic",
-          "tropoi.spatial.optics.column.thin_atmosphere_mass_kg",
-          "tropoi.spatial.optics.column.thin_atmosphere_surface_pressure_pa"
+          "tropoi.physics.column.thin_atmosphere_mass_kg",
+          "tropoi.physics.column.thin_atmosphere_surface_pressure_pa",
+          "tropoi.physics.rayleigh.composition_cross_section"
         ],
         "title": "NumPy reference of the sky page's arithmetic (parity tests; the page never calls it)"
       },
@@ -73,7 +75,10 @@
       "tropoi.physics.radiation.gray.isca_mars_shortwave": "gray Mars shortwave optical-depth profile; no caller in the package; used by tests",
       "tropoi.physics.radiation.gray.schneider_liu_longwave": "gray longwave optical-depth profile (Schneider & Liu 2009); no caller in the package; used by tests and tools/radiation/regimes.py",
       "tropoi.physics.radiation.kdist.ktable_from_spectrum": "builds a correlated-k table from a user-supplied absorption function; no caller in the package; used by tests",
+      "tropoi.physics.thermodynamics.cp_molar": "isobaric molar heat capacity of one named species; no caller in the package; used by tests",
+      "tropoi.physics.thermodynamics.kappa": "R / c_p(T) of a mixture; no caller in the package",
       "tropoi.representation.visual.atmosphere.dequantize_columns": "NumPy reference of the atmosphere page's browser-side dequantization, used by tests to bound the quantization error; no workflow starts here",
+      "tropoi.representation.visual.colour.srgb_encode": "colour helper; the sky page encodes sRGB in JavaScript, so no Python caller exists",
       "tropoi.representation.visual.swe.build_swe_snapshot_timeline": "exported timeline builder (alias build_swe_timeline) used directly by tests; no caller in the package",
       "tropoi.representation.visual.timeline.build_timeline_overview": "exported but used nowhere in src or tests; kept as API surface",
       "tropoi.run.custom.prepare.pad_coefficients": "helper that a user calls before prepare_*_state to zero-pad coefficients; no workflow starts here",
@@ -83,14 +88,13 @@
       "tropoi.run.held_suarez.config.smoke_config": "reached by name through the held_suarez.config.PRESETS registry (a dict lookup static analysis does not follow)",
       "tropoi.run.radiative.config.earth_gray_dry": "reached by name through the run.radiative.config.PRESETS registry (a dict lookup static analysis does not follow)",
       "tropoi.run.radiative.config.jupiter_schneider_liu": "reached by name through the run.radiative.config.PRESETS registry (a dict lookup static analysis does not follow)",
-      "tropoi.spatial.optics.colour.srgb_encode": "colour helper; the sky page encodes sRGB in JavaScript, so no Python caller exists",
-      "tropoi.spatial.optics.rayleigh.rayleigh_cross_section": "convenience wrapper; the sky reaches cross sections through SPECIES[...].cross_section",
       "tropoi.temporal.hooks.rk4_real_axis_limit": "numerical helper (RK4 stability limit on the real axis) used by a stability test; no workflow starts here"
     }
   },
   "discovered": {
-    "classes": 209,
+    "classes": 211,
     "cli_handlers": {
+      "cli-capsule-command": "tropoi.cli.capsule._command",
       "cli-gen": "tropoi.cli.main._cmd_gen",
       "cli-inspect": "tropoi.cli.main._cmd_inspect",
       "cli-list-presets": "tropoi.cli.main._cmd_list_presets",
@@ -103,6 +107,12 @@
       "cli-terrain-run-prepare": "tropoi.cli.terrain.run_prepare"
     },
     "entry_point_candidates": {
+      "tropoi.physics.column.thin_atmosphere_mass_kg": [
+        "tropoi.physics.column.thin_atmosphere_mass_kg"
+      ],
+      "tropoi.physics.column.thin_atmosphere_surface_pressure_pa": [
+        "tropoi.physics.column.thin_atmosphere_surface_pressure_pa"
+      ],
       "tropoi.physics.radiation.gray.isca_mars_longwave": [
         "tropoi.physics.radiation.gray.isca_mars_longwave"
       ],
@@ -115,8 +125,20 @@
       "tropoi.physics.radiation.kdist.ktable_from_spectrum": [
         "tropoi.physics.radiation.kdist.ktable_from_spectrum"
       ],
+      "tropoi.physics.rayleigh.composition_cross_section": [
+        "tropoi.physics.rayleigh.composition_cross_section"
+      ],
+      "tropoi.physics.thermodynamics.cp_molar": [
+        "tropoi.physics.thermodynamics.cp_molar"
+      ],
+      "tropoi.physics.thermodynamics.kappa": [
+        "tropoi.physics.thermodynamics.kappa"
+      ],
       "tropoi.representation.visual.atmosphere.dequantize_columns": [
         "tropoi.representation.visual.atmosphere.dequantize_columns"
+      ],
+      "tropoi.representation.visual.colour.srgb_encode": [
+        "tropoi.representation.visual.colour.srgb_encode"
       ],
       "tropoi.representation.visual.sky.optical_depth_diagnostic": [
         "tropoi.representation.visual.sky.optical_depth_diagnostic"
@@ -179,21 +201,6 @@
       "tropoi.run.radiative.config.jupiter_schneider_liu": [
         "tropoi.run.radiative.config.jupiter_schneider_liu"
       ],
-      "tropoi.spatial.optics.colour.srgb_encode": [
-        "tropoi.spatial.optics.colour.srgb_encode"
-      ],
-      "tropoi.spatial.optics.column.thin_atmosphere_mass_kg": [
-        "tropoi.spatial.optics.column.thin_atmosphere_mass_kg",
-        "tropoi.spatial.optics.thin_atmosphere_mass_kg"
-      ],
-      "tropoi.spatial.optics.column.thin_atmosphere_surface_pressure_pa": [
-        "tropoi.spatial.optics.column.thin_atmosphere_surface_pressure_pa",
-        "tropoi.spatial.optics.thin_atmosphere_surface_pressure_pa"
-      ],
-      "tropoi.spatial.optics.rayleigh.rayleigh_cross_section": [
-        "tropoi.spatial.optics.rayleigh.rayleigh_cross_section",
-        "tropoi.spatial.optics.rayleigh_cross_section"
-      ],
       "tropoi.spatial.terrain.raster.encode_grey16": [
         "tropoi.run.custom.encode_grey16",
         "tropoi.spatial.terrain.raster.encode_grey16"
@@ -206,16 +213,16 @@
         "tropoi.temporal.hooks.rk4_real_axis_limit"
       ]
     },
-    "functions": 1609,
-    "modules": 164,
-    "packages": 26
+    "functions": 1681,
+    "modules": 167,
+    "packages": 25
   },
   "limits": {
     "call_sites": {
-      "builtin": 3510,
-      "external": 2372,
-      "internal": 2854,
-      "unresolved": 3561
+      "builtin": 3674,
+      "external": 2448,
+      "internal": 2931,
+      "unresolved": 3680
     },
     "dynamic_import_sites": {
       "tropoi.representation.archive.writer": 1
@@ -346,6 +353,14 @@
   },
   "rendered": {
     "call_graphs": {
+      "cli-capsule-command": {
+        "packages": [
+          "tropoi.cli"
+        ],
+        "roots": [
+          "tropoi.cli.capsule._command"
+        ]
+      },
       "cli-gen": {
         "packages": [
           "tropoi.cli",
@@ -503,8 +518,8 @@
       },
       "sky-hypothetical": {
         "packages": [
-          "tropoi.representation.visual",
-          "tropoi.spatial.optics"
+          "tropoi.physics",
+          "tropoi.representation.visual"
         ],
         "roots": [
           "tropoi.representation.visual.sky.write_sky_page",
@@ -513,24 +528,25 @@
       },
       "sky-numpy-reference": {
         "packages": [
-          "tropoi.representation.visual",
-          "tropoi.spatial.optics"
+          "tropoi.physics",
+          "tropoi.representation.visual"
         ],
         "roots": [
           "tropoi.representation.visual.sky.radiance_table",
           "tropoi.representation.visual.sky.star_path_column",
           "tropoi.representation.visual.sky.optical_depth_diagnostic",
-          "tropoi.spatial.optics.column.thin_atmosphere_mass_kg",
-          "tropoi.spatial.optics.column.thin_atmosphere_surface_pressure_pa"
+          "tropoi.physics.column.thin_atmosphere_mass_kg",
+          "tropoi.physics.column.thin_atmosphere_surface_pressure_pa",
+          "tropoi.physics.rayleigh.composition_cross_section"
         ]
       },
       "sky-saved-column": {
         "packages": [
+          "tropoi.physics",
           "tropoi.representation.archive",
           "tropoi.representation.diagnostics",
           "tropoi.representation.visual",
           "tropoi.spatial",
-          "tropoi.spatial.optics",
           "tropoi.spatial.transforms",
           "tropoi.temporal"
         ],
@@ -550,10 +566,10 @@
         ]
       }
     },
-    "classes": 209,
+    "classes": 211,
     "classes_in_inheritance_overview": 21,
-    "modules": 164,
-    "package_pages": 26
+    "modules": 167,
+    "package_pages": 25
   },
   "rules": {
     "cli_handlers": "every <parser>.set_defaults(<keyword>=<function>) handler gets calls/cli-<name>.mmd",
@@ -562,6 +578,6 @@
   },
   "scope_file": {
     "path": "docs/architecture/entry-points.toml",
-    "sha256": "e61bab516c6f6f5d7d3e23c871903da260c29206c4a66746f46398a7dbd719d7"
+    "sha256": "b7fcc928dbfde3302ffaf9242f85ad1495e99cec4abd37eb9f8bbbb27dfd859c"
   }
 }

@@ -7,6 +7,7 @@ implementation paths or fixed timesteps as current API guidance.
 
 | Record | What it supports |
 | --- | --- |
+| [Historical run preservation](run_archive_2026-11-12/README.md) | Full-cloud checksums, published cores, source matching and rescued interactive evidence |
 | [Williamson 5 vs MRI-JMA](williamson5_mri_2026-07-30.md) | Day-zero contract, 15-day model intercomparison, figures and external artifact checksums |
 | [Gauss/geodesic comparison](latlon_backend_review.md) | Quadratic quadrature derivation and matched-timestep RH4 measurements |
 | [Fine-product characterization](r3_characterization.md) | Factorized experiments, preregistered predictions, corrected attribution and residual band mismatch |

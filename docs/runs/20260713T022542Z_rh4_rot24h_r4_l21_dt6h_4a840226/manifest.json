@@ -1,0 +1,75 @@
+{
+  "created_utc": "2026-07-13T02:25:46.765304+00:00",
+  "run_id": "20260713T022542Z_rh4_rot24h_r4_l21_dt6h_4a840226",
+  "experiment": "validation-rh4",
+  "argv": [
+    "C:\\Users\\User\\Projects\\PlanetarySandbox\\venv\\Scripts\\psx-bve",
+    "--grid",
+    "geodesic",
+    "--resolution",
+    "4",
+    "--lmax",
+    "21",
+    "--scenario",
+    "rh4",
+    "--day-hours",
+    "24",
+    "--duration-days",
+    "1",
+    "--dt-snapshots",
+    "21600",
+    "--product-quadrature",
+    "fine",
+    "--viscosity",
+    "0",
+    "--out",
+    "runs",
+    "--experiment",
+    "validation-rh4"
+  ],
+  "run_config": {
+    "lmax": 21,
+    "grid": "geodesic",
+    "resolution": 4,
+    "nlat": 128,
+    "nlon": 256,
+    "day_hours": 24.0,
+    "radius_earth_units": 1.0,
+    "duration_days": 1.0,
+    "dt_snapshots": 21600.0,
+    "scenario": "rh4",
+    "viscosity": 0.0,
+    "product_quadrature": "fine",
+    "out": "runs",
+    "experiment": "validation-rh4",
+    "overwrite": false,
+    "run_id": "20260713T022542Z_rh4_rot24h_r4_l21_dt6h_4a840226"
+  },
+  "numerics": {
+    "backend": "GeodesicBackend",
+    "grid": "GeodesicGridGeometry",
+    "state_sampling": "geodesic-res4-state",
+    "product_quadrature": "fine",
+    "product_sampling": "geodesic-res5-voronoi",
+    "transform": "GeodesicSphericalHarmonics",
+    "l_max": 21
+  },
+  "git": {
+    "commit": "4a84022651b6b37752a168a2d8ef660359df945c",
+    "branch": "main",
+    "dirty": true
+  },
+  "versions": {
+    "python": "3.12.12",
+    "numpy": "2.2.6",
+    "scipy": "1.16.3",
+    "cupy": "13.4.0",
+    "matplotlib": "3.10.8"
+  },
+  "gpu": "NVIDIA GeForce MX110",
+  "notes": {
+    "equations": "barotropic vorticity equation on a rotating sphere (see MATHEMATICAL_MODEL.md)",
+    "timestep_policy": "fixed dt from initial CFL (KNOWN_RISKS.md R-4)",
+    "diagnostics": "see diagnostics.py module docstring for definitions"
+  }
+}

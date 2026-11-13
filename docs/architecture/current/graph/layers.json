@@ -30,8 +30,17 @@
     {
       "direction": "down",
       "kind": "imports",
-      "module_edges": 41,
-      "package_edges": 9,
+      "module_edges": 6,
+      "package_edges": 1,
+      "source": "representation",
+      "target": "physics",
+      "type_checking_only_package_edges": 0
+    },
+    {
+      "direction": "down",
+      "kind": "imports",
+      "module_edges": 34,
+      "package_edges": 8,
       "source": "representation",
       "target": "spatial",
       "type_checking_only_package_edges": 0
@@ -48,7 +57,7 @@
     {
       "direction": "down",
       "kind": "imports",
-      "module_edges": 6,
+      "module_edges": 7,
       "package_edges": 2,
       "source": "run",
       "target": "physics",
@@ -106,21 +115,21 @@
       "depth": 0,
       "id": "cli",
       "internal_package_edges": 0,
-      "modules": 4,
+      "modules": 5,
       "packages": 1
     },
     {
       "depth": 5,
       "id": "physics",
       "internal_package_edges": 1,
-      "modules": 10,
+      "modules": 18,
       "packages": 2
     },
     {
       "depth": 2,
       "id": "representation",
       "internal_package_edges": 4,
-      "modules": 41,
+      "modules": 42,
       "packages": 4
     },
     {
@@ -134,8 +143,8 @@
       "depth": 4,
       "id": "spatial",
       "internal_package_edges": 13,
-      "modules": 42,
-      "packages": 9
+      "modules": 35,
+      "packages": 8
     },
     {
       "depth": 3,

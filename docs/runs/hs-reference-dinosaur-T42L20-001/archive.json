@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "provider": "google-drive",
+  "kind": "external-reference",
+  "folder_url": "https://drive.google.com/drive/folders/1vvahNZIv_6tamBW0DvH6IYEQBLuFTqWd",
+  "collection_url": "https://drive.google.com/drive/folders/1Yjig-jolvU15gvCqTq-19kyjCbJi9iX1",
+  "original_local_path": "runs/hs-reference-dinosaur-T42L20-001",
+  "provenance_note": "Original local bytes preserved unchanged; full copy in the owner's November 12 bulk upload. Scientific conclusions retain the qualifications of their original validation records.",
+  "included_files": [
+    "b2.json",
+    "meta.json",
+    "run.log"
+  ],
+  "omitted_files": {
+    "checkpoint.pkl": "Large external-reference state/statistics file retained in the external archive.",
+    "series.npz": "Large external-reference state/statistics file retained in the external archive."
+  },
+  "files": {
+    "b2.json": {
+      "drive_id": "11ys0tsvAQrn4OuRpX_4kMnDkus-R4emP",
+      "size": 1175
+    },
+    "checkpoint.pkl": {
+      "drive_id": "1jrAWGFX8zJ3wvc5BF5oy4f_M81c0mluY",
+      "size": 88193125
+    },
+    "meta.json": {
+      "drive_id": "17Gmkyslwo626idXhereejJRkj3T1A3fC",
+      "size": 1293
+    },
+    "run.log": {
+      "drive_id": "1QeT9rtV2aUyz18_95lafIzr4vHVNjogr",
+      "size": 9493
+    },
+    "series.npz": {
+      "drive_id": "1EBOYzHl2bigp_cJQT-johhdzUmOzE_cM",
+      "size": 86068082
+    }
+  }
+}

@@ -46,6 +46,7 @@ flowchart LR
     n_tropoi_orun_oradiative_omodel --> n_tropoi_orun_oradiative_oconfig
     n_tropoi_orun_oradiative_o____main____ -.->|1| p_tropoi_ospatial_ostates
     n_tropoi_orun_oradiative_oconfig -.->|1| p_tropoi_ospatial
+    n_tropoi_orun_oradiative_oexperiment -.->|1| p_tropoi_ophysics
     n_tropoi_orun_oradiative_oexperiment -->|2| p_tropoi_orun_oheld__suarez
     n_tropoi_orun_oradiative_oexperiment -.->|1| p_tropoi_ospatial_ostates
     n_tropoi_orun_oradiative_oexperiment -.->|1| p_tropoi_otemporal

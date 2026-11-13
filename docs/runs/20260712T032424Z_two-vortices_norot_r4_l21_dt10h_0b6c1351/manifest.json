@@ -1,0 +1,48 @@
+{
+  "created_utc": "2026-07-12T03:24:26.525138+00:00",
+  "run_id": "20260712T032424Z_two-vortices_norot_r4_l21_dt10h_0b6c1351",
+  "experiment": null,
+  "argv": [
+    "C:\\Users\\User\\Projects\\PlanetarySandbox\\venv\\Scripts\\psx-bve",
+    "--duration-days",
+    "10",
+    "--dt-snapshots",
+    "36000",
+    "--out",
+    "runs"
+  ],
+  "run_config": {
+    "lmax": 21,
+    "resolution": 4,
+    "nlat": 128,
+    "nlon": 256,
+    "day_hours": Infinity,
+    "radius_earth_units": 1.0,
+    "duration_days": 10.0,
+    "dt_snapshots": 36000.0,
+    "scenario": "two_vortices",
+    "viscosity": 0.0,
+    "out": "runs",
+    "experiment": null,
+    "overwrite": false,
+    "run_id": "20260712T032424Z_two-vortices_norot_r4_l21_dt10h_0b6c1351"
+  },
+  "git": {
+    "commit": "0b6c1351806cd186361297697d0d352036d178df",
+    "branch": "geodesic-grid-refactor",
+    "dirty": true
+  },
+  "versions": {
+    "python": "3.12.12",
+    "numpy": "2.2.6",
+    "scipy": "1.16.3",
+    "cupy": "13.4.0",
+    "matplotlib": "3.10.8"
+  },
+  "gpu": "NVIDIA GeForce MX110",
+  "notes": {
+    "equations": "barotropic vorticity equation on a rotating sphere (see MATHEMATICAL_MODEL.md)",
+    "timestep_policy": "fixed dt from initial CFL (KNOWN_RISKS.md R-4)",
+    "diagnostics": "see diagnostics.py module docstring for definitions"
+  }
+}

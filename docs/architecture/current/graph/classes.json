@@ -88,6 +88,79 @@
   "name": "classes",
   "nodes": [
     {
+      "decorators": [
+        "dataclass(frozen=True, eq=False)"
+      ],
+      "external_bases": [],
+      "id": "tropoi.physics.column.AtmosphericColumn",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__post_init__"
+        },
+        {
+          "kind": "method",
+          "name": "_check_z"
+        },
+        {
+          "kind": "method",
+          "name": "altitude_at"
+        },
+        {
+          "kind": "property",
+          "name": "base_m"
+        },
+        {
+          "kind": "classmethod",
+          "name": "from_levels"
+        },
+        {
+          "kind": "classmethod",
+          "name": "hypothetical"
+        },
+        {
+          "kind": "method",
+          "name": "number_density"
+        },
+        {
+          "kind": "method",
+          "name": "observer_altitude"
+        },
+        {
+          "kind": "method",
+          "name": "pressure_at"
+        },
+        {
+          "kind": "property",
+          "name": "surface_pressure_pa"
+        },
+        {
+          "kind": "method",
+          "name": "temperature_at"
+        },
+        {
+          "kind": "method",
+          "name": "to_dict"
+        },
+        {
+          "kind": "property",
+          "name": "top_m"
+        }
+      ],
+      "module": "tropoi.physics.column",
+      "qualname": "AtmosphericColumn"
+    },
+    {
+      "decorators": [],
+      "external_bases": [
+        "ValueError"
+      ],
+      "id": "tropoi.physics.column.ColumnError",
+      "members": [],
+      "module": "tropoi.physics.column",
+      "qualname": "ColumnError"
+    },
+    {
       "decorators": [],
       "external_bases": [],
       "id": "tropoi.physics.column_model.ColumnPhysics",
@@ -161,6 +234,91 @@
       "qualname": "RadiativeConvectiveColumn"
     },
     {
+      "decorators": [
+        "dataclass(frozen=True)"
+      ],
+      "external_bases": [],
+      "id": "tropoi.physics.composition.Composition",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__post_init__"
+        },
+        {
+          "kind": "method",
+          "name": "describe"
+        },
+        {
+          "kind": "classmethod",
+          "name": "from_mass_fractions"
+        },
+        {
+          "kind": "property",
+          "name": "gas_constant"
+        },
+        {
+          "kind": "method",
+          "name": "mass_fraction"
+        },
+        {
+          "kind": "property",
+          "name": "mass_fractions"
+        },
+        {
+          "kind": "property",
+          "name": "molar_mass"
+        },
+        {
+          "kind": "property",
+          "name": "molar_mass_g_per_mol"
+        },
+        {
+          "kind": "property",
+          "name": "molar_mass_kg_per_mol"
+        },
+        {
+          "kind": "method",
+          "name": "mole_fraction"
+        },
+        {
+          "kind": "classmethod",
+          "name": "normalized"
+        },
+        {
+          "kind": "classmethod",
+          "name": "of"
+        },
+        {
+          "kind": "method",
+          "name": "require_coverage"
+        },
+        {
+          "kind": "method",
+          "name": "sources"
+        },
+        {
+          "kind": "property",
+          "name": "species_names"
+        },
+        {
+          "kind": "method",
+          "name": "to_dict"
+        }
+      ],
+      "module": "tropoi.physics.composition",
+      "qualname": "Composition"
+    },
+    {
+      "decorators": [],
+      "external_bases": [
+        "ValueError"
+      ],
+      "id": "tropoi.physics.composition.CompositionError",
+      "members": [],
+      "module": "tropoi.physics.composition",
+      "qualname": "CompositionError"
+    },
+    {
       "decorators": [],
       "external_bases": [],
       "id": "tropoi.physics.convection.DryConvectiveAdjustment",
@@ -224,41 +382,6 @@
       "qualname": "InstantaneousInsolation"
     },
     {
-      "decorators": [
-        "dataclass(frozen=True)"
-      ],
-      "external_bases": [],
-      "id": "tropoi.physics.insolation.Orbit",
-      "members": [
-        {
-          "kind": "method",
-          "name": "__post_init__"
-        },
-        {
-          "kind": "method",
-          "name": "as_dict"
-        },
-        {
-          "kind": "method",
-          "name": "declination"
-        },
-        {
-          "kind": "method",
-          "name": "flux_at"
-        },
-        {
-          "kind": "method",
-          "name": "solar_longitude"
-        },
-        {
-          "kind": "method",
-          "name": "true_anomaly"
-        }
-      ],
-      "module": "tropoi.physics.insolation",
-      "qualname": "Orbit"
-    },
-    {
       "decorators": [],
       "external_bases": [],
       "id": "tropoi.physics.insolation.PrescribedInsolation",
@@ -278,6 +401,53 @@
       ],
       "module": "tropoi.physics.insolation",
       "qualname": "PrescribedInsolation"
+    },
+    {
+      "decorators": [
+        "dataclass(frozen=True)"
+      ],
+      "external_bases": [],
+      "id": "tropoi.physics.insolation.StellarIllumination",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__post_init__"
+        },
+        {
+          "kind": "method",
+          "name": "as_dict"
+        },
+        {
+          "kind": "method",
+          "name": "declination"
+        },
+        {
+          "kind": "method",
+          "name": "flux_at"
+        },
+        {
+          "kind": "classmethod",
+          "name": "from_components"
+        },
+        {
+          "kind": "property",
+          "name": "obliquity_deg"
+        },
+        {
+          "kind": "classmethod",
+          "name": "prescribed"
+        },
+        {
+          "kind": "method",
+          "name": "solar_longitude"
+        },
+        {
+          "kind": "method",
+          "name": "true_anomaly"
+        }
+      ],
+      "module": "tropoi.physics.insolation",
+      "qualname": "StellarIllumination"
     },
     {
       "decorators": [],
@@ -305,6 +475,85 @@
         "dataclass(frozen=True)"
       ],
       "external_bases": [],
+      "id": "tropoi.physics.orbit.KeplerOrbit",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__post_init__"
+        },
+        {
+          "kind": "property",
+          "name": "apoapsis_m"
+        },
+        {
+          "kind": "property",
+          "name": "argument_of_periapsis_rad"
+        },
+        {
+          "kind": "classmethod",
+          "name": "from_apsides"
+        },
+        {
+          "kind": "classmethod",
+          "name": "from_au"
+        },
+        {
+          "kind": "classmethod",
+          "name": "from_irradiance"
+        },
+        {
+          "kind": "classmethod",
+          "name": "from_period"
+        },
+        {
+          "kind": "property",
+          "name": "mean_anomaly_epoch_rad"
+        },
+        {
+          "kind": "method",
+          "name": "mean_motion"
+        },
+        {
+          "kind": "property",
+          "name": "periapsis_m"
+        },
+        {
+          "kind": "method",
+          "name": "period"
+        },
+        {
+          "kind": "method",
+          "name": "position_at"
+        },
+        {
+          "kind": "method",
+          "name": "radius_at"
+        },
+        {
+          "kind": "method",
+          "name": "radius_at_time"
+        },
+        {
+          "kind": "method",
+          "name": "to_dict"
+        },
+        {
+          "kind": "method",
+          "name": "true_anomaly_at"
+        },
+        {
+          "kind": "method",
+          "name": "with_"
+        }
+      ],
+      "module": "tropoi.physics.orbit",
+      "qualname": "KeplerOrbit"
+    },
+    {
+      "decorators": [
+        "dataclass(frozen=True)"
+      ],
+      "external_bases": [],
       "id": "tropoi.physics.planets.PlanetaryBody",
       "members": [
         {
@@ -322,6 +571,10 @@
         {
           "kind": "method",
           "name": "regime"
+        },
+        {
+          "kind": "property",
+          "name": "rotation_rate"
         },
         {
           "kind": "property",
@@ -671,6 +924,213 @@
       "qualname": "RadiativeFluxes"
     },
     {
+      "decorators": [
+        "dataclass(frozen=True)"
+      ],
+      "external_bases": [],
+      "id": "tropoi.physics.rayleigh.OpticalRecord",
+      "members": [
+        {
+          "kind": "method",
+          "name": "covers"
+        },
+        {
+          "kind": "method",
+          "name": "cross_section"
+        },
+        {
+          "kind": "method",
+          "name": "describe"
+        },
+        {
+          "kind": "method",
+          "name": "king_factor"
+        },
+        {
+          "kind": "method",
+          "name": "refractivity"
+        }
+      ],
+      "module": "tropoi.physics.rayleigh",
+      "qualname": "OpticalRecord"
+    },
+    {
+      "decorators": [
+        "dataclass(frozen=True)"
+      ],
+      "external_bases": [],
+      "id": "tropoi.physics.rotation.Rotation",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__post_init__"
+        },
+        {
+          "kind": "classmethod",
+          "name": "from_period"
+        },
+        {
+          "kind": "property",
+          "name": "obliquity_deg"
+        },
+        {
+          "kind": "classmethod",
+          "name": "of"
+        },
+        {
+          "kind": "property",
+          "name": "sidereal_period_s"
+        },
+        {
+          "kind": "method",
+          "name": "to_dict"
+        },
+        {
+          "kind": "method",
+          "name": "with_"
+        }
+      ],
+      "module": "tropoi.physics.rotation",
+      "qualname": "Rotation"
+    },
+    {
+      "decorators": [
+        "dataclass(frozen=True)"
+      ],
+      "external_bases": [],
+      "id": "tropoi.physics.species.Species",
+      "members": [
+        {
+          "kind": "method",
+          "name": "formula_dict"
+        },
+        {
+          "kind": "property",
+          "name": "molar_mass_g_per_mol"
+        }
+      ],
+      "module": "tropoi.physics.species",
+      "qualname": "Species"
+    },
+    {
+      "decorators": [
+        "dataclass(frozen=True)"
+      ],
+      "external_bases": [],
+      "id": "tropoi.physics.star.ApparentStar",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__post_init__"
+        },
+        {
+          "kind": "property",
+          "name": "bolometric_irradiance_w_m2"
+        },
+        {
+          "kind": "method",
+          "name": "describe"
+        },
+        {
+          "kind": "method",
+          "name": "irradiance"
+        },
+        {
+          "kind": "property",
+          "name": "luminosity_lsun"
+        },
+        {
+          "kind": "classmethod",
+          "name": "of"
+        },
+        {
+          "kind": "method",
+          "name": "radiance"
+        },
+        {
+          "kind": "property",
+          "name": "solid_angle_sr"
+        },
+        {
+          "kind": "classmethod",
+          "name": "sun_at"
+        },
+        {
+          "kind": "classmethod",
+          "name": "sun_at_1au"
+        },
+        {
+          "kind": "method",
+          "name": "to_dict"
+        },
+        {
+          "kind": "classmethod",
+          "name": "with_sun_irradiance_at_1au"
+        }
+      ],
+      "module": "tropoi.physics.star",
+      "qualname": "ApparentStar"
+    },
+    {
+      "decorators": [
+        "dataclass(frozen=True)"
+      ],
+      "external_bases": [],
+      "id": "tropoi.physics.star.Star",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__post_init__"
+        },
+        {
+          "kind": "method",
+          "name": "angular_radius_deg_at"
+        },
+        {
+          "kind": "method",
+          "name": "at"
+        },
+        {
+          "kind": "classmethod",
+          "name": "blackbody"
+        },
+        {
+          "kind": "property",
+          "name": "gravitational_parameter"
+        },
+        {
+          "kind": "method",
+          "name": "irradiance_at"
+        },
+        {
+          "kind": "property",
+          "name": "luminosity_lsun"
+        },
+        {
+          "kind": "method",
+          "name": "radiance"
+        },
+        {
+          "kind": "property",
+          "name": "radius_rsun"
+        },
+        {
+          "kind": "method",
+          "name": "seen_from"
+        },
+        {
+          "kind": "classmethod",
+          "name": "sun"
+        },
+        {
+          "kind": "method",
+          "name": "to_dict"
+        }
+      ],
+      "module": "tropoi.physics.star",
+      "qualname": "Star"
+    },
+    {
       "decorators": [],
       "external_bases": [],
       "id": "tropoi.physics.surface.SlabSurface",
@@ -696,50 +1156,7 @@
         "dataclass(frozen=True)"
       ],
       "external_bases": [],
-      "id": "tropoi.physics.thermodynamics.GasMixture",
-      "members": [
-        {
-          "kind": "method",
-          "name": "__post_init__"
-        },
-        {
-          "kind": "method",
-          "name": "as_dict"
-        },
-        {
-          "kind": "method",
-          "name": "cp"
-        },
-        {
-          "kind": "method",
-          "name": "cp_range"
-        },
-        {
-          "kind": "property",
-          "name": "gas_constant"
-        },
-        {
-          "kind": "method",
-          "name": "kappa"
-        },
-        {
-          "kind": "method",
-          "name": "mass_fraction"
-        },
-        {
-          "kind": "property",
-          "name": "molar_mass"
-        }
-      ],
-      "module": "tropoi.physics.thermodynamics",
-      "qualname": "GasMixture"
-    },
-    {
-      "decorators": [
-        "dataclass(frozen=True)"
-      ],
-      "external_bases": [],
-      "id": "tropoi.physics.thermodynamics.Species",
+      "id": "tropoi.physics.thermodynamics.ThermoRecord",
       "members": [
         {
           "kind": "method",
@@ -747,7 +1164,7 @@
         }
       ],
       "module": "tropoi.physics.thermodynamics",
-      "qualname": "Species"
+      "qualname": "ThermoRecord"
     },
     {
       "decorators": [],
@@ -4064,249 +4481,6 @@
       ],
       "module": "tropoi.spatial.operators.spectral_operators",
       "qualname": "SpectralOperators"
-    },
-    {
-      "decorators": [
-        "dataclass(frozen=True, eq=False)"
-      ],
-      "external_bases": [],
-      "id": "tropoi.spatial.optics.column.AtmosphericColumn",
-      "members": [
-        {
-          "kind": "method",
-          "name": "__post_init__"
-        },
-        {
-          "kind": "method",
-          "name": "_check_z"
-        },
-        {
-          "kind": "method",
-          "name": "altitude_at"
-        },
-        {
-          "kind": "property",
-          "name": "base_m"
-        },
-        {
-          "kind": "classmethod",
-          "name": "from_levels"
-        },
-        {
-          "kind": "classmethod",
-          "name": "hypothetical"
-        },
-        {
-          "kind": "method",
-          "name": "number_density"
-        },
-        {
-          "kind": "method",
-          "name": "observer_altitude"
-        },
-        {
-          "kind": "method",
-          "name": "pressure_at"
-        },
-        {
-          "kind": "property",
-          "name": "surface_pressure_pa"
-        },
-        {
-          "kind": "method",
-          "name": "temperature_at"
-        },
-        {
-          "kind": "method",
-          "name": "to_dict"
-        },
-        {
-          "kind": "property",
-          "name": "top_m"
-        }
-      ],
-      "module": "tropoi.spatial.optics.column",
-      "qualname": "AtmosphericColumn"
-    },
-    {
-      "decorators": [],
-      "external_bases": [
-        "ValueError"
-      ],
-      "id": "tropoi.spatial.optics.column.ColumnError",
-      "members": [],
-      "module": "tropoi.spatial.optics.column",
-      "qualname": "ColumnError"
-    },
-    {
-      "decorators": [
-        "dataclass(frozen=True)"
-      ],
-      "external_bases": [],
-      "id": "tropoi.spatial.optics.composition.Composition",
-      "members": [
-        {
-          "kind": "method",
-          "name": "__post_init__"
-        },
-        {
-          "kind": "method",
-          "name": "cross_section"
-        },
-        {
-          "kind": "method",
-          "name": "describe"
-        },
-        {
-          "kind": "classmethod",
-          "name": "from_mass_fractions"
-        },
-        {
-          "kind": "property",
-          "name": "gas_constant"
-        },
-        {
-          "kind": "property",
-          "name": "mass_fractions"
-        },
-        {
-          "kind": "property",
-          "name": "molar_mass_kg_per_mol"
-        },
-        {
-          "kind": "classmethod",
-          "name": "of"
-        },
-        {
-          "kind": "method",
-          "name": "sources"
-        },
-        {
-          "kind": "method",
-          "name": "to_dict"
-        }
-      ],
-      "module": "tropoi.spatial.optics.composition",
-      "qualname": "Composition"
-    },
-    {
-      "decorators": [],
-      "external_bases": [
-        "ValueError"
-      ],
-      "id": "tropoi.spatial.optics.composition.CompositionError",
-      "members": [],
-      "module": "tropoi.spatial.optics.composition",
-      "qualname": "CompositionError"
-    },
-    {
-      "decorators": [
-        "dataclass(frozen=True)"
-      ],
-      "external_bases": [],
-      "id": "tropoi.spatial.optics.rayleigh.Species",
-      "members": [
-        {
-          "kind": "method",
-          "name": "cross_section"
-        },
-        {
-          "kind": "method",
-          "name": "describe"
-        },
-        {
-          "kind": "method",
-          "name": "king_factor"
-        },
-        {
-          "kind": "method",
-          "name": "refractivity"
-        }
-      ],
-      "module": "tropoi.spatial.optics.rayleigh",
-      "qualname": "Species"
-    },
-    {
-      "decorators": [
-        "dataclass(frozen=True)"
-      ],
-      "external_bases": [],
-      "id": "tropoi.spatial.optics.star.Star",
-      "members": [
-        {
-          "kind": "method",
-          "name": "__post_init__"
-        },
-        {
-          "kind": "property",
-          "name": "bolometric_irradiance_w_m2"
-        },
-        {
-          "kind": "method",
-          "name": "describe"
-        },
-        {
-          "kind": "method",
-          "name": "irradiance"
-        },
-        {
-          "kind": "property",
-          "name": "luminosity_lsun"
-        },
-        {
-          "kind": "classmethod",
-          "name": "of"
-        },
-        {
-          "kind": "method",
-          "name": "radiance"
-        },
-        {
-          "kind": "property",
-          "name": "solid_angle_sr"
-        },
-        {
-          "kind": "classmethod",
-          "name": "sun_at"
-        },
-        {
-          "kind": "classmethod",
-          "name": "sun_at_1au"
-        },
-        {
-          "kind": "method",
-          "name": "to_dict"
-        },
-        {
-          "kind": "classmethod",
-          "name": "with_sun_irradiance_at_1au"
-        }
-      ],
-      "module": "tropoi.spatial.optics.star",
-      "qualname": "Star"
-    },
-    {
-      "decorators": [
-        "dataclass(frozen=True)"
-      ],
-      "external_bases": [],
-      "id": "tropoi.spatial.optics.star.StellarBody",
-      "members": [
-        {
-          "kind": "method",
-          "name": "at"
-        },
-        {
-          "kind": "classmethod",
-          "name": "from_luminosity"
-        },
-        {
-          "kind": "method",
-          "name": "to_dict"
-        }
-      ],
-      "module": "tropoi.spatial.optics.star",
-      "qualname": "StellarBody"
     },
     {
       "decorators": [],
