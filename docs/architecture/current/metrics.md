@@ -9,13 +9,13 @@ Nodes are analysed modules; a directed edge A -> B means A has at least one stat
 * **all imports**: every static import statement, wherever it appears;
 * **import-time**: only edges with at least one import statement at module scope (executed when the importing module is imported). Edges made only of function-scope or `if TYPE_CHECKING:` imports are dropped.
 
-Edge counts by scope set: `function`: 167, `function+module`: 5, `function+type_checking`: 1, `module`: 262, `type_checking`: 6.
+Edge counts by scope set: `function`: 168, `function+module`: 5, `function+type_checking`: 1, `module`: 262, `type_checking`: 6.
 
 | Metric | all imports | import-time |
 |---|---|---|
 | Nodes \|V\| | 144 | 144 |
-| Directed edges \|E\| | 441 | 267 |
-| Density | 0.021416 | 0.012966 |
+| Directed edges \|E\| | 442 | 267 |
+| Density | 0.021465 | 0.012966 |
 | Weakly connected components | 1 | 7 |
 | WCC sizes | 144 | 131, 8, 1, 1, 1, 1, 1 |
 | Strongly connected components | 144 | 144 |
@@ -24,25 +24,25 @@ Edge counts by scope set: `function`: 167, `function+module`: 5, `function+type_
 | Nodes in cycles | 0 | 0 |
 | Fraction of nodes in cycles | 0 | 0 |
 | Sources (in-degree 0) | 6 | 38 |
-| Sinks (out-degree 0) | 40 | 51 |
+| Sinks (out-degree 0) | 39 | 51 |
 | Reciprocal pairs | 0 | 0 |
 | Reciprocity | 0 | 0 |
 | In-degree min / median / max | 0 / 2 / 15 | 0 / 1 / 12 |
-| In-degree mean | 3.0625 | 1.854167 |
+| In-degree mean | 3.069444 | 1.854167 |
 | In-degree quartiles | 1, 2, 4 | 0, 1, 2 |
 | In-degree zeros | 6 | 38 |
 | Out-degree min / median / max | 0 / 2 / 21 | 0 / 1 / 9 |
-| Out-degree mean | 3.0625 | 1.854167 |
+| Out-degree mean | 3.069444 | 1.854167 |
 | Out-degree quartiles | 0, 2, 5 | 0, 1, 3 |
-| Out-degree zeros | 40 | 51 |
+| Out-degree zeros | 39 | 51 |
 | Condensation nodes | 144 | 144 |
-| Condensation edges | 441 | 267 |
-| Condensation sources / sinks | 6 / 40 | 38 / 51 |
+| Condensation edges | 442 | 267 |
+| Condensation sources / sinks | 6 / 39 | 38 / 51 |
 | Condensation longest path (edges) | 14 | 7 |
 
-In-degree histogram (all imports) {degree: modules}: 0: 6, 1: 39, 2: 40, 3: 17, 4: 14, 5: 5, 6: 6, 7: 4, 8: 4, 9: 2, 10: 5, 11: 1, 15: 1
+In-degree histogram (all imports) {degree: modules}: 0: 6, 1: 39, 2: 39, 3: 18, 4: 14, 5: 5, 6: 6, 7: 4, 8: 4, 9: 2, 10: 5, 11: 1, 15: 1
 
-Out-degree histogram (all imports) {degree: modules}: 0: 40, 1: 24, 2: 22, 3: 12, 4: 7, 5: 10, 6: 5, 7: 6, 8: 5, 9: 3, 10: 7, 13: 1, 16: 1, 21: 1
+Out-degree histogram (all imports) {degree: modules}: 0: 39, 1: 25, 2: 22, 3: 12, 4: 7, 5: 10, 6: 5, 7: 6, 8: 5, 9: 3, 10: 7, 13: 1, 16: 1, 21: 1
 
 **Top 10 fan-in (all imports)** (ties at cutoff: 4)
 
@@ -214,9 +214,9 @@ Module-level import edges involved: 2.
 
 ## Call graph
 
-* Nodes (functions, methods, classes): 1899
-* Edges by kind: `call` 1296, `constructor` 63, `instantiate` 495, `override` 6, `self` 328, `super` 4
-* Call sites by resolution outcome: builtin 3677, external 2453, internal 2943, unresolved 3685
+* Nodes (functions, methods, classes): 1900
+* Edges by kind: `call` 1298, `constructor` 63, `instantiate` 496, `override` 6, `self` 328, `super` 4
+* Call sites by resolution outcome: builtin 3685, external 2456, internal 2946, unresolved 3686
 
 | Scoped graph | Roots | Depth | Nodes | Edges | Truncated nodes | Reachable (unbounded) |
 |---|---|---|---|---|---|---|

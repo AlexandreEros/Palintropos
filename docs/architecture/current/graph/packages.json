@@ -702,8 +702,8 @@
     },
     {
       "kind": "imports",
-      "module_edges": 1,
-      "runtime_module_edges": 1,
+      "module_edges": 2,
+      "runtime_module_edges": 2,
       "source": "tropoi.temporal.tendencies",
       "target": "tropoi.temporal"
     }

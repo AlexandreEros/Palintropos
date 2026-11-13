@@ -10,7 +10,7 @@ Index: [all packages](../index.md) · parent [`tropoi.temporal`](tropoi.temporal
 |---|---|---|---|
 | `tropoi.temporal.tendencies` | empty | – | – |
 | `tropoi.temporal.tendencies.barotropic` | code | `BarotropicVorticity` | – |
-| `tropoi.temporal.tendencies.drag` | code | `LatitudeDependentRayleighDrag`, `MomentumSinkHeating` | `schneider_liu_drag_profile` |
+| `tropoi.temporal.tendencies.drag` | code | `LatitudeDependentRayleighDrag`, `MomentumSinkHeating` | `rayleigh_sponge_damping`, `schneider_liu_drag_profile` |
 | `tropoi.temporal.tendencies.held_suarez` | code | `HeldSuarezParameters`, `NewtonianRelaxation` | `equilibrium_temperature`, `hyperdiffusion_coefficient`, `hyperdiffusion_damping`, `newtonian_rate`, `newtonian_tendency_grid`, `rayleigh_drag_damping`, `rayleigh_rate` |
 | `tropoi.temporal.tendencies.primitive_equations` | code | `PrimitiveEquationsModel` | – |
 | `tropoi.temporal.tendencies.shallow_water` | code | `ShallowWaterModel` | – |
@@ -64,6 +64,7 @@ flowchart LR
     p_tropoi_otemporal -.->|1| n_tropoi_otemporal_otendencies_oshallow__water
     n_tropoi_otemporal_otendencies_obarotropic -->|2| p_tropoi_ospatial
     n_tropoi_otemporal_otendencies_obarotropic -->|1| p_tropoi_ospatial_ostates
+    n_tropoi_otemporal_otendencies_odrag -.->|1| p_tropoi_otemporal
     n_tropoi_otemporal_otendencies_oheld__suarez -->|1| p_tropoi_ospatial
     n_tropoi_otemporal_otendencies_oheld__suarez -->|1| p_tropoi_otemporal
     n_tropoi_otemporal_otendencies_oprimitive__equations -->|4| p_tropoi_ospatial

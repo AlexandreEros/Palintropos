@@ -65,7 +65,7 @@ flowchart LR
     p_tropoi_orun_oradiative -.->|1| n_tropoi_otemporal_osemi__implicit
     p_tropoi_orun_oswe -->|2| n_tropoi_otemporal_ointegration
     p_tropoi_orun_oswe -->|1| n_tropoi_otemporal_omodels
-    p_tropoi_otemporal_otendencies -->|1| n_tropoi_otemporal_ohooks
+    p_tropoi_otemporal_otendencies -->|2| n_tropoi_otemporal_ohooks
     n_tropoi_otemporal_ocolumn__coupling -.->|1| p_tropoi_ospatial_ostates
     n_tropoi_otemporal_omodels -.->|5| p_tropoi_ospatial
     n_tropoi_otemporal_omodels -.->|1| p_tropoi_ospatial_oterrain

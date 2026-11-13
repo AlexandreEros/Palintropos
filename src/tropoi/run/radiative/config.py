@@ -9,6 +9,7 @@ readable without importing any solver. Nothing here imports CuPy.
 """
 from __future__ import annotations
 
+import functools
 import hashlib
 import json
 import math
@@ -59,6 +60,9 @@ class RadiativeConfig:
     surface: Optional[dict] = None
     sensible: Optional[dict] = None
     drag: Optional[dict] = None
+    # top Rayleigh sponge {"bottom_pressure": Pa, "efold_days": d} (Isca
+    # damping_driver); left out of the canonical form when unset
+    sponge: Optional[dict] = None
     internal_heat_flux: float = 0.0
     # return the kinetic energy removed by drag and hyperdiffusion as heat.
     # The field default stays False: configurations recorded before the
@@ -135,6 +139,8 @@ class RadiativeConfig:
 
     def to_dict(self) -> dict[str, Any]:
         d = asdict(self)
+        if d["sponge"] is None:
+            del d["sponge"]
         if not d["frictional_heating"]:
             # written only when set, so configurations that predate the
             # option keep their hash
@@ -268,7 +274,8 @@ def _time_of_perihelion_for_equinox_start(period: float, eccentricity: float,
 
 
 def mars_gray_flat_dev(experiment_id: Optional[str] = None, *, days: int = 30,
-                       dt: float = 600.0, frictional_heating: bool = True) -> RadiativeConfig:
+                       dt: float = 600.0, frictional_heating: bool = True,
+                       sponge: bool = False) -> RadiativeConfig:
     """DEVELOPMENT EXPERIMENT, not a reproduction of Thomson & Vallis (2019)
     M-I (docs/radiation/MARS_MI_PLAN.md).
 
@@ -285,14 +292,18 @@ def mars_gray_flat_dev(experiment_id: Optional[str] = None, *, days: int = 30,
     drag (1 day^-1 below sigma = 0.7) stands in for surface stress and
     vertical momentum diffusion, and instantaneous dry convective adjustment
     stands in for the turbulent diffusion of heat (M-I has no convection
-    scheme). NOT matched: T21 (M-I: T42), no sponge, del^8 and RAW (Isca:
+    scheme). ``sponge=True`` (preset ``dev-mars-gray-flat-sponge``) adds
+    M-I's top sponge, 1 / 0.125 day ((0.5 Pa - p) / 0.5 Pa)^2 above 0.5 Pa
+    (Isca damping_driver). NOT matched: T21 (M-I: T42), del^8 and RAW (Isca:
     del^4 and Robert-Asselin 0.04), a uniform 285 K initial surface (Isca
     test case: 285 - 40 (3 sin^2 lat - 1) / 3).
     """
     year, ecc, ls_peri = 59166360.0, 0.0935, 250.85
     return RadiativeConfig(
-        experiment_id=_preset_id(experiment_id, "dev-mars-gray-flat", "T21L25",
-                                 frictional_heating),
+        experiment_id=_preset_id(experiment_id,
+                                 "dev-mars-gray-flat-sponge" if sponge else "dev-mars-gray-flat",
+                                 "T21L25", frictional_heating),
+        sponge={"bottom_pressure": 0.5, "efold_days": 0.125} if sponge else None,
         frictional_heating=frictional_heating, radius=3.396e6,
         omega=2.0 * math.pi / 88308.0, gravity=3.71, gas_constant=192.0,
         cp=192.0 / 0.22727, reference_pressure=610.0,
@@ -316,4 +327,5 @@ def mars_gray_flat_dev(experiment_id: Optional[str] = None, *, days: int = 30,
 
 
 PRESETS = {"jupiter-schneider-liu": jupiter_schneider_liu, "earth-gray-dry": earth_gray_dry,
-           "dev-mars-gray-flat": mars_gray_flat_dev}
+           "dev-mars-gray-flat": mars_gray_flat_dev,
+           "dev-mars-gray-flat-sponge": functools.partial(mars_gray_flat_dev, sponge=True)}

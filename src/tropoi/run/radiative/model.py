@@ -251,6 +251,13 @@ def build_stepper(cfg: RadiativeConfig, model, coupling, *,
                                    cfg.hyperdiffusion_efold_days * DAY_SECONDS,
                                    cfg.retained_cut, order=cfg.hyperdiffusion_order)
     dampers, lagged = _drag(cfg, model)
+    if cfg.sponge is not None:
+        from tropoi.temporal.tendencies.drag import rayleigh_sponge_damping
+        o = _options({"kind": "sponge", **cfg.sponge}, "bottom_pressure", "efold_days")
+        dampers = dampers + (rayleigh_sponge_damping(
+            model.sigma.full_levels_array(), cfg.l_max + 1,
+            reference_pressure=cfg.reference_pressure, bottom_pressure=o["bottom_pressure"],
+            efold_days=o["efold_days"]),)
     explicit = ()
     if cfg.frictional_heating:
         explicit = (_frictional_heating(cfg, model, dampers + (hyper,), lagged),)

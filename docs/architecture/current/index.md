@@ -32,7 +32,7 @@ Explore dependencies, call sites, possible dispatch, runtime observations and pr
 | [`tropoi.spatial.transforms`](packages/tropoi.spatial.transforms.md) | 5 | 3 | 4 | `README.md` |
 | [`tropoi.spatial.transforms.cuda`](packages/tropoi.spatial.transforms.cuda.md) | 2 | 0 | 2 | `README.md`, `legendre.cu`, `sh_matrix.cu` |
 | [`tropoi.temporal`](packages/tropoi.temporal.md) | 8 | 11 | 17 | `README.md`, `SAVED_RUNS.md`, `SEMI_IMPLICIT.md` |
-| [`tropoi.temporal.tendencies`](packages/tropoi.temporal.tendencies.md) | 6 | 7 | 8 | `PRIMITIVE_EQUATIONS.md`, `README.md`, `RETAINED_TRUNCATION.md`, `SHALLOW_WATER.md` |
+| [`tropoi.temporal.tendencies`](packages/tropoi.temporal.tendencies.md) | 6 | 7 | 9 | `PRIMITIVE_EQUATIONS.md`, `README.md`, `RETAINED_TRUNCATION.md`, `SHALLOW_WATER.md` |
 
 ## Entry paths
 

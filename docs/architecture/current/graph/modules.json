@@ -3441,6 +3441,14 @@
     {
       "kind": "imports",
       "scopes": [
+        "function"
+      ],
+      "source": "tropoi.temporal.tendencies.drag",
+      "target": "tropoi.temporal.hooks"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
         "module"
       ],
       "source": "tropoi.temporal.tendencies.held_suarez",
@@ -4983,6 +4991,7 @@
       "stdlib_imports": [
         "__future__",
         "dataclasses",
+        "functools",
         "hashlib",
         "json",
         "math",

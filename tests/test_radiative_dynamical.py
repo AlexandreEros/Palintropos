@@ -505,3 +505,58 @@ def test_flat_mars_one_day_is_stable_and_closes_atmosphere_and_slab_budgets(tmp_
     assert 100.0 < series["t_min"][-1] and series["t_max"][-1] < 400.0
     slab_heat = cfg.surface["heat_capacity"] * (series["mean_surface_temperature"][-1] - ts0)
     assert slab_heat == pytest.approx(series["surface_net"][-1] * 86400.0, rel=1e-9)
+
+
+def test_rayleigh_sponge_rates_are_iscas_damping_driver():
+    """Isca damping_driver `rayleigh` (d1321ac3): momentum only, rate
+    (1 / tau) ((p_b - p) / p_b)^2 where p < p_b, here at p = sigma p_ref."""
+    from tropoi.temporal.tendencies.drag import rayleigh_sponge_damping
+    sigma = build_sigma(PRESETS["dev-mars-gray-flat"]()).full_levels_array()
+    K, n = sigma.size, 23
+    d = rayleigh_sponge_damping(sigma, n, reference_pressure=610.0, bottom_pressure=0.5,
+                                efold_days=0.125)
+    p = sigma * 610.0
+    expected = np.where(p < 0.5, (1.0 / (0.125 * 86400.0)) * ((0.5 - p) / 0.5) ** 2, 0.0)
+    np.testing.assert_allclose(d.rates[0:K], expected[:, None] * np.ones((1, n)), rtol=1e-14)
+    np.testing.assert_allclose(d.rates[K:2 * K], expected[:, None] * np.ones((1, n)), rtol=1e-14)
+    assert not d.rates[2 * K:].any()                      # temperature and ln p_s untouched
+    assert np.count_nonzero(expected) >= 2 and expected[-1] == 0.0
+    assert d.name == "rayleigh_sponge"
+
+
+def test_the_sponge_is_left_out_of_configurations_without_it():
+    """Adding the field must not move any recorded identity: the two Mars
+    pilot runs (evidence of PR #35) keep their hashes."""
+    ev = pathlib.Path(__file__).resolve().parents[1] / "docs" / "radiation" / "evidence"
+    for preset_kw, run in (({}, "dev-mars-gray-flat-heated-T21L25-30d-b3aaef8-l4"),
+                           ({"frictional_heating": False}, "dev-mars-gray-flat-T21L25-30d-b3aaef8-l4")):
+        cfg = PRESETS["dev-mars-gray-flat"](**preset_kw)
+        assert cfg.sponge is None and "sponge" not in cfg.to_dict()
+        assert cfg.sha256() == json.loads((ev / run / "config.json").read_text())["config_sha256"]
+
+
+def test_the_sponge_preset_differs_from_the_pilot_by_the_sponge_alone():
+    base = PRESETS["dev-mars-gray-flat"]()
+    cfg = PRESETS["dev-mars-gray-flat-sponge"]()
+    assert cfg.experiment_id == "dev-mars-gray-flat-sponge-heated-T21L25"
+    assert PRESETS["dev-mars-gray-flat-sponge"](frictional_heating=False).experiment_id == \
+        "dev-mars-gray-flat-sponge-T21L25"
+    assert cfg.sponge == {"bottom_pressure": 0.5, "efold_days": 0.125}
+    assert cfg.with_(sponge=None, experiment_id=base.experiment_id) == base
+    assert RadiativeConfig.from_dict(json.loads(cfg.canonical_json())) == cfg
+
+
+@needs_cuda
+def test_flat_mars_with_the_sponge_returns_its_loss_and_closes_the_budget(tmp_path):
+    """One T9 day with the sponge and frictional heating: the sponge is one of
+    the stepper's dampers, so the heating returns its kinetic-energy loss; the
+    coupled residual meets the pilot's M2 daily bound, 1e-2 F."""
+    from tropoi.run.radiative.experiment import RadiativeRun
+    from tropoi.run.radiative.model import build_model, build_stepper
+    cfg = _tiny(PRESETS["dev-mars-gray-flat-sponge"](days=1), experiment_id="mars-sponge-test")
+    names = [d.name for d in build_stepper(cfg, build_model(cfg), None).dampers]
+    assert "rayleigh_sponge" in names
+    RadiativeRun(cfg, tmp_path / "run", allow_dirty=True, log=lambda s: None).run()
+    series = json.loads((tmp_path / "run" / "series.json").read_text())
+    assert abs(series["energy_residual"][-1]) < 1e-2 * series["absorbed_stellar"][-1]
+    assert series["max_abs_u"][-1] < 150.0

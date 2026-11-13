@@ -8301,6 +8301,11 @@
       "target": "tropoi.run.radiative.model._frictional_heating"
     },
     {
+      "kind": "call",
+      "source": "tropoi.run.radiative.model.build_stepper",
+      "target": "tropoi.run.radiative.model._options"
+    },
+    {
       "kind": "instantiate",
       "source": "tropoi.run.radiative.model.build_stepper",
       "target": "tropoi.temporal.semi_implicit.SemiImplicitLeapfrogStepper"
@@ -8309,6 +8314,11 @@
       "kind": "call",
       "source": "tropoi.run.radiative.model.build_stepper",
       "target": "tropoi.temporal.semi_implicit.SemiImplicitOperator.from_model"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.radiative.model.build_stepper",
+      "target": "tropoi.temporal.tendencies.drag.rayleigh_sponge_damping"
     },
     {
       "kind": "call",
@@ -10474,6 +10484,11 @@
       "kind": "constructor",
       "source": "tropoi.temporal.tendencies.drag.MomentumSinkHeating",
       "target": "tropoi.temporal.tendencies.drag.MomentumSinkHeating.__init__"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.temporal.tendencies.drag.rayleigh_sponge_damping",
+      "target": "tropoi.temporal.hooks.DiagonalDamping"
     },
     {
       "kind": "constructor",
@@ -23862,6 +23877,13 @@
       "kind": "method",
       "module": "tropoi.temporal.tendencies.drag",
       "qualname": "MomentumSinkHeating.signature",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.temporal.tendencies.drag.rayleigh_sponge_damping",
+      "kind": "function",
+      "module": "tropoi.temporal.tendencies.drag",
+      "qualname": "rayleigh_sponge_damping",
       "type": "function"
     },
     {
