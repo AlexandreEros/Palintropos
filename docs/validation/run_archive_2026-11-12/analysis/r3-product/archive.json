@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "provider": "google-drive",
+  "kind": "computational-analysis",
+  "folder_url": "https://drive.google.com/drive/folders/1Fnh_LUqKf4VAmoZhPrvwZwRxDXzzENzp",
+  "collection_url": "https://drive.google.com/drive/folders/1Yjig-jolvU15gvCqTq-19kyjCbJi9iX1",
+  "original_local_path": "runs/r3-product",
+  "provenance_note": "Original local bytes preserved unchanged; full copy in the owner's November 12 bulk upload. Scientific conclusions retain the qualifications of their original validation records.",
+  "included_files": [
+    "final_states_res4.npz",
+    "final_states_res5.npz",
+    "summary_res4.txt",
+    "summary_res5.txt",
+    "upper-band-review.diff"
+  ],
+  "omitted_files": {},
+  "files": {
+    "final_states_res4.npz": {
+      "drive_id": "1Zm7SWNq1W9Jf1jip4w--eXwTzFs4ZQhk",
+      "size": 31974
+    },
+    "final_states_res5.npz": {
+      "drive_id": "1BhoGbta66_tqUkBo9oaSreH3BcHlZqQu",
+      "size": 23986
+    },
+    "summary_res4.txt": {
+      "drive_id": "17jB1M52We1nwK04V8BQdhlstBdEC-R7s",
+      "size": 1254
+    },
+    "summary_res5.txt": {
+      "drive_id": "1BhQrmeKoMb9zmLpdFadomWsGHEMfe1KU",
+      "size": 803
+    },
+    "upper-band-review.diff": {
+      "drive_id": "15Q5MukgkaNbJJESP_GRZQq_FMoU7e5rZ",
+      "size": 38878
+    }
+  }
+}

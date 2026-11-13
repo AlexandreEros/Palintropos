@@ -1,0 +1,593 @@
+diff --git a/docs/KNOWN_RISKS.md b/docs/KNOWN_RISKS.md
+index a9b57ad..ef28469 100644
+--- a/docs/KNOWN_RISKS.md
++++ b/docs/KNOWN_RISKS.md
+@@ -151,7 +151,7 @@ Decomposing the fix into its two parts — round-trip removal (A→B) and fine q
+ 
+     tilt   A coarse+RT   B coarse+spec   D fine+spec (prod)
+       0°    −2.64e−3      −2.84e−3        −4.46e−4     ← fine quadrature does the work (6.4×)
+-     30°    −1.11e−2      −1.03e−2        −9.69e−3     ← neither helps much (truncation floor)
++     30°    −1.11e−2      −1.03e−2        −9.69e−3     ← neither helps much (cause not isolated)
+      60°    +1.75e−2      +5.41e−4        −9.26e−4     ← round-trip removal does the work (32×)
+ 
+ So the characterization's "the product-analysis quadrature is *the* dominant defect" holds
+@@ -160,17 +160,16 @@ larger, strongly orientation-dependent error (it was invisible in the characteri
+ because the tilt sweep there ran variant A alone). P3 fails because it credited the fine
+ *quadrature* with the tilt-60 gain; the gain is real (fix as a whole cuts tilt-60 19×,
+ +1.75e−2 → −9.26e−4) but comes from the round-trip removal — and the fine quadrature
+-slightly *worsens* the (non-solution) tilt-60 flow. The fix is beneficial at every
+-orientation (6.4× / 1.1× / 19×) and never harmful, so it stands; both components are
+-warranted. **Remaining limitation:** tilt-30 barely improves. The reason is structural:
+-the tendency is truncated at l = 14 (2/3 rule) while the prognostic state retains modes
+-through l = 21, so the evolved system is **not an invariant-conserving Galerkin
+-truncation** of either the l ≤ 14 or the l ≤ 21 system — nonlinear transfer into the
+-cutoff band l ∈ (14, 21] has no conservation guarantee, and flows that drive such
+-transfer (tilt-30 RH4, two_vortices filamentation) drift regardless of product-quadrature
+-quality. Closing that requires a consistent truncation/state treatment (e.g. evolve the
+-state at the cut, or add scale-selective dissipation across it) — a separate design
+-decision, out of R-3 scope. Memory note: `"fine"` builds a res-(r+1) grid at init (res 5
++slightly *worsens* the (non-solution) tilt-60 flow. The combined fix reduces energy-drift
++magnitude at the three measured orientations (6.4× / 1.1× / 19×).
++**Remaining limitation (corrected attribution):** tilt-30 barely improves, but the
++historical comparison did not isolate why. With viscosity zero and no forcing, the
++l = 14 tendency cutoff makes state degrees 15–21 exactly frozen; there is no nonlinear
++transfer into that band. Those initial coefficients still participate in low-band
++products. The [controlled upper-band audit](validation/r3_characterization.md#controlled-upper-band-comparison)
++measures their budget effect separately at fixed quadrature and dt. It does not
++establish the cause of tilted-RH4 drift or a conservation repair through projection
++or damping. Solver and cutoff policy are unchanged. Memory note: `"fine"` builds a res-(r+1) grid at init (res 5
+ co-grid ≈ 160 MB at l_max 21; res 6 co-grid for a res-5 state ≈ 1.3 GB — set `"coarse"`
+ there).
+ 
+diff --git a/docs/validation/r3_characterization.md b/docs/validation/r3_characterization.md
+index d43bbfd..cccd29e 100644
+--- a/docs/validation/r3_characterization.md
++++ b/docs/validation/r3_characterization.md
+@@ -1,8 +1,9 @@
+ # R-3 characterization and fix record — fine-grid product evaluation
+ 
+ Tracked record of the R-3 investigation (KNOWN_RISKS.md R-3), kept in Git because the
+-raw run artifacts under `runs/` are Git-ignored. Every number below is reproducible from
+-the cited commit + script; run IDs embed their commit hashes.
++raw run artifacts under `runs/` are Git-ignored. Historical measurements cite their
++commit + script; run IDs embed their commit hashes. The controlled upper-band
++comparison also saves compact tables and source hashes alongside this record.
+ 
+ ## Commit trail
+ 
+@@ -81,19 +82,125 @@ solution, so magnitudes are indicative of orientation sensitivity only):
+   the fine quadrature slightly *worsens* this non-solution flow. The characterization
+   missed this because its tilt sweep ran variant A alone.
+ - P3 fails because it credited the fine quadrature with the tilt-60 gain. The fix as a
+-  whole (round-trip removal + fine quadrature, both shipped) improves every orientation
+-  — 6.4× / 1.1× / 19× — and is never harmful.
+-
+-**Residual limitation (precise statement).** The tendency is truncated at l = 14 while
+-the prognostic state retains modes through l = 21, so the evolved system is not an
+-invariant-conserving Galerkin truncation of either the l ≤ 14 or the l ≤ 21 system.
+-Nonlinear transfer into the band l ∈ (14, 21] therefore carries no conservation
+-guarantee, and flows that drive such transfer (tilt-30 RH4 at ≈ −1e−2/5 d;
+-`two_vortices` filamentation, whose 5-step integrated |dE/E| rises from 1.7e−3 to
+-6.7e−3 under the more accurate fine quadrature) drift regardless of product-quadrature
+-quality. Closing this requires a consistent truncation/state treatment (evolve the state
+-at the cut, or scale-selective dissipation across it) — a separate design decision
+-outside R-3.
++  whole (round-trip removal + fine quadrature, both shipped) reduces the magnitude of
++  energy drift at the three measured orientations — 6.4× / 1.1× / 19×.
++
++**Residual limitation (corrected attribution).** The tendency is truncated at l = 14
++while the state retains modes through l = 21. With viscosity zero and no forcing,
++degrees 15–21 have exactly zero tendency: their initial coefficients remain frozen,
++but enter the products driving the low band. There is no nonlinear transfer *into*
++that upper band. The historical quadrature/orientation comparisons did not isolate
++its participation and cannot attribute tilt-30 drift to the state/tendency split.
++Likewise, the historical `two_vortices` 5-step integrated |dE/E| increase from 1.7e−3
++to 6.7e−3 under fine quadrature does not establish that a truncation defect became
++more visible. The controlled comparison below tests upper-band participation at
++fixed quadrature and dt. Removing that content is not a demonstrated conservation
++repair; approximate quadrature, low-band IC-analysis error, and RK4 error remain.
++
++## Controlled upper-band comparison
++
++Reproduce from the repository root with the CUDA-enabled project environment:
++
++```powershell
++./venv/Scripts/python.exe tests/audit_r3_product.py upper-band --output docs/validation/r3_upper_band
++./venv/Scripts/python.exe -m pytest tests/test_r3_fine_product.py tests/test_diagnostics.py tests/test_r5_spectral_eta.py -q --basetemp=runs/r3-upper-band-pytest-20260918
++```
++
++The new `upper-band` mode uses `BarotropicVorticity` and `rk4_step` unchanged,
++not the historical A–D variant models. For each IC (`make_ic("rh4", planet)` and
++`make_ic("two_vortices", planet)`), analyze once on the same res-4/l21 state grid.
++Copy those coefficients twice and zero only l > 14 in one copy, without any
++synthesis/re-analysis. Low-band IC coefficients, rotation (24 h), viscosity (0),
++forcing (none), state representation, and tendency cutoff are identical within
++each pair. RH4 is on-axis; the two-vortices IC uses the production ±5e−5 s⁻¹
++Gaussians at latitude ±33°, longitude ±90°, width 10°.
++
++The full factorial matrix has **24 five-day runs**: two ICs × two state-band
++members × two product quadratures × three fixed timesteps. Coarse uses 2562
++state-grid points, fine uses 10242 res-5 points, both with Voronoi weights and
++the same l_max. Every pair uses N = 200, 400, or 800 steps, respectively dt =
++2160, 1080, or 540 s, with no adaptive CFL reselection. Sweep dt at fixed
++quadrature and quadrature at fixed dt; neither changes the analyzed IC.
++
++Energy E and absolute enstrophy Z_abs use the production spectral diagnostics
++(valid m ≤ l, multiplicity 1 for m = 0 and 2 otherwise). For either invariant I,
++the paired budget effect is
++
++`B_I = [(I_full(T) - I_full(0)) - (I_zero(T) - I_zero(0))] / I_zero(0)`.
++
++This common initial low-band denominator excludes an apparent effect caused
++solely by removing the initial upper-band invariant. Own-initial relative drift
++is retained as a separate column. Because f is degree 1 and the upper band
++remains frozen, each member's full-band and low-band absolute budget changes
++coincide up to roundoff. Initial and final instantaneous production rates are
++also normalized to the common denominator and reported per day. The audit
++checks finiteness, upper-band tendency at every RK4 stage, and upper-band state
++change at every stage and accepted step; any nonzero upper-band tendency or
++change fails it.
++
++The declared reporting threshold is **1e−8** in dimensionless paired budget,
++not a bound on total numerical error. The compact evidence is
++[runs.csv](r3_upper_band/runs.csv) (initial/final invariants, drifts, production
++rates, freeze checks), [pairs.csv](r3_upper_band/pairs.csv) (controlled differences),
++and [metadata.json](r3_upper_band/metadata.json) (configuration, environment,
++IC hashes, base commit, and LF-normalized audit/source hashes). No solver files
++were changed. The historical P1 test remains a two-sided characterization band,
++not an accuracy ceiling; the new tests check controls and accounting rather than
++pinning the measured drift or requiring projection to improve it.
++
++Measured on the MX110 with CuPy 13.4.0, using unchanged production source at
++`fd0ddffd63c4bace901210dbdc98270a11b22265` and the audit hash in the metadata:
++
++| IC | initial upper E fraction | initial upper relative-enstrophy fraction |
++|---|---:|---:|
++| RH4 | 2.65704e−6 | 6.30531e−5 |
++| two_vortices | 5.65514e−5 | 1.74325e−3 |
++
++These fractions are measured from the production IC definitions above; the
++two-vortices values differ from the issue draft's unsaved one-off probe
++(5.043e−5 and 1.549e−3). The tables here use the newly recorded coefficients
++and hashes, rather than importing those earlier numbers.
++
++Five-day results at **dt = 540 s**. E drifts use each member's own initial E;
++B_E and B_Z_abs use the common low-band denominator defined above:
++
++| IC | product quadrature | E drift, as analyzed | E drift, upper zeroed | B_E | B_Z_abs |
++|---|---|---:|---:|---:|---:|
++| RH4 | fine | −4.45546e−4 | −3.64942e−4 | −8.06051e−5 | +2.45901e−6 |
++| RH4 | coarse | −2.83556e−3 | −1.47760e−3 | −1.35796e−3 | −2.12829e−4 |
++| two_vortices | fine | +1.45246e−3 | +4.80607e−4 | +9.71938e−4 | +1.20922e−4 |
++| two_vortices | coarse | +1.69753e−3 | +1.89494e−3 | −1.97316e−4 | −1.54937e−5 |
++
++Across dt = 2160, 1080, and 540 s, the largest within-IC/quadrature range of
++B_E is **1.34e−9** and of B_Z_abs is **3.10e−10**, both below the declared
++1e−8 threshold. Every paired budget effect exceeds that threshold at every
++tested timestep. This measures timestep sensitivity of the paired difference;
++it is not a bound on either member's total numerical error. All upper-band
++tendencies and coefficient changes were **exactly zero**, including RK4 stages.
++
++**Supported conclusion:** frozen upper-band state content measurably changes
++both invariant budgets for these configurations. Quadrature changes the effect's
++magnitude and, for two-vortices, its sign. Removing the upper band reduces energy
++drift magnitude for RH4 at both quadratures and for two-vortices with fine
++quadrature, but increases it for two-vortices with coarse quadrature. It also
++slightly worsens RH4's fine-quadrature absolute-enstrophy drift
++(−8.46046e−5 → −8.70642e−5). Low-band-only runs still drift.
++
++This establishes an effect of upper-band participation **under the current
++cutoff policy and approximate quadratures**, including their interaction. It
++does not separate an idealized cutoff-policy error from quadrature error, test
++a different cutoff policy, or establish conservation recovery from projection.
++No damping was applied or assessed. The scope is on-axis RH4 and the specified
++two-vortices IC, res-4/l21, inviscid/unforced, five days; it does not explain the
++historical tilted-RH4 results or generalize to SWE/PE or other resolutions and
++horizons. The historical measurements above remain unchanged.
++
++Verification: **24 tests passed** with the command above, including independent
++direct-integration and finite-difference production-rate checks. The explicit
++pytest temporary path avoids inaccessible pre-existing temporary directories on
++this workstation. All 24 run rows and 12 paired rows were checked for finite
++values, consistent endpoint-budget arithmetic, zero upper-band change/tendency,
++and matching audit/source hashes.
+ 
+ ## Related supporting results
+ 
+diff --git a/tests/audit_r3_product.py b/tests/audit_r3_product.py
+index dfeff67..8964703 100644
+--- a/tests/audit_r3_product.py
++++ b/tests/audit_r3_product.py
+@@ -33,16 +33,28 @@ state.
+ Run:
+     python tests/audit_r3_product.py res4
+     python tests/audit_r3_product.py res5
++    python tests/audit_r3_product.py upper-band
++
++The upper-band mode uses the unchanged production BVE tendency, with paired
++as-analyzed / upper-zeroed spectral ICs, at each fixed quadrature and dt.
++It does not use the historical A-D models above or change the cutoff policy.
+ """
+ from __future__ import annotations
+ 
++import argparse
++import csv
++import hashlib
++import json
+ import pathlib
++import platform
++import subprocess
+ import sys
+ import time as wallclock
+ import warnings
+ 
+ import numpy as np
+ import cupy as cp
++import scipy
+ from scipy.spatial.transform import Rotation
+ 
+ warnings.simplefilter("ignore")
+@@ -56,6 +68,7 @@ from tropoi.planet import Planet, PlanetaryParameters
+ from tropoi.run.bve.barotropic_vorticity import BarotropicState, BarotropicVorticity
+ from tropoi.run.bve.runner import rk4_step
+ from tropoi.run.bve.diagnostics import spectral_diagnostics
++from tropoi.run.bve.initial_conditions import make_ic
+ 
+ L_MAX = 21
+ DAY_HOURS = 24.0
+@@ -174,6 +187,176 @@ def run_case(planet: Planet, zeta0_grid: cp.ndarray, model: VariantModel,
+     )
+ 
+ 
++def upper_band_pair(zeta_lm: cp.ndarray) -> dict[str, cp.ndarray]:
++    """Copy one analyzed IC; change only degrees above its production cut.
++
++    In particular, never synthesize/re-analyze the projected member: that
++    would change the shared low band and reintroduce quadrature leakage.
++    """
++    cut = (2 * (zeta_lm.shape[0] - 1)) // 3
++    projected = zeta_lm.copy()
++    projected[cut + 1:, :] = 0.0
++    return {"as_analyzed": zeta_lm.copy(), "upper_zeroed": projected}
++
++
++class FrozenBandProbe:
++    """Observe every RK4 stage without modifying the production tendency."""
++
++    def __init__(self, model, initial):
++        self.model = model
++        self.cut = (2 * (initial.shape[0] - 1)) // 3
++        self.upper = initial[self.cut + 1:].copy()
++        self.state_change_max = 0.0
++        self.tendency_max = 0.0
++
++    def observe_state(self, coeffs):
++        if not bool(cp.isfinite(coeffs).all()):
++            raise FloatingPointError("nonfinite state in upper-band audit")
++        self.state_change_max = max(self.state_change_max, float(
++            cp.abs(coeffs[self.cut + 1:] - self.upper).max()))
++
++    def tendency(self, state, forcing_coeffs):
++        self.observe_state(state.coeffs)
++        dz = self.model.tendency(state, forcing_coeffs)
++        if not bool(cp.isfinite(dz).all()):
++            raise FloatingPointError("nonfinite tendency in upper-band audit")
++        self.tendency_max = max(self.tendency_max, float(
++            cp.abs(dz[self.cut + 1:]).max()))
++        return dz
++
++
++def run_upper_band_pair(planet, zeta_lm, model, N: int, dt: float) -> dict:
++    """Compare budget changes using a COMMON initial low-band denominator.
++
++    Own-initial relative drifts are also reported, but subtracting those
++    would confound participation with removal of the initial upper budget.
++    Since f is degree 1 and the upper band is frozen, full and low-band
++    absolute changes are identical within each member (up to roundoff).
++    """
++    if N < 1 or not np.isfinite(dt) or dt <= 0:
++        raise ValueError("N and dt must be positive and finite")
++    pair = upper_band_pair(zeta_lm)
++    R, om = planet.params.radius, planet.params.angular_velocity
++    common = spectral_diagnostics(pair["upper_zeroed"], R, om)
++    runs = {}
++    for tag, initial in pair.items():
++        state = BarotropicState(initial.copy())
++        probe = FrozenBandProbe(model, initial)
++        d0 = spectral_diagnostics(initial, R, om)
++        rate0 = production_rates(initial, probe.tendency(state, None), model.f_lm, R)
++        for step in range(N):
++            state = rk4_step(probe, state, step * dt, dt)
++            probe.observe_state(state.coeffs)
++        d1 = spectral_diagnostics(state.coeffs, R, om)
++        rate1 = production_rates(state.coeffs, probe.tendency(state, None), model.f_lm, R)
++        if probe.state_change_max != 0.0 or probe.tendency_max != 0.0:
++            raise AssertionError("inviscid unforced upper band is no longer frozen")
++        run = dict(upper_state_change_max=probe.state_change_max,
++                   upper_tendency_max=probe.tendency_max)
++        for i, key in enumerate(("energy", "enstrophy_abs")):
++            run[key] = dict(
++                initial=d0[key], final=d1[key],
++                relative_drift=(d1[key] - d0[key]) / d0[key],
++                change_over_common_initial=(d1[key] - d0[key]) / common[key],
++                rate0_per_day_over_common=rate0[i] * 86400.0 / common[key],
++                rateT_per_day_over_common=rate1[i] * 86400.0 / common[key],
++            )
++        runs[tag] = run
++    return dict(runs=runs, paired_budget_difference={
++        key: (runs["as_analyzed"][key]["change_over_common_initial"]
++              - runs["upper_zeroed"][key]["change_over_common_initial"])
++        for key in ("energy", "enstrophy_abs")
++    })
++
++
++def upper_band_main(argv):
++    parser = argparse.ArgumentParser(description="Controlled BVE upper-band audit")
++    parser.add_argument("--output", type=pathlib.Path, default=OUT / "upper-band")
++    parser.add_argument("--steps", type=int, nargs="+", default=[200, 400, 800],
++                        help="fixed step counts over five days (default: dt, dt/2, dt/4)")
++    args = parser.parse_args(argv)
++    if any(n < 1 for n in args.steps):
++        parser.error("all step counts must be positive")
++    root = pathlib.Path(__file__).resolve().parents[1]
++    params = PlanetaryParameters.from_earth_like(day_hours=DAY_HOURS)
++    planet = Planet.generate(params=params, grid_resolution=4, l_max=L_MAX)
++    # Construct/analyze each IC ONCE, before either independent sweep.
++    initial = {ic: planet.sh.transform(make_ic(ic, planet))
++               for ic in ("rh4", "two_vortices")}
++    operators = {"fine": planet.so, "coarse": SpectralOperators(
++        planet.sh, params.radius, planet.grid, product_quadrature="coarse")}
++    source_hash = hashlib.sha256()
++    source_files = subprocess.check_output(
++        ["git", "ls-files", "src"], cwd=root, text=True).splitlines()
++    for name in source_files:
++        content = (root / name).read_bytes().replace(b"\r\n", b"\n")
++        source_hash.update(name.encode() + b"\0" + content + b"\0")
++    metadata = dict(
++        schema_version=1,
++        command="python tests/audit_r3_product.py upper-band --steps "
++                + " ".join(map(str, args.steps)) + " --output " + args.output.as_posix(),
++        base_commit=subprocess.check_output(
++            ["git", "rev-parse", "HEAD"], cwd=root, text=True).strip(),
++        audit_sha256=hashlib.sha256(pathlib.Path(__file__).read_bytes().replace(
++            b"\r\n", b"\n")).hexdigest(),
++        tracked_src_sha256=source_hash.hexdigest(),
++        source_hash_recipe="SHA256 of sorted git ls-files src: path UTF-8 + NUL + LF-normalized bytes + NUL",
++        python=platform.python_version(), numpy=np.__version__, cupy=cp.__version__,
++        scipy=scipy.__version__, quadrature_weights="voronoi",
++        cuda_runtime=cp.cuda.runtime.runtimeGetVersion(),
++        device=cp.cuda.runtime.getDeviceProperties(0)["name"].decode(),
++        resolution=4, state_points=planet.grid.n_points, l_max=L_MAX, cut=CUT,
++        product_points={q: (so.product_grid.n_points if so.product_grid is not None
++                            else planet.grid.n_points) for q, so in operators.items()},
++        radius_m=params.radius, omega_per_s=params.angular_velocity,
++        viscosity=0.0, forcing="none", dtype=str(initial["rh4"].dtype),
++        horizon_s=T_END_DAYS * 86400.0, steps=args.steps,
++        paired_budget_definition="(change_as_analyzed - change_upper_zeroed) / initial_upper_zeroed",
++        reporting_tolerance=1e-8,
++        tolerance_scope="dimensionless paired budget; reporting threshold, not an error bound",
++        initial={},
++    )
++    for ic, z0 in initial.items():
++        d0 = spectral_diagnostics(z0, params.radius, params.angular_velocity)
++        metadata["initial"][ic] = dict(
++            sha256=hashlib.sha256(cp.asnumpy(z0).tobytes()).hexdigest(),
++            upper_energy_fraction=float(d0["energy_l"][CUT + 1:].sum() / d0["energy"]),
++            upper_relative_enstrophy_fraction=d0["high_l_enstrophy_frac"],
++        )
++    rows, pairs = [], []
++    for ic, z0 in initial.items():
++        for quadrature, so in operators.items():
++            model = BarotropicVorticity(planet, viscosity=0.0)
++            model.so = so  # supported coarse/fine audit option; same object within pair
++            for N in args.steps:
++                dt = T_END_DAYS * 86400.0 / N
++                result = run_upper_band_pair(planet, z0, model, N, dt)
++                config = dict(ic=ic, quadrature=quadrature, steps=N, dt_s=dt)
++                for tag, run in result["runs"].items():
++                    row = dict(config, member=tag,
++                               upper_state_change_max=run["upper_state_change_max"],
++                               upper_tendency_max=run["upper_tendency_max"])
++                    for key in ("energy", "enstrophy_abs"):
++                        row.update({f"{key}_{metric}": value
++                                    for metric, value in run[key].items()})
++                    rows.append(row)
++                pairs.append(dict(config, **result["paired_budget_difference"]))
++                print(f"{ic} {quadrature} N={N} dt={dt:g}: "
++                      f"paired budgets {result['paired_budget_difference']}", flush=True)
++    # Reject incomplete/nonfinite evidence instead of serializing a success record.
++    for row in rows + pairs:
++        if any(not np.isfinite(v) for v in row.values() if isinstance(v, (int, float))):
++            raise FloatingPointError("nonfinite audit result")
++    args.output.mkdir(parents=True, exist_ok=True)
++    for name, data in (("runs.csv", rows), ("pairs.csv", pairs)):
++        with (args.output / name).open("w", encoding="utf-8", newline="") as stream:
++            writer = csv.DictWriter(stream, fieldnames=list(data[0]))
++            writer.writeheader()
++            writer.writerows(data)
++    (args.output / "metadata.json").write_text(
++        json.dumps(metadata, indent=2, allow_nan=False) + "\n", encoding="utf-8")
++
++
+ def main(part: str):
+     res = 4 if part == "res4" else 5
+     print(f"[audit_r3_product] part={part} (res={res}, l_max={L_MAX}, "
+@@ -266,4 +449,7 @@ def main(part: str):
+ 
+ 
+ if __name__ == "__main__":
+-    main(sys.argv[1] if len(sys.argv) > 1 else "res4")
++    if len(sys.argv) > 1 and sys.argv[1] == "upper-band":
++        upper_band_main(sys.argv[2:])
++    else:
++        main(sys.argv[1] if len(sys.argv) > 1 else "res4")
+diff --git a/tests/test_r3_fine_product.py b/tests/test_r3_fine_product.py
+index 75fa7e8..233a954 100644
+--- a/tests/test_r3_fine_product.py
++++ b/tests/test_r3_fine_product.py
+@@ -208,3 +208,60 @@ def test_prediction_p1_5day_energy_drift(planet):
+         f"5-day RH4 energy drift {drift:+.4e} outside preregistered band "
+         "[-5.4e-4, -3.6e-4] (prediction -4.5e-4 +/- 20%)"
+     )
++
++
++# Controlled state-band audit: these check the intervention and accounting,
++# not a historical drift value (an improvement toward zero must remain valid).
++@pytest.mark.parametrize("ic", ["rh4", "two_vortices"])
++@pytest.mark.parametrize("quadrature", ["coarse", "fine"])
++def test_upper_band_pair_controls_and_frozen_state(planet, ic, quadrature):
++    import audit_r3_product as audit
++    from tropoi.run.bve.initial_conditions import make_ic
++
++    z0 = planet.sh.transform(make_ic(ic, planet))
++    original = z0.copy()
++    pair = audit.upper_band_pair(z0)
++    cp.testing.assert_array_equal(pair["as_analyzed"], original)
++    cp.testing.assert_array_equal(pair["upper_zeroed"][:CUT + 1], original[:CUT + 1])
++    assert float(cp.abs(original[CUT + 1:]).max()) > 0.0
++    assert float(cp.abs(pair["upper_zeroed"][CUT + 1:]).max()) == 0.0
++
++    model = BarotropicVorticity(planet, viscosity=0.0)
++    if quadrature == "coarse":
++        model.so = SpectralOperators(planet.sh, planet.params.radius, planet.grid,
++                                     product_quadrature="coarse")
++    result = audit.run_upper_band_pair(planet, z0, model, N=4, dt=2160.0)
++    cp.testing.assert_array_equal(z0, original)  # no in-place intervention
++    reference = spectral_diagnostics(pair["upper_zeroed"], planet.params.radius,
++                                     planet.params.angular_velocity)
++    for tag, initial in pair.items():
++        run = result["runs"][tag]
++        assert run["upper_state_change_max"] == 0.0
++        assert run["upper_tendency_max"] == 0.0
++        # Independent direct integration catches re-analysis of the projected IC,
++        # per-member CFL selection, or evolution with a different model.
++        state = BarotropicState(initial.copy())
++        for _ in range(4):
++            state = rk4_step(model, state, 0.0, 2160.0)
++        final = spectral_diagnostics(state.coeffs, planet.params.radius,
++                                     planet.params.angular_velocity)
++        # A symmetric finite difference of the quadratic invariants verifies
++        # the instantaneous production normalization independently of the audit.
++        dz = model.tendency(BarotropicState(initial), None)
++        plus = spectral_diagnostics(initial + 100.0 * dz, planet.params.radius,
++                                    planet.params.angular_velocity)
++        minus = spectral_diagnostics(initial - 100.0 * dz, planet.params.radius,
++                                     planet.params.angular_velocity)
++        for key in ("energy", "enstrophy_abs"):
++            assert run[key]["final"] == pytest.approx(final[key], rel=1e-13)
++            expected = (final[key] - run[key]["initial"]) / reference[key]
++            assert run[key]["change_over_common_initial"] == pytest.approx(expected)
++            rate = (plus[key] - minus[key]) / 200.0 * 86400.0 / reference[key]
++            assert run[key]["rate0_per_day_over_common"] == pytest.approx(
++                rate, rel=1e-7, abs=1e-12)
++    for key in ("energy", "enstrophy_abs"):
++        full = result["runs"]["as_analyzed"][key]
++        zero = result["runs"]["upper_zeroed"][key]
++        expected = ((full["final"] - full["initial"])
++                    - (zero["final"] - zero["initial"])) / reference[key]
++        assert result["paired_budget_difference"][key] == pytest.approx(expected)
+diff --git a/docs/validation/r3_upper_band/metadata.json b/docs/validation/r3_upper_band/metadata.json
+new file mode 100644
+index 0000000..f67d6c0
+--- /dev/null
++++ b/docs/validation/r3_upper_band/metadata.json
+@@ -0,0 +1,49 @@
++{
++  "schema_version": 1,
++  "command": "python tests/audit_r3_product.py upper-band --steps 200 400 800 --output docs/validation/r3_upper_band",
++  "base_commit": "fd0ddffd63c4bace901210dbdc98270a11b22265",
++  "audit_sha256": "221c902654dabaecb158a94569eab1e494dd6d5ad6877d2e5784789c30b99eef",
++  "tracked_src_sha256": "62b4b3602fa80e6ac31b551803d144d381ca8d16677f4830f0ebb57a17186d05",
++  "source_hash_recipe": "SHA256 of sorted git ls-files src: path UTF-8 + NUL + LF-normalized bytes + NUL",
++  "python": "3.12.12",
++  "numpy": "2.2.6",
++  "cupy": "13.4.0",
++  "scipy": "1.16.3",
++  "quadrature_weights": "voronoi",
++  "cuda_runtime": 11080,
++  "device": "NVIDIA GeForce MX110",
++  "resolution": 4,
++  "state_points": 2562,
++  "l_max": 21,
++  "cut": 14,
++  "product_points": {
++    "fine": 10242,
++    "coarse": 2562
++  },
++  "radius_m": 6367354.690444991,
++  "omega_per_s": 7.27220521664304e-05,
++  "viscosity": 0.0,
++  "forcing": "none",
++  "dtype": "complex128",
++  "horizon_s": 432000.0,
++  "steps": [
++    200,
++    400,
++    800
++  ],
++  "paired_budget_definition": "(change_as_analyzed - change_upper_zeroed) / initial_upper_zeroed",
++  "reporting_tolerance": 1e-08,
++  "tolerance_scope": "dimensionless paired budget; reporting threshold, not an error bound",
++  "initial": {
++    "rh4": {
++      "sha256": "1a02f15b353c40c3b7f457cadea82cb93f7a11909fdd35cbd248a275721e4824",
++      "upper_energy_fraction": 2.657036922174e-06,
++      "upper_relative_enstrophy_fraction": 6.305312201774002e-05
++    },
++    "two_vortices": {
++      "sha256": "1e584e845adfa9023ff04d3e56088b4658ea190dca6f806123ce59db7242e489",
++      "upper_energy_fraction": 5.655142013457669e-05,
++      "upper_relative_enstrophy_fraction": 0.0017432476464780014
++    }
++  }
++}
+diff --git a/docs/validation/r3_upper_band/pairs.csv b/docs/validation/r3_upper_band/pairs.csv
+new file mode 100644
+index 0000000..595e0a5
+--- /dev/null
++++ b/docs/validation/r3_upper_band/pairs.csv
+@@ -0,0 +1,13 @@
++ic,quadrature,steps,dt_s,energy,enstrophy_abs
++rh4,fine,200,2160.0,-8.060508774232483e-05,2.4589930867890953e-06
++rh4,fine,400,1080.0,-8.060511178453435e-05,2.459010617833772e-06
++rh4,fine,800,540.0,-8.060511275677758e-05,2.4590117361056427e-06
++rh4,coarse,200,2160.0,-0.0013579636577495443,-0.0002128294242066765
++rh4,coarse,400,1080.0,-0.0013579637983393697,-0.00021282942921473742
++rh4,coarse,800,540.0,-0.0013579638048096402,-0.00021282942921775774
++two_vortices,fine,200,2160.0,0.0009719374006736304,0.00012092193989828074
++two_vortices,fine,400,1080.0,0.0009719380080875037,0.0001209222458472764
++two_vortices,fine,800,540.0,0.0009719379000086017,0.00012092224962547875
++two_vortices,coarse,200,2160.0,-0.00019731738813564864,-1.5493571064126748e-05
++two_vortices,coarse,400,1080.0,-0.00019731604509677712,-1.549366750660249e-05
++two_vortices,coarse,800,540.0,-0.0001973160462627342,-1.549367284225368e-05
+diff --git a/docs/validation/r3_upper_band/runs.csv b/docs/validation/r3_upper_band/runs.csv
+new file mode 100644
+index 0000000..c87d5d2
+--- /dev/null
++++ b/docs/validation/r3_upper_band/runs.csv
+@@ -0,0 +1,25 @@
++ic,quadrature,steps,dt_s,member,upper_state_change_max,upper_tendency_max,energy_initial,energy_final,energy_relative_drift,energy_change_over_common_initial,energy_rate0_per_day_over_common,energy_rateT_per_day_over_common,enstrophy_abs_initial,enstrophy_abs_final,enstrophy_abs_relative_drift,enstrophy_abs_change_over_common_initial,enstrophy_abs_rate0_per_day_over_common,enstrophy_abs_rateT_per_day_over_common
++rh4,fine,200,2160.0,as_analyzed,0.0,0.0,7.78078972313377e+17,7.77732302358361e+17,-0.00044554597586071265,-0.0004455471596959665,-6.127156962075739e-05,-0.0007157231505045293,2466839.669874069,2466630.9637855105,-8.460464257450481e-05,-8.460525432150524e-05,-1.1188791285473277e-05,-0.00012567659756902502
++rh4,fine,200,2160.0,upper_zeroed,0.0,0.0,7.780769049288193e+17,7.777929519309953e+17,-0.00036494207195364166,-0.00036494207195364166,-1.0656959655048989e-05,-0.00030286034821568053,2466821.8331359057,2466607.0611495133,-8.706424740829434e-05,-8.706424740829434e-05,-1.6102286098854804e-06,-7.09485376266392e-05
++rh4,fine,400,1080.0,as_analyzed,0.0,0.0,7.78078972313377e+17,7.777323022428902e+17,-0.00044554612426559717,-0.0004455473081012453,-6.127156962075739e-05,-0.000715723898296604,2466839.669874069,2466630.9639121993,-8.460459121780632e-05,-8.46052029644354e-05,-1.1188791285473277e-05,-0.00012567633726836742
++rh4,fine,400,1080.0,upper_zeroed,0.0,0.0,7.780769049288193e+17,7.777929518342313e+17,-0.0003649421963167109,-0.0003649421963167109,-1.0656959655048989e-05,-0.0003028622402828861,2466821.8331359057,2466607.061232956,-8.706421358226917e-05,-8.706421358226917e-05,-1.6102286098854804e-06,-7.094881479277555e-05
++rh4,fine,800,540.0,as_analyzed,0.0,0.0,7.78078972313377e+17,7.777323022307231e+17,-0.00044554613990304326,-0.00044554732373873295,-6.127156962075739e-05,-0.0007157239297279429,2466839.669874069,2466630.963913165,-8.460459082630074e-05,-8.460520257292699e-05,-1.1188791285473277e-05,-0.00012567631891669028
++rh4,fine,800,540.0,upper_zeroed,0.0,0.0,7.780769049288193e+17,7.777929518228206e+17,-0.00036494221098195537,-0.00036494221098195537,-1.0656959655048989e-05,-0.00030286234172006505,2466821.8331359057,2466607.0612311633,-8.706421430903263e-05,-8.706421430903263e-05,-1.6102286098854804e-06,-7.09488291526593e-05
++rh4,coarse,200,2160.0,as_analyzed,0.0,0.0,7.78078972313377e+17,7.758726840784334e+17,-0.0028355582318127692,-0.0028355657660157044,-0.0003654929967084257,-0.0021081745034751075,2466839.669874069,2465450.116126142,-0.0005632930931412234,-0.0005632971661193674,-5.913956745335636e-05,-0.0004086146161690977
++rh4,coarse,200,2160.0,upper_zeroed,0.0,0.0,7.780769049288193e+17,7.769272168537033e+17,-0.00147760210826616,-0.00147760210826616,-4.024278222211993e-05,-0.0012399137993937724,2466821.8331359057,2465957.2916583456,-0.00035046774191269093,-0.00035046774191269093,-6.062513204393702e-06,-0.00028942297477299275
++rh4,coarse,400,1080.0,as_analyzed,0.0,0.0,7.78078972313377e+17,7.758726834343156e+17,-0.0028355590596435974,-0.002835566593848732,-0.0003654929967084257,-0.002108180546656091,2466839.669874069,2465450.1159720668,-0.0005632931555997669,-0.0005632972285783625,-5.913956745335636e-05,-0.0004086150790002371
++rh4,coarse,400,1080.0,upper_zeroed,0.0,0.0,7.780769049288193e+17,7.769272163189752e+17,-0.0014776027955093625,-0.0014776027955093625,-4.024278222211993e-05,-0.0012399236785891618,2466821.8331359057,2465957.2915166244,-0.00035046779936362513,-0.00035046779936362513,-6.062513204393702e-06,-0.00028942445794509416
++rh4,coarse,800,540.0,as_analyzed,0.0,0.0,7.78078972313377e+17,7.758726833848621e+17,-0.002835559123202143,-0.002835566657407447,-0.0003654929967084257,-0.0021081808687326144,2466839.669874069,2465450.115952958,-0.0005632931633460655,-0.0005632972363247171,-5.913956745335636e-05,-0.00040861509858216547
++rh4,coarse,800,540.0,upper_zeroed,0.0,0.0,7.780769049288193e+17,7.76927216274556e+17,-0.0014776028525978068,-0.0014776028525978068,-4.024278222211993e-05,-0.001239924236259316,2466821.8331359057,2465957.291497523,-0.00035046780710695937,-0.00035046780710695937,-6.062513204393702e-06,-0.0002894245399398351
++two_vortices,fine,200,2160.0,as_analyzed,0.0,0.0,4.76751271488679e+16,4.77434022061064e+16,0.0014320896727827031,0.0014321706640676314,1.1295282875384816e-16,0.0006169180703581216,1864965.5830822063,1865199.649267903,0.0001255069733297226,0.0001255081057055708,4.4528335212027705e-18,8.206007312806584e-05
++two_vortices,fine,200,2160.0,upper_zeroed,0.0,0.0,4.7672431052722536e+16,4.769437149123986e+16,0.00046023326339400094,0.00046023326339400094,4.458595786157362e-16,-3.696714610508058e-05,1864948.7567428069,1864957.3097070274,4.586165807290062e-06,4.586165807290062e-06,8.369557782625137e-18,-5.972550726074126e-06
++two_vortices,fine,400,1080.0,as_analyzed,0.0,0.0,4.76751271488679e+16,4.774434403682325e+16,0.001451844852751224,0.0014519269612828162,1.1295282875384816e-16,0.0006167519575515409,1864965.5830822063,1865199.6978990885,0.00012553304951358038,0.00012553418212469869,4.4528335212027705e-18,8.203940465543675e-05
++two_vortices,fine,400,1080.0,upper_zeroed,0.0,0.0,4.7672431052722536e+16,4.769531329299981e+16,0.0004799889531953125,0.0004799889531953125,4.458595786157362e-16,-3.697151751383235e-05,1864948.7567428069,1864957.3577676336,4.611936277422289e-06,4.611936277422289e-06,8.369557782625137e-18,-5.972040842405909e-06
++two_vortices,fine,800,540.0,as_analyzed,0.0,0.0,4.76751271488679e+16,4.774437350371483e+16,0.0014524629295838663,0.001452545073070558,1.1295282875384816e-16,0.0006167416122135348,1864965.5830822063,1865199.6993713977,0.00012553383897009643,0.00012553497158833754,4.4528335212027705e-18,8.203810957396247e-05
++two_vortices,fine,800,540.0,upper_zeroed,0.0,0.0,4.7672431052722536e+16,4.769534276504378e+16,0.0004806071730619563,0.0004806071730619563,4.458595786157362e-16,-3.697181754153216e-05,1864948.7567428069,1864957.3592328967,4.612721962858788e-06,4.612721962858788e-06,8.369557782625137e-18,-5.97200621139347e-06
++two_vortices,coarse,200,2160.0,as_analyzed,0.0,0.0,4.76751271488679e+16,4.775508250988736e+16,0.0016770875255306922,0.0016771823725756862,5.796752135640977e-17,-0.0005546264052133595,1864965.5830822063,1864969.3567743676,2.0234647735824315e-06,2.0234830301189288e-06,2.5969239238162333e-18,-5.4195417584187e-05
++two_vortices,coarse,200,2160.0,upper_zeroed,0.0,0.0,4.7672431052722536e+16,4.776179301332339e+16,0.0018744997607113348,0.0018744997607113348,9.906690701252569e-17,-0.00016003767852825612,1864948.7567428069,1864981.4251510617,1.7517054094245676e-05,1.7517054094245676e-05,3.6518494768546005e-18,-2.3502058502338688e-05
++two_vortices,coarse,400,1080.0,as_analyzed,0.0,0.0,4.76751271488679e+16,4.7756027400846584e+16,0.0016969068949950574,0.001697002862916928,5.796752135640977e-17,-0.0005545669832600534,1864965.5830822063,1864969.4044488047,2.049027946161043e-06,2.0490464333390618e-06,2.5969239238162333e-18,-5.418826696567329e-05
++two_vortices,coarse,400,1080.0,upper_zeroed,0.0,0.0,4.7672431052722536e+16,4.776273784025669e+16,0.0018943189080137051,0.0018943189080137051,9.906690701252569e-17,-0.00016005724064216582,1864948.7567428069,1864981.473005359,1.7542713939941555e-05,1.7542713939941555e-05,3.6518494768546005e-18,-2.3500026449643405e-05
++two_vortices,coarse,800,540.0,as_analyzed,0.0,0.0,4.76751271488679e+16,4.775605700213949e+16,0.001697527790935441,0.0016976237939718443,5.796752135640977e-17,-0.0005545632009699476,1864965.5830822063,1864969.4058953926,2.049803610858566e-06,2.0498221050349527e-06,2.5969239238162333e-18,-5.418780609579324e-05
++two_vortices,coarse,800,540.0,upper_zeroed,0.0,0.0,4.7672431052722536e+16,4.7762767441605176e+16,0.0018949398402345785,0.0018949398402345785,9.906690701252569e-17,-0.00016005854992268178,1864948.7567428069,1864981.4744618977,1.7543494947288633e-05,1.7543494947288633e-05,3.6518494768546005e-18,-2.3499888928334485e-05

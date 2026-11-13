@@ -1,0 +1,74 @@
+{
+  "schema_version": 1,
+  "provider": "google-drive",
+  "kind": "palintropos-run",
+  "folder_url": "https://drive.google.com/drive/folders/1T9xnzE0M_e6Dz4KqSBIAVBujmAT01rgG",
+  "collection_url": "https://drive.google.com/drive/folders/1Yjig-jolvU15gvCqTq-19kyjCbJi9iX1",
+  "original_local_path": "runs/readme-rotations-final/20260713T024914Z_two-vortices-equator-90e_norot_r4_l21_dt12h_4a840226",
+  "provenance_note": "Original local bytes preserved unchanged; full copy in the owner's November 12 bulk upload. Scientific conclusions retain the qualifications of their original validation records.",
+  "included_files": [
+    "bve_summary.png",
+    "config.json",
+    "diagnostics/spectra.npz",
+    "diagnostics/timeseries.csv",
+    "figures/cfl_history.png",
+    "figures/invariant_drift.png",
+    "figures/spectra.png",
+    "figures/spectral_health.png",
+    "manifest.json",
+    "two-vortices-equator-90e_t0.00h-24.00h-12.00h.png",
+    "vorticity_coeffs.npy",
+    "vorticity_grid.npy"
+  ],
+  "omitted_files": {},
+  "files": {
+    "bve_summary.png": {
+      "drive_id": "1gEHNI4YOa_cIDQEmoDPHoGcy9tWtcSTm",
+      "size": 1156872
+    },
+    "config.json": {
+      "drive_id": "1LtgatAKdMdlXIHndF6GJUioNne1K_xYW",
+      "size": 767
+    },
+    "diagnostics/spectra.npz": {
+      "drive_id": "1gv5_eXrKzS_ufyDZjSUWlCJUGM-kJpLQ",
+      "size": 1486
+    },
+    "diagnostics/timeseries.csv": {
+      "drive_id": "1B8RNNcZePEnVC7-L65t-yVBIguSFhv2X",
+      "size": 2866
+    },
+    "figures/cfl_history.png": {
+      "drive_id": "14eJLncKJyHNh-_qT6s_h5bsja9kt-wi3",
+      "size": 66927
+    },
+    "figures/invariant_drift.png": {
+      "drive_id": "141syTUa_k-uyvvxptzNDen3_CHyUbhPN",
+      "size": 56036
+    },
+    "figures/spectra.png": {
+      "drive_id": "1WAK_ayWDarCipTTg9xI0Viiv1Do1FJ3p",
+      "size": 123800
+    },
+    "figures/spectral_health.png": {
+      "drive_id": "1ob3ywF5JRmqbWmhtMlL93duNuOfTLXmq",
+      "size": 29458
+    },
+    "manifest.json": {
+      "drive_id": "1Ss5dagdsR_LIyhNUQHcgjUCNxiUAw_VE",
+      "size": 1984
+    },
+    "two-vortices-equator-90e_t0.00h-24.00h-12.00h.png": {
+      "drive_id": "1CSEffilTVbrrAd5-2owfahtuMjR6NaaR",
+      "size": 1589207
+    },
+    "vorticity_coeffs.npy": {
+      "drive_id": "1lKCD4Xb_fyriz2nc_g-DO9UwXHRwB-Yv",
+      "size": 23360
+    },
+    "vorticity_grid.npy": {
+      "drive_id": "1wdlFLMG6MQWaPkca6Gfbdu3M3RYPpr87",
+      "size": 61616
+    }
+  }
+}

@@ -92,7 +92,7 @@ before, and the only behavioural change is the extra slab step at startup.
 
 ## Full suite on Linux/CUDA at `341acfe` (2026-11-12, Colab Tesla T4)
 
-Run by the repository owner with `notebooks/Palintropos-Colab-CUDA-Regression.ipynb`
+Run by the repository owner with the [Colab CUDA regression notebook](../../notebooks/Palintropos-Colab-CUDA-Regression.ipynb)
 on a clone of `341acfeb9e9331d3a9a53e0eecceb966177cebf4`. Counts below were
 re-read from the run's JUnit report and `result.json`.
 

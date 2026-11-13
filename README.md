@@ -11,8 +11,10 @@ harmonics, with conservation diagnostics and run provenance, so each claim can
 be traced back to a recorded run.
 
 It is **not** a climate or weather model. Its solvers are idealized: no
-moisture, no radiation, and the only forcing is the analytic Held–Suarez
-benchmark in the primitive-equation core. Terrain can be analytic or read from
+moisture, and the only forcings are the analytic Held–Suarez benchmark and
+an idealized gray radiative transfer coupled to the primitive-equation core
+([radiation status](docs/radiation/README.md)) — prescribed optical depths,
+no real gas opacities. Terrain can be analytic or read from
 an elevation file (for example Mars from MOLA), but it is fixed bottom
 topography only; running over real terrain does not make a run a model of
 that planet's atmosphere.
@@ -90,13 +92,18 @@ See [src/tropoi/spatial/terrain/IMPORT.md](src/tropoi/spatial/terrain/IMPORT.md#
 The dry PE core also supports controlled studies of forced circulation and
 eddy heat transport: its 1200-day Held–Suarez baseline passed the declared
 comparison with Dinosaur. That establishes a dry benchmark under stated
-parameters, not predictive climates for arbitrary planets. Moist physics,
-radiative heating and general planetary-climate validation remain future work
+parameters, not predictive climates for arbitrary planets. Radiative
+transfer exists in two deliberately distinct forms that share one
+description of composition, molecular properties and stellar illumination
+([shared physics](docs/radiation/SHARED_PHYSICS.md)): idealized gray
+two-stream radiation coupled to the PE core
+([radiation status](docs/radiation/README.md)), and the standalone
+single-scattering sky page ([sky view](docs/SKY_VIEW.md)), a visual
+prototype, not a validated sky colour. Moist physics, real gas opacities
+and general planetary-climate validation remain future work
 ([radiative-transfer milestone](https://github.com/AlexandreEros/Palintropos/issues/26)).
-The standalone sky prototype and expanded architecture coverage remain in
-[open PR #22](https://github.com/AlexandreEros/Palintropos/pull/22) and
-[#23](https://github.com/AlexandreEros/Palintropos/pull/23); they are outside
-the current `main` capabilities described here.
+Expanded architecture coverage remains in
+[open PR #23](https://github.com/AlexandreEros/Palintropos/pull/23).
 
 ## Model cores
 
@@ -108,7 +115,7 @@ the long forced runs ([SEMI_IMPLICIT.md](src/tropoi/temporal/SEMI_IMPLICIT.md)).
 |---|---|---|---|---|
 | **Barotropic vorticity (BVE)** | `tropoi run bve` | relative vorticity | RH4 traveling wave on both grids; conservation and rotation-equivalence tests | Single layer, non-divergent. Optional Laplacian viscosity has no stability control of its own |
 | **Rotating shallow water (SWE)** | `tropoi run swe` | vorticity, divergence, perturbation thickness geopotential | Linear gravity-wave dispersion, Williamson 2, exact lake at rest over terrain, Williamson 5 compared with an external model | Inviscid, single layer. Terrain is an analytic Gaussian mountain, the benchmark cone, or imported from an elevation file through a saved initial state ([TERRAIN_IMPORT.md](src/tropoi/spatial/terrain/IMPORT.md)) |
-| **Dry hydrostatic primitive equations (PE)** | `tropoi run pe` (RK4); `python -m tropoi.run.held_suarez` (HS experiment) | per-level vorticity, divergence, temperature; ln surface pressure | Exact rest; smooth short evolution; analytic orographic balance (to roundoff on the Gauss grid); **Held–Suarez forced climate, 1200 days at T42L20, all three acceptance tiers passed** ([STATUS.md](docs/held_suarez/STATUS.md)) | Fixed user-chosen step, no CFL controller, no energy-conservation claim. Forcing is Held–Suarez only (Newtonian relaxation + Rayleigh friction, ∇⁸ hyperdiffusion); no moisture or radiation |
+| **Dry hydrostatic primitive equations (PE)** | `tropoi run pe` (RK4); `python -m tropoi.run.held_suarez` (HS experiment) | per-level vorticity, divergence, temperature; ln surface pressure | Exact rest; smooth short evolution; analytic orographic balance (to roundoff on the Gauss grid); **Held–Suarez forced climate, 1200 days at T42L20, all three acceptance tiers passed** ([STATUS.md](docs/held_suarez/STATUS.md)) | Fixed user-chosen step, no CFL controller, no energy-conservation claim. Forcing is Held–Suarez only (Newtonian relaxation + Rayleigh friction, ∇⁸ hyperdiffusion); no moisture; radiation only through the radiative experiment driver |
 
 BVE and SWE recompute their timestep ceiling after every accepted state;
 SWE includes the gravity-wave speed. The PE command uses a fixed RK4 step;
@@ -418,11 +425,14 @@ environment boundaries. Historical suite counts are not current coverage.
 
 ## Limitations
 
-- No moisture, radiation, or time-varying terrain in any solver. Real
-  terrain can be imported (SWE initial states, `tropoi run pe --terrain`), but
-  only as fixed band-limited bottom topography. The only forcing is
-  Held–Suarez in the PE core; BVE and SWE are unforced. The terrain from
-  `Planet.generate` is decorative only.
+- No moisture or time-varying terrain in any solver. Radiation is the
+  idealized gray scheme of the radiative–dynamical experiments (prescribed
+  optical depths; no real gas opacities) plus the standalone
+  single-scattering sky page; neither validates a planetary climate or a
+  sky colour. Real terrain can be imported (SWE initial states,
+  `tropoi run pe --terrain`), but only as fixed band-limited bottom
+  topography. PE forcing is Held–Suarez or the gray radiation; BVE and SWE
+  are unforced. The terrain from `Planet.generate` is decorative only.
 - BVE and SWE are single-layer.
 - The semi-implicit stepper exists for PE and was used for the Held–Suarez
   runs; BVE and SWE are explicit RK4 only. There is no stability control for

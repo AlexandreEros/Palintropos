@@ -24,7 +24,7 @@ star. Every other input is stated here, none is inferred:
   fixed one, so brightness comparisons between runs are meaningful).
 
 It needs no saved simulation, prepared planet, terrain data or CUDA: it
-imports only ``tropoi.spatial.optics`` and
+imports only ``tropoi.physics`` and
 ``tropoi.representation.visual.sky``. The page is ONE offline HTML file in
 which atmosphere, composition, star, observer, view and exposure can all be
 changed. It is a single-scattering Rayleigh visual prototype, not a
@@ -38,7 +38,8 @@ import pathlib
 
 from tropoi.representation.visual.sky import (HypotheticalColumn, SkySpec,
                                               write_sky_page)
-from tropoi.spatial.optics import Composition, Star
+from tropoi.physics.composition import Composition
+from tropoi.physics.star import ApparentStar
 
 SUN_T_K = 5772.0                                      # IAU 2015 B3 nominal
 SUN_SIN_ALPHA_1AU = 695700.0 / 149597870.7            # R_sun / au (IAU)
@@ -72,7 +73,7 @@ def build_spec(args) -> SkySpec:
     alpha = (args.star_angular_radius_deg if args.star_angular_radius_deg
              is not None else equal_irradiance_radius_deg(
                  args.star_temperature_k))
-    star = Star(args.star_temperature_k, alpha,
+    star = ApparentStar(args.star_temperature_k, alpha,
                 label=f"{args.star_temperature_k:g} K blackbody star",
                 source=("stated on the command line" if
                         args.star_angular_radius_deg is not None else

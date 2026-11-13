@@ -1,0 +1,55 @@
+resumed jupiter-sl09-heated-T21L30 at day 1.0 from checkpoint-s000000072.npz
+day 2/200  0.268 s/step  max|u| 0.2 m/s
+day 10/200  0.269 s/step  max|u| 0.2 m/s
+{
+ "case": "jupiter",
+ "checkpoints_timed": 1,
+ "code": {
+  "git_commit": "d38d2a365b60c3528c3ba2eae76c688d453ee505",
+  "git_dirty": false
+ },
+ "config_sha256": "0d02921200136cf99915a41997ed44e33797a88ec7c25bedfc5b18e2adb8deec",
+ "device": {
+  "cupy": "14.0.1",
+  "name": "Tesla T4",
+  "nvidia_smi": "Tesla T4, 580.82.07, 15360 MiB",
+  "total_memory_gb": 14.56317138671875
+ },
+ "estimated_full_run_hours": 1.0774086416027777,
+ "estimated_remaining_hours": 1.0235382095226389,
+ "experiment_id": "jupiter-sl09-heated-T21L30",
+ "gpu_utilisation": {
+  "max_percent": 46.0,
+  "mean_percent": 35.5364238410596,
+  "median_percent": 38.0,
+  "min_percent": 9.0,
+  "samples": 151
+ },
+ "kind": "pilot_timing",
+ "resolution": {
+  "dt": 1200.0,
+  "l_max": 22,
+  "nlat": 32,
+  "nlev": 30,
+  "nlon": 64,
+  "retained": 21
+ },
+ "resume_events": 1,
+ "resumed_from_day": 1,
+ "seconds_per_checkpoint": 0.045170525999992606,
+ "seconds_per_daily_sample": 0.13674611687503102,
+ "seconds_per_step_all_inclusive": 0.26936784461111113,
+ "seconds_per_step_stepping_only": 0.2673901719357635,
+ "simulated_days_per_wall_hour": 185.6197797928905,
+ "target_days": 200,
+ "timed": {
+  "from_day": 2,
+  "status": "reached",
+  "steps": 576,
+  "to_day": 10.0,
+  "wall_seconds": 155.155878496
+ },
+ "utc": "2026-11-12T00:50:16+00:00",
+ "warm_days": 1,
+ "warm_seconds": 19.32158984399996
+}

@@ -1,0 +1,32 @@
+{
+  "lmax": 21,
+  "grid": "geodesic",
+  "resolution": 4,
+  "nlat": 128,
+  "nlon": 256,
+  "day_hours": 24.0,
+  "radius_earth_units": 1.0,
+  "duration_days": 1.0,
+  "dt_snapshots": 21600.0,
+  "scenario": "rh4",
+  "viscosity": 0.0,
+  "product_quadrature": "fine",
+  "out": "runs",
+  "experiment": "validation-rh4",
+  "overwrite": false,
+  "snapshot_mode": "interval",
+  "n_snapshots": null,
+  "snapshot_times": [
+    0.0,
+    21600.0,
+    43200.0,
+    64800.0,
+    86400.0
+  ],
+  "plots": [
+    "diagnostics",
+    "snapshots",
+    "summary"
+  ],
+  "run_id": "20260923T225840Z_rh4_rot24h_r4_l21_dt6h_9e5d0eb1"
+}

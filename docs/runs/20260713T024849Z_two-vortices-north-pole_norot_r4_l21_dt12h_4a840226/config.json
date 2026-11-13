@@ -1,0 +1,26 @@
+{
+  "grid": "geodesic",
+  "resolution": 4,
+  "nlat": 128,
+  "nlon": 256,
+  "lmax": 21,
+  "day_hours": Infinity,
+  "radius_earth_units": 1.0,
+  "duration_days": 1.0,
+  "dt_snapshots": 43200.0,
+  "viscosity": 0.0,
+  "product_quadrature": "fine",
+  "scenario": "two-vortices-north-pole",
+  "out": "C:\\Users\\User\\Projects\\PlanetarySandbox\\runs\\readme-rotations-final",
+  "experiment": null,
+  "overwrite": false,
+  "custom_initial_condition": {
+    "kind": "antipodal_gaussian_vortex_pair",
+    "positive_center_lat_deg": 89.999999,
+    "positive_center_lon_deg": 0.0,
+    "negative_center": "antipode",
+    "amplitude_s-1": 5e-05,
+    "sigma_deg": 10.0
+  },
+  "run_id": "20260713T024849Z_two-vortices-north-pole_norot_r4_l21_dt12h_4a840226"
+}

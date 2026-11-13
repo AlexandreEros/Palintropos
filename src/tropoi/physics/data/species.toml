@@ -1,0 +1,62 @@
+# Species identities: which gases tropoi knows, and their molecular masses.
+#
+# This file is the single source of truth for molecular masses. Each species
+# states its atomic makeup; its molar mass is the sum of the atomic weights
+# below, computed by the loader (tropoi.physics.species), never transcribed
+# per molecule. Whether a species has thermodynamic or optical data is a
+# separate question answered by thermodynamics.toml and rayleigh.toml.
+#
+# History: before 2026-11 the thermodynamics module carried its own molar
+# masses transcribed from pre-2021 standard atomic weights (e.g. N2
+# 28.0134 g/mol where these weights give 28.014). The relative differences
+# are at most 5e-5 (Ar); docs/radiation/SHARED_PHYSICS.md quantifies the
+# effect on derived gas constants.
+
+schema = "palintropos.species/1"
+
+[atomic_weights]
+# g/mol. IUPAC/CIAAW abridged standard atomic weights, conventional values
+# for interval elements (Prohaska et al., Pure Appl. Chem. 94, 573, 2022).
+source = "IUPAC/CIAAW abridged standard atomic weights (Prohaska et al., Pure Appl. Chem. 94, 573, 2022)"
+
+[atomic_weights.values]
+H = 1.008
+He = 4.0026
+C = 12.011
+N = 14.007
+O = 15.999
+S = 32.06
+Ar = 39.95
+
+[species.H2]
+atoms = { H = 2 }
+
+[species.He]
+atoms = { He = 1 }
+
+[species.Ar]
+atoms = { Ar = 1 }
+
+[species.N2]
+atoms = { N = 2 }
+
+[species.O2]
+atoms = { O = 2 }
+
+[species.CO]
+atoms = { C = 1, O = 1 }
+
+[species.CO2]
+atoms = { C = 1, O = 2 }
+
+[species.H2O]
+atoms = { H = 2, O = 1 }
+
+[species.CH4]
+atoms = { C = 1, H = 4 }
+
+[species.NH3]
+atoms = { N = 1, H = 3 }
+
+[species.SO2]
+atoms = { S = 1, O = 2 }

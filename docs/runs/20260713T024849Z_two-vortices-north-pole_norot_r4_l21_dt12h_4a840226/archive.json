@@ -1,0 +1,74 @@
+{
+  "schema_version": 1,
+  "provider": "google-drive",
+  "kind": "palintropos-run",
+  "folder_url": "https://drive.google.com/drive/folders/1g_lzQ9xzBaB5x_cY2-MRAoIIBdZB1j-Q",
+  "collection_url": "https://drive.google.com/drive/folders/1Yjig-jolvU15gvCqTq-19kyjCbJi9iX1",
+  "original_local_path": "runs/readme-rotations-final/20260713T024849Z_two-vortices-north-pole_norot_r4_l21_dt12h_4a840226",
+  "provenance_note": "Original local bytes preserved unchanged; full copy in the owner's November 12 bulk upload. Scientific conclusions retain the qualifications of their original validation records.",
+  "included_files": [
+    "bve_summary.png",
+    "config.json",
+    "diagnostics/spectra.npz",
+    "diagnostics/timeseries.csv",
+    "figures/cfl_history.png",
+    "figures/invariant_drift.png",
+    "figures/spectra.png",
+    "figures/spectral_health.png",
+    "manifest.json",
+    "two-vortices-north-pole_t0.00h-24.00h-12.00h.png",
+    "vorticity_coeffs.npy",
+    "vorticity_grid.npy"
+  ],
+  "omitted_files": {},
+  "files": {
+    "bve_summary.png": {
+      "drive_id": "1vR2ZpAl79tSaXLrP3_tvyb9dW8RvsYcF",
+      "size": 506393
+    },
+    "config.json": {
+      "drive_id": "1FuTAkrYjqQ2cmo7UsdcvY5wRormxfwnT",
+      "size": 770
+    },
+    "diagnostics/spectra.npz": {
+      "drive_id": "1bsZ9aM5gigGVnDUc9MKTm6gmwOdBQpsU",
+      "size": 1486
+    },
+    "diagnostics/timeseries.csv": {
+      "drive_id": "1ioj4LKyIXatmpCoe-ZDs16SkPMk7XWLp",
+      "size": 2883
+    },
+    "figures/cfl_history.png": {
+      "drive_id": "1dXf1PfDo2fj7z6KoPQOEZOJvdUMAMMrm",
+      "size": 70665
+    },
+    "figures/invariant_drift.png": {
+      "drive_id": "12AZs6dCmN8G5joSVYf1fFw1Y2bFjIP2N",
+      "size": 50625
+    },
+    "figures/spectra.png": {
+      "drive_id": "1rIcsJvPcYinxaQAUJMc17cWAlUQIoqKQ",
+      "size": 121792
+    },
+    "figures/spectral_health.png": {
+      "drive_id": "1nOBQ006qfkjSD7qHETffN-a4lJBn1t_-",
+      "size": 29470
+    },
+    "manifest.json": {
+      "drive_id": "1VQwONciTXGgPN9LUelNyAczO0JWPpMy9",
+      "size": 1986
+    },
+    "two-vortices-north-pole_t0.00h-24.00h-12.00h.png": {
+      "drive_id": "1jwkCWJFnRe_uiUBqT_YV3aa_h86QbV2z",
+      "size": 675541
+    },
+    "vorticity_coeffs.npy": {
+      "drive_id": "17H0tjRV5n4MVlfygccFNiDU8zK_r_j9h",
+      "size": 23360
+    },
+    "vorticity_grid.npy": {
+      "drive_id": "1P3YVrHH-2cxHvpTdCRE8utnZwYV_Dsvv",
+      "size": 61616
+    }
+  }
+}

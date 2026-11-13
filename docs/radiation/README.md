@@ -6,6 +6,12 @@ and what is not validated. Nothing here is a claim about a real planet.
 
 ## 1. What exists
 
+**Archive update (2026-11-12):** the six original run capsules behind this page
+(the partial Earth run, the Earth/Jupiter baselines, heated Earth on MX110, and
+heated Earth/Jupiter on Colab) now have [published cores and full-cloud receipts](../runs/README.md#additional-preserved-evidence-2026-11-12).
+The [preservation record](../validation/run_archive_2026-11-12/README.md) verifies
+their association with the evidence below, including config line-ending differences.
+
 | Piece | Where | State |
 | --- | --- | --- |
 | Gas thermodynamics (R, c_p(T) from molecular constants, H2 ortho/para) | `src/tropoi/physics/thermodynamics.py` | implemented, tested |
@@ -364,8 +370,11 @@ Run by the repository owner from a clean clone of `d38d2a3` with the
 checkpoints on Google Drive (CuPy 14.0.1, Python 3.13, Linux); evidence in
 `evidence/earth-gray-dry-heated-T21L25-300d-colab/` and
 `evidence/jupiter-sl09-heated-T21L30-200d-colab/`, each with the pilot's
-timing record. The launcher notebook and pilot script are not part of this
-branch.
+timing record. See the [Colab notebook](../../notebooks/radiative_colab_pilot.ipynb)
+and [pilot script](../../tools/colab/radiative_pilot.py) for the launch and
+checkpoint workflow.
+The [evidence index](evidence/README.md) maps the summaries to the preserved
+run capsules.
 
 | | Earth heated, T4 | Earth heated, MX110 | Jupiter heated, T4 |
 | --- | --- | --- | --- |

@@ -1,0 +1,21 @@
+{"day": 210, "state_sha256": "cfdb42abf224f25d4f1e6e094e2305e6020b4fc4423d7c23cb5fc8c732dcce42", "semi_discrete_per_day": 9.125681228544285e-11, "lagged_predicted_per_day_both": -1.4502341859335285e-06, "lagged_predicted_per_day_drag": -1.4382180100319106e-06, "lagged_predicted_per_day_del8": -1.048712440904623e-08}
+{"day": 300, "state_sha256": "e3ce196f39f8f7a9f9cf81d421ca69c8a14baa5245879cae28f4bfef7cf603ae", "semi_discrete_per_day": 2.333475814803685e-10, "lagged_predicted_per_day_both": -1.3193980048374676e-06, "lagged_predicted_per_day_drag": -1.310424037028094e-06, "lagged_predicted_per_day_del8": -7.768072655941099e-09}
+{"day": 400, "state_sha256": "31d2c463ecc748371b6667edc1089760b25b9ef04a30e1a056dd8b68c70e71ec", "semi_discrete_per_day": 1.508443875260877e-10, "lagged_predicted_per_day_both": -1.376911152458548e-06, "lagged_predicted_per_day_drag": -1.3697629728852137e-06, "lagged_predicted_per_day_del8": -5.9871924509422185e-09}
+{"day": 500, "state_sha256": "a80860860e6c437e43b3c1e15646fdabd2d63b3caa5a21f1315fbb2b1141aec6", "semi_discrete_per_day": 1.626677089391195e-11, "lagged_predicted_per_day_both": -1.2026725127908562e-06, "lagged_predicted_per_day_drag": -1.197628865694307e-06, "lagged_predicted_per_day_del8": -4.2229514617118164e-09}
+{"day": 600, "state_sha256": "807ce588ea130ec3a11d5ffcce37970ff743b866cb7a53e22bbba19d2d76384a", "semi_discrete_per_day": 3.0902226923715327e-10, "lagged_predicted_per_day_both": -1.5369452159898659e-06, "lagged_predicted_per_day_drag": -1.5282423372897253e-06, "lagged_predicted_per_day_del8": -7.324287524517594e-09}
+{"day": 700, "state_sha256": "d0d93a479d01edd96cd5c2954b2ff79f35f60ed07cf3064a06e6e68bfa1f71aa", "semi_discrete_per_day": 6.792425646972372e-11, "lagged_predicted_per_day_both": -1.100816348416662e-06, "lagged_predicted_per_day_drag": -1.096209844335375e-06, "lagged_predicted_per_day_del8": -3.779891073006638e-09}
+{"day": 800, "state_sha256": "564fe684bd7d533a33aacd3f46ce9e5c1e45c4710ae3435f94391904c672162b", "semi_discrete_per_day": 7.935603784208067e-11, "lagged_predicted_per_day_both": -1.1053766966165724e-06, "lagged_predicted_per_day_drag": -1.101368478627505e-06, "lagged_predicted_per_day_del8": -3.15622307373238e-09}
+{"day": 900, "state_sha256": "897f59aa5f6408d9536eae2ea967523a28ca19659d20c9c7b2895d569b58807c", "semi_discrete_per_day": 5.994274435698128e-11, "lagged_predicted_per_day_both": -1.5034440087941085e-06, "lagged_predicted_per_day_drag": -1.4970703099388719e-06, "lagged_predicted_per_day_del8": -5.258033920938994e-09}
+{"day": 1000, "state_sha256": "3374bf8f856180555b4cb36df9a2e61aa80f8d4df955954cc5791dd824b8a743", "semi_discrete_per_day": 2.0035640213466588e-10, "lagged_predicted_per_day_both": -1.0956128666369665e-06, "lagged_predicted_per_day_drag": -1.088923091684054e-06, "lagged_predicted_per_day_del8": -5.7131005845983555e-09}
+{"day": 1100, "state_sha256": "857488b7c617cfc5a0521dbb8ead8a438e263dd2e3ab63d47e34ceb0d7323fb6", "semi_discrete_per_day": 1.6375174674350865e-10, "lagged_predicted_per_day_both": -1.4978056382445193e-06, "lagged_predicted_per_day_drag": -1.4902350296301096e-06, "lagged_predicted_per_day_del8": -6.418046435166395e-09}
+{"day": 1200, "state_sha256": "27b302dbe12fc82bca7384c43c51adb479b76e1e56891fcd5217ffd136a68a49", "semi_discrete_per_day": 1.7309456779669195e-10, "lagged_predicted_per_day_both": -1.3543345424482105e-06, "lagged_predicted_per_day_drag": -1.347918797662043e-06, "lagged_predicted_per_day_del8": -5.276239783738166e-09}
+wrote runs\hs-T42L20-prod-001\assets\mass_budget\states.json
+lagged dt=900: day 1.00 rel <p_s> -1.2986e-06  predicted lag leak -1.3061e-06  (603 s)
+lagged dt=900: day 2.00 rel <p_s> -2.6164e-06  predicted lag leak -2.6357e-06  (1196 s)
+wrote runs\hs-T42L20-prod-001\assets\mass_budget\restart-lagged-dt900.json
+lagged dt=720: day 1.00 rel <p_s> -1.0443e-06  predicted lag leak -1.0490e-06  (754 s)
+lagged dt=720: day 2.00 rel <p_s> -2.1037e-06  predicted lag leak -2.1157e-06  (1708 s)
+wrote runs\hs-T42L20-prod-001\assets\mass_budget\restart-lagged-dt720.json
+centred dt=720: day 1.00 rel <p_s> -9.9050e-10  predicted lag leak  0.0000e+00  (836 s)
+centred dt=720: day 2.00 rel <p_s> -2.3598e-09  predicted lag leak  0.0000e+00  (1667 s)
+wrote runs\hs-T42L20-prod-001\assets\mass_budget\restart-centred-dt720.json

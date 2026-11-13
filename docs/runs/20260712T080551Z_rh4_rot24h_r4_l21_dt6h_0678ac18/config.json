@@ -1,0 +1,16 @@
+{
+  "lmax": 21,
+  "resolution": 4,
+  "nlat": 128,
+  "nlon": 256,
+  "day_hours": 24.0,
+  "radius_earth_units": 1.0,
+  "duration_days": 1.0,
+  "dt_snapshots": 21600.0,
+  "scenario": "rh4",
+  "viscosity": 0.0,
+  "out": "runs",
+  "experiment": "r3-smoke",
+  "overwrite": false,
+  "run_id": "20260712T080551Z_rh4_rot24h_r4_l21_dt6h_0678ac18"
+}

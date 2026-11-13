@@ -8,7 +8,7 @@ enforces it (type-only annotations are discussed in the architecture).
 
 | Layer | Responsibility and interfaces |
 | --- | --- |
-| [physics](physics/README.md) | Column physics independent of any dynamical core: gas thermodynamics, planet presets, radiation (two-stream solver, gray and correlated-k optics), insolation, dry convection, slab surface |
+| [physics](physics/README.md) | The shared physical world, independent of any dynamical core: species/composition/star data (packaged TOML), gas thermodynamics, Rayleigh optics, Kepler orbits and rotation, planet presets, radiation (two-stream solver, gray and correlated-k optics), insolation, dry convection, slab surface |
 | [spatial](spatial/README.md) | Environment/specifications, grids, transforms, operators, states and initial conditions |
 | [temporal](temporal/README.md) | Tendencies, integration/steppers, model assembly and read-only Simulation/Snapshot |
 | [representation](representation/README.md) | Archive/schema, diagnostics and explicit visualization |

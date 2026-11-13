@@ -7,6 +7,12 @@ docs/architecture/*.png -text
 # receipt); never convert their line endings.
 docs/runs/** -text
 
+# Rescued historical evidence: receipts identify the original bytes.
+docs/validation/run_archive_2026-11-12/** -text
+docs/validation/interactive_pressure_2026-11-08/hs_isobars_interactive.html -text
+# A unified diff's context-only lines intentionally contain a single space.
+docs/validation/run_archive_2026-11-12/analysis/r3-product/upper-band-review.diff -whitespace
+
 # Test fixtures from real runs carry a SHA256SUMS receipt; keep their bytes.
 tests/fixtures/** -text
 

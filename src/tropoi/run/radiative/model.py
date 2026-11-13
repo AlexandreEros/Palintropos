@@ -15,7 +15,7 @@ import numpy as np
 from tropoi.physics.column_model import ColumnPhysics, RadiativeConvectiveColumn
 from tropoi.physics.convection import DryConvectiveAdjustment
 from tropoi.physics.insolation import (DiurnalMeanInsolation, InstantaneousInsolation,
-                                       Orbit, PrescribedInsolation,
+                                       PrescribedInsolation, StellarIllumination,
                                        TidallyLockedInsolation, frierson_net_surface_flux)
 from tropoi.physics.radiation.gray import (GrayLongwave, GrayShortwave, OpticalDepthProfile,
                                            SemiInfiniteScatteringShortwave,
@@ -110,9 +110,9 @@ def build_insolation(spec: Optional[dict]):
                      obliquity_deg=0.0, perihelion_longitude_deg=0.0, time_of_perihelion=0.0,
                      **({"solar_day": DAY_SECONDS} if kind == "instantaneous" else {}))
         solar_day = o.pop("solar_day", None)
-        orbit = Orbit(**o)
-        return (DiurnalMeanInsolation(orbit) if kind == "diurnal_mean"
-                else InstantaneousInsolation(orbit, solar_day))
+        illumination = StellarIllumination.prescribed(**o)
+        return (DiurnalMeanInsolation(illumination) if kind == "diurnal_mean"
+                else InstantaneousInsolation(illumination, solar_day))
     raise ValueError(f"unknown insolation kind {kind!r}")
 
 
