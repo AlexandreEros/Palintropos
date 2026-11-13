@@ -145,6 +145,31 @@ to 10⁻⁴ F, keeps mass to 6 × 10⁻⁶, and develops a diurnal thermal tide.
 T21, 30 days, no seasonal mean); stability of the top levels; local
 energy conservation by each operator.
 
+## 2b. Sponge rerun (criteria fixed 2026-11-13, before the sponge code)
+
+The change: M-I's top sponge, Isca `damping_driver` `rayleigh` at
+`d1321ac3`. It acts on momentum only, at rate (1 / 0.125 day) ((p_b −
+p) / p_b)² for p < p_b = 0.5 Pa. With frictional heating on, its
+kinetic-energy loss returns as heat (Isca `do_conserve_energy`). The
+existing `DiagonalDamping` hook needs level-only rates, so p is taken as
+σ × 610 Pa, where Isca uses the local full-level pressure. On flat Mars
+the two differ by the surface-pressure variation. Nothing else changes.
+The preset is `dev-mars-gray-flat-sponge`, with Hs heated and Us
+`--no-frictional-heating`, from one commit, on one machine, for 30 days.
+
+Hs and Us are judged by **M1–M6 exactly as written in §2**. Stated now:
+
+- **If the missing sponge caused M1's failure, M1 is met**: daily max
+  \|u\| stays below 150 m s⁻¹. If M1 still fails, that explanation is
+  refuted or the sponge is insufficient, and it is reported that way.
+- **M5 is expected to fail again** on the 11–16 h window (the slab lag of
+  §2's results is untouched by a sponge). The window is not changed.
+- M2–M4 and M6 are expected to stay met. A failure of M2 would mean the
+  heating does not return the sponge's loss.
+
+Reported, not judged: H − Hs differences in max \|u\| below 6 Pa, in the
+S1 tide and in the residual; and the sponge's share of the measured sinks.
+
 ## 3. After the pilot, in order
 
 1. The energy-conserving top sponge (existing `DiagonalDamping` hook, its
