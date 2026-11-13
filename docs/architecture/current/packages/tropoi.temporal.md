@@ -29,11 +29,11 @@ This package's modules and the import edges between them; every other package is
 flowchart LR
     subgraph g_tropoi_otemporal["temporal"]
         n_tropoi_otemporal["temporal"]
-        n_tropoi_otemporal_ocolumn__coupling["temporal.column_coupling"]
+        n_tropoi_otemporal_ocolumn__coupling["temporal.column#95;coupling"]
         n_tropoi_otemporal_ohooks["temporal.hooks"]
         n_tropoi_otemporal_ointegration["temporal.integration"]
         n_tropoi_otemporal_omodels["temporal.models"]
-        n_tropoi_otemporal_osemi__implicit["temporal.semi_implicit"]
+        n_tropoi_otemporal_osemi__implicit["temporal.semi#95;implicit"]
         n_tropoi_otemporal_osimulation["temporal.simulation"]
         n_tropoi_otemporal_osteppers["temporal.steppers"]
     end
@@ -41,7 +41,7 @@ flowchart LR
     p_tropoi_orepresentation_ovisual["package representation.visual"]
     p_tropoi_orun_obve["package run.bve"]
     p_tropoi_orun_ocustom["package run.custom"]
-    p_tropoi_orun_oheld__suarez["package run.held_suarez"]
+    p_tropoi_orun_oheld__suarez["package run.held#95;suarez"]
     p_tropoi_orun_ope["package run.pe"]
     p_tropoi_orun_oradiative["package run.radiative"]
     p_tropoi_orun_oswe["package run.swe"]
@@ -96,7 +96,7 @@ flowchart LR
 %% Classes of tropoi.temporal
 classDiagram
     direction LR
-    class c_tropoi_otemporal_ocolumn__coupling_oColumnPhysicsCoupling["ColumnPhysicsCoupling (temporal.column_coupling)"]
+    class c_tropoi_otemporal_ocolumn__coupling_oColumnPhysicsCoupling["ColumnPhysicsCoupling (temporal.column#95;coupling)"]
     c_tropoi_otemporal_ocolumn__coupling_oColumnPhysicsCoupling : +#95;#95;call#95;#95;()
     c_tropoi_otemporal_ocolumn__coupling_oColumnPhysicsCoupling : +#95;#95;init#95;#95;()
     c_tropoi_otemporal_ocolumn__coupling_oColumnPhysicsCoupling : +#95;lowest#95;wind#95;speed()
@@ -117,7 +117,7 @@ classDiagram
     class c_tropoi_otemporal_ointegration_oIntegrationScheduler["IntegrationScheduler (temporal.integration)"]
     c_tropoi_otemporal_ointegration_oIntegrationScheduler : +#95;#95;init#95;#95;()
     c_tropoi_otemporal_ointegration_oIntegrationScheduler : +next#95;event()
-    class c_tropoi_otemporal_osemi__implicit_oSemiImplicitLeapfrogStepper["SemiImplicitLeapfrogStepper (temporal.semi_implicit)"]
+    class c_tropoi_otemporal_osemi__implicit_oSemiImplicitLeapfrogStepper["SemiImplicitLeapfrogStepper (temporal.semi#95;implicit)"]
     c_tropoi_otemporal_osemi__implicit_oSemiImplicitLeapfrogStepper : +#95;#95;init#95;#95;()
     c_tropoi_otemporal_osemi__implicit_oSemiImplicitLeapfrogStepper : +#95;hook#95;signatures()
     c_tropoi_otemporal_osemi__implicit_oSemiImplicitLeapfrogStepper : +#95;leapfrog()
@@ -131,7 +131,7 @@ classDiagram
     c_tropoi_otemporal_osemi__implicit_oSemiImplicitLeapfrogStepper : +step#95;count
     c_tropoi_otemporal_osemi__implicit_oSemiImplicitLeapfrogStepper : +t
     c_tropoi_otemporal_osemi__implicit_oSemiImplicitLeapfrogStepper : +x#95;prev
-    class c_tropoi_otemporal_osemi__implicit_oSemiImplicitOperator["SemiImplicitOperator (temporal.semi_implicit)"]
+    class c_tropoi_otemporal_osemi__implicit_oSemiImplicitOperator["SemiImplicitOperator (temporal.semi#95;implicit)"]
     c_tropoi_otemporal_osemi__implicit_oSemiImplicitOperator : +#95;#95;init#95;#95;()
     c_tropoi_otemporal_osemi__implicit_oSemiImplicitOperator : +#95;dev()
     c_tropoi_otemporal_osemi__implicit_oSemiImplicitOperator : +apply()
@@ -141,7 +141,7 @@ classDiagram
     c_tropoi_otemporal_osemi__implicit_oSemiImplicitOperator : +gravity#95;wave#95;speeds()
     c_tropoi_otemporal_osemi__implicit_oSemiImplicitOperator : +max#95;frequency()
     c_tropoi_otemporal_osemi__implicit_oSemiImplicitOperator : +signature()
-    class c_tropoi_otemporal_osemi__implicit_oSemiImplicitSolver["SemiImplicitSolver (temporal.semi_implicit)"]
+    class c_tropoi_otemporal_osemi__implicit_oSemiImplicitSolver["SemiImplicitSolver (temporal.semi#95;implicit)"]
     c_tropoi_otemporal_osemi__implicit_oSemiImplicitSolver : +#95;#95;init#95;#95;()
     c_tropoi_otemporal_osemi__implicit_oSemiImplicitSolver : +#95;advance#95;centred()
     c_tropoi_otemporal_osemi__implicit_oSemiImplicitSolver : +#95;centred#95;tables()

@@ -554,15 +554,15 @@
     "classes_in_inheritance_overview": 21,
     "containment": {
       "class": 209,
-      "module": 163,
-      "package": 26
+      "module": 95,
+      "package": 23
     },
     "modules": 164,
     "package_pages": 26
   },
   "rules": {
     "cli_handlers": "every <parser>.set_defaults(<keyword>=<function>) handler gets calls/cli-<name>.mmd",
-    "containment": "both views contain each package directory, physical Python file and class definition once, with parents verified from the source AST",
+    "containment": "both views contain each class definition, and each Python file and package directory that contains one, once, with parents verified from the source AST",
     "entry_point_candidates": "module-level functions exported through some __all__ (re-exports followed) that no analysed function calls; each must be declared as an entry path root or excluded with a reason",
     "packages": "every analysed package gets packages/<package>.md with all of its modules, classes and public module-level functions"
   },

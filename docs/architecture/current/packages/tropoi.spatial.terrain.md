@@ -29,12 +29,12 @@ This package's modules and the import edges between them; every other package is
 flowchart LR
     subgraph g_tropoi_ospatial_oterrain["spatial.terrain"]
         n_tropoi_ospatial_oterrain["spatial.terrain"]
-        n_tropoi_ospatial_oterrain_oelevation__data["spatial.terrain.elevation_data"]
-        n_tropoi_ospatial_oterrain_oelevation__import["spatial.terrain.elevation_import"]
-        n_tropoi_ospatial_oterrain_oheight__function["spatial.terrain.height_function"]
+        n_tropoi_ospatial_oterrain_oelevation__data["spatial.terrain.elevation#95;data"]
+        n_tropoi_ospatial_oterrain_oelevation__import["spatial.terrain.elevation#95;import"]
+        n_tropoi_ospatial_oterrain_oheight__function["spatial.terrain.height#95;function"]
         n_tropoi_ospatial_oterrain_oraster["spatial.terrain.raster"]
         n_tropoi_ospatial_oterrain_otectonics["spatial.terrain.tectonics"]
-        n_tropoi_ospatial_oterrain_oterrain__spectral["spatial.terrain.terrain_spectral"]
+        n_tropoi_ospatial_oterrain_oterrain__spectral["spatial.terrain.terrain#95;spectral"]
         n_tropoi_ospatial_oterrain_otopography["spatial.terrain.topography"]
     end
     p_tropoi_ocli["package cli"]
@@ -78,18 +78,18 @@ flowchart LR
 %% Classes of tropoi.spatial.terrain
 classDiagram
     direction LR
-    class c_tropoi_ospatial_oterrain_oelevation__data_oElevationData["ElevationData (spatial.terrain.elevation_data)"]
+    class c_tropoi_ospatial_oterrain_oelevation__data_oElevationData["ElevationData (spatial.terrain.elevation#95;data)"]
     c_tropoi_ospatial_oterrain_oelevation__data_oElevationData : +get#95;j2()
     c_tropoi_ospatial_oterrain_oelevation__data_oElevationData : +max#95;degree
     c_tropoi_ospatial_oterrain_oelevation__data_oElevationData : +oblateness#95;from#95;sh
-    class c_tropoi_ospatial_oterrain_oelevation__import_oElevationImportError["ElevationImportError (spatial.terrain.elevation_import)"]
+    class c_tropoi_ospatial_oterrain_oelevation__import_oElevationImportError["ElevationImportError (spatial.terrain.elevation#95;import)"]
     c_tropoi_ospatial_oterrain_oelevation__import_oElevationImportError : external base ValueError
-    class c_tropoi_ospatial_oterrain_oheight__function_oHeightExpression["HeightExpression (spatial.terrain.height_function)"]
+    class c_tropoi_ospatial_oterrain_oheight__function_oHeightExpression["HeightExpression (spatial.terrain.height#95;function)"]
     c_tropoi_ospatial_oterrain_oheight__function_oHeightExpression : +#95;#95;call#95;#95;()
     c_tropoi_ospatial_oterrain_oheight__function_oHeightExpression : +#95;#95;post#95;init#95;#95;()
     c_tropoi_ospatial_oterrain_oheight__function_oHeightExpression : +provenance()
-    class c_tropoi_ospatial_oterrain_oheight__function_oHeightExpressionError["HeightExpressionError (spatial.terrain.height_function)"]
-    class c_tropoi_ospatial_oterrain_oheight__function_oHeightFunctionError["HeightFunctionError (spatial.terrain.height_function)"]
+    class c_tropoi_ospatial_oterrain_oheight__function_oHeightExpressionError["HeightExpressionError (spatial.terrain.height#95;function)"]
+    class c_tropoi_ospatial_oterrain_oheight__function_oHeightFunctionError["HeightFunctionError (spatial.terrain.height#95;function)"]
     class c_tropoi_ospatial_oterrain_oraster_oElevationRaster["ElevationRaster (spatial.terrain.raster)"]
     c_tropoi_ospatial_oterrain_oraster_oElevationRaster : +#95;#95;post#95;init#95;#95;()
     c_tropoi_ospatial_oterrain_oraster_oElevationRaster : +area#95;mean()
@@ -104,7 +104,7 @@ classDiagram
     c_tropoi_ospatial_oterrain_oraster_oElevationRaster : +sample()
     c_tropoi_ospatial_oterrain_oraster_oElevationRaster : +shape
     class c_tropoi_ospatial_oterrain_otectonics_oTectonicParams["TectonicParams (spatial.terrain.tectonics)"]
-    class c_tropoi_ospatial_oterrain_oterrain__spectral_oSpectralTerrainParams["SpectralTerrainParams (spatial.terrain.terrain_spectral)"]
+    class c_tropoi_ospatial_oterrain_oterrain__spectral_oSpectralTerrainParams["SpectralTerrainParams (spatial.terrain.terrain#95;spectral)"]
     class c_tropoi_ospatial_oterrain_otopography_oTopography["Topography (spatial.terrain.topography)"]
     c_tropoi_ospatial_oterrain_otopography_oTopography : +#95;#95;init#95;#95;()
     c_tropoi_ospatial_oterrain_otopography_oTopography : +describe()

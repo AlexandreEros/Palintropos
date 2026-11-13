@@ -23,7 +23,7 @@ This package's modules and the import edges between them; every other package is
 flowchart LR
     subgraph g_tropoi_ospatial_ooperators["spatial.operators"]
         n_tropoi_ospatial_ooperators["spatial.operators"]
-        n_tropoi_ospatial_ooperators_ospectral__operators["spatial.operators.spectral_operators"]
+        n_tropoi_ospatial_ooperators_ospectral__operators["spatial.operators.spectral#95;operators"]
     end
     p_tropoi_orepresentation_ovisual["package representation.visual"]
     p_tropoi_ospatial["package spatial"]
@@ -50,7 +50,7 @@ flowchart LR
 %% Classes of tropoi.spatial.operators
 classDiagram
     direction LR
-    class c_tropoi_ospatial_ooperators_ospectral__operators_oSpectralOperators["SpectralOperators (spatial.operators.spectral_operators)"]
+    class c_tropoi_ospatial_ooperators_ospectral__operators_oSpectralOperators["SpectralOperators (spatial.operators.spectral#95;operators)"]
     c_tropoi_ospatial_ooperators_ospectral__operators_oSpectralOperators : +#95;#95;init#95;#95;()
     c_tropoi_ospatial_ooperators_ospectral__operators_oSpectralOperators : +#95;precompute#95;sin#95;theta#95;d#95;theta#95;coeffs()
     c_tropoi_ospatial_ooperators_ospectral__operators_oSpectralOperators : +#95;truncate#95;product()

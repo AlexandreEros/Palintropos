@@ -28,7 +28,7 @@ This package's modules and the import edges between them; every other package is
 flowchart LR
     subgraph g_tropoi_ophysics["physics"]
         n_tropoi_ophysics["physics"]
-        n_tropoi_ophysics_ocolumn__model["physics.column_model"]
+        n_tropoi_ophysics_ocolumn__model["physics.column#95;model"]
         n_tropoi_ophysics_oconvection["physics.convection"]
         n_tropoi_ophysics_oinsolation["physics.insolation"]
         n_tropoi_ophysics_oplanets["physics.planets"]
@@ -60,15 +60,15 @@ flowchart LR
 %% Classes of tropoi.physics
 classDiagram
     direction LR
-    class c_tropoi_ophysics_ocolumn__model_oColumnPhysics["ColumnPhysics (physics.column_model)"]
+    class c_tropoi_ophysics_ocolumn__model_oColumnPhysics["ColumnPhysics (physics.column#95;model)"]
     c_tropoi_ophysics_ocolumn__model_oColumnPhysics : +#95;#95;init#95;#95;()
     c_tropoi_ophysics_ocolumn__model_oColumnPhysics : +adjust()
     c_tropoi_ophysics_ocolumn__model_oColumnPhysics : +compute()
     c_tropoi_ophysics_ocolumn__model_oColumnPhysics : +reset()
     c_tropoi_ophysics_ocolumn__model_oColumnPhysics : +signature()
-    class c_tropoi_ophysics_ocolumn__model_oPhysicsOutput["PhysicsOutput (physics.column_model)"]
+    class c_tropoi_ophysics_ocolumn__model_oPhysicsOutput["PhysicsOutput (physics.column#95;model)"]
     c_tropoi_ophysics_ocolumn__model_oPhysicsOutput : +column#95;energy#95;tendency
-    class c_tropoi_ophysics_ocolumn__model_oRadiativeConvectiveColumn["RadiativeConvectiveColumn (physics.column_model)"]
+    class c_tropoi_ophysics_ocolumn__model_oRadiativeConvectiveColumn["RadiativeConvectiveColumn (physics.column#95;model)"]
     c_tropoi_ophysics_ocolumn__model_oRadiativeConvectiveColumn : +#95;#95;init#95;#95;()
     c_tropoi_ophysics_ocolumn__model_oRadiativeConvectiveColumn : +#95;stable#95;step()
     c_tropoi_ophysics_ocolumn__model_oRadiativeConvectiveColumn : +equilibrate()

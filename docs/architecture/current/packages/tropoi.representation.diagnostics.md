@@ -30,10 +30,10 @@ flowchart LR
     subgraph g_tropoi_orepresentation_odiagnostics["representation.diagnostics"]
         n_tropoi_orepresentation_odiagnostics["representation.diagnostics"]
         n_tropoi_orepresentation_odiagnostics_obve["representation.diagnostics.bve"]
-        n_tropoi_orepresentation_odiagnostics_oheld__suarez__sections["representation.diagnostics.held_suarez_sections"]
+        n_tropoi_orepresentation_odiagnostics_oheld__suarez__sections["representation.diagnostics.held#95;suarez#95;sections"]
         n_tropoi_orepresentation_odiagnostics_ope["representation.diagnostics.pe"]
-        n_tropoi_orepresentation_odiagnostics_ope__levels["representation.diagnostics.pe_levels"]
-        n_tropoi_orepresentation_odiagnostics_ope__surfaces["representation.diagnostics.pe_surfaces"]
+        n_tropoi_orepresentation_odiagnostics_ope__levels["representation.diagnostics.pe#95;levels"]
+        n_tropoi_orepresentation_odiagnostics_ope__surfaces["representation.diagnostics.pe#95;surfaces"]
         n_tropoi_orepresentation_odiagnostics_ospectral["representation.diagnostics.spectral"]
         n_tropoi_orepresentation_odiagnostics_oswe["representation.diagnostics.swe"]
     end
@@ -85,16 +85,16 @@ classDiagram
     c_tropoi_orepresentation_odiagnostics_obve_oDiagnosticsRecorder : +#95;#95;init#95;#95;()
     c_tropoi_orepresentation_odiagnostics_obve_oDiagnosticsRecorder : +close()
     c_tropoi_orepresentation_odiagnostics_obve_oDiagnosticsRecorder : +record()
-    class c_tropoi_orepresentation_odiagnostics_oheld__suarez__sections_oBandlimit["Bandlimit (representation.diagnostics.held_suarez_sections)"]
+    class c_tropoi_orepresentation_odiagnostics_oheld__suarez__sections_oBandlimit["Bandlimit (representation.diagnostics.held#95;suarez#95;sections)"]
     c_tropoi_orepresentation_odiagnostics_oheld__suarez__sections_oBandlimit : +check#95;longitudes()
     c_tropoi_orepresentation_odiagnostics_oheld__suarez__sections_oBandlimit : +to#95;dict()
     c_tropoi_orepresentation_odiagnostics_oheld__suarez__sections_oBandlimit : +update()
-    class c_tropoi_orepresentation_odiagnostics_oheld__suarez__sections_oDailySeries["DailySeries (representation.diagnostics.held_suarez_sections)"]
+    class c_tropoi_orepresentation_odiagnostics_oheld__suarez__sections_oDailySeries["DailySeries (representation.diagnostics.held#95;suarez#95;sections)"]
     c_tropoi_orepresentation_odiagnostics_oheld__suarez__sections_oDailySeries : +mass#95;drift()
     c_tropoi_orepresentation_odiagnostics_oheld__suarez__sections_oDailySeries : +reference#95;day
     c_tropoi_orepresentation_odiagnostics_oheld__suarez__sections_oDailySeries : +summary()
     c_tropoi_orepresentation_odiagnostics_oheld__suarez__sections_oDailySeries : +to#95;dict()
-    class c_tropoi_orepresentation_odiagnostics_oheld__suarez__sections_oSampleSelection["SampleSelection (representation.diagnostics.held_suarez_sections)"]
+    class c_tropoi_orepresentation_odiagnostics_oheld__suarez__sections_oSampleSelection["SampleSelection (representation.diagnostics.held#95;suarez#95;sections)"]
     c_tropoi_orepresentation_odiagnostics_oheld__suarez__sections_oSampleSelection : +cadence#95;label()
     c_tropoi_orepresentation_odiagnostics_oheld__suarez__sections_oSampleSelection : +complete
     c_tropoi_orepresentation_odiagnostics_oheld__suarez__sections_oSampleSelection : +count
@@ -102,13 +102,13 @@ classDiagram
     c_tropoi_orepresentation_odiagnostics_oheld__suarez__sections_oSampleSelection : +regular
     c_tropoi_orepresentation_odiagnostics_oheld__suarez__sections_oSampleSelection : +summary()
     c_tropoi_orepresentation_odiagnostics_oheld__suarez__sections_oSampleSelection : +to#95;dict()
-    class c_tropoi_orepresentation_odiagnostics_oheld__suarez__sections_oSectionAccumulator["SectionAccumulator (representation.diagnostics.held_suarez_sections)"]
+    class c_tropoi_orepresentation_odiagnostics_oheld__suarez__sections_oSectionAccumulator["SectionAccumulator (representation.diagnostics.held#95;suarez#95;sections)"]
     c_tropoi_orepresentation_odiagnostics_oheld__suarez__sections_oSectionAccumulator : +#95;#95;init#95;#95;()
     c_tropoi_orepresentation_odiagnostics_oheld__suarez__sections_oSectionAccumulator : +add()
     c_tropoi_orepresentation_odiagnostics_oheld__suarez__sections_oSectionAccumulator : +means()
-    class c_tropoi_orepresentation_odiagnostics_oheld__suarez__sections_oSectionError["SectionError (representation.diagnostics.held_suarez_sections)"]
+    class c_tropoi_orepresentation_odiagnostics_oheld__suarez__sections_oSectionError["SectionError (representation.diagnostics.held#95;suarez#95;sections)"]
     c_tropoi_orepresentation_odiagnostics_oheld__suarez__sections_oSectionError : external base ValueError
-    class c_tropoi_orepresentation_odiagnostics_oheld__suarez__sections_oSectionResult["SectionResult (representation.diagnostics.held_suarez_sections)"]
+    class c_tropoi_orepresentation_odiagnostics_oheld__suarez__sections_oSectionResult["SectionResult (representation.diagnostics.held#95;suarez#95;sections)"]
     c_tropoi_orepresentation_odiagnostics_oheld__suarez__sections_oSectionResult : +#95;#95;getitem#95;#95;()
     c_tropoi_orepresentation_odiagnostics_oheld__suarez__sections_oSectionResult : +states#95;sha256()
     class c_tropoi_orepresentation_odiagnostics_ope_oPEDiagnosticsRecorder["PEDiagnosticsRecorder (representation.diagnostics.pe)"]
@@ -117,32 +117,32 @@ classDiagram
     c_tropoi_orepresentation_odiagnostics_ope_oPEDiagnosticsRecorder : +#95;#95;init#95;#95;()
     c_tropoi_orepresentation_odiagnostics_ope_oPEDiagnosticsRecorder : +close()
     c_tropoi_orepresentation_odiagnostics_ope_oPEDiagnosticsRecorder : +record()
-    class c_tropoi_orepresentation_odiagnostics_ope__levels_oLevelFields["LevelFields (representation.diagnostics.pe_levels)"]
+    class c_tropoi_orepresentation_odiagnostics_ope__levels_oLevelFields["LevelFields (representation.diagnostics.pe#95;levels)"]
     c_tropoi_orepresentation_odiagnostics_ope__levels_oLevelFields : +#95;#95;getitem#95;#95;()
-    class c_tropoi_orepresentation_odiagnostics_ope__surfaces_oGeopotentialHeightSurface["GeopotentialHeightSurface (representation.diagnostics.pe_surfaces)"]
+    class c_tropoi_orepresentation_odiagnostics_ope__surfaces_oGeopotentialHeightSurface["GeopotentialHeightSurface (representation.diagnostics.pe#95;surfaces)"]
     c_tropoi_orepresentation_odiagnostics_ope__surfaces_oGeopotentialHeightSurface : +#95;#95;post#95;init#95;#95;()
     c_tropoi_orepresentation_odiagnostics_ope__surfaces_oGeopotentialHeightSurface : +label
     c_tropoi_orepresentation_odiagnostics_ope__surfaces_oGeopotentialHeightSurface : +value
-    class c_tropoi_orepresentation_odiagnostics_ope__surfaces_oPressureColumns["PressureColumns (representation.diagnostics.pe_surfaces)"]
+    class c_tropoi_orepresentation_odiagnostics_ope__surfaces_oPressureColumns["PressureColumns (representation.diagnostics.pe#95;surfaces)"]
     c_tropoi_orepresentation_odiagnostics_ope__surfaces_oPressureColumns : +nlev
     c_tropoi_orepresentation_odiagnostics_ope__surfaces_oPressureColumns : +sampled#95;height#95;range()
     c_tropoi_orepresentation_odiagnostics_ope__surfaces_oPressureColumns : +sampled#95;pressure#95;range()
     c_tropoi_orepresentation_odiagnostics_ope__surfaces_oPressureColumns : +stacks()
     c_tropoi_orepresentation_odiagnostics_ope__surfaces_oPressureColumns : +surface#95;geopotential()
     c_tropoi_orepresentation_odiagnostics_ope__surfaces_oPressureColumns : +winds
-    class c_tropoi_orepresentation_odiagnostics_ope__surfaces_oPressureSurface["PressureSurface (representation.diagnostics.pe_surfaces)"]
+    class c_tropoi_orepresentation_odiagnostics_ope__surfaces_oPressureSurface["PressureSurface (representation.diagnostics.pe#95;surfaces)"]
     c_tropoi_orepresentation_odiagnostics_ope__surfaces_oPressureSurface : +#95;#95;post#95;init#95;#95;()
     c_tropoi_orepresentation_odiagnostics_ope__surfaces_oPressureSurface : +label
     c_tropoi_orepresentation_odiagnostics_ope__surfaces_oPressureSurface : +value
-    class c_tropoi_orepresentation_odiagnostics_ope__surfaces_oSigmaSurface["SigmaSurface (representation.diagnostics.pe_surfaces)"]
+    class c_tropoi_orepresentation_odiagnostics_ope__surfaces_oSigmaSurface["SigmaSurface (representation.diagnostics.pe#95;surfaces)"]
     c_tropoi_orepresentation_odiagnostics_ope__surfaces_oSigmaSurface : +#95;#95;post#95;init#95;#95;()
     c_tropoi_orepresentation_odiagnostics_ope__surfaces_oSigmaSurface : +label
     c_tropoi_orepresentation_odiagnostics_ope__surfaces_oSigmaSurface : +value
-    class c_tropoi_orepresentation_odiagnostics_ope__surfaces_oSurfaceFields["SurfaceFields (representation.diagnostics.pe_surfaces)"]
+    class c_tropoi_orepresentation_odiagnostics_ope__surfaces_oSurfaceFields["SurfaceFields (representation.diagnostics.pe#95;surfaces)"]
     c_tropoi_orepresentation_odiagnostics_ope__surfaces_oSurfaceFields : +#95;#95;getitem#95;#95;()
     c_tropoi_orepresentation_odiagnostics_ope__surfaces_oSurfaceFields : +counts()
     c_tropoi_orepresentation_odiagnostics_ope__surfaces_oSurfaceFields : +valid
-    class c_tropoi_orepresentation_odiagnostics_ope__surfaces_oSurfaceUnavailableError["SurfaceUnavailableError (representation.diagnostics.pe_surfaces)"]
+    class c_tropoi_orepresentation_odiagnostics_ope__surfaces_oSurfaceUnavailableError["SurfaceUnavailableError (representation.diagnostics.pe#95;surfaces)"]
     c_tropoi_orepresentation_odiagnostics_ope__surfaces_oSurfaceUnavailableError : external base ValueError
     class c_tropoi_orepresentation_odiagnostics_ospectral_oSpectralComplexity["SpectralComplexity (representation.diagnostics.spectral)"]
     c_tropoi_orepresentation_odiagnostics_ospectral_oSpectralComplexity : +as#95;dict()

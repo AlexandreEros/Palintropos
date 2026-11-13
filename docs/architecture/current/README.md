@@ -5,7 +5,7 @@
 
 | | |
 |---|---|
-| Source base commit | `74729f475aa2d21dc48ab1ee3bb2c72aca13e71c` (clean working tree) |
+| Source base commit | `4235cbd8f02d7869971c6b7f00906a6439a0d35b` (clean working tree) |
 | Analysed package | `tropoi` under `src/` |
 | Generator | `tools.architecture` 2.2.0 |
 | Toolchain | Python 3.12, grimp 3.17, networkx 3.7 |
@@ -41,7 +41,7 @@ python -m tools.architecture.generate
 | `calls/sky-numpy-reference.mmd` | Scoped static call graph (roots and depth: see *Call graphs* below). |
 | `calls/sky-saved-column.mmd` | Scoped static call graph (roots and depth: see *Call graphs* below). |
 | `calls/terrain-raster.mmd` | Scoped static call graph (roots and depth: see *Call graphs* below). |
-| `class-atlas.html` | Offline explorer for the complete source containment tree. |
+| `class-atlas.html` | Offline explorer for the class containment tree. |
 | `class-inheritance.mmd` | Classes linked by inheritance between analysed classes. |
 | `coverage.json` | What was discovered, what is rendered, deliberate exclusions, static-analysis limits. |
 | `graph/calls.json` | Whole-package static call graph (all resolvable edges). |
@@ -79,7 +79,7 @@ python -m tools.architecture.generate
 | `packages/tropoi.spatial.transforms.md` | Package page: all of its modules, classes and public functions; imports in and out. |
 | `packages/tropoi.temporal.md` | Package page: all of its modules, classes and public functions; imports in and out. |
 | `packages/tropoi.temporal.tendencies.md` | Package page: all of its modules, classes and public functions; imports in and out. |
-| `structure.mmd` | Complete source containment tree of packages, Python files and class definitions. |
+| `structure.mmd` | Every class definition, with the Python files and directories that contain it. |
 
 Generated files contain no timestamps, absolute paths, or source line numbers, so they change only when the extracted structure changes (the call-site totals in `metrics.json` are the exception: they count call expressions).
 
@@ -139,7 +139,7 @@ The layers are the only input to this snapshot that states an expectation. They 
 
 ### Class containment tree (ast)
 
-The Mermaid tree and the offline atlas each contain every discovered Python file, its ancestor directories, and every class definition in those files. Class nodes belong to the nearest enclosing class, or to their file. Function-local classes include their lexical scope in the qualified name. File and line distinguish definitions that share a qualified name. Generation checks the rendered nodes and parents against a separate filesystem and AST scan.
+The Mermaid tree and the offline atlas each contain every class definition, the Python files that define classes, and the directories above those files. Files and directories without classes are left out. Mermaid labels show each node's own name; the atlas also shows its qualified path and source line. Class nodes belong to the nearest enclosing class, or to their file. Function-local classes include their lexical scope in the qualified name. File and line distinguish definitions that share a qualified name. Generation checks the rendered nodes and parents against a separate filesystem and AST scan.
 
 ### Class graph (ast)
 

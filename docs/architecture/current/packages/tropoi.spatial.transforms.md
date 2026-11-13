@@ -26,10 +26,10 @@ This package's modules and the import edges between them; every other package is
 flowchart LR
     subgraph g_tropoi_ospatial_otransforms["spatial.transforms"]
         n_tropoi_ospatial_otransforms["spatial.transforms"]
-        n_tropoi_ospatial_otransforms_ofast__geodesic__sh["spatial.transforms.fast_geodesic_sh"]
-        n_tropoi_ospatial_otransforms_ohost__synthesis["spatial.transforms.host_synthesis"]
-        n_tropoi_ospatial_otransforms_ooptimized__geodesic__sh["spatial.transforms.optimized_geodesic_sh"]
-        n_tropoi_ospatial_otransforms_ospherical__harmonics["spatial.transforms.spherical_harmonics"]
+        n_tropoi_ospatial_otransforms_ofast__geodesic__sh["spatial.transforms.fast#95;geodesic#95;sh"]
+        n_tropoi_ospatial_otransforms_ohost__synthesis["spatial.transforms.host#95;synthesis"]
+        n_tropoi_ospatial_otransforms_ooptimized__geodesic__sh["spatial.transforms.optimized#95;geodesic#95;sh"]
+        n_tropoi_ospatial_otransforms_ospherical__harmonics["spatial.transforms.spherical#95;harmonics"]
     end
     p_tropoi_orepresentation_odiagnostics["package representation.diagnostics"]
     p_tropoi_orepresentation_ovisual["package representation.visual"]
@@ -70,13 +70,13 @@ flowchart LR
 %% Classes of tropoi.spatial.transforms
 classDiagram
     direction LR
-    class c_tropoi_ospatial_otransforms_ofast__geodesic__sh_oPointSetSphericalHarmonics["PointSetSphericalHarmonics (spatial.transforms.fast_geodesic_sh)"]
+    class c_tropoi_ospatial_otransforms_ofast__geodesic__sh_oPointSetSphericalHarmonics["PointSetSphericalHarmonics (spatial.transforms.fast#95;geodesic#95;sh)"]
     c_tropoi_ospatial_otransforms_ofast__geodesic__sh_oPointSetSphericalHarmonics : +#95;#95;init#95;#95;()
     c_tropoi_ospatial_otransforms_ofast__geodesic__sh_oPointSetSphericalHarmonics : +inv#95;transform()
     c_tropoi_ospatial_otransforms_ofast__geodesic__sh_oPointSetSphericalHarmonics : +inv#95;transform#95;batch()
     c_tropoi_ospatial_otransforms_ofast__geodesic__sh_oPointSetSphericalHarmonics : +transform()
     c_tropoi_ospatial_otransforms_ofast__geodesic__sh_oPointSetSphericalHarmonics : +transform#95;batch()
-    class c_tropoi_ospatial_otransforms_ooptimized__geodesic__sh_oGeodesicSphericalHarmonics["GeodesicSphericalHarmonics (spatial.transforms.optimized_geodesic_sh)"]
+    class c_tropoi_ospatial_otransforms_ooptimized__geodesic__sh_oGeodesicSphericalHarmonics["GeodesicSphericalHarmonics (spatial.transforms.optimized#95;geodesic#95;sh)"]
     c_tropoi_ospatial_otransforms_ooptimized__geodesic__sh_oGeodesicSphericalHarmonics : +#95;#95;getattr#95;#95;()
     c_tropoi_ospatial_otransforms_ooptimized__geodesic__sh_oGeodesicSphericalHarmonics : +#95;#95;init#95;#95;()
     c_tropoi_ospatial_otransforms_ooptimized__geodesic__sh_oGeodesicSphericalHarmonics : +#95;compute#95;optimal#95;weights()$
@@ -85,7 +85,7 @@ classDiagram
     c_tropoi_ospatial_otransforms_ooptimized__geodesic__sh_oGeodesicSphericalHarmonics : +#95;save#95;cached#95;weights()
     c_tropoi_ospatial_otransforms_ooptimized__geodesic__sh_oGeodesicSphericalHarmonics : +inv#95;transform()
     c_tropoi_ospatial_otransforms_ooptimized__geodesic__sh_oGeodesicSphericalHarmonics : +transform()
-    class c_tropoi_ospatial_otransforms_ospherical__harmonics_oLatLonSphericalHarmonics["LatLonSphericalHarmonics (spatial.transforms.spherical_harmonics)"]
+    class c_tropoi_ospatial_otransforms_ospherical__harmonics_oLatLonSphericalHarmonics["LatLonSphericalHarmonics (spatial.transforms.spherical#95;harmonics)"]
     c_tropoi_ospatial_otransforms_ospherical__harmonics_oLatLonSphericalHarmonics : +#95;#95;init#95;#95;()
     c_tropoi_ospatial_otransforms_ospherical__harmonics_oLatLonSphericalHarmonics : +#95;factorial()
     c_tropoi_ospatial_otransforms_ospherical__harmonics_oLatLonSphericalHarmonics : +#95;normalization#95;factor()

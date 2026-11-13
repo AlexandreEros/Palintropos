@@ -29,15 +29,15 @@ flowchart LR
         n_tropoi_otemporal_otendencies["temporal.tendencies"]
         n_tropoi_otemporal_otendencies_obarotropic["temporal.tendencies.barotropic"]
         n_tropoi_otemporal_otendencies_odrag["temporal.tendencies.drag"]
-        n_tropoi_otemporal_otendencies_oheld__suarez["temporal.tendencies.held_suarez"]
-        n_tropoi_otemporal_otendencies_oprimitive__equations["temporal.tendencies.primitive_equations"]
-        n_tropoi_otemporal_otendencies_oshallow__water["temporal.tendencies.shallow_water"]
+        n_tropoi_otemporal_otendencies_oheld__suarez["temporal.tendencies.held#95;suarez"]
+        n_tropoi_otemporal_otendencies_oprimitive__equations["temporal.tendencies.primitive#95;equations"]
+        n_tropoi_otemporal_otendencies_oshallow__water["temporal.tendencies.shallow#95;water"]
     end
     p_tropoi_orepresentation_odiagnostics["package representation.diagnostics"]
     p_tropoi_orepresentation_ovisual["package representation.visual"]
     p_tropoi_orun_obve["package run.bve"]
     p_tropoi_orun_ocustom["package run.custom"]
-    p_tropoi_orun_oheld__suarez["package run.held_suarez"]
+    p_tropoi_orun_oheld__suarez["package run.held#95;suarez"]
     p_tropoi_orun_ope["package run.pe"]
     p_tropoi_orun_oradiative["package run.radiative"]
     p_tropoi_orun_oswe["package run.swe"]
@@ -108,15 +108,15 @@ classDiagram
     c_tropoi_otemporal_otendencies_odrag_oMomentumSinkHeating : +#95;#95;call#95;#95;()
     c_tropoi_otemporal_otendencies_odrag_oMomentumSinkHeating : +#95;#95;init#95;#95;()
     c_tropoi_otemporal_otendencies_odrag_oMomentumSinkHeating : +signature()
-    class c_tropoi_otemporal_otendencies_oheld__suarez_oHeldSuarezParameters["HeldSuarezParameters (temporal.tendencies.held_suarez)"]
+    class c_tropoi_otemporal_otendencies_oheld__suarez_oHeldSuarezParameters["HeldSuarezParameters (temporal.tendencies.held#95;suarez)"]
     c_tropoi_otemporal_otendencies_oheld__suarez_oHeldSuarezParameters : +#95;#95;post#95;init#95;#95;()
     c_tropoi_otemporal_otendencies_oheld__suarez_oHeldSuarezParameters : +as#95;dict()
-    class c_tropoi_otemporal_otendencies_oheld__suarez_oNewtonianRelaxation["NewtonianRelaxation (temporal.tendencies.held_suarez)"]
+    class c_tropoi_otemporal_otendencies_oheld__suarez_oNewtonianRelaxation["NewtonianRelaxation (temporal.tendencies.held#95;suarez)"]
     c_tropoi_otemporal_otendencies_oheld__suarez_oNewtonianRelaxation : +#95;#95;call#95;#95;()
     c_tropoi_otemporal_otendencies_oheld__suarez_oNewtonianRelaxation : +#95;#95;init#95;#95;()
     c_tropoi_otemporal_otendencies_oheld__suarez_oNewtonianRelaxation : +grid#95;fields()
     c_tropoi_otemporal_otendencies_oheld__suarez_oNewtonianRelaxation : +signature()
-    class c_tropoi_otemporal_otendencies_oprimitive__equations_oPrimitiveEquationsModel["PrimitiveEquationsModel (temporal.tendencies.primitive_equations)"]
+    class c_tropoi_otemporal_otendencies_oprimitive__equations_oPrimitiveEquationsModel["PrimitiveEquationsModel (temporal.tendencies.primitive#95;equations)"]
     c_tropoi_otemporal_otendencies_oprimitive__equations_oPrimitiveEquationsModel : +#95;#95;init#95;#95;()
     c_tropoi_otemporal_otendencies_oprimitive__equations_oPrimitiveEquationsModel : +#95;deriv#95;fields()
     c_tropoi_otemporal_otendencies_oprimitive__equations_oPrimitiveEquationsModel : +#95;inv#95;laplacian()
@@ -139,7 +139,7 @@ classDiagram
     c_tropoi_otemporal_otendencies_oprimitive__equations_oPrimitiveEquationsModel : +validate#95;state()
     c_tropoi_otemporal_otendencies_oprimitive__equations_oPrimitiveEquationsModel : +vertical#95;transport#95;diagnostics()
     c_tropoi_otemporal_otendencies_oprimitive__equations_oPrimitiveEquationsModel : +wind#95;on#95;state#95;grid()
-    class c_tropoi_otemporal_otendencies_oshallow__water_oShallowWaterModel["ShallowWaterModel (temporal.tendencies.shallow_water)"]
+    class c_tropoi_otemporal_otendencies_oshallow__water_oShallowWaterModel["ShallowWaterModel (temporal.tendencies.shallow#95;water)"]
     c_tropoi_otemporal_otendencies_oshallow__water_oShallowWaterModel : +#95;#95;init#95;#95;()
     c_tropoi_otemporal_otendencies_oshallow__water_oShallowWaterModel : +#95;deriv#95;fields()
     c_tropoi_otemporal_otendencies_oshallow__water_oShallowWaterModel : +#95;inv#95;laplacian()

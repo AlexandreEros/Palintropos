@@ -26,13 +26,13 @@ flowchart LR
     subgraph g_tropoi_ospatial_ostates["spatial.states"]
         n_tropoi_ospatial_ostates["spatial.states"]
         n_tropoi_ospatial_ostates_obarotropic["spatial.states.barotropic"]
-        n_tropoi_ospatial_ostates_oprimitive__equations["spatial.states.primitive_equations"]
-        n_tropoi_ospatial_ostates_oshallow__water["spatial.states.shallow_water"]
+        n_tropoi_ospatial_ostates_oprimitive__equations["spatial.states.primitive#95;equations"]
+        n_tropoi_ospatial_ostates_oshallow__water["spatial.states.shallow#95;water"]
     end
     p_tropoi_orepresentation_ovisual["package representation.visual"]
     p_tropoi_orun_obve["package run.bve"]
     p_tropoi_orun_ocustom["package run.custom"]
-    p_tropoi_orun_oheld__suarez["package run.held_suarez"]
+    p_tropoi_orun_oheld__suarez["package run.held#95;suarez"]
     p_tropoi_orun_oradiative["package run.radiative"]
     p_tropoi_ospatial_oinitialization["package spatial.initialization"]
     p_tropoi_otemporal["package temporal"]
@@ -69,7 +69,7 @@ flowchart LR
 classDiagram
     direction LR
     class c_tropoi_ospatial_ostates_obarotropic_oBarotropicState["BarotropicState (spatial.states.barotropic)"]
-    class c_tropoi_ospatial_ostates_oprimitive__equations_oPrimitiveEquationsState["PrimitiveEquationsState (spatial.states.primitive_equations)"]
+    class c_tropoi_ospatial_ostates_oprimitive__equations_oPrimitiveEquationsState["PrimitiveEquationsState (spatial.states.primitive#95;equations)"]
     c_tropoi_ospatial_ostates_oprimitive__equations_oPrimitiveEquationsState : +#95;#95;post#95;init#95;#95;()
     c_tropoi_ospatial_ostates_oprimitive__equations_oPrimitiveEquationsState : +delta
     c_tropoi_ospatial_ostates_oprimitive__equations_oPrimitiveEquationsState : +from#95;fields()$
@@ -78,15 +78,15 @@ classDiagram
     c_tropoi_ospatial_ostates_oprimitive__equations_oPrimitiveEquationsState : +temperature
     c_tropoi_ospatial_ostates_oprimitive__equations_oPrimitiveEquationsState : +zeros()$
     c_tropoi_ospatial_ostates_oprimitive__equations_oPrimitiveEquationsState : +zeta
-    class c_tropoi_ospatial_ostates_oprimitive__equations_oPrimitiveEquationsStateError["PrimitiveEquationsStateError (spatial.states.primitive_equations)"]
+    class c_tropoi_ospatial_ostates_oprimitive__equations_oPrimitiveEquationsStateError["PrimitiveEquationsStateError (spatial.states.primitive#95;equations)"]
     c_tropoi_ospatial_ostates_oprimitive__equations_oPrimitiveEquationsStateError : external base ValueError
-    class c_tropoi_ospatial_ostates_oshallow__water_oShallowWaterState["ShallowWaterState (spatial.states.shallow_water)"]
+    class c_tropoi_ospatial_ostates_oshallow__water_oShallowWaterState["ShallowWaterState (spatial.states.shallow#95;water)"]
     c_tropoi_ospatial_ostates_oshallow__water_oShallowWaterState : +delta
     c_tropoi_ospatial_ostates_oshallow__water_oShallowWaterState : +from#95;fields()$
     c_tropoi_ospatial_ostates_oshallow__water_oShallowWaterState : +phi
     c_tropoi_ospatial_ostates_oshallow__water_oShallowWaterState : +zeros()$
     c_tropoi_ospatial_ostates_oshallow__water_oShallowWaterState : +zeta
-    class c_tropoi_ospatial_ostates_oshallow__water_oShallowWaterStateError["ShallowWaterStateError (spatial.states.shallow_water)"]
+    class c_tropoi_ospatial_ostates_oshallow__water_oShallowWaterStateError["ShallowWaterStateError (spatial.states.shallow#95;water)"]
     c_tropoi_ospatial_ostates_oshallow__water_oShallowWaterStateError : external base ValueError
 ```
 

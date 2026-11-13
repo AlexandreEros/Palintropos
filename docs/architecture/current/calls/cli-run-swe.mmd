@@ -2,51 +2,51 @@
 %% Static call graph from tropoi.cli.main._cmd_run_swe, depth <= 4. Solid: call/instantiate/__init__/super. Dashed: self-dispatch and possible overrides. Dashed border: node with further calls beyond the depth cut.
 flowchart LR
     subgraph g_tropoi_ocli_omain["cli.main"]
-        n_tropoi_ocli_omain_o__cmd__run__swe["_cmd_run_swe()"]
-        n_tropoi_ocli_omain_orun__initial__state__command["run_initial_state_command()"]
+        n_tropoi_ocli_omain_o__cmd__run__swe["#95;cmd#95;run#95;swe()"]
+        n_tropoi_ocli_omain_orun__initial__state__command["run#95;initial#95;state#95;command()"]
     end
-    subgraph g_tropoi_orepresentation_oarchive_oinitial__state["representation.archive.initial_state"]
+    subgraph g_tropoi_orepresentation_oarchive_oinitial__state["representation.archive.initial#95;state"]
         n_tropoi_orepresentation_oarchive_oinitial__state_oInitialState{{"InitialState"}}
         n_tropoi_orepresentation_oarchive_oinitial__state_oInitialStateError{{"InitialStateError"}}
-        n_tropoi_orepresentation_oarchive_oinitial__state_o__canonical__json["_canonical_json()"]
-        n_tropoi_orepresentation_oarchive_oinitial__state_o__check__block["_check_block()"]
-        n_tropoi_orepresentation_oarchive_oinitial__state_o__load__array["_load_array()"]
-        n_tropoi_orepresentation_oarchive_oinitial__state_o__require__mapping["_require_mapping()"]
-        n_tropoi_orepresentation_oarchive_oinitial__state_oarray__digest["array_digest()"]
-        n_tropoi_orepresentation_oarchive_oinitial__state_oload__initial__state["load_initial_state()"]
+        n_tropoi_orepresentation_oarchive_oinitial__state_o__canonical__json["#95;canonical#95;json()"]
+        n_tropoi_orepresentation_oarchive_oinitial__state_o__check__block["#95;check#95;block()"]
+        n_tropoi_orepresentation_oarchive_oinitial__state_o__load__array["#95;load#95;array()"]
+        n_tropoi_orepresentation_oarchive_oinitial__state_o__require__mapping["#95;require#95;mapping()"]
+        n_tropoi_orepresentation_oarchive_oinitial__state_oarray__digest["array#95;digest()"]
+        n_tropoi_orepresentation_oarchive_oinitial__state_oload__initial__state["load#95;initial#95;state()"]
     end
     subgraph g_tropoi_orepresentation_oarchive_oschema["representation.archive.schema"]
         n_tropoi_orepresentation_oarchive_oschema_oSchemaError{{"SchemaError"}}
-        n_tropoi_orepresentation_oarchive_oschema_oStateSchema_ofrom__manifest__dict["StateSchema.from_manifest_dict()"]
+        n_tropoi_orepresentation_oarchive_oschema_oStateSchema_ofrom__manifest__dict["StateSchema.from#95;manifest#95;dict()"]
         n_tropoi_orepresentation_oarchive_oschema_oUnknownSchemaVersionError{{"UnknownSchemaVersionError"}}
         n_tropoi_orepresentation_oarchive_oschema_oUnsupportedConventionError{{"UnsupportedConventionError"}}
-        n_tropoi_orepresentation_oarchive_oschema_odiagnostic__definitions__for["diagnostic_definitions_for()"]
-        n_tropoi_orepresentation_oarchive_oschema_oprovenance__blocks["provenance_blocks()"]
-        n_tropoi_orepresentation_oarchive_oschema_ostate__schema__for["state_schema_for()"]
+        n_tropoi_orepresentation_oarchive_oschema_odiagnostic__definitions__for["diagnostic#95;definitions#95;for()"]
+        n_tropoi_orepresentation_oarchive_oschema_oprovenance__blocks["provenance#95;blocks()"]
+        n_tropoi_orepresentation_oarchive_oschema_ostate__schema__for["state#95;schema#95;for()"]
     end
     subgraph g_tropoi_orepresentation_oarchive_owriter["representation.archive.writer"]
         n_tropoi_orepresentation_oarchive_owriter_oRunDirectory{{"RunDirectory"}}
         n_tropoi_orepresentation_oarchive_owriter_oRunProvenanceError{{"RunProvenanceError"}}
-        n_tropoi_orepresentation_oarchive_owriter_o__git["_git()"]
-        n_tropoi_orepresentation_oarchive_owriter_o__sanitize["_sanitize()"]
-        n_tropoi_orepresentation_oarchive_owriter_o__short__commit["_short_commit()"]
-        n_tropoi_orepresentation_oarchive_owriter_oatomic__write__text["atomic_write_text()"]
-        n_tropoi_orepresentation_oarchive_owriter_ocreate__run__dir["create_run_dir()"]
-        n_tropoi_orepresentation_oarchive_owriter_ofailure__record["failure_record()"]
-        n_tropoi_orepresentation_oarchive_owriter_omake__run__id["make_run_id()"]
-        n_tropoi_orepresentation_oarchive_owriter_oupdate__manifest__status["update_manifest_status()"]
-        n_tropoi_orepresentation_oarchive_owriter_owrite__run__manifest["write_run_manifest()"]
+        n_tropoi_orepresentation_oarchive_owriter_o__git["#95;git()"]
+        n_tropoi_orepresentation_oarchive_owriter_o__sanitize["#95;sanitize()"]
+        n_tropoi_orepresentation_oarchive_owriter_o__short__commit["#95;short#95;commit()"]
+        n_tropoi_orepresentation_oarchive_owriter_oatomic__write__text["atomic#95;write#95;text()"]
+        n_tropoi_orepresentation_oarchive_owriter_ocreate__run__dir["create#95;run#95;dir()"]
+        n_tropoi_orepresentation_oarchive_owriter_ofailure__record["failure#95;record()"]
+        n_tropoi_orepresentation_oarchive_owriter_omake__run__id["make#95;run#95;id()"]
+        n_tropoi_orepresentation_oarchive_owriter_oupdate__manifest__status["update#95;manifest#95;status()"]
+        n_tropoi_orepresentation_oarchive_owriter_owrite__run__manifest["write#95;run#95;manifest()"]
     end
     subgraph g_tropoi_orepresentation_odiagnostics_oswe["representation.diagnostics.swe"]
         n_tropoi_orepresentation_odiagnostics_oswe_oSWEDiagnosticsRecorder{{"SWEDiagnosticsRecorder"}}
-        n_tropoi_orepresentation_odiagnostics_oswe_oplot__swe__diagnostics["plot_swe_diagnostics()"]
+        n_tropoi_orepresentation_odiagnostics_oswe_oplot__swe__diagnostics["plot#95;swe#95;diagnostics()"]
     end
     subgraph g_tropoi_orepresentation_ovisual_oswe["representation.visual.swe"]
-        n_tropoi_orepresentation_ovisual_oswe_orender__swe__snapshots["render_swe_snapshots()"]
-        n_tropoi_orepresentation_ovisual_oswe_orender__swe__summary["render_swe_summary()"]
+        n_tropoi_orepresentation_ovisual_oswe_orender__swe__snapshots["render#95;swe#95;snapshots()"]
+        n_tropoi_orepresentation_ovisual_oswe_orender__swe__summary["render#95;swe#95;summary()"]
     end
     subgraph g_tropoi_orun_obve_oconfig["run.bve.config"]
-        n_tropoi_orun_obve_oconfig_oBVERunConfig_o__resolve__plots["BVERunConfig._resolve_plots()"]
+        n_tropoi_orun_obve_oconfig_oBVERunConfig_o__resolve__plots["BVERunConfig.#95;resolve#95;plots()"]
     end
     subgraph g_tropoi_orun_obve_oexecution["run.bve.execution"]
         n_tropoi_orun_obve_oexecution_oOverwriteCleanupError{{"OverwriteCleanupError"}}
@@ -55,82 +55,82 @@ flowchart LR
         n_tropoi_orun_ocustom_oconfig_oCustomRunConfig_oresolve["CustomRunConfig.resolve()"]
     end
     subgraph g_tropoi_orun_ocustom_oexecute["run.custom.execute"]
-        n_tropoi_orun_ocustom_oexecute_o__clean__artifacts["_clean_artifacts()"]
-        n_tropoi_orun_ocustom_oexecute_o__execute__solver["_execute_solver()"]
-        n_tropoi_orun_ocustom_oexecute_o__integrate["_integrate()"]
-        n_tropoi_orun_ocustom_oexecute_o__notes["_notes()"]
-        n_tropoi_orun_ocustom_oexecute_o__persist__initial__state["_persist_initial_state()"]
-        n_tropoi_orun_ocustom_oexecute_o__resolve__base__dir["_resolve_base_dir()"]
-        n_tropoi_orun_ocustom_oexecute_oexecute__custom__run["execute_custom_run()"]
+        n_tropoi_orun_ocustom_oexecute_o__clean__artifacts["#95;clean#95;artifacts()"]
+        n_tropoi_orun_ocustom_oexecute_o__execute__solver["#95;execute#95;solver()"]
+        n_tropoi_orun_ocustom_oexecute_o__integrate["#95;integrate()"]
+        n_tropoi_orun_ocustom_oexecute_o__notes["#95;notes()"]
+        n_tropoi_orun_ocustom_oexecute_o__persist__initial__state["#95;persist#95;initial#95;state()"]
+        n_tropoi_orun_ocustom_oexecute_o__resolve__base__dir["#95;resolve#95;base#95;dir()"]
+        n_tropoi_orun_ocustom_oexecute_oexecute__custom__run["execute#95;custom#95;run()"]
     end
     subgraph g_tropoi_orun_olifecycle["run.lifecycle"]
-        n_tropoi_orun_olifecycle_oexecute__with__provenance["execute_with_provenance()"]
-        n_tropoi_orun_olifecycle_oresolve__writable__base__dir["resolve_writable_base_dir()"]
+        n_tropoi_orun_olifecycle_oexecute__with__provenance["execute#95;with#95;provenance()"]
+        n_tropoi_orun_olifecycle_oresolve__writable__base__dir["resolve#95;writable#95;base#95;dir()"]
     end
     subgraph g_tropoi_orun_oswe_oconfig["run.swe.config"]
-        n_tropoi_orun_oswe_oconfig_oSWERunConfig_o__resolve__plots["SWERunConfig._resolve_plots()"]
+        n_tropoi_orun_oswe_oconfig_oSWERunConfig_o__resolve__plots["SWERunConfig.#95;resolve#95;plots()"]
         n_tropoi_orun_oswe_oconfig_oSWERunConfig_oresolve["SWERunConfig.resolve()"]
     end
     subgraph g_tropoi_orun_oswe_oexecution["run.swe.execution"]
-        n_tropoi_orun_oswe_oexecution_o__clean__overwrite__artifacts["_clean_overwrite_artifacts()"]
-        n_tropoi_orun_oswe_oexecution_o__execute__solver["_execute_solver()"]
-        n_tropoi_orun_oswe_oexecution_o__manifest__notes["_manifest_notes()"]
-        n_tropoi_orun_oswe_oexecution_o__resolve__writable__base__dir["_resolve_writable_base_dir()"]
-        n_tropoi_orun_oswe_oexecution_oexecute__run["execute_run()"]
+        n_tropoi_orun_oswe_oexecution_o__clean__overwrite__artifacts["#95;clean#95;overwrite#95;artifacts()"]
+        n_tropoi_orun_oswe_oexecution_o__execute__solver["#95;execute#95;solver()"]
+        n_tropoi_orun_oswe_oexecution_o__manifest__notes["#95;manifest#95;notes()"]
+        n_tropoi_orun_oswe_oexecution_o__resolve__writable__base__dir["#95;resolve#95;writable#95;base#95;dir()"]
+        n_tropoi_orun_oswe_oexecution_oexecute__run["execute#95;run()"]
     end
     subgraph g_tropoi_orun_oswe_orunner["run.swe.runner"]
-        n_tropoi_orun_oswe_orunner_orun__swe["run_swe()"]
+        n_tropoi_orun_oswe_orunner_orun__swe["run#95;swe()"]
     end
     subgraph g_tropoi_ospatial_oenvironment["spatial.environment"]
-        n_tropoi_ospatial_oenvironment_oPlanetaryParameters_ofrom__earth__like["PlanetaryParameters.from_earth_like()"]
+        n_tropoi_ospatial_oenvironment_oPlanetaryParameters_ofrom__earth__like["PlanetaryParameters.from#95;earth#95;like()"]
     end
     subgraph g_tropoi_ospatial_oinitialization_oswe["spatial.initialization.swe"]
-        n_tropoi_ospatial_oinitialization_oswe_omake__swe__ic["make_swe_ic()"]
+        n_tropoi_ospatial_oinitialization_oswe_omake__swe__ic["make#95;swe#95;ic()"]
     end
     subgraph g_tropoi_ospatial_omodes["spatial.modes"]
-        n_tropoi_ospatial_omodes_oFieldSpec_ofrom__dict["FieldSpec.from_dict()"]
+        n_tropoi_ospatial_omodes_oFieldSpec_ofrom__dict["FieldSpec.from#95;dict()"]
     end
     subgraph g_tropoi_ospatial_oplanet["spatial.planet"]
         n_tropoi_ospatial_oplanet_oPlanet_ogenerate["Planet.generate()"]
     end
     subgraph g_tropoi_ospatial_ospecification["spatial.specification"]
-        n_tropoi_ospatial_ospecification_oDiscretizationSpec_ofrom__dict["DiscretizationSpec.from_dict()"]
-        n_tropoi_ospatial_ospecification_oFluidLayerSpec_ofrom__dict["FluidLayerSpec.from_dict()"]
-        n_tropoi_ospatial_ospecification_oPlanetSpec_ofrom__dict["PlanetSpec.from_dict()"]
+        n_tropoi_ospatial_ospecification_oDiscretizationSpec_ofrom__dict["DiscretizationSpec.from#95;dict()"]
+        n_tropoi_ospatial_ospecification_oFluidLayerSpec_ofrom__dict["FluidLayerSpec.from#95;dict()"]
+        n_tropoi_ospatial_ospecification_oPlanetSpec_ofrom__dict["PlanetSpec.from#95;dict()"]
         n_tropoi_ospatial_ospecification_oSpecificationError{{"SpecificationError"}}
-        n_tropoi_ospatial_ospecification_oTopographySpec_ofrom__dict["TopographySpec.from_dict()"]
-        n_tropoi_ospatial_ospecification_o__check__document["_check_document()"]
-        n_tropoi_ospatial_ospecification_o__check__statement["_check_statement()"]
+        n_tropoi_ospatial_ospecification_oTopographySpec_ofrom__dict["TopographySpec.from#95;dict()"]
+        n_tropoi_ospatial_ospecification_o__check__document["#95;check#95;document()"]
+        n_tropoi_ospatial_ospecification_o__check__statement["#95;check#95;statement()"]
     end
-    subgraph g_tropoi_ospatial_ostates_oshallow__water["spatial.states.shallow_water"]
+    subgraph g_tropoi_ospatial_ostates_oshallow__water["spatial.states.shallow#95;water"]
         n_tropoi_ospatial_ostates_oshallow__water_oShallowWaterState{{"ShallowWaterState"}}
     end
     subgraph g_tropoi_ospatial_oterrain_otopography["spatial.terrain.topography"]
         n_tropoi_ospatial_oterrain_otopography_oTopography{{"Topography"}}
         n_tropoi_ospatial_oterrain_otopography_oTopography_omountain["Topography.mountain()"]
-        n_tropoi_ospatial_oterrain_otopography_oTopography_owilliamson5__cone["Topography.williamson5_cone()"]
+        n_tropoi_ospatial_oterrain_otopography_oTopography_owilliamson5__cone["Topography.williamson5#95;cone()"]
     end
     subgraph g_tropoi_ospatial_otruncation["spatial.truncation"]
-        n_tropoi_ospatial_otruncation_oproduct__truncation__cut["product_truncation_cut()"]
-        n_tropoi_ospatial_otruncation_orequire__scenario__support["require_scenario_support()"]
+        n_tropoi_ospatial_otruncation_oproduct__truncation__cut["product#95;truncation#95;cut()"]
+        n_tropoi_ospatial_otruncation_orequire__scenario__support["require#95;scenario#95;support()"]
     end
     subgraph g_tropoi_otemporal_ointegration["temporal.integration"]
         n_tropoi_otemporal_ointegration_oIntegrationScheduler{{"IntegrationScheduler"}}
-        n_tropoi_otemporal_ointegration_o__require__finite__nonneg["_require_finite_nonneg()"]
-        n_tropoi_otemporal_ointegration_o__require__finite__number["_require_finite_number()"]
-        n_tropoi_otemporal_ointegration_o__require__finite__positive["_require_finite_positive()"]
-        n_tropoi_otemporal_ointegration_oadvective__cfl__timestep["advective_cfl_timestep()"]
-        n_tropoi_otemporal_ointegration_ocount__snapshot__times["count_snapshot_times()"]
+        n_tropoi_otemporal_ointegration_o__require__finite__nonneg["#95;require#95;finite#95;nonneg()"]
+        n_tropoi_otemporal_ointegration_o__require__finite__number["#95;require#95;finite#95;number()"]
+        n_tropoi_otemporal_ointegration_o__require__finite__positive["#95;require#95;finite#95;positive()"]
+        n_tropoi_otemporal_ointegration_oadvective__cfl__timestep["advective#95;cfl#95;timestep()"]
+        n_tropoi_otemporal_ointegration_ocount__snapshot__times["count#95;snapshot#95;times()"]
         n_tropoi_otemporal_ointegration_ointegrate["integrate()"]
-        n_tropoi_otemporal_ointegration_ointerval__snapshot__times["interval_snapshot_times()"]
-        n_tropoi_otemporal_ointegration_ork4__step__array["rk4_step_array()"]
-        n_tropoi_otemporal_ointegration_ovalidate__snapshot__schedule["validate_snapshot_schedule()"]
+        n_tropoi_otemporal_ointegration_ointerval__snapshot__times["interval#95;snapshot#95;times()"]
+        n_tropoi_otemporal_ointegration_ork4__step__array["rk4#95;step#95;array()"]
+        n_tropoi_otemporal_ointegration_ovalidate__snapshot__schedule["validate#95;snapshot#95;schedule()"]
     end
     subgraph g_tropoi_otemporal_omodels["temporal.models"]
-        n_tropoi_otemporal_omodels_o__w5__planet__params["_w5_planet_params()"]
-        n_tropoi_otemporal_omodels_obuild__swe__model["build_swe_model()"]
+        n_tropoi_otemporal_omodels_o__w5__planet__params["#95;w5#95;planet#95;params()"]
+        n_tropoi_otemporal_omodels_obuild__swe__model["build#95;swe#95;model()"]
     end
-    subgraph g_tropoi_otemporal_otendencies_oshallow__water["temporal.tendencies.shallow_water"]
+    subgraph g_tropoi_otemporal_otendencies_oshallow__water["temporal.tendencies.shallow#95;water"]
         n_tropoi_otemporal_otendencies_oshallow__water_oShallowWaterModel{{"ShallowWaterModel"}}
     end
     n_tropoi_ocli_omain_o__cmd__run__swe --> n_tropoi_ocli_omain_orun__initial__state__command

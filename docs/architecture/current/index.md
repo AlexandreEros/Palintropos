@@ -67,7 +67,7 @@ Explore class definitions in the [offline HTML atlas](class-atlas.html) or the [
 * Packages: 26 discovered, 26 with a page.
 * Import module records: 164 discovered (including namespace placeholders), 164 listed on a package page.
 * Classes: 209 discovered, 209 drawn on a package page (21 in [the inheritance overview](class-inheritance.mmd)).
-* Both containment views cover 26 packages, 163 Python files, 209 class definitions.
+* Both containment views cover 23 directories, 95 Python files, 209 class definitions, leaving out files and directories that define no class.
 * CLI handlers: 10 discovered, each with a call graph.
 * Public Python entry-point candidates: 30; 13 are roots of declared paths, 17 excluded with a reason.
 

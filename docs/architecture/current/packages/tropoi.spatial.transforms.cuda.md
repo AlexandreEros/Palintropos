@@ -23,7 +23,7 @@ This package's modules and the import edges between them; every other package is
 flowchart LR
     subgraph g_tropoi_ospatial_otransforms_ocuda["spatial.transforms.cuda"]
         n_tropoi_ospatial_otransforms_ocuda["spatial.transforms.cuda"]
-        n_tropoi_ospatial_otransforms_ocuda_ocuda__utils["spatial.transforms.cuda.cuda_utils"]
+        n_tropoi_ospatial_otransforms_ocuda_ocuda__utils["spatial.transforms.cuda.cuda#95;utils"]
     end
     p_tropoi_ocli["package cli"]
     p_tropoi_ospatial_otransforms["package spatial.transforms"]

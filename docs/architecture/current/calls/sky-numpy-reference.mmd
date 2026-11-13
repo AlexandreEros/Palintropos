@@ -2,16 +2,16 @@
 %% Static call graph from tropoi.representation.visual.sky.radiance_table, tropoi.representation.visual.sky.star_path_column, tropoi.representation.visual.sky.optical_depth_diagnostic, tropoi.spatial.optics.column.thin_atmosphere_mass_kg, tropoi.spatial.optics.column.thin_atmosphere_surface_pressure_pa, depth <= 4. Solid: call/instantiate/__init__/super. Dashed: self-dispatch and possible overrides. Dashed border: node with further calls beyond the depth cut.
 flowchart LR
     subgraph g_tropoi_orepresentation_ovisual_osky["representation.visual.sky"]
-        n_tropoi_orepresentation_ovisual_osky_o__density["_density()"]
-        n_tropoi_orepresentation_ovisual_osky_o__segments["_segments()"]
-        n_tropoi_orepresentation_ovisual_osky_odensity__grid["density_grid()"]
-        n_tropoi_orepresentation_ovisual_osky_ooptical__depth__diagnostic["optical_depth_diagnostic()"]
-        n_tropoi_orepresentation_ovisual_osky_oradiance__table["radiance_table()"]
-        n_tropoi_orepresentation_ovisual_osky_ostar__path__column["star_path_column()"]
+        n_tropoi_orepresentation_ovisual_osky_o__density["#95;density()"]
+        n_tropoi_orepresentation_ovisual_osky_o__segments["#95;segments()"]
+        n_tropoi_orepresentation_ovisual_osky_odensity__grid["density#95;grid()"]
+        n_tropoi_orepresentation_ovisual_osky_ooptical__depth__diagnostic["optical#95;depth#95;diagnostic()"]
+        n_tropoi_orepresentation_ovisual_osky_oradiance__table["radiance#95;table()"]
+        n_tropoi_orepresentation_ovisual_osky_ostar__path__column["star#95;path#95;column()"]
     end
     subgraph g_tropoi_ospatial_ooptics_ocolumn["spatial.optics.column"]
-        n_tropoi_ospatial_ooptics_ocolumn_othin__atmosphere__mass__kg["thin_atmosphere_mass_kg()"]
-        n_tropoi_ospatial_ooptics_ocolumn_othin__atmosphere__surface__pressure__pa["thin_atmosphere_surface_pressure_pa()"]
+        n_tropoi_ospatial_ooptics_ocolumn_othin__atmosphere__mass__kg["thin#95;atmosphere#95;mass#95;kg()"]
+        n_tropoi_ospatial_ooptics_ocolumn_othin__atmosphere__surface__pressure__pa["thin#95;atmosphere#95;surface#95;pressure#95;pa()"]
     end
     n_tropoi_orepresentation_ovisual_osky_oradiance__table --> n_tropoi_orepresentation_ovisual_osky_o__density
     n_tropoi_orepresentation_ovisual_osky_oradiance__table --> n_tropoi_orepresentation_ovisual_osky_o__segments

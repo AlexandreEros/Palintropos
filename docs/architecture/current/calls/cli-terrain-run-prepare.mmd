@@ -2,73 +2,73 @@
 %% Static call graph from tropoi.cli.terrain.run_prepare, depth <= 4. Solid: call/instantiate/__init__/super. Dashed: self-dispatch and possible overrides. Dashed border: node with further calls beyond the depth cut.
 flowchart LR
     subgraph g_tropoi_ocli_oterrain["cli.terrain"]
-        n_tropoi_ocli_oterrain_o__fail["_fail()"]
-        n_tropoi_ocli_oterrain_o__source__label["_source_label()"]
-        n_tropoi_ocli_oterrain_obuild__raster["build_raster()"]
-        n_tropoi_ocli_oterrain_odefault__gauss__grid["default_gauss_grid()"]
-        n_tropoi_ocli_oterrain_orun__prepare["run_prepare()"]
+        n_tropoi_ocli_oterrain_o__fail["#95;fail()"]
+        n_tropoi_ocli_oterrain_o__source__label["#95;source#95;label()"]
+        n_tropoi_ocli_oterrain_obuild__raster["build#95;raster()"]
+        n_tropoi_ocli_oterrain_odefault__gauss__grid["default#95;gauss#95;grid()"]
+        n_tropoi_ocli_oterrain_orun__prepare["run#95;prepare()"]
     end
-    subgraph g_tropoi_orepresentation_oarchive_oprepared__terrain["representation.archive.prepared_terrain"]
-        n_tropoi_orepresentation_oarchive_oprepared__terrain_ois__prepared__terrain["is_prepared_terrain()"]
+    subgraph g_tropoi_orepresentation_oarchive_oprepared__terrain["representation.archive.prepared#95;terrain"]
+        n_tropoi_orepresentation_oarchive_oprepared__terrain_ois__prepared__terrain["is#95;prepared#95;terrain()"]
     end
     subgraph g_tropoi_orun_ocustom_oplanet["run.custom.planet"]
         n_tropoi_orun_ocustom_oplanet_oPreparedPlanet{{"PreparedPlanet"}}
-        n_tropoi_orun_ocustom_oplanet_o__measure__after__cut["_measure_after_cut()"]
-        n_tropoi_orun_ocustom_oplanet_oprepare__planet["prepare_planet()"]
+        n_tropoi_orun_ocustom_oplanet_o__measure__after__cut["#95;measure#95;after#95;cut()"]
+        n_tropoi_orun_ocustom_oplanet_oprepare__planet["prepare#95;planet()"]
     end
     subgraph g_tropoi_orun_ocustom_oresources["run.custom.resources"]
         n_tropoi_orun_ocustom_oresources_oPreparationError{{"PreparationError"}}
-        n_tropoi_orun_ocustom_oresources_oPreparationError_o____init____["PreparationError.__init__()"]
-        n_tropoi_orun_ocustom_oresources_obase__config["base_config()"]
-        n_tropoi_orun_ocustom_oresources_obuild__spec__planet["build_spec_planet()"]
-        n_tropoi_orun_ocustom_oresources_ocheck__specs["check_specs()"]
-        n_tropoi_orun_ocustom_oresources_oresolve__topography["resolve_topography()"]
+        n_tropoi_orun_ocustom_oresources_oPreparationError_o____init____["PreparationError.#95;#95;init#95;#95;()"]
+        n_tropoi_orun_ocustom_oresources_obase__config["base#95;config()"]
+        n_tropoi_orun_ocustom_oresources_obuild__spec__planet["build#95;spec#95;planet()"]
+        n_tropoi_orun_ocustom_oresources_ocheck__specs["check#95;specs()"]
+        n_tropoi_orun_ocustom_oresources_oresolve__topography["resolve#95;topography()"]
     end
     subgraph g_tropoi_ospatial_oenvironment["spatial.environment"]
-        n_tropoi_ospatial_oenvironment_oPlanetaryParameters_ofrom__earth__like["PlanetaryParameters.from_earth_like()"]
+        n_tropoi_ospatial_oenvironment_oPlanetaryParameters_ofrom__earth__like["PlanetaryParameters.from#95;earth#95;like()"]
     end
     subgraph g_tropoi_ospatial_oplanet["spatial.planet"]
         n_tropoi_ospatial_oplanet_oPlanet_ogenerate["Planet.generate()"]
     end
     subgraph g_tropoi_ospatial_ospecification["spatial.specification"]
-        n_tropoi_ospatial_ospecification_oDiscretizationSpec_ogauss__latlon["DiscretizationSpec.gauss_latlon()"]
-        n_tropoi_ospatial_ospecification_oPlanetSpec_oearth__like["PlanetSpec.earth_like()"]
-        n_tropoi_ospatial_ospecification_oPlanetSpec_ofrom__dict["PlanetSpec.from_dict()"]
+        n_tropoi_ospatial_ospecification_oDiscretizationSpec_ogauss__latlon["DiscretizationSpec.gauss#95;latlon()"]
+        n_tropoi_ospatial_ospecification_oPlanetSpec_oearth__like["PlanetSpec.earth#95;like()"]
+        n_tropoi_ospatial_ospecification_oPlanetSpec_ofrom__dict["PlanetSpec.from#95;dict()"]
         n_tropoi_ospatial_ospecification_oPlanetSpec_ooblate["PlanetSpec.oblate()"]
         n_tropoi_ospatial_ospecification_oTopographySpec_oflat["TopographySpec.flat()"]
         n_tropoi_ospatial_ospecification_oTopographySpec_oimported["TopographySpec.imported()"]
-        n_tropoi_ospatial_ospecification_o__day__or__none["_day_or_none()"]
+        n_tropoi_ospatial_ospecification_o__day__or__none["#95;day#95;or#95;none()"]
     end
-    subgraph g_tropoi_ospatial_oterrain_oheight__function["spatial.terrain.height_function"]
+    subgraph g_tropoi_ospatial_oterrain_oheight__function["spatial.terrain.height#95;function"]
         n_tropoi_ospatial_oterrain_oheight__function_oHeightExpression{{"HeightExpression"}}
         n_tropoi_ospatial_oterrain_oheight__function_oHeightFunctionError{{"HeightFunctionError"}}
-        n_tropoi_ospatial_oterrain_oheight__function_o__check__result["_check_result()"]
-        n_tropoi_ospatial_oterrain_oheight__function_oload__height__function["load_height_function()"]
-        n_tropoi_ospatial_oterrain_oheight__function_osample__height__function["sample_height_function()"]
-        n_tropoi_ospatial_oterrain_oheight__function_osampling__grid["sampling_grid()"]
+        n_tropoi_ospatial_oterrain_oheight__function_o__check__result["#95;check#95;result()"]
+        n_tropoi_ospatial_oterrain_oheight__function_oload__height__function["load#95;height#95;function()"]
+        n_tropoi_ospatial_oterrain_oheight__function_osample__height__function["sample#95;height#95;function()"]
+        n_tropoi_ospatial_oterrain_oheight__function_osampling__grid["sampling#95;grid()"]
     end
     subgraph g_tropoi_ospatial_oterrain_oraster["spatial.terrain.raster"]
-        n_tropoi_ospatial_oterrain_oraster_oElevationRaster_ofrom__array["ElevationRaster.from_array()"]
-        n_tropoi_ospatial_oterrain_oraster_oElevationRaster_ofrom__expression["ElevationRaster.from_expression()"]
-        n_tropoi_ospatial_oterrain_oraster_oElevationRaster_ofrom__function["ElevationRaster.from_function()"]
-        n_tropoi_ospatial_oterrain_oraster_o__normalize__axes["_normalize_axes()"]
-        n_tropoi_ospatial_oterrain_oraster_oworking__resolution__deg["working_resolution_deg()"]
+        n_tropoi_ospatial_oterrain_oraster_oElevationRaster_ofrom__array["ElevationRaster.from#95;array()"]
+        n_tropoi_ospatial_oterrain_oraster_oElevationRaster_ofrom__expression["ElevationRaster.from#95;expression()"]
+        n_tropoi_ospatial_oterrain_oraster_oElevationRaster_ofrom__function["ElevationRaster.from#95;function()"]
+        n_tropoi_ospatial_oterrain_oraster_o__normalize__axes["#95;normalize#95;axes()"]
+        n_tropoi_ospatial_oterrain_oraster_oworking__resolution__deg["working#95;resolution#95;deg()"]
     end
     subgraph g_tropoi_ospatial_oterrain_otopography["spatial.terrain.topography"]
-        n_tropoi_ospatial_oterrain_otopography_oTopography_ofrom__raster["Topography.from_raster()"]
+        n_tropoi_ospatial_oterrain_otopography_oTopography_ofrom__raster["Topography.from#95;raster()"]
         n_tropoi_ospatial_oterrain_otopography_oTopography_omountain["Topography.mountain()"]
-        n_tropoi_ospatial_oterrain_otopography_oTopography_owilliamson5__cone["Topography.williamson5_cone()"]
+        n_tropoi_ospatial_oterrain_otopography_oTopography_owilliamson5__cone["Topography.williamson5#95;cone()"]
         n_tropoi_ospatial_oterrain_otopography_oTopographyError{{"TopographyError"}}
-        n_tropoi_ospatial_oterrain_otopography_o__analyze__elevation["_analyze_elevation()"]
-        n_tropoi_ospatial_oterrain_otopography_o__require["_require()"]
-        n_tropoi_ospatial_oterrain_otopography_ospectral__smoothing__factors["spectral_smoothing_factors()"]
-        n_tropoi_ospatial_oterrain_otopography_owilliamson5__cone__elevation["williamson5_cone_elevation()"]
+        n_tropoi_ospatial_oterrain_otopography_o__analyze__elevation["#95;analyze#95;elevation()"]
+        n_tropoi_ospatial_oterrain_otopography_o__require["#95;require()"]
+        n_tropoi_ospatial_oterrain_otopography_ospectral__smoothing__factors["spectral#95;smoothing#95;factors()"]
+        n_tropoi_ospatial_oterrain_otopography_owilliamson5__cone__elevation["williamson5#95;cone#95;elevation()"]
     end
     subgraph g_tropoi_ospatial_otruncation["spatial.truncation"]
-        n_tropoi_ospatial_otruncation_oproduct__truncation__cut["product_truncation_cut()"]
+        n_tropoi_ospatial_otruncation_oproduct__truncation__cut["product#95;truncation#95;cut()"]
     end
     subgraph g_tropoi_otemporal_omodels["temporal.models"]
-        n_tropoi_otemporal_omodels_obuild__planet["build_planet()"]
+        n_tropoi_otemporal_omodels_obuild__planet["build#95;planet()"]
     end
     n_tropoi_ocli_oterrain_obuild__raster -->|instantiate| n_tropoi_ospatial_oterrain_oheight__function_oHeightFunctionError
     n_tropoi_ocli_oterrain_obuild__raster --> n_tropoi_ospatial_oterrain_oheight__function_oload__height__function
@@ -95,7 +95,7 @@ flowchart LR
     n_tropoi_orun_ocustom_oplanet_oprepare__planet --> n_tropoi_ospatial_oterrain_otopography_oTopography_ofrom__raster
     n_tropoi_orun_ocustom_oplanet_oprepare__planet --> n_tropoi_ospatial_oterrain_otopography_oTopography_omountain
     n_tropoi_orun_ocustom_oplanet_oprepare__planet --> n_tropoi_ospatial_otruncation_oproduct__truncation__cut
-    n_tropoi_orun_ocustom_oresources_oPreparationError -->|__init__| n_tropoi_orun_ocustom_oresources_oPreparationError_o____init____
+    n_tropoi_orun_ocustom_oresources_oPreparationError -->|#95;#95;init#95;#95;| n_tropoi_orun_ocustom_oresources_oPreparationError_o____init____
     n_tropoi_orun_ocustom_oresources_obuild__spec__planet --> n_tropoi_orun_ocustom_oresources_obase__config
     n_tropoi_orun_ocustom_oresources_obuild__spec__planet --> n_tropoi_otemporal_omodels_obuild__planet
     n_tropoi_orun_ocustom_oresources_ocheck__specs -->|instantiate| n_tropoi_orun_ocustom_oresources_oPreparationError

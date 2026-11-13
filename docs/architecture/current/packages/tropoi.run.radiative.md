@@ -26,14 +26,14 @@ This package's modules and the import edges between them; every other package is
 flowchart LR
     subgraph g_tropoi_orun_oradiative["run.radiative"]
         n_tropoi_orun_oradiative["run.radiative"]
-        n_tropoi_orun_oradiative_o____main____["run.radiative.__main__"]
+        n_tropoi_orun_oradiative_o____main____["run.radiative.#95;#95;main#95;#95;"]
         n_tropoi_orun_oradiative_oconfig["run.radiative.config"]
         n_tropoi_orun_oradiative_oexperiment["run.radiative.experiment"]
         n_tropoi_orun_oradiative_omodel["run.radiative.model"]
     end
     p_tropoi_ophysics["package physics"]
     p_tropoi_ophysics_oradiation["package physics.radiation"]
-    p_tropoi_orun_oheld__suarez["package run.held_suarez"]
+    p_tropoi_orun_oheld__suarez["package run.held#95;suarez"]
     p_tropoi_ospatial["package spatial"]
     p_tropoi_ospatial_ostates["package spatial.states"]
     p_tropoi_otemporal["package temporal"]

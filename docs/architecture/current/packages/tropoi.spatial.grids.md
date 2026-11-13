@@ -29,13 +29,13 @@ This package's modules and the import edges between them; every other package is
 flowchart LR
     subgraph g_tropoi_ospatial_ogrids["spatial.grids"]
         n_tropoi_ospatial_ogrids["spatial.grids"]
-        n_tropoi_ospatial_ogrids_ocartesian__to__spherical["spatial.grids.cartesian_to_spherical"]
-        n_tropoi_ospatial_ogrids_ogeodesic__grid["spatial.grids.geodesic_grid"]
+        n_tropoi_ospatial_ogrids_ocartesian__to__spherical["spatial.grids.cartesian#95;to#95;spherical"]
+        n_tropoi_ospatial_ogrids_ogeodesic__grid["spatial.grids.geodesic#95;grid"]
         n_tropoi_ospatial_ogrids_ogrid["spatial.grids.grid"]
-        n_tropoi_ospatial_ogrids_ogrid__base["spatial.grids.grid_base"]
-        n_tropoi_ospatial_ogrids_ogrid__interpolation["spatial.grids.grid_interpolation"]
+        n_tropoi_ospatial_ogrids_ogrid__base["spatial.grids.grid#95;base"]
+        n_tropoi_ospatial_ogrids_ogrid__interpolation["spatial.grids.grid#95;interpolation"]
         n_tropoi_ospatial_ogrids_ointegration["spatial.grids.integration"]
-        n_tropoi_ospatial_ogrids_olatlon__grid["spatial.grids.latlon_grid"]
+        n_tropoi_ospatial_ogrids_olatlon__grid["spatial.grids.latlon#95;grid"]
     end
     p_tropoi_orepresentation_ovisual["package representation.visual"]
     p_tropoi_ospatial["package spatial"]
@@ -74,7 +74,7 @@ flowchart LR
 %% Classes of tropoi.spatial.grids
 classDiagram
     direction LR
-    class c_tropoi_ospatial_ogrids_ogeodesic__grid_oGeodesicGridGeometry["GeodesicGridGeometry (spatial.grids.geodesic_grid)"]
+    class c_tropoi_ospatial_ogrids_ogeodesic__grid_oGeodesicGridGeometry["GeodesicGridGeometry (spatial.grids.geodesic#95;grid)"]
     c_tropoi_ospatial_ogrids_ogeodesic__grid_oGeodesicGridGeometry : +#95;#95;init#95;#95;()
     c_tropoi_ospatial_ogrids_ogeodesic__grid_oGeodesicGridGeometry : +#95;compute#95;voronoi#95;areas()
     c_tropoi_ospatial_ogrids_ogeodesic__grid_oGeodesicGridGeometry : +#95;get#95;midpoint#95;index()$
@@ -100,7 +100,7 @@ classDiagram
     c_tropoi_ospatial_ogrids_ogrid_oLatLonGridGeometry : +n#95;points
     c_tropoi_ospatial_ogrids_ogrid_oLatLonGridGeometry : +point#95;latitudes
     c_tropoi_ospatial_ogrids_ogrid_oLatLonGridGeometry : +point#95;longitudes
-    class c_tropoi_ospatial_ogrids_ogrid__base_oGridGeometry["GridGeometry (spatial.grids.grid_base)"]
+    class c_tropoi_ospatial_ogrids_ogrid__base_oGridGeometry["GridGeometry (spatial.grids.grid#95;base)"]
     c_tropoi_ospatial_ogrids_ogrid__base_oGridGeometry : +cfl#95;length#95;scale
     c_tropoi_ospatial_ogrids_ogrid__base_oGridGeometry : +colatitudes
     c_tropoi_ospatial_ogrids_ogrid__base_oGridGeometry : +grid#95;shape
@@ -110,7 +110,7 @@ classDiagram
     c_tropoi_ospatial_ogrids_ogrid__base_oGridGeometry : +point#95;latitudes
     c_tropoi_ospatial_ogrids_ogrid__base_oGridGeometry : +point#95;longitudes
     c_tropoi_ospatial_ogrids_ogrid__base_oGridGeometry : external base abc.ABC
-    class c_tropoi_ospatial_ogrids_olatlon__grid_oGaussLatLonGridGeometry["GaussLatLonGridGeometry (spatial.grids.latlon_grid)"]
+    class c_tropoi_ospatial_ogrids_olatlon__grid_oGaussLatLonGridGeometry["GaussLatLonGridGeometry (spatial.grids.latlon#95;grid)"]
     c_tropoi_ospatial_ogrids_olatlon__grid_oGaussLatLonGridGeometry : +#95;#95;init#95;#95;()
     c_tropoi_ospatial_ogrids_olatlon__grid_oGaussLatLonGridGeometry : +cell#95;areas
     c_tropoi_ospatial_ogrids_olatlon__grid_oGaussLatLonGridGeometry : +cfl#95;length#95;scale
@@ -120,7 +120,7 @@ classDiagram
     c_tropoi_ospatial_ogrids_olatlon__grid_oGaussLatLonGridGeometry : +n#95;points
     c_tropoi_ospatial_ogrids_olatlon__grid_oGaussLatLonGridGeometry : +point#95;latitudes
     c_tropoi_ospatial_ogrids_olatlon__grid_oGaussLatLonGridGeometry : +point#95;longitudes
-    class c_tropoi_ospatial_ogrids_olatlon__grid_oGaussLatLonSphericalHarmonics["GaussLatLonSphericalHarmonics (spatial.grids.latlon_grid)"]
+    class c_tropoi_ospatial_ogrids_olatlon__grid_oGaussLatLonSphericalHarmonics["GaussLatLonSphericalHarmonics (spatial.grids.latlon#95;grid)"]
     c_tropoi_ospatial_ogrids_olatlon__grid_oGaussLatLonSphericalHarmonics : +#95;#95;getattr#95;#95;()
     c_tropoi_ospatial_ogrids_olatlon__grid_oGaussLatLonSphericalHarmonics : +#95;#95;init#95;#95;()
     c_tropoi_ospatial_ogrids_olatlon__grid_oGaussLatLonSphericalHarmonics : +inv#95;transform()

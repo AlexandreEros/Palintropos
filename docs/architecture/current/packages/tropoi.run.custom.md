@@ -149,7 +149,7 @@ classDiagram
     c_tropoi_orun_ocustom_oprepare_oSpectralCoefficients : +#95;#95;post#95;init#95;#95;()
     c_tropoi_orun_ocustom_oprepare_oSpectralCoefficients : +l#95;max
     class c_tropoi_orun_ocustom_oprepare_oStateSampling["StateSampling (run.custom.prepare)"]
-    class c_tropoi_orun_ocustom_oprepare_o__Resources["_Resources (run.custom.prepare)"]
+    class c_tropoi_orun_ocustom_oprepare_o__Resources["#95;Resources (run.custom.prepare)"]
     c_tropoi_orun_ocustom_oprepare_o__Resources : +#95;#95;init#95;#95;()
     c_tropoi_orun_ocustom_oprepare_o__Resources : +planet
     c_tropoi_orun_ocustom_oprepare_o__Resources : +sampling

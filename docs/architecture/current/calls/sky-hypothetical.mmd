@@ -2,24 +2,24 @@
 %% Static call graph from tropoi.representation.visual.sky.write_sky_page, tropoi.representation.visual.sky.standalone_page, depth <= 4. Solid: call/instantiate/__init__/super. Dashed: self-dispatch and possible overrides. Dashed border: node with further calls beyond the depth cut.
 flowchart LR
     subgraph g_tropoi_orepresentation_ovisual_osky["representation.visual.sky"]
-        n_tropoi_orepresentation_ovisual_osky_o__default__path["_default_path()"]
-        n_tropoi_orepresentation_ovisual_osky_o__hypothetical__block["_hypothetical_block()"]
-        n_tropoi_orepresentation_ovisual_osky_o__open["_open()"]
-        n_tropoi_orepresentation_ovisual_osky_o__optics__block["_optics_block()"]
-        n_tropoi_orepresentation_ovisual_osky_o__species__block["_species_block()"]
-        n_tropoi_orepresentation_ovisual_osky_o__write__page["_write_page()"]
-        n_tropoi_orepresentation_ovisual_osky_orender__page["render_page()"]
-        n_tropoi_orepresentation_ovisual_osky_osky__block["sky_block()"]
-        n_tropoi_orepresentation_ovisual_osky_ostandalone__page["standalone_page()"]
-        n_tropoi_orepresentation_ovisual_osky_owrite__sky__page["write_sky_page()"]
+        n_tropoi_orepresentation_ovisual_osky_o__default__path["#95;default#95;path()"]
+        n_tropoi_orepresentation_ovisual_osky_o__hypothetical__block["#95;hypothetical#95;block()"]
+        n_tropoi_orepresentation_ovisual_osky_o__open["#95;open()"]
+        n_tropoi_orepresentation_ovisual_osky_o__optics__block["#95;optics#95;block()"]
+        n_tropoi_orepresentation_ovisual_osky_o__species__block["#95;species#95;block()"]
+        n_tropoi_orepresentation_ovisual_osky_o__write__page["#95;write#95;page()"]
+        n_tropoi_orepresentation_ovisual_osky_orender__page["render#95;page()"]
+        n_tropoi_orepresentation_ovisual_osky_osky__block["sky#95;block()"]
+        n_tropoi_orepresentation_ovisual_osky_ostandalone__page["standalone#95;page()"]
+        n_tropoi_orepresentation_ovisual_osky_owrite__sky__page["write#95;sky#95;page()"]
     end
     subgraph g_tropoi_ospatial_ooptics_ocolour["spatial.optics.colour"]
-        n_tropoi_ospatial_ooptics_ocolour_obin__weights["bin_weights()"]
-        n_tropoi_ospatial_ooptics_ocolour_ocie__1931["cie_1931()"]
-        n_tropoi_ospatial_ooptics_ocolour_oomitted__fraction["omitted_fraction()"]
+        n_tropoi_ospatial_ooptics_ocolour_obin__weights["bin#95;weights()"]
+        n_tropoi_ospatial_ooptics_ocolour_ocie__1931["cie#95;1931()"]
+        n_tropoi_ospatial_ooptics_ocolour_oomitted__fraction["omitted#95;fraction()"]
     end
     subgraph g_tropoi_ospatial_ooptics_ocomposition["spatial.optics.composition"]
-        n_tropoi_ospatial_ooptics_ocomposition_ogas__constant__report["gas_constant_report()"]
+        n_tropoi_ospatial_ooptics_ocomposition_ogas__constant__report["gas#95;constant#95;report()"]
     end
     n_tropoi_orepresentation_ovisual_osky_o__hypothetical__block --> n_tropoi_orepresentation_ovisual_osky_osky__block
     n_tropoi_orepresentation_ovisual_osky_o__optics__block --> n_tropoi_ospatial_ooptics_ocolour_obin__weights

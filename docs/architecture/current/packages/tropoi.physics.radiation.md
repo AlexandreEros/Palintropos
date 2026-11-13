@@ -87,7 +87,7 @@ classDiagram
     c_tropoi_ophysics_oradiation_okdist_oKTable : +n#95;band
     c_tropoi_ophysics_oradiation_okdist_oKTable : +n#95;g
     c_tropoi_ophysics_oradiation_okdist_oKTable : +save()
-    class c_tropoi_ophysics_oradiation_okdist_o__CorrelatedK["_CorrelatedK (physics.radiation.kdist)"]
+    class c_tropoi_ophysics_oradiation_okdist_o__CorrelatedK["#95;CorrelatedK (physics.radiation.kdist)"]
     c_tropoi_ophysics_oradiation_okdist_o__CorrelatedK : +#95;#95;init#95;#95;()
     c_tropoi_ophysics_oradiation_okdist_o__CorrelatedK : +#95;layer#95;k()
     c_tropoi_ophysics_oradiation_okdist_o__CorrelatedK : +#95;signature()

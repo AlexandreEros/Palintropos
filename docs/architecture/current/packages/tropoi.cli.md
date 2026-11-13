@@ -26,8 +26,8 @@ This package's modules and the import edges between them; every other package is
 flowchart LR
     subgraph g_tropoi_ocli["cli"]
         n_tropoi_ocli["cli"]
-        n_tropoi_ocli_oclear__cache["cli.clear_cache"]
-        n_tropoi_ocli_ogenerate__planet["cli.generate_planet"]
+        n_tropoi_ocli_oclear__cache["cli.clear#95;cache"]
+        n_tropoi_ocli_ogenerate__planet["cli.generate#95;planet"]
         n_tropoi_ocli_omain["cli.main"]
         n_tropoi_ocli_oterrain["cli.terrain"]
     end
