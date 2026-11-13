@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import json
 import math
+import pathlib
 
 import numpy as np
 import pytest
@@ -59,21 +60,89 @@ def _planet_config(name: str, **changes) -> RadiativeConfig:
         initial={"kind": "isothermal", "temperature": body.reference_temperature}), **changes)
 
 
-def test_frictional_heating_is_opt_in_and_leaves_existing_hashes_alone():
-    """The option is written into the canonical configuration only when
-    set, so the hashes of the runs recorded before it existed (docs/
-    radiation/evidence) are still the hashes of the presets."""
-    recorded = {"earth-gray-dry": "e31ae183937da3bc9c5a63cbaf5c889bbeefc384a2f70b81e529b7a6965890d5",
-                "jupiter-schneider-liu":
-                    "80f280d2005fd86a2415f29dabbd90e126e75232b98bbe203b88fd913333d189"}
-    for name, digest in recorded.items():
-        cfg = PRESETS[name]()
+EVIDENCE = pathlib.Path(__file__).resolve().parents[1] / "docs" / "radiation" / "evidence"
+
+# (preset, evidence run with frictional heating, evidence run without, their hashes)
+PRESET_IDENTITIES = [
+    ("earth-gray-dry", "earth-gray-dry-heated-T21L25-300d", "earth-gray-dry-T21L25-300d",
+     "748cec4b", "e31ae183937da3bc9c5a63cbaf5c889bbeefc384a2f70b81e529b7a6965890d5"),
+    ("jupiter-schneider-liu", "jupiter-sl09-heated-T21L30-200d-colab",
+     "jupiter-sl09-T21L30-200d",
+     "0d029212", "80f280d2005fd86a2415f29dabbd90e126e75232b98bbe203b88fd913333d189"),
+]
+
+
+def _recorded(run: str) -> dict:
+    return json.loads((EVIDENCE / run / "config.json").read_text(encoding="utf-8"))
+
+
+@pytest.mark.parametrize("preset, heated, unheated, heated_prefix, unheated_digest",
+                         PRESET_IDENTITIES)
+def test_presets_default_to_frictional_heating_and_name_the_recorded_runs(
+        preset, heated, unheated, heated_prefix, unheated_digest):
+    """An eddying run without frictional heating fails the energy criteria
+    A2/A3 (README §6), so the presets turn it on. Both formulations stay
+    reachable by name and both keep the identity of the evidence already
+    recorded for them: the heated default is the configuration of the
+    committed heated run, and ``frictional_heating=False`` is the
+    configuration of the committed unheated run, hash for hash."""
+    on = PRESETS[preset]()
+    assert on.frictional_heating is True
+    assert on.sha256() == _recorded(heated)["config_sha256"]
+    assert on.sha256().startswith(heated_prefix)
+    assert on.to_dict() == _recorded(heated)["config"]
+
+    off = PRESETS[preset](frictional_heating=False)
+    assert off.frictional_heating is False
+    assert "frictional_heating" not in off.to_dict()
+    assert off.sha256() == _recorded(unheated)["config_sha256"] == unheated_digest
+    assert RadiativeConfig.from_dict(json.loads(on.canonical_json())) == on
+    assert RadiativeConfig.from_dict(json.loads(off.canonical_json())) == off
+
+
+def test_a_configuration_written_before_the_default_changed_still_means_unheated():
+    """Configurations recorded before the option existed have no
+    ``frictional_heating`` key. The dataclass default stays False, so such a
+    file still loads as the unheated experiment with its recorded hash (and
+    an existing run directory keeps resuming as what it is)."""
+    for run in ("earth-gray-dry-T21L25-300d", "jupiter-sl09-T21L30-200d"):
+        doc = _recorded(run)
+        assert "frictional_heating" not in doc["config"]
+        cfg = RadiativeConfig.from_dict(doc["config"])
         assert cfg.frictional_heating is False
-        assert "frictional_heating" not in cfg.to_dict()
-        assert cfg.sha256() == digest
-        on = cfg.with_(frictional_heating=True)
-        assert on.sha256() != digest
-        assert RadiativeConfig.from_dict(json.loads(on.canonical_json())) == on
+        assert cfg.sha256() == doc["config_sha256"]
+
+
+def test_an_explicit_experiment_id_is_kept_whatever_the_heating():
+    for preset in PRESETS:
+        for heating in (True, False):
+            cfg = PRESETS[preset]("my-run", frictional_heating=heating)
+            assert cfg.experiment_id == "my-run"
+            assert cfg.frictional_heating is heating
+
+
+@pytest.mark.parametrize("preset, heated, unheated, heated_prefix, unheated_digest",
+                         PRESET_IDENTITIES)
+def test_the_command_line_resolves_the_heating_flags(capsys, tmp_path, preset, heated, unheated,
+                                                     heated_prefix, unheated_digest):
+    from tropoi.run.radiative.__main__ import main
+
+    def digest(*argv) -> str:
+        assert main(["show-config", *argv]) == 0
+        return json.loads(capsys.readouterr().out)["config_sha256"]
+
+    heated_digest = _recorded(heated)["config_sha256"]
+    assert digest("--preset", preset) == heated_digest
+    assert digest("--preset", preset, "--frictional-heating") == heated_digest
+    assert digest("--preset", preset, "--no-frictional-heating") == unheated_digest
+    # a configuration file means what it says unless a flag overrides it
+    files = {}
+    for run in (heated, unheated):
+        files[run] = tmp_path / f"{run}.json"
+        files[run].write_text(json.dumps(_recorded(run)["config"]), encoding="utf-8")
+    assert digest("--config", str(files[unheated])) == unheated_digest
+    assert digest("--config", str(files[heated])) == heated_digest
+    assert digest("--config", str(files[heated]), "--no-frictional-heating") != heated_digest
 
 
 def test_radiation_interval_must_divide_a_day_so_that_resume_is_exact():
@@ -234,7 +303,8 @@ def test_coupled_energy_budget_closes_and_a_resumed_run_is_identical(tmp_path):
     from tropoi.run.radiative.experiment import RadiativeRun
     cfg = _tiny(PRESETS["jupiter-schneider-liu"](days=2), experiment_id="jup-test",
                 vertical={"kind": "uniform", "nlev": 12}, checkpoint_every_days=1,
-                state_every_days=1, perturbation_wind=1.0, hyperdiffusion_efold_days=1.0e9)
+                state_every_days=1, perturbation_wind=1.0, hyperdiffusion_efold_days=1.0e9,
+                frictional_heating=False)
     full = RadiativeRun(cfg, tmp_path / "full", allow_dirty=True, log=lambda s: None)
     assert full.run()["status"] == "completed"
     series = json.loads((tmp_path / "full" / "series.json").read_text())
@@ -262,7 +332,7 @@ def test_with_hyperdiffusion_the_budget_residual_is_the_kinetic_energy_it_delete
     from tropoi.run.radiative.experiment import RadiativeRun
     cfg = _tiny(PRESETS["jupiter-schneider-liu"](days=1), experiment_id="jup-hyper",
                 vertical={"kind": "uniform", "nlev": 12}, checkpoint_every_days=1,
-                state_every_days=1, perturbation_wind=1.0)
+                state_every_days=1, perturbation_wind=1.0, frictional_heating=False)
     RadiativeRun(cfg, tmp_path / "run", allow_dirty=True, log=lambda s: None).run()
     series = json.loads((tmp_path / "run" / "series.json").read_text())
     kinetic_rate = (series["energy_kinetic"][1] - series["energy_kinetic"][0]) / 86400.0
@@ -278,7 +348,7 @@ def test_surface_exchange_conserves_energy_between_surface_and_atmosphere(tmp_pa
     from tropoi.run.radiative.experiment import RadiativeRun
     cfg = _tiny(PRESETS["earth-gray-dry"](days=1), experiment_id="earth-test",
                 vertical={"kind": "frierson", "nlev": 10}, checkpoint_every_days=1,
-                state_every_days=1)
+                state_every_days=1, frictional_heating=False)
     run = RadiativeRun(cfg, tmp_path / "earth", allow_dirty=True, log=lambda s: None)
     ts0 = float((run.coupling.weights * run.coupling.surface_temperature).sum())
     run.run()
@@ -351,7 +421,7 @@ def test_a_resumed_run_with_held_radiation_is_identical(tmp_path):
     from tropoi.run.radiative.experiment import RadiativeRun
     cfg = _tiny(PRESETS["earth-gray-dry"](days=2), experiment_id="earth-held",
                 vertical={"kind": "frierson", "nlev": 10}, checkpoint_every_days=1,
-                state_every_days=1, radiation_interval=4)
+                state_every_days=1, radiation_interval=4, frictional_heating=False)
     RadiativeRun(cfg, tmp_path / "full", allow_dirty=True, log=lambda s: None).run()
     RadiativeRun(cfg, tmp_path / "split", allow_dirty=True, log=lambda s: None).run(until_day=1)
     resumed = RadiativeRun(cfg, tmp_path / "split", allow_dirty=True, log=lambda s: None)

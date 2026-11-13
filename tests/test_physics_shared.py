@@ -382,7 +382,7 @@ def test_radiative_config_hash_still_matches_the_committed_evidence():
     evidence = pathlib.Path(__file__).resolve().parents[1] / "docs" / \
         "radiation" / "evidence" / "earth-gray-dry-T21L25-300d" / "config.json"
     recorded = json.loads(evidence.read_text(encoding="utf-8"))
-    assert PRESETS["earth-gray-dry"](days=300).sha256() == \
+    assert PRESETS["earth-gray-dry"](days=300, frictional_heating=False).sha256() == \
         recorded["config_sha256"] == \
         "e31ae183937da3bc9c5a63cbaf5c889bbeefc384a2f70b81e529b7a6965890d5"
 

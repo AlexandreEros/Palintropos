@@ -1,13 +1,13 @@
 {
   "atlas": {
-    "call_edges": 2182,
+    "call_edges": 2184,
     "call_sites_omitted_by_cap": 32,
-    "call_sites_recorded": 2908,
+    "call_sites_recorded": 2910,
     "import_edges": 441,
     "import_sites_omitted_by_cap": 0,
     "import_sites_recorded": 499,
     "max_sites_per_edge": 8,
-    "nodes": 2059,
+    "nodes": 2060,
     "proposal": {
       "call_edges_by_direction": {
         "downward": 402,
@@ -56,7 +56,7 @@
         "integration": 92,
         "physics": 193,
         "run": 90,
-        "setup": 284,
+        "setup": 285,
         "spectral": 232,
         "world": 150
       },
@@ -149,24 +149,24 @@
         "sha256": "1dcfeb9400fd06152e45cd607c8648f54d8fa8f41c02b0fcd8ee9310a03c28a4"
       }
     ],
-    "source_lines_embedded": 17213
+    "source_lines_embedded": 17221
   },
   "call_graph": {
     "call_sites": {
       "builtin": 3674,
       "external": 2448,
-      "internal": 2931,
+      "internal": 2933,
       "unresolved": 3680
     },
     "edges_by_kind": {
-      "call": 1290,
+      "call": 1292,
       "constructor": 62,
       "instantiate": 492,
       "override": 6,
       "self": 328,
       "super": 4
     },
-    "nodes": 1892,
+    "nodes": 1893,
     "scoped": {
       "cli-capsule-command": {
         "edges": 21,
@@ -1226,7 +1226,7 @@
     "package": "tropoi",
     "src": "src",
     "working_tree": {
-      "base_commit": "ecd59b00d471c70e060bd44cc227309b3bd2fee4",
+      "base_commit": "19e92f095b3ae0dc1e410b54b7a6c0b17c832314",
       "generator": {
         "changes": [],
         "files": {
@@ -1256,7 +1256,10 @@
         "status": "clean"
       },
       "source": {
-        "changes": [],
+        "changes": [
+          " M src/tropoi/run/radiative/__main__.py",
+          " M src/tropoi/run/radiative/config.py"
+        ],
         "files": {
           "src/tropoi/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
           "src/tropoi/cli/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
@@ -1361,8 +1364,8 @@
           "src/tropoi/run/pe/model.py": "e45d376f5b7d48301482162bb0377afa242be39e399b07c6357baeb84920e79f",
           "src/tropoi/run/pe/runner.py": "1f3dc50308832c8d5a9a75fe77c98f0284462cac6e697a78a52b3ea8e0ccab07",
           "src/tropoi/run/radiative/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-          "src/tropoi/run/radiative/__main__.py": "5bc299c25f734a5e979c15ee66bdc86ddf220726066fd4b13baee2eff687636e",
-          "src/tropoi/run/radiative/config.py": "72d2c32dd0359d5de11967091323ecc67199eb9e3bb48581452a5dda8b1cf01b",
+          "src/tropoi/run/radiative/__main__.py": "f5a10b53a468a0f496352b4c4ba2d8ed4c5f607497c459c68f9004ef69ff9d73",
+          "src/tropoi/run/radiative/config.py": "f284b54103af194ef4c04221556643a0c4a16c937171021de538c3e412337880",
           "src/tropoi/run/radiative/experiment.py": "30bcfc692fb5d61d9e65eaeeb9dc345cd8f4ac52d15b31056e271705c4445ab2",
           "src/tropoi/run/radiative/model.py": "9e853596e0b59670f53e5c5496f9a3e7f5d1846e3e3c0125fb806aec6ab38953",
           "src/tropoi/run/swe/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
@@ -1429,8 +1432,8 @@
           "src/tropoi/temporal/tendencies/primitive_equations.py": "848c6fe9406a7c1c465c0aa9459760b01c542164c8cc9395797a3c4a60793e52",
           "src/tropoi/temporal/tendencies/shallow_water.py": "7ae521f2378824e89f88bc467fc99321d1ef4224b037c865137e076a601da3c8"
         },
-        "sha256": "363d3660bc218585aeefd2db5af8eb805f1302519728829901d72fe77c55b32b",
-        "status": "clean"
+        "sha256": "c6db3720b28530d807ff5c3316954a059ffd20bbb448dc9a369d871f538b0bea",
+        "status": "dirty"
       }
     }
   },

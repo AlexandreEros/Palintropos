@@ -3,12 +3,16 @@
     python -m tropoi.run.radiative run    --preset jupiter-schneider-liu --run-dir DIR
                                           [--days N] [--dt S] [--until-day N]
                                           [--max-wall-hours H] [--adiabatic] [--allow-dirty]
-                                          [--frictional-heating]
+                                          [--frictional-heating | --no-frictional-heating]
     python -m tropoi.run.radiative column --preset jupiter-schneider-liu
     python -m tropoi.run.radiative show-config --preset earth-gray-dry
 
-``--frictional-heating`` returns the kinetic energy removed by drag and
-hyperdiffusion as heat (off by default; it changes the configuration hash).
+Frictional heating returns the kinetic energy removed by drag and
+hyperdiffusion as heat. The presets turn it on (an eddying run without it
+fails the energy criteria, docs/radiation/README.md §6);
+``--no-frictional-heating`` gives the unheated configuration of the
+recorded runs. A ``--config`` file means what it says unless one of the two
+flags overrides it. Each choice is a different configuration hash.
 
 ``column`` solves the single-column radiative(-convective) equilibrium of a
 preset on the CPU and prints it; ``--adiabatic`` runs the same dynamical
@@ -27,14 +31,18 @@ from tropoi.run.radiative.config import PRESETS, RadiativeConfig
 
 
 def _config(args) -> RadiativeConfig:
-    if getattr(args, "config", None):
-        cfg = RadiativeConfig.from_dict(json.loads(pathlib.Path(args.config).read_text()))
-    else:
-        cfg = PRESETS[args.preset]()
+    heating = getattr(args, "frictional_heating", None)
     changes = {k: getattr(args, k) for k in ("days", "dt", "experiment_id")
                if getattr(args, k, None) is not None}
-    if getattr(args, "frictional_heating", False):
-        changes["frictional_heating"] = True
+    if getattr(args, "config", None):
+        cfg = RadiativeConfig.from_dict(json.loads(pathlib.Path(args.config).read_text()))
+        if heating is not None:
+            changes["frictional_heating"] = heating
+    else:
+        # through the preset, so that its default experiment id follows the
+        # heating (the ids of the recorded heated and unheated runs)
+        cfg = PRESETS[args.preset](**({} if heating is None
+                                      else {"frictional_heating": heating}))
     return cfg.with_(**changes) if changes else cfg
 
 
@@ -48,7 +56,8 @@ def main(argv=None) -> int:
         p.add_argument("--experiment-id")
         p.add_argument("--days", type=int)
         p.add_argument("--dt", type=float)
-        p.add_argument("--frictional-heating", action="store_true")
+        p.add_argument("--frictional-heating", action=argparse.BooleanOptionalAction,
+                       default=None)
         if name == "run":
             p.add_argument("--run-dir", required=True)
             p.add_argument("--until-day", type=int)
