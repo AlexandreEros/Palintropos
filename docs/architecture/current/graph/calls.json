@@ -901,6 +901,16 @@
       "target": "tropoi.physics.radiation.gray._xp"
     },
     {
+      "kind": "constructor",
+      "source": "tropoi.physics.radiation.gray.VerticalPathShortwave",
+      "target": "tropoi.physics.radiation.gray.VerticalPathShortwave.__init__"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.physics.radiation.gray.VerticalPathShortwave.analytic_fluxes",
+      "target": "tropoi.physics.radiation.gray._xp"
+    },
+    {
       "kind": "instantiate",
       "source": "tropoi.physics.radiation.gray.frierson_longwave",
       "target": "tropoi.physics.radiation.gray.GrayLongwave"
@@ -7856,6 +7866,26 @@
       "target": "tropoi.run.radiative.config._t21"
     },
     {
+      "kind": "instantiate",
+      "source": "tropoi.run.radiative.config.mars_gray_flat_dev",
+      "target": "tropoi.run.radiative.config.RadiativeConfig"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.radiative.config.mars_gray_flat_dev",
+      "target": "tropoi.run.radiative.config._preset_id"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.radiative.config.mars_gray_flat_dev",
+      "target": "tropoi.run.radiative.config._t21"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.radiative.config.mars_gray_flat_dev",
+      "target": "tropoi.run.radiative.config._time_of_perihelion_for_equinox_start"
+    },
+    {
       "kind": "constructor",
       "source": "tropoi.run.radiative.experiment.RadiativeRun",
       "target": "tropoi.run.radiative.experiment.RadiativeRun.__init__"
@@ -8126,6 +8156,11 @@
       "target": "tropoi.physics.radiation.gray.SemiInfiniteScatteringShortwave"
     },
     {
+      "kind": "instantiate",
+      "source": "tropoi.run.radiative.model._shortwave",
+      "target": "tropoi.physics.radiation.gray.VerticalPathShortwave"
+    },
+    {
       "kind": "call",
       "source": "tropoi.run.radiative.model._shortwave",
       "target": "tropoi.run.radiative.model._options"
@@ -8234,6 +8269,11 @@
       "kind": "call",
       "source": "tropoi.run.radiative.model.build_sigma",
       "target": "tropoi.run.radiative.model._options"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.run.radiative.model.build_sigma",
+      "target": "tropoi.spatial.sigma_coordinate.SigmaGrid"
     },
     {
       "kind": "call",
@@ -12321,6 +12361,34 @@
       "kind": "method",
       "module": "tropoi.physics.radiation.gray",
       "qualname": "SemiInfiniteScatteringShortwave.signature",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.radiation.gray.VerticalPathShortwave",
+      "kind": "class",
+      "module": "tropoi.physics.radiation.gray",
+      "qualname": "VerticalPathShortwave",
+      "type": "class"
+    },
+    {
+      "id": "tropoi.physics.radiation.gray.VerticalPathShortwave.__init__",
+      "kind": "method",
+      "module": "tropoi.physics.radiation.gray",
+      "qualname": "VerticalPathShortwave.__init__",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.radiation.gray.VerticalPathShortwave.analytic_fluxes",
+      "kind": "method",
+      "module": "tropoi.physics.radiation.gray",
+      "qualname": "VerticalPathShortwave.analytic_fluxes",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.radiation.gray.VerticalPathShortwave.signature",
+      "kind": "method",
+      "module": "tropoi.physics.radiation.gray",
+      "qualname": "VerticalPathShortwave.signature",
       "type": "function"
     },
     {
@@ -19849,6 +19917,13 @@
       "type": "function"
     },
     {
+      "id": "tropoi.run.radiative.config._time_of_perihelion_for_equinox_start",
+      "kind": "function",
+      "module": "tropoi.run.radiative.config",
+      "qualname": "_time_of_perihelion_for_equinox_start",
+      "type": "function"
+    },
+    {
       "id": "tropoi.run.radiative.config.earth_gray_dry",
       "kind": "function",
       "module": "tropoi.run.radiative.config",
@@ -19860,6 +19935,13 @@
       "kind": "function",
       "module": "tropoi.run.radiative.config",
       "qualname": "jupiter_schneider_liu",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.radiative.config.mars_gray_flat_dev",
+      "kind": "function",
+      "module": "tropoi.run.radiative.config",
+      "qualname": "mars_gray_flat_dev",
       "type": "function"
     },
     {

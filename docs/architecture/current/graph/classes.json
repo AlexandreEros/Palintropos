@@ -702,6 +702,27 @@
     {
       "decorators": [],
       "external_bases": [],
+      "id": "tropoi.physics.radiation.gray.VerticalPathShortwave",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__init__"
+        },
+        {
+          "kind": "method",
+          "name": "analytic_fluxes"
+        },
+        {
+          "kind": "method",
+          "name": "signature"
+        }
+      ],
+      "module": "tropoi.physics.radiation.gray",
+      "qualname": "VerticalPathShortwave"
+    },
+    {
+      "decorators": [],
+      "external_bases": [],
       "id": "tropoi.physics.radiation.kdist.CorrelatedKLongwave",
       "members": [
         {

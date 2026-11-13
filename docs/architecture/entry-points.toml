@@ -115,6 +115,10 @@ function = "tropoi.run.radiative.config.jupiter_schneider_liu"
 reason = "reached by name through the run.radiative.config.PRESETS registry (a dict lookup static analysis does not follow)"
 
 [[excluded]]
+function = "tropoi.run.radiative.config.mars_gray_flat_dev"
+reason = "reached by name through the run.radiative.config.PRESETS registry (a dict lookup static analysis does not follow)"
+
+[[excluded]]
 function = "tropoi.physics.radiation.gray.schneider_liu_longwave"
 reason = "gray longwave optical-depth profile (Schneider & Liu 2009); no caller in the package; used by tests and tools/radiation/regimes.py"
 

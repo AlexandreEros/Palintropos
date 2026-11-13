@@ -10,7 +10,7 @@ Index: [all packages](../index.md) · parent [`tropoi.run`](tropoi.run.md)
 |---|---|---|---|
 | `tropoi.run.radiative` | empty | – | – |
 | `tropoi.run.radiative.__main__` | code | – | `main` |
-| `tropoi.run.radiative.config` | code | `RadiativeConfig` | `earth_gray_dry`, `jupiter_schneider_liu` |
+| `tropoi.run.radiative.config` | code | `RadiativeConfig` | `earth_gray_dry`, `jupiter_schneider_liu`, `mars_gray_flat_dev` |
 | `tropoi.run.radiative.experiment` | code | `RadiativeRun` | – |
 | `tropoi.run.radiative.model` | code | – | `build_insolation`, `build_model`, `build_physics`, `build_radiation`, `build_sigma`, `build_stepper`, `initial_state`, `reference_column` |
 

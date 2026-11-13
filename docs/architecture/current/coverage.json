@@ -88,11 +88,12 @@
       "tropoi.run.held_suarez.config.smoke_config": "reached by name through the held_suarez.config.PRESETS registry (a dict lookup static analysis does not follow)",
       "tropoi.run.radiative.config.earth_gray_dry": "reached by name through the run.radiative.config.PRESETS registry (a dict lookup static analysis does not follow)",
       "tropoi.run.radiative.config.jupiter_schneider_liu": "reached by name through the run.radiative.config.PRESETS registry (a dict lookup static analysis does not follow)",
+      "tropoi.run.radiative.config.mars_gray_flat_dev": "reached by name through the run.radiative.config.PRESETS registry (a dict lookup static analysis does not follow)",
       "tropoi.temporal.hooks.rk4_real_axis_limit": "numerical helper (RK4 stability limit on the real axis) used by a stability test; no workflow starts here"
     }
   },
   "discovered": {
-    "classes": 211,
+    "classes": 212,
     "cli_handlers": {
       "cli-capsule-command": "tropoi.cli.capsule._command",
       "cli-gen": "tropoi.cli.main._cmd_gen",
@@ -201,6 +202,9 @@
       "tropoi.run.radiative.config.jupiter_schneider_liu": [
         "tropoi.run.radiative.config.jupiter_schneider_liu"
       ],
+      "tropoi.run.radiative.config.mars_gray_flat_dev": [
+        "tropoi.run.radiative.config.mars_gray_flat_dev"
+      ],
       "tropoi.spatial.terrain.raster.encode_grey16": [
         "tropoi.run.custom.encode_grey16",
         "tropoi.spatial.terrain.raster.encode_grey16"
@@ -213,16 +217,16 @@
         "tropoi.temporal.hooks.rk4_real_axis_limit"
       ]
     },
-    "functions": 1682,
+    "functions": 1687,
     "modules": 167,
     "packages": 25
   },
   "limits": {
     "call_sites": {
-      "builtin": 3674,
-      "external": 2448,
-      "internal": 2933,
-      "unresolved": 3680
+      "builtin": 3677,
+      "external": 2453,
+      "internal": 2943,
+      "unresolved": 3685
     },
     "dynamic_import_sites": {
       "tropoi.representation.archive.writer": 1
@@ -569,10 +573,10 @@
         ]
       }
     },
-    "classes": 211,
+    "classes": 212,
     "classes_in_inheritance_overview": 21,
     "containment": {
-      "class": 211,
+      "class": 212,
       "module": 98,
       "package": 22
     },
@@ -587,6 +591,6 @@
   },
   "scope_file": {
     "path": "docs/architecture/entry-points.toml",
-    "sha256": "b7fcc928dbfde3302ffaf9242f85ad1495e99cec4abd37eb9f8bbbb27dfd859c"
+    "sha256": "efd0a3f141985265980cfca15c1c02414f5df5e67a4cf0f136de29a160420c05"
   }
 }

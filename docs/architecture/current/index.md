@@ -11,7 +11,7 @@ Explore dependencies, call sites, possible dispatch, runtime observations and pr
 | [`tropoi`](packages/tropoi.md) | 1 | 0 | 0 | `README.md` |
 | [`tropoi.cli`](packages/tropoi.cli.md) | 6 | 0 | 24 | `README.md` |
 | [`tropoi.physics`](packages/tropoi.physics.md) | 15 | 23 | 22 | `README.md` |
-| [`tropoi.physics.radiation`](packages/tropoi.physics.radiation.md) | 5 | 12 | 18 | `README.md` |
+| [`tropoi.physics.radiation`](packages/tropoi.physics.radiation.md) | 5 | 13 | 18 | `README.md` |
 | [`tropoi.representation`](packages/tropoi.representation.md) | 2 | 0 | 1 | `README.md` |
 | [`tropoi.representation.archive`](packages/tropoi.representation.archive.md) | 9 | 18 | 26 | `README.md` |
 | [`tropoi.representation.diagnostics`](packages/tropoi.representation.diagnostics.md) | 8 | 18 | 25 | `README.md` |
@@ -21,7 +21,7 @@ Explore dependencies, call sites, possible dispatch, runtime observations and pr
 | [`tropoi.run.custom`](packages/tropoi.run.custom.md) | 7 | 12 | 15 | `INITIAL_STATES.md`, `README.md` |
 | [`tropoi.run.held_suarez`](packages/tropoi.run.held_suarez.md) | 8 | 5 | 35 | `README.md` |
 | [`tropoi.run.pe`](packages/tropoi.run.pe.md) | 5 | 1 | 2 | `GUIDE.md`, `README.md` |
-| [`tropoi.run.radiative`](packages/tropoi.run.radiative.md) | 5 | 2 | 11 | `README.md` |
+| [`tropoi.run.radiative`](packages/tropoi.run.radiative.md) | 5 | 2 | 12 | `README.md` |
 | [`tropoi.run.swe`](packages/tropoi.run.swe.md) | 5 | 1 | 2 | `README.md` |
 | [`tropoi.spatial`](packages/tropoi.spatial.md) | 10 | 18 | 18 | `CONVENTIONS.md`, `README.md` |
 | [`tropoi.spatial.grids`](packages/tropoi.spatial.grids.md) | 8 | 5 | 4 | `README.md` |
@@ -66,10 +66,10 @@ Explore dependencies, call sites, possible dispatch, runtime observations and pr
 
 * Packages: 25 discovered, 25 with a page.
 * Import module records: 167 discovered (including namespace placeholders), 167 listed on a package page.
-* Classes: 211 discovered, 211 drawn on a package page (21 in [the inheritance overview](class-inheritance.mmd)).
-* Both containment views cover 22 directories, 98 Python files, 211 class definitions, leaving out files and directories that define no class.
+* Classes: 212 discovered, 212 drawn on a package page (21 in [the inheritance overview](class-inheritance.mmd)).
+* Both containment views cover 22 directories, 98 Python files, 212 class definitions, leaving out files and directories that define no class.
 * CLI handlers: 11 discovered, each with a call graph.
-* Public Python entry-point candidates: 32; 14 are roots of declared paths, 18 excluded with a reason.
+* Public Python entry-point candidates: 33; 14 are roots of declared paths, 19 excluded with a reason.
 
 **Deliberate exclusions**
 
@@ -90,6 +90,7 @@ Explore dependencies, call sites, possible dispatch, runtime observations and pr
 * `tropoi.run.held_suarez.config.smoke_config`: reached by name through the held_suarez.config.PRESETS registry (a dict lookup static analysis does not follow)
 * `tropoi.run.radiative.config.earth_gray_dry`: reached by name through the run.radiative.config.PRESETS registry (a dict lookup static analysis does not follow)
 * `tropoi.run.radiative.config.jupiter_schneider_liu`: reached by name through the run.radiative.config.PRESETS registry (a dict lookup static analysis does not follow)
+* `tropoi.run.radiative.config.mars_gray_flat_dev`: reached by name through the run.radiative.config.PRESETS registry (a dict lookup static analysis does not follow)
 * `tropoi.temporal.hooks.rk4_real_axis_limit`: numerical helper (RK4 stability limit on the real axis) used by a stability test; no workflow starts here
 
 **Static-analysis limits** (counts in `coverage.json`): calls through objects, `getattr`, callbacks and decorators are not edges; dynamic imports are counted, not followed; function-local classes are recorded only in the containment views; non-Python files are listed, never read. A missing edge does not mean "never called".
