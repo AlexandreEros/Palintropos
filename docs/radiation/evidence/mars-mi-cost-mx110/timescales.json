@@ -1,0 +1,56 @@
+{
+  "checkpoint": "C:/Users/User/Projects/PlanetarySandbox/docs/runs/dev-mars-gray-flat-bl-heated-T21L25-06f5356/checkpoints/checkpoint-s000008640.npz",
+  "checkpoint_day": 60.0,
+  "gray_lw_thin_relaxation_sols_at_K": {
+    "150": 5.129332020942841,
+    "180": 2.9683634380456256,
+    "210": 1.8692900950957871,
+    "240": 1.2522783254254983
+  },
+  "mean_ts_exponential_fit": {
+    "T_asymptote_K": 209.1096435434879,
+    "amplitude_K": 72.79587351962665,
+    "caveat": "the seasonal forcing changes over the fit (L_s 0-29), so the asymptote is not an equilibrium; the fit dates the memory, not the climate",
+    "fit_days": [
+      10.0,
+      60.0
+    ],
+    "rms_residual_K": 0.11355304268742626,
+    "series": "docs/radiation/evidence/dev-mars-gray-flat-bl-heated-T21L25-60d-06f5356-l4/series.json",
+    "tau_days": 35.75,
+    "tau_sols": 34.92537313432836
+  },
+  "slab_heat_capacity": 8257737.05256127,
+  "slab_relaxation_sols": {
+    "sensible_0.0": {
+      "max": 56.75303015113017,
+      "median": 38.19895072751176,
+      "min": 33.58603312225146
+    },
+    "sensible_0.5": {
+      "max": 43.52522549906712,
+      "median": 31.711978824852018,
+      "min": 28.466299006110688
+    }
+  },
+  "slab_relaxation_sols_at_K": {
+    "140": 150.02252849083666,
+    "150": 121.97387205299431,
+    "180": 70.5867315121495,
+    "210": 44.451119552840495,
+    "240": 29.778777356688067,
+    "285": 17.78304010103431
+  },
+  "slab_ts_range_K": [
+    193.57555414779748,
+    230.5653063354834
+  ],
+  "surface_spin_down_sols": {
+    "10": 10.839867726044739,
+    "20": 5.4199338630223695,
+    "5": 21.679735452089478,
+    "C_D_neutral": 0.0010796539999938697,
+    "z1_m": 6.214641509434123
+  },
+  "tool": "mars_cost_profile.py timescales"
+}

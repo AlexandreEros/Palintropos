@@ -30,3 +30,6 @@ and the [preservation record](../../validation/run_archive_2026-11-12/README.md)
   and [Ui](dev-mars-gray-flat-sponge-implicit-T21L25-60d-63d05a2-t4/README.md): the sponge
   rerun with a backward-Euler surface exchange, 60 days on a T4. N1 and M2-M4 met; M1, M5
   and M6 not met (M1 and M6 against the prediction).
+- [CV-1 cost on the MX110](mars-mi-cost-mx110/README.md): s/step and its breakdown by
+  operator at T10–T42, time-step probes, slab timescales and the CV-1 wall-clock
+  arithmetic behind [MARS_MI_COST.md](../MARS_MI_COST.md).

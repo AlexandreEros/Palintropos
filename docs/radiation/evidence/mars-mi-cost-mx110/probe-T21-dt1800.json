@@ -1,0 +1,105 @@
+{
+  "benchmark_only_gemm_chunk_rows": 0,
+  "dt": 1800.0,
+  "environment": {
+    "cuda_runtime": 11080,
+    "cupy": "13.4.0",
+    "git_commit": "cfebd16aa65ab38413f245556e5dde98781cb03f",
+    "git_dirty_tracked": true,
+    "gpu": "NVIDIA GeForce MX110",
+    "gpu_memory_total_bytes": 2147352576,
+    "numpy": "2.2.6",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "python": "3.12.12",
+    "sm_count": 2
+  },
+  "preset": "dev-mars-gray-flat-bl",
+  "records": [
+    {
+      "courant_horizontal": 1.6647987898112024,
+      "courant_vertical": 0.952245650606249,
+      "finite": true,
+      "max_abs_u": 142.89790757883907,
+      "max_speed": 149.5676373068477,
+      "step": 0,
+      "t_max": 283.37721678602315,
+      "t_min": 144.04088565267796,
+      "vorticity_tail_fraction": 0.22718113685466418
+    },
+    {
+      "courant_horizontal": 1.648430558496781,
+      "courant_vertical": 0.908088929872415,
+      "finite": true,
+      "max_abs_u": 148.09708938762844,
+      "max_speed": 148.09709462050446,
+      "step": 4,
+      "t_max": 287.1566833478722,
+      "t_min": 150.9453953298398,
+      "t_sols": 0.0814111261872456,
+      "vorticity_tail_fraction": 0.23976896069403314
+    },
+    {
+      "courant_horizontal": 2.00130474985362,
+      "courant_vertical": 0.8472186406293407,
+      "finite": true,
+      "max_abs_u": 145.70356285759817,
+      "max_speed": 179.79976006621408,
+      "step": 8,
+      "t_max": 289.90007424902336,
+      "t_min": 151.78701106909415,
+      "t_sols": 0.1628222523744912,
+      "vorticity_tail_fraction": 0.24838537804554298
+    },
+    {
+      "courant_horizontal": 3.355002929157868,
+      "courant_vertical": 1.4513908145258563,
+      "finite": true,
+      "max_abs_u": 244.5079050332229,
+      "max_speed": 301.4177234767227,
+      "step": 12,
+      "t_max": 292.65707196809944,
+      "t_min": 124.09318322591699,
+      "t_sols": 0.24423337856173677,
+      "vorticity_tail_fraction": 0.3048579297343618
+    },
+    {
+      "courant_horizontal": 54.32150217606724,
+      "courant_vertical": 31.39668917864398,
+      "finite": true,
+      "max_abs_u": 2093.723617117376,
+      "max_speed": 4880.312735183184,
+      "step": 16,
+      "t_max": 927.0884945710104,
+      "t_min": -1823.4996518640235,
+      "t_sols": 0.3256445047489824,
+      "vorticity_tail_fraction": 0.7178161663901365
+    }
+  ],
+  "scratch_dir": "C:\\Users\\User\\AppData\\Local\\Temp\\claude\\3a577e870356ee0b\\7346164c-44b0-41ac-bde2-0168f21edd03\\scratchpad\\mars-probe-rb6bfv2_",
+  "seconds_per_step": 1.2113530874994467,
+  "sols_requested": 2.0,
+  "source": "C:/Users/User/Projects/PlanetarySandbox/docs/runs/dev-mars-gray-flat-bl-heated-T21L25-06f5356/checkpoints/checkpoint-s000008640.npz",
+  "source_day": 60.0,
+  "source_truncation": "T21",
+  "startup_substeps": 2,
+  "status": "unstable",
+  "steps_done": 16,
+  "steps_requested": 98,
+  "t0_seconds": 5184000.0,
+  "tool": "mars_cost_profile.py probe",
+  "transfer": {
+    "dropped_norm_fraction": 0.0,
+    "source_norm_above_retained_cut": 0.0,
+    "ts_destination_range_K": [
+      193.5428735938686,
+      230.54990082333512
+    ],
+    "ts_source_range_K": [
+      193.57555414779748,
+      230.5653063354834
+    ],
+    "ts_source_roundtrip_max_abs_K": 0.04051314105703341
+  },
+  "truncation": "T21",
+  "unstable_rule": "non-finite, max speed > 500 m/s, or T outside [0, 700] K"
+}
