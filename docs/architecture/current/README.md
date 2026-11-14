@@ -5,13 +5,13 @@
 
 | | |
 |---|---|
-| Source base commit | `1e2a4a0f7d1070e5fdcf38ac7b2df86b1099d00e` (clean working tree) |
+| Source base commit | `cfebd16aa65ab38413f245556e5dde98781cb03f` (plus uncommitted working-tree changes) |
 | Analysed package | `tropoi` under `src/` |
 | Generator | `tools.architecture` 2.3.0 |
 | Toolchain | Python 3.12, grimp 3.17, networkx 3.7 |
 | Command | `python -m tools.architecture.generate` |
 
-Source working tree: **clean**. Content SHA-256: `971c068f44e5f8bb0db145ad0ea061522a867874fa6cde6d38281c6659bc3dfb`. Generator working tree: **clean**. Per-file hashes and scoped Git status are recorded in `metrics.json`. These describe generation time; --check verifies source and generator content hashes before reusing this context across later commits. The base commit alone does not identify uncommitted source.
+Source working tree: **dirty**. Content SHA-256: `4663e65b04a5c1e876904cc6ef52af6dffd006939e82ce3d5f740898b40c1e19`. Generator working tree: **clean**. Per-file hashes and scoped Git status are recorded in `metrics.json`. These describe generation time; --check verifies source and generator content hashes before reusing this context across later commits. The base commit alone does not identify uncommitted source.
 
 ## Reproducing
 
@@ -88,11 +88,11 @@ Generated files contain no timestamps, absolute paths, or source line numbers, s
 
 Three generic rules decide what must be documented (`tools/architecture/coverage.py`):
 
-1. **Packages:** every analysed package gets packages/<package>.md with all of its modules, classes and public module-level functions. 25 packages, 25 pages; 169 of 169 modules and 213 of 213 classes rendered (generation fails if any is missing).
+1. **Packages:** every analysed package gets packages/<package>.md with all of its modules, classes and public module-level functions. 25 packages, 25 pages; 171 of 171 modules and 216 of 216 classes rendered (generation fails if any is missing).
 2. **CLI handlers:** every <parser>.set_defaults(<keyword>=<function>) handler gets calls/cli-<name>.mmd. 11 discovered.
-3. **Public Python entry points:** module-level functions exported through some __all__ (re-exports followed) that no analysed function calls; each must be declared as an entry path root or excluded with a reason. 33 candidates: 14 are roots of declared entry paths, 19 excluded with a reason.
+3. **Public Python entry points:** module-level functions exported through some __all__ (re-exports followed) that no analysed function calls; each must be declared as an entry path root or excluded with a reason. 37 candidates: 14 are roots of declared entry paths, 23 excluded with a reason.
 
-The declarations are read from `docs/architecture/entry-points.toml` (SHA-256 `efd0a3f141985265980cfca15c1c02414f5df5e67a4cf0f136de29a160420c05`). Like the layer declaration, they state expectations; unlike it, a gap fails generation: an undeclared candidate, a declared root or exclusion that no longer exists, or a declared narrative page that is missing or does not link its diagram. `--check` therefore fails on any of these too.
+The declarations are read from `docs/architecture/entry-points.toml` (SHA-256 `68523b1901b3c65bd104a5d9ac6c1263251246d81383e89a1e860b028da6b13e`). Like the layer declaration, they state expectations; unlike it, a gap fails generation: an undeclared candidate, a declared root or exclusion that no longer exists, or a declared narrative page that is missing or does not link its diagram. `--check` therefore fails on any of these too.
 
 What CI establishes: the committed outputs equal what these rules produce from the committed source, and the rules found no undeclared entry point. It does not establish that a diagram is easy to read or that a narrative page is still accurate prose.
 
@@ -106,7 +106,7 @@ The rules are generic path and syntax rules; none names a particular subpackage.
 4. Each module gets a syntactic category: `namespace` (a namespace package directory), `empty` (no statement besides a docstring), `reexport` (only imports, `__all__` assignments, and alias assignments `A = B`), or `code`. Categories are attributes, not filters, with one exception: a `namespace` or `empty` module that no analysed module imports is dropped from the module graph, because it has no code and no edges.
 5. Imports of modules outside the package are not graph edges; they are listed per module (`stdlib_imports`, `third_party_imports` in `graph/modules.json`).
 
-Modules discovered: 169; in the module graph: 146. Categories: code 141, empty 22, namespace 1, reexport 5.
+Modules discovered: 171; in the module graph: 148. Categories: code 143, empty 22, namespace 1, reexport 5.
 
 Excluded by rule 4: `tropoi`, `tropoi.cli`, `tropoi.physics`, `tropoi.physics.radiation`, `tropoi.representation`, `tropoi.representation.diagnostics`, `tropoi.representation.visual`, `tropoi.run`, `tropoi.run.bve`, `tropoi.run.held_suarez`, `tropoi.run.pe`, `tropoi.run.radiative`, `tropoi.run.swe`, `tropoi.spatial`, `tropoi.spatial.grids`, `tropoi.spatial.initialization`, `tropoi.spatial.operators`, `tropoi.spatial.states`, `tropoi.spatial.terrain`, `tropoi.spatial.transforms`, `tropoi.spatial.transforms.cuda`, `tropoi.temporal`, `tropoi.temporal.tendencies`.
 
@@ -152,7 +152,7 @@ The Mermaid tree and the offline atlas each contain every class definition, the 
 
 ### Call graphs (ast)
 
-Each call expression inside a function or method body (nested functions, lambdas, and comprehensions are attributed to the enclosing function) is classified as `internal` (resolved to an analysed definition), `external` (resolved to a name outside the package), `builtin` (an unshadowed builtin), or `unresolved`. Totals: builtin 3716, external 2465, internal 2962, unresolved 3739.
+Each call expression inside a function or method body (nested functions, lambdas, and comprehensions are attributed to the enclosing function) is classified as `internal` (resolved to an analysed definition), `external` (resolved to a name outside the package), `builtin` (an unshadowed builtin), or `unresolved`. Totals: builtin 3751, external 2495, internal 3015, unresolved 3865.
 
 | Edge kind | Syntax | What it claims |
 |---|---|---|
