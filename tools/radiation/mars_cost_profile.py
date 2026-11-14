@@ -712,15 +712,20 @@ def project(args) -> dict[str, Any]:
         io_ps = d["io"]["amortized_s_per_step"]
         for dt in args.dt:
             steps = args.sols * SOL / dt
-            wall = steps * (sps + io_ps * 600.0 / dt)   # I/O is per model day, not per step
+            # I/O runs at fixed model-day cadences, so its per-step share
+            # grows with dt (fewer steps per day) and its total is fixed
+            io_dt = io_ps * dt / float(d["dt"])
+            wall = steps * (sps + io_dt)
             rows.append({"profile": pathlib.Path(path).name, "gpu": d["environment"]["gpu"],
                          "truncation": d["truncation"], "dt": dt, "sols": args.sols,
-                         "steps": steps, "s_per_step": sps, "io_s_per_step_at_600": io_ps,
+                         "steps": steps, "s_per_step": sps,
+                         "io_s_per_step_at_profile_dt": io_ps, "profile_dt": float(d["dt"]),
+                         "io_s_per_step": io_dt, "io_hours": steps * io_dt / 3600.0,
                          "wall_hours": wall / 3600.0, "wall_days": wall / 86400.0})
     window = (ls_time_sols(225.0), ls_time_sols(315.0))
     return {"tool": "mars_cost_profile.py project", "rows": rows,
             "arithmetic": "steps = sols * 88440 / dt; wall = steps * (s/step + "
-                          "amortized I/O per step at dt 600 * 600 / dt)",
+                          "amortized I/O per step at the profile's dt * dt / profile dt)",
             "year_sols": YEAR_SOLS,
             "ls_225_315_window_sols_year1": window,
             "cv1_last_complete_window_year": int((CV1_SOLS - window[1]) // YEAR_SOLS) + 1}

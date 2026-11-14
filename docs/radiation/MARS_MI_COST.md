@@ -37,9 +37,9 @@ step other than 110 s is a labelled departure from IR-10, not conformance**
    - A low resolution is therefore **not proportionally cheaper**. A T10
      step costs 0.40–0.46 s, against 0.875 s at T21.
 2. **CV-1 as written (T42, 1920 sols) is out of reach locally.**
-   - MX110: 29 days at dt 600 s and 161 days at Isca's 110 s, at full
+   - MX110: 29 days at dt 600 s and 158 days at Isca's 110 s, at full
      clock. Sustained load throttles the laptop GPU by about 23 %, so
-     expect 36 and 198 days.
+     expect 36 and 195 days.
    - The MX110 cannot run T42 unmodified at all: one 608-row synthesis GEMM
      outlives the Windows 2 s watchdog (TDR, `CUDA_ERROR_LAUNCH_TIMEOUT`).
      The local T42 numbers were measured with the benchmark-only GEMM
@@ -273,14 +273,16 @@ measurement of §6 before any launch is planned on them.
 
 ## 2. CV-1 wall-clock projections
 
-Steps = sols × 88 440 s / dt. Wall = steps × (s/step + amortized I/O). The
+Steps = sols × 88 440 s / dt. Wall = steps × s/step + I/O. I/O runs at
+fixed model-day cadences, so its total is the same at every dt: 2.0 h at
+T42 on the MX110 for 1920 sols. The
 table comes from `project` (`projection-mx110-run1.json` and
 `projection-mx110.json`); the Colab rows use the §1.4 estimates.
 
 | GPU, T42 | s/step | dt 110 s (Isca, IR-10): 1 543 680 steps | dt 300 s: 566 016 | dt 450 s: 377 344 | dt 600 s (current): 283 008 |
 | --- | --- | --- | --- | --- | --- |
-| MX110 (measured, chunked GEMMs, full clock) | 8.856 | 3 857 h = **161 d** | 1 400 h = 58 d | 932 h = 39 d | 698 h = **29 d** |
-| MX110 (measured, throttled second pass) | 10.93 | 4 744 h = 198 d | 1 726 h = 72 d | 1 149 h = 48 d | 861 h = 36 d |
+| MX110 (measured, chunked GEMMs, full clock) | 8.856 | 3 799 h = **158 d** | 1 394 h = 58 d | 930 h = 39 d | 698 h = **29 d** |
+| MX110 (measured, throttled second pass) | 10.93 | 4 688 h = 195 d | 1 720 h = 72 d | 1 148 h = 48 d | 861 h = 36 d |
 | L4 (estimate) | ~0.45 | ~193 h = **8 d** | ~71 h = 3 d | ~47 h | ~35 h = **1.5 d** |
 | T4 (estimate) | ~0.75 | ~322 h = **13 d** | ~118 h = 5 d | ~79 h | ~59 h = **2.5 d** |
 
