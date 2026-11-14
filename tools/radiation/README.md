@@ -13,7 +13,9 @@
   [judge_mars_pilot.py](judge_mars_pilot.py) applies M1–M6.
   [mars_state_diagnostics.py](mars_state_diagnostics.py) reads the saved
   states for where the winds peak, the surface-exchange stiffness and the
-  ln p_s mass terms.
+  ln p_s mass terms. [mars_wind_audit.py](mars_wind_audit.py) recomputes
+  M7's registered (lowest-level |u|) and judged (speed) observables and the
+  zonal-mean winds from the saved states (`MARS_MI_PLAN.md` §4.6).
 
 The [evidence index](../../docs/radiation/evidence/README.md) links the
 saved products, and the [radiation report](../../docs/radiation/README.md)
