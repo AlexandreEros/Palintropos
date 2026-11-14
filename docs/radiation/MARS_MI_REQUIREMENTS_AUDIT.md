@@ -308,3 +308,17 @@ The grid-point max |u| and the lowest-level speed were checked against
 matched on every day for Hb and Ub. The §2d run has no `max_wind_bottom`
 series. L_s was computed from the runs' orbit: e 0.0935, perihelion at
 L_s 250.85°, L_s = 0 at t = 0, a year of 59 166 360 s.
+
+For Hb and Ub this computation is committed as
+`tools/radiation/mars_wind_audit.py`. Its outputs are
+`docs/radiation/evidence/dev-mars-gray-flat-bl-heated-T21L25-60d-06f5356-l4/wind_audit.json`
+(Hb) and
+`docs/radiation/evidence/dev-mars-gray-flat-bl-T21L25-60d-06f5356-l4/wind_audit.json`
+(Ub). Each holds the per-day values and a `summary` over days 11–60. The
+summary gives the largest value and its day for the grid-point |u|, the
+lowest-level |u|, speed and |v|, and the zonal-mean u (all levels, and
+σ > 0.01). It also counts the days on which the lowest-level |u| and speed
+exceed 40 m s⁻¹. The tool aborts when a state does not reproduce the run's
+`series.json`. The Hb/Ub numbers in §3 are read from these files, and
+`tests/test_mars_wind_audit.py` checks them there. The §2d run's numbers
+were computed the same way but have no committed output.

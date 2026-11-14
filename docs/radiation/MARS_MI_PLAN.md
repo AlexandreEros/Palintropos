@@ -776,9 +776,12 @@ The discrepancy was not noticed before judging. Both measurements, days
 The historical verdict, **M7 not met**, is unchanged, and it is the same
 under either observable. The §2e text and `verdicts-2e-corrected.json` stay
 as they are; their numbers are the speed. The \|u\| values were computed
-read-only from the saved states. The states are local and untracked, so the
-audit's Appendix A records the method. From here on, DM-2 reports both,
-labelled, and judges neither.
+read-only from the saved states, which are local and untracked. The
+computation is `tools/radiation/mars_wind_audit.py`; its outputs are
+`wind_audit.json` in `evidence/dev-mars-gray-flat-bl-heated-T21L25-60d-06f5356-l4/`
+(Hb) and `evidence/dev-mars-gray-flat-bl-T21L25-60d-06f5356-l4/` (Ub), whose
+`summary` holds both columns above, and the audit's Appendix A describes the
+method. From here on, DM-2 reports both, labelled, and judges neither.
 
 ### 4.7 The M5 slab phase: an analytical expectation, not a proof
 
