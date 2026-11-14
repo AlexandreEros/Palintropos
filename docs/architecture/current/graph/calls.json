@@ -496,6 +496,31 @@
       "target": "tropoi.spatial.terrain.raster.working_resolution_deg"
     },
     {
+      "kind": "call",
+      "source": "tropoi.physics.boundary_layer.boundary_layer_depth",
+      "target": "tropoi.physics.boundary_layer._xp"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.physics.boundary_layer.diffusivity_profile",
+      "target": "tropoi.physics.boundary_layer._xp"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.physics.boundary_layer.exchange_coefficient",
+      "target": "tropoi.physics.boundary_layer._xp"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.physics.boundary_layer.exchange_coefficient",
+      "target": "tropoi.physics.surface.drag_coefficient"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.physics.boundary_layer.implicit_column_diffusion",
+      "target": "tropoi.physics.boundary_layer._xp"
+    },
+    {
       "kind": "instantiate",
       "source": "tropoi.physics.column.AtmosphericColumn.__post_init__",
       "target": "tropoi.physics.column.ColumnError"
@@ -7948,6 +7973,11 @@
     {
       "kind": "call",
       "source": "tropoi.run.radiative.experiment.RadiativeRun.__init__",
+      "target": "tropoi.run.radiative.model.build_boundary_layer"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.radiative.experiment.RadiativeRun.__init__",
       "target": "tropoi.run.radiative.model.build_model"
     },
     {
@@ -8164,6 +8194,16 @@
       "kind": "call",
       "source": "tropoi.run.radiative.model._shortwave",
       "target": "tropoi.run.radiative.model._options"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.radiative.model.build_boundary_layer",
+      "target": "tropoi.run.radiative.model._options"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.run.radiative.model.build_boundary_layer",
+      "target": "tropoi.temporal.tendencies.boundary_layer.BoundaryLayerDiffusion"
     },
     {
       "kind": "instantiate",
@@ -10477,6 +10517,41 @@
     },
     {
       "kind": "constructor",
+      "source": "tropoi.temporal.tendencies.boundary_layer.BoundaryLayerDiffusion",
+      "target": "tropoi.temporal.tendencies.boundary_layer.BoundaryLayerDiffusion.__init__"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.temporal.tendencies.boundary_layer.BoundaryLayerDiffusion.__call__",
+      "target": "tropoi.physics.boundary_layer.boundary_layer_depth"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.temporal.tendencies.boundary_layer.BoundaryLayerDiffusion.__call__",
+      "target": "tropoi.physics.boundary_layer.diffusivity_profile"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.temporal.tendencies.boundary_layer.BoundaryLayerDiffusion.__call__",
+      "target": "tropoi.physics.boundary_layer.exchange_coefficient"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.temporal.tendencies.boundary_layer.BoundaryLayerDiffusion.__call__",
+      "target": "tropoi.physics.boundary_layer.implicit_column_diffusion"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.temporal.tendencies.boundary_layer.BoundaryLayerDiffusion.__call__",
+      "target": "tropoi.spatial.sigma_coordinate.hydrostatic_geopotential"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.temporal.tendencies.boundary_layer.BoundaryLayerDiffusion.__call__",
+      "target": "tropoi.temporal.tendencies.boundary_layer.BoundaryLayerDiffusion._synthesize"
+    },
+    {
+      "kind": "constructor",
       "source": "tropoi.temporal.tendencies.drag.LatitudeDependentRayleighDrag",
       "target": "tropoi.temporal.tendencies.drag.LatitudeDependentRayleighDrag.__init__"
     },
@@ -11382,6 +11457,41 @@
       "kind": "function",
       "module": "tropoi.cli.terrain",
       "qualname": "run_prepare",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.boundary_layer._xp",
+      "kind": "function",
+      "module": "tropoi.physics.boundary_layer",
+      "qualname": "_xp",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.boundary_layer.boundary_layer_depth",
+      "kind": "function",
+      "module": "tropoi.physics.boundary_layer",
+      "qualname": "boundary_layer_depth",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.boundary_layer.diffusivity_profile",
+      "kind": "function",
+      "module": "tropoi.physics.boundary_layer",
+      "qualname": "diffusivity_profile",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.boundary_layer.exchange_coefficient",
+      "kind": "function",
+      "module": "tropoi.physics.boundary_layer",
+      "qualname": "exchange_coefficient",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.boundary_layer.implicit_column_diffusion",
+      "kind": "function",
+      "module": "tropoi.physics.boundary_layer",
+      "qualname": "implicit_column_diffusion",
       "type": "function"
     },
     {
@@ -20086,6 +20196,13 @@
       "type": "function"
     },
     {
+      "id": "tropoi.run.radiative.model.build_boundary_layer",
+      "kind": "function",
+      "module": "tropoi.run.radiative.model",
+      "qualname": "build_boundary_layer",
+      "type": "function"
+    },
+    {
       "id": "tropoi.run.radiative.model.build_insolation",
       "kind": "function",
       "module": "tropoi.run.radiative.model",
@@ -23821,6 +23938,62 @@
       "kind": "method",
       "module": "tropoi.temporal.tendencies.barotropic",
       "qualname": "BarotropicVorticity.vorticity_to_streamfunction",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.temporal.tendencies.boundary_layer.BoundaryLayerDiffusion",
+      "kind": "class",
+      "module": "tropoi.temporal.tendencies.boundary_layer",
+      "qualname": "BoundaryLayerDiffusion",
+      "type": "class"
+    },
+    {
+      "id": "tropoi.temporal.tendencies.boundary_layer.BoundaryLayerDiffusion.__call__",
+      "kind": "method",
+      "module": "tropoi.temporal.tendencies.boundary_layer",
+      "qualname": "BoundaryLayerDiffusion.__call__",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.temporal.tendencies.boundary_layer.BoundaryLayerDiffusion.__init__",
+      "kind": "method",
+      "module": "tropoi.temporal.tendencies.boundary_layer",
+      "qualname": "BoundaryLayerDiffusion.__init__",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.temporal.tendencies.boundary_layer.BoundaryLayerDiffusion._synthesize",
+      "kind": "method",
+      "module": "tropoi.temporal.tendencies.boundary_layer",
+      "qualname": "BoundaryLayerDiffusion._synthesize",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.temporal.tendencies.boundary_layer.BoundaryLayerDiffusion.budget_means",
+      "kind": "method",
+      "module": "tropoi.temporal.tendencies.boundary_layer",
+      "qualname": "BoundaryLayerDiffusion.budget_means",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.temporal.tendencies.boundary_layer.BoundaryLayerDiffusion.load_state_dict",
+      "kind": "method",
+      "module": "tropoi.temporal.tendencies.boundary_layer",
+      "qualname": "BoundaryLayerDiffusion.load_state_dict",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.temporal.tendencies.boundary_layer.BoundaryLayerDiffusion.signature",
+      "kind": "method",
+      "module": "tropoi.temporal.tendencies.boundary_layer",
+      "qualname": "BoundaryLayerDiffusion.signature",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.temporal.tendencies.boundary_layer.BoundaryLayerDiffusion.state_dict",
+      "kind": "method",
+      "module": "tropoi.temporal.tendencies.boundary_layer",
+      "qualname": "BoundaryLayerDiffusion.state_dict",
       "type": "function"
     },
     {

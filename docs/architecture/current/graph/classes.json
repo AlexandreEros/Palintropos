@@ -5859,6 +5859,43 @@
     {
       "decorators": [],
       "external_bases": [],
+      "id": "tropoi.temporal.tendencies.boundary_layer.BoundaryLayerDiffusion",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__call__"
+        },
+        {
+          "kind": "method",
+          "name": "__init__"
+        },
+        {
+          "kind": "method",
+          "name": "_synthesize"
+        },
+        {
+          "kind": "method",
+          "name": "budget_means"
+        },
+        {
+          "kind": "method",
+          "name": "load_state_dict"
+        },
+        {
+          "kind": "method",
+          "name": "signature"
+        },
+        {
+          "kind": "method",
+          "name": "state_dict"
+        }
+      ],
+      "module": "tropoi.temporal.tendencies.boundary_layer",
+      "qualname": "BoundaryLayerDiffusion"
+    },
+    {
+      "decorators": [],
+      "external_bases": [],
       "id": "tropoi.temporal.tendencies.drag.LatitudeDependentRayleighDrag",
       "members": [
         {

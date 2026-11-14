@@ -84,7 +84,7 @@
     {
       "direction": "down",
       "kind": "imports",
-      "module_edges": 24,
+      "module_edges": 25,
       "package_edges": 12,
       "source": "run",
       "target": "temporal",
@@ -102,7 +102,16 @@
     {
       "direction": "down",
       "kind": "imports",
-      "module_edges": 25,
+      "module_edges": 1,
+      "package_edges": 1,
+      "source": "temporal",
+      "target": "physics",
+      "type_checking_only_package_edges": 0
+    },
+    {
+      "direction": "down",
+      "kind": "imports",
+      "module_edges": 26,
       "package_edges": 6,
       "source": "temporal",
       "target": "spatial",
@@ -122,7 +131,7 @@
       "depth": 5,
       "id": "physics",
       "internal_package_edges": 1,
-      "modules": 18,
+      "modules": 19,
       "packages": 2
     },
     {
@@ -150,7 +159,7 @@
       "depth": 3,
       "id": "temporal",
       "internal_package_edges": 2,
-      "modules": 12,
+      "modules": 13,
       "packages": 2
     }
   ]

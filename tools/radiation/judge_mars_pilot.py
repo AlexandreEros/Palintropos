@@ -10,6 +10,24 @@ criteria are applied exactly as fixed in commit fba92fb.
 ``--tides`` names the M5 sample inside H's evidence directory (default
 ``tides.json``); ``--out-file`` the verdict file (default
 ``verdicts.json``). An existing verdict file is never overwritten.
+
+``--criteria 2e`` judges a boundary-layer pair as pre-registered in plan
+§2e (commit 04f4547): M6 becomes the scaled pair (|drift| <= 1e-5 to day
+30 AND <= 2e-5 over the run), M7 bounds the daily max lowest-level wind
+speed (``max_wind_bottom``) by 40 m/s over days M7_FIRST_DAY..DAYS
+(pre-registered independently of ``--window``), and the report adds the
+boundary layer's kinetic-energy sink and the two fixer-equivalent series
+(the per-day mass factor Isca's mass correction would have applied, and
+the uniform temperature increment per day its energy correction would have
+applied). The default leaves every earlier verdict path untouched.
+
+M4 and the boundary layer: ``summarize_run.py`` measures the sinks on the
+saved states, which carry no slab temperature, so it cannot evaluate the
+boundary layer; the run itself records that sink as ``bl_kinetic_sink``.
+When U's series has it and the measured operators do not already include
+``boundary_layer_diffusion``, its window mean is added to the sinks. Under
+``frictional_heating`` the boundary layer returns its kinetic energy as
+heat (column-exact), so its total-energy sink is zero and nothing is added.
 """
 from __future__ import annotations
 
@@ -22,6 +40,23 @@ import numpy as np
 EVIDENCE = pathlib.Path(__file__).resolve().parents[2] / "docs" / "radiation" / "evidence"
 WINDOW = (11, 30)          # default: days whose daily records enter the window means
 DAYS = 30                  # default: the configured last day (M1)
+M7_FIRST_DAY = 11          # plan 2e: M7 covers days 11..DAYS whatever the window
+BL_KIND = "boundary_layer_diffusion"
+
+
+def _boundary_layer_sink(series, summary, config):
+    """The boundary layer's total-energy sink over the window (W m^-2,
+    negative removes) that the state-sink measurement left out, and why."""
+    if BL_KIND in summary["sinks"].get("operators", []):
+        return 0.0, "already among the measured sink operators"
+    if "bl_kinetic_sink" not in series:
+        return 0.0, "no boundary layer in this run"
+    if config["config"].get("frictional_heating"):
+        return 0.0, "frictional_heating returns the boundary layer's kinetic energy as heat"
+    day = np.asarray(series["day"], dtype=float)[1:]
+    sink = np.asarray(series["bl_kinetic_sink"], dtype=float)[1:]
+    win = (day >= WINDOW[0]) & (day <= WINDOW[1])
+    return float(sink[win].mean()), "series bl_kinetic_sink, window mean of the daily records"
 
 
 def _load(name):
@@ -81,6 +116,9 @@ def main() -> None:
     ap.add_argument("--window", type=int, nargs=2, default=list(WINDOW),
                     metavar=("FIRST", "LAST"), help="days of the M2-M4 window means")
     ap.add_argument("--days", type=int, default=DAYS, help="configured last day (M1)")
+    ap.add_argument("--criteria", choices=["2d", "2e"], default="2d",
+                    help="2e: the boundary-layer pair of plan 2e (scaled M6, M7, "
+                         "fixer-equivalent report)")
     args = ap.parse_args()
     globals()["WINDOW"], globals()["DAYS"] = tuple(args.window), args.days
     h_name, u_name = args.h_evidence, args.u_evidence
@@ -89,10 +127,14 @@ def main() -> None:
     sinks = usum["sinks"]
     states = [s for s in sinks["states"] if WINDOW[0] <= s["day"] <= WINDOW[1]]
     totals = np.array([s["all_sinks_total"] for s in states])
-    sink_mean = float(totals.mean())
+    state_sinks = float(totals.mean())
+    bl_sink, bl_source = _boundary_layer_sink(us, usum, ucfg)
+    sink_mean = state_sinks + bl_sink
     sink_se = float(totals.std(ddof=1) / np.sqrt(totals.size))
     tolerance = max(2.0 * sink_se, 1e-3 * u["F"])
     m4 = {"unheated_residual": u["residual_window_mean"], "unheated_sinks": sink_mean,
+          "state_sinks": state_sinks, "boundary_layer_sink": bl_sink,
+          "boundary_layer_sink_source": bl_source,
           "sinks_standard_error": sink_se, "states": int(totals.size), "tolerance": tolerance,
           "difference": u["residual_window_mean"] - sink_mean,
           "met": bool(abs(u["residual_window_mean"] - sink_mean) <= tolerance and h["M2"])}
@@ -111,6 +153,48 @@ def main() -> None:
                      "H_minus_U_toa_window_mean": h["toa_window_mean"] - u["toa_window_mean"],
                      "tides": {k: v for k, v in tides.items() if k not in ("by_latitude", "M5")}},
     }
+    if args.criteria == "2e":
+        verdicts["criteria_commit"] = "04f4547 (plan 2e)"
+        for name, series, assessed in (("H", hs, h), ("U", us, u)):
+            day = np.asarray(series["day"], dtype=float)
+            ps = np.asarray(series["mean_ps"], dtype=float)
+            d30 = np.nonzero(day == 30.0)[0]
+            assessed["ps_drift_day30"] = (float(ps[d30[0]] / ps[0] - 1.0) if d30.size
+                                          else None)
+            assessed["M6"] = bool(assessed["ps_drift_day30"] is not None
+                                  and abs(assessed["ps_drift_day30"]) <= 1e-5
+                                  and abs(assessed["ps_drift"]) <= 2e-5)
+            m7_win = (day >= M7_FIRST_DAY) & (day <= DAYS)
+            bottom = np.asarray(series["max_wind_bottom"], dtype=float)
+            assessed["max_wind_bottom"] = float(bottom[m7_win].max())
+            assessed["M7"] = bool(assessed["max_wind_bottom"] <= 40.0
+                                  and assessed["last_day"] == float(DAYS))
+        verdicts["verdict"]["M6"] = bool(h["M6"] and u["M6"])
+        verdicts["verdict"]["M7"] = bool(h["M7"] and u["M7"])
+        verdicts["m7_days"] = [M7_FIRST_DAY, DAYS]
+        # Fixer-equivalent series (plan 2e, reported, never applied): the
+        # per-day mass factor Isca's do_mass_correction would have applied,
+        # and the uniform temperature increment per day (K/day) that its
+        # do_energy_correction would have removed, from H's own records.
+        day = np.asarray(hs["day"], dtype=float)
+        ps = np.asarray(hs["mean_ps"], dtype=float)
+        res = np.asarray(hs["energy_residual"], dtype=float)          # days 1..N, W/m^2
+        cp_heat = float(hcfg["config"]["cp"])
+        gravity = float(hcfg["config"]["gravity"])
+        mass_factor = ps[:-1] / ps[1:]
+        energy_dt = -res * 86400.0 * gravity / (cp_heat * ps[1:])
+        verdicts["reported"]["fixer_equivalent"] = {
+            "mass_factor_day_by_day": [float(x) for x in mass_factor],
+            "mass_factor_log_sum": float(np.log(mass_factor).sum()),
+            "energy_uniform_dT_per_day": [float(x) for x in energy_dt],
+            "energy_uniform_dT_mean": float(energy_dt.mean()),
+        }
+        if "bl_kinetic_sink" in hs:
+            sink = np.asarray(hs["bl_kinetic_sink"], dtype=float)[1:]
+            win = (day[1:] >= WINDOW[0]) & (day[1:] <= WINDOW[1])
+            verdicts["reported"]["bl_kinetic_sink_window_mean"] = float(sink[win].mean())
+            verdicts["reported"]["bl_max_depth_max"] = float(
+                np.max(hs["bl_max_depth"]))
     target.write_text(
         json.dumps(verdicts, indent=2, sort_keys=True, default=float) + "\n", encoding="utf-8")
     print(json.dumps(verdicts["verdict"], indent=2))

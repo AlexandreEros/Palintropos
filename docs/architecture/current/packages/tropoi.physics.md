@@ -9,6 +9,7 @@ Index: [all packages](../index.md) · parent [`tropoi`](tropoi.md) · [`tropoi.p
 | Module | Category | Classes | Public functions |
 |---|---|---|---|
 | `tropoi.physics` | empty | – | – |
+| `tropoi.physics.boundary_layer` | code | – | `boundary_layer_depth`, `diffusivity_profile`, `exchange_coefficient`, `implicit_column_diffusion` |
 | `tropoi.physics.column` | code | `AtmosphericColumn`, `ColumnError` | `thin_atmosphere_mass_kg`, `thin_atmosphere_surface_pressure_pa` |
 | `tropoi.physics.column_model` | code | `ColumnPhysics`, `PhysicsOutput`, `RadiativeConvectiveColumn` | – |
 | `tropoi.physics.composition` | code | `Composition`, `CompositionError` | `gas_constant_report` |
@@ -36,6 +37,7 @@ This package's modules and the import edges between them; every other package is
 flowchart LR
     subgraph g_tropoi_ophysics["physics"]
         n_tropoi_ophysics["physics"]
+        n_tropoi_ophysics_oboundary__layer["physics.boundary#95;layer"]
         n_tropoi_ophysics_ocolumn["physics.column"]
         n_tropoi_ophysics_ocolumn__model["physics.column#95;model"]
         n_tropoi_ophysics_ocomposition["physics.composition"]
@@ -54,6 +56,8 @@ flowchart LR
     p_tropoi_ophysics_oradiation["package physics.radiation"]
     p_tropoi_orepresentation_ovisual["package representation.visual"]
     p_tropoi_orun_oradiative["package run.radiative"]
+    p_tropoi_otemporal_otendencies["package temporal.tendencies"]
+    n_tropoi_ophysics_oboundary__layer --> n_tropoi_ophysics_osurface
     n_tropoi_ophysics_ocolumn --> n_tropoi_ophysics_oconstants
     n_tropoi_ophysics_ocolumn__model --> n_tropoi_ophysics_oconvection
     n_tropoi_ophysics_ocolumn__model --> n_tropoi_ophysics_osurface
@@ -88,11 +92,13 @@ flowchart LR
     p_tropoi_orun_oradiative -->|1| n_tropoi_ophysics_oinsolation
     p_tropoi_orun_oradiative -.->|1| n_tropoi_ophysics_ospecies
     p_tropoi_orun_oradiative -->|1| n_tropoi_ophysics_osurface
+    p_tropoi_otemporal_otendencies -->|1| n_tropoi_ophysics_oboundary__layer
     n_tropoi_ophysics_ocolumn__model -->|1| p_tropoi_ophysics_oradiation
     classDef other fill:none,stroke-dasharray:3 3
     class p_tropoi_ophysics_oradiation other
     class p_tropoi_orepresentation_ovisual other
     class p_tropoi_orun_oradiative other
+    class p_tropoi_otemporal_otendencies other
 ```
 
 ## Classes

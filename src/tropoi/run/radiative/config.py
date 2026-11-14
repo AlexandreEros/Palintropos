@@ -63,6 +63,12 @@ class RadiativeConfig:
     # top Rayleigh sponge {"bottom_pressure": Pa, "efold_days": d} (Isca
     # damping_driver); left out of the canonical form when unset
     sponge: Optional[dict] = None
+    # dry boundary layer (MARS_MI_PLAN.md 2e): bulk surface stress plus
+    # implicit K-profile diffusion of momentum and dry static energy,
+    # {"roughness_length": m, "critical_richardson": ..., "rich_crit_pbl":
+    # ..., "frac_inner": ..., "gustiness": m/s}; left out of the canonical
+    # form when unset so every earlier configuration keeps its hash
+    boundary_layer: Optional[dict] = None
     internal_heat_flux: float = 0.0
     # return the kinetic energy removed by drag and hyperdiffusion as heat.
     # The field default stays False: configurations recorded before the
@@ -115,6 +121,8 @@ class RadiativeConfig:
             raise ValueError("vertical and longwave need a 'kind'")
         if self.sensible is not None and self.surface is None:
             raise ValueError("sensible exchange needs a surface")
+        if self.boundary_layer is not None and self.surface is None:
+            raise ValueError("the boundary layer needs a surface")
         if self.surface is None and self.shortwave is None and self.internal_heat_flux <= 0:
             raise ValueError("a surface-less column needs a stellar or interior heat source")
 
@@ -141,6 +149,8 @@ class RadiativeConfig:
         d = asdict(self)
         if d["sponge"] is None:
             del d["sponge"]
+        if d["boundary_layer"] is None:
+            del d["boundary_layer"]
         if not d["frictional_heating"]:
             # written only when set, so configurations that predate the
             # option keep their hash
@@ -275,7 +285,8 @@ def _time_of_perihelion_for_equinox_start(period: float, eccentricity: float,
 
 def mars_gray_flat_dev(experiment_id: Optional[str] = None, *, days: int = 30,
                        dt: float = 600.0, frictional_heating: bool = True,
-                       sponge: bool = False, implicit_surface: bool = False) -> RadiativeConfig:
+                       sponge: bool = False, implicit_surface: bool = False,
+                       boundary_layer: bool = False) -> RadiativeConfig:
     """DEVELOPMENT EXPERIMENT, not a reproduction of Thomson & Vallis (2019)
     M-I (docs/radiation/MARS_MI_PLAN.md).
 
@@ -298,12 +309,23 @@ def mars_gray_flat_dev(experiment_id: Optional[str] = None, *, days: int = 30,
     ``dev-mars-gray-flat-sponge-implicit``) solves the bulk sensible exchange
     backward-Euler between bottom layer and slab (MARS_MI_PLAN.md §2c-2d;
     the explicit exchange is unstable in Isca's 0.73 Pa bottom layer once
-    low-level winds pass ~25 m/s). NOT matched: T21 (M-I: T42), del^8 and RAW (Isca:
+    low-level winds pass ~25 m/s). ``boundary_layer=True`` (preset
+    ``dev-mars-gray-flat-bl``) replaces BOTH substitutes with the §2e dry
+    boundary layer: bulk surface stress plus implicit K-profile diffusion
+    of momentum and dry static energy (drag and convection are then None,
+    matching M-I's ``convection: None``); it implies the sponge and the
+    implicit exchange. NOT matched: T21 (M-I: T42), del^8 and RAW (Isca:
     del^4 and Robert-Asselin 0.04), a uniform 285 K initial surface (Isca
-    test case: 285 - 40 (3 sin^2 lat - 1) / 3).
+    test case: 285 - 40 (3 sin^2 lat - 1) / 3), and the FHZ06-simplified
+    exchange coefficient and neutral K profile against Isca's full
+    Monin-Obukhov forms (stated in §2e).
     """
+    if boundary_layer:
+        sponge = implicit_surface = True
     year, ecc, ls_peri = 59166360.0, 0.0935, 250.85
-    name = "dev-mars-gray-flat" + ("-sponge" if sponge else "") +         ("-implicit" if implicit_surface else "")
+    name = "dev-mars-gray-flat" + ("-bl" if boundary_layer else
+                                   ("-sponge" if sponge else "") +
+                                   ("-implicit" if implicit_surface else ""))
     sensible = {"roughness_length": 3.21e-5, "critical_richardson": 1.0, "gustiness": 0.0}
     if implicit_surface:
         sensible["implicit"] = True
@@ -322,11 +344,15 @@ def mars_gray_flat_dev(experiment_id: Optional[str] = None, *, days: int = 30,
                     "time_of_perihelion": _time_of_perihelion_for_equinox_start(year, ecc,
                                                                                 ls_peri),
                     "solar_day": 88440.0},
-        convection={"timescale": 0.0},
+        convection=None if boundary_layer else {"timescale": 0.0},
         surface={"heat_capacity": 2.0 * _ISCA_RHO_CP, "albedo": 0.3, "emissivity": 1.0,
                  "initial_temperature": 285.0},
         sensible=sensible,
-        drag={"kind": "held_suarez", "k_f_per_day": 1.0, "sigma_b": 0.7},
+        boundary_layer={"roughness_length": 3.21e-5, "critical_richardson": 1.0,
+                        "rich_crit_pbl": 1.0, "frac_inner": 0.1,
+                        "gustiness": 0.0} if boundary_layer else None,
+        drag=None if boundary_layer else {"kind": "held_suarez", "k_f_per_day": 1.0,
+                                          "sigma_b": 0.7},
         initial={"kind": "isothermal", "temperature": 264.0},
         checkpoint_every_days=10, state_every_days=1,
         **_t21())
@@ -336,4 +362,6 @@ PRESETS = {"jupiter-schneider-liu": jupiter_schneider_liu, "earth-gray-dry": ear
            "dev-mars-gray-flat": mars_gray_flat_dev,
            "dev-mars-gray-flat-sponge": functools.partial(mars_gray_flat_dev, sponge=True),
            "dev-mars-gray-flat-sponge-implicit": functools.partial(
-               mars_gray_flat_dev, sponge=True, implicit_surface=True, days=60)}
+               mars_gray_flat_dev, sponge=True, implicit_surface=True, days=60),
+           "dev-mars-gray-flat-bl": functools.partial(
+               mars_gray_flat_dev, boundary_layer=True, days=60)}
