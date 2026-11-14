@@ -214,3 +214,65 @@ def test_a_resumed_boundary_layer_run_is_identical(tmp_path):
     sa = json.loads((tmp_path / "a" / "series.json").read_text())
     sb = json.loads((tmp_path / "b" / "series.json").read_text())
     assert sa == sb
+
+
+# ---------------------------------------------------------------------------
+# the 2e judge path (CPU)
+# ---------------------------------------------------------------------------
+
+def _fake_evidence(root: pathlib.Path, name: str, *, drift30: float, drift60: float,
+                   wind_bottom: float) -> None:
+    """A synthetic 60-day evidence directory with everything the judge reads."""
+    days = 60
+    ps0 = 610.0
+    ps = [ps0] + [ps0 * (1.0 + drift30 * min(d, 30) / 30.0
+                         + (drift60 - drift30) * max(d - 30, 0) / 30.0)
+                  for d in range(1, days + 1)]
+    n1 = days + 1
+    series = {
+        "day": list(range(n1)), "mean_ps": ps,
+        "max_abs_u": [100.0] * n1, "t_min": [150.0] * n1, "t_max": [300.0] * n1,
+        "max_wind_bottom": [wind_bottom] * n1,
+        "bl_kinetic_sink": [-0.05] * n1, "bl_max_depth": [4000.0] * n1,
+        "energy_total": [1.0e7] * n1, "mean_surface_temperature": [240.0] * n1,
+        "energy_residual": [-0.01] * days, "absorbed_stellar": [100.0] * n1,
+        "toa_net_down": [0.0] * n1, "surface_net": [0.0] * n1,
+    }
+    d = root / name
+    d.mkdir(parents=True)
+    (d / "series.json").write_text(json.dumps(series))
+    (d / "summary.json").write_text(json.dumps(
+        {"sinks": {"states": [{"day": day, "all_sinks_total": -0.01}
+                              for day in range(11, 31)]}}))
+    (d / "config.json").write_text(json.dumps(
+        {"config": {"cp": 844.8, "gravity": 3.71, "surface": {"heat_capacity": 8.26e6}}}))
+    (d / "tides.json").write_text(json.dumps({"M5": {"met": False}}))
+
+
+def test_the_2e_judge_applies_the_scaled_m6_and_m7(tmp_path, monkeypatch, capsys):
+    """Plan §2e: M6 needs BOTH the 30-day and the scaled 60-day bound; M7
+    bounds the lowest-level wind; the fixer-equivalent report follows from
+    the series arithmetic. The default (2d) path is untouched by the flag."""
+    import importlib
+    import sys
+    sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1] / "tools" / "radiation"))
+    judge = importlib.import_module("judge_mars_pilot")
+    monkeypatch.setattr(judge, "EVIDENCE", tmp_path)
+    # H passes everything; U fails M6 on the 60-day bound alone and M7
+    _fake_evidence(tmp_path, "H", drift30=-8e-6, drift60=-1.5e-5, wind_bottom=30.0)
+    _fake_evidence(tmp_path, "U", drift30=-8e-6, drift60=-2.5e-5, wind_bottom=45.0)
+    monkeypatch.setattr(sys, "argv", ["judge", "H", "U", "--days", "60",
+                                      "--window", "11", "30", "--criteria", "2e"])
+    judge.main()
+    v = json.loads((tmp_path / "H" / "verdicts.json").read_text())
+    assert v["criteria_commit"].startswith("04f4547")
+    assert v["H"]["M6"] is True and v["U"]["M6"] is False
+    assert v["H"]["M7"] is True and v["U"]["M7"] is False
+    assert v["verdict"]["M6"] is False and v["verdict"]["M7"] is False
+    assert v["H"]["ps_drift_day30"] == pytest.approx(-8e-6)
+    fx = v["reported"]["fixer_equivalent"]
+    assert fx["mass_factor_log_sum"] == pytest.approx(-np.log1p(-1.5e-5), rel=1e-6)
+    # -res * 86400 * g / (cp * ps): res = -0.01 everywhere
+    assert fx["energy_uniform_dT_mean"] == pytest.approx(
+        0.01 * 86400.0 * 3.71 / (844.8 * 610.0), rel=1e-4)
+    assert v["reported"]["bl_kinetic_sink_window_mean"] == pytest.approx(-0.05)

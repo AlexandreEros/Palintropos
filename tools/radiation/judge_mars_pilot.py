@@ -10,6 +10,16 @@ criteria are applied exactly as fixed in commit fba92fb.
 ``--tides`` names the M5 sample inside H's evidence directory (default
 ``tides.json``); ``--out-file`` the verdict file (default
 ``verdicts.json``). An existing verdict file is never overwritten.
+
+``--criteria 2e`` judges a boundary-layer pair as pre-registered in plan
+§2e (commit 04f4547): M6 becomes the scaled pair (|drift| <= 1e-5 to day
+30 AND <= 2e-5 over the run), M7 bounds the daily max lowest-level wind
+speed (``max_wind_bottom``) by 40 m/s over days WINDOW[0]..DAYS, and the
+report adds the boundary layer's kinetic-energy sink and the two
+fixer-equivalent series (the per-day mass factor Isca's mass correction
+would have applied, and the uniform temperature increment per day its
+energy correction would have applied). The default leaves every earlier
+verdict path untouched.
 """
 from __future__ import annotations
 
@@ -81,6 +91,9 @@ def main() -> None:
     ap.add_argument("--window", type=int, nargs=2, default=list(WINDOW),
                     metavar=("FIRST", "LAST"), help="days of the M2-M4 window means")
     ap.add_argument("--days", type=int, default=DAYS, help="configured last day (M1)")
+    ap.add_argument("--criteria", choices=["2d", "2e"], default="2d",
+                    help="2e: the boundary-layer pair of plan 2e (scaled M6, M7, "
+                         "fixer-equivalent report)")
     args = ap.parse_args()
     globals()["WINDOW"], globals()["DAYS"] = tuple(args.window), args.days
     h_name, u_name = args.h_evidence, args.u_evidence
@@ -111,6 +124,47 @@ def main() -> None:
                      "H_minus_U_toa_window_mean": h["toa_window_mean"] - u["toa_window_mean"],
                      "tides": {k: v for k, v in tides.items() if k not in ("by_latitude", "M5")}},
     }
+    if args.criteria == "2e":
+        verdicts["criteria_commit"] = "04f4547 (plan 2e)"
+        for name, series, assessed in (("H", hs, h), ("U", us, u)):
+            day = np.asarray(series["day"], dtype=float)
+            ps = np.asarray(series["mean_ps"], dtype=float)
+            d30 = np.nonzero(day == 30.0)[0]
+            assessed["ps_drift_day30"] = (float(ps[d30[0]] / ps[0] - 1.0) if d30.size
+                                          else None)
+            assessed["M6"] = bool(assessed["ps_drift_day30"] is not None
+                                  and abs(assessed["ps_drift_day30"]) <= 1e-5
+                                  and abs(assessed["ps_drift"]) <= 2e-5)
+            m7_win = (day >= WINDOW[0]) & (day <= DAYS)
+            bottom = np.asarray(series["max_wind_bottom"], dtype=float)
+            assessed["max_wind_bottom"] = float(bottom[m7_win].max())
+            assessed["M7"] = bool(assessed["max_wind_bottom"] <= 40.0
+                                  and assessed["last_day"] == float(DAYS))
+        verdicts["verdict"]["M6"] = bool(h["M6"] and u["M6"])
+        verdicts["verdict"]["M7"] = bool(h["M7"] and u["M7"])
+        # Fixer-equivalent series (plan 2e, reported, never applied): the
+        # per-day mass factor Isca's do_mass_correction would have applied,
+        # and the uniform temperature increment per day (K/day) that its
+        # do_energy_correction would have removed, from H's own records.
+        day = np.asarray(hs["day"], dtype=float)
+        ps = np.asarray(hs["mean_ps"], dtype=float)
+        res = np.asarray(hs["energy_residual"], dtype=float)          # days 1..N, W/m^2
+        cp_heat = float(hcfg["config"]["cp"])
+        gravity = float(hcfg["config"]["gravity"])
+        mass_factor = ps[:-1] / ps[1:]
+        energy_dt = -res * 86400.0 * gravity / (cp_heat * ps[1:])
+        verdicts["reported"]["fixer_equivalent"] = {
+            "mass_factor_day_by_day": [float(x) for x in mass_factor],
+            "mass_factor_log_sum": float(np.log(mass_factor).sum()),
+            "energy_uniform_dT_per_day": [float(x) for x in energy_dt],
+            "energy_uniform_dT_mean": float(energy_dt.mean()),
+        }
+        if "bl_kinetic_sink" in hs:
+            sink = np.asarray(hs["bl_kinetic_sink"], dtype=float)[1:]
+            win = (day[1:] >= WINDOW[0]) & (day[1:] <= WINDOW[1])
+            verdicts["reported"]["bl_kinetic_sink_window_mean"] = float(sink[win].mean())
+            verdicts["reported"]["bl_max_depth_max"] = float(
+                np.max(hs["bl_max_depth"]))
     target.write_text(
         json.dumps(verdicts, indent=2, sort_keys=True, default=float) + "\n", encoding="utf-8")
     print(json.dumps(verdicts["verdict"], indent=2))
