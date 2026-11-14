@@ -220,51 +220,67 @@ def test_a_resumed_boundary_layer_run_is_identical(tmp_path):
 # the 2e judge path (CPU)
 # ---------------------------------------------------------------------------
 
-def _fake_evidence(root: pathlib.Path, name: str, *, drift30: float, drift60: float,
-                   wind_bottom: float) -> None:
-    """A synthetic 60-day evidence directory with everything the judge reads."""
+def _fake_evidence(root: pathlib.Path, name: str, *, drift30: float = -8e-6,
+                   drift60: float = -1.5e-5, wind_bottom=30.0, residual: float = -0.01,
+                   absorbed: float = 100.0, bl_sink: float = -0.05,
+                   state_sink: float = -0.01, sink_days=range(11, 31), operators=None,
+                   frictional_heating=None) -> None:
+    """A synthetic 60-day evidence directory with everything the judge reads.
+    ``wind_bottom`` is a constant or a {day: value} override of 30 m/s."""
     days = 60
     ps0 = 610.0
     ps = [ps0] + [ps0 * (1.0 + drift30 * min(d, 30) / 30.0
                          + (drift60 - drift30) * max(d - 30, 0) / 30.0)
                   for d in range(1, days + 1)]
     n1 = days + 1
+    if isinstance(wind_bottom, dict):
+        wind = [wind_bottom.get(d, 30.0) for d in range(n1)]
+    else:
+        wind = [wind_bottom] * n1
     series = {
         "day": list(range(n1)), "mean_ps": ps,
         "max_abs_u": [100.0] * n1, "t_min": [150.0] * n1, "t_max": [300.0] * n1,
-        "max_wind_bottom": [wind_bottom] * n1,
-        "bl_kinetic_sink": [-0.05] * n1, "bl_max_depth": [4000.0] * n1,
+        "max_wind_bottom": wind,
+        "bl_kinetic_sink": [bl_sink] * n1, "bl_max_depth": [4000.0] * n1,
         "energy_total": [1.0e7] * n1, "mean_surface_temperature": [240.0] * n1,
-        "energy_residual": [-0.01] * days, "absorbed_stellar": [100.0] * n1,
+        "energy_residual": [residual] * days, "absorbed_stellar": [absorbed] * n1,
         "toa_net_down": [0.0] * n1, "surface_net": [0.0] * n1,
     }
     d = root / name
     d.mkdir(parents=True)
     (d / "series.json").write_text(json.dumps(series))
-    (d / "summary.json").write_text(json.dumps(
-        {"sinks": {"states": [{"day": day, "all_sinks_total": -0.01}
-                              for day in range(11, 31)]}}))
+    sinks = {"states": [{"day": day, "all_sinks_total": state_sink} for day in sink_days]}
+    if operators is not None:
+        sinks["operators"] = list(operators)
+    (d / "summary.json").write_text(json.dumps({"sinks": sinks}))
     (d / "config.json").write_text(json.dumps(
-        {"config": {"cp": 844.8, "gravity": 3.71, "surface": {"heat_capacity": 8.26e6}}}))
+        {"config": {"cp": 844.8, "gravity": 3.71, "surface": {"heat_capacity": 8.26e6},
+                    "frictional_heating": frictional_heating}}))
     (d / "tides.json").write_text(json.dumps({"M5": {"met": False}}))
+
+
+def _judge(tmp_path, monkeypatch, *argv):
+    import importlib
+    import sys
+    sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1] / "tools" / "radiation"))
+    judge = importlib.import_module("judge_mars_pilot")
+    monkeypatch.setattr(judge, "EVIDENCE", tmp_path)
+    monkeypatch.setattr(judge, "WINDOW", judge.WINDOW)
+    monkeypatch.setattr(judge, "DAYS", judge.DAYS)
+    monkeypatch.setattr(sys, "argv", ["judge", "H", "U", *argv])
+    judge.main()
+    return json.loads((tmp_path / "H" / "verdicts.json").read_text())
 
 
 def test_the_2e_judge_applies_the_scaled_m6_and_m7(tmp_path, monkeypatch, capsys):
     """Plan §2e: M6 needs BOTH the 30-day and the scaled 60-day bound; M7
     bounds the lowest-level wind; the fixer-equivalent report follows from
     the series arithmetic. The default (2d) path is untouched by the flag."""
-    import importlib
-    import sys
-    sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1] / "tools" / "radiation"))
-    judge = importlib.import_module("judge_mars_pilot")
-    monkeypatch.setattr(judge, "EVIDENCE", tmp_path)
     # H passes everything; U fails M6 on the 60-day bound alone and M7
     _fake_evidence(tmp_path, "H", drift30=-8e-6, drift60=-1.5e-5, wind_bottom=30.0)
     _fake_evidence(tmp_path, "U", drift30=-8e-6, drift60=-2.5e-5, wind_bottom=45.0)
-    monkeypatch.setattr(sys, "argv", ["judge", "H", "U", "--days", "60",
-                                      "--window", "11", "30", "--criteria", "2e"])
-    judge.main()
-    v = json.loads((tmp_path / "H" / "verdicts.json").read_text())
+    v = _judge(tmp_path, monkeypatch, "--days", "60", "--window", "11", "30",
+               "--criteria", "2e")
     assert v["criteria_commit"].startswith("04f4547")
     assert v["H"]["M6"] is True and v["U"]["M6"] is False
     assert v["H"]["M7"] is True and v["U"]["M7"] is False
@@ -276,3 +292,75 @@ def test_the_2e_judge_applies_the_scaled_m6_and_m7(tmp_path, monkeypatch, capsys
     assert fx["energy_uniform_dT_mean"] == pytest.approx(
         0.01 * 86400.0 * 3.71 / (844.8 * 610.0), rel=1e-4)
     assert v["reported"]["bl_kinetic_sink_window_mean"] == pytest.approx(-0.05)
+
+
+def test_m7_starts_at_day_11_whatever_the_m2_m4_window(tmp_path, monkeypatch, capsys):
+    """Regression: with ``--window 41 60`` a lowest-level wind violation on
+    day 20 still fails M7 (plan 2e: days 11-60); one on day 5 does not."""
+    _fake_evidence(tmp_path, "H", wind_bottom={20: 50.0}, sink_days=range(41, 61))
+    _fake_evidence(tmp_path, "U", wind_bottom={5: 99.0}, sink_days=range(41, 61))
+    v = _judge(tmp_path, monkeypatch, "--days", "60", "--window", "41", "60",
+               "--criteria", "2e")
+    assert v["window_days"] == [41, 60] and v["m7_days"] == [11, 60]
+    assert v["H"]["max_wind_bottom"] == 50.0 and v["H"]["M7"] is False
+    assert v["U"]["max_wind_bottom"] == 30.0 and v["U"]["M7"] is True
+    assert v["verdict"]["M7"] is False
+
+
+@pytest.mark.parametrize("case", ["added", "already_measured", "returned_as_heat"])
+def test_m4_counts_the_boundary_layer_sink_exactly_once(tmp_path, monkeypatch, capsys, case):
+    """U's residual -0.06 W/m^2 against state sinks -0.01 plus a recorded
+    boundary-layer sink -0.05 (F = 10, tolerance 0.01). The series sink is
+    added when the measurement lacks it, not when the operators already
+    include it, and not when frictional heating returns it as heat."""
+    common = dict(absorbed=10.0, sink_days=range(41, 61))
+    _fake_evidence(tmp_path, "H", residual=0.0, **common)
+    if case == "added":
+        _fake_evidence(tmp_path, "U", residual=-0.06, state_sink=-0.01, **common)
+        expect_bl, expect_sinks, met = -0.05, -0.06, True
+    elif case == "already_measured":
+        _fake_evidence(tmp_path, "U", residual=-0.06, state_sink=-0.06,
+                       operators=["rayleigh_sponge", "boundary_layer_diffusion"], **common)
+        expect_bl, expect_sinks, met = 0.0, -0.06, True
+    else:
+        _fake_evidence(tmp_path, "U", residual=-0.06, state_sink=-0.01,
+                       frictional_heating=True, **common)
+        expect_bl, expect_sinks, met = 0.0, -0.01, False
+    v = _judge(tmp_path, monkeypatch, "--days", "60", "--window", "41", "60",
+               "--criteria", "2e")
+    m4 = v["M4"]
+    assert m4["boundary_layer_sink"] == pytest.approx(expect_bl)
+    assert m4["unheated_sinks"] == pytest.approx(expect_sinks)
+    assert m4["unheated_sinks"] == pytest.approx(m4["state_sinks"] + m4["boundary_layer_sink"])
+    assert m4["tolerance"] == pytest.approx(0.01)
+    assert m4["met"] is met and v["verdict"]["M4"] is met
+
+
+@needs_cuda
+def test_the_tides_tool_restores_and_replays_a_boundary_layer_checkpoint(
+        tmp_path, monkeypatch, capsys):
+    """mars_tides must rebuild the boundary layer like RadiativeRun (the
+    saved hook signatures include it), restore its budget state, and replay
+    the last checkpoint interval onto the run's own saved state exactly."""
+    import importlib
+    import sys
+    from tropoi.run.held_suarez.checkpoint import list_checkpoints, read_checkpoint
+    from tropoi.run.radiative.experiment import RadiativeRun
+    sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1] / "tools" / "radiation"))
+    tides = importlib.import_module("mars_tides")
+    cfg = _tiny_bl(2, "mars-bl-tides")
+    RadiativeRun(cfg, tmp_path / "run", allow_dirty=True, log=lambda s: None).run()
+    _, model, coupling, stepper, _, ckpt = tides._restore(tmp_path / "run", -2)
+    kinds = [t.signature()["kind"] for t in stepper.lagged_terms]
+    assert "boundary_layer_diffusion" in kinds
+    bl =next(t for t in stepper.lagged_terms
+              if t.signature()["kind"] == "boundary_layer_diffusion")
+    _, meta = read_checkpoint(list_checkpoints(tmp_path / "run" / "checkpoints")[-2][1])
+    assert bl.state_dict() == meta["boundary_layer"]
+    monkeypatch.setattr(tides, "EVIDENCE", tmp_path / "evidence")
+    monkeypatch.setattr(sys, "argv", ["mars_tides", str(tmp_path / "run"), "--name", "E",
+                                      "--window", "last", "--sols", "0.5"])
+    tides.main()
+    out = json.loads((tmp_path / "evidence" / "E" / "tides.json").read_text())
+    assert out["restored_checkpoint"] == ckpt
+    assert out["replay_max_relative_departure_by_day"] == {"2": 0.0}

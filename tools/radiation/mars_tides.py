@@ -44,7 +44,8 @@ def _restore(run_dir: pathlib.Path, checkpoint_index: int = -1,
     import cupy as cp
     from tropoi.run.held_suarez.checkpoint import list_checkpoints, read_checkpoint
     from tropoi.run.radiative.config import RadiativeConfig
-    from tropoi.run.radiative.model import build_model, build_physics, build_stepper
+    from tropoi.run.radiative.model import (build_boundary_layer, build_model, build_physics,
+                                            build_stepper)
     from tropoi.temporal.column_coupling import ColumnPhysicsCoupling
     doc = json.loads((run_dir / "config.json").read_text(encoding="utf-8"))
     cfg = RadiativeConfig.from_dict(doc["config"])
@@ -57,7 +58,9 @@ def _restore(run_dir: pathlib.Path, checkpoint_index: int = -1,
     physics = build_physics(cfg)
     coupling = ColumnPhysicsCoupling(model, physics, cfg.dt,
                                      surface_temperature=cp.asarray(arrays["surface_temperature"]))
-    stepper = build_stepper(cfg, model, coupling)
+    # the same lagged terms as RadiativeRun, or the saved hook signatures refuse
+    boundary_layer = build_boundary_layer(cfg, model, coupling)
+    stepper = build_stepper(cfg, model, coupling, boundary_layer=boundary_layer)
     sd = dict(meta["stepper"])
     sd["x_curr"] = cp.asarray(arrays["x_curr"])
     sd["x_prev"] = cp.asarray(arrays["x_prev"])
@@ -68,6 +71,8 @@ def _restore(run_dir: pathlib.Path, checkpoint_index: int = -1,
     c = dict(meta["coupling"] or {})
     c["surface_temperature"] = arrays["surface_temperature"]
     coupling.load_state_dict(c)
+    if boundary_layer is not None:
+        boundary_layer.load_state_dict(meta.get("boundary_layer") or {})
     return cfg, model, coupling, stepper, physics, path.name
 
 
