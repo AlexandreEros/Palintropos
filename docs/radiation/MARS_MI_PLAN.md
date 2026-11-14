@@ -1,5 +1,13 @@
 # Isca Mars M-I: gap analysis and flat-Mars pilot (2026-11-13)
 
+> **Amended 2026-11-14 (§4).** §1–§3 below are the historical record and
+> are unchanged. The criteria M1–M7, N1 and I1–I2 are **historical
+> development criteria**. They judged engineering experiments, and their
+> verdicts stand as written. They are neither current requirements nor
+> published M-I criteria. The current requirements register, the published
+> M-I comparison protocol and the remaining configuration differences are
+> in §4. The reasoning is in `MARS_MI_REQUIREMENTS_AUDIT.md`.
+
 Target: the intermediate-complexity Mars model **M-I** of Thomson & Vallis
 (2019), *Atmosphere* 10, 803 (doi:10.3390/atmos10120803), §4.2 and Table 1.
 The pilot defined here is a **development experiment, not a reproduction
@@ -562,3 +570,308 @@ criterion, or an M-I reproduction.
 5. T42, one Mars year plus the L_s 225°–315° average; compare with Fig. 4b.
 6. Then MOLA terrain with nothing else changed (the existing terrain
    import), for the flat-to-topography comparison.
+
+## 4. Requirements amendment (2026-11-14)
+
+This amendment corrects how requirements are written and classified. It is
+**not** a retrospective attempt to make any experiment pass. Nothing in
+§1–§3 changes: no criterion, prediction, window, threshold, measurement or
+verdict. No verdict moves from "not met" to "met", and every verdict file
+stays byte-identical (§4.9). The analysis behind it, with sources and
+methods, is `MARS_MI_REQUIREMENTS_AUDIT.md` (the "audit"). Isca statements
+here were checked at the pinned commit `d1321ac3` (audit §4). Those not
+checked are listed in §4.10.
+
+### 4.1 Three kinds of statement, kept apart
+
+1. **Historical development criteria.** These are M1–M7, N1 and I1–I2 of
+   §2–§2e. They were pre-registered predictions about engineering
+   experiments: does a sponge, an implicit exchange or a boundary layer do
+   what it was added for? They stay frozen with their verdicts. None of
+   them is a published M-I criterion. Their thresholds were chosen inside
+   the project or inherited from the dry gray Earth A-series, which was
+   itself written after the runs it describes (audit §1–§2). They are not
+   requirements from here on.
+2. **Current requirements** (§4.3). Each is one of four classes:
+   implementation requirement (IR), numerical-integrity test (NI),
+   diagnostic measurement (DM) or climate-validation target (CV). Each
+   states its origin, justification, observable, evidence source and
+   verification method. Only IR and NI are pass/fail. A DM is reported and
+   never judged.
+3. **The published M-I reproduction target** (§4.4). This is the paper's
+   own comparison: Fig. 4b at T42 over L_s 225°–315°. It is the only
+   external climate reference the paper gives for M-I. No run so far can
+   be compared with it.
+
+Origin codes:
+
+- **P**: the paper (Table 1, the text, the figures).
+- **Isca**: Isca's grey-Mars test case or defaults at `d1321ac3`. It is
+  used where the paper leaves a value implicit, and is not proof that the
+  paper's run used it (§4.10).
+- **D**: derived from physical or numerical principle.
+- **I**: chosen inside the project.
+
+### 4.2 What each historical failure did and did not establish
+
+| | historical verdict (unchanged) | what the failure establishes | what it does not establish |
+| --- | --- | --- | --- |
+| M1 (§2) | not met | the top two levels were undamped without the sponge; tested and confirmed by §2b | — |
+| M1 (§2d, §2e) | not met | a southern westerly jet at 0.5–4 Pa still strengthening at L_s ≈ 29° (southern autumn). Its zonal mean is about 90–99 m s⁻¹; grid-point maxima are 170–186 m s⁻¹ (audit §3) | an instability, which N1, the temperature bounds and energy closure all rule out. Nor an error: M-I's own Fig. 4b zonal-mean jet exceeds 140 m s⁻¹ |
+| M5 window (all) | not met | the T_s peak comes at 17.0–17.05 h, as the linearised slab expectation predicts for M-I's 2 m slab (§4.7) | a defect: a peak inside 11–16 h was not to be expected of M-I's surface |
+| M5 3 × noise (§2e) | not met | the tropical p_s varies more about the fitted tide than in §2d | that the tide went undetected: the "noise" is physical variability, not measurement error |
+| M6 (§2d, §2e) | not met | the ln-p_s core's mass error grows with the flow: −2.57 × 10⁻⁵ in 60 days (Hb) | an M-I discrepancy (Isca removes the drift every step), or an energy-budget problem (its energy equivalent is about 1.4 × 10⁻⁶ F) |
+| M7 (§2e) | not met | the surface stress cut the lowest-level wind from 63 to 47 m s⁻¹, a quarter, not to 40 | that 40 m s⁻¹ is the right value. It was an internal prediction with no published counterpart |
+
+### 4.3 Current requirements register
+
+Status is given at `06f5356`, the §2e configuration
+(`dev-mars-gray-flat-bl`).
+
+**Implementation requirements (IR): conformance to M-I's configuration.**
+Pass/fail per configuration. A development run may depart from an IR only
+when the departure is labelled (§4.5). A run with an IR unmet cannot be
+called M-I.
+
+| id | requirement | origin | observable | evidence | verification | status |
+| --- | --- | --- | --- | --- | --- | --- |
+| IR-1 | a 3396 km, g 3.71, R 192, κ 0.22727, Ω = 2π/88 308 s (7.12 × 10⁻⁵), reference p_s 610 Pa | P (Table 1: a, Ω, 6.1 hPa); Isca `constants_nml` (R, κ, g, rotation period) | config fields | `config.json` | `test_the_flat_mars_development_preset_matches_m_i_where_it_claims_to`; `test_the_bl_preset_removes_both_substitutes_and_moves_no_other_identity` | met |
+| IR-2 | 25 levels on Isca's grey-Mars σ interfaces (`bk`, with `pk` = 0) | P (25 levels); Isca test case (the values) | `vertical.sigma` | `config.json` | same test (`ISCA_GREY_MARS_BK`) | met for the interfaces. Full-level placement not compared (§4.10) |
+| IR-3 | gray radiation: τ_lw = 0.2 (p/610 Pa), τ_sw = 0.2 (p/610 Pa)⁴, vertical-path shortwave, reflected beam not re-absorbed, albedo 0.3 | P (eqs. 14–15, τ 0.2); Isca `two_stream_gray_rad` (vertical path, reflection, 610 Pa reference) | radiation profiles and provider type | `config.json` | same test (profile terms and reference) | met, except the cosine of the zenith angle (§4.5) |
+| IR-4 | diurnal and seasonal insolation: S 589 W m⁻², e 0.0935, obliquity 25.19°, perihelion at L_s 250.85°, year 59 166 360 s, sol 88 440 s, L_s = 0 at t = 0 | P (diurnal cycle; perihelion near L_s 251°); Isca `astronomy_nml`, `constants_nml`, `equinox_day` 0 | insolation config; L_s(0) | `config.json` | same test | met |
+| IR-5 | slab surface of 2 m × `RHO_CP` = 8.26 × 10⁶ J m⁻² K⁻¹; flat; roughness 3.21 × 10⁻⁵ m for heat and momentum; no gustiness | P (land depth 2 m, no topography); Isca `mixed_layer`, `constants`, `idealized_moist_phys_nml`, `constant_gust` 0 | surface and BL config | `config.json` | same tests | met |
+| IR-6 | Rayleigh sponge, 0.125 day, rate ∝ ((p_b − p)/p_b)² for p < 0.5 Pa at the **local** full-level pressure; its KE loss returned as heat | Isca `damping_driver` | sponge config | `config.json` | `test_rayleigh_sponge_rates_are_iscas_damping_driver` | **partial**: p = σ × 610 Pa (§2b) |
+| IR-7 | no convection scheme | P (Table 1 "None") | `convection` | `config.json` | BL preset test | met since §2e |
+| IR-8 | boundary layer as Isca: full Monin–Obukhov `mo_drag`; K from `mo_diff` below 0.1 h and tapered above; h from Ri = 1; one implicit down–up sweep with the slab between; vertical-diffusion dissipation always returned as heat | Isca (`surface_flux`, `monin_obukhov`, `diffusivity`, `vert_diff`, `idealized_moist_phys`) | BL config and scheme | source, `config.json` | `test_boundary_layer.py` (the FHZ06 scheme only) | **partial**: FHZ06-simplified, neutral, split solves (§4.5) |
+| IR-9 | T42 | P (Table 1) | `l_max`, retained truncation | `config.json` | config check | **not met** (T21) |
+| IR-10 | numerics: Δt 110 s; ∇⁴ hyperdiffusion (`damping_order` 2, coefficient (0.1 day)⁻¹, `resolution_dependent`); Robert–Asselin 0.04 with RAW off | Isca (test case and defaults) | `dt`, `hyperdiffusion_*`, `raw_*` | `config.json` | config check | **not met** (§4.5) |
+| IR-11 | global mass and energy corrections each step | Isca `spectral_dynamics` defaults (on; not overridden) | — | — | — | **not implemented** (§3 item 4) |
+| IR-12 | initial state: isothermal 264 K at rest; T_s = 285 − 40 (3 sin²φ − 1)/3 K | Isca (`initial_temperature`, `tconst`, `delta_T`) | `initial`, `surface` | `config.json` | config check | **partial**: uniform 285 K; 0.1 m s⁻¹ seed |
+| IR-13 | no temperature floor, no CO₂ condensation, no dust, no topography | P (§4.2: "no lower bound on the temperature"; no dust or topography in M-I) | config | `config.json` | config check | met |
+
+**Numerical-integrity tests (NI).** Pass/fail on every run.
+
+| id | test | origin and justification | observable | evidence | verification |
+| --- | --- | --- | --- | --- | --- |
+| NI-1 | the run reaches its configured last day without a validation abort, and every saved state is finite | D: a necessary condition (was M1a) | `completed` event; finiteness of the states | `events.jsonl`, states, `series.json` | the judge's `last_day`; the run's own finiteness checks |
+| NI-2 | every daily T inside [0, 700] K | Isca: the grey-Mars `valid_range_T`, the range outside which M-I itself aborts. It replaces the internal 100–400 K, which becomes DM-3. Here it is checked on daily snapshots; Isca checks every step | `t_min`, `t_max` | `series.json` | from the series |
+| NI-3 | after any change to the surface coupling, the boundary layer or the time stepping: a run restarted from the final checkpoint stays finite for ≥ 2 sols | D: the regression test for the §2c instability (was N1). It is weak evidence (one state, 2 sols) and only a regression guard | finiteness of every continued step | `tides.json` (`mars_tides.py` aborts on any non-finite value) | the tool |
+| NI-4 | the slab's daily heat change equals the accumulated surface flux to 10⁻⁹ relative | D: a bookkeeping identity (observed about 10⁻¹³) (was part of M3) | `C ΔT_s / (surface_net · day) − 1` | `series.json` | judge `slab_max_relative_error` |
+| NI-5 | column operators conserve what they should: implicit exchange C_a ΔT_a + C_s ΔT_s = 0 to round-off; tridiagonal solve to 10⁻¹² relative; column dissipative heating equals the kinetic energy removed | D | unit-test quantities | tests | `test_physics_columns.py` (I1); `test_boundary_layer.py` |
+| NI-6 | a resumed run is byte-identical on the same platform; a cross-platform replay departs ≤ 10⁻⁹ relative or is refused | D (determinism); I (the 10⁻⁹) | state difference | tests; `mars_tides.py` replay record | `test_a_resumed_boundary_layer_run_is_identical`; the replay check |
+| NI-7 | **energy tripwire**: \|window-mean atmosphere and whole-system residual\| ≤ 10⁻³ F and every daily value ≤ 10⁻² F; in a heated/unheated pair, unheated residual − measured sinks within 10⁻³ F | D principle; **I numbers**, inherited from A2/A3 (Earth). Kept because they are a demonstrated detector of one defect class (missing frictional heating: the unheated Earth run fails by a factor of 22). Labelled an engineering tripwire, not a scientific requirement and not an M-I property (Isca enforces closure). A bound derived for Mars and for the CV-1 run length is open (§4.11) | `energy_residual`, the system residual, the sinks | `series.json`, `summary.json` | `judge_mars_pilot.py` (M2–M4 logic, unchanged) |
+
+**Diagnostic measurements (DM).** Reported for every run, with their
+evidence file. **Never judged.** A DM becomes a requirement only by a dated
+amendment that gives it a P or D basis.
+
+| id | measurement | was | observable and evidence |
+| --- | --- | --- | --- |
+| DM-1 | winds aloft: daily grid-point max \|u\| with its level and latitude; zonal-mean u maximum and minimum with their level and latitude; the same restricted to p > 6 Pa | M1b | `max_abs_u` (`series.json`); zonal means from the saved states (audit Appendix A) |
+| DM-2 | lowest-level winds: the daily max **\|u\|** and the daily max **horizontal speed**, both reported and labelled (§4.6) | M7 | `max_wind_bottom` (speed, `series.json`); \|u\| from the states |
+| DM-3 | daily T extremes, against the historical 100–400 K | M1c | `t_min`, `t_max` |
+| DM-4 | diurnal response: T_s S1 amplitude and peak hour **with the linearised expectation** arctan(C ω / λ_eff) beside it (§4.7); tropical p_s S1 and S2 amplitudes and phases; the RMS of the fit residual | M5 | `tides.json` |
+| DM-5 | mass: relative drift of mean p_s; ⟨ln p_s⟩ and the variance of ln p_s; the fixer-equivalent mass factor | M6 | `series.json`; `state_diagnostics.json`; the judge's `fixer_equivalent` |
+| DM-6 | energy: sinks by operator (sponge, hyperdiffusion, boundary layer); the time-integration remainder; the fixer-equivalent uniform temperature increment | M4 numbers, §2e report | `summary.json`, `series.json`, the verdict file's `reported` |
+| DM-7 | cost and stiffness: s/step; k w/C_a; BL depth (max and median) | §2c–§2e reports | `events.jsonl`, `state_diagnostics.json`, `series.json` |
+
+**Climate-validation target (CV).**
+
+| id | target | origin | observable | evidence | verification |
+| --- | --- | --- | --- | --- | --- |
+| CV-1 | M-I's seasonal zonal-mean zonal wind, L_s 225°–315° | P (Fig. 4b and §4.2) | §4.4 | a future T42 multi-year run | §4.4: a qualitative feature comparison; numerical tolerances deliberately not set |
+
+### 4.4 The published M-I comparison protocol
+
+**What the paper specifies.**
+
+- Configuration: Table 1, M-I column, plus §4.2 eqs. 14–15.
+- The comparison quantity: Fig. 4 is the "zonal-mean zonal wind for Mars
+  averaged over the solar longitude range L_S = 225°–315°", centred on the
+  northern winter solstice. Panel 4b is the grey (M-I) model.
+- Axes: latitude −90° to 90°; pressure on a log axis from 10⁻² hPa (1 Pa)
+  to about 6 hPa.
+- Colour scale: ±140 m s⁻¹, labelled every 35 m s⁻¹, with extension arrows.
+- The paper's own evaluation is **qualitative** against MACDA (MY24–27).
+  The zonal-mean wind is "now a reasonable match". The southern-hemisphere
+  eastward jet "is somewhat stronger than in the reanalysis". The much
+  stronger westward jet in the upper tropical atmosphere "now compares well
+  with observations".
+
+**What the paper does not specify.**
+
+- the integration length or spin-up;
+- which year, or how many years, were averaged;
+- the output frequency;
+- whether the zonal mean was formed on σ or on pressure surfaces;
+- any uncertainty or agreement measure.
+
+The Isca test case runs 64 × 30 sols, about 2.87 Mars years, with sol-mean
+output. It is not known to be the paper's run (§4.10).
+
+**Our protocol for CV-1** (prerequisites: IR-1 to IR-13 met, or each
+departure labelled and argued):
+
+1. T42L25, integrated at least as long as the test case: 1920 sols, from
+   L_s = 0.
+2. Sol-mean output. Average L_s 225°–315° over the last complete year,
+   and report each available year separately to expose year-to-year
+   variability.
+3. Interpolate the zonal-mean u to pressure. Plot it on Fig. 4b's axes and
+   colour scale, beside a crop of Fig. 4b.
+4. Compare the features the paper itself describes:
+   - a northern winter westerly jet near 60° N whose zonal mean exceeds the
+     140 m s⁻¹ cap over roughly 1–100 Pa, as read from the figure;
+   - a weaker southern-hemisphere eastward jet;
+   - westward flow in the tropical upper atmosphere;
+   - the latitude–pressure sign structure (the zero contour).
+
+**No numerical agreement tolerance is set.** The reference is a contour
+image with a saturating colour bar and no stated uncertainty, sampling or
+averaging. A tolerance would need a defensible basis. Options, for a later
+decision:
+
+- the digitisation uncertainty of the figure, combined with our own
+  year-to-year spread;
+- **running Isca at `d1321ac3` with the grey-Mars namelist as the
+  reference**, which gives a full field and Isca's own variability.
+
+The second is the stronger reference, and the only one that would support
+quantitative tolerances.
+
+### 4.5 Remaining configuration differences (at `06f5356`)
+
+| item | M-I (Table 1 / Isca `d1321ac3`) | the §2e runs | bearing |
+| --- | --- | --- | --- |
+| resolution | T42 | T21 (`l_max` 22, retained 21) | IR-9; CV-1 needs T42 |
+| time step | `dt_atmos` **110 s** | 600 s | IR-10. Not listed in §1. The stiffness numbers of §2c and §2e (k w/C_a, stress and diffusion stiffness) scale with the step |
+| time filter | Robert–Asselin 0.04, RAW off (`raw_filter_coeff` 1.0) | RAW ν 0.1, α 0.53 | IR-10 |
+| hyperdiffusion | ∇⁴ (`damping_order` 2), coefficient 1.157 × 10⁻⁴ s⁻¹, `resolution_dependent` (scaling not read, §4.10) | ∇⁸, e-folding 0.1 day at the cut | IR-10; changes the sinks DM-6 reports |
+| global fixers | mass and energy corrections every step; the energy correction also returns the ∇⁴ loss as uniform heat | none; residual and drift measured | IR-11. M-I's drift and dynamical residual are zero by construction, so NI-7 and DM-5 have no M-I counterpart |
+| surface exchange | full Monin–Obukhov `mo_drag` (`rich_crit` 2.0, `stable_option` 1, `drag_min` 10⁻⁵, `zeta_trans` 0.5); `use_frierson_mo_drag` false | FHZ06-simplified coefficient (Ri_c 1), neutral | IR-8 |
+| K profile | inner layer K from `mo_diff` (stability functions); taper above 0.1 h; zero above h | neutral κ u\* z below 0.1 h, the same taper | IR-8 |
+| surface–diffusion coupling | one implicit down–up sweep with the slab between (`Tri_surf`) | split: implicit exchange (§2d), then diffusion with zero bottom heat flux (§2e) | IR-8 |
+| dissipation of vertical diffusion | always returned as heat (`do_conserve_energy` hard-coded) | follows `frictional_heating`, so the U runs have no Isca counterpart | IR-8; NI-7 pairs |
+| stress derivative | `old_dtaudv` True (the same −ρ C\|v\| for u and v) | implicit −ρ C\|v\|u for each component | comparable; not tested |
+| `use_actual_surface_temperatures` | False | — | not examined (§4.10) |
+| sponge pressure | local full-level p | σ × 610 Pa | IR-6 |
+| cosine of the zenith angle | averaged over each 110 s step | instantaneous at the 600 s step | IR-3; small, not measured |
+| vertical grid | Isca `bk`, 26 interfaces, `pk` = 0 | the same interfaces | met; full-level placement not compared |
+| initial state | quiescent 264 K (any perturbation in `spectral_initialize_fields` not read); T_s 285 − 40(3 sin²φ − 1)/3 | 264 K plus a 0.1 m s⁻¹ seed; uniform 285 K | IR-12; matters only in spin-up |
+| time unit | sols (segments of 30 × 88 440 s) | days of 86 400 s | bookkeeping only; L_s is computed exactly |
+
+### 4.6 The M7 observable: a recorded discrepancy
+
+§2e registered M7 as the "daily max lowest-full-level |u|". The judge at
+`7dfc39d` and `33e818d` reads `max_wind_bottom`, which `experiment.py`
+writes as the lowest-level horizontal **speed** ("an upper bound on |u|").
+The discrepancy was not noticed before judging. Both measurements, days
+11–60:
+
+| run | registered (\|u\|), *recomputed* from the saved states | judged (speed), `verdicts-2e-corrected.json` |
+| --- | --- | --- |
+| Hb | 43.1 m s⁻¹ (day 57); above 40 on 6 days | 46.7 m s⁻¹ (day 27); above 40 on 13 days |
+| Ub | 46.3 m s⁻¹ (day 47); above 40 on 2 days | 47.2 m s⁻¹ (day 47); above 40 on 4 days |
+
+The historical verdict, **M7 not met**, is unchanged, and it is the same
+under either observable. The §2e text and `verdicts-2e-corrected.json` stay
+as they are; their numbers are the speed. The \|u\| values were computed
+read-only from the saved states. The states are local and untracked, so the
+audit's Appendix A records the method. From here on, DM-2 reports both,
+labelled, and judges neither.
+
+### 4.7 The M5 slab phase: an analytical expectation, not a proof
+
+The paper's §3.2 linearised slab gives a lag of φ ≈ arctan(C ω / λ). It
+assumes one harmonic, linear restoring λ ≈ 4σT³ and fixed downwelling
+radiation. For M-I's slab, C ω = 587 W m⁻² K⁻¹ while λ is about
+2.4–5.3 W m⁻² K⁻¹, plus about 0.3–0.6 W m⁻² K⁻¹ of sensible exchange at
+the measured winds. So φ ≈ 89.5–89.8°, and the S1 maximum is expected near
+18 h. The measured 17.0–17.05 h is consistent.
+
+A peak at 16 h would need λ ≥ 339 W m⁻² K⁻¹. That makes a pass very
+unlikely for any faithful M-I surface, but it is not ruled out
+mathematically:
+
+- the model is nonlinear and coupled;
+- M5 judges the peak of a fitted S1 + S2 curve;
+- the downwelling longwave varies diurnally.
+
+DM-4 reports the measured phase beside the expectation.
+
+### 4.8 How criteria are written from now on
+
+1. **Classify every criterion** as IR, NI, DM or CV. State its origin
+   (P, Isca, D or I), its justification, the exact observable (the series
+   key or function), the evidence file, the verification method, and what
+   a failure would and would not establish.
+2. **An I-origin number cannot be a pass/fail scientific requirement.** It
+   may be:
+   - a labelled engineering tripwire, with a demonstrated detection
+     purpose (NI-7);
+   - a prediction about an experiment, as in §2–§2e, whose verdict
+     informs and does not certify.
+3. **Check feasibility before registering.** Check each threshold against
+   the configuration's own physics (analytic scalings, the published
+   figure). Record the check.
+4. **The judge computes exactly the registered observable.** A change of
+   observable is a dated amendment made before judging. If one is found
+   afterwards, both values are recorded, as in §4.6.
+5. **Isca statements name the commit and file they were read at.** Where
+   the source was not read, that is said.
+6. **Inherited thresholds name their source and how it was set.** That
+   includes whether it was written before or after the runs it describes.
+
+### 4.9 Preserved records
+
+No file below is modified by this amendment (SHA-256 prefixes of the
+committed files, in `docs/radiation/evidence/`):
+
+| file | SHA-256 |
+| --- | --- |
+| `dev-mars-gray-flat-heated-T21L25-30d-b3aaef8-l4/verdicts.json` | `1d3368e34c95f351` |
+| `dev-mars-gray-flat-heated-T21L25-30d-b3aaef8-l4/tides.json` | `467e008f66ca7eed` |
+| `dev-mars-gray-flat-sponge-heated-T21L25-30d-e38890e-l4/verdicts.json` | `bdcef4f5016bc142` |
+| `dev-mars-gray-flat-sponge-heated-T21L25-30d-e38890e-l4/verdicts-last2sols.json` | `ce09e6f584970980` |
+| `dev-mars-gray-flat-sponge-heated-T21L25-30d-e38890e-l4/tides.json` | `f7189db9f71a1179` |
+| `dev-mars-gray-flat-sponge-heated-T21L25-30d-e38890e-l4/tides-last2sols.json` | `9161a34fed35e61e` |
+| `dev-mars-gray-flat-sponge-implicit-heated-T21L25-60d-63d05a2-t4/verdicts.json` | `6d995d0685a61e30` |
+| `dev-mars-gray-flat-sponge-implicit-heated-T21L25-60d-63d05a2-t4/tides.json` | `3b4f3130058a4d7e` |
+| `dev-mars-gray-flat-bl-heated-T21L25-60d-06f5356-l4/verdicts-2e-recovery.json` | `bea7e011067bb6e6` |
+| `dev-mars-gray-flat-bl-heated-T21L25-60d-06f5356-l4/verdicts-2e-corrected.json` | `6b5d6d475b7d3eba` |
+| `dev-mars-gray-flat-bl-heated-T21L25-60d-06f5356-l4/tides.json` | `36788bf9b39d9c32` |
+
+The judge, the tools and the tests that freeze these verdicts are
+unchanged. `judge_mars_pilot.py` still writes the M-labelled verdicts. Its
+output is read through §4.2, not as a requirement verdict.
+
+### 4.10 Uncertainties left open
+
+These were not verified at `d1321ac3`:
+
+- the body of `monin_obukhov_drag_1d`, which `mo_drag` calls;
+- the effect of `use_actual_surface_temperatures` False and of
+  `vert_turb_driver` `do_simple`;
+- any perturbation inside `spectral_initialize_fields`;
+- the `resolution_dependent` scaling of `damping_coeff`;
+- the full-level placement (`vert_difference_option`).
+
+Also open: whether the test case is the run behind Fig. 4b. Its comment
+("'dry' convection, 1.0 m") contradicts its namelist, and the paper states
+no integration length.
+
+### 4.11 Decisions this amendment leaves open
+
+- **Mass.** Either a mass bound derived from the CV-1 integration (one T42
+  run of about three Mars years), or an opt-in mass fixer whose per-step
+  factor becomes the DM. §3 item 4 stands.
+- **Energy.** A Mars-derived bound for NI-7 in place of the inherited
+  10⁻³ F.
+- **CV-1's reference and any tolerance.** The figure alone, or an Isca run
+  at `d1321ac3` (§4.4).
+- **Which IR-8 and IR-10 departures to close before CV-1, and which to
+  argue.** The surface exchange, the joint sweep, the time step and the
+  ∇⁴/RA numerics.
+
+§3's ordering is unchanged. Its item 3 ("open candidates for M7") now
+reads as closing IR-8, not as making M7 pass. Item 5 is CV-1.
