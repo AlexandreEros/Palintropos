@@ -14,6 +14,11 @@
   [mars_state_diagnostics.py](mars_state_diagnostics.py) reads the saved
   states for where the winds peak, the surface-exchange stiffness and the
   ln p_s mass terms.
+  [mars_cost_profile.py](mars_cost_profile.py) measures what the T42 CV-1
+  run would cost (`docs/radiation/MARS_MI_COST.md`): s/step and its
+  breakdown by operator, short time-step stability probes from a
+  transferred state, and the wall-clock projection arithmetic. It changes no
+  production behaviour.
 
 The [evidence index](../../docs/radiation/evidence/README.md) links the
 saved products, and the [radiation report](../../docs/radiation/README.md)

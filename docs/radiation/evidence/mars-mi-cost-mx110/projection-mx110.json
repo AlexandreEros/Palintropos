@@ -1,0 +1,156 @@
+{
+  "arithmetic": "steps = sols * 88440 / dt; wall = steps * (s/step + amortized I/O per step at dt 600 * 600 / dt)",
+  "cv1_last_complete_window_year": 2,
+  "ls_225_315_window_sols_year1": [
+    445.5103399922281,
+    587.2356415773885
+  ],
+  "rows": [
+    {
+      "dt": 110.0,
+      "gpu": "NVIDIA GeForce MX110",
+      "io_s_per_step_at_600": 0.024940815243017923,
+      "profile": "profile-T42-dt600-chunk64.json",
+      "s_per_step": 10.928416775173611,
+      "sols": 1920.0,
+      "steps": 1543680.0,
+      "truncation": "T42",
+      "wall_days": 197.68497552920925,
+      "wall_hours": 4744.439412701022
+    },
+    {
+      "dt": 300.0,
+      "gpu": "NVIDIA GeForce MX110",
+      "io_s_per_step_at_600": 0.024940815243017923,
+      "profile": "profile-T42-dt600-chunk64.json",
+      "s_per_step": 10.928416775173611,
+      "sols": 1920.0,
+      "steps": 566016.0,
+      "truncation": "T42",
+      "wall_days": 71.9200526664103,
+      "wall_hours": 1726.0812639938474
+    },
+    {
+      "dt": 450.0,
+      "gpu": "NVIDIA GeForce MX110",
+      "io_s_per_step_at_600": 0.024940815243017923,
+      "profile": "profile-T42-dt600-chunk64.json",
+      "s_per_step": 10.928416775173611,
+      "sols": 1920.0,
+      "steps": 377344.0,
+      "truncation": "T42",
+      "wall_days": 47.87408397678078,
+      "wall_hours": 1148.9780154427388
+    },
+    {
+      "dt": 600.0,
+      "gpu": "NVIDIA GeForce MX110",
+      "io_s_per_step_at_600": 0.024940815243017923,
+      "profile": "profile-T42-dt600-chunk64.json",
+      "s_per_step": 10.928416775173611,
+      "sols": 1920.0,
+      "steps": 283008.0,
+      "truncation": "T42",
+      "wall_days": 35.8783313072758,
+      "wall_hours": 861.0799513746191
+    },
+    {
+      "dt": 110.0,
+      "gpu": "NVIDIA GeForce MX110",
+      "io_s_per_step_at_600": 0.025236368611068528,
+      "profile": "profile-T42-dt600-chunk64-run1.json",
+      "s_per_step": 8.856012912326388,
+      "sols": 1920.0,
+      "steps": 1543680.0,
+      "truncation": "T42",
+      "wall_days": 160.68682953214653,
+      "wall_hours": 3856.4839087715163
+    },
+    {
+      "dt": 300.0,
+      "gpu": "NVIDIA GeForce MX110",
+      "io_s_per_step_at_600": 0.025236368611068528,
+      "profile": "profile-T42-dt600-chunk64-run1.json",
+      "s_per_step": 8.856012912326388,
+      "sols": 1920.0,
+      "steps": 566016.0,
+      "truncation": "T42",
+      "wall_days": 58.347377099709,
+      "wall_hours": 1400.337050393016
+    },
+    {
+      "dt": 450.0,
+      "gpu": "NVIDIA GeForce MX110",
+      "io_s_per_step_at_600": 0.025236368611068528,
+      "profile": "profile-T42-dt600-chunk64-run1.json",
+      "s_per_step": 8.856012912326388,
+      "sols": 1920.0,
+      "steps": 377344.0,
+      "truncation": "T42",
+      "wall_days": 38.82477306433397,
+      "wall_hours": 931.7945535440153
+    },
+    {
+      "dt": 600.0,
+      "gpu": "NVIDIA GeForce MX110",
+      "io_s_per_step_at_600": 0.025236368611068528,
+      "profile": "profile-T42-dt600-chunk64-run1.json",
+      "s_per_step": 8.856012912326388,
+      "sols": 1920.0,
+      "steps": 283008.0,
+      "truncation": "T42",
+      "wall_days": 29.09102542244847,
+      "wall_hours": 698.1846101387633
+    },
+    {
+      "dt": 110.0,
+      "gpu": "NVIDIA GeForce MX110",
+      "io_s_per_step_at_600": 0.0031234827314754647,
+      "profile": "profile-T21-dt600.json",
+      "s_per_step": 0.8622892272949219,
+      "sols": 1920.0,
+      "steps": 1543680.0,
+      "truncation": "T21",
+      "wall_days": 15.710631784167,
+      "wall_hours": 377.055162820008
+    },
+    {
+      "dt": 300.0,
+      "gpu": "NVIDIA GeForce MX110",
+      "io_s_per_step_at_600": 0.0031234827314754647,
+      "profile": "profile-T21-dt600.json",
+      "s_per_step": 0.8622892272949219,
+      "sols": 1920.0,
+      "steps": 566016.0,
+      "truncation": "T21",
+      "wall_days": 5.689877102778242,
+      "wall_hours": 136.5570504666778
+    },
+    {
+      "dt": 450.0,
+      "gpu": "NVIDIA GeForce MX110",
+      "io_s_per_step_at_600": 0.0031234827314754647,
+      "profile": "profile-T21-dt600.json",
+      "s_per_step": 0.8622892272949219,
+      "sols": 1920.0,
+      "steps": 377344.0,
+      "truncation": "T21",
+      "wall_days": 3.784157054106591,
+      "wall_hours": 90.81976929855819
+    },
+    {
+      "dt": 600.0,
+      "gpu": "NVIDIA GeForce MX110",
+      "io_s_per_step_at_600": 0.0031234827314754647,
+      "profile": "profile-T21-dt600.json",
+      "s_per_step": 0.8622892272949219,
+      "sols": 1920.0,
+      "steps": 283008.0,
+      "truncation": "T21",
+      "wall_days": 2.834707410175355,
+      "wall_hours": 68.03297784420852
+    }
+  ],
+  "tool": "mars_cost_profile.py project",
+  "year_sols": 669.0
+}
