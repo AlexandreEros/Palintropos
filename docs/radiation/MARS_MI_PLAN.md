@@ -448,19 +448,112 @@ Isca's `do_mass_correction` would have applied (⟨p_s⟩_{d−1}/⟨p_s⟩_d fr
 Neither correction is applied; §3 item 4 stays open for the opt-in
 versions.
 
+### Boundary-layer results (2026-11-14; criteria, thresholds and predictions unchanged)
+
+Hb (`004fd4b8…`) and Ub (`f01c4203…`) ran 60 days from `06f5356` on a
+Colab L4, without resuming. The physics is unchanged at `7dfc39d` and
+after, so nothing was rerun. Evidence is in
+`evidence/dev-mars-gray-flat-bl{-heated,}-T21L25-60d-06f5356-l4/`. The
+judged verdict is **`verdicts-2e-corrected.json`**, written by
+`judge_mars_pilot.py --criteria 2e --days 60 --window 41 60` from the saved
+evidence alone, after the three postprocessing fixes below. The first
+verdict, `verdicts-2e-recovery.json`, is kept unmodified for provenance
+(SHA-256 `bea7e011…`); it is superseded on M4 only.
+
+| | measured | verdict | predicted |
+| --- | --- | --- | --- |
+| N1 | day 60 reached; the 2-sol continuation from the day-60 checkpoint ran all 295 steps finite | met | met |
+| M1 | completed; T 140–319 K; **max \|u\| 170 (Hb, day 42) / 186 (Ub, day 56) m s⁻¹**, ≥ 150 on 3 and 5 days, none before day 42 | **not met** | not met |
+| M7 | **daily max lowest-level wind speed 46.7 (Hb, day 27) / 47.2 (Ub, day 47) m s⁻¹** over days 11–60; above 40 on 13 (Hb) and 4 (Ub) days | **not met** | met |
+| M2, M3 | Hb residual over days 41–60 −0.0148 W m⁻² (1.5 × 10⁻⁴ F); largest daily 0.0158; slab exact | met | met |
+| M4 | Ub residual −0.2846 against sinks −0.2700 (sponge + hyperdiffusion −0.1663 on the states, boundary layer −0.1037 from the series); difference −0.0146, tolerance 0.099 | met | met |
+| M5 | p_s S1 1.42 % (≥ 5 × 10⁻⁴ ✓) but only 2.5 × noise (0.58 %) ✗; T_s maximum 17.05 h ✗ | **not met** | not met (window only) |
+| M6 | **day 30: −1.08 × 10⁻⁵ (Hb), −0.95 × 10⁻⁵ (Ub); day 60: −2.57 × 10⁻⁵ (Hb), −2.21 × 10⁻⁵ (Ub)** | **not met** | met (low confidence) |
+
+The real failures are **M1, M5, M6 and M7**. M1 failed as predicted. M7,
+M6 and part of M5 failed against their predictions; all are reported as
+measured.
+
+**Postprocessing corrections (no physics, threshold or run changed).**
+
+1. *M7 window.* The judge at `7dfc39d` started M7 at `--window`'s first day,
+   but §2e fixes M7 at days 11–60 whatever the M2–M4 window. With the 41–60
+   window it would have reported Hb at 45.5 m s⁻¹ (day 44) and missed the
+   day-27 peak of 46.7. M7 fails either way. The judge now starts M7 at
+   day 11 (`M7_FIRST_DAY`) and records `m7_days`. The recovery file already
+   carries the 11–60 maxima.
+2. *M4 sink accounting.* `summarize_run.py` measures the sinks on the saved
+   states. Those carry no slab temperature, so the boundary layer, which
+   needs it, cannot be evaluated there and was left out. The recovery
+   verdict compared Ub's residual with the sponge and hyperdiffusion alone
+   and reported −0.1183 W m⁻², outside tolerance. The run records the
+   boundary layer's own sink (`bl_kinetic_sink`). The judge now adds its
+   window mean, −0.1037, once: not when the measured operators already
+   include the boundary layer, and not under frictional heating, which
+   returns that energy as heat. The difference becomes −0.0146 W m⁻², about
+   Hb's own residual, which is the §2d split again.
+3. *Tidal restoration.* `mars_tides.py` built its stepper without the
+   boundary layer, so the saved hook signatures refused the checkpoint. It
+   now builds the boundary layer as `RadiativeRun` does and restores its
+   budget state. The Colab sample was made with the same patch applied in
+   memory, so `tides.json` stands. A GPU test replays a boundary-layer
+   checkpoint onto the run's own saved state with zero departure.
+
+**M7: the stress lowers the lowest-level wind but not to 40 m s⁻¹.** §2d
+reached 63 (Hi) and 61 (Ui) m s⁻¹ without a surface stress. The boundary
+layer brings that to 47, a quarter less, but the daily maximum exceeds
+40 m s⁻¹ in Hb on days 16 and 27 and on 11 days from day 44 on, and in Ub
+on days 27, 40, 47 and 52. The
+diagnosed depth h reaches 20 km at its deepest, so the scheme is active.
+Why the bottom wind stays this strong is not decided here. The documented
+departures of §2e (FHZ06-simplified neutral φ against Isca's full
+Monin–Obukhov; the split surface-heat and diffusion solves) are untested
+candidates. So is the still-strengthening flow aloft (M1).
+
+**M1.** As predicted, the jet aloft still crosses 150 m s⁻¹ after day 40,
+at 170 and 186 m s⁻¹ (§2d: 182 and 178). The boundary layer does not reach
+it.
+
+**M6.** At day 10 the drift is −1.9 × 10⁻⁶, as in every Mars run. It
+departs from §2d by day 20 (−4.1 × 10⁻⁶ to −4.2 × 10⁻⁶ against −3.6 ×
+10⁻⁶ to −3.7 × 10⁻⁶) and keeps growing faster: −1.08 × 10⁻⁵ at day 30 in
+Hb, just over the bound, and −2.57 × 10⁻⁵ at day 60. Ub meets the 30-day half and fails the
+60-day half. The low-confidence prediction failed: the flow the boundary
+layer changes moves the ln-p_s mass error the wrong way. The
+fixer-equivalent log-sum of the mass factor is 2.57 × 10⁻⁵, the drift
+itself, which is what Isca's `do_mass_correction` would have removed.
+
+**M5.** The T_s peak is at 17.05 h, as predicted (slab inertia). Against
+the prediction, the tropical p_s S1 (1.42 %) is now only 2.5 times the
+residual noise (0.58 %), so the 3 × noise part fails as well. It passed
+in §2d (1.33 %, 4.1 × noise). Its amplitude is not smaller; the
+non-tidal variability is larger.
+
+**Energy.** Hb's residual, −0.0148 W m⁻² (1.5 × 10⁻⁴ F), stays at the size
+of every earlier Mars run. The uniform temperature increment Isca's
+`do_energy_correction` would have applied averages 0.0082 K day⁻¹
+(largest 0.0098). In Hb the boundary layer removes −0.101 W m⁻² of kinetic
+energy over days 41–60 and returns it as heat.
+
+**What this establishes.** The configuration with the boundary layer in
+place of both substitutes integrates 60 days and continues finite. Its
+energy closes to 1.5 × 10⁻⁴ F and its sinks account for the unheated
+residual. **What it does not establish:** the lowest-level wind bound,
+the wind bound aloft, mass conservation over 30 or 60 days, the tidal
+criterion, or an M-I reproduction.
+
 ## 3. After the pilot, in order
 
 1. ~~The energy-conserving top sponge~~: done (§2b). M1 met as predicted.
 2. ~~An implicit surface exchange~~: done (§2d, opt-in). The §2c
    instability is gone and runs reach 60 days and beyond. M1 and M6 failed
    on the wind bound and the mass drift, neither caused by the change.
-3. The boundary layer: pre-registered in §2e (bulk surface stress and
-   implicit vertical diffusion of heat and momentum, the §2d exchange as
-   the surface heat condition, dissipation in the frictional heating,
-   both substitutes removed). This is still the gating dependency for
-   any M-I claim. The 60 m s⁻¹ lowest-level winds and the M1 jet of §2d
-   are its measured symptoms. Isca's ∇⁴ / RA numerics as an option, if
-   the comparison needs them.
+3. The boundary layer: run and judged in §2e. N1 and M2–M4 met. M1, M5,
+   M6 and M7 not met: the lowest-level winds fall from 63 to 47 m s⁻¹ but
+   stay above the 40 m s⁻¹ bound, and the drift and jet are unchanged in
+   kind. Open candidates for M7 are the full Monin–Obukhov forms and
+   Isca's joint surface-heat and diffusion sweep. Isca's ∇⁴ / RA numerics
+   as an option, if the comparison needs them.
 4. Isca's global fixers, as opt-ins that record what they remove: the mass
    correction (it would close M6 by construction, so its per-step factor
    is the diagnostic), and a log of the energy correction Isca would apply,
