@@ -219,6 +219,31 @@ def test_a_resumed_boundary_layer_run_is_identical(tmp_path):
     assert sa == sb
 
 
+@needs_cuda
+def test_a_resume_may_not_change_the_transform_evaluator(tmp_path, monkeypatch):
+    """The basis has two evaluators that agree only to round-off, and
+    TROPOI_SH_BACKEND picks between them without touching config_sha256 or
+    the commit. A restart that would swap them has to be refused, or one
+    experiment ends up holding two numerics."""
+    from tropoi.run.held_suarez.experiment import RunError
+    from tropoi.run.radiative.experiment import RadiativeRun
+    cfg = _tiny_bl(2, "mars-bl-evaluator")
+    # Pin both ends rather than inheriting the ambient default, so the test
+    # means the same thing under a TROPOI_SH_BACKEND=separable sweep. This
+    # grid clears separable_is_applicable (2*l_max = 20 < nlon = 32), so the
+    # switch is a real one and not a warn-and-downgrade back to dense.
+    monkeypatch.setenv("TROPOI_SH_BACKEND", "dense")
+    run = RadiativeRun(cfg, tmp_path / "r", allow_dirty=True, log=lambda s: None)
+    assert run.model.sh.transform_backend == "dense"
+    run.run(until_day=1)
+    monkeypatch.setenv("TROPOI_SH_BACKEND", "separable")
+    with pytest.raises(RunError, match="mix numerics"):
+        RadiativeRun(cfg, tmp_path / "r", allow_dirty=True, log=lambda s: None)
+    # Same configuration, same commit: only the evaluator differed.
+    monkeypatch.setenv("TROPOI_SH_BACKEND", "dense")
+    RadiativeRun(cfg, tmp_path / "r", allow_dirty=True, log=lambda s: None).run()
+
+
 # ---------------------------------------------------------------------------
 # the 2e judge path (CPU)
 # ---------------------------------------------------------------------------

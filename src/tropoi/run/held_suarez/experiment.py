@@ -89,6 +89,26 @@ def environment_identity() -> dict[str, Any]:
     return env
 
 
+def transform_identity(model: Any) -> dict[str, Any]:
+    """Which evaluator of the spherical-harmonic basis a run's arithmetic
+    comes from.
+
+    The Gauss lat-lon transform has two interchangeable evaluators of the
+    *same* basis -- the dense basis matrix and the separable FFT+Legendre
+    path -- chosen per run or by ``TROPOI_SH_BACKEND``. They agree only to
+    round-off (~1e-14), so swapping evaluator part-way through an
+    experiment mixes two numerics in one run exactly as swapping commit
+    would. Recorded in every checkpoint and compared on resume.
+
+    Checkpoints written before this was recorded carry no such key; those
+    resume unchecked, so historical runs stay resumable.
+    """
+    sh = getattr(model, "sh", None)
+    inner = getattr(sh, "sh", sh)
+    return {"transform_backend": getattr(sh, "transform_backend", None),
+            "transform_evaluator": None if inner is None else type(inner).__name__}
+
+
 def protocol_sha256() -> Optional[str]:
     try:
         return hashlib.sha256(PROTOCOL.read_bytes()).hexdigest()
@@ -250,6 +270,15 @@ class HeldSuarezRun:
                 f"{path}: checkpoint was written by commit {meta['code'].get('git_commit')}, "
                 f"this code is {self.code.get('git_commit')}; a production experiment may not "
                 "change code mid-run (plan §2 B5). Start a new experiment instead.")
+        stored_transform = meta.get("transform")
+        transform = transform_identity(self.model)
+        if stored_transform is not None and stored_transform != transform:
+            raise RunError(
+                f"{path}: written with transform {stored_transform}, this run resolves "
+                f"{transform}. The two evaluators of the basis agree only to round-off, so "
+                "resuming across them would mix numerics mid-experiment (plan §2 B5). "
+                "Start a new experiment, or set TROPOI_SH_BACKEND back to "
+                f"{stored_transform.get('transform_backend')!r}.")
         if meta.get("protocol_sha256") != protocol_sha256():
             raise RunError(
                 f"{path}: PROTOCOL.md changed since this experiment started "
@@ -316,7 +345,8 @@ class HeldSuarezRun:
         meta = {"day": self.day, "stepper": sd, "rng_state": self.rng_state,
                 "statistics": self.stats.meta(), "config": self.cfg.to_dict(),
                 "config_sha256": self.config_sha256, "protocol_sha256": protocol_sha256(),
-                "code": self.code, "environment": environment_identity()}
+                "code": self.code, "environment": environment_identity(),
+                "transform": transform_identity(self.model)}
         path = write_checkpoint(self.run_dir / "checkpoints", self.step, arrays, meta)
         prune_checkpoints(self.run_dir / "checkpoints", self.cfg.keep_checkpoints)
         self._export()
