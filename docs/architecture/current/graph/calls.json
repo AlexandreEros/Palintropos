@@ -7423,6 +7423,11 @@
     {
       "kind": "call",
       "source": "tropoi.run.held_suarez.experiment.HeldSuarezRun._resume",
+      "target": "tropoi.run.held_suarez.experiment.transform_identity"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.held_suarez.experiment.HeldSuarezRun._resume",
       "target": "tropoi.run.held_suarez.statistics.OnlineStatistics.from_arrays"
     },
     {
@@ -7464,6 +7469,11 @@
       "kind": "call",
       "source": "tropoi.run.held_suarez.experiment.HeldSuarezRun._write_checkpoint",
       "target": "tropoi.run.held_suarez.experiment.protocol_sha256"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.held_suarez.experiment.HeldSuarezRun._write_checkpoint",
+      "target": "tropoi.run.held_suarez.experiment.transform_identity"
     },
     {
       "kind": "call",
@@ -8246,6 +8256,11 @@
       "target": "tropoi.run.held_suarez.experiment.RunError"
     },
     {
+      "kind": "call",
+      "source": "tropoi.run.radiative.experiment.RadiativeRun._resume",
+      "target": "tropoi.run.held_suarez.experiment.transform_identity"
+    },
+    {
       "kind": "self",
       "source": "tropoi.run.radiative.experiment.RadiativeRun._resume",
       "target": "tropoi.run.radiative.experiment.RadiativeRun._event"
@@ -8284,6 +8299,11 @@
       "kind": "call",
       "source": "tropoi.run.radiative.experiment.RadiativeRun._write_checkpoint",
       "target": "tropoi.run.held_suarez.experiment.environment_identity"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.radiative.experiment.RadiativeRun._write_checkpoint",
+      "target": "tropoi.run.held_suarez.experiment.transform_identity"
     },
     {
       "kind": "self",
@@ -19980,6 +20000,13 @@
       "kind": "function",
       "module": "tropoi.run.held_suarez.experiment",
       "qualname": "protocol_sha256",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.held_suarez.experiment.transform_identity",
+      "kind": "function",
+      "module": "tropoi.run.held_suarez.experiment",
+      "qualname": "transform_identity",
       "type": "function"
     },
     {
