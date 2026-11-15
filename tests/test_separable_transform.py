@@ -206,7 +206,7 @@ def test_applicability_gate():
         SeparableGaussSphericalHarmonics(cp.zeros(32), 40, 22)
 
 
-def test_wrapper_selects_backend_and_default_is_dense(monkeypatch):
+def test_wrapper_selects_backend_and_default_is_separable(monkeypatch):
     from tropoi.spatial.grids.latlon_grid import (
         GaussLatLonGridGeometry, GaussLatLonSphericalHarmonics,
         default_transform_backend)
@@ -214,17 +214,22 @@ def test_wrapper_selects_backend_and_default_is_dense(monkeypatch):
     from tropoi.spatial.transforms.separable_gauss_sh import (
         SeparableGaussSphericalHarmonics)
     monkeypatch.delenv("TROPOI_SH_BACKEND", raising=False)
-    assert default_transform_backend() == "dense"
+    assert default_transform_backend() == "separable"
     g = GaussLatLonGridGeometry(32, 64, radius=RADIUS)
     assert isinstance(GaussLatLonSphericalHarmonics(g, 22).sh,
-                      PointSetSphericalHarmonics)
-    assert isinstance(
-        GaussLatLonSphericalHarmonics(g, 22, transform_backend="separable").sh,
-        SeparableGaussSphericalHarmonics)
-    monkeypatch.setenv("TROPOI_SH_BACKEND", "separable")
-    assert default_transform_backend() == "separable"
-    assert isinstance(GaussLatLonSphericalHarmonics(g, 22).sh,
                       SeparableGaussSphericalHarmonics)
+    # The deprecated reference path stays reachable, and says so.
+    with warnings.catch_warnings(record=True) as caught:
+        warnings.simplefilter("always")
+        explicit_dense = GaussLatLonSphericalHarmonics(
+            g, 22, transform_backend="dense")
+    assert isinstance(explicit_dense.sh, PointSetSphericalHarmonics)
+    assert any(issubclass(w.category, DeprecationWarning)
+               and "DEPRECATED" in str(w.message) for w in caught)
+    monkeypatch.setenv("TROPOI_SH_BACKEND", "dense")
+    assert default_transform_backend() == "dense"
+    assert isinstance(GaussLatLonSphericalHarmonics(g, 22).sh,
+                      PointSetSphericalHarmonics)
     monkeypatch.setenv("TROPOI_SH_BACKEND", "nonsense")
     with pytest.raises(ValueError):
         default_transform_backend()
@@ -267,7 +272,8 @@ def test_pe_tendency_matches_dense(monkeypatch):
         return PrimitiveEquationsModel(pl, SigmaGrid.uniform(k), r_dry=287.0,
                                        cp_dry=1004.0, batched_transforms=True)
 
-    monkeypatch.delenv("TROPOI_SH_BACKEND", raising=False)
+    # Name both evaluators: neither end may ride on the ambient default.
+    monkeypatch.setenv("TROPOI_SH_BACKEND", "dense")
     dense_model = build()
     monkeypatch.setenv("TROPOI_SH_BACKEND", "separable")
     sep_model = build()

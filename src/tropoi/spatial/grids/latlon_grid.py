@@ -43,28 +43,50 @@ from tropoi.spatial.transforms.separable_gauss_sh import (
 __all__ = ["GaussLatLonGridGeometry", "GaussLatLonSphericalHarmonics",
            "TRANSFORM_BACKENDS", "default_transform_backend"]
 
-#: Evaluators this grid can pair with. ``"dense"`` is the historical
-#: :class:`PointSetSphericalHarmonics` basis-matrix path and the numerical
-#: reference; ``"separable"`` is the FFT + Legendre path, which is
-#: substantially faster but agrees only to round-off (different summation
-#: order), so it is not the default and pinned run hashes are unaffected
-#: unless a caller asks for it.
+#: Evaluators this grid can pair with. ``"separable"`` is the FFT +
+#: Legendre path and the default: 16x a dense T42 step on the reference
+#: device. ``"dense"`` is the historical
+#: :class:`PointSetSphericalHarmonics` basis-matrix path -- **deprecated**,
+#: and retained as the numerical reference, as the fallback for grids that
+#: cannot factorize, and to reproduce runs recorded before the evaluator
+#: became selectable. The two agree only to round-off (different summation
+#: order), so they are interchangeable for new work but not for
+#: reproducing a pinned hash.
 TRANSFORM_BACKENDS = ("dense", "separable")
 
 _BACKEND_ENV = "TROPOI_SH_BACKEND"
+
+#: Emitted whenever a Gauss lat-lon grid ends up on the dense evaluator,
+#: whether a caller asked for it or the separable path was inapplicable.
+_DENSE_DEPRECATED = (
+    "DEPRECATED: the dense basis-matrix evaluator "
+    "(transform_backend='dense') is deprecated on Gauss lat-lon grids. It "
+    "builds an n_points x n_basis complex matrix and spends one GEMM per "
+    "transform, which measured ~96% of a synchronized T42 step; the "
+    "separable FFT+Legendre evaluator is the default and ~16x faster on "
+    "the same step. Dense is kept as the numerical reference, as the "
+    "fallback for grids that cannot factorize, and to reproduce runs "
+    "recorded before the evaluator became selectable -- the two agree only "
+    "to round-off, so a pinned hash still needs this path.")
 
 
 def default_transform_backend() -> str:
     """Backend used when a caller does not name one.
 
-    ``"dense"`` unless the ``TROPOI_SH_BACKEND`` environment variable says
-    otherwise. The variable exists so an existing run configuration can be
-    pointed at the fast path without editing call sites; whichever backend is
-    chosen is recorded in the run manifest by
-    :meth:`SphericalGridBackend.describe`, so a run never silently loses
-    track of which numerics produced it.
+    ``"separable"`` unless the ``TROPOI_SH_BACKEND`` environment variable
+    says otherwise. The variable exists so an existing run configuration
+    can be pointed at either evaluator without editing call sites;
+    whichever is chosen is recorded in the run manifest by
+    :meth:`SphericalGridBackend.describe` and in every checkpoint by
+    ``run.held_suarez.experiment.transform_identity``, so a run never
+    silently loses track of which numerics produced it.
+
+    This default changed with the separable evaluator: runs made before it
+    were necessarily dense, which is why replaying a saved run pins the
+    evaluator its manifest records rather than taking this default (see
+    ``representation.visual.snapshot``).
     """
-    value = os.environ.get(_BACKEND_ENV, "dense").strip().lower()
+    value = os.environ.get(_BACKEND_ENV, "separable").strip().lower()
     if value not in TRANSFORM_BACKENDS:
         raise ValueError(
             f"{_BACKEND_ENV}={value!r} is not one of {TRANSFORM_BACKENDS} "
@@ -197,6 +219,10 @@ class GaussLatLonSphericalHarmonics:
         ``"separable"`` falls back to the dense path, with a warning naming
         the reason, when this (grid, l_max) pairing cannot use it -- chiefly
         a longitude axis too coarse for the truncation (2*l_max >= nlon).
+
+        Landing on ``"dense"`` raises a ``DeprecationWarning`` either way,
+        asked for or fallen back to, so a slow run is never quiet about
+        why.
     """
 
     def __init__(self, grid: GaussLatLonGridGeometry, l_max: int, *,
@@ -238,6 +264,11 @@ class GaussLatLonSphericalHarmonics:
                 )
                 requested = "dense"
         self.transform_backend = requested
+
+        # Deliberately after the fallback: an involuntary dense run is as
+        # worth reporting as a requested one.
+        if requested == "dense":
+            warnings.warn(_DENSE_DEPRECATED, DeprecationWarning, stacklevel=2)
 
         if requested == "separable":
             self.sh = SeparableGaussSphericalHarmonics(

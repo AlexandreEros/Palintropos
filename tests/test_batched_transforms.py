@@ -32,9 +32,14 @@ def _rel(a, b):
 def sh():
     from tropoi.spatial.planet import Planet
     from tropoi.spatial.environment import PlanetaryParameters
+    # Pinned to the dense evaluator on purpose: this file is about
+    # PointSetSphericalHarmonics' byte-stable scalar path, which the pinned
+    # run hashes depend on, so it must not follow the default evaluator.
+    # The separable evaluator's own batching parity is covered by
+    # tests/test_separable_transform.py.
     planet = Planet.generate(params=PlanetaryParameters.from_earth_like(day_hours=24.0),
                              grid_type="latlon", nlat=32, nlon=64, l_max=21,
-                             grid_resolution=3)
+                             grid_resolution=3, transform_backend="dense")
     return planet.sh
 
 
@@ -71,12 +76,6 @@ def test_transform_batch_matches_per_level(sh):
 def test_per_level_transform_is_unchanged_by_batching_support(sh):
     """The scalar path must keep its exact arithmetic (pinned hashes)."""
     import cupy as cp
-    if not hasattr(sh, "Y_matrix"):
-        pytest.skip(
-            "dense basis-matrix invariant; this grid is paired with the "
-            f"separable evaluator ({type(getattr(sh, 'sh', sh)).__name__}), "
-            "whose arithmetic is deliberately not bit-identical. The pinned "
-            "hashes belong to the dense path, which is still the default.")
     c = _random_coeffs(sh, 1, seed=2)[0]
     f = sh.inv_transform(c)
     w = f * sh.weights

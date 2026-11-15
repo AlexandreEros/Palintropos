@@ -24,8 +24,21 @@ relies on:
 
 | Geometry | Points | Weights | Exactness | CFL length |
 | --- | --- | --- | --- | --- |
-| `GeodesicGridGeometry` (`geodesic_grid.py`) | Subdivided icosahedron, `10·4^r + 2` vertices, rotated 0.01 rad about x so no vertex sits on a pole | Each spherical triangle (L'Huilier excess) gives a third of its area to each vertex; the code calls these "Voronoi" areas. They sum to exactly `4πR²` | Approximate and orientation-dependent | Shortest edge (chord length) |
+| `GeodesicGridGeometry` (`geodesic_grid.py`) | **Deprecated** (see below). Subdivided icosahedron, `10·4^r + 2` vertices, rotated 0.01 rad about x so no vertex sits on a pole | Each spherical triangle (L'Huilier excess) gives a third of its area to each vertex; the code calls these "Voronoi" areas. They sum to exactly `4πR²` | Approximate and orientation-dependent | Shortest edge (chord length) |
 | `GaussLatLonGridGeometry` (`latlon_grid.py`) | Gauss–Legendre latitudes in `sin(lat)` × uniform periodic longitudes; no pole rows | Gauss weights × `2π/nlon` | Exact for band-limited analysis when `nlat >= L+1`, `nlon >= 2L+1`; for quadratic products at the 3/2 rule | `R · min Δcolatitude` |
+
+`GeodesicGridGeometry` is **deprecated** and raises a
+`DeprecationWarning` when `Planet.generate` builds one. Its sampling is
+unstructured, so it admits no separable transform: every transform on it is
+a dense basis-matrix product, with no faster path available even in
+principle. Its quadrature is approximate and orientation-dependent, and its
+nonlinear products use overresolved rather than exact quadrature
+(`docs/validation/r3_characterization.md`). Prefer
+`GaussLatLonGridGeometry`. It is kept, not removed, because presets and
+published runs were measured on it and must stay reproducible — including
+the `rh4` and `two-vortices-quick` BVE presets, which inherit it from
+`BASE_DEFAULTS["grid"]` and whose pinned config hashes would change if that
+default moved.
 
 `latlon_grid.py` also defines `GaussLatLonSphericalHarmonics`, the
 production Gauss transform: the shared GPU matrix transform fed with these

@@ -33,25 +33,40 @@ defines normalization, signs and layout and records measured envelopes.
 The production Gauss transform, `GaussLatLonSphericalHarmonics`, sits in
 [grids/latlon_grid.py](../grids/README.md) with its geometry. It pairs exact
 tensor-product weights with **one of two evaluators** of the same basis,
-chosen by its `transform_backend` argument (`"dense"`, the default, or
-`"separable"`); everything else talks to the wrapper and does not care which.
+chosen by its `transform_backend` argument (`"separable"`, the default, or
+the deprecated `"dense"`); everything else talks to the wrapper and does not
+care which.
 Backends pair a grid with a transform in
 [`spherical_backend.py`](../spherical_backend.py), which also owns the
 product sampling and propagates the evaluator choice to it.
 
 ## Choosing an evaluator on the Gauss grid
 
-`"dense"` is the historical path and stays the default, so pinned run hashes
-are untouched. `"separable"` exploits the tensor-product structure the dense
-path throws away: with uniform longitudes and longitude-independent weights,
-`Y_lm(lat_j, lon_k) = N_lm P_l^m(x_j) e^{i m lon_k}`, so the longitude sum is
-a DFT and the latitude sum no longer carries the `nlon` factor.
+`"separable"` is the default. It exploits the tensor-product structure the
+dense path throws away: with uniform longitudes and longitude-independent
+weights, `Y_lm(lat_j, lon_k) = N_lm P_l^m(x_j) e^{i m lon_k}`, so the
+longitude sum is a DFT and the latitude sum no longer carries the `nlon`
+factor.
 
-- **Selection.** `transform_backend="separable"`, or set
-  `TROPOI_SH_BACKEND=separable` to point an existing run configuration at it
-  without editing call sites. Either way the choice is recorded in run
-  manifests by `SphericalGridBackend.describe` (`transform_backend`,
-  `transform_evaluator`).
+`"dense"` is the historical basis-matrix path. It is **deprecated** and
+raises a `DeprecationWarning` whenever a Gauss grid lands on it — asked for
+or fallen back to, so a slow run is never quiet about why. It is kept for
+three jobs: the numerical reference the separable path is measured against,
+the fallback for grids that cannot factorize, and reproducing runs recorded
+before the evaluator became selectable.
+
+- **Selection.** `transform_backend=`, or `TROPOI_SH_BACKEND` to point an
+  existing run configuration at either evaluator without editing call sites.
+  Either way the choice is recorded in run manifests by
+  `SphericalGridBackend.describe` (`transform_backend`,
+  `transform_evaluator`) and in every checkpoint by
+  `run.held_suarez.experiment.transform_identity`, which refuses a resume
+  that would change it.
+- **Replaying a saved run** uses the evaluator its manifest records, not the
+  current default; a run from before the choice existed records none and is
+  replayed on the dense path it ran with
+  (`representation.visual.snapshot._recorded_transform_backend`). Changing
+  the default therefore does not change how existing runs are re-read.
 - **Applicability.** `separable_is_applicable` is the single gate: uniform
   longitudes, weights that do not vary along longitude, and `2*l_max < nlon`
   (every retained zonal wavenumber needs its own real-FFT bin below Nyquist).

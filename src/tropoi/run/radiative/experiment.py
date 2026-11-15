@@ -36,6 +36,7 @@ from tropoi.run.held_suarez.checkpoint import (CheckpointError, atomic_write_byt
                                                read_checkpoint, write_checkpoint)
 from tropoi.run.held_suarez.experiment import (RunError, _now, code_identity,
                                                transform_identity,
+                                               stored_transform_identity,
                                                daily_sample, environment_identity)
 from tropoi.run.radiative.config import DAY_SECONDS, RadiativeConfig
 
@@ -235,8 +236,8 @@ class RadiativeRun:
         if meta["code"].get("git_commit") != self.code.get("git_commit"):
             raise RunError(f"{path}: written by commit {meta['code'].get('git_commit')}, this "
                            f"code is {self.code.get('git_commit')}; start a new experiment")
-        stored_transform = meta.get("transform")
         transform = transform_identity(self.model)
+        stored_transform = stored_transform_identity(meta, transform)
         if stored_transform is not None and stored_transform != transform:
             raise RunError(
                 f"{path}: written with transform {stored_transform}, this run resolves "
