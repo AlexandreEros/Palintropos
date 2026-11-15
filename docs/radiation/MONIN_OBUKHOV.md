@@ -177,10 +177,21 @@ those literals cannot support.
 
 On Isca's `test_drag` inputs the fused CUDA kernel reproduces the NumPy path
 **exactly, element for element**, in `drag_m`, `drag_t`, `drag_q`, `u_star`
-and `b_star`; only `richardson` differs, by at most one ulp, because the
-kernel associates `−z·Δb/(s² + small)` differently. Both sides are ours, so
-this one is a genuine elementwise bit-level claim — about internal
-consistency, not about Isca. It does not generalize: see §5.
+and `b_star`; only `richardson` differs, and by at most **2 ulp**
+(3.4e-16 relative, 1.5 ε).
+
+That difference has a single identified cause rather than a tolerance.
+`nvcc` contracts `s*s + small` into `fma(s, s, small)` by default, so the
+denominator of `−z·Δb/(s² + small)` is rounded **once** on the device and
+twice in NumPy. Rebuilding the NumPy expression with an exactly-rounded fma
+in the denominator reproduces the kernel's output **bit for bit on all five
+columns**, which is what the test asserts — a stronger statement than any ulp
+budget, because it leaves no room for a second source of difference to hide
+inside a tolerance. `-fmad` is left at its default on purpose: turning it off
+would cost accuracy in the iteration to buy agreement in a diagnostic.
+
+Both sides are ours, so this is a genuine elementwise bit-level claim — about
+internal consistency, not about Isca. It does not generalize: see §5.
 
 ### 4d. Summary of what is claimed
 
@@ -188,7 +199,7 @@ consistency, not about Isca. It does not generalize: see §5.
 |---|---|---|
 | three published checksums reproduce at 0 ulp | aggregate per array, summed | exact |
 | ten published per-column scales reproduce | elementwise, every column | a few ulp, at the literals' precision |
-| fused kernel equals the NumPy path | elementwise, our own code | exact (≤1 ulp on Ri) |
+| fused kernel equals the NumPy path | elementwise, our own code | exact on the five coefficients; Ri exact once the fma contraction is accounted for (≤2 ulp otherwise) |
 | the closure is solved | elementwise, independent of Isca | see below |
 
 ### 4e. The closure's own accuracy
@@ -249,8 +260,10 @@ Measured on the MX110 (2 GB), 20 repetitions, synchronized:
 | 65 536 | 86.2 ms | 26.2 ms | 3.3× |
 
 **Agreement.** On Isca's own `test_drag` inputs the kernel is elementwise
-bit-identical to the NumPy path (§4c) and reproduces the published aggregate
-checksum at 0 ulp. That does not generalize: over a 60 000-column randomized
+bit-identical to the NumPy path in all five exchange coefficients and scales,
+and differs only in the diagnostic Richardson number by the fma contraction
+identified in §4c; it reproduces the published aggregate checksum at 0 ulp.
+That does not generalize: over a 60 000-column randomized
 sweep the worst relative difference is ~1e-13 of the field maximum, and
 ~2e-13 in the broadest 200 000-column sweep. It is not guaranteed
 bit-identical in general — device and host `log`, `atan`

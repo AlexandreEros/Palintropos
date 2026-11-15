@@ -264,6 +264,14 @@ def _compiled():
         # No --use_fast_math: it is off by default and must stay off. It
         # would swap log/atan/pow and the divisions for fast approximations,
         # which is exactly the agreement this path has to keep.
+        #
+        # --fmad, by contrast, is left at its default (on). It is the one
+        # measured departure from the NumPy path on Isca's reference case:
+        # `s*s + small` contracts to fma(s, s, small), rounding the
+        # Richardson denominator once instead of twice, worth 2 ulp in that
+        # diagnostic and nothing in the coefficients. Disabling it would
+        # spend accuracy in the iteration to buy agreement in a diagnostic.
+        # tests/test_monin_obukhov.py asserts that contraction exactly.
         kernel = cupy.RawKernel(_KERNEL_SOURCE, "monin_obukhov_drag")
         _cache["kernel"] = kernel
     return kernel

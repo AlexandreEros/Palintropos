@@ -28,6 +28,7 @@ from __future__ import annotations
 
 import json
 import struct
+from fractions import Fraction
 
 import numpy as np
 import pytest
@@ -68,6 +69,18 @@ def _bits(x: float) -> int:
 def _wrap(i: int) -> int:
     i &= _WRAP - 1
     return i - _WRAP if i >= (1 << 63) else i
+
+
+def _fma(a: float, b: float, c: float) -> np.float64:
+    """``a * b + c`` with a single rounding, as the hardware fma does.
+
+    ``math.fma`` arrived in Python 3.13; the product is formed exactly in
+    :class:`~fractions.Fraction` instead and rounded once on the way back to
+    a double. Used to show that the CUDA kernel's only departure from the
+    NumPy path is ``nvcc``'s default contraction of ``x*y + z``.
+    """
+    return np.float64(float(Fraction(float(a)) * Fraction(float(b))
+                            + Fraction(float(c))))
 
 
 def _fortran_sum(a) -> float:
@@ -841,9 +854,15 @@ def test_the_fused_kernel_is_elementwise_identical_on_the_reference_case():
     sides are ours, so every element can be compared directly rather than
     through a published aggregate. On Isca's own ``test_drag`` inputs the
     fused kernel reproduces the NumPy path exactly, element for element, in
-    every output but the Richardson number - which differs by at most one
-    ulp because the kernel associates ``-z * delta_b / (s*s + small)``
-    differently.
+    every output but the Richardson number.
+
+    The Richardson number differs by up to 2 ulp, and the cause is pinned
+    rather than bounded: ``nvcc`` contracts ``s*s + small`` into
+    ``fma(s, s, small)`` by default, so the denominator is rounded once on
+    the device and twice in NumPy. Asserting *that* is stronger than any ulp
+    budget - the kernel must equal the contracted expression exactly, which
+    leaves no room for a second source of difference to hide. ``-fmad`` is
+    left at its default deliberately; see the kernel module.
 
     It does **not** generalize: the randomized sweeps show ~1e-13 relative
     differences, which is why the kernel is opt-in. See
@@ -862,9 +881,24 @@ def test_the_fused_kernel_is_elementwise_identical_on_the_reference_case():
         a = getattr(host, name)
         b = cp.asnumpy(getattr(fused, name))
         assert np.array_equal(a, b), f"{name} is not elementwise identical"
-    ulp = np.abs(np.asarray([_bits(x) for x in cp.asnumpy(fused.richardson)])
-                 - np.asarray([_bits(x) for x in host.richardson]))
-    assert int(ulp.max()) <= 1
+    kernel_rich = cp.asnumpy(fused.richardson)
+    host_rich = np.asarray(host.richardson)
+    # Rebuild the Richardson number with the denominator contracted into a
+    # single-rounded fma, which is what the device computes.
+    z = np.asarray(DRAG_CASE["z"], dtype=np.float64)
+    speed = np.asarray(DRAG_CASE["speed"], dtype=np.float64)
+    pt = np.asarray(DRAG_CASE["pt"], dtype=np.float64)
+    pt0 = np.asarray(DRAG_CASE["pt0"], dtype=np.float64)
+    delta_b = KERNEL_TEST_GRAVITY * (pt0 - pt) / pt0
+    contracted = np.asarray([
+        np.float64(-zi * db) / _fma(si, si, ISCA_SMALL)
+        for zi, db, si in zip(z, delta_b, speed)])
+    assert np.array_equal(kernel_rich, contracted), (
+        "the kernel's Richardson number is not the fma-contracted expression, "
+        "so something other than fma contraction differs")
+    # And that contraction costs no more than a couple of eps.
+    assert np.max(np.abs(kernel_rich - host_rich)
+                  / np.abs(host_rich)) < 4.0 * np.finfo(np.float64).eps
 
 
 @needs_cuda
