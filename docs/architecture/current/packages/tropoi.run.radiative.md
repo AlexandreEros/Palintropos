@@ -77,6 +77,7 @@ classDiagram
     direction LR
     class c_tropoi_orun_oradiative_oconfig_oRadiativeConfig["RadiativeConfig (run.radiative.config)"]
     c_tropoi_orun_oradiative_oconfig_oRadiativeConfig : +#95;#95;post#95;init#95;#95;()
+    c_tropoi_orun_oradiative_oconfig_oRadiativeConfig : +#95;check#95;surface#95;layer#95;scheme()
     c_tropoi_orun_oradiative_oconfig_oRadiativeConfig : +canonical#95;json()
     c_tropoi_orun_oradiative_oconfig_oRadiativeConfig : +from#95;dict()$
     c_tropoi_orun_oradiative_oconfig_oRadiativeConfig : +kappa

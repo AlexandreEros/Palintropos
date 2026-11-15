@@ -33,7 +33,9 @@ import numpy as np
 from tropoi.physics.convection import DryConvectiveAdjustment
 from tropoi.physics.radiation.scheme import (STEFAN_BOLTZMANN, Column, LowerBoundary,
                                              Radiation, RadiativeFluxes, heating_rate)
-from tropoi.physics.surface import SlabSurface, sensible_heat_flux
+from tropoi.physics.monin_obukhov import MoninObukhovOptions
+from tropoi.physics.surface import (SENSIBLE_SCHEMES, SlabSurface,
+                                    monin_obukhov_sensible_heat_flux, sensible_heat_flux)
 
 __all__ = ["PhysicsOutput", "ColumnPhysics", "RadiativeConvectiveColumn"]
 
@@ -95,10 +97,30 @@ class ColumnPhysics:
         self.radiation_interval = int(radiation_interval)
         self.sensible = None if sensible is None else dict(sensible)
         # opt-in backward-Euler exchange (see compute); not a flux option
-        self._implicit_exchange = bool((self.sensible or {}).get("implicit", False))
-        self._flux_options = {k: v for k, v in (self.sensible or {}).items() if k != "implicit"}
+        options = self.sensible or {}
+        self._implicit_exchange = bool(options.get("implicit", False))
+        self._scheme = str(options.get("scheme", "fhz06"))
+        if self._scheme not in SENSIBLE_SCHEMES:
+            raise ValueError(f"sensible scheme must be one of {SENSIBLE_SCHEMES}, "
+                             f"not {self._scheme!r}")
+        self._mo_options = None
+        structural = ("implicit", "scheme", "monin_obukhov")
+        if self._scheme == "monin_obukhov":
+            self._mo_options = MoninObukhovOptions(**dict(options.get("monin_obukhov", {})))
+            # critical_richardson is the FHZ06 knob; under Monin-Obukhov the
+            # critical Richardson number is monin_obukhov.rich_crit, and
+            # accepting the other name would silently ignore it
+            stale = sorted(set(options) & {"critical_richardson"})
+            if stale:
+                raise ValueError(
+                    f"{stale} does not apply to the monin_obukhov scheme; set "
+                    "monin_obukhov.rich_crit (Isca's default is 2.0, against "
+                    "FHZ06's 1.0)")
+        self._flux_options = {k: v for k, v in options.items() if k not in structural}
         self._cached: Optional[RadiativeFluxes] = None
         self._calls = 0
+        # the last Monin-Obukhov solve, for diagnostics (None under FHZ06)
+        self.last_exchange = None
 
     def signature(self) -> dict:
         return {"kind": "column_physics", "radiation": self.radiation.signature(),
@@ -120,7 +142,18 @@ class ColumnPhysics:
                 exchange_window=None, surface_step=None) -> PhysicsOutput:
         """``exchange_window`` (s) is the interval over which the host applies
         the heating to the air, ``surface_step`` the one over which it
-        advances the slab. With ``"implicit": true`` in the sensible options
+        advances the slab.
+
+        With ``"scheme": "monin_obukhov"`` the exchange coefficient and the
+        thermodynamic difference come from Isca's iterated surface layer
+        (:func:`~tropoi.physics.surface.monin_obukhov_sensible_heat_flux`)
+        instead of the FHZ06 forms, and the whole solve is kept on
+        ``last_exchange`` for diagnostics; a column whose iteration fails
+        raises rather than falling back. ``C_t`` is then what enters the
+        implicit exchange below, while ``C_m`` is the stress coefficient
+        the boundary-layer term uses.
+
+        With ``"implicit": true`` in the sensible options
         and both given, the bulk exchange is the backward-Euler flux between
         the two reservoirs with the exchange coefficient k = rho C |v| c_p
         frozen: F' = F / (1 + k w / Ca + k s / Cs), Ca = c_p dp / g. The same
@@ -162,9 +195,18 @@ class ColumnPhysics:
             height = alpha * self.gas_constant * t_air / self.gravity
             density = 0.5 * (p_top + p_bot) / (self.gas_constant * t_air)
             speed = zero if wind_speed is None else wind_speed
-            sensible, coefficient = sensible_heat_flux(surface_temperature, t_air, height, speed,
-                                                       density, self.cp, self.gravity,
-                                                       **self._flux_options)
+            if self._scheme == "monin_obukhov":
+                sensible, exchange = monin_obukhov_sensible_heat_flux(
+                    surface_temperature, t_air, height, speed, density, self.cp,
+                    self.gas_constant, self.gravity, options=self._mo_options,
+                    **self._flux_options)
+                exchange.require_convergence()
+                self.last_exchange = exchange
+                coefficient = exchange.drag_t
+            else:
+                sensible, coefficient = sensible_heat_flux(
+                    surface_temperature, t_air, height, speed, density, self.cp,
+                    self.gravity, **self._flux_options)
             if self._implicit_exchange and exchange_window is not None:
                 gust = float(self._flux_options.get("gustiness", 0.0))
                 k = density * coefficient * xp.sqrt(speed * speed + gust * gust) * self.cp

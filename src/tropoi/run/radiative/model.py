@@ -249,7 +249,9 @@ def build_boundary_layer(cfg: RadiativeConfig, model, coupling):
         return None
     from tropoi.temporal.tendencies.boundary_layer import BoundaryLayerDiffusion
     o = _options({"kind": "boundary_layer", **cfg.boundary_layer}, "roughness_length",
-                 critical_richardson=1.0, rich_crit_pbl=1.0, frac_inner=0.1, gustiness=0.0)
+                 critical_richardson=1.0, rich_crit_pbl=1.0, frac_inner=0.1,
+                 gustiness=0.0, scheme="fhz06", roughness_heat=None,
+                 monin_obukhov=None, fused_kernel=False)
     return BoundaryLayerDiffusion(model, coupling, gravity=cfg.gravity, cp=cfg.cp,
                                   gas_constant=cfg.gas_constant, dt=cfg.dt,
                                   heating=cfg.frictional_heating, **o)

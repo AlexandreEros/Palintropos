@@ -521,6 +521,21 @@
       "target": "tropoi.physics.boundary_layer._xp"
     },
     {
+      "kind": "call",
+      "source": "tropoi.physics.boundary_layer.monin_obukhov_diffusivity_profile",
+      "target": "tropoi.physics.boundary_layer._xp"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.physics.boundary_layer.monin_obukhov_diffusivity_profile",
+      "target": "tropoi.physics.monin_obukhov.MoninObukhovOptions"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.physics.boundary_layer.monin_obukhov_diffusivity_profile",
+      "target": "tropoi.physics.monin_obukhov.diffusivities"
+    },
+    {
       "kind": "instantiate",
       "source": "tropoi.physics.column.AtmosphericColumn.__post_init__",
       "target": "tropoi.physics.column.ColumnError"
@@ -597,6 +612,11 @@
     },
     {
       "kind": "instantiate",
+      "source": "tropoi.physics.column_model.ColumnPhysics.__init__",
+      "target": "tropoi.physics.monin_obukhov.MoninObukhovOptions"
+    },
+    {
+      "kind": "instantiate",
       "source": "tropoi.physics.column_model.ColumnPhysics.compute",
       "target": "tropoi.physics.column_model.PhysicsOutput"
     },
@@ -619,6 +639,11 @@
       "kind": "call",
       "source": "tropoi.physics.column_model.ColumnPhysics.compute",
       "target": "tropoi.physics.radiation.scheme.heating_rate"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.physics.column_model.ColumnPhysics.compute",
+      "target": "tropoi.physics.surface.monin_obukhov_sensible_heat_flux"
     },
     {
       "kind": "call",
@@ -809,6 +834,191 @@
       "kind": "call",
       "source": "tropoi.physics.insolation.frierson_net_surface_flux",
       "target": "tropoi.physics.insolation._xp"
+    },
+    {
+      "kind": "constructor",
+      "source": "tropoi.physics.monin_obukhov.MoninObukhovConvergenceError",
+      "target": "tropoi.physics.monin_obukhov.MoninObukhovConvergenceError.__init__"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.physics.monin_obukhov.SurfaceExchange.require_convergence",
+      "target": "tropoi.physics.monin_obukhov.MoninObukhovConvergenceError"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.physics.monin_obukhov.SurfaceExchange.require_convergence",
+      "target": "tropoi.physics.monin_obukhov._xp"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.physics.monin_obukhov.diffusivities",
+      "target": "tropoi.physics.monin_obukhov.MoninObukhovOptions"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.physics.monin_obukhov.diffusivities",
+      "target": "tropoi.physics.monin_obukhov._xp"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.physics.monin_obukhov.diffusivities",
+      "target": "tropoi.physics.monin_obukhov.stability_derivative_m"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.physics.monin_obukhov.diffusivities",
+      "target": "tropoi.physics.monin_obukhov.stability_derivative_t"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.physics.monin_obukhov.solve_zeta",
+      "target": "tropoi.physics.monin_obukhov.MoninObukhovOptions"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.physics.monin_obukhov.solve_zeta",
+      "target": "tropoi.physics.monin_obukhov._xp"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.physics.monin_obukhov.solve_zeta",
+      "target": "tropoi.physics.monin_obukhov.stability_derivative_m"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.physics.monin_obukhov.solve_zeta",
+      "target": "tropoi.physics.monin_obukhov.stability_derivative_t"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.physics.monin_obukhov.solve_zeta",
+      "target": "tropoi.physics.monin_obukhov.stability_integral_m"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.physics.monin_obukhov.solve_zeta",
+      "target": "tropoi.physics.monin_obukhov.stability_integral_t"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.physics.monin_obukhov.stability_derivative_m",
+      "target": "tropoi.physics.monin_obukhov.MoninObukhovOptions"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.physics.monin_obukhov.stability_derivative_m",
+      "target": "tropoi.physics.monin_obukhov._phi_stable"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.physics.monin_obukhov.stability_derivative_m",
+      "target": "tropoi.physics.monin_obukhov._split"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.physics.monin_obukhov.stability_derivative_m",
+      "target": "tropoi.physics.monin_obukhov._xp"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.physics.monin_obukhov.stability_derivative_t",
+      "target": "tropoi.physics.monin_obukhov.MoninObukhovOptions"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.physics.monin_obukhov.stability_derivative_t",
+      "target": "tropoi.physics.monin_obukhov._phi_stable"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.physics.monin_obukhov.stability_derivative_t",
+      "target": "tropoi.physics.monin_obukhov._split"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.physics.monin_obukhov.stability_derivative_t",
+      "target": "tropoi.physics.monin_obukhov._xp"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.physics.monin_obukhov.stability_integral_m",
+      "target": "tropoi.physics.monin_obukhov.MoninObukhovOptions"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.physics.monin_obukhov.stability_integral_m",
+      "target": "tropoi.physics.monin_obukhov._split"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.physics.monin_obukhov.stability_integral_m",
+      "target": "tropoi.physics.monin_obukhov._xp"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.physics.monin_obukhov.stability_integral_t",
+      "target": "tropoi.physics.monin_obukhov.MoninObukhovOptions"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.physics.monin_obukhov.stability_integral_t",
+      "target": "tropoi.physics.monin_obukhov._split"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.physics.monin_obukhov.stability_integral_t",
+      "target": "tropoi.physics.monin_obukhov._xp"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.physics.monin_obukhov.stable_mix",
+      "target": "tropoi.physics.monin_obukhov.MoninObukhovOptions"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.physics.monin_obukhov.stable_mix",
+      "target": "tropoi.physics.monin_obukhov._xp"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.physics.monin_obukhov.surface_drag",
+      "target": "tropoi.physics.monin_obukhov.MoninObukhovOptions"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.physics.monin_obukhov.surface_drag",
+      "target": "tropoi.physics.monin_obukhov.SurfaceExchange"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.physics.monin_obukhov.surface_drag",
+      "target": "tropoi.physics.monin_obukhov._xp"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.physics.monin_obukhov.surface_drag",
+      "target": "tropoi.physics.monin_obukhov.solve_zeta"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.physics.monin_obukhov_cuda.kernel_available",
+      "target": "tropoi.physics.monin_obukhov_cuda._compiled"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.physics.monin_obukhov_cuda.surface_drag_fused",
+      "target": "tropoi.physics.monin_obukhov.MoninObukhovOptions"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.physics.monin_obukhov_cuda.surface_drag_fused",
+      "target": "tropoi.physics.monin_obukhov.SurfaceExchange"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.physics.monin_obukhov_cuda.surface_drag_fused",
+      "target": "tropoi.physics.monin_obukhov_cuda._compiled"
     },
     {
       "kind": "call",
@@ -1328,6 +1538,16 @@
     {
       "kind": "call",
       "source": "tropoi.physics.surface.drag_coefficient",
+      "target": "tropoi.physics.surface._xp"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.physics.surface.monin_obukhov_sensible_heat_flux",
+      "target": "tropoi.physics.monin_obukhov.surface_drag"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.physics.surface.monin_obukhov_sensible_heat_flux",
       "target": "tropoi.physics.surface._xp"
     },
     {
@@ -7847,6 +8067,11 @@
     },
     {
       "kind": "self",
+      "source": "tropoi.run.radiative.config.RadiativeConfig.__post_init__",
+      "target": "tropoi.run.radiative.config.RadiativeConfig._check_surface_layer_scheme"
+    },
+    {
+      "kind": "self",
       "source": "tropoi.run.radiative.config.RadiativeConfig.canonical_json",
       "target": "tropoi.run.radiative.config.RadiativeConfig.to_dict"
     },
@@ -10543,12 +10768,22 @@
     {
       "kind": "call",
       "source": "tropoi.temporal.tendencies.boundary_layer.BoundaryLayerDiffusion.__call__",
+      "target": "tropoi.physics.boundary_layer.monin_obukhov_diffusivity_profile"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.temporal.tendencies.boundary_layer.BoundaryLayerDiffusion.__call__",
       "target": "tropoi.spatial.sigma_coordinate.hydrostatic_geopotential"
     },
     {
       "kind": "self",
       "source": "tropoi.temporal.tendencies.boundary_layer.BoundaryLayerDiffusion.__call__",
       "target": "tropoi.temporal.tendencies.boundary_layer.BoundaryLayerDiffusion._synthesize"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.temporal.tendencies.boundary_layer.BoundaryLayerDiffusion.__init__",
+      "target": "tropoi.physics.monin_obukhov.MoninObukhovOptions"
     },
     {
       "kind": "constructor",
@@ -11495,6 +11730,13 @@
       "type": "function"
     },
     {
+      "id": "tropoi.physics.boundary_layer.monin_obukhov_diffusivity_profile",
+      "kind": "function",
+      "module": "tropoi.physics.boundary_layer",
+      "qualname": "monin_obukhov_diffusivity_profile",
+      "type": "function"
+    },
+    {
       "id": "tropoi.physics.column.AtmosphericColumn",
       "kind": "class",
       "module": "tropoi.physics.column",
@@ -12115,6 +12357,174 @@
       "kind": "function",
       "module": "tropoi.physics.insolation",
       "qualname": "frierson_net_surface_flux",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.monin_obukhov.MoninObukhovConvergenceError",
+      "kind": "class",
+      "module": "tropoi.physics.monin_obukhov",
+      "qualname": "MoninObukhovConvergenceError",
+      "type": "class"
+    },
+    {
+      "id": "tropoi.physics.monin_obukhov.MoninObukhovConvergenceError.__init__",
+      "kind": "method",
+      "module": "tropoi.physics.monin_obukhov",
+      "qualname": "MoninObukhovConvergenceError.__init__",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.monin_obukhov.MoninObukhovOptions",
+      "kind": "class",
+      "module": "tropoi.physics.monin_obukhov",
+      "qualname": "MoninObukhovOptions",
+      "type": "class"
+    },
+    {
+      "id": "tropoi.physics.monin_obukhov.MoninObukhovOptions.__post_init__",
+      "kind": "method",
+      "module": "tropoi.physics.monin_obukhov",
+      "qualname": "MoninObukhovOptions.__post_init__",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.monin_obukhov.MoninObukhovOptions.b_stab",
+      "kind": "property",
+      "module": "tropoi.physics.monin_obukhov",
+      "qualname": "MoninObukhovOptions.b_stab",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.monin_obukhov.MoninObukhovOptions.lambda_stab",
+      "kind": "property",
+      "module": "tropoi.physics.monin_obukhov",
+      "qualname": "MoninObukhovOptions.lambda_stab",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.monin_obukhov.MoninObukhovOptions.signature",
+      "kind": "method",
+      "module": "tropoi.physics.monin_obukhov",
+      "qualname": "MoninObukhovOptions.signature",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.monin_obukhov.SurfaceExchange",
+      "kind": "class",
+      "module": "tropoi.physics.monin_obukhov",
+      "qualname": "SurfaceExchange",
+      "type": "class"
+    },
+    {
+      "id": "tropoi.physics.monin_obukhov.SurfaceExchange.require_convergence",
+      "kind": "method",
+      "module": "tropoi.physics.monin_obukhov",
+      "qualname": "SurfaceExchange.require_convergence",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.monin_obukhov._phi_stable",
+      "kind": "function",
+      "module": "tropoi.physics.monin_obukhov",
+      "qualname": "_phi_stable",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.monin_obukhov._split",
+      "kind": "function",
+      "module": "tropoi.physics.monin_obukhov",
+      "qualname": "_split",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.monin_obukhov._xp",
+      "kind": "function",
+      "module": "tropoi.physics.monin_obukhov",
+      "qualname": "_xp",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.monin_obukhov.diffusivities",
+      "kind": "function",
+      "module": "tropoi.physics.monin_obukhov",
+      "qualname": "diffusivities",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.monin_obukhov.solve_zeta",
+      "kind": "function",
+      "module": "tropoi.physics.monin_obukhov",
+      "qualname": "solve_zeta",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.monin_obukhov.stability_derivative_m",
+      "kind": "function",
+      "module": "tropoi.physics.monin_obukhov",
+      "qualname": "stability_derivative_m",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.monin_obukhov.stability_derivative_t",
+      "kind": "function",
+      "module": "tropoi.physics.monin_obukhov",
+      "qualname": "stability_derivative_t",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.monin_obukhov.stability_integral_m",
+      "kind": "function",
+      "module": "tropoi.physics.monin_obukhov",
+      "qualname": "stability_integral_m",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.monin_obukhov.stability_integral_t",
+      "kind": "function",
+      "module": "tropoi.physics.monin_obukhov",
+      "qualname": "stability_integral_t",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.monin_obukhov.stable_mix",
+      "kind": "function",
+      "module": "tropoi.physics.monin_obukhov",
+      "qualname": "stable_mix",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.monin_obukhov.surface_drag",
+      "kind": "function",
+      "module": "tropoi.physics.monin_obukhov",
+      "qualname": "surface_drag",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.monin_obukhov_cuda._compiled",
+      "kind": "function",
+      "module": "tropoi.physics.monin_obukhov_cuda",
+      "qualname": "_compiled",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.monin_obukhov_cuda.clear_cache",
+      "kind": "function",
+      "module": "tropoi.physics.monin_obukhov_cuda",
+      "qualname": "clear_cache",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.monin_obukhov_cuda.kernel_available",
+      "kind": "function",
+      "module": "tropoi.physics.monin_obukhov_cuda",
+      "qualname": "kernel_available",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.monin_obukhov_cuda.surface_drag_fused",
+      "kind": "function",
+      "module": "tropoi.physics.monin_obukhov_cuda",
+      "qualname": "surface_drag_fused",
       "type": "function"
     },
     {
@@ -13403,6 +13813,13 @@
       "kind": "function",
       "module": "tropoi.physics.surface",
       "qualname": "drag_coefficient",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.surface.monin_obukhov_sensible_heat_flux",
+      "kind": "function",
+      "module": "tropoi.physics.surface",
+      "qualname": "monin_obukhov_sensible_heat_flux",
       "type": "function"
     },
     {
@@ -19962,6 +20379,13 @@
       "kind": "method",
       "module": "tropoi.run.radiative.config",
       "qualname": "RadiativeConfig.__post_init__",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.radiative.config.RadiativeConfig._check_surface_layer_scheme",
+      "kind": "method",
+      "module": "tropoi.run.radiative.config",
+      "qualname": "RadiativeConfig._check_surface_layer_scheme",
       "type": "function"
     },
     {

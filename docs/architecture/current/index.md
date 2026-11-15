@@ -10,7 +10,7 @@ Explore dependencies, call sites, possible dispatch, runtime observations and pr
 |---|---|---|---|---|
 | [`tropoi`](packages/tropoi.md) | 1 | 0 | 0 | `README.md` |
 | [`tropoi.cli`](packages/tropoi.cli.md) | 6 | 0 | 24 | `README.md` |
-| [`tropoi.physics`](packages/tropoi.physics.md) | 16 | 23 | 26 | `README.md` |
+| [`tropoi.physics`](packages/tropoi.physics.md) | 18 | 26 | 39 | `README.md` |
 | [`tropoi.physics.radiation`](packages/tropoi.physics.radiation.md) | 5 | 13 | 18 | `README.md` |
 | [`tropoi.representation`](packages/tropoi.representation.md) | 2 | 0 | 1 | `README.md` |
 | [`tropoi.representation.archive`](packages/tropoi.representation.archive.md) | 9 | 18 | 26 | `README.md` |
@@ -65,14 +65,18 @@ Explore dependencies, call sites, possible dispatch, runtime observations and pr
 ## Coverage
 
 * Packages: 25 discovered, 25 with a page.
-* Import module records: 169 discovered (including namespace placeholders), 169 listed on a package page.
-* Classes: 213 discovered, 213 drawn on a package page (21 in [the inheritance overview](class-inheritance.mmd)).
-* Both containment views cover 22 directories, 99 Python files, 213 class definitions, leaving out files and directories that define no class.
+* Import module records: 171 discovered (including namespace placeholders), 171 listed on a package page.
+* Classes: 216 discovered, 216 drawn on a package page (21 in [the inheritance overview](class-inheritance.mmd)).
+* Both containment views cover 22 directories, 100 Python files, 216 class definitions, leaving out files and directories that define no class.
 * CLI handlers: 11 discovered, each with a call graph.
-* Public Python entry-point candidates: 33; 14 are roots of declared paths, 19 excluded with a reason.
+* Public Python entry-point candidates: 37; 14 are roots of declared paths, 23 excluded with a reason.
 
 **Deliberate exclusions**
 
+* `tropoi.physics.monin_obukhov.stable_mix`: Isca's free-atmosphere stable mixing factor; grey-Mars leaves free_atm_diff off so nothing calls it, but it is part of the referenced formulation and its published checksum is the exact test of the stable branch
+* `tropoi.physics.monin_obukhov_cuda.clear_cache`: drops the compiled RawKernel so a test can force recompilation; no workflow starts here
+* `tropoi.physics.monin_obukhov_cuda.kernel_available`: capability probe for callers and tests deciding whether the fused path can run; no workflow starts here
+* `tropoi.physics.monin_obukhov_cuda.surface_drag_fused`: reached through the BoundaryLayerDiffusion._drag indirection, chosen at construction by the fused_kernel option (an attribute call static analysis does not follow)
 * `tropoi.physics.radiation.gray.isca_mars_longwave`: gray Mars longwave optical-depth profile; no caller in the package; used by tests
 * `tropoi.physics.radiation.gray.isca_mars_shortwave`: gray Mars shortwave optical-depth profile; no caller in the package; used by tests
 * `tropoi.physics.radiation.gray.schneider_liu_longwave`: gray longwave optical-depth profile (Schneider & Liu 2009); no caller in the package; used by tests and tools/radiation/regimes.py

@@ -159,7 +159,10 @@ def test_the_bl_preset_removes_both_substitutes_and_moves_no_other_identity():
     assert cfg.with_(boundary_layer=None, drag=implicit.drag, convection=implicit.convection,
                      experiment_id=implicit.experiment_id) == implicit
     for name, factory in PRESETS.items():
-        if name != "dev-mars-gray-flat-bl":
+        # dev-mars-gray-flat-bl-most is the same scheme with Isca's full
+        # Monin-Obukhov forms substituted in (tests/test_monin_obukhov.py);
+        # no other preset may carry the key, or its hash would move
+        if name not in ("dev-mars-gray-flat-bl", "dev-mars-gray-flat-bl-most"):
             assert "boundary_layer" not in factory().to_dict()
 
 
