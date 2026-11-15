@@ -8066,7 +8066,7 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ],
 [
 [
-290,
+298,
 11,
 "MoninObukhovOptions()",
 []
@@ -8074,7 +8074,7 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ],
 [
 [
-327,
+335,
 11,
 "SurfaceExchange(drag_m=drag_m.reshape(shape), drag_t=drag_t.reshape(shape), drag_q=drag_q.reshape(shape), u_star=u_star.reshape(shape), b_star=b_star.reshape(shape), richardson=richardson.reshape(shape), zeta=zeta.reshape(shape), converged…",
 []
@@ -8082,7 +8082,7 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ],
 [
 [
-317,
+325,
 4,
 "_compiled()",
 []
@@ -77976,39 +77976,39 @@ null,
 "257":"    _cache.clear()",
 "260":"def _compiled():",
 "261":"    kernel = _cache.get(\"kernel\")",
-"272":"def surface_drag_fused(potential_temperature, surface_temperature, height, speed, *,",
-"273":"                       gravity: float, roughness_momentum, roughness_heat,",
-"274":"                       roughness_moisture=None,",
-"275":"                       opts: Optional[MoninObukhovOptions] = None,",
-"276":"                       small: float = ISCA_SMALL,",
-"277":"                       max_iter: int = ISCA_MAX_ITER,",
-"278":"                       tolerance: float = ISCA_ERROR,",
-"279":"                       zeta_min: float = ISCA_ZETA_MIN,",
-"280":"                       block: int = 128) -\u003e SurfaceExchange:",
-"281":"    \"\"\"One fused CUDA launch for the whole Monin-Obukhov surface solve.",
-"288":"    import cupy",
-"289":"",
-"290":"    opts = MoninObukhovOptions() if opts is None else opts",
-"291":"    if opts.neutral:",
-"292":"        raise ValueError(\"the fused kernel is for the iterated solve; the neutral \"",
-"294":"    pt = cupy.ascontiguousarray(potential_temperature, dtype=cupy.float64).ravel()",
-"296":"    pt0 = cupy.ascontiguousarray(cupy.broadcast_to(",
-"298":"    z = cupy.ascontiguousarray(cupy.broadcast_to(",
-"300":"    spd = cupy.ascontiguousarray(cupy.broadcast_to(",
-"315":"",
-"316":"    grid = (n + block - 1) // block",
-"317":"    _compiled()((grid,), (block,), (",
-"318":"        pt, pt0, z, z0, zt, zq, spd,",
-"319":"        cupy.float64(gravity), cupy.float64(VON_KARMAN),",
-"325":"",
-"326":"    shape = potential_temperature.shape",
-"327":"    return SurfaceExchange(",
-"328":"        drag_m=drag_m.reshape(shape), drag_t=drag_t.reshape(shape),",
-"329":"        drag_q=drag_q.reshape(shape), u_star=u_star.reshape(shape),",
-"330":"        b_star=b_star.reshape(shape), richardson=richardson.reshape(shape),",
-"331":"        zeta=zeta.reshape(shape),",
-"332":"        converged=converged.reshape(shape).astype(bool),",
-"333":"        capped=capped.reshape(shape).astype(bool))",
+"280":"def surface_drag_fused(potential_temperature, surface_temperature, height, speed, *,",
+"281":"                       gravity: float, roughness_momentum, roughness_heat,",
+"282":"                       roughness_moisture=None,",
+"283":"                       opts: Optional[MoninObukhovOptions] = None,",
+"284":"                       small: float = ISCA_SMALL,",
+"285":"                       max_iter: int = ISCA_MAX_ITER,",
+"286":"                       tolerance: float = ISCA_ERROR,",
+"287":"                       zeta_min: float = ISCA_ZETA_MIN,",
+"288":"                       block: int = 128) -\u003e SurfaceExchange:",
+"289":"    \"\"\"One fused CUDA launch for the whole Monin-Obukhov surface solve.",
+"296":"    import cupy",
+"297":"",
+"298":"    opts = MoninObukhovOptions() if opts is None else opts",
+"299":"    if opts.neutral:",
+"300":"        raise ValueError(\"the fused kernel is for the iterated solve; the neutral \"",
+"302":"    pt = cupy.ascontiguousarray(potential_temperature, dtype=cupy.float64).ravel()",
+"304":"    pt0 = cupy.ascontiguousarray(cupy.broadcast_to(",
+"306":"    z = cupy.ascontiguousarray(cupy.broadcast_to(",
+"308":"    spd = cupy.ascontiguousarray(cupy.broadcast_to(",
+"323":"",
+"324":"    grid = (n + block - 1) // block",
+"325":"    _compiled()((grid,), (block,), (",
+"326":"        pt, pt0, z, z0, zt, zq, spd,",
+"327":"        cupy.float64(gravity), cupy.float64(VON_KARMAN),",
+"333":"",
+"334":"    shape = potential_temperature.shape",
+"335":"    return SurfaceExchange(",
+"336":"        drag_m=drag_m.reshape(shape), drag_t=drag_t.reshape(shape),",
+"337":"        drag_q=drag_q.reshape(shape), u_star=u_star.reshape(shape),",
+"338":"        b_star=b_star.reshape(shape), richardson=richardson.reshape(shape),",
+"339":"        zeta=zeta.reshape(shape),",
+"340":"        converged=converged.reshape(shape).astype(bool),",
+"341":"        capped=capped.reshape(shape).astype(bool))",
 "57":"",
 "58":"from tropoi.physics.monin_obukhov import (ISCA_ERROR, ISCA_MAX_ITER, ISCA_SMALL,",
 "59":"                                          ISCA_ZETA_MIN, VON_KARMAN,"
@@ -94405,7 +94405,7 @@ null,
 }
 },
 "meta":{
-"base_commit":"3b85af4d4963b2f2fefeedac57bdfa52032a24d0",
+"base_commit":"6351550267fcfde580abf8b5d027fe5711548e7b",
 "call_depth":4,
 "command":"python -m tools.architecture.generate",
 "dynamic_import_sites":{
@@ -94449,7 +94449,7 @@ null,
 "max_sites":8,
 "package":"tropoi",
 "source_commit":null,
-"source_sha256":"f103c5f9bcfdb27cec009e9faf3a589fb2f9829f7f8b472ec1298ae35a922098",
+"source_sha256":"5944768a938dda647ad98adf6e0470a6df1f0cdeabf41d307f0b313806bb886f",
 "source_status":"clean",
 "title":"current",
 "tool_version":"2.3.0",
@@ -95675,7 +95675,7 @@ null,
 [
 "function",
 189,
-272,
+280,
 65
 ],
 [
@@ -131850,7 +131850,7 @@ null
 null,
 "",
 [],
-269
+277
 ],
 "1900":[
 "apply_implicit",
@@ -132602,7 +132602,7 @@ null,
 "SurfaceExchange",
 "One fused CUDA launch for the whole Monin-Obukhov surface solve.",
 [],
-333
+341
 ],
 "1930":[
 "build_planet",
@@ -269077,22 +269077,22 @@ null,
 },
 [
 [
-294,
+302,
 "unresolved",
 "cupy.ascontiguousarray(potential_temperature, dtype=cupy.float64).ravel"
 ],
 [
-296,
+304,
 "unresolved",
 "cupy.ascontiguousarray(cupy.broadcast_to(cupy.asarray(surface_temperature, dtype=cupy.float64), pt.shape)).ravel"
 ],
 [
-298,
+306,
 "unresolved",
 "cupy.ascontiguousarray(cupy.broadcast_to(cupy.asarray(height, dtype=cupy.float64), pt.shape)).ravel"
 ],
 [
-300,
+308,
 "unresolved",
 "cupy.ascontiguousarray(cupy.broadcast_to(cupy.asarray(speed, dtype=cupy.float64), pt.shape)).ravel"
 ]
