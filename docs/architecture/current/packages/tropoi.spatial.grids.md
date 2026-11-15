@@ -15,7 +15,7 @@ Index: [all packages](../index.md) · parent [`tropoi.spatial`](tropoi.spatial.m
 | `tropoi.spatial.grids.grid_base` | code | `GridGeometry` | – |
 | `tropoi.spatial.grids.grid_interpolation` | code | – | `geodesic_to_latlon_grid`, `latlon_to_geodesic_grid` |
 | `tropoi.spatial.grids.integration` | code | – | `simpson_2d` |
-| `tropoi.spatial.grids.latlon_grid` | code | `GaussLatLonGridGeometry`, `GaussLatLonSphericalHarmonics` | – |
+| `tropoi.spatial.grids.latlon_grid` | code | `GaussLatLonGridGeometry`, `GaussLatLonSphericalHarmonics` | `default_transform_backend` |
 
 Files shipped in this directory that are **not Python and not analysed** (templates, data): `README.md`. Their contents (for example JavaScript in an HTML template) are invisible to every graph here.
 
@@ -57,7 +57,7 @@ flowchart LR
     p_tropoi_ospatial_ooperators -->|1| n_tropoi_ospatial_ogrids_ogeodesic__grid
     p_tropoi_ospatial_otransforms -->|1| n_tropoi_ospatial_ogrids_ogeodesic__grid
     p_tropoi_ospatial_otransforms -->|1| n_tropoi_ospatial_ogrids_ointegration
-    n_tropoi_ospatial_ogrids_olatlon__grid -->|1| p_tropoi_ospatial_otransforms
+    n_tropoi_ospatial_ogrids_olatlon__grid -->|2| p_tropoi_ospatial_otransforms
     classDef other fill:none,stroke-dasharray:3 3
     class p_tropoi_orepresentation_ovisual other
     class p_tropoi_ospatial other

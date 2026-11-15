@@ -71,6 +71,12 @@ def test_transform_batch_matches_per_level(sh):
 def test_per_level_transform_is_unchanged_by_batching_support(sh):
     """The scalar path must keep its exact arithmetic (pinned hashes)."""
     import cupy as cp
+    if not hasattr(sh, "Y_matrix"):
+        pytest.skip(
+            "dense basis-matrix invariant; this grid is paired with the "
+            f"separable evaluator ({type(getattr(sh, 'sh', sh)).__name__}), "
+            "whose arithmetic is deliberately not bit-identical. The pinned "
+            "hashes belong to the dense path, which is still the default.")
     c = _random_coeffs(sh, 1, seed=2)[0]
     f = sh.inv_transform(c)
     w = f * sh.weights

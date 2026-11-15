@@ -255,15 +255,15 @@ flowchart LR
     nEE7ZF7EBPCMYO["grid#95;base.py"]:::moduleNode
     nMOI22CPKHUGQK["GridGeometry"]:::classNode
     nCVIOOSQOYSRIA["latlon#95;grid.py"]:::moduleNode
-    nB4MKU4AKNTVWQ["GaussLatLonGridGeometry"]:::classNode
-    nNIDKH5RNEXGHA["GaussLatLonSphericalHarmonics"]:::classNode
+    nFTFSVRV3UYNJM["GaussLatLonGridGeometry"]:::classNode
+    nGRVPY6HGTV3EA["GaussLatLonSphericalHarmonics"]:::classNode
     nQ2HJGB6D5QTC6["modes.py"]:::moduleNode
     n2QVEONPF7UU5M["SpectralConventionError"]:::classNode
     n2OYKTWNHZSOSE["FieldSpec"]:::classNode
     nZHEPEFPUSKQVQ["SpectralModes"]:::classNode
     nBJTZOYGX2MFOO["SpectralState"]:::classNode
     nS4RCOUUC72XZA["spectral#95;operators.py"]:::moduleNode
-    nNERYKUCAWINUS["SpectralOperators"]:::classNode
+    nU2ACRUCTJB64K["SpectralOperators"]:::classNode
     nOFPLYGEJOKJ2S["planet.py"]:::moduleNode
     nUB62VT6YLJ3GU["Planet"]:::classNode
     nWVI6XNQA3HJAY["sigma#95;coordinate.py"]:::moduleNode
@@ -278,9 +278,9 @@ flowchart LR
     nN65HVQAEICNH6["spherical#95;backend.py"]:::moduleNode
     nIEKFBAOLGVR5O["ProductSpace"]:::classNode
     nD7NDYLA37CBOC["SphericalGridBackend"]:::classNode
-    nA6QMVQC5IYKFC["GeodesicBackend"]:::classNode
-    nMK2QMRVXVW7CM["LatLonBackend"]:::classNode
-    nCYM6W26UEI5YI["PointSetBackend"]:::classNode
+    nTF6IK272MDROS["GeodesicBackend"]:::classNode
+    nLB5WNI5656QOI["LatLonBackend"]:::classNode
+    nVKNV2UDIA3GTE["PointSetBackend"]:::classNode
     nCAC5VU2Y2JDJY["barotropic.py"]:::moduleNode
     n6SXTVRYGCVGTO["BarotropicState"]:::classNode
     nRZ6OABD2ZTBQ6["primitive#95;equations.py"]:::moduleNode
@@ -310,6 +310,9 @@ flowchart LR
     nCMMGYA5IPSEXC["PointSetSphericalHarmonics"]:::classNode
     nCS67BHDY7VRVY["optimized#95;geodesic#95;sh.py"]:::moduleNode
     nSZGPYEUNASH2Q["GeodesicSphericalHarmonics"]:::classNode
+    nH5NVGBWK6BNZI["separable#95;gauss#95;sh.py"]:::moduleNode
+    nQKWSN2QA5TIZ6["SeparableStructureError"]:::classNode
+    nL7P2EU2VRYVYQ["SeparableGaussSphericalHarmonics"]:::classNode
     nLSDGJEGXCDEQY["spherical#95;harmonics.py"]:::moduleNode
     n4UB7ULPHEOPCO["LatLonSphericalHarmonics"]:::classNode
     nVHLEQO5BKBHCQ["column#95;coupling.py"]:::moduleNode
@@ -592,15 +595,15 @@ flowchart LR
     nXNSPLEKTMFRB4 --> nEE7ZF7EBPCMYO
     nEE7ZF7EBPCMYO --> nMOI22CPKHUGQK
     nXNSPLEKTMFRB4 --> nCVIOOSQOYSRIA
-    nCVIOOSQOYSRIA --> nB4MKU4AKNTVWQ
-    nCVIOOSQOYSRIA --> nNIDKH5RNEXGHA
+    nCVIOOSQOYSRIA --> nFTFSVRV3UYNJM
+    nCVIOOSQOYSRIA --> nGRVPY6HGTV3EA
     nCKVWON7JUNULM --> nQ2HJGB6D5QTC6
     nQ2HJGB6D5QTC6 --> n2QVEONPF7UU5M
     nQ2HJGB6D5QTC6 --> n2OYKTWNHZSOSE
     nQ2HJGB6D5QTC6 --> nZHEPEFPUSKQVQ
     nQ2HJGB6D5QTC6 --> nBJTZOYGX2MFOO
     nMDDEZ4OXE2WQO --> nS4RCOUUC72XZA
-    nS4RCOUUC72XZA --> nNERYKUCAWINUS
+    nS4RCOUUC72XZA --> nU2ACRUCTJB64K
     nCKVWON7JUNULM --> nOFPLYGEJOKJ2S
     nOFPLYGEJOKJ2S --> nUB62VT6YLJ3GU
     nCKVWON7JUNULM --> nWVI6XNQA3HJAY
@@ -615,9 +618,9 @@ flowchart LR
     nCKVWON7JUNULM --> nN65HVQAEICNH6
     nN65HVQAEICNH6 --> nIEKFBAOLGVR5O
     nN65HVQAEICNH6 --> nD7NDYLA37CBOC
-    nN65HVQAEICNH6 --> nA6QMVQC5IYKFC
-    nN65HVQAEICNH6 --> nMK2QMRVXVW7CM
-    nN65HVQAEICNH6 --> nCYM6W26UEI5YI
+    nN65HVQAEICNH6 --> nTF6IK272MDROS
+    nN65HVQAEICNH6 --> nLB5WNI5656QOI
+    nN65HVQAEICNH6 --> nVKNV2UDIA3GTE
     nOS3WFX4PPDHMI --> nCAC5VU2Y2JDJY
     nCAC5VU2Y2JDJY --> n6SXTVRYGCVGTO
     nOS3WFX4PPDHMI --> nRZ6OABD2ZTBQ6
@@ -647,6 +650,9 @@ flowchart LR
     nULGTHTZGQJJTG --> nCMMGYA5IPSEXC
     nDZNKIG56YF4Q2 --> nCS67BHDY7VRVY
     nCS67BHDY7VRVY --> nSZGPYEUNASH2Q
+    nDZNKIG56YF4Q2 --> nH5NVGBWK6BNZI
+    nH5NVGBWK6BNZI --> nQKWSN2QA5TIZ6
+    nH5NVGBWK6BNZI --> nL7P2EU2VRYVYQ
     nDZNKIG56YF4Q2 --> nLSDGJEGXCDEQY
     nLSDGJEGXCDEQY --> n4UB7ULPHEOPCO
     n26OGEY2QQJ23S --> nVHLEQO5BKBHCQ

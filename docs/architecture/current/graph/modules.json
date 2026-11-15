@@ -3017,6 +3017,14 @@
       "scopes": [
         "module"
       ],
+      "source": "tropoi.spatial.grids.latlon_grid",
+      "target": "tropoi.spatial.transforms.separable_gauss_sh"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
       "source": "tropoi.spatial.initialization.bve",
       "target": "tropoi.spatial.planet"
     },
@@ -3317,6 +3325,14 @@
       ],
       "source": "tropoi.spatial.transforms.optimized_geodesic_sh",
       "target": "tropoi.spatial.transforms.fast_geodesic_sh"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.spatial.transforms.separable_gauss_sh",
+      "target": "tropoi.spatial.transforms.cuda.cuda_utils"
     },
     {
       "kind": "imports",
@@ -5322,6 +5338,7 @@
       "path": "tropoi/spatial/grids/latlon_grid.py",
       "stdlib_imports": [
         "__future__",
+        "os",
         "warnings"
       ],
       "third_party_imports": [
@@ -5404,7 +5421,9 @@
       "id": "tropoi.spatial.operators.spectral_operators",
       "is_package": false,
       "path": "tropoi/spatial/operators/spectral_operators.py",
-      "stdlib_imports": [],
+      "stdlib_imports": [
+        "warnings"
+      ],
       "third_party_imports": [
         "cupy"
       ]
@@ -5683,6 +5702,20 @@
         "cupy",
         "numpy",
         "scipy"
+      ]
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.spatial.transforms.separable_gauss_sh",
+      "is_package": false,
+      "path": "tropoi/spatial/transforms/separable_gauss_sh.py",
+      "stdlib_imports": [
+        "__future__"
+      ],
+      "third_party_imports": [
+        "cupy",
+        "numpy"
       ]
     },
     {

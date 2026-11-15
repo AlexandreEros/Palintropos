@@ -5363,6 +5363,69 @@
     {
       "decorators": [],
       "external_bases": [],
+      "id": "tropoi.spatial.transforms.separable_gauss_sh.SeparableGaussSphericalHarmonics",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__init__"
+        },
+        {
+          "kind": "method",
+          "name": "__repr__"
+        },
+        {
+          "kind": "method",
+          "name": "_as_rows"
+        },
+        {
+          "kind": "method",
+          "name": "_build_fourier_bins"
+        },
+        {
+          "kind": "method",
+          "name": "_build_legendre_tables"
+        },
+        {
+          "kind": "method",
+          "name": "describe"
+        },
+        {
+          "kind": "method",
+          "name": "extended"
+        },
+        {
+          "kind": "method",
+          "name": "inv_transform"
+        },
+        {
+          "kind": "method",
+          "name": "inv_transform_batch"
+        },
+        {
+          "kind": "method",
+          "name": "transform"
+        },
+        {
+          "kind": "method",
+          "name": "transform_batch"
+        }
+      ],
+      "module": "tropoi.spatial.transforms.separable_gauss_sh",
+      "qualname": "SeparableGaussSphericalHarmonics"
+    },
+    {
+      "decorators": [],
+      "external_bases": [
+        "ValueError"
+      ],
+      "id": "tropoi.spatial.transforms.separable_gauss_sh.SeparableStructureError",
+      "members": [],
+      "module": "tropoi.spatial.transforms.separable_gauss_sh",
+      "qualname": "SeparableStructureError"
+    },
+    {
+      "decorators": [],
+      "external_bases": [],
       "id": "tropoi.spatial.transforms.spherical_harmonics.LatLonSphericalHarmonics",
       "members": [
         {

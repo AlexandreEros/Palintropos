@@ -53,7 +53,8 @@ class Planet:
                  product_quadrature: str = "fine",
                  grid_type: str = "geodesic",
                  nlat: int = 128,
-                 nlon: int = 256) -> 'Planet':
+                 nlon: int = 256,
+                 transform_backend: str | None = None) -> 'Planet':
         """
         product_quadrature : {"fine", "coarse"}
             Passed to SpectralOperators. "fine" (default) evaluates nonlinear
@@ -67,6 +68,15 @@ class Planet:
             Grid family. "geodesic" (default) uses `grid_resolution`;
             "latlon" uses `nlat`/`nlon` (Gauss-Legendre latitudes, uniform
             longitudes). Unknown values raise (no silent fallback).
+        transform_backend : {"dense", "separable"}, optional
+            Which evaluator the "latlon" grid pairs with: the historical
+            dense basis matrix (the default and the numerical reference) or
+            the separable FFT+Legendre path, which is much faster but agrees
+            only to round-off. Ignored by "geodesic", whose unstructured
+            points cannot factorize. None takes
+            `latlon_grid.default_transform_backend()`, i.e. "dense" unless
+            TROPOI_SH_BACKEND says otherwise. Recorded in run manifests
+            either way.
         """
         if terrain_params is None:
             terrain_params = SpectralTerrainParams(
@@ -87,7 +97,8 @@ class Planet:
             backend = GeodesicBackend(grid, sh)
         elif grid_type == "latlon":
             grid = GaussLatLonGridGeometry(nlat, nlon, params.radius)
-            sh = GaussLatLonSphericalHarmonics(grid, l_max)
+            sh = GaussLatLonSphericalHarmonics(
+                grid, l_max, transform_backend=transform_backend)
             backend = LatLonBackend(grid, sh)
         else:
             raise ValueError(

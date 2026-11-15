@@ -1,3 +1,5 @@
+import warnings
+
 import cupy as cp
 
 from tropoi.spatial.grids.geodesic_grid import GeodesicGridGeometry
@@ -399,9 +401,29 @@ class SpectralOperators:
         if self._vector_analysis_cache is None:
             from tropoi.spatial.transforms.fast_geodesic_sh import PointSetSphericalHarmonics
             sh_p = self._product_space.sh
-            sh_ext = PointSetSphericalHarmonics(
-                sh_p.latitudes, sh_p.longitudes, self.l_max + 1,
-                weights=sh_p.weights)
+            # A transform that can re-truncate itself on its own sampling
+            # (the separable Gauss one can) builds the extended basis the
+            # cheap way; anything else gets a dense basis matrix on the same
+            # points with the same weights, as before.
+            re_truncate = getattr(sh_p, "extended", None)
+            sh_ext = None
+            if callable(re_truncate):
+                try:
+                    sh_ext = re_truncate(self.l_max + 1)
+                except ValueError as exc:
+                    # The extra degree can push a sampling past what the
+                    # cheap evaluator supports even though l_max itself fit.
+                    warnings.warn(
+                        f"{type(sh_p).__name__} cannot extend to "
+                        f"l_max={self.l_max + 1} on its own sampling "
+                        f"({exc}); using a dense basis matrix for the vector "
+                        f"weak form instead.",
+                        stacklevel=2,
+                    )
+            if sh_ext is None:
+                sh_ext = PointSetSphericalHarmonics(
+                    sh_p.latitudes, sh_p.longitudes, self.l_max + 1,
+                    weights=sh_p.weights)
             L = cp.arange(0, self.l_max + 1, dtype=cp.float64)[:, None]
             M = cp.arange(0, self.l_max + 1, dtype=cp.float64)[None, :]
             Lb = cp.broadcast_to(L, (self.l_max + 1, self.l_max + 1))
