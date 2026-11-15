@@ -149,7 +149,7 @@
         "sha256": "1dcfeb9400fd06152e45cd607c8648f54d8fa8f41c02b0fcd8ee9310a03c28a4"
       }
     ],
-    "source_lines_embedded": 17855
+    "source_lines_embedded": 17857
   },
   "call_graph": {
     "call_sites": {
@@ -1228,7 +1228,7 @@
     "package": "tropoi",
     "src": "src",
     "working_tree": {
-      "base_commit": "5f6516bd0cebc0791b9e4d971987605fc5c6316b",
+      "base_commit": "06e30a1428f9fd159707c6059b916c7a0ef37e4b",
       "generator": {
         "changes": [],
         "files": {
@@ -1258,15 +1258,7 @@
         "status": "clean"
       },
       "source": {
-        "changes": [
-          " M src/tropoi/spatial/grids/latlon_grid.py",
-          " M src/tropoi/spatial/operators/spectral_operators.py",
-          " M src/tropoi/spatial/spherical_backend.py",
-          " M src/tropoi/spatial/transforms/README.md",
-          " M src/tropoi/spatial/transforms/cuda/README.md",
-          "?? src/tropoi/spatial/transforms/cuda/legendre_stages.cu",
-          "?? src/tropoi/spatial/transforms/separable_gauss_sh.py"
-        ],
+        "changes": [],
         "files": {
           "src/tropoi/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
           "src/tropoi/cli/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
@@ -1401,7 +1393,7 @@
           "src/tropoi/spatial/modes.py": "93ba4b82735a63e19cbdcaefccf710520e1cd9c4407ded63181a1dbaaac06065",
           "src/tropoi/spatial/operators/__init__.py": "fad4929748754331ba46d35351e6e10fa6eacb135e621e6d7f7955c45bb499cd",
           "src/tropoi/spatial/operators/spectral_operators.py": "ec3e7c515abfe2288b59212c3169cf61e747966a4d4e80bb6eb16f55d708d5da",
-          "src/tropoi/spatial/planet.py": "3b50d56cfc9560255e6bdfe351cba360a505359805bc6a8113855826be7c08e5",
+          "src/tropoi/spatial/planet.py": "cc65b494687b468e35505d494ce01e2373c070eed94fa42ea8bb991734f54fe5",
           "src/tropoi/spatial/sigma_coordinate.py": "f25636c460a65f00c12b1b799c7578110a01aaeea38a9fc69cf9617b86643cb4",
           "src/tropoi/spatial/specification.py": "721debd02458b574321cacc06f3a4b9a3c60be65f07fd83f1b6a3ff4d131f276",
           "src/tropoi/spatial/spherical_backend.py": "ba10b094f3177b8762a21574162a93a2b53ac5bffc048f7ccb97ee0c0d553059",
@@ -1445,8 +1437,8 @@
           "src/tropoi/temporal/tendencies/primitive_equations.py": "848c6fe9406a7c1c465c0aa9459760b01c542164c8cc9395797a3c4a60793e52",
           "src/tropoi/temporal/tendencies/shallow_water.py": "7ae521f2378824e89f88bc467fc99321d1ef4224b037c865137e076a601da3c8"
         },
-        "sha256": "8fecc6e76812a67583afd6cee1d26be21156dffb2bcc0281731ca25b81461da1",
-        "status": "dirty"
+        "sha256": "9e6ca28798ddb71544becf735d5bd0075a1266e06e64a366272d975736098aa6",
+        "status": "clean"
       }
     }
   },

@@ -40274,7 +40274,7 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 [],
 [
 [
-85,
+95,
 19,
 "GeodesicGridGeometry(grid_resolution, params.radius)",
 [
@@ -40291,7 +40291,7 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ],
 [
 [
-89,
+99,
 19,
 "GaussLatLonGridGeometry(nlat, nlon, params.radius)",
 [
@@ -40312,9 +40312,9 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ],
 [
 [
-90,
+100,
 17,
-"GaussLatLonSphericalHarmonics(grid, l_max)",
+"GaussLatLonSphericalHarmonics(grid, l_max, transform_backend=transform_backend)",
 [
 [
 "grid",
@@ -40323,13 +40323,17 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 [
 "l_max",
 "l_max"
+],
+[
+"transform_backend",
+"transform_backend"
 ]
 ]
 ]
 ],
 [
 [
-96,
+107,
 13,
 "SpectralOperators(sh, params.radius, grid, product_quadrature=product_quadrature, backend=backend)",
 [
@@ -40358,7 +40362,7 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ],
 [
 [
-109,
+120,
 26,
 "cls._calculate_radial_distances(params, grid, height)",
 [
@@ -40379,7 +40383,7 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ],
 [
 [
-118,
+129,
 29,
 "cls._compute_power_spectrum(height_coeffs, sh.l_max)",
 [
@@ -40396,7 +40400,7 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ],
 [
 [
-87,
+97,
 22,
 "GeodesicBackend(grid, sh)",
 [
@@ -40413,7 +40417,7 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ],
 [
 [
-91,
+102,
 22,
 "LatLonBackend(grid, sh)",
 [
@@ -40430,7 +40434,7 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ],
 [
 [
-114,
+125,
 20,
 "ElevationData(surface_height=height, radial_distance=radial_distance, sh_coeffs=height_coeffs, power_spectrum=cls._compute_power_spectrum(height_coeffs, sh.l_max))",
 []
@@ -40438,7 +40442,7 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ],
 [
 [
-76,
+86,
 30,
 "TectonicParams()",
 []
@@ -40446,7 +40450,7 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ],
 [
 [
-72,
+82,
 29,
 "SpectralTerrainParams(rms_elevation=params.radius * 0.001)",
 []
@@ -40454,7 +40458,7 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ],
 [
 [
-100,
+111,
 24,
 "generate_spectral_terrain_gpu(sph=sh, params=terrain_params)",
 [
@@ -40471,7 +40475,7 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ],
 [
 [
-86,
+96,
 17,
 "GeodesicSphericalHarmonics(grid, l_max)",
 [
@@ -73635,7 +73639,7 @@ null,
 ],
 [
 [
-81,
+91,
 "function",
 [
 "GaussLatLonGridGeometry",
@@ -73656,7 +73660,7 @@ null,
 ],
 [
 [
-80,
+90,
 "function",
 [
 "GeodesicBackend",
@@ -90984,51 +90988,62 @@ null,
 },
 "tropoi/spatial/planet.py":{
 "10":"from tropoi.spatial.terrain.elevation_data import ElevationData",
-"100":"        height_coeffs = generate_spectral_terrain_gpu(",
-"101":"            sph=sh,",
-"102":"            params=terrain_params",
-"103":"        )",
-"104":"",
-"105":"        # Final terrain back to CPU grid:",
-"106":"        height = sh.inv_transform(height_coeffs)",
-"107":"",
-"108":"        # Calculate radial distances (includes oblateness)",
-"109":"        radial_distance = cls._calculate_radial_distances(",
+"100":"            sh = GaussLatLonSphericalHarmonics(",
+"101":"                grid, l_max, transform_backend=transform_backend)",
+"102":"            backend = LatLonBackend(grid, sh)",
+"103":"        else:",
+"104":"            raise ValueError(",
+"105":"                f\"grid_type must be 'geodesic' or 'latlon', got {grid_type!r} \"",
+"106":"                \"(no silent fallback)\")",
+"107":"        so = SpectralOperators(sh, params.radius, grid,",
+"108":"                               product_quadrature=product_quadrature,",
+"109":"                               backend=backend)",
 "11":"from tropoi.spatial.terrain.terrain_spectral import generate_spectral_terrain_gpu, SpectralTerrainParams",
-"110":"            params, grid, height",
-"111":"        )",
-"112":"",
-"113":"        # Create elevation data structure",
-"114":"        elevation = ElevationData(",
-"115":"            surface_height=height,",
-"116":"            radial_distance=radial_distance,",
-"117":"            sh_coeffs=height_coeffs,",
-"118":"            power_spectrum = cls._compute_power_spectrum(",
-"119":"                height_coeffs,",
+"110":"",
+"111":"        height_coeffs = generate_spectral_terrain_gpu(",
+"112":"            sph=sh,",
+"113":"            params=terrain_params",
+"114":"        )",
+"115":"",
+"116":"        # Final terrain back to CPU grid:",
+"117":"        height = sh.inv_transform(height_coeffs)",
+"118":"",
+"119":"        # Calculate radial distances (includes oblateness)",
 "12":"from tropoi.spatial.terrain.tectonics import TectonicParams",
-"120":"                sh.l_max",
-"121":"            )",
+"120":"        radial_distance = cls._calculate_radial_distances(",
+"121":"            params, grid, height",
 "122":"        )",
 "123":"",
-"124":"        pln = cls(params, grid, elevation, sh, so)",
-"129":"    @staticmethod",
+"124":"        # Create elevation data structure",
+"125":"        elevation = ElevationData(",
+"126":"            surface_height=height,",
+"127":"            radial_distance=radial_distance,",
+"128":"            sh_coeffs=height_coeffs,",
+"129":"            power_spectrum = cls._compute_power_spectrum(",
 "13":"",
-"130":"    def _calculate_radial_distances(params: PlanetaryParameters,",
-"131":"                                    grid: GridGeometryBase,",
-"132":"                                    surface_height: np.ndarray) -\u003e np.ndarray:",
-"133":"        \"\"\"",
+"130":"                height_coeffs,",
+"131":"                sh.l_max",
+"132":"            )",
+"133":"        )",
+"134":"",
+"135":"        pln = cls(params, grid, elevation, sh, so)",
 "14":"class Planet:",
-"150":"    @staticmethod",
-"151":"    def _compute_power_spectrum(coeffs: cp.ndarray, l_max: int) -\u003e np.ndarray:",
-"152":"        \"\"\"Compute power spectrum from spherical harmonic coefficients",
-"166":"            power += 2.0 * cp.real((pos_m * cp.conj(pos_m)).sum(axis=1))",
-"172":"    def reconstruct_surface(self,",
-"173":"                            l_max_filt: Optional[int] = None,",
-"174":"                            m_max_filt: Optional[int] = None",
-"175":"                            ) -\u003e np.ndarray:",
-"176":"        \"\"\"",
-"184":"        coeffs = coeffs.copy()",
-"195":"        reconstructed = self.sh.inv_transform(coeffs)",
+"140":"    @staticmethod",
+"141":"    def _calculate_radial_distances(params: PlanetaryParameters,",
+"142":"                                    grid: GridGeometryBase,",
+"143":"                                    surface_height: np.ndarray) -\u003e np.ndarray:",
+"144":"        \"\"\"",
+"161":"    @staticmethod",
+"162":"    def _compute_power_spectrum(coeffs: cp.ndarray, l_max: int) -\u003e np.ndarray:",
+"163":"        \"\"\"Compute power spectrum from spherical harmonic coefficients",
+"177":"            power += 2.0 * cp.real((pos_m * cp.conj(pos_m)).sum(axis=1))",
+"183":"    def reconstruct_surface(self,",
+"184":"                            l_max_filt: Optional[int] = None,",
+"185":"                            m_max_filt: Optional[int] = None",
+"186":"                            ) -\u003e np.ndarray:",
+"187":"        \"\"\"",
+"195":"        coeffs = coeffs.copy()",
+"206":"        reconstructed = self.sh.inv_transform(coeffs)",
 "25":"    def __init__(self,",
 "26":"                 params: PlanetaryParameters,",
 "27":"                 grid: GeodesicGridGeometry,",
@@ -91051,42 +91066,33 @@ null,
 "53":"                 product_quadrature: str = \"fine\",",
 "54":"                 grid_type: str = \"geodesic\",",
 "55":"                 nlat: int = 128,",
-"56":"                 nlon: int = 256) -\u003e 'Planet':",
-"57":"        \"\"\"",
+"56":"                 nlon: int = 256,",
+"57":"                 transform_backend: str | None = None) -\u003e 'Planet':",
+"58":"        \"\"\"",
 "6":"from tropoi.spatial.transforms.optimized_geodesic_sh import GeodesicSphericalHarmonics",
 "7":"from tropoi.spatial.grids.grid_base import GridGeometry as GridGeometryBase",
-"70":"        \"\"\"",
-"71":"        if terrain_params is None:",
-"72":"            terrain_params = SpectralTerrainParams(",
-"73":"                rms_elevation=params.radius * 0.001,  # 0.1% of radius",
-"74":"            )",
-"75":"        if tectonic_params is None:",
-"76":"            tectonic_params = TectonicParams()",
-"77":"",
-"78":"        # Grid geometry, SH transform, and their pairing (the backend, which",
-"79":"        # owns product-quadrature policy) are three separate objects.",
 "8":"from tropoi.spatial.grids.geodesic_grid import GeodesicGridGeometry",
-"80":"        from tropoi.spatial.spherical_backend import GeodesicBackend, LatLonBackend",
-"81":"        from tropoi.spatial.grids.latlon_grid import (",
-"82":"            GaussLatLonGridGeometry, GaussLatLonSphericalHarmonics)",
-"83":"",
-"84":"        if grid_type == \"geodesic\":",
-"85":"            grid = GeodesicGridGeometry(grid_resolution, params.radius)",
-"86":"            sh = GeodesicSphericalHarmonics(grid, l_max)",
-"87":"            backend = GeodesicBackend(grid, sh)",
-"88":"        elif grid_type == \"latlon\":",
-"89":"            grid = GaussLatLonGridGeometry(nlat, nlon, params.radius)",
+"80":"        \"\"\"",
+"81":"        if terrain_params is None:",
+"82":"            terrain_params = SpectralTerrainParams(",
+"83":"                rms_elevation=params.radius * 0.001,  # 0.1% of radius",
+"84":"            )",
+"85":"        if tectonic_params is None:",
+"86":"            tectonic_params = TectonicParams()",
+"87":"",
+"88":"        # Grid geometry, SH transform, and their pairing (the backend, which",
+"89":"        # owns product-quadrature policy) are three separate objects.",
 "9":"from tropoi.spatial.environment import PlanetaryParameters",
-"90":"            sh = GaussLatLonSphericalHarmonics(grid, l_max)",
-"91":"            backend = LatLonBackend(grid, sh)",
-"92":"        else:",
-"93":"            raise ValueError(",
-"94":"                f\"grid_type must be 'geodesic' or 'latlon', got {grid_type!r} \"",
-"95":"                \"(no silent fallback)\")",
-"96":"        so = SpectralOperators(sh, params.radius, grid,",
-"97":"                               product_quadrature=product_quadrature,",
-"98":"                               backend=backend)",
-"99":""
+"90":"        from tropoi.spatial.spherical_backend import GeodesicBackend, LatLonBackend",
+"91":"        from tropoi.spatial.grids.latlon_grid import (",
+"92":"            GaussLatLonGridGeometry, GaussLatLonSphericalHarmonics)",
+"93":"",
+"94":"        if grid_type == \"geodesic\":",
+"95":"            grid = GeodesicGridGeometry(grid_resolution, params.radius)",
+"96":"            sh = GeodesicSphericalHarmonics(grid, l_max)",
+"97":"            backend = GeodesicBackend(grid, sh)",
+"98":"        elif grid_type == \"latlon\":",
+"99":"            grid = GaussLatLonGridGeometry(nlat, nlon, params.radius)"
 },
 "tropoi/spatial/sigma_coordinate.py":{
 "104":"        \"\"\"",
@@ -94855,7 +94861,7 @@ null,
 }
 },
 "meta":{
-"base_commit":"5f6516bd0cebc0791b9e4d971987605fc5c6316b",
+"base_commit":"06e30a1428f9fd159707c6059b916c7a0ef37e4b",
 "call_depth":4,
 "command":"python -m tools.architecture.generate",
 "dynamic_import_sites":{
@@ -94899,8 +94905,8 @@ null,
 "max_sites":8,
 "package":"tropoi",
 "source_commit":null,
-"source_sha256":"8fecc6e76812a67583afd6cee1d26be21156dffb2bcc0281731ca25b81461da1",
-"source_status":"dirty",
+"source_sha256":"9e6ca28798ddb71544becf735d5bd0075a1266e06e64a366272d975736098aa6",
+"source_status":"clean",
 "title":"current",
 "tool_version":"2.3.0",
 "traversed":[
@@ -105062,13 +105068,13 @@ null,
 [
 "staticmethod",
 1621,
-130,
+141,
 1470
 ],
 [
 "staticmethod",
 1621,
-151,
+162,
 1470
 ],
 [
@@ -105080,7 +105086,7 @@ null,
 [
 "method",
 1621,
-172,
+183,
 1470
 ],
 [
@@ -126272,7 +126278,7 @@ null,
 null,
 "A procedurally generated planet with realistic physical properties.",
 [],
-197,
+208,
 []
 ],
 "1623":[
@@ -126362,7 +126368,7 @@ null
 [
 "staticmethod"
 ],
-148
+159
 ],
 "1626":[
 "_compute_power_spectrum",
@@ -126385,7 +126391,7 @@ null
 [
 "staticmethod"
 ],
-169
+180
 ],
 "1627":[
 "generate",
@@ -126449,6 +126455,12 @@ null
 "nlon",
 "int",
 "256"
+],
+[
+"pos",
+"transform_backend",
+"str | None",
+"None"
 ]
 ],
 "'Planet'",
@@ -126456,7 +126468,7 @@ null
 [
 "classmethod"
 ],
-126
+137
 ],
 "1628":[
 "reconstruct_surface",
@@ -126483,7 +126495,7 @@ null
 "np.ndarray",
 "Reconstruct function from spherical harmonic coefficients.",
 [],
-197
+208
 ],
 "163":[
 "__call__",
@@ -284115,7 +284127,7 @@ null,
 },
 [
 [
-166,
+177,
 "unresolved",
 "(pos_m * cp.conj(pos_m)).sum"
 ]
@@ -284128,12 +284140,12 @@ null,
 },
 [
 [
-106,
+117,
 "unresolved",
 "sh.inv_transform"
 ],
 [
-124,
+135,
 "unresolved",
 "cls"
 ]
@@ -284146,12 +284158,12 @@ null,
 },
 [
 [
-184,
+195,
 "unresolved",
 "coeffs.copy"
 ],
 [
-195,
+206,
 "unresolved",
 "self.sh.inv_transform"
 ]
