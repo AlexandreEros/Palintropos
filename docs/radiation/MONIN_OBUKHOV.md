@@ -340,8 +340,9 @@ K profile at h = 2 km, u\* = 0.4 m/s (m²/s), at 10/50/200/500/1000/1800 m:
 The neutral row is the FHZ06 row, which is the identity of §2 made concrete.
 
 None of this says the scheme improves the M-I comparison. It says what the
-scheme does differently; whether that moves M1 or M6 is an experiment, not a
-claim.
+scheme does differently. Whether that moves a 60-day flat-Mars climate was
+an experiment rather than a claim; §10 reports it, and the answer is that it
+does not.
 
 ## 8. Differences from Isca that remain
 
@@ -420,3 +421,92 @@ NumPy↔fused-kernel agreement over three option sets, the checksum on the
 device, and a coupled run — one day closes its budget, two days resume
 bit-identically through a checkpoint, and the MOST state differs from the
 FHZ06 state it replaces.
+
+## 10. The 60-day experiment (2026-11-15)
+
+The scheme was run on the §2e flat-Mars configuration: preset
+`dev-mars-gray-flat-bl-most`, `monin_obukhov: {}` (every Isca module
+default), both substitutes removed, 60 days on a Colab T4 from `8e98d7b`
+with a clean tree. Two runs, differing only in frictional heating, as the
+FHZ06 pair does:
+
+- **Hm**, heating on — `dev-mars-gray-flat-bl-most-heated-T21L25-60d-8e98d7b-t4`
+- **Um**, heating off — `dev-mars-gray-flat-bl-most-T21L25-60d-8e98d7b-t4`
+
+They are compared with **Hb** and **Ub**, the §2e runs of the identical
+configuration with the FHZ06-simplified forms. Both pairs completed 60
+days; all four means are over days 41–60, twenty daily values each.
+
+**This is a measurement, not a judged experiment.** No criterion was
+registered before these runs, and none is applied to them: M1–M7 are
+historical and are not requirements from here on (`MARS_MI_PLAN.md`
+§4.1). What follows is a comparison, in the sense of a DM.
+
+### 10.1 What the swap changes
+
+| days 41–60 mean | Hb (FHZ06) | Hm (MOST) | Ub (FHZ06) | Um (MOST) | within-run sd |
+| --- | --- | --- | --- | --- | --- |
+| lowest-level max wind (m s⁻¹) | 40.5 | 36.4 | 37.2 | 38.2 | 2.8 / 3.3 |
+| max \|u\| anywhere (m s⁻¹) | 138.1 | 145.7 | 145.3 | 146.4 | 12.1 / 14.9 |
+| BL depth, daily max (km) | 14.04 | 14.34 | 14.33 | 14.96 | 1.28 / 0.79 |
+| BL kinetic sink (W m⁻²) | −0.1007 | −0.0891 | −0.1037 | −0.0880 | 0.010 / 0.014 |
+| mean surface temperature (K) | 227.08 | 227.04 | 227.05 | 227.02 | 3.07 / 3.08 |
+| \|mean residual\| / F | 1.49 × 10⁻⁴ | 1.48 × 10⁻⁴ | 2.87 × 10⁻³ | 3.04 × 10⁻³ | — |
+| relative drift of mean p_s | −2.57 × 10⁻⁵ | −2.72 × 10⁻⁵ | −2.21 × 10⁻⁵ | −2.34 × 10⁻⁵ | — |
+
+The last column is the standard deviation of the twenty daily values
+within a run, averaged over the pair — heated / unheated. It is the only
+noise estimate available: each configuration was run once, so there is no
+ensemble, and the daily values are autocorrelated, which makes the true
+uncertainty of a window mean *larger* than twenty independent samples
+would give.
+
+**Two differences keep their sign in both pairs**, which is what a scheme
+effect looks like with one run per configuration:
+
+- the **boundary-layer kinetic sink falls by 11–15 %** in magnitude
+  (−0.101 → −0.089 heated, −0.104 → −0.088 unheated). The full forms
+  remove less kinetic energy at the surface than the FHZ06 simplification
+  over this climate, despite §7's stable branch never decoupling
+  completely;
+- the **diagnosed BL depth is slightly greater**, by 0.3 km heated and
+  0.6 km unheated — 2–4 %, well inside the day-to-day spread of 0.8–1.3 km.
+
+**Everything else is within the noise.** The mean surface temperature is
+unchanged to 0.04 K, a hundredth of its own spread. The wind aloft rises
+by 7.6 and 1.1 m s⁻¹ against a spread of 12–15. The energy residual is
+indistinguishable between Hb and Hm (1.48 against 1.49 × 10⁻⁴ F): the
+swap does not perturb the budget, and the unheated pair misses A2 by the
+same factor of three in both schemes, for the reason §6 of
+[the radiation report](README.md) gives ("Frictional heating becomes the
+preset default").
+
+### 10.2 One reading to avoid
+
+Taken alone, the heated pair says the lowest-level wind fell from 40.5 to
+36.4 m s⁻¹ — across the 40 m s⁻¹ line of the historical M7. It should not
+be read that way, for two independent reasons. The unheated pair moves the
+*other* way (37.2 → 38.2), so the sign is not a property of the scheme;
+and both shifts are smaller than the 2.8–3.3 m s⁻¹ spread within either
+run. M7 is in any case historical and is not re-judged here.
+
+The same caution applies in the other direction: nothing here shows the
+scheme is *worse*. The honest summary is that over 60 days at T21, with
+Isca's defaults, the full Monin–Obukhov forms leave this climate where the
+FHZ06 simplification left it.
+
+### 10.3 What the comparison does not control
+
+- **Commit and device differ.** Hb/Ub ran at `06f5356` on an L4; Hm/Um at
+  `8e98d7b` on a T4. The FHZ06 configuration hashes are unchanged across
+  those two commits (§6, and the preset-identity tests), but the FHZ06
+  runs were not repeated at `8e98d7b`, so a commit or device contribution
+  is bounded only by those identities, not measured.
+- **One run per configuration**, so every difference above is a single
+  realization of a chaotic flow. Sign consistency across the heated and
+  unheated pairs is the substitute for a repeat, not an equal to it.
+- **T21, Δt 600 s, 60 days**, none of them M-I's (IR-9, IR-10). A scheme
+  difference could be real at T42 and invisible here.
+- **The largest structural difference from Isca remains** — the split
+  surface and diffusion solves (§8 item 1, IR-8). This experiment changed
+  the forms, not the coupling, so it says nothing about that.
