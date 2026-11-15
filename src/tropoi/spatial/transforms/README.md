@@ -23,18 +23,75 @@ defines normalization, signs and layout and records measured envelopes.
 
 | Module | Role | Used by |
 | --- | --- | --- |
-| `fast_geodesic_sh.py` | `PointSetSphericalHarmonics`: dense basis matrix `Y` (n_points × n_basis) built on GPU by `cuda/sh_matrix.cu`; analysis and synthesis are matrix products. Works on any point set given weights; batched `transform_batch` / `inv_transform_batch` analyze K fields in one GEMM | Both production backends |
+| `fast_geodesic_sh.py` | `PointSetSphericalHarmonics`: dense basis matrix `Y` (n_points × n_basis) built on GPU by `cuda/sh_matrix.cu`; analysis and synthesis are matrix products. Works on any point set given weights; batched `transform_batch` / `inv_transform_batch` analyze K fields in one GEMM | Both production backends; numerical reference and fallback everywhere |
+| `separable_gauss_sh.py` | `SeparableGaussSphericalHarmonics`: the same basis evaluated separably on a Gauss × uniform-longitude grid — a cuFFT `rfft`/`irfft` longitude stage and a `cuda/legendre_stages.cu` latitude stage, so cost is `nlat × n_basis` instead of `n_points × n_basis`. Opt-in; see below | Gauss lat–lon backend when selected |
 | `optimized_geodesic_sh.py` | `GeodesicSphericalHarmonics`: wraps the point-set transform with geodesic weights (`"voronoi"` default, `"uniform"`, or least-squares `"optimize"` with an on-disk cache) and warns below 6 points per basis function | Geodesic backend, `Planet` |
 | `host_synthesis.py` | NumPy-only exact synthesis on a lat–lon mesh, plus `sin(theta) d/dtheta` and wind from vorticity/divergence. Never imports CuPy | Saved-state previews, PE level/section diagnostics |
 | `spherical_harmonics.py` | `LatLonSphericalHarmonics`: legacy Simpson-rule transform with per-(l, m) Legendre kernels from `cuda/legendre.cu` | Comparison code and decorative terrain only |
 | [cuda](cuda/README.md) | Kernel sources and their loader | The GPU classes above |
 
 The production Gauss transform, `GaussLatLonSphericalHarmonics`, sits in
-[grids/latlon_grid.py](../grids/README.md) with its geometry. It feeds the
-same `PointSetSphericalHarmonics` matrix path with exact tensor-product
-weights. Backends pair a grid with a transform in
+[grids/latlon_grid.py](../grids/README.md) with its geometry. It pairs exact
+tensor-product weights with **one of two evaluators** of the same basis,
+chosen by its `transform_backend` argument (`"separable"`, the default, or
+the deprecated `"dense"`); everything else talks to the wrapper and does not
+care which.
+Backends pair a grid with a transform in
 [`spherical_backend.py`](../spherical_backend.py), which also owns the
-product sampling.
+product sampling and propagates the evaluator choice to it.
+
+## Choosing an evaluator on the Gauss grid
+
+`"separable"` is the default. It exploits the tensor-product structure the
+dense path throws away: with uniform longitudes and longitude-independent
+weights, `Y_lm(lat_j, lon_k) = N_lm P_l^m(x_j) e^{i m lon_k}`, so the
+longitude sum is a DFT and the latitude sum no longer carries the `nlon`
+factor.
+
+`"dense"` is the historical basis-matrix path. It is **deprecated** and
+raises a `DeprecationWarning` whenever a Gauss grid lands on it — asked for
+or fallen back to, so a slow run is never quiet about why. It is kept for
+three jobs: the numerical reference the separable path is measured against,
+the fallback for grids that cannot factorize, and reproducing runs recorded
+before the evaluator became selectable.
+
+- **Selection.** `transform_backend=`, or `TROPOI_SH_BACKEND` to point an
+  existing run configuration at either evaluator without editing call sites.
+  Either way the choice is recorded in run manifests by
+  `SphericalGridBackend.describe` (`transform_backend`,
+  `transform_evaluator`) and in every checkpoint by
+  `run.held_suarez.experiment.transform_identity`, which refuses a resume
+  that would change it.
+- **Replaying a saved run** uses the evaluator its manifest records, not the
+  current default; a run from before the choice existed records none and is
+  replayed on the dense path it ran with
+  (`representation.visual.snapshot._recorded_transform_backend`). Changing
+  the default therefore does not change how existing runs are re-read.
+- **Applicability.** `separable_is_applicable` is the single gate: uniform
+  longitudes, weights that do not vary along longitude, and `2*l_max < nlon`
+  (every retained zonal wavenumber needs its own real-FFT bin below Nyquist).
+  Production grids clear it — the state grid is `nlon >= 2 l_max + 1`, the
+  3/2-rule product grid `nlon >= 3 l_max + 1`. A grid that does not falls
+  back to the dense evaluator **with a warning**, never silently. The
+  unstructured geodesic grid cannot factorize at all and is unaffected.
+- **Agreement, not bit-identity.** The Legendre values come from the same
+  `cuda/sh_matrix.cu` recurrence (tabulated at longitude zero), so only the
+  summation order differs. Measured agreement against the dense path is
+  ~1e-14 relative on analysis, synthesis, round trips and a full PE
+  tendency; the tolerance in `tests/test_separable_transform.py` is 1e-13.
+  It is therefore **not** a drop-in for reproducing a pinned hash.
+- **Measured cost** (MX110, float64, 25 levels, `cupyx.profiler.benchmark`):
+  at T42 the batched product-grid synthesis is 364 ms → 2.8 ms and a full
+  Held–Suarez-style PE step 10.76 s → 0.67 s (16×); at T21 the step is
+  0.864 s → 0.372 s (2.3×). The dense basis matrix is also 128 MB per object
+  at T42 against ~1 MB of Legendre tables, which is why the dense T42 path
+  needs GEMM chunking to survive the Windows TDR and this one does not.
+- **Credit.** The factorization and the normalization convention follow
+  NVIDIA [torch-harmonics](https://github.com/NVIDIA/torch-harmonics)
+  (BSD-3-Clause), which uses the same
+  `sqrt((2l+1)/(4π) (l-m)!/(l+m)!)` normalization. No code is vendored: its
+  CUDA extensions need compute capability ≥ 7.0 and do not cover this stage,
+  and PyTorch is deliberately not a dependency.
 
 ## Contracts worth knowing
 

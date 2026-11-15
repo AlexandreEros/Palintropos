@@ -35,6 +35,8 @@ from tropoi.run.held_suarez.checkpoint import (CheckpointError, atomic_write_byt
                                                list_checkpoints, prune_checkpoints,
                                                read_checkpoint, write_checkpoint)
 from tropoi.run.held_suarez.experiment import (RunError, _now, code_identity,
+                                               transform_identity,
+                                               stored_transform_identity,
                                                daily_sample, environment_identity)
 from tropoi.run.radiative.config import DAY_SECONDS, RadiativeConfig
 
@@ -204,7 +206,8 @@ class RadiativeRun:
                 "boundary_layer": bl_state, "count": self._count,
                 "series": self.series, "energy_prev": self._energy_prev,
                 "config_sha256": self.config_sha256, "code": self.code,
-                "environment": environment_identity()}
+                "environment": environment_identity(),
+                "transform": transform_identity(self.model)}
         path = write_checkpoint(self.run_dir / "checkpoints", self.step, self._arrays(), meta)
         prune_checkpoints(self.run_dir / "checkpoints", self.cfg.keep_checkpoints)
         atomic_write_bytes(self.run_dir / "series.json",
@@ -233,6 +236,15 @@ class RadiativeRun:
         if meta["code"].get("git_commit") != self.code.get("git_commit"):
             raise RunError(f"{path}: written by commit {meta['code'].get('git_commit')}, this "
                            f"code is {self.code.get('git_commit')}; start a new experiment")
+        transform = transform_identity(self.model)
+        stored_transform = stored_transform_identity(meta, transform)
+        if stored_transform is not None and stored_transform != transform:
+            raise RunError(
+                f"{path}: written with transform {stored_transform}, this run resolves "
+                f"{transform}. The two evaluators of the basis agree only to round-off, so "
+                "resuming across them would mix numerics mid-experiment. Start a new "
+                "experiment, or set TROPOI_SH_BACKEND back to "
+                f"{stored_transform.get('transform_backend')!r}.")
         sd = dict(meta["stepper"])
         sd["x_curr"] = cp.asarray(arrays["x_curr"])
         sd["x_prev"] = cp.asarray(arrays["x_prev"]) if "x_prev" in arrays else None

@@ -1,3 +1,5 @@
+import warnings
+
 import numpy as np
 import cupy as cp
 
@@ -53,7 +55,8 @@ class Planet:
                  product_quadrature: str = "fine",
                  grid_type: str = "geodesic",
                  nlat: int = 128,
-                 nlon: int = 256) -> 'Planet':
+                 nlon: int = 256,
+                 transform_backend: str | None = None) -> 'Planet':
         """
         product_quadrature : {"fine", "coarse"}
             Passed to SpectralOperators. "fine" (default) evaluates nonlinear
@@ -64,9 +67,28 @@ class Planet:
             "coarse" retains the historical state-grid product path for
             A/B comparisons.
         grid_type : {"geodesic", "latlon"}
-            Grid family. "geodesic" (default) uses `grid_resolution`;
-            "latlon" uses `nlat`/`nlon` (Gauss-Legendre latitudes, uniform
-            longitudes). Unknown values raise (no silent fallback).
+            Grid family. "geodesic" (still the signature default, for the
+            historical configurations that depend on it) uses
+            `grid_resolution`; "latlon" uses `nlat`/`nlon` (Gauss-Legendre
+            latitudes, uniform longitudes). Unknown values raise (no silent
+            fallback).
+
+            "geodesic" is **deprecated** and warns: its unstructured points
+            admit no separable transform, so every transform on it is a
+            dense basis-matrix product, and its product quadrature is
+            overresolved rather than exact. It is kept because the
+            presets and published runs that were measured on it must stay
+            reproducible.
+        transform_backend : {"dense", "separable"}, optional
+            Which evaluator the "latlon" grid pairs with: the historical
+            dense basis matrix (the default and the numerical reference) or
+            the separable FFT+Legendre path, which is much faster but agrees
+            only to round-off. Ignored by "geodesic", whose unstructured
+            points cannot factorize. None takes
+            `latlon_grid.default_transform_backend()`, i.e. "separable"
+            unless TROPOI_SH_BACKEND says otherwise. Recorded in run
+            manifests either way; choosing "dense" warns, since it is
+            deprecated.
         """
         if terrain_params is None:
             terrain_params = SpectralTerrainParams(
@@ -82,12 +104,23 @@ class Planet:
             GaussLatLonGridGeometry, GaussLatLonSphericalHarmonics)
 
         if grid_type == "geodesic":
+            warnings.warn(
+                "DEPRECATED: the geodesic grid is deprecated. Its "
+                "unstructured points cannot factorize, so every transform "
+                "on it is a dense basis-matrix product with no separable "
+                "path available, and its nonlinear products use "
+                "overresolved rather than exact quadrature. Prefer "
+                "grid_type='latlon' (Gauss-Legendre latitudes, uniform "
+                "longitudes). The geodesic path is kept so the presets and "
+                "published runs measured on it stay reproducible.",
+                DeprecationWarning, stacklevel=2)
             grid = GeodesicGridGeometry(grid_resolution, params.radius)
             sh = GeodesicSphericalHarmonics(grid, l_max)
             backend = GeodesicBackend(grid, sh)
         elif grid_type == "latlon":
             grid = GaussLatLonGridGeometry(nlat, nlon, params.radius)
-            sh = GaussLatLonSphericalHarmonics(grid, l_max)
+            sh = GaussLatLonSphericalHarmonics(
+                grid, l_max, transform_backend=transform_backend)
             backend = LatLonBackend(grid, sh)
         else:
             raise ValueError(

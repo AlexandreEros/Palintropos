@@ -97,7 +97,7 @@
     }
   },
   "discovered": {
-    "classes": 216,
+    "classes": 218,
     "cli_handlers": {
       "cli-capsule-command": "tropoi.cli.capsule._command",
       "cli-gen": "tropoi.cli.main._cmd_gen",
@@ -233,16 +233,16 @@
         "tropoi.temporal.hooks.rk4_real_axis_limit"
       ]
     },
-    "functions": 1725,
-    "modules": 171,
+    "functions": 1741,
+    "modules": 172,
     "packages": 25
   },
   "limits": {
     "call_sites": {
-      "builtin": 3751,
-      "external": 2495,
-      "internal": 3015,
-      "unresolved": 3863
+      "builtin": 3792,
+      "external": 2540,
+      "internal": 3037,
+      "unresolved": 3892
     },
     "dynamic_import_sites": {
       "tropoi.representation.archive.writer": 1
@@ -350,6 +350,7 @@
       "tropoi.spatial.transforms.cuda": [
         "README.md",
         "legendre.cu",
+        "legendre_stages.cu",
         "sh_matrix.cu"
       ],
       "tropoi.temporal": [
@@ -589,14 +590,14 @@
         ]
       }
     },
-    "classes": 216,
+    "classes": 218,
     "classes_in_inheritance_overview": 21,
     "containment": {
-      "class": 216,
-      "module": 100,
+      "class": 218,
+      "module": 101,
       "package": 22
     },
-    "modules": 171,
+    "modules": 172,
     "package_pages": 25
   },
   "rules": {

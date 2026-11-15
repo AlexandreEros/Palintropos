@@ -5503,6 +5503,11 @@
     {
       "kind": "call",
       "source": "tropoi.representation.visual.snapshot.build_resources",
+      "target": "tropoi.representation.visual.snapshot._recorded_transform_backend"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.snapshot.build_resources",
       "target": "tropoi.temporal.models.build_pe_model"
     },
     {
@@ -7423,6 +7428,16 @@
     {
       "kind": "call",
       "source": "tropoi.run.held_suarez.experiment.HeldSuarezRun._resume",
+      "target": "tropoi.run.held_suarez.experiment.stored_transform_identity"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.held_suarez.experiment.HeldSuarezRun._resume",
+      "target": "tropoi.run.held_suarez.experiment.transform_identity"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.held_suarez.experiment.HeldSuarezRun._resume",
       "target": "tropoi.run.held_suarez.statistics.OnlineStatistics.from_arrays"
     },
     {
@@ -7464,6 +7479,11 @@
       "kind": "call",
       "source": "tropoi.run.held_suarez.experiment.HeldSuarezRun._write_checkpoint",
       "target": "tropoi.run.held_suarez.experiment.protocol_sha256"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.held_suarez.experiment.HeldSuarezRun._write_checkpoint",
+      "target": "tropoi.run.held_suarez.experiment.transform_identity"
     },
     {
       "kind": "call",
@@ -8246,6 +8266,16 @@
       "target": "tropoi.run.held_suarez.experiment.RunError"
     },
     {
+      "kind": "call",
+      "source": "tropoi.run.radiative.experiment.RadiativeRun._resume",
+      "target": "tropoi.run.held_suarez.experiment.stored_transform_identity"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.radiative.experiment.RadiativeRun._resume",
+      "target": "tropoi.run.held_suarez.experiment.transform_identity"
+    },
+    {
       "kind": "self",
       "source": "tropoi.run.radiative.experiment.RadiativeRun._resume",
       "target": "tropoi.run.radiative.experiment.RadiativeRun._event"
@@ -8284,6 +8314,11 @@
       "kind": "call",
       "source": "tropoi.run.radiative.experiment.RadiativeRun._write_checkpoint",
       "target": "tropoi.run.held_suarez.experiment.environment_identity"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.radiative.experiment.RadiativeRun._write_checkpoint",
+      "target": "tropoi.run.held_suarez.experiment.transform_identity"
     },
     {
       "kind": "self",
@@ -8871,9 +8906,24 @@
       "target": "tropoi.spatial.grids.latlon_grid.GaussLatLonSphericalHarmonics.__init__"
     },
     {
+      "kind": "call",
+      "source": "tropoi.spatial.grids.latlon_grid.GaussLatLonSphericalHarmonics.__init__",
+      "target": "tropoi.spatial.grids.latlon_grid.default_transform_backend"
+    },
+    {
       "kind": "instantiate",
       "source": "tropoi.spatial.grids.latlon_grid.GaussLatLonSphericalHarmonics.__init__",
       "target": "tropoi.spatial.transforms.fast_geodesic_sh.PointSetSphericalHarmonics"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.spatial.grids.latlon_grid.GaussLatLonSphericalHarmonics.__init__",
+      "target": "tropoi.spatial.transforms.separable_gauss_sh.SeparableGaussSphericalHarmonics"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.spatial.grids.latlon_grid.GaussLatLonSphericalHarmonics.__init__",
+      "target": "tropoi.spatial.transforms.separable_gauss_sh.separable_is_applicable"
     },
     {
       "kind": "call",
@@ -10224,6 +10274,61 @@
       "kind": "instantiate",
       "source": "tropoi.spatial.transforms.optimized_geodesic_sh.test_optimized_vs_voronoi",
       "target": "tropoi.spatial.transforms.optimized_geodesic_sh.GeodesicSphericalHarmonics"
+    },
+    {
+      "kind": "constructor",
+      "source": "tropoi.spatial.transforms.separable_gauss_sh.SeparableGaussSphericalHarmonics",
+      "target": "tropoi.spatial.transforms.separable_gauss_sh.SeparableGaussSphericalHarmonics.__init__"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.spatial.transforms.separable_gauss_sh.SeparableGaussSphericalHarmonics.__init__",
+      "target": "tropoi.spatial.transforms.cuda.cuda_utils.raw_module_from_cuda"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.spatial.transforms.separable_gauss_sh.SeparableGaussSphericalHarmonics.__init__",
+      "target": "tropoi.spatial.transforms.separable_gauss_sh.SeparableGaussSphericalHarmonics._build_fourier_bins"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.spatial.transforms.separable_gauss_sh.SeparableGaussSphericalHarmonics.__init__",
+      "target": "tropoi.spatial.transforms.separable_gauss_sh.SeparableGaussSphericalHarmonics._build_legendre_tables"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.spatial.transforms.separable_gauss_sh.SeparableGaussSphericalHarmonics.__init__",
+      "target": "tropoi.spatial.transforms.separable_gauss_sh.SeparableStructureError"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.spatial.transforms.separable_gauss_sh.SeparableGaussSphericalHarmonics.__init__",
+      "target": "tropoi.spatial.transforms.separable_gauss_sh.separable_is_applicable"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.spatial.transforms.separable_gauss_sh.SeparableGaussSphericalHarmonics._build_legendre_tables",
+      "target": "tropoi.spatial.transforms.cuda.cuda_utils.raw_module_from_cuda"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.spatial.transforms.separable_gauss_sh.SeparableGaussSphericalHarmonics.inv_transform",
+      "target": "tropoi.spatial.transforms.separable_gauss_sh.SeparableGaussSphericalHarmonics.inv_transform_batch"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.spatial.transforms.separable_gauss_sh.SeparableGaussSphericalHarmonics.transform",
+      "target": "tropoi.spatial.transforms.separable_gauss_sh.SeparableGaussSphericalHarmonics.transform_batch"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.spatial.transforms.separable_gauss_sh.SeparableGaussSphericalHarmonics.transform_batch",
+      "target": "tropoi.spatial.transforms.separable_gauss_sh.SeparableGaussSphericalHarmonics._as_rows"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.spatial.transforms.separable_gauss_sh.separable_is_applicable",
+      "target": "tropoi.spatial.transforms.separable_gauss_sh.SeparableStructureError"
     },
     {
       "kind": "constructor",
@@ -17862,6 +17967,13 @@
       "type": "function"
     },
     {
+      "id": "tropoi.representation.visual.snapshot._recorded_transform_backend",
+      "kind": "function",
+      "module": "tropoi.representation.visual.snapshot",
+      "qualname": "_recorded_transform_backend",
+      "type": "function"
+    },
+    {
       "id": "tropoi.representation.visual.snapshot.build_resources",
       "kind": "function",
       "module": "tropoi.representation.visual.snapshot",
@@ -19913,6 +20025,20 @@
       "type": "function"
     },
     {
+      "id": "tropoi.run.held_suarez.experiment.stored_transform_identity",
+      "kind": "function",
+      "module": "tropoi.run.held_suarez.experiment",
+      "qualname": "stored_transform_identity",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.held_suarez.experiment.transform_identity",
+      "kind": "function",
+      "module": "tropoi.run.held_suarez.experiment",
+      "qualname": "transform_identity",
+      "type": "function"
+    },
+    {
       "id": "tropoi.run.held_suarez.model.build_model",
       "kind": "function",
       "module": "tropoi.run.held_suarez.model",
@@ -21226,6 +21352,13 @@
       "kind": "method",
       "module": "tropoi.spatial.grids.latlon_grid",
       "qualname": "GaussLatLonSphericalHarmonics.transform_batch",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.spatial.grids.latlon_grid.default_transform_backend",
+      "kind": "function",
+      "module": "tropoi.spatial.grids.latlon_grid",
+      "qualname": "default_transform_backend",
       "type": "function"
     },
     {
@@ -23256,6 +23389,104 @@
       "kind": "function",
       "module": "tropoi.spatial.transforms.optimized_geodesic_sh",
       "qualname": "test_optimized_vs_voronoi",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.spatial.transforms.separable_gauss_sh.SeparableGaussSphericalHarmonics",
+      "kind": "class",
+      "module": "tropoi.spatial.transforms.separable_gauss_sh",
+      "qualname": "SeparableGaussSphericalHarmonics",
+      "type": "class"
+    },
+    {
+      "id": "tropoi.spatial.transforms.separable_gauss_sh.SeparableGaussSphericalHarmonics.__init__",
+      "kind": "method",
+      "module": "tropoi.spatial.transforms.separable_gauss_sh",
+      "qualname": "SeparableGaussSphericalHarmonics.__init__",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.spatial.transforms.separable_gauss_sh.SeparableGaussSphericalHarmonics.__repr__",
+      "kind": "method",
+      "module": "tropoi.spatial.transforms.separable_gauss_sh",
+      "qualname": "SeparableGaussSphericalHarmonics.__repr__",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.spatial.transforms.separable_gauss_sh.SeparableGaussSphericalHarmonics._as_rows",
+      "kind": "method",
+      "module": "tropoi.spatial.transforms.separable_gauss_sh",
+      "qualname": "SeparableGaussSphericalHarmonics._as_rows",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.spatial.transforms.separable_gauss_sh.SeparableGaussSphericalHarmonics._build_fourier_bins",
+      "kind": "method",
+      "module": "tropoi.spatial.transforms.separable_gauss_sh",
+      "qualname": "SeparableGaussSphericalHarmonics._build_fourier_bins",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.spatial.transforms.separable_gauss_sh.SeparableGaussSphericalHarmonics._build_legendre_tables",
+      "kind": "method",
+      "module": "tropoi.spatial.transforms.separable_gauss_sh",
+      "qualname": "SeparableGaussSphericalHarmonics._build_legendre_tables",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.spatial.transforms.separable_gauss_sh.SeparableGaussSphericalHarmonics.describe",
+      "kind": "method",
+      "module": "tropoi.spatial.transforms.separable_gauss_sh",
+      "qualname": "SeparableGaussSphericalHarmonics.describe",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.spatial.transforms.separable_gauss_sh.SeparableGaussSphericalHarmonics.extended",
+      "kind": "method",
+      "module": "tropoi.spatial.transforms.separable_gauss_sh",
+      "qualname": "SeparableGaussSphericalHarmonics.extended",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.spatial.transforms.separable_gauss_sh.SeparableGaussSphericalHarmonics.inv_transform",
+      "kind": "method",
+      "module": "tropoi.spatial.transforms.separable_gauss_sh",
+      "qualname": "SeparableGaussSphericalHarmonics.inv_transform",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.spatial.transforms.separable_gauss_sh.SeparableGaussSphericalHarmonics.inv_transform_batch",
+      "kind": "method",
+      "module": "tropoi.spatial.transforms.separable_gauss_sh",
+      "qualname": "SeparableGaussSphericalHarmonics.inv_transform_batch",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.spatial.transforms.separable_gauss_sh.SeparableGaussSphericalHarmonics.transform",
+      "kind": "method",
+      "module": "tropoi.spatial.transforms.separable_gauss_sh",
+      "qualname": "SeparableGaussSphericalHarmonics.transform",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.spatial.transforms.separable_gauss_sh.SeparableGaussSphericalHarmonics.transform_batch",
+      "kind": "method",
+      "module": "tropoi.spatial.transforms.separable_gauss_sh",
+      "qualname": "SeparableGaussSphericalHarmonics.transform_batch",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.spatial.transforms.separable_gauss_sh.SeparableStructureError",
+      "kind": "class",
+      "module": "tropoi.spatial.transforms.separable_gauss_sh",
+      "qualname": "SeparableStructureError",
+      "type": "class"
+    },
+    {
+      "id": "tropoi.spatial.transforms.separable_gauss_sh.separable_is_applicable",
+      "kind": "function",
+      "module": "tropoi.spatial.transforms.separable_gauss_sh",
+      "qualname": "separable_is_applicable",
       "type": "function"
     },
     {

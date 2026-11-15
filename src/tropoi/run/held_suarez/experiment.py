@@ -31,7 +31,7 @@ import platform
 import subprocess
 import sys
 import time
-from typing import Any, Callable, Optional
+from typing import Any, Callable, Mapping, Optional
 
 import numpy as np
 
@@ -87,6 +87,58 @@ def environment_identity() -> dict[str, Any]:
         env["cupy"] = None
         env["cupy_error"] = str(exc)
     return env
+
+
+def transform_identity(model: Any) -> dict[str, Any]:
+    """Which evaluator of the spherical-harmonic basis a run's arithmetic
+    comes from.
+
+    The Gauss lat-lon transform has two interchangeable evaluators of the
+    *same* basis -- the dense basis matrix and the separable FFT+Legendre
+    path -- chosen per run or by ``TROPOI_SH_BACKEND``. They agree only to
+    round-off (~1e-14), so swapping evaluator part-way through an
+    experiment mixes two numerics in one run exactly as swapping commit
+    would. Recorded in every checkpoint and compared on resume.
+
+    Checkpoints written before this was recorded carry no such key, but
+    they are not unknown: see :func:`stored_transform_identity`.
+    """
+    sh = getattr(model, "sh", None)
+    inner = getattr(sh, "sh", sh)
+    return {"transform_backend": getattr(sh, "transform_backend", None),
+            "transform_evaluator": None if inner is None else type(inner).__name__}
+
+
+#: What a checkpoint written before the evaluator was recorded must have
+#: used: the dense basis matrix was the only evaluator, and the default.
+_LEGACY_TRANSFORM = {"transform_backend": "dense",
+                     "transform_evaluator": "PointSetSphericalHarmonics"}
+
+
+def stored_transform_identity(meta: Mapping[str, Any],
+                              resolved: dict[str, Any]) -> Optional[dict]:
+    """The evaluator a checkpoint was written with, inferring the legacy one.
+
+    A checkpoint from before ``transform_identity`` existed carries no
+    ``"transform"`` key, but it is not unknown: the dense basis matrix was
+    then the only evaluator of a Gauss lat-lon basis and the default, so
+    that is what it used. Inferring it rather than waiving the check is
+    what keeps the default moving to the separable evaluator from quietly
+    continuing an old experiment on different numerics -- the same
+    legacy-inference rule as the missing ``grid`` key in
+    :mod:`tropoi.temporal.models`.
+
+    ``resolved`` is this process's :func:`transform_identity`. On a grid
+    with no selectable evaluator (geodesic, whose ``transform_backend`` is
+    None) there is nothing to infer and nothing to mix, so the check is
+    waived as before.
+    """
+    stored = meta.get("transform")
+    if stored is not None:
+        return dict(stored)
+    if resolved.get("transform_backend") is None:
+        return None
+    return dict(_LEGACY_TRANSFORM)
 
 
 def protocol_sha256() -> Optional[str]:
@@ -250,6 +302,15 @@ class HeldSuarezRun:
                 f"{path}: checkpoint was written by commit {meta['code'].get('git_commit')}, "
                 f"this code is {self.code.get('git_commit')}; a production experiment may not "
                 "change code mid-run (plan §2 B5). Start a new experiment instead.")
+        transform = transform_identity(self.model)
+        stored_transform = stored_transform_identity(meta, transform)
+        if stored_transform is not None and stored_transform != transform:
+            raise RunError(
+                f"{path}: written with transform {stored_transform}, this run resolves "
+                f"{transform}. The two evaluators of the basis agree only to round-off, so "
+                "resuming across them would mix numerics mid-experiment (plan §2 B5). "
+                "Start a new experiment, or set TROPOI_SH_BACKEND back to "
+                f"{stored_transform.get('transform_backend')!r}.")
         if meta.get("protocol_sha256") != protocol_sha256():
             raise RunError(
                 f"{path}: PROTOCOL.md changed since this experiment started "
@@ -316,7 +377,8 @@ class HeldSuarezRun:
         meta = {"day": self.day, "stepper": sd, "rng_state": self.rng_state,
                 "statistics": self.stats.meta(), "config": self.cfg.to_dict(),
                 "config_sha256": self.config_sha256, "protocol_sha256": protocol_sha256(),
-                "code": self.code, "environment": environment_identity()}
+                "code": self.code, "environment": environment_identity(),
+                "transform": transform_identity(self.model)}
         path = write_checkpoint(self.run_dir / "checkpoints", self.step, arrays, meta)
         prune_checkpoints(self.run_dir / "checkpoints", self.cfg.keep_checkpoints)
         self._export()

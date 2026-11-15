@@ -9,6 +9,7 @@ source checkout.
 | File | Kernel | Consumer |
 | --- | --- | --- |
 | `sh_matrix.cu` | `generate_sph_harm_basis`: one thread per point fills that point's row of the complex basis matrix `Y`, all `(l, m)` with `m >= 0`, linear index `l(l+1)/2 + m` | `PointSetSphericalHarmonics` (both production backends) |
+| `legendre_stages.cu` | `legendre_analysis` / `legendre_synthesis`: the latitude stage of the separable Gauss transform. One thread per output, contracting over latitude (analysis) or degree (synthesis) against a rectangular `(nlat, l_max+1, l_max+1)` real table, with the complex field as two real accumulators | `SeparableGaussSphericalHarmonics` |
 | `legendre.cu` | `compute_legendre`: unnormalized `P_l^m(x)` for one `(l, m)` across all points | Legacy `LatLonSphericalHarmonics` only |
 | `cuda_utils.py` | `load_cuda_source(name)` and `raw_module_from_cuda(name)` → `cupy.RawModule` | Both transforms and `tropoi clear-cache` |
 
@@ -25,6 +26,13 @@ P_l^m = [(2l-1) x P_{l-1}^m - (l+m-1) P_{l-2}^m] / (l-m)
 `sh_matrix.cu` then multiplies by `N_lm = sqrt((2l+1)/(4π) (l-m)!/(l+m)!)`,
 using `lgamma` for the factorial ratio, and by `e^{i m λ}`. Colatitude is
 `π/2 - lat`, so `x = sin(lat)`.
+
+`legendre_stages.cu` evaluates no basis function of its own: its tables are
+built by calling `generate_sph_harm_basis` at longitude zero, where the
+`e^{i m λ}` factor is 1 and the real part is exactly `N_lm P_l^m(x_j)` (the
+same tabulation `representation/visual/evaluate.py` uses host-side). So the
+separable transform inherits this recurrence's accuracy and its overflow
+limit rather than introducing a second set of numerics.
 
 The recurrence runs on **unnormalized** values. `(2m-1)!!` exceeds the
 double-precision range at `m = 151`, so equatorial rows overflow from

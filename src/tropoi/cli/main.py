@@ -1467,6 +1467,11 @@ def build_parser() -> argparse.ArgumentParser:
 
 
 def main(argv: Optional[Sequence[str]] = None) -> int:
+    # Python shows DeprecationWarning only from __main__, which would hide
+    # the deprecated geodesic grid and dense evaluator from exactly the
+    # people running them. "default" prints each distinct one once.
+    import warnings
+    warnings.simplefilter("default", DeprecationWarning)
     parser = build_parser()
     args = parser.parse_args(argv)
     handler = getattr(args, "_handler", None)

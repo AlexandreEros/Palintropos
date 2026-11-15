@@ -110,7 +110,7 @@ class SphericalGridBackend(ABC):
         sampling actually used for `product_quadrature`, and the transform
         type — enough to know which numerics produced a run's outputs.
         """
-        return {
+        described = {
             "backend": type(self).__name__,
             "grid": type(self.geometry).__name__,
             "state_sampling": self.product_space("coarse").label,
@@ -119,6 +119,18 @@ class SphericalGridBackend(ABC):
             "transform": type(self.sh).__name__,
             "l_max": int(self.l_max),
         }
+        # Which evaluator the transform actually used. A transform that can
+        # be paired with more than one (the Gauss lat-lon one can: dense
+        # basis matrix or separable FFT+Legendre) reports it, so a run
+        # manifest records the numerics that produced it rather than only
+        # the wrapper's class name.
+        evaluator = getattr(self.sh, "transform_backend", None)
+        if evaluator is not None:
+            described["transform_backend"] = str(evaluator)
+            inner = getattr(self.sh, "sh", None)
+            if inner is not None:
+                described["transform_evaluator"] = type(inner).__name__
+        return described
 
     # -- shared helpers ------------------------------------------------------
 
@@ -202,7 +214,13 @@ class LatLonBackend(SphericalGridBackend):
         nlat_f = max((3 * self.l_max) // 2 + 1, g.nlat)
         nlon_f = max(3 * self.l_max + 1, g.nlon)
         fine_geometry = GaussLatLonGridGeometry(nlat_f, nlon_f, g.radius)
-        fine_sh = GaussLatLonSphericalHarmonics(fine_geometry, self.l_max)
+        # The product transform must use the same evaluator as the state
+        # transform: it is the one that dominates a tendency (it carries
+        # ~12 K rows of synthesis per call), so leaving it on the dense path
+        # would forfeit most of the benefit of choosing the separable one.
+        fine_sh = GaussLatLonSphericalHarmonics(
+            fine_geometry, self.l_max,
+            transform_backend=getattr(self.sh, "transform_backend", None))
         return ProductSpace(
             sh=fine_sh,
             coslat=cp.maximum(cp.asarray(fine_geometry.coslat), _COSLAT_FLOOR),

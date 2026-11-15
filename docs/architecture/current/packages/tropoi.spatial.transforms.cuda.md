@@ -11,7 +11,7 @@ Index: [all packages](../index.md) · parent [`tropoi.spatial.transforms`](tropo
 | `tropoi.spatial.transforms.cuda` | namespace | – | – |
 | `tropoi.spatial.transforms.cuda.cuda_utils` | code | – | `load_cuda_source`, `raw_module_from_cuda` |
 
-Files shipped in this directory that are **not Python and not analysed** (templates, data): `README.md`, `legendre.cu`, `sh_matrix.cu`. Their contents (for example JavaScript in an HTML template) are invisible to every graph here.
+Files shipped in this directory that are **not Python and not analysed** (templates, data): `README.md`, `legendre.cu`, `legendre_stages.cu`, `sh_matrix.cu`. Their contents (for example JavaScript in an HTML template) are invisible to every graph here.
 
 ## Imports
 
@@ -28,7 +28,7 @@ flowchart LR
     p_tropoi_ocli["package cli"]
     p_tropoi_ospatial_otransforms["package spatial.transforms"]
     p_tropoi_ocli -.->|1| n_tropoi_ospatial_otransforms_ocuda_ocuda__utils
-    p_tropoi_ospatial_otransforms -->|2| n_tropoi_ospatial_otransforms_ocuda_ocuda__utils
+    p_tropoi_ospatial_otransforms -->|3| n_tropoi_ospatial_otransforms_ocuda_ocuda__utils
     classDef other fill:none,stroke-dasharray:3 3
     class p_tropoi_ocli other
     class p_tropoi_ospatial_otransforms other

@@ -29,6 +29,7 @@ unstructured convention used throughout the operators.
 """
 from __future__ import annotations
 
+import os
 import warnings
 
 import numpy as np
@@ -36,8 +37,61 @@ import cupy as cp
 
 from tropoi.spatial.grids.grid_base import GridGeometry
 from tropoi.spatial.transforms.fast_geodesic_sh import PointSetSphericalHarmonics
+from tropoi.spatial.transforms.separable_gauss_sh import (
+    SeparableGaussSphericalHarmonics, separable_is_applicable)
 
-__all__ = ["GaussLatLonGridGeometry", "GaussLatLonSphericalHarmonics"]
+__all__ = ["GaussLatLonGridGeometry", "GaussLatLonSphericalHarmonics",
+           "TRANSFORM_BACKENDS", "default_transform_backend"]
+
+#: Evaluators this grid can pair with. ``"separable"`` is the FFT +
+#: Legendre path and the default: 16x a dense T42 step on the reference
+#: device. ``"dense"`` is the historical
+#: :class:`PointSetSphericalHarmonics` basis-matrix path -- **deprecated**,
+#: and retained as the numerical reference, as the fallback for grids that
+#: cannot factorize, and to reproduce runs recorded before the evaluator
+#: became selectable. The two agree only to round-off (different summation
+#: order), so they are interchangeable for new work but not for
+#: reproducing a pinned hash.
+TRANSFORM_BACKENDS = ("dense", "separable")
+
+_BACKEND_ENV = "TROPOI_SH_BACKEND"
+
+#: Emitted whenever a Gauss lat-lon grid ends up on the dense evaluator,
+#: whether a caller asked for it or the separable path was inapplicable.
+_DENSE_DEPRECATED = (
+    "DEPRECATED: the dense basis-matrix evaluator "
+    "(transform_backend='dense') is deprecated on Gauss lat-lon grids. It "
+    "builds an n_points x n_basis complex matrix and spends one GEMM per "
+    "transform, which measured ~96% of a synchronized T42 step; the "
+    "separable FFT+Legendre evaluator is the default and ~16x faster on "
+    "the same step. Dense is kept as the numerical reference, as the "
+    "fallback for grids that cannot factorize, and to reproduce runs "
+    "recorded before the evaluator became selectable -- the two agree only "
+    "to round-off, so a pinned hash still needs this path.")
+
+
+def default_transform_backend() -> str:
+    """Backend used when a caller does not name one.
+
+    ``"separable"`` unless the ``TROPOI_SH_BACKEND`` environment variable
+    says otherwise. The variable exists so an existing run configuration
+    can be pointed at either evaluator without editing call sites;
+    whichever is chosen is recorded in the run manifest by
+    :meth:`SphericalGridBackend.describe` and in every checkpoint by
+    ``run.held_suarez.experiment.transform_identity``, so a run never
+    silently loses track of which numerics produced it.
+
+    This default changed with the separable evaluator: runs made before it
+    were necessarily dense, which is why replaying a saved run pins the
+    evaluator its manifest records rather than taking this default (see
+    ``representation.visual.snapshot``).
+    """
+    value = os.environ.get(_BACKEND_ENV, "separable").strip().lower()
+    if value not in TRANSFORM_BACKENDS:
+        raise ValueError(
+            f"{_BACKEND_ENV}={value!r} is not one of {TRANSFORM_BACKENDS} "
+            "(no silent fallback)")
+    return value
 
 
 class GaussLatLonGridGeometry(GridGeometry):
@@ -145,19 +199,47 @@ class GaussLatLonGridGeometry(GridGeometry):
 class GaussLatLonSphericalHarmonics:
     """SH analysis/synthesis on a GaussLatLonGridGeometry.
 
-    Thin pairing of the grid's exact tensor-product quadrature with the
-    GPU matrix transform (`PointSetSphericalHarmonics`). Fields are flat
-    (n_points,) arrays in the geometry's lat-major point order; 2D
-    (nlat, nlon) inputs to `transform` are accepted and flattened.
+    Thin pairing of the grid's exact tensor-product quadrature with one of
+    two GPU evaluators. Fields are flat (n_points,) arrays in the geometry's
+    lat-major point order; 2D (nlat, nlon) inputs to `transform` are accepted
+    and flattened.
+
+    Parameters
+    ----------
+    transform_backend : {"dense", "separable"}, optional
+        Which evaluator to pair with. ``"dense"`` is the historical
+        `PointSetSphericalHarmonics` basis-matrix path: one n_points x
+        n_basis complex matrix product per transform, the numerical
+        reference, and the default. ``"separable"`` is
+        `SeparableGaussSphericalHarmonics`: a cuFFT longitude stage plus a
+        custom-kernel Legendre stage, which drops the nlon factor from the
+        dominant stage and agrees with the dense path to round-off. Defaults
+        to :func:`default_transform_backend`.
+
+        ``"separable"`` falls back to the dense path, with a warning naming
+        the reason, when this (grid, l_max) pairing cannot use it -- chiefly
+        a longitude axis too coarse for the truncation (2*l_max >= nlon).
+
+        Landing on ``"dense"`` raises a ``DeprecationWarning`` either way,
+        asked for or fallen back to, so a slow run is never quiet about
+        why.
     """
 
-    def __init__(self, grid: GaussLatLonGridGeometry, l_max: int):
+    def __init__(self, grid: GaussLatLonGridGeometry, l_max: int, *,
+                 transform_backend: str | None = None):
         if not isinstance(grid, GaussLatLonGridGeometry):
             raise ValueError(
                 f"GaussLatLonSphericalHarmonics requires a "
                 f"GaussLatLonGridGeometry, got {type(grid).__name__}")
         self.grid = grid
         self.l_max = int(l_max)
+
+        requested = (default_transform_backend() if transform_backend is None
+                     else str(transform_backend).strip().lower())
+        if requested not in TRANSFORM_BACKENDS:
+            raise ValueError(
+                f"transform_backend must be one of {TRANSFORM_BACKENDS}, got "
+                f"{transform_backend!r} (no silent fallback)")
 
         # Exactness envelope for analysis of degree-l_max fields.
         if grid.nlat < l_max + 1 or grid.nlon < 2 * l_max + 1:
@@ -169,12 +251,37 @@ class GaussLatLonSphericalHarmonics:
                 stacklevel=2,
             )
 
-        self.sh = PointSetSphericalHarmonics(
-            grid.point_latitudes,
-            grid.point_longitudes,
-            self.l_max,
-            weights=grid.solid_angle_weights,
-        )
+        if requested == "separable":
+            ok, reason = separable_is_applicable(
+                grid.nlat, grid.nlon, self.l_max, grid.solid_angle_weights)
+            if not ok:
+                warnings.warn(
+                    f"transform_backend='separable' requested but not "
+                    f"applicable to this ({grid.nlat}, {grid.nlon}) grid at "
+                    f"l_max={self.l_max}: {reason}. Falling back to the dense "
+                    f"basis-matrix evaluator.",
+                    stacklevel=2,
+                )
+                requested = "dense"
+        self.transform_backend = requested
+
+        # Deliberately after the fallback: an involuntary dense run is as
+        # worth reporting as a requested one.
+        if requested == "dense":
+            warnings.warn(_DENSE_DEPRECATED, DeprecationWarning, stacklevel=2)
+
+        if requested == "separable":
+            self.sh = SeparableGaussSphericalHarmonics(
+                grid.latitudes, grid.nlon, self.l_max,
+                weights=grid.solid_angle_weights,
+            )
+        else:
+            self.sh = PointSetSphericalHarmonics(
+                grid.point_latitudes,
+                grid.point_longitudes,
+                self.l_max,
+                weights=grid.solid_angle_weights,
+            )
         self.weights = self.sh.weights
 
     def transform(self, values) -> cp.ndarray:

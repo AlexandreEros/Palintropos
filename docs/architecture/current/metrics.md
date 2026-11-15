@@ -9,16 +9,16 @@ Nodes are analysed modules; a directed edge A -> B means A has at least one stat
 * **all imports**: every static import statement, wherever it appears;
 * **import-time**: only edges with at least one import statement at module scope (executed when the importing module is imported). Edges made only of function-scope or `if TYPE_CHECKING:` imports are dropped.
 
-Edge counts by scope set: `function`: 173, `function+module`: 6, `function+type_checking`: 1, `module`: 267, `type_checking`: 6.
+Edge counts by scope set: `function`: 173, `function+module`: 6, `function+type_checking`: 1, `module`: 269, `type_checking`: 6.
 
 | Metric | all imports | import-time |
 |---|---|---|
-| Nodes \|V\| | 148 | 148 |
-| Directed edges \|E\| | 453 | 273 |
-| Density | 0.020822 | 0.012548 |
+| Nodes \|V\| | 149 | 149 |
+| Directed edges \|E\| | 455 | 275 |
+| Density | 0.020633 | 0.012471 |
 | Weakly connected components | 1 | 7 |
-| WCC sizes | 148 | 135, 8, 1, 1, 1, 1, 1 |
-| Strongly connected components | 148 | 148 |
+| WCC sizes | 149 | 136, 8, 1, 1, 1, 1, 1 |
+| Strongly connected components | 149 | 149 |
 | Nontrivial SCCs | 0 | 0 |
 | Nontrivial SCC sizes | - | - |
 | Nodes in cycles | 0 | 0 |
@@ -28,21 +28,21 @@ Edge counts by scope set: `function`: 173, `function+module`: 6, `function+type_
 | Reciprocal pairs | 0 | 0 |
 | Reciprocity | 0 | 0 |
 | In-degree min / median / max | 0 / 2 / 15 | 0 / 1 / 12 |
-| In-degree mean | 3.060811 | 1.844595 |
+| In-degree mean | 3.053691 | 1.845638 |
 | In-degree quartiles | 1, 2, 4 | 0, 1, 2 |
 | In-degree zeros | 6 | 40 |
 | Out-degree min / median / max | 0 / 2 / 21 | 0 / 1 / 9 |
-| Out-degree mean | 3.060811 | 1.844595 |
+| Out-degree mean | 3.053691 | 1.845638 |
 | Out-degree quartiles | 0, 2, 5 | 0, 1, 3 |
 | Out-degree zeros | 39 | 52 |
-| Condensation nodes | 148 | 148 |
-| Condensation edges | 453 | 273 |
+| Condensation nodes | 149 | 149 |
+| Condensation edges | 455 | 275 |
 | Condensation sources / sinks | 6 / 39 | 40 / 52 |
 | Condensation longest path (edges) | 14 | 7 |
 
-In-degree histogram (all imports) {degree: modules}: 0: 6, 1: 42, 2: 38, 3: 18, 4: 15, 5: 6, 6: 6, 7: 4, 8: 4, 9: 2, 10: 4, 11: 2, 15: 1
+In-degree histogram (all imports) {degree: modules}: 0: 6, 1: 43, 2: 38, 3: 17, 4: 16, 5: 6, 6: 6, 7: 4, 8: 4, 9: 2, 10: 4, 11: 2, 15: 1
 
-Out-degree histogram (all imports) {degree: modules}: 0: 39, 1: 27, 2: 23, 3: 11, 4: 8, 5: 11, 6: 5, 7: 6, 8: 5, 9: 3, 10: 7, 13: 1, 17: 1, 21: 1
+Out-degree histogram (all imports) {degree: modules}: 0: 39, 1: 28, 2: 22, 3: 12, 4: 8, 5: 11, 6: 5, 7: 6, 8: 5, 9: 3, 10: 7, 13: 1, 17: 1, 21: 1
 
 **Top 10 fan-in (all imports)** (ties at cutoff: 4)
 
@@ -206,32 +206,32 @@ Module-level import edges involved: 2.
 
 ## Class graph
 
-* Classes: 216
-* Classes in at least one `inherits` edge (drawn in `class-inheritance.mmd`): 21; with neither an analysed base nor an analysed subclass: 195
+* Classes: 218
+* Classes in at least one `inherits` edge (drawn in `class-inheritance.mmd`): 21; with neither an analysed base nor an analysed subclass: 197
 * `inherits` edges between analysed classes: 14
 * `nests` edges (class defined in a class body): 0
-* Bases outside the analysed package: `RuntimeError` x7, `UserWarning` x1, `ValueError` x20, `abc.ABC` x2, `collections.abc.Mapping` x1, `enum.Enum` x2, `str` x2, `typing.Protocol` x3
+* Bases outside the analysed package: `RuntimeError` x7, `UserWarning` x1, `ValueError` x21, `abc.ABC` x2, `collections.abc.Mapping` x1, `enum.Enum` x2, `str` x2, `typing.Protocol` x3
 
 ## Call graph
 
-* Nodes (functions, methods, classes): 1941
-* Edges by kind: `call` 1340, `constructor` 65, `instantiate` 512, `override` 6, `self` 330, `super` 4
-* Call sites by resolution outcome: builtin 3751, external 2495, internal 3015, unresolved 3863
+* Nodes (functions, methods, classes): 1959
+* Edges by kind: `call` 1352, `constructor` 66, `instantiate` 515, `override` 6, `self` 335, `super` 4
+* Call sites by resolution outcome: builtin 3792, external 2540, internal 3037, unresolved 3892
 
 | Scoped graph | Roots | Depth | Nodes | Edges | Truncated nodes | Reachable (unbounded) |
 |---|---|---|---|---|---|---|
 | `calls/cli-capsule-command.mmd` | `tropoi.cli.capsule._command` | 4 | 14 | 21 | 0 | 14 |
-| `calls/cli-gen.mmd` | `tropoi.cli.main._cmd_gen` | 4 | 27 | 28 | 6 | 45 |
+| `calls/cli-gen.mmd` | `tropoi.cli.main._cmd_gen` | 4 | 27 | 28 | 6 | 52 |
 | `calls/cli-inspect.mmd` | `tropoi.cli.main._cmd_inspect` | 4 | 32 | 42 | 2 | 43 |
 | `calls/cli-list-presets.mmd` | `tropoi.cli.main._cmd_list_presets` | 4 | 1 | 0 | 0 | 1 |
 | `calls/cli-list-scenarios.mmd` | `tropoi.cli.main._cmd_list_scenarios` | 4 | 1 | 0 | 0 | 1 |
 | `calls/cli-plot.mmd` | `tropoi.cli.main._cmd_plot` | 4 | 57 | 76 | 4 | 71 |
 | `calls/cli-recompile.mmd` | `tropoi.cli.main._cmd_recompile` | 4 | 6 | 5 | 0 | 6 |
-| `calls/cli-run-bve.mmd` | `tropoi.cli.main._cmd_run_bve` | 4 | 45 | 60 | 13 | 208 |
-| `calls/cli-run-pe.mmd` | `tropoi.cli.main._cmd_run_pe` | 4 | 56 | 65 | 19 | 170 |
-| `calls/cli-run-swe.mmd` | `tropoi.cli.main._cmd_run_swe` | 4 | 82 | 119 | 15 | 210 |
-| `calls/cli-terrain-run-prepare.mmd` | `tropoi.cli.terrain.run_prepare` | 4 | 45 | 62 | 4 | 89 |
-| `calls/custom-initial-states.mmd` | `tropoi.run.custom.execute.run_initial_state`, `tropoi.run.custom.presets.initial_state_from_preset`, `tropoi.run.custom.prepare.prepare_bve_state`, `tropoi.run.custom.prepare.prepare_swe_state` | 4 | 133 | 209 | 12 | 244 |
+| `calls/cli-run-bve.mmd` | `tropoi.cli.main._cmd_run_bve` | 4 | 45 | 60 | 13 | 215 |
+| `calls/cli-run-pe.mmd` | `tropoi.cli.main._cmd_run_pe` | 4 | 56 | 65 | 19 | 177 |
+| `calls/cli-run-swe.mmd` | `tropoi.cli.main._cmd_run_swe` | 4 | 82 | 119 | 15 | 217 |
+| `calls/cli-terrain-run-prepare.mmd` | `tropoi.cli.terrain.run_prepare` | 4 | 45 | 62 | 4 | 96 |
+| `calls/custom-initial-states.mmd` | `tropoi.run.custom.execute.run_initial_state`, `tropoi.run.custom.presets.initial_state_from_preset`, `tropoi.run.custom.prepare.prepare_bve_state`, `tropoi.run.custom.prepare.prepare_swe_state` | 4 | 133 | 209 | 12 | 251 |
 | `calls/sky-hypothetical.mmd` | `tropoi.representation.visual.sky.write_sky_page`, `tropoi.representation.visual.sky.standalone_page` | 4 | 15 | 17 | 1 | 16 |
 | `calls/sky-numpy-reference.mmd` | `tropoi.representation.visual.sky.radiance_table`, `tropoi.representation.visual.sky.star_path_column`, `tropoi.representation.visual.sky.optical_depth_diagnostic`, `tropoi.physics.column.thin_atmosphere_mass_kg`, `tropoi.physics.column.thin_atmosphere_surface_pressure_pa`, `tropoi.physics.rayleigh.composition_cross_section` | 4 | 11 | 8 | 0 | 11 |
 | `calls/sky-saved-column.mmd` | `tropoi.temporal.simulation.Simulation.sky`, `tropoi.representation.archive.capsule.CapsuleStorage.sky`, `tropoi.representation.archive.held_suarez.HeldSuarezStorage.sky` | 4 | 32 | 36 | 2 | 34 |

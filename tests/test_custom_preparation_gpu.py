@@ -59,7 +59,19 @@ def test_band_limited_callable_projects_exactly_on_the_gauss_grid():
     a = prepared.state.coeffs
     assert a[1, 0].real == pytest.approx(c * math.sqrt(4 * math.pi / 3),
                                          rel=1e-13)
-    assert a[1, 0].imag == 0.0 and a[0, 0] == pytest.approx(0, abs=1e-20)
+    assert a[1, 0].imag == 0.0
+    # The mean of this field vanishes analytically, so a[0, 0] is whatever a
+    # cancelling sum leaves behind -- which depends on the summation order.
+    # The dense evaluator's residue is far below one ulp of the field scale
+    # (a[1, 0] ~ 6e-5); the separable one reduces longitudes by FFT first and
+    # lands at ~0.2 ulp of it instead. Keep the exacting floor on the dense
+    # reference path and require round-off of the field scale on the other;
+    # see spatial/transforms/README.md, "Agreement, not bit-identity".
+    from tropoi.spatial.grids.latlon_grid import default_transform_backend
+    if default_transform_backend() == "dense":
+        assert a[0, 0] == pytest.approx(0, abs=1e-20)
+    else:
+        assert abs(a[0, 0]) < 1e-15 * abs(a[1, 0].real)
     # The same samples given as an array produce the same coefficients.
     s = state_sampling(planet, _disc())
     again = prepare_bve_state(planet, _disc(), zeta=SampledField(

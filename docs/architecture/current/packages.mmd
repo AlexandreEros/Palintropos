@@ -32,7 +32,7 @@ flowchart TD
         n_tropoi_ospatial_ooperators["spatial.operators (1 module)"]
         n_tropoi_ospatial_ostates["spatial.states (3 modules)"]
         n_tropoi_ospatial_oterrain["spatial.terrain (7 modules)"]
-        n_tropoi_ospatial_otransforms["spatial.transforms (4 modules)"]
+        n_tropoi_ospatial_otransforms["spatial.transforms (5 modules)"]
         n_tropoi_ospatial_otransforms_ocuda["spatial.transforms.cuda (1 module)"]
     end
     subgraph g_physics["layer physics"]
@@ -122,7 +122,7 @@ flowchart TD
     n_tropoi_ospatial -->|1| n_tropoi_ospatial_ooperators
     n_tropoi_ospatial -->|3| n_tropoi_ospatial_oterrain
     n_tropoi_ospatial -->|2| n_tropoi_ospatial_otransforms
-    n_tropoi_ospatial_ogrids -->|1| n_tropoi_ospatial_otransforms
+    n_tropoi_ospatial_ogrids -->|2| n_tropoi_ospatial_otransforms
     n_tropoi_ospatial_oinitialization -->|4| n_tropoi_ospatial
     n_tropoi_ospatial_oinitialization -->|2| n_tropoi_ospatial_ostates
     n_tropoi_ospatial_oinitialization -.->|"2 up, type-only"| n_tropoi_otemporal_otendencies
@@ -131,7 +131,7 @@ flowchart TD
     n_tropoi_ospatial_ooperators -->|2| n_tropoi_ospatial_otransforms
     n_tropoi_ospatial_oterrain -.->|"1, type-only"| n_tropoi_ospatial_otransforms
     n_tropoi_ospatial_otransforms -->|2| n_tropoi_ospatial_ogrids
-    n_tropoi_ospatial_otransforms -->|2| n_tropoi_ospatial_otransforms_ocuda
+    n_tropoi_ospatial_otransforms -->|3| n_tropoi_ospatial_otransforms_ocuda
     n_tropoi_otemporal -->|9| n_tropoi_ospatial
     n_tropoi_otemporal -->|1| n_tropoi_ospatial_ostates
     n_tropoi_otemporal -->|1| n_tropoi_ospatial_oterrain

@@ -583,8 +583,8 @@
     },
     {
       "kind": "imports",
-      "module_edges": 1,
-      "runtime_module_edges": 1,
+      "module_edges": 2,
+      "runtime_module_edges": 2,
       "source": "tropoi.spatial.grids",
       "target": "tropoi.spatial.transforms"
     },
@@ -646,8 +646,8 @@
     },
     {
       "kind": "imports",
-      "module_edges": 2,
-      "runtime_module_edges": 2,
+      "module_edges": 3,
+      "runtime_module_edges": 3,
       "source": "tropoi.spatial.transforms",
       "target": "tropoi.spatial.transforms.cuda"
     },
@@ -820,7 +820,7 @@
     {
       "id": "tropoi.spatial.transforms",
       "internal_edges": 1,
-      "modules": 4
+      "modules": 5
     },
     {
       "id": "tropoi.spatial.transforms.cuda",

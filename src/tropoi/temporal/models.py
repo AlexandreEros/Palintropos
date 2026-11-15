@@ -24,7 +24,7 @@ from __future__ import annotations
 from typing import Mapping
 
 
-def build_planet(run_config: Mapping):
+def build_planet(run_config: Mapping, *, transform_backend=None):
     """The BVE run's Planet (grid, transform, backend, operators).
 
     Built from the resolved run configuration dict, so the same resources
@@ -55,6 +55,7 @@ def build_planet(run_config: Mapping):
         grid_type=run_config.get("grid", "geodesic"),
         nlat=int(run_config["nlat"]),
         nlon=int(run_config["nlon"]),
+        transform_backend=transform_backend,
     )
 
 
@@ -87,7 +88,8 @@ def _w5_planet_params(run_config):
         sidereal_day_s=day_hours * 3600.0)
 
 
-def build_swe_model(run_config: Mapping, *, topography_lm=None):
+def build_swe_model(run_config: Mapping, *, topography_lm=None,
+                    transform_backend=None):
     """The shallow-water model (planet + terrain + core) of a run.
 
     Built from the resolved run configuration dict — exactly the values
@@ -126,6 +128,7 @@ def build_swe_model(run_config: Mapping, *, topography_lm=None):
         grid_type=run_config.get("grid", "geodesic"),
         nlat=int(run_config["nlat"]),
         nlon=int(run_config["nlon"]),
+        transform_backend=transform_backend,
     )
     # Topography is reconstructed deterministically from the resolved
     # configuration (which participates in the scientific hash), so no
@@ -167,7 +170,8 @@ def build_swe_model(run_config: Mapping, *, topography_lm=None):
     return model
 
 
-def build_pe_model(run_config: Mapping, *, topography_lm=None):
+def build_pe_model(run_config: Mapping, *, topography_lm=None,
+                   transform_backend=None):
     """The primitive-equation model (planet + sigma grid + terrain) of a run.
 
     Built from the resolved run configuration dict — exactly the values
@@ -204,6 +208,7 @@ def build_pe_model(run_config: Mapping, *, topography_lm=None):
         grid_type=run_config.get("grid", "geodesic"),
         nlat=int(run_config["nlat"]),
         nlon=int(run_config["nlon"]),
+        transform_backend=transform_backend,
     )
     topography_kind = run_config.get("topography", "flat")
     if "terrain_digest" in run_config:
