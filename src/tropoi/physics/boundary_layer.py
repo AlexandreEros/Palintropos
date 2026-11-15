@@ -7,7 +7,9 @@ entrainment, no free-atmosphere diffusion), with the FHZ06-simplified
 exchange coefficient (:func:`tropoi.physics.surface.drag_coefficient`)
 and neutral similarity in place of the full Monin-Obukhov functions.
 That simplification is stated in the plan; Isca's grey-Mars case runs
-the full forms.
+the full forms, which :mod:`tropoi.physics.monin_obukhov` now provides
+as an opt-in alternative (``scheme = "monin_obukhov"``). FHZ06 remains
+the default and its arithmetic here is unchanged.
 
 Pieces, all column-wise over (nlev, npts) arrays ordered top to bottom:
 
@@ -20,6 +22,9 @@ Pieces, all column-wise over (nlev, npts) arrays ordered top to bottom:
 * :func:`diffusivity_profile` - K = k u* z below ``frac_inner`` h, the
   FHZ06 cubic taper K = k u* z (1 - (z - fb h)/((1 - fb) h))^2 up to h,
   zero above.
+* :func:`monin_obukhov_diffusivity_profile` - the same structure with
+  Isca's stability functions, returning distinct K_m and K_h; it reduces
+  exactly to the previous function in the neutral limit.
 * :func:`implicit_column_diffusion` - one backward-Euler tridiagonal
   solve per column (Thomas algorithm), unconditionally stable, exactly
   conservative under zero-flux boundaries; an optional bottom
@@ -35,7 +40,7 @@ import numpy as np
 from tropoi.physics.surface import VON_KARMAN, drag_coefficient
 
 __all__ = ["exchange_coefficient", "boundary_layer_depth", "diffusivity_profile",
-           "implicit_column_diffusion"]
+           "monin_obukhov_diffusivity_profile", "implicit_column_diffusion"]
 
 
 def _xp(*arrays):
@@ -62,7 +67,8 @@ def exchange_coefficient(surface_temperature, air_temperature, air_height, speed
 
 
 def boundary_layer_depth(z_full, dry_static_energy, wind_speed_sq, gravity: float,
-                         *, critical_richardson: float = 1.0):
+                         *, critical_richardson: float = 1.0,
+                         wind_floor: float = 1e-12, wind_offset: float = 0.0):
     """Boundary-layer depth h (npts,) above the surface.
 
     ``z_full`` and ``dry_static_energy`` are (nlev, npts) full-level
@@ -76,12 +82,30 @@ def boundary_layer_depth(z_full, dry_static_energy, wind_speed_sq, gravity: floa
     Ri where it first exceeds ``critical_richardson`` (Isca
     ``diffusivity.pbl_depth``, the branch its ``do_simple`` always
     takes). A column that never crosses keeps h at its lowest full
-    level, as there."""
+    level, as there.
+
+    Two mutually exclusive regularizations of a calm column are offered,
+    because the two schemes this model carries disagree about it.
+    ``wind_floor`` (the default, 1e-12 m^2/s^2) clamps the denominator, as
+    the FHZ06 path has always done. ``wind_offset``, when non-zero, adds
+    instead of clamping - Isca's ``small = 1e-4`` m^2/s^2 - which is what
+    the Monin-Obukhov path uses so that the depth diagnosis and the surface
+    exchange treat a calm column the same way. An offset of 1e-4 keeps Ri
+    finite and *small* at vanishing wind, where a 1e-12 clamp lets it grow
+    to ~1e12 and so reports a boundary layer one level deep; with the
+    offset the column instead looks neutral and the first crossing is found
+    higher up. Asking for both at once is an error; pass
+    ``wind_floor=0.0`` alongside a ``wind_offset``."""
     xp = _xp(z_full, dry_static_energy)
+    if wind_offset > 0.0 and wind_floor > 0.0:
+        raise ValueError("give either wind_floor or wind_offset, not both "
+                         "(pass wind_floor=0.0 with a wind_offset)")
     K = z_full.shape[0]
     s_bot = dry_static_energy[-1]
+    denominator = (wind_speed_sq + wind_offset if wind_offset
+                   else xp.maximum(wind_speed_sq, wind_floor))
     rich = (gravity * z_full * (dry_static_energy - s_bot) / s_bot
-            / xp.maximum(wind_speed_sq, 1e-12))
+            / denominator)
     h = z_full[-1].copy()
     found = xp.zeros(h.shape, dtype=bool)
     rich_below, z_below = rich[-1], z_full[-1]
@@ -112,6 +136,61 @@ def diffusivity_profile(z, u_star, h, *, frac_inner: float = 0.1,
     taper = xp.where(z < h_inner, 1.0,
                      xp.clip(1.0 - (z - h_inner) / span, 0.0, 1.0) ** 2)
     return von_karman * u_star * z * taper
+
+
+def monin_obukhov_diffusivity_profile(z, u_star, b_star, h, *,
+                                      frac_inner: float = 0.1,
+                                      options=None):
+    """Stability-dependent ``(K_m, K_h)`` at heights ``z`` above the
+    surface: Isca ``diffusivity.diffusivity_pbl`` with ``mo_diff``.
+
+    ``z`` is (m, npts), ``u_star``, ``b_star`` and ``h`` are (npts,).
+    ``options`` is a
+    :class:`~tropoi.physics.monin_obukhov.MoninObukhovOptions` (its
+    defaults, i.e. Isca's, when None).
+
+    Three regions, with ``h_i = frac_inner h``:
+
+    * ``z < h_i`` - the surface layer proper, ``K = k u* z / phi(zeta(z))``
+      with ``zeta(z) = -k b* z / u*^2``: the full Monin-Obukhov profile,
+      evaluated at the height in question.
+    * ``h_i <= z < h`` - the outer layer. Isca does *not* continue to
+      evaluate ``phi`` here. It takes ``K(h_i)`` and scales it::
+
+          K = K(h_i) (z / h_i) (1 - (z - h_i)/(h - h_i))^2
+
+      so the stability function is frozen at its ``h_i`` value while the
+      linear growth continues and the parabola closes the profile at
+      ``z = h``. Because ``K(h_i) z / h_i = k u* z / phi(zeta(h_i))``,
+      this is "neutral-shaped growth times a frozen stability factor",
+      which is how the scheme avoids ``phi`` misbehaving where similarity
+      theory no longer holds.
+    * ``z >= h`` - zero.
+
+    In the neutral limit (``phi = 1``) this collapses onto
+    :func:`diffusivity_profile`, the FHZ06 form: there
+    ``K(h_i) z / h_i = k u* z``, so the two differ only by the stability
+    factor. The agreement is to rounding, not bit for bit, because this
+    route multiplies and divides by ``h_i`` where the FHZ06 one does not;
+    it is checked in the tests at ~1e-15 relative. That identity is what
+    makes the FHZ06 taper already Isca-consistent in the neutral limit.
+    """
+    from tropoi.physics.monin_obukhov import MoninObukhovOptions, diffusivities
+    xp = _xp(z, u_star)
+    opts = MoninObukhovOptions() if options is None else options
+    h_inner = frac_inner * h
+    span = xp.maximum(h - h_inner, 1e-30)
+    inner_m, inner_h = diffusivities(z, u_star, b_star, opts)
+    ref_m, ref_h = diffusivities(h_inner, u_star, b_star, opts)
+    # the outer-layer shape; h_inner > 0 wherever h > 0, and a zero-depth
+    # column is caught by the z >= h branch below
+    safe_inner = xp.maximum(h_inner, 1e-30)
+    factor = (z / safe_inner) * xp.clip(1.0 - (z - h_inner) / span, 0.0, 1.0) ** 2
+    below = z < h_inner
+    above = z >= h
+    k_m = xp.where(above, 0.0, xp.where(below, inner_m, ref_m * factor))
+    k_h = xp.where(above, 0.0, xp.where(below, inner_h, ref_h * factor))
+    return k_m, k_h
 
 
 def implicit_column_diffusion(q, layer_mass, conductance, window: float, *,

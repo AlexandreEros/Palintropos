@@ -68,7 +68,7 @@ flowchart LR
     p_tropoi_otemporal -.->|1| n_tropoi_otemporal_otendencies_oshallow__water
     n_tropoi_otemporal_otendencies_obarotropic -->|2| p_tropoi_ospatial
     n_tropoi_otemporal_otendencies_obarotropic -->|1| p_tropoi_ospatial_ostates
-    n_tropoi_otemporal_otendencies_oboundary__layer -->|1| p_tropoi_ophysics
+    n_tropoi_otemporal_otendencies_oboundary__layer -->|4| p_tropoi_ophysics
     n_tropoi_otemporal_otendencies_oboundary__layer -.->|1| p_tropoi_ospatial
     n_tropoi_otemporal_otendencies_odrag -.->|1| p_tropoi_otemporal
     n_tropoi_otemporal_otendencies_oheld__suarez -->|1| p_tropoi_ospatial

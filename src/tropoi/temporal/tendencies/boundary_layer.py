@@ -46,7 +46,10 @@ import math
 import numpy as np
 
 from tropoi.physics.boundary_layer import (boundary_layer_depth, diffusivity_profile,
-                                           exchange_coefficient, implicit_column_diffusion)
+                                           exchange_coefficient, implicit_column_diffusion,
+                                           monin_obukhov_diffusivity_profile)
+from tropoi.physics.monin_obukhov import ISCA_SMALL, MoninObukhovOptions
+from tropoi.physics.surface import SENSIBLE_SCHEMES
 
 __all__ = ["BoundaryLayerDiffusion"]
 
@@ -58,7 +61,15 @@ class BoundaryLayerDiffusion:
                  gas_constant: float, dt: float, roughness_length: float,
                  critical_richardson: float = 1.0, rich_crit_pbl: float = 1.0,
                  frac_inner: float = 0.1, gustiness: float = 0.0,
-                 heating: bool = True):
+                 heating: bool = True, scheme: str = "fhz06",
+                 roughness_heat: float = None, monin_obukhov: dict = None,
+                 fused_kernel: bool = False):
+        # argument validation before anything that touches the model or the
+        # coupling, so a mis-specified term fails on its own terms
+        if scheme not in SENSIBLE_SCHEMES:
+            raise ValueError(f"scheme must be one of {SENSIBLE_SCHEMES}, not {scheme!r}")
+        if fused_kernel and scheme != "monin_obukhov":
+            raise ValueError("fused_kernel applies only to the monin_obukhov scheme")
         import cupy as cp_mod
         if coupling.surface_temperature is None:
             raise ValueError("the boundary layer needs a surface temperature")
@@ -74,6 +85,21 @@ class BoundaryLayerDiffusion:
         self.frac_inner = float(frac_inner)
         self.gustiness = float(gustiness)
         self.heating = bool(heating)
+        self.scheme = str(scheme)
+        self.roughness_heat = (self.roughness_length if roughness_heat is None
+                               else float(roughness_heat))
+        self.monin_obukhov = None
+        self.fused_kernel = bool(fused_kernel)
+        if self.scheme == "monin_obukhov":
+            self.monin_obukhov = MoninObukhovOptions(**dict(monin_obukhov or {}))
+        self._drag = None
+        if self.fused_kernel:
+            from tropoi.physics.monin_obukhov_cuda import surface_drag_fused
+            self._drag = surface_drag_fused
+        else:
+            from tropoi.physics.monin_obukhov import surface_drag
+            self._drag = surface_drag
+        self.last_richardson = None
         ps = model._ps
         self._shape = ps.coslat.shape
         self._sigma_int = cp_mod.asarray(model.sigma.interfaces_array())[:, None]
@@ -84,10 +110,25 @@ class BoundaryLayerDiffusion:
         self.last_max_depth = 0.0
 
     def signature(self) -> dict:
-        return {"kind": "boundary_layer_diffusion", "roughness_length": self.roughness_length,
-                "critical_richardson": self.critical_richardson,
-                "rich_crit_pbl": self.rich_crit_pbl, "frac_inner": self.frac_inner,
-                "gustiness": self.gustiness, "heating": self.heating}
+        out = {"kind": "boundary_layer_diffusion", "roughness_length": self.roughness_length,
+               "critical_richardson": self.critical_richardson,
+               "rich_crit_pbl": self.rich_crit_pbl, "frac_inner": self.frac_inner,
+               "gustiness": self.gustiness, "heating": self.heating}
+        # the signature of an FHZ06 term is left exactly as it was, so every
+        # configuration that predates this scheme keeps its canonical hash
+        if self.scheme != "fhz06":
+            # the FHZ06 critical Richardson number has no counterpart under
+            # Monin-Obukhov (its role is taken by monin_obukhov.rich_crit),
+            # so recording it would name a parameter that does nothing
+            del out["critical_richardson"]
+            out["scheme"] = self.scheme
+            out["roughness_heat"] = self.roughness_heat
+            out["monin_obukhov"] = self.monin_obukhov.signature()
+            if self.fused_kernel:
+                # the fused kernel agrees with the vectorized path to about
+                # 1e-13 relative, not bit for bit, so a run says which it used
+                out["fused_kernel"] = True
+        return out
 
     # -- budget -----------------------------------------------------------
     def budget_means(self, *, reset: bool = False) -> dict:
@@ -146,30 +187,52 @@ class BoundaryLayerDiffusion:
         # Surface exchange, depth, diffusivity, conductances.
         gust2 = self.gustiness * self.gustiness
         speed1 = xp.sqrt(u[-1] * u[-1] + v[-1] * v[-1] + gust2)
-        coefficient = exchange_coefficient(
-            ts, temperature[-1], z_full[-1], speed1, cp, g,
-            roughness_length=self.roughness_length,
-            critical_richardson=self.critical_richardson)
-        u_star = xp.sqrt(coefficient) * speed1
         dse = cp * temperature + g * z_full
-        h = boundary_layer_depth(z_full, dse, u * u + v * v, g,
-                                 critical_richardson=self.rich_crit_pbl)
-        diffusivity = diffusivity_profile(z_interface, u_star, h,
-                                          frac_inner=self.frac_inner)
         t_interface = 0.5 * (temperature[:K - 1] + temperature[1:])
         rho_interface = p_int[1:K] / (r * t_interface)
         dz = z_full[:K - 1] - z_full[1:]
-        conductance = rho_interface * diffusivity / dz
         mass = (p_int[1:] - p_int[:K]) / g
         rho1 = 0.5 * (p_int[-1] + p_int[-2]) / (r * temperature[-1])
-        stress_conductance = rho1 * coefficient * speed1
+        if self.scheme == "monin_obukhov":
+            # theta of the lowest level referenced to the surface pressure,
+            # formed from the same Simmons-Burridge height the Richardson
+            # number uses (see surface.monin_obukhov_sensible_heat_flux)
+            theta1 = temperature[-1] * xp.exp(g * z_full[-1] / (cp * temperature[-1]))
+            exchange = self._drag(
+                theta1, ts, z_full[-1], speed1, gravity=g,
+                roughness_momentum=self.roughness_length,
+                roughness_heat=self.roughness_heat,
+                opts=self.monin_obukhov).require_convergence()
+            u_star = exchange.u_star
+            h = boundary_layer_depth(z_full, dse, u * u + v * v, g,
+                                     critical_richardson=self.rich_crit_pbl,
+                                     wind_floor=0.0, wind_offset=ISCA_SMALL)
+            k_m, k_h = monin_obukhov_diffusivity_profile(
+                z_interface, u_star, exchange.b_star, h,
+                frac_inner=self.frac_inner, options=self.monin_obukhov)
+            conductance_m = rho_interface * k_m / dz
+            conductance_h = rho_interface * k_h / dz
+            stress_conductance = rho1 * exchange.drag_m * speed1
+            self.last_richardson = exchange.richardson
+        else:
+            coefficient = exchange_coefficient(
+                ts, temperature[-1], z_full[-1], speed1, cp, g,
+                roughness_length=self.roughness_length,
+                critical_richardson=self.critical_richardson)
+            u_star = xp.sqrt(coefficient) * speed1
+            h = boundary_layer_depth(z_full, dse, u * u + v * v, g,
+                                     critical_richardson=self.rich_crit_pbl)
+            diffusivity = diffusivity_profile(z_interface, u_star, h,
+                                              frac_inner=self.frac_inner)
+            conductance_m = conductance_h = rho_interface * diffusivity / dz
+            stress_conductance = rho1 * coefficient * speed1
 
         # The implicit solves and the changes they imply.
-        u_new = implicit_column_diffusion(u, mass, conductance, w,
+        u_new = implicit_column_diffusion(u, mass, conductance_m, w,
                                           bottom_conductance=stress_conductance)
-        v_new = implicit_column_diffusion(v, mass, conductance, w,
+        v_new = implicit_column_diffusion(v, mass, conductance_m, w,
                                           bottom_conductance=stress_conductance)
-        s_new = implicit_column_diffusion(dse, mass, conductance, w)
+        s_new = implicit_column_diffusion(dse, mass, conductance_h, w)
         du = u_new - u
         dv = v_new - v
         d_temp = (s_new - dse) / cp

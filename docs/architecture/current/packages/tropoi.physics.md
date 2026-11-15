@@ -9,20 +9,22 @@ Index: [all packages](../index.md) · parent [`tropoi`](tropoi.md) · [`tropoi.p
 | Module | Category | Classes | Public functions |
 |---|---|---|---|
 | `tropoi.physics` | empty | – | – |
-| `tropoi.physics.boundary_layer` | code | – | `boundary_layer_depth`, `diffusivity_profile`, `exchange_coefficient`, `implicit_column_diffusion` |
+| `tropoi.physics.boundary_layer` | code | – | `boundary_layer_depth`, `diffusivity_profile`, `exchange_coefficient`, `implicit_column_diffusion`, `monin_obukhov_diffusivity_profile` |
 | `tropoi.physics.column` | code | `AtmosphericColumn`, `ColumnError` | `thin_atmosphere_mass_kg`, `thin_atmosphere_surface_pressure_pa` |
 | `tropoi.physics.column_model` | code | `ColumnPhysics`, `PhysicsOutput`, `RadiativeConvectiveColumn` | – |
 | `tropoi.physics.composition` | code | `Composition`, `CompositionError` | `gas_constant_report` |
 | `tropoi.physics.constants` | code | – | – |
 | `tropoi.physics.convection` | code | `DryConvectiveAdjustment` | `neutral_profile` |
 | `tropoi.physics.insolation` | code | `DiurnalMeanInsolation`, `InstantaneousInsolation`, `PrescribedInsolation`, `StellarIllumination`, `TidallyLockedInsolation` | `frierson_net_surface_flux` |
+| `tropoi.physics.monin_obukhov` | code | `MoninObukhovConvergenceError`, `MoninObukhovOptions`, `SurfaceExchange` | `diffusivities`, `solve_zeta`, `stability_derivative_m`, `stability_derivative_t`, `stability_integral_m`, `stability_integral_t`, `stable_mix`, `surface_drag` |
+| `tropoi.physics.monin_obukhov_cuda` | code | – | `clear_cache`, `kernel_available`, `surface_drag_fused` |
 | `tropoi.physics.orbit` | code | `KeplerOrbit` | `eccentric_from_true`, `mean_from_true`, `true_from_eccentric`, `true_from_mean` |
 | `tropoi.physics.planets` | code | `PlanetaryBody`, `VerticalGridSpec` | – |
 | `tropoi.physics.rayleigh` | code | `OpticalRecord` | `composition_cross_section`, `optical_records`, `rayleigh_cross_section` |
 | `tropoi.physics.rotation` | code | `Rotation` | – |
 | `tropoi.physics.species` | code | `Species` | `dataset_identities`, `load_dataset` |
 | `tropoi.physics.star` | code | `ApparentStar`, `Star` | `planck_radiance` |
-| `tropoi.physics.surface` | code | `SlabSurface` | `drag_coefficient`, `sensible_heat_flux` |
+| `tropoi.physics.surface` | code | `SlabSurface` | `drag_coefficient`, `monin_obukhov_sensible_heat_flux`, `sensible_heat_flux` |
 | `tropoi.physics.thermodynamics` | code | `ThermoRecord` | `cp_molar`, `heat_capacity`, `heat_capacity_range`, `hydrogen_rotational_cv`, `kappa` |
 
 Files shipped in this directory that are **not Python and not analysed** (templates, data): `README.md`. Their contents (for example JavaScript in an HTML template) are invisible to every graph here.
@@ -44,6 +46,8 @@ flowchart LR
         n_tropoi_ophysics_oconstants["physics.constants"]
         n_tropoi_ophysics_oconvection["physics.convection"]
         n_tropoi_ophysics_oinsolation["physics.insolation"]
+        n_tropoi_ophysics_omonin__obukhov["physics.monin#95;obukhov"]
+        n_tropoi_ophysics_omonin__obukhov__cuda["physics.monin#95;obukhov#95;cuda"]
         n_tropoi_ophysics_oorbit["physics.orbit"]
         n_tropoi_ophysics_oplanets["physics.planets"]
         n_tropoi_ophysics_orayleigh["physics.rayleigh"]
@@ -57,15 +61,18 @@ flowchart LR
     p_tropoi_orepresentation_ovisual["package representation.visual"]
     p_tropoi_orun_oradiative["package run.radiative"]
     p_tropoi_otemporal_otendencies["package temporal.tendencies"]
+    n_tropoi_ophysics_oboundary__layer -.-> n_tropoi_ophysics_omonin__obukhov
     n_tropoi_ophysics_oboundary__layer --> n_tropoi_ophysics_osurface
     n_tropoi_ophysics_ocolumn --> n_tropoi_ophysics_oconstants
     n_tropoi_ophysics_ocolumn__model --> n_tropoi_ophysics_oconvection
+    n_tropoi_ophysics_ocolumn__model --> n_tropoi_ophysics_omonin__obukhov
     n_tropoi_ophysics_ocolumn__model --> n_tropoi_ophysics_osurface
     n_tropoi_ophysics_ocomposition --> n_tropoi_ophysics_oconstants
     n_tropoi_ophysics_ocomposition --> n_tropoi_ophysics_ospecies
     n_tropoi_ophysics_oinsolation --> n_tropoi_ophysics_oorbit
     n_tropoi_ophysics_oinsolation --> n_tropoi_ophysics_orotation
     n_tropoi_ophysics_oinsolation --> n_tropoi_ophysics_ostar
+    n_tropoi_ophysics_omonin__obukhov__cuda --> n_tropoi_ophysics_omonin__obukhov
     n_tropoi_ophysics_oorbit --> n_tropoi_ophysics_oconstants
     n_tropoi_ophysics_oplanets --> n_tropoi_ophysics_ocomposition
     n_tropoi_ophysics_oplanets --> n_tropoi_ophysics_oinsolation
@@ -78,6 +85,7 @@ flowchart LR
     n_tropoi_ophysics_orayleigh --> n_tropoi_ophysics_ospecies
     n_tropoi_ophysics_ostar --> n_tropoi_ophysics_oconstants
     n_tropoi_ophysics_ostar --> n_tropoi_ophysics_ospecies
+    n_tropoi_ophysics_osurface -.-> n_tropoi_ophysics_omonin__obukhov
     n_tropoi_ophysics_othermodynamics --> n_tropoi_ophysics_ocomposition
     n_tropoi_ophysics_othermodynamics --> n_tropoi_ophysics_oconstants
     n_tropoi_ophysics_othermodynamics --> n_tropoi_ophysics_ospecies
@@ -93,6 +101,9 @@ flowchart LR
     p_tropoi_orun_oradiative -.->|1| n_tropoi_ophysics_ospecies
     p_tropoi_orun_oradiative -->|1| n_tropoi_ophysics_osurface
     p_tropoi_otemporal_otendencies -->|1| n_tropoi_ophysics_oboundary__layer
+    p_tropoi_otemporal_otendencies -->|1| n_tropoi_ophysics_omonin__obukhov
+    p_tropoi_otemporal_otendencies -.->|1| n_tropoi_ophysics_omonin__obukhov__cuda
+    p_tropoi_otemporal_otendencies -->|1| n_tropoi_ophysics_osurface
     n_tropoi_ophysics_ocolumn__model -->|1| p_tropoi_ophysics_oradiation
     classDef other fill:none,stroke-dasharray:3 3
     class p_tropoi_ophysics_oradiation other
@@ -103,7 +114,7 @@ flowchart LR
 
 ## Classes
 
-23 classes, each with the functions defined in its body (`$`: class/static method; no parentheses: property). Edges: inheritance (`<|--`) and nesting (`*--`) only.
+26 classes, each with the functions defined in its body (`$`: class/static method; no parentheses: property). Edges: inheritance (`<|--`) and nesting (`*--`) only.
 
 ```mermaid
 %% Generated by tools.architecture 2.3.0. Do not edit by hand.
@@ -189,6 +200,16 @@ classDiagram
     c_tropoi_ophysics_oinsolation_oTidallyLockedInsolation : +#95;#95;call#95;#95;()
     c_tropoi_ophysics_oinsolation_oTidallyLockedInsolation : +#95;#95;init#95;#95;()
     c_tropoi_ophysics_oinsolation_oTidallyLockedInsolation : +signature()
+    class c_tropoi_ophysics_omonin__obukhov_oMoninObukhovConvergenceError["MoninObukhovConvergenceError (physics.monin#95;obukhov)"]
+    c_tropoi_ophysics_omonin__obukhov_oMoninObukhovConvergenceError : +#95;#95;init#95;#95;()
+    c_tropoi_ophysics_omonin__obukhov_oMoninObukhovConvergenceError : external base RuntimeError
+    class c_tropoi_ophysics_omonin__obukhov_oMoninObukhovOptions["MoninObukhovOptions (physics.monin#95;obukhov)"]
+    c_tropoi_ophysics_omonin__obukhov_oMoninObukhovOptions : +#95;#95;post#95;init#95;#95;()
+    c_tropoi_ophysics_omonin__obukhov_oMoninObukhovOptions : +b#95;stab
+    c_tropoi_ophysics_omonin__obukhov_oMoninObukhovOptions : +lambda#95;stab
+    c_tropoi_ophysics_omonin__obukhov_oMoninObukhovOptions : +signature()
+    class c_tropoi_ophysics_omonin__obukhov_oSurfaceExchange["SurfaceExchange (physics.monin#95;obukhov)"]
+    c_tropoi_ophysics_omonin__obukhov_oSurfaceExchange : +require#95;convergence()
     class c_tropoi_ophysics_oorbit_oKeplerOrbit["KeplerOrbit (physics.orbit)"]
     c_tropoi_ophysics_oorbit_oKeplerOrbit : +#95;#95;post#95;init#95;#95;()
     c_tropoi_ophysics_oorbit_oKeplerOrbit : +apoapsis#95;m

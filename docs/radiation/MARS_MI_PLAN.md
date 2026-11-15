@@ -642,7 +642,7 @@ called M-I.
 | IR-5 | slab surface of 2 m × `RHO_CP` = 8.26 × 10⁶ J m⁻² K⁻¹; flat; roughness 3.21 × 10⁻⁵ m for heat and momentum; no gustiness | P (land depth 2 m, no topography); Isca `mixed_layer`, `constants`, `idealized_moist_phys_nml`, `constant_gust` 0 | surface and BL config | `config.json` | same tests | met |
 | IR-6 | Rayleigh sponge, 0.125 day, rate ∝ ((p_b − p)/p_b)² for p < 0.5 Pa at the **local** full-level pressure; its KE loss returned as heat | Isca `damping_driver` | sponge config | `config.json` | `test_rayleigh_sponge_rates_are_iscas_damping_driver` | **partial**: p = σ × 610 Pa (§2b) |
 | IR-7 | no convection scheme | P (Table 1 "None") | `convection` | `config.json` | BL preset test | met since §2e |
-| IR-8 | boundary layer as Isca: full Monin–Obukhov `mo_drag`; K from `mo_diff` below 0.1 h and tapered above; h from Ri = 1; one implicit down–up sweep with the slab between; vertical-diffusion dissipation always returned as heat | Isca (`surface_flux`, `monin_obukhov`, `diffusivity`, `vert_diff`, `idealized_moist_phys`) | BL config and scheme | source, `config.json` | `test_boundary_layer.py` (the FHZ06 scheme only) | **partial**: FHZ06-simplified, neutral, split solves (§4.5) |
+| IR-8 | boundary layer as Isca: full Monin–Obukhov `mo_drag`; K from `mo_diff` below 0.1 h and tapered above; h from Ri = 1; one implicit down–up sweep with the slab between; vertical-diffusion dissipation always returned as heat | Isca (`surface_flux`, `monin_obukhov`, `diffusivity`, `vert_diff`, `idealized_moist_phys`) | BL config and scheme | source, `config.json` | `test_boundary_layer.py` (FHZ06); `test_monin_obukhov.py` (MOST) | **partial**, reduced 2026-11-14: `mo_drag` and `mo_diff` are now implemented and selectable (preset `dev-mars-gray-flat-bl-most`), verified against Isca's published kernel references — its three checksums reproduce exactly (an aggregate agreement) and its ten per-column `u_star`/`b_star` literals elementwise to a few ulp — see `MONIN_OBUKHOV.md` §4. Still **partial**: the surface and diffusion solves remain split rather than one implicit down–up sweep (§4.5), and the default scheme is still FHZ06. Integrated 2026-11-15: runs Hm/Um carry the scheme 60 days on the §2e configuration; the climate effect is measured and small (§5) |
 | IR-9 | T42 | P (Table 1) | `l_max`, retained truncation | `config.json` | config check | **not met** (T21) |
 | IR-10 | numerics: Δt 110 s; ∇⁴ hyperdiffusion (`damping_order` 2, coefficient (0.1 day)⁻¹, `resolution_dependent`); Robert–Asselin 0.04 with RAW off | Isca (test case and defaults) | `dt`, `hyperdiffusion_*`, `raw_*` | `config.json` | config check | **not met** (§4.5) |
 | IR-11 | global mass and energy corrections each step | Isca `spectral_dynamics` defaults (on; not overridden) | — | — | — | **not implemented** (§3 item 4) |
@@ -748,7 +748,7 @@ quantitative tolerances.
 | time filter | Robert–Asselin 0.04, RAW off (`raw_filter_coeff` 1.0) | RAW ν 0.1, α 0.53 | IR-10 |
 | hyperdiffusion | ∇⁴ (`damping_order` 2), coefficient 1.157 × 10⁻⁴ s⁻¹, `resolution_dependent` (scaling not read, §4.10) | ∇⁸, e-folding 0.1 day at the cut | IR-10; changes the sinks DM-6 reports |
 | global fixers | mass and energy corrections every step; the energy correction also returns the ∇⁴ loss as uniform heat | none; residual and drift measured | IR-11. M-I's drift and dynamical residual are zero by construction, so NI-7 and DM-5 have no M-I counterpart |
-| surface exchange | full Monin–Obukhov `mo_drag` (`rich_crit` 2.0, `stable_option` 1, `drag_min` 10⁻⁵, `zeta_trans` 0.5); `use_frierson_mo_drag` false | FHZ06-simplified coefficient (Ri_c 1), neutral | IR-8 |
+| surface exchange | full Monin–Obukhov `mo_drag` (`rich_crit` 2.0, `stable_option` 1, `drag_min` 10⁻⁵, `zeta_trans` 0.5); `use_frierson_mo_drag` false | FHZ06-simplified coefficient (Ri_c 1), neutral — or, since 2026-11-14, the full forms with exactly those four values, by opting in (`MONIN_OBUKHOV.md`) | IR-8 |
 | K profile | inner layer K from `mo_diff` (stability functions); taper above 0.1 h; zero above h | neutral κ u\* z below 0.1 h, the same taper | IR-8 |
 | surface–diffusion coupling | one implicit down–up sweep with the slab between (`Tri_surf`) | split: implicit exchange (§2d), then diffusion with zero bottom heat flux (§2e) | IR-8 |
 | dissipation of vertical diffusion | always returned as heat (`do_conserve_energy` hard-coded) | follows `frictional_heating`, so the U runs have no Isca counterpart | IR-8; NI-7 pairs |
@@ -875,3 +875,54 @@ no integration length.
 
 §3's ordering is unchanged. Its item 3 ("open candidates for M7") now
 reads as closing IR-8, not as making M7 pass. Item 5 is CV-1.
+
+## 5. The Monin–Obukhov runs (2026-11-15)
+
+§3 item 3 left two open candidates for the lowest-level wind: the full
+Monin–Obukhov forms, and Isca's joint surface-heat and diffusion sweep.
+The first has now been exercised. Per §4.11 it reads as work on IR-8, not
+as an attempt on M7.
+
+**Nothing in §1–§4 changes.** No criterion, prediction, window, threshold
+or verdict moves, every preserved file of §4.9 stays byte-identical, and
+M1–M7 are not re-judged — they are historical (§4.1). The runs below were
+**not** pre-registered: no criterion existed for them before they ran, so
+what they produce is a measurement in the sense of a DM, reported and not
+judged.
+
+**The runs.** Preset `dev-mars-gray-flat-bl-most` with `monin_obukhov: {}`
+(every Isca module default, which is what grey-Mars sets), both
+substitutes removed, 60 days at T21L25 on a Colab T4 from `8e98d7b`, clean
+tree. Two runs differing only in frictional heating, as every pair since
+§2 has been:
+
+| run | heating | configuration | evidence |
+| --- | --- | --- | --- |
+| Hm | on | `8cc1ade2…` | `dev-mars-gray-flat-bl-most-heated-T21L25-60d-8e98d7b-t4/` |
+| Um | off | `2069b1c3…` | `dev-mars-gray-flat-bl-most-T21L25-60d-8e98d7b-t4/` |
+
+Both completed day 60, each resuming twice through its day-2 checkpoint.
+They are compared with Hb and Ub, the §2e runs of the same configuration
+under the FHZ06-simplified forms.
+
+**What it measures.** The full table, the noise estimate and the caveats
+are `MONIN_OBUKHOV.md` §10. In summary: two quantities shift with a
+consistent sign across both pairs — the boundary-layer kinetic sink falls
+11–15 % in magnitude and the diagnosed depth rises 2–4 % — and everything
+else sits inside the day-to-day spread. The mean surface temperature is
+unchanged to 0.04 K. The energy residual is indistinguishable from the
+FHZ06 run's (1.48 against 1.49 × 10⁻⁴ F, heated). The ln-p_s drift is
+marginally *larger* (−2.72 against −2.57 × 10⁻⁵), so the mass behaviour of
+§4.2 is a core property and the surface scheme does not reach it.
+
+The lowest-level wind falls in the heated pair (40.5 → 36.4 m s⁻¹) and
+rises in the unheated one (37.2 → 38.2), both by less than the spread
+within either run. That is noise, not an effect, and §10.2 says why it
+must not be read as the 40 m s⁻¹ line being crossed.
+
+**What this means for the plan.** IR-8's remaining departure is now the
+coupling, not the forms: the split surface and diffusion solves against
+Isca's one implicit down–up sweep (§4.5, §4.11). §3's ordering is
+unchanged, and §3 item 4 — Isca's global fixers, which bear directly on
+the drift above — still stands next. These runs are at T21 with Δt 600 s
+(IR-9, IR-10 unmet), so they bound nothing about CV-1.
