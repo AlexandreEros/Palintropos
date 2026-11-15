@@ -251,6 +251,22 @@
     {
       "kind": "imports",
       "scopes": [
+        "function"
+      ],
+      "source": "tropoi.physics.boundary_layer",
+      "target": "tropoi.physics.monin_obukhov"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.physics.boundary_layer",
+      "target": "tropoi.physics.surface"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
         "module"
       ],
       "source": "tropoi.physics.column",
@@ -263,6 +279,14 @@
       ],
       "source": "tropoi.physics.column_model",
       "target": "tropoi.physics.convection"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.physics.column_model",
+      "target": "tropoi.physics.monin_obukhov"
     },
     {
       "kind": "imports",
@@ -320,6 +344,14 @@
       ],
       "source": "tropoi.physics.insolation",
       "target": "tropoi.physics.star"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.physics.monin_obukhov_cuda",
+      "target": "tropoi.physics.monin_obukhov"
     },
     {
       "kind": "imports",
@@ -440,6 +472,14 @@
       ],
       "source": "tropoi.physics.star",
       "target": "tropoi.physics.species"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.physics.surface",
+      "target": "tropoi.physics.monin_obukhov"
     },
     {
       "kind": "imports",
@@ -2746,6 +2786,14 @@
         "function"
       ],
       "source": "tropoi.run.radiative.model",
+      "target": "tropoi.temporal.tendencies.boundary_layer"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.run.radiative.model",
       "target": "tropoi.temporal.tendencies.drag"
     },
     {
@@ -3441,6 +3489,47 @@
     {
       "kind": "imports",
       "scopes": [
+        "module"
+      ],
+      "source": "tropoi.temporal.tendencies.boundary_layer",
+      "target": "tropoi.physics.boundary_layer"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function",
+        "module"
+      ],
+      "source": "tropoi.temporal.tendencies.boundary_layer",
+      "target": "tropoi.physics.monin_obukhov"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.temporal.tendencies.boundary_layer",
+      "target": "tropoi.physics.monin_obukhov_cuda"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.temporal.tendencies.boundary_layer",
+      "target": "tropoi.physics.surface"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.temporal.tendencies.boundary_layer",
+      "target": "tropoi.spatial.sigma_coordinate"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
         "function"
       ],
       "source": "tropoi.temporal.tendencies.drag",
@@ -3636,6 +3725,20 @@
     {
       "category": "code",
       "dynamic_import_calls": 0,
+      "id": "tropoi.physics.boundary_layer",
+      "is_package": false,
+      "path": "tropoi/physics/boundary_layer.py",
+      "stdlib_imports": [
+        "__future__"
+      ],
+      "third_party_imports": [
+        "cupy",
+        "numpy"
+      ]
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
       "id": "tropoi.physics.column",
       "is_package": false,
       "path": "tropoi/physics/column.py",
@@ -3720,6 +3823,36 @@
       "third_party_imports": [
         "cupy",
         "numpy"
+      ]
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.physics.monin_obukhov",
+      "is_package": false,
+      "path": "tropoi/physics/monin_obukhov.py",
+      "stdlib_imports": [
+        "__future__",
+        "dataclasses",
+        "typing"
+      ],
+      "third_party_imports": [
+        "cupy",
+        "numpy"
+      ]
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.physics.monin_obukhov_cuda",
+      "is_package": false,
+      "path": "tropoi/physics/monin_obukhov_cuda.py",
+      "stdlib_imports": [
+        "__future__",
+        "typing"
+      ],
+      "third_party_imports": [
+        "cupy"
       ]
     },
     {
@@ -3880,7 +4013,8 @@
       "path": "tropoi/physics/surface.py",
       "stdlib_imports": [
         "__future__",
-        "math"
+        "math",
+        "typing"
       ],
       "third_party_imports": [
         "cupy",
@@ -5700,6 +5834,21 @@
       ],
       "third_party_imports": [
         "cupy"
+      ]
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.temporal.tendencies.boundary_layer",
+      "is_package": false,
+      "path": "tropoi/temporal/tendencies/boundary_layer.py",
+      "stdlib_imports": [
+        "__future__",
+        "math"
+      ],
+      "third_party_imports": [
+        "cupy",
+        "numpy"
       ]
     },
     {

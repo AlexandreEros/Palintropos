@@ -141,3 +141,19 @@ reason = "isobaric molar heat capacity of one named species; no caller in the pa
 [[excluded]]
 function = "tropoi.physics.thermodynamics.kappa"
 reason = "R / c_p(T) of a mixture; no caller in the package"
+
+[[excluded]]
+function = "tropoi.physics.monin_obukhov.stable_mix"
+reason = "Isca's free-atmosphere stable mixing factor; grey-Mars leaves free_atm_diff off so nothing calls it, but it is part of the referenced formulation and its published checksum is the exact test of the stable branch"
+
+[[excluded]]
+function = "tropoi.physics.monin_obukhov_cuda.surface_drag_fused"
+reason = "reached through the BoundaryLayerDiffusion._drag indirection, chosen at construction by the fused_kernel option (an attribute call static analysis does not follow)"
+
+[[excluded]]
+function = "tropoi.physics.monin_obukhov_cuda.kernel_available"
+reason = "capability probe for callers and tests deciding whether the fused path can run; no workflow starts here"
+
+[[excluded]]
+function = "tropoi.physics.monin_obukhov_cuda.clear_cache"
+reason = "drops the compiled RawKernel so a test can force recompilation; no workflow starts here"

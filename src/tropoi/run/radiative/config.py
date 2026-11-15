@@ -58,11 +58,25 @@ class RadiativeConfig:
     insolation: Optional[dict] = None
     convection: Optional[dict] = None
     surface: Optional[dict] = None
+    # bulk surface exchange: tropoi.physics.surface.sensible_heat_flux
+    # options, plus "implicit" for the backward-Euler exchange. "scheme":
+    # "monin_obukhov" with "monin_obukhov": {...} selects Isca's full
+    # surface layer instead of FHZ06, and must match the same two keys in
+    # "boundary_layer" (see _check_surface_layer_scheme)
     sensible: Optional[dict] = None
     drag: Optional[dict] = None
     # top Rayleigh sponge {"bottom_pressure": Pa, "efold_days": d} (Isca
     # damping_driver); left out of the canonical form when unset
     sponge: Optional[dict] = None
+    # dry boundary layer (MARS_MI_PLAN.md 2e): bulk surface stress plus
+    # implicit K-profile diffusion of momentum and dry static energy,
+    # {"roughness_length": m, "critical_richardson": ..., "rich_crit_pbl":
+    # ..., "frac_inner": ..., "gustiness": m/s}; left out of the canonical
+    # form when unset so every earlier configuration keeps its hash.
+    # "scheme": "monin_obukhov" with "monin_obukhov": {...} selects Isca's
+    # full surface layer instead, and must match the same two keys in
+    # "sensible" (see _check_surface_layer_scheme)
+    boundary_layer: Optional[dict] = None
     internal_heat_flux: float = 0.0
     # return the kinetic energy removed by drag and hyperdiffusion as heat.
     # The field default stays False: configurations recorded before the
@@ -115,8 +129,50 @@ class RadiativeConfig:
             raise ValueError("vertical and longwave need a 'kind'")
         if self.sensible is not None and self.surface is None:
             raise ValueError("sensible exchange needs a surface")
+        if self.boundary_layer is not None and self.surface is None:
+            raise ValueError("the boundary layer needs a surface")
+        self._check_surface_layer_scheme()
         if self.surface is None and self.shortwave is None and self.internal_heat_flux <= 0:
             raise ValueError("a surface-less column needs a stellar or interior heat source")
+
+    def _check_surface_layer_scheme(self) -> None:
+        """The surface exchange and the vertical diffusion must agree on the
+        surface-layer scheme and on its parameters.
+
+        They are separate objects evaluated on different grids - the bulk
+        flux in the column physics, the stress and the K profile in the
+        lagged tendency - so nothing structural stops a configuration from
+        asking for a Monin-Obukhov heat flux over an FHZ06 K profile. That
+        combination is not a scheme either model implements, and the two
+        would disagree about the stability of the same column, so it is
+        rejected here rather than left to produce a quietly meaningless
+        run.
+        """
+        flux = (self.sensible or {}).get("scheme", "fhz06")
+        diffusion = (self.boundary_layer or {}).get("scheme", "fhz06")
+        if self.sensible is not None and self.boundary_layer is not None:
+            if flux != diffusion:
+                raise ValueError(
+                    f"the sensible flux asks for scheme {flux!r} and the boundary "
+                    f"layer for {diffusion!r}; the surface-layer scheme must be the "
+                    "same for both")
+            a = (self.sensible or {}).get("monin_obukhov") or {}
+            b = (self.boundary_layer or {}).get("monin_obukhov") or {}
+            if flux == "monin_obukhov" and a != b:
+                raise ValueError(
+                    "the sensible flux and the boundary layer must use the same "
+                    f"monin_obukhov options, not {a} and {b}")
+            for key in ("roughness_length", "gustiness"):
+                if key in (self.sensible or {}) and key in (self.boundary_layer or {}):
+                    if self.sensible[key] != self.boundary_layer[key]:
+                        raise ValueError(
+                            f"the sensible flux and the boundary layer disagree on "
+                            f"{key}: {self.sensible[key]} and {self.boundary_layer[key]}")
+        elif flux == "monin_obukhov" or diffusion == "monin_obukhov":
+            # one of the two is absent; Monin-Obukhov is a surface-layer
+            # scheme, so half of it is a configuration error
+            raise ValueError("the monin_obukhov scheme needs both a sensible flux "
+                             "and a boundary layer")
 
     @property
     def kappa(self) -> float:
@@ -141,6 +197,8 @@ class RadiativeConfig:
         d = asdict(self)
         if d["sponge"] is None:
             del d["sponge"]
+        if d["boundary_layer"] is None:
+            del d["boundary_layer"]
         if not d["frictional_heating"]:
             # written only when set, so configurations that predate the
             # option keep their hash
@@ -275,7 +333,9 @@ def _time_of_perihelion_for_equinox_start(period: float, eccentricity: float,
 
 def mars_gray_flat_dev(experiment_id: Optional[str] = None, *, days: int = 30,
                        dt: float = 600.0, frictional_heating: bool = True,
-                       sponge: bool = False, implicit_surface: bool = False) -> RadiativeConfig:
+                       sponge: bool = False, implicit_surface: bool = False,
+                       boundary_layer: bool = False,
+                       monin_obukhov: bool = False) -> RadiativeConfig:
     """DEVELOPMENT EXPERIMENT, not a reproduction of Thomson & Vallis (2019)
     M-I (docs/radiation/MARS_MI_PLAN.md).
 
@@ -298,15 +358,57 @@ def mars_gray_flat_dev(experiment_id: Optional[str] = None, *, days: int = 30,
     ``dev-mars-gray-flat-sponge-implicit``) solves the bulk sensible exchange
     backward-Euler between bottom layer and slab (MARS_MI_PLAN.md §2c-2d;
     the explicit exchange is unstable in Isca's 0.73 Pa bottom layer once
-    low-level winds pass ~25 m/s). NOT matched: T21 (M-I: T42), del^8 and RAW (Isca:
+    low-level winds pass ~25 m/s). ``boundary_layer=True`` (preset
+    ``dev-mars-gray-flat-bl``) replaces BOTH substitutes with the §2e dry
+    boundary layer: bulk surface stress plus implicit K-profile diffusion
+    of momentum and dry static energy (drag and convection are then None,
+    matching M-I's ``convection: None``); it implies the sponge and the
+    implicit exchange. NOT matched: T21 (M-I: T42), del^8 and RAW (Isca:
     del^4 and Robert-Asselin 0.04), a uniform 285 K initial surface (Isca
-    test case: 285 - 40 (3 sin^2 lat - 1) / 3).
+    test case: 285 - 40 (3 sin^2 lat - 1) / 3), and the FHZ06-simplified
+    exchange coefficient and neutral K profile against Isca's full
+    Monin-Obukhov forms (stated in §2e), unless ``monin_obukhov=True``.
+
+    ``monin_obukhov=True`` (preset ``dev-mars-gray-flat-bl-most``) keeps
+    everything else and removes that last difference: the surface exchange
+    becomes Isca's iterated Monin-Obukhov drag and the K profile its
+    stability-dependent K_m and K_h
+    (:mod:`tropoi.physics.monin_obukhov`; Isca's three published kernel
+    checksums reproduce exactly as aggregates and its per-column published
+    scales elementwise to a few ulp - see docs/radiation/MONIN_OBUKHOV.md
+    §4, which keeps the two claims apart).
+    It implies ``boundary_layer`` and runs Isca's own namelist defaults,
+    which its grey-Mars test case does not override: rich_crit 2.0,
+    drag_min 1e-5, stable_option 1. The surface-layer critical Richardson
+    number is therefore 2.0, not the 1.0 the FHZ06 path uses; the depth
+    diagnosis keeps rich_crit_pbl = 1.0, Isca's separate default for it.
     """
+    if monin_obukhov:
+        boundary_layer = True
+    if boundary_layer:
+        sponge = implicit_surface = True
     year, ecc, ls_peri = 59166360.0, 0.0935, 250.85
-    name = "dev-mars-gray-flat" + ("-sponge" if sponge else "") +         ("-implicit" if implicit_surface else "")
+    name = "dev-mars-gray-flat" + (("-bl" + ("-most" if monin_obukhov else ""))
+                                   if boundary_layer else
+                                   ("-sponge" if sponge else "") +
+                                   ("-implicit" if implicit_surface else ""))
     sensible = {"roughness_length": 3.21e-5, "critical_richardson": 1.0, "gustiness": 0.0}
+    if monin_obukhov:
+        # critical_richardson is the FHZ06 knob and is rejected here; the
+        # Monin-Obukhov critical value is monin_obukhov.rich_crit, left at
+        # Isca's default of 2.0 by the empty options dict
+        sensible = {"roughness_length": 3.21e-5, "gustiness": 0.0,
+                    "scheme": "monin_obukhov", "monin_obukhov": {}}
     if implicit_surface:
         sensible["implicit"] = True
+    bl = None
+    if boundary_layer:
+        bl = {"roughness_length": 3.21e-5, "critical_richardson": 1.0,
+              "rich_crit_pbl": 1.0, "frac_inner": 0.1, "gustiness": 0.0}
+        if monin_obukhov:
+            del bl["critical_richardson"]
+            bl["scheme"] = "monin_obukhov"
+            bl["monin_obukhov"] = {}
     return RadiativeConfig(
         experiment_id=_preset_id(experiment_id, name, "T21L25", frictional_heating),
         sponge={"bottom_pressure": 0.5, "efold_days": 0.125} if sponge else None,
@@ -322,11 +424,13 @@ def mars_gray_flat_dev(experiment_id: Optional[str] = None, *, days: int = 30,
                     "time_of_perihelion": _time_of_perihelion_for_equinox_start(year, ecc,
                                                                                 ls_peri),
                     "solar_day": 88440.0},
-        convection={"timescale": 0.0},
+        convection=None if boundary_layer else {"timescale": 0.0},
         surface={"heat_capacity": 2.0 * _ISCA_RHO_CP, "albedo": 0.3, "emissivity": 1.0,
                  "initial_temperature": 285.0},
         sensible=sensible,
-        drag={"kind": "held_suarez", "k_f_per_day": 1.0, "sigma_b": 0.7},
+        boundary_layer=bl,
+        drag=None if boundary_layer else {"kind": "held_suarez", "k_f_per_day": 1.0,
+                                          "sigma_b": 0.7},
         initial={"kind": "isothermal", "temperature": 264.0},
         checkpoint_every_days=10, state_every_days=1,
         **_t21())
@@ -336,4 +440,8 @@ PRESETS = {"jupiter-schneider-liu": jupiter_schneider_liu, "earth-gray-dry": ear
            "dev-mars-gray-flat": mars_gray_flat_dev,
            "dev-mars-gray-flat-sponge": functools.partial(mars_gray_flat_dev, sponge=True),
            "dev-mars-gray-flat-sponge-implicit": functools.partial(
-               mars_gray_flat_dev, sponge=True, implicit_surface=True, days=60)}
+               mars_gray_flat_dev, sponge=True, implicit_surface=True, days=60),
+           "dev-mars-gray-flat-bl": functools.partial(
+               mars_gray_flat_dev, boundary_layer=True, days=60),
+           "dev-mars-gray-flat-bl-most": functools.partial(
+               mars_gray_flat_dev, monin_obukhov=True, days=60)}

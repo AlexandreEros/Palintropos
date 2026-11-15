@@ -71,6 +71,10 @@
       }
     ],
     "excluded": {
+      "tropoi.physics.monin_obukhov.stable_mix": "Isca's free-atmosphere stable mixing factor; grey-Mars leaves free_atm_diff off so nothing calls it, but it is part of the referenced formulation and its published checksum is the exact test of the stable branch",
+      "tropoi.physics.monin_obukhov_cuda.clear_cache": "drops the compiled RawKernel so a test can force recompilation; no workflow starts here",
+      "tropoi.physics.monin_obukhov_cuda.kernel_available": "capability probe for callers and tests deciding whether the fused path can run; no workflow starts here",
+      "tropoi.physics.monin_obukhov_cuda.surface_drag_fused": "reached through the BoundaryLayerDiffusion._drag indirection, chosen at construction by the fused_kernel option (an attribute call static analysis does not follow)",
       "tropoi.physics.radiation.gray.isca_mars_longwave": "gray Mars longwave optical-depth profile; no caller in the package; used by tests",
       "tropoi.physics.radiation.gray.isca_mars_shortwave": "gray Mars shortwave optical-depth profile; no caller in the package; used by tests",
       "tropoi.physics.radiation.gray.schneider_liu_longwave": "gray longwave optical-depth profile (Schneider & Liu 2009); no caller in the package; used by tests and tools/radiation/regimes.py",
@@ -93,7 +97,7 @@
     }
   },
   "discovered": {
-    "classes": 212,
+    "classes": 216,
     "cli_handlers": {
       "cli-capsule-command": "tropoi.cli.capsule._command",
       "cli-gen": "tropoi.cli.main._cmd_gen",
@@ -113,6 +117,18 @@
       ],
       "tropoi.physics.column.thin_atmosphere_surface_pressure_pa": [
         "tropoi.physics.column.thin_atmosphere_surface_pressure_pa"
+      ],
+      "tropoi.physics.monin_obukhov.stable_mix": [
+        "tropoi.physics.monin_obukhov.stable_mix"
+      ],
+      "tropoi.physics.monin_obukhov_cuda.clear_cache": [
+        "tropoi.physics.monin_obukhov_cuda.clear_cache"
+      ],
+      "tropoi.physics.monin_obukhov_cuda.kernel_available": [
+        "tropoi.physics.monin_obukhov_cuda.kernel_available"
+      ],
+      "tropoi.physics.monin_obukhov_cuda.surface_drag_fused": [
+        "tropoi.physics.monin_obukhov_cuda.surface_drag_fused"
       ],
       "tropoi.physics.radiation.gray.isca_mars_longwave": [
         "tropoi.physics.radiation.gray.isca_mars_longwave"
@@ -217,16 +233,16 @@
         "tropoi.temporal.hooks.rk4_real_axis_limit"
       ]
     },
-    "functions": 1688,
-    "modules": 167,
+    "functions": 1725,
+    "modules": 171,
     "packages": 25
   },
   "limits": {
     "call_sites": {
-      "builtin": 3689,
-      "external": 2456,
-      "internal": 2946,
-      "unresolved": 3690
+      "builtin": 3751,
+      "external": 2495,
+      "internal": 3015,
+      "unresolved": 3863
     },
     "dynamic_import_sites": {
       "tropoi.representation.archive.writer": 1
@@ -573,14 +589,14 @@
         ]
       }
     },
-    "classes": 212,
+    "classes": 216,
     "classes_in_inheritance_overview": 21,
     "containment": {
-      "class": 212,
-      "module": 98,
+      "class": 216,
+      "module": 100,
       "package": 22
     },
-    "modules": 167,
+    "modules": 171,
     "package_pages": 25
   },
   "rules": {
@@ -591,6 +607,6 @@
   },
   "scope_file": {
     "path": "docs/architecture/entry-points.toml",
-    "sha256": "efd0a3f141985265980cfca15c1c02414f5df5e67a4cf0f136de29a160420c05"
+    "sha256": "68523b1901b3c65bd104a5d9ac6c1263251246d81383e89a1e860b028da6b13e"
   }
 }

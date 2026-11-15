@@ -30,3 +30,13 @@ and the [preservation record](../../validation/run_archive_2026-11-12/README.md)
   and [Ui](dev-mars-gray-flat-sponge-implicit-T21L25-60d-63d05a2-t4/README.md): the sponge
   rerun with a backward-Euler surface exchange, 60 days on a T4. N1 and M2-M4 met; M1, M5
   and M6 not met (M1 and M6 against the prediction).
+- [Boundary-layer run Hb](dev-mars-gray-flat-bl-heated-T21L25-60d-06f5356-l4/README.md) and
+  [Ub](dev-mars-gray-flat-bl-T21L25-60d-06f5356-l4/README.md): the §2e boundary layer in
+  place of both substitutes, FHZ06-simplified, 60 days on an L4. N1 and M2-M4 met; M1, M5,
+  M6 and M7 not met.
+- [Monin-Obukhov run Hm](dev-mars-gray-flat-bl-most-heated-T21L25-60d-8e98d7b-t4/README.md) and
+  [Um](dev-mars-gray-flat-bl-most-T21L25-60d-8e98d7b-t4/README.md): Hb/Ub with the surface
+  exchange and diffusivity switched to the full Monin-Obukhov forms, 60 days on a T4. A
+  measurement, not a judged experiment: no criterion was registered before it. The scheme
+  leaves the climate, the energy budget and the mass drift where FHZ06 left them
+  ([MONIN_OBUKHOV.md](../MONIN_OBUKHOV.md) §10).
