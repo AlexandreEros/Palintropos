@@ -5503,6 +5503,11 @@
     {
       "kind": "call",
       "source": "tropoi.representation.visual.snapshot.build_resources",
+      "target": "tropoi.representation.visual.snapshot._recorded_transform_backend"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.snapshot.build_resources",
       "target": "tropoi.temporal.models.build_pe_model"
     },
     {
@@ -7423,6 +7428,11 @@
     {
       "kind": "call",
       "source": "tropoi.run.held_suarez.experiment.HeldSuarezRun._resume",
+      "target": "tropoi.run.held_suarez.experiment.stored_transform_identity"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.held_suarez.experiment.HeldSuarezRun._resume",
       "target": "tropoi.run.held_suarez.experiment.transform_identity"
     },
     {
@@ -8254,6 +8264,11 @@
       "kind": "instantiate",
       "source": "tropoi.run.radiative.experiment.RadiativeRun._resume",
       "target": "tropoi.run.held_suarez.experiment.RunError"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.radiative.experiment.RadiativeRun._resume",
+      "target": "tropoi.run.held_suarez.experiment.stored_transform_identity"
     },
     {
       "kind": "call",
@@ -17952,6 +17967,13 @@
       "type": "function"
     },
     {
+      "id": "tropoi.representation.visual.snapshot._recorded_transform_backend",
+      "kind": "function",
+      "module": "tropoi.representation.visual.snapshot",
+      "qualname": "_recorded_transform_backend",
+      "type": "function"
+    },
+    {
       "id": "tropoi.representation.visual.snapshot.build_resources",
       "kind": "function",
       "module": "tropoi.representation.visual.snapshot",
@@ -20000,6 +20022,13 @@
       "kind": "function",
       "module": "tropoi.run.held_suarez.experiment",
       "qualname": "protocol_sha256",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.held_suarez.experiment.stored_transform_identity",
+      "kind": "function",
+      "module": "tropoi.run.held_suarez.experiment",
+      "qualname": "stored_transform_identity",
       "type": "function"
     },
     {

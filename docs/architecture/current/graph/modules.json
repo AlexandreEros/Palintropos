@@ -3717,7 +3717,8 @@
         "re",
         "subprocess",
         "sys",
-        "typing"
+        "typing",
+        "warnings"
       ],
       "third_party_imports": []
     },
@@ -5435,7 +5436,8 @@
       "is_package": false,
       "path": "tropoi/spatial/planet.py",
       "stdlib_imports": [
-        "typing"
+        "typing",
+        "warnings"
       ],
       "third_party_imports": [
         "cupy",

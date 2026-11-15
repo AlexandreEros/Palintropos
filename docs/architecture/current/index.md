@@ -19,7 +19,7 @@ Explore dependencies, call sites, possible dispatch, runtime observations and pr
 | [`tropoi.run`](packages/tropoi.run.md) | 2 | 0 | 2 | `README.md` |
 | [`tropoi.run.bve`](packages/tropoi.run.bve.md) | 6 | 2 | 3 | `README.md` |
 | [`tropoi.run.custom`](packages/tropoi.run.custom.md) | 7 | 12 | 15 | `INITIAL_STATES.md`, `README.md` |
-| [`tropoi.run.held_suarez`](packages/tropoi.run.held_suarez.md) | 8 | 5 | 36 | `README.md` |
+| [`tropoi.run.held_suarez`](packages/tropoi.run.held_suarez.md) | 8 | 5 | 37 | `README.md` |
 | [`tropoi.run.pe`](packages/tropoi.run.pe.md) | 5 | 1 | 2 | `GUIDE.md`, `README.md` |
 | [`tropoi.run.radiative`](packages/tropoi.run.radiative.md) | 5 | 2 | 13 | `README.md` |
 | [`tropoi.run.swe`](packages/tropoi.run.swe.md) | 5 | 1 | 2 | `README.md` |

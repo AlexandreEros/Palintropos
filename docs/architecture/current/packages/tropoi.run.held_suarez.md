@@ -12,7 +12,7 @@ Index: [all packages](../index.md) · parent [`tropoi.run`](tropoi.run.md)
 | `tropoi.run.held_suarez.__main__` | code | – | `main` |
 | `tropoi.run.held_suarez.checkpoint` | code | `CheckpointError` | `array_sha256`, `atomic_copy`, `atomic_write_bytes`, `backup_files`, `checkpoint_name`, `list_checkpoints`, `prune_checkpoints`, `read_checkpoint`, `write_checkpoint` |
 | `tropoi.run.held_suarez.config` | code | `HeldSuarezConfig` | `development_config`, `legacy_production_config`, `production_config`, `smoke_config` |
-| `tropoi.run.held_suarez.experiment` | code | `HeldSuarezRun`, `RunError` | `benchmark`, `code_identity`, `daily_sample`, `environment_identity`, `protocol_sha256`, `transform_identity` |
+| `tropoi.run.held_suarez.experiment` | code | `HeldSuarezRun`, `RunError` | `benchmark`, `code_identity`, `daily_sample`, `environment_identity`, `protocol_sha256`, `stored_transform_identity`, `transform_identity` |
 | `tropoi.run.held_suarez.model` | code | – | `build_model`, `build_physics`, `build_stepper`, `initial_state`, `perturbation_coefficients` |
 | `tropoi.run.held_suarez.report` | code | – | `build_report`, `config_mismatches`, `load_run`, `reference_summary`, `reference_tier_b`, `render_markdown`, `tier_a`, `tier_b`, `tier_c`, `worst`, `write_report` |
 | `tropoi.run.held_suarez.statistics` | code | `OnlineStatistics` | – |
