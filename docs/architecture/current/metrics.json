@@ -1,13 +1,13 @@
 {
   "atlas": {
-    "call_edges": 2284,
+    "call_edges": 2285,
     "call_sites_omitted_by_cap": 32,
-    "call_sites_recorded": 3020,
+    "call_sites_recorded": 3021,
     "import_edges": 457,
     "import_sites_omitted_by_cap": 0,
     "import_sites_recorded": 517,
     "max_sites_per_edge": 8,
-    "nodes": 2132,
+    "nodes": 2133,
     "proposal": {
       "call_edges_by_direction": {
         "downward": 412,
@@ -50,7 +50,7 @@
       "import_group_cycles_without_exceptions": [],
       "members": {
         "analysis": 663,
-        "archive": 181,
+        "archive": 182,
         "cli": 65,
         "dynamics": 119,
         "integration": 92,
@@ -149,24 +149,24 @@
         "sha256": "1dcfeb9400fd06152e45cd607c8648f54d8fa8f41c02b0fcd8ee9310a03c28a4"
       }
     ],
-    "source_lines_embedded": 17923
+    "source_lines_embedded": 17926
   },
   "call_graph": {
     "call_sites": {
-      "builtin": 3797,
+      "builtin": 3800,
       "external": 2541,
-      "internal": 3043,
-      "unresolved": 3901
+      "internal": 3044,
+      "unresolved": 3902
     },
     "edges_by_kind": {
-      "call": 1358,
+      "call": 1359,
       "constructor": 66,
       "instantiate": 515,
       "override": 6,
       "self": 335,
       "super": 4
     },
-    "nodes": 1960,
+    "nodes": 1961,
     "scoped": {
       "cli-capsule-command": {
         "edges": 21,
@@ -242,7 +242,7 @@
         "edges": 60,
         "max_depth": 4,
         "nodes": 45,
-        "reachable_nodes_unbounded": 217,
+        "reachable_nodes_unbounded": 218,
         "roots": [
           "tropoi.cli.main._cmd_run_bve"
         ],
@@ -252,7 +252,7 @@
         "edges": 66,
         "max_depth": 4,
         "nodes": 57,
-        "reachable_nodes_unbounded": 179,
+        "reachable_nodes_unbounded": 180,
         "roots": [
           "tropoi.cli.main._cmd_run_pe"
         ],
@@ -262,7 +262,7 @@
         "edges": 120,
         "max_depth": 4,
         "nodes": 83,
-        "reachable_nodes_unbounded": 219,
+        "reachable_nodes_unbounded": 220,
         "roots": [
           "tropoi.cli.main._cmd_run_swe"
         ],
@@ -282,7 +282,7 @@
         "edges": 212,
         "max_depth": 4,
         "nodes": 135,
-        "reachable_nodes_unbounded": 253,
+        "reachable_nodes_unbounded": 254,
         "roots": [
           "tropoi.run.custom.execute.run_initial_state",
           "tropoi.run.custom.presets.initial_state_from_preset",
@@ -1229,7 +1229,7 @@
     "package": "tropoi",
     "src": "src",
     "working_tree": {
-      "base_commit": "a08a5801b88d03d42ca8108d1573c5e9e645569e",
+      "base_commit": "4276dcae23ae23fcc83c28164d19d46a6b2fe80e",
       "generator": {
         "changes": [],
         "files": {
@@ -1300,7 +1300,7 @@
           "src/tropoi/representation/archive/pe_context.py": "a51cf51f6fa1955644c39abcf647ad43cb0f9a10709549e5f8a9e28ec197a173",
           "src/tropoi/representation/archive/prepared_terrain.py": "915687438a9b03f0881e1182c6635f1dec8c6ee9d0e8816bce3cfd1ba4fc8b83",
           "src/tropoi/representation/archive/schema.py": "db53f5138caeee6d969508f0bd3f64e98bde23a86494a6c0cb7dcdc240ba6487",
-          "src/tropoi/representation/archive/writer.py": "0642d754f9572f63fa962a092662a99814791f467f1f9b5a924a2b0bdb4c87a8",
+          "src/tropoi/representation/archive/writer.py": "db10a0f4c144ffadb9642099832f726e9b5d53b586eaa59c20b99cbd541d793a",
           "src/tropoi/representation/diagnostics/__init__.py": "29950032dc1573f806bc05c980b6ee2c0fa5677cab03425dee607454b82e44b8",
           "src/tropoi/representation/diagnostics/bve.py": "a4b0b6a8c492413f48459a3f8eb1b7c238df93e82ec4d2dbed5ecd04c7c89a0e",
           "src/tropoi/representation/diagnostics/held_suarez_sections.py": "3ceeca2da162b25bae2b618bff343cdd7d010943089df2545dc8cc875d3d2ec5",
@@ -1438,7 +1438,7 @@
           "src/tropoi/temporal/tendencies/primitive_equations.py": "848c6fe9406a7c1c465c0aa9459760b01c542164c8cc9395797a3c4a60793e52",
           "src/tropoi/temporal/tendencies/shallow_water.py": "7ae521f2378824e89f88bc467fc99321d1ef4224b037c865137e076a601da3c8"
         },
-        "sha256": "c6c914fe69292ca2e3428cf615713f10fd09c075752cf4f470febfec159571df",
+        "sha256": "015af22caf9108c56f38f3f3ec499f1bae262b2bce204511f4ebe08bea9a5dad",
         "status": "clean"
       }
     }
