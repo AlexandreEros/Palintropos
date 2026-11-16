@@ -37,8 +37,12 @@ normalization and the `C±` recurrence are in
 - `"coarse"`: on the state sampling itself. Whether that aliases depends
   on the grid. A Gauss state grid that already meets the 3/2 rule
   (`nlon >= 3L+1`, `nlat >= ceil((3L+1)/2)`) analyzes quadratic products
-  exactly; the default lat–lon grid (128×256 at `L = 21`) does. A smaller
-  Gauss grid, or any geodesic grid, lets aliasing reach the kept band.
+  exactly — and the **default** lat–lon grid always does, at every
+  truncation, because `truncation.gauss_grid_for_truncation` sizes it by
+  that very rule (`L = 21` → 32×64, `L = 42` → 64×128). A grid sized below
+  it explicitly, or any geodesic grid, lets aliasing reach the kept band;
+  the Held–Suarez experiment is the deliberate case (`L = 43` on 64×128,
+  which relies on `"fine"`).
 - `"fine"`: on an overresolved sampling chosen by the backend. Gauss uses a
   grid of at least the 3/2-rule size (the larger of that and the state
   grid), which is exact for quadratic products. Geodesic uses a

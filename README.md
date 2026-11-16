@@ -127,13 +127,18 @@ Details: [SHALLOW_WATER.md](src/tropoi/temporal/tendencies/SHALLOW_WATER.md),
 **Two grids, one coefficient layout.** Every core runs on either grid, chosen
 with `--backend`:
 
-- **`gauss-latlon`: the reference grid.** A Gauss–Legendre latitude–longitude
-  grid. It transforms band-limited fields exactly to floating-point precision:
-  in one measured round trip at `L = 21`, the relative L2 residual was
-  ≈ 7 × 10⁻¹⁵.
-- **`geodesic` (default): experimental.** An icosahedral grid. Its quadrature
-  is approximate and depends on how the grid is oriented: the same round trip
-  left a residual of ≈ 1 × 10⁻².
+- **`gauss-latlon` (default): the reference grid.** A Gauss–Legendre
+  latitude–longitude grid. It transforms band-limited fields exactly to
+  floating-point precision: in one measured round trip at `L = 21`, the
+  relative L2 residual was ≈ 7 × 10⁻¹⁵. Its `--nlat`/`--nlon` default to the
+  sizing for `--l-max` (the 3/2 quadratic rule, even `nlat`, `nlon = 2·nlat`,
+  so `L = 21` → 32×64 and `L = 42` → 64×128); giving either one overrides it.
+- **`geodesic`: deprecated, experimental.** An icosahedral grid. Its
+  quadrature is approximate and depends on how the grid is oriented: the same
+  round trip left a residual of ≈ 1 × 10⁻². Its unstructured points admit no
+  separable transform either, so every transform on it is a dense
+  basis-matrix product. It is retained and selectable (`--backend geodesic`,
+  which warns) for the validation work that uses it, never implicitly.
 
 ## Install
 

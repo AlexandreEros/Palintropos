@@ -27,18 +27,48 @@ relies on:
 | `GeodesicGridGeometry` (`geodesic_grid.py`) | **Deprecated** (see below). Subdivided icosahedron, `10·4^r + 2` vertices, rotated 0.01 rad about x so no vertex sits on a pole | Each spherical triangle (L'Huilier excess) gives a third of its area to each vertex; the code calls these "Voronoi" areas. They sum to exactly `4πR²` | Approximate and orientation-dependent | Shortest edge (chord length) |
 | `GaussLatLonGridGeometry` (`latlon_grid.py`) | Gauss–Legendre latitudes in `sin(lat)` × uniform periodic longitudes; no pole rows | Gauss weights × `2π/nlon` | Exact for band-limited analysis when `nlat >= L+1`, `nlon >= 2L+1`; for quadratic products at the 3/2 rule | `R · min Δcolatitude` |
 
-`GeodesicGridGeometry` is **deprecated** and raises a
-`DeprecationWarning` when `Planet.generate` builds one. Its sampling is
-unstructured, so it admits no separable transform: every transform on it is
-a dense basis-matrix product, with no faster path available even in
-principle. Its quadrature is approximate and orientation-dependent, and its
-nonlinear products use overresolved rather than exact quadrature
-(`docs/validation/r3_characterization.md`). Prefer
-`GaussLatLonGridGeometry`. It is kept, not removed, because presets and
-published runs were measured on it and must stay reproducible — including
-the `rh4` and `two-vortices-quick` BVE presets, which inherit it from
-`BASE_DEFAULTS["grid"]` and whose pinned config hashes would change if that
-default moved.
+`GaussLatLonGridGeometry` is **the default** for every core (BVE, SWE, PE)
+and for `Planet.generate`.
+
+`GeodesicGridGeometry` is **deprecated** and raises a `DeprecationWarning`
+when `Planet.generate` builds one. Its sampling is unstructured, so it
+admits no separable transform: every transform on it is a dense
+basis-matrix product, with no faster path available even in principle. Its
+quadrature is approximate and orientation-dependent, and its nonlinear
+products use overresolved rather than exact quadrature
+(`docs/validation/r3_characterization.md`).
+
+It is **retained, never implicit**. It is reachable only by asking for it
+(`--backend geodesic`, `grid_type="geodesic"`), and it is kept for one
+concrete purpose: the resolution-3 product-quadrature characterization
+(`tests/audit_r3_product.py` with `docs/validation/r3_characterization.md`)
+and the exact mass-conservation check on that backend
+(`tests/test_swe_runner.py`). No preset selects it any more. Capsules
+recorded on it are still readable — a saved configuration predating the
+`grid` key is read as geodesic (`temporal.models.LEGACY_GRID_TYPE`) — but a
+run that must reproduce bit-for-bit is reproduced from the commit its
+manifest records, not by keeping obsolete defaults alive.
+
+## Default sizing
+
+When a caller names no `nlat`/`nlon`, they come from the truncation:
+`truncation.gauss_grid_for_truncation(l_max)` applies the **3/2 quadratic
+rule** with an even latitude count and `nlon = 2·nlat` —
+
+    nlat = ceil((3·l_max + 1) / 2) rounded up to even,   nlon = 2·nlat
+
+so `l_max = 8 → 14×28`, `10 → 16×32`, `21 → 32×64`, `42 → 64×128`. This
+reproduces the resolutions already in production use. By construction it
+satisfies analysis exactness (`nlat ≥ l_max+1`, `nlon ≥ 2·l_max+1`), the
+3/2 rule (`nlon ≥ 3·l_max+1`) and separable applicability
+(`2·l_max < nlon`) at every truncation, so the default grid never forces
+the default evaluator onto its dense fallback.
+
+It is a **sizing policy, not a correctness contract**: dimensions given
+explicitly always win, and a configuration below it is not thereby wrong —
+it forfeits state-grid quadratic exactness and leans on the finer product
+grid instead, which is what the Held–Suarez experiment does at
+`l_max = 43` on 64×128.
 
 `latlon_grid.py` also defines `GaussLatLonSphericalHarmonics`, the
 production Gauss transform: the shared GPU matrix transform fed with these
