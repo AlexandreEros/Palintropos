@@ -57,8 +57,51 @@ def build_sigma(cfg: RadiativeConfig) -> SigmaGrid:
     raise ValueError(f"unknown vertical grid kind {kind!r}")
 
 
-def _longwave(spec: dict):
+def _correlated_k(spec: dict, cfg: RadiativeConfig, stream: str):
+    """A correlated-k provider from named k-tables.
+
+    ``{"kind": "correlated_k", "tables": [{"file": ..., "sha256": ...}, ...],
+    "mass_fractions": {species: q}, "bounds": "error"}``, plus
+    ``"diffusivity"`` (thermal) or ``"stellar_temperature"`` /
+    ``"band_fractions"`` (stellar). Tables are located and their content
+    hashes checked by :mod:`tropoi.physics.radiation.tables`; a state
+    outside a table is an error unless ``bounds`` is ``"clamp"``. A
+    premixed table must have been mixed for the model's own gas
+    (``cfg.gas_constant``), so the radiative and the bulk composition
+    cannot drift apart.
+    """
+    from tropoi.physics.radiation.kdist import CorrelatedKLongwave, CorrelatedKShortwave
+    from tropoi.physics.radiation.tables import check_premixed, load_table
+    extra = ({"diffusivity": 1.66} if stream == "longwave"
+             else {"stellar_temperature": None, "band_fractions": None})
+    o = _options(spec, "tables", "mass_fractions", bounds="error", **extra)
+    if not isinstance(o["tables"], (list, tuple)) or not o["tables"]:
+        raise ValueError("correlated_k: 'tables' must be a non-empty list")
+    tables = [load_table(t) for t in o["tables"]]
+    fractions = {str(k): float(v) for k, v in dict(o["mass_fractions"]).items()}
+    unused = sorted(set(fractions) - {t.species for t in tables})
+    if unused:
+        raise ValueError(f"correlated_k: mass fractions given for {unused}, which no "
+                         f"table provides (tables: {[t.species for t in tables]})")
+    check_premixed(tables, fractions, gas_constant=cfg.gas_constant)
+    if stream == "longwave":
+        return CorrelatedKLongwave(tables, fractions, gravity=cfg.gravity,
+                                   bounds=o["bounds"], diffusivity=o["diffusivity"])
+    if o["band_fractions"] is None and o["stellar_temperature"] is None:
+        raise ValueError("correlated_k shortwave needs 'stellar_temperature' (blackbody "
+                         "star) or 'band_fractions'")
+    kw = {} if o["stellar_temperature"] is None else {
+        "stellar_temperature": float(o["stellar_temperature"])}
+    if o["band_fractions"] is not None:
+        kw["band_fractions"] = np.asarray(o["band_fractions"], dtype=np.float64)
+    return CorrelatedKShortwave(tables, fractions, gravity=cfg.gravity, bounds=o["bounds"],
+                                **kw)
+
+
+def _longwave(spec: dict, cfg: Optional[RadiativeConfig] = None):
     kind = spec["kind"]
+    if kind == "correlated_k":
+        return _correlated_k(spec, cfg, "longwave")
     if kind == "frierson":
         return frierson_longwave(**_options(spec, tau_equator=6.0, tau_pole=1.5,
                                             linear_fraction=0.1))
@@ -70,10 +113,12 @@ def _longwave(spec: dict):
     raise ValueError(f"unknown longwave kind {kind!r}")
 
 
-def _shortwave(spec: Optional[dict]):
+def _shortwave(spec: Optional[dict], cfg: Optional[RadiativeConfig] = None):
     if spec is None:
         return None
     kind = spec["kind"]
+    if kind == "correlated_k":
+        return _correlated_k(spec, cfg, "shortwave")
     if kind == "transparent":
         _options(spec)
         return GrayShortwave(OpticalDepthProfile([(1.0, 1.0)], equator=0.0))
@@ -96,7 +141,7 @@ def _shortwave(spec: Optional[dict]):
 
 
 def build_radiation(cfg: RadiativeConfig) -> Radiation:
-    return Radiation(_longwave(cfg.longwave), _shortwave(cfg.shortwave),
+    return Radiation(_longwave(cfg.longwave, cfg), _shortwave(cfg.shortwave, cfg),
                      source=cfg.thermal_source)
 
 
