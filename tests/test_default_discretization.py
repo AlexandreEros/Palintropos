@@ -205,6 +205,10 @@ def test_every_bve_preset_lands_on_the_default_grid():
 
 
 def test_planet_generate_defaults_to_latlon_and_derived_dimensions():
+    # Importing Planet pulls in CuPy. The assertions need only the module,
+    # not a device, so this skips on the CPU-only CI rather than requiring
+    # CUDA.
+    pytest.importorskip("cupy")
     from tropoi.spatial.planet import Planet
     sig = inspect.signature(Planet.generate)
     assert sig.parameters["grid_type"].default == "latlon"
@@ -214,6 +218,7 @@ def test_planet_generate_defaults_to_latlon_and_derived_dimensions():
 
 
 def test_the_default_evaluator_is_separable():
+    pytest.importorskip("cupy")   # latlon_grid imports CuPy; no device needed
     from tropoi.spatial.grids.latlon_grid import default_transform_backend
     assert default_transform_backend() == "separable"
 
@@ -265,6 +270,47 @@ def test_the_default_grid_uses_the_separable_evaluator_without_falling_back(l_ma
         warnings.simplefilter("error", DeprecationWarning)
         sh = GaussLatLonSphericalHarmonics(grid, l_max)
     assert sh.transform_backend == "separable"
+
+
+@requires_cuda
+def test_a_field_on_the_default_grid_renders_through_the_planet_viewer():
+    """The default grid must be *plottable*, not merely correct.
+
+    `PlanetViewer.plot_scalar` takes the flat (n_points,) array the
+    transforms produce and, for a structured grid, hands it to `imshow`,
+    which needs (nlat, nlon). Nothing caught this when lat-lon became the
+    default: the geodesic path interpolates onto a 2-D view grid first, and
+    the one existing `plot_scalar` call in the suite sits inside a
+    try/except that only prints. Bare `tropoi gen` failed on an invalid
+    image shape.
+    """
+    pytest.importorskip("matplotlib")
+    import matplotlib
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+    import cupy as cp
+    from tropoi.spatial.grids.latlon_grid import (
+        GaussLatLonGridGeometry, GaussLatLonSphericalHarmonics)
+    from tropoi.representation.visual.planet_viewer import PlanetViewer
+
+    l_max = 10
+    nlat, nlon = gauss_grid_for_truncation(l_max)
+    grid = GaussLatLonGridGeometry(nlat, nlon, 6.371e6)
+    sh = GaussLatLonSphericalHarmonics(grid, l_max)
+
+    field = sh.inv_transform(_real_field_coeffs(l_max, seed=4))
+    assert field.ndim == 1 and field.size == nlat * nlon, (
+        "a transform returns a flat lat-major field; this test is only "
+        "meaningful while that is true")
+
+    fig, ax = plt.subplots(1, 1)
+    try:
+        PlanetViewer.plot_scalar(field, grid, title="default grid", ax=ax)
+        image = [a for a in ax.get_images()]
+        assert image, "no image was drawn"
+        assert image[0].get_array().shape == (nlat, nlon)
+    finally:
+        plt.close(fig)
 
 
 @requires_cuda
