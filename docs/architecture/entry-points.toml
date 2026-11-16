@@ -119,6 +119,14 @@ function = "tropoi.run.radiative.config.mars_gray_flat_dev"
 reason = "reached by name through the run.radiative.config.PRESETS registry (a dict lookup static analysis does not follow)"
 
 [[excluded]]
+function = "tropoi.run.radiative.config.thai_dry_dev"
+reason = "reached by name through the run.radiative.config.PRESETS registry (a dict lookup static analysis does not follow)"
+
+[[excluded]]
+function = "tropoi.physics.radiation.tables.table_spec"
+reason = "returns the configuration entry (file and content hash) that pins a stored k-table; no caller in the package; used by tests and by whoever writes a configuration"
+
+[[excluded]]
 function = "tropoi.physics.radiation.gray.schneider_liu_longwave"
 reason = "gray longwave optical-depth profile (Schneider & Liu 2009); no caller in the package; used by tests and tools/radiation/regimes.py"
 
