@@ -8,6 +8,8 @@ from tropoi.run.bve.config import (
     DEFAULT_N_SNAPSHOTS,
 )
 
+from tropoi.spatial.truncation import gauss_grid_for_truncation
+
 from .conftest import (
     ADDITIVE_CONFIG_KEYS,
     LEGACY_CONFIG_KEYS,
@@ -24,14 +26,22 @@ def test_canonical_default_is_count_mode_n5(stub_execute_run):
         0.0, 21600.0, 43200.0, 64800.0, 86400.0]
 
 
-def test_defaults_match_legacy_psx_bve_values(stub_execute_run):
+def test_default_config_dict(stub_execute_run):
+    """The config dict a bare `tropoi run bve` emits.
+
+    The key *set* is still the frozen historical one (it feeds make_run_id
+    and the on-disk config.json schema); the grid values are not --
+    lat-lon is the default and its dimensions come from lmax.
+    """
     cfg = run_tropoi_stubbed(["run", "bve"], stub_execute_run)
     d = cfg.to_run_config_dict()
     assert set(d) == LEGACY_CONFIG_KEYS | ADDITIVE_CONFIG_KEYS
     assert d["lmax"] == 21
-    assert d["grid"] == "geodesic"
+    assert d["grid"] == "latlon"
+    assert d["nlat"] == 32 and d["nlon"] == 64
+    assert (d["nlat"], d["nlon"]) == gauss_grid_for_truncation(d["lmax"])
+    # resolution is inert on lat-lon but still recorded, unchanged.
     assert d["resolution"] == 4
-    assert d["nlat"] == 128 and d["nlon"] == 256
     assert d["day_hours"] == float("inf")
     assert d["duration_days"] == 1.0
     assert d["scenario"] == "two_vortices"

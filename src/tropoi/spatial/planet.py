@@ -12,6 +12,7 @@ from tropoi.spatial.environment import PlanetaryParameters
 from tropoi.spatial.terrain.elevation_data import ElevationData
 from tropoi.spatial.terrain.terrain_spectral import generate_spectral_terrain_gpu, SpectralTerrainParams
 from tropoi.spatial.terrain.tectonics import TectonicParams
+from tropoi.spatial.truncation import gauss_grid_for_truncation
 
 class Planet:
     """
@@ -53,9 +54,9 @@ class Planet:
                  tectonic_params: Optional[TectonicParams] = None,
                  l_max: int = 15,
                  product_quadrature: str = "fine",
-                 grid_type: str = "geodesic",
-                 nlat: int = 128,
-                 nlon: int = 256,
+                 grid_type: str = "latlon",
+                 nlat: Optional[int] = None,
+                 nlon: Optional[int] = None,
                  transform_backend: str | None = None) -> 'Planet':
         """
         product_quadrature : {"fine", "coarse"}
@@ -66,30 +67,43 @@ class Planet:
             a 3/2-rule Gauss-Legendre grid (exact product quadrature).
             "coarse" retains the historical state-grid product path for
             A/B comparisons.
-        grid_type : {"geodesic", "latlon"}
-            Grid family. "geodesic" (still the signature default, for the
-            historical configurations that depend on it) uses
-            `grid_resolution`; "latlon" uses `nlat`/`nlon` (Gauss-Legendre
-            latitudes, uniform longitudes). Unknown values raise (no silent
-            fallback).
+        grid_type : {"latlon", "geodesic"}
+            Grid family. "latlon" (**the default**) is the Gauss-Legendre
+            lat-lon grid -- Gauss latitudes, uniform longitudes -- sized by
+            `nlat`/`nlon`; "geodesic" uses `grid_resolution`. Unknown values
+            raise (no silent fallback).
 
             "geodesic" is **deprecated** and warns: its unstructured points
             admit no separable transform, so every transform on it is a
             dense basis-matrix product, and its product quadrature is
-            overresolved rather than exact. It is kept because the
-            presets and published runs that were measured on it must stay
-            reproducible.
-        transform_backend : {"dense", "separable"}, optional
-            Which evaluator the "latlon" grid pairs with: the historical
-            dense basis matrix (the default and the numerical reference) or
-            the separable FFT+Legendre path, which is much faster but agrees
-            only to round-off. Ignored by "geodesic", whose unstructured
-            points cannot factorize. None takes
+            overresolved rather than exact. It is retained, never implicit,
+            for the one validation purpose that needs it (the resolution-3
+            product-quadrature characterization in
+            docs/validation/r3_characterization.md, and the exact
+            mass-conservation check on that backend) and so that published
+            runs measured on it can be replayed from their own commits.
+        nlat, nlon : int, optional
+            Gauss lat-lon dimensions. None (the default) sizes them from
+            `l_max` with
+            :func:`~tropoi.spatial.truncation.gauss_grid_for_truncation`
+            (the 3/2 quadratic rule, even `nlat`, `nlon = 2 nlat`); an
+            explicit value overrides it. Ignored by "geodesic".
+        transform_backend : {"separable", "dense"}, optional
+            Which evaluator the "latlon" grid pairs with: the separable
+            FFT+Legendre path (**the default**), or the historical dense
+            basis matrix, retained as the numerical reference and as the
+            fallback for grids that cannot factorize. The two agree to
+            round-off. Ignored by "geodesic", whose unstructured points
+            cannot factorize. None takes
             `latlon_grid.default_transform_backend()`, i.e. "separable"
             unless TROPOI_SH_BACKEND says otherwise. Recorded in run
-            manifests either way; choosing "dense" warns, since it is
+            manifests either way; landing on "dense" warns, since it is
             deprecated.
         """
+        if nlat is None or nlon is None:
+            derived_nlat, derived_nlon = gauss_grid_for_truncation(l_max)
+            nlat = derived_nlat if nlat is None else nlat
+            nlon = derived_nlon if nlon is None else nlon
         if terrain_params is None:
             terrain_params = SpectralTerrainParams(
                 rms_elevation=params.radius * 0.001,  # 0.1% of radius
@@ -109,10 +123,14 @@ class Planet:
                 "unstructured points cannot factorize, so every transform "
                 "on it is a dense basis-matrix product with no separable "
                 "path available, and its nonlinear products use "
-                "overresolved rather than exact quadrature. Prefer "
+                "overresolved rather than exact quadrature. "
                 "grid_type='latlon' (Gauss-Legendre latitudes, uniform "
-                "longitudes). The geodesic path is kept so the presets and "
-                "published runs measured on it stay reproducible.",
+                "longitudes) is the default. The geodesic path is retained, "
+                "never implicit, for the validation work that needs it (the "
+                "resolution-3 product-quadrature characterization in "
+                "docs/validation/r3_characterization.md and the exact "
+                "mass-conservation check on that backend) and so that "
+                "capsules recorded on it can still be read.",
                 DeprecationWarning, stacklevel=2)
             grid = GeodesicGridGeometry(grid_resolution, params.radius)
             sh = GeodesicSphericalHarmonics(grid, l_max)

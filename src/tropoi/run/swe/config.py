@@ -31,8 +31,8 @@ from tropoi.temporal.integration import (SECONDS_PER_DAY, _require_finite_number
 from tropoi.run.bve.config import (GRID_TYPES, MIN_NLAT, MIN_NLON,
                           scientific_config_subset)
 from tropoi.spatial.truncation import (  # noqa: F401  (re-exports)
-    SWE_SCENARIO_SUPPORT, _min_lmax_retaining, product_truncation_cut,
-    require_scenario_support)
+    SWE_SCENARIO_SUPPORT, _min_lmax_retaining, gauss_grid_for_truncation,
+    product_truncation_cut, require_scenario_support)
 # The Williamson (1992) case-5 constants are the benchmark's prescribed
 # world; they live (verbatim, stdlib-only) in tropoi.spatial.williamson5.
 from tropoi.spatial.williamson5 import (  # noqa: F401  (re-exports)
@@ -115,12 +115,15 @@ _MOUNTAIN_PARAM_FIELDS = ("mountain_height_m", "mountain_lat_deg",
 
 _MAX_T_END_SECONDS = 1e12
 
+#: ``nlat``/``nlon`` are ``None`` = "size from ``lmax``" via
+#: :func:`~tropoi.spatial.truncation.gauss_grid_for_truncation`; a value
+#: from the user or a preset overrides it.
 SWE_BASE_DEFAULTS: dict = {
     "lmax": 21,
-    "grid": "geodesic",
+    "grid": "latlon",
     "resolution": 4,
-    "nlat": 128,
-    "nlon": 256,
+    "nlat": None,
+    "nlon": None,
     "day_hours": DEFAULT_DAY_HOURS,
     "radius_earth_units": 1.0,
     "duration_days": 1.0,
@@ -143,10 +146,10 @@ class SWERunConfig:
     """Fully resolved configuration for one shallow-water run."""
 
     lmax: int = 21
-    grid: str = "geodesic"
+    grid: str = "latlon"
     resolution: int = 4
-    nlat: int = 128
-    nlon: int = 256
+    nlat: Optional[int] = None
+    nlon: Optional[int] = None
     day_hours: float = DEFAULT_DAY_HOURS
     radius_earth_units: float = 1.0
     duration_days: float = 1.0
@@ -173,6 +176,16 @@ class SWERunConfig:
             raise ValueError(f"lmax must be >= 1, got {self.lmax}")
         if self.resolution < 0:
             raise ValueError(f"resolution must be >= 0, got {self.resolution}")
+
+        # Grid dimensions come from the truncation unless the caller named
+        # them (see BVERunConfig.__post_init__ for the full rationale).
+        if self.nlat is None or self.nlon is None:
+            derived_nlat, derived_nlon = gauss_grid_for_truncation(self.lmax)
+            if self.nlat is None:
+                object.__setattr__(self, "nlat", derived_nlat)
+            if self.nlon is None:
+                object.__setattr__(self, "nlon", derived_nlon)
+
         if self.grid == "latlon":
             if self.nlat < MIN_NLAT:
                 raise ValueError(

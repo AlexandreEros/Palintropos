@@ -99,8 +99,10 @@ def test_cli_exposes_grid_choice():
     from tropoi.run.bve.config import BVERunConfig
     parser = build_parser()
     args = parser.parse_args(["run", "bve"])
-    assert BVERunConfig.resolve({"grid": args.grid}).grid == "geodesic"
+    assert args.grid is None            # the CLI supplies no default
+    assert BVERunConfig.resolve({"grid": args.grid}).grid == "latlon"
     assert parser.parse_args(["run", "bve", "--grid", "latlon"]).grid == "latlon"
+    assert parser.parse_args(["run", "bve", "--grid", "geodesic"]).grid == "geodesic"
     with pytest.raises(SystemExit):
         parser.parse_args(["run", "bve", "--grid", "cubed-sphere"])
 
