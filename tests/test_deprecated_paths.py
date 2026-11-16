@@ -1,14 +1,18 @@
-"""The two deprecated numerical paths, and the one rule that keeps
-deprecating them from rewriting history.
+"""The two deprecated numerical paths: reachable, never implicit, loud.
 
 `"separable"` is the default evaluator of the spherical-harmonic basis and
-the geodesic grid is deprecated, but both legacy paths stay reachable: the
-dense evaluator is the numerical reference, the fallback for grids that
-cannot factorize, and the arithmetic every run recorded before the choice
-existed. So the contract is "loud, not gone" -- and a replay must follow
-the evaluator a run recorded rather than today's default, or changing the
-default would silently re-derive every saved run's diagnostics on
-different numerics.
+Gauss lat-lon is the default grid, but both legacy paths stay *reachable*:
+the dense evaluator is the numerical reference and the fallback for grids
+that cannot factorize, and the geodesic grid carries the resolution-3
+product-quadrature characterization and the exact mass-conservation check.
+So the contract is "loud, not gone" -- choosing either warns, and so does
+falling back to dense involuntarily.
+
+What is deliberately *not* tested here any more: pinning a replay to the
+evaluator a run's manifest records. A replay re-derives diagnostics on the
+current default; a run that must reproduce bit-for-bit is reproduced from
+the commit its manifest records, not by keeping obsolete arithmetic alive
+in current code.
 """
 from __future__ import annotations
 
@@ -73,37 +77,3 @@ def test_the_default_lat_lon_pairing_is_quiet():
         sh = GaussLatLonSphericalHarmonics(grid, 21)
     assert sh.transform_backend == "separable"
     assert [w for w in caught if issubclass(w.category, DeprecationWarning)] == []
-
-
-# ---------------------------------------------------------------------------
-# a replay follows the run, not the default (CPU)
-# ---------------------------------------------------------------------------
-
-class _Storage:
-    """Just the two attributes `build_resources` reads."""
-
-    def __init__(self, manifest):
-        self.manifest = manifest
-        self.solver = "bve"
-        self.run_config = {}
-
-
-@pytest.mark.parametrize("recorded", ["dense", "separable"])
-def test_a_replay_uses_the_evaluator_the_manifest_records(recorded):
-    from tropoi.representation.visual.snapshot import _recorded_transform_backend
-    storage = _Storage({"numerics": {"transform_backend": recorded}})
-    assert _recorded_transform_backend(storage) == recorded
-
-
-@pytest.mark.parametrize("manifest", [
-    {},                                     # no numerics block at all
-    {"numerics": None},                     # manifest written without one
-    {"numerics": {}},                       # numerics, but from before the choice
-    {"numerics": {"product_quadrature": "fine"}},
-])
-def test_a_run_recorded_before_the_choice_replays_on_the_dense_path(manifest):
-    """Runs predating the evaluator choice were necessarily dense, so that
-    is what reproducing their diagnostics needs -- the same legacy
-    inference as the missing ``grid`` key in temporal.models."""
-    from tropoi.representation.visual.snapshot import _recorded_transform_backend
-    assert _recorded_transform_backend(_Storage(manifest)) == "dense"

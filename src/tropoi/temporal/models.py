@@ -23,8 +23,38 @@ from __future__ import annotations
 
 from typing import Mapping
 
+# These builders take no evaluator parameter. The spherical-harmonic
+# evaluator comes from ``latlon_grid.default_transform_backend()`` (the
+# separable path, or ``TROPOI_SH_BACKEND``), with the dense fallback for
+# grids that cannot factorize. The parameter existed only so a replay could
+# be pinned to the evaluator a run's manifest recorded, i.e. to reproduce
+# obsolete numerical semantics in current code; a run that must reproduce
+# bit-for-bit is reproduced from the commit its manifest records. Callers
+# that genuinely need to choose go through ``Planet.generate`` or
+# ``GaussLatLonSphericalHarmonics`` directly.
 
-def build_planet(run_config: Mapping, *, transform_backend=None):
+#: The grid family a saved configuration that predates the ``grid`` key was
+#: necessarily run on. Kept because it has a *current* use, not to preserve
+#: old API behavior: five committed, receipted BVE capsules under
+#: ``docs/runs/`` omit ``"grid"`` and are resolution-4 geodesic runs --
+#: ``20260712T023305Z_two-vortices_rot24h_r4_l21_dt10h_501bce43`` and its
+#: three ``20260712T03*_two-vortices`` siblings, plus
+#: ``20260712T080551Z_rh4_rot24h_r4_l21_dt6h_0678ac18``. Reading them as
+#: anything else would rebuild the wrong discretization and their published
+#: figures would not reproduce. Unrelated to the *default* grid for new
+#: runs, which is lat-lon: this is how to read those old files correctly,
+#: and it stays only while they are in the repository. (The grid-less
+#: radiative capsules are not affected: that core fixes its own grid and
+#: never reaches this builder.)
+LEGACY_GRID_TYPE = "geodesic"
+
+
+def _legacy_grid_type(run_config: Mapping) -> str:
+    """``run_config``'s grid family, inferring :data:`LEGACY_GRID_TYPE`."""
+    return run_config.get("grid", LEGACY_GRID_TYPE)
+
+
+def build_planet(run_config: Mapping):
     """The BVE run's Planet (grid, transform, backend, operators).
 
     Built from the resolved run configuration dict, so the same resources
@@ -52,10 +82,9 @@ def build_planet(run_config: Mapping, *, transform_backend=None):
         grid_resolution=int(run_config["resolution"]),
         l_max=int(run_config["lmax"]),
         product_quadrature=run_config.get("product_quadrature", "fine"),
-        grid_type=run_config.get("grid", "geodesic"),
+        grid_type=_legacy_grid_type(run_config),
         nlat=int(run_config["nlat"]),
         nlon=int(run_config["nlon"]),
-        transform_backend=transform_backend,
     )
 
 
@@ -88,8 +117,7 @@ def _w5_planet_params(run_config):
         sidereal_day_s=day_hours * 3600.0)
 
 
-def build_swe_model(run_config: Mapping, *, topography_lm=None,
-                    transform_backend=None):
+def build_swe_model(run_config: Mapping, *, topography_lm=None):
     """The shallow-water model (planet + terrain + core) of a run.
 
     Built from the resolved run configuration dict — exactly the values
@@ -125,10 +153,9 @@ def build_swe_model(run_config: Mapping, *, topography_lm=None,
         grid_resolution=int(run_config["resolution"]),
         l_max=int(run_config["lmax"]),
         product_quadrature="fine",
-        grid_type=run_config.get("grid", "geodesic"),
+        grid_type=_legacy_grid_type(run_config),
         nlat=int(run_config["nlat"]),
         nlon=int(run_config["nlon"]),
-        transform_backend=transform_backend,
     )
     # Topography is reconstructed deterministically from the resolved
     # configuration (which participates in the scientific hash), so no
@@ -170,8 +197,7 @@ def build_swe_model(run_config: Mapping, *, topography_lm=None,
     return model
 
 
-def build_pe_model(run_config: Mapping, *, topography_lm=None,
-                   transform_backend=None):
+def build_pe_model(run_config: Mapping, *, topography_lm=None):
     """The primitive-equation model (planet + sigma grid + terrain) of a run.
 
     Built from the resolved run configuration dict — exactly the values
@@ -205,10 +231,9 @@ def build_pe_model(run_config: Mapping, *, topography_lm=None,
         grid_resolution=int(run_config["resolution"]),
         l_max=int(run_config["lmax"]),
         product_quadrature="fine",
-        grid_type=run_config.get("grid", "geodesic"),
+        grid_type=_legacy_grid_type(run_config),
         nlat=int(run_config["nlat"]),
         nlon=int(run_config["nlon"]),
-        transform_backend=transform_backend,
     )
     topography_kind = run_config.get("topography", "flat")
     if "terrain_digest" in run_config:
