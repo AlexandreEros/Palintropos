@@ -66,8 +66,8 @@ from typing import Mapping, Optional, Sequence
 
 from tropoi.spatial.sigma_coordinate import SigmaGrid
 from tropoi.spatial.truncation import (  # noqa: F401  (re-exports)
-    THERMAL_WAVE_MIN_RETAINED_DEGREE, product_truncation_cut,
-    require_thermal_wave_support)
+    THERMAL_WAVE_MIN_RETAINED_DEGREE, gauss_grid_for_truncation,
+    product_truncation_cut, require_thermal_wave_support)
 from tropoi.run.bve.config import (GRID_TYPES, MIN_NLAT, MIN_NLON,
                           scientific_config_subset)
 from tropoi.temporal.integration import (SECONDS_PER_DAY, _require_finite_number,
@@ -105,8 +105,9 @@ DEFAULT_SURFACE_PRESSURE = 101325.0  # Pa
 #: the perturbed temperature positive everywhere.
 DEFAULT_THERMAL_AMPLITUDE = 1.0  # K
 
-#: A deliberately tiny, stable demonstration: a coarse geodesic grid, a short
-#: fixed step, and half an hour of simulated time (six RK4 steps).
+#: A deliberately tiny, stable demonstration: the lmax-10 default grid
+#: (16 x 32), a short fixed step, and half an hour of simulated time (six
+#: RK4 steps).
 DEFAULT_NLEV = 8
 DEFAULT_DT_SECONDS = 300.0
 DEFAULT_DURATION_DAYS = 1800.0 / SECONDS_PER_DAY  # 30 minutes
@@ -162,12 +163,15 @@ _SCENARIOS_NEEDING_L2 = ("thermal_wave", "orographic_thermal_wave")
 #: literal here because that module imports CuPy).
 THERMAL_WAVE_PEAK_PER_COEFFICIENT = 2.0 * math.sqrt(15.0 / (32.0 * math.pi))
 
+#: ``nlat``/``nlon`` are ``None`` = "size from ``lmax``" via
+#: :func:`~tropoi.spatial.truncation.gauss_grid_for_truncation`; a value
+#: from the user, a preset or a prepared terrain overrides it.
 PE_BASE_DEFAULTS: dict = {
     "lmax": 10,
-    "grid": "geodesic",
+    "grid": "latlon",
     "resolution": 3,
-    "nlat": 32,
-    "nlon": 64,
+    "nlat": None,
+    "nlon": None,
     "day_hours": 24.0,
     "radius_earth_units": 1.0,
     "nlev": DEFAULT_NLEV,
@@ -253,10 +257,10 @@ class PERunConfig:
     """Fully resolved configuration for one dry primitive-equation run."""
 
     lmax: int = 10
-    grid: str = "geodesic"
+    grid: str = "latlon"
     resolution: int = 3
-    nlat: int = 32
-    nlon: int = 64
+    nlat: Optional[int] = None
+    nlon: Optional[int] = None
     day_hours: float = 24.0
     radius_earth_units: float = 1.0
     nlev: int = DEFAULT_NLEV
@@ -294,6 +298,18 @@ class PERunConfig:
             raise ValueError(f"lmax must be >= 1, got {self.lmax}")
         if self.resolution < 0:
             raise ValueError(f"resolution must be >= 0, got {self.resolution}")
+
+        # Grid dimensions come from the truncation unless the caller named
+        # them (see BVERunConfig.__post_init__ for the full rationale). A
+        # prepared terrain names them through resolve(), which adopts the
+        # terrain's own discretization, so it overrides this too.
+        if self.nlat is None or self.nlon is None:
+            derived_nlat, derived_nlon = gauss_grid_for_truncation(self.lmax)
+            if self.nlat is None:
+                object.__setattr__(self, "nlat", derived_nlat)
+            if self.nlon is None:
+                object.__setattr__(self, "nlon", derived_nlon)
+
         if self.grid == "latlon":
             if self.nlat < MIN_NLAT:
                 raise ValueError(

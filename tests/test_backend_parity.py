@@ -59,7 +59,8 @@ def backend_case(request):
     params = PlanetaryParameters.from_earth_like(day_hours=24.0)
     if kind == "geodesic":
         planet = Planet.generate(params=params, grid_resolution=4,
-                                 l_max=L_MAX, product_quadrature="fine")
+                                 l_max=L_MAX, product_quadrature="fine",
+                                 grid_type="geodesic")
     else:
         planet = Planet.generate(params=params, grid_type="latlon",
                                  nlat=32, nlon=64,

@@ -64,10 +64,10 @@ _DENSE_DEPRECATED = (
     "builds an n_points x n_basis complex matrix and spends one GEMM per "
     "transform, which measured ~96% of a synchronized T42 step; the "
     "separable FFT+Legendre evaluator is the default and ~16x faster on "
-    "the same step. Dense is kept as the numerical reference, as the "
-    "fallback for grids that cannot factorize, and to reproduce runs "
-    "recorded before the evaluator became selectable -- the two agree only "
-    "to round-off, so a pinned hash still needs this path.")
+    "the same step. Dense is kept as the numerical reference and as the "
+    "fallback for grids that cannot factorize; the two agree to round-off "
+    "but not bit-for-bit, so a run that must reproduce bit-for-bit is "
+    "reproduced from the commit its manifest records.")
 
 
 def default_transform_backend() -> str:

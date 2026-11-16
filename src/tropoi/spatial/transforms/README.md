@@ -51,9 +51,8 @@ factor.
 `"dense"` is the historical basis-matrix path. It is **deprecated** and
 raises a `DeprecationWarning` whenever a Gauss grid lands on it — asked for
 or fallen back to, so a slow run is never quiet about why. It is kept for
-three jobs: the numerical reference the separable path is measured against,
-the fallback for grids that cannot factorize, and reproducing runs recorded
-before the evaluator became selectable.
+two jobs: the numerical reference the separable path is measured against,
+and the fallback for grids that cannot factorize.
 
 - **Selection.** `transform_backend=`, or `TROPOI_SH_BACKEND` to point an
   existing run configuration at either evaluator without editing call sites.
@@ -62,11 +61,13 @@ before the evaluator became selectable.
   `transform_evaluator`) and in every checkpoint by
   `run.held_suarez.experiment.transform_identity`, which refuses a resume
   that would change it.
-- **Replaying a saved run** uses the evaluator its manifest records, not the
-  current default; a run from before the choice existed records none and is
-  replayed on the dense path it ran with
-  (`representation.visual.snapshot._recorded_transform_backend`). Changing
-  the default therefore does not change how existing runs are re-read.
+- **Replaying a saved run** re-derives its diagnostics on the *current*
+  default evaluator, not the one its manifest records. The two agree to
+  round-off (~1e-14 relative), so a replayed diagnostic differs only in the
+  last digits; reproducing a run bit-for-bit is done from the commit its
+  manifest records, which is what the manifest is for. A replay of a run
+  whose own grid cannot factorize still lands on the dense path through the
+  evaluator's own fallback, with its warning.
 - **Applicability.** `separable_is_applicable` is the single gate: uniform
   longitudes, weights that do not vary along longitude, and `2*l_max < nlon`
   (every retained zonal wavenumber needs its own real-FFT bin below Nyquist).

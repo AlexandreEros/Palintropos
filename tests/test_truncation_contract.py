@@ -47,9 +47,14 @@ def test_support_module_has_no_package_dependencies():
     import tropoi.spatial.truncation as support
     import tropoi.spatial.truncation as truncation
     assert support is truncation              # legacy path aliases the module
-    # The cut plus the preset support guards relocated from the SWE/PE
-    # configuration modules (which re-export the same objects).
-    assert support.__all__ == ["product_truncation_cut", "SWE_SCENARIO_SUPPORT",
+    # The cut, the default state-grid sizing policy, and the preset support
+    # guards relocated from the SWE/PE configuration modules (which
+    # re-export the same objects). The point of pinning __all__ is that
+    # this module stays a NEUTRAL support module: the banned-import check
+    # below is the real contract, and a new export must not break it.
+    assert support.__all__ == ["product_truncation_cut",
+                               "gauss_grid_for_truncation",
+                               "SWE_SCENARIO_SUPPORT",
                                "require_scenario_support",
                                "THERMAL_WAVE_MIN_RETAINED_DEGREE",
                                "require_thermal_wave_support"]

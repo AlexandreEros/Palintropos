@@ -39,7 +39,7 @@ files here. Custom planets, fields and imported terrain go through
 | `--scenario` | `williamson2` | `rest`, `gravity_wave`, `williamson2`, `williamson5` ([initialization](../../spatial/initialization/README.md)) |
 | `--topography` | `flat` | `mountain`: one Gaussian mountain, band-limited at `L` (default 2000 m at 30°N 90°E, 20° wide; `--mountain-*` to change). Williamson 5 builds its own cone |
 | Planet and fluid | 23.9345 h day, Earth radius, `g = 9.80616`, mean depth 3000 m | `--day-hours`, `--radius-earth-units`, `--gravity`, `--mean-depth` |
-| Backend and truncation | geodesic resolution 4, `L = 21` | `--backend latlon` / `gauss-latlon` with `--nlat`, `--nlon` |
+| Backend and truncation | Gauss lat–lon 32×64, `L = 21` | Dimensions derive from `L`; `--nlat`/`--nlon` override, `--backend geodesic --resolution 4` selects the deprecated grid |
 | Snapshots and figures | as for [BVE](../bve/README.md) | |
 
 A flat-bottom run writes exactly the historical config dict, so its run

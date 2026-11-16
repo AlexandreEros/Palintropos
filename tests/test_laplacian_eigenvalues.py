@@ -140,7 +140,8 @@ def test_cores_read_the_shared_eigenvalues_and_bve_keeps_l0_physical():
     from tropoi.temporal.tendencies.barotropic import BarotropicVorticity
 
     params = PlanetaryParameters.from_earth_like(day_hours=24.0)
-    planet = Planet.generate(params=params, grid_resolution=4, l_max=21)
+    planet = Planet.generate(params=params, grid_resolution=4, l_max=21,
+                             grid_type="geodesic")
     model = BarotropicVorticity(planet, viscosity=0.0)
     expected = laplacian_eigenvalues(21, model.R)
     np.testing.assert_array_equal(cp.asnumpy(model.laplacian_eig), expected)
@@ -160,7 +161,8 @@ def test_every_inversion_route_agrees_including_l0():
     from tropoi.temporal.tendencies.barotropic import BarotropicVorticity
 
     params = PlanetaryParameters.from_earth_like(day_hours=24.0)
-    planet = Planet.generate(params=params, grid_resolution=4, l_max=21)
+    planet = Planet.generate(params=params, grid_resolution=4, l_max=21,
+                             grid_type="geodesic")
     model = BarotropicVorticity(planet, viscosity=0.0)
     zeta = cp.asarray(_random_coeffs((22, 22), seed=2))
     zeta[0, 0] = 1.0e-5

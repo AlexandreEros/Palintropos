@@ -40,8 +40,9 @@ signs and conventions are in
 
 | Option | Default | Note |
 | --- | --- | --- |
-| Backend | geodesic, resolution 4 | `--backend latlon` (or `gauss-latlon`) uses Gauss nodes, default 128×256 |
+| Backend | Gauss lat–lon | `--backend geodesic --resolution 4` selects the deprecated icosahedral grid (warns) |
 | Truncation | `L = 21` | |
+| Grid size | 32×64 | Derived from `L` (3/2 quadratic rule, even `nlat`, `nlon = 2·nlat`); `--nlat`/`--nlon` override |
 | Rotation | `day_hours = inf` | **Non-rotating** unless set; the `rh4` preset uses 24 h |
 | Viscosity | 0 | `ν∇²` diffusion; the CFL ceiling does not account for its stability |
 | Products | `fine` | `coarse` reproduces the historical state-grid products |

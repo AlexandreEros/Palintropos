@@ -63,6 +63,9 @@ from tropoi.temporal.integration import (  # noqa: F401  (re-exports)
 # imports it from this module).
 from tropoi.representation.identity import (  # noqa: F401  (re-exports)
     HASH_EXCLUDED_KEYS, scientific_config_subset)
+# Default state-grid sizing. truncation.py imports nothing from the package,
+# so this keeps the configuration layer as import-light as it was.
+from tropoi.spatial.truncation import gauss_grid_for_truncation
 
 #: Historical psx-bve snapshot cadence (seconds); the interval-mode default.
 DEFAULT_SNAPSHOT_INTERVAL_SECONDS = 21600.0
@@ -94,15 +97,17 @@ _PLOTS_REQUIRING_SNAPSHOTS = ("snapshots", "summary")
 #: ``tropoi plot`` / ``Simulation.plot``.
 DEFAULT_PLOTS: tuple[str, ...] = ()
 
-#: Ordinary defaults for run-bve settings, identical to the historical
-#: psx-bve argparse defaults. Snapshot and plot controls are deliberately
-#: absent: their defaults depend on the calling interface / schedule.
+#: Ordinary defaults for run-bve settings. Snapshot and plot controls are
+#: deliberately absent: their defaults depend on the calling interface /
+#: schedule. ``nlat``/``nlon`` are ``None`` = "size from ``lmax``" via
+#: :func:`~tropoi.spatial.truncation.gauss_grid_for_truncation`; a value
+#: from the user or a preset overrides it.
 BASE_DEFAULTS: dict = {
     "lmax": 21,
-    "grid": "geodesic",
+    "grid": "latlon",
     "resolution": 4,
-    "nlat": 128,
-    "nlon": 256,
+    "nlat": None,
+    "nlon": None,
     "day_hours": math.inf,
     "radius_earth_units": 1.0,
     "duration_days": 1.0,
@@ -137,10 +142,10 @@ class BVERunConfig:
     """
 
     lmax: int = 21
-    grid: str = "geodesic"
+    grid: str = "latlon"
     resolution: int = 4
-    nlat: int = 128
-    nlon: int = 256
+    nlat: Optional[int] = None
+    nlon: Optional[int] = None
     day_hours: float = math.inf
     radius_earth_units: float = 1.0
     duration_days: float = 1.0
@@ -166,6 +171,20 @@ class BVERunConfig:
             raise ValueError(f"lmax must be >= 1, got {self.lmax}")
         if self.resolution < 0:
             raise ValueError(f"resolution must be >= 0, got {self.resolution}")
+
+        # Grid dimensions come from the truncation unless the caller named
+        # them (rule: derive from spectral truncation and dealiasing, never
+        # from a historical constant). Derived on every construction path,
+        # not only in resolve(), so there is one sizing site. Done for the
+        # geodesic family too: the values are inert there, but they still
+        # land in config.json, and a figure consistent with lmax beats a
+        # leftover one.
+        if self.nlat is None or self.nlon is None:
+            derived_nlat, derived_nlon = gauss_grid_for_truncation(self.lmax)
+            if self.nlat is None:
+                object.__setattr__(self, "nlat", derived_nlat)
+            if self.nlon is None:
+                object.__setattr__(self, "nlon", derived_nlon)
 
         # Lat-lon dimensions matter only when the lat-lon backend is used,
         # but the values live in the config either way; enforce the

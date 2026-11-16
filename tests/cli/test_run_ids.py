@@ -1,4 +1,11 @@
-"""Legacy run-ID stability and canonical scientific-config hashes."""
+"""Run-ID stability and canonical scientific-config hashes.
+
+The grid token names the grid family: ``gl{nlat}x{nlon}`` on the default
+Gauss lat-lon grid, ``r{resolution}`` on the geodesic one. These two cases
+are the lat-lon default, so they read ``gl32x64`` where they once read
+``r4`` -- which named a geodesic subdivision level the runs never used.
+Capsules recorded under the old spelling keep their names.
+"""
 from __future__ import annotations
 
 from datetime import datetime, timezone
@@ -24,14 +31,14 @@ def test_legacy_interval_run_id_form_is_stable(
         ["--scenario", "rh4", "--day-hours", "24",
          "--dt-snapshots", "21600"],
         stub_execute_run)
-    assert run_id == "20260715T000000Z_rh4_rot24h_r4_l21_dt6h"
+    assert run_id == "20260715T000000Z_rh4_rot24h_gl32x64_l21_dt6h"
 
 
 def test_explicit_interval_run_id_unchanged(
         stub_execute_run):
     run_id = _run_id_for(
         ["--snapshot-interval-seconds", "21600"], stub_execute_run)
-    assert run_id == "20260715T000000Z_two-vortices_norot_r4_l21_dt6h"
+    assert run_id == "20260715T000000Z_two-vortices_norot_gl32x64_l21_dt6h"
 
 
 def test_count_mode_run_id_uses_uniform_interval_tag(

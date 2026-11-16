@@ -23,7 +23,7 @@ Explore dependencies, call sites, possible dispatch, runtime observations and pr
 | [`tropoi.run.pe`](packages/tropoi.run.pe.md) | 5 | 1 | 2 | `GUIDE.md`, `README.md` |
 | [`tropoi.run.radiative`](packages/tropoi.run.radiative.md) | 5 | 2 | 13 | `README.md` |
 | [`tropoi.run.swe`](packages/tropoi.run.swe.md) | 5 | 1 | 2 | `README.md` |
-| [`tropoi.spatial`](packages/tropoi.spatial.md) | 10 | 18 | 18 | `CONVENTIONS.md`, `README.md` |
+| [`tropoi.spatial`](packages/tropoi.spatial.md) | 10 | 18 | 19 | `CONVENTIONS.md`, `README.md` |
 | [`tropoi.spatial.grids`](packages/tropoi.spatial.grids.md) | 8 | 5 | 5 | `README.md` |
 | [`tropoi.spatial.initialization`](packages/tropoi.spatial.initialization.md) | 4 | 0 | 4 | `README.md` |
 | [`tropoi.spatial.operators`](packages/tropoi.spatial.operators.md) | 2 | 1 | 0 | `README.md` |

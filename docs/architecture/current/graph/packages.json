@@ -233,8 +233,8 @@
     },
     {
       "kind": "imports",
-      "module_edges": 1,
-      "runtime_module_edges": 1,
+      "module_edges": 2,
+      "runtime_module_edges": 2,
       "source": "tropoi.run.bve",
       "target": "tropoi.spatial"
     },
@@ -789,7 +789,7 @@
     },
     {
       "id": "tropoi.spatial",
-      "internal_edges": 4,
+      "internal_edges": 5,
       "modules": 9
     },
     {

@@ -149,28 +149,6 @@ def _prepared_terrain(storage):
     return terrain.topography_lm
 
 
-def _recorded_transform_backend(storage) -> str:
-    """Which evaluator of the spherical-harmonic basis this run used.
-
-    A replay re-derives diagnostics by transforming the run's own stored
-    coefficients, so it has to use the run's own arithmetic. The manifest's
-    ``numerics`` block records the evaluator
-    (:meth:`SphericalGridBackend.describe`) for every run made since it
-    became selectable; a run from before that carries no such key and was
-    necessarily dense, which is therefore what a faithful replay of it
-    needs -- the same legacy-inference rule as the missing ``grid`` key in
-    :mod:`tropoi.temporal.models`. Without this, changing the default
-    evaluator would quietly re-derive every saved run's diagnostics on
-    different numerics.
-
-    Geodesic runs record no evaluator either; the value is ignored on that
-    grid family, which has only one.
-    """
-    manifest = getattr(storage, "manifest", None) or {}
-    recorded = (manifest.get("numerics") or {}).get("transform_backend")
-    return str(recorded) if recorded else "dense"
-
-
 def build_resources(storage) -> SnapshotResources:
     """Reconstruct the run's Planet/model from its persisted configuration.
 
@@ -178,26 +156,33 @@ def build_resources(storage) -> SnapshotResources:
     path the run itself used), never a preset validator, so legacy capsules
     are not re-validated by newer guards. Requires CUDA; a missing CuPy/CUDA
     surfaces as :class:`PlotUnavailableError` with the CPU alternatives.
+
+    The spherical-harmonic evaluator is **not** pinned to the one the
+    manifest records: a replay re-derives diagnostics on the current
+    default, which is the separable path. The two evaluators agree to
+    round-off (1e-16..1e-14 relative), so this changes a replayed
+    diagnostic only in the last couple of digits, and it is not this code's
+    job to reproduce obsolete numerical semantics -- a run that must be
+    reproduced bit-for-bit is reproduced from the commit its manifest
+    records. A run whose own grid cannot factorize still lands on the dense
+    path through the evaluator's own fallback, with its warning.
     """
     solver = storage.solver
     run_config = storage.run_config
-    backend = _recorded_transform_backend(storage)
     try:
         if solver == "bve":
             from tropoi.temporal.models import build_planet
-            planet = build_planet(run_config, transform_backend=backend)
+            planet = build_planet(run_config)
             return SnapshotResources(solver, planet)
         if solver == "swe":
             from tropoi.temporal.models import build_swe_model
             model = build_swe_model(
-                run_config, topography_lm=_custom_terrain(storage),
-                transform_backend=backend)
+                run_config, topography_lm=_custom_terrain(storage))
             return SnapshotResources(solver, model.planet, model)
         if solver == "pe":
             from tropoi.temporal.models import build_pe_model
             model = build_pe_model(
-                run_config, topography_lm=_prepared_terrain(storage),
-                transform_backend=backend)
+                run_config, topography_lm=_prepared_terrain(storage))
             return SnapshotResources(solver, model.planet, model)
     except Exception as err:  # noqa: BLE001 - classified below
         if _cuda_failure(err):

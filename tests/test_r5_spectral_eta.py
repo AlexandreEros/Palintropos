@@ -40,7 +40,8 @@ RES, L_MAX = 4, 21
 
 def _planet(day_hours):
     params = PlanetaryParameters.from_earth_like(day_hours=day_hours)
-    return Planet.generate(params=params, grid_resolution=RES, l_max=L_MAX)
+    return Planet.generate(params=params, grid_resolution=RES,
+                           l_max=L_MAX, grid_type="geodesic")
 
 
 @pytest.fixture(scope="module")

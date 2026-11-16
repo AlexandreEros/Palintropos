@@ -71,12 +71,13 @@ BACKEND_CHOICES = ("geodesic", "latlon", "gauss-latlon")
 
 _BVE_EXAMPLES = """\
 examples:
-  tropoi run bve                          geodesic grid, two_vortices, 1 day, 5 snapshots
+  tropoi run bve                          Gauss lat-lon 32x64, two_vortices, 1 day, 5 snapshots
   tropoi run bve --preset rh4             documented RH4 validation configuration
   tropoi run bve --days 1 --n-snapshots 9
   tropoi run bve --n-snapshots 20 --no-plots
   tropoi run bve --n-snapshots 1 --plot summary
-  tropoi run bve --backend gauss-latlon --nlat 12 --nlon 24 --l-max 8 --days 0.02
+  tropoi run bve --l-max 8 --days 0.02    lat-lon dimensions follow --l-max (14x28)
+  tropoi run bve --backend geodesic --resolution 4   deprecated geodesic grid
   tropoi run bve --initial-state states/rh4_small --days 2 --n-snapshots 9
 """
 
@@ -106,10 +107,11 @@ def add_bve_arguments(parser: argparse.ArgumentParser) -> None:
     parser.add_argument(
         "--backend", "--grid", dest="grid", choices=list(BACKEND_CHOICES),
         default=None,
-        help="Numerical backend / grid family [default: geodesic]. "
+        help="Numerical backend / grid family [default: latlon]. "
              "'gauss-latlon' is an alias for 'latlon' (Gauss-Legendre "
-             "latitudes, uniform longitudes). 'geodesic' uses --resolution; "
-             "'latlon' uses --nlat/--nlon.")
+             "latitudes, uniform longitudes). 'latlon' uses --nlat/--nlon, "
+             "which default to the sizing for --l-max; 'geodesic' is "
+             "deprecated and uses --resolution.")
     parser.add_argument(
         "--l-max", "--lmax", dest="lmax", type=int, default=None,
         help="Maximum spherical harmonic degree [default: 21].")
@@ -120,10 +122,12 @@ def add_bve_arguments(parser: argparse.ArgumentParser) -> None:
              "SH basis function (src/tropoi/spatial/CONVENTIONS.md, geodesic sampling).")
     parser.add_argument(
         "--nlat", type=int, default=None,
-        help="Lat-lon backend: number of Gauss-Legendre latitudes [default: 128].")
+        help="Lat-lon backend: number of Gauss-Legendre latitudes "
+             "[default: sized from --l-max by the 3/2 quadratic rule].")
     parser.add_argument(
         "--nlon", type=int, default=None,
-        help="Lat-lon backend: number of uniform longitudes [default: 256].")
+        help="Lat-lon backend: number of uniform longitudes "
+             "[default: 2 x nlat, sized from --l-max].")
     parser.add_argument(
         "--day-hours", type=float, default=None,
         help="Sidereal day length in hours; 'inf' = non-rotating [default: inf].")
@@ -308,7 +312,7 @@ def _cmd_run_bve(args: argparse.Namespace) -> int:
 
 _SWE_EXAMPLES = """\
 examples:
-  tropoi run swe                          Williamson-2 steady flow, 1 day, geodesic grid
+  tropoi run swe                          Williamson-2 steady flow, 1 day, Gauss lat-lon 32x64
   tropoi run swe --backend gauss-latlon --nlat 32 --nlon 64 --l-max 15
   tropoi run swe --scenario gravity_wave --day-hours inf --mean-depth 1000
   tropoi run swe --days 5 --n-snapshots 11 --no-plots
@@ -328,8 +332,9 @@ def add_swe_arguments(parser: argparse.ArgumentParser) -> None:
     parser.add_argument(
         "--backend", "--grid", dest="grid", choices=list(BACKEND_CHOICES),
         default=None,
-        help="Numerical backend / grid family [default: geodesic]. "
-             "'gauss-latlon' is an alias for 'latlon'.")
+        help="Numerical backend / grid family [default: latlon]. "
+             "'gauss-latlon' is an alias for 'latlon'; 'geodesic' is "
+             "deprecated.")
     parser.add_argument(
         "--l-max", "--lmax", dest="lmax", type=int, default=None,
         help="Maximum spherical harmonic degree [default: 21].")
@@ -338,10 +343,12 @@ def add_swe_arguments(parser: argparse.ArgumentParser) -> None:
         help="Geodesic grid subdivision level [default: 4].")
     parser.add_argument(
         "--nlat", type=int, default=None,
-        help="Lat-lon backend: number of Gauss-Legendre latitudes [default: 128].")
+        help="Lat-lon backend: number of Gauss-Legendre latitudes "
+             "[default: sized from --l-max by the 3/2 quadratic rule].")
     parser.add_argument(
         "--nlon", type=int, default=None,
-        help="Lat-lon backend: number of uniform longitudes [default: 256].")
+        help="Lat-lon backend: number of uniform longitudes "
+             "[default: 2 x nlat, sized from --l-max].")
     parser.add_argument(
         "--day-hours", type=float, default=None,
         help="Sidereal day length in hours; 'inf' = non-rotating "
@@ -485,8 +492,9 @@ def add_pe_arguments(parser: argparse.ArgumentParser) -> None:
     parser.add_argument(
         "--backend", "--grid", dest="grid", choices=list(BACKEND_CHOICES),
         default=None,
-        help="Numerical backend / grid family [default: geodesic]. "
-             "'gauss-latlon' is an alias for 'latlon'.")
+        help="Numerical backend / grid family [default: latlon]. "
+             "'gauss-latlon' is an alias for 'latlon'; 'geodesic' is "
+             "deprecated.")
     parser.add_argument(
         "--l-max", "--lmax", dest="lmax", type=int, default=None,
         help="Maximum spherical harmonic degree [default: 10].")
@@ -495,10 +503,12 @@ def add_pe_arguments(parser: argparse.ArgumentParser) -> None:
         help="Geodesic grid subdivision level [default: 3].")
     parser.add_argument(
         "--nlat", type=int, default=None,
-        help="Lat-lon backend: number of Gauss-Legendre latitudes [default: 32].")
+        help="Lat-lon backend: number of Gauss-Legendre latitudes "
+             "[default: sized from --l-max by the 3/2 quadratic rule].")
     parser.add_argument(
         "--nlon", type=int, default=None,
-        help="Lat-lon backend: number of uniform longitudes [default: 64].")
+        help="Lat-lon backend: number of uniform longitudes "
+             "[default: 2 x nlat, sized from --l-max].")
     parser.add_argument(
         "--day-hours", type=float, default=None,
         help="Sidereal day length in hours; 'inf' = non-rotating [default: 24].")

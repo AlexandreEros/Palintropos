@@ -64,6 +64,7 @@ flowchart LR
     p_tropoi_orun_oswe -->|1| n_tropoi_orun_obve_oconfig
     p_tropoi_orun_oswe -.->|1| n_tropoi_orun_obve_oexecution
     n_tropoi_orun_obve_oconfig -->|1| p_tropoi_orepresentation
+    n_tropoi_orun_obve_oconfig -->|1| p_tropoi_ospatial
     n_tropoi_orun_obve_oconfig -->|1| p_tropoi_otemporal
     n_tropoi_orun_obve_oexecution -.->|2| p_tropoi_orepresentation_oarchive
     n_tropoi_orun_obve_oexecution -->|1| p_tropoi_orun

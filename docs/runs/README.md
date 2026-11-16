@@ -15,6 +15,24 @@ docs/runs/<run-id>/
     assets/                         derived products: figures, sidecars, ...
 ```
 
+## Reading a run id
+
+A run id is underscore-separated and positional:
+`<timestamp>_<scenario>_<rotation>_<grid>_<lmax>_<snapshot>[_<hash>][_<commit>]`.
+The grid token names the discretization: `gl32x64` is the Gauss lat-lon grid
+with `nlat=32, nlon=64`, while `r4` is the geodesic grid at subdivision
+level 4.
+
+**Directory names are historical and are never rewritten.** Four
+committed capsules, recorded before the grid token named the family, carry
+`rN` although they ran on the Gauss lat-lon grid: three say `r4` (at
+32×64, 96×192 and 128×256) and one says `r3` (at 34×68). Two of them
+collide outright — `20260713T022748Z_rh4_rot24h_r4_l21_dt6h_…` is a
+lat-lon 32×64 run and `20260926T051829Z_two-vortices_…_r4_l21_…` a
+lat-lon 128×256 one, so they share a token that describes neither. Their
+`config.json` is authoritative for the grid in every case; the id is a
+label, not a source of truth. New runs do not have this ambiguity.
+
 Receipts identify preserved bytes and may include derived figures. Older fully
 committed capsules retain their original primary-file receipts and embedded
 figure-input hashes. Checksums prove byte identity, not scientific correctness

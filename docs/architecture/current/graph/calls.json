@@ -2473,6 +2473,11 @@
     {
       "kind": "call",
       "source": "tropoi.representation.archive.writer.make_run_id",
+      "target": "tropoi.representation.archive.writer._grid_tag"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.archive.writer.make_run_id",
       "target": "tropoi.representation.archive.writer._rotation_tag"
     },
     {
@@ -5503,11 +5508,6 @@
     {
       "kind": "call",
       "source": "tropoi.representation.visual.snapshot.build_resources",
-      "target": "tropoi.representation.visual.snapshot._recorded_transform_backend"
-    },
-    {
-      "kind": "call",
-      "source": "tropoi.representation.visual.snapshot.build_resources",
       "target": "tropoi.temporal.models.build_pe_model"
     },
     {
@@ -6134,6 +6134,11 @@
       "kind": "self",
       "source": "tropoi.run.bve.config.BVERunConfig.__post_init__",
       "target": "tropoi.run.bve.config.BVERunConfig.snapshot_times_seconds"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.bve.config.BVERunConfig.__post_init__",
+      "target": "tropoi.spatial.truncation.gauss_grid_for_truncation"
     },
     {
       "kind": "call",
@@ -7853,6 +7858,11 @@
     {
       "kind": "call",
       "source": "tropoi.run.pe.config.PERunConfig.__post_init__",
+      "target": "tropoi.spatial.truncation.gauss_grid_for_truncation"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.pe.config.PERunConfig.__post_init__",
       "target": "tropoi.spatial.truncation.require_thermal_wave_support"
     },
     {
@@ -8668,6 +8678,11 @@
     {
       "kind": "call",
       "source": "tropoi.run.swe.config.SWERunConfig.__post_init__",
+      "target": "tropoi.spatial.truncation.gauss_grid_for_truncation"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.swe.config.SWERunConfig.__post_init__",
       "target": "tropoi.spatial.truncation.require_scenario_support"
     },
     {
@@ -9304,6 +9319,11 @@
       "kind": "instantiate",
       "source": "tropoi.spatial.planet.Planet.generate",
       "target": "tropoi.spatial.transforms.optimized_geodesic_sh.GeodesicSphericalHarmonics"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.spatial.planet.Planet.generate",
+      "target": "tropoi.spatial.truncation.gauss_grid_for_truncation"
     },
     {
       "kind": "instantiate",
@@ -10576,6 +10596,11 @@
       "target": "tropoi.spatial.truncation.product_truncation_cut"
     },
     {
+      "kind": "call",
+      "source": "tropoi.temporal.models.build_pe_model",
+      "target": "tropoi.temporal.models._legacy_grid_type"
+    },
+    {
       "kind": "instantiate",
       "source": "tropoi.temporal.models.build_pe_model",
       "target": "tropoi.temporal.tendencies.primitive_equations.PrimitiveEquationsModel"
@@ -10594,6 +10619,11 @@
       "kind": "call",
       "source": "tropoi.temporal.models.build_planet",
       "target": "tropoi.spatial.specification.PlanetSpec.from_dict"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.temporal.models.build_planet",
+      "target": "tropoi.temporal.models._legacy_grid_type"
     },
     {
       "kind": "call",
@@ -10624,6 +10654,11 @@
       "kind": "call",
       "source": "tropoi.temporal.models.build_swe_model",
       "target": "tropoi.spatial.terrain.topography.Topography.williamson5_cone"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.temporal.models.build_swe_model",
+      "target": "tropoi.temporal.models._legacy_grid_type"
     },
     {
       "kind": "call",
@@ -15027,6 +15062,13 @@
       "type": "function"
     },
     {
+      "id": "tropoi.representation.archive.writer._grid_tag",
+      "kind": "function",
+      "module": "tropoi.representation.archive.writer",
+      "qualname": "_grid_tag",
+      "type": "function"
+    },
+    {
       "id": "tropoi.representation.archive.writer._rotation_tag",
       "kind": "function",
       "module": "tropoi.representation.archive.writer",
@@ -17964,13 +18006,6 @@
       "kind": "function",
       "module": "tropoi.representation.visual.snapshot",
       "qualname": "_prepared_terrain",
-      "type": "function"
-    },
-    {
-      "id": "tropoi.representation.visual.snapshot._recorded_transform_backend",
-      "kind": "function",
-      "module": "tropoi.representation.visual.snapshot",
-      "qualname": "_recorded_transform_backend",
       "type": "function"
     },
     {
@@ -23553,6 +23588,13 @@
       "type": "function"
     },
     {
+      "id": "tropoi.spatial.truncation.gauss_grid_for_truncation",
+      "kind": "function",
+      "module": "tropoi.spatial.truncation",
+      "qualname": "gauss_grid_for_truncation",
+      "type": "function"
+    },
+    {
       "id": "tropoi.spatial.truncation.product_truncation_cut",
       "kind": "function",
       "module": "tropoi.spatial.truncation",
@@ -23886,6 +23928,13 @@
       "kind": "function",
       "module": "tropoi.temporal.integration",
       "qualname": "validate_snapshot_schedule",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.temporal.models._legacy_grid_type",
+      "kind": "function",
+      "module": "tropoi.temporal.models",
+      "qualname": "_legacy_grid_type",
       "type": "function"
     },
     {

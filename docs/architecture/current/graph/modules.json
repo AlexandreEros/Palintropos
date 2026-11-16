@@ -1626,6 +1626,14 @@
         "module"
       ],
       "source": "tropoi.run.bve.config",
+      "target": "tropoi.spatial.truncation"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.run.bve.config",
       "target": "tropoi.temporal.integration"
     },
     {
@@ -3211,6 +3219,14 @@
       ],
       "source": "tropoi.spatial.planet",
       "target": "tropoi.spatial.transforms.optimized_geodesic_sh"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.spatial.planet",
+      "target": "tropoi.spatial.truncation"
     },
     {
       "kind": "imports",

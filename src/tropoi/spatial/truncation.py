@@ -18,10 +18,17 @@ preset_support_characterization.md):
   on those stored degrees (exact linear spectral operators, forcing,
   hyperdiffusion or viscosity, prescribed topographic terms) is decided by
   each core, not by this module.
+* **default state grid** :func:`gauss_grid_for_truncation`: the Gauss
+  lat-lon ``(nlat, nlon)`` a core uses for stored capacity ``l_max`` when
+  the caller names no dimensions. A sizing *policy*, not a correctness
+  contract -- an explicitly given pair always wins, and a configuration
+  may legitimately sit below it (Held-Suarez runs ``l_max = 43`` on
+  ``64 x 128`` and leans on the finer product grid for dealiasing).
 """
 from __future__ import annotations
 
-__all__ = ["product_truncation_cut", "SWE_SCENARIO_SUPPORT",
+__all__ = ["product_truncation_cut", "gauss_grid_for_truncation",
+           "SWE_SCENARIO_SUPPORT",
            "require_scenario_support", "THERMAL_WAVE_MIN_RETAINED_DEGREE",
            "require_thermal_wave_support"]
 
@@ -37,6 +44,59 @@ def product_truncation_cut(l_max: int) -> int:
     every operator, core, and diagnostic band derives from it.
     """
     return (2 * int(l_max)) // 3
+
+
+def gauss_grid_for_truncation(l_max: int) -> tuple[int, int]:
+    """Default Gauss lat-lon ``(nlat, nlon)`` for stored capacity ``l_max``.
+
+    The repository's established sizing convention, made explicit: the
+    **3/2 (quadratic) rule** with an even latitude count and
+    ``nlon = 2 * nlat``::
+
+        nlat = ceil((3 * l_max + 1) / 2) rounded up to even
+        nlon = 2 * nlat
+
+    Pinned values: ``1->(2, 4), 2->(4, 8), 4->(8, 16), 5->(8, 16),
+    8->(14, 28), 10->(16, 32), 15->(24, 48), 21->(32, 64), 42->(64, 128),
+    63->(96, 192)``. The T21 and T42 pairs are exactly the resolutions in
+    production use.
+
+    Three requirements are satisfied by construction, for every
+    ``l_max >= 1``:
+
+    * **analysis exactness** (``spatial.grids.latlon_grid``):
+      ``nlat >= l_max + 1`` and ``nlon >= 2 * l_max + 1``, so a round trip
+      of a degree-``l_max`` field leaks nothing across modes;
+    * **quadratic dealiasing** (the 3/2 rule that
+      ``spatial.spherical_backend.LatLonBackend`` applies to its *product*
+      grid): ``nlat >= ceil((3 * l_max + 1) / 2)`` and
+      ``nlon >= 3 * l_max + 1``. Holding the *state* grid to it as well
+      means the ``product_quadrature="coarse"`` A/B path is also
+      quadratically exact, and the "fine" product grid then needs no
+      enlargement at all;
+    * **separable applicability**
+      (``spatial.transforms.separable_gauss_sh.separable_is_applicable``):
+      ``2 * l_max < nlon``, so every retained zonal wavenumber owns a
+      real-FFT bin strictly below Nyquist and the default evaluator never
+      falls back to the dense path.
+
+    An even ``nlat`` keeps the Gauss-Legendre latitudes symmetric about the
+    equator with no node *on* it, and makes ``nlon`` a multiple of four --
+    both friendly to the real FFT the separable evaluator runs in
+    longitude.
+
+    This is a **policy**, not a validity test. Dimensions the caller gives
+    explicitly always override it, and a configuration below it is not
+    thereby wrong: it forfeits state-grid quadratic exactness and relies on
+    the finer product grid instead, which is what Held-Suarez does at
+    ``l_max = 43`` on ``64 x 128``.
+    """
+    l_max = int(l_max)
+    if l_max < 1:
+        raise ValueError(f"l_max must be >= 1, got {l_max}")
+    nlat = -(-(3 * l_max + 1) // 2)   # ceil((3 l_max + 1) / 2)
+    nlat += nlat % 2                  # up to even
+    return nlat, 2 * nlat
 
 
 # ---------------------------------------------------------------------------

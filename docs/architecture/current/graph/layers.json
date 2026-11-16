@@ -75,7 +75,7 @@
     {
       "direction": "down",
       "kind": "imports",
-      "module_edges": 46,
+      "module_edges": 47,
       "package_edges": 15,
       "source": "run",
       "target": "spatial",

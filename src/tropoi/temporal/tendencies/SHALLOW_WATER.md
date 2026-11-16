@@ -379,7 +379,7 @@ external mirror are given in the report).
 ## Minimal CLI example
 
 ```powershell
-# Default: Williamson-2 steady flow, geodesic res 4, l_max 21, 1 day,
+# Default: Williamson-2 steady flow, Gauss lat-lon 32x64, l_max 21, 1 day,
 # 5 stored states, a normalized snapshot timeline, diagnostics, and a summary.
 tropoi run swe
 
