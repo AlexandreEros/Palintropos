@@ -50,7 +50,10 @@ def _rh4(grid):
 @pytest.fixture(scope="module")
 def planet():
     params = PlanetaryParameters.from_earth_like(day_hours=24.0)
-    return Planet.generate(params=params, grid_resolution=RES, l_max=L_MAX)
+    # Geodesic is what the R-3 characterization is ABOUT; it is retained
+    # for exactly this purpose and must be named, never inherited.
+    return Planet.generate(params=params, grid_resolution=RES,
+                           l_max=L_MAX, grid_type="geodesic")
 
 
 def _production_rate(planet, model, zeta_lm):

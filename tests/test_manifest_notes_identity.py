@@ -52,30 +52,45 @@ HISTORICAL_SWE_NOTES = {
                    "definitions",
 }
 
-#: Hashes and run IDs measured before the path correction. Any change to
-#: these means descriptive text leaked into scientific identity.
+#: Hashes and run IDs for resolved configurations. Any change to these that
+#: is not a deliberate, recorded change to what a default run *is* means
+#: descriptive text leaked into scientific identity -- which is what this
+#: file exists to catch.
+#:
+#: Moved once, deliberately, when Gauss lat-lon became the default grid and
+#: its dimensions began deriving from lmax (and `two-vortices-quick` lost
+#: its stale nlat/nlon). Grid family and grid dimensions are part of
+#: scientific identity, so these had to move; preserving them was
+#: explicitly rejected. Previous values, measured before the 2026-10-31
+#: path correction: bve-rh4 4382a391, swe-default 0e6cfc38,
+#: swe-williamson5 cf9bd4e7, pe-thermal-wave fa2db863,
+#: pe-orographic-rest 2ea7567a.
+#:
+#: The run ids' ``rN`` component is unchanged: make_run_id encodes
+#: ``resolution`` whatever the grid family, so these lat-lon runs still say
+#: r4 / r3.
 PINNED = {
     "bve-rh4": (lambda: BVERunConfig.resolve({"scenario": "rh4"}),
-                "4382a391",
-                "20261031T000000Z_rh4_norot_r4_l21_dt6h_4382a391"),
+                "c9cc1089",
+                "20261031T000000Z_rh4_norot_r4_l21_dt6h_c9cc1089"),
     "swe-default": (lambda: SWERunConfig.resolve({}),
-                    "0e6cfc38",
+                    "620bb60e",
                     "20261031T000000Z_williamson2_rot23p93h_r4_l21_dt6h_"
-                    "0e6cfc38"),
+                    "620bb60e"),
     "swe-williamson5": (
         lambda: SWERunConfig.resolve({"scenario": "williamson5"}),
-        "cf9bd4e7",
-        "20261031T000000Z_williamson5_rot23p93h_r4_l21_dt6h_cf9bd4e7"),
+        "f726cd65",
+        "20261031T000000Z_williamson5_rot23p93h_r4_l21_dt6h_f726cd65"),
     "pe-thermal-wave": (
         lambda: PERunConfig.resolve({"scenario": "thermal_wave"}),
-        "fa2db863",
-        "20261031T000000Z_thermal-wave_rot24h_r3_l10_dt15m_fa2db863"),
+        "071daf45",
+        "20261031T000000Z_thermal-wave_rot24h_r3_l10_dt15m_071daf45"),
     "pe-orographic-rest": (
         lambda: PERunConfig.resolve(
             {"scenario": "orographic_isothermal_rest"}),
-        "2ea7567a",
+        "d67409e2",
         "20261031T000000Z_orographic-isothermal-rest_rot24h_r3_l10_dt15m_"
-        "2ea7567a"),
+        "d67409e2"),
 }
 
 _OBSOLETE = re.compile(r"\bphysics/|\brun/(bve|swe|pe)/diagnostics\.py")
