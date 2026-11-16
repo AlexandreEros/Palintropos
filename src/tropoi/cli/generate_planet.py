@@ -1,6 +1,13 @@
 """Generate a demo planet and save a summary plot.
 
-Invoked by ``tropoi gen``. Heavy imports (CuPy, matplotlib) happen after argument parsing.
+Invoked by ``tropoi gen``. Heavy imports (CuPy, matplotlib) happen after
+argument parsing.
+
+Grid: Gauss lat-lon by default, sized from ``--l-max``, like every other
+entry point. ``--grid-resolution`` is the geodesic subdivision level, so
+passing it selects the deprecated geodesic grid explicitly (PlanetViewer
+renders either -- it builds a triangulation for geodesic points and uses
+the structured path for lat-lon).
 """
 from __future__ import annotations
 
@@ -31,8 +38,18 @@ def add_arguments(parser: argparse.ArgumentParser) -> None:
         help="Output PNG file; relative paths are written under out/ "
              "(default: planet_summary.png).")
     parser.add_argument(
-        "--grid-resolution", type=int, default=3,
-        help="Geodesic grid subdivision level (default: 3).")
+        "--nlat", type=int, default=None,
+        help="Gauss lat-lon latitudes [default: sized from --l-max by the "
+             "3/2 quadratic rule].")
+    parser.add_argument(
+        "--nlon", type=int, default=None,
+        help="Gauss lat-lon longitudes [default: 2 x nlat, sized from "
+             "--l-max].")
+    parser.add_argument(
+        "--grid-resolution", type=int, default=None,
+        help="Geodesic grid subdivision level. Giving this option selects "
+             "the deprecated geodesic grid (which warns); the default grid "
+             "is Gauss lat-lon, sized from --l-max.")
 
 
 def resolve_output_path(output: str) -> pathlib.Path:
@@ -62,12 +79,30 @@ def run(args: argparse.Namespace) -> int:
         radius_earth_units=args.radius_earth_units,
     )
 
+    # The grid family follows the options actually given. --grid-resolution
+    # is a geodesic concept, so asking for it asks for the geodesic grid;
+    # with no grid option at all the default is Gauss lat-lon, sized from
+    # l_max. Silently ignoring --grid-resolution would be the one
+    # unacceptable outcome.
+    grid_kwargs: dict = {}
+    if args.grid_resolution is not None:
+        if args.nlat is not None or args.nlon is not None:
+            raise SystemExit(
+                "--grid-resolution selects the geodesic grid and --nlat/"
+                "--nlon the Gauss lat-lon grid; give one grid's options, "
+                "not both")
+        grid_kwargs = {"grid_type": "geodesic",
+                       "grid_resolution": args.grid_resolution}
+    else:
+        grid_kwargs = {"grid_type": "latlon",
+                       "nlat": args.nlat, "nlon": args.nlon}
+
     planet = Planet.generate(
         params=params,
-        grid_resolution=args.grid_resolution,
         terrain_params=SpectralTerrainParams(seed=args.seed),
         tectonic_params=TectonicParams(),
         l_max=args.l_max,
+        **grid_kwargs,
     )
 
     viewer = PlanetViewer(planet)
