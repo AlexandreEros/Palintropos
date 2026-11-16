@@ -99,6 +99,7 @@ flowchart LR
         n_tropoi_otemporal_ointegration_o__require__finite__positive["#95;require#95;finite#95;positive()"]
     end
     subgraph g_tropoi_otemporal_omodels["temporal.models"]
+        n_tropoi_otemporal_omodels_o__legacy__grid__type["#95;legacy#95;grid#95;type()"]
         n_tropoi_otemporal_omodels_obuild__pe__model["build#95;pe#95;model()"]
     end
     subgraph g_tropoi_otemporal_osteppers["temporal.steppers"]
@@ -171,6 +172,7 @@ flowchart LR
     n_tropoi_otemporal_omodels_obuild__pe__model --> n_tropoi_ospatial_osigma__coordinate_oSigmaGrid_ouniform
     n_tropoi_otemporal_omodels_obuild__pe__model --> n_tropoi_ospatial_oterrain_otopography_oTopography_omountain
     n_tropoi_otemporal_omodels_obuild__pe__model --> n_tropoi_ospatial_otruncation_oproduct__truncation__cut
+    n_tropoi_otemporal_omodels_obuild__pe__model --> n_tropoi_otemporal_omodels_o__legacy__grid__type
     n_tropoi_otemporal_omodels_obuild__pe__model -->|instantiate| n_tropoi_otemporal_otendencies_oprimitive__equations_oPrimitiveEquationsModel
     classDef root stroke-width:3px
     classDef truncated stroke-dasharray:4 3
