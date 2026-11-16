@@ -57,7 +57,7 @@
     {
       "direction": "down",
       "kind": "imports",
-      "module_edges": 7,
+      "module_edges": 11,
       "package_edges": 2,
       "source": "run",
       "target": "physics",
@@ -131,7 +131,7 @@
       "depth": 5,
       "id": "physics",
       "internal_package_edges": 1,
-      "modules": 21,
+      "modules": 22,
       "packages": 2
     },
     {

@@ -843,6 +843,10 @@
           "name": "__post_init__"
         },
         {
+          "kind": "method",
+          "name": "content_sha256"
+        },
+        {
           "kind": "classmethod",
           "name": "load"
         },
@@ -853,6 +857,10 @@
         {
           "kind": "property",
           "name": "n_g"
+        },
+        {
+          "kind": "property",
+          "name": "point_weights"
         },
         {
           "kind": "method",
@@ -1000,6 +1008,16 @@
       ],
       "module": "tropoi.physics.radiation.scheme",
       "qualname": "RadiativeFluxes"
+    },
+    {
+      "decorators": [],
+      "external_bases": [
+        "ValueError"
+      ],
+      "id": "tropoi.physics.radiation.tables.KTableError",
+      "members": [],
+      "module": "tropoi.physics.radiation.tables",
+      "qualname": "KTableError"
     },
     {
       "decorators": [
