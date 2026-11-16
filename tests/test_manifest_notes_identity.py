@@ -66,31 +66,34 @@ HISTORICAL_SWE_NOTES = {
 #: swe-williamson5 cf9bd4e7, pe-thermal-wave fa2db863,
 #: pe-orographic-rest 2ea7567a.
 #:
-#: The run ids' ``rN`` component is unchanged: make_run_id encodes
-#: ``resolution`` whatever the grid family, so these lat-lon runs still say
-#: r4 / r3.
+#: Moved a second time, also deliberately, when the run id's grid token
+#: began naming the grid family: ``gl{nlat}x{nlon}`` on Gauss lat-lon,
+#: ``r{resolution}`` on geodesic. These runs are lat-lon, so ``r4`` / ``r3``
+#: became ``gl32x64`` / ``gl16x32``. The config HASHES did not move with it,
+#: which is the expected result and worth keeping as a check: the id is
+#: derived from the configuration, not the reverse.
 PINNED = {
     "bve-rh4": (lambda: BVERunConfig.resolve({"scenario": "rh4"}),
                 "c9cc1089",
-                "20261031T000000Z_rh4_norot_r4_l21_dt6h_c9cc1089"),
+                "20261031T000000Z_rh4_norot_gl32x64_l21_dt6h_c9cc1089"),
     "swe-default": (lambda: SWERunConfig.resolve({}),
                     "620bb60e",
-                    "20261031T000000Z_williamson2_rot23p93h_r4_l21_dt6h_"
-                    "620bb60e"),
+                    "20261031T000000Z_williamson2_rot23p93h_gl32x64_l21_"
+                    "dt6h_620bb60e"),
     "swe-williamson5": (
         lambda: SWERunConfig.resolve({"scenario": "williamson5"}),
         "f726cd65",
-        "20261031T000000Z_williamson5_rot23p93h_r4_l21_dt6h_f726cd65"),
+        "20261031T000000Z_williamson5_rot23p93h_gl32x64_l21_dt6h_f726cd65"),
     "pe-thermal-wave": (
         lambda: PERunConfig.resolve({"scenario": "thermal_wave"}),
         "071daf45",
-        "20261031T000000Z_thermal-wave_rot24h_r3_l10_dt15m_071daf45"),
+        "20261031T000000Z_thermal-wave_rot24h_gl16x32_l10_dt15m_071daf45"),
     "pe-orographic-rest": (
         lambda: PERunConfig.resolve(
             {"scenario": "orographic_isothermal_rest"}),
         "d67409e2",
-        "20261031T000000Z_orographic-isothermal-rest_rot24h_r3_l10_dt15m_"
-        "d67409e2"),
+        "20261031T000000Z_orographic-isothermal-rest_rot24h_gl16x32_l10_"
+        "dt15m_d67409e2"),
 }
 
 _OBSOLETE = re.compile(r"\bphysics/|\brun/(bve|swe|pe)/diagnostics\.py")
