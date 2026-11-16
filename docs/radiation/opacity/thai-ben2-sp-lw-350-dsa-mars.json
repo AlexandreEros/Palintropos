@@ -1,0 +1,4364 @@
+{
+  "command": "python -I tools/radiation/opacity/import_socrates.py --case thai_ben2_reference --record-dir docs/radiation/opacity",
+  "file": "thai-ben2-sp-lw-350-dsa-mars.npz",
+  "metadata": {
+    "assumptions": {
+      "absent_gases_dropped": [
+        "H2O"
+      ],
+      "broadening": "CO2 lines self-broadened (look-up axis of CO2 fraction 0.9 and 1.0); H2O broadened by air (H2O is absent from the dry cases)",
+      "continua": "CO2-CO2 collision-induced absorption (Gruszka & Borysow 1998, Mol. Phys. 93, 1007; Baranov et al. 2004, J. Mol. Spectrosc. 228, 432; Wordsworth et al. 2010). H2O continuum MT_CKD 3.0 (unused: no water)",
+      "continuum_density": "k_cont q1 q2 rho with rho = p / (R_mix T) of the stated mixture; continuum look-up (10 K steps) interpolated linearly in T to the gas table's temperatures. Where the source data stop (CO2-CO2 below 200 K) the file itself holds the edge value",
+      "far_wings": "CO2 sub-Lorentzian line shapes (Perrin & Hartmann 1989, JQSRT 42, 311; Wordsworth et al. 2010, Icarus 210, 992). The truncation distance is not stated in the documentation",
+      "line_data": "HITRAN 2012 (Rothman et al. 2013, JQSRT 130, 4)",
+      "overlap": "as flagged in the spectral file: random overlap (products of k-terms) between a gas and a continuum, exact where either has one term. Not a common-wavenumber-grid premix",
+      "random_overlap_bands": [
+        116,
+        120,
+        121,
+        123,
+        124,
+        125,
+        127,
+        128,
+        130
+      ],
+      "self_broadening_axis": {
+        "CO2": {
+          "axis": [
+            0.9,
+            1.0
+          ],
+          "used": 1.0
+        }
+      },
+      "thermal_source": "band Planck fractions are computed by the provider (planck_band_fraction); SOCRATES' own Planck table is not used. Nothing is emitted outside the bands"
+    },
+    "bands": [
+      {
+        "band": 1,
+        "components": [
+          "CO2:1",
+          "CO2-CO2:10"
+        ],
+        "points": 10,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          1.0,
+          10.0
+        ]
+      },
+      {
+        "band": 2,
+        "components": [
+          "CO2:1",
+          "CO2-CO2:3"
+        ],
+        "points": 3,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          10.0,
+          20.0
+        ]
+      },
+      {
+        "band": 3,
+        "components": [
+          "CO2:1",
+          "CO2-CO2:2"
+        ],
+        "points": 2,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          20.0,
+          30.000000003
+        ]
+      },
+      {
+        "band": 4,
+        "components": [
+          "CO2:1",
+          "CO2-CO2:1"
+        ],
+        "points": 1,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          30.000000003,
+          40.0
+        ]
+      },
+      {
+        "band": 5,
+        "components": [
+          "CO2:1",
+          "CO2-CO2:1"
+        ],
+        "points": 1,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          40.0,
+          50.0
+        ]
+      },
+      {
+        "band": 6,
+        "components": [
+          "CO2-CO2:1"
+        ],
+        "points": 1,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          50.0,
+          59.999999988000006
+        ]
+      },
+      {
+        "band": 7,
+        "components": [
+          "CO2-CO2:1"
+        ],
+        "points": 1,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          59.999999988000006,
+          69.99999997900001
+        ]
+      },
+      {
+        "band": 8,
+        "components": [
+          "CO2-CO2:1"
+        ],
+        "points": 1,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          69.99999997900001,
+          80.0
+        ]
+      },
+      {
+        "band": 9,
+        "components": [
+          "CO2-CO2:1"
+        ],
+        "points": 1,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          80.0,
+          90.000000009
+        ]
+      },
+      {
+        "band": 10,
+        "components": [
+          "CO2-CO2:1"
+        ],
+        "points": 1,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          90.000000009,
+          100.0
+        ]
+      },
+      {
+        "band": 11,
+        "components": [
+          "CO2-CO2:1"
+        ],
+        "points": 1,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          100.0,
+          109.99999999890001
+        ]
+      },
+      {
+        "band": 12,
+        "components": [
+          "CO2-CO2:1"
+        ],
+        "points": 1,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          109.99999999890001,
+          120.0000000048
+        ]
+      },
+      {
+        "band": 13,
+        "components": [
+          "CO2-CO2:1"
+        ],
+        "points": 1,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          120.0000000048,
+          130.0000000052
+        ]
+      },
+      {
+        "band": 14,
+        "components": [
+          "CO2-CO2:1"
+        ],
+        "points": 1,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          130.0000000052,
+          139.99999999719998
+        ]
+      },
+      {
+        "band": 15,
+        "components": [
+          "CO2:1",
+          "CO2-CO2:1"
+        ],
+        "points": 1,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          139.99999999719998,
+          149.99999999250002
+        ]
+      },
+      {
+        "band": 16,
+        "components": [
+          "CO2:1",
+          "CO2-CO2:1"
+        ],
+        "points": 1,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          149.99999999250002,
+          160.0
+        ]
+      },
+      {
+        "band": 17,
+        "components": [
+          "CO2:1",
+          "CO2-CO2:1"
+        ],
+        "points": 1,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          160.0,
+          170.00000000510002
+        ]
+      },
+      {
+        "band": 18,
+        "components": [
+          "CO2:1",
+          "CO2-CO2:1"
+        ],
+        "points": 1,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          170.00000000510002,
+          179.9999999856
+        ]
+      },
+      {
+        "band": 19,
+        "components": [
+          "CO2:1",
+          "CO2-CO2:1"
+        ],
+        "points": 1,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          179.9999999856,
+          189.99999999050002
+        ]
+      },
+      {
+        "band": 20,
+        "components": [
+          "CO2:1",
+          "CO2-CO2:1"
+        ],
+        "points": 1,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          189.99999999050002,
+          200.0
+        ]
+      },
+      {
+        "band": 21,
+        "components": [
+          "CO2:1",
+          "CO2-CO2:1"
+        ],
+        "points": 1,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          200.0,
+          209.9999999958
+        ]
+      },
+      {
+        "band": 22,
+        "components": [
+          "CO2:1",
+          "CO2-CO2:1"
+        ],
+        "points": 1,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          209.9999999958,
+          220.000000022
+        ]
+      },
+      {
+        "band": 23,
+        "components": [
+          "CO2:1",
+          "CO2-CO2:1"
+        ],
+        "points": 1,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          220.000000022,
+          229.9999999977
+        ]
+      },
+      {
+        "band": 24,
+        "components": [
+          "CO2:1",
+          "CO2-CO2:1"
+        ],
+        "points": 1,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          229.9999999977,
+          239.99999998080003
+        ]
+      },
+      {
+        "band": 25,
+        "components": [
+          "CO2:1",
+          "CO2-CO2:1"
+        ],
+        "points": 1,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          239.99999998080003,
+          249.99999999999997
+        ]
+      },
+      {
+        "band": 26,
+        "components": [
+          "CO2:1"
+        ],
+        "points": 1,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          249.99999999999997,
+          260.0000000104
+        ]
+      },
+      {
+        "band": 27,
+        "components": [
+          "CO2:1"
+        ],
+        "points": 1,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          260.0000000104,
+          269.9999999784
+        ]
+      },
+      {
+        "band": 28,
+        "components": [
+          "CO2:1"
+        ],
+        "points": 1,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          269.9999999784,
+          280.0000000336
+        ]
+      },
+      {
+        "band": 29,
+        "components": [
+          "CO2:1"
+        ],
+        "points": 1,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          280.0000000336,
+          290.00000000579996
+        ]
+      },
+      {
+        "band": 30,
+        "components": [
+          "CO2:1"
+        ],
+        "points": 1,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          290.00000000579996,
+          300.00000002999997
+        ]
+      },
+      {
+        "band": 31,
+        "components": [
+          "CO2:1"
+        ],
+        "points": 1,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          300.00000002999997,
+          309.9999999628
+        ]
+      },
+      {
+        "band": 32,
+        "components": [
+          "CO2:1"
+        ],
+        "points": 1,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          309.9999999628,
+          320.0
+        ]
+      },
+      {
+        "band": 33,
+        "components": [
+          "CO2:1"
+        ],
+        "points": 1,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          320.0,
+          330.000000033
+        ]
+      },
+      {
+        "band": 34,
+        "components": [
+          "CO2:1"
+        ],
+        "points": 1,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          330.000000033,
+          339.9999999524
+        ]
+      },
+      {
+        "band": 35,
+        "components": [
+          "CO2:1"
+        ],
+        "points": 1,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          339.9999999524,
+          350.00000001750004
+        ]
+      },
+      {
+        "band": 36,
+        "components": [
+          "CO2:1"
+        ],
+        "points": 1,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          350.00000001750004,
+          359.9999999712
+        ]
+      },
+      {
+        "band": 37,
+        "components": [
+          "CO2:1"
+        ],
+        "points": 1,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          359.9999999712,
+          369.9999999593
+        ]
+      },
+      {
+        "band": 38,
+        "components": [
+          "CO2:1"
+        ],
+        "points": 1,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          369.9999999593,
+          380.0000000532
+        ]
+      },
+      {
+        "band": 39,
+        "components": [
+          "CO2:1"
+        ],
+        "points": 1,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          380.0000000532,
+          390.0000000156
+        ]
+      },
+      {
+        "band": 40,
+        "components": [
+          "CO2:1"
+        ],
+        "points": 1,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          390.0000000156,
+          400.0
+        ]
+      },
+      {
+        "band": 41,
+        "components": [
+          "CO2:1"
+        ],
+        "points": 1,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          400.0,
+          410.00000004099996
+        ]
+      },
+      {
+        "band": 42,
+        "components": [
+          "CO2:1"
+        ],
+        "points": 1,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          410.00000004099996,
+          419.9999999916
+        ]
+      },
+      {
+        "band": 43,
+        "components": [
+          "CO2:1"
+        ],
+        "points": 1,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          419.9999999916,
+          430.0000000645
+        ]
+      },
+      {
+        "band": 44,
+        "components": [
+          "CO2:1"
+        ],
+        "points": 1,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          430.0000000645,
+          439.9999999472
+        ]
+      },
+      {
+        "band": 45,
+        "components": [
+          "CO2:1"
+        ],
+        "points": 1,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          439.9999999472,
+          450.00000004500004
+        ]
+      },
+      {
+        "band": 46,
+        "components": [
+          "CO2:1"
+        ],
+        "points": 1,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          450.00000004500004,
+          460.0000001012
+        ]
+      },
+      {
+        "band": 47,
+        "components": [
+          "CO2:1"
+        ],
+        "points": 1,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          460.0000001012,
+          470.00000010340005
+        ]
+      },
+      {
+        "band": 48,
+        "components": [
+          "CO2:6"
+        ],
+        "points": 6,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          470.00000010340005,
+          480.0000000768
+        ]
+      },
+      {
+        "band": 49,
+        "components": [
+          "CO2:3"
+        ],
+        "points": 3,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          480.0000000768,
+          489.9999998873
+        ]
+      },
+      {
+        "band": 50,
+        "components": [
+          "CO2:6"
+        ],
+        "points": 6,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          489.9999998873,
+          499.99999999999994
+        ]
+      },
+      {
+        "band": 51,
+        "components": [
+          "CO2:18"
+        ],
+        "points": 18,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          499.99999999999994,
+          509.9999999286
+        ]
+      },
+      {
+        "band": 52,
+        "components": [
+          "CO2:26"
+        ],
+        "points": 26,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          509.9999999286,
+          520.0000000208
+        ]
+      },
+      {
+        "band": 53,
+        "components": [
+          "CO2:28"
+        ],
+        "points": 28,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          520.0000000208,
+          529.9999999523001
+        ]
+      },
+      {
+        "band": 54,
+        "components": [
+          "CO2:27"
+        ],
+        "points": 27,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          529.9999999523001,
+          539.9999999568
+        ]
+      },
+      {
+        "band": 55,
+        "components": [
+          "CO2:32"
+        ],
+        "points": 32,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          539.9999999568,
+          550.0000000550001
+        ]
+      },
+      {
+        "band": 56,
+        "components": [
+          "CO2:27"
+        ],
+        "points": 27,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          550.0000000550001,
+          559.9999999104
+        ]
+      },
+      {
+        "band": 57,
+        "components": [
+          "CO2:28"
+        ],
+        "points": 28,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          559.9999999104,
+          569.9999999715001
+        ]
+      },
+      {
+        "band": 58,
+        "components": [
+          "CO2:32"
+        ],
+        "points": 32,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          569.9999999715001,
+          580.0000000115999
+        ]
+      },
+      {
+        "band": 59,
+        "components": [
+          "CO2:39"
+        ],
+        "points": 39,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          580.0000000115999,
+          590.0000000826
+        ]
+      },
+      {
+        "band": 60,
+        "components": [
+          "CO2:40"
+        ],
+        "points": 40,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          590.0000000826,
+          599.99999988
+        ]
+      },
+      {
+        "band": 61,
+        "components": [
+          "CO2:40"
+        ],
+        "points": 40,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          599.99999988,
+          610.0000001098001
+        ]
+      },
+      {
+        "band": 62,
+        "components": [
+          "CO2:41"
+        ],
+        "points": 41,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          610.0000001098001,
+          619.9999999256
+        ]
+      },
+      {
+        "band": 63,
+        "components": [
+          "CO2:39"
+        ],
+        "points": 39,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          619.9999999256,
+          630.0000001197
+        ]
+      },
+      {
+        "band": 64,
+        "components": [
+          "CO2:44"
+        ],
+        "points": 44,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          630.0000001197,
+          640.0
+        ]
+      },
+      {
+        "band": 65,
+        "components": [
+          "CO2:46"
+        ],
+        "points": 46,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          640.0,
+          650.000000195
+        ]
+      },
+      {
+        "band": 66,
+        "components": [
+          "CO2:44"
+        ],
+        "points": 44,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          650.000000195,
+          660.000000066
+        ]
+      },
+      {
+        "band": 67,
+        "components": [
+          "CO2:48"
+        ],
+        "points": 48,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          660.000000066,
+          670.0000001943
+        ]
+      },
+      {
+        "band": 68,
+        "components": [
+          "CO2:47"
+        ],
+        "points": 47,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          670.0000001943,
+          680.000000136
+        ]
+      },
+      {
+        "band": 69,
+        "components": [
+          "CO2:46"
+        ],
+        "points": 46,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          680.000000136,
+          690.0000001518
+        ]
+      },
+      {
+        "band": 70,
+        "components": [
+          "CO2:46"
+        ],
+        "points": 46,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          690.0000001518,
+          699.9999997900001
+        ]
+      },
+      {
+        "band": 71,
+        "components": [
+          "CO2:44"
+        ],
+        "points": 44,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          699.9999997900001,
+          710.0000001136
+        ]
+      },
+      {
+        "band": 72,
+        "components": [
+          "CO2:37"
+        ],
+        "points": 37,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          710.0000001136,
+          719.9999999424
+        ]
+      },
+      {
+        "band": 73,
+        "components": [
+          "CO2:41"
+        ],
+        "points": 41,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          719.9999999424,
+          729.9999998394001
+        ]
+      },
+      {
+        "band": 74,
+        "components": [
+          "CO2:39"
+        ],
+        "points": 39,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          729.9999998394001,
+          740.0000001924
+        ]
+      },
+      {
+        "band": 75,
+        "components": [
+          "CO2:40"
+        ],
+        "points": 40,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          740.0000001924,
+          750.0000001875001
+        ]
+      },
+      {
+        "band": 76,
+        "components": [
+          "CO2:37"
+        ],
+        "points": 37,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          750.0000001875001,
+          759.9999998175999
+        ]
+      },
+      {
+        "band": 77,
+        "components": [
+          "CO2:32"
+        ],
+        "points": 32,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          759.9999998175999,
+          769.9999998229
+        ]
+      },
+      {
+        "band": 78,
+        "components": [
+          "CO2:29"
+        ],
+        "points": 29,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          769.9999998229,
+          780.0000000312
+        ]
+      },
+      {
+        "band": 79,
+        "components": [
+          "CO2:28"
+        ],
+        "points": 28,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          780.0000000312,
+          789.9999998815
+        ]
+      },
+      {
+        "band": 80,
+        "components": [
+          "CO2:31"
+        ],
+        "points": 31,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          789.9999998815,
+          800.0
+        ]
+      },
+      {
+        "band": 81,
+        "components": [
+          "CO2:29"
+        ],
+        "points": 29,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          800.0,
+          810.0000001539
+        ]
+      },
+      {
+        "band": 82,
+        "components": [
+          "CO2:29"
+        ],
+        "points": 29,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          810.0000001539,
+          820.0000000819999
+        ]
+      },
+      {
+        "band": 83,
+        "components": [
+          "CO2:26"
+        ],
+        "points": 26,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          820.0000000819999,
+          830.0000000747
+        ]
+      },
+      {
+        "band": 84,
+        "components": [
+          "CO2:20"
+        ],
+        "points": 20,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          830.0000000747,
+          840.0000003360001
+        ]
+      },
+      {
+        "band": 85,
+        "components": [
+          "CO2:18"
+        ],
+        "points": 18,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          840.0000003360001,
+          850.00000017
+        ]
+      },
+      {
+        "band": 86,
+        "components": [
+          "CO2:15"
+        ],
+        "points": 15,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          850.00000017,
+          859.9999997592
+        ]
+      },
+      {
+        "band": 87,
+        "components": [
+          "CO2:17"
+        ],
+        "points": 17,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          859.9999997592,
+          870.0000002697001
+        ]
+      },
+      {
+        "band": 88,
+        "components": [
+          "CO2:13"
+        ],
+        "points": 13,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          870.0000002697001,
+          880.0000002816
+        ]
+      },
+      {
+        "band": 89,
+        "components": [
+          "CO2:20"
+        ],
+        "points": 20,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          880.0000002816,
+          889.9999996974001
+        ]
+      },
+      {
+        "band": 90,
+        "components": [
+          "CO2:22"
+        ],
+        "points": 22,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          889.9999996974001,
+          900.0000000900001
+        ]
+      },
+      {
+        "band": 91,
+        "components": [
+          "CO2:23"
+        ],
+        "points": 23,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          900.0000000900001,
+          909.9999999181
+        ]
+      },
+      {
+        "band": 92,
+        "components": [
+          "CO2:24"
+        ],
+        "points": 24,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          909.9999999181,
+          919.9999997791999
+        ]
+      },
+      {
+        "band": 93,
+        "components": [
+          "CO2:29"
+        ],
+        "points": 29,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          919.9999997791999,
+          930.0000001766999
+        ]
+      },
+      {
+        "band": 94,
+        "components": [
+          "CO2:29"
+        ],
+        "points": 29,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          930.0000001766999,
+          940.0000002068001
+        ]
+      },
+      {
+        "band": 95,
+        "components": [
+          "CO2:29"
+        ],
+        "points": 29,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          940.0000002068001,
+          949.9999999525
+        ]
+      },
+      {
+        "band": 96,
+        "components": [
+          "CO2:31"
+        ],
+        "points": 31,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          949.9999999525,
+          959.9999996928
+        ]
+      },
+      {
+        "band": 97,
+        "components": [
+          "CO2:34"
+        ],
+        "points": 34,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          959.9999996928,
+          970.0000000485
+        ]
+      },
+      {
+        "band": 98,
+        "components": [
+          "CO2:28"
+        ],
+        "points": 28,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          970.0000000485,
+          980.0000002548
+        ]
+      },
+      {
+        "band": 99,
+        "components": [
+          "CO2:31"
+        ],
+        "points": 31,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          980.0000002548,
+          990.0000000990001
+        ]
+      },
+      {
+        "band": 100,
+        "components": [
+          "CO2:28"
+        ],
+        "points": 28,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          990.0000000990001,
+          999.9999999999999
+        ]
+      },
+      {
+        "band": 101,
+        "components": [
+          "CO2:22"
+        ],
+        "points": 22,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          999.9999999999999,
+          1010.0000000010101
+        ]
+      },
+      {
+        "band": 102,
+        "components": [
+          "CO2:25"
+        ],
+        "points": 25,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          1010.0000000010101,
+          1019.9999999612401
+        ]
+      },
+      {
+        "band": 103,
+        "components": [
+          "CO2:29"
+        ],
+        "points": 29,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          1019.9999999612401,
+          1030.00000000824
+        ]
+      },
+      {
+        "band": 104,
+        "components": [
+          "CO2:32"
+        ],
+        "points": 32,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          1030.00000000824,
+          1040.0000000416
+        ]
+      },
+      {
+        "band": 105,
+        "components": [
+          "CO2:32"
+        ],
+        "points": 32,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          1040.0000000416,
+          1049.999999979
+        ]
+      },
+      {
+        "band": 106,
+        "components": [
+          "CO2:29"
+        ],
+        "points": 29,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          1049.999999979,
+          1060.00000001696
+        ]
+      },
+      {
+        "band": 107,
+        "components": [
+          "CO2:32"
+        ],
+        "points": 32,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          1060.00000001696,
+          1069.9999999454299
+        ]
+      },
+      {
+        "band": 108,
+        "components": [
+          "CO2:29"
+        ],
+        "points": 29,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          1069.9999999454299,
+          1080.00000003024
+        ]
+      },
+      {
+        "band": 109,
+        "components": [
+          "CO2:31"
+        ],
+        "points": 31,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          1080.00000003024,
+          1089.99999995313
+        ]
+      },
+      {
+        "band": 110,
+        "components": [
+          "CO2:30"
+        ],
+        "points": 30,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          1089.99999995313,
+          1099.9999999890001
+        ]
+      },
+      {
+        "band": 111,
+        "components": [
+          "CO2:18"
+        ],
+        "points": 18,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          1099.9999999890001,
+          1110.00000000111
+        ]
+      },
+      {
+        "band": 112,
+        "components": [
+          "CO2:2"
+        ],
+        "points": 2,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          1110.00000000111,
+          1119.99999994624
+        ]
+      },
+      {
+        "band": 113,
+        "components": [
+          "CO2:2"
+        ],
+        "points": 2,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          1119.99999994624,
+          1130.00000001582
+        ]
+      },
+      {
+        "band": 114,
+        "components": [
+          "CO2:2"
+        ],
+        "points": 2,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          1130.00000001582,
+          1139.9999999430001
+        ]
+      },
+      {
+        "band": 115,
+        "components": [
+          "CO2:2"
+        ],
+        "points": 2,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          1139.9999999430001,
+          1149.9999999885
+        ]
+      },
+      {
+        "band": 116,
+        "components": [
+          "CO2:2",
+          "CO2-CO2:12"
+        ],
+        "points": 24,
+        "random_overlap_acts": true,
+        "wavenumber_cm": [
+          1149.9999999885,
+          1160.0000000231998
+        ]
+      },
+      {
+        "band": 117,
+        "components": [
+          "CO2:1",
+          "CO2-CO2:3"
+        ],
+        "points": 3,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          1160.0000000231998,
+          1170.00000000117
+        ]
+      },
+      {
+        "band": 118,
+        "components": [
+          "CO2:1",
+          "CO2-CO2:1"
+        ],
+        "points": 1,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          1170.00000000117,
+          1180.00000002596
+        ]
+      },
+      {
+        "band": 119,
+        "components": [
+          "CO2:1",
+          "CO2-CO2:2"
+        ],
+        "points": 2,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          1180.00000002596,
+          1189.99999993455
+        ]
+      },
+      {
+        "band": 120,
+        "components": [
+          "CO2:3",
+          "CO2-CO2:2"
+        ],
+        "points": 6,
+        "random_overlap_acts": true,
+        "wavenumber_cm": [
+          1189.99999993455,
+          1200.0000000480002
+        ]
+      },
+      {
+        "band": 121,
+        "components": [
+          "CO2:6",
+          "CO2-CO2:2"
+        ],
+        "points": 12,
+        "random_overlap_acts": true,
+        "wavenumber_cm": [
+          1200.0000000480002,
+          1209.9999999878999
+        ]
+      },
+      {
+        "band": 122,
+        "components": [
+          "CO2:17",
+          "CO2-CO2:1"
+        ],
+        "points": 17,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          1209.9999999878999,
+          1220.00000007076
+        ]
+      },
+      {
+        "band": 123,
+        "components": [
+          "CO2:22",
+          "CO2-CO2:2"
+        ],
+        "points": 44,
+        "random_overlap_acts": true,
+        "wavenumber_cm": [
+          1220.00000007076,
+          1229.99999997171
+        ]
+      },
+      {
+        "band": 124,
+        "components": [
+          "CO2:24",
+          "CO2-CO2:2"
+        ],
+        "points": 48,
+        "random_overlap_acts": true,
+        "wavenumber_cm": [
+          1229.99999997171,
+          1240.00000000496
+        ]
+      },
+      {
+        "band": 125,
+        "components": [
+          "CO2:22",
+          "CO2-CO2:2"
+        ],
+        "points": 44,
+        "random_overlap_acts": true,
+        "wavenumber_cm": [
+          1240.00000000496,
+          1250.0
+        ]
+      },
+      {
+        "band": 126,
+        "components": [
+          "CO2:25",
+          "CO2-CO2:1"
+        ],
+        "points": 25,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          1250.0,
+          1259.99999992188
+        ]
+      },
+      {
+        "band": 127,
+        "components": [
+          "CO2:25",
+          "CO2-CO2:2"
+        ],
+        "points": 50,
+        "random_overlap_acts": true,
+        "wavenumber_cm": [
+          1259.99999992188,
+          1270.00000000508
+        ]
+      },
+      {
+        "band": 128,
+        "components": [
+          "CO2:24",
+          "CO2-CO2:2"
+        ],
+        "points": 48,
+        "random_overlap_acts": true,
+        "wavenumber_cm": [
+          1270.00000000508,
+          1280.0
+        ]
+      },
+      {
+        "band": 129,
+        "components": [
+          "CO2:23",
+          "CO2-CO2:1"
+        ],
+        "points": 23,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          1280.0,
+          1290.00000008256
+        ]
+      },
+      {
+        "band": 130,
+        "components": [
+          "CO2:23",
+          "CO2-CO2:2"
+        ],
+        "points": 46,
+        "random_overlap_acts": true,
+        "wavenumber_cm": [
+          1290.00000008256,
+          1300.000000052
+        ]
+      },
+      {
+        "band": 131,
+        "components": [
+          "CO2:14",
+          "CO2-CO2:1"
+        ],
+        "points": 14,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          1300.000000052,
+          1310.00000004454
+        ]
+      },
+      {
+        "band": 132,
+        "components": [
+          "CO2:7",
+          "CO2-CO2:1"
+        ],
+        "points": 7,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          1310.00000004454,
+          1319.99999995776
+        ]
+      },
+      {
+        "band": 133,
+        "components": [
+          "CO2:19",
+          "CO2-CO2:1"
+        ],
+        "points": 19,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          1319.99999995776,
+          1330.00000008512
+        ]
+      },
+      {
+        "band": 134,
+        "components": [
+          "CO2:23",
+          "CO2-CO2:1"
+        ],
+        "points": 23,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          1330.00000008512,
+          1340.0000000294801
+        ]
+      },
+      {
+        "band": 135,
+        "components": [
+          "CO2:24",
+          "CO2-CO2:1"
+        ],
+        "points": 24,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          1340.0000000294801,
+          1350.00000007425
+        ]
+      },
+      {
+        "band": 136,
+        "components": [
+          "CO2:22",
+          "CO2-CO2:1"
+        ],
+        "points": 22,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          1350.00000007425,
+          1360.00000008704
+        ]
+      },
+      {
+        "band": 137,
+        "components": [
+          "CO2:25",
+          "CO2-CO2:1"
+        ],
+        "points": 25,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          1360.00000008704,
+          1369.99999999863
+        ]
+      },
+      {
+        "band": 138,
+        "components": [
+          "CO2:23",
+          "CO2-CO2:1"
+        ],
+        "points": 23,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          1369.99999999863,
+          1379.99999992272
+        ]
+      },
+      {
+        "band": 139,
+        "components": [
+          "CO2:24",
+          "CO2-CO2:1"
+        ],
+        "points": 24,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          1379.99999992272,
+          1390.00000006116
+        ]
+      },
+      {
+        "band": 140,
+        "components": [
+          "CO2:23",
+          "CO2-CO2:1"
+        ],
+        "points": 23,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          1390.00000006116,
+          1399.999999972
+        ]
+      },
+      {
+        "band": 141,
+        "components": [
+          "CO2:18",
+          "CO2-CO2:1"
+        ],
+        "points": 18,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          1399.999999972,
+          1409.99999991258
+        ]
+      },
+      {
+        "band": 142,
+        "components": [
+          "CO2:14",
+          "CO2-CO2:1"
+        ],
+        "points": 14,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          1409.99999991258,
+          1420.00000002556
+        ]
+      },
+      {
+        "band": 143,
+        "components": [
+          "CO2:7",
+          "CO2-CO2:1"
+        ],
+        "points": 7,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          1420.00000002556,
+          1430.00000000143
+        ]
+      },
+      {
+        "band": 144,
+        "components": [
+          "CO2:4",
+          "CO2-CO2:1"
+        ],
+        "points": 4,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          1430.00000000143,
+          1440.00000009216
+        ]
+      },
+      {
+        "band": 145,
+        "components": [
+          "CO2:2",
+          "CO2-CO2:1"
+        ],
+        "points": 2,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          1440.00000009216,
+          1450.0000000290001
+        ]
+      },
+      {
+        "band": 146,
+        "components": [
+          "CO2:1",
+          "CO2-CO2:1"
+        ],
+        "points": 1,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          1450.0000000290001,
+          1460.00000010512
+        ]
+      },
+      {
+        "band": 147,
+        "components": [
+          "CO2:1",
+          "CO2-CO2:1"
+        ],
+        "points": 1,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          1460.00000010512,
+          1470.00000009408
+        ]
+      },
+      {
+        "band": 148,
+        "components": [
+          "CO2:1",
+          "CO2-CO2:1"
+        ],
+        "points": 1,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          1470.00000009408,
+          1479.99999994672
+        ]
+      },
+      {
+        "band": 149,
+        "components": [
+          "CO2:1",
+          "CO2-CO2:1"
+        ],
+        "points": 1,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          1479.99999994672,
+          1489.99999999404
+        ]
+      },
+      {
+        "band": 150,
+        "components": [
+          "CO2:1",
+          "CO2-CO2:1"
+        ],
+        "points": 1,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          1489.99999999404,
+          1499.9999999249999
+        ]
+      },
+      {
+        "band": 151,
+        "components": [
+          "CO2:1",
+          "CO2-CO2:1"
+        ],
+        "points": 1,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          1499.9999999249999,
+          1510.00000006644
+        ]
+      },
+      {
+        "band": 152,
+        "components": [
+          "CO2:1",
+          "CO2-CO2:1"
+        ],
+        "points": 1,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          1510.00000006644,
+          1520.00000009728
+        ]
+      },
+      {
+        "band": 153,
+        "components": [
+          "CO2:1",
+          "CO2-CO2:1"
+        ],
+        "points": 1,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          1520.00000009728,
+          1530.00000009792
+        ]
+      },
+      {
+        "band": 154,
+        "components": [
+          "CO2:1",
+          "CO2-CO2:2"
+        ],
+        "points": 2,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          1530.00000009792,
+          1539.99999988296
+        ]
+      },
+      {
+        "band": 155,
+        "components": [
+          "CO2:1",
+          "CO2-CO2:13"
+        ],
+        "points": 13,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          1539.99999988296,
+          1550.00000005425
+        ]
+      },
+      {
+        "band": 156,
+        "components": [
+          "CO2:1"
+        ],
+        "points": 1,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          1550.00000005425,
+          1560.0000000624
+        ]
+      },
+      {
+        "band": 157,
+        "components": [
+          "CO2:1"
+        ],
+        "points": 1,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          1560.0000000624,
+          1569.99999989952
+        ]
+      },
+      {
+        "band": 158,
+        "components": [
+          "CO2:1"
+        ],
+        "points": 1,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          1569.99999989952,
+          1580.00000001264
+        ]
+      },
+      {
+        "band": 159,
+        "components": [
+          "CO2:1"
+        ],
+        "points": 1,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          1580.00000001264,
+          1590.00000002544
+        ]
+      },
+      {
+        "band": 160,
+        "components": [
+          "CO2:1"
+        ],
+        "points": 1,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          1590.00000002544,
+          1600.0
+        ]
+      },
+      {
+        "band": 161,
+        "components": [
+          "CO2:1"
+        ],
+        "points": 1,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          1600.0,
+          1610.00000005796
+        ]
+      },
+      {
+        "band": 162,
+        "components": [
+          "CO2:1"
+        ],
+        "points": 1,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          1610.00000005796,
+          1620.00000004536
+        ]
+      },
+      {
+        "band": 163,
+        "components": [
+          "CO2:1"
+        ],
+        "points": 1,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          1620.00000004536,
+          1630.00000004075
+        ]
+      },
+      {
+        "band": 164,
+        "components": [
+          "CO2:1"
+        ],
+        "points": 1,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          1630.00000004075,
+          1639.99999989504
+        ]
+      },
+      {
+        "band": 165,
+        "components": [
+          "CO2:1"
+        ],
+        "points": 1,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          1639.99999989504,
+          1649.99999989275
+        ]
+      },
+      {
+        "band": 166,
+        "components": [
+          "CO2:1"
+        ],
+        "points": 1,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          1649.99999989275,
+          1659.9999998738401
+        ]
+      },
+      {
+        "band": 167,
+        "components": [
+          "CO2:1"
+        ],
+        "points": 1,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          1659.9999998738401,
+          1670.00000002672
+        ]
+      },
+      {
+        "band": 168,
+        "components": [
+          "CO2:1"
+        ],
+        "points": 1,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          1670.00000002672,
+          1680.00000010752
+        ]
+      },
+      {
+        "band": 169,
+        "components": [
+          "CO2:1"
+        ],
+        "points": 1,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          1680.00000010752,
+          1690.0000000895702
+        ]
+      },
+      {
+        "band": 170,
+        "components": [
+          "CO2:1"
+        ],
+        "points": 1,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          1690.0000000895702,
+          1700.000000051
+        ]
+      },
+      {
+        "band": 171,
+        "components": [
+          "CO2:1"
+        ],
+        "points": 1,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          1700.000000051,
+          1710.00000010944
+        ]
+      },
+      {
+        "band": 172,
+        "components": [
+          "CO2:1"
+        ],
+        "points": 1,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          1710.00000010944,
+          1720.00000011008
+        ]
+      },
+      {
+        "band": 173,
+        "components": [
+          "CO2:1"
+        ],
+        "points": 1,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          1720.00000011008,
+          1729.99999994291
+        ]
+      },
+      {
+        "band": 174,
+        "components": [
+          "CO2:1"
+        ],
+        "points": 1,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          1729.99999994291,
+          1739.9999999338802
+        ]
+      },
+      {
+        "band": 175,
+        "components": [
+          "CO2:1"
+        ],
+        "points": 1,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          1739.9999999338802,
+          1750.0000000875
+        ]
+      },
+      {
+        "band": 176,
+        "components": [
+          "CO2:1"
+        ],
+        "points": 1,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          1750.0000000875,
+          1759.9999999436802
+        ]
+      },
+      {
+        "band": 177,
+        "components": [
+          "CO2:1"
+        ],
+        "points": 1,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          1759.9999999436802,
+          1770.00000003894
+        ]
+      },
+      {
+        "band": 178,
+        "components": [
+          "CO2:1"
+        ],
+        "points": 1,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          1770.00000003894,
+          1780.00000002848
+        ]
+      },
+      {
+        "band": 179,
+        "components": [
+          "CO2:1"
+        ],
+        "points": 1,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          1780.00000002848,
+          1789.9999999266101
+        ]
+      },
+      {
+        "band": 180,
+        "components": [
+          "CO2:2"
+        ],
+        "points": 2,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          1789.9999999266101,
+          1799.9999998560002
+        ]
+      },
+      {
+        "band": 181,
+        "components": [
+          "CO2:3"
+        ],
+        "points": 3,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          1799.9999998560002,
+          1810.00000014842
+        ]
+      },
+      {
+        "band": 182,
+        "components": [
+          "CO2:3"
+        ],
+        "points": 3,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          1810.00000014842,
+          1819.9999998362
+        ]
+      },
+      {
+        "band": 183,
+        "components": [
+          "CO2:5"
+        ],
+        "points": 5,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          1819.9999998362,
+          1830.00000010614
+        ]
+      },
+      {
+        "band": 184,
+        "components": [
+          "CO2:18"
+        ],
+        "points": 18,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          1830.00000010614,
+          1839.9999998969602
+        ]
+      },
+      {
+        "band": 185,
+        "components": [
+          "CO2:23"
+        ],
+        "points": 23,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          1839.9999998969602,
+          1850.00000013875
+        ]
+      },
+      {
+        "band": 186,
+        "components": [
+          "CO2:23"
+        ],
+        "points": 23,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          1850.00000013875,
+          1860.0000000074401
+        ]
+      },
+      {
+        "band": 187,
+        "components": [
+          "CO2:23"
+        ],
+        "points": 23,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          1860.0000000074401,
+          1869.9999999607298
+        ]
+      },
+      {
+        "band": 188,
+        "components": [
+          "CO2:20"
+        ],
+        "points": 20,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          1869.9999999607298,
+          1880.0000000601601
+        ]
+      },
+      {
+        "band": 189,
+        "components": [
+          "CO2:22"
+        ],
+        "points": 22,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          1880.0000000601601,
+          1890.0000000018902
+        ]
+      },
+      {
+        "band": 190,
+        "components": [
+          "CO2:29"
+        ],
+        "points": 29,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          1890.0000000018902,
+          1899.999999905
+        ]
+      },
+      {
+        "band": 191,
+        "components": [
+          "CO2:31"
+        ],
+        "points": 31,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          1899.999999905,
+          1910.0000000878601
+        ]
+      },
+      {
+        "band": 192,
+        "components": [
+          "CO2:29"
+        ],
+        "points": 29,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          1910.0000000878601,
+          1920.00000012288
+        ]
+      },
+      {
+        "band": 193,
+        "components": [
+          "CO2:31"
+        ],
+        "points": 31,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          1920.00000012288,
+          1930.0000000965001
+        ]
+      },
+      {
+        "band": 194,
+        "components": [
+          "CO2:31"
+        ],
+        "points": 31,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          1930.0000000965001,
+          1940.000000097
+        ]
+      },
+      {
+        "band": 195,
+        "components": [
+          "CO2:26"
+        ],
+        "points": 26,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          1940.000000097,
+          1950.0000000779999
+        ]
+      },
+      {
+        "band": 196,
+        "components": [
+          "CO2:28"
+        ],
+        "points": 28,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          1950.0000000779999,
+          1960.00000012544
+        ]
+      },
+      {
+        "band": 197,
+        "components": [
+          "CO2:28"
+        ],
+        "points": 28,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          1960.00000012544,
+          1969.99999999212
+        ]
+      },
+      {
+        "band": 198,
+        "components": [
+          "CO2:26"
+        ],
+        "points": 26,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          1969.99999999212,
+          1979.99999980596
+        ]
+      },
+      {
+        "band": 199,
+        "components": [
+          "CO2:22"
+        ],
+        "points": 22,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          1979.99999980596,
+          1990.0000000557202
+        ]
+      },
+      {
+        "band": 200,
+        "components": [
+          "CO2:22"
+        ],
+        "points": 22,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          1990.0000000557202,
+          1999.9999999999998
+        ]
+      },
+      {
+        "band": 201,
+        "components": [
+          "CO2:27"
+        ],
+        "points": 27,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          1999.9999999999998,
+          2010.00000004422
+        ]
+      },
+      {
+        "band": 202,
+        "components": [
+          "CO2:26"
+        ],
+        "points": 26,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          2010.00000004422,
+          2019.999999798
+        ]
+      },
+      {
+        "band": 203,
+        "components": [
+          "CO2:25"
+        ],
+        "points": 25,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          2019.999999798,
+          2030.0000001583398
+        ]
+      },
+      {
+        "band": 204,
+        "components": [
+          "CO2:31"
+        ],
+        "points": 31,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          2030.0000001583398,
+          2040.00000013056
+        ]
+      },
+      {
+        "band": 205,
+        "components": [
+          "CO2:33"
+        ],
+        "points": 33,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          2040.00000013056,
+          2050.000000205
+        ]
+      },
+      {
+        "band": 206,
+        "components": [
+          "CO2:33"
+        ],
+        "points": 33,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          2050.000000205,
+          2060.00000001648
+        ]
+      },
+      {
+        "band": 207,
+        "components": [
+          "CO2:32"
+        ],
+        "points": 32,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          2060.00000001648,
+          2070.00000016974
+        ]
+      },
+      {
+        "band": 208,
+        "components": [
+          "CO2:33"
+        ],
+        "points": 33,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          2070.00000016974,
+          2079.99999986688
+        ]
+      },
+      {
+        "band": 209,
+        "components": [
+          "CO2:30"
+        ],
+        "points": 30,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          2079.99999986688,
+          2090.00000009405
+        ]
+      },
+      {
+        "band": 210,
+        "components": [
+          "CO2:28"
+        ],
+        "points": 28,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          2090.00000009405,
+          2099.999999958
+        ]
+      },
+      {
+        "band": 211,
+        "components": [
+          "CO2:27"
+        ],
+        "points": 27,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          2099.999999958,
+          2109.9999999514703
+        ]
+      },
+      {
+        "band": 212,
+        "components": [
+          "CO2:26"
+        ],
+        "points": 26,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          2109.9999999514703,
+          2120.00000003392
+        ]
+      },
+      {
+        "band": 213,
+        "components": [
+          "CO2:27"
+        ],
+        "points": 27,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          2120.00000003392,
+          2129.9999998871103
+        ]
+      },
+      {
+        "band": 214,
+        "components": [
+          "CO2:22"
+        ],
+        "points": 22,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          2129.9999998871103,
+          2140.00000011984
+        ]
+      },
+      {
+        "band": 215,
+        "components": [
+          "CO2:19"
+        ],
+        "points": 19,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          2140.00000011984,
+          2149.99999986025
+        ]
+      },
+      {
+        "band": 216,
+        "components": [
+          "CO2:15"
+        ],
+        "points": 15,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          2149.99999986025,
+          2159.9999998272
+        ]
+      },
+      {
+        "band": 217,
+        "components": [
+          "CO2:15"
+        ],
+        "points": 15,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          2159.9999998272,
+          2169.99999994141
+        ]
+      },
+      {
+        "band": 218,
+        "components": [
+          "CO2:10"
+        ],
+        "points": 10,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          2169.99999994141,
+          2180.00000014388
+        ]
+      },
+      {
+        "band": 219,
+        "components": [
+          "CO2:13"
+        ],
+        "points": 13,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          2180.00000014388,
+          2189.9999998379403
+        ]
+      },
+      {
+        "band": 220,
+        "components": [
+          "CO2:18"
+        ],
+        "points": 18,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          2189.9999998379403,
+          2200.0000002200004
+        ]
+      },
+      {
+        "band": 221,
+        "components": [
+          "CO2:20"
+        ],
+        "points": 20,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          2200.0000002200004,
+          2209.99999991602
+        ]
+      },
+      {
+        "band": 222,
+        "components": [
+          "CO2:27"
+        ],
+        "points": 27,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          2209.99999991602,
+          2219.9999997557998
+        ]
+      },
+      {
+        "band": 223,
+        "components": [
+          "CO2:32"
+        ],
+        "points": 32,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          2219.9999997557998,
+          2229.9999998684298
+        ]
+      },
+      {
+        "band": 224,
+        "components": [
+          "CO2:35"
+        ],
+        "points": 35,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          2229.9999998684298,
+          2240.00000014336
+        ]
+      },
+      {
+        "band": 225,
+        "components": [
+          "CO2:40"
+        ],
+        "points": 40,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          2240.00000014336,
+          2250.000000225
+        ]
+      },
+      {
+        "band": 226,
+        "components": [
+          "CO2:41"
+        ],
+        "points": 41,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          2250.000000225,
+          2260.00000003164
+        ]
+      },
+      {
+        "band": 227,
+        "components": [
+          "CO2:41"
+        ],
+        "points": 41,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          2260.00000003164,
+          2269.9999998002404
+        ]
+      },
+      {
+        "band": 228,
+        "components": [
+          "CO2:40"
+        ],
+        "points": 40,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          2269.9999998002404,
+          2280.0000001459202
+        ]
+      },
+      {
+        "band": 229,
+        "components": [
+          "CO2:40"
+        ],
+        "points": 40,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          2280.0000001459202,
+          2290.00000003893
+        ]
+      },
+      {
+        "band": 230,
+        "components": [
+          "CO2:40"
+        ],
+        "points": 40,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          2290.00000003893,
+          2299.999999977
+        ]
+      },
+      {
+        "band": 231,
+        "components": [
+          "CO2:43"
+        ],
+        "points": 43,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          2299.999999977,
+          2310.0000000023097
+        ]
+      },
+      {
+        "band": 232,
+        "components": [
+          "CO2:46"
+        ],
+        "points": 46,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          2310.0000000023097,
+          2319.99999977728
+        ]
+      },
+      {
+        "band": 233,
+        "components": [
+          "CO2:47"
+        ],
+        "points": 47,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          2319.99999977728,
+          2329.99999976234
+        ]
+      },
+      {
+        "band": 234,
+        "components": [
+          "CO2:48"
+        ],
+        "points": 48,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          2329.99999976234,
+          2339.99999972856
+        ]
+      },
+      {
+        "band": 235,
+        "components": [
+          "CO2:48"
+        ],
+        "points": 48,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          2339.99999972856,
+          2349.9999999647503
+        ]
+      },
+      {
+        "band": 236,
+        "components": [
+          "CO2:48"
+        ],
+        "points": 48,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          2349.9999999647503,
+          2359.99999977344
+        ]
+      },
+      {
+        "band": 237,
+        "components": [
+          "CO2:48"
+        ],
+        "points": 48,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          2359.99999977344,
+          2369.9999998317303
+        ]
+      },
+      {
+        "band": 238,
+        "components": [
+          "CO2:49"
+        ],
+        "points": 49,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          2369.9999998317303,
+          2380.00000015232
+        ]
+      },
+      {
+        "band": 239,
+        "components": [
+          "CO2:44"
+        ],
+        "points": 44,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          2380.00000015232,
+          2390.00000023422
+        ]
+      },
+      {
+        "band": 240,
+        "components": [
+          "CO2:23"
+        ],
+        "points": 23,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          2390.00000023422,
+          2399.999999808
+        ]
+      },
+      {
+        "band": 241,
+        "components": [
+          "CO2:12"
+        ],
+        "points": 12,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          2399.999999808,
+          2410.00000020967
+        ]
+      },
+      {
+        "band": 242,
+        "components": [
+          "CO2:14"
+        ],
+        "points": 14,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          2410.00000020967,
+          2419.9999999757997
+        ]
+      },
+      {
+        "band": 243,
+        "components": [
+          "CO2:15"
+        ],
+        "points": 15,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          2419.9999999757997,
+          2430.00000026487
+        ]
+      },
+      {
+        "band": 244,
+        "components": [
+          "CO2:12"
+        ],
+        "points": 12,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          2430.00000026487,
+          2439.99999984384
+        ]
+      },
+      {
+        "band": 245,
+        "components": [
+          "CO2:14"
+        ],
+        "points": 14,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          2439.99999984384,
+          2450.0000000367504
+        ]
+      },
+      {
+        "band": 246,
+        "components": [
+          "CO2:11"
+        ],
+        "points": 11,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          2450.0000000367504,
+          2460.000000246
+        ]
+      },
+      {
+        "band": 247,
+        "components": [
+          "CO2:3"
+        ],
+        "points": 3,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          2460.000000246,
+          2469.99999997036
+        ]
+      },
+      {
+        "band": 248,
+        "components": [
+          "CO2:10"
+        ],
+        "points": 10,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          2469.99999997036,
+          2479.9999997024
+        ]
+      },
+      {
+        "band": 249,
+        "components": [
+          "CO2:13"
+        ],
+        "points": 13,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          2479.9999997024,
+          2490.00000001743
+        ]
+      },
+      {
+        "band": 250,
+        "components": [
+          "CO2:14"
+        ],
+        "points": 14,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          2490.00000001743,
+          2500.0
+        ]
+      },
+      {
+        "band": 251,
+        "components": [
+          "CO2:13"
+        ],
+        "points": 13,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          2500.0,
+          2510.00000001255
+        ]
+      },
+      {
+        "band": 252,
+        "components": [
+          "CO2:15"
+        ],
+        "points": 15,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          2510.00000001255,
+          2520.0000001612802
+        ]
+      },
+      {
+        "band": 253,
+        "components": [
+          "CO2:15"
+        ],
+        "points": 15,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          2520.0000001612802,
+          2529.9999999747
+        ]
+      },
+      {
+        "band": 254,
+        "components": [
+          "CO2:11"
+        ],
+        "points": 11,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          2529.9999999747,
+          2540.00000001016
+        ]
+      },
+      {
+        "band": 255,
+        "components": [
+          "CO2:2"
+        ],
+        "points": 2,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          2540.00000001016,
+          2550.00000029325
+        ]
+      },
+      {
+        "band": 256,
+        "components": [
+          "CO2:1"
+        ],
+        "points": 1,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          2550.00000029325,
+          2560.0
+        ]
+      },
+      {
+        "band": 257,
+        "components": [
+          "CO2:1"
+        ],
+        "points": 1,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          2560.0,
+          2569.99999977384
+        ]
+      },
+      {
+        "band": 258,
+        "components": [
+          "CO2:8"
+        ],
+        "points": 8,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          2569.99999977384,
+          2580.00000016512
+        ]
+      },
+      {
+        "band": 259,
+        "components": [
+          "CO2:17"
+        ],
+        "points": 17,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          2580.00000016512,
+          2590.00000000259
+        ]
+      },
+      {
+        "band": 260,
+        "components": [
+          "CO2:20"
+        ],
+        "points": 20,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          2590.00000000259,
+          2600.000000104
+        ]
+      },
+      {
+        "band": 261,
+        "components": [
+          "CO2:19"
+        ],
+        "points": 19,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          2600.000000104,
+          2609.99999967375
+        ]
+      },
+      {
+        "band": 262,
+        "components": [
+          "CO2:22"
+        ],
+        "points": 22,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          2609.99999967375,
+          2620.00000008908
+        ]
+      },
+      {
+        "band": 263,
+        "components": [
+          "CO2:20"
+        ],
+        "points": 20,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          2620.00000008908,
+          2629.99999987639
+        ]
+      },
+      {
+        "band": 264,
+        "components": [
+          "CO2:21"
+        ],
+        "points": 21,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          2629.99999987639,
+          2639.99999991552
+        ]
+      },
+      {
+        "band": 265,
+        "components": [
+          "CO2:20"
+        ],
+        "points": 20,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          2639.99999991552,
+          2649.9999997615
+        ]
+      },
+      {
+        "band": 266,
+        "components": [
+          "CO2:14"
+        ],
+        "points": 14,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          2649.9999997615,
+          2660.00000017024
+        ]
+      },
+      {
+        "band": 267,
+        "components": [
+          "CO2:13"
+        ],
+        "points": 13,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          2660.00000017024,
+          2670.00000004272
+        ]
+      },
+      {
+        "band": 268,
+        "components": [
+          "CO2:1"
+        ],
+        "points": 1,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          2670.00000004272,
+          2679.99999969984
+        ]
+      },
+      {
+        "band": 269,
+        "components": [
+          "CO2:1"
+        ],
+        "points": 1,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          2679.99999969984,
+          2689.99999997041
+        ]
+      },
+      {
+        "band": 270,
+        "components": [
+          "CO2:1"
+        ],
+        "points": 1,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          2689.99999997041,
+          2699.999999784
+        ]
+      },
+      {
+        "band": 271,
+        "components": [
+          "CO2:1"
+        ],
+        "points": 1,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          2699.999999784,
+          2710.0000002710003
+        ]
+      },
+      {
+        "band": 272,
+        "components": [
+          "CO2:1"
+        ],
+        "points": 1,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          2710.0000002710003,
+          2720.00000017408
+        ]
+      },
+      {
+        "band": 273,
+        "components": [
+          "CO2:13"
+        ],
+        "points": 13,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          2720.00000017408,
+          2730.00000000273
+        ]
+      },
+      {
+        "band": 274,
+        "components": [
+          "CO2:19"
+        ],
+        "points": 19,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          2730.00000000273,
+          2740.00000037264
+        ]
+      },
+      {
+        "band": 275,
+        "components": [
+          "CO2:17"
+        ],
+        "points": 17,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          2740.00000037264,
+          2750.0000002750003
+        ]
+      },
+      {
+        "band": 276,
+        "components": [
+          "CO2:20"
+        ],
+        "points": 20,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          2750.0000002750003,
+          2759.99999984544
+        ]
+      },
+      {
+        "band": 277,
+        "components": [
+          "CO2:19"
+        ],
+        "points": 19,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          2759.99999984544,
+          2770.00000019113
+        ]
+      },
+      {
+        "band": 278,
+        "components": [
+          "CO2:18"
+        ],
+        "points": 18,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          2770.00000019113,
+          2780.00000012232
+        ]
+      },
+      {
+        "band": 279,
+        "components": [
+          "CO2:18"
+        ],
+        "points": 18,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          2780.00000012232,
+          2789.99999975169
+        ]
+      },
+      {
+        "band": 280,
+        "components": [
+          "CO2:10"
+        ],
+        "points": 10,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          2789.99999975169,
+          2800.000000336
+        ]
+      },
+      {
+        "band": 281,
+        "components": [
+          "CO2:5"
+        ],
+        "points": 5,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          2800.000000336,
+          2810.00000016579
+        ]
+      },
+      {
+        "band": 282,
+        "components": [
+          "CO2:4"
+        ],
+        "points": 4,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          2810.00000016579,
+          2819.99999982516
+        ]
+      },
+      {
+        "band": 283,
+        "components": [
+          "CO2:3"
+        ],
+        "points": 3,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          2819.99999982516,
+          2829.99999967455
+        ]
+      },
+      {
+        "band": 284,
+        "components": [
+          "CO2:2"
+        ],
+        "points": 2,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          2829.99999967455,
+          2839.99999964784
+        ]
+      },
+      {
+        "band": 285,
+        "components": [
+          "CO2:1"
+        ],
+        "points": 1,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          2839.99999964784,
+          2849.9999998575004
+        ]
+      },
+      {
+        "band": 286,
+        "components": [
+          "CO2:1"
+        ],
+        "points": 1,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          2849.9999998575004,
+          2859.9999995938797
+        ]
+      },
+      {
+        "band": 287,
+        "components": [
+          "CO2:1"
+        ],
+        "points": 1,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          2859.9999995938797,
+          2870.00000040467
+        ]
+      },
+      {
+        "band": 288,
+        "components": [
+          "CO2:1"
+        ],
+        "points": 1,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          2870.00000040467,
+          2880.00000018432
+        ]
+      },
+      {
+        "band": 289,
+        "components": [
+          "CO2:1"
+        ],
+        "points": 1,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          2880.00000018432,
+          2890.0000003814803
+        ]
+      },
+      {
+        "band": 290,
+        "components": [
+          "CO2:1"
+        ],
+        "points": 1,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          2890.0000003814803,
+          2900.0000000580003
+        ]
+      },
+      {
+        "band": 291,
+        "components": [
+          "CO2:1"
+        ],
+        "points": 1,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          2900.0000000580003,
+          2909.99999986323
+        ]
+      },
+      {
+        "band": 292,
+        "components": [
+          "CO2:1"
+        ],
+        "points": 1,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          2909.99999986323,
+          2920.00000021024
+        ]
+      },
+      {
+        "band": 293,
+        "components": [
+          "CO2:1"
+        ],
+        "points": 1,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          2920.00000021024,
+          2930.0000002373304
+        ]
+      },
+      {
+        "band": 294,
+        "components": [
+          "CO2:1"
+        ],
+        "points": 1,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          2930.0000002373304,
+          2940.00000018816
+        ]
+      },
+      {
+        "band": 295,
+        "components": [
+          "CO2:1"
+        ],
+        "points": 1,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          2940.00000018816,
+          2950.000000413
+        ]
+      },
+      {
+        "band": 296,
+        "components": [
+          "CO2:2"
+        ],
+        "points": 2,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          2950.000000413,
+          2960.0000003315204
+        ]
+      },
+      {
+        "band": 297,
+        "components": [
+          "CO2:2"
+        ],
+        "points": 2,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          2960.0000003315204,
+          2970.00000000297
+        ]
+      },
+      {
+        "band": 298,
+        "components": [
+          "CO2:5"
+        ],
+        "points": 5,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          2970.00000000297,
+          2979.99999998808
+        ]
+      },
+      {
+        "band": 299,
+        "components": [
+          "CO2:9"
+        ],
+        "points": 9,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          2979.99999998808,
+          2990.0000003139503
+        ]
+      },
+      {
+        "band": 300,
+        "components": [
+          "CO2:4"
+        ],
+        "points": 4,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          2990.0000003139503,
+          3000.0000003
+        ]
+      },
+      {
+        "band": 301,
+        "components": [
+          "CO2:2"
+        ],
+        "points": 2,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          3000.0000003,
+          3010.00000019264
+        ]
+      },
+      {
+        "band": 302,
+        "components": [
+          "CO2:2"
+        ],
+        "points": 2,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          3010.00000019264,
+          3020.00000013288
+        ]
+      },
+      {
+        "band": 303,
+        "components": [
+          "CO2:1"
+        ],
+        "points": 1,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          3020.00000013288,
+          3030.00000000303
+        ]
+      },
+      {
+        "band": 304,
+        "components": [
+          "CO2:1"
+        ],
+        "points": 1,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          3030.00000000303,
+          3040.00000019456
+        ]
+      },
+      {
+        "band": 305,
+        "components": [
+          "CO2:1"
+        ],
+        "points": 1,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          3040.00000019456,
+          3049.9999996187503
+        ]
+      },
+      {
+        "band": 306,
+        "components": [
+          "CO2:1"
+        ],
+        "points": 1,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          3049.9999996187503,
+          3060.00000019584
+        ]
+      },
+      {
+        "band": 307,
+        "components": [
+          "CO2:1"
+        ],
+        "points": 1,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          3060.00000019584,
+          3070.0000002149
+        ]
+      },
+      {
+        "band": 308,
+        "components": [
+          "CO2:1"
+        ],
+        "points": 1,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          3070.0000002149,
+          3079.99999976592
+        ]
+      },
+      {
+        "band": 309,
+        "components": [
+          "CO2:4"
+        ],
+        "points": 4,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          3079.99999976592,
+          3089.99999970645
+        ]
+      },
+      {
+        "band": 310,
+        "components": [
+          "CO2:12"
+        ],
+        "points": 12,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          3089.99999970645,
+          3099.999999628
+        ]
+      },
+      {
+        "band": 311,
+        "components": [
+          "CO2:9"
+        ],
+        "points": 9,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          3099.999999628,
+          3109.99999961436
+        ]
+      },
+      {
+        "band": 312,
+        "components": [
+          "CO2:7"
+        ],
+        "points": 7,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          3109.99999961436,
+          3120.0000001248
+        ]
+      },
+      {
+        "band": 313,
+        "components": [
+          "CO2:10"
+        ],
+        "points": 10,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          3120.0000001248,
+          3129.9999999154898
+        ]
+      },
+      {
+        "band": 314,
+        "components": [
+          "CO2:14"
+        ],
+        "points": 14,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          3129.9999999154898,
+          3139.99999979904
+        ]
+      },
+      {
+        "band": 315,
+        "components": [
+          "CO2:20"
+        ],
+        "points": 20,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          3139.99999979904,
+          3149.99999960625
+        ]
+      },
+      {
+        "band": 316,
+        "components": [
+          "CO2:22"
+        ],
+        "points": 22,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          3149.99999960625,
+          3160.00000002528
+        ]
+      },
+      {
+        "band": 317,
+        "components": [
+          "CO2:21"
+        ],
+        "points": 21,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          3160.00000002528,
+          3170.00000049452
+        ]
+      },
+      {
+        "band": 318,
+        "components": [
+          "CO2:22"
+        ],
+        "points": 22,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          3170.00000049452,
+          3180.00000005088
+        ]
+      },
+      {
+        "band": 319,
+        "components": [
+          "CO2:22"
+        ],
+        "points": 22,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          3180.00000005088,
+          3190.00000024882
+        ]
+      },
+      {
+        "band": 320,
+        "components": [
+          "CO2:25"
+        ],
+        "points": 25,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          3190.00000024882,
+          3200.0
+        ]
+      },
+      {
+        "band": 321,
+        "components": [
+          "CO2:22"
+        ],
+        "points": 22,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          3200.0,
+          3209.99999949282
+        ]
+      },
+      {
+        "band": 322,
+        "components": [
+          "CO2:24"
+        ],
+        "points": 24,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          3209.99999949282,
+          3220.00000011592
+        ]
+      },
+      {
+        "band": 323,
+        "components": [
+          "CO2:22"
+        ],
+        "points": 22,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          3220.00000011592,
+          3230.00000020672
+        ]
+      },
+      {
+        "band": 324,
+        "components": [
+          "CO2:15"
+        ],
+        "points": 15,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          3230.00000020672,
+          3240.00000009072
+        ]
+      },
+      {
+        "band": 325,
+        "components": [
+          "CO2:11"
+        ],
+        "points": 11,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          3240.00000009072,
+          3249.9999999187503
+        ]
+      },
+      {
+        "band": 326,
+        "components": [
+          "CO2:14"
+        ],
+        "points": 14,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          3249.9999999187503,
+          3259.9999995501203
+        ]
+      },
+      {
+        "band": 327,
+        "components": [
+          "CO2:15"
+        ],
+        "points": 15,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          3259.9999995501203,
+          3269.9999995029602
+        ]
+      },
+      {
+        "band": 328,
+        "components": [
+          "CO2:16"
+        ],
+        "points": 16,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          3269.9999995029602,
+          3279.99999979008
+        ]
+      },
+      {
+        "band": 329,
+        "components": [
+          "CO2:19"
+        ],
+        "points": 19,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          3279.99999979008,
+          3289.99999979602
+        ]
+      },
+      {
+        "band": 330,
+        "components": [
+          "CO2:23"
+        ],
+        "points": 23,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          3289.99999979602,
+          3300.00000033
+        ]
+      },
+      {
+        "band": 331,
+        "components": [
+          "CO2:24"
+        ],
+        "points": 24,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          3300.00000033,
+          3310.0000002780403
+        ]
+      },
+      {
+        "band": 332,
+        "components": [
+          "CO2:24"
+        ],
+        "points": 24,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          3310.0000002780403,
+          3319.9999997476802
+        ]
+      },
+      {
+        "band": 333,
+        "components": [
+          "CO2:26"
+        ],
+        "points": 26,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          3319.9999997476802,
+          3330.00000000333
+        ]
+      },
+      {
+        "band": 334,
+        "components": [
+          "CO2:23"
+        ],
+        "points": 23,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          3330.00000000333,
+          3340.00000005344
+        ]
+      },
+      {
+        "band": 335,
+        "components": [
+          "CO2:27"
+        ],
+        "points": 27,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          3340.00000005344,
+          3349.99999984925
+        ]
+      },
+      {
+        "band": 336,
+        "components": [
+          "CO2:26"
+        ],
+        "points": 26,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          3349.99999984925,
+          3360.00000021504
+        ]
+      },
+      {
+        "band": 337,
+        "components": [
+          "CO2:27"
+        ],
+        "points": 27,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          3360.00000021504,
+          3370.0000005055
+        ]
+      },
+      {
+        "band": 338,
+        "components": [
+          "CO2:26"
+        ],
+        "points": 26,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          3370.0000005055,
+          3379.99999960792
+        ]
+      },
+      {
+        "band": 339,
+        "components": [
+          "CO2:24"
+        ],
+        "points": 24,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          3379.99999960792,
+          3390.00000043053
+        ]
+      },
+      {
+        "band": 340,
+        "components": [
+          "CO2:13"
+        ],
+        "points": 13,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          3390.00000043053,
+          3399.999999524
+        ]
+      },
+      {
+        "band": 341,
+        "components": [
+          "CO2:16"
+        ],
+        "points": 16,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          3399.999999524,
+          3409.9999995908
+        ]
+      },
+      {
+        "band": 342,
+        "components": [
+          "CO2:16"
+        ],
+        "points": 16,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          3409.9999995908,
+          3420.00000021888
+        ]
+      },
+      {
+        "band": 343,
+        "components": [
+          "CO2:15"
+        ],
+        "points": 15,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          3420.00000021888,
+          3430.00000005145
+        ]
+      },
+      {
+        "band": 344,
+        "components": [
+          "CO2:17"
+        ],
+        "points": 17,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          3430.00000005145,
+          3440.00000022016
+        ]
+      },
+      {
+        "band": 345,
+        "components": [
+          "CO2:19"
+        ],
+        "points": 19,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          3440.00000022016,
+          3449.99999956875
+        ]
+      },
+      {
+        "band": 346,
+        "components": [
+          "CO2:19"
+        ],
+        "points": 19,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          3449.99999956875,
+          3460.0000004844
+        ]
+      },
+      {
+        "band": 347,
+        "components": [
+          "CO2:24"
+        ],
+        "points": 24,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          3460.0000004844,
+          3470.0000004858
+        ]
+      },
+      {
+        "band": 348,
+        "components": [
+          "CO2:24"
+        ],
+        "points": 24,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          3470.0000004858,
+          3480.00000047328
+        ]
+      },
+      {
+        "band": 349,
+        "components": [
+          "CO2:27"
+        ],
+        "points": 27,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          3480.00000047328,
+          3489.99999987087
+        ]
+      },
+      {
+        "band": 350,
+        "components": [
+          "CO2:30"
+        ],
+        "points": 30,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          3489.99999987087,
+          3500.000000175
+        ]
+      }
+    ],
+    "coverage": {
+      "documented_accuracy": "the high-resolution reference of sp_lw_17_dsa_mars",
+      "documented_ranges": "opacity look-up tables 100-400 K; Planck table 1-500 K; long-wave accuracy decreases above about 310 K",
+      "documented_validity": "CO2-dominated atmospheres with > 90 % CO2, surface pressures up to 10 bar",
+      "n_band": 350,
+      "n_points": 5768,
+      "n_pressure": 61,
+      "n_temperature": 13,
+      "pressure_pa": [
+        1.0,
+        1000000.0
+      ],
+      "temperature_k": [
+        100.0,
+        400.0
+      ],
+      "wavenumber_cm": [
+        1.0,
+        3500.000000175
+      ]
+    },
+    "mass_basis": {
+      "composition": {
+        "CO2": 1.0
+      },
+      "composition_label": "thai_ben2",
+      "gas_constant": 188.926415463956,
+      "kind": "premixed",
+      "mass_fractions": {
+        "CO2": 1.0
+      },
+      "molar_mass_kg_per_mol": 0.044009,
+      "per": "kg of the mixture"
+    },
+    "schema": "palintropos.ktable.metadata/1",
+    "source": {
+      "documentation": {
+        "read": "2026-11-16",
+        "sha256": "ff20b814dd80761e9ebf3e20cb74d914027d5c368a0bf026001d47e1a9a983a6",
+        "url": "https://simplex.giss.nasa.gov/gcm/ROCKE-3D/Spectralfiles.html"
+      },
+      "files": [
+        {
+          "bytes": 1350812,
+          "name": "sp_lw_350_dsa_mars",
+          "sha256": "99dd5038379d84120f849fcd66e3e297391f2d1b040e2b70d074b60aac4bc2bb",
+          "url": "https://portal.nccs.nasa.gov/GISS_modelE/ROCKE-3D/spectral_files/sp_lw_dsa_mars/sp_lw_350_dsa_mars"
+        },
+        {
+          "bytes": 232456841,
+          "name": "sp_lw_350_dsa_mars_k",
+          "sha256": "88398a8afdc0b0ecd50a0e29af47baa9925758bc69f07df2dcbec93e4f655e78",
+          "url": "https://portal.nccs.nasa.gov/GISS_modelE/ROCKE-3D/spectral_files/sp_lw_dsa_mars/sp_lw_350_dsa_mars_k"
+        }
+      ],
+      "generator": "SOCRATES spectral files prepared for ROCKE-3D by D. S. Amundsen (github.com/DavidSAmundsen/socrates_tools)",
+      "kind": "SOCRATES look-up spectral file"
+    },
+    "stream": "longwave",
+    "units": {
+      "band_edges": "cm^-1",
+      "k": "m^2 kg^-1 (of mixture)",
+      "pressure": "Pa",
+      "temperature": "K"
+    }
+  },
+  "provenance": "sp_lw_350_dsa_mars (ROCKE-3D SOCRATES) premixed for thai_ben2; source sha256 99dd5038379d8412/88398a8afdc0b0ec",
+  "sha256": "5b2304e0917fdaecc149e2b2453a4a19e18a7cad0fac7a016ae5673a244e8a24",
+  "species": "thai_ben2"
+}

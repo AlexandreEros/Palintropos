@@ -12,8 +12,8 @@ Each spectral file is a text file plus its ``_k`` look-up companion.
   ``sp_lw_17_dsa_mars`` (Ben 2) and ``sp_lw_15_dsa_ar10bar`` (Ben 1);
 * ``reference`` (450 MB): their documented 350-band high-resolution
   references, used only by the column comparison;
-* ``shortwave`` (22 MB): the TRAPPIST-1 short-wave files (fetched for a
-  follow-up; no importer reads them yet).
+* ``shortwave`` (22 MB): the TRAPPIST-1 short-wave files of the same two
+  families.
 
 Files are written once and never transformed. A file whose SHA-256 is
 pinned below must match it, on download and on every later run; the sizes
@@ -49,7 +49,8 @@ FILES = (
      "88398a8afdc0b0ecd50a0e29af47baa9925758bc69f07df2dcbec93e4f655e78"),
     ("reference", "sp_lw_dsa_ar10bar/sp_lw_350_dsa_ar10bar",
      "ac711eaa35fa47e7ffdda4a8376895348daca6d6a9d23b32db0bde9cc5691839"),
-    ("reference", "sp_lw_dsa_ar10bar/sp_lw_350_dsa_ar10bar_k", None),
+    ("reference", "sp_lw_dsa_ar10bar/sp_lw_350_dsa_ar10bar_k",
+     "66280ded7adb0fdb9a71e27b4e2d1844ddb4c6d8c936999af9ebd3095849d2d6"),
     ("shortwave", "sp_sw_dsa_mars/sp_sw_42_dsa_mars_trappist1",
      "f2730774ae08ad722524cf18c65e5ab4eb1f1bdd35b3c08b6af76c22567099fe"),
     ("shortwave", "sp_sw_dsa_mars/sp_sw_42_dsa_mars_trappist1_k",

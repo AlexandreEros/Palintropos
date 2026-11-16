@@ -116,8 +116,31 @@ SOURCES = {
                               "documented_accuracy": "the high-resolution reference of "
                                                      "sp_lw_15_dsa_ar10bar"},
 }
-#: The THAI dry cases: composition preset and long-wave spectral file.
+_STAR = ("TRAPPIST-1 band fluxes as normalised in block 2 of the spectral file (the "
+         "documentation does not name the stellar spectrum behind them)")
+_SW_NOTE = {"stream": "shortwave", "star": _STAR,
+            "documented_accuracy": "below about 5 W m^-2 for all stars, against the "
+                                   "280-band reference"}
+SOURCES.update({
+    "sp_sw_42_dsa_mars_trappist1": {
+        **_MARS, **_SW_NOTE, "directory": "sp_sw_dsa_mars",
+        "continua": _MARS["continua"] + ". The file's generalised Rayleigh scattering "
+                    "(per-gas coefficients) is recorded in the metadata and not applied"},
+    "sp_sw_43_dsa_ar10bar_trappist1": {
+        **_AR10BAR, **_SW_NOTE, "directory": "sp_sw_dsa_ar10bar",
+        "continua": "the documentation lists N2-CH4, N2-N2, N2-H2, H2-CH4, H2-H2 and "
+                    "H2-CO2 CIA for these files; whichever involve only the gases present "
+                    "are kept (see the per-band components). The file's generalised "
+                    "Rayleigh scattering is recorded in the metadata and not applied"},
+})
+
+#: The THAI dry cases: composition preset and spectral file.
 CASES = {
+    "thai_ben2_shortwave": {"composition": "thai_ben2",
+                            "spectral_file": "sp_sw_dsa_mars/sp_sw_42_dsa_mars_trappist1"},
+    "thai_ben1_shortwave": {
+        "composition": "thai_ben1",
+        "spectral_file": "sp_sw_dsa_ar10bar/sp_sw_43_dsa_ar10bar_trappist1"},
     "thai_ben2": {"composition": "thai_ben2",
                   "spectral_file": "sp_lw_dsa_mars/sp_lw_17_dsa_mars"},
     "thai_ben2_reference": {"composition": "thai_ben2",
@@ -163,8 +186,6 @@ def premix(sp: socrates.SpectralFile, composition: Composition, *, name: str,
     pressure, temperature = sp.pressure, sp.temperature[0]
     rho = pressure[:, None] / (composition.gas_constant * temperature[None, :])
     edges = sp.band_edges_cm()
-    if not np.allclose(edges[1:, 0], edges[:-1, 1], rtol=1e-9):
-        raise ValueError("bands are not contiguous and increasing in wavenumber")
 
     band_terms, report, fraction_used = [], [], {}
     for b in range(1, sp.n_band + 1):
@@ -226,6 +247,30 @@ def premix(sp: socrates.SpectralFile, composition: Composition, *, name: str,
                        "points": int(w_band.size),
                        "random_overlap_acts": len(multi) > 1})
 
+    # Stellar files list their bands by increasing wavelength; a KTable's
+    # bands increase in wavenumber. ``report`` keeps the file's band numbers.
+    order = np.argsort(edges[:, 0])
+    edges = edges[order]
+    band_terms = [band_terms[i] for i in order]
+    report = [report[i] for i in order]
+    if not np.allclose(edges[1:, 0], edges[:-1, 1], rtol=1e-9):
+        raise ValueError("bands are not contiguous in wavenumber")
+    stellar = {}
+    if source["stream"] == "shortwave":
+        if sp.stellar_fraction is None:
+            raise ValueError("a stellar spectral file needs the band fluxes of block 2")
+        fraction = sp.stellar_fraction[order]
+        rayleigh = np.zeros(sp.n_band)
+        for gas, coefficient in sp.rayleigh.items():
+            rayleigh += q.get(species_of[gas], 0.0) * coefficient[order]
+        stellar = {
+            "star": source["star"],
+            "band_fractions": [float(v) for v in fraction],
+            "band_fractions_sum": float(fraction.sum()),
+            "rayleigh_m2_per_kg_of_mixture": [float(v) for v in rayleigh],
+            "rayleigh_note": "per band, summed over the gases present with their mass "
+                             "fractions; NOT applied by the provider (absorption only)",
+        }
     n_g = max(w.size for _, w in band_terms)
     weights = np.zeros((sp.n_band, n_g))
     k = np.zeros(rho.shape + (sp.n_band, n_g))
@@ -281,12 +326,15 @@ def premix(sp: socrates.SpectralFile, composition: Composition, *, name: str,
             "random_overlap_bands": [r["band"] for r in report if r["random_overlap_acts"]],
             "thermal_source": "band Planck fractions are computed by the provider "
                               "(planck_band_fraction); SOCRATES' own Planck table is not "
-                              "used. Nothing is emitted outside the bands",
+                              "used. Nothing is emitted outside the bands"
+            if source["stream"] == "longwave" else "not applicable (stellar stream)",
             "absent_gases_dropped": sorted(
                 s for s in set(species_of.values()) if q.get(s, 0.0) <= 0.0),
         },
         "bands": report,
     }
+    if stellar:
+        metadata["stellar"] = stellar
     provenance = (f"{path.name} (ROCKE-3D SOCRATES) premixed for {composition.label}; "
                   f"source sha256 {files[0]['sha256'][:16]}/{files[1]['sha256'][:16]}")
     return KTable(name, pressure, temperature, band_edges, weights, k, provenance, metadata)

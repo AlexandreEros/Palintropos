@@ -18,3 +18,19 @@
 The [evidence index](../../docs/radiation/evidence/README.md) links the
 saved products, and the [radiation report](../../docs/radiation/README.md)
 documents the experiment settings and interpretation.
+
+## Real-gas opacity tables
+
+- [opacity/fetch_socrates.py](opacity/fetch_socrates.py) downloads the
+  ROCKE-3D SOCRATES spectral files with pinned SHA-256 into the ignored
+  `opacity_cache/`. [opacity/socrates.py](opacity/socrates.py) reads their
+  look-up tables, and [opacity/import_socrates.py](opacity/import_socrates.py)
+  premixes them for a fixed composition into a `KTable` with a provenance
+  record.
+- [thai_column.py](thai_column.py) saves the interface fluxes and layer
+  heating of a preset's columns, checks the heating against the flux
+  convergence and compares with a reference table.
+  [thai_dev_evidence.py](thai_dev_evidence.py) records a short coupled run
+  and compares an interrupted run with an uninterrupted control.
+
+See [docs/radiation/OPACITY.md](../../docs/radiation/OPACITY.md).
