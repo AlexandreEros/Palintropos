@@ -85194,12 +85194,12 @@ null,
 "186":"",
 "187":"        # Precompute triangulation for geodesic grids; None for structured lat/lon",
 "188":"        triangulation = None",
-"209":"            im = ax.tripcolor(triangulation, q, shading='gouraud', cmap=cmap)",
-"213":"            im = ax.imshow(np.flip(q, axis=0),",
 "22":"    def plot_summary(self):",
-"220":"        ax.set_aspect('equal')",
-"221":"        ax.set_xlabel('Longitude (deg)')",
+"220":"            q = q.reshape(grid_shape)",
 "23":"        \"\"\"Create a comprehensive visualization of the planet.\"\"\"",
+"233":"            im = ax.tripcolor(triangulation, q, shading='gouraud', cmap=cmap)",
+"244":"            im = ax.imshow(np.flip(q, axis=0),",
+"245":"                        extent=(_deg(grid.longitudes[0]),",
 "26":"        view_grid = None",
 "27":"        if hasattr(self.grid, \"faces\"):",
 "28":"            view_grid = LatLonGridGeometry.create((91, 181))",
@@ -95247,7 +95247,7 @@ null,
 }
 },
 "meta":{
-"base_commit":"1952d65b33f21f166132ed0b2a59d8801fbaf6b6",
+"base_commit":"a08a5801b88d03d42ca8108d1573c5e9e645569e",
 "call_depth":4,
 "command":"python -m tools.architecture.generate",
 "dynamic_import_sites":{
@@ -95291,7 +95291,7 @@ null,
 "max_sites":8,
 "package":"tropoi",
 "source_commit":null,
-"source_sha256":"eff09b3f2b39ef49c7fd0d5315843ff3f3f8f292c07fca59f8ac31db35e57f1a",
+"source_sha256":"c6c914fe69292ca2e3428cf615713f10fd09c075752cf4f470febfec159571df",
 "source_status":"clean",
 "title":"current",
 "tool_version":"2.3.0",
@@ -155377,7 +155377,7 @@ null
 null,
 "",
 [],
-226,
+257,
 []
 ],
 "95":[
@@ -155502,7 +155502,7 @@ null,
 [
 "staticmethod"
 ],
-226
+257
 ],
 "953":[
 "plot_summary",
@@ -278042,30 +278042,30 @@ null,
 ],
 "952":[
 {
-"builtin":3,
-"external":8,
-"unresolved":6
+"builtin":7,
+"external":9,
+"unresolved":11
 },
 [
 [
-209,
+220,
+"unresolved",
+"q.reshape"
+],
+[
+233,
 "unresolved",
 "ax.tripcolor"
 ],
 [
-213,
+244,
 "unresolved",
 "ax.imshow"
 ],
 [
-220,
+245,
 "unresolved",
-"ax.set_aspect"
-],
-[
-221,
-"unresolved",
-"ax.set_xlabel"
+"_deg"
 ]
 ]
 ],
