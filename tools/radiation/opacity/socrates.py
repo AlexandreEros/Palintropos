@@ -7,6 +7,9 @@ module reads only what a gas-absorption import needs:
 
 * block 0  - absorber and generalised-continuum indexing;
 * block 1  - band limits (wavelength, m);
+* block 2  - (stellar files) the fraction of the stellar flux in each band;
+* block 3  - (stellar files, subtype 1) Rayleigh mass scattering
+  coefficients per band and gas, m^2 kg^-1;
 * block 5  - per (band, gas): number of k-terms and their weights (the
   reference k of block 5 is NOT used; the look-up table replaces it), and
   the self-broadening index of each gas;
@@ -57,6 +60,8 @@ class SpectralFile:
     gas_k: dict[tuple[int, int], np.ndarray] = field(default_factory=dict)
     #   (band, gas) -> (n_term, n_block, n_p, n_T) with n_block = n_gf or 1
     cont_temperature: np.ndarray = None             # (n_Tc,) K
+    stellar_fraction: np.ndarray = None             # (n_band,) or None
+    rayleigh: dict = field(default_factory=dict)    # gas index -> (n_band,) m^2/kg
     cont_k: dict[tuple[int, int], np.ndarray] = field(default_factory=dict)
     #   (band, continuum) -> (n_term, n_Tc)
 
@@ -133,6 +138,25 @@ def _read_block19(lines):
         overlap[(band, cont)] = ovl
         i += 1 + n_k
     return weights, overlap
+
+
+def _read_block3(lines, n_band):
+    """Rayleigh coefficients per gas (subtype 1); {} for other layouts."""
+    try:
+        at = next(i for i, ln in enumerate(lines) if ln.startswith("Indexing numbers"))
+    except StopIteration:
+        return {}
+    gases = [int(x) for x in lines[at + 1].split()]
+    values: list[list[float]] = []
+    for line in lines[at + 2:]:
+        if line.startswith("Band ="):
+            values.append([])
+        elif _NUM.match(line) and line.strip() and values:
+            values[-1].extend(_floats(line))
+    if len(values) != n_band or any(len(v) != len(gases) for v in values):
+        raise ValueError("block 3: unexpected Rayleigh record layout")
+    table = np.asarray(values)
+    return {g: table[:, i].copy() for i, g in enumerate(gases)}
 
 
 def _numbers(lines, start, count):
@@ -232,6 +256,13 @@ def read_spectral_file(path) -> SpectralFile:
     sp = SpectralFile(str(path), absorbers, continua, lam, band_gases, self_b, gas_w)
     if 19 in blocks:
         sp.cont_weights, sp.cont_overlap = _read_block19(blocks[19])
+    if 2 in blocks:
+        rows = [_floats(ln) for ln in blocks[2] if _NUM.match(ln) and len(ln.split()) == 2]
+        sp.stellar_fraction = np.asarray([r[1] for r in rows])
+        if sp.stellar_fraction.size != lam.shape[0]:
+            raise ValueError(f"{path}: block 2 does not list every band")
+    if 3 in blocks:
+        sp.rayleigh = _read_block3(blocks[3], lam.shape[0])
     _read_k_file(sp, pathlib.Path(str(path) + "_k").read_text(encoding="ascii"))
     for key, w in gas_w.items():
         if key not in sp.gas_k or sp.gas_k[key].shape[0] != w.size:
