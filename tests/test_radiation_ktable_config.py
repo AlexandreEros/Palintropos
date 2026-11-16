@@ -245,3 +245,48 @@ def test_thai_imported_table_when_present(case):
     with pytest.raises(ValueError, match="outside the k-table"):
         rad.fluxes(Column(p, t - 210.0, cfg.gravity, cfg.cp),
                    LowerBoundary("surface", temperature=np.full(1, 300.0)))
+
+
+def test_recorded_thai_configurations_keep_their_hashes():
+    """The configurations of the recorded development runs
+    (docs/radiation/evidence/dev-thai-ben*-lwck-heated-T21L40-9f8c776)."""
+    from tropoi.run.radiative.config import PRESETS
+    assert PRESETS["dev-thai-ben2"]().sha256() == (
+        "80e5a1824e5b378f4d97491f13e6d0aa0479fb2d41b5ad5647cdc40195dd1d28")
+    assert PRESETS["dev-thai-ben1"]().sha256() == (
+        "72494a3143b330c9221721257d5aa4e9e3ef2379ff99723bda8520b5b0dad0c1")
+
+
+@pytest.mark.parametrize("case", ["ben1", "ben2"])
+def test_thai_stellar_absorption_is_one_more_input(case):
+    """The ``-ck`` presets are the default ones with a stellar k-table and
+    the star's band fractions in place of the transparent shortwave."""
+    from tropoi.run.radiative.config import PRESETS
+    base, ck = PRESETS[f"dev-thai-{case}"](), PRESETS[f"dev-thai-{case}-ck"]()
+    d0, d1 = base.to_dict(), ck.to_dict()
+    assert {k for k in d0 if d0[k] != d1[k]} == {"experiment_id", "shortwave"}
+    sw = ck.shortwave
+    assert sw["kind"] == "correlated_k" and sw["bounds"] == "error"
+    assert sw["mass_fractions"] == ck.longwave["mass_fractions"]
+    assert sum(sw["band_fractions"]) == pytest.approx(1.0, abs=1e-9)
+    assert "-ck-" in ck.experiment_id and "-lwck-" in base.experiment_id
+    try:
+        rad = build_radiation(ck)
+    except KTableError as exc:
+        if "not found" in str(exc):
+            pytest.skip("imported THAI k-tables are not present")
+        raise
+    assert len(sw["band_fractions"]) == rad.shortwave.n_band
+    p = (build_sigma(ck).interfaces_array() * ck.reference_pressure)[:, None]
+    mid = 0.5 * (p[1:] + p[:-1])
+    t = np.maximum(250.0 * (mid / ck.reference_pressure) ** ck.kappa, 160.0)
+    fl = rad.fluxes(Column(p, t, ck.gravity, ck.cp),
+                    LowerBoundary("surface", temperature=np.full(1, 250.0), albedo=0.3),
+                    toa_flux=np.full(1, 225.0), mu0=np.full(1, 0.5))
+    absorbed = float(fl.absorbed_stellar[0])
+    at_surface = float(fl.sw_down[-1, 0] - fl.sw_up[-1, 0])
+    # absorption only: the gas can only darken the planet below its surface albedo
+    assert 0.7 * 225.0 < absorbed < 225.0 and 0.0 < at_surface < 0.7 * 225.0
+    column_heating = (ck.cp * (p[1:] - p[:-1]) / ck.gravity * fl.heating).sum()
+    assert column_heating == pytest.approx(float(fl.net_down[0, 0] - fl.net_down[-1, 0]),
+                                           rel=1e-12)
