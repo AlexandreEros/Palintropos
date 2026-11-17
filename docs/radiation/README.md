@@ -52,8 +52,9 @@ dry and Held–Suarez experiments are unchanged.
   files), through the ordinary radiative configuration, on the GPU and
   coupled to the dynamics, for the two dry THAI compositions. What is
   still true: no comparison with an external radiation code or a
-  line-by-line calculation, no Rayleigh scattering, a transparent
-  shortwave, and development runs only. OPACITY.md §7 lists the gaps.
+  line-by-line calculation, no Rayleigh scattering, development runs
+  only, and a model top that does not hold up once stellar absorption is
+  switched on. OPACITY.md §7 lists the gaps.
 
 ## 2. Conventions (column contract)
 
@@ -696,8 +697,9 @@ Test results for this commit are in [TEST_RESULTS.md](TEST_RESULTS.md).
    CIA) and compare `CorrelatedKLongwave` with an independent model for one
    Earth and one CO2 case; add Rayleigh, continua, CIA, gas overlap.
    (Partly done 2026-11-16, [OPACITY.md](OPACITY.md): longwave CO2 tables
-   with CIA for the two dry THAI compositions, configured and coupled.
-   Still open: the independent model, the shortwave, Rayleigh.)
+   with CIA for the two dry THAI compositions, configured and coupled,
+   and stellar absorption as an option. Still open: the independent
+   model, Rayleigh, a sponge for the model top.)
 2. A resolution sweep for the Jupiter ∇⁸ loss. (Done 2026-11-13: heating
    is the preset default, the time-stepping residual is split, and the
    controlled R1/R2 comparison met C1–C4.)

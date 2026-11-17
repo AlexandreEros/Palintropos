@@ -1,0 +1,214 @@
+{
+  "code": {
+    "git_commit": "809ffdd55d3c863179dab60a6bd8cafa2eba15e3",
+    "git_dirty": false
+  },
+  "config": {
+    "boundary_layer": {
+      "critical_richardson": 1.0,
+      "frac_inner": 0.1,
+      "gustiness": 0.0,
+      "rich_crit_pbl": 1.0,
+      "roughness_length": 0.01
+    },
+    "checkpoint_every_days": 1,
+    "convection": null,
+    "cp": 791.4851590100508,
+    "damping_scheme": "centred",
+    "days": 5,
+    "drag": null,
+    "dt": 1200.0,
+    "experiment_id": "dev-thai-ben2-ck-heated-T21L40",
+    "frictional_heating": true,
+    "gas_constant": 188.926415463956,
+    "gravity": 9.12,
+    "hyperdiffusion_efold_days": 0.1,
+    "hyperdiffusion_order": 4,
+    "initial": {
+      "kind": "isothermal",
+      "temperature": 300.0
+    },
+    "insolation": {
+      "kind": "tidally_locked",
+      "stellar_constant": 900.0
+    },
+    "internal_heat_flux": 0.0,
+    "keep_checkpoints": 2,
+    "l_max": 22,
+    "longwave": {
+      "bounds": "error",
+      "kind": "correlated_k",
+      "mass_fractions": {
+        "thai_ben2": 1.0
+      },
+      "tables": [
+        {
+          "file": "thai-ben2-sp-lw-17-dsa-mars.npz",
+          "sha256": "9d4c18a6822690aa12051598695ca4d6946324bb36f8752a35d57b9963087e18"
+        }
+      ]
+    },
+    "mean_last_days": 0,
+    "nlat": 32,
+    "nlon": 64,
+    "omega": 1.1921647896136131e-05,
+    "perturbation_lmax": 8,
+    "perturbation_wind": 0.1,
+    "radiation_interval": 3,
+    "radius": 5798000.0,
+    "raw_alpha": 0.53,
+    "raw_nu": 0.1,
+    "reference_pressure": 100000.0,
+    "retained_truncation": 21,
+    "schema": "palintropos.radiative.config/1",
+    "seed": 20261110,
+    "sensible": {
+      "critical_richardson": 1.0,
+      "gustiness": 0.0,
+      "implicit": true,
+      "roughness_length": 0.01
+    },
+    "shortwave": {
+      "band_fractions": [
+        0.007258484028,
+        0.006780315862,
+        0.002870869908,
+        0.009652540429,
+        0.0395083342,
+        0.02363320203,
+        0.01990910171,
+        0.02146444856,
+        0.02269817405,
+        0.01096201485,
+        0.01248332998,
+        0.02849879125,
+        0.02621123844,
+        0.06775044413,
+        0.0348666271,
+        0.03048862789,
+        0.03289022826,
+        0.09284954726,
+        0.01518227359,
+        0.01474203956,
+        0.01975398087,
+        0.04499964863,
+        0.04929574556,
+        0.03437250387,
+        0.03599036771,
+        0.0508297636,
+        0.05216377736,
+        0.04110577227,
+        0.09996624428,
+        0.003882973633,
+        0.02612883711,
+        0.004724752917,
+        0.01099017399,
+        0.002530298546,
+        0.00102034457,
+        0.0007771275866,
+        0.0005825989255,
+        0.0001044206189,
+        5.747656744e-05,
+        1.116784097e-05,
+        1.136564469e-05,
+        2.481091694e-08
+      ],
+      "bounds": "error",
+      "kind": "correlated_k",
+      "mass_fractions": {
+        "thai_ben2": 1.0
+      },
+      "tables": [
+        {
+          "file": "thai-ben2-sp-sw-42-dsa-mars-trappist1.npz",
+          "sha256": "c2e873d40e3da41dd52a9b3187fd47cf65631481b03a152363f6bfc6300e8386"
+        }
+      ]
+    },
+    "state_every_days": 1,
+    "surface": {
+      "albedo": 0.3,
+      "emissivity": 1.0,
+      "heat_capacity": 2000000.0,
+      "initial_temperature": 300.0
+    },
+    "t_ref": 300.0,
+    "thermal_source": "linear",
+    "vertical": {
+      "kind": "stretched",
+      "linear_scale": 0.15,
+      "nlev": 40,
+      "sigma_top": 4e-05
+    }
+  },
+  "config_sha256": "fdbcf1cfd7ebcfaaf3ca887896c3cc6a049a371abdadc5985c78131304c209f3",
+  "created": "2026-11-16T20:19:07Z",
+  "initial_state": {
+    "kind": "isothermal",
+    "temperature_profile": [
+      300.0,
+      300.0,
+      300.0,
+      300.0,
+      300.0,
+      300.0,
+      300.0,
+      300.0,
+      300.0,
+      300.0,
+      300.0,
+      300.0,
+      300.0,
+      300.0,
+      300.0,
+      300.0,
+      300.0,
+      300.0,
+      300.0,
+      300.0,
+      300.0,
+      300.0,
+      300.0,
+      300.0,
+      300.0,
+      300.0,
+      300.0,
+      300.0,
+      300.0,
+      300.0,
+      300.0,
+      300.0,
+      300.0,
+      300.0,
+      300.0,
+      300.0,
+      300.0,
+      300.0,
+      300.0,
+      300.0
+    ]
+  },
+  "physics": true,
+  "physics_datasets": {
+    "mixtures.toml": {
+      "schema": "palintropos.mixtures/1",
+      "sha256": "82213df68abcdbf51385b65e311d77485ade910034de72e1a5b040182a9c5e96"
+    },
+    "rayleigh.toml": {
+      "schema": "palintropos.rayleigh/1",
+      "sha256": "14b4d6b74ed386803ab418b15532b81dd5311269c42af3debbaf66eadd5abc34"
+    },
+    "species.toml": {
+      "schema": "palintropos.species/1",
+      "sha256": "6a84f853a61933a06e829d09e8d45e742d62f1a09b4f9869ea079ce87be5a6c3"
+    },
+    "stars.toml": {
+      "schema": "palintropos.stars/1",
+      "sha256": "9ee13bf16318d04e442a8d8cbc4b7a1332860286c07a74265df2ce6179e75ee7"
+    },
+    "thermodynamics.toml": {
+      "schema": "palintropos.thermodynamics/1",
+      "sha256": "8d3fbd48a13a8f4e34d2dded4460d67d4f7bb13023c34ee1117c97303ae8bca7"
+    }
+  }
+}

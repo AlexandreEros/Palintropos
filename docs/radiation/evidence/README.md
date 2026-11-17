@@ -46,3 +46,8 @@ and the [preservation record](../../validation/run_archive_2026-11-12/README.md)
   k-tables for the two dry THAI compositions, 5 days from the isothermal start on the MX110.
   Development runs, not THAI reproductions; the Ben 2 summary holds the stop-and-resume
   comparison with an uninterrupted control ([OPACITY.md](../OPACITY.md)).
+- The same two with real-gas stellar absorption:
+  [dev-thai-ben2-ck](dev-thai-ben2-ck-heated-T21L40-809ffdd/summary.json) and
+  [dev-thai-ben1-ck](dev-thai-ben1-ck-heated-T21L40-809ffdd/summary.json). They complete and
+  close their budgets, but the unsponged top layers reach 293 and 51 m/s
+  (`state_diagnostics.json`); not usable aloft.

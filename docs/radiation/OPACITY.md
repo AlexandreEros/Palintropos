@@ -1,18 +1,21 @@
-# Real-gas longwave absorption: tables, configuration, THAI dry development runs
+# Real-gas absorption: tables, configuration, THAI dry development runs
 
 Status on 2026-11-16, branch `feat/thai-dry-real-gas-longwave`. Multi-band
-CO2 longwave absorption from documented k-tables now drives the column
-physics and the primitive-equation model through the ordinary radiative
-configuration. It was exercised on the two dry THAI compositions:
+CO2 absorption from documented k-tables now drives the column physics and
+the primitive-equation model through the ordinary radiative configuration.
+It was exercised on the two dry THAI compositions:
 
 * **Ben 2**, 1 bar CO2: column verified, 5-day coupled run with a stop and
   an exact resume.
 * **Ben 1**, 1 bar N2 with 400 ppmv CO2: column verified, 5-day coupled
   run.
+* Both again with real-gas **stellar** absorption added (presets `…-ck`).
+  Those two runs complete and close their budgets, but **their top layers
+  are not usable**: Ben 2 reaches 293 m s^-1 at 2 Pa (§6).
 
 These are **development runs with the THAI compositions, not THAI
-reproductions**: five days from the isothermal start, a transparent
-shortwave, and the differences listed in §7. Equilibration and the
+reproductions**: five days from the isothermal start, and the differences
+listed in §7. Equilibration and the
 comparison with Turbet et al. (2022) are left for later
 (the plan in `THAI_BEN_PLAN.md`, a draft that is not yet tracked).
 
@@ -30,7 +33,8 @@ comparison with Turbet et al. (2022) are left for later
 
 The existing `KTable`, `CorrelatedKLongwave` / `CorrelatedKShortwave`,
 two-stream solver, `ColumnPhysics` and `ColumnPhysicsCoupling` are reused
-unchanged in what they compute. The gray presets are untouched and keep
+unchanged in what they compute. The stellar presets needed no solver or
+provider change: a table and the star's band fractions are inputs. The gray presets are untouched and keep
 their configuration hashes.
 
 ## 2. Configuration
@@ -78,6 +82,11 @@ The two THAI presets differ in four configuration keys and nothing else
 | `longwave` table | `thai-ben1-sp-lw-15-dsa-ar10bar.npz` | `thai-ben2-sp-lw-17-dsa-mars.npz` |
 | `experiment_id` | `dev-thai-ben1-lwck-heated-T21L40` | `dev-thai-ben2-lwck-heated-T21L40` |
 
+`dev-thai-ben1-ck` and `dev-thai-ben2-ck` are the same two configurations
+with one more input: the `shortwave` entry becomes a `correlated_k` stellar
+table with the star's `band_fractions` (ids `dev-thai-ben*-ck-heated-T21L40`).
+The default presets keep the hashes of the recorded runs (asserted).
+
 ## 3. The tables
 
 Both are imported from SOCRATES spectral files prepared for ROCKE-3D by
@@ -107,6 +116,23 @@ stored inside the `.npz` as `metadata`.
 | far wings | CO2 sub-Lorentzian line shape (Perrin & Hartmann 1989; Wordsworth et al. 2010). Truncation distance not stated | not stated for this file |
 | continua | CO2–CO2 collision-induced absorption (Gruszka & Borysow 1998; Baranov et al. 2004; Wordsworth et al. 2010), in bands 1 and 11–14 | N2–N2 collision-induced absorption from HITRAN (Richard et al. 2012), in bands 1–3 and 12–15. **N2–CO2 CIA is not in the file** (documentation: data not found in the literature) |
 | dropped (gas absent) | H2O lines and continuum | H2O, CH4, H2 lines; H2O continuum; N2–CH4, N2–H2, H2–CH4, H2–H2, H2–CO2 CIA |
+
+### Stellar tables (presets `…-ck`)
+
+| | Ben 2 | Ben 1 |
+| --- | --- | --- |
+| table | `thai-ben2-sp-sw-42-dsa-mars-trappist1.npz` | `thai-ben1-sp-sw-43-dsa-ar10bar-trappist1.npz` |
+| content SHA-256 | `c2e873d40e3da41dd52a9b3187fd47cf65631481b03a152363f6bfc6300e8386` | `c473fca1eceb69cbb69016d856eff67093d0183e3c5542301cf28429ae35c09d` |
+| record | [thai-ben2-sp-sw-42-dsa-mars-trappist1.json](opacity/thai-ben2-sp-sw-42-dsa-mars-trappist1.json) | [thai-ben1-sp-sw-43-dsa-ar10bar-trappist1.json](opacity/thai-ben1-sp-sw-43-dsa-ar10bar-trappist1.json) |
+| source files | `sp_sw_dsa_mars/sp_sw_42_dsa_mars_trappist1` (88 479 bytes, `f2730774…7099fe`) and `…_k` (10 410 696 bytes, `222801f3…f6bef4ed`) | `sp_sw_dsa_ar10bar/sp_sw_43_dsa_ar10bar_trappist1` (116 554 bytes, `704f9776…3c54b4`) and `…_k` (11 400 655 bytes, `977f2cdd…4a65c1`) |
+| units, mass basis | as the longwave tables: m^2 per kg of the mixture, premixed | same |
+| spectral coverage | 500–50000 cm^-1 (0.2–20 μm), 42 bands, 392 spectral points; 10 bands hold no absorber for this gas | 500–50000 cm^-1, 43 bands, 337 points; 11 bands without an absorber |
+| pressure, temperature | 1 Pa – 10^6 Pa (61), 100–400 K (13) | same |
+| stellar spectrum | the TRAPPIST-1 band fluxes of the file (block 2), copied into the configuration as `band_fractions`. **The documentation does not say which stellar spectrum they were integrated from**, so they are not known to be the protocol's BT-Settl 2600 K spectrum | same star, the 43 bands of this file |
+| documented accuracy | below about 5 W m^-2 for all stars, against the 280-band reference | same |
+| lines, broadening, far wings | as the longwave file of the same family | as the longwave file of the same family |
+| continua kept | CO2–CO2 CIA in the three bands between 1111 and 1818 cm^-1 | N2–N2 CIA in the four bands between 1818 and 3175 cm^-1 |
+| Rayleigh scattering | **not applied.** The per-gas coefficients of the file are recorded in the metadata; the flux-weighted Rayleigh optical depth of the column for this star is 0.0076 | **not applied**; 0.0048 |
 
 How the importer combines terms, and what it assumes:
 
@@ -149,8 +175,16 @@ python -I tools/radiation/opacity/import_socrates.py --case thai_ben2_reference 
 python -I tools/radiation/opacity/import_socrates.py --case thai_ben1_reference --record-dir docs/radiation/opacity
 ```
 
+```bash
+# stellar absorption (22 MB), for the -ck presets
+python -I tools/radiation/opacity/fetch_socrates.py --set shortwave
+python -I tools/radiation/opacity/import_socrates.py --case thai_ben2_shortwave --record-dir docs/radiation/opacity
+python -I tools/radiation/opacity/import_socrates.py --case thai_ben1_shortwave --record-dir docs/radiation/opacity
+```
+
 `opacity_cache/` is ignored by git. Each import prints the table's content
-hash; the presets pin the two above. Another composition or spectral file:
+hash; the presets pin the four above. Re-importing the two longwave tables
+with the later version of the importer reproduced their hashes exactly. Another composition or spectral file:
 `import_socrates.py --spectral-file <dir/file> --composition <preset>`,
 after adding the file's documented source statements to `SOURCES`.
 
@@ -218,6 +252,35 @@ The isothermal 300 K columns exceed 1 W m^-2 at the surface for Ben 2
 the layer at 5.6 mbar, where the reference is −1.52 K/day: **32 %, outside
 the 5 % target** at that level. The 350-band files extend to 3500 cm^-1,
 which accounts for the −0.13 W m^-2 of the isothermal columns.
+
+### Stellar absorption (presets `…-ck`)
+
+```bash
+python tools/radiation/thai_column.py --preset dev-thai-ben2-ck
+python tools/radiation/thai_column.py --preset dev-thai-ben1-ck
+```
+
+Same columns, same stellar input (225 W m^-2 at μ0 = 0.5, surface albedo
+0.3). The thermal fluxes are those of the table above, unchanged.
+
+| W m^-2 | Ben 2 isothermal 300 | Ben 2 adiabat 250/160 | Ben 1 isothermal 300 | Ben 1 adiabat 250/160 |
+| --- | --- | --- | --- | --- |
+| stellar absorbed, total | 183.86 | 181.14 | 162.12 | 161.76 |
+| of which at the surface | 102.69 | 108.52 | 148.54 | 149.18 |
+| of which in the atmosphere | 81.16 | 72.62 | 13.58 | 12.58 |
+| planetary albedo of the column | 0.183 | 0.195 | 0.280 | 0.281 |
+| Σ c_p Δp/g · heating = N_top − N_bottom | −251.678 | +41.238 | −102.972 | −3.317 |
+| closure residual | −3·10^-14 | 0.0 | 0.0 | 0.0 |
+| stellar heating, K/day: top layer (2 Pa) | +260 | +113 | +10.1 | +5.0 |
+| stellar heating, K/day: lowest layer | +0.29 | +0.32 | +0.06 | +0.06 |
+
+A CO2 atmosphere absorbs a third of this star's light before it reaches
+the ground; N2 with 400 ppmv CO2 absorbs 6 %. The column albedos, 0.19 and
+0.28, fall inside the Bond albedos THAI reports (0.18–0.22 and 0.27–0.30).
+That is a plausibility check on one prescribed column at one zenith angle,
+not a comparison: the inputs are not matched and nothing is in equilibrium.
+The stellar tables were **not** compared with their 280-band references
+(not fetched).
 
 What this comparison is and is not. It is independent of the 17- and
 15-band structure and of their k-term fits, and it exercises random overlap
@@ -312,28 +375,86 @@ What these five days show, and what they do not:
   per day, towards the 100 K lower bound; the maximum rose to 339 K (the
   bound is 400 K). With no stellar absorption aloft and strict bounds, a
   longer Ben 2 run in this configuration would be expected to stop at one
-  of them. That is the strict default doing its job, and it is a reason to
-  add the shortwave before running longer, not to clamp.
+  of them. That is the strict default doing its job, not a reason to
+  clamp. Adding the stellar absorption did not remove it (below: 116 K on
+  day 4).
 * Nothing here is compared with Turbet et al. (2022).
+
+### With stellar absorption (MX110, commit `809ffdd`)
+
+```bash
+python -m tropoi.run.radiative run --preset dev-thai-ben2-ck --run-dir $R/dev-thai-ben2-ck-heated-T21L40-809ffdd
+python -m tropoi.run.radiative run --preset dev-thai-ben1-ck --run-dir $R/dev-thai-ben1-ck-heated-T21L40-809ffdd
+python tools/radiation/thai_dev_evidence.py $R/dev-thai-ben2-ck-heated-T21L40-809ffdd
+python tools/radiation/thai_dev_evidence.py $R/dev-thai-ben1-ck-heated-T21L40-809ffdd
+python tools/radiation/mars_state_diagnostics.py $R/<run> --name <run>    # where the wind maximum is
+```
+
+Clean tree, the same numerics, 5 days, 3.53 and 3.49 s/step (592 and 577
+spectral points against 200 and 240). No stop and resume was exercised on
+these two. Records:
+[Ben 2](evidence/dev-thai-ben2-ck-heated-T21L40-809ffdd/),
+[Ben 1](evidence/dev-thai-ben1-ck-heated-T21L40-809ffdd/).
+
+**Ben 2 with stellar absorption** (`config_sha256` `fdbcf1cfd7ebcfaaf3ca887896c3cc6a049a371abdadc5985c78131304c209f3`):
+
+| day | T min (K) | T max (K) | max \|u\| (m/s) | level of that maximum | OLR (W m^-2) | stellar absorbed (W m^-2) | mean surface T (K) | energy residual (W m^-2) |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 1 | 170.8 | 303.8 | 174.2 | top layer | 417.9 | 183.4 | 299.12 | +0.429 |
+| 2 | 145.9 | 311.0 | 274.0 | top layer | 384.0 | 183.3 | 298.27 | +0.147 |
+| 3 | 126.2 | 317.3 | 293.0 | top layer | 367.0 | 183.3 | 297.38 | +0.105 |
+| 4 | 116.2 | 323.3 | 248.6 | second layer | 354.8 | 183.3 | 296.44 | +0.083 |
+| 5 | 124.1 | 328.0 | 239.7 | second layer | 345.0 | 183.3 | 295.44 | +0.066 |
+
+**Ben 1 with stellar absorption** (`config_sha256` `ba8254e236f2f6b1bef33d469dd15fa0ca3372d93596c3cfa3bac3061253e4df`):
+
+| day | T min (K) | T max (K) | max \|u\| (m/s) | level of that maximum | OLR (W m^-2) | stellar absorbed (W m^-2) | mean surface T (K) | energy residual (W m^-2) |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 1 | 261.5 | 300.4 | 11.2 | top layer | 440.7 | 161.9 | 292.55 | -0.036 |
+| 2 | 244.7 | 301.9 | 20.3 | top layer | 410.2 | 161.9 | 286.57 | -0.016 |
+| 3 | 233.4 | 304.7 | 32.2 | top layer | 388.1 | 161.9 | 281.61 | -0.003 |
+| 4 | 224.7 | 307.9 | 41.2 | top layer | 371.0 | 161.9 | 277.39 | +0.000 |
+| 5 | 218.1 | 309.9 | 51.5 | top layer | 357.3 | 161.9 | 273.76 | +0.003 |
+
+* Both completed without a validation failure or a bounds error, and the
+  daily energy residuals are as small as in the first pair. The global-mean
+  stellar absorption is 183.3 W m^-2 (Ben 2) and 161.9 W m^-2 (Ben 1)
+  against 157.5 W m^-2 for the transparent atmosphere: Bond albedos of
+  0.185 and 0.280 for these five days.
+* **The top of the model is not credible in these runs.** In the first
+  pair the largest wind was at the surface (5–7 m s^-1). Here it is in the
+  top layer (2 Pa), near the equator: 174, 274, 293 m s^-1 on days 1–3 of
+  Ben 2, then 249 and 240 m s^-1 in the second layer. The speed of sound
+  in CO2 at those temperatures is about 190 m s^-1. Ben 1 reaches 51
+  m s^-1 in the top layer and is still rising. The stellar heating enters
+  the 2 Pa layer on the dayside only (+260 K/day at μ0 = 0.5 in §5) against
+  about −1500 K/day of thermal cooling everywhere, and nothing damps the
+  layer: the configuration has no sponge. Whether a sponge, a lower top or
+  a shorter radiation interval is the remedy was not tested.
+* What the two runs establish is that the configured stellar path runs
+  coupled on the GPU and closes its budget. They say nothing reliable about
+  the circulation aloft. Where the minimum temperatures of the tables
+  occur was not looked up.
+* The minimum temperature of Ben 2 reached 116 K on day 4 (bound: 100 K).
 
 ## 7. Approximations, gaps and what was not done
 
-* **Shortwave is an approximation, by configuration**: `{"kind":
-  "transparent"}`. No CO2 near-infrared absorption and no Rayleigh
-  scattering; the surface absorbs 70 % of the incident light. THAI's Bond
-  albedos (0.18–0.22 for Ben 2 against a surface albedo of 0.3) show that a
-  CO2 atmosphere absorbs a large share of an M dwarf's light, so this is
-  the largest known departure, and Ben 2 is affected most. Suitable data
-  exist and are fetched with pinned hashes
-  (`fetch_socrates.py --set shortwave`: `sp_sw_42_dsa_mars_trappist1`,
-  `sp_sw_43_dsa_ar10bar_trappist1`, with the TRAPPIST-1 band fluxes and
-  per-gas Rayleigh coefficients). The importer already reads them
-  (`--case thai_ben2_shortwave`, `--case thai_ben1_shortwave`: band
-  reordering, stellar band fractions and the mixture's Rayleigh
-  coefficients in the metadata), but at this commit no preset uses them
-  and `CorrelatedKShortwave` has no Rayleigh term.
-* **No external reference.** §5 compares against the documented
-  high-resolution files only. A line-by-line or external-code calculation
+* **Shortwave is an approximation in both variants, by configuration.**
+  The default presets use `{"kind": "transparent"}`: no CO2 near-infrared
+  absorption, the surface absorbs 70 % of the incident light. §5 measures
+  what that leaves out: 73–81 W m^-2 of 225 for Ben 2, 13 W m^-2 for
+  Ben 1. The `-ck` presets add the absorption but **no Rayleigh
+  scattering** (`CorrelatedKShortwave` has no scattering term; the
+  optical depth left out is 0.008 and 0.005), take the star's band fluxes
+  from a spectral file whose stellar spectrum is not documented, and were
+  not compared with a reference.
+* **The model top cannot carry the stellar heating as configured.** With
+  the `-ck` presets the wind maximum moves to the top layer (2 Pa) and
+  reaches 293 m s^-1 in Ben 2 and 51 m s^-1, still rising, in Ben 1 (§6).
+  There is no sponge and the top layer has no layer above it. A sponge or
+  a lower top is needed before any longer `-ck` run; neither was tried.
+* **No external reference.** §5 compares the longwave tables against the
+  documented high-resolution files only. A line-by-line or external-code calculation
   on the same columns is the missing check of the spectroscopy and of the
   format reading.
 * **N2–CO2 collision-induced absorption is absent** from the Ben 1 table
@@ -361,16 +482,17 @@ What these five days show, and what they do not:
 python -m pytest tests/test_radiation_ktable_config.py tests/test_radiation_kdist.py tests/test_radiation_twostream.py tests/test_physics_columns.py tests/test_physics_shared.py tests/test_radiation_evidence.py tests/test_radiative_dynamical.py tests/test_layout.py -q
 ```
 
-Run on 2026-11-16 at `9f8c776` (Windows, MX110, Python 3.12.12, CuPy
-13.4.0), with the four imported tables present: **147 passed, 0 failed, 0
-skipped** in 4 min 45 s. It covers the new configuration path, the
+Run on 2026-11-16 at `809ffdd` (Windows, MX110, Python 3.12.12, CuPy
+13.4.0), with the imported tables present: **150 passed, 0 failed,
+0 skipped** in 305 s. The same command gave 147 passed at
+`9f8c776`, before the stellar presets and their three tests were added. It covers the new configuration path, the
 k-distribution method against line-by-line on the synthetic spectrum, the
 two-stream solver, the column physics, the frozen gray configuration
 hashes, the energy criteria A1–A4 on the recorded gray runs, the coupled
 gray runs with their checkpoint/resume tests, and the import-layer rules.
 The full suite was not run.
 
-`tests/test_radiation_ktable_config.py` (9 tests):
+`tests/test_radiation_ktable_config.py` (12 tests):
 
 * a `correlated_k` configuration reaches layer heating through
   `build_physics`, the heating closes against the flux convergence to
@@ -391,7 +513,12 @@ The full suite was not run.
   `cp` and `longwave`, and take R and c_p from the composition;
 * with the imported tables present (skipped otherwise): the pinned hash
   loads, the table was mixed for the preset's gas, an isothermal column
-  emits σT^4 over the bands to 1e-6, and a 90 K column is refused.
+  emits σT^4 over the bands to 1e-6, and a 90 K column is refused;
+* the default presets keep the configuration hashes of the recorded runs;
+* each `-ck` preset differs from its default only in `experiment_id` and
+  `shortwave`, its band fractions sum to 1 and match the table's bands,
+  and (tables present) the gas darkens the column below its surface
+  albedo while the heating still closes.
 
 The first seven use the synthetic Lorentz-line fixture of
 `test_radiation_kdist.py` and need no data. The importer and the SOCRATES
