@@ -22,6 +22,7 @@ import numpy as np
 import pytest
 
 from tropoi.physics.planets import PLANETS
+from tropoi.physics.radiation.tables import KTableError
 from tropoi.run.radiative.config import PRESETS, RadiativeConfig
 from tropoi.run.radiative.model import (build_physics, build_sigma, reference_column)
 
@@ -158,7 +159,7 @@ def test_radiation_interval_must_divide_a_day_so_that_resume_is_exact():
 # ---------------------------------------------------------------- host only
 def test_presets_are_valid_hashable_and_round_trip():
     seen = set()
-    for name, factory in PRESETS.items():
+    for factory in PRESETS.values():
         cfg = factory()
         again = RadiativeConfig.from_dict(json.loads(json.dumps(cfg.to_dict())))
         assert again == cfg and again.sha256() == cfg.sha256()
@@ -166,7 +167,6 @@ def test_presets_are_valid_hashable_and_round_trip():
         seen.add(cfg.sha256())
         expected = cfg.vertical.get("nlev", len(cfg.vertical.get("sigma", ())) - 1)
         assert build_sigma(cfg).nlev == expected
-        assert build_physics(cfg).signature()["kind"] == "column_physics"
     assert len(seen) == len(PRESETS)
     with pytest.raises(ValueError):
         PRESETS["earth-gray-dry"]().with_(dt=7.0)
@@ -174,6 +174,17 @@ def test_presets_are_valid_hashable_and_round_trip():
                                                              "tau_equatr": 6.0})
     with pytest.raises(ValueError, match="unknown keys"):
         build_physics(misspelt)
+
+
+@pytest.mark.parametrize("preset", PRESETS)
+def test_preset_builds_column_physics(preset):
+    try:
+        physics = build_physics(PRESETS[preset]())
+    except KTableError as exc:
+        if preset.startswith("dev-thai-") and " not found in " in str(exc):
+            pytest.skip(str(exc))
+        raise
+    assert physics.signature()["kind"] == "column_physics"
 
 
 def test_reference_column_of_the_jupiter_preset_is_in_energy_balance():
