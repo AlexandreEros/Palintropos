@@ -136,6 +136,9 @@ python -m pytest tests/test_radiation_ktable_config.py tests/test_radiation_kdis
 147 passed, 1 warning in 285.96s
 ```
 
+Rerun at `809ffdd` after the stellar presets and their three tests:
+150 passed, 0 skipped in 304.86s.
+
 The warning is the known `invalid value encountered in log` of
 `test_implicit_surface_exchange_is_stable_where_the_explicit_one_diverges`.
 The full suite was not run at this commit. What each new test covers is in
