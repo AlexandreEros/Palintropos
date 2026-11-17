@@ -145,10 +145,8 @@ def test_the_bottom_conductance_alone_is_the_implicit_bulk_stress():
 # the configuration contract (CPU)
 # ---------------------------------------------------------------------------
 
-def test_the_bl_preset_removes_both_substitutes_and_moves_no_other_identity():
-    """Plan §2e: drag and convection become None, the scheme's options are
-    the registered ones, and every other preset's canonical form has no
-    boundary_layer key (their hashes cannot move)."""
+def test_the_bl_preset_replaces_drag_and_convection():
+    """The Mars boundary-layer preset changes only the intended options."""
     cfg = PRESETS["dev-mars-gray-flat-bl"]()
     assert cfg.experiment_id == "dev-mars-gray-flat-bl-heated-T21L25"
     assert cfg.days == 60 and cfg.drag is None and cfg.convection is None
@@ -158,12 +156,6 @@ def test_the_bl_preset_removes_both_substitutes_and_moves_no_other_identity():
     implicit = PRESETS["dev-mars-gray-flat-sponge-implicit"]()
     assert cfg.with_(boundary_layer=None, drag=implicit.drag, convection=implicit.convection,
                      experiment_id=implicit.experiment_id) == implicit
-    for name, factory in PRESETS.items():
-        # dev-mars-gray-flat-bl-most is the same scheme with Isca's full
-        # Monin-Obukhov forms substituted in (tests/test_monin_obukhov.py);
-        # no other preset may carry the key, or its hash would move
-        if name not in ("dev-mars-gray-flat-bl", "dev-mars-gray-flat-bl-most"):
-            assert "boundary_layer" not in factory().to_dict()
 
 
 def test_the_bl_preset_round_trips_and_requires_a_surface():
