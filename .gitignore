@@ -2,18 +2,27 @@
 __pycache__/
 *.pyc
 
+# Zip files
+*.zip
+
 # Virtual env
 venv/
+venv_storepy313_backup_20260705/
 
 # Caches
 .pytest_cache/
 .mypy_cache/
 .ruff_cache/
 tests/.sh_cache/
+.grimp_cache/
 
 # IDE
 .idea/
 .vscode/
+
+# Agents
+.claude/
+**/superpowers/
 
 # Notebooks
 .ipynb_checkpoints/
@@ -28,6 +37,9 @@ psx-bve-*/
 tmp_codex_out/
 tests/*.png
 *.egg-info/
+
+# Generated plans
+plans/
 
 # Local sdist/wheel builds (setuptools writes build/ next to pyproject.toml)
 build/
@@ -47,6 +59,7 @@ mri-w5-reference-preparation-v1-fixed-run/
 artifacts/
 notebooks/*_browser_handoff.ipynb
 .pytest-tmp/
+.pytest-tmp2/
 
 # Raw opacity inputs (HITRAN line lists, CIA): fetched, never committed.
 # tools/radiation/opacity/fetch_hitran.py records their URLs and hashes.
