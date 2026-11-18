@@ -4,10 +4,15 @@ from __future__ import annotations
 
 import numpy as np
 import pytest
-from scipy.integrate import solve_bvp
+from scipy.integrate import quad, solve_bvp
 from scipy.special import expn
 
 from tropoi.physics.radiation import twostream as ts
+from tropoi.physics.radiation.gray import GrayLongwave, OpticalDepthProfile
+from tropoi.physics.radiation.scheme import (
+    STEFAN_BOLTZMANN, Column, LowerBoundary, Radiation,
+)
+from tropoi.run.radiative.config import PRESETS
 
 
 def _bvp(rhs, bc, edges, per_layer=300, tol=1e-10):
@@ -99,6 +104,63 @@ def test_absorbing_isothermal_column_is_exact_and_thin_layers_are_stable():
     # a linear source across a vanishing layer must not blow up
     up2, down2 = ts.thermal_fluxes(tau, p, 2 * p, surface_source=0.0, diffusivity=1.66)
     assert np.isfinite(up2).all() and np.isfinite(down2).all()
+
+
+def test_layer_centered_longwave_cools_each_optically_thin_layer_at_its_own_temperature():
+    """The thin-limit emission of hot and cold layers must differ even when
+    their interpolated internal face temperatures are identical."""
+    pressure = np.linspace(0., 1.e5, 9)[:, None]
+    temperature = np.tile([230., 170.], 4)[:, None]
+    optical_depth = 1.e-5
+    optics = GrayLongwave(OpticalDepthProfile([(1.0, 1.0)], equator=optical_depth))
+    column = Column(pressure, temperature, 10., 1000.)
+    surface = LowerBoundary(temperature=np.array([0.]))
+    cfg = PRESETS["dev-thai-ben2-ck"]()
+    fluxes = Radiation(optics, source=cfg.thermal_source).fluxes(column, surface)
+    dp = np.diff(pressure, axis=0)
+    emission = -fluxes.heating * column.cp * dp / column.gravity
+    expected = 2 * optical_depth / 8 * STEFAN_BOLTZMANN * temperature**4
+    np.testing.assert_allclose(emission, expected, rtol=4.e-5, atol=0.)
+    np.testing.assert_allclose(emission.sum(axis=0),
+                               fluxes.net_down[-1] - fluxes.net_down[0], atol=1.e-15)
+
+
+def test_layer_centered_longwave_preserves_the_isothermal_solution():
+    pressure = np.array([0., 5., 9., 250., 5000., 1.e5])[:, None]
+    column = Column(pressure, np.full((5, 1), 215.), 10., 1000.)
+    optics = GrayLongwave(OpticalDepthProfile([(1.0, 1.0)], equator=4.))
+    surface = LowerBoundary(temperature=np.array([300.]), emissivity=0.8)
+    layer = Radiation(optics, source="layer-linear").fluxes(column, surface)
+    original = Radiation(optics, source="linear").fluxes(column, surface)
+    np.testing.assert_array_equal(layer.lw_up, original.lw_up)
+    np.testing.assert_array_equal(layer.lw_down, original.lw_down)
+
+
+def test_layer_centered_longwave_converges_on_a_smooth_column():
+    """Compare the fluxes to independent integrals of the smooth source."""
+    optical_depth = 2.5
+    optics = GrayLongwave(OpticalDepthProfile([(1.0, 1.0)], equator=optical_depth))
+    surface = LowerBoundary(temperature=np.array([260.]))
+
+    def planck(x):
+        return STEFAN_BOLTZMANN * (220. - 30. * np.cos(np.pi * x))**4
+
+    direct_surface = STEFAN_BOLTZMANN * 260.**4 * np.exp(-optical_depth)
+    exact_up = direct_surface + quad(
+        lambda x: optical_depth * planck(x) * np.exp(-optical_depth * x), 0., 1.)[0]
+    exact_down = quad(
+        lambda x: optical_depth * planck(x) * np.exp(-optical_depth * (1. - x)), 0., 1.)[0]
+
+    errors = []
+    for layers in (8, 16, 32):
+        x = np.linspace(0., 1., layers + 1)
+        t = 220. - 30. * np.diff(np.sin(np.pi * x)) / (np.pi * np.diff(x))
+        column = Column(x[:, None] * 1.e5, t[:, None], 10., 1000.)
+        fluxes = Radiation(optics, source="layer-linear").fluxes(column, surface)
+        errors.append(np.abs([fluxes.lw_up[0, 0] - exact_up, fluxes.lw_down[-1, 0] - exact_down]))
+    errors = np.asarray(errors)
+    assert np.all(errors[1:] < 0.3 * errors[:-1])
+    assert np.all(errors[-1] < 0.006)  # W m^-2
 
 
 def test_two_stream_angular_error_against_exact_exponential_integrals():

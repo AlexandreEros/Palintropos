@@ -258,13 +258,18 @@ def test_recorded_thai_configurations_keep_their_hashes():
 
 
 @pytest.mark.parametrize("case", ["ben1", "ben2"])
-def test_thai_stellar_absorption_is_one_more_input(case):
-    """The ``-ck`` presets are the default ones with a stellar k-table and
-    the star's band fractions in place of the transparent shortwave."""
+def test_thai_stellar_absorption_preset_options(case):
+    """The coupled Ben 2 run additionally preserves layer-local thermal emission."""
     from tropoi.run.radiative.config import PRESETS
     base, ck = PRESETS[f"dev-thai-{case}"](), PRESETS[f"dev-thai-{case}-ck"]()
     d0, d1 = base.to_dict(), ck.to_dict()
-    assert {k for k in d0 if d0[k] != d1[k]} == {"experiment_id", "shortwave"}
+    changed = {"experiment_id", "shortwave"}
+    if case == "ben2":
+        changed.add("thermal_source")
+        assert ck.thermal_source == "layer-linear"
+        assert ck.with_(thermal_source="linear").sha256() == (
+            "fdbcf1cfd7ebcfaaf3ca887896c3cc6a049a371abdadc5985c78131304c209f3")
+    assert {k for k in d0 if d0[k] != d1[k]} == changed
     sw = ck.shortwave
     assert sw["kind"] == "correlated_k" and sw["bounds"] == "error"
     assert sw["mass_fractions"] == ck.longwave["mass_fractions"]

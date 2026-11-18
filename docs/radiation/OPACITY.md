@@ -82,10 +82,13 @@ The two THAI presets differ in four configuration keys and nothing else
 | `longwave` table | `thai-ben1-sp-lw-15-dsa-ar10bar.npz` | `thai-ben2-sp-lw-17-dsa-mars.npz` |
 | `experiment_id` | `dev-thai-ben1-lwck-heated-T21L40` | `dev-thai-ben2-lwck-heated-T21L40` |
 
-`dev-thai-ben1-ck` and `dev-thai-ben2-ck` are the same two configurations
-with one more input: the `shortwave` entry becomes a `correlated_k` stellar
-table with the star's `band_fractions` (ids `dev-thai-ben*-ck-heated-T21L40`).
-The default presets keep the hashes of the recorded runs (asserted).
+`dev-thai-ben1-ck` and `dev-thai-ben2-ck` use a `correlated_k` stellar table
+with the star's `band_fractions` (ids `dev-thai-ben*-ck-heated-T21L40`).
+`dev-thai-ben2-ck` also sets `thermal_source="layer-linear"` for the
+upper-atmosphere issue [#47](https://github.com/AlexandreEros/Palintropos/issues/47).
+The historical coupled runs below used `thermal_source="linear"`. Their
+serialized configurations still select that scheme and keep their hashes.
+Use a fresh run directory for the revised preset.
 
 ## 3. The tables
 
@@ -436,6 +439,35 @@ these two. Records:
   the circulation aloft. Where the minimum temperatures of the tables
   occur was not looked up.
 * The minimum temperature of Ben 2 reached 116 K on day 4 (bound: 100 K).
+
+### Layer-centered thermal emission in Ben 2
+
+The original linear longwave source builds Planck fluxes from temperatures
+interpolated to the two faces. A layer-scale warm/cold alternation can be
+nearly absent at the faces. In an optically thin layer, the two-stream
+emission depends to first order on the mean Planck flux through that
+layer. Using only the two faces therefore weakens the radiative response to
+the prognosed layer temperature. This combines with the weak hydrostatic
+response to the vertical computational mode of the Lorenz grid.
+
+The `layer-linear` source retains the Planck slope inferred from the faces
+and centers it on the Planck flux evaluated at the layer temperature. The
+average of the two reconstructed endpoints then equals that layer flux.
+The slope is bounded by the center flux so both endpoints are nonnegative.
+The same optical depths, two-stream solution, and flux-divergence heating
+apply. The layer Planck flux approximates the optical-depth mean for the
+layer's homogeneous optics; a coarse layer crossing a sharp inversion
+still needs a resolution check. The independent gray-column tests cover
+the optically thin limit, the isothermal limit, and convergence to the
+formal solution on a smooth column.
+
+A native five-day replay matched the archived configuration and initial
+state, changing only the longwave source. The area-weighted RMS of the
+fitted alternating component in the top eight layers was 0.23 K at day 1
+and 1.06 K at day 5 with the revised source, versus 2.30 and 11.71 K for
+the original run. The fit removes a quadratic trend in log layer pressure.
+The day-5 adjacent-layer vorticity and divergence correlations remained
+low. The wind-coherence part of #47 remains open.
 
 ## 7. Approximations, gaps and what was not done
 
