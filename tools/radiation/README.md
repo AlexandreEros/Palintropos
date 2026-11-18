@@ -32,5 +32,8 @@ documents the experiment settings and interpretation.
   convergence and compares with a reference table.
   [thai_dev_evidence.py](thai_dev_evidence.py) records a short coupled run
   and compares an interrupted run with an uninterrupted control.
+  [thai_vertical_coherence.py](thai_vertical_coherence.py) reads the saved
+  states (CPU) for the layer means, the alternating temperature component
+  and the adjacent-layer vorticity and divergence correlations (issue #47).
 
 See [docs/radiation/OPACITY.md](../../docs/radiation/OPACITY.md).

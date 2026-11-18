@@ -163,6 +163,42 @@ def test_layer_centered_longwave_converges_on_a_smooth_column():
     assert np.all(errors[-1] < 0.006)  # W m^-2
 
 
+@pytest.mark.parametrize("optical_depth", [50., 500.])
+def test_layer_centered_longwave_is_no_worse_than_linear_in_optically_thick_layers(optical_depth):
+    """Interface net fluxes against the formal solution, Delta tau 1.6 to 31.
+
+    The layer-centered faces jump at interfaces; in thick layers the flux
+    leaving a layer is set by its face values, so this is where a jump
+    could cost accuracy. It does not: the error converges and stays below
+    the face-interpolated source's at every tested layer depth (issue #47).
+    """
+    optics = GrayLongwave(OpticalDepthProfile([(1.0, 1.0)], equator=optical_depth))
+    surface = LowerBoundary(temperature=np.array([260.]))
+
+    def planck(x):
+        return STEFAN_BOLTZMANN * (220. - 30. * np.cos(np.pi * x))**4
+
+    def exact_net(xi):
+        up = STEFAN_BOLTZMANN * 260.**4 * np.exp(-optical_depth * (1. - xi)) + quad(
+            lambda x: optical_depth * planck(x) * np.exp(-optical_depth * (x - xi)),
+            xi, 1., limit=400)[0]
+        down = quad(lambda x: optical_depth * planck(x) * np.exp(-optical_depth * (xi - x)),
+                    0., xi, limit=400)[0] if xi > 0. else 0.
+        return down - up
+
+    worst = {}
+    for layers in (16, 32):
+        x = np.linspace(0., 1., layers + 1)
+        t = 220. - 30. * np.diff(np.sin(np.pi * x)) / (np.pi * np.diff(x))
+        column = Column(x[:, None] * 1.e5, t[:, None], 10., 1000.)
+        reference = np.array([exact_net(xi) for xi in x])
+        for source in ("linear", "layer-linear"):
+            f = Radiation(optics, source=source).fluxes(column, surface)
+            worst[source, layers] = np.abs((f.lw_down - f.lw_up)[:, 0] - reference).max()
+        assert worst["layer-linear", layers] < worst["linear", layers]
+    assert worst["layer-linear", 32] < 0.3 * worst["layer-linear", 16]
+
+
 def test_two_stream_angular_error_against_exact_exponential_integrals():
     """The method's own limit: flux emissivity of an isothermal absorbing
     slab is exactly 1 - 2 E3(tau); the diffusivity approximation gives

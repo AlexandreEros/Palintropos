@@ -459,15 +459,95 @@ apply. The layer Planck flux approximates the optical-depth mean for the
 layer's homogeneous optics; a coarse layer crossing a sharp inversion
 still needs a resolution check. The independent gray-column tests cover
 the optically thin limit, the isothermal limit, and convergence to the
-formal solution on a smooth column.
+formal solution on a smooth column, from optically thin layers to
+`Δτ = 31` per layer; at every tested layer depth the `layer-linear` net
+fluxes are closer to the formal solution than the `linear` ones.
 
-A native five-day replay matched the archived configuration and initial
-state, changing only the longwave source. The area-weighted RMS of the
-fitted alternating component in the top eight layers was 0.23 K at day 1
-and 1.06 K at day 5 with the revised source, versus 2.30 and 11.71 K for
-the original run. The fit removes a quadratic trend in log layer pressure.
-The day-5 adjacent-layer vorticity and divergence correlations remained
-low. The wind-coherence part of #47 remains open.
+### Vertical structure of the stellar-absorbing runs (issue #47, MX110)
+
+Measured from the native saved states (full-precision spectral
+coefficients) by
+[thai_vertical_coherence.py](../../tools/radiation/thai_vertical_coherence.py):
+each field is synthesized exactly on the run's 32 Gauss latitudes × 64
+longitudes, and the Gauss × uniform-longitude weights integrate the
+products of two band-limited fields exactly, so the means, RMS values and
+area-weighted Pearson correlations below are exact sphere integrals. Native
+layer `k` (0-based, top first) is the issue's "level `k + 1`". The
+alternating component is the least-squares amplitude `a` of `(-1)^k` in
+`T_k = c0 + c1 ln σ_k + c2 (ln σ_k)^2 + a (-1)^k` over the top eight
+layers of each column (equivalently a quadratic in log layer pressure);
+the record is the area-weighted RMS of `a`.
+
+```bash
+R=runs/radiative
+# the preset (3f2de9d8…) and the same configuration with thermal_source="linear",
+# which is the recorded 809ffdd one (fdbcf1cf…)
+python -c "import json; from tropoi.run.radiative.config import PRESETS; c = PRESETS['dev-thai-ben2-ck'](); \
+[json.dump(c.with_(thermal_source=s).to_dict(), open(f'ben2-ck-{s}.json', 'w')) for s in ('linear', 'layer-linear')]"
+python -m tropoi.run.radiative run --config ben2-ck-linear.json --run-dir $R/dev-thai-ben2-ck-heated-T21L40-9b2060c-linear
+python -m tropoi.run.radiative run --config ben2-ck-layer-linear.json --run-dir $R/dev-thai-ben2-ck-heated-T21L40-9b2060c-layer-linear
+python tools/radiation/thai_vertical_coherence.py $R/<run> [...] --write
+```
+
+**Reproduction.** The issue's preliminary numbers, read from the
+quantized globe viewer, agree with the native states to every quoted
+digit: day-5 layer means 197.30, 174.96, 197.13, 177.10 K for layers 1–4;
+vorticity correlations of the pairs 1–2, 2–3, 3–4 +0.89/+0.91/+0.93 on day
+1 and +0.30/+0.28/+0.36 on day 5; divergence +0.64/+0.50/+0.82 and
+−0.20/−0.23/−0.06. The PR's 2.30 and 11.71 K are reproduced by the tool
+(2.303, 11.706 K). The Colab T4 copy of the same run agrees with the MX110
+run to ~1e-11 in `max|u|` at day 5.
+
+**Control.** The configuration with `thermal_source="linear"`, rerun at
+`9b2060c`, is bit-identical to the `809ffdd` run in all ten saved arrays
+(states and slab temperatures, days 1–5): the branch leaves the historical
+source path unchanged.
+
+**One factor at a time.** Day 1 → day 5, means over the eight top layer
+pairs; "δ < 0.5 to" is the deepest layer whose divergence correlation with
+the layer above it is below 0.5 on day 5:
+
+| run | source | alternating RMS (K) | ζ r, top 8 | δ r, top 8 | δ < 0.5 to | max\|u\| day 5 |
+|---|---|---:|---:|---:|---:|---:|
+| Ben 1, transparent SW (`9f8c776`) | linear | 0.56 → 1.02 | +1.00 → +0.98 | +0.96 → +0.87 | — | 5 m/s at 972 hPa |
+| Ben 2, transparent SW (`9f8c776`) | linear | 1.49 → 1.79 | +1.00 → +0.84 | +0.98 → +0.46 | 8.4 hPa | 7 m/s at 646 hPa |
+| Ben 1, stellar absorption (`809ffdd`) | linear | 0.52 → 0.84 | +0.74 → +0.53 | +0.67 → −0.20 | 0.67 hPa | 51 m/s at 2 Pa |
+| Ben 2, stellar absorption (`809ffdd`) | linear | 2.30 → 11.71 | +0.94 → +0.50 | +0.83 → −0.16 | 12.6 hPa | 240 m/s at 5 Pa |
+| Ben 2, stellar absorption (`9b2060c`) | layer-linear | 0.23 → 1.06 | +0.96 → +0.53 | +0.87 → −0.05 | 5.6 hPa | 241 m/s at 5 Pa |
+
+What this establishes:
+
+* **The temperature alternation is a radiative-source defect.** With only
+  the thermal source changed (and the unchanged path shown bit-identical),
+  the alternating component falls tenfold and the day-5 layer means of
+  layers 1–4 become 192.3, 187.2, 187.7, 187.1 K. The new source closes
+  the energy budget as the old one did (largest |residual| 0.424 against
+  0.429 W m^-2).
+* **The loss of wind coherence is not caused by the temperature
+  alternation.** It is unchanged when the alternation is removed, and it
+  occurs in Ben 1 with stellar absorption, where the alternation never
+  exceeds 0.84 K and the divergence of layers 1 and 2 is already
+  anticorrelated on day 1 (−0.83).
+* **It appears with stellar absorption.** The `-ck` presets differ from
+  the transparent-shortwave ones only in the `shortwave` entry (asserted
+  by `test_thai_stellar_absorption_preset_options`). Without it, Ben 1
+  stays coherent and Ben 2 loses divergence coherence only slowly, with
+  winds below 7 m/s whose upper-level divergence is small (a correlation
+  is blind to amplitude, so this row is weak evidence either way). With
+  it, the shortwave heats the 2 Pa layer of a 300 K Ben 2 column by about
+  260 K/day (10 K/day in Ben 1) and the wind maximum moves to the
+  unsponged top layers.
+
+Not yet discriminated, and the remaining part of #47: whether the
+incoherent upper-level flow forced by stellar heating at the unsponged top
+is a numerical artifact of the upper boundary or of vertical resolution,
+or a physically consistent response. The next controlled experiments are
+one-factor changes of the upper-boundary treatment and of the vertical
+resolution of the `-ck` Ben 2 configuration, measured with the same tool.
+Radiation cadence was checked and is not the cause: the stiffest
+radiative relaxation (300 K isothermal top layer, about 21 day^-1) times
+the one-hour radiation interval is 0.87, below the oscillation threshold
+of 1 for a held tendency.
 
 ## 7. Approximations, gaps and what was not done
 
@@ -511,11 +591,14 @@ low. The wind-coherence part of #47 remains open.
 ## 8. Tests
 
 ```bash
-python -m pytest tests/test_radiation_ktable_config.py tests/test_radiation_kdist.py tests/test_radiation_twostream.py tests/test_physics_columns.py tests/test_physics_shared.py tests/test_radiation_evidence.py tests/test_radiative_dynamical.py tests/test_layout.py -q
+python -m pytest tests/test_radiation_ktable_config.py tests/test_radiation_kdist.py tests/test_radiation_twostream.py tests/test_physics_columns.py tests/test_physics_shared.py tests/test_radiation_evidence.py tests/test_radiative_dynamical.py tests/test_layout.py tests/test_thai_vertical_coherence.py -q
 ```
 
-Run on 2026-11-16 at `809ffdd` (Windows, MX110, Python 3.12.12, CuPy
-13.4.0), with the imported tables present: **150 passed, 0 failed,
+Run on 2026-11-18 on the issue-#47 work over `9b2060c` (same machine and
+versions, tables present): **169 passed, 0 failed, 0 skipped** in 256 s;
+`python -m tools.architecture.generate --check` up to date. Run on
+2026-11-16 at `809ffdd` (Windows, MX110, Python 3.12.12, CuPy
+13.4.0), with the imported tables present, without the last file: **150 passed, 0 failed,
 0 skipped** in 305 s. The same command gave 147 passed at
 `9f8c776`, before the stellar presets and their three tests were added. It covers the new configuration path, the
 k-distribution method against line-by-line on the synthetic spectrum, the
