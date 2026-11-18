@@ -1,0 +1,293 @@
+{
+  "command": "python -I tools/radiation/opacity/import_socrates.py --case thai_ben1 --record-dir docs/radiation/opacity",
+  "file": "thai-ben1-sp-lw-15-dsa-ar10bar.npz",
+  "metadata": {
+    "assumptions": {
+      "absent_gases_dropped": [
+        "CH4",
+        "H2",
+        "H2O"
+      ],
+      "broadening": "CO2 lines broadened by air (HITRAN air widths; the file's single self-broadening entry is CO2 fraction 0), used here for an N2 background: N2 broadening is approximated by air broadening",
+      "continua": "N2-N2 collision-induced absorption from HITRAN (Richard et al. 2012, JQSRT 113, 1276). N2-CO2 CIA is NOT included (the documentation: data not found in the literature). N2-CH4, N2-H2, H2-CH4, H2-H2, H2-CO2 CIA and the H2O continuum are in the file but unused (those gases are absent)",
+      "continuum_density": "k_cont q1 q2 rho with rho = p / (R_mix T) of the stated mixture; continuum look-up (10 K steps) interpolated linearly in T to the gas table's temperatures. Where the source data stop (CO2-CO2 below 200 K) the file itself holds the edge value",
+      "far_wings": "not stated in the documentation for this file (the CO2 sub-Lorentzian line shape is listed only for the CO2-rich files)",
+      "line_data": "HITRAN 2012 (Rothman et al. 2013, JQSRT 130, 4)",
+      "overlap": "as flagged in the spectral file: random overlap (products of k-terms) between a gas and a continuum, exact where either has one term. Not a common-wavenumber-grid premix",
+      "random_overlap_bands": [
+        3,
+        13,
+        14,
+        15
+      ],
+      "self_broadening_axis": {
+        "CO2": {
+          "axis": [
+            0.0
+          ],
+          "used": 0.0
+        }
+      },
+      "thermal_source": "band Planck fractions are computed by the provider (planck_band_fraction); SOCRATES' own Planck table is not used. Nothing is emitted outside the bands"
+    },
+    "bands": [
+      {
+        "band": 1,
+        "components": [
+          "CO2:1",
+          "N2-N2:4"
+        ],
+        "points": 4,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          1.0,
+          229.9999999977
+        ]
+      },
+      {
+        "band": 2,
+        "components": [
+          "CO2:1",
+          "N2-N2:3"
+        ],
+        "points": 3,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          229.9999999977,
+          400.0
+        ]
+      },
+      {
+        "band": 3,
+        "components": [
+          "CO2:14",
+          "N2-N2:6"
+        ],
+        "points": 84,
+        "random_overlap_acts": true,
+        "wavenumber_cm": [
+          400.0,
+          550.0000000550001
+        ]
+      },
+      {
+        "band": 4,
+        "components": [
+          "CO2:11"
+        ],
+        "points": 11,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          550.0000000550001,
+          590.0000000826
+        ]
+      },
+      {
+        "band": 5,
+        "components": [
+          "CO2:22"
+        ],
+        "points": 22,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          590.0000000826,
+          750.0000001875001
+        ]
+      },
+      {
+        "band": 6,
+        "components": [
+          "CO2:10"
+        ],
+        "points": 10,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          750.0000001875001,
+          800.0
+        ]
+      },
+      {
+        "band": 7,
+        "components": [
+          "CO2:14"
+        ],
+        "points": 14,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          800.0,
+          990.0000000990001
+        ]
+      },
+      {
+        "band": 8,
+        "components": [
+          "CO2:11"
+        ],
+        "points": 11,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          990.0000000990001,
+          1119.99999994624
+        ]
+      },
+      {
+        "band": 9,
+        "components": [
+          "CO2:1"
+        ],
+        "points": 1,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          1119.99999994624,
+          1200.0000000480002
+        ]
+      },
+      {
+        "band": 10,
+        "components": [
+          "CO2:8"
+        ],
+        "points": 8,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          1200.0000000480002,
+          1310.00000004454
+        ]
+      },
+      {
+        "band": 11,
+        "components": [
+          "CO2:8"
+        ],
+        "points": 8,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          1310.00000004454,
+          1409.99999991258
+        ]
+      },
+      {
+        "band": 12,
+        "components": [
+          "CO2:1",
+          "N2-N2:1"
+        ],
+        "points": 1,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          1409.99999991258,
+          1860.0000000074401
+        ]
+      },
+      {
+        "band": 13,
+        "components": [
+          "CO2:9",
+          "N2-N2:3"
+        ],
+        "points": 27,
+        "random_overlap_acts": true,
+        "wavenumber_cm": [
+          1860.0000000074401,
+          2189.9999998379403
+        ]
+      },
+      {
+        "band": 14,
+        "components": [
+          "CO2:10",
+          "N2-N2:2"
+        ],
+        "points": 20,
+        "random_overlap_acts": true,
+        "wavenumber_cm": [
+          2189.9999998379403,
+          2410.00000020967
+        ]
+      },
+      {
+        "band": 15,
+        "components": [
+          "CO2:4",
+          "N2-N2:4"
+        ],
+        "points": 16,
+        "random_overlap_acts": true,
+        "wavenumber_cm": [
+          2410.00000020967,
+          3000.0000003
+        ]
+      }
+    ],
+    "coverage": {
+      "documented_accuracy": "about 1 W m^-2 for temperatures below about 310 K, against sp_lw_350_dsa_ar10bar",
+      "documented_ranges": "opacity look-up tables 100-400 K; Planck table 1-500 K; long-wave accuracy decreases above about 310 K",
+      "documented_validity": "atmospheres dominated by a mixture of N2 and H2 with up to 1 % CO2 and CH4, surface pressures up to 10 bar",
+      "n_band": 15,
+      "n_points": 240,
+      "n_pressure": 61,
+      "n_temperature": 13,
+      "pressure_pa": [
+        1.0,
+        1000000.0
+      ],
+      "temperature_k": [
+        100.0,
+        400.0
+      ],
+      "wavenumber_cm": [
+        1.0,
+        3000.0000003
+      ]
+    },
+    "mass_basis": {
+      "composition": {
+        "CO2": 0.0004,
+        "N2": 0.9996
+      },
+      "composition_label": "thai_ben1",
+      "gas_constant": 296.7289264825303,
+      "kind": "premixed",
+      "mass_fractions": {
+        "CO2": 0.0006282423254658981,
+        "N2": 0.9993717576745341
+      },
+      "molar_mass_kg_per_mol": 0.028020398000000002,
+      "per": "kg of the mixture"
+    },
+    "schema": "palintropos.ktable.metadata/1",
+    "source": {
+      "documentation": {
+        "read": "2026-11-16",
+        "sha256": "ff20b814dd80761e9ebf3e20cb74d914027d5c368a0bf026001d47e1a9a983a6",
+        "url": "https://simplex.giss.nasa.gov/gcm/ROCKE-3D/Spectralfiles.html"
+      },
+      "files": [
+        {
+          "bytes": 49157,
+          "name": "sp_lw_15_dsa_ar10bar",
+          "sha256": "7bfb63eb1c0ca2fd1bfb446a358034592f3decabbb6db3450217a14095540bb7",
+          "url": "https://portal.nccs.nasa.gov/GISS_modelE/ROCKE-3D/spectral_files/sp_lw_dsa_ar10bar/sp_lw_15_dsa_ar10bar"
+        },
+        {
+          "bytes": 4414929,
+          "name": "sp_lw_15_dsa_ar10bar_k",
+          "sha256": "da6393d5646fe5ba13f4e6d21352858232095def311042ee14412d372e13af88",
+          "url": "https://portal.nccs.nasa.gov/GISS_modelE/ROCKE-3D/spectral_files/sp_lw_dsa_ar10bar/sp_lw_15_dsa_ar10bar_k"
+        }
+      ],
+      "generator": "SOCRATES spectral files prepared for ROCKE-3D by D. S. Amundsen (github.com/DavidSAmundsen/socrates_tools)",
+      "kind": "SOCRATES look-up spectral file"
+    },
+    "stream": "longwave",
+    "units": {
+      "band_edges": "cm^-1",
+      "k": "m^2 kg^-1 (of mixture)",
+      "pressure": "Pa",
+      "temperature": "K"
+    }
+  },
+  "provenance": "sp_lw_15_dsa_ar10bar (ROCKE-3D SOCRATES) premixed for thai_ben1; source sha256 7bfb63eb1c0ca2fd/da6393d5646fe5ba",
+  "sha256": "699c00492b5e5d5b9e6642da054a8daeee3f3269670a351ef689356c350e9038",
+  "species": "thai_ben1"
+}

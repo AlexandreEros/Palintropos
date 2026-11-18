@@ -127,13 +127,36 @@ radiative files at `d38d2a3` (82 targeted tests), and after `814bcf8` only
 the three frictional-heating tests and the guards. The browser tests and the
 17 data-dependent tests have not run at this head on any machine.
 
+## Real-gas k-table configuration (2026-11-16, commit `9f8c776`)
+
+Windows, MX110, Python 3.12.12, CuPy 13.4.0, imported THAI tables present.
+
+```
+python -m pytest tests/test_radiation_ktable_config.py tests/test_radiation_kdist.py     tests/test_radiation_twostream.py tests/test_physics_columns.py tests/test_physics_shared.py     tests/test_radiation_evidence.py tests/test_radiative_dynamical.py tests/test_layout.py -q
+147 passed, 1 warning in 285.96s
+```
+
+Rerun at `809ffdd` after the stellar presets and their three tests:
+150 passed, 0 skipped in 304.86s.
+
+The warning is the known `invalid value encountered in log` of
+`test_implicit_surface_exchange_is_stable_where_the_explicit_one_diverges`.
+The full suite was not run at this commit. What each new test covers is in
+[OPACITY.md](OPACITY.md) §8.
+
 ## Not tested at all
 
 - `temporal/tendencies/drag.py` has no dedicated test (it runs inside the
   coupled Jupiter tests).
-- The correlated-k path on the GPU, with more than one absorber, or coupled
-  to the dynamics.
-- `InstantaneousInsolation` and `TidallyLockedInsolation` in a 3-D run.
+- The correlated-k path with more than one absorber. (On the GPU and coupled
+  to the dynamics it has now run, in the two 5-day THAI development runs of
+  [OPACITY.md](OPACITY.md) §6, but no automated test does so.)
+- `InstantaneousInsolation` in a 3-D run outside the flat-Mars tests.
+  `TidallyLockedInsolation` has run in 3-D only in those two development
+  runs.
+- `tools/radiation/opacity` (the SOCRATES reader and importer),
+  `tools/radiation/thai_column.py` and `thai_dev_evidence.py` have no unit
+  tests.
 - Any run at T42 or finer; any run longer than 300 model days.
 - `tools/radiation/summarize_run.py` has no test; it was run on the two
   completed runs only.
