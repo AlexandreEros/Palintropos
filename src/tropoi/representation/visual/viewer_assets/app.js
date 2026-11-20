@@ -184,7 +184,9 @@ class Panel {
   }
 
   shell() {
-    return Boolean(this.field.levels || manifest.fields.free_surface_height);
+    // A level is lifted to its geopotential height; without the run's gravity
+    // there is none, and the level is drawn as a flat map on the sphere.
+    return Boolean((this.field.levels && manifest.fields.geopotential_height) || manifest.fields.free_surface_height);
   }
 
   updateCoordinate() {

@@ -243,6 +243,9 @@ export class StructureView {
     };
     c.follow.onchange = () => this.update();
     c.snap.onchange = () => this.update();
+    // Only Gauss–Legendre latitude–longitude archives have native nodes to snap to.
+    this.gaussian = manifest.geometry?.grid === "latlon";
+    if (!this.gaussian) c.snap.checked = false;
     c.lat.onchange = c.lon.onchange = () => {
       if (c.lat.validity.valid && c.lon.validity.valid && c.lat.value !== "" && c.lon.value !== "")
         links.onCursor({lat: c.lat.valueAsNumber, lon: c.lon.valueAsNumber});
@@ -324,7 +327,7 @@ export class StructureView {
     const time = c.follow.checked ? links.getTime() : Number(c.first.value);
     if (c.follow.checked) c.first.value = c.last.value = String(time);
     const base = {time};
-    if (product === "column") return {kind: "column", ...base, lat: this.cursor.lat, lon: this.cursor.lon, snap: c.snap.checked ? 1 : 0};
+    if (product === "column") return {kind: "column", ...base, lat: this.cursor.lat, lon: this.cursor.lon, snap: this.gaussian && c.snap.checked ? 1 : 0};
     if (product === "meridional") return {kind: "meridional", ...base, at: this.cursor.lon};
     if (product === "zonal") return {kind: "zonal", ...base, at: this.cursor.lat};
     let last = c.follow.checked ? time : Number(c.last.value);
@@ -344,7 +347,7 @@ export class StructureView {
     this.fieldLinked = linked;
     c["field-wrap"].hidden = !fields.length;
     c["axis-wrap"].hidden = product !== "column";
-    c["snap-wrap"].hidden = product !== "column";
+    c["snap-wrap"].hidden = product !== "column" || !this.gaussian;
     c["last-wrap"].hidden = !["zonal_mean", "streamfunction"].includes(product);
     this.loadRange();
   }
@@ -354,8 +357,18 @@ export class StructureView {
     this.syncControls();
     const query = this.request();
     const key = JSON.stringify(query);
-    if (key === this.key && this.data) { this.draw(); return; }
-    this.key = key;
+    // `loaded` names the data on hand and `pending` the request in flight, so
+    // data for one product is never drawn as another while a request runs.
+    if (key === this.loaded && this.data) {
+      this.abort?.abort();
+      this.pending = null;
+      this.status("");
+      this.c.png.disabled = false;
+      this.draw();
+      return;
+    }
+    if (key === this.pending) return;           // it draws the current selection on arrival
+    this.pending = key;
     this.abort?.abort();
     const abort = new AbortController();
     this.abort = abort;
@@ -367,13 +380,13 @@ export class StructureView {
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || response.statusText);
       if (this.abort !== abort) return;
-      this.data = data; this.query = query;
+      this.data = data; this.query = query; this.loaded = key; this.pending = null;
       this.status("");
       this.draw();
       this.c.png.disabled = false;
     } catch (error) {
       if (abort.signal.aborted || this.abort !== abort) return;
-      this.data = null; this.key = null;
+      this.data = null; this.loaded = this.pending = null;
       this.c.plot.hidden = true;
       this.status(error.message, true);
     }
@@ -464,7 +477,7 @@ export class StructureView {
 
   draw() {
     const c = this.c;
-    if (!this.data) return;
+    if (!this.data || this.pending) return;
     const width = Math.max(320, c.plot.parentElement.clientWidth - 4 || 900);
     this.width = this.node.clientWidth;
     this.spec = this.plotSpec();
@@ -546,6 +559,7 @@ export class StructureView {
   }
 
   hover(e) {
+    if (this.pending) return;
     const hit = this.locate(e), d = this.data, c = this.c;
     if (!hit || !d) { c.readout.textContent = ""; return; }
     const k = hit.level, product = this.product, parts = [];
@@ -571,6 +585,7 @@ export class StructureView {
   }
 
   click(e) {
+    if (this.pending) return;
     const hit = this.locate(e);
     if (!hit) return;
     const product = this.product;

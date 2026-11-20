@@ -60,7 +60,9 @@ def _operations(fields, vertical, physics, diagnostics):
     if "wind" in names:
         ops["wind"] = ["wind"]
     levels = [k for k, f in fields.items() if f.get("levels")]
-    if vertical and levels:
+    # Sigma and pressure surfaces interpolate in columns that carry Z = Φ/g,
+    # so they need the run's gravity. Native levels do not.
+    if vertical and levels and physics.get("gravity"):
         ops.update(column=levels, sigma=levels)
         if "ln_ps" in names:
             reconstructed = [key for key in levels if key in
@@ -201,6 +203,11 @@ def viewer_manifest(directory):
     output["operations"] = _operations(output["fields"], vertical, output["physics"], products)
     if "terrain" in output["unavailable"]:
         output["operations"].pop("geopotential_height", None)
+    if (any(field.get("levels") for field in output["fields"].values())
+            and not output["physics"].get("gravity")):
+        output["unavailable"]["vertical_surfaces"] = (
+            "The run records no gravity, so geopotential height, sigma and pressure surfaces "
+            "and vertical structure are undefined; native levels remain available")
     structure = output["operations"].get("structure")
     if structure and output["geometry"].get("grid") != "latlon":
         # Zonal reductions use Gauss–Legendre latitudes and equally spaced longitudes.

@@ -213,9 +213,14 @@ class FrameProvider:
         if coordinate == "native":
             if int(value) != value or not 0 <= value < self._context.nlev:
                 raise ValueError("Native level must be a zero-based full-level index")
+            # A flat run may record no gravity: its native fields are still
+            # defined, but Z = Φ/g is not, so the layer is drawn on the datum.
+            heights = self._context.gravity is not None
             native = reconstruct_levels(frame, self._context, self.lat, self.lon, [int(value)],
-                                        vorticity_divergence=field in ("zeta", "delta"))
+                                        vorticity_divergence=field in ("zeta", "delta"), heights=heights)
             fields = {name: arr[0] for name, arr in native.values.items()}
+            if not heights:
+                fields["geopotential_height"] = self.terrain
             mask = None
         else:
             if coordinate not in ("pressure", "sigma", "geopotential_height"):
@@ -274,7 +279,9 @@ class FrameProvider:
         index, seconds = self._saved_index(time)
         lat, lon = float(lat), float(lon) % 360.0
         node = None
-        if snap:
+        # Only Gauss–Legendre latitude–longitude grids have nodes to snap to;
+        # elsewhere the column is exact point synthesis, and says so.
+        if snap and self.geometry.get("grid") == "latlon":
             grid_lat, grid_lon = self._native_grid()
             i = int(np.abs(grid_lat - lat).argmin())
             j = int(np.abs((grid_lon - lon + 180) % 360 - 180).argmin())

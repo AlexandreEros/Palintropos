@@ -95,8 +95,13 @@ p_k = σ_k pₛ at the nominal level, and Z_k is the absolute Simmons–Burridge
 geopotential over g at the hydrostatic level position. Every plot names its
 archive directory and config hash, and notes that extrema between saved states
 are not represented. Sections and reductions are offered only for pure-σ PE
-archives (σ from 0 to 1). Zonal reductions also need a Gaussian latitude–longitude
-state grid. Averaging costs about 0.2 s per T21L40 state and 2 s per T42L20
+archives (σ from 0 to 1) that record gravity. Zonal reductions and snapping to
+native nodes also need a Gaussian latitude–longitude state grid. On other grids a
+column is exact synthesis at the requested point. A flat PE run that records no
+gravity (the `tropoi run pe` default) still opens on its native levels. Its T,
+winds, ζ, δ and p are defined without g. Geopotential height, σ and pressure
+surfaces and the vertical-structure products are withheld, and the manifest
+says why. Its levels are drawn flat on the globe. Averaging costs about 0.2 s per T21L40 state and 2 s per T42L20
 state read from a Windows drive under WSL. It runs outside the session lock,
 so maps stay responsive. A request superseded in the browser still finishes
 on the provider, and its result is cached.

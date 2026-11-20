@@ -240,10 +240,10 @@
   },
   "limits": {
     "call_sites": {
-      "builtin": 4034,
+      "builtin": 4035,
       "external": 2648,
       "internal": 3162,
-      "unresolved": 4179
+      "unresolved": 4184
     },
     "dynamic_import_sites": {
       "tropoi.representation.archive.writer": 1

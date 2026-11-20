@@ -220,3 +220,71 @@ def test_mars_column_and_section_follow_the_terrain():
     expected = synthesize_latlon(provider._terrain_lm, [section["points"][row]], [lon % 360])[0, 0]
     assert section["surface_height"][row] == pytest.approx(expected, abs=1e-9)
     assert all(np.array(section["geopotential_height"])[-1] > np.array(section["surface_height"]))
+
+
+def mars_variant(tmp_path, *, flat=False, geodesic=False):
+    """A copy of the published Mars capsule, relabelled as a capsule the viewer must also open.
+
+    ``flat``: a flat run that records no gravity (the ``tropoi run pe`` default).
+    ``geodesic``: the same coefficients on a geodesic state grid (no Gaussian nodes).
+    """
+    import json
+    import shutil
+    if not MARS.is_dir():
+        pytest.skip(f"Missing archive: {MARS}")
+    root = tmp_path / MARS.name
+    root.mkdir(parents=True)
+    for name in ("config.json", "manifest.json", "pe_coeffs.npy", "pe_snapshot_times.npy"):
+        shutil.copy(MARS / name, root / name)
+    if not flat:
+        shutil.copytree(MARS / "terrain", root / "terrain")
+    manifest = json.loads((root / "manifest.json").read_text())
+    config = json.loads((root / "config.json").read_text())
+    if flat:
+        for block in (config, manifest["run_config"], manifest["state_schema"]["environment"]):
+            block.update(topography="flat", gravity=None)
+            block.pop("terrain_digest", None)
+    if geodesic:
+        for block in (config, manifest["run_config"], manifest["state_schema"]["geometry"]):
+            block.update(grid="geodesic", resolution=3)
+            block.pop("nlat", None)
+            block.pop("nlon", None)
+    (root / "manifest.json").write_text(json.dumps(manifest))
+    (root / "config.json").write_text(json.dumps(config))
+    return root
+
+
+def test_flat_capsule_without_gravity_keeps_native_level_maps(tmp_path):
+    """Native T, wind, ζ, δ and p need no gravity; Z and interpolated surfaces are withheld."""
+    flat = mars_variant(tmp_path, flat=True)
+    m = viewer_manifest(flat)
+    assert m["physics"]["gravity"] is None
+    assert {"geopotential", "geopotential_height"}.isdisjoint(m["fields"])
+    assert {"sigma", "pressure", "geopotential_height", "structure"}.isdisjoint(m["operations"])
+    assert "no gravity" in m["unavailable"]["vertical_surfaces"]
+    provider = FrameProvider(flat, m)
+    reference = FrameProvider(MARS, viewer_manifest(MARS))
+    for field in ("temperature", "u", "v", "wind_speed", "zeta", "delta", "pressure"):
+        result = provider.slice(8, field, "native", 2)
+        expected = reference.slice(8, field, "native", 2)
+        # T, the winds, ζ, δ and σ pₛ are the same synthesis whatever the terrain.
+        np.testing.assert_allclose(result["values"], expected["values"], rtol=1e-12, atol=1e-12)
+        np.testing.assert_array_equal(result["height"], np.zeros(provider.shape))
+    with pytest.raises(ValueError, match="Unavailable coordinate"):
+        provider.slice(8, "temperature", "sigma", 0.5)
+
+
+def test_geodesic_column_uses_exact_point_synthesis(tmp_path):
+    """No Gaussian nodes to snap to: a snapped request is evaluated at the point itself."""
+    geodesic = mars_variant(tmp_path, geodesic=True)
+    m = viewer_manifest(geodesic)
+    assert m["geometry"]["grid"] == "geodesic" and "nlat" not in m["geometry"]
+    assert m["operations"]["structure"] == ["column", "meridional_section", "zonal_section"]
+    provider = FrameProvider(geodesic, m)
+    snapped = provider.column(8, 12.3, 201.7, snap=True)
+    exact = provider.column(8, 12.3, 201.7, snap=False)
+    assert (snapped["latitude"], snapped["longitude"]) == (12.3, 201.7)
+    assert snapped["sampling"] == "exact band-limited synthesis at the requested point"
+    np.testing.assert_array_equal(snapped["temperature"], exact["temperature"])
+    reference = FrameProvider(MARS, viewer_manifest(MARS)).column(8, 12.3, 201.7, snap=False)
+    np.testing.assert_allclose(exact["temperature"], reference["temperature"], rtol=1e-12)

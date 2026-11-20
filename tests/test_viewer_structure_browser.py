@@ -269,3 +269,80 @@ def test_section_fixed_colour_range_persists_by_quantity_and_exports(browser):
     finally:
         server.shutdown()
         thread.join()
+
+
+def test_pending_structure_request_never_draws_stale_data(browser, tmp_path):
+    """Changing the quantity while a zonal mean is in flight must not draw the old column as a mean."""
+    from test_viewer_fields import MARS
+    server, thread = serve([MARS])
+    try:
+        with OfflinePage(browser, width=1400, height=1800, loopback_port=server.server_port) as page:
+            page.call("Page.navigate", url=server.url + "?time=8&product=column")
+            until(page, READY)
+            assert page.eval("viewer.structure.spec.kind") == "profile"
+            # Hold zonal-mean responses until released.
+            page.eval("""(() => {const fetch0 = window.fetch; window.held = [];
+                window.fetch = (url, options) => String(url).includes("kind=zonal_mean") ?
+                  new Promise(resolve => held.push(() => resolve(fetch0(url, options)))) : fetch0(url, options);})()""")
+            structure(page, "product", "zonal_mean")
+            until(page, "held.length === 1")
+            structure(page, "field", "u")       # same request: previously redrew the column as a mean
+            structure(page, "range-mode", "fixed")
+            assert page.eval("held.length") == 1
+            assert page.eval("viewer.structure.spec.kind") == "profile"
+            assert page.eval("viewer.structure.c.png.disabled")
+            assert not page.exceptions, page.exceptions
+            page.eval("held.shift()()")
+            until(page, READY)
+            spec = page.eval("({kind: viewer.structure.spec.kind, label: viewer.structure.spec.label,"
+                             " lat: viewer.structure.data.lat.length})")
+            assert spec["kind"] == "section" and spec["label"].startswith("Zonal mean [u]") and spec["lat"] == 34
+            # Returning to the loaded column while a new mean is pending shows the column at once.
+            structure(page, "product", "column")
+            until(page, READY + " && viewer.structure.spec.kind === 'profile'")
+            structure(page, "product", "streamfunction")       # ψ is also served by kind=zonal_mean
+            until(page, "held.length === 1")
+            page.eval("held.shift()()")
+            until(page, "viewer.structure.spec.kind === 'section' && " + READY)
+            set_control(page, "time", 7, "input")
+            until(page, "held.length === 1")
+            structure(page, "product", "column")
+            until(page, "viewer.structure.query.kind === 'column' && viewer.structure.query.time === 7 && " + READY)
+            page.eval("held.shift()()")
+            page.eval("new Promise(resolve => setTimeout(resolve, 300))")
+            assert page.eval("viewer.structure.spec.kind") == "profile"
+            assert not page.exceptions, page.exceptions
+    finally:
+        server.shutdown()
+        thread.join()
+
+
+def test_flat_gravity_free_and_geodesic_capsules_open(browser, tmp_path):
+    from test_viewer_fields import mars_variant
+    flat = mars_variant(tmp_path / "flat", flat=True)
+    geodesic = mars_variant(tmp_path / "geodesic", geodesic=True)
+    server, thread = serve([flat, geodesic])
+    try:
+        with OfflinePage(browser, width=1400, height=1800, loopback_port=server.server_port) as page:
+            page.call("Page.navigate", url=server.url + "?time=8")
+            until(page, 'document.querySelector(\'[data-id="png"]\')?.disabled === false')
+            assert page.eval("document.querySelector('[data-id=field]').value") == "temperature"
+            assert page.eval("document.getElementById('structure').hidden")
+            coordinates = page.eval("[...document.querySelector('[data-id=coordinate]').options].map(o => o.value)")
+            assert coordinates == ["native"]
+            assert page.eval("document.querySelector('[data-id=opacity-wrap]').hidden")
+            set_control(page, "level", 0)
+            until(page, 'document.querySelector(\'[data-id="png"]\')?.disabled === false')
+            assert not page.exceptions, page.exceptions
+            page.eval('(() => {const el=document.getElementById("runs"); el.selectedIndex=1;'
+                      'el.dispatchEvent(new Event("change"));})()')
+            until(page, 'location.pathname.endsWith("/1/") && ' + READY)
+            assert page.eval("document.querySelector('[data-s=snap-wrap]').hidden")
+            assert page.eval("viewer.structure.query.snap") == 0
+            assert page.eval("viewer.structure.data.sampling") == "exact band-limited synthesis at the requested point"
+            products = page.eval("[...viewer.structure.c.product.options].map(o => o.value)")
+            assert products == ["column", "meridional", "zonal"]
+            assert not page.exceptions, page.exceptions
+    finally:
+        server.shutdown()
+        thread.join()
