@@ -761,6 +761,15 @@ def _describe_state_fields(manifest: dict, run_config: dict):
 def _cmd_inspect(args: argparse.Namespace) -> int:
     import json
 
+    if getattr(args, "viewer_manifest", False):
+        from tropoi.representation.archive.viewer_manifest import viewer_manifest
+        if args.snapshot is not None or args.field is not None:
+            return _error("--viewer-manifest takes a capsule directory without a snapshot selection")
+        try:
+            print(json.dumps(viewer_manifest(args.run_path), allow_nan=False, indent=2))
+        except (OSError, ValueError, KeyError, TypeError) as err:
+            return _error(str(err))
+        return 0
     if getattr(args, "field", None) is not None and \
             getattr(args, "snapshot", None) is None:
         return _error("--field requires --snapshot INDEX")
@@ -1352,6 +1361,8 @@ def build_parser() -> argparse.ArgumentParser:
         help="With --snapshot: restrict the snapshot description to one "
              "stored field (e.g. zeta, delta, phi, temperature, ln_ps). "
              "The field must belong to the run's solver.")
+    inspect_parser.add_argument("--viewer-manifest", action="store_true",
+                                help="Print Viewer 2 capability manifest JSON for this directory.")
     inspect_parser.set_defaults(_handler=_cmd_inspect)
 
     # tropoi plot RUN_PATH

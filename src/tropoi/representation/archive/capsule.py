@@ -472,13 +472,16 @@ def open_simulation(run_path, *, mmap: bool = True) -> Simulation:
     read-only). Opening validates metadata, array headers/layout/dtype, and
     the time axis; it never reads coefficient values or initializes CUDA.
     """
+    return Simulation(open_storage(run_path, mmap=mmap))
+
+
+def open_storage(run_path, *, mmap=True):
+    """Resolve one known saved-run format without reading frame values."""
     from tropoi.representation.archive.held_suarez import (
         HeldSuarezStorage, is_held_suarez_experiment,
         statistics_only_description)
 
     path = pathlib.Path(run_path)
-    if path.is_dir() and is_held_suarez_experiment(path):
-        return Simulation(HeldSuarezStorage(path, mmap=mmap))
     try:
         run_dir = resolve_run_directory(run_path)
     except CapsuleError as err:
@@ -487,4 +490,13 @@ def open_simulation(run_path, *, mmap: bool = True) -> Simulation:
         if reason is not None:
             raise CapsuleError(reason) from err
         raise
-    return Simulation(CapsuleStorage(run_dir, mmap=mmap))
+    if is_held_suarez_experiment(run_dir):
+        return HeldSuarezStorage(run_dir, mmap=mmap)
+    from tropoi.representation.archive.radiative import FORMAT, RadiativeStorage
+    config_file = run_dir / "config.json"
+    if config_file.is_file() and not (run_dir / "manifest.json").is_file():
+        doc = _read_json_object(config_file, "config.json")
+        cfg = doc.get("config")
+        if isinstance(cfg, dict) and cfg.get("schema") == FORMAT:
+            return RadiativeStorage(run_dir, doc, mmap=mmap)
+    return CapsuleStorage(run_dir, mmap=mmap)

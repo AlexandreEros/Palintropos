@@ -13,3 +13,11 @@ Read the [saved-run contract](../../temporal/SAVED_RUNS.md) and
 terrain bundles; [visual](../visual/README.md) renders explicit requests.
 Legacy manifests keep their original descriptive strings and checksums.
 Readers do not rewrite evidence; generated assets are separate from it.
+
+Viewer 2 Stage 1 discovery is available with `tropoi inspect RUN --viewer-manifest`
+or `viewer_manifest(RUN)` from `tropoi.representation.archive.viewer_manifest`.
+Pass the archive directory itself. Discovery uses local files, opens no network
+listener, and returns the versioned manifest on stdout. Indexed operations
+describe scientific selections for subsequent viewer stages. Daily radiative
+states also open through `open_simulation`. Dashboard rendering, GPU selection
+and portable bundles belong to later stages.
