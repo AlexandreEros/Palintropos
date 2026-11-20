@@ -216,7 +216,7 @@ Module-level import edges involved: 2.
 
 * Nodes (functions, methods, classes): 1961
 * Edges by kind: `call` 1359, `constructor` 66, `instantiate` 515, `override` 6, `self` 335, `super` 4
-* Call sites by resolution outcome: builtin 3800, external 2541, internal 3044, unresolved 3902
+* Call sites by resolution outcome: builtin 3800, external 2541, internal 3044, unresolved 3904
 
 | Scoped graph | Roots | Depth | Nodes | Edges | Truncated nodes | Reachable (unbounded) |
 |---|---|---|---|---|---|---|

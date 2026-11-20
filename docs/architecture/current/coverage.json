@@ -242,7 +242,7 @@
       "builtin": 3800,
       "external": 2541,
       "internal": 3044,
-      "unresolved": 3902
+      "unresolved": 3904
     },
     "dynamic_import_sites": {
       "tropoi.representation.archive.writer": 1
