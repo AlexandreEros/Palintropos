@@ -1,0 +1,926 @@
+{
+  "build_seconds": 1.7920782000001054,
+  "cprofile": {
+    "python_calls_per_step": 24642.0,
+    "steps": 5,
+    "top_by_own_time": [
+      {
+        "calls_per_step": 253.0,
+        "cumulative_s_per_step": 0.0963797,
+        "function": "spectral_operators.py:137(sin_theta_d_theta_coeffs)",
+        "own_s_per_step": 0.07534744000000002
+      },
+      {
+        "calls_per_step": 107.0,
+        "cumulative_s_per_step": 0.08826562,
+        "function": "fast_geodesic_sh.py:87(inv_transform)",
+        "own_s_per_step": 0.06285726
+      },
+      {
+        "calls_per_step": 353.0,
+        "cumulative_s_per_step": 0.04965618000000001,
+        "function": "spectral_operators.py:129(d_lambda_coeffs)",
+        "own_s_per_step": 0.04860702
+      },
+      {
+        "calls_per_step": 3.0,
+        "cumulative_s_per_step": 0.05022990000000001,
+        "function": "boundary_layer.py:117(implicit_column_diffusion)",
+        "own_s_per_step": 0.04847756
+      },
+      {
+        "calls_per_step": 252.0,
+        "cumulative_s_per_step": 0.029203640000000003,
+        "function": "~:0(<method 'dot' of 'cupy._core.core._ndarray_base' objects>)",
+        "own_s_per_step": 0.027035800000000006
+      },
+      {
+        "calls_per_step": 1.0,
+        "cumulative_s_per_step": 0.02457072,
+        "function": "twostream.py:168(adding)",
+        "own_s_per_step": 0.023780520000000003
+      },
+      {
+        "calls_per_step": 3.0,
+        "cumulative_s_per_step": 0.023935,
+        "function": "sigma_coordinate.py:351(vertical_advection)",
+        "own_s_per_step": 0.023105240000000003
+      },
+      {
+        "calls_per_step": 2.0,
+        "cumulative_s_per_step": 0.04799482000000001,
+        "function": "spectral_operators.py:352(vector_curl_div_spectral_batch)",
+        "own_s_per_step": 0.01525502
+      },
+      {
+        "calls_per_step": 2.0,
+        "cumulative_s_per_step": 0.015166500000000003,
+        "function": "sigma_coordinate.py:235(hydrostatic_geopotential)",
+        "own_s_per_step": 0.01458682
+      },
+      {
+        "calls_per_step": 100.0,
+        "cumulative_s_per_step": 0.014555120000000001,
+        "function": "spectral_operators.py:371(_adjoint_ext)",
+        "own_s_per_step": 0.014555120000000001
+      },
+      {
+        "calls_per_step": 1.0,
+        "cumulative_s_per_step": 0.28041234000000004,
+        "function": "boundary_layer.py:117(__call__)",
+        "own_s_per_step": 0.0142957
+      },
+      {
+        "calls_per_step": 298.0,
+        "cumulative_s_per_step": 0.01314856,
+        "function": "~:0(<method 'memset_async' of 'cupy.cuda.memory.MemoryPointer' objects>)",
+        "own_s_per_step": 0.01314856
+      },
+      {
+        "calls_per_step": 1.0,
+        "cumulative_s_per_step": 0.016673680000000003,
+        "function": "boundary_layer.py:64(boundary_layer_depth)",
+        "own_s_per_step": 0.011679320000000002
+      },
+      {
+        "calls_per_step": 56.0,
+        "cumulative_s_per_step": 0.014908780000000002,
+        "function": "laplacian.py:32(invert_laplacian)",
+        "own_s_per_step": 0.0110395
+      },
+      {
+        "calls_per_step": 1.0,
+        "cumulative_s_per_step": 0.054874820000000005,
+        "function": "column_coupling.py:159(__call__)",
+        "own_s_per_step": 0.010371920000000001
+      },
+      {
+        "calls_per_step": 75.0,
+        "cumulative_s_per_step": 0.009986940000000001,
+        "function": "primitive_equations.py:530(_truncate)",
+        "own_s_per_step": 0.009986940000000001
+      },
+      {
+        "calls_per_step": 28.0,
+        "cumulative_s_per_step": 0.00883194,
+        "function": "~:0(<built-in method cupy._core._routines_manipulation.concatenate_method>)",
+        "own_s_per_step": 0.00871672
+      },
+      {
+        "calls_per_step": 27.0,
+        "cumulative_s_per_step": 0.01582416,
+        "function": "fast_geodesic_sh.py:66(transform)",
+        "own_s_per_step": 0.00821168
+      },
+      {
+        "calls_per_step": 4893.0,
+        "cumulative_s_per_step": 0.012513580000000002,
+        "function": "numeric.py:1927(isscalar)",
+        "own_s_per_step": 0.0073401000000000004
+      },
+      {
+        "calls_per_step": 6.0,
+        "cumulative_s_per_step": 0.11848352,
+        "function": "primitive_equations.py:704(_stack_derivs)",
+        "own_s_per_step": 0.007021780000000001
+      },
+      {
+        "calls_per_step": 3.0,
+        "cumulative_s_per_step": 0.00657268,
+        "function": "sigma_coordinate.py:283(_thickness_weighted)",
+        "own_s_per_step": 0.0062711600000000004
+      },
+      {
+        "calls_per_step": 1.0,
+        "cumulative_s_per_step": 0.00796758,
+        "function": "sigma_coordinate.py:444(omega_over_p)",
+        "own_s_per_step": 0.00531838
+      },
+      {
+        "calls_per_step": 52.0,
+        "cumulative_s_per_step": 0.12423244,
+        "function": "primitive_equations.py:213(_deriv_fields)",
+        "own_s_per_step": 0.0052844400000000005
+      },
+      {
+        "calls_per_step": 263.0,
+        "cumulative_s_per_step": 0.0216786,
+        "function": "basic.py:255(zeros_like)",
+        "own_s_per_step": 0.004975660000000001
+      },
+      {
+        "calls_per_step": 60.0,
+        "cumulative_s_per_step": 0.00399044,
+        "function": "~:0(<method 'copy' of 'cupy._core.core._ndarray_base' objects>)",
+        "own_s_per_step": 0.00399044
+      },
+      {
+        "calls_per_step": 6690.0,
+        "cumulative_s_per_step": 0.00552794,
+        "function": "~:0(<built-in method builtins.isinstance>)",
+        "own_s_per_step": 0.00391388
+      },
+      {
+        "calls_per_step": 26.0,
+        "cumulative_s_per_step": 0.12812644,
+        "function": "primitive_equations.py:221(_wind_from)",
+        "own_s_per_step": 0.0038940000000000003
+      },
+      {
+        "calls_per_step": 550.0,
+        "cumulative_s_per_step": 0.005461580000000001,
+        "function": "~:0(<built-in method cupy._core._routines_manipulation._expand_dims>)",
+        "own_s_per_step": 0.0032037000000000003
+      },
+      {
+        "calls_per_step": 1.0,
+        "cumulative_s_per_step": 0.0054601400000000005,
+        "function": "sigma_coordinate.py:297(interface_sigma_dot)",
+        "own_s_per_step": 0.0030919600000000004
+      },
+      {
+        "calls_per_step": 68.0,
+        "cumulative_s_per_step": 0.0030276400000000003,
+        "function": "~:0(<method 'astype' of 'cupy._core.core._ndarray_base' objects>)",
+        "own_s_per_step": 0.0030246400000000003
+      }
+    ]
+  },
+  "dt": 600.0,
+  "environment": {
+    "cuda_runtime": 11080,
+    "cupy": "13.4.0",
+    "git_commit": "cfebd16aa65ab38413f245556e5dde98781cb03f",
+    "git_dirty_tracked": false,
+    "gpu": "NVIDIA GeForce MX110",
+    "gpu_memory_total_bytes": 2147352576,
+    "numpy": "2.2.6",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "python": "3.12.12",
+    "sm_count": 2
+  },
+  "grid": {
+    "nlev": 25,
+    "product_points": 578,
+    "state_points": 512
+  },
+  "instrumented": {
+    "rows": [
+      {
+        "calls_per_step": 102.0,
+        "exclusive_s_per_step": 0.13015678665833547,
+        "inclusive_s_per_step": 0.13015678665833547,
+        "label": "sh.inv_transform[product]",
+        "parents": {
+          "boundary_layer": 60,
+          "wind_from": 3000
+        }
+      },
+      {
+        "calls_per_step": 1.0,
+        "exclusive_s_per_step": 0.11109127000478718,
+        "inclusive_s_per_step": 0.17339577999955508,
+        "label": "dynamics.tendency",
+        "parents": {
+          "step": 30
+        }
+      },
+      {
+        "calls_per_step": 26.0,
+        "exclusive_s_per_step": 0.0712407066632295,
+        "inclusive_s_per_step": 0.20353421332644453,
+        "label": "wind_from",
+        "parents": {
+          "boundary_layer": 750,
+          "coupling.lowest_wind": 30
+        }
+      },
+      {
+        "calls_per_step": 1.0,
+        "exclusive_s_per_step": 0.06070866666753621,
+        "inclusive_s_per_step": 0.07800881666577576,
+        "label": "explicit.MomentumSinkHeating",
+        "parents": {
+          "step": 30
+        }
+      },
+      {
+        "calls_per_step": 3.0,
+        "exclusive_s_per_step": 0.05384392333119952,
+        "inclusive_s_per_step": 0.05384392333119952,
+        "label": "bl.implicit_column_diffusion",
+        "parents": {
+          "boundary_layer": 90
+        }
+      },
+      {
+        "calls_per_step": 2.0,
+        "exclusive_s_per_step": 0.05206765666371212,
+        "inclusive_s_per_step": 0.06168195332963175,
+        "label": "vector_curl_div_batch",
+        "parents": {
+          "boundary_layer": 30,
+          "dynamics.tendency": 30
+        }
+      },
+      {
+        "calls_per_step": 1.0,
+        "exclusive_s_per_step": 0.04955080000412029,
+        "inclusive_s_per_step": 0.38447930000256747,
+        "label": "boundary_layer",
+        "parents": {
+          "step": 30
+        }
+      },
+      {
+        "calls_per_step": 1.0,
+        "exclusive_s_per_step": 0.041488856667031844,
+        "inclusive_s_per_step": 0.041488856667031844,
+        "label": "radiation.fluxes",
+        "parents": {
+          "column_physics.compute": 30
+        }
+      },
+      {
+        "calls_per_step": 2.0,
+        "exclusive_s_per_step": 0.026860353327356278,
+        "inclusive_s_per_step": 0.026860353327356278,
+        "label": "sh.inv_transform_batch[product]",
+        "parents": {
+          "boundary_layer": 30,
+          "dynamics.tendency": 30
+        }
+      },
+      {
+        "calls_per_step": 26.0,
+        "exclusive_s_per_step": 0.021652286673391547,
+        "inclusive_s_per_step": 0.021652286673391547,
+        "label": "sh.transform[product]",
+        "parents": {
+          "boundary_layer": 780
+        }
+      },
+      {
+        "calls_per_step": 2.0,
+        "exclusive_s_per_step": 0.01808026666500761,
+        "inclusive_s_per_step": 0.01808026666500761,
+        "label": "sh.inv_transform_batch[state]",
+        "parents": {
+          "coupling.columns": 30,
+          "explicit.MomentumSinkHeating": 30
+        }
+      },
+      {
+        "calls_per_step": 1.0,
+        "exclusive_s_per_step": 0.0163660533328463,
+        "inclusive_s_per_step": 0.0163660533328463,
+        "label": "bl.boundary_layer_depth",
+        "parents": {
+          "boundary_layer": 30
+        }
+      },
+      {
+        "calls_per_step": 4.0,
+        "exclusive_s_per_step": 0.009614296665919635,
+        "inclusive_s_per_step": 0.009614296665919635,
+        "label": "sh.transform_batch[product_ext]",
+        "parents": {
+          "vector_curl_div_batch": 120
+        }
+      },
+      {
+        "calls_per_step": 1.0,
+        "exclusive_s_per_step": 0.007276093335046123,
+        "inclusive_s_per_step": 0.007276093335046123,
+        "label": "hydrostatic_geopotential",
+        "parents": {
+          "boundary_layer": 30
+        }
+      },
+      {
+        "calls_per_step": 1.0,
+        "exclusive_s_per_step": 0.007236996665596962,
+        "inclusive_s_per_step": 0.007236996665596962,
+        "label": "sh.transform_batch[product]",
+        "parents": {
+          "dynamics.tendency": 30
+        }
+      },
+      {
+        "calls_per_step": 5.0,
+        "exclusive_s_per_step": 0.006269633338282195,
+        "inclusive_s_per_step": 0.006269633338282195,
+        "label": "sh.inv_transform[state]",
+        "parents": {
+          "coupling.columns": 30,
+          "wind_from": 120
+        }
+      },
+      {
+        "calls_per_step": 1.0,
+        "exclusive_s_per_step": 0.004832710000725152,
+        "inclusive_s_per_step": 0.004832710000725152,
+        "label": "si.solve_and_damp",
+        "parents": {
+          "step": 30
+        }
+      },
+      {
+        "calls_per_step": 1.0,
+        "exclusive_s_per_step": 0.004805746665806509,
+        "inclusive_s_per_step": 0.0674007166652397,
+        "label": "column_coupling",
+        "parents": {
+          "step": 30
+        }
+      },
+      {
+        "calls_per_step": 2.0,
+        "exclusive_s_per_step": 0.004397953333682381,
+        "inclusive_s_per_step": 0.004397953333682381,
+        "label": "sh.transform_batch[state]",
+        "parents": {
+          "column_coupling": 30,
+          "explicit.MomentumSinkHeating": 30
+        }
+      },
+      {
+        "calls_per_step": 1.0,
+        "exclusive_s_per_step": 0.00437902333214879,
+        "inclusive_s_per_step": 0.046799373333730424,
+        "label": "column_physics.compute",
+        "parents": {
+          "column_coupling": 30
+        }
+      },
+      {
+        "calls_per_step": 1.0,
+        "exclusive_s_per_step": 0.0029109900021770346,
+        "inclusive_s_per_step": 0.0029109900021770346,
+        "label": "si.operator_apply",
+        "parents": {
+          "step": 30
+        }
+      },
+      {
+        "calls_per_step": 1.0,
+        "exclusive_s_per_step": 0.002142116665102852,
+        "inclusive_s_per_step": 0.7131704300011431,
+        "label": "step",
+        "parents": {
+          "-": 30
+        }
+      },
+      {
+        "calls_per_step": 1.0,
+        "exclusive_s_per_step": 0.00139042000422099,
+        "inclusive_s_per_step": 0.00139042000422099,
+        "label": "bl.exchange_coefficient",
+        "parents": {
+          "boundary_layer": 30
+        }
+      },
+      {
+        "calls_per_step": 1.0,
+        "exclusive_s_per_step": 0.0012115166648679102,
+        "inclusive_s_per_step": 0.0012115166648679102,
+        "label": "bl.diffusivity_profile",
+        "parents": {
+          "boundary_layer": 30
+        }
+      },
+      {
+        "calls_per_step": 1.0,
+        "exclusive_s_per_step": 0.0011073000020890807,
+        "inclusive_s_per_step": 0.00859805333117644,
+        "label": "coupling.lowest_wind",
+        "parents": {
+          "column_coupling": 30
+        }
+      },
+      {
+        "calls_per_step": 1.0,
+        "exclusive_s_per_step": 0.0009314933345497896,
+        "inclusive_s_per_step": 0.0009314933345497896,
+        "label": "insolation",
+        "parents": {
+          "column_physics.compute": 30
+        }
+      },
+      {
+        "calls_per_step": 1.0,
+        "exclusive_s_per_step": 0.0009279533318476751,
+        "inclusive_s_per_step": 0.0009279533318476751,
+        "label": "sh.transform[state]",
+        "parents": {
+          "boundary_layer": 30
+        }
+      },
+      {
+        "calls_per_step": 1.0,
+        "exclusive_s_per_step": 0.000628560000526098,
+        "inclusive_s_per_step": 0.005023599998094141,
+        "label": "coupling.columns",
+        "parents": {
+          "column_coupling": 30
+        }
+      }
+    ],
+    "steps": 30,
+    "synced_step_s": {
+      "max": 0.731471090001287,
+      "mean": 0.713170430001143,
+      "median": 0.7131045699963579,
+      "min": 0.6949356300057843,
+      "n": 3,
+      "std": 0.01826781903856935
+    }
+  },
+  "io": {
+    "amortized_s_per_step": 0.001590204999990453,
+    "checkpoint_every_days": 10,
+    "checkpoint_s": {
+      "max": 0.021230999991530553,
+      "mean": 0.020207199995638803,
+      "median": 0.020838299999013543,
+      "min": 0.018552299996372312,
+      "n": 3,
+      "std": 0.0014465731321678442
+    },
+    "daily_sample_s": {
+      "max": 0.23029310000129044,
+      "mean": 0.21907623333390802,
+      "median": 0.22501270001521334,
+      "min": 0.20192289998522028,
+      "n": 3,
+      "std": 0.015088018084945516
+    },
+    "daily_state_write_s": {
+      "max": 0.009467299998505041,
+      "mean": 0.00789256666515333,
+      "median": 0.007646300015039742,
+      "min": 0.006564099981915206,
+      "n": 3,
+      "std": 0.0014671837074137755
+    },
+    "state_every_days": 1,
+    "steps_per_day": 144
+  },
+  "l_max": 11,
+  "memory": {
+    "device_free_bytes": 1668209051,
+    "pool_total_bytes": 17890304,
+    "pool_used_bytes": 3511808
+  },
+  "micro_transforms": {
+    "one_elementwise_launch": {
+      "cpu_s": {
+        "max": 0.00013309999485500157,
+        "mean": 5.45930011139717e-05,
+        "median": 4.610000178217888e-05,
+        "min": 4.25000034738332e-05,
+        "n": 200,
+        "std": 1.611240242600402e-05
+      },
+      "gpu_s": {
+        "max": 0.0001695999950170517,
+        "mean": 8.705007996410133e-05,
+        "median": 7.419199869036674e-05,
+        "min": 3.750399872660637e-05,
+        "n": 200,
+        "std": 2.4041441394783895e-05
+      }
+    },
+    "one_scalar_readback": {
+      "cpu_s": {
+        "max": 0.00024709998979233205,
+        "mean": 0.00014096250015427358,
+        "median": 0.0001341500028502196,
+        "min": 0.00010309999925084412,
+        "n": 200,
+        "std": 3.4011343665243395e-05
+      },
+      "gpu_s": {
+        "max": 0.00030873599648475645,
+        "mean": 0.00017312271971255542,
+        "median": 0.00016142399609088897,
+        "min": 0.00011484800279140473,
+        "n": 200,
+        "std": 4.407222087747162e-05
+      }
+    },
+    "product": {
+      "Y_matrix_bytes": 721344,
+      "inv_transform_batch_K": {
+        "cpu_s": {
+          "max": 0.0007942999945953488,
+          "mean": 0.0006463899975642562,
+          "median": 0.0006411500071408227,
+          "min": 0.0004833999846596271,
+          "n": 10,
+          "std": 8.448763942059412e-05
+        },
+        "gpu_s": {
+          "max": 0.003365567922592163,
+          "mean": 0.0031636767864227297,
+          "median": 0.0031482239961624146,
+          "min": 0.0029908161163330078,
+          "n": 10,
+          "std": 9.827372307687206e-05
+        }
+      },
+      "inv_transform_scalar": {
+        "cpu_s": {
+          "max": 0.0005262999911792576,
+          "mean": 0.0004719500022474676,
+          "median": 0.0004821500042453408,
+          "min": 0.00040450002416037023,
+          "n": 10,
+          "std": 4.739386001994255e-05
+        },
+        "gpu_s": {
+          "max": 0.00099235200881958,
+          "mean": 0.0009171552002429962,
+          "median": 0.0009302079975605012,
+          "min": 0.0008459200263023377,
+          "n": 10,
+          "std": 5.6852408663391366e-05
+        }
+      },
+      "l_max": 11,
+      "n_basis": 78,
+      "n_points": 578,
+      "transform_batch_K": {
+        "cpu_s": {
+          "max": 0.0008724000072106719,
+          "mean": 0.0005780499952379615,
+          "median": 0.0005366499972296879,
+          "min": 0.00041290000081062317,
+          "n": 10,
+          "std": 0.00014828995693017547
+        },
+        "gpu_s": {
+          "max": 0.0023929920196533202,
+          "mean": 0.0021528543949127198,
+          "median": 0.002118496060371399,
+          "min": 0.0020102078914642336,
+          "n": 10,
+          "std": 0.00012668156219159288
+        }
+      },
+      "transform_scalar": {
+        "cpu_s": {
+          "max": 0.0007751999946776778,
+          "mean": 0.0005294000031426549,
+          "median": 0.00044180000259075314,
+          "min": 0.00035519999801181257,
+          "n": 10,
+          "std": 0.0001686774502688048
+        },
+        "gpu_s": {
+          "max": 0.0013305280208587647,
+          "mean": 0.0008467072069644928,
+          "median": 0.0007977440059185029,
+          "min": 0.0007197440266609192,
+          "n": 10,
+          "std": 0.00018519371657631556
+        }
+      }
+    },
+    "product_ext": {
+      "Y_matrix_bytes": 841568,
+      "inv_transform_batch_K": {
+        "cpu_s": {
+          "max": 0.0009571000118739903,
+          "mean": 0.0006522800103994086,
+          "median": 0.0006157000025268644,
+          "min": 0.0005422000249382108,
+          "n": 10,
+          "std": 0.00012330648893875908
+        },
+        "gpu_s": {
+          "max": 0.003715456008911133,
+          "mean": 0.0034700224399566654,
+          "median": 0.003551232099533081,
+          "min": 0.002980384111404419,
+          "n": 10,
+          "std": 0.00024361010614198136
+        }
+      },
+      "inv_transform_scalar": {
+        "cpu_s": {
+          "max": 0.0004695999959949404,
+          "mean": 0.0004100899997865781,
+          "median": 0.0003973499988205731,
+          "min": 0.00037349999183788896,
+          "n": 10,
+          "std": 3.2758427675212736e-05
+        },
+        "gpu_s": {
+          "max": 0.0007888960242271424,
+          "mean": 0.0006507200062274933,
+          "median": 0.000665008008480072,
+          "min": 0.00028105598688125613,
+          "n": 10,
+          "std": 0.00013877187229917716
+        }
+      },
+      "l_max": 12,
+      "n_basis": 91,
+      "n_points": 578,
+      "transform_batch_K": {
+        "cpu_s": {
+          "max": 0.000888400012627244,
+          "mean": 0.0006008500029565766,
+          "median": 0.000557400009711273,
+          "min": 0.0004155999922659248,
+          "n": 10,
+          "std": 0.0001563392611926923
+        },
+        "gpu_s": {
+          "max": 0.0024068799018859863,
+          "mean": 0.002200976014137268,
+          "median": 0.0022083200216293335,
+          "min": 0.0020331840515136717,
+          "n": 10,
+          "std": 0.00013768990063394942
+        }
+      },
+      "transform_scalar": {
+        "cpu_s": {
+          "max": 0.00046820001443848014,
+          "mean": 0.00039022000273689625,
+          "median": 0.00040844999602995813,
+          "min": 0.00032740001915954053,
+          "n": 10,
+          "std": 5.343573365255066e-05
+        },
+        "gpu_s": {
+          "max": 0.0006310080289840699,
+          "mean": 0.0005183167994022369,
+          "median": 0.0005013919919729232,
+          "min": 0.00043487998843193054,
+          "n": 10,
+          "std": 7.127538572762447e-05
+        }
+      }
+    },
+    "state": {
+      "Y_matrix_bytes": 638976,
+      "inv_transform_batch_K": {
+        "cpu_s": {
+          "max": 0.0006699999794363976,
+          "mean": 0.0005244600004516542,
+          "median": 0.0005020499957026914,
+          "min": 0.0004571000172290951,
+          "n": 10,
+          "std": 7.174065908348224e-05
+        },
+        "gpu_s": {
+          "max": 0.0026908159255981446,
+          "mean": 0.0025839008092880247,
+          "median": 0.0025729600191116333,
+          "min": 0.002508960008621216,
+          "n": 10,
+          "std": 5.859014622618342e-05
+        }
+      },
+      "inv_transform_scalar": {
+        "cpu_s": {
+          "max": 0.0006474000110756606,
+          "mean": 0.0004542400100035593,
+          "median": 0.00042315000609960407,
+          "min": 0.0004008000250905752,
+          "n": 10,
+          "std": 7.864912539964317e-05
+        },
+        "gpu_s": {
+          "max": 0.0010915520191192628,
+          "mean": 0.0008672672092914582,
+          "median": 0.0008345279991626739,
+          "min": 0.0007789760231971741,
+          "n": 10,
+          "std": 9.014057120671817e-05
+        }
+      },
+      "l_max": 11,
+      "n_basis": 78,
+      "n_points": 512,
+      "transform_batch_K": {
+        "cpu_s": {
+          "max": 0.0007277000113390386,
+          "mean": 0.0004243500035954639,
+          "median": 0.000407300001825206,
+          "min": 0.0002975999959744513,
+          "n": 10,
+          "std": 0.00012677835499226375
+        },
+        "gpu_s": {
+          "max": 0.002178879976272583,
+          "mean": 0.001994604778289795,
+          "median": 0.002040447950363159,
+          "min": 0.0017983039617538452,
+          "n": 10,
+          "std": 0.000132074788268859
+        }
+      },
+      "transform_scalar": {
+        "cpu_s": {
+          "max": 0.0004896000027656555,
+          "mean": 0.00038318999868351965,
+          "median": 0.0003923499898519367,
+          "min": 0.0003285999991931021,
+          "n": 10,
+          "std": 4.895949764321142e-05
+        },
+        "gpu_s": {
+          "max": 0.0008109440207481384,
+          "mean": 0.0007220127999782562,
+          "median": 0.000715279996395111,
+          "min": 0.0006464959979057312,
+          "n": 10,
+          "std": 5.682820581401897e-05
+        }
+      }
+    }
+  },
+  "nlat": 16,
+  "nlon": 32,
+  "preset": "dev-mars-gray-flat-bl",
+  "retained": 10,
+  "scratch_dir": "C:\\Users\\User\\AppData\\Local\\Temp\\claude\\3a577e870356ee0b\\7346164c-44b0-41ac-bde2-0168f21edd03\\scratchpad\\mars-cost-bvjyfo4j",
+  "startup_step_seconds": 1.8254589000134729,
+  "startup_substeps": 1,
+  "tool": "mars_cost_profile.py profile",
+  "truncation": "T10",
+  "uninstrumented": {
+    "all_steps_gpu_s": {
+      "max": 0.7078250122070313,
+      "mean": 0.4626843027750651,
+      "median": 0.47439944458007816,
+      "min": 0.29956610107421877,
+      "n": 30,
+      "std": 0.08383335553362979
+    },
+    "gpu_sampler": {
+      "available": true,
+      "sm_clock_mhz": {
+        "max": 979.0,
+        "mean": 820.632,
+        "median": 783.0,
+        "min": 783.0,
+        "n": 125,
+        "std": 77.50978460605744
+      },
+      "utilization_percent": {
+        "max": 48.0,
+        "mean": 26.912,
+        "median": 27.0,
+        "min": 0.0,
+        "n": 125,
+        "std": 8.951496540946694
+      }
+    },
+    "note": "gpu_s = CUDA-event time from the call's start to its end on the null stream, cpu_s = host time of the call; per step, n = steps per trial",
+    "trial_means_gpu_s": {
+      "max": 0.4724196166992187,
+      "mean": 0.4626843027750651,
+      "median": 0.4696124237060547,
+      "min": 0.4460208679199219,
+      "n": 3,
+      "std": 0.014499056141829319
+    },
+    "trials": [
+      {
+        "cpu_s": {
+          "max": 0.5060021999815945,
+          "mean": 0.44579624000180046,
+          "median": 0.4742289500136394,
+          "min": 0.34388959998614155,
+          "n": 10,
+          "std": 0.058730464004463495
+        },
+        "gpu_s": {
+          "max": 0.5061531372070313,
+          "mean": 0.4460208679199219,
+          "median": 0.47439944458007816,
+          "min": 0.344221923828125,
+          "n": 10,
+          "std": 0.05868785841978855
+        },
+        "gpu_s_each": [
+          0.48442910766601566,
+          0.4385793151855469,
+          0.46901965332031254,
+          0.4866866760253906,
+          0.5061531372070313,
+          0.4797792358398438,
+          0.4878905029296875,
+          0.3489715270996094,
+          0.4144776000976563,
+          0.344221923828125
+        ]
+      },
+      {
+        "cpu_s": {
+          "max": 0.7076251999824308,
+          "mean": 0.46936969000380485,
+          "median": 0.4722699000121793,
+          "min": 0.29922340001212433,
+          "n": 10,
+          "std": 0.11985106909002782
+        },
+        "gpu_s": {
+          "max": 0.7078250122070313,
+          "mean": 0.4696124237060547,
+          "median": 0.4723961791992188,
+          "min": 0.29956610107421877,
+          "n": 10,
+          "std": 0.11982637798810296
+        },
+        "gpu_s_each": [
+          0.29956610107421877,
+          0.3268037109375,
+          0.5392705078125,
+          0.5416289672851563,
+          0.4882263793945313,
+          0.7078250122070313,
+          0.5257843627929688,
+          0.381057861328125,
+          0.4565659790039063,
+          0.42939535522460937
+        ]
+      },
+      {
+        "cpu_s": {
+          "max": 0.5638058999902569,
+          "mean": 0.4721525000000838,
+          "median": 0.4588495000061812,
+          "min": 0.3926248000061605,
+          "n": 10,
+          "std": 0.06615727728094957
+        },
+        "gpu_s": {
+          "max": 0.5640092163085938,
+          "mean": 0.4724196166992187,
+          "median": 0.45906524658203124,
+          "min": 0.3929585876464844,
+          "n": 10,
+          "std": 0.0661520392159801
+        },
+        "gpu_s_each": [
+          0.40519778442382814,
+          0.48693844604492187,
+          0.4258524169921875,
+          0.4977071533203125,
+          0.5640092163085938,
+          0.5530205688476563,
+          0.5495980834960937,
+          0.4311920471191406,
+          0.41772186279296875,
+          0.3929585876464844
+        ]
+      }
+    ]
+  }
+}

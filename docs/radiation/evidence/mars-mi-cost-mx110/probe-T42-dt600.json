@@ -1,0 +1,177 @@
+{
+  "benchmark_only_gemm_chunk_rows": 64,
+  "dt": 600.0,
+  "environment": {
+    "cuda_runtime": 11080,
+    "cupy": "13.4.0",
+    "git_commit": "cfebd16aa65ab38413f245556e5dde98781cb03f",
+    "git_dirty_tracked": true,
+    "gpu": "NVIDIA GeForce MX110",
+    "gpu_memory_total_bytes": 2147352576,
+    "numpy": "2.2.6",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "python": "3.12.12",
+    "sm_count": 2
+  },
+  "preset": "dev-mars-gray-flat-bl",
+  "records": [
+    {
+      "courant_horizontal": 1.1310360843918617,
+      "courant_vertical": 0.3639303801083993,
+      "finite": true,
+      "max_abs_u": 151.50745389985332,
+      "max_speed": 152.42057708709373,
+      "step": 0,
+      "t_max": 283.65785135861466,
+      "t_min": 143.18156927309857,
+      "vorticity_tail_fraction": 0.0
+    },
+    {
+      "courant_horizontal": 1.0776868298024174,
+      "courant_vertical": 0.4164792353538978,
+      "finite": true,
+      "max_abs_u": 145.11661292764887,
+      "max_speed": 145.23112992099243,
+      "step": 4,
+      "t_max": 284.3583967794353,
+      "t_min": 145.5463181610507,
+      "t_sols": 0.027137042062415198,
+      "vorticity_tail_fraction": 0.014220182313367196
+    },
+    {
+      "courant_horizontal": 1.1254755628187019,
+      "courant_vertical": 0.49866987553263703,
+      "finite": true,
+      "max_abs_u": 149.1143352104446,
+      "max_speed": 151.67123060842505,
+      "step": 8,
+      "t_max": 286.08635533509215,
+      "t_min": 147.8883017703213,
+      "t_sols": 0.054274084124830396,
+      "vorticity_tail_fraction": 0.05539137789159653
+    },
+    {
+      "courant_horizontal": 1.1867820598439636,
+      "courant_vertical": 0.5937787287222509,
+      "finite": true,
+      "max_abs_u": 143.77460610423964,
+      "max_speed": 159.93301092182938,
+      "step": 12,
+      "t_max": 286.9533580999049,
+      "t_min": 150.87287035990846,
+      "t_sols": 0.0814111261872456,
+      "vorticity_tail_fraction": 0.10788643107901405
+    },
+    {
+      "courant_horizontal": 1.2550304845041826,
+      "courant_vertical": 0.5839252826304976,
+      "finite": true,
+      "max_abs_u": 153.68579638304024,
+      "max_speed": 169.13029862603986,
+      "step": 16,
+      "t_max": 286.6510079257963,
+      "t_min": 145.68852131998446,
+      "t_sols": 0.10854816824966079,
+      "vorticity_tail_fraction": 0.15290595588000164
+    },
+    {
+      "courant_horizontal": 1.1321648002467821,
+      "courant_vertical": 0.670475753972371,
+      "finite": true,
+      "max_abs_u": 147.40561488233868,
+      "max_speed": 152.57268498563778,
+      "step": 20,
+      "t_max": 288.6667875497084,
+      "t_min": 141.69757453404546,
+      "t_sols": 0.13568521031207598,
+      "vorticity_tail_fraction": 0.1948694535561256
+    },
+    {
+      "courant_horizontal": 1.0840462856251296,
+      "courant_vertical": 0.6526418956692022,
+      "finite": true,
+      "max_abs_u": 144.87636918415834,
+      "max_speed": 146.08814230091033,
+      "step": 24,
+      "t_max": 289.7827557978799,
+      "t_min": 137.01026585050022,
+      "t_sols": 0.1628222523744912,
+      "vorticity_tail_fraction": 0.22613111971923114
+    },
+    {
+      "courant_horizontal": 1.1280441881149688,
+      "courant_vertical": 0.678715247124136,
+      "finite": true,
+      "max_abs_u": 145.54505789618224,
+      "max_speed": 152.0173834459696,
+      "step": 28,
+      "t_max": 290.04236545943667,
+      "t_min": 133.8537182762294,
+      "t_sols": 0.18995929443690637,
+      "vorticity_tail_fraction": 0.249788948819264
+    },
+    {
+      "courant_horizontal": 1.1495121949808056,
+      "courant_vertical": 0.7827013656946717,
+      "finite": true,
+      "max_abs_u": 154.5370780525003,
+      "max_speed": 154.9104529426514,
+      "step": 32,
+      "t_max": 290.85025951155075,
+      "t_min": 136.9956134811,
+      "t_sols": 0.21709633649932158,
+      "vorticity_tail_fraction": 0.271997117860617
+    },
+    {
+      "courant_horizontal": 1.1737150067437714,
+      "courant_vertical": 0.7591679944260291,
+      "finite": true,
+      "max_abs_u": 150.75886797835057,
+      "max_speed": 158.17206995642252,
+      "step": 36,
+      "t_max": 290.7117980445832,
+      "t_min": 136.6439764308123,
+      "t_sols": 0.24423337856173677,
+      "vorticity_tail_fraction": 0.2900858981386218
+    },
+    {
+      "courant_horizontal": 1.1938438966894738,
+      "courant_vertical": 0.7454817056157464,
+      "finite": true,
+      "max_abs_u": 147.62777763984823,
+      "max_speed": 160.88467750624812,
+      "step": 37,
+      "t_max": 290.52430653039744,
+      "t_min": 136.60909398238348,
+      "t_sols": 0.2510176390773406,
+      "vorticity_tail_fraction": 0.294463789109498
+    }
+  ],
+  "scratch_dir": "C:\\Users\\User\\AppData\\Local\\Temp\\claude\\3a577e870356ee0b\\7346164c-44b0-41ac-bde2-0168f21edd03\\scratchpad\\mars-probe-qzyv_izg",
+  "seconds_per_step": 11.0249582486482,
+  "sols_requested": 0.25,
+  "source": "C:/Users/User/Projects/PlanetarySandbox/docs/runs/dev-mars-gray-flat-bl-heated-T21L25-06f5356/checkpoints/checkpoint-s000008640.npz",
+  "source_day": 60.0,
+  "source_truncation": "T21",
+  "startup_substeps": 1,
+  "status": "stable",
+  "steps_done": 37,
+  "steps_requested": 37,
+  "t0_seconds": 5184000.0,
+  "tool": "mars_cost_profile.py probe",
+  "transfer": {
+    "dropped_norm_fraction": 0.0,
+    "source_norm_above_retained_cut": 0.0,
+    "ts_destination_range_K": [
+      193.4059496598643,
+      230.55133327006502
+    ],
+    "ts_source_range_K": [
+      193.57555414779748,
+      230.5653063354834
+    ],
+    "ts_source_roundtrip_max_abs_K": 0.04051314105703341
+  },
+  "truncation": "T42",
+  "unstable_rule": "non-finite, max speed > 500 m/s, or T outside [0, 700] K"
+}

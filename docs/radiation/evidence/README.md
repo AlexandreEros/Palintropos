@@ -40,3 +40,6 @@ and the [preservation record](../../validation/run_archive_2026-11-12/README.md)
   measurement, not a judged experiment: no criterion was registered before it. The scheme
   leaves the climate, the energy budget and the mass drift where FHZ06 left them
   ([MONIN_OBUKHOV.md](../MONIN_OBUKHOV.md) §10).
+- [CV-1 cost on the MX110](mars-mi-cost-mx110/README.md): s/step and its breakdown by
+  operator at T10–T42, time-step probes, slab timescales and the CV-1 wall-clock
+  arithmetic behind [MARS_MI_COST.md](../MARS_MI_COST.md).
