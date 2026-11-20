@@ -15,3 +15,8 @@ inspection work without CUDA. Numerical runs and terrain projection require
 CUDA; the [architecture](../../../docs/ARCHITECTURE.md#cpu-and-gpu-requirements)
 defines the boundary. Detailed examples live with their
 [owning subsystems](../README.md), rather than in duplicate CLI guides.
+
+`tropoi view CAPSULE [CAPSULE ...]` opens the local offline globe and map viewer.
+Pass the intended capsule directories explicitly. See the
+[interactive viewer guide](../representation/visual/README.md#interactive-capsule-viewer)
+for fields, vertical coordinates, backend selection and PNG export.

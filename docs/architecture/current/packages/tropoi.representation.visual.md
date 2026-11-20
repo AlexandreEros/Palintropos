@@ -23,7 +23,7 @@ Index: [all packages](../index.md) · parent [`tropoi.representation`](tropoi.re
 | `tropoi.representation.visual.pe` | code | – | `build_pe_summary_spec`, `render_pe_summary` |
 | `tropoi.representation.visual.pe_snapshots` | code | `PESnapshotFields`, `SelectedLevels` | `build_pe_snapshot_figure`, `build_pe_snapshot_timeline`, `build_pe_snapshot_timeline_from_data`, `prepare_pe_snapshot_fields`, `render_pe_snapshots`, `select_snapshot_levels` |
 | `tropoi.representation.visual.planet_viewer` | code | `PlanetViewer` | – |
-| `tropoi.representation.visual.quantities` | code | `Quantity`, `QuantityUnavailableError` | `available_quantities`, `quantity` |
+| `tropoi.representation.visual.quantities` | code | `Quantity`, `QuantityUnavailableError`, `_Presentation` | `available_quantities`, `quantity`, `viewer_presentation` |
 | `tropoi.representation.visual.renderers` | code | `Renderer` | `get_default_renderer` |
 | `tropoi.representation.visual.sky` | code | `HypotheticalColumn`, `SkyPreset`, `SkySpec` | `density_grid`, `optical_depth_diagnostic`, `radiance_table`, `render_page`, `saved_sky_page`, `sky_block`, `standalone_page`, `star_path_column`, `write_sky_page`, `xyz` |
 | `tropoi.representation.visual.snapshot` | code | `PlotUnavailableError`, `SnapshotResources` | `build_resources`, `build_snapshot_timeline`, `render_snapshot` |
@@ -32,6 +32,8 @@ Index: [all packages](../index.md) · parent [`tropoi.representation`](tropoi.re
 | `tropoi.representation.visual.swe` | code | – | `build_swe_snapshot_timeline`, `build_swe_snapshot_timelines`, `build_swe_snapshot_timelines_from_data`, `build_swe_summary_spec`, `render_swe_snapshots`, `render_swe_summary` |
 | `tropoi.representation.visual.terrain` | code | `TerrainPreview` | `build_terrain_preview`, `default_exaggeration`, `display_resolution_deg`, `globe_payload`, `plot_terrain`, `write_globe_html`, `write_globe_page` |
 | `tropoi.representation.visual.timeline` | code | `FigureFrame`, `FigureTimeline` | `build_timeline_overview`, `render_figure_timeline`, `render_snapshot_product`, `resolve_figure_normalizations`, `select_representative_frame_indices` |
+| `tropoi.representation.visual.viewer_fields` | code | `FrameProvider` | – |
+| `tropoi.representation.visual.viewer_server` | code | `ViewerServer`, `ViewerSession`, `_Handler` | `encode_frame`, `serve` |
 | `tropoi.representation.visual.views` | code | `Arrows`, `AutoVectors`, `Complexity`, `Contours`, `Drift`, `Grid`, `Map`, `Overview`, `Sigma`, `StreamfunctionContours`, `Streamlines`, `Style` | `describe`, `parse_time` |
 | `tropoi.representation.visual.vorticity_viewer` | code | `VorticityViewer` | – |
 
@@ -70,6 +72,8 @@ flowchart LR
         n_tropoi_orepresentation_ovisual_oswe["representation.visual.swe"]
         n_tropoi_orepresentation_ovisual_oterrain["representation.visual.terrain"]
         n_tropoi_orepresentation_ovisual_otimeline["representation.visual.timeline"]
+        n_tropoi_orepresentation_ovisual_oviewer__fields["representation.visual.viewer#95;fields"]
+        n_tropoi_orepresentation_ovisual_oviewer__server["representation.visual.viewer#95;server"]
         n_tropoi_orepresentation_ovisual_oviews["representation.visual.views"]
         n_tropoi_orepresentation_ovisual_ovorticity__viewer["representation.visual.vorticity#95;viewer"]
     end
@@ -145,17 +149,19 @@ flowchart LR
     n_tropoi_orepresentation_ovisual_otimeline --> n_tropoi_orepresentation_ovisual_onormalization
     n_tropoi_orepresentation_ovisual_otimeline --> n_tropoi_orepresentation_ovisual_orenderers
     n_tropoi_orepresentation_ovisual_otimeline --> n_tropoi_orepresentation_ovisual_ospecs
+    n_tropoi_orepresentation_ovisual_oviewer__server -.-> n_tropoi_orepresentation_ovisual_oviewer__fields
     n_tropoi_orepresentation_ovisual_ovorticity__viewer -.-> n_tropoi_orepresentation_ovisual_obve
     p_tropoi_ocli -.->|1| n_tropoi_orepresentation_ovisual_ocompose
     p_tropoi_ocli -.->|1| n_tropoi_orepresentation_ovisual_oevaluate
     p_tropoi_ocli -.->|1| n_tropoi_orepresentation_ovisual_oplanet__viewer
     p_tropoi_ocli -.->|1| n_tropoi_orepresentation_ovisual_oquantities
     p_tropoi_ocli -.->|1| n_tropoi_orepresentation_ovisual_osnapshot
+    p_tropoi_ocli -.->|1| n_tropoi_orepresentation_ovisual_oviewer__server
     p_tropoi_ocli -.->|1| n_tropoi_orepresentation_ovisual_oviews
     p_tropoi_orepresentation_oarchive -.->|2| n_tropoi_orepresentation_ovisual_oatmosphere
     p_tropoi_orepresentation_oarchive -.->|1| n_tropoi_orepresentation_ovisual_ocompose
     p_tropoi_orepresentation_oarchive -.->|1| n_tropoi_orepresentation_ovisual_oheld__suarez__climate
-    p_tropoi_orepresentation_oarchive -.->|1| n_tropoi_orepresentation_ovisual_oquantities
+    p_tropoi_orepresentation_oarchive -->|2| n_tropoi_orepresentation_ovisual_oquantities
     p_tropoi_orepresentation_oarchive -.->|2| n_tropoi_orepresentation_ovisual_osky
     p_tropoi_orepresentation_oarchive -.->|1| n_tropoi_orepresentation_ovisual_osnapshot
     p_tropoi_orun_obve -->|1| n_tropoi_orepresentation_ovisual_obve
@@ -189,6 +195,12 @@ flowchart LR
     n_tropoi_orepresentation_ovisual_osnapshot -.->|1| p_tropoi_otemporal
     n_tropoi_orepresentation_ovisual_oswe -.->|1| p_tropoi_otemporal_otendencies
     n_tropoi_orepresentation_ovisual_oterrain -->|1| p_tropoi_ospatial_otransforms
+    n_tropoi_orepresentation_ovisual_oviewer__fields -->|3| p_tropoi_orepresentation_oarchive
+    n_tropoi_orepresentation_ovisual_oviewer__fields -->|4| p_tropoi_orepresentation_odiagnostics
+    n_tropoi_orepresentation_ovisual_oviewer__fields -->|1| p_tropoi_ospatial
+    n_tropoi_orepresentation_ovisual_oviewer__fields -->|2| p_tropoi_ospatial_otransforms
+    n_tropoi_orepresentation_ovisual_oviewer__server -.->|1| p_tropoi_ophysics
+    n_tropoi_orepresentation_ovisual_oviewer__server -->|2| p_tropoi_orepresentation_oarchive
     n_tropoi_orepresentation_ovisual_ovorticity__viewer -->|1| p_tropoi_ospatial
     n_tropoi_orepresentation_ovisual_ovorticity__viewer -->|2| p_tropoi_ospatial_ogrids
     classDef other fill:none,stroke-dasharray:3 3
@@ -211,7 +223,7 @@ flowchart LR
 
 ## Classes
 
-57 classes, each with the functions defined in its body (`$`: class/static method; no parentheses: property). Edges: inheritance (`<|--`) and nesting (`*--`) only.
+62 classes, each with the functions defined in its body (`$`: class/static method; no parentheses: property). Edges: inheritance (`<|--`) and nesting (`*--`) only.
 
 ```mermaid
 %% Generated by tools.architecture 2.3.0. Do not edit by hand.
@@ -335,6 +347,7 @@ classDiagram
     c_tropoi_orepresentation_ovisual_oquantities_oQuantity : +check#95;solver()
     class c_tropoi_orepresentation_ovisual_oquantities_oQuantityUnavailableError["QuantityUnavailableError (representation.visual.quantities)"]
     c_tropoi_orepresentation_ovisual_oquantities_oQuantityUnavailableError : external base ValueError
+    class c_tropoi_orepresentation_ovisual_oquantities_o__Presentation["#95;Presentation (representation.visual.quantities)"]
     class c_tropoi_orepresentation_ovisual_orenderers_oRenderer["Renderer (representation.visual.renderers)"]
     c_tropoi_orepresentation_ovisual_orenderers_oRenderer : +render#95;figure()
     c_tropoi_orepresentation_ovisual_orenderers_oRenderer : +render#95;scalar#95;map()
@@ -416,6 +429,39 @@ classDiagram
     c_tropoi_orepresentation_ovisual_otimeline_oFigureTimeline : +resolve#95;normalizations()
     c_tropoi_orepresentation_ovisual_otimeline_oFigureTimeline : +specifications
     c_tropoi_orepresentation_ovisual_otimeline_oFigureTimeline : +times#95;seconds
+    class c_tropoi_orepresentation_ovisual_oviewer__fields_oFrameProvider["FrameProvider (representation.visual.viewer#95;fields)"]
+    c_tropoi_orepresentation_ovisual_oviewer__fields_oFrameProvider : +#95;#95;init#95;#95;()
+    c_tropoi_orepresentation_ovisual_oviewer__fields_oFrameProvider : +#95;context()
+    c_tropoi_orepresentation_ovisual_oviewer__fields_oFrameProvider : +#95;horizontal#95;slice()
+    c_tropoi_orepresentation_ovisual_oviewer__fields_oFrameProvider : +#95;native#95;grid()
+    c_tropoi_orepresentation_ovisual_oviewer__fields_oFrameProvider : +#95;pe#95;slice()
+    c_tropoi_orepresentation_ovisual_oviewer__fields_oFrameProvider : +#95;read()
+    c_tropoi_orepresentation_ovisual_oviewer__fields_oFrameProvider : +#95;result()
+    c_tropoi_orepresentation_ovisual_oviewer__fields_oFrameProvider : +#95;saved#95;index()
+    c_tropoi_orepresentation_ovisual_oviewer__fields_oFrameProvider : +#95;scalar()
+    c_tropoi_orepresentation_ovisual_oviewer__fields_oFrameProvider : +#95;slab#95;point()
+    c_tropoi_orepresentation_ovisual_oviewer__fields_oFrameProvider : +#95;structure#95;context()
+    c_tropoi_orepresentation_ovisual_oviewer__fields_oFrameProvider : +#95;terrain#95;lm()
+    c_tropoi_orepresentation_ovisual_oviewer__fields_oFrameProvider : +column()
+    c_tropoi_orepresentation_ovisual_oviewer__fields_oFrameProvider : +radius
+    c_tropoi_orepresentation_ovisual_oviewer__fields_oFrameProvider : +section()
+    c_tropoi_orepresentation_ovisual_oviewer__fields_oFrameProvider : +slice()
+    c_tropoi_orepresentation_ovisual_oviewer__fields_oFrameProvider : +terrain()
+    c_tropoi_orepresentation_ovisual_oviewer__fields_oFrameProvider : +zonal#95;mean()
+    class c_tropoi_orepresentation_ovisual_oviewer__server_oViewerServer["ViewerServer (representation.visual.viewer#95;server)"]
+    c_tropoi_orepresentation_ovisual_oviewer__server_oViewerServer : +#95;#95;init#95;#95;()
+    c_tropoi_orepresentation_ovisual_oviewer__server_oViewerServer : external base http.server.ThreadingHTTPServer
+    class c_tropoi_orepresentation_ovisual_oviewer__server_oViewerSession["ViewerSession (representation.visual.viewer#95;server)"]
+    c_tropoi_orepresentation_ovisual_oviewer__server_oViewerSession : +#95;#95;init#95;#95;()
+    c_tropoi_orepresentation_ovisual_oviewer__server_oViewerSession : +#95;cached()
+    c_tropoi_orepresentation_ovisual_oviewer__server_oViewerSession : +diagnostic()
+    c_tropoi_orepresentation_ovisual_oviewer__server_oViewerSession : +frame()
+    c_tropoi_orepresentation_ovisual_oviewer__server_oViewerSession : +structure()
+    class c_tropoi_orepresentation_ovisual_oviewer__server_o__Handler["#95;Handler (representation.visual.viewer#95;server)"]
+    c_tropoi_orepresentation_ovisual_oviewer__server_o__Handler : +#95;reply()
+    c_tropoi_orepresentation_ovisual_oviewer__server_o__Handler : +do#95;GET()
+    c_tropoi_orepresentation_ovisual_oviewer__server_o__Handler : +log#95;message()
+    c_tropoi_orepresentation_ovisual_oviewer__server_o__Handler : external base http.server.BaseHTTPRequestHandler
     class c_tropoi_orepresentation_ovisual_oviews_oArrows["Arrows (representation.visual.views)"]
     class c_tropoi_orepresentation_ovisual_oviews_oAutoVectors["AutoVectors (representation.visual.views)"]
     c_tropoi_orepresentation_ovisual_oviews_oAutoVectors : +#95;#95;post#95;init#95;#95;()
@@ -445,9 +491,11 @@ classDiagram
 ## Entry paths through this package
 
 * [`calls/cli-gen.mmd`](../calls/cli-gen.mmd)
+* [`calls/cli-inspect.mmd`](../calls/cli-inspect.mmd)
 * [`calls/cli-plot.mmd`](../calls/cli-plot.mmd)
 * [`calls/cli-run-pe.mmd`](../calls/cli-run-pe.mmd)
 * [`calls/cli-run-swe.mmd`](../calls/cli-run-swe.mmd)
+* [`calls/cli-view.mmd`](../calls/cli-view.mmd)
 * [`calls/sky-hypothetical.mmd`](../calls/sky-hypothetical.mmd)
 * [`calls/sky-numpy-reference.mmd`](../calls/sky-numpy-reference.mmd)
 * [`calls/sky-saved-column.mmd`](../calls/sky-saved-column.mmd)

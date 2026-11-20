@@ -66,9 +66,9 @@ flowchart LR
     p_tropoi_ocli -.->|1| n_tropoi_ospatial_oenvironment
     p_tropoi_ocli -.->|1| n_tropoi_ospatial_omodes
     p_tropoi_ocli -.->|1| n_tropoi_ospatial_oplanet
-    p_tropoi_orepresentation_oarchive -.->|1| n_tropoi_ospatial_oenvironment
+    p_tropoi_orepresentation_oarchive -.->|2| n_tropoi_ospatial_oenvironment
     p_tropoi_orepresentation_oarchive -->|5| n_tropoi_ospatial_omodes
-    p_tropoi_orepresentation_oarchive -->|1| n_tropoi_ospatial_osigma__coordinate
+    p_tropoi_orepresentation_oarchive -->|2| n_tropoi_ospatial_osigma__coordinate
     p_tropoi_orepresentation_oarchive -->|2| n_tropoi_ospatial_ospecification
     p_tropoi_orepresentation_oarchive -->|1| n_tropoi_ospatial_otruncation
     p_tropoi_orepresentation_odiagnostics -->|1| n_tropoi_ospatial_olaplacian
@@ -77,6 +77,7 @@ flowchart LR
     p_tropoi_orepresentation_ovisual -->|2| n_tropoi_ospatial_oplanet
     p_tropoi_orepresentation_ovisual -->|2| n_tropoi_ospatial_osigma__coordinate
     p_tropoi_orepresentation_ovisual -.->|1| n_tropoi_ospatial_otruncation
+    p_tropoi_orepresentation_ovisual -->|1| n_tropoi_ospatial_owilliamson5
     p_tropoi_orun_obve -->|1| n_tropoi_ospatial_oplanet
     p_tropoi_orun_obve -->|1| n_tropoi_ospatial_otruncation
     p_tropoi_orun_ocustom -->|1| n_tropoi_ospatial_olaplacian
