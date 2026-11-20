@@ -2891,6 +2891,46 @@
       "target": "tropoi.spatial.transforms.host_synthesis.synthesize_wind_latlon"
     },
     {
+      "kind": "constructor",
+      "source": "tropoi.representation.diagnostics.pe_structure.ZonalMeanAccumulator",
+      "target": "tropoi.representation.diagnostics.pe_structure.ZonalMeanAccumulator.__init__"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.representation.diagnostics.pe_structure.ZonalMeanAccumulator.__init__",
+      "target": "tropoi.representation.diagnostics.held_suarez_sections.SectionAccumulator"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.diagnostics.pe_structure.ZonalMeanAccumulator.__init__",
+      "target": "tropoi.representation.diagnostics.held_suarez_sections.state_grid"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.diagnostics.pe_structure.ZonalMeanAccumulator.add",
+      "target": "tropoi.representation.diagnostics.pe_levels.reconstruct_levels"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.diagnostics.pe_structure.column",
+      "target": "tropoi.representation.diagnostics.pe_levels.reconstruct_levels"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.diagnostics.pe_structure.column",
+      "target": "tropoi.representation.diagnostics.pe_structure._finite_point"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.diagnostics.pe_structure.vertical_section",
+      "target": "tropoi.representation.diagnostics.pe_levels.reconstruct_levels"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.diagnostics.pe_structure.vertical_section",
+      "target": "tropoi.representation.diagnostics.pe_structure._finite_point"
+    },
+    {
       "kind": "call",
       "source": "tropoi.representation.diagnostics.pe_surfaces.GeopotentialHeightSurface.__post_init__",
       "target": "tropoi.representation.diagnostics.pe_surfaces._is_number"
@@ -6287,6 +6327,11 @@
     },
     {
       "kind": "call",
+      "source": "tropoi.representation.visual.viewer_fields.FrameProvider._native_grid",
+      "target": "tropoi.representation.diagnostics.held_suarez_sections.state_grid"
+    },
+    {
+      "kind": "call",
       "source": "tropoi.representation.visual.viewer_fields.FrameProvider._pe_slice",
       "target": "tropoi.representation.diagnostics.pe_levels.reconstruct_levels"
     },
@@ -6311,6 +6356,16 @@
       "target": "tropoi.spatial.transforms.host_synthesis.synthesize_latlon"
     },
     {
+      "kind": "self",
+      "source": "tropoi.representation.visual.viewer_fields.FrameProvider._slab_point",
+      "target": "tropoi.representation.visual.viewer_fields.FrameProvider._read"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.viewer_fields.FrameProvider._slab_point",
+      "target": "tropoi.representation.visual.viewer_fields._slab_map"
+    },
+    {
       "kind": "call",
       "source": "tropoi.representation.visual.viewer_fields.FrameProvider._terrain_lm",
       "target": "tropoi.representation.archive.local_resource.resource"
@@ -6324,6 +6379,56 @@
       "kind": "call",
       "source": "tropoi.representation.visual.viewer_fields.FrameProvider._terrain_lm",
       "target": "tropoi.representation.visual.viewer_fields._cone_coefficients"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.viewer_fields.FrameProvider.column",
+      "target": "tropoi.representation.diagnostics.pe_structure.column"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.representation.visual.viewer_fields.FrameProvider.column",
+      "target": "tropoi.representation.visual.viewer_fields.FrameProvider._native_grid"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.representation.visual.viewer_fields.FrameProvider.column",
+      "target": "tropoi.representation.visual.viewer_fields.FrameProvider._read"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.representation.visual.viewer_fields.FrameProvider.column",
+      "target": "tropoi.representation.visual.viewer_fields.FrameProvider._saved_index"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.representation.visual.viewer_fields.FrameProvider.column",
+      "target": "tropoi.representation.visual.viewer_fields.FrameProvider._slab_point"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.representation.visual.viewer_fields.FrameProvider.column",
+      "target": "tropoi.representation.visual.viewer_fields.FrameProvider._structure_context"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.viewer_fields.FrameProvider.section",
+      "target": "tropoi.representation.diagnostics.pe_structure.vertical_section"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.representation.visual.viewer_fields.FrameProvider.section",
+      "target": "tropoi.representation.visual.viewer_fields.FrameProvider._read"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.representation.visual.viewer_fields.FrameProvider.section",
+      "target": "tropoi.representation.visual.viewer_fields.FrameProvider._saved_index"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.representation.visual.viewer_fields.FrameProvider.section",
+      "target": "tropoi.representation.visual.viewer_fields.FrameProvider._structure_context"
     },
     {
       "kind": "self",
@@ -6361,6 +6466,31 @@
       "target": "tropoi.representation.visual.viewer_fields.FrameProvider._scalar"
     },
     {
+      "kind": "instantiate",
+      "source": "tropoi.representation.visual.viewer_fields.FrameProvider.zonal_mean",
+      "target": "tropoi.representation.diagnostics.pe_structure.ZonalMeanAccumulator"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.viewer_fields.FrameProvider.zonal_mean",
+      "target": "tropoi.representation.diagnostics.pe_structure.mass_streamfunction"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.representation.visual.viewer_fields.FrameProvider.zonal_mean",
+      "target": "tropoi.representation.visual.viewer_fields.FrameProvider._read"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.representation.visual.viewer_fields.FrameProvider.zonal_mean",
+      "target": "tropoi.representation.visual.viewer_fields.FrameProvider._saved_index"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.representation.visual.viewer_fields.FrameProvider.zonal_mean",
+      "target": "tropoi.representation.visual.viewer_fields.FrameProvider._structure_context"
+    },
+    {
       "kind": "call",
       "source": "tropoi.representation.visual.viewer_fields._slab_map",
       "target": "tropoi.representation.diagnostics.held_suarez_sections.state_grid"
@@ -6386,19 +6516,34 @@
       "target": "tropoi.representation.visual.viewer_server._star"
     },
     {
+      "kind": "instantiate",
+      "source": "tropoi.representation.visual.viewer_server.ViewerSession._cached",
+      "target": "tropoi.representation.visual.viewer_fields.FrameProvider"
+    },
+    {
       "kind": "call",
       "source": "tropoi.representation.visual.viewer_server.ViewerSession.diagnostic",
       "target": "tropoi.representation.archive.local_resource.resource"
     },
     {
-      "kind": "instantiate",
+      "kind": "self",
       "source": "tropoi.representation.visual.viewer_server.ViewerSession.frame",
-      "target": "tropoi.representation.visual.viewer_fields.FrameProvider"
+      "target": "tropoi.representation.visual.viewer_server.ViewerSession._cached"
     },
     {
       "kind": "call",
       "source": "tropoi.representation.visual.viewer_server.ViewerSession.frame",
       "target": "tropoi.representation.visual.viewer_server.encode_frame"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.representation.visual.viewer_server.ViewerSession.structure",
+      "target": "tropoi.representation.visual.viewer_server.ViewerSession._cached"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.viewer_server.ViewerSession.structure",
+      "target": "tropoi.representation.visual.viewer_server._json"
     },
     {
       "kind": "self",
@@ -14981,6 +15126,13 @@
       "type": "function"
     },
     {
+      "id": "tropoi.representation.archive.local_resource._reserved",
+      "kind": "function",
+      "module": "tropoi.representation.archive.local_resource",
+      "qualname": "_reserved",
+      "type": "function"
+    },
+    {
       "id": "tropoi.representation.archive.local_resource.resource",
       "kind": "function",
       "module": "tropoi.representation.archive.local_resource",
@@ -15986,6 +16138,69 @@
       "kind": "function",
       "module": "tropoi.representation.diagnostics.pe_levels",
       "qualname": "reconstruct_levels",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.diagnostics.pe_structure.ZonalMeanAccumulator",
+      "kind": "class",
+      "module": "tropoi.representation.diagnostics.pe_structure",
+      "qualname": "ZonalMeanAccumulator",
+      "type": "class"
+    },
+    {
+      "id": "tropoi.representation.diagnostics.pe_structure.ZonalMeanAccumulator.__init__",
+      "kind": "method",
+      "module": "tropoi.representation.diagnostics.pe_structure",
+      "qualname": "ZonalMeanAccumulator.__init__",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.diagnostics.pe_structure.ZonalMeanAccumulator.add",
+      "kind": "method",
+      "module": "tropoi.representation.diagnostics.pe_structure",
+      "qualname": "ZonalMeanAccumulator.add",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.diagnostics.pe_structure.ZonalMeanAccumulator.count",
+      "kind": "property",
+      "module": "tropoi.representation.diagnostics.pe_structure",
+      "qualname": "ZonalMeanAccumulator.count",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.diagnostics.pe_structure.ZonalMeanAccumulator.means",
+      "kind": "method",
+      "module": "tropoi.representation.diagnostics.pe_structure",
+      "qualname": "ZonalMeanAccumulator.means",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.diagnostics.pe_structure._finite_point",
+      "kind": "function",
+      "module": "tropoi.representation.diagnostics.pe_structure",
+      "qualname": "_finite_point",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.diagnostics.pe_structure.column",
+      "kind": "function",
+      "module": "tropoi.representation.diagnostics.pe_structure",
+      "qualname": "column",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.diagnostics.pe_structure.mass_streamfunction",
+      "kind": "function",
+      "module": "tropoi.representation.diagnostics.pe_structure",
+      "qualname": "mass_streamfunction",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.diagnostics.pe_structure.vertical_section",
+      "kind": "function",
+      "module": "tropoi.representation.diagnostics.pe_structure",
+      "qualname": "vertical_section",
       "type": "function"
     },
     {
@@ -19286,6 +19501,13 @@
       "type": "function"
     },
     {
+      "id": "tropoi.representation.visual.viewer_fields.FrameProvider._native_grid",
+      "kind": "method",
+      "module": "tropoi.representation.visual.viewer_fields",
+      "qualname": "FrameProvider._native_grid",
+      "type": "function"
+    },
+    {
       "id": "tropoi.representation.visual.viewer_fields.FrameProvider._pe_slice",
       "kind": "method",
       "module": "tropoi.representation.visual.viewer_fields",
@@ -19307,10 +19529,31 @@
       "type": "function"
     },
     {
+      "id": "tropoi.representation.visual.viewer_fields.FrameProvider._saved_index",
+      "kind": "method",
+      "module": "tropoi.representation.visual.viewer_fields",
+      "qualname": "FrameProvider._saved_index",
+      "type": "function"
+    },
+    {
       "id": "tropoi.representation.visual.viewer_fields.FrameProvider._scalar",
       "kind": "method",
       "module": "tropoi.representation.visual.viewer_fields",
       "qualname": "FrameProvider._scalar",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.viewer_fields.FrameProvider._slab_point",
+      "kind": "method",
+      "module": "tropoi.representation.visual.viewer_fields",
+      "qualname": "FrameProvider._slab_point",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.viewer_fields.FrameProvider._structure_context",
+      "kind": "method",
+      "module": "tropoi.representation.visual.viewer_fields",
+      "qualname": "FrameProvider._structure_context",
       "type": "function"
     },
     {
@@ -19321,10 +19564,24 @@
       "type": "function"
     },
     {
+      "id": "tropoi.representation.visual.viewer_fields.FrameProvider.column",
+      "kind": "method",
+      "module": "tropoi.representation.visual.viewer_fields",
+      "qualname": "FrameProvider.column",
+      "type": "function"
+    },
+    {
       "id": "tropoi.representation.visual.viewer_fields.FrameProvider.radius",
       "kind": "property",
       "module": "tropoi.representation.visual.viewer_fields",
       "qualname": "FrameProvider.radius",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.viewer_fields.FrameProvider.section",
+      "kind": "method",
+      "module": "tropoi.representation.visual.viewer_fields",
+      "qualname": "FrameProvider.section",
       "type": "function"
     },
     {
@@ -19339,6 +19596,13 @@
       "kind": "method",
       "module": "tropoi.representation.visual.viewer_fields",
       "qualname": "FrameProvider.terrain",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.viewer_fields.FrameProvider.zonal_mean",
+      "kind": "method",
+      "module": "tropoi.representation.visual.viewer_fields",
+      "qualname": "FrameProvider.zonal_mean",
       "type": "function"
     },
     {
@@ -19384,6 +19648,13 @@
       "type": "function"
     },
     {
+      "id": "tropoi.representation.visual.viewer_server.ViewerSession._cached",
+      "kind": "method",
+      "module": "tropoi.representation.visual.viewer_server",
+      "qualname": "ViewerSession._cached",
+      "type": "function"
+    },
+    {
       "id": "tropoi.representation.visual.viewer_server.ViewerSession.diagnostic",
       "kind": "method",
       "module": "tropoi.representation.visual.viewer_server",
@@ -19395,6 +19666,13 @@
       "kind": "method",
       "module": "tropoi.representation.visual.viewer_server",
       "qualname": "ViewerSession.frame",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.viewer_server.ViewerSession.structure",
+      "kind": "method",
+      "module": "tropoi.representation.visual.viewer_server",
+      "qualname": "ViewerSession.structure",
       "type": "function"
     },
     {

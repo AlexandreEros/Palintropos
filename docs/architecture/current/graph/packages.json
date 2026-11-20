@@ -135,8 +135,8 @@
     },
     {
       "kind": "imports",
-      "module_edges": 10,
-      "runtime_module_edges": 10,
+      "module_edges": 11,
+      "runtime_module_edges": 11,
       "source": "tropoi.representation.visual",
       "target": "tropoi.representation.diagnostics"
     },
@@ -744,8 +744,8 @@
     },
     {
       "id": "tropoi.representation.diagnostics",
-      "internal_edges": 2,
-      "modules": 7
+      "internal_edges": 4,
+      "modules": 8
     },
     {
       "id": "tropoi.representation.visual",

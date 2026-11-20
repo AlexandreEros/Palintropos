@@ -2005,6 +2005,31 @@
       "qualname": "LevelFields"
     },
     {
+      "decorators": [],
+      "external_bases": [],
+      "id": "tropoi.representation.diagnostics.pe_structure.ZonalMeanAccumulator",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__init__"
+        },
+        {
+          "kind": "method",
+          "name": "add"
+        },
+        {
+          "kind": "property",
+          "name": "count"
+        },
+        {
+          "kind": "method",
+          "name": "means"
+        }
+      ],
+      "module": "tropoi.representation.diagnostics.pe_structure",
+      "qualname": "ZonalMeanAccumulator"
+    },
+    {
       "decorators": [
         "dataclass(frozen=True)"
       ],
@@ -3272,6 +3297,10 @@
         },
         {
           "kind": "method",
+          "name": "_native_grid"
+        },
+        {
+          "kind": "method",
           "name": "_pe_slice"
         },
         {
@@ -3284,15 +3313,35 @@
         },
         {
           "kind": "method",
+          "name": "_saved_index"
+        },
+        {
+          "kind": "method",
           "name": "_scalar"
+        },
+        {
+          "kind": "method",
+          "name": "_slab_point"
+        },
+        {
+          "kind": "method",
+          "name": "_structure_context"
         },
         {
           "kind": "method",
           "name": "_terrain_lm"
         },
         {
+          "kind": "method",
+          "name": "column"
+        },
+        {
           "kind": "property",
           "name": "radius"
+        },
+        {
+          "kind": "method",
+          "name": "section"
         },
         {
           "kind": "method",
@@ -3301,6 +3350,10 @@
         {
           "kind": "method",
           "name": "terrain"
+        },
+        {
+          "kind": "method",
+          "name": "zonal_mean"
         }
       ],
       "module": "tropoi.representation.visual.viewer_fields",
@@ -3332,11 +3385,19 @@
         },
         {
           "kind": "method",
+          "name": "_cached"
+        },
+        {
+          "kind": "method",
           "name": "diagnostic"
         },
         {
           "kind": "method",
           "name": "frame"
+        },
+        {
+          "kind": "method",
+          "name": "structure"
         }
       ],
       "module": "tropoi.representation.visual.viewer_server",

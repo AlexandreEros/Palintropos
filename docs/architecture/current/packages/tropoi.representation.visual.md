@@ -196,7 +196,7 @@ flowchart LR
     n_tropoi_orepresentation_ovisual_oswe -.->|1| p_tropoi_otemporal_otendencies
     n_tropoi_orepresentation_ovisual_oterrain -->|1| p_tropoi_ospatial_otransforms
     n_tropoi_orepresentation_ovisual_oviewer__fields -->|3| p_tropoi_orepresentation_oarchive
-    n_tropoi_orepresentation_ovisual_oviewer__fields -->|3| p_tropoi_orepresentation_odiagnostics
+    n_tropoi_orepresentation_ovisual_oviewer__fields -->|4| p_tropoi_orepresentation_odiagnostics
     n_tropoi_orepresentation_ovisual_oviewer__fields -->|1| p_tropoi_ospatial
     n_tropoi_orepresentation_ovisual_oviewer__fields -->|2| p_tropoi_ospatial_otransforms
     n_tropoi_orepresentation_ovisual_oviewer__server -.->|1| p_tropoi_ophysics
@@ -433,21 +433,30 @@ classDiagram
     c_tropoi_orepresentation_ovisual_oviewer__fields_oFrameProvider : +#95;#95;init#95;#95;()
     c_tropoi_orepresentation_ovisual_oviewer__fields_oFrameProvider : +#95;context()
     c_tropoi_orepresentation_ovisual_oviewer__fields_oFrameProvider : +#95;horizontal#95;slice()
+    c_tropoi_orepresentation_ovisual_oviewer__fields_oFrameProvider : +#95;native#95;grid()
     c_tropoi_orepresentation_ovisual_oviewer__fields_oFrameProvider : +#95;pe#95;slice()
     c_tropoi_orepresentation_ovisual_oviewer__fields_oFrameProvider : +#95;read()
     c_tropoi_orepresentation_ovisual_oviewer__fields_oFrameProvider : +#95;result()
+    c_tropoi_orepresentation_ovisual_oviewer__fields_oFrameProvider : +#95;saved#95;index()
     c_tropoi_orepresentation_ovisual_oviewer__fields_oFrameProvider : +#95;scalar()
+    c_tropoi_orepresentation_ovisual_oviewer__fields_oFrameProvider : +#95;slab#95;point()
+    c_tropoi_orepresentation_ovisual_oviewer__fields_oFrameProvider : +#95;structure#95;context()
     c_tropoi_orepresentation_ovisual_oviewer__fields_oFrameProvider : +#95;terrain#95;lm()
+    c_tropoi_orepresentation_ovisual_oviewer__fields_oFrameProvider : +column()
     c_tropoi_orepresentation_ovisual_oviewer__fields_oFrameProvider : +radius
+    c_tropoi_orepresentation_ovisual_oviewer__fields_oFrameProvider : +section()
     c_tropoi_orepresentation_ovisual_oviewer__fields_oFrameProvider : +slice()
     c_tropoi_orepresentation_ovisual_oviewer__fields_oFrameProvider : +terrain()
+    c_tropoi_orepresentation_ovisual_oviewer__fields_oFrameProvider : +zonal#95;mean()
     class c_tropoi_orepresentation_ovisual_oviewer__server_oViewerServer["ViewerServer (representation.visual.viewer#95;server)"]
     c_tropoi_orepresentation_ovisual_oviewer__server_oViewerServer : +#95;#95;init#95;#95;()
     c_tropoi_orepresentation_ovisual_oviewer__server_oViewerServer : external base http.server.ThreadingHTTPServer
     class c_tropoi_orepresentation_ovisual_oviewer__server_oViewerSession["ViewerSession (representation.visual.viewer#95;server)"]
     c_tropoi_orepresentation_ovisual_oviewer__server_oViewerSession : +#95;#95;init#95;#95;()
+    c_tropoi_orepresentation_ovisual_oviewer__server_oViewerSession : +#95;cached()
     c_tropoi_orepresentation_ovisual_oviewer__server_oViewerSession : +diagnostic()
     c_tropoi_orepresentation_ovisual_oviewer__server_oViewerSession : +frame()
+    c_tropoi_orepresentation_ovisual_oviewer__server_oViewerSession : +structure()
     class c_tropoi_orepresentation_ovisual_oviewer__server_o__Handler["#95;Handler (representation.visual.viewer#95;server)"]
     c_tropoi_orepresentation_ovisual_oviewer__server_o__Handler : +#95;reply()
     c_tropoi_orepresentation_ovisual_oviewer__server_o__Handler : +do#95;GET()

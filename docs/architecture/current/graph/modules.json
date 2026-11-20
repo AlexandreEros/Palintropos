@@ -927,6 +927,22 @@
       "scopes": [
         "module"
       ],
+      "source": "tropoi.representation.diagnostics.pe_structure",
+      "target": "tropoi.representation.diagnostics.held_suarez_sections"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.representation.diagnostics.pe_structure",
+      "target": "tropoi.representation.diagnostics.pe_levels"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
       "source": "tropoi.representation.diagnostics.pe_surfaces",
       "target": "tropoi.representation.diagnostics.pe_levels"
     },
@@ -1740,6 +1756,14 @@
       ],
       "source": "tropoi.representation.visual.viewer_fields",
       "target": "tropoi.representation.diagnostics.pe_levels"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.representation.visual.viewer_fields",
+      "target": "tropoi.representation.diagnostics.pe_structure"
     },
     {
       "kind": "imports",
@@ -4385,6 +4409,7 @@
       "is_package": false,
       "path": "tropoi/representation/archive/local_resource.py",
       "stdlib_imports": [
+        "ntpath",
         "pathlib"
       ],
       "third_party_imports": []
@@ -4575,6 +4600,20 @@
         "__future__",
         "collections",
         "dataclasses"
+      ],
+      "third_party_imports": [
+        "numpy"
+      ]
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.representation.diagnostics.pe_structure",
+      "is_package": false,
+      "path": "tropoi/representation/diagnostics/pe_structure.py",
+      "stdlib_imports": [
+        "__future__",
+        "math"
       ],
       "third_party_imports": [
         "numpy"
