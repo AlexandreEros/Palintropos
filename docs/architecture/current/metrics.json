@@ -159,14 +159,14 @@
         "sha256": "1dcfeb9400fd06152e45cd607c8648f54d8fa8f41c02b0fcd8ee9310a03c28a4"
       }
     ],
-    "source_lines_embedded": 18552
+    "source_lines_embedded": 18554
   },
   "call_graph": {
     "call_sites": {
       "builtin": 4034,
       "external": 2648,
       "internal": 3162,
-      "unresolved": 4177
+      "unresolved": 4179
     },
     "edges_by_kind": {
       "call": 1411,
@@ -1252,7 +1252,7 @@
     "package": "tropoi",
     "src": "src",
     "working_tree": {
-      "base_commit": "9ecacba96476e85e8ab54cf67c9053a0caed1e95",
+      "base_commit": "ee1899bd4adf9003b2dae7562d752dc1fd891360",
       "generator": {
         "changes": [],
         "files": {
@@ -1366,7 +1366,7 @@
           "src/tropoi/representation/visual/timeline.py": "daf63d0946317b3930cae59770a3c264e43018420d631db55cd82fe6c786d83e",
           "src/tropoi/representation/visual/viewer_assets/index.html": "e53c7a80f5872ac408ac69c7ccb824f614313e01552f9d17377dbed4d83f8c81",
           "src/tropoi/representation/visual/viewer_fields.py": "90979ae73d0ac2c591927e00672f97faf801b9dc1f7bcb88731698de393edc1f",
-          "src/tropoi/representation/visual/viewer_server.py": "9f783b036913c4d390d78d03e4e6fcf33445697d238430e0483774bbab3df8b8",
+          "src/tropoi/representation/visual/viewer_server.py": "97f877a7e81cdf1d830b36440d219fa1d6e8bc8b51ec31a8d7733948da46be17",
           "src/tropoi/representation/visual/views.py": "102f42bbb2598b320652c1e080e91f56faa8b07c772101643a5a1be0d8952891",
           "src/tropoi/representation/visual/vorticity_viewer.py": "30c3f401cc653cc7856f829bbd5427fe2178cd425d5124f29bf2297d289d04f3",
           "src/tropoi/run/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
@@ -1469,7 +1469,7 @@
           "src/tropoi/temporal/tendencies/primitive_equations.py": "848c6fe9406a7c1c465c0aa9459760b01c542164c8cc9395797a3c4a60793e52",
           "src/tropoi/temporal/tendencies/shallow_water.py": "7ae521f2378824e89f88bc467fc99321d1ef4224b037c865137e076a601da3c8"
         },
-        "sha256": "21a8a8e57dca95f4129fc6e6c524d49d0240cfa53a9548cde19ac7dd25c65ff3",
+        "sha256": "54a79878d4ed49436e0abffe927d824f8eabbcaf574a18ddb341084b3f765203",
         "status": "clean"
       }
     }
