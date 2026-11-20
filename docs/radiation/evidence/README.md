@@ -51,3 +51,11 @@ and the [preservation record](../../validation/run_archive_2026-11-12/README.md)
   [dev-thai-ben1-ck](dev-thai-ben1-ck-heated-T21L40-809ffdd/summary.json). They complete and
   close their budgets, but the unsponged top layers reach 293 and 51 m/s
   (`state_diagnostics.json`); not usable aloft.
+- Issue #47, vertical structure (`vertical_coherence.json` in each of the four runs above):
+  the Ben 2 stellar run with `thermal_source="layer-linear"`
+  ([dev-thai-ben2-ck-layer-linear](dev-thai-ben2-ck-heated-T21L40-9b2060c-layer-linear/summary.json))
+  and its control at the same commit with the historical source
+  ([dev-thai-ben2-ck-linear](dev-thai-ben2-ck-heated-T21L40-9b2060c-linear/summary.json),
+  bit-identical to the `809ffdd` run). The new source removes the alternating temperature
+  component; the loss of upper-level wind coherence remains and comes with stellar absorption
+  ([OPACITY.md](../OPACITY.md) §6).

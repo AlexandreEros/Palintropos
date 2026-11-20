@@ -520,6 +520,10 @@ def thai_dry_dev(case: str, experiment_id: Optional[str] = None, *, days: int = 
     approximation: absorption only, NO Rayleigh scattering (its
     flux-weighted optical depth for this star is 0.008 and 0.005).
 
+    The stellar-absorbing Ben 2 preset centers the linear longwave source on
+    each layer's Planck flux. This retains layer-scale thermal feedback on
+    the stretched grid (issue #47).
+
     NOT matched: T21 L40 to 4 Pa with del^8 and no sponge; a one-layer slab
     of 2e6 J m^-2 K^-1 (the UM's); the FHZ06 dry boundary layer of the Mars
     development runs in place of each THAI model's own; constant c_p;
@@ -552,6 +556,7 @@ def thai_dry_dev(case: str, experiment_id: Optional[str] = None, *, days: int = 
         dt=dt, days=days,
         longwave={"kind": "correlated_k", "tables": [dict(entry["longwave"])],
                   "mass_fractions": {composition.label: 1.0}, "bounds": "error"},
+        thermal_source="layer-linear" if case == "ben2" and stellar_absorption else "linear",
         shortwave=shortwave,
         insolation={"kind": "tidally_locked", "stellar_constant": 900.0},
         convection=None,
