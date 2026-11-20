@@ -94,8 +94,7 @@ class ViewerSession:
         self.cache = OrderedDict()
         self.bytes_used = 0
         self.lock = threading.Lock()
-        self.provider = None
-        self.active = None
+        self.providers = {}
 
     def frame(self, run, query):
         manifest = self.manifests[run]
@@ -123,22 +122,33 @@ class ViewerSession:
             provider.slice(time, field, coordinate, value)))
 
     def _cached(self, run, key, evaluate):
-        """Serialize evaluation; one byte-bounded LRU cache serves every view."""
+        """One byte-bounded LRU cache serves every view.
+
+        Providers only read their archive, so evaluation runs outside the lock:
+        a long zonal mean does not block map requests. Frame evaluation keeps
+        the lock, because the optional CUDA synthesis object is not thread-safe.
+        """
         from tropoi.representation.visual.viewer_fields import FrameProvider
 
         with self.lock:
             if key in self.cache:
                 self.cache.move_to_end(key)
                 return self.cache[key]
-            if self.active != run:
-                self.provider = FrameProvider(self.roots[run], self.manifests[run], backend=self.backend)
-                self.active = run
-            data = evaluate(self.provider)
-            while self.cache and self.bytes_used + len(data) > self.cache_bytes:
-                self.bytes_used -= len(self.cache.popitem(last=False)[1])
-            if len(data) <= self.cache_bytes:
-                self.cache[key] = data
-                self.bytes_used += len(data)
+            provider = self.providers.get(run)
+            if provider is None:
+                provider = self.providers[run] = FrameProvider(self.roots[run], self.manifests[run],
+                                                               backend=self.backend)
+            if key[0] != "structure":
+                data = evaluate(provider)
+        if key[0] == "structure":
+            data = evaluate(provider)
+        with self.lock:
+            if key not in self.cache:
+                while self.cache and self.bytes_used + len(data) > self.cache_bytes:
+                    self.bytes_used -= len(self.cache.popitem(last=False)[1])
+                if len(data) <= self.cache_bytes:
+                    self.cache[key] = data
+                    self.bytes_used += len(data)
             return data
 
     def structure(self, run, query):

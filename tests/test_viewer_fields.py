@@ -199,3 +199,24 @@ def test_cuda_selection_matches_reference_if_available():
                       ("u", 1e-10), ("v", 1e-10)):
         np.testing.assert_allclose(result[key], reference[key], rtol=1e-12, atol=atol)
     np.testing.assert_array_equal(result["mask"], reference["mask"])
+
+
+def test_mars_column_and_section_follow_the_terrain():
+    """Columns and sections over prepared terrain use the same datum as the map."""
+    if not MARS.is_dir():
+        pytest.skip(f"Missing archive: {MARS}")
+    m = viewer_manifest(MARS)
+    provider = FrameProvider(MARS, m)
+    last = len(m["time_axes"]["snapshots"]["values"]) - 1
+    peak = np.unravel_index(provider.terrain.argmax(), provider.terrain.shape)
+    lat, lon = float(provider.lat[peak[0]]) + 0.7, float(provider.lon[peak[1]]) + 0.3
+    column = provider.column(last, lat, lon, snap=False)
+    terrain = synthesize_latlon(provider._terrain_lm, [lat], [lon % 360])[0, 0]
+    assert column["surface_height"] == pytest.approx(terrain, abs=1e-9) and terrain > 1000
+    heights = np.array(column["geopotential_height"])
+    assert heights[-1] > column["surface_height"] and np.all(np.diff(heights) < 0)
+    section = provider.section(last, "meridional", lon)
+    row = int(np.abs(np.array(section["points"]) - lat).argmin())
+    expected = synthesize_latlon(provider._terrain_lm, [section["points"][row]], [lon % 360])[0, 0]
+    assert section["surface_height"][row] == pytest.approx(expected, abs=1e-9)
+    assert all(np.array(section["geopotential_height"])[-1] > np.array(section["surface_height"]))

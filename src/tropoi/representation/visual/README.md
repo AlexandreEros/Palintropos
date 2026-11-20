@@ -87,8 +87,10 @@ geopotential over g at the hydrostatic level position. Every plot names its
 archive directory and config hash, and notes that extrema between saved states
 are not represented. Sections and reductions are offered only for pure-σ PE
 archives (σ from 0 to 1). Zonal reductions also need a Gaussian latitude–longitude
-state grid. A long average holds the provider while it runs (about 0.2 s per
-T21L40 state).
+state grid. Averaging costs about 0.2 s per T21L40 state and 2 s per T42L20
+state read from a Windows drive under WSL. It runs outside the session lock,
+so maps stay responsive. A request superseded in the browser still finishes
+on the provider, and its result is cached.
 
 CPU is the default. `--backend cuda` enables CuPy scalar synthesis for eligible
 horizontal fields with CPU fallback. Wind and PE column evaluation use the
