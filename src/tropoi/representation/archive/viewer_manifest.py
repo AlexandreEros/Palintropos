@@ -69,6 +69,13 @@ def _operations(fields, vertical, physics, diagnostics):
             ops["pressure"] = reconstructed
             if physics.get("gravity") and (physics.get("r_dry") or physics.get("gas_constant")):
                 ops["geopotential_height"] = reconstructed
+                # Columns, sections and native-grid zonal reductions need the
+                # full column and a pure-sigma vertical from 0 to 1.
+                interfaces = vertical.get("interfaces") or []
+                if (interfaces and interfaces[0] == 0 and interfaces[-1] == 1
+                        and {"temperature", "zeta", "delta"} <= names):
+                    ops["structure"] = ["column", "meridional_section", "zonal_section",
+                                        "zonal_mean", "mass_streamfunction"]
     for kind in ("series", "zonal_section"):
         keys = [key for key, product in diagnostics.items() if product["kind"] == kind]
         if keys:
@@ -194,6 +201,12 @@ def viewer_manifest(directory):
     output["operations"] = _operations(output["fields"], vertical, output["physics"], products)
     if "terrain" in output["unavailable"]:
         output["operations"].pop("geopotential_height", None)
+    structure = output["operations"].get("structure")
+    if structure and output["geometry"].get("grid") != "latlon":
+        # Zonal reductions use Gauss–Legendre latitudes and equally spaced longitudes.
+        output["operations"]["structure"] = [op for op in structure if op not in
+                                             ("zonal_mean", "mass_streamfunction")]
+        output["unavailable"]["zonal_mean"] = "The state grid has no Gaussian latitude–longitude quadrature"
     if isinstance(storage, RadiativeStorage) and storage.run_config.get("surface") is not None:
         missing = sorted(set(storage.states) - storage.surfaces.keys())
         if missing:

@@ -84,3 +84,30 @@ def test_core_diagnostic_and_invalid_request(live):
     with pytest.raises(HTTPError) as exc:
         fetch(live.url + "frame?time=4320&field=temperature")
     assert exc.value.code == 400
+
+
+def test_structure_routes_on_ben2_and_statistics_core(live):
+    manifest = json.loads(fetch(live.url + "manifest"))
+    assert "mass_streamfunction" in manifest["operations"]["structure"]
+    last = len(manifest["time_axes"]["snapshots"]["values"]) - 1
+    column = json.loads(fetch(live.url + f"structure?kind=column&time={last}&lat=-19.4&lon=-79"))
+    assert column["sampling"] == "native Gaussian grid node" and column["longitude"] == 281.25
+    assert len(column["temperature"]) == len(column["sigma"]) == 40
+    # Slab Tₛ and the lowest-level air temperature are separate quantities.
+    assert column["surface_temperature"]["value"] != column["lowest_air"]["value"]
+    assert column["lowest_air"]["level"] == 39
+    section = json.loads(fetch(live.url + f"structure?kind=zonal&time={last}&at=0"))
+    assert len(section["points"]) == 181 and len(section["u"]) == 40 and len(section["u"][0]) == 181
+    np.testing.assert_allclose(np.array(section["u"])[:, 0], np.array(section["u"])[:, -1], atol=1e-9)
+    mean = json.loads(fetch(live.url + f"structure?kind=zonal_mean&first={last-1}&last={last}"))
+    assert mean["sample"]["count"] == 2 and len(mean["streamfunction"]) == 41
+    assert np.all(np.array(mean["streamfunction"][0]) == 0)
+    assert live.session.bytes_used <= live.session.cache_bytes
+    core = live.url.removesuffix("0/") + "4/"
+    for url in [core + "structure?kind=column&time=0&lat=0&lon=0",
+                live.url + "structure?kind=zonal_mean&first=3&last=2",
+                live.url + "structure?kind=column&time=0&lat=nan&lon=0",
+                live.url + "structure?kind=meridional&time=0&at=0&at=1"]:
+        with pytest.raises(HTTPError) as exc:
+            fetch(url)
+        assert exc.value.code == 400

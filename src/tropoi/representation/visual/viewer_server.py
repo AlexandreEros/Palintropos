@@ -98,8 +98,6 @@ class ViewerSession:
         self.active = None
 
     def frame(self, run, query):
-        from tropoi.representation.visual.viewer_fields import FrameProvider
-
         manifest = self.manifests[run]
         field = query["field"]
         fields = manifest["fields"]
@@ -121,20 +119,53 @@ class ViewerSession:
             if not value.is_integer() or not 0 <= value < len(levels):
                 raise ValueError("Native level outside saved axis")
         key = (run, time, field, coordinate, value)
+        return self._cached(run, key, lambda provider: encode_frame(
+            provider.slice(time, field, coordinate, value)))
+
+    def _cached(self, run, key, evaluate):
+        """Serialize evaluation; one byte-bounded LRU cache serves every view."""
+        from tropoi.representation.visual.viewer_fields import FrameProvider
+
         with self.lock:
             if key in self.cache:
                 self.cache.move_to_end(key)
                 return self.cache[key]
             if self.active != run:
-                self.provider = FrameProvider(self.roots[run], manifest, backend=self.backend)
+                self.provider = FrameProvider(self.roots[run], self.manifests[run], backend=self.backend)
                 self.active = run
-            data = encode_frame(self.provider.slice(time, field, coordinate, value))
+            data = evaluate(self.provider)
             while self.cache and self.bytes_used + len(data) > self.cache_bytes:
                 self.bytes_used -= len(self.cache.popitem(last=False)[1])
             if len(data) <= self.cache_bytes:
                 self.cache[key] = data
                 self.bytes_used += len(data)
             return data
+
+    def structure(self, run, query):
+        """Column, section or zonal reduction as JSON (see FrameProvider)."""
+        kind = query.get("kind")
+        operation = {"column": "column", "meridional": "meridional_section", "zonal": "zonal_section",
+                     "zonal_mean": "zonal_mean"}.get(kind)
+        if operation not in self.manifests[run]["operations"].get("structure", []):
+            raise ValueError("This archive does not offer that vertical-structure product")
+
+        def number(name):
+            value = float(query[name])
+            if not math.isfinite(value):
+                raise ValueError("Coordinates must be finite")
+            return value
+
+        if kind == "column":
+            args = (int(query["time"]), number("lat"), number("lon"), query.get("snap", "1") == "1")
+            evaluate = lambda provider: _json(provider.column(*args))
+        elif kind == "zonal_mean":
+            # One reduction yields [u], [v], [T] and the mass streamfunction.
+            args = (int(query["first"]), int(query["last"]))
+            evaluate = lambda provider: _json(provider.zonal_mean(*args))
+        else:
+            args = (int(query["time"]), kind, number("at"))
+            evaluate = lambda provider: _json(provider.section(*args))
+        return self._cached(run, ("structure", run, kind, args), evaluate)
 
     def diagnostic(self, run, field):
         product = self.manifests[run]["diagnostics"].get(field)
@@ -195,7 +226,7 @@ class _Handler(BaseHTTPRequestHandler):
             if not 0 <= run < len(session.roots):
                 raise ValueError("Unknown capsule")
             entry = parts[3] or "index.html"
-            query = parse_qs(url.query, strict_parsing=True, max_num_fields=4)
+            query = parse_qs(url.query, strict_parsing=True, max_num_fields=6)
             if any(len(values) != 1 for values in query.values()):
                 raise ValueError("Repeated selection parameter")
             query = {k: values[0] for k, values in query.items()}
@@ -208,6 +239,8 @@ class _Handler(BaseHTTPRequestHandler):
             elif entry == "frame":
                 data = session.frame(run, query)
                 mime = "application/octet-stream"
+            elif entry == "structure":
+                data = session.structure(run, query)
             elif entry == "diagnostic":
                 data = _json(session.diagnostic(run, query["field"]))
             elif entry in server.assets:

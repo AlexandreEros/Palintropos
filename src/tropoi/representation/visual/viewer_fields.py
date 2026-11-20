@@ -11,6 +11,8 @@ from tropoi.representation.archive.pe_context import PEColumnContext
 from tropoi.representation.archive.prepared_terrain import load_prepared_terrain
 from tropoi.representation.diagnostics.held_suarez_sections import state_grid
 from tropoi.representation.diagnostics.pe_levels import reconstruct_levels
+from tropoi.representation.diagnostics.pe_structure import (
+    ZonalMeanAccumulator, column, mass_streamfunction, vertical_section)
 from tropoi.representation.diagnostics.pe_surfaces import pressure_surface
 from tropoi.spatial.transforms.host_synthesis import synthesize_latlon, synthesize_wind_latlon
 from tropoi.spatial.williamson5 import W5_PROJECTION_POLICY
@@ -229,3 +231,133 @@ class FrameProvider:
         u, v = fields["u"], fields["v"]
         values = np.hypot(u, v) if field in ("wind", "wind_speed") else fields[field]
         return self._result(values, fields["geopotential_height"], mask, (u, v))
+
+    # ------------------------------------------------------------------
+    # Linked vertical structure (PE only). Scientific reductions use the
+    # run's own Gaussian state grid; columns and sections are exact
+    # band-limited point synthesis, never values read off the 2° mesh.
+    # ------------------------------------------------------------------
+
+    def _structure_context(self):
+        if self.solver != "pe" or "structure" not in self.manifest["operations"]:
+            raise ValueError("This archive has no atmospheric column evaluator")
+        return self._context
+
+    def _saved_index(self, time):
+        times = self.manifest["time_axes"].get("snapshots", {}).get("values", [])
+        if isinstance(time, bool) or not isinstance(time, (int, np.integer)) or not 0 <= time < len(times):
+            raise ValueError("Saved time index is out of range")
+        return int(time), times[time]
+
+    def _native_grid(self):
+        return state_grid(self.geometry["nlat"], self.geometry["nlon"])[:2]
+
+    def _slab_point(self, seconds, lat, lon, node):
+        """Slab temperature at a native node, or bilinear between nodes."""
+        axis = self.manifest["time_axes"].get("slab")
+        if not axis or seconds not in axis["values"]:
+            return None
+        values = self._read("slab", axis["values"].index(seconds))
+        nlat, nlon = self.geometry["nlat"], self.geometry["nlon"]
+        if node is not None:
+            value = float(np.asarray(values).reshape(nlat, nlon)[node])
+            sampling = "slab value at the native grid node"
+        else:
+            value = float(_slab_map(values, self.geometry, np.array([lat]), np.array([lon]))[0, 0])
+            sampling = "bilinear between native slab nodes (periodic in longitude)"
+        return dict(value=value, units="K", sampling=sampling,
+                    definition="Slab surface temperature Tₛ, a stored grid-point prognostic")
+
+    def column(self, time, lat, lon, snap=True):
+        """Native-level profile at one geographic point and saved time."""
+        context = self._structure_context()
+        index, seconds = self._saved_index(time)
+        lat, lon = float(lat), float(lon) % 360.0
+        node = None
+        if snap:
+            grid_lat, grid_lon = self._native_grid()
+            i = int(np.abs(grid_lat - lat).argmin())
+            j = int(np.abs((grid_lon - lon + 180) % 360 - 180).argmin())
+            lat, lon, node = float(grid_lat[i]), float(grid_lon[j]), (i, j)
+        profile = column(self._read("state", index), context, lat, lon)
+        k = context.nlev - 1
+        result = {key: (value.tolist() if isinstance(value, np.ndarray) else value)
+                  for key, value in profile.items()}
+        result.update(
+            time=seconds, sampling=("native Gaussian grid node" if node is not None else
+                                    "exact band-limited synthesis at the requested point"),
+            lowest_air=dict(value=float(profile["temperature"][k]), level=k, sigma=float(profile["sigma"][k]),
+                            pressure=float(profile["pressure"][k]),
+                            height=float(profile["geopotential_height"][k]),
+                            definition="Air temperature at the lowest full level, not a surface temperature"),
+            surface_temperature=(self._slab_point(seconds, lat, lon, node)
+                                 if "surface_temperature" in self.manifest["fields"] else None),
+            conventions=dict(
+                pressure="p_k = σ_k pₛ at the nominal full level (Pa)",
+                geopotential_height=("Z_k = Φ_k/g, Simmons–Burridge full-level geopotential, absolute, at the "
+                                     "hydrostatic level position σʰ_k (m above the model datum)"),
+                wind="u eastward, v northward (m s⁻¹)"))
+        return result
+
+    def section(self, time, kind, at):
+        """Latitude × level at a longitude, or longitude × level at a latitude."""
+        context = self._structure_context()
+        index, seconds = self._saved_index(time)
+        if kind == "meridional":
+            points = self.lat
+            data = vertical_section(self._read("state", index), context, longitude=at, points=points)
+        elif kind == "zonal":
+            points = np.append(self.lon, 360.0)
+            data = vertical_section(self._read("state", index), context, latitude=at, points=points)
+        else:
+            raise ValueError("Section kind must be meridional or zonal")
+        result = {key: value.tolist() for key, value in data.items()}
+        result.update(kind=kind, at=float(at) % 360.0 if kind == "meridional" else float(at),
+                      points=points.tolist(), time=seconds,
+                      sigma=list(context.full_levels), sigma_interfaces=list(context.sigma_interfaces),
+                      sampling="exact band-limited synthesis on native full levels, 2° horizontal sample spacing")
+        return result
+
+    def zonal_mean(self, first, last):
+        """Equal-weight zonal means of saved states first..last on the native grid."""
+        context = self._structure_context()
+        if "zonal_mean" not in self.manifest["operations"]["structure"]:
+            raise ValueError(self.manifest["unavailable"].get("zonal_mean", "No zonal reduction"))
+        first, start = self._saved_index(first)
+        last, end = self._saved_index(last)
+        if last < first:
+            raise ValueError("The last saved time precedes the first")
+        if last - first + 1 > 400:
+            raise ValueError("Select at most 400 saved states for one mean")
+        accumulator = ZonalMeanAccumulator(context, self.geometry["nlat"], self.geometry["nlon"])
+        for index in range(first, last + 1):
+            accumulator.add(self._read("state", index))
+        means = accumulator.means()
+        interfaces = context.sigma_interfaces
+        psi = mass_streamfunction(means["ps_v"], interfaces, accumulator.lat_deg,
+                                  context.radius_m, context.gravity)
+        times = self.manifest["time_axes"]["snapshots"]["values"][first:last + 1]
+        steps = np.diff(times)
+        intervals = {str(float(step)): int(count) for step, count in zip(*np.unique(steps, return_counts=True))}
+        order = slice(None, None, -1)                       # south to north, as the display mesh
+        result = {key: means[key][:, order].tolist() for key in ("u", "v", "temperature")}
+        result.update(
+            lat=accumulator.lat_deg[order].tolist(), sigma=list(context.full_levels),
+            sigma_interfaces=list(interfaces), streamfunction=psi[:, order].tolist(),
+            surface_pressure=means["surface_pressure"][order].tolist(),
+            column_flux_residual=dict(
+                max_abs=float(np.abs(psi[-1]).max()), max_abs_interior=float(np.abs(psi).max()),
+                note="ψ at σ = 1 is the whole-column northward mass flux; not forced to zero"),
+            sample=dict(rule="equal-weight mean of every saved state from the first to the last selection",
+                        times=times, count=len(times), intervals_seconds=intervals,
+                        cadence=("single state" if len(times) == 1 else
+                                 "regular" if len(intervals) == 1 else "irregular")),
+            grid=dict(latitudes=f"{len(accumulator.lat_deg)} Gauss–Legendre nodes, south to north",
+                      longitudes=f"{len(accumulator.lon_deg)} equally spaced, plain mean",
+                      source=accumulator.latitude_source),
+            definitions=dict(
+                zonal_mean="[x] is the plain mean over the native longitudes at each latitude and full level",
+                streamfunction=("ψ(φ, σ_{k+½}) = 2πa cos φ / g · Σ_{j≤k} [pₛ v_j] Δσ_j, integrated downward from "
+                                "ψ = 0 at σ = 0; kg s⁻¹, positive for northward mass transport above the interface. "
+                                "[pₛ v] is formed per state before the longitude mean")))
+        return result
