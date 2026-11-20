@@ -135,7 +135,12 @@ class OfflinePage:
     """
 
     def __init__(self, browser: str, *, width: int = 1280, height: int = 1000,
-                 timeout: float = 60.0):
+                 timeout: float = 60.0, loopback_port: int | None = None):
+        # Live-viewer tests allow exactly one numerical loopback endpoint.
+        # The standalone-file tests retain full DevTools offline emulation.
+        self.loopback_port = loopback_port
+        bypass = "<-loopback>" if loopback_port is None else f"<-loopback>;127.0.0.1:{int(loopback_port)}"
+        resolver = "MAP * ~NOTFOUND" if loopback_port is None else "MAP * ~NOTFOUND, EXCLUDE 127.0.0.1"
         self.timeout = timeout
         self.profile = tempfile.mkdtemp(prefix="tropoi-cdp-")
         self.proc = subprocess.Popen(
@@ -145,8 +150,8 @@ class OfflinePage:
              "--disable-background-networking", "--disable-sync",
              "--disable-component-update", "--no-sandbox",
              "--use-angle=swiftshader", "--enable-unsafe-swiftshader",
-             "--proxy-server=127.0.0.1:9", "--proxy-bypass-list=<-loopback>",
-             "--host-resolver-rules=MAP * ~NOTFOUND",
+             "--proxy-server=127.0.0.1:9", f"--proxy-bypass-list={bypass}",
+             f"--host-resolver-rules={resolver}",
              f"--window-size={width},{height}", "about:blank"],
             stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         self.ws = None
@@ -186,8 +191,9 @@ class OfflinePage:
         self.ws = _WebSocket(page["webSocketDebuggerUrl"], self.timeout)
         for domain in ("Page", "Runtime", "Log", "Network"):
             self.call(f"{domain}.enable")
-        self.call("Network.emulateNetworkConditions", offline=True, latency=0,
-                  downloadThroughput=-1, uploadThroughput=-1)
+        if self.loopback_port is None:
+            self.call("Network.emulateNetworkConditions", offline=True, latency=0,
+                      downloadThroughput=-1, uploadThroughput=-1)
         return self
 
     def __exit__(self, *exc):

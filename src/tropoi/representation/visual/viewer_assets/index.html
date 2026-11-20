@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Palintropos · Archive viewer</title>
+  <link rel="stylesheet" href="style.css">
+  <script type="module" src="app.js"></script>
+</head>
+<body>
+  <header class="masthead"><strong>Palintropos</strong><span>Archive viewer</span></header>
+  <main>
+    <div class="run-heading">
+      <div><h1 id="run-title">Opening archive…</h1><p id="run-facts"></p></div>
+      <label id="run-picker" hidden>Archive<select id="runs"></select></label>
+    </div>
+    <p id="notice" role="status" hidden></p>
+    <div id="toolbar" class="toolbar" hidden>
+      <button id="compare" aria-pressed="false">Compare selections</button>
+      <div id="links" class="toggles" hidden>
+        <label><input id="link-time" type="checkbox" checked> Link saved time</label>
+        <label id="link-level-label"><input id="link-level" type="checkbox"> Link level</label>
+        <label><input id="link-color" type="checkbox" checked> Share compatible colour scales</label>
+      </div>
+    </div>
+    <div id="views"></div>
+    <section id="series" hidden>
+      <h2>Recorded series</h2>
+      <div class="series-toolbar"><label>Diagnostic<select id="diagnostic"></select></label>
+        <button id="series-png" disabled>Save PNG</button></div>
+      <p id="series-note" role="status"></p>
+      <canvas id="chart" width="1100" height="440" aria-label="Recorded diagnostic over time"></canvas>
+    </section>
+  </main>
+  <template id="panel">
+    <section class="panel">
+      <div class="panel-heading"><h2></h2><button data-id="png" disabled>Save PNG</button></div>
+      <div class="panel-layout">
+        <div class="controls">
+          <label>Quantity<select data-id="field"></select></label>
+          <div class="record"><span data-id="classification"></span><p data-id="definition"></p></div>
+          <fieldset data-id="timeline"><legend>Saved time</legend>
+            <output data-id="time-label"></output>
+            <input type="range" min="0" value="0" step="1" data-id="time" aria-label="Saved time index">
+            <div class="transport">
+              <button data-id="previous" aria-label="Previous saved time">Previous</button>
+              <button data-id="play">Play</button>
+              <button data-id="next" aria-label="Next saved time">Next</button>
+            </div>
+            <div class="play-options">
+              <label>Speed<select data-id="speed" aria-label="Playback speed">
+                <option value="0.5">0.5×</option><option value="1" selected>1×</option>
+                <option value="2">2×</option><option value="4">4×</option>
+              </select></label>
+              <label class="check"><input type="checkbox" data-id="loop" checked> Loop</label>
+            </div>
+          </fieldset>
+          <fieldset data-id="vertical"><legend>Vertical selection</legend>
+            <label>Coordinate<select data-id="coordinate"></select></label>
+            <label data-id="level-wrap">Native level<select data-id="level"></select></label>
+            <label data-id="value-wrap"><span data-id="value-label"></span>
+              <input data-id="value" type="number" step="any" required></label>
+          </fieldset>
+          <details open><summary>Display</summary>
+            <label data-id="wind-wrap" class="check"><input data-id="winds" type="checkbox"> Wind streamlines</label>
+            <label data-id="light-wrap">Illumination<select data-id="light">
+              <option value="neutral">Neutral display</option>
+              <option value="star">Geometric day and night</option></select></label>
+            <label data-id="exaggeration-wrap">Vertical exaggeration
+              <input data-id="exaggeration" type="number" min="0" max="10000" step="any" value="1"></label>
+            <label data-id="opacity-wrap">Layer opacity
+              <input data-id="opacity" type="range" min="0" max="1" step="0.05" value="0.9"></label>
+          </details>
+        </div>
+        <div class="visual"><p data-id="status" class="status" role="status"></p><div data-id="surface"></div></div>
+      </div>
+    </section>
+  </template>
+</body>
+</html>

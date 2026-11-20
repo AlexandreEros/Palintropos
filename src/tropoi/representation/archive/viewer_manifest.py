@@ -7,6 +7,7 @@ from tropoi.representation.archive.local_resource import resource
 from tropoi.representation.archive.radiative import FORMAT, RadiativeStorage
 from tropoi.representation.archive.schema import COEFFICIENT_FILES, TIME_FILES, SchemaError, StateSchema
 from tropoi.representation.archive.viewer_diagnostics import diagnostics
+from tropoi.representation.visual.quantities import viewer_presentation
 
 
 def _derived_fields(fields, physics, geometry, resources):
@@ -18,10 +19,16 @@ def _derived_fields(fields, physics, geometry, resources):
         fields[name] = dict(kind=q.kind, recipe=name + "/1", inputs=inputs,
                             definition=q.definition, units=q.units, **extra)
 
+    def add_viewer_field(name, inputs, units, **extra):
+        fields[name] = dict(kind="derived", recipe=name + "/1", inputs=inputs, units=units,
+                            definition=viewer_presentation(name, {})["definition"], **extra)
+
     if "zeta" in fields and (geometry.get("reference_radius_m") or geometry.get("dynamical_radius_m")):
         inputs = ["zeta"] + (["delta"] if "delta" in fields else [])
         add("wind", inputs, levels=fields["zeta"]["levels"], basis="east, north")
         add("wind_speed", ["wind"], levels=fields["zeta"]["levels"])
+        for component in ("u", "v"):
+            add_viewer_field(component, ["wind"], "m s^-1", levels=fields["zeta"]["levels"])
     terrain = physics.get("topography")
     if terrain == "williamson5_cone" or "terrain" in resources:
         add("terrain", ["resources.terrain" if "terrain" in resources else "physics.topography"],
@@ -30,6 +37,17 @@ def _derived_fields(fields, physics, geometry, resources):
         add("layer_depth", ["phi", "physics.gravity", "physics.mean_depth_m"])
         if "terrain" in fields or terrain == "flat":
             add("free_surface_height", ["layer_depth"] + (["terrain"] if "terrain" in fields else []))
+            add_viewer_field("free_surface_geopotential", ["free_surface_height", "physics.gravity"], "m^2 s^-2")
+    if "ln_ps" in fields and fields.get("temperature", {}).get("levels"):
+        add_viewer_field("pressure", ["ln_ps", "axes.vertical"], "Pa", levels=True)
+        gas_constant = "r_dry" if physics.get("r_dry") else "gas_constant"
+        if (physics.get("gravity") and physics.get(gas_constant)
+                and (terrain in (None, "flat") or "terrain" in fields)):
+            inputs = ["temperature", "pressure", "physics.gravity", "physics." + gas_constant]
+            if "terrain" in fields:
+                inputs.append("terrain")
+            add_viewer_field("geopotential", inputs, "m^2 s^-2", levels=True)
+            add_viewer_field("geopotential_height", ["geopotential", "physics.gravity"], "m", levels=True)
 
 
 def _operations(fields, vertical, physics, diagnostics):
@@ -45,9 +63,12 @@ def _operations(fields, vertical, physics, diagnostics):
     if vertical and levels:
         ops.update(column=levels, sigma=levels)
         if "ln_ps" in names:
-            ops["pressure"] = levels
+            reconstructed = [key for key in levels if key in
+                             {"temperature", "u", "v", "wind", "wind_speed",
+                              "geopotential_height", "geopotential", "pressure"}]
+            ops["pressure"] = reconstructed
             if physics.get("gravity") and (physics.get("r_dry") or physics.get("gas_constant")):
-                ops["geopotential_height"] = levels
+                ops["geopotential_height"] = reconstructed
     for kind in ("series", "zonal_section"):
         keys = [key for key, product in diagnostics.items() if product["kind"] == kind]
         if keys:
@@ -159,6 +180,17 @@ def viewer_manifest(directory):
             output["unavailable"]["terrain"] = "Prepared terrain is missing"
     if len(storage.times):
         _derived_fields(output["fields"], output["physics"], output["geometry"], output["resources"])
+    if "terrain" in output["fields"]:
+        for prefix in ("w5_cone", "mountain"):
+            lat = output["physics"].get(prefix + "_lat_deg")
+            lon = output["physics"].get(prefix + "_lon_deg")
+            if lat is not None and lon is not None:
+                output["geometry"]["initial_center"] = dict(latitude=lat, longitude=lon)
+                break
+    for key, field in output["fields"].items():
+        field["presentation"] = viewer_presentation(key, field)
+    for key, product in products.items():
+        product["presentation"] = viewer_presentation(key, product, recorded=True)
     output["operations"] = _operations(output["fields"], vertical, output["physics"], products)
     if "terrain" in output["unavailable"]:
         output["operations"].pop("geopotential_height", None)

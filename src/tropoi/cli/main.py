@@ -1260,6 +1260,15 @@ def _cmd_gen(args: argparse.Namespace) -> int:
     return generate_planet.run(args)
 
 
+def _cmd_view(args: argparse.Namespace) -> int:
+    from tropoi.representation.visual.viewer_server import serve
+    try:
+        serve(args.capsules, port=args.port, open_browser=not args.no_browser, backend=args.backend)
+    except (KeyError, ValueError, OSError, OverflowError) as err:
+        return _error(str(err))
+    return 0
+
+
 def _cmd_recompile(args: argparse.Namespace) -> int:
     return clear_cache.run(args)
 
@@ -1339,6 +1348,14 @@ def build_parser() -> argparse.ArgumentParser:
     scenarios_parser = topics.add_parser(
         "scenarios", help="Initial-condition scenarios for 'tropoi run bve --scenario'.")
     scenarios_parser.set_defaults(_handler=_cmd_list_scenarios)
+
+    view_parser = commands.add_parser("view", help="Explore local simulation capsules in a browser.")
+    view_parser.add_argument("capsules", nargs="+", metavar="CAPSULE", help="Allowed capsule directories")
+    view_parser.add_argument("--port", type=int, default=0, help="Loopback port (default: automatically assigned)")
+    view_parser.add_argument("--no-browser", action="store_true", help="Print the private URL without opening a tab")
+    view_parser.add_argument("--backend", choices=["cpu", "cuda"], default="cpu",
+                             help="Spectral evaluation backend (default: CPU)")
+    view_parser.set_defaults(_handler=_cmd_view)
 
     # tropoi inspect RUN_PATH
     inspect_parser = commands.add_parser(
