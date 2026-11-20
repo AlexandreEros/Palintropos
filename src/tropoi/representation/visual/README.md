@@ -78,6 +78,15 @@ table selects that level on the map. Clicking a section moves the cursor.
 | Zonal mean | [u], [v], [T] on native full levels | Run's Gauss–Legendre latitudes and plain mean over its `nlon` longitudes, shared with the Held–Suarez `SectionAccumulator` |
 | Mass streamfunction | ψ(φ, σ_{k+½}) = 2πa cos φ / g · Σ_{j≤k} [pₛ v_j] Δσ_j, from ψ = 0 at σ = 0 | Same grid. [pₛ v] is formed for each state before the longitude mean and is never replaced by [pₛ][v]. kg s⁻¹, positive for northward mass transport above the interface. ψ at σ = 1 is the whole-column flux, reported and not forced to zero |
 
+Sections, zonal means and ψ have their own automatic or fixed colour range,
+separate from the map's, because the two often show different quantities. A
+fixed minimum and maximum belongs to the plotted quantity (T, u, v, p, Z or ψ):
+it stays while you step through saved times or switch between section products,
+and other quantities keep their own setting. The colour bar, the notes and the
+exported PNG label a fixed range, and the notes count the values beyond it,
+which take the end colours. A maximum that does not exceed the minimum falls
+back to the automatic range.
+
 Zonal means and ψ can average every saved state between a first and a last
 selection, with equal weights. The plot states the count and the actual
 cadence. The lowest full level is an air temperature at σ_{K−1}. The column

@@ -152,8 +152,8 @@ function drawSection(canvas, plot, width, ratio) {
     ctx.strokeRect(box.x, Y(edges[plot.selected]), box.w, Y(edges[plot.selected + 1]) - Y(edges[plot.selected]));
   }
   ctx.strokeStyle = INK; ctx.strokeRect(box.x, box.y, box.w, box.h);
-  colorbar(ctx, scale, box, plot.label);
-  return {box, width, height, edges, xEdges, X, Y, rows, cols, kind: "section", log, x0, x1};
+  colorbar(ctx, scale, box, plot.range ? plot.label + " · fixed colour range; values beyond it take the end colours" : plot.label);
+  return {box, width, height, edges, xEdges, X, Y, rows, cols, kind: "section", log, x0, x1, range: scale.range};
 }
 
 function superscript(n) {
@@ -247,6 +247,17 @@ export class StructureView {
       if (c.lat.validity.valid && c.lon.validity.valid && c.lat.value !== "" && c.lon.value !== "")
         links.onCursor({lat: c.lat.valueAsNumber, lon: c.lon.valueAsNumber});
     };
+    // Fixed section colour ranges, kept per plotted quantity (ψ or the field key)
+    // so stepping through saved times keeps one scale. The map has its own.
+    this.ranges = new Map();
+    c["range-mode"].onchange = () => {
+      if (c["range-mode"].value === "fixed" && this.layout?.range) {
+        if (c["range-min"].value === "") c["range-min"].value = String(Number(this.layout.range[0].toPrecision(6)));
+        if (c["range-max"].value === "") c["range-max"].value = String(Number(this.layout.range[1].toPrecision(6)));
+      }
+      this.storeRange();
+    };
+    c["range-min"].onchange = c["range-max"].onchange = () => this.storeRange();
     c.png.onclick = () => this.png();
     c.plot.addEventListener("pointermove", e => this.hover(e));
     c.plot.addEventListener("pointerleave", () => { c.readout.textContent = ""; });
@@ -256,6 +267,47 @@ export class StructureView {
   }
 
   get product() { return this.c.product.value; }
+
+  /** The quantity a colour range belongs to. Columns have no colour scale. */
+  get rangeKey() {
+    return this.product === "column" ? null : this.product === "streamfunction" ? "psi" : this.c.field.value;
+  }
+
+  storeRange() {
+    const c = this.c, key = this.rangeKey;
+    if (!key) return;
+    this.ranges.set(key, {mode: c["range-mode"].value, min: c["range-min"].value, max: c["range-max"].value});
+    this.showRange();
+    this.draw();
+  }
+
+  /** Show the stored range of the plotted quantity; quantities without one are automatic. */
+  loadRange() {
+    const c = this.c, key = this.rangeKey;
+    c["range-fieldset"].hidden = !key;
+    if (!key || key === this.rangeShown) return;
+    this.rangeShown = key;
+    const stored = this.ranges.get(key) ?? {mode: "auto", min: "", max: ""};
+    c["range-mode"].value = stored.mode;
+    c["range-min"].value = stored.min;
+    c["range-max"].value = stored.max;
+    this.showRange();
+  }
+
+  showRange() {
+    const c = this.c, fixed = c["range-mode"].value === "fixed";
+    c["range-wrap"].hidden = !fixed;
+    const invalid = fixed && !this.fixedRange();
+    c["range-max"].setCustomValidity(invalid ? "The maximum must exceed the minimum" : "");
+  }
+
+  /** [min, max] when the plotted quantity has a valid fixed range, otherwise null (automatic). */
+  fixedRange() {
+    const c = this.c;
+    if (!this.rangeKey || c["range-mode"].value !== "fixed") return null;
+    const lo = c["range-min"].valueAsNumber, hi = c["range-max"].valueAsNumber;
+    return Number.isFinite(lo) && Number.isFinite(hi) && hi > lo ? [lo, hi] : null;
+  }
 
   setCursor(cursor) {
     this.cursor = cursor;
@@ -294,6 +346,7 @@ export class StructureView {
     c["axis-wrap"].hidden = product !== "column";
     c["snap-wrap"].hidden = product !== "column";
     c["last-wrap"].hidden = !["zonal_mean", "streamfunction"].includes(product);
+    this.loadRange();
   }
 
   async update() {
@@ -359,6 +412,7 @@ export class StructureView {
       const meridional = product === "meridional";
       return {
         kind: "section", values: d[c.field.value], x: d.points, levels: d.sigma, reference, selected: level,
+      range: this.fixedRange(),
         xRange: meridional ? [-90, 90] : [0, 360], ticks: meridional ? latTicks : lonTicks,
         tickLabel: meridional ? latLabel : t => t + "°E", diverging: field.diverging,
         xLabel: meridional ? "Latitude" : "Longitude (east)", yLabel: "Nominal σ, native full levels (log)",
@@ -373,6 +427,7 @@ export class StructureView {
     return {
       kind: "section", values: streamfunction ? d.streamfunction : d[c.field.value], x: d.lat,
       levels: streamfunction ? d.sigma_interfaces : d.sigma, reference, selected: streamfunction ? null : level,
+      range: this.fixedRange(),
       xRange: [-90, 90], ticks: latTicks, tickLabel: latLabel, diverging: meta.diverging,
       xLabel: "Latitude (" + d.lat.length + " Gauss–Legendre nodes)",
       yLabel: streamfunction ? "Nominal σ at layer interfaces (log)" : "Nominal σ, native full levels (log)",
@@ -433,6 +488,16 @@ export class StructureView {
       this.table(d);
     } else {
       c.table.hidden = true;
+      const range = this.spec.range;
+      if (range) {
+        let below = 0, above = 0, total = 0;
+        for (const row of this.spec.values) for (const v of row) {
+          if (!Number.isFinite(v)) continue;
+          total++; if (v < range[0]) below++; else if (v > range[1]) above++;
+        }
+        rows.push("Fixed colour range " + valueText(range[0]) + " to " + valueText(range[1]) + ": " + below +
+          " of " + total + " plotted values lie below it and " + above + " above it, drawn at the end colours.");
+      }
       if (d.sample) {
         rows.push("Native grid: " + d.grid.latitudes + "; " + d.grid.longitudes + ".");
         if (this.product === "streamfunction") rows.push("Bottom (σ = 1) whole-column flux: max |ψ| " +

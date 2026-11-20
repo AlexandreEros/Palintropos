@@ -59,6 +59,7 @@ Stages 1 and 2 are delivered. PR #58 also promotes a bounded part of Stages 3 an
   - A native-level column profile at the cursor against geopotential height, pressure or nominal σ.
   - Meridional and zonal sections on native levels with log-σ axes.
   - Level selection linked back to the map.
+  - An automatic or fixed colour range for sections, kept per quantity across saved times and used in PNG exports, independent of the map's range.
 - **Delivered from Stage 4:**
   - Native-grid zonal-mean [u], [v] and [T] for one saved state, or an equal-weight mean of a consecutive range.
   - The pure-σ meridional mass streamfunction, as specified above.

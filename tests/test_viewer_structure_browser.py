@@ -157,3 +157,115 @@ def test_phone_width_has_no_horizontal_scroll(browser):
     finally:
         server.shutdown()
         thread.join()
+
+
+def section_state(page):
+    return page.eval("""(() => {const s = viewer.structure, c = s.c;
+        return {mode: c["range-mode"].value, min: c["range-min"].value, max: c["range-max"].value,
+                hidden: c["range-fieldset"].hidden, inputs: c["range-wrap"].hidden ? null : true,
+                drawn: s.layout?.range ?? null, spec: s.spec?.range ?? null, time: s.query?.time,
+                title: s.spec?.title.join(" | ")};})()""")
+
+
+def export_top_colour_rows(page):
+    """Export a PNG and count rows of its centre column drawn in the palette's top colour."""
+    return page.eval("""(async () => {
+        const lut = (await import("./mesh.js")).fieldScale({values: [0]}, {range: [0, 1]}).lut;
+        const blob = HTMLCanvasElement.prototype.toBlob;
+        let canvas, name;
+        HTMLCanvasElement.prototype.toBlob = function (callback, ...rest) { canvas = this; return blob.call(this, callback, ...rest); };
+        const click = HTMLAnchorElement.prototype.click;
+        HTMLAnchorElement.prototype.click = function () { name = this.download; };
+        try {
+          viewer.structure.c.png.click();
+          for (let i = 0; i < 100 && !name; i++) await new Promise(r => setTimeout(r, 50));
+        } finally {
+          HTMLCanvasElement.prototype.toBlob = blob;
+          HTMLAnchorElement.prototype.click = click;
+        }
+        const x = Math.round(canvas.width / 2), pixels = canvas.getContext("2d").getImageData(x, 0, 1, canvas.height).data;
+        const [r, g, b] = lut[255];
+        let rows = 0;
+        for (let y = 0; y < canvas.height; y++) if (pixels[4*y] === r && pixels[4*y+1] === g && pixels[4*y+2] === b) rows++;
+        return {rows, name, width: canvas.width};
+    })()""")
+
+
+def test_section_fixed_colour_range_persists_by_quantity_and_exports(browser):
+    server, thread = serve([A])
+    try:
+        with OfflinePage(browser, width=1400, height=1800, loopback_port=server.server_port) as page:
+            page.call("Page.navigate", url=server.url + "?time=29&lat=-40&lon=90&product=meridional")
+            until(page, READY)
+            structure(page, "field", "temperature")
+            until(page, READY)
+            state = section_state(page)
+            assert state["mode"] == "auto" and not state["hidden"] and state["spec"] is None
+            auto = state["drawn"]
+            map_range = page.eval("viewer.panels[0].view.range")
+            # Choosing a fixed range starts from the automatic one.
+            structure(page, "range-mode", "fixed")
+            state = section_state(page)
+            assert state["inputs"] and [float(state["min"]), float(state["max"])] == [
+                float(f"{auto[0]:.6g}"), float(f"{auto[1]:.6g}")]
+            structure(page, "range-min", 150)
+            structure(page, "range-max", 300)
+            state = section_state(page)
+            assert state["drawn"] == [150, 300] and state["spec"] == [150, 300]
+            notes = page.eval("document.querySelector('[data-s=notes]').innerText")
+            assert "Fixed colour range 150 to 300" in notes
+            # The map keeps its own automatic range.
+            assert page.eval("document.querySelector('[data-id=range-mode]').value") == "auto"
+            assert page.eval("document.querySelector('[data-id=range-wrap]').hidden")
+            assert page.eval("viewer.panels[0].view.range") == map_range
+            # Another saved time keeps the fixed range for the same quantity.
+            set_control(page, "time", 20, "input")
+            until(page, "viewer.structure.query?.time === 20 && " + READY)
+            state = section_state(page)
+            assert "Day 21 " in state["title"]
+            assert (state["mode"], state["min"], state["max"]) == ("fixed", "150", "300")
+            assert state["drawn"] == [150, 300]
+            # Other quantities have their own setting; returning restores this one.
+            structure(page, "field", "u")
+            until(page, READY)
+            state = section_state(page)
+            assert state["mode"] == "auto" and state["spec"] is None and state["inputs"] is None
+            assert state["drawn"][0] == -state["drawn"][1]
+            structure(page, "field", "temperature")
+            until(page, READY)
+            assert section_state(page)["drawn"] == [150, 300]
+            # The same quantity keeps its range in the zonal section; ψ has its own; columns have none.
+            structure(page, "product", "zonal")
+            until(page, READY)
+            assert section_state(page)["drawn"] == [150, 300]
+            structure(page, "product", "streamfunction")
+            until(page, READY)
+            assert section_state(page)["spec"] is None
+            structure(page, "product", "column")
+            until(page, READY)
+            assert section_state(page)["hidden"]
+            structure(page, "product", "meridional")
+            until(page, READY)
+            # An invalid range falls back to automatic and is flagged.
+            structure(page, "range-max", 100)
+            assert section_state(page)["spec"] is None
+            assert not page.eval("document.querySelector('[data-s=range-max]').checkValidity()")
+            # A fixed map range leaves the section unchanged.
+            set_control(page, "range-mode", "fixed")
+            set_control(page, "range-min", 200)
+            set_control(page, "range-max", 210)
+            until(page, "viewer.panels[0].view.range[0] === 200")
+            assert section_state(page)["spec"] is None
+            # PNG export uses the section range: [0, 1] K puts every cell at the top colour.
+            structure(page, "range-min", 0)
+            structure(page, "range-max", 1)
+            fixed = export_top_colour_rows(page)
+            structure(page, "range-mode", "auto")
+            automatic = export_top_colour_rows(page)
+            assert fixed["width"] == automatic["width"] == 1650
+            assert fixed["name"].endswith("-meridional-temperature-t20.png")
+            assert fixed["rows"] > 500 > 100 > automatic["rows"]
+            assert not page.exceptions, page.exceptions
+    finally:
+        server.shutdown()
+        thread.join()

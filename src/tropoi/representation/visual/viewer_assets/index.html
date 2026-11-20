@@ -47,6 +47,16 @@
             <option value="height">Geopotential height Z</option>
             <option value="pressure">Pressure p (log)</option>
             <option value="sigma">Nominal σ (log)</option></select></label>
+          <fieldset data-s="range-fieldset"><legend>Section colours</legend>
+            <label>Colour range<select data-s="range-mode">
+              <option value="auto">Automatic (all plotted values)</option>
+              <option value="fixed">Fixed minimum and maximum</option></select></label>
+            <div data-s="range-wrap" class="pair" hidden>
+              <label>Minimum<input data-s="range-min" type="number" step="any"></label>
+              <label>Maximum<input data-s="range-max" type="number" step="any"></label>
+            </div>
+            <p class="hint">Kept for each quantity across saved times. Independent of the map.</p>
+          </fieldset>
           <label class="check"><input data-s="link-level" type="checkbox" checked> A clicked level selects it on the map</label>
         </div>
         <div class="visual">
