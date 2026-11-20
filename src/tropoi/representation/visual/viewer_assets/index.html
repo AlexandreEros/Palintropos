@@ -24,6 +24,43 @@
       </div>
     </div>
     <div id="views"></div>
+    <section id="structure" class="panel" hidden>
+      <div class="panel-heading"><h2>Vertical structure</h2><button data-s="png" disabled>Save PNG</button></div>
+      <div class="panel-layout">
+        <div class="controls">
+          <label>Product<select data-s="product"></select></label>
+          <label data-s="field-wrap">Quantity<select data-s="field"></select></label>
+          <fieldset><legend>Location</legend>
+            <p class="hint">Click the map or globe, or a section, to move the linked cursor.</p>
+            <div class="pair">
+              <label>Latitude (°N)<input data-s="lat" type="number" min="-90" max="90" step="any" required></label>
+              <label>Longitude (°E)<input data-s="lon" type="number" step="any" required></label>
+            </div>
+            <label data-s="snap-wrap" class="check"><input data-s="snap" type="checkbox" checked> Snap to native grid node</label>
+          </fieldset>
+          <fieldset><legend>Saved time</legend>
+            <label class="check"><input data-s="follow" type="checkbox" checked> Follow selection A</label>
+            <label>First saved state<select data-s="first"></select></label>
+            <label data-s="last-wrap">Last saved state<select data-s="last"></select></label>
+          </fieldset>
+          <label data-s="axis-wrap">Vertical axis<select data-s="axis">
+            <option value="height">Geopotential height Z</option>
+            <option value="pressure">Pressure p (log)</option>
+            <option value="sigma">Nominal σ (log)</option></select></label>
+          <label class="check"><input data-s="link-level" type="checkbox" checked> A clicked level selects it on the map</label>
+        </div>
+        <div class="visual">
+          <p data-s="status" class="status" role="status"></p>
+          <canvas data-s="plot" class="structure-plot" aria-label="Vertical structure plot. Hover for values; click to move the cursor or select a level."></canvas>
+          <div data-s="readout" class="surface-readout" aria-live="polite"></div>
+          <div data-s="notes" class="notes"></div>
+          <table data-s="table" class="levels" hidden>
+            <thead><tr><th>Level</th><th>σ</th><th>p (Pa)</th><th>Z (m)</th><th>T (K)</th><th>u (m s⁻¹)</th><th>v (m s⁻¹)</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
     <section id="series" hidden>
       <h2>Recorded series</h2>
       <div class="series-toolbar"><label>Diagnostic<select id="diagnostic"></select></label>
@@ -68,6 +105,13 @@
               <option value="star">Geometric day and night</option></select></label>
             <label data-id="exaggeration-wrap">Vertical exaggeration
               <input data-id="exaggeration" type="number" min="0" max="10000" step="any" value="1"></label>
+            <label>Colour range<select data-id="range-mode">
+              <option value="auto">Automatic (all valid samples)</option>
+              <option value="fixed">Fixed minimum and maximum</option></select></label>
+            <div data-id="range-wrap" class="pair" hidden>
+              <label>Minimum<input data-id="range-min" type="number" step="any"></label>
+              <label>Maximum<input data-id="range-max" type="number" step="any"></label>
+            </div>
             <label data-id="opacity-wrap">Layer opacity
               <input data-id="opacity" type="range" min="0" max="1" step="0.05" value="0.9"></label>
           </details>

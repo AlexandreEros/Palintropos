@@ -99,6 +99,26 @@ export function globeLines(frame, options, winds) {
     row.push([y,frame.lon[0]+360]);
     path(row,false);
   }
+  // The linked cursor: its meridian and parallel are the planes of the
+  // meridional and zonal sections.
+  const cursor=options.cursor, marks=[];
+  if (cursor && Number.isFinite(cursor.lat) && Number.isFinite(cursor.lon)) {
+    const lon=(cursor.lon+540)%360-180;
+    const meridian=[], parallel=[];
+    for (let lat=-90;lat<=90;lat+=1) meridian.push([lat,lon]);
+    for (let x=0;x<=360;x+=1) parallel.push([cursor.lat,x]);
+    for (const line of [meridian,parallel]) {
+      let previous=null;
+      for (const point of line) {
+        const sample=sampleAt(frame,...point);
+        let r=1.004;
+        if (options.shell && sample) r+=1.004*radiusScale*interpolate(frame.height,sample);
+        const p=direction(...point).map(x=>x*r);
+        if (previous) marks.push(...previous,...p);
+        previous=p;
+      }
+    }
+  }
   for (const line of winds) {
     path(line,true);
     const m=Math.floor(line.length/2), p=line[m], prev=line[m-1];
@@ -108,5 +128,5 @@ export function globeLines(frame, options, winds) {
     const east=dx/speed, north=dy/speed;
     for (const side of [-1,1]) path([p,[p[0]-2*north+side*east,p[1]+(-2*east-side*north)/cos]],true);
   }
-  return [new Float32Array(grids),new Float32Array(flow)];
+  return [new Float32Array(grids),new Float32Array(flow),new Float32Array(marks)];
 }

@@ -71,3 +71,16 @@ output { font-size: .9rem }
   .visual { padding: .5rem }
   .toggles { gap: .5rem }
 }
+.pair { display: grid; grid-template-columns: 1fr 1fr; gap: .5rem; margin-top: .5rem }
+.pair label + label { margin-top: 0 }
+.hint { font-size: .8rem; color: #4a6364; margin-bottom: .4rem }
+.structure-plot { display: block; max-width: 100%; cursor: crosshair }
+.notes { font-size: .82rem; color: #3c5958; line-height: 1.45; margin-top: .5rem }
+.notes p + p { margin-top: .25rem }
+.levels { border-collapse: collapse; font-size: .8rem; margin-top: .8rem; width: 100%; max-width: 52rem }
+.levels th, .levels td { padding: .2rem .5rem; text-align: right; border-bottom: 1px solid #e1e6e0 }
+.levels tbody tr { cursor: pointer }
+.levels tbody tr:hover { background: #eef5f1 }
+.levels tr.selected { background: #ffe8cf }
+#structure { margin-top: .85rem }
+@media(max-width: 720px) { .levels { font-size: .72rem } .levels th, .levels td { padding: .15rem .25rem } }

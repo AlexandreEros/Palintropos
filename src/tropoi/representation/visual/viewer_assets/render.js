@@ -29,12 +29,12 @@ export class SurfaceView {
   constructor(container) {
     this.root=make("div","surface-view");
     this.canvas=make("canvas","globe-canvas");
-    this.canvas.setAttribute("aria-label","Globe. Drag or use the arrow keys to rotate. Scroll or use plus and minus to zoom.");
+    this.canvas.setAttribute("aria-label","Globe. Drag or use the arrow keys to rotate. Scroll or use plus and minus to zoom. Click to select a location.");
     this.canvas.tabIndex=0;
     this.canvas.style.cssText="width:100%;height:clamp(220px,32vw,415px);display:block;touch-action:none;background:#141d24";
     this.map=make("canvas","map-canvas");
     this.map.style.cssText="width:100%;height:auto;display:block";
-    this.map.setAttribute("aria-label","Latitude and longitude map with field colour scale. Click a location to centre the globe.");
+    this.map.setAttribute("aria-label","Latitude and longitude map with field colour scale. Click a location to select it for the column and sections and to centre the globe.");
     const toolbar=make("div","surface-camera");
     const reset=make("button","reset-camera","Reset camera");
     reset.type="button";
@@ -70,7 +70,7 @@ export class SurfaceView {
     this.layout=drawMap(this.map,this.scene,this.mapWidth,Math.min(devicePixelRatio,2));
   }
   draw(frame,opts={}) {
-    const options={radius:1,exaggeration:1,opacity:0.75,shell:false,...opts};
+    const options={radius:1,exaggeration:1,opacity:0.75,shell:false,cursor:this.cursor,...opts};
     options.opacity=clamp(options.opacity,0,1);
     if (options.star && (!Number.isFinite(options.star.latitude) || !Number.isFinite(options.star.longitude))) options.star=null;
     checkFrame(frame,options);
@@ -86,12 +86,30 @@ export class SurfaceView {
     this.range=scale.range;
     this.globe.setScene(this.scene);
     this.root.dataset.backend=this.globe.backend;
-    this.description.textContent=options.star ? "Geometric day/night lighting · star direction marker" : "Neutral display lighting";
+    this.description.textContent=options.star ?
+      "Geometric day/night shading darkens the globe only; colours, map and readouts keep model values" :
+      "Neutral display lighting";
     this.readout.textContent="";
+    this.paintMap();
+  }
+  /** Mark the linked geographic cursor (degrees) on the globe and map. */
+  setCursor(cursor) {
+    this.cursor=cursor;
+    if (!this.scene) return;
+    this.scene.options.cursor=cursor;
+    this.scene.lines=globeLines(this.scene.frame,this.scene.options,this.scene.winds);
+    this.globe.setScene(this.scene);
     this.paintMap();
   }
   installInteraction() {
     const c=this.canvas, globe=this.globe;
+    let pressed=null;
+    this.on(c,"pointerdown",e=>{ pressed=[e.clientX,e.clientY]; });
+    this.on(c,"pointerup",e=>{
+      if (!pressed || Math.hypot(e.clientX-pressed[0],e.clientY-pressed[1])>4 || !this.scene) return;
+      const hit=globe.pick(e.clientX,e.clientY);
+      if (hit) this.onSelect?.({lat:hit.lat,lon:hit.lon});
+    });
     const zoom=f=>{ globe.camera.distance=clamp(globe.camera.distance*f,1.4,9); this.schedule(); };
     let drag=null;
     this.on(c,"pointerdown",e=>{
@@ -135,7 +153,9 @@ export class SurfaceView {
     this.on(this.map,"pointerleave",()=>this.show(null));
     this.on(this.map,"click",e=>{
       const p=locate(e);
-      if (p) { globe.camera.pitch=p.lat*DEG; globe.camera.yaw=-p.lon*DEG; this.schedule(); }
+      if (!p) return;
+      globe.camera.pitch=p.lat*DEG; globe.camera.yaw=-p.lon*DEG; this.schedule();
+      this.onSelect?.({lat:p.lat,lon:p.lon});
     });
   }
   show(hit) {

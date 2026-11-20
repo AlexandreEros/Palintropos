@@ -59,6 +59,8 @@ function createProgram(gl) {
   if (!gl.getProgramParameter(program,gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(program));
   return program;
 }
+// Line inks: graticule, wind streamlines, linked cursor and section planes.
+const INK=[[0.1,.13,.17,.38],[1,1,1,.9],[1,.55,.1,1]];
 class WebGLGlobe {
   constructor(gl) {
     this.gl=gl;
@@ -125,7 +127,7 @@ class WebGLGlobe {
       gl.disable(gl.BLEND);
     });
     gl.disable(gl.POLYGON_OFFSET_FILL); gl.enable(gl.BLEND); gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);
-    this.lines.forEach((line,i)=>this.ink(line.pos,gl.LINES,line.count,i ? [1,1,1,.90] : [0.1,.13,.17,.38]));
+    this.lines.forEach((line,i)=>this.ink(line.pos,gl.LINES,line.count,INK[i]));
     gl.disable(gl.BLEND);
   }
   destroy() { this.clearBuffers(); this.gl.deleteProgram(this.program); }
@@ -179,7 +181,7 @@ function softwareRender(canvas,scene,camera) {
     }
   });
   scene.lines.forEach((line,idx)=>{
-    const p=projected(line,mv,w,h), ink=idx ? [255,255,255,.9] : [25,33,43,.38];
+    const p=projected(line,mv,w,h), ink=[...INK[idx].slice(0,3).map(c=>255*c),INK[idx][3]];
     for (let k=0;k<p.length;k+=6) {
       const dx=p[k+3]-p[k],dy=p[k+4]-p[k+1],n=Math.max(1,Math.ceil(Math.max(Math.abs(dx),Math.abs(dy))));
       if (p[k+2]<=0 || p[k+5]<=0 || n>w+h) continue;

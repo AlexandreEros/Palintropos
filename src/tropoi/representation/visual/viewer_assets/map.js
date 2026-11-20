@@ -90,6 +90,15 @@ export function drawMap(canvas,scene,cssWidth,ratio=1) {
   for (let lon=-180;lon<=180;lon+=30) { ctx.moveTo(X(lon),box.y); ctx.lineTo(X(lon),box.y+box.h); }
   for (let lat=-90;lat<=90;lat+=30) { ctx.moveTo(box.x,Y(lat)); ctx.lineTo(box.x+box.w,Y(lat)); }
   ctx.stroke(); flow(ctx,winds,box);
+  const cursor=options.cursor;
+  if (cursor && Number.isFinite(cursor.lat) && Number.isFinite(cursor.lon)) {
+    // The linked selection: meridional section along x, zonal section along y.
+    const cx=X((cursor.lon+540)%360-180), cy=Y(cursor.lat);
+    ctx.save(); ctx.strokeStyle="#ff8c1a"; ctx.lineWidth=1.2; ctx.setLineDash([5,4]); ctx.beginPath();
+    ctx.moveTo(cx,box.y); ctx.lineTo(cx,box.y+box.h); ctx.moveTo(box.x,cy); ctx.lineTo(box.x+box.w,cy); ctx.stroke();
+    ctx.setLineDash([]); ctx.lineWidth=2; ctx.strokeStyle="#1b1b1b"; ctx.beginPath(); ctx.arc(cx,cy,5,0,2*Math.PI); ctx.stroke();
+    ctx.strokeStyle="#ff8c1a"; ctx.lineWidth=1.4; ctx.beginPath(); ctx.arc(cx,cy,5,0,2*Math.PI); ctx.stroke(); ctx.restore();
+  }
   ctx.fillStyle="#263437"; ctx.font="11px system-ui"; ctx.textAlign="right";
   for (const lat of [-60,0,60]) ctx.fillText(lat===0 ? "0°" : Math.abs(lat)+"°"+(lat<0?"S":"N"),box.x-3,Y(lat)+4);
   ctx.textAlign="center";

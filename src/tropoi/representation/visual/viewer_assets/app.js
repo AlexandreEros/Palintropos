@@ -1,5 +1,6 @@
 import {loadFrame} from "./data.js";
 import {SurfaceView} from "./render.js";
+import {StructureView} from "./structure.js";
 
 const byId = id => document.getElementById(id);
 const panels = [];
@@ -12,6 +13,26 @@ const coordinates = {
 let manifest;
 let times;
 let levels;
+let cursor;
+let structure;
+
+// One geographic cursor links the globes, maps, column and sections.
+function setCursor(point) {
+  if (!point || !Number.isFinite(point.lat) || !Number.isFinite(point.lon)) return;
+  cursor = {lat: Math.max(-90, Math.min(90, point.lat)), lon: ((point.lon % 360) + 360) % 360};
+  for (const panel of panels) panel.view.setCursor(cursor);
+  structure?.setCursor(cursor);
+}
+
+// A level chosen in the column or a section becomes selection A's native level.
+function selectLevel(k) {
+  const panel = panels[0];
+  if (!panel?.field.levels || !Number.isInteger(k) || k < 0 || k >= levels.length) return;
+  panel.controls.coordinate.value = "native";
+  panel.updateCoordinate();
+  panel.controls.level.value = String(k);
+  panel.changeLevel();
+}
 
 async function json(path, signal) {
   const response = await fetch(path, {signal});
@@ -86,6 +107,8 @@ class Panel {
       .map(element => [element.dataset.id, element]));
     const c = this.controls;
     this.view = new SurfaceView(c.surface);
+    this.view.onSelect = setCursor;
+    this.view.cursor = cursor;
     this.playing = false;
     const keys = (manifest.operations.map || []).filter(key => key !== "wind");
     options(c.field, keys.map(key => [key, quantityLabel(manifest.fields[key])]));
@@ -113,6 +136,16 @@ class Panel {
     c.coordinate.onchange = () => { this.updateCoordinate(); this.changeLevel(); };
     c.value.onchange = c.level.onchange = () => this.changeLevel();
     c.play.onclick = () => this.playing ? this.stop() : this.play();
+    c["range-mode"].onchange = () => {
+      const fixed = c["range-mode"].value === "fixed";
+      c["range-wrap"].hidden = !fixed;
+      if (fixed && this.view.range) {
+        if (c["range-min"].value === "") c["range-min"].value = String(Number(this.view.range[0].toPrecision(6)));
+        if (c["range-max"].value === "") c["range-max"].value = String(Number(this.view.range[1].toPrecision(6)));
+      }
+      scaleTogether();
+    };
+    c["range-min"].onchange = c["range-max"].onchange = () => scaleTogether();
     for (const id of ["opacity", "exaggeration", "light", "winds"]) {
       c[id].oninput = () => {
         if (c.exaggeration.validity.valid) scaleTogether();
@@ -267,6 +300,7 @@ class Panel {
       if (panels.length > 1) scaleTogether();
       this.status("");
       c.png.disabled = false;
+      if (this === panels[0]) structure?.follow();
     } catch (error) {
       if (!request.signal.aborted && this.request === request) {
         this.frame = null;
@@ -277,15 +311,24 @@ class Panel {
     }
   }
 
+  fixedRange() {
+    const c = this.controls;
+    if (c["range-mode"].value !== "fixed") return null;
+    const lo = c["range-min"].valueAsNumber, hi = c["range-max"].valueAsNumber;
+    return Number.isFinite(lo) && Number.isFinite(hi) && hi > lo ? [lo, hi] : null;
+  }
+
   draw(range) {
     const c = this.controls;
+    range = this.fixedRange() || range;
     const time = Number(c.time.value);
     const geo = manifest.geometry;
     const p = this.field.presentation;
     this.view.draw(this.frame, {
       radius: geo.dynamical_radius_m || geo.reference_radius_m,
       title: runName(), field: this.key, label: p.name + (p.symbol ? " (" + p.symbol + ")" : ""),
-      units: p.units, selection: timeLabel(time) + " · " + this.surfaceLabel() + " · " + p.role + " · " + p.origin,
+      units: p.units, selection: timeLabel(time) + " · " + this.surfaceLabel() + " · " + p.role + " · " + p.origin +
+        (this.fixedRange() ? " · fixed colour range" : ""),
       winds: !c["wind-wrap"].hidden && c.winds.checked, shell: this.shell(),
       opacity: Number(c.opacity.value), exaggeration: Number(c.exaggeration.value),
       star: c.light.value === "star" ? manifest.star?.positions?.[time] : null, center: geo.initial_center,
@@ -425,6 +468,12 @@ async function openArchive() {
   if (times.length) facts.push(timeLabel(0).split(" · ")[0] + " to " + timeLabel(times.length - 1).split(" · ")[0]);
   byId("run-facts").textContent = facts.filter(Boolean).join(" · ");
   if (times.length && manifest.operations.map?.length) {
+    const query = new URLSearchParams(location.search);
+    const star = manifest.star?.positions?.[0];
+    const center = manifest.geometry.initial_center;
+    cursor = {lat: Number(query.get("lat") ?? star?.latitude ?? center?.latitude ?? 0),
+      lon: Number(query.get("lon") ?? star?.longitude ?? center?.longitude ?? 0)};
+    if (!Number.isFinite(cursor.lat) || !Number.isFinite(cursor.lon)) cursor = {lat: 0, lon: 0};
     byId("toolbar").hidden = false;
     const first = new Panel("A");
     panels.push(first);
@@ -432,6 +481,18 @@ async function openArchive() {
     byId("link-color").onchange = scaleTogether;
     byId("link-time").onchange = () => sync(first, "time");
     byId("link-level").onchange = () => sync(first, "level");
+    if (manifest.operations.structure?.length) {
+      structure = new StructureView(byId("structure"), {
+        manifest, runName, timeLabel,
+        getTime: () => Number(first.controls.time.value),
+        getField: () => first.key,
+        getLevel: () => first.field.levels && first.coordinate === "native" ? Number(first.controls.level.value) : null,
+        onCursor: setCursor, onLevel: selectLevel,
+      });
+      const product = query.get("product");
+      if (product && [...structure.c.product.options].some(o => o.value === product)) structure.c.product.value = product;
+    }
+    setCursor(cursor);
     await first.load();
   } else {
     const keys = (manifest.operations.series || []).filter(k => !manifest.diagnostics[k].columns);
