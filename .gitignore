@@ -48,6 +48,6 @@ artifacts/
 notebooks/*_browser_handoff.ipynb
 .pytest-tmp/
 
-# Raw opacity inputs (HITRAN line lists, CIA): fetched, never committed.
-# tools/radiation/opacity/fetch_hitran.py records their URLs and hashes.
+# Fetched opacity inputs and imported k-tables, never committed:
+# tools/radiation/opacity/fetch_socrates.py and import_socrates.py write here.
 opacity_cache/
