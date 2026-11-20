@@ -97,7 +97,7 @@
     }
   },
   "discovered": {
-    "classes": 218,
+    "classes": 224,
     "cli_handlers": {
       "cli-capsule-command": "tropoi.cli.capsule._command",
       "cli-gen": "tropoi.cli.main._cmd_gen",
@@ -109,7 +109,8 @@
       "cli-run-bve": "tropoi.cli.main._cmd_run_bve",
       "cli-run-pe": "tropoi.cli.main._cmd_run_pe",
       "cli-run-swe": "tropoi.cli.main._cmd_run_swe",
-      "cli-terrain-run-prepare": "tropoi.cli.terrain.run_prepare"
+      "cli-terrain-run-prepare": "tropoi.cli.terrain.run_prepare",
+      "cli-view": "tropoi.cli.main._cmd_view"
     },
     "entry_point_candidates": {
       "tropoi.physics.column.thin_atmosphere_mass_kg": [
@@ -233,16 +234,16 @@
         "tropoi.temporal.hooks.rk4_real_axis_limit"
       ]
     },
-    "functions": 1743,
-    "modules": 172,
+    "functions": 1784,
+    "modules": 178,
     "packages": 25
   },
   "limits": {
     "call_sites": {
-      "builtin": 3800,
-      "external": 2541,
-      "internal": 3044,
-      "unresolved": 3902
+      "builtin": 3959,
+      "external": 2615,
+      "internal": 3128,
+      "unresolved": 4126
     },
     "dynamic_import_sites": {
       "tropoi.representation.archive.writer": 1
@@ -403,6 +404,7 @@
         "packages": [
           "tropoi.cli",
           "tropoi.representation.archive",
+          "tropoi.representation.visual",
           "tropoi.spatial",
           "tropoi.temporal"
         ],
@@ -516,6 +518,16 @@
           "tropoi.cli.terrain.run_prepare"
         ]
       },
+      "cli-view": {
+        "packages": [
+          "tropoi.cli",
+          "tropoi.representation.archive",
+          "tropoi.representation.visual"
+        ],
+        "roots": [
+          "tropoi.cli.main._cmd_view"
+        ]
+      },
       "custom-initial-states": {
         "packages": [
           "tropoi.representation.archive",
@@ -590,14 +602,14 @@
         ]
       }
     },
-    "classes": 218,
+    "classes": 224,
     "classes_in_inheritance_overview": 21,
     "containment": {
-      "class": 218,
-      "module": 101,
+      "class": 224,
+      "module": 104,
       "package": 22
     },
-    "modules": 172,
+    "modules": 178,
     "package_pages": 25
   },
   "rules": {

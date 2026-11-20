@@ -50,8 +50,8 @@ flowchart LR
     n_tropoi_ocli_ogenerate__planet -.->|1| p_tropoi_orepresentation_ovisual
     n_tropoi_ocli_ogenerate__planet -.->|2| p_tropoi_ospatial
     n_tropoi_ocli_ogenerate__planet -.->|2| p_tropoi_ospatial_oterrain
-    n_tropoi_ocli_omain -.->|3| p_tropoi_orepresentation_oarchive
-    n_tropoi_ocli_omain -.->|5| p_tropoi_orepresentation_ovisual
+    n_tropoi_ocli_omain -.->|4| p_tropoi_orepresentation_oarchive
+    n_tropoi_ocli_omain -.->|6| p_tropoi_orepresentation_ovisual
     n_tropoi_ocli_omain -->|3| p_tropoi_orun_obve
     n_tropoi_ocli_omain -.->|1| p_tropoi_orun_ocustom
     n_tropoi_ocli_omain -.->|2| p_tropoi_orun_ope
@@ -89,3 +89,4 @@ No classes.
 * [`calls/cli-run-pe.mmd`](../calls/cli-run-pe.mmd)
 * [`calls/cli-run-swe.mmd`](../calls/cli-run-swe.mmd)
 * [`calls/cli-terrain-run-prepare.mmd`](../calls/cli-terrain-run-prepare.mmd)
+* [`calls/cli-view.mmd`](../calls/cli-view.mmd)

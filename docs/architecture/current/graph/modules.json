@@ -110,6 +110,14 @@
         "function"
       ],
       "source": "tropoi.cli.main",
+      "target": "tropoi.representation.archive.viewer_manifest"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.cli.main",
       "target": "tropoi.representation.visual.compose"
     },
     {
@@ -135,6 +143,14 @@
       ],
       "source": "tropoi.cli.main",
       "target": "tropoi.representation.visual.snapshot"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.cli.main",
+      "target": "tropoi.representation.visual.viewer_server"
     },
     {
       "kind": "imports",
@@ -540,6 +556,14 @@
     {
       "kind": "imports",
       "scopes": [
+        "function"
+      ],
+      "source": "tropoi.representation.archive.capsule",
+      "target": "tropoi.representation.archive.radiative"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
         "module"
       ],
       "source": "tropoi.representation.archive.capsule",
@@ -734,6 +758,38 @@
       "scopes": [
         "module"
       ],
+      "source": "tropoi.representation.archive.radiative",
+      "target": "tropoi.representation.archive.local_resource"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.representation.archive.radiative",
+      "target": "tropoi.representation.archive.pe_context"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.representation.archive.radiative",
+      "target": "tropoi.representation.archive.schema"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.representation.archive.radiative",
+      "target": "tropoi.spatial.sigma_coordinate"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
       "source": "tropoi.representation.archive.schema",
       "target": "tropoi.spatial.modes"
     },
@@ -744,6 +800,71 @@
       ],
       "source": "tropoi.representation.archive.schema",
       "target": "tropoi.spatial.truncation"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.representation.archive.viewer_diagnostics",
+      "target": "tropoi.representation.archive.local_resource"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.representation.archive.viewer_manifest",
+      "target": "tropoi.representation.archive.capsule"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.representation.archive.viewer_manifest",
+      "target": "tropoi.representation.archive.local_resource"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.representation.archive.viewer_manifest",
+      "target": "tropoi.representation.archive.radiative"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.representation.archive.viewer_manifest",
+      "target": "tropoi.representation.archive.schema"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.representation.archive.viewer_manifest",
+      "target": "tropoi.representation.archive.viewer_diagnostics"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function",
+        "module"
+      ],
+      "source": "tropoi.representation.archive.viewer_manifest",
+      "target": "tropoi.representation.visual.quantities"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.representation.archive.viewer_manifest",
+      "target": "tropoi.spatial.environment"
     },
     {
       "kind": "imports",
@@ -1579,6 +1700,110 @@
       ],
       "source": "tropoi.representation.visual.timeline",
       "target": "tropoi.representation.visual.specs"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.representation.visual.viewer_fields",
+      "target": "tropoi.representation.archive.local_resource"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.representation.visual.viewer_fields",
+      "target": "tropoi.representation.archive.pe_context"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.representation.visual.viewer_fields",
+      "target": "tropoi.representation.archive.prepared_terrain"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.representation.visual.viewer_fields",
+      "target": "tropoi.representation.diagnostics.held_suarez_sections"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.representation.visual.viewer_fields",
+      "target": "tropoi.representation.diagnostics.pe_levels"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.representation.visual.viewer_fields",
+      "target": "tropoi.representation.diagnostics.pe_surfaces"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.representation.visual.viewer_fields",
+      "target": "tropoi.spatial.transforms.host_synthesis"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.representation.visual.viewer_fields",
+      "target": "tropoi.spatial.transforms.separable_gauss_sh"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.representation.visual.viewer_fields",
+      "target": "tropoi.spatial.williamson5"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.representation.visual.viewer_server",
+      "target": "tropoi.physics.insolation"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.representation.visual.viewer_server",
+      "target": "tropoi.representation.archive.local_resource"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.representation.visual.viewer_server",
+      "target": "tropoi.representation.archive.viewer_manifest"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.representation.visual.viewer_server",
+      "target": "tropoi.representation.visual.viewer_fields"
     },
     {
       "kind": "imports",
@@ -4156,6 +4381,17 @@
     {
       "category": "code",
       "dynamic_import_calls": 0,
+      "id": "tropoi.representation.archive.local_resource",
+      "is_package": false,
+      "path": "tropoi/representation/archive/local_resource.py",
+      "stdlib_imports": [
+        "pathlib"
+      ],
+      "third_party_imports": []
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
       "id": "tropoi.representation.archive.pe_context",
       "is_package": false,
       "path": "tropoi/representation/archive/pe_context.py",
@@ -4197,6 +4433,21 @@
     {
       "category": "code",
       "dynamic_import_calls": 0,
+      "id": "tropoi.representation.archive.radiative",
+      "is_package": false,
+      "path": "tropoi/representation/archive/radiative.py",
+      "stdlib_imports": [
+        "dataclasses",
+        "pathlib",
+        "re"
+      ],
+      "third_party_imports": [
+        "numpy"
+      ]
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
       "id": "tropoi.representation.archive.schema",
       "is_package": false,
       "path": "tropoi/representation/archive/schema.py",
@@ -4205,6 +4456,32 @@
         "collections",
         "dataclasses",
         "math"
+      ],
+      "third_party_imports": []
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.representation.archive.viewer_diagnostics",
+      "is_package": false,
+      "path": "tropoi/representation/archive/viewer_diagnostics.py",
+      "stdlib_imports": [
+        "csv",
+        "json"
+      ],
+      "third_party_imports": [
+        "numpy"
+      ]
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.representation.archive.viewer_manifest",
+      "is_package": false,
+      "path": "tropoi/representation/archive/viewer_manifest.py",
+      "stdlib_imports": [
+        "json",
+        "pathlib"
       ],
       "third_party_imports": []
     },
@@ -4734,6 +5011,47 @@
         "shutil",
         "tempfile",
         "typing"
+      ],
+      "third_party_imports": [
+        "numpy"
+      ]
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.representation.visual.viewer_fields",
+      "is_package": false,
+      "path": "tropoi/representation/visual/viewer_fields.py",
+      "stdlib_imports": [
+        "__future__",
+        "functools",
+        "pathlib"
+      ],
+      "third_party_imports": [
+        "numpy",
+        "scipy"
+      ]
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.representation.visual.viewer_server",
+      "is_package": false,
+      "path": "tropoi/representation/visual/viewer_server.py",
+      "stdlib_imports": [
+        "__future__",
+        "collections",
+        "csv",
+        "http",
+        "importlib",
+        "json",
+        "math",
+        "pathlib",
+        "secrets",
+        "struct",
+        "threading",
+        "urllib",
+        "webbrowser"
       ],
       "third_party_imports": [
         "numpy"
