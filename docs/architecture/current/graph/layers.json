@@ -3,7 +3,7 @@
     {
       "direction": "down",
       "kind": "imports",
-      "module_edges": 10,
+      "module_edges": 12,
       "package_edges": 2,
       "source": "cli",
       "target": "representation",
@@ -30,7 +30,7 @@
     {
       "direction": "down",
       "kind": "imports",
-      "module_edges": 6,
+      "module_edges": 7,
       "package_edges": 1,
       "source": "representation",
       "target": "physics",
@@ -39,7 +39,7 @@
     {
       "direction": "down",
       "kind": "imports",
-      "module_edges": 34,
+      "module_edges": 39,
       "package_edges": 8,
       "source": "representation",
       "target": "spatial",
@@ -138,7 +138,7 @@
       "depth": 2,
       "id": "representation",
       "internal_package_edges": 4,
-      "modules": 42,
+      "modules": 49,
       "packages": 4
     },
     {

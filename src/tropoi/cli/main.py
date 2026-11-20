@@ -761,6 +761,15 @@ def _describe_state_fields(manifest: dict, run_config: dict):
 def _cmd_inspect(args: argparse.Namespace) -> int:
     import json
 
+    if getattr(args, "viewer_manifest", False):
+        from tropoi.representation.archive.viewer_manifest import viewer_manifest
+        if args.snapshot is not None or args.field is not None:
+            return _error("--viewer-manifest takes a capsule directory without a snapshot selection")
+        try:
+            print(json.dumps(viewer_manifest(args.run_path), allow_nan=False, indent=2))
+        except (OSError, ValueError, KeyError, TypeError) as err:
+            return _error(str(err))
+        return 0
     if getattr(args, "field", None) is not None and \
             getattr(args, "snapshot", None) is None:
         return _error("--field requires --snapshot INDEX")
@@ -1251,6 +1260,15 @@ def _cmd_gen(args: argparse.Namespace) -> int:
     return generate_planet.run(args)
 
 
+def _cmd_view(args: argparse.Namespace) -> int:
+    from tropoi.representation.visual.viewer_server import serve
+    try:
+        serve(args.capsules, port=args.port, open_browser=not args.no_browser, backend=args.backend)
+    except (KeyError, ValueError, OSError, OverflowError) as err:
+        return _error(str(err))
+    return 0
+
+
 def _cmd_recompile(args: argparse.Namespace) -> int:
     return clear_cache.run(args)
 
@@ -1331,6 +1349,14 @@ def build_parser() -> argparse.ArgumentParser:
         "scenarios", help="Initial-condition scenarios for 'tropoi run bve --scenario'.")
     scenarios_parser.set_defaults(_handler=_cmd_list_scenarios)
 
+    view_parser = commands.add_parser("view", help="Explore local simulation capsules in a browser.")
+    view_parser.add_argument("capsules", nargs="+", metavar="CAPSULE", help="Allowed capsule directories")
+    view_parser.add_argument("--port", type=int, default=0, help="Loopback port (default: automatically assigned)")
+    view_parser.add_argument("--no-browser", action="store_true", help="Print the private URL without opening a tab")
+    view_parser.add_argument("--backend", choices=["cpu", "cuda"], default="cpu",
+                             help="Spectral evaluation backend (default: CPU)")
+    view_parser.set_defaults(_handler=_cmd_view)
+
     # tropoi inspect RUN_PATH
     inspect_parser = commands.add_parser(
         "inspect", help="Summarize a run directory from its manifest.",
@@ -1352,6 +1378,8 @@ def build_parser() -> argparse.ArgumentParser:
         help="With --snapshot: restrict the snapshot description to one "
              "stored field (e.g. zeta, delta, phi, temperature, ln_ps). "
              "The field must belong to the run's solver.")
+    inspect_parser.add_argument("--viewer-manifest", action="store_true",
+                                help="Print Viewer 2 capability manifest JSON for this directory.")
     inspect_parser.set_defaults(_handler=_cmd_inspect)
 
     # tropoi plot RUN_PATH

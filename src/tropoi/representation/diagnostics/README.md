@@ -12,7 +12,7 @@ There are two kinds of module:
 | Kind | Modules | When | Runs on |
 | --- | --- | --- | --- |
 | Run-time recorders | `bve.py`, `swe.py`, `pe.py` | After every accepted step | GPU, inside the runner |
-| Saved-state readers | `spectral.py`, `pe_levels.py`, `pe_surfaces.py`, `held_suarez_sections.py` | After a run, from saved frames | CPU (NumPy only) |
+| Saved-state readers | `spectral.py`, `pe_levels.py`, `pe_surfaces.py`, `pe_structure.py`, `held_suarez_sections.py` | After a run, from saved frames | CPU (NumPy only) |
 
 ## Run-time recorders
 
@@ -38,6 +38,7 @@ module docstring and [CONVENTIONS.md](../../spatial/CONVENTIONS.md).
 | `spectral.py` | Kinetic energy per mode `E(l, m) = (R⁴/2)(P_ζ + P_δ)/(l(l+1))` from the rotational/divergent split, plus mean degree, mean zonal wavenumber, entropy and effective mode count | Visual quantity pages |
 | `pe_levels.py` | Temperature, pressure `σ_k p_s`, absolute Simmons–Burridge geopotential and geopotential height on native full levels, on a lat–lon display mesh | Atmosphere view, PE archive context |
 | `pe_surfaces.py` | The same fields on a fixed pressure, geopotential height or sigma surface, interpolated linearly in `ln σ`, with per-node masks for nodes where the surface is underground, above the top full level, or between the lowest full level and the ground | Atmosphere view |
+| `pe_structure.py` | A native-level column at a point, latitude × σ and longitude × σ sections, equal-weight zonal means [u], [v], [T] on the Gaussian state grid (through the Held–Suarez accumulator), and the meridional mass streamfunction integrated top-down from [pₛ v] per state | Viewer 2 vertical-structure panel |
 | `held_suarez_sections.py` | The six zonal-mean latitude–sigma sections (`[u]`, `[T]`, `[u*v*]`, `[v*T*]`, EKE, `[T*²]`) on the run's Gaussian grid, with sample selection, band-limit checks, mass drift and SHA-256 of the input states | [Held–Suarez climate figure](../visual/HELD_SUAREZ_CLIMATE.md) |
 
 Eddy products in the Held–Suarez sections are formed per state, against

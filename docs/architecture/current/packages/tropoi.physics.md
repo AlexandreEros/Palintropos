@@ -92,6 +92,7 @@ flowchart LR
     p_tropoi_orepresentation_ovisual -->|1| n_tropoi_ophysics_ocolumn
     p_tropoi_orepresentation_ovisual -->|1| n_tropoi_ophysics_ocomposition
     p_tropoi_orepresentation_ovisual -->|1| n_tropoi_ophysics_oconstants
+    p_tropoi_orepresentation_ovisual -.->|1| n_tropoi_ophysics_oinsolation
     p_tropoi_orepresentation_ovisual -->|1| n_tropoi_ophysics_orayleigh
     p_tropoi_orepresentation_ovisual -->|1| n_tropoi_ophysics_ospecies
     p_tropoi_orepresentation_ovisual -->|1| n_tropoi_ophysics_ostar
