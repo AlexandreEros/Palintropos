@@ -18,6 +18,9 @@ Viewer 2 Stage 1 discovery is available with `tropoi inspect RUN --viewer-manife
 or `viewer_manifest(RUN)` from `tropoi.representation.archive.viewer_manifest`.
 Pass the archive directory itself. Discovery uses local files, opens no network
 listener, and returns the versioned manifest on stdout. Indexed operations
-describe scientific selections for subsequent viewer stages. Daily radiative
-states also open through `open_simulation`. Dashboard rendering, GPU selection
-and portable bundles belong to later stages.
+describe scientific selections for the viewer. `operations.structure` lists the
+column, section and zonal-reduction products of a pure-σ PE archive. Zonal
+mean and mass streamfunction are omitted, with a reason under `unavailable`,
+when the state grid has no Gaussian latitude–longitude quadrature. Daily
+radiative states also open through `open_simulation`. Portable bundles belong
+to a later stage.

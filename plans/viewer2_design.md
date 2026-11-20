@@ -50,6 +50,27 @@ Local Python introduces a process dependency in exchange for direct archive acce
 5. **Sky and physical illumination.** Feed a selected column, documented composition and star into the existing single-scattering Rayleigh model. Distinguish display lighting, geometric incidence, recorded irradiance (including location, level and averaging) and modeled directional sky radiance. Use surface incident radiation for terrain when supported. Distinguish direct and diffuse components where available and avoid applying a second cosine factor to horizontal irradiance. Identify blackbody and scattering approximations, user assumptions, fixed/auto exposure, clipping and false-colour scales. Verify fixed-input sky agreement with the existing explorer, stellar alignment across globe and sky, the terminator for known geometry and limited capabilities when only global flux exists.
 6. **Portable distribution.** Add a portable offline selection and size-budgeted single-file HTML backed by the same renderer and selection contract. Estimate size before export. Record included times, fields, precision, masks, recipes and provenance. Disconnect both network and provider and reproduce the selected maps, values, masks, units and timestamps. Preserve existing standalone export behavior.
 
+## Delivery status · 2026-11-20
+
+Stages 1 and 2 are delivered. PR #58 also promotes a bounded part of Stages 3 and 4:
+
+- **Delivered from Stage 3:**
+  - A linked geographic cursor, drawn on the map and as lines on the globe.
+  - A native-level column profile at the cursor against geopotential height, pressure or nominal σ.
+  - Meridional and zonal sections on native levels with log-σ axes.
+  - Level selection linked back to the map.
+- **Delivered from Stage 4:**
+  - Native-grid zonal-mean [u], [v] and [T] for one saved state, or an equal-weight mean of a consecutive range.
+  - The pure-σ meridional mass streamfunction, as specified above.
+- **Verification:**
+  - An analytic transport case, and a wavenumber-1 case where [pₛ v] ≠ [pₛ][v].
+  - Parity with `reduce_sections` on full Held–Suarez states.
+  - Parity with the Ben 2 run accumulator (`means.npz`, days 16–30 and 61–120), within 2 × 10⁻⁹.
+  - The equatorial jet against the independent sponge-study profiles at days 30, 60, 90 and 120, within 10⁻⁹ m s⁻¹.
+- **Not in scope:**
+  - Sections on pressure or height surfaces.
+  - Eddy products, cross-run linking, the 3D cutaway, radiative-transfer diagnostics, sky optics and portable HTML.
+
 ## Fixture acceptance matrix
 
 | Archive | Verified local inventory | Required result |

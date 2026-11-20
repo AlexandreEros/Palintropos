@@ -58,9 +58,15 @@ function bands(centres) {
 function wrapped(ctx, text, width) {
   const lines = [];
   let current = "";
-  for (const word of String(text).split(/\s+/)) {
-    if (current && ctx.measureText(current + " " + word).width > width) { lines.push(current); current = word; }
-    else current = current ? current + " " + word : word;
+  for (let word of String(text).split(/\s+/)) {
+    if (current && ctx.measureText(current + " " + word).width > width) { lines.push(current); current = ""; }
+    // Break an archive name or hash longer than the line itself.
+    while (!current && ctx.measureText(word).width > width) {
+      let n = word.length - 1;
+      while (n > 1 && ctx.measureText(word.slice(0, n)).width > width) n--;
+      lines.push(word.slice(0, n)); word = word.slice(n);
+    }
+    current = current ? current + " " + word : word;
   }
   if (current) lines.push(current);
   return lines;

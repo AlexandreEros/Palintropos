@@ -57,6 +57,39 @@ datum as terrain. Cells touching an invalid thickness are masked. A field change
 sets the colours on that shell. PE uses its native or vertically interpolated
 geopotential height, with masks at the terrain and sampling limits.
 
+Each map has an automatic colour range (all valid samples) or a fixed minimum
+and maximum. Geometric day/night shading darkens only the globe; the flat map,
+legend and readouts always show model values.
+
+### Linked vertical structure (primitive-equation archives)
+
+One geographic cursor links the views. Clicking the map or globe moves it.
+The map draws it as an orange cross along the meridian and parallel that the
+sections follow, and the globe draws the same lines. The **Vertical
+structure** panel follows selection A's saved time, quantity and native level
+unless you choose otherwise. Clicking a level in a plot or in the column
+table selects that level on the map. Clicking a section moves the cursor.
+
+| Product | Definition | Sampling |
+| --- | --- | --- |
+| Column profile | T, u, v, p and Z on every native full level against geopotential height, pressure or nominal σ, with a per-level table | Exact band-limited synthesis at the point. By default the point snaps to the nearest native Gaussian node, so slab Tₛ is the stored node value. Off-node Tₛ is bilinear and labelled so |
+| Meridional section | Latitude × σ at the cursor longitude | Exact synthesis on native full levels, 2° horizontal spacing |
+| Zonal section | Longitude × σ at the cursor latitude | Same |
+| Zonal mean | [u], [v], [T] on native full levels | Run's Gauss–Legendre latitudes and plain mean over its `nlon` longitudes, shared with the Held–Suarez `SectionAccumulator` |
+| Mass streamfunction | ψ(φ, σ_{k+½}) = 2πa cos φ / g · Σ_{j≤k} [pₛ v_j] Δσ_j, from ψ = 0 at σ = 0 | Same grid. [pₛ v] is formed for each state before the longitude mean and is never replaced by [pₛ][v]. kg s⁻¹, positive for northward mass transport above the interface. ψ at σ = 1 is the whole-column flux, reported and not forced to zero |
+
+Zonal means and ψ can average every saved state between a first and a last
+selection, with equal weights. The plot states the count and the actual
+cadence. The lowest full level is an air temperature at σ_{K−1}. The column
+always shows it separately from the slab surface temperature. Pressure is
+p_k = σ_k pₛ at the nominal level, and Z_k is the absolute Simmons–Burridge
+geopotential over g at the hydrostatic level position. Every plot names its
+archive directory and config hash, and notes that extrema between saved states
+are not represented. Sections and reductions are offered only for pure-σ PE
+archives (σ from 0 to 1). Zonal reductions also need a Gaussian latitude–longitude
+state grid. A long average holds the provider while it runs (about 0.2 s per
+T21L40 state).
+
 CPU is the default. `--backend cuda` enables CuPy scalar synthesis for eligible
 horizontal fields with CPU fallback. Wind and PE column evaluation use the
 existing host routines. Browser graphics acceleration is independent of the

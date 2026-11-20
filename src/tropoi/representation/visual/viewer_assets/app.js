@@ -121,7 +121,7 @@ class Panel {
     c.exaggeration.value = initial?.controls.exaggeration.value ||
       String(manifest.fields.free_surface_height ? 75 : levels.length ? 8 : 1);
     c.opacity.value = initial?.controls.opacity.value || (manifest.fields.free_surface_height ? "0.45" : "0.9");
-    options(c.level, levels.map((sigma, index) => [index, (index + 1) + " · σ = " + sigma]));
+    options(c.level, levels.map((sigma, index) => [index, (index + 1) + " · σ = " + Number(sigma.toPrecision(6))]));
     c.level.value = initial?.controls.level.value || String(levels.length - 1);
     this.updateField();
     if (initial && this.field.levels) {
@@ -458,7 +458,11 @@ async function openArchive() {
     select.value = inventory.current;
     select.onchange = () => {
       const run = inventory.runs.find(run => String(run.id) === select.value);
-      if (run) location.assign(run.url);
+      if (!run) return;
+      // Carry the geographic cursor and structure product; saved times differ per archive.
+      const keep = cursor ? {lat: cursor.lat, lon: cursor.lon} : {};
+      if (structure) keep.product = structure.product;
+      location.assign(run.url + "?" + new URLSearchParams(keep));
     };
   }
   times = manifest.time_axes.snapshots?.values || [];
@@ -493,6 +497,8 @@ async function openArchive() {
       if (product && [...structure.c.product.options].some(o => o.value === product)) structure.c.product.value = product;
     }
     setCursor(cursor);
+    // Inspection handle for acceptance tests and the browser console.
+    window.viewer = {panels, get structure() { return structure; }, get cursor() { return cursor; }};
     await first.load();
   } else {
     const keys = (manifest.operations.series || []).filter(k => !manifest.diagnostics[k].columns);
