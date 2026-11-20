@@ -151,7 +151,7 @@ def test_slab_mapping_preserves_native_values_and_wrap():
                          "runs/dev-thai-ben2-ck-heated-T21L40-f44c039-layer-linear-dt600-30d",
                          "runs/hs-T42L20-prod-002"])
 def test_jump_to_final_day_reads_only_requested_members(directory, monkeypatch):
-    path = ROOT / directory
+    path = (ROOT / directory).resolve()
     if not path.is_dir():
         pytest.skip(f"Missing archive: {path}")
     m = viewer_manifest(path)
