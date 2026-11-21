@@ -443,15 +443,15 @@
     },
     {
       "kind": "imports",
-      "module_edges": 5,
-      "runtime_module_edges": 5,
+      "module_edges": 7,
+      "runtime_module_edges": 7,
       "source": "tropoi.run.radiative",
       "target": "tropoi.physics"
     },
     {
       "kind": "imports",
-      "module_edges": 2,
-      "runtime_module_edges": 2,
+      "module_edges": 4,
+      "runtime_module_edges": 4,
       "source": "tropoi.run.radiative",
       "target": "tropoi.physics.radiation"
     },
@@ -729,8 +729,8 @@
     },
     {
       "id": "tropoi.physics.radiation",
-      "internal_edges": 3,
-      "modules": 4
+      "internal_edges": 4,
+      "modules": 5
     },
     {
       "id": "tropoi.representation",

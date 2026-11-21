@@ -454,6 +454,14 @@
       "scopes": [
         "module"
       ],
+      "source": "tropoi.physics.radiation.tables",
+      "target": "tropoi.physics.radiation.kdist"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
       "source": "tropoi.physics.rayleigh",
       "target": "tropoi.physics.composition"
     },
@@ -2875,6 +2883,22 @@
         "function"
       ],
       "source": "tropoi.run.radiative.config",
+      "target": "tropoi.physics.composition"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.run.radiative.config",
+      "target": "tropoi.physics.thermodynamics"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.run.radiative.config",
       "target": "tropoi.spatial.truncation"
     },
     {
@@ -2968,10 +2992,26 @@
     {
       "kind": "imports",
       "scopes": [
+        "function"
+      ],
+      "source": "tropoi.run.radiative.model",
+      "target": "tropoi.physics.radiation.kdist"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
         "module"
       ],
       "source": "tropoi.run.radiative.model",
       "target": "tropoi.physics.radiation.scheme"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.run.radiative.model",
+      "target": "tropoi.physics.radiation.tables"
     },
     {
       "kind": "imports",
@@ -4191,6 +4231,8 @@
       "stdlib_imports": [
         "__future__",
         "dataclasses",
+        "hashlib",
+        "json",
         "math",
         "typing"
       ],
@@ -4214,6 +4256,20 @@
         "cupy",
         "numpy"
       ]
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.physics.radiation.tables",
+      "is_package": false,
+      "path": "tropoi/physics/radiation/tables.py",
+      "stdlib_imports": [
+        "__future__",
+        "os",
+        "pathlib",
+        "typing"
+      ],
+      "third_party_imports": []
     },
     {
       "category": "code",

@@ -1356,6 +1356,41 @@
       "target": "tropoi.physics.radiation.scheme._xp"
     },
     {
+      "kind": "instantiate",
+      "source": "tropoi.physics.radiation.tables.check_premixed",
+      "target": "tropoi.physics.radiation.tables.KTableError"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.physics.radiation.tables.load_table",
+      "target": "tropoi.physics.radiation.kdist.KTable.load"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.physics.radiation.tables.load_table",
+      "target": "tropoi.physics.radiation.tables.KTableError"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.physics.radiation.tables.load_table",
+      "target": "tropoi.physics.radiation.tables.resolve_table"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.physics.radiation.tables.resolve_table",
+      "target": "tropoi.physics.radiation.tables.KTableError"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.physics.radiation.tables.resolve_table",
+      "target": "tropoi.physics.radiation.tables.search_path"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.physics.radiation.tables.table_spec",
+      "target": "tropoi.physics.radiation.kdist.KTable.load"
+    },
+    {
       "kind": "call",
       "source": "tropoi.physics.radiation.twostream.adding",
       "target": "tropoi.physics.radiation.twostream._xp"
@@ -8636,6 +8671,26 @@
       "target": "tropoi.run.radiative.config._time_of_perihelion_for_equinox_start"
     },
     {
+      "kind": "call",
+      "source": "tropoi.run.radiative.config.thai_dry_dev",
+      "target": "tropoi.physics.thermodynamics.heat_capacity"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.run.radiative.config.thai_dry_dev",
+      "target": "tropoi.run.radiative.config.RadiativeConfig"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.radiative.config.thai_dry_dev",
+      "target": "tropoi.run.radiative.config._preset_id"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.radiative.config.thai_dry_dev",
+      "target": "tropoi.run.radiative.config._t21"
+    },
+    {
       "kind": "constructor",
       "source": "tropoi.run.radiative.experiment.RadiativeRun",
       "target": "tropoi.run.radiative.experiment.RadiativeRun.__init__"
@@ -8851,6 +8906,31 @@
       "target": "tropoi.spatial.states.primitive_equations.PrimitiveEquationsStateError"
     },
     {
+      "kind": "instantiate",
+      "source": "tropoi.run.radiative.model._correlated_k",
+      "target": "tropoi.physics.radiation.kdist.CorrelatedKLongwave"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.run.radiative.model._correlated_k",
+      "target": "tropoi.physics.radiation.kdist.CorrelatedKShortwave"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.radiative.model._correlated_k",
+      "target": "tropoi.physics.radiation.tables.check_premixed"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.radiative.model._correlated_k",
+      "target": "tropoi.physics.radiation.tables.load_table"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.radiative.model._correlated_k",
+      "target": "tropoi.run.radiative.model._options"
+    },
+    {
       "kind": "call",
       "source": "tropoi.run.radiative.model._drag",
       "target": "tropoi.run.radiative.model._options"
@@ -8908,6 +8988,11 @@
     {
       "kind": "call",
       "source": "tropoi.run.radiative.model._longwave",
+      "target": "tropoi.run.radiative.model._correlated_k"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.radiative.model._longwave",
       "target": "tropoi.run.radiative.model._options"
     },
     {
@@ -8929,6 +9014,11 @@
       "kind": "instantiate",
       "source": "tropoi.run.radiative.model._shortwave",
       "target": "tropoi.physics.radiation.gray.VerticalPathShortwave"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.radiative.model._shortwave",
+      "target": "tropoi.run.radiative.model._correlated_k"
     },
     {
       "kind": "call",
@@ -13670,6 +13760,13 @@
       "type": "function"
     },
     {
+      "id": "tropoi.physics.radiation.kdist.KTable.content_sha256",
+      "kind": "method",
+      "module": "tropoi.physics.radiation.kdist",
+      "qualname": "KTable.content_sha256",
+      "type": "function"
+    },
+    {
       "id": "tropoi.physics.radiation.kdist.KTable.load",
       "kind": "classmethod",
       "module": "tropoi.physics.radiation.kdist",
@@ -13688,6 +13785,13 @@
       "kind": "property",
       "module": "tropoi.physics.radiation.kdist",
       "qualname": "KTable.n_g",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.radiation.kdist.KTable.point_weights",
+      "kind": "property",
+      "module": "tropoi.physics.radiation.kdist",
+      "qualname": "KTable.point_weights",
       "type": "function"
     },
     {
@@ -13947,6 +14051,48 @@
       "kind": "function",
       "module": "tropoi.physics.radiation.scheme",
       "qualname": "interface_temperature",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.radiation.tables.KTableError",
+      "kind": "class",
+      "module": "tropoi.physics.radiation.tables",
+      "qualname": "KTableError",
+      "type": "class"
+    },
+    {
+      "id": "tropoi.physics.radiation.tables.check_premixed",
+      "kind": "function",
+      "module": "tropoi.physics.radiation.tables",
+      "qualname": "check_premixed",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.radiation.tables.load_table",
+      "kind": "function",
+      "module": "tropoi.physics.radiation.tables",
+      "qualname": "load_table",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.radiation.tables.resolve_table",
+      "kind": "function",
+      "module": "tropoi.physics.radiation.tables",
+      "qualname": "resolve_table",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.radiation.tables.search_path",
+      "kind": "function",
+      "module": "tropoi.physics.radiation.tables",
+      "qualname": "search_path",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.radiation.tables.table_spec",
+      "kind": "function",
+      "module": "tropoi.physics.radiation.tables",
+      "qualname": "table_spec",
       "type": "function"
     },
     {
@@ -21587,6 +21733,13 @@
       "type": "function"
     },
     {
+      "id": "tropoi.run.radiative.config.thai_dry_dev",
+      "kind": "function",
+      "module": "tropoi.run.radiative.config",
+      "qualname": "thai_dry_dev",
+      "type": "function"
+    },
+    {
       "id": "tropoi.run.radiative.experiment.RadiativeRun",
       "kind": "class",
       "module": "tropoi.run.radiative.experiment",
@@ -21668,6 +21821,13 @@
       "kind": "property",
       "module": "tropoi.run.radiative.experiment",
       "qualname": "RadiativeRun.step",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.radiative.model._correlated_k",
+      "kind": "function",
+      "module": "tropoi.run.radiative.model",
+      "qualname": "_correlated_k",
       "type": "function"
     },
     {

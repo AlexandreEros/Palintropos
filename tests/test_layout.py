@@ -94,6 +94,7 @@ def test_documented_cpu_only_modules_import_without_cupy_or_matplotlib():
                "tropoi.physics.surface", "tropoi.physics.column_model",
                "tropoi.physics.radiation.twostream", "tropoi.physics.radiation.scheme",
                "tropoi.physics.radiation.gray", "tropoi.physics.radiation.kdist",
+               "tropoi.physics.radiation.tables",
                "tropoi.temporal.column_coupling", "tropoi.temporal.semi_implicit",
                "tropoi.run.radiative.config", "tropoi.run.radiative.model"]
     probe = (

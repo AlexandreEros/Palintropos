@@ -37,7 +37,7 @@ flowchart TD
     end
     subgraph g_physics["layer physics"]
         n_tropoi_ophysics["physics (17 modules)"]
-        n_tropoi_ophysics_oradiation["physics.radiation (4 modules)"]
+        n_tropoi_ophysics_oradiation["physics.radiation (5 modules)"]
     end
     n_tropoi_ocli -->|5| n_tropoi_orepresentation_oarchive
     n_tropoi_ocli -->|7| n_tropoi_orepresentation_ovisual
@@ -102,8 +102,8 @@ flowchart TD
     n_tropoi_orun_ope -->|1| n_tropoi_ospatial_oinitialization
     n_tropoi_orun_ope -->|4| n_tropoi_otemporal
     n_tropoi_orun_ope -->|1| n_tropoi_otemporal_otendencies
-    n_tropoi_orun_oradiative -->|5| n_tropoi_ophysics
-    n_tropoi_orun_oradiative -->|2| n_tropoi_ophysics_oradiation
+    n_tropoi_orun_oradiative -->|7| n_tropoi_ophysics
+    n_tropoi_orun_oradiative -->|4| n_tropoi_ophysics_oradiation
     n_tropoi_orun_oradiative -->|2| n_tropoi_orun_oheld__suarez
     n_tropoi_orun_oradiative -->|5| n_tropoi_ospatial
     n_tropoi_orun_oradiative -->|3| n_tropoi_ospatial_ostates

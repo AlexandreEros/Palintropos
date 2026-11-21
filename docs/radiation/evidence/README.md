@@ -40,3 +40,9 @@ and the [preservation record](../../validation/run_archive_2026-11-12/README.md)
   measurement, not a judged experiment: no criterion was registered before it. The scheme
   leaves the climate, the energy budget and the mass drift where FHZ06 left them
   ([MONIN_OBUKHOV.md](../MONIN_OBUKHOV.md) §10).
+- [THAI dry development columns](thai-dev-columns/) and the coupled runs
+  [dev-thai-ben2](dev-thai-ben2-lwck-heated-T21L40-9f8c776/summary.json) and
+  [dev-thai-ben1](dev-thai-ben1-lwck-heated-T21L40-9f8c776/summary.json): real-gas longwave
+  k-tables for the two dry THAI compositions, 5 days from the isothermal start on the MX110.
+  Development runs, not THAI reproductions; the Ben 2 summary holds the stop-and-resume
+  comparison with an uninterrupted control ([OPACITY.md](../OPACITY.md)).

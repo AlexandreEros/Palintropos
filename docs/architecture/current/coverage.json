@@ -79,6 +79,7 @@
       "tropoi.physics.radiation.gray.isca_mars_shortwave": "gray Mars shortwave optical-depth profile; no caller in the package; used by tests",
       "tropoi.physics.radiation.gray.schneider_liu_longwave": "gray longwave optical-depth profile (Schneider & Liu 2009); no caller in the package; used by tests and tools/radiation/regimes.py",
       "tropoi.physics.radiation.kdist.ktable_from_spectrum": "builds a correlated-k table from a user-supplied absorption function; no caller in the package; used by tests",
+      "tropoi.physics.radiation.tables.table_spec": "returns the configuration entry (file and content hash) that pins a stored k-table; no caller in the package; used by tests and by whoever writes a configuration",
       "tropoi.physics.thermodynamics.cp_molar": "isobaric molar heat capacity of one named species; no caller in the package; used by tests",
       "tropoi.physics.thermodynamics.kappa": "R / c_p(T) of a mixture; no caller in the package",
       "tropoi.representation.visual.atmosphere.dequantize_columns": "NumPy reference of the atmosphere page's browser-side dequantization, used by tests to bound the quantization error; no workflow starts here",
@@ -93,11 +94,12 @@
       "tropoi.run.radiative.config.earth_gray_dry": "reached by name through the run.radiative.config.PRESETS registry (a dict lookup static analysis does not follow)",
       "tropoi.run.radiative.config.jupiter_schneider_liu": "reached by name through the run.radiative.config.PRESETS registry (a dict lookup static analysis does not follow)",
       "tropoi.run.radiative.config.mars_gray_flat_dev": "reached by name through the run.radiative.config.PRESETS registry (a dict lookup static analysis does not follow)",
+      "tropoi.run.radiative.config.thai_dry_dev": "reached by name through the run.radiative.config.PRESETS registry (a dict lookup static analysis does not follow)",
       "tropoi.temporal.hooks.rk4_real_axis_limit": "numerical helper (RK4 stability limit on the real axis) used by a stability test; no workflow starts here"
     }
   },
   "discovered": {
-    "classes": 225,
+    "classes": 226,
     "cli_handlers": {
       "cli-capsule-command": "tropoi.cli.capsule._command",
       "cli-gen": "tropoi.cli.main._cmd_gen",
@@ -142,6 +144,9 @@
       ],
       "tropoi.physics.radiation.kdist.ktable_from_spectrum": [
         "tropoi.physics.radiation.kdist.ktable_from_spectrum"
+      ],
+      "tropoi.physics.radiation.tables.table_spec": [
+        "tropoi.physics.radiation.tables.table_spec"
       ],
       "tropoi.physics.rayleigh.composition_cross_section": [
         "tropoi.physics.rayleigh.composition_cross_section"
@@ -222,6 +227,9 @@
       "tropoi.run.radiative.config.mars_gray_flat_dev": [
         "tropoi.run.radiative.config.mars_gray_flat_dev"
       ],
+      "tropoi.run.radiative.config.thai_dry_dev": [
+        "tropoi.run.radiative.config.thai_dry_dev"
+      ],
       "tropoi.spatial.terrain.raster.encode_grey16": [
         "tropoi.run.custom.encode_grey16",
         "tropoi.spatial.terrain.raster.encode_grey16"
@@ -234,16 +242,16 @@
         "tropoi.temporal.hooks.rk4_real_axis_limit"
       ]
     },
-    "functions": 1802,
-    "modules": 179,
+    "functions": 1811,
+    "modules": 180,
     "packages": 25
   },
   "limits": {
     "call_sites": {
-      "builtin": 4035,
-      "external": 2648,
-      "internal": 3162,
-      "unresolved": 4184
+      "builtin": 4062,
+      "external": 2664,
+      "internal": 3183,
+      "unresolved": 4203
     },
     "dynamic_import_sites": {
       "tropoi.representation.archive.writer": 1
@@ -602,14 +610,14 @@
         ]
       }
     },
-    "classes": 225,
+    "classes": 226,
     "classes_in_inheritance_overview": 21,
     "containment": {
-      "class": 225,
-      "module": 105,
+      "class": 226,
+      "module": 106,
       "package": 22
     },
-    "modules": 179,
+    "modules": 180,
     "package_pages": 25
   },
   "rules": {
@@ -620,6 +628,6 @@
   },
   "scope_file": {
     "path": "docs/architecture/entry-points.toml",
-    "sha256": "68523b1901b3c65bd104a5d9ac6c1263251246d81383e89a1e860b028da6b13e"
+    "sha256": "ff6839b21d5b4107ee00786decb521ba8213ca6278389b16f027112ff56e7b0e"
   }
 }

@@ -1,0 +1,240 @@
+{
+ "aborted": [],
+ "completed": true,
+ "config_sha256": "80e5a1824e5b378f4d97491f13e6d0aa0479fb2d41b5ad5647cdc40195dd1d28",
+ "cp": 791.4851590100508,
+ "daily": {
+  "0": {
+   "absorbed_stellar": 0.0,
+   "bottom_net_down": 0.0,
+   "column_energy_tendency": 0.0,
+   "energy_total": 2603569656.8313036,
+   "max_abs_u": 0.2213002179584926,
+   "max_wind_bottom": 0.22570207437549383,
+   "mean_ps": 99999.99999999987,
+   "mean_surface_temperature": 300.0,
+   "olr": 0.0,
+   "sensible": 0.0,
+   "surface_net": 0.0,
+   "t_max": 299.99999999999994,
+   "t_min": 299.99999999999994,
+   "toa_net_down": 0.0
+  },
+  "1": {
+   "absorbed_stellar": 157.3758831396182,
+   "bottom_net_down": 26.07882080477805,
+   "column_energy_tendency": -282.5997335888325,
+   "energy_rate": -282.0472758214562,
+   "energy_residual": 0.5524577673763247,
+   "energy_total": 2579200772.20033,
+   "max_abs_u": 0.3434589220753034,
+   "max_wind_bottom": 0.34625500121061525,
+   "mean_ps": 99999.99999880198,
+   "mean_surface_temperature": 301.1148719289639,
+   "olr": 414.16839615058325,
+   "sensible": 0.2716002269108521,
+   "surface_net": 25.807220577867213,
+   "t_max": 304.811526205788,
+   "t_min": 159.15050966032328,
+   "toa_net_down": -256.7925130109652
+  },
+  "2": {
+   "absorbed_stellar": 157.3758831396182,
+   "bottom_net_down": 17.61041929039382,
+   "column_energy_tendency": -236.1019307496688,
+   "energy_rate": -235.8713325761424,
+   "energy_residual": 0.23059817352640266,
+   "energy_total": 2558821489.065751,
+   "max_abs_u": 1.5151127817529466,
+   "max_wind_bottom": 1.5172065665705077,
+   "mean_ps": 99999.99999279126,
+   "mean_surface_temperature": 301.7671789743492,
+   "olr": 378.37811376462696,
+   "sensible": 2.510719165733954,
+   "surface_net": 15.099700124659872,
+   "t_max": 315.6490548233628,
+   "t_min": 143.3188036479183,
+   "toa_net_down": -221.00223062500896
+  },
+  "3": {
+   "absorbed_stellar": 157.3758831396182,
+   "bottom_net_down": 11.865887393034116,
+   "column_energy_tendency": -207.7781153446842,
+   "energy_rate": -207.61001696978454,
+   "energy_residual": 0.16809837489967094,
+   "energy_total": 2540883983.5995617,
+   "max_abs_u": 3.316866876845085,
+   "max_wind_bottom": 3.32621458521395,
+   "mean_ps": 99999.9999952197,
+   "mean_surface_temperature": 301.94559844273954,
+   "olr": 361.02391819748794,
+   "sensible": 7.735807106219859,
+   "surface_net": 4.130080286814263,
+   "t_max": 325.2740063118522,
+   "t_min": 134.7206530449934,
+   "toa_net_down": -203.6480350578701
+  },
+  "4": {
+   "absorbed_stellar": 157.3758831396182,
+   "bottom_net_down": 8.162302108867848,
+   "column_energy_tendency": -186.37244019789992,
+   "energy_rate": -186.23876547494422,
+   "energy_residual": 0.13367472295570337,
+   "energy_total": 2524792954.2625265,
+   "max_abs_u": 4.811779004574672,
+   "max_wind_bottom": 4.824599680010917,
+   "mean_ps": 99999.99996292868,
+   "mean_surface_temperature": 301.73229806373786,
+   "olr": 348.6858321107049,
+   "sensible": 13.099810882054953,
+   "surface_net": -4.937508773187106,
+   "t_max": 330.93447487801336,
+   "t_min": 129.05294790046096,
+   "toa_net_down": -191.30994897108698
+  },
+  "5": {
+   "absorbed_stellar": 157.3758831396182,
+   "bottom_net_down": 6.368755326857052,
+   "column_energy_tendency": -167.58104683300584,
+   "energy_rate": -167.464802019276,
+   "energy_residual": 0.11624481372984974,
+   "energy_total": 2510323995.368061,
+   "max_abs_u": 7.466571590997552,
+   "max_wind_bottom": 6.570574579020852,
+   "mean_ps": 99999.99990750678,
+   "mean_surface_temperature": 301.1384640046587,
+   "olr": 338.7030887476056,
+   "sensible": 20.114914101838757,
+   "surface_net": -13.746158774981708,
+   "t_max": 339.332736991191,
+   "t_min": 124.84056405268284,
+   "toa_net_down": -181.32720560798762
+  }
+ },
+ "dt_seconds": 1200.0,
+ "events": [
+  {
+   "day": 0,
+   "event": "created",
+   "step": 0,
+   "time": "2026-11-16T19:49:01Z"
+  },
+  {
+   "day": 0.0,
+   "event": "checkpoint",
+   "file": "checkpoint-s000000000.npz",
+   "step": 0,
+   "time": "2026-11-16T19:49:01Z"
+  },
+  {
+   "day": 1.0,
+   "event": "checkpoint",
+   "file": "checkpoint-s000000072.npz",
+   "step": 72,
+   "time": "2026-11-16T19:50:33Z"
+  },
+  {
+   "day": 2.0,
+   "event": "checkpoint",
+   "file": "checkpoint-s000000144.npz",
+   "step": 144,
+   "time": "2026-11-16T19:51:59Z"
+  },
+  {
+   "checkpoint": "checkpoint-s000000144.npz",
+   "day": 2.0,
+   "event": "resumed",
+   "step": 144,
+   "time": "2026-11-16T19:52:04Z"
+  },
+  {
+   "day": 3.0,
+   "event": "checkpoint",
+   "file": "checkpoint-s000000216.npz",
+   "step": 216,
+   "time": "2026-11-16T19:53:28Z"
+  },
+  {
+   "day": 4.0,
+   "event": "checkpoint",
+   "file": "checkpoint-s000000288.npz",
+   "step": 288,
+   "time": "2026-11-16T19:54:55Z"
+  },
+  {
+   "day": 5.0,
+   "event": "checkpoint",
+   "file": "checkpoint-s000000360.npz",
+   "step": 360,
+   "time": "2026-11-16T19:56:24Z"
+  },
+  {
+   "day": 5.0,
+   "event": "completed",
+   "step": 360,
+   "time": "2026-11-16T19:56:24Z"
+  }
+ ],
+ "experiment_id": "dev-thai-ben2-lwck-heated-T21L40",
+ "gas_constant": 188.926415463956,
+ "git_commit": "9f8c776d2558104498d516871a36ed4e17cc936e",
+ "git_dirty": false,
+ "last_day": 5,
+ "longwave": {
+  "bounds": "error",
+  "kind": "correlated_k",
+  "mass_fractions": {
+   "thai_ben2": 1.0
+  },
+  "tables": [
+   {
+    "file": "thai-ben2-sp-lw-17-dsa-mars.npz",
+    "sha256": "9d4c18a6822690aa12051598695ca4d6946324bb36f8752a35d57b9963087e18"
+   }
+  ]
+ },
+ "max_abs_energy_residual_w_m2": 0.5524577673763247,
+ "radiation_interval_steps": 3,
+ "resume_check": {
+  "all_bit_identical": true,
+  "control": "dev-thai-ben2-lwck-heated-T21L40-9f8c776-uninterrupted",
+  "max_abs_state_difference": 0.0,
+  "same_configuration_and_commit": true,
+  "series_days_compared": 3,
+  "series_keys_not_identical": [],
+  "states": {
+   "state-d00001.npy": {
+    "bit_identical": true,
+    "max_abs_difference": 0.0
+   },
+   "state-d00002.npy": {
+    "bit_identical": true,
+    "max_abs_difference": 0.0
+   },
+   "state-d00003.npy": {
+    "bit_identical": true,
+    "max_abs_difference": 0.0
+   },
+   "surface-d00001.npy": {
+    "bit_identical": true,
+    "max_abs_difference": 0.0
+   },
+   "surface-d00002.npy": {
+    "bit_identical": true,
+    "max_abs_difference": 0.0
+   },
+   "surface-d00003.npy": {
+    "bit_identical": true,
+    "max_abs_difference": 0.0
+   }
+  }
+ },
+ "resumed_at_days": [
+  2.0
+ ],
+ "run": "dev-thai-ben2-lwck-heated-T21L40-9f8c776",
+ "schema": "palintropos.radiation.thai_dev_run/1",
+ "shortwave": {
+  "kind": "transparent"
+ }
+}

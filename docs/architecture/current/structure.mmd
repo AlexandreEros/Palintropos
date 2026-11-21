@@ -61,15 +61,17 @@ flowchart LR
     nW3V6EBHY3I6C6["SemiInfiniteScatteringShortwave"]:::classNode
     nQKEENXJGZTG62["VerticalPathShortwave"]:::classNode
     n7T4P6TFFPCETY["kdist.py"]:::moduleNode
-    nLPBEYKYU2KBLM["KTable"]:::classNode
-    n7FK5C2USZB35U["#95;CorrelatedK"]:::classNode
-    nKJAW24BVQCOCW["CorrelatedKLongwave"]:::classNode
-    nZB5JHTLCYTV6O["CorrelatedKShortwave"]:::classNode
+    nGGYM2E4Q4CF5U["KTable"]:::classNode
+    nFDRNUSLGTOJFE["#95;CorrelatedK"]:::classNode
+    nQP7R2XU6Q34EC["CorrelatedKLongwave"]:::classNode
+    nWCTZQZ4QBAXAY["CorrelatedKShortwave"]:::classNode
     nUTFO3UHZ5QSGK["scheme.py"]:::moduleNode
     nCH4F2HNHUGSAK["Column"]:::classNode
     nTHJNB4N226J3C["LowerBoundary"]:::classNode
     nZUKIGTYFUYH3E["RadiativeFluxes"]:::classNode
     nBTNFQKAKLYONK["Radiation"]:::classNode
+    nY7NHLQ2OYOSJS["tables.py"]:::moduleNode
+    nCJ44HFI257NQK["KTableError"]:::classNode
     nUE7HYYFTQULI6["rayleigh.py"]:::moduleNode
     n4EJDWKUMSXYJ2["OpticalRecord"]:::classNode
     nBHK36N3GRK4A4["rotation.py"]:::moduleNode
@@ -412,15 +414,17 @@ flowchart LR
     nUXAQUP5X7AOV2 --> nW3V6EBHY3I6C6
     nUXAQUP5X7AOV2 --> nQKEENXJGZTG62
     nUPRZB5Y5LKZBK --> n7T4P6TFFPCETY
-    n7T4P6TFFPCETY --> nLPBEYKYU2KBLM
-    n7T4P6TFFPCETY --> n7FK5C2USZB35U
-    n7T4P6TFFPCETY --> nKJAW24BVQCOCW
-    n7T4P6TFFPCETY --> nZB5JHTLCYTV6O
+    n7T4P6TFFPCETY --> nGGYM2E4Q4CF5U
+    n7T4P6TFFPCETY --> nFDRNUSLGTOJFE
+    n7T4P6TFFPCETY --> nQP7R2XU6Q34EC
+    n7T4P6TFFPCETY --> nWCTZQZ4QBAXAY
     nUPRZB5Y5LKZBK --> nUTFO3UHZ5QSGK
     nUTFO3UHZ5QSGK --> nCH4F2HNHUGSAK
     nUTFO3UHZ5QSGK --> nTHJNB4N226J3C
     nUTFO3UHZ5QSGK --> nZUKIGTYFUYH3E
     nUTFO3UHZ5QSGK --> nBTNFQKAKLYONK
+    nUPRZB5Y5LKZBK --> nY7NHLQ2OYOSJS
+    nY7NHLQ2OYOSJS --> nCJ44HFI257NQK
     nUX3XGDIQ6OMYG --> nUE7HYYFTQULI6
     nUE7HYYFTQULI6 --> n4EJDWKUMSXYJ2
     nUX3XGDIQ6OMYG --> nBHK36N3GRK4A4

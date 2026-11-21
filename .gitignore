@@ -47,3 +47,7 @@ mri-w5-reference-preparation-v1-fixed-run/
 artifacts/
 notebooks/*_browser_handoff.ipynb
 .pytest-tmp/
+
+# Fetched opacity inputs and imported k-tables, never committed:
+# tools/radiation/opacity/fetch_socrates.py and import_socrates.py write here.
+opacity_cache/
