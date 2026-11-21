@@ -38214,7 +38214,7 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ],
 [
 [
-562,
+563,
 17,
 "heat_capacity(composition, THAI_CP_TEMPERATURE)",
 [
@@ -38231,7 +38231,7 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ],
 [
 [
-556,
+557,
 11,
 "RadiativeConfig(experiment_id=_preset_id(experiment_id, f'dev-thai-{case}-{tag}', 'T21L40', frictional_heating), frictional_heating=frictional_heating, radius=5798000.0, omega=2.0 * math.pi / (6.1 * DAY_SECONDS), gravity=9.12, gas_constant…",
 []
@@ -38239,7 +38239,7 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ],
 [
 [
-557,
+558,
 22,
 "_preset_id(experiment_id, f'dev-thai-{case}-{tag}', 'T21L40', frictional_heating)",
 [
@@ -38264,7 +38264,7 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ],
 [
 [
-582,
+583,
 10,
 "_t21()",
 []
@@ -76786,7 +76786,7 @@ null,
 ],
 [
 [
-543,
+544,
 "function",
 [
 "COMPOSITIONS"
@@ -76796,7 +76796,7 @@ null,
 ],
 [
 [
-544,
+545,
 "function",
 [
 "heat_capacity"
@@ -94319,41 +94319,41 @@ null,
 "486":"                 stellar_absorption: bool = False,",
 "487":"                 thermal_source: str = \"linear\") -\u003e RadiativeConfig:",
 "488":"    \"\"\"DEVELOPMENT EXPERIMENT with a THAI dry composition and real-gas",
-"542":"        raise ValueError(f\"case must be one of {sorted(THAI_DRY_TABLES)}, not {case!r}\")",
-"543":"    from tropoi.physics.composition import COMPOSITIONS",
-"544":"    from tropoi.physics.thermodynamics import heat_capacity",
-"545":"    entry = THAI_DRY_TABLES[case]",
-"554":"    if thermal_source != \"linear\":",
-"555":"        tag += f\"-{thermal_source}\"",
-"556":"    return RadiativeConfig(",
-"557":"        experiment_id=_preset_id(experiment_id, f\"dev-thai-{case}-{tag}\", \"T21L40\",",
-"558":"                                 frictional_heating),",
-"559":"        frictional_heating=frictional_heating, radius=5.798e6,",
-"560":"        omega=2.0 * math.pi / (6.1 * DAY_SECONDS), gravity=9.12,",
-"561":"        gas_constant=float(composition.gas_constant),",
-"562":"        cp=float(heat_capacity(composition, THAI_CP_TEMPERATURE)),",
-"563":"        reference_pressure=1.0e5,",
-"564":"        vertical={\"kind\": \"stretched\", \"nlev\": 40, \"sigma_top\": 4.0e-5,",
-"565":"                  \"linear_scale\": 0.15},",
-"566":"        dt=dt, days=days,",
-"567":"        longwave={\"kind\": \"correlated_k\", \"tables\": [dict(entry[\"longwave\"])],",
-"568":"                  \"mass_fractions\": {composition.label: 1.0}, \"bounds\": \"error\"},",
-"569":"        thermal_source=thermal_source,",
-"570":"        shortwave=shortwave,",
-"571":"        insolation={\"kind\": \"tidally_locked\", \"stellar_constant\": 900.0},",
-"572":"        convection=None,",
-"573":"        surface={\"heat_capacity\": 2.0e6, \"albedo\": 0.3, \"emissivity\": 1.0,",
-"574":"                 \"initial_temperature\": 300.0},",
-"575":"        sensible={\"roughness_length\": roughness, \"critical_richardson\": 1.0,",
-"576":"                  \"gustiness\": 0.0, \"implicit\": True},",
-"577":"        boundary_layer={\"roughness_length\": roughness, \"critical_richardson\": 1.0,",
-"578":"                        \"rich_crit_pbl\": 1.0, \"frac_inner\": 0.1, \"gustiness\": 0.0},",
-"579":"        drag=None, radiation_interval=radiation_interval,",
-"580":"        initial={\"kind\": \"isothermal\", \"temperature\": 300.0},",
-"581":"        checkpoint_every_days=1, state_every_days=1,",
-"582":"        **_t21())",
-"583":"",
+"543":"        raise ValueError(f\"case must be one of {sorted(THAI_DRY_TABLES)}, not {case!r}\")",
+"544":"    from tropoi.physics.composition import COMPOSITIONS",
+"545":"    from tropoi.physics.thermodynamics import heat_capacity",
+"546":"    entry = THAI_DRY_TABLES[case]",
+"555":"    if thermal_source != \"linear\":",
+"556":"        tag += f\"-{thermal_source}\"",
+"557":"    return RadiativeConfig(",
+"558":"        experiment_id=_preset_id(experiment_id, f\"dev-thai-{case}-{tag}\", \"T21L40\",",
+"559":"                                 frictional_heating),",
+"560":"        frictional_heating=frictional_heating, radius=5.798e6,",
+"561":"        omega=2.0 * math.pi / (6.1 * DAY_SECONDS), gravity=9.12,",
+"562":"        gas_constant=float(composition.gas_constant),",
+"563":"        cp=float(heat_capacity(composition, THAI_CP_TEMPERATURE)),",
+"564":"        reference_pressure=1.0e5,",
+"565":"        vertical={\"kind\": \"stretched\", \"nlev\": 40, \"sigma_top\": 4.0e-5,",
+"566":"                  \"linear_scale\": 0.15},",
+"567":"        dt=dt, days=days,",
+"568":"        longwave={\"kind\": \"correlated_k\", \"tables\": [dict(entry[\"longwave\"])],",
+"569":"                  \"mass_fractions\": {composition.label: 1.0}, \"bounds\": \"error\"},",
+"570":"        thermal_source=thermal_source,",
+"571":"        shortwave=shortwave,",
+"572":"        insolation={\"kind\": \"tidally_locked\", \"stellar_constant\": 900.0},",
+"573":"        convection=None,",
+"574":"        surface={\"heat_capacity\": 2.0e6, \"albedo\": 0.3, \"emissivity\": 1.0,",
+"575":"                 \"initial_temperature\": 300.0},",
+"576":"        sensible={\"roughness_length\": roughness, \"critical_richardson\": 1.0,",
+"577":"                  \"gustiness\": 0.0, \"implicit\": True},",
+"578":"        boundary_layer={\"roughness_length\": roughness, \"critical_richardson\": 1.0,",
+"579":"                        \"rich_crit_pbl\": 1.0, \"frac_inner\": 0.1, \"gustiness\": 0.0},",
+"580":"        drag=None, radiation_interval=radiation_interval,",
+"581":"        initial={\"kind\": \"isothermal\", \"temperature\": 300.0},",
+"582":"        checkpoint_every_days=1, state_every_days=1,",
+"583":"        **_t21())",
 "584":"",
+"585":"",
 "91":"    perturbation_wind: float = 0.1          # m/s, grid RMS wind scale of the seed",
 "98":"    mean_last_days: int = 0                 # 0 = second half of the run"
 },
@@ -99893,7 +99893,7 @@ null,
 }
 },
 "meta":{
-"base_commit":"ba9ff65cb4dc17b9e0b3ff879e3f050fe4261b5b",
+"base_commit":"be23cdaa3b4662f22e0fea79405f25721abd0b61",
 "call_depth":4,
 "command":"python -m tools.architecture.generate",
 "dynamic_import_sites":{
@@ -99937,7 +99937,7 @@ null,
 "max_sites":8,
 "package":"tropoi",
 "source_commit":null,
-"source_sha256":"dbf9a948a6f883845eb69229bf32484fc8051ccff823df5d040874c8580cd9bf",
+"source_sha256":"32998baffcc9dc4f0d4e00bceb9482e2e40f7797b4c1a54f899b9e0303ec4da7",
 "source_status":"clean",
 "title":"current",
 "tool_version":"2.3.0",
@@ -130157,7 +130157,7 @@ null
 "RadiativeConfig",
 "DEVELOPMENT EXPERIMENT with a THAI dry composition and real-gas longwave absorption; not a THAI reproduction (docs/radiation/OPACITY.md, docs/radiation/THAI_BEN_PLAN.md).",
 [],
-582
+583
 ],
 "1508":[
 "RadiativeRun",
