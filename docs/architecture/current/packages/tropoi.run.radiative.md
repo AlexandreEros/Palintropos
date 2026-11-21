@@ -10,7 +10,7 @@ Index: [all packages](../index.md) · parent [`tropoi.run`](tropoi.run.md)
 |---|---|---|---|
 | `tropoi.run.radiative` | empty | – | – |
 | `tropoi.run.radiative.__main__` | code | – | `main` |
-| `tropoi.run.radiative.config` | code | `RadiativeConfig` | `earth_gray_dry`, `jupiter_schneider_liu`, `mars_gray_flat_dev` |
+| `tropoi.run.radiative.config` | code | `RadiativeConfig` | `earth_gray_dry`, `jupiter_schneider_liu`, `mars_gray_flat_dev`, `thai_dry_dev` |
 | `tropoi.run.radiative.experiment` | code | `RadiativeRun` | – |
 | `tropoi.run.radiative.model` | code | – | `build_boundary_layer`, `build_insolation`, `build_model`, `build_physics`, `build_radiation`, `build_sigma`, `build_stepper`, `initial_state`, `reference_column` |
 
@@ -45,13 +45,14 @@ flowchart LR
     n_tropoi_orun_oradiative_oexperiment -.-> n_tropoi_orun_oradiative_omodel
     n_tropoi_orun_oradiative_omodel --> n_tropoi_orun_oradiative_oconfig
     n_tropoi_orun_oradiative_o____main____ -.->|1| p_tropoi_ospatial_ostates
+    n_tropoi_orun_oradiative_oconfig -.->|2| p_tropoi_ophysics
     n_tropoi_orun_oradiative_oconfig -.->|1| p_tropoi_ospatial
     n_tropoi_orun_oradiative_oexperiment -.->|1| p_tropoi_ophysics
     n_tropoi_orun_oradiative_oexperiment -->|2| p_tropoi_orun_oheld__suarez
     n_tropoi_orun_oradiative_oexperiment -.->|1| p_tropoi_ospatial_ostates
     n_tropoi_orun_oradiative_oexperiment -.->|1| p_tropoi_otemporal
     n_tropoi_orun_oradiative_omodel -->|4| p_tropoi_ophysics
-    n_tropoi_orun_oradiative_omodel -->|2| p_tropoi_ophysics_oradiation
+    n_tropoi_orun_oradiative_omodel -->|4| p_tropoi_ophysics_oradiation
     n_tropoi_orun_oradiative_omodel -->|4| p_tropoi_ospatial
     n_tropoi_orun_oradiative_omodel -.->|1| p_tropoi_ospatial_ostates
     n_tropoi_orun_oradiative_omodel -.->|1| p_tropoi_otemporal

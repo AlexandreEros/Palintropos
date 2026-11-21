@@ -17,7 +17,7 @@ from dataclasses import asdict, dataclass, field, replace
 from typing import Any, Optional
 
 __all__ = ["RadiativeConfig", "PRESETS", "CONFIG_SCHEMA", "DAY_SECONDS", "mars_gray_flat_dev",
-           "jupiter_schneider_liu", "earth_gray_dry"]
+           "jupiter_schneider_liu", "earth_gray_dry", "thai_dry_dev", "THAI_DRY_TABLES"]
 
 CONFIG_SCHEMA = "palintropos.radiative.config/1"
 DAY_SECONDS = 86400.0
@@ -436,7 +436,97 @@ def mars_gray_flat_dev(experiment_id: Optional[str] = None, *, days: int = 30,
         **_t21())
 
 
+#: The k-tables of the THAI dry development cases, pinned by content hash
+#: (docs/radiation/OPACITY.md: sources, coverage, assumptions, and the two
+#: commands that fetch and import them into ``opacity_cache/tables``).
+THAI_DRY_TABLES = {
+    "ben1": {"composition": "thai_ben1", "longwave": {
+        "file": "thai-ben1-sp-lw-15-dsa-ar10bar.npz",
+        "sha256": "699c00492b5e5d5b9e6642da054a8daeee3f3269670a351ef689356c350e9038"}},
+    "ben2": {"composition": "thai_ben2", "longwave": {
+        "file": "thai-ben2-sp-lw-17-dsa-mars.npz",
+        "sha256": "9d4c18a6822690aa12051598695ca4d6946324bb36f8752a35d57b9963087e18"}},
+}
+#: Temperature (K) at which the constant c_p of the THAI dry cases is evaluated.
+THAI_CP_TEMPERATURE = 250.0
+
+
+def thai_dry_dev(case: str, experiment_id: Optional[str] = None, *, days: int = 5,
+                 dt: float = 1200.0, frictional_heating: bool = True,
+                 radiation_interval: int = 3) -> RadiativeConfig:
+    """DEVELOPMENT EXPERIMENT with a THAI dry composition and real-gas
+    longwave absorption; not a THAI reproduction (docs/radiation/OPACITY.md,
+    docs/radiation/THAI_BEN_PLAN.md).
+
+    ``case`` is ``"ben1"`` (1 bar N2 with 400 ppmv CO2) or ``"ben2"`` (1 bar
+    CO2). The two differ only through inputs: the composition preset
+    (``thai_ben1`` / ``thai_ben2`` of ``tropoi.physics.composition``) and
+    the premixed longwave k-table imported for it. The bulk thermodynamics
+    come from that same composition - ``gas_constant`` from its molar mass
+    and a constant ``cp`` from its heat capacity at 250 K - and the table
+    loader refuses a table mixed for another gas constant.
+
+    Matched to the THAI protocol (Fauchez et al. 2020): radius 5798 km,
+    g = 9.12 m s^-2, synchronous 6.1-day rotation, 900 W m^-2 on a fixed
+    substellar point, 1 bar, surface albedo 0.3, roughness 1e-2 m, a 300 K
+    isothermal start at rest, dry.
+
+    Longwave: correlated-k, 1-3000 cm^-1, from the ROCKE-3D SOCRATES
+    spectral files ``sp_lw_17_dsa_mars`` (Ben 2: self-broadened CO2 lines,
+    sub-Lorentzian wings, CO2-CO2 CIA) and ``sp_lw_15_dsa_ar10bar`` (Ben 1:
+    air-broadened CO2 lines, N2-N2 CIA; no N2-CO2 CIA). States outside
+    1 Pa - 10 bar or 100 - 400 K are an error.
+
+    SHORTWAVE APPROXIMATION: the atmosphere is transparent to starlight
+    (no CO2 near-infrared absorption, no Rayleigh scattering); the surface
+    absorbs 70 % of the incident flux. THAI's Bond albedos (0.27-0.30 Ben 1,
+    0.18-0.22 Ben 2) show the atmosphere absorbs a large share of an
+    M-dwarf's light in Ben 2, so this is the largest known departure.
+
+    NOT matched: T21 L40 to 4 Pa with del^8 and no sponge; a one-layer slab
+    of 2e6 J m^-2 K^-1 (the UM's); the FHZ06 dry boundary layer of the Mars
+    development runs in place of each THAI model's own; constant c_p;
+    radiation every ``radiation_interval`` steps (hourly at 1200 s). Short
+    runs from the isothermal start are nowhere near equilibrium.
+    """
+    if case not in THAI_DRY_TABLES:
+        raise ValueError(f"case must be one of {sorted(THAI_DRY_TABLES)}, not {case!r}")
+    from tropoi.physics.composition import COMPOSITIONS
+    from tropoi.physics.thermodynamics import heat_capacity
+    entry = THAI_DRY_TABLES[case]
+    composition = COMPOSITIONS[entry["composition"]]
+    roughness = 1.0e-2
+    return RadiativeConfig(
+        experiment_id=_preset_id(experiment_id, f"dev-thai-{case}-lwck", "T21L40",
+                                 frictional_heating),
+        frictional_heating=frictional_heating, radius=5.798e6,
+        omega=2.0 * math.pi / (6.1 * DAY_SECONDS), gravity=9.12,
+        gas_constant=float(composition.gas_constant),
+        cp=float(heat_capacity(composition, THAI_CP_TEMPERATURE)),
+        reference_pressure=1.0e5,
+        vertical={"kind": "stretched", "nlev": 40, "sigma_top": 4.0e-5,
+                  "linear_scale": 0.15},
+        dt=dt, days=days,
+        longwave={"kind": "correlated_k", "tables": [dict(entry["longwave"])],
+                  "mass_fractions": {composition.label: 1.0}, "bounds": "error"},
+        shortwave={"kind": "transparent"},
+        insolation={"kind": "tidally_locked", "stellar_constant": 900.0},
+        convection=None,
+        surface={"heat_capacity": 2.0e6, "albedo": 0.3, "emissivity": 1.0,
+                 "initial_temperature": 300.0},
+        sensible={"roughness_length": roughness, "critical_richardson": 1.0,
+                  "gustiness": 0.0, "implicit": True},
+        boundary_layer={"roughness_length": roughness, "critical_richardson": 1.0,
+                        "rich_crit_pbl": 1.0, "frac_inner": 0.1, "gustiness": 0.0},
+        drag=None, radiation_interval=radiation_interval,
+        initial={"kind": "isothermal", "temperature": 300.0},
+        checkpoint_every_days=1, state_every_days=1,
+        **_t21())
+
+
 PRESETS = {"jupiter-schneider-liu": jupiter_schneider_liu, "earth-gray-dry": earth_gray_dry,
+           "dev-thai-ben1": functools.partial(thai_dry_dev, "ben1"),
+           "dev-thai-ben2": functools.partial(thai_dry_dev, "ben2"),
            "dev-mars-gray-flat": mars_gray_flat_dev,
            "dev-mars-gray-flat-sponge": functools.partial(mars_gray_flat_dev, sponge=True),
            "dev-mars-gray-flat-sponge-implicit": functools.partial(

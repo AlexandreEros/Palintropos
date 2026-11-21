@@ -45,6 +45,15 @@ dry and Held–Suarez experiments are unchanged.
   scattering, no continuum or collision-induced absorption, and combines
   gases only by adding k at equal g. It has not been run on the GPU or
   coupled to the dynamics. No planet's radiation is represented.
+- **Update 2026-11-16: real longwave k-tables, development status.** The
+  paragraph above describes the state before [OPACITY.md](OPACITY.md).
+  Since then the provider has been given documented CO2 tables with
+  collision-induced absorption (imported from ROCKE-3D SOCRATES spectral
+  files), through the ordinary radiative configuration, on the GPU and
+  coupled to the dynamics, for the two dry THAI compositions. What is
+  still true: no comparison with an external radiation code or a
+  line-by-line calculation, no Rayleigh scattering, a transparent
+  shortwave, and development runs only. OPACITY.md §7 lists the gaps.
 
 ## 2. Conventions (column contract)
 
@@ -686,6 +695,9 @@ Test results for this commit are in [TEST_RESULTS.md](TEST_RESULTS.md).
 1. Obtain real k-tables (needs a decision on downloads: exo_k + ExoMol/HITRAN
    CIA) and compare `CorrelatedKLongwave` with an independent model for one
    Earth and one CO2 case; add Rayleigh, continua, CIA, gas overlap.
+   (Partly done 2026-11-16, [OPACITY.md](OPACITY.md): longwave CO2 tables
+   with CIA for the two dry THAI compositions, configured and coupled.
+   Still open: the independent model, the shortwave, Rayleigh.)
 2. A resolution sweep for the Jupiter ∇⁸ loss. (Done 2026-11-13: heating
    is the preset default, the time-stepping residual is split, and the
    controlled R1/R2 comparison met C1–C4.)

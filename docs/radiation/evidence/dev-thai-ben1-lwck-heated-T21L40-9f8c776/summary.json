@@ -1,0 +1,197 @@
+{
+ "aborted": [],
+ "completed": true,
+ "config_sha256": "72494a3143b330c9221721257d5aa4e9e3ef2379ff99723bda8520b5b0dad0c1",
+ "cp": 1038.7131588609018,
+ "daily": {
+  "0": {
+   "absorbed_stellar": 0.0,
+   "bottom_net_down": 0.0,
+   "column_energy_tendency": 0.0,
+   "energy_total": 3416819656.3406796,
+   "max_abs_u": 0.2213002179584926,
+   "max_wind_bottom": 0.22570207437549383,
+   "mean_ps": 99999.99999999987,
+   "mean_surface_temperature": 300.0,
+   "olr": 0.0,
+   "sensible": 0.0,
+   "surface_net": 0.0,
+   "t_max": 299.99999999999994,
+   "t_min": 299.99999999999994,
+   "toa_net_down": 0.0
+  },
+  "1": {
+   "absorbed_stellar": 157.3758831396182,
+   "bottom_net_down": -164.9744606804841,
+   "column_energy_tendency": -118.9888891399252,
+   "energy_rate": -119.0195363833231,
+   "energy_residual": -0.03064724339789393,
+   "energy_total": 3406536368.3971605,
+   "max_abs_u": 0.37816089572254735,
+   "max_wind_bottom": 0.2697367919482003,
+   "mean_ps": 99999.99999967641,
+   "mean_surface_temperature": 292.87106387883017,
+   "olr": 441.3864417510678,
+   "sensible": 0.04720879104016338,
+   "surface_net": -165.02166947152438,
+   "t_max": 300.2855482580718,
+   "t_min": 259.2675616489566,
+   "toa_net_down": -284.0105586114496
+  },
+  "2": {
+   "absorbed_stellar": 157.3758831396182,
+   "bottom_net_down": -132.31154544984142,
+   "column_energy_tendency": -122.03380634311043,
+   "energy_rate": -122.04599279193967,
+   "energy_residual": -0.012186448829240248,
+   "energy_total": 3395991594.619937,
+   "max_abs_u": 0.6279876715516126,
+   "max_wind_bottom": 0.6295685353955867,
+   "mean_ps": 99999.9999992128,
+   "mean_surface_temperature": 287.14065816174536,
+   "olr": 412.0579699708016,
+   "sensible": 0.3367350382318109,
+   "surface_net": -132.64828048807325,
+   "t_max": 301.7686331181545,
+   "t_min": 239.65250981157652,
+   "toa_net_down": -254.68208683118365
+  },
+  "3": {
+   "absorbed_stellar": 157.3758831396182,
+   "bottom_net_down": -109.48835587090332,
+   "column_energy_tendency": -122.63850179634181,
+   "energy_rate": -122.63650358030641,
+   "energy_residual": 0.0019982160354032885,
+   "energy_total": 3385395800.7105985,
+   "max_abs_u": 1.4552949686500767,
+   "max_wind_bottom": 1.4604866327031834,
+   "mean_ps": 99999.99999775489,
+   "mean_surface_temperature": 282.356020802365,
+   "olr": 390.7698793660622,
+   "sensible": 1.2671385591988362,
+   "surface_net": -110.75549443010227,
+   "t_max": 304.31260622180935,
+   "t_min": 227.2425950108373,
+   "toa_net_down": -233.39399622644396
+  },
+  "4": {
+   "absorbed_stellar": 157.3758831396182,
+   "bottom_net_down": -92.42495403292607,
+   "column_energy_tendency": -122.01972974580958,
+   "energy_rate": -122.01551796584218,
+   "energy_residual": 0.00421177996740596,
+   "energy_total": 3374853659.9583497,
+   "max_abs_u": 2.8460782482574656,
+   "max_wind_bottom": 2.858006431838334,
+   "mean_ps": 99999.9999933689,
+   "mean_surface_temperature": 278.2582716575552,
+   "olr": 374.2509171634314,
+   "sensible": 2.430350245077397,
+   "surface_net": -94.8553042780035,
+   "t_max": 307.2397653127309,
+   "t_min": 218.28949835217884,
+   "toa_net_down": -216.87503402381313
+  },
+  "5": {
+   "absorbed_stellar": 157.3758831396182,
+   "bottom_net_down": -79.21563726635668,
+   "column_energy_tendency": -121.42993306799434,
+   "energy_rate": -121.42468142066289,
+   "energy_residual": 0.005251647331448339,
+   "energy_total": 3364362567.4836044,
+   "max_abs_u": 4.605504911160322,
+   "max_wind_bottom": 4.625973771254003,
+   "mean_ps": 99999.99999216764,
+   "mean_surface_temperature": 274.7118038251613,
+   "olr": 360.8999789945075,
+   "sensible": 2.8785255205384797,
+   "surface_net": -82.09416278689518,
+   "t_max": 309.2320855935216,
+   "t_min": 211.4326027176296,
+   "toa_net_down": -203.52409585488942
+  }
+ },
+ "dt_seconds": 1200.0,
+ "events": [
+  {
+   "day": 0,
+   "event": "created",
+   "step": 0,
+   "time": "2026-11-16T20:01:23Z"
+  },
+  {
+   "day": 0.0,
+   "event": "checkpoint",
+   "file": "checkpoint-s000000000.npz",
+   "step": 0,
+   "time": "2026-11-16T20:01:24Z"
+  },
+  {
+   "day": 1.0,
+   "event": "checkpoint",
+   "file": "checkpoint-s000000072.npz",
+   "step": 72,
+   "time": "2026-11-16T20:03:15Z"
+  },
+  {
+   "day": 2.0,
+   "event": "checkpoint",
+   "file": "checkpoint-s000000144.npz",
+   "step": 144,
+   "time": "2026-11-16T20:04:53Z"
+  },
+  {
+   "day": 3.0,
+   "event": "checkpoint",
+   "file": "checkpoint-s000000216.npz",
+   "step": 216,
+   "time": "2026-11-16T20:06:29Z"
+  },
+  {
+   "day": 4.0,
+   "event": "checkpoint",
+   "file": "checkpoint-s000000288.npz",
+   "step": 288,
+   "time": "2026-11-16T20:08:02Z"
+  },
+  {
+   "day": 5.0,
+   "event": "checkpoint",
+   "file": "checkpoint-s000000360.npz",
+   "step": 360,
+   "time": "2026-11-16T20:10:11Z"
+  },
+  {
+   "day": 5.0,
+   "event": "completed",
+   "step": 360,
+   "time": "2026-11-16T20:10:11Z"
+  }
+ ],
+ "experiment_id": "dev-thai-ben1-lwck-heated-T21L40",
+ "gas_constant": 296.7289264825303,
+ "git_commit": "9f8c776d2558104498d516871a36ed4e17cc936e",
+ "git_dirty": false,
+ "last_day": 5,
+ "longwave": {
+  "bounds": "error",
+  "kind": "correlated_k",
+  "mass_fractions": {
+   "thai_ben1": 1.0
+  },
+  "tables": [
+   {
+    "file": "thai-ben1-sp-lw-15-dsa-ar10bar.npz",
+    "sha256": "699c00492b5e5d5b9e6642da054a8daeee3f3269670a351ef689356c350e9038"
+   }
+  ]
+ },
+ "max_abs_energy_residual_w_m2": 0.03064724339789393,
+ "radiation_interval_steps": 3,
+ "resumed_at_days": [],
+ "run": "dev-thai-ben1-lwck-heated-T21L40-9f8c776",
+ "schema": "palintropos.radiation.thai_dev_run/1",
+ "shortwave": {
+  "kind": "transparent"
+ }
+}

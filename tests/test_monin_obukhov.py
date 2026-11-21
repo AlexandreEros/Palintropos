@@ -688,17 +688,18 @@ def test_the_most_preset_selects_the_scheme_on_both_sides_and_keeps_everything_e
                      experiment_id=bl.experiment_id) == bl
 
 
-def test_no_preset_other_than_the_two_boundary_layer_ones_carries_the_scheme():
-    """Every earlier configuration keeps its canonical form, so its recorded
-    hash cannot move."""
+def test_only_opted_in_presets_serialize_boundary_layer_and_most():
+    boundary_layer_presets = {
+        "dev-mars-gray-flat-bl",
+        "dev-mars-gray-flat-bl-most",
+        "dev-thai-ben1",
+        "dev-thai-ben2",
+    }
     for name, factory in PRESETS.items():
         d = factory().to_dict()
-        if name in ("dev-mars-gray-flat-bl", "dev-mars-gray-flat-bl-most"):
-            assert "boundary_layer" in d
-        else:
-            assert "boundary_layer" not in d
-        if name != "dev-mars-gray-flat-bl-most":
-            assert "scheme" not in (d.get("sensible") or {})
+        assert ("boundary_layer" in d) == (name in boundary_layer_presets), name
+        assert ("scheme" in (d.get("sensible") or {})) == (
+            name == "dev-mars-gray-flat-bl-most"), name
 
 
 def test_the_most_preset_round_trips_through_json_with_its_hash():
