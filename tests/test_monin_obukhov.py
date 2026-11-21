@@ -696,6 +696,7 @@ def test_only_opted_in_presets_serialize_boundary_layer_and_most():
         "dev-thai-ben2",
         "dev-thai-ben1-ck",
         "dev-thai-ben2-ck",
+        "dev-thai-ben2-ck-layer-linear",
     }
     for name, factory in PRESETS.items():
         d = factory().to_dict()

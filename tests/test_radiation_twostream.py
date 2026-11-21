@@ -12,7 +12,6 @@ from tropoi.physics.radiation.gray import GrayLongwave, OpticalDepthProfile
 from tropoi.physics.radiation.scheme import (
     STEFAN_BOLTZMANN, Column, LowerBoundary, Radiation,
 )
-from tropoi.run.radiative.config import PRESETS
 
 
 def _bvp(rhs, bc, edges, per_layer=300, tol=1e-10):
@@ -115,8 +114,7 @@ def test_layer_centered_longwave_cools_each_optically_thin_layer_at_its_own_temp
     optics = GrayLongwave(OpticalDepthProfile([(1.0, 1.0)], equator=optical_depth))
     column = Column(pressure, temperature, 10., 1000.)
     surface = LowerBoundary(temperature=np.array([0.]))
-    cfg = PRESETS["dev-thai-ben2-ck"]()
-    fluxes = Radiation(optics, source=cfg.thermal_source).fluxes(column, surface)
+    fluxes = Radiation(optics, source="layer-linear").fluxes(column, surface)
     dp = np.diff(pressure, axis=0)
     emission = -fluxes.heating * column.cp * dp / column.gravity
     expected = 2 * optical_depth / 8 * STEFAN_BOLTZMANN * temperature**4

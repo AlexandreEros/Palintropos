@@ -17,7 +17,9 @@ from the full-precision spectral coefficients (issue #47):
   (K): the RMS over columns of the alternating part ``a (-1)^k``.
 * **coherence.** The area-weighted Pearson correlation of relative
   vorticity and of horizontal divergence between every pair of adjacent
-  layers, and each layer's area-weighted RMS.
+  layers, and each layer's area-weighted RMS. A correlation is undefined
+  when either layer has no spatial variance and is then recorded as
+  ``null`` (see :func:`weighted_correlation`).
 
 Sampling and weighting: each field is synthesized exactly from its
 coefficients (:func:`tropoi.spatial.transforms.host_synthesis.synthesize_latlon`)
@@ -41,6 +43,14 @@ import pathlib
 import sys
 
 import numpy as np
+
+#: A field counts as spatially constant when its standard deviation about
+#: the area mean is at most this multiple of machine epsilon times its own
+#: RMS. Synthesizing a constant on the T21 Gauss mesh leaves a relative
+#: spread of 2e-16 to 9e-16 (measured from 1e-3 to 1e6 K); 64 eps (1.4e-14)
+#: is ~16 times that and scale-free, so it flags only round-off, never a
+#: small physical signal (a 1e-12 relative perturbation is still a field).
+CONSTANT_FIELD_EPS = 64.0
 
 SCHEMA = "palintropos.radiation.vertical_coherence/1"
 OUT_FILE = "vertical_coherence.json"
@@ -67,12 +77,31 @@ def area_mean(field, weights) -> np.ndarray:
     return np.tensordot(field, weights, axes=([-2, -1], [0, 1]))
 
 
-def weighted_correlation(a, b, weights) -> float:
-    """Area-weighted Pearson correlation of two fields (means removed)."""
-    a = a - area_mean(a, weights)
-    b = b - area_mean(b, weights)
-    return float(area_mean(a * b, weights)
-                 / np.sqrt(area_mean(a * a, weights) * area_mean(b * b, weights)))
+def _spread(field, weights) -> tuple[np.ndarray, float, float]:
+    """Anomaly about the area mean, its standard deviation and the RMS of
+    the field itself."""
+    anomaly = field - area_mean(field, weights)
+    return (anomaly, float(np.sqrt(area_mean(anomaly * anomaly, weights))),
+            float(np.sqrt(area_mean(field * field, weights))))
+
+
+def weighted_correlation(a, b, weights) -> "float | None":
+    """Area-weighted Pearson correlation of two fields (means removed).
+
+    The correlation is undefined when either field has no spatial variance.
+    That case returns ``None`` (``null`` in the JSON evidence) instead of
+    dividing by zero or returning the correlation of round-off: a field is
+    treated as constant when it is identically zero, or when its standard
+    deviation is at most ``CONSTANT_FIELD_EPS`` machine epsilons times its
+    own RMS. The test is relative to the field's own size, so a field of
+    any amplitude with a resolved spatial pattern keeps its correlation.
+    """
+    eps = CONSTANT_FIELD_EPS * np.finfo(np.float64).eps
+    a, sd_a, rms_a = _spread(a, weights)
+    b, sd_b, rms_b = _spread(b, weights)
+    if sd_a <= eps * rms_a or sd_b <= eps * rms_b or sd_a == 0.0 or sd_b == 0.0:
+        return None
+    return float(area_mean(a * b, weights) / (sd_a * sd_b))
 
 
 def alternating_design(sigma) -> np.ndarray:
@@ -156,6 +185,10 @@ def run_metrics(run: pathlib.Path, *, top: int = 8) -> dict:
     }
 
 
+def _r(value) -> str:
+    return "  n/a" if value is None else f"{value:+.2f}"
+
+
 def _print(result: dict) -> None:
     print(f"{result['run']}  [{result['thermal_source']}]  {result['config_sha256'][:12]}")
     print("  day  RMS alt(K)  mean T levels 1-4 (K)              "
@@ -166,8 +199,8 @@ def _print(result: dict) -> None:
         d = row["delta_adjacent_correlation"][:3]
         print(f"  {day:>3}  {row['alternating_rms_top']:9.3f}  "
               + " ".join(f"{v:7.2f}" for v in t) + "   "
-              + " ".join(f"{v:+.2f}" for v in z) + "   "
-              + " ".join(f"{v:+.2f}" for v in d))
+              + " ".join(_r(v) for v in z) + "   "
+              + " ".join(_r(v) for v in d))
 
 
 def main(argv=None) -> int:
@@ -187,7 +220,8 @@ def main(argv=None) -> int:
             if target.exists():
                 raise SystemExit(f"{target} exists (evidence is not overwritten)")
             target.parent.mkdir(parents=True, exist_ok=True)
-            target.write_text(json.dumps(result, indent=1, sort_keys=True) + "\n",
+            target.write_text(json.dumps(result, indent=1, sort_keys=True, allow_nan=False)
+                              + "\n",
                               encoding="utf-8")
             print(f"  wrote {target}")
     return 0
