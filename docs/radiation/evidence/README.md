@@ -58,6 +58,6 @@ and the [preservation record](../../validation/run_archive_2026-11-12/README.md)
   configuration as the later preset `dev-thai-ben2-ck-layer-linear` apart from its id)
   and its control at the same commit with the historical source
   ([9b2060c linear control](dev-thai-ben2-ck-heated-T21L40-9b2060c-linear/summary.json),
-  `fdbcf1cf…`, bit-identical to the `809ffdd` run). The new source removes the alternating temperature
-  component; the loss of upper-level wind coherence remains and comes with stellar absorption
+  `fdbcf1cf…`, bit-identical to the `809ffdd` run). In this 5-day matched replay the new source reduces the alternating
+  temperature component about tenfold; the loss of upper-level wind coherence remains and comes with stellar absorption
   ([OPACITY.md](../OPACITY.md) §6).

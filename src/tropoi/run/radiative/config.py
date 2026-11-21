@@ -527,8 +527,9 @@ def thai_dry_dev(case: str, experiment_id: Optional[str] = None, *, days: int = 
     configuration with another source never shares an id with the recorded
     ``linear`` runs: ``dev-thai-ben2-ck-layer-linear`` (id
     ``dev-thai-ben2-ck-layer-linear-heated-T21L40``) centers the linear
-    source on each layer's Planck flux, which removes the layer-scale
-    temperature alternation of the stellar-absorbing Ben 2 runs (issue
+    source on each layer's Planck flux. In the matched 5-day replay of the
+    stellar-absorbing Ben 2 run this reduced the layer-scale temperature
+    alternation about tenfold (docs/radiation/OPACITY.md section 6, issue
     #47). It does not address the upper-level wind decoherence or the
     dt = 1200 s instability of #47.
 
