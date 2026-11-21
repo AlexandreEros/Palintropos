@@ -1,16 +1,16 @@
 {
   "atlas": {
-    "call_edges": 2379,
+    "call_edges": 2397,
     "call_sites_omitted_by_cap": 35,
-    "call_sites_recorded": 3136,
-    "import_edges": 488,
+    "call_sites_recorded": 3157,
+    "import_edges": 493,
     "import_sites_omitted_by_cap": 0,
-    "import_sites_recorded": 549,
+    "import_sites_recorded": 554,
     "max_sites_per_edge": 8,
-    "nodes": 2206,
+    "nodes": 2217,
     "proposal": {
       "call_edges_by_direction": {
-        "downward": 424,
+        "downward": 429,
         "lateral": 6,
         "upward": 3
       },
@@ -20,8 +20,8 @@
           "archive"
         ]
       ],
-      "crossing_call_edges": 453,
-      "crossing_import_edges": 281,
+      "crossing_call_edges": 458,
+      "crossing_import_edges": 285,
       "exceptions_used": [
         11,
         6,
@@ -34,7 +34,7 @@
         3
       ],
       "import_edges_by_direction": {
-        "downward": 260,
+        "downward": 264,
         "lateral": 4,
         "upward": 1
       },
@@ -64,9 +64,9 @@
         "cli": 66,
         "dynamics": 119,
         "integration": 92,
-        "physics": 231,
+        "physics": 240,
         "run": 92,
-        "setup": 290,
+        "setup": 292,
         "spectral": 249,
         "world": 150
       },
@@ -159,24 +159,24 @@
         "sha256": "1dcfeb9400fd06152e45cd607c8648f54d8fa8f41c02b0fcd8ee9310a03c28a4"
       }
     ],
-    "source_lines_embedded": 18556
+    "source_lines_embedded": 18692
   },
   "call_graph": {
     "call_sites": {
-      "builtin": 4035,
-      "external": 2648,
-      "internal": 3162,
-      "unresolved": 4186
+      "builtin": 4064,
+      "external": 2664,
+      "internal": 3183,
+      "unresolved": 4205
     },
     "edges_by_kind": {
-      "call": 1411,
+      "call": 1423,
       "constructor": 71,
-      "instantiate": 525,
+      "instantiate": 531,
       "override": 6,
       "self": 362,
       "super": 4
     },
-    "nodes": 2027,
+    "nodes": 2037,
     "scoped": {
       "cli-capsule-command": {
         "edges": 21,
@@ -363,12 +363,12 @@
     }
   },
   "class_graph": {
-    "classes": 225,
+    "classes": 226,
     "classes_in_inherits_edges": 21,
     "external_bases": {
       "RuntimeError": 7,
       "UserWarning": 1,
-      "ValueError": 21,
+      "ValueError": 22,
       "abc.ABC": 2,
       "collections.abc.Mapping": 1,
       "enum.Enum": 2,
@@ -410,13 +410,13 @@
       "tropoi.temporal.tendencies"
     ],
     "module_categories": {
-      "code": 151,
+      "code": 152,
       "empty": 22,
       "namespace": 1,
       "reexport": 5
     },
-    "modules_discovered": 179,
-    "modules_in_graph": 156,
+    "modules_discovered": 180,
+    "modules_in_graph": 157,
     "reexport_modules": [
       "tropoi.representation.archive",
       "tropoi.run.bve.model",
@@ -655,33 +655,33 @@
   "module_graph": {
     "all_imports": {
       "condensation": {
-        "edges": 488,
+        "edges": 493,
         "longest_path_edges": 14,
-        "nodes": 156,
+        "nodes": 157,
         "sinks": 40,
-        "sources": 6
+        "sources": 5
       },
-      "density": 0.020182,
-      "edges": 488,
+      "density": 0.020129,
+      "edges": 493,
       "in_degree": {
         "histogram": {
-          "0": 6,
+          "0": 5,
           "1": 44,
           "10": 3,
           "11": 1,
           "12": 2,
           "17": 1,
-          "2": 39,
+          "2": 41,
           "3": 19,
-          "4": 15,
-          "5": 9,
+          "4": 14,
+          "5": 10,
           "6": 6,
           "7": 4,
           "8": 5,
           "9": 2
         },
         "max": 17,
-        "mean": 3.128205,
+        "mean": 3.140127,
         "median": 2.0,
         "min": 0,
         "quartiles": [
@@ -689,9 +689,9 @@
           2.0,
           4.0
         ],
-        "zeros": 6
+        "zeros": 5
       },
-      "nodes": 156,
+      "nodes": 157,
       "nodes_in_cycles": {
         "count": 0,
         "fraction": 0.0
@@ -708,10 +708,10 @@
           "10": 6,
           "11": 2,
           "13": 1,
-          "17": 1,
+          "19": 1,
           "2": 22,
           "23": 1,
-          "3": 13,
+          "3": 14,
           "4": 10,
           "5": 11,
           "6": 5,
@@ -720,7 +720,7 @@
           "9": 3
         },
         "max": 23,
-        "mean": 3.128205,
+        "mean": 3.140127,
         "median": 2.0,
         "min": 0,
         "quartiles": [
@@ -737,9 +737,9 @@
       "reciprocity": 0.0,
       "self_loops": 0,
       "sinks": 40,
-      "sources": 6,
+      "sources": 5,
       "strongly_connected_components": {
-        "count": 156
+        "count": 157
       },
       "top_fan_in": {
         "nodes": [
@@ -793,7 +793,7 @@
             "node": "tropoi.cli.main"
           },
           {
-            "degree": 17,
+            "degree": 19,
             "node": "tropoi.run.radiative.model"
           },
           {
@@ -834,31 +834,31 @@
       "weakly_connected_components": {
         "count": 1,
         "sizes": [
-          156
+          157
         ]
       }
     },
     "edge_scopes": {
-      "function": 180,
+      "function": 184,
       "function+module": 7,
       "function+type_checking": 1,
-      "module": 294,
+      "module": 295,
       "type_checking": 6
     },
     "import_time": {
       "condensation": {
-        "edges": 301,
+        "edges": 302,
         "longest_path_edges": 7,
-        "nodes": 156,
+        "nodes": 157,
         "sinks": 53,
         "sources": 41
       },
-      "density": 0.012448,
-      "edges": 301,
+      "density": 0.012331,
+      "edges": 302,
       "in_degree": {
         "histogram": {
           "0": 41,
-          "1": 52,
+          "1": 53,
           "14": 1,
           "2": 24,
           "3": 14,
@@ -870,17 +870,17 @@
           "9": 3
         },
         "max": 14,
-        "mean": 1.929487,
+        "mean": 1.923567,
         "median": 1.0,
         "min": 0,
         "quartiles": [
           0.0,
           1.0,
-          2.25
+          2.0
         ],
         "zeros": 41
       },
-      "nodes": 156,
+      "nodes": 157,
       "nodes_in_cycles": {
         "count": 0,
         "fraction": 0.0
@@ -893,7 +893,7 @@
       "out_degree": {
         "histogram": {
           "0": 53,
-          "1": 33,
+          "1": 34,
           "2": 23,
           "3": 18,
           "4": 8,
@@ -904,7 +904,7 @@
           "9": 4
         },
         "max": 9,
-        "mean": 1.929487,
+        "mean": 1.923567,
         "median": 1.0,
         "min": 0,
         "quartiles": [
@@ -923,7 +923,7 @@
       "sinks": 53,
       "sources": 41,
       "strongly_connected_components": {
-        "count": 156
+        "count": 157
       },
       "top_fan_in": {
         "nodes": [
@@ -1018,7 +1018,7 @@
       "weakly_connected_components": {
         "count": 7,
         "sizes": [
-          143,
+          144,
           8,
           1,
           1,
@@ -1065,7 +1065,7 @@
       ],
       "zeros": 2
     },
-    "intra_package_module_edges": 174,
+    "intra_package_module_edges": 175,
     "nodes": 24,
     "nodes_in_cycles": {
       "count": 8,
@@ -1252,7 +1252,7 @@
     "package": "tropoi",
     "src": "src",
     "working_tree": {
-      "base_commit": "00581198363233836f3346e3d55a461af819a971",
+      "base_commit": "966de903830744ea574411248ba9ff0899f26191",
       "generator": {
         "changes": [],
         "files": {
@@ -1305,8 +1305,9 @@
           "src/tropoi/physics/planets.py": "4568cb1fc41c1bbf5529d215e5e3f31df04266d36fb68b62b0c0c0b023cf8aec",
           "src/tropoi/physics/radiation/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
           "src/tropoi/physics/radiation/gray.py": "1c32cb04dd77aa8129b2225a2a250515bfa5cb6522244ac6b606cb51016ab6b4",
-          "src/tropoi/physics/radiation/kdist.py": "e661d9ba0eb07ad3bbf20b427c03996a26149c710990e970f884623afbd0edec",
+          "src/tropoi/physics/radiation/kdist.py": "2b0897245e73928f81cb1b6aacb925a85e062f0a12c946d438917293a23101c6",
           "src/tropoi/physics/radiation/scheme.py": "d89f1aaea2970d5bcb02b22d28579cce20618dfef2f16c0fe0d981980ccfe36f",
+          "src/tropoi/physics/radiation/tables.py": "91d0dfe81d19b9506205a20a4e6271defba7f0da14af1ef297e6095626eb533e",
           "src/tropoi/physics/radiation/twostream.py": "a2a34eed1686945be47171465006711dc8e9ff2ff7cafd6c733057fe7c50d125",
           "src/tropoi/physics/rayleigh.py": "19aea061cceb369829efa7c97c539dfb8e4bee9e6705c830453937debe5dc4f9",
           "src/tropoi/physics/rotation.py": "fd67a37dfa31f53c1f8bd820a3b46bc9b04b861e66d886411cc4fd055b801053",
@@ -1399,9 +1400,9 @@
           "src/tropoi/run/pe/runner.py": "1f3dc50308832c8d5a9a75fe77c98f0284462cac6e697a78a52b3ea8e0ccab07",
           "src/tropoi/run/radiative/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
           "src/tropoi/run/radiative/__main__.py": "f5a10b53a468a0f496352b4c4ba2d8ed4c5f607497c459c68f9004ef69ff9d73",
-          "src/tropoi/run/radiative/config.py": "d6d06ab4173815116da0ec13a33fd48f407a0a3af0bbf15ffa3d877706ba27a7",
+          "src/tropoi/run/radiative/config.py": "25dd14256b45db06063a939c111740ac7f0f3bbbdf67e72ea77226640097cba9",
           "src/tropoi/run/radiative/experiment.py": "84845889d24ac09297c0d1dc2eb27c76332a15bcc9bdad3dd6a852de492a631d",
-          "src/tropoi/run/radiative/model.py": "a5edac2b29dbd3f1a72d59a149ae41411f48d5c5597682f96e3d3ef059c34855",
+          "src/tropoi/run/radiative/model.py": "5ef22d544cac309ffe47554cb678e1a9ce998089604cb5ec46671169d277b2dc",
           "src/tropoi/run/swe/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
           "src/tropoi/run/swe/config.py": "39945549e13f82db90972269b8c1624a121040b83e5e601066fb538ab7a931a2",
           "src/tropoi/run/swe/execution.py": "987607c40667c58fd94192dd3157f8c7d6e58facbc6c96920d71eca5c6afe7b9",
@@ -1469,7 +1470,7 @@
           "src/tropoi/temporal/tendencies/primitive_equations.py": "848c6fe9406a7c1c465c0aa9459760b01c542164c8cc9395797a3c4a60793e52",
           "src/tropoi/temporal/tendencies/shallow_water.py": "7ae521f2378824e89f88bc467fc99321d1ef4224b037c865137e076a601da3c8"
         },
-        "sha256": "f877021edd65053172f8d4ca40a9efc5705a351e8ffaa868771cac4d592dc7da",
+        "sha256": "10f5e34b91e0d7fb4f490e20344814f77e7eb3d4b10479a53fa25e4fd06f9070",
         "status": "clean"
       }
     }
