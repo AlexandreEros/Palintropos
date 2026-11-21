@@ -27,3 +27,88 @@ coefficient normalization, longitude origin and any configured palette phase
 offset. Changing the longitude origin rotates phases for m>0 even when the
 physical field is unchanged. See the [numerical conventions](../../spatial/CONVENTIONS.md)
 and [rendering architecture](../../../../docs/ARCHITECTURE.md#output-capsules-and-provenance).
+
+## Interactive capsule viewer
+
+From an environment with Palintropos installed, run the following from the repository root:
+
+```powershell
+tropoi view runs/dev-thai-ben2-ck-heated-T21L40-f44c039-layer-linear-dt600-30d
+```
+
+Choose **Air temperature** and the final saved time (day 30). The native-level
+selector runs from the top of the atmosphere to the bottom. Pressure selections
+use pascals, geopotential heights use metres and nominal σ is dimensionless.
+You can pass more capsule directories to the same command and switch among
+them in the archive selector. A statistics-only core opens its recorded series.
+
+The command opens a browser and serves the selected directories read-only on
+an automatically assigned loopback port. Use `--no-browser` to print the
+private session URL, and Ctrl+C to close the service. All scripts, styles and
+scientific data are local. Each map request reconstructs one saved-time slice
+on a 2° display mesh. A shared 32 MiB response cache supports revisiting
+recent selections. PNG export captures the labelled 2D map with its selection
+and colour scale. The self-contained HTML exporters remain separately available.
+
+For SWE, the lower mesh follows terrain and the translucent upper mesh follows
+the fluid surface. Both use the displayed vertical exaggeration. With slab
+thickness h = h₀ + φ/g, the upper surface is H = hₛ + h relative to the same
+datum as terrain. Cells touching an invalid thickness are masked. A field change
+sets the colours on that shell. PE uses its native or vertically interpolated
+geopotential height, with masks at the terrain and sampling limits.
+
+Each map has an automatic colour range (all valid samples) or a fixed minimum
+and maximum. Geometric day/night shading darkens only the globe; the flat map,
+legend and readouts always show model values.
+
+### Linked vertical structure (primitive-equation archives)
+
+One geographic cursor links the views. Clicking the map or globe moves it.
+The map draws it as an orange cross along the meridian and parallel that the
+sections follow, and the globe draws the same lines. The **Vertical
+structure** panel follows selection A's saved time, quantity and native level
+unless you choose otherwise. Clicking a level in a plot or in the column
+table selects that level on the map. Clicking a section moves the cursor.
+
+| Product | Definition | Sampling |
+| --- | --- | --- |
+| Column profile | T, u, v, p and Z on every native full level against geopotential height, pressure or nominal σ, with a per-level table | Exact band-limited synthesis at the point. By default the point snaps to the nearest native Gaussian node, so slab Tₛ is the stored node value. Off-node Tₛ is bilinear and labelled so |
+| Meridional section | Latitude × σ at the cursor longitude | Exact synthesis on native full levels, 2° horizontal spacing |
+| Zonal section | Longitude × σ at the cursor latitude | Same |
+| Zonal mean | [u], [v], [T] on native full levels | Run's Gauss–Legendre latitudes and plain mean over its `nlon` longitudes, shared with the Held–Suarez `SectionAccumulator` |
+| Mass streamfunction | ψ(φ, σ_{k+½}) = 2πa cos φ / g · Σ_{j≤k} [pₛ v_j] Δσ_j, from ψ = 0 at σ = 0 | Same grid. [pₛ v] is formed for each state before the longitude mean and is never replaced by [pₛ][v]. kg s⁻¹, positive for northward mass transport above the interface. ψ at σ = 1 is the whole-column flux, reported and not forced to zero |
+
+Sections, zonal means and ψ have their own automatic or fixed colour range,
+separate from the map's, because the two often show different quantities. A
+fixed minimum and maximum belongs to the plotted quantity (T, u, v, p, Z or ψ):
+it stays while you step through saved times or switch between section products,
+and other quantities keep their own setting. The colour bar, the notes and the
+exported PNG label a fixed range, and the notes count the values beyond it,
+which take the end colours. A maximum that does not exceed the minimum falls
+back to the automatic range.
+
+Zonal means and ψ can average every saved state between a first and a last
+selection, with equal weights. The plot states the count and the actual
+cadence. The lowest full level is an air temperature at σ_{K−1}. The column
+always shows it separately from the slab surface temperature. Pressure is
+p_k = σ_k pₛ at the nominal level, and Z_k is the absolute Simmons–Burridge
+geopotential over g at the hydrostatic level position. Every plot names its
+archive directory and config hash, and notes that extrema between saved states
+are not represented. Sections and reductions are offered only for pure-σ PE
+archives (σ from 0 to 1) that record gravity. Zonal reductions and snapping to
+native nodes also need a Gaussian latitude–longitude state grid. On other grids a
+column is exact synthesis at the requested point. A flat PE run that records no
+gravity (the `tropoi run pe` default) still opens on its native levels. Its T,
+winds, ζ, δ and p are defined without g. Geopotential height, σ and pressure
+surfaces and the vertical-structure products are withheld, and the manifest
+says why. Its levels are drawn flat on the globe. Averaging costs about 0.2 s per T21L40 state and 2 s per T42L20
+state read from a Windows drive under WSL. It runs outside the session lock,
+so maps stay responsive. A request superseded in the browser still finishes
+on the provider, and its result is cached.
+
+CPU is the default. `--backend cuda` enables CuPy scalar synthesis for eligible
+horizontal fields with CPU fallback. Wind and PE column evaluation use the
+existing host routines. Browser graphics acceleration is independent of the
+Python backend. Neutral illumination is available on every globe. Enabled
+instantaneous or tidally locked insolation also supplies a geometric
+substellar direction at each saved timestamp.
