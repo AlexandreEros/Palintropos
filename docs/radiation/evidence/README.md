@@ -53,9 +53,11 @@ and the [preservation record](../../validation/run_archive_2026-11-12/README.md)
   (`state_diagnostics.json`); not usable aloft.
 - Issue #47, vertical structure (`vertical_coherence.json` in each of the four runs above):
   the Ben 2 stellar run with `thermal_source="layer-linear"`
-  ([dev-thai-ben2-ck-layer-linear](dev-thai-ben2-ck-heated-T21L40-9b2060c-layer-linear/summary.json))
+  ([9b2060c layer-linear replay](dev-thai-ben2-ck-heated-T21L40-9b2060c-layer-linear/summary.json);
+  run as `dev-thai-ben2-ck` with the source overridden, `3f2de9d8…`, and the same
+  configuration as the later preset `dev-thai-ben2-ck-layer-linear` apart from its id)
   and its control at the same commit with the historical source
-  ([dev-thai-ben2-ck-linear](dev-thai-ben2-ck-heated-T21L40-9b2060c-linear/summary.json),
-  bit-identical to the `809ffdd` run). The new source removes the alternating temperature
+  ([9b2060c linear control](dev-thai-ben2-ck-heated-T21L40-9b2060c-linear/summary.json),
+  `fdbcf1cf…`, bit-identical to the `809ffdd` run). The new source removes the alternating temperature
   component; the loss of upper-level wind coherence remains and comes with stellar absorption
   ([OPACITY.md](../OPACITY.md) §6).

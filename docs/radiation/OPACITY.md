@@ -84,11 +84,18 @@ The two THAI presets differ in four configuration keys and nothing else
 
 `dev-thai-ben1-ck` and `dev-thai-ben2-ck` use a `correlated_k` stellar table
 with the star's `band_fractions` (ids `dev-thai-ben*-ck-heated-T21L40`).
-`dev-thai-ben2-ck` also sets `thermal_source="layer-linear"` for the
-upper-atmosphere issue [#47](https://github.com/AlexandreEros/Palintropos/issues/47).
-The historical coupled runs below used `thermal_source="linear"`. Their
-serialized configurations still select that scheme and keep their hashes.
-Use a fresh run directory for the revised preset.
+Both use `thermal_source="linear"`, as every recorded coupled run below
+did, and keep their recorded hashes (`dev-thai-ben2-ck`: `fdbcf1cf…`).
+The corrected Ben 2 source for the upper-atmosphere issue
+[#47](https://github.com/AlexandreEros/Palintropos/issues/47) is a separate
+opt-in preset, `dev-thai-ben2-ck-layer-linear` (id
+`dev-thai-ben2-ck-layer-linear-heated-T21L40`, `08bc8714…`): the same
+configuration with `thermal_source="layer-linear"` and its own experiment
+id. No run has been recorded under that id yet. The archived replay of §6
+(`…-9b2060c-layer-linear`, `3f2de9d8…`) was made before the preset existed,
+as `dev-thai-ben2-ck` with the source overridden; it is identical to the
+new preset apart from the experiment id, which a test asserts. Ben 1 keeps
+`linear`.
 
 ## 3. The tables
 
@@ -476,12 +483,18 @@ layer `k` (0-based, top first) is the issue's "level `k + 1`". The
 alternating component is the least-squares amplitude `a` of `(-1)^k` in
 `T_k = c0 + c1 ln σ_k + c2 (ln σ_k)^2 + a (-1)^k` over the top eight
 layers of each column (equivalently a quadratic in log layer pressure);
-the record is the area-weighted RMS of `a`.
+the record is the area-weighted RMS of `a`. A correlation is undefined
+when either layer has no spatial variance (identically zero, or a standard
+deviation within 64 machine epsilons of the layer's own RMS, i.e. the
+round-off of a constant); it is then recorded as `null`. None of the
+recorded runs has such a layer.
 
 ```bash
 R=runs/radiative
-# the preset (3f2de9d8…) and the same configuration with thermal_source="linear",
-# which is the recorded 809ffdd one (fdbcf1cf…)
+# dev-thai-ben2-ck with each thermal source, as the two archived runs were made:
+# "linear" is the preset itself, the recorded 809ffdd configuration (fdbcf1cf…);
+# "layer-linear" is the archived replay (3f2de9d8…). For a new run of the
+# corrected source use --preset dev-thai-ben2-ck-layer-linear (08bc8714…).
 python -c "import json; from tropoi.run.radiative.config import PRESETS; c = PRESETS['dev-thai-ben2-ck'](); \
 [json.dump(c.with_(thermal_source=s).to_dict(), open(f'ben2-ck-{s}.json', 'w')) for s in ('linear', 'layer-linear')]"
 python -m tropoi.run.radiative run --config ben2-ck-linear.json --run-dir $R/dev-thai-ben2-ck-heated-T21L40-9b2060c-linear
@@ -530,7 +543,7 @@ What this establishes:
   anticorrelated on day 1 (−0.83).
 * **It appears with stellar absorption.** The `-ck` presets differ from
   the transparent-shortwave ones only in the `shortwave` entry (asserted
-  by `test_thai_stellar_absorption_preset_options`). Without it, Ben 1
+  by `test_thai_stellar_absorption_is_one_more_input`). Without it, Ben 1
   stays coherent and Ben 2 loses divergence coherence only slowly, with
   winds below 7 m/s whose upper-level divergence is small (a correlation
   is blind to amplitude, so this row is weak evidence either way). With
