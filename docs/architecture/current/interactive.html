@@ -9179,7 +9179,7 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 [],
 [
 [
-235,
+237,
 57,
 "_points(albedo, xp)",
 [
@@ -9196,7 +9196,7 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ],
 [
 [
-217,
+219,
 13,
 "_xp(column.temperature)",
 [
@@ -9209,7 +9209,7 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ],
 [
 [
-234,
+236,
 23,
 "twostream.stellar_fluxes(tau, ssa, asym, mu, flux, surface_albedo=_points(albedo, xp), closure=sw.closure, scale=sw.delta_scale, diffuse_incidence=sw.diffuse_incidence)",
 [
@@ -9254,7 +9254,7 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ],
 [
 [
-244,
+246,
 13,
 "_xp(column.temperature)",
 [
@@ -9267,8 +9267,8 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ],
 [
 [
-251,
-16,
+253,
+57,
 "interface_temperature(column)",
 [
 [
@@ -9280,7 +9280,7 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ],
 [
 [
-273,
+283,
 19,
 "twostream.thermal_fluxes(tau, p_top, p_bot, surface_source=source, surface_albedo=albedo, ssa=ssa, asym=asym, diffusivity=lw.diffusivity)",
 [
@@ -9321,7 +9321,7 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ],
 [
 [
-286,
+296,
 36,
 "self._stellar(column, boundary, toa_flux, mu0)",
 [
@@ -9346,7 +9346,7 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ],
 [
 [
-288,
+298,
 25,
 "self._thermal(column, boundary, absorbed_bottom)",
 [
@@ -9367,7 +9367,7 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ],
 [
 [
-291,
+301,
 15,
 "RadiativeFluxes(lw_up=lw_up, lw_down=lw_down, sw_up=sw_up, sw_down=sw_down, heating=heating, sw_down_direct=sw_direct)",
 []
@@ -9375,7 +9375,7 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ],
 [
 [
-290,
+300,
 18,
 "heating_rate(net, column.pressure_interfaces, column.gravity, column.cp)",
 [
@@ -82447,63 +82447,63 @@ null,
 "181":"    p_mid = column.layer_pressure",
 "183":"    out = xp.empty_like(p_int)",
 "191":"class Radiation:",
-"201":"    def __init__(self, longwave=None, shortwave=None, *, source: str = \"linear\",",
-"202":"                 chunk: int = 16):",
-"203":"        if source not in (\"linear\", \"isothermal\"):",
-"210":"    def signature(self) -\u003e dict:",
-"211":"        return {\"kind\": \"radiation\", \"source\": self.source,",
-"212":"                \"longwave\": None if self.longwave is None else self.longwave.signature(),",
-"213":"                \"shortwave\": None if self.shortwave is None else self.shortwave.signature()}",
-"215":"    # ------------------------------------------------------------------",
-"216":"    def _stellar(self, column, boundary, toa_flux, mu0):",
-"217":"        xp = _xp(column.temperature)",
-"218":"        zeros = xp.zeros_like(column.pressure_interfaces)",
-"219":"        sw = self.shortwave",
-"221":"            return zeros, zeros.copy(), zeros.copy()",
-"225":"            return analytic(column, toa_flux, mu0, albedo)",
-"232":"            flux = toa_flux[:, None] * w[None, :]",
-"233":"            mu = None if mu0 is None else mu0[:, None]",
-"234":"            u, d, dd = twostream.stellar_fluxes(",
-"235":"                tau, ssa, asym, mu, flux, surface_albedo=_points(albedo, xp),",
-"236":"                closure=sw.closure, scale=sw.delta_scale,",
-"237":"                diffuse_incidence=sw.diffuse_incidence)",
-"238":"            up += u.sum(axis=-1)",
-"239":"            down += d.sum(axis=-1)",
-"242":"",
-"243":"    def _thermal(self, column, boundary, bottom_absorbed_stellar):",
-"244":"        xp = _xp(column.temperature)",
-"245":"        zeros = xp.zeros_like(column.pressure_interfaces)",
-"246":"        lw = self.longwave",
-"248":"            return zeros, zeros.copy()",
-"249":"        up, down = zeros.copy(), zeros.copy()",
-"250":"        t_lay = column.temperature",
-"251":"        t_int = interface_temperature(column) if self.source == \"linear\" else None",
-"252":"        closed = boundary.kind == \"closed\"",
-"253":"        if closed:",
-"271":"                source = boundary.emissivity * lw.planck(boundary.temperature, pts)",
-"272":"                albedo = 1.0 - boundary.emissivity",
-"273":"            u, d = twostream.thermal_fluxes(",
-"274":"                tau, p_top, p_bot, surface_source=source, surface_albedo=albedo,",
-"275":"                ssa=ssa, asym=asym, diffusivity=lw.diffusivity)",
-"276":"            up += u.sum(axis=-1)",
-"277":"            down += d.sum(axis=-1)",
-"280":"    def fluxes(self, column: Column, boundary: LowerBoundary, *,",
-"281":"               toa_flux=None, mu0=None) -\u003e RadiativeFluxes:",
-"282":"        \"\"\"Solve both streams. ``toa_flux`` (ncol,) is the stellar flux",
-"284":"        cosine of the stellar zenith angle (None for diffuse or analytic",
-"285":"        stellar schemes).\"\"\"",
-"286":"        sw_up, sw_down, sw_direct = self._stellar(column, boundary, toa_flux, mu0)",
-"287":"        absorbed_bottom = sw_down[-1] - sw_up[-1]",
-"288":"        lw_up, lw_down = self._thermal(column, boundary, absorbed_bottom)",
-"289":"        net = lw_down - lw_up + sw_down - sw_up",
-"290":"        heating = heating_rate(net, column.pressure_interfaces, column.gravity, column.cp)",
-"291":"        return RadiativeFluxes(lw_up=lw_up, lw_down=lw_down, sw_up=sw_up, sw_down=sw_down,",
-"292":"                               heating=heating, sw_down_direct=sw_direct)",
-"293":"",
-"294":"",
-"295":"def _points(value, xp):",
-"296":"    \"\"\"Give a per-column quantity a trailing spectral axis.\"\"\"",
-"299":"    return xp.asarray(value)[:, None]",
+"202":"    def __init__(self, longwave=None, shortwave=None, *, source: str = \"linear\",",
+"203":"                 chunk: int = 16):",
+"204":"        if source not in (\"linear\", \"layer-linear\", \"isothermal\"):",
+"212":"    def signature(self) -\u003e dict:",
+"213":"        return {\"kind\": \"radiation\", \"source\": self.source,",
+"214":"                \"longwave\": None if self.longwave is None else self.longwave.signature(),",
+"215":"                \"shortwave\": None if self.shortwave is None else self.shortwave.signature()}",
+"217":"    # ------------------------------------------------------------------",
+"218":"    def _stellar(self, column, boundary, toa_flux, mu0):",
+"219":"        xp = _xp(column.temperature)",
+"220":"        zeros = xp.zeros_like(column.pressure_interfaces)",
+"221":"        sw = self.shortwave",
+"223":"            return zeros, zeros.copy(), zeros.copy()",
+"227":"            return analytic(column, toa_flux, mu0, albedo)",
+"234":"            flux = toa_flux[:, None] * w[None, :]",
+"235":"            mu = None if mu0 is None else mu0[:, None]",
+"236":"            u, d, dd = twostream.stellar_fluxes(",
+"237":"                tau, ssa, asym, mu, flux, surface_albedo=_points(albedo, xp),",
+"238":"                closure=sw.closure, scale=sw.delta_scale,",
+"239":"                diffuse_incidence=sw.diffuse_incidence)",
+"240":"            up += u.sum(axis=-1)",
+"241":"            down += d.sum(axis=-1)",
+"244":"",
+"245":"    def _thermal(self, column, boundary, bottom_absorbed_stellar):",
+"246":"        xp = _xp(column.temperature)",
+"247":"        zeros = xp.zeros_like(column.pressure_interfaces)",
+"248":"        lw = self.longwave",
+"250":"            return zeros, zeros.copy()",
+"251":"        up, down = zeros.copy(), zeros.copy()",
+"252":"        t_lay = column.temperature",
+"253":"        t_int = None if self.source == \"isothermal\" else interface_temperature(column)",
+"254":"        closed = boundary.kind == \"closed\"",
+"255":"        if closed:",
+"281":"                source = boundary.emissivity * lw.planck(boundary.temperature, pts)",
+"282":"                albedo = 1.0 - boundary.emissivity",
+"283":"            u, d = twostream.thermal_fluxes(",
+"284":"                tau, p_top, p_bot, surface_source=source, surface_albedo=albedo,",
+"285":"                ssa=ssa, asym=asym, diffusivity=lw.diffusivity)",
+"286":"            up += u.sum(axis=-1)",
+"287":"            down += d.sum(axis=-1)",
+"290":"    def fluxes(self, column: Column, boundary: LowerBoundary, *,",
+"291":"               toa_flux=None, mu0=None) -\u003e RadiativeFluxes:",
+"292":"        \"\"\"Solve both streams. ``toa_flux`` (ncol,) is the stellar flux",
+"294":"        cosine of the stellar zenith angle (None for diffuse or analytic",
+"295":"        stellar schemes).\"\"\"",
+"296":"        sw_up, sw_down, sw_direct = self._stellar(column, boundary, toa_flux, mu0)",
+"297":"        absorbed_bottom = sw_down[-1] - sw_up[-1]",
+"298":"        lw_up, lw_down = self._thermal(column, boundary, absorbed_bottom)",
+"299":"        net = lw_down - lw_up + sw_down - sw_up",
+"300":"        heating = heating_rate(net, column.pressure_interfaces, column.gravity, column.cp)",
+"301":"        return RadiativeFluxes(lw_up=lw_up, lw_down=lw_down, sw_up=sw_up, sw_down=sw_down,",
+"302":"                               heating=heating, sw_down_direct=sw_direct)",
+"303":"",
+"304":"",
+"305":"def _points(value, xp):",
+"306":"    \"\"\"Give a per-column quantity a trailing spectral axis.\"\"\"",
+"309":"    return xp.asarray(value)[:, None]",
 "37":"",
 "38":"from tropoi.physics.radiation import twostream",
 "39":"",
@@ -99210,7 +99210,7 @@ null,
 }
 },
 "meta":{
-"base_commit":"f296128a3ef0b9f72362278af6242a305f61d367",
+"base_commit":"00581198363233836f3346e3d55a461af819a971",
 "call_depth":4,
 "command":"python -m tools.architecture.generate",
 "dynamic_import_sites":{
@@ -99254,8 +99254,8 @@ null,
 "max_sites":8,
 "package":"tropoi",
 "source_commit":null,
-"source_sha256":"7222c998a294908ed545de2ffa60e69d4463585ac62e3fe60554d72237ec7223",
-"source_status":"dirty",
+"source_sha256":"f877021edd65053172f8d4ca40a9efc5705a351e8ffaa868771cac4d592dc7da",
+"source_status":"clean",
 "title":"current",
 "tool_version":"2.3.0",
 "traversed":[
@@ -101146,31 +101146,31 @@ null,
 [
 "method",
 290,
-201,
+202,
 231
 ],
 [
 "method",
 290,
-216,
+218,
 231
 ],
 [
 "method",
 290,
-243,
+245,
 231
 ],
 [
 "method",
 290,
-280,
+290,
 231
 ],
 [
 "method",
 290,
-210,
+212,
 231
 ],
 [
@@ -101212,7 +101212,7 @@ null,
 [
 "function",
 290,
-295,
+305,
 231
 ],
 [
@@ -146443,7 +146443,7 @@ null
 null,
 "Thermal + stellar radiative transfer for a batch of columns.",
 [],
-292,
+302,
 []
 ],
 "301":[
@@ -146483,7 +146483,7 @@ null,
 null,
 "",
 [],
-208
+210
 ],
 "302":[
 "_stellar",
@@ -146522,7 +146522,7 @@ null
 null,
 "",
 [],
-241
+243
 ],
 "303":[
 "_thermal",
@@ -146555,7 +146555,7 @@ null
 null,
 "",
 [],
-278
+288
 ],
 "304":[
 "fluxes",
@@ -146594,7 +146594,7 @@ null,
 "RadiativeFluxes",
 "Solve both streams. ``toa_flux`` (ncol,) is the stellar flux through a horizontal surface at the top (W m^-2), ``mu0`` (ncol,) the cosine of the stellar zenith angle (None for diffuse or analytic stellar schemes).",
 [],
-292
+302
 ],
 "305":[
 "signature",
@@ -146609,7 +146609,7 @@ null
 "dict",
 "",
 [],
-213
+215
 ],
 "306":[
 "RadiativeFluxes",
@@ -146741,7 +146741,7 @@ null
 null,
 "Give a per-column quantity a trailing spectral axis.",
 [],
-299
+309
 ],
 "313":[
 "_xp",
@@ -277203,22 +277203,22 @@ null
 },
 [
 [
-218,
+220,
 "unresolved",
 "xp.zeros_like"
 ],
 [
-221,
+223,
 "unresolved",
 "zeros.copy"
 ],
 [
-221,
+223,
 "unresolved",
 "zeros.copy"
 ],
 [
-225,
+227,
 "unresolved",
 "analytic"
 ]
@@ -277227,26 +277227,26 @@ null
 "303":[
 {
 "builtin":4,
-"unresolved":13
+"unresolved":15
 },
 [
 [
-245,
+247,
 "unresolved",
 "xp.zeros_like"
 ],
 [
-248,
+250,
 "unresolved",
 "zeros.copy"
 ],
 [
-249,
+251,
 "unresolved",
 "zeros.copy"
 ],
 [
-249,
+251,
 "unresolved",
 "zeros.copy"
 ]
@@ -277258,12 +277258,12 @@ null
 },
 [
 [
-212,
+214,
 "unresolved",
 "self.longwave.signature"
 ],
 [
-213,
+215,
 "unresolved",
 "self.shortwave.signature"
 ]
@@ -277276,7 +277276,7 @@ null
 },
 [
 [
-299,
+309,
 "unresolved",
 "xp.asarray"
 ]
