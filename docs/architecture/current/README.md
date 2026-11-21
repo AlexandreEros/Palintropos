@@ -5,13 +5,13 @@
 
 | | |
 |---|---|
-| Source base commit | `5948735fb163b553a3d8a1d2546d2c0e2f011cfc` (clean working tree) |
+| Source base commit | `3ffcfeb350e7605a485a85306d9cf8eef7ceecd5` (clean working tree) |
 | Analysed package | `tropoi` under `src/` |
 | Generator | `tools.architecture` 2.3.0 |
 | Toolchain | Python 3.12, grimp 3.17, networkx 3.7 |
 | Command | `python -m tools.architecture.generate` |
 
-Source working tree: **clean**. Content SHA-256: `b57a2d8055d9298d0d60247a866d51b458ed7e74c33b1c40d8047359c7ae194f`. Generator working tree: **clean**. Per-file hashes and scoped Git status are recorded in `metrics.json`. These describe generation time; --check verifies source and generator content hashes before reusing this context across later commits. The base commit alone does not identify uncommitted source.
+Source working tree: **clean**. Content SHA-256: `2cade8d358e21d6da392db8ede9299e28c0080b7a1afbf88c5178ccb6431c59d`. Generator working tree: **clean**. Per-file hashes and scoped Git status are recorded in `metrics.json`. These describe generation time; --check verifies source and generator content hashes before reusing this context across later commits. The base commit alone does not identify uncommitted source.
 
 ## Reproducing
 
@@ -37,6 +37,7 @@ python -m tools.architecture.generate
 | `calls/cli-run-pe.mmd` | Scoped static call graph (roots and depth: see *Call graphs* below). |
 | `calls/cli-run-swe.mmd` | Scoped static call graph (roots and depth: see *Call graphs* below). |
 | `calls/cli-terrain-run-prepare.mmd` | Scoped static call graph (roots and depth: see *Call graphs* below). |
+| `calls/cli-view.mmd` | Scoped static call graph (roots and depth: see *Call graphs* below). |
 | `calls/custom-initial-states.mmd` | Scoped static call graph (roots and depth: see *Call graphs* below). |
 | `calls/sky-hypothetical.mmd` | Scoped static call graph (roots and depth: see *Call graphs* below). |
 | `calls/sky-numpy-reference.mmd` | Scoped static call graph (roots and depth: see *Call graphs* below). |
@@ -88,8 +89,8 @@ Generated files contain no timestamps, absolute paths, or source line numbers, s
 
 Three generic rules decide what must be documented (`tools/architecture/coverage.py`):
 
-1. **Packages:** every analysed package gets packages/<package>.md with all of its modules, classes and public module-level functions. 25 packages, 25 pages; 173 of 173 modules and 219 of 219 classes rendered (generation fails if any is missing).
-2. **CLI handlers:** every <parser>.set_defaults(<keyword>=<function>) handler gets calls/cli-<name>.mmd. 11 discovered.
+1. **Packages:** every analysed package gets packages/<package>.md with all of its modules, classes and public module-level functions. 25 packages, 25 pages; 180 of 180 modules and 226 of 226 classes rendered (generation fails if any is missing).
+2. **CLI handlers:** every <parser>.set_defaults(<keyword>=<function>) handler gets calls/cli-<name>.mmd. 12 discovered.
 3. **Public Python entry points:** module-level functions exported through some __all__ (re-exports followed) that no analysed function calls; each must be declared as an entry path root or excluded with a reason. 39 candidates: 14 are roots of declared entry paths, 25 excluded with a reason.
 
 The declarations are read from `docs/architecture/entry-points.toml` (SHA-256 `ff6839b21d5b4107ee00786decb521ba8213ca6278389b16f027112ff56e7b0e`). Like the layer declaration, they state expectations; unlike it, a gap fails generation: an undeclared candidate, a declared root or exclusion that no longer exists, or a declared narrative page that is missing or does not link its diagram. `--check` therefore fails on any of these too.
@@ -106,7 +107,7 @@ The rules are generic path and syntax rules; none names a particular subpackage.
 4. Each module gets a syntactic category: `namespace` (a namespace package directory), `empty` (no statement besides a docstring), `reexport` (only imports, `__all__` assignments, and alias assignments `A = B`), or `code`. Categories are attributes, not filters, with one exception: a `namespace` or `empty` module that no analysed module imports is dropped from the module graph, because it has no code and no edges.
 5. Imports of modules outside the package are not graph edges; they are listed per module (`stdlib_imports`, `third_party_imports` in `graph/modules.json`).
 
-Modules discovered: 173; in the module graph: 150. Categories: code 145, empty 22, namespace 1, reexport 5.
+Modules discovered: 180; in the module graph: 157. Categories: code 152, empty 22, namespace 1, reexport 5.
 
 Excluded by rule 4: `tropoi`, `tropoi.cli`, `tropoi.physics`, `tropoi.physics.radiation`, `tropoi.representation`, `tropoi.representation.diagnostics`, `tropoi.representation.visual`, `tropoi.run`, `tropoi.run.bve`, `tropoi.run.held_suarez`, `tropoi.run.pe`, `tropoi.run.radiative`, `tropoi.run.swe`, `tropoi.spatial`, `tropoi.spatial.grids`, `tropoi.spatial.initialization`, `tropoi.spatial.operators`, `tropoi.spatial.states`, `tropoi.spatial.terrain`, `tropoi.spatial.transforms`, `tropoi.spatial.transforms.cuda`, `tropoi.temporal`, `tropoi.temporal.tendencies`.
 
@@ -152,7 +153,7 @@ The Mermaid tree and the offline atlas each contain every class definition, the 
 
 ### Call graphs (ast)
 
-Each call expression inside a function or method body (nested functions, lambdas, and comprehensions are attributed to the enclosing function) is classified as `internal` (resolved to an analysed definition), `external` (resolved to a name outside the package), `builtin` (an unshadowed builtin), or `unresolved`. Totals: builtin 3829, external 2557, internal 3065, unresolved 3923.
+Each call expression inside a function or method body (nested functions, lambdas, and comprehensions are attributed to the enclosing function) is classified as `internal` (resolved to an analysed definition), `external` (resolved to a name outside the package), `builtin` (an unshadowed builtin), or `unresolved`. Totals: builtin 4064, external 2664, internal 3183, unresolved 4203.
 
 | Edge kind | Syntax | What it claims |
 |---|---|---|
@@ -182,6 +183,7 @@ Scoped graphs follow edges of kinds `call`, `instantiate`, `constructor`, `self`
 | `calls/cli-run-pe.mmd` | `tropoi.cli.main._cmd_run_pe` | 4 |
 | `calls/cli-run-swe.mmd` | `tropoi.cli.main._cmd_run_swe` | 4 |
 | `calls/cli-terrain-run-prepare.mmd` | `tropoi.cli.terrain.run_prepare` | 4 |
+| `calls/cli-view.mmd` | `tropoi.cli.main._cmd_view` | 4 |
 | `calls/custom-initial-states.mmd` | `tropoi.run.custom.execute.run_initial_state`, `tropoi.run.custom.presets.initial_state_from_preset`, `tropoi.run.custom.prepare.prepare_bve_state`, `tropoi.run.custom.prepare.prepare_swe_state` | 4 |
 | `calls/sky-hypothetical.mmd` | `tropoi.representation.visual.sky.write_sky_page`, `tropoi.representation.visual.sky.standalone_page` | 4 |
 | `calls/sky-numpy-reference.mmd` | `tropoi.representation.visual.sky.radiance_table`, `tropoi.representation.visual.sky.star_path_column`, `tropoi.representation.visual.sky.optical_depth_diagnostic`, `tropoi.physics.column.thin_atmosphere_mass_kg`, `tropoi.physics.column.thin_atmosphere_surface_pressure_pa`, `tropoi.physics.rayleigh.composition_cross_section` | 4 |

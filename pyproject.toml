@@ -49,7 +49,7 @@ include = ["tropoi*"]
 "tropoi.spatial.transforms.cuda" = ["*.cu"]
 # The self-contained page templates (read via importlib.resources) and the
 # verbatim CIE 1931 colour-matching table (checked by SHA-256 on load).
-"tropoi.representation.visual" = ["*.html", "data/*.csv"]
+"tropoi.representation.visual" = ["*.html", "data/*.csv", "viewer_assets/*.html", "viewer_assets/*.css", "viewer_assets/*.js"]
 # The packaged scientific datasets of the shared physics layer: species
 # identities and molar masses, thermodynamic records, Rayleigh optical
 # records, mixture presets and the star catalogue.
