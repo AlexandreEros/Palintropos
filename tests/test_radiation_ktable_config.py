@@ -257,6 +257,31 @@ def test_recorded_thai_configurations_keep_their_hashes():
         "72494a3143b330c9221721257d5aa4e9e3ef2379ff99723bda8520b5b0dad0c1")
 
 
+def test_ben2_layer_linear_preset_is_a_distinct_opt_in_experiment():
+    """The corrected Ben 2 configuration (issue #47) selects the
+    layer-centered source under its own experiment id, leaving the recorded
+    ``dev-thai-ben2-ck`` (fdbcf1cf...) untouched. With the historical id it
+    is exactly the configuration of the archived replay
+    (docs/radiation/evidence/dev-thai-ben2-ck-heated-T21L40-9b2060c-layer-linear,
+    3f2de9d8...), which was run as ``dev-thai-ben2-ck`` with the source
+    overridden."""
+    from tropoi.run.radiative.config import PRESETS
+    ck, ll = PRESETS["dev-thai-ben2-ck"](), PRESETS["dev-thai-ben2-ck-layer-linear"]()
+    assert ck.thermal_source == "linear"
+    assert ck.sha256() == "fdbcf1cfd7ebcfaaf3ca887896c3cc6a049a371abdadc5985c78131304c209f3"
+    assert ll.thermal_source == "layer-linear"
+    assert ll.experiment_id == "dev-thai-ben2-ck-layer-linear-heated-T21L40"
+    assert ll.sha256() == "08bc87147ef557ae3161d57b9caa533c3f89caf680151b7dff5dfdc17c374af2"
+    d0, d1 = ck.to_dict(), ll.to_dict()
+    assert {k for k in d0 if d0[k] != d1[k]} == {"experiment_id", "thermal_source"}
+    replay = ll.with_(experiment_id=ck.experiment_id)
+    assert replay == ck.with_(thermal_source="layer-linear")
+    assert replay.sha256() == (
+        "3f2de9d8985c2bc1405cced826bb84755860ddf6ed68986aeb702186d2536eff")
+    # Ben 1 keeps the historical source; switching it is a separate decision
+    assert "dev-thai-ben1-ck-layer-linear" not in PRESETS
+
+
 @pytest.mark.parametrize("case", ["ben1", "ben2"])
 def test_thai_stellar_absorption_is_one_more_input(case):
     """The ``-ck`` presets are the default ones with a stellar k-table and

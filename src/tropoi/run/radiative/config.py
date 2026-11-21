@@ -483,7 +483,8 @@ THAI_CP_TEMPERATURE = 250.0
 def thai_dry_dev(case: str, experiment_id: Optional[str] = None, *, days: int = 5,
                  dt: float = 1200.0, frictional_heating: bool = True,
                  radiation_interval: int = 3,
-                 stellar_absorption: bool = False) -> RadiativeConfig:
+                 stellar_absorption: bool = False,
+                 thermal_source: str = "linear") -> RadiativeConfig:
     """DEVELOPMENT EXPERIMENT with a THAI dry composition and real-gas
     longwave absorption; not a THAI reproduction (docs/radiation/OPACITY.md,
     docs/radiation/THAI_BEN_PLAN.md).
@@ -520,6 +521,18 @@ def thai_dry_dev(case: str, experiment_id: Optional[str] = None, *, days: int = 
     approximation: absorption only, NO Rayleigh scattering (its
     flux-weighted optical depth for this star is 0.008 and 0.005).
 
+    ``thermal_source`` selects the longwave source inside a layer (see
+    :class:`tropoi.physics.radiation.scheme.Radiation`). Any value other
+    than the default ``"linear"`` is appended to the experiment id, so a
+    configuration with another source never shares an id with the recorded
+    ``linear`` runs: ``dev-thai-ben2-ck-layer-linear`` (id
+    ``dev-thai-ben2-ck-layer-linear-heated-T21L40``) centers the linear
+    source on each layer's Planck flux. In the matched 5-day replay of the
+    stellar-absorbing Ben 2 run this reduced the layer-scale temperature
+    alternation about tenfold (docs/radiation/OPACITY.md section 6, issue
+    #47). It does not address the upper-level wind decoherence or the
+    dt = 1200 s instability of #47.
+
     NOT matched: T21 L40 to 4 Pa with del^8 and no sponge; a one-layer slab
     of 2e6 J m^-2 K^-1 (the UM's); the FHZ06 dry boundary layer of the Mars
     development runs in place of each THAI model's own; constant c_p;
@@ -539,6 +552,8 @@ def thai_dry_dev(case: str, experiment_id: Optional[str] = None, *, days: int = 
                      "mass_fractions": {composition.label: 1.0}, "bounds": "error",
                      "band_fractions": list(entry["stellar_band_fractions"])}
     tag = "ck" if stellar_absorption else "lwck"
+    if thermal_source != "linear":
+        tag += f"-{thermal_source}"
     return RadiativeConfig(
         experiment_id=_preset_id(experiment_id, f"dev-thai-{case}-{tag}", "T21L40",
                                  frictional_heating),
@@ -552,6 +567,7 @@ def thai_dry_dev(case: str, experiment_id: Optional[str] = None, *, days: int = 
         dt=dt, days=days,
         longwave={"kind": "correlated_k", "tables": [dict(entry["longwave"])],
                   "mass_fractions": {composition.label: 1.0}, "bounds": "error"},
+        thermal_source=thermal_source,
         shortwave=shortwave,
         insolation={"kind": "tidally_locked", "stellar_constant": 900.0},
         convection=None,
@@ -574,6 +590,9 @@ PRESETS = {"jupiter-schneider-liu": jupiter_schneider_liu, "earth-gray-dry": ear
                                                  stellar_absorption=True),
            "dev-thai-ben2-ck": functools.partial(thai_dry_dev, "ben2",
                                                  stellar_absorption=True),
+           "dev-thai-ben2-ck-layer-linear": functools.partial(
+               thai_dry_dev, "ben2", stellar_absorption=True,
+               thermal_source="layer-linear"),
            "dev-mars-gray-flat": mars_gray_flat_dev,
            "dev-mars-gray-flat-sponge": functools.partial(mars_gray_flat_dev, sponge=True),
            "dev-mars-gray-flat-sponge-implicit": functools.partial(
