@@ -13,9 +13,9 @@ Explore dependencies, call sites, possible dispatch, runtime observations and pr
 | [`tropoi.physics`](packages/tropoi.physics.md) | 18 | 26 | 39 | `README.md` |
 | [`tropoi.physics.radiation`](packages/tropoi.physics.radiation.md) | 6 | 14 | 23 | `README.md` |
 | [`tropoi.representation`](packages/tropoi.representation.md) | 2 | 0 | 1 | `README.md` |
-| [`tropoi.representation.archive`](packages/tropoi.representation.archive.md) | 9 | 18 | 26 | `README.md` |
-| [`tropoi.representation.diagnostics`](packages/tropoi.representation.diagnostics.md) | 8 | 18 | 25 | `README.md` |
-| [`tropoi.representation.visual`](packages/tropoi.representation.visual.md) | 26 | 57 | 88 | `ATMOSPHERE_VIEW.md`, `HELD_SUAREZ_CLIMATE.md`, `README.md`, `sky_view.html`, `terrain_globe.html` |
+| [`tropoi.representation.archive`](packages/tropoi.representation.archive.md) | 13 | 19 | 30 | `README.md` |
+| [`tropoi.representation.diagnostics`](packages/tropoi.representation.diagnostics.md) | 9 | 19 | 28 | `README.md` |
+| [`tropoi.representation.visual`](packages/tropoi.representation.visual.md) | 28 | 62 | 91 | `ATMOSPHERE_VIEW.md`, `HELD_SUAREZ_CLIMATE.md`, `README.md`, `sky_view.html`, `terrain_globe.html` |
 | [`tropoi.run`](packages/tropoi.run.md) | 2 | 0 | 2 | `README.md` |
 | [`tropoi.run.bve`](packages/tropoi.run.bve.md) | 6 | 2 | 3 | `README.md` |
 | [`tropoi.run.custom`](packages/tropoi.run.custom.md) | 7 | 12 | 15 | `INITIAL_STATES.md`, `README.md` |
@@ -51,6 +51,7 @@ Explore dependencies, call sites, possible dispatch, runtime observations and pr
 | [`calls/cli-run-pe.mmd`](calls/cli-run-pe.mmd) | `tropoi.cli.main._cmd_run_pe` |
 | [`calls/cli-run-swe.mmd`](calls/cli-run-swe.mmd) | `tropoi.cli.main._cmd_run_swe` |
 | [`calls/cli-terrain-run-prepare.mmd`](calls/cli-terrain-run-prepare.mmd) | `tropoi.cli.terrain.run_prepare` |
+| [`calls/cli-view.mmd`](calls/cli-view.mmd) | `tropoi.cli.main._cmd_view` |
 
 **Declared Python entry paths** (from the scope file; every public entry point candidate is a root here or listed under exclusions):
 
@@ -65,10 +66,10 @@ Explore dependencies, call sites, possible dispatch, runtime observations and pr
 ## Coverage
 
 * Packages: 25 discovered, 25 with a page.
-* Import module records: 173 discovered (including namespace placeholders), 173 listed on a package page.
-* Classes: 219 discovered, 219 drawn on a package page (21 in [the inheritance overview](class-inheritance.mmd)).
-* Both containment views cover 22 directories, 102 Python files, 219 class definitions, leaving out files and directories that define no class.
-* CLI handlers: 11 discovered, each with a call graph.
+* Import module records: 180 discovered (including namespace placeholders), 180 listed on a package page.
+* Classes: 226 discovered, 226 drawn on a package page (21 in [the inheritance overview](class-inheritance.mmd)).
+* Both containment views cover 22 directories, 106 Python files, 226 class definitions, leaving out files and directories that define no class.
+* CLI handlers: 12 discovered, each with a call graph.
 * Public Python entry-point candidates: 39; 14 are roots of declared paths, 25 excluded with a reason.
 
 **Deliberate exclusions**

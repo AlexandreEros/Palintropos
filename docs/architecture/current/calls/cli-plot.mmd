@@ -18,30 +18,23 @@ flowchart LR
     end
     subgraph g_tropoi_orepresentation_oarchive_ocapsule["representation.archive.capsule"]
         n_tropoi_orepresentation_oarchive_ocapsule_oCapsuleError{{"CapsuleError"}}
-        n_tropoi_orepresentation_oarchive_ocapsule_oCapsuleLayoutError{{"CapsuleLayoutError"}}
         n_tropoi_orepresentation_oarchive_ocapsule_oCapsuleStorage{{"CapsuleStorage"}}
         n_tropoi_orepresentation_oarchive_ocapsule_oCapsuleStorage_o____init____["CapsuleStorage.#95;#95;init#95;#95;()"]
-        n_tropoi_orepresentation_oarchive_ocapsule_oCapsuleStorage_o__load__times["CapsuleStorage.#95;load#95;times()"]
-        n_tropoi_orepresentation_oarchive_ocapsule_o__open__array["#95;open#95;array()"]
-        n_tropoi_orepresentation_oarchive_ocapsule_o__validate__coefficients__layout["#95;validate#95;coefficients#95;layout()"]
+        n_tropoi_orepresentation_oarchive_ocapsule_o__read__json__object["#95;read#95;json#95;object()"]
         n_tropoi_orepresentation_oarchive_ocapsule_oopen__simulation["open#95;simulation()"]
-        n_tropoi_orepresentation_oarchive_ocapsule_oread__capsule__metadata["read#95;capsule#95;metadata()"]
+        n_tropoi_orepresentation_oarchive_ocapsule_oopen__storage["open#95;storage()"]
         n_tropoi_orepresentation_oarchive_ocapsule_oresolve__run__directory["resolve#95;run#95;directory()"]
     end
     subgraph g_tropoi_orepresentation_oarchive_oheld__suarez["representation.archive.held#95;suarez"]
         n_tropoi_orepresentation_oarchive_oheld__suarez_oHeldSuarezStorage{{"HeldSuarezStorage"}}
         n_tropoi_orepresentation_oarchive_oheld__suarez_oHeldSuarezStorage_o____init____["HeldSuarezStorage.#95;#95;init#95;#95;()"]
-        n_tropoi_orepresentation_oarchive_oheld__suarez_oHeldSuarezStorage_o__scan__states["HeldSuarezStorage.#95;scan#95;states()"]
         n_tropoi_orepresentation_oarchive_oheld__suarez_o__experiment__config["#95;experiment#95;config()"]
         n_tropoi_orepresentation_oarchive_oheld__suarez_o__read__config["#95;read#95;config()"]
         n_tropoi_orepresentation_oarchive_oheld__suarez_ois__held__suarez__experiment["is#95;held#95;suarez#95;experiment()"]
     end
-    subgraph g_tropoi_orepresentation_oarchive_oschema["representation.archive.schema"]
-        n_tropoi_orepresentation_oarchive_oschema_oSchemaError{{"SchemaError"}}
-        n_tropoi_orepresentation_oarchive_oschema_oStateSchema_ofrom__manifest__dict["StateSchema.from#95;manifest#95;dict()"]
-        n_tropoi_orepresentation_oarchive_oschema_oinfer__solver["infer#95;solver()"]
-        n_tropoi_orepresentation_oarchive_oschema_oinfer__state__schema["infer#95;state#95;schema()"]
-        n_tropoi_orepresentation_oarchive_oschema_ostate__schema__for["state#95;schema#95;for()"]
+    subgraph g_tropoi_orepresentation_oarchive_oradiative["representation.archive.radiative"]
+        n_tropoi_orepresentation_oarchive_oradiative_oRadiativeStorage{{"RadiativeStorage"}}
+        n_tropoi_orepresentation_oarchive_oradiative_oRadiativeStorage_o____init____["RadiativeStorage.#95;#95;init#95;#95;()"]
     end
     subgraph g_tropoi_orepresentation_ovisual_ocompose["representation.visual.compose"]
         n_tropoi_orepresentation_ovisual_ocompose_o__time__axis["#95;time#95;axis()"]
@@ -108,41 +101,24 @@ flowchart LR
     n_tropoi_ocli_omain_o__plot__view -->|instantiate| n_tropoi_orepresentation_ovisual_oviews_oStreamfunctionContours
     n_tropoi_ocli_omain_o__plot__view -->|instantiate| n_tropoi_orepresentation_ovisual_oviews_oStreamlines
     n_tropoi_orepresentation_oarchive_ocapsule_oCapsuleStorage -->|#95;#95;init#95;#95;| n_tropoi_orepresentation_oarchive_ocapsule_oCapsuleStorage_o____init____
-    n_tropoi_orepresentation_oarchive_ocapsule_oCapsuleStorage_o____init____ -->|instantiate| n_tropoi_orepresentation_oarchive_ocapsule_oCapsuleLayoutError
-    n_tropoi_orepresentation_oarchive_ocapsule_oCapsuleStorage_o____init____ -.->|self| n_tropoi_orepresentation_oarchive_ocapsule_oCapsuleStorage_o__load__times
-    n_tropoi_orepresentation_oarchive_ocapsule_oCapsuleStorage_o____init____ --> n_tropoi_orepresentation_oarchive_ocapsule_o__open__array
-    n_tropoi_orepresentation_oarchive_ocapsule_oCapsuleStorage_o____init____ --> n_tropoi_orepresentation_oarchive_ocapsule_o__validate__coefficients__layout
-    n_tropoi_orepresentation_oarchive_ocapsule_oCapsuleStorage_o____init____ --> n_tropoi_orepresentation_oarchive_ocapsule_oread__capsule__metadata
-    n_tropoi_orepresentation_oarchive_ocapsule_oCapsuleStorage_o____init____ -->|instantiate| n_tropoi_orepresentation_oarchive_oschema_oSchemaError
-    n_tropoi_orepresentation_oarchive_ocapsule_oCapsuleStorage_o____init____ --> n_tropoi_orepresentation_oarchive_oschema_oStateSchema_ofrom__manifest__dict
-    n_tropoi_orepresentation_oarchive_ocapsule_oCapsuleStorage_o____init____ --> n_tropoi_orepresentation_oarchive_oschema_oinfer__solver
-    n_tropoi_orepresentation_oarchive_ocapsule_oCapsuleStorage_o____init____ --> n_tropoi_orepresentation_oarchive_oschema_oinfer__state__schema
-    n_tropoi_orepresentation_oarchive_ocapsule_oCapsuleStorage_o__load__times -->|instantiate| n_tropoi_orepresentation_oarchive_ocapsule_oCapsuleLayoutError
-    n_tropoi_orepresentation_oarchive_ocapsule_oCapsuleStorage_o__load__times --> n_tropoi_orepresentation_oarchive_ocapsule_o__open__array
-    n_tropoi_orepresentation_oarchive_ocapsule_o__open__array -->|instantiate| n_tropoi_orepresentation_oarchive_ocapsule_oCapsuleLayoutError
-    n_tropoi_orepresentation_oarchive_ocapsule_o__validate__coefficients__layout -->|instantiate| n_tropoi_orepresentation_oarchive_ocapsule_oCapsuleLayoutError
-    n_tropoi_orepresentation_oarchive_ocapsule_oopen__simulation --> n_tropoi_orepresentation_oarchive_oavailability_ostatistics__only__description
-    n_tropoi_orepresentation_oarchive_ocapsule_oopen__simulation -->|instantiate| n_tropoi_orepresentation_oarchive_ocapsule_oCapsuleError
-    n_tropoi_orepresentation_oarchive_ocapsule_oopen__simulation -->|instantiate| n_tropoi_orepresentation_oarchive_ocapsule_oCapsuleStorage
-    n_tropoi_orepresentation_oarchive_ocapsule_oopen__simulation --> n_tropoi_orepresentation_oarchive_ocapsule_oresolve__run__directory
-    n_tropoi_orepresentation_oarchive_ocapsule_oopen__simulation -->|instantiate| n_tropoi_orepresentation_oarchive_oheld__suarez_oHeldSuarezStorage
-    n_tropoi_orepresentation_oarchive_ocapsule_oopen__simulation --> n_tropoi_orepresentation_oarchive_oheld__suarez_ois__held__suarez__experiment
+    n_tropoi_orepresentation_oarchive_ocapsule_o__read__json__object -->|instantiate| n_tropoi_orepresentation_oarchive_ocapsule_oCapsuleError
+    n_tropoi_orepresentation_oarchive_ocapsule_oopen__simulation --> n_tropoi_orepresentation_oarchive_ocapsule_oopen__storage
     n_tropoi_orepresentation_oarchive_ocapsule_oopen__simulation -->|instantiate| n_tropoi_otemporal_osimulation_oSimulation
-    n_tropoi_orepresentation_oarchive_ocapsule_oread__capsule__metadata -->|instantiate| n_tropoi_orepresentation_oarchive_ocapsule_oCapsuleError
+    n_tropoi_orepresentation_oarchive_ocapsule_oopen__storage --> n_tropoi_orepresentation_oarchive_oavailability_ostatistics__only__description
+    n_tropoi_orepresentation_oarchive_ocapsule_oopen__storage -->|instantiate| n_tropoi_orepresentation_oarchive_ocapsule_oCapsuleError
+    n_tropoi_orepresentation_oarchive_ocapsule_oopen__storage -->|instantiate| n_tropoi_orepresentation_oarchive_ocapsule_oCapsuleStorage
+    n_tropoi_orepresentation_oarchive_ocapsule_oopen__storage --> n_tropoi_orepresentation_oarchive_ocapsule_o__read__json__object
+    n_tropoi_orepresentation_oarchive_ocapsule_oopen__storage --> n_tropoi_orepresentation_oarchive_ocapsule_oresolve__run__directory
+    n_tropoi_orepresentation_oarchive_ocapsule_oopen__storage -->|instantiate| n_tropoi_orepresentation_oarchive_oheld__suarez_oHeldSuarezStorage
+    n_tropoi_orepresentation_oarchive_ocapsule_oopen__storage --> n_tropoi_orepresentation_oarchive_oheld__suarez_ois__held__suarez__experiment
+    n_tropoi_orepresentation_oarchive_ocapsule_oopen__storage -->|instantiate| n_tropoi_orepresentation_oarchive_oradiative_oRadiativeStorage
     n_tropoi_orepresentation_oarchive_ocapsule_oresolve__run__directory -->|instantiate| n_tropoi_orepresentation_oarchive_ocapsule_oCapsuleError
     n_tropoi_orepresentation_oarchive_oheld__suarez_oHeldSuarezStorage -->|#95;#95;init#95;#95;| n_tropoi_orepresentation_oarchive_oheld__suarez_oHeldSuarezStorage_o____init____
-    n_tropoi_orepresentation_oarchive_oheld__suarez_oHeldSuarezStorage_o____init____ -.->|self| n_tropoi_orepresentation_oarchive_oheld__suarez_oHeldSuarezStorage_o__scan__states
     n_tropoi_orepresentation_oarchive_oheld__suarez_oHeldSuarezStorage_o____init____ --> n_tropoi_orepresentation_oarchive_oheld__suarez_o__experiment__config
     n_tropoi_orepresentation_oarchive_oheld__suarez_oHeldSuarezStorage_o____init____ --> n_tropoi_orepresentation_oarchive_oheld__suarez_o__read__config
-    n_tropoi_orepresentation_oarchive_oheld__suarez_oHeldSuarezStorage_o____init____ -->|instantiate| n_tropoi_orepresentation_oarchive_oschema_oSchemaError
-    n_tropoi_orepresentation_oarchive_oheld__suarez_oHeldSuarezStorage_o____init____ --> n_tropoi_orepresentation_oarchive_oschema_ostate__schema__for
-    n_tropoi_orepresentation_oarchive_oheld__suarez_oHeldSuarezStorage_o__scan__states -->|instantiate| n_tropoi_orepresentation_oarchive_oschema_oSchemaError
     n_tropoi_orepresentation_oarchive_oheld__suarez_ois__held__suarez__experiment --> n_tropoi_orepresentation_oarchive_oheld__suarez_o__experiment__config
     n_tropoi_orepresentation_oarchive_oheld__suarez_ois__held__suarez__experiment --> n_tropoi_orepresentation_oarchive_oheld__suarez_o__read__config
-    n_tropoi_orepresentation_oarchive_oschema_oStateSchema_ofrom__manifest__dict -->|instantiate| n_tropoi_orepresentation_oarchive_oschema_oSchemaError
-    n_tropoi_orepresentation_oarchive_oschema_oinfer__solver -->|instantiate| n_tropoi_orepresentation_oarchive_oschema_oSchemaError
-    n_tropoi_orepresentation_oarchive_oschema_oinfer__state__schema --> n_tropoi_orepresentation_oarchive_oschema_ostate__schema__for
-    n_tropoi_orepresentation_oarchive_oschema_ostate__schema__for -->|instantiate| n_tropoi_orepresentation_oarchive_oschema_oSchemaError
+    n_tropoi_orepresentation_oarchive_oradiative_oRadiativeStorage -->|#95;#95;init#95;#95;| n_tropoi_orepresentation_oarchive_oradiative_oRadiativeStorage_o____init____
     n_tropoi_orepresentation_ovisual_ocompose_odefault__view --> n_tropoi_orepresentation_ovisual_ope__snapshots_oselect__snapshot__levels
     n_tropoi_orepresentation_ovisual_ocompose_odefault__view -->|instantiate| n_tropoi_orepresentation_ovisual_oviews_oAutoVectors
     n_tropoi_orepresentation_ovisual_ocompose_odefault__view -->|instantiate| n_tropoi_orepresentation_ovisual_oviews_oContours
@@ -163,7 +139,6 @@ flowchart LR
     classDef root stroke-width:3px
     classDef truncated stroke-dasharray:4 3
     class n_tropoi_ocli_omain_o__cmd__plot root
-    class n_tropoi_orepresentation_oarchive_ocapsule_oCapsuleStorage_o__load__times truncated
-    class n_tropoi_orepresentation_oarchive_ocapsule_oread__capsule__metadata truncated
-    class n_tropoi_orepresentation_oarchive_oschema_oStateSchema_ofrom__manifest__dict truncated
-    class n_tropoi_orepresentation_oarchive_oschema_ostate__schema__for truncated
+    class n_tropoi_orepresentation_oarchive_ocapsule_oCapsuleStorage_o____init____ truncated
+    class n_tropoi_orepresentation_oarchive_oheld__suarez_oHeldSuarezStorage_o____init____ truncated
+    class n_tropoi_orepresentation_oarchive_oradiative_oRadiativeStorage_o____init____ truncated

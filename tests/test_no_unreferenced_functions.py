@@ -37,7 +37,16 @@ SRC = REPO / "src" / "tropoi"
 SCAN_ROOTS = [REPO / "src", REPO / "tests", REPO / "tools", REPO / "examples"]
 
 #: name -> why it is reached without a textual reference.
-ALLOWED: dict[str, str] = {}
+# Split callback names so this file's string scan does not count the exemptions
+# themselves as references (the stale-entry test must still detect real callers).
+ALLOWED: dict[str, str] = {
+    "log_" + "message": (
+        "Viewer _Handler overrides BaseHTTPRequestHandler's logging callback; "
+        "the standard library invokes it when logging requests and errors."),
+    "do_" + "GET": (
+        "Viewer _Handler overrides BaseHTTPRequestHandler's GET callback; "
+        "the standard library dispatches requests using the HTTP method name."),
+}
 
 #: Sources carry non-ASCII (the operator comments), so every read names UTF-8:
 #: ``read_text()`` would otherwise use the platform encoding and fail on Windows.

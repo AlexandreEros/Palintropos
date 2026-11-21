@@ -10,12 +10,16 @@ Index: [all packages](../index.md) · parent [`tropoi.representation`](tropoi.re
 |---|---|---|---|
 | `tropoi.representation.archive` | reexport | – | – |
 | `tropoi.representation.archive.availability` | code | `NoSnapshotsError` | `statistics_only_description` |
-| `tropoi.representation.archive.capsule` | code | `CapsuleError`, `CapsuleLayoutError`, `CapsuleStorage` | `open_simulation`, `read_capsule_metadata`, `resolve_run_directory` |
+| `tropoi.representation.archive.capsule` | code | `CapsuleError`, `CapsuleLayoutError`, `CapsuleStorage` | `open_simulation`, `open_storage`, `read_capsule_metadata`, `resolve_run_directory` |
 | `tropoi.representation.archive.held_suarez` | code | `HeldSuarezPlotError`, `HeldSuarezStorage` | `is_held_suarez_experiment` |
 | `tropoi.representation.archive.initial_state` | code | `InitialState`, `InitialStateError` | `array_digest`, `load_initial_state`, `save_initial_state` |
+| `tropoi.representation.archive.local_resource` | code | – | `resource` |
 | `tropoi.representation.archive.pe_context` | code | `PEColumnContext`, `PEContextError` | `pe_capsule_context` |
 | `tropoi.representation.archive.prepared_terrain` | code | `PreparedTerrainError`, `SavedTerrain` | `is_prepared_terrain`, `load_prepared_terrain`, `save_prepared_terrain`, `summary` |
+| `tropoi.representation.archive.radiative` | code | `RadiativeStorage` | – |
 | `tropoi.representation.archive.schema` | code | `SchemaError`, `StateSchema`, `UnknownSchemaVersionError`, `UnsupportedConventionError` | `canonical_field_layout`, `diagnostic_definitions_for`, `high_l_enstrophy_fraction_definition`, `infer_solver`, `infer_state_schema`, `provenance_blocks`, `state_schema_for` |
+| `tropoi.representation.archive.viewer_diagnostics` | code | – | `diagnostics` |
+| `tropoi.representation.archive.viewer_manifest` | code | – | `viewer_manifest` |
 | `tropoi.representation.archive.writer` | code | `RunDirectory`, `RunProvenanceError` | `atomic_write_text`, `create_run_dir`, `failure_record`, `make_run_id`, `update_manifest_status`, `write_run_manifest` |
 
 Files shipped in this directory that are **not Python and not analysed** (templates, data): `README.md`. Their contents (for example JavaScript in an HTML template) are invisible to every graph here.
@@ -34,9 +38,13 @@ flowchart LR
         n_tropoi_orepresentation_oarchive_ocapsule["representation.archive.capsule"]
         n_tropoi_orepresentation_oarchive_oheld__suarez["representation.archive.held#95;suarez"]
         n_tropoi_orepresentation_oarchive_oinitial__state["representation.archive.initial#95;state"]
+        n_tropoi_orepresentation_oarchive_olocal__resource["representation.archive.local#95;resource"]
         n_tropoi_orepresentation_oarchive_ope__context["representation.archive.pe#95;context"]
         n_tropoi_orepresentation_oarchive_oprepared__terrain["representation.archive.prepared#95;terrain"]
+        n_tropoi_orepresentation_oarchive_oradiative["representation.archive.radiative"]
         n_tropoi_orepresentation_oarchive_oschema["representation.archive.schema"]
+        n_tropoi_orepresentation_oarchive_oviewer__diagnostics["representation.archive.viewer#95;diagnostics"]
+        n_tropoi_orepresentation_oarchive_oviewer__manifest["representation.archive.viewer#95;manifest"]
         n_tropoi_orepresentation_oarchive_owriter["representation.archive.writer"]
     end
     p_tropoi_ocli["package cli"]
@@ -53,6 +61,7 @@ flowchart LR
     n_tropoi_orepresentation_oarchive --> n_tropoi_orepresentation_oarchive_oschema
     n_tropoi_orepresentation_oarchive_ocapsule -.-> n_tropoi_orepresentation_oarchive_oheld__suarez
     n_tropoi_orepresentation_oarchive_ocapsule -.-> n_tropoi_orepresentation_oarchive_ope__context
+    n_tropoi_orepresentation_oarchive_ocapsule -.-> n_tropoi_orepresentation_oarchive_oradiative
     n_tropoi_orepresentation_oarchive_ocapsule --> n_tropoi_orepresentation_oarchive_oschema
     n_tropoi_orepresentation_oarchive_oheld__suarez --> n_tropoi_orepresentation_oarchive_oavailability
     n_tropoi_orepresentation_oarchive_oheld__suarez --> n_tropoi_orepresentation_oarchive_ope__context
@@ -60,13 +69,26 @@ flowchart LR
     n_tropoi_orepresentation_oarchive_oinitial__state --> n_tropoi_orepresentation_oarchive_oschema
     n_tropoi_orepresentation_oarchive_ope__context -.-> n_tropoi_orepresentation_oarchive_oprepared__terrain
     n_tropoi_orepresentation_oarchive_oprepared__terrain --> n_tropoi_orepresentation_oarchive_oinitial__state
+    n_tropoi_orepresentation_oarchive_oradiative --> n_tropoi_orepresentation_oarchive_olocal__resource
+    n_tropoi_orepresentation_oarchive_oradiative --> n_tropoi_orepresentation_oarchive_ope__context
+    n_tropoi_orepresentation_oarchive_oradiative --> n_tropoi_orepresentation_oarchive_oschema
+    n_tropoi_orepresentation_oarchive_oviewer__diagnostics --> n_tropoi_orepresentation_oarchive_olocal__resource
+    n_tropoi_orepresentation_oarchive_oviewer__manifest --> n_tropoi_orepresentation_oarchive_ocapsule
+    n_tropoi_orepresentation_oarchive_oviewer__manifest --> n_tropoi_orepresentation_oarchive_olocal__resource
+    n_tropoi_orepresentation_oarchive_oviewer__manifest --> n_tropoi_orepresentation_oarchive_oradiative
+    n_tropoi_orepresentation_oarchive_oviewer__manifest --> n_tropoi_orepresentation_oarchive_oschema
+    n_tropoi_orepresentation_oarchive_oviewer__manifest --> n_tropoi_orepresentation_oarchive_oviewer__diagnostics
     p_tropoi_ocli -.->|1| n_tropoi_orepresentation_oarchive
     p_tropoi_ocli -.->|1| n_tropoi_orepresentation_oarchive_ocapsule
     p_tropoi_ocli -.->|1| n_tropoi_orepresentation_oarchive_oprepared__terrain
     p_tropoi_ocli -.->|1| n_tropoi_orepresentation_oarchive_oschema
+    p_tropoi_ocli -.->|1| n_tropoi_orepresentation_oarchive_oviewer__manifest
     p_tropoi_orepresentation_ovisual -.->|2| n_tropoi_orepresentation_oarchive_oavailability
     p_tropoi_orepresentation_ovisual -.->|1| n_tropoi_orepresentation_oarchive_oinitial__state
-    p_tropoi_orepresentation_ovisual -.->|1| n_tropoi_orepresentation_oarchive_oprepared__terrain
+    p_tropoi_orepresentation_ovisual -->|2| n_tropoi_orepresentation_oarchive_olocal__resource
+    p_tropoi_orepresentation_ovisual -->|1| n_tropoi_orepresentation_oarchive_ope__context
+    p_tropoi_orepresentation_ovisual -->|2| n_tropoi_orepresentation_oarchive_oprepared__terrain
+    p_tropoi_orepresentation_ovisual -->|1| n_tropoi_orepresentation_oarchive_oviewer__manifest
     p_tropoi_orepresentation_ovisual -.->|1| n_tropoi_orepresentation_oarchive_owriter
     p_tropoi_orun -.->|1| n_tropoi_orepresentation_oarchive_oschema
     p_tropoi_orun -.->|1| n_tropoi_orepresentation_oarchive_owriter
@@ -89,7 +111,10 @@ flowchart LR
     n_tropoi_orepresentation_oarchive_oinitial__state -->|2| p_tropoi_ospatial
     n_tropoi_orepresentation_oarchive_ope__context -->|2| p_tropoi_ospatial
     n_tropoi_orepresentation_oarchive_oprepared__terrain -->|2| p_tropoi_ospatial
+    n_tropoi_orepresentation_oarchive_oradiative -->|1| p_tropoi_ospatial
     n_tropoi_orepresentation_oarchive_oschema -->|2| p_tropoi_ospatial
+    n_tropoi_orepresentation_oarchive_oviewer__manifest -->|1| p_tropoi_orepresentation_ovisual
+    n_tropoi_orepresentation_oarchive_oviewer__manifest -.->|1| p_tropoi_ospatial
     n_tropoi_orepresentation_oarchive_owriter -->|1| p_tropoi_orepresentation
     classDef other fill:none,stroke-dasharray:3 3
     class p_tropoi_ocli other
@@ -106,7 +131,7 @@ flowchart LR
 
 ## Classes
 
-18 classes, each with the functions defined in its body (`$`: class/static method; no parentheses: property). Edges: inheritance (`<|--`) and nesting (`*--`) only.
+19 classes, each with the functions defined in its body (`$`: class/static method; no parentheses: property). Edges: inheritance (`<|--`) and nesting (`*--`) only.
 
 ```mermaid
 %% Generated by tools.architecture 2.3.0. Do not edit by hand.
@@ -197,6 +222,15 @@ classDiagram
     c_tropoi_orepresentation_oarchive_oprepared__terrain_oSavedTerrain : +#95;#95;post#95;init#95;#95;()
     c_tropoi_orepresentation_oarchive_oprepared__terrain_oSavedTerrain : +digest
     c_tropoi_orepresentation_oarchive_oprepared__terrain_oSavedTerrain : +to#95;document()
+    class c_tropoi_orepresentation_oarchive_oradiative_oRadiativeStorage["RadiativeStorage (representation.archive.radiative)"]
+    c_tropoi_orepresentation_oarchive_oradiative_oRadiativeStorage : +#95;#95;init#95;#95;()
+    c_tropoi_orepresentation_oarchive_oradiative_oRadiativeStorage : +#95;index()
+    c_tropoi_orepresentation_oarchive_oradiative_oRadiativeStorage : +#95;read()
+    c_tropoi_orepresentation_oarchive_oradiative_oRadiativeStorage : +frame()
+    c_tropoi_orepresentation_oarchive_oradiative_oRadiativeStorage : +pe#95;context()
+    c_tropoi_orepresentation_oarchive_oradiative_oRadiativeStorage : +plot#95;simulation()
+    c_tropoi_orepresentation_oarchive_oradiative_oRadiativeStorage : +quantities()
+    c_tropoi_orepresentation_oarchive_oradiative_oRadiativeStorage : +surface()
     class c_tropoi_orepresentation_oarchive_oschema_oSchemaError["SchemaError (representation.archive.schema)"]
     c_tropoi_orepresentation_oarchive_oschema_oSchemaError : external base ValueError
     class c_tropoi_orepresentation_oarchive_oschema_oStateSchema["StateSchema (representation.archive.schema)"]
@@ -235,5 +269,6 @@ classDiagram
 * [`calls/cli-run-pe.mmd`](../calls/cli-run-pe.mmd)
 * [`calls/cli-run-swe.mmd`](../calls/cli-run-swe.mmd)
 * [`calls/cli-terrain-run-prepare.mmd`](../calls/cli-terrain-run-prepare.mmd)
+* [`calls/cli-view.mmd`](../calls/cli-view.mmd)
 * [`calls/custom-initial-states.mmd`](../calls/custom-initial-states.mmd)
 * [`calls/sky-saved-column.mmd`](../calls/sky-saved-column.mmd)

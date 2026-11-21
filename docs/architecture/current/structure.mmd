@@ -103,6 +103,8 @@ flowchart LR
     nYS6R6EV43PKZO["prepared#95;terrain.py"]:::moduleNode
     nJHWSWZZPFJXXK["PreparedTerrainError"]:::classNode
     nOELIHGTMYSFA2["SavedTerrain"]:::classNode
+    nXZKYQWGKOHTN4["radiative.py"]:::moduleNode
+    nGPHC67V2XHEIE["RadiativeStorage"]:::classNode
     n33X5NUFP3SHGK["schema.py"]:::moduleNode
     n5PSHVQHEXLQGM["SchemaError"]:::classNode
     n4VALVWFJNN4TU["UnknownSchemaVersionError"]:::classNode
@@ -124,6 +126,8 @@ flowchart LR
     n4TFTGKB4SRLRS["PEDiagnosticsRecorder"]:::classNode
     nF4KQMN3MPPAXG["pe#95;levels.py"]:::moduleNode
     nAROTGQGRRONHG["LevelFields"]:::classNode
+    nNZXUJRIOAPPXS["pe#95;structure.py"]:::moduleNode
+    nIQV73YEMPLA62["ZonalMeanAccumulator"]:::classNode
     nGGMITOKPIGRO4["pe#95;surfaces.py"]:::moduleNode
     n7WDFSWTGBTT4O["SurfaceUnavailableError"]:::classNode
     nRRZSVUHOKIW7A["PressureSurface"]:::classNode
@@ -160,8 +164,9 @@ flowchart LR
     n2ALKKXWJG67JY["planet#95;viewer.py"]:::moduleNode
     nW7QBLLKWXGXN4["PlanetViewer"]:::classNode
     nUHWCTEL2APVEM["quantities.py"]:::moduleNode
-    nPETH6XGMSNBXM["QuantityUnavailableError"]:::classNode
-    nK4QIABERVYSIQ["Quantity"]:::classNode
+    nS6AD5R6YARPXK["#95;Presentation"]:::classNode
+    nIINJSMOPBNVEO["QuantityUnavailableError"]:::classNode
+    nFRN2HITNNODVA["Quantity"]:::classNode
     nWXCKZXJTGCWFO["renderers.py"]:::moduleNode
     n4LSBTSTMYOOJO["Renderer"]:::classNode
     nV5LKYH6ENZOUC["sky.py"]:::moduleNode
@@ -196,6 +201,12 @@ flowchart LR
     nVF7MSZT7JT5TO["timeline.py"]:::moduleNode
     nMX4DWJ6MII7QW["FigureFrame"]:::classNode
     nIP3363CMMC22C["FigureTimeline"]:::classNode
+    n335RXRLBSSG34["viewer#95;fields.py"]:::moduleNode
+    nGWCS36VDHWZU6["FrameProvider"]:::classNode
+    nQTMXWAPPGEPPY["viewer#95;server.py"]:::moduleNode
+    nTGD5L6ZFXHMH6["ViewerSession"]:::classNode
+    n46GRXPVECGEXU["ViewerServer"]:::classNode
+    nIJHLPBTUP7BBC["#95;Handler"]:::classNode
     nBVTRQ6LZTYIQ6["views.py"]:::moduleNode
     nP4RE64PXKMGIC["Sigma"]:::classNode
     nNDKFXUAYLFTHS["Streamlines"]:::classNode
@@ -445,6 +456,8 @@ flowchart LR
     nDKNJBTA36EPYM --> nYS6R6EV43PKZO
     nYS6R6EV43PKZO --> nJHWSWZZPFJXXK
     nYS6R6EV43PKZO --> nOELIHGTMYSFA2
+    nDKNJBTA36EPYM --> nXZKYQWGKOHTN4
+    nXZKYQWGKOHTN4 --> nGPHC67V2XHEIE
     nDKNJBTA36EPYM --> n33X5NUFP3SHGK
     n33X5NUFP3SHGK --> n5PSHVQHEXLQGM
     n33X5NUFP3SHGK --> n4VALVWFJNN4TU
@@ -466,6 +479,8 @@ flowchart LR
     n7GFIDO4XQWTD2 --> n4TFTGKB4SRLRS
     nQ7HBGIAMNTAWA --> nF4KQMN3MPPAXG
     nF4KQMN3MPPAXG --> nAROTGQGRRONHG
+    nQ7HBGIAMNTAWA --> nNZXUJRIOAPPXS
+    nNZXUJRIOAPPXS --> nIQV73YEMPLA62
     nQ7HBGIAMNTAWA --> nGGMITOKPIGRO4
     nGGMITOKPIGRO4 --> n7WDFSWTGBTT4O
     nGGMITOKPIGRO4 --> nRRZSVUHOKIW7A
@@ -502,8 +517,9 @@ flowchart LR
     n27HUT5DJ4WGUK --> n2ALKKXWJG67JY
     n2ALKKXWJG67JY --> nW7QBLLKWXGXN4
     n27HUT5DJ4WGUK --> nUHWCTEL2APVEM
-    nUHWCTEL2APVEM --> nPETH6XGMSNBXM
-    nUHWCTEL2APVEM --> nK4QIABERVYSIQ
+    nUHWCTEL2APVEM --> nS6AD5R6YARPXK
+    nUHWCTEL2APVEM --> nIINJSMOPBNVEO
+    nUHWCTEL2APVEM --> nFRN2HITNNODVA
     n27HUT5DJ4WGUK --> nWXCKZXJTGCWFO
     nWXCKZXJTGCWFO --> n4LSBTSTMYOOJO
     n27HUT5DJ4WGUK --> nV5LKYH6ENZOUC
@@ -538,6 +554,12 @@ flowchart LR
     n27HUT5DJ4WGUK --> nVF7MSZT7JT5TO
     nVF7MSZT7JT5TO --> nMX4DWJ6MII7QW
     nVF7MSZT7JT5TO --> nIP3363CMMC22C
+    n27HUT5DJ4WGUK --> n335RXRLBSSG34
+    n335RXRLBSSG34 --> nGWCS36VDHWZU6
+    n27HUT5DJ4WGUK --> nQTMXWAPPGEPPY
+    nQTMXWAPPGEPPY --> nTGD5L6ZFXHMH6
+    nQTMXWAPPGEPPY --> n46GRXPVECGEXU
+    nQTMXWAPPGEPPY --> nIJHLPBTUP7BBC
     n27HUT5DJ4WGUK --> nBVTRQ6LZTYIQ6
     nBVTRQ6LZTYIQ6 --> nP4RE64PXKMGIC
     nBVTRQ6LZTYIQ6 --> nNDKFXUAYLFTHS
