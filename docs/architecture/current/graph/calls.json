@@ -1582,6 +1582,56 @@
     },
     {
       "kind": "constructor",
+      "source": "tropoi.physics.substrate.ConductiveSubstrate",
+      "target": "tropoi.physics.substrate.ConductiveSubstrate.__init__"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.physics.substrate.ConductiveSubstrate.__init__",
+      "target": "tropoi.physics.substrate.geometric_interfaces"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.physics.substrate.ConductiveSubstrate.energy",
+      "target": "tropoi.physics.substrate.ConductiveSubstrate._constants"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.physics.substrate.ConductiveSubstrate.energy",
+      "target": "tropoi.physics.substrate._xp"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.physics.substrate.ConductiveSubstrate.initial_state",
+      "target": "tropoi.physics.substrate.SubstrateState"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.physics.substrate.ConductiveSubstrate.step",
+      "target": "tropoi.physics.substrate.ConductiveSubstrate._constants"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.physics.substrate.ConductiveSubstrate.step",
+      "target": "tropoi.physics.substrate.ConductiveSubstrate._thomas"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.physics.substrate.ConductiveSubstrate.step",
+      "target": "tropoi.physics.substrate.SubstrateState"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.physics.substrate.ConductiveSubstrate.step",
+      "target": "tropoi.physics.substrate._xp"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.physics.substrate.geometric_interfaces",
+      "target": "tropoi.physics.substrate._continue_geometric"
+    },
+    {
+      "kind": "constructor",
       "source": "tropoi.physics.surface.SlabSurface",
       "target": "tropoi.physics.surface.SlabSurface.__init__"
     },
@@ -14534,6 +14584,118 @@
       "kind": "function",
       "module": "tropoi.physics.star",
       "qualname": "planck_radiance",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.substrate.ConductiveSubstrate",
+      "kind": "class",
+      "module": "tropoi.physics.substrate",
+      "qualname": "ConductiveSubstrate",
+      "type": "class"
+    },
+    {
+      "id": "tropoi.physics.substrate.ConductiveSubstrate.__init__",
+      "kind": "method",
+      "module": "tropoi.physics.substrate",
+      "qualname": "ConductiveSubstrate.__init__",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.substrate.ConductiveSubstrate._constants",
+      "kind": "method",
+      "module": "tropoi.physics.substrate",
+      "qualname": "ConductiveSubstrate._constants",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.substrate.ConductiveSubstrate._thomas",
+      "kind": "staticmethod",
+      "module": "tropoi.physics.substrate",
+      "qualname": "ConductiveSubstrate._thomas",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.substrate.ConductiveSubstrate.depth",
+      "kind": "property",
+      "module": "tropoi.physics.substrate",
+      "qualname": "ConductiveSubstrate.depth",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.substrate.ConductiveSubstrate.energy",
+      "kind": "method",
+      "module": "tropoi.physics.substrate",
+      "qualname": "ConductiveSubstrate.energy",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.substrate.ConductiveSubstrate.initial_state",
+      "kind": "method",
+      "module": "tropoi.physics.substrate",
+      "qualname": "ConductiveSubstrate.initial_state",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.substrate.ConductiveSubstrate.layers",
+      "kind": "property",
+      "module": "tropoi.physics.substrate",
+      "qualname": "ConductiveSubstrate.layers",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.substrate.ConductiveSubstrate.signature",
+      "kind": "method",
+      "module": "tropoi.physics.substrate",
+      "qualname": "ConductiveSubstrate.signature",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.substrate.ConductiveSubstrate.step",
+      "kind": "method",
+      "module": "tropoi.physics.substrate",
+      "qualname": "ConductiveSubstrate.step",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.substrate.ConductiveSubstrate.surface_temperature",
+      "kind": "method",
+      "module": "tropoi.physics.substrate",
+      "qualname": "ConductiveSubstrate.surface_temperature",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.substrate.ConductiveSubstrate.temperature",
+      "kind": "method",
+      "module": "tropoi.physics.substrate",
+      "qualname": "ConductiveSubstrate.temperature",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.substrate.SubstrateState",
+      "kind": "class",
+      "module": "tropoi.physics.substrate",
+      "qualname": "SubstrateState",
+      "type": "class"
+    },
+    {
+      "id": "tropoi.physics.substrate._continue_geometric",
+      "kind": "function",
+      "module": "tropoi.physics.substrate",
+      "qualname": "_continue_geometric",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.substrate._xp",
+      "kind": "function",
+      "module": "tropoi.physics.substrate",
+      "qualname": "_xp",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.substrate.geometric_interfaces",
+      "kind": "function",
+      "module": "tropoi.physics.substrate",
+      "qualname": "geometric_interfaces",
       "type": "function"
     },
     {
