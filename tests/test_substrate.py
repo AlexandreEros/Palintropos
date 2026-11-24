@@ -1,8 +1,11 @@
-"""Fast CPU regression tests for the standalone conductive substrate.
+"""Fast CPU regression tests for the conductive substrate.
 
-The acceptance gates (G1-G5b) live in ``audit_substrate_gates.py``. These
-tests are quick checks of the same kernel: layering, sign convention, energy
-identity, the one-layer slab limit and the skin linearization.
+The original acceptance gates (G1-G5b) live in ``audit_substrate_gates.py``.
+The nonlinear, stratified gates (G-B) live in ``test_substrate_nonlinear.py``.
+These are quick checks of layering, sign convention, the energy identity,
+the one-layer slab limit and the Robin/skin response, written against the
+generalized kernel (Planet One). The layer-mean skin mode was removed with
+the owner's choice of the diagnosed skin, so its checks are gone.
 """
 from __future__ import annotations
 
@@ -19,14 +22,21 @@ from tropoi.physics.substrate import (ConductiveSubstrate, ENERGY_REFERENCE_TEMP
 from tropoi.physics.surface import SlabSurface
 
 
+def _prescribed(**kw):
+    """A constant-property column with a non-radiating surface: the forcing
+    is the prescribed flux alone."""
+    return ConductiveSubstrate.constant(emissivity=0.0, **kw)
+
+
 def test_default_layering_is_thai_column():
-    sub = ConductiveSubstrate()
+    sub = _prescribed()
     assert sub.layers == 30
     assert sub.interfaces[0] == 0.0 and sub.interfaces[-1] == 3.5
     assert math.isclose(sub.thickness[0], 0.02, rel_tol=1e-12)
     ratios = sub.thickness[1:] / sub.thickness[:-1]
     assert np.all(ratios <= 1.5) and np.all(ratios >= 1.0)
-    assert math.isclose(sub.conductivity, 2.0, rel_tol=1e-15)
+    st = sub.initial_state(1)
+    assert np.allclose(sub.conductivity(st), 2.0, rtol=1e-15, atol=0)
     assert sub.signature()["kind"] == "conductive"
 
 
@@ -97,7 +107,7 @@ def test_layers_mode_near_uniform_and_argument_checks():
         with pytest.raises((ValueError, TypeError)):
             geometric_interfaces(0.02, 3.5, layers=bad)
     with pytest.raises(ValueError):
-        ConductiveSubstrate(layers=29.9)
+        ConductiveSubstrate.constant(layers=29.9)
 
 
 def test_generated_grids_never_leave_the_ratio_bounds():
@@ -130,35 +140,35 @@ def test_constructor_rejects_conflicting_geometry():
                    dict(interfaces=(0.0, 1.0), top_thickness=0.02),
                    dict(interfaces=(0.0, 1.0), stretch=1.1), dict(layers=18, stretch=1.2)):
         with pytest.raises(ValueError):
-            ConductiveSubstrate(**kwargs)
-    sub = ConductiveSubstrate(stretch=1.2, depth=1.0, top_thickness=0.1)
+            ConductiveSubstrate.constant(**kwargs)
+    sub = ConductiveSubstrate.constant(stretch=1.2, depth=1.0, top_thickness=0.1)
     assert sub.layers == 6 and sub.depth == 1.0
 
 
 def test_constructor_rejects_nonfinite_parameters():
     for kwargs in (dict(bottom_heat_flux=float("nan")), dict(initial_temperature=float("nan")),
                    dict(initial_temperature=0.0), dict(interfaces=(0.0, float("nan"))),
-                   dict(albedo=float("nan")), dict(volumetric_heat_capacity=float("inf"))):
+                   dict(albedo=float("nan")), dict(volumetric_heat_capacity=float("inf")),
+                   dict(thermal_inertia=2000.0, conductivity=2.0)):
         with pytest.raises(ValueError):
-            ConductiveSubstrate(**kwargs)
+            ConductiveSubstrate.constant(**kwargs)
 
 
-@pytest.mark.parametrize("skin", ["layer", "diagnosed"])
-def test_step_rejects_invalid_inputs(skin):
-    sub = ConductiveSubstrate(skin=skin)
+def test_step_rejects_invalid_inputs():
+    sub = _prescribed()
     st = sub.initial_state(2)
     f = np.array([10.0, -10.0])
     for dt in (0.0, -600.0, float("nan"), float("inf")):
         with pytest.raises(ValueError):
-            sub.step(st, f, dt)
+            sub.step(st, dt, flux=f)
     with pytest.raises(ValueError):
-        sub.step(st, np.array([np.nan, 1.0]), 600.0)
+        sub.step(st, 600.0, flux=np.array([np.nan, 1.0]))
     with pytest.raises(ValueError):
-        sub.step(st, f, 600.0, bottom_heat_flux=np.array([0.0, np.inf]))
+        sub.step(st, 600.0, flux=f, bottom_heat_flux=np.array([0.0, np.inf]))
     for a in (np.array([-1.0, 200.0]), np.array([-1.0, np.nan]), 1e-9):
         with pytest.raises(ValueError):
-            sub.step(st, f, 600.0, flux_derivative=a)
-    ok = sub.step(st, f, 600.0, flux_derivative=np.array([-5.0, 0.0]))
+            sub.step(st, 600.0, flux=f, flux_derivative=a)
+    ok, _ = sub.step(st, 600.0, flux=f, flux_derivative=np.array([-5.0, 0.0]))
     assert np.all(np.isfinite(ok.anomaly))
 
 
@@ -172,11 +182,11 @@ def test_historical_grids_fixture():
     assert fx["source_commit"].startswith("cc33bfb")
     grids = fx["grids"]
     # The production default is bitwise the grid the original run used.
-    assert list(ConductiveSubstrate().interfaces) == grids["default"]
+    assert list(ConductiveSubstrate.constant().interfaces) == grids["default"]
     for key, e in grids.items():
         e = np.asarray(e)
         assert e[0] == 0.0 and np.all(np.diff(e) > 0), key
-        ConductiveSubstrate(interfaces=e)            # explicit grids are accepted as given
+        ConductiveSubstrate.constant(interfaces=e)   # explicit grids are accepted as given
     # Every gate grid of the original run is present. 'uniform:N=400' is the extra grid of
     # the post hoc G1-C supplementary study (not a gate grid), kept so it is documented.
     expected = {"default", "G4", "uniform:N=400"}
@@ -200,15 +210,9 @@ def test_gate_harness_rejects_unknown_gate_names(tmp_path, capsys):
     assert not (tmp_path / "out").exists()
 
 
-def test_material_arguments_are_exclusive():
-    with pytest.raises(ValueError):
-        ConductiveSubstrate(thermal_inertia=2000.0, conductivity=2.0)
-
-
 def test_bottom_flux_enters_bottom_row():
-    sub = ConductiveSubstrate()
-    st = sub.initial_state(1)
-    st = sub.step(st, np.array([0.0]), 600.0, bottom_heat_flux=5.0)
+    sub = _prescribed()
+    st, _ = sub.step(sub.initial_state(1), 600.0, flux=0.0, bottom_heat_flux=5.0)
     theta = st.anomaly[:, 0]
     assert theta[-1] > 0.0
     assert np.all(np.diff(theta) >= 0.0)                # warms from below
@@ -216,7 +220,8 @@ def test_bottom_flux_enters_bottom_row():
 
 
 def test_energy_identity_with_signs():
-    sub = ConductiveSubstrate()
+    """G5's criterion: cumulative |E - sum dt (F_s + F_b)| <= 1e-12 sum dt |F_s + F_b|."""
+    sub = _prescribed()
     rng = np.random.default_rng(1)
     fb = np.array([0.0, 0.1, -0.1])
     st = sub.initial_state(3)
@@ -224,53 +229,49 @@ def test_energy_identity_with_signs():
     denom = np.zeros(3)
     for _ in range(2000):
         f = rng.uniform(-200.0, 200.0, size=3)
-        st = sub.step(st, f, 600.0, bottom_heat_flux=fb)
-        inflow += 600.0 * (st.surface_flux + fb)
-        denom += 600.0 * np.abs(st.surface_flux + fb)
+        st, rep = sub.step(st, 600.0, flux=f, bottom_heat_flux=fb)
+        assert rep.iterations == 1                       # linear problem: one Newton step
+        inflow += 600.0 * (rep.conducted + fb)
+        denom += 600.0 * np.abs(rep.conducted + fb)
         resid = np.abs(np.asarray(sub.energy(st)) - inflow)
         assert np.all(resid <= 1e-12 * denom + 1e-30)
 
 
 def test_one_layer_matches_slab():
-    sub = ConductiveSubstrate(interfaces=(0.0, 1.0))
+    sub = _prescribed(interfaces=(0.0, 1.0))
     slab = SlabSurface(2.0e6)
     rng = np.random.default_rng(2)
     st = sub.initial_state(1)
     T = np.array([ENERGY_REFERENCE_TEMPERATURE])
     for _ in range(1000):
         f = rng.uniform(-200.0, 200.0, size=1)
-        st = sub.step(st, f, 600.0)
+        st, _ = sub.step(st, 600.0, flux=f)
         T = slab.advance(T, f, 600.0)
     assert abs(float(sub.temperature(st)[0, 0]) - float(T[0])) < 1000 * np.spacing(300.0)
 
 
-@pytest.mark.parametrize("skin", ["layer", "diagnosed"])
-def test_robin_linearization_is_exact(skin):
-    sub = ConductiveSubstrate(skin=skin)
+def test_robin_linearization_is_exact():
+    sub = _prescribed()
     h = 8.14
     st = sub.initial_state(1)
-    st = st._replace(anomaly=st.anomaly + 5.0)
+    st = st._replace(anomaly=st.anomaly + 5.0, surface_anomaly=st.surface_anomaly + 5.0)
     ts_old = float(sub.surface_temperature(st)[0]) - 300.0
-    new = sub.step(st, np.array([-h * ts_old]), 600.0, flux_derivative=-h)
+    new, rep = sub.step(st, 600.0, flux=np.array([-h * ts_old]), flux_derivative=-h)
     t1 = float(new.anomaly[0, 0])
-    if skin == "layer":
-        expect = -h * t1
-    else:
-        expect = -h * t1 / (1.0 + h * sub.skin_resistance)
-    assert math.isclose(float(new.surface_flux[0]), expect, rel_tol=1e-12)
-    if skin == "diagnosed":
-        ts_new = float(sub.surface_temperature(new)[0]) - 300.0
-        assert math.isclose(float(new.surface_flux[0]), -h * ts_new, rel_tol=1e-12)
+    r = sub.thickness[0] / (2.0 * 2.0)
+    assert math.isclose(float(rep.conducted[0]), -h * t1 / (1.0 + h * r), rel_tol=1e-12)
+    ts_new = float(sub.surface_temperature(new)[0]) - 300.0
+    assert math.isclose(float(rep.conducted[0]), -h * ts_new, rel_tol=1e-12)
 
 
 def test_step_flux_surface_response():
     """G2 at the default layering (the gate's own criterion, as a regression)."""
-    sub = ConductiveSubstrate()
+    sub = _prescribed()
     st = sub.initial_state(1)
     F, dt, k, kappa = 100.0, 600.0, 2.0, 1e-6
     z = 0.5 * sub.thickness[0]
     for n in range(1, 400):
-        st = sub.step(st, np.array([F]), dt)
+        st, _ = sub.step(st, dt, flux=np.array([F]))
     t = 399 * dt
     s = math.sqrt(kappa * t)
     x = z / (2 * s)

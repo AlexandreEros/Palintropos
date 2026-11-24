@@ -6,6 +6,11 @@ script ran. Mandatory gates: G1-M, G2, G3-M, G4, G5. Reported evidence: G1-C,
 G1 at P = 1 and 2 d, G3-D, G5b. The run stops at the first failed mandatory
 gate.
 
+Since Planet One (2026-11-24) the harness runs the generalized kernel. The
+layer-mean skin mode is gone, so G3-D (diagnosed skin) is the mandatory
+Robin gate in place of G3-M, and G5b reports the diagnosed arm only. Every
+tolerance is unchanged (docs/validation/PLANET-ONE-GATES.md, G-R).
+
 Usage::
 
     python tests/audit_substrate_gates.py OUTDIR [--only G1M,G2,...]
@@ -99,9 +104,11 @@ def extended_interfaces(depth, top=TOP):
     return geometric_interfaces(top, depth, stretch=default_stretch(), depth_is_minimum=True)
 
 
-def substrate(interfaces, skin="layer"):
-    return ConductiveSubstrate(volumetric_heat_capacity=C_V, thermal_inertia=INERTIA,
-                               interfaces=interfaces, skin=skin)
+def substrate(interfaces):
+    """The THAI constant-property column with a non-radiating surface: the
+    forcing of every gate is the prescribed flux alone."""
+    return ConductiveSubstrate.constant(volumetric_heat_capacity=C_V, thermal_inertia=INERTIA,
+                                        interfaces=interfaces, emissivity=0.0)
 
 
 # ------------------------------------------------------------------ reconstruction
@@ -161,10 +168,10 @@ def mu1(bi):
 
 
 # ------------------------------------------------------------------ periodic runner
-def run_periodic(edges, P, dt, skin="layer", F0=100.0):
+def run_periodic(edges, P, dt, F0=100.0):
     """Six periods from the exact finite-column periodic state; returns per-layer
     complex first-harmonic amplitudes over period 6 and surface series."""
-    sub = substrate(edges, skin)
+    sub = substrate(edges)
     e = sub.interfaces
     D = float(e[-1])
     w = 2 * math.pi / P
@@ -172,24 +179,26 @@ def run_periodic(edges, P, dt, skin="layer", F0=100.0):
     q = (1 + 1j) / delta
     init = np.array([theta_fin_mean(e[i], e[i + 1], F0, q, D).real for i in range(sub.layers)])
     st = sub.initial_state(1)
-    st = st._replace(anomaly=init.reshape(-1, 1).copy())
+    st = st._replace(anomaly=init.reshape(-1, 1).copy(),
+                     surface_anomaly=init[:1].copy())
     nsteps = int(math.ceil(6 * P / dt - 1e-9))
-    t_s, th_s, fl_s = [], [], []
+    t_s, th_s, fl_s, sk_s = [], [], [], []
     for n in range(nsteps):
         t0, t1 = n * dt, (n + 1) * dt
         fbar = F0 / (w * dt) * (math.sin(w * t1) - math.sin(w * t0))
-        st = sub.step(st, np.array([fbar]), dt)
+        st, rep = sub.step(st, dt, flux=np.array([fbar]))
         if t1 > 5 * P:
             t_s.append(t1)
             th_s.append(st.anomaly[:, 0].copy())
-            fl_s.append(float(st.surface_flux[0]))
+            fl_s.append(float(rep.conducted[0]))
+            sk_s.append(float(st.surface_anomaly[0]))
     t = np.array(t_s)
     X = np.column_stack([np.ones_like(t), np.cos(w * t), np.sin(w * t)])
     Y = np.array(th_s)
     coef, *_ = np.linalg.lstsq(X, Y, rcond=None)
     amp = coef[1] - 1j * coef[2]          # T = Re[amp e^{i w t}]
     return dict(sub=sub, edges=e, D=D, q=q, delta=delta, w=w, amp=amp, t=t, Y=Y,
-                flux=np.array(fl_s), F0=F0)
+                flux=np.array(fl_s), skin=np.array(sk_s), F0=F0)
 
 
 def compare_point(run, z):
@@ -295,7 +304,7 @@ def gate_g2():
     samples = []
     while True:
         n += 1
-        st = sub.step(st, np.array([F]), DT)
+        st, _ = sub.step(st, DT, flux=np.array([F]))
         t = n * DT
         if t > tmax:
             break
@@ -317,9 +326,9 @@ def gate_g2():
             "at_t_s": worst_t, "layer_mean_max_abs_rel_err": worst_lm, "samples": samples}
 
 
-def run_robin(skin):
+def run_robin():
     edges = grid("default", default_interfaces)
-    sub = substrate(edges, skin)
+    sub = substrate(edges)
     L = sub.depth
     h = np.array(H_SET)
     mus = [mu1(hh * L / K) for hh in H_SET]
@@ -330,13 +339,13 @@ def run_robin(skin):
         for i in range(sub.layers):
             a, b = e[i], e[i + 1]
             init[i, c] = 10.0 * L / (m * (b - a)) * (math.sin(m * (L - a) / L) - math.sin(m * (L - b) / L))
-    st = sub.initial_state(len(H_SET))._replace(anomaly=init)
+    st = sub.initial_state(len(H_SET))._replace(anomaly=init, surface_anomaly=init[0].copy())
     tend = 3.0 / lam.min()
     nsteps = int(math.ceil(tend / DT))
     ts, Es = [], []
     for n in range(nsteps):
         ts_old = sub.surface_temperature(st) - 300.0
-        st = sub.step(st, -h * ts_old, DT, flux_derivative=-h)
+        st, _ = sub.step(st, DT, flux=-h * ts_old, flux_derivative=-h)
         ts.append((n + 1) * DT)
         Es.append(np.asarray(sub.energy(st)).copy())
     ts = np.array(ts)
@@ -353,12 +362,14 @@ def run_robin(skin):
 
 
 def gate_g3():
-    prod = run_robin("layer")
-    diag = run_robin("diagnosed")
-    ok = all(abs(r["rel_err"]) <= 0.01 for r in prod)
-    return {"gate": "G3-M", "mandatory": True, "pass": ok, "tolerance": 0.01,
-            "production_formulation": "layer (identification, provisional)",
-            "G3-M_identification": prod, "G3-D_diagnosed_reported_only": diag}
+    """G3-D: Robin decay with the diagnosed skin, the only skin since Planet
+    One (the layer-mean identification of G3-M was removed with its mode;
+    docs/validation/PLANET-ONE-GATES.md, G-R)."""
+    diag = run_robin()
+    ok = all(abs(r["rel_err"]) <= 0.01 for r in diag)
+    return {"gate": "G3-D", "mandatory": True, "pass": ok, "tolerance": 0.01,
+            "production_formulation": "diagnosed skin",
+            "G3-D_diagnosed": diag}
 
 
 def gate_g4():
@@ -369,7 +380,7 @@ def gate_g4():
     F = rng.uniform(-200.0, 200.0, size=n)
     st = sub.initial_state(1)
     T_slab = np.array([300.0])
-    m = float(sub.layer_capacity[0])
+    m = C_V * float(sub.thickness[0])
     acc = 0.0
     worst_ratio, worst_diff = 0.0, 0.0
     diffs = []
@@ -377,7 +388,7 @@ def gate_g4():
     for j in range(n):
         theta_j = float(st.anomaly[0, 0])
         Fj = np.array([F[j]])
-        st = sub.step(st, Fj, DT)
+        st, _ = sub.step(st, DT, flux=Fj)
         T_slab = slab.advance(T_slab, Fj, DT)
         delta_j = abs(DT * F[j] / m)
         acc += g2 * delta_j + 0.5 * float(np.spacing(abs(T_slab[0]))) + g3 * (abs(theta_j) + delta_j)
@@ -430,15 +441,15 @@ def gate_g5():
     n = 100000
     F = rng.uniform(-200.0, 200.0, size=(n, ncol))
     st = sub.initial_state(ncol)
-    m = sub.layer_capacity[:, None]
+    m = C_V * sub.thickness[:, None]
     fs = [ExactSum() for _ in range(ncol)]
     fbsum = [ExactSum() for _ in range(ncol)]
     den = [ExactSum() for _ in range(ncol)]
     worst = np.zeros(ncol)
     worst_step = np.zeros(ncol, dtype=int)
     for k in range(n):
-        st = sub.step(st, F[k], DT, bottom_heat_flux=fbs)
-        applied = st.surface_flux
+        st, rep = sub.step(st, DT, flux=F[k], bottom_heat_flux=fbs)
+        applied = rep.conducted
         prod = m * st.anomaly
         for c in range(ncol):
             fs[c].add(float(applied[c]))
@@ -455,7 +466,7 @@ def gate_g5():
                         "ratio": ratio}
             if ratio > worst[c]:
                 worst[c], worst_step[c] = ratio, k + 1
-    applied_equals_prescribed = bool(np.all(np.asarray(st.surface_flux) == F[-1]))
+    applied_equals_prescribed = bool(np.all(np.asarray(rep.conducted) == F[-1]))
     return {"gate": "G5", "mandatory": True, "pass": True, "steps": n, "tolerance_ratio": 1e-12,
             "columns": [{"F_b": float(fbs[c]), "max_ratio": float(worst[c]),
                          "at_step": int(worst_step[c])} for c in range(ncol)],
@@ -475,12 +486,11 @@ def gate_g5b():
             for top in tops:
                 edges = grid(f"G5b:periodic:P={Pd}:top={top}", lambda: extended_interfaces(D, top))
                 run = run_periodic(edges, P, dt)
-                r = run["sub"].skin_resistance
-                T1 = run["Y"][:, 0]
+                Ts = run["skin"]
                 ana_s = theta_inf(0.0, run["F0"], run["q"])
                 ana_series = np.real(ana_s * np.exp(1j * run["w"] * run["t"]))
                 row = {"top_m": top, "layers": len(edges) - 1, "depth_m": float(edges[-1])}
-                for name, series in (("identification", T1), ("diagnosed", T1 + r * run["flux"])):
+                for name, series in (("diagnosed", Ts),):
                     X = np.column_stack([np.ones_like(run["t"]), np.cos(run["w"] * run["t"]),
                                          np.sin(run["w"] * run["t"])])
                     cf, *_ = np.linalg.lstsq(X, series, rcond=None)
@@ -490,9 +500,9 @@ def gate_g5b():
                     row[name] = {"amp_err": abs(ratio) - 1.0, "phase_err_P": cmath.phase(ratio) / (2 * math.pi),
                                  "complex_rel_err": abs(ratio - 1.0), "max_abs_dTs_K": maxdT,
                                  "flux_err_W_m2": {str(h): h * maxdT for h in H_SET}}
-                row["skin_minus_T1_amplitude_K"] = float(abs(r) * np.max(np.abs(run["flux"])))
+                row["skin_minus_T1_amplitude_K"] = float(np.max(np.abs(Ts - run["Y"][:, 0])))
                 rows.append(row)
-            _orders(rows, tops, ("identification", "diagnosed"), "complex_rel_err")
+            _orders(rows, tops, ("diagnosed",), "complex_rel_err")
             # D_m keeps the frozen run's meaning (the requested depth); the
             # actual column depth of each grid is rows[*].depth_m.
             out["periodic"].append({"P_days": Pd, "dt": dt, "D_m": D, "D_requested_m": D,
@@ -504,21 +514,19 @@ def gate_g5b():
         for top in tops:
             edges = grid(f"G5b:step:top={top}", lambda: extended_interfaces(DEPTH, top))
             sub = substrate(edges)
-            r = sub.skin_resistance
             st = sub.initial_state(1)
             n = 0
-            worst = {"identification": 0.0, "diagnosed": 0.0}
+            worst = {"diagnosed": 0.0}
             last = {}
             while True:
                 n += 1
-                st = sub.step(st, np.array([F]), dt)
+                st, _ = sub.step(st, dt, flux=np.array([F]))
                 t = n * dt
                 if t > tmax:
                     break
                 if n >= 20:
                     ana = 2 * F * math.sqrt(t / math.pi) / INERTIA
-                    T1 = float(st.anomaly[0, 0])
-                    for name, val in (("identification", T1), ("diagnosed", T1 + r * float(st.surface_flux[0]))):
+                    for name, val in (("diagnosed", float(st.surface_anomaly[0])),):
                         err = val / ana - 1.0
                         worst[name] = max(worst[name], abs(err))
                         last[name] = {"t_s": t, "rel_err": err, "dTs_K": val - ana}
@@ -527,7 +535,7 @@ def gate_g5b():
                 row[name] = {"max_abs_rel_err": worst[name], "end_of_window": last[name],
                              "flux_err_end_W_m2": {str(h): h * abs(last[name]["dTs_K"]) for h in H_SET}}
             rows.append(row)
-        _orders(rows, tops, ("identification", "diagnosed"), "max_abs_rel_err")
+        _orders(rows, tops, ("diagnosed",), "max_abs_rel_err")
         out["step"].append({"dt": dt, "window_s": [20 * dt, tmax], "rows": rows})
     return out
 
