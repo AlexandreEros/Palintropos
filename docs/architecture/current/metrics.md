@@ -13,36 +13,36 @@ Edge counts by scope set: `function`: 184, `function+module`: 7, `function+type_
 
 | Metric | all imports | import-time |
 |---|---|---|
-| Nodes \|V\| | 158 | 158 |
+| Nodes \|V\| | 157 | 157 |
 | Directed edges \|E\| | 493 | 302 |
-| Density | 0.019874 | 0.012174 |
-| Weakly connected components | 2 | 8 |
-| WCC sizes | 157, 1 | 144, 8, 1, 1, 1, 1, 1, 1 |
-| Strongly connected components | 158 | 158 |
+| Density | 0.020129 | 0.012331 |
+| Weakly connected components | 1 | 7 |
+| WCC sizes | 157 | 144, 8, 1, 1, 1, 1, 1 |
+| Strongly connected components | 157 | 157 |
 | Nontrivial SCCs | 0 | 0 |
 | Nontrivial SCC sizes | - | - |
 | Nodes in cycles | 0 | 0 |
 | Fraction of nodes in cycles | 0 | 0 |
-| Sources (in-degree 0) | 6 | 42 |
-| Sinks (out-degree 0) | 41 | 54 |
+| Sources (in-degree 0) | 5 | 41 |
+| Sinks (out-degree 0) | 40 | 53 |
 | Reciprocal pairs | 0 | 0 |
 | Reciprocity | 0 | 0 |
 | In-degree min / median / max | 0 / 2 / 17 | 0 / 1 / 14 |
-| In-degree mean | 3.120253 | 1.911392 |
+| In-degree mean | 3.140127 | 1.923567 |
 | In-degree quartiles | 1, 2, 4 | 0, 1, 2 |
-| In-degree zeros | 6 | 42 |
+| In-degree zeros | 5 | 41 |
 | Out-degree min / median / max | 0 / 2 / 23 | 0 / 1 / 9 |
-| Out-degree mean | 3.120253 | 1.911392 |
+| Out-degree mean | 3.140127 | 1.923567 |
 | Out-degree quartiles | 0, 2, 5 | 0, 1, 3 |
-| Out-degree zeros | 41 | 54 |
-| Condensation nodes | 158 | 158 |
+| Out-degree zeros | 40 | 53 |
+| Condensation nodes | 157 | 157 |
 | Condensation edges | 493 | 302 |
-| Condensation sources / sinks | 6 / 41 | 42 / 54 |
+| Condensation sources / sinks | 5 / 40 | 41 / 53 |
 | Condensation longest path (edges) | 14 | 7 |
 
-In-degree histogram (all imports) {degree: modules}: 0: 6, 1: 44, 2: 41, 3: 19, 4: 14, 5: 10, 6: 6, 7: 4, 8: 5, 9: 2, 10: 3, 11: 1, 12: 2, 17: 1
+In-degree histogram (all imports) {degree: modules}: 0: 5, 1: 44, 2: 41, 3: 19, 4: 14, 5: 10, 6: 6, 7: 4, 8: 5, 9: 2, 10: 3, 11: 1, 12: 2, 17: 1
 
-Out-degree histogram (all imports) {degree: modules}: 0: 41, 1: 29, 2: 22, 3: 14, 4: 10, 5: 11, 6: 5, 7: 7, 8: 5, 9: 3, 10: 6, 11: 2, 13: 1, 19: 1, 23: 1
+Out-degree histogram (all imports) {degree: modules}: 0: 40, 1: 29, 2: 22, 3: 14, 4: 10, 5: 11, 6: 5, 7: 7, 8: 5, 9: 3, 10: 6, 11: 2, 13: 1, 19: 1, 23: 1
 
 **Top 10 fan-in (all imports)** (ties at cutoff: 5)
 
@@ -206,17 +206,17 @@ Module-level import edges involved: 2.
 
 ## Class graph
 
-* Classes: 228
-* Classes in at least one `inherits` edge (drawn in `class-inheritance.mmd`): 21; with neither an analysed base nor an analysed subclass: 207
+* Classes: 226
+* Classes in at least one `inherits` edge (drawn in `class-inheritance.mmd`): 21; with neither an analysed base nor an analysed subclass: 205
 * `inherits` edges between analysed classes: 14
 * `nests` edges (class defined in a class body): 0
-* Bases outside the analysed package: `RuntimeError` x7, `UserWarning` x1, `ValueError` x22, `abc.ABC` x2, `collections.abc.Mapping` x1, `enum.Enum` x2, `http.server.BaseHTTPRequestHandler` x1, `http.server.ThreadingHTTPServer` x1, `str` x2, `typing.NamedTuple` x1, `typing.Protocol` x3
+* Bases outside the analysed package: `RuntimeError` x7, `UserWarning` x1, `ValueError` x22, `abc.ABC` x2, `collections.abc.Mapping` x1, `enum.Enum` x2, `http.server.BaseHTTPRequestHandler` x1, `http.server.ThreadingHTTPServer` x1, `str` x2, `typing.Protocol` x3
 
 ## Call graph
 
-* Nodes (functions, methods, classes): 2053
-* Edges by kind: `call` 1427, `constructor` 72, `instantiate` 533, `override` 6, `self` 365, `super` 4
-* Call sites by resolution outcome: builtin 4110, external 2679, internal 3193, unresolved 4223
+* Nodes (functions, methods, classes): 2037
+* Edges by kind: `call` 1423, `constructor` 71, `instantiate` 531, `override` 6, `self` 362, `super` 4
+* Call sites by resolution outcome: builtin 4064, external 2664, internal 3183, unresolved 4205
 
 | Scoped graph | Roots | Depth | Nodes | Edges | Truncated nodes | Reachable (unbounded) |
 |---|---|---|---|---|---|---|

@@ -1229,69 +1229,6 @@
     {
       "decorators": [],
       "external_bases": [],
-      "id": "tropoi.physics.substrate.ConductiveSubstrate",
-      "members": [
-        {
-          "kind": "method",
-          "name": "__init__"
-        },
-        {
-          "kind": "method",
-          "name": "_constants"
-        },
-        {
-          "kind": "staticmethod",
-          "name": "_thomas"
-        },
-        {
-          "kind": "property",
-          "name": "depth"
-        },
-        {
-          "kind": "method",
-          "name": "energy"
-        },
-        {
-          "kind": "method",
-          "name": "initial_state"
-        },
-        {
-          "kind": "property",
-          "name": "layers"
-        },
-        {
-          "kind": "method",
-          "name": "signature"
-        },
-        {
-          "kind": "method",
-          "name": "step"
-        },
-        {
-          "kind": "method",
-          "name": "surface_temperature"
-        },
-        {
-          "kind": "method",
-          "name": "temperature"
-        }
-      ],
-      "module": "tropoi.physics.substrate",
-      "qualname": "ConductiveSubstrate"
-    },
-    {
-      "decorators": [],
-      "external_bases": [
-        "typing.NamedTuple"
-      ],
-      "id": "tropoi.physics.substrate.SubstrateState",
-      "members": [],
-      "module": "tropoi.physics.substrate",
-      "qualname": "SubstrateState"
-    },
-    {
-      "decorators": [],
-      "external_bases": [],
       "id": "tropoi.physics.surface.SlabSurface",
       "members": [
         {

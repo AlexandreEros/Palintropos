@@ -4346,22 +4346,6 @@
     {
       "category": "code",
       "dynamic_import_calls": 0,
-      "id": "tropoi.physics.substrate",
-      "is_package": false,
-      "path": "tropoi/physics/substrate.py",
-      "stdlib_imports": [
-        "__future__",
-        "math",
-        "typing"
-      ],
-      "third_party_imports": [
-        "cupy",
-        "numpy"
-      ]
-    },
-    {
-      "category": "code",
-      "dynamic_import_calls": 0,
       "id": "tropoi.physics.surface",
       "is_package": false,
       "path": "tropoi/physics/surface.py",
