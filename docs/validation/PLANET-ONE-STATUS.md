@@ -83,7 +83,8 @@ resume. It never changes a criterion.
 | G-P2 periodicity | Per run, reported in each run's `cycles.json` and `retained/status.json` | |
 | G-I heat1d (L2) | **PASS**. heat1d uses CFL substeps. At common times the max \|ΔTs\| goes 3.75 → 3.09 → 1.65 K (0°E) and 3.79 → 2.48 → 1.30 K (90°E); RMS 2.17 → 1.12 → 0.59 K; final ≤ e_ours + e_heat1d + 0.2 K (1.87 and 1.76 K). Both codes converge at first order. Tmax agrees to ≤ 0.02 K. Attempt 1 (fixed shared dt) is kept | `planet-one-evidence/gi-heat1d-vpw99-two-G0.02.json` |
 | G-M L3 (VPW99) | **EVALUATED**, G = 0, production settings, temperature at depth at 0°N 0°: BOT 367.85 vs 365 K (+2.85), TOP 470.69 vs 463 K (+7.69), TWO 425.78 vs 427 K (−1.22). All within the 10 K investigation threshold; no parameter changed | `planet-one-evidence/l3-vpw99.json` |
-| G-G global | **RUNNING**: 2° (90×180), VPW99 TWO, G = 0.02, 6 workers. The first attempt was stopped under memory pressure (5 GB WSL); tier-2 output now streams to disk | `runs/planet-one/global-vpw99-two-G0.02/` |
+| G-G global | **RUNNING on a Colab T4** (owner approved GPU and Colab): 2° (90×180), VPW99 TWO, G = 0.02, CuPy FP64, commit d3801c7, about 1–1.5 h. A supplementary 4° CPU run (45×90) is also running; it does not replace the 2° requirement | VM: `/content/runs/planet-one/global2-gpu-vpw99-two-G0.02`; local: `runs/planet-one/global4-vpw99-two-G0.02/` |
+| G-GPU parity (A2) | **PASS** on a T4: max \|T_GPU − T_CPU\| = 1.9e-11 K over a production cycle of the six columns (bound 1e-6 K), with no Newton-iteration differences; energy closure, G4/G5 and manufactured parity on the GPU; 78 tests pass on the T4 | `planet-one-evidence/gpu-t4-2026-11-24.json` |
 | L4 observational | **NOT EVALUATED** | |
 
 **Exploratory runs, not evidence:** coarse settings, dirty tree. BOT at
