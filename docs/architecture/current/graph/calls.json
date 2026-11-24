@@ -1626,6 +1626,16 @@
       "target": "tropoi.physics.substrate._xp"
     },
     {
+      "kind": "call",
+      "source": "tropoi.physics.substrate.geometric_interfaces",
+      "target": "tropoi.physics.substrate._checked"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.physics.substrate.geometric_interfaces",
+      "target": "tropoi.physics.substrate._geometric_sum"
+    },
+    {
       "kind": "constructor",
       "source": "tropoi.physics.surface.SlabSurface",
       "target": "tropoi.physics.surface.SlabSurface.__init__"
@@ -14671,6 +14681,20 @@
       "module": "tropoi.physics.substrate",
       "qualname": "SubstrateState",
       "type": "class"
+    },
+    {
+      "id": "tropoi.physics.substrate._checked",
+      "kind": "function",
+      "module": "tropoi.physics.substrate",
+      "qualname": "_checked",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.substrate._geometric_sum",
+      "kind": "function",
+      "module": "tropoi.physics.substrate",
+      "qualname": "_geometric_sum",
+      "type": "function"
     },
     {
       "id": "tropoi.physics.substrate._xp",

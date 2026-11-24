@@ -1,13 +1,13 @@
 {
   "atlas": {
-    "call_edges": 2406,
+    "call_edges": 2408,
     "call_sites_omitted_by_cap": 35,
-    "call_sites_recorded": 3166,
+    "call_sites_recorded": 3172,
     "import_edges": 493,
     "import_sites_omitted_by_cap": 0,
     "import_sites_recorded": 554,
     "max_sites_per_edge": 8,
-    "nodes": 2233,
+    "nodes": 2235,
     "proposal": {
       "call_edges_by_direction": {
         "downward": 429,
@@ -64,7 +64,7 @@
         "cli": 66,
         "dynamics": 119,
         "integration": 92,
-        "physics": 256,
+        "physics": 258,
         "run": 92,
         "setup": 292,
         "spectral": 249,
@@ -159,24 +159,24 @@
         "sha256": "1dcfeb9400fd06152e45cd607c8648f54d8fa8f41c02b0fcd8ee9310a03c28a4"
       }
     ],
-    "source_lines_embedded": 18779
+    "source_lines_embedded": 18809
   },
   "call_graph": {
     "call_sites": {
-      "builtin": 4132,
-      "external": 2689,
-      "internal": 3192,
+      "builtin": 4138,
+      "external": 2691,
+      "internal": 3198,
       "unresolved": 4238
     },
     "edges_by_kind": {
-      "call": 1426,
+      "call": 1428,
       "constructor": 72,
       "instantiate": 533,
       "override": 6,
       "self": 365,
       "super": 4
     },
-    "nodes": 2052,
+    "nodes": 2054,
     "scoped": {
       "cli-capsule-command": {
         "edges": 21,
@@ -1255,7 +1255,7 @@
     "package": "tropoi",
     "src": "src",
     "working_tree": {
-      "base_commit": "e0eae841c0bd9c667a824aaec0230beb822ad2ce",
+      "base_commit": "632f4a6d1c2786b9f5210f9c744d92d17f7539ea",
       "generator": {
         "changes": [],
         "files": {
@@ -1316,7 +1316,7 @@
           "src/tropoi/physics/rotation.py": "fd67a37dfa31f53c1f8bd820a3b46bc9b04b861e66d886411cc4fd055b801053",
           "src/tropoi/physics/species.py": "e9cf7b23887f5ae8f620daf7faab6fb253fb402ab88419c1dc99aa75a9c860e1",
           "src/tropoi/physics/star.py": "48e443fa8c47c6091ea899bbbe53ed9efa27360bc4cb03549fc9ca0eea277443",
-          "src/tropoi/physics/substrate.py": "bbfd21e3d1fa7c396af729314eaca01c7eb7f615e10224f1c610bf9f498e2ab4",
+          "src/tropoi/physics/substrate.py": "96701ca43b2990ca1adb8e1b9b07dcae1ae6cab3214cf7b427a6172ab15ab0f5",
           "src/tropoi/physics/surface.py": "eae85c36e3da3be57c2dd369b386c937693bf95d15f57adfe17b5047732f155d",
           "src/tropoi/physics/thermodynamics.py": "037c8eb1952dfe0face3313f67d38af4862eaa89d9451a361af5aed8e4752d38",
           "src/tropoi/representation/__init__.py": "88477f9f4ebfdf96b2d33b5e6612d29b172238b1bd486e7100523ae1a79384a5",
@@ -1474,7 +1474,7 @@
           "src/tropoi/temporal/tendencies/primitive_equations.py": "848c6fe9406a7c1c465c0aa9459760b01c542164c8cc9395797a3c4a60793e52",
           "src/tropoi/temporal/tendencies/shallow_water.py": "7ae521f2378824e89f88bc467fc99321d1ef4224b037c865137e076a601da3c8"
         },
-        "sha256": "7271831061582b36f5e8ee5c58cf7dcf8663b1256c5ff3113deda2d22dcd7c2a",
+        "sha256": "57c542b09c537fee25e283bddcddd299f96cdfaa9612bb77a222b059073a735c",
         "status": "clean"
       }
     }
