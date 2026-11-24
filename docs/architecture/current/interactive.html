@@ -100342,7 +100342,7 @@ null,
 }
 },
 "meta":{
-"base_commit":"632f4a6d1c2786b9f5210f9c744d92d17f7539ea",
+"base_commit":"e79fd14ba64d76d7e10f4d01174c201f45192474",
 "call_depth":4,
 "command":"python -m tools.architecture.generate",
 "dynamic_import_sites":{
@@ -299140,7 +299140,7 @@ function inspectImport(k){const [s,t,scopes]=D.imports[k];let h=`<div>${ev(scope
 function inspectObs(ti,ei){const t=D.traces[ti],e=t.edges[ei];let h=`<div>${ev('observed','observed ×'+e.count)} <span class="pill">${esc(e.category)}</span></div><h2>${typeof e.s==='number'?nodeBtn(e.s,e.rs):esc(e.rs)} → ${typeof e.t==='number'?nodeBtn(e.t,e.rt):esc(e.rt)}</h2>`;
  const CAT={corroborated:'A static edge connects the same two definitions.','runtime-only':'No static edge connects them: the call went through something the resolver does not follow (an attribute, parameter, callback, registry or wrapper). This is the static graph\'s blind spot, made visible.',unmapped:'At least one side is not an analysed definition at the static revision (renamed, removed, or outside the package).','generated-code':'At least one side is code generated at run time (a dataclass __init__): it has no source definition to align with.','same-static-node':'Both sides map to one static node (e.g. a nested function calling its parent).'};
  h+=`<div class="note">${esc(CAT[e.category]||'')}</div>`;
- if(e.static.length)h+=`<h3>Static counterpart</h3>`+e.static.map(([k,ci])=>`<div class="row"><button data-edge="call:${ci}">${esc(ID[D.calls[ci][0]])} → ${esc(ID[D.calls[ci][1]])}</button>${ev(evClass(D.calls[ci][2])||'static-certain',k)}</div>`).join('');
+ if(e.static.length)h+=`<h3>Static counterpart</h3>`+e.static.map(([k,ci])=>`<div class="row"><button data-edge="call:${num(ci)}">${esc(ID[D.calls[ci][0]])} → ${esc(ID[D.calls[ci][1]])}</button>${ev(evClass(D.calls[ci][2])||'static-certain',k)}</div>`).join('');
  const prov=t.provenance||{},code=prov.code||{};const same=code.source_sha256&&code.source_sha256===D.meta.source_sha256;
  h+=`<h3>Capture</h3><div class="note">${esc(t.scenario)} · commit <code>${esc((code.commit||'?').slice(0,12))}</code>${code.source_dirty?' <b style="color:var(--possible)">(source dirty)</b>':''} · ${same?'same source content as this static snapshot':'<b style="color:var(--possible)">source content differs from (or is not comparable with) this static snapshot; compare separately</b>'}</div>`;
  if(e.phases)h+=`<table><tr><th>phase</th><th>calls</th></tr>${Object.entries(e.phases).map(([p,n])=>`<tr><td>${esc(p)}</td><td>${num(n)}</td></tr>`).join('')}</table>`;

@@ -5,13 +5,13 @@
 
 | | |
 |---|---|
-| Source base commit | `632f4a6d1c2786b9f5210f9c744d92d17f7539ea` (clean working tree) |
+| Source base commit | `e79fd14ba64d76d7e10f4d01174c201f45192474` (clean working tree) |
 | Analysed package | `tropoi` under `src/` |
 | Generator | `tools.architecture` 2.3.0 |
 | Toolchain | Python 3.12, grimp 3.17, networkx 3.7 |
 | Command | `python -m tools.architecture.generate` |
 
-Source working tree: **clean**. Content SHA-256: `57c542b09c537fee25e283bddcddd299f96cdfaa9612bb77a222b059073a735c`. Generator working tree: **clean**. Per-file hashes and scoped Git status are recorded in `metrics.json`. These describe generation time; --check verifies source and generator content hashes before reusing this context across later commits. The base commit alone does not identify uncommitted source.
+Source working tree: **clean**. Content SHA-256: `57c542b09c537fee25e283bddcddd299f96cdfaa9612bb77a222b059073a735c`. Generator working tree: **dirty**. Per-file hashes and scoped Git status are recorded in `metrics.json`. These describe generation time; --check verifies source and generator content hashes before reusing this context across later commits. The base commit alone does not identify uncommitted source.
 
 ## Reproducing
 

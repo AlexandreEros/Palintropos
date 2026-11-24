@@ -73,6 +73,7 @@ def test_template_has_no_unreviewed_raw_data_interpolation():
 @pytest.mark.parametrize("expr", [
     "e.nodes", "D.meta.max_sites", "st[0]", "b.call_index", "D.import_omitted[k]",
     "v.omitted", "e.truncated_nodes?' · '+e.truncated_nodes+' cut':''",
+    "ci",  # inspectObs static counterpart: the flow CodeQL kept reporting after #63
 ])
 # Known blind spot: a data field *named* ``length`` (describe()'s ``v.length``)
 # looks like Array.length to the scan; the browser test below poisons it.
