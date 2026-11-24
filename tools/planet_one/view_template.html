@@ -1,0 +1,274 @@
+<title>Mercury Thermal Day</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: an instrument console. Map and globe lead, orbit and controls beside
+   them, then the time series, depth profile and section, then the evidence.
+   Deliberately single-theme (dark): the thermal scale reads best on a dark ground. */
+:root {
+  --bg: #0d0f14; --panel: #151923; --line: #262c3a; --fg: #e6e2d8; --muted: #9a97a0;
+  --accent: #f0a63a; --sun: #ffd27a; --good: #6fcf97; --warn: #f2c94c; --bad: #eb5757;
+  --display: "Archivo", "Helvetica Neue", Arial, sans-serif;
+  --body: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  color-scheme: dark;
+}
+html, body { background: var(--bg); color: var(--fg); }
+body { font-family: var(--body); line-height: 1.5;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 20px 40px; }
+.wrap { max-width: 1280px; margin: 0 auto; display: grid; gap: 18px; }
+header { display: flex; flex-wrap: wrap; align-items: baseline; gap: 10px 18px; }
+h1 { font-family: var(--display); font-weight: 700; font-size: 1.9rem; letter-spacing: .01em; margin: 0; text-wrap: balance; }
+h2 { font-family: var(--display); font-weight: 500; font-size: .78rem; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin: 0 0 8px; }
+.sub { color: var(--muted); font-size: .9rem; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { font-family: var(--mono); font-size: .72rem; padding: 2px 8px; border-radius: 999px; border: 1px solid var(--line); color: var(--fg); }
+.chip.good { border-color: var(--good); color: var(--good); }
+.chip.warn { border-color: var(--warn); color: var(--warn); }
+.chip.bad { border-color: var(--bad); color: var(--bad); }
+.grid2 { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: 18px; }
+.grid3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
+@media (max-width: 900px) { .grid2, .grid3 { grid-template-columns: minmax(0, 1fr); } }
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 14px; min-width: 0; }
+canvas { display: block; width: 100%; height: auto; max-width: 100%; }
+.mapwrap { position: relative; }
+#map { cursor: crosshair; image-rendering: auto; }
+.controls { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 10px; }
+button { font: 500 .85rem var(--body); background: var(--accent); color: #1a1205; border: 0; border-radius: 4px; padding: 6px 14px; cursor: pointer; }
+button:focus-visible, input:focus-visible { outline: 2px solid var(--sun); outline-offset: 2px; }
+input[type=range] { flex: 1 1 200px; accent-color: var(--accent); }
+.readout { font-family: var(--mono); font-size: .78rem; font-variant-numeric: tabular-nums; color: var(--fg); display: grid; grid-template-columns: auto auto; gap: 2px 14px; }
+.readout span:nth-child(odd) { color: var(--muted); }
+.scale { display: flex; align-items: center; gap: 8px; font-family: var(--mono); font-size: .72rem; color: var(--muted); margin-top: 8px; }
+.scale canvas { height: 10px; flex: 1; border-radius: 2px; }
+table { border-collapse: collapse; width: 100%; font-size: .82rem; font-variant-numeric: tabular-nums; }
+td, th { padding: 4px 8px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+th { color: var(--muted); font-weight: 500; }
+.tablewrap { overflow-x: auto; }
+.note { color: var(--muted); font-size: .8rem; max-width: 75ch; }
+code { font-family: var(--mono); font-size: .78rem; }
+@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto; } }
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>Mercury, one solar day</h1>
+    <div class="chips" id="chips"></div>
+    <p class="sub" id="subtitle" style="flex-basis:100%;margin:0"></p>
+  </header>
+
+  <section class="grid2">
+    <div class="panel">
+      <h2>Surface temperature, east longitude</h2>
+      <div class="mapwrap"><canvas id="map" width="1080" height="540" aria-label="Surface temperature map"></canvas></div>
+      <div class="scale"><span>80 K</span><canvas id="scale" width="400" height="10"></canvas><span>720 K</span></div>
+      <div class="controls">
+        <button id="play" type="button">Play</button>
+        <input id="slider" type="range" min="0" max="1" value="0" step="1" aria-label="Time in the solar day">
+      </div>
+      <p class="note">Click the map to choose the column for the depth profile. Dashed lines: terminator. Sun symbol: subsolar point.</p>
+    </div>
+    <div class="panel" style="display:grid;gap:14px;align-content:start">
+      <div><h2>Globe, centred on the subsolar meridian</h2><canvas id="globe" width="360" height="360" aria-label="Globe"></canvas></div>
+      <div><h2>Orbit and spin</h2><canvas id="orbit" width="360" height="240" aria-label="Orbit"></canvas></div>
+      <div class="readout" id="readout"></div>
+    </div>
+  </section>
+
+  <section class="grid3">
+    <div class="panel"><h2 id="seriesTitle">Equatorial surface temperature</h2><canvas id="series" width="520" height="300"></canvas></div>
+    <div class="panel"><h2 id="profTitle">Depth profile</h2><canvas id="profile" width="520" height="300"></canvas></div>
+    <div class="panel"><h2>Equatorial section, depth × longitude</h2><canvas id="section" width="520" height="300"></canvas></div>
+  </section>
+
+  <section class="panel">
+    <h2>Evidence and provenance</h2>
+    <div class="tablewrap"><table id="evidence"></table></div>
+    <p class="note" id="footnote"></p>
+  </section>
+</div>
+
+<script>
+const D = /*__DATA__*/null;
+const TMIN = 80, TMAX = 720;
+// thermal LUT: dark violet -> red -> amber -> pale yellow (inferno-like control points)
+const STOPS = [[0,0,0,4],[.13,31,12,72],[.25,85,15,109],[.38,136,34,106],[.5,186,54,85],
+  [.63,227,89,51],[.75,249,140,10],[.88,249,201,50],[1,252,255,164]];
+const LUT = new Uint8ClampedArray(256 * 3);
+for (let i = 0; i < 256; i++) { const x = i / 255; let k = 0; while (k < STOPS.length - 2 && x > STOPS[k + 1][0]) k++;
+  const [x0, ...a] = STOPS[k], [x1, ...b] = STOPS[k + 1], f = (x - x0) / (x1 - x0);
+  for (let c = 0; c < 3; c++) LUT[i * 3 + c] = a[c] + (b[c] - a[c]) * f; }
+const lutIndex = T => Math.max(0, Math.min(255, Math.round((T - TMIN) / (TMAX - TMIN) * 255)));
+const $ = id => document.getElementById(id);
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+async function inflate(b64) {
+  const bin = Uint8Array.from(atob(b64), c => c.charCodeAt(0));
+  const stream = new Blob([bin]).stream().pipeThrough(new DecompressionStream("gzip"));
+  return new Uint16Array(await new Response(stream).arrayBuffer());
+}
+let SURF, SEC, SUB, EMIN, EMAX, frame = 0, playing = false, pick = null;
+const NL = D.nlat, NO = D.nlon, F = D.frames, L = D.L, q = D.quantum_K;
+const temp = (arr, i) => arr[i] * q;
+
+function drawScale() { const c = $("scale"), g = c.getContext("2d"), im = g.createImageData(c.width, 1);
+  for (let x = 0; x < c.width; x++) { const i = Math.round(x / (c.width - 1) * 255); im.data.set([LUT[i*3], LUT[i*3+1], LUT[i*3+2], 255], x * 4); }
+  for (let y = 0; y < c.height; y++) g.putImageData(im, 0, y); }
+
+function drawMap() {
+  const c = $("map"), g = c.getContext("2d"), off = new OffscreenCanvas(NO, NL), og = off.getContext("2d"), im = og.createImageData(NO, NL);
+  const base = frame * NL * NO;
+  for (let r = 0; r < NL; r++) for (let j = 0; j < NO; j++) {
+    const i = lutIndex(temp(SURF, base + r * NO + j)), p = ((NL - 1 - r) * NO + j) * 4;
+    im.data[p] = LUT[i*3]; im.data[p+1] = LUT[i*3+1]; im.data[p+2] = LUT[i*3+2]; im.data[p+3] = 255; }
+  og.putImageData(im, 0, 0); g.imageSmoothingEnabled = true; g.drawImage(off, 0, 0, c.width, c.height);
+  const [slat, slon] = D.geo[frame], X = lo => lo / 360 * c.width, Y = la => (90 - la) / 180 * c.height;
+  // terminator: points 90 deg from the subsolar point
+  g.setLineDash([6, 5]); g.strokeStyle = "rgba(230,226,216,.8)"; g.lineWidth = 1.5;
+  const s = Math.PI / 180, la0 = slat * s, lo0 = slon * s; let prev = null; g.beginPath();
+  for (let k = 0; k <= 720; k++) { const az = k / 720 * 2 * Math.PI;
+    const la = Math.asin(Math.cos(la0) * Math.cos(az)), lo = lo0 + Math.atan2(Math.sin(az), -Math.sin(la0) * Math.cos(az));
+    const x = X(((lo / s) % 360 + 360) % 360), y = Y(la / s);
+    if (prev && Math.abs(x - prev) < c.width / 2) g.lineTo(x, y); else g.moveTo(x, y); prev = x; }
+  g.stroke(); g.setLineDash([]);
+  sunMark(g, X(slon), Y(slat), 9);
+  if (pick) { g.strokeStyle = css("--fg"); g.lineWidth = 2; g.strokeRect(X(D.sub_lon[pick[1]]) - 6, Y(D.sub_lat[pick[0]]) - 6, 12, 12); }
+  g.fillStyle = css("--muted"); g.font = "12px " + css("--mono");
+  for (const lo of [0, 90, 180, 270]) g.fillText(lo + "°E", X(lo) + 3, c.height - 6);
+}
+function sunMark(g, x, y, r) { g.fillStyle = css("--sun"); g.strokeStyle = "#1a1205"; g.lineWidth = 1.5;
+  g.beginPath(); g.arc(x, y, r * .55, 0, 2 * Math.PI); g.fill(); g.stroke();
+  for (let k = 0; k < 8; k++) { const a = k * Math.PI / 4; g.beginPath(); g.moveTo(x + Math.cos(a) * r * .75, y + Math.sin(a) * r * .75);
+    g.lineTo(x + Math.cos(a) * r * 1.25, y + Math.sin(a) * r * 1.25); g.strokeStyle = css("--sun"); g.stroke(); } }
+
+function drawGlobe() {
+  const c = $("globe"), g = c.getContext("2d"), W = c.width, R = W / 2 - 8, im = g.createImageData(W, W);
+  const s = Math.PI / 180, [slat, slon] = D.geo[frame], lo0 = slon * s, base = frame * NL * NO;
+  for (let py = 0; py < W; py++) for (let px = 0; px < W; px++) {
+    const x = (px - W / 2) / R, y = (W / 2 - py) / R, rr = x * x + y * y, p = (py * W + px) * 4;
+    if (rr > 1) { im.data[p+3] = 0; continue; }
+    const z = Math.sqrt(1 - rr), la = Math.asin(y), lo = lo0 + Math.atan2(x, z);
+    let j = Math.floor((((lo / s) % 360 + 360) % 360) / 360 * NO) % NO, r = Math.min(NL - 1, Math.max(0, Math.floor((la / s + 90) / 180 * NL)));
+    const i = lutIndex(temp(SURF, base + r * NO + j)), shade = 0.55 + 0.45 * z;
+    im.data[p] = LUT[i*3] * shade; im.data[p+1] = LUT[i*3+1] * shade; im.data[p+2] = LUT[i*3+2] * shade; im.data[p+3] = 255; }
+  g.clearRect(0, 0, W, W); g.putImageData(im, 0, 0);
+  g.strokeStyle = css("--line"); g.beginPath(); g.arc(W / 2, W / 2, R, 0, 2 * Math.PI); g.stroke();
+  sunMark(g, W / 2, W / 2 - Math.sin(slat * s) * R, 10);
+}
+
+function drawOrbit() {
+  const c = $("orbit"), g = c.getContext("2d"), W = c.width, H = c.height; g.clearRect(0, 0, W, H);
+  const e = D.e, sc = Math.min(W / 2.3, H / (2 * Math.sqrt(1 - e * e) * 1.12)), cx = W / 2 + e * sc, cy = H / 2;
+  g.strokeStyle = css("--line"); g.lineWidth = 1.5; g.beginPath();
+  g.ellipse(W / 2, cy, sc, sc * Math.sqrt(1 - e * e), 0, 0, 2 * Math.PI); g.stroke();
+  sunMark(g, cx, cy, 9);
+  const mark = (x, y, label) => { g.fillStyle = css("--muted"); g.beginPath(); g.arc(cx + x * sc, cy - y * sc, 3, 0, 2 * Math.PI); g.fill();
+    g.font = "11px " + css("--mono"); g.fillText(label, cx + x * sc + (x > 0 ? 6 : -64), cy - y * sc - 6); };
+  mark(1 - e, 0, "perihelion"); mark(-(1 + e), 0, "aphelion");
+  const [, , x, y, nu, flux, w] = D.geo[frame], px = cx + x * sc, py = cy - y * sc;
+  g.fillStyle = css("--fg"); g.beginPath(); g.arc(px, py, 6, 0, 2 * Math.PI); g.fill();
+  const a = w * Math.PI / 180;                 // prime meridian direction in the orbit plane
+  g.strokeStyle = css("--accent"); g.lineWidth = 2; g.beginPath(); g.moveTo(px, py); g.lineTo(px + Math.cos(a) * 18, py - Math.sin(a) * 18); g.stroke();
+  g.fillStyle = css("--muted"); g.font = "11px " + css("--mono"); g.fillText("orange tick: 0°E meridian", 8, H - 8);
+}
+
+function drawSeries() {
+  const c = $("series"), g = c.getContext("2d"), W = c.width, H = c.height, m = {l: 44, r: 10, t: 10, b: 28};
+  g.clearRect(0, 0, W, H); const X = f => m.l + f * (W - m.l - m.r), Y = T => m.t + (1 - (T - TMIN) / (TMAX - TMIN)) * (H - m.t - m.b);
+  g.strokeStyle = css("--line"); g.fillStyle = css("--muted"); g.font = "11px " + css("--mono"); g.lineWidth = 1;
+  for (let T = 100; T <= 700; T += 100) { g.beginPath(); g.moveTo(m.l, Y(T)); g.lineTo(W - m.r, Y(T)); g.stroke(); g.fillText(T + " K", 4, Y(T) + 4); }
+  for (let k = 0; k <= 4; k++) { const f = k / 4; g.fillText((f * D.period_days).toFixed(0) + " d", X(f) - 10, H - 8); }
+  const cols = ["#f0a63a", "#6fcf97", "#eb5757", "#7aa2ff"], keys = Object.keys(D.series);
+  keys.forEach((k, n) => { const s = D.series[k]; g.strokeStyle = cols[n]; g.lineWidth = 1.6; g.beginPath();
+    s.forEach((T, i) => { const x = X((i + 1) / s.length), y = Y(T); i ? g.lineTo(x, y) : g.moveTo(x, y); }); g.stroke();
+    g.fillStyle = cols[n]; g.fillText(k + "°E", W - m.r - 150 + n * 38, m.t + 12); });
+  const f = D.t_days[frame] / D.period_days; g.strokeStyle = css("--fg"); g.setLineDash([3, 3]); g.beginPath(); g.moveTo(X(f), m.t); g.lineTo(X(f), H - m.b); g.stroke(); g.setLineDash([]);
+  $("seriesTitle").textContent = `Surface temperature at ${D.eq_lat.toFixed(0)}°N`;
+}
+
+function profileFrame() { return Math.min(D.profile_frames - 1, Math.floor((frame + 1) * D.profile_frames / F) - 1 + (D.profile_frames >= F ? 0 : 0)); }
+function drawProfile() {
+  const c = $("profile"), g = c.getContext("2d"), W = c.width, H = c.height, m = {l: 50, r: 12, t: 10, b: 28};
+  g.clearRect(0, 0, W, H); const [ia, ib] = pick, na = D.sub_lat.length, nb = D.sub_lon.length;
+  const zmax = D.centres[L - 1], X = T => m.l + (T - TMIN) / (TMAX - TMIN) * (W - m.l - m.r);
+  const Y = z => m.t + Math.sqrt(z / zmax) * (H - m.t - m.b);       // square-root depth axis
+  g.strokeStyle = css("--line"); g.fillStyle = css("--muted"); g.font = "11px " + css("--mono");
+  for (const z of [0.01, 0.02, 0.05, 0.1, 0.2, 0.5, 1].filter(z => z <= zmax)) { g.beginPath(); g.moveTo(m.l, Y(z)); g.lineTo(W - m.r, Y(z)); g.stroke(); g.fillText(z * 100 + " cm", 4, Y(z) + 4); }
+  for (let T = 100; T <= 700; T += 200) g.fillText(T + " K", X(T) - 14, H - 8);
+  const idx = (k, f) => ((f * L + k) * na + ia) * nb + ib, env = k => (k * na + ia) * nb + ib;
+  g.fillStyle = "rgba(240,166,58,.16)"; g.beginPath();
+  for (let k = 0; k < L; k++) g.lineTo(X(temp(EMIN, env(k))), Y(D.centres[k]));
+  for (let k = L - 1; k >= 0; k--) g.lineTo(X(temp(EMAX, env(k))), Y(D.centres[k]));
+  g.fill(); const pf = profileFrame(); g.strokeStyle = css("--accent"); g.lineWidth = 2; g.beginPath();
+  for (let k = 0; k < L; k++) { const x = X(temp(SUB, idx(k, pf))), y = Y(D.centres[k]); k ? g.lineTo(x, y) : g.moveTo(x, y); } g.stroke();
+  $("profTitle").textContent = `Depth profile at ${D.sub_lat[ia].toFixed(0)}°, ${D.sub_lon[ib].toFixed(0)}°E (band: cycle range)`;
+}
+
+function drawSection() {
+  const c = $("section"), g = c.getContext("2d"), W = c.width, H = c.height, m = {l: 50, r: 8, t: 8, b: 24};
+  const pf = profileFrame(), off = new OffscreenCanvas(NO, 120), og = off.getContext("2d"), im = og.createImageData(NO, 120);
+  const zmax = D.centres[L - 1];
+  for (let r = 0; r < 120; r++) { const z = (r / 119) ** 2 * zmax; let k = 0; while (k < L - 1 && D.centres[k + 1] < z) k++;
+    for (let j = 0; j < NO; j++) { const i = lutIndex(temp(SEC, (pf * L + k) * NO + j)), p = (r * NO + j) * 4;
+      im.data[p] = LUT[i*3]; im.data[p+1] = LUT[i*3+1]; im.data[p+2] = LUT[i*3+2]; im.data[p+3] = 255; } }
+  og.putImageData(im, 0, 0); g.clearRect(0, 0, W, H); g.drawImage(off, m.l, m.t, W - m.l - m.r, H - m.t - m.b);
+  g.fillStyle = css("--muted"); g.font = "11px " + css("--mono");
+  for (const z of [0.02, 0.1, 0.3, 1].filter(z => z <= zmax)) g.fillText(z * 100 + " cm", 4, m.t + Math.sqrt(z / zmax) * (H - m.t - m.b) + 4);
+  for (const lo of [0, 90, 180, 270]) g.fillText(lo + "°E", m.l + lo / 360 * (W - m.l - m.r), H - 6);
+}
+
+function readout() {
+  const [slat, slon, , , nu, flux] = D.geo[frame], t = D.t_days[frame];
+  const prev = D.geo[(frame - 1 + F) % F][1], dl = ((slon - prev + 540) % 360) - 180;
+  $("readout").innerHTML = [["time since perihelion", t.toFixed(2) + " d"], ["orbit", (t / D.orbit_days < 1 ? "1st" : "2nd") + " of 2"],
+    ["true anomaly", nu.toFixed(1) + "°"], ["irradiance", flux.toFixed(0) + " W m⁻²"], ["subsolar point", `${slat.toFixed(1)}°, ${slon.toFixed(1)}°E`],
+    ["apparent Sun", dl > 0 ? "moving east (retrograde loop)" : "moving west"]].map(([k, v]) => `<span>${k}</span><span>${v}</span>`).join("");
+}
+
+function render() { drawMap(); drawGlobe(); drawOrbit(); drawSeries(); drawProfile(); drawSection(); readout(); $("slider").value = frame; }
+
+function evidence() {
+  const st = D.status, dg = D.diag, chips = [];
+  const label = st.status === "PERIODIC" ? ["good", "PERIODIC"] : ["warn", "TRANSIENT"];
+  chips.push(`<span class="chip ${label[0]}">${label[1]}</span>`);
+  const mat = D.strata.map(s => s.name).join(" / ");
+  const ext = dg.extent.some(([lo, hi], j) => { const r = D.strata[j].heat_capacity_range; return r && (lo < r[0] || (r[1] != null && hi > r[1])); });
+  chips.push(`<span class="chip">L1 numerical verification</span>`);
+  if (D.extras.gi) chips.push(`<span class="chip">L2 heat1d compared</span>`);
+  chips.push(`<span class="chip ${D.extras.l3 ? "" : "warn"}">L3 ${D.extras.l3 ? "VPW99 compared" : "NOT EVALUATED"}</span>`);
+  chips.push(`<span class="chip warn">L4 NOT EVALUATED</span>`);
+  if (ext) chips.push(`<span class="chip bad">EXTRAPOLATED c_p</span>`);
+  $("chips").innerHTML = chips.join("");
+  $("subtitle").textContent = `${D.experiment}: idealized airless Mercury, eccentric orbit, exact 3:2 spin–orbit resonance, ${mat}. One full solar day of ${D.period_days.toFixed(2)} Earth days (two orbits).`;
+  const rows = [
+    ["Result status", st.label], ["Material", mat],
+    ["Albedo, emissivity, geothermal flux", `${D.albedo}, ${D.emissivity}, ${D.geothermal_flux} W m⁻²`],
+    ["Surface range (this day)", `${dg.Ts_min.toFixed(1)}–${dg.Ts_max.toFixed(1)} K`],
+    ["Global mean absorbed / emitted", `${dg.mean_absorbed.toFixed(2)} / ${dg.mean_emitted.toFixed(2)} W m⁻²`],
+    ["Periodicity (last vs previous day)", dg.max_surface_change == null ? "not compared" : `surface ${dg.max_surface_change.toExponential(2)} K, subsurface ${dg.max_subsurface_change.toExponential(2)} K, bottom drift ${dg.bottom_drift.toExponential(2)} K, |ΔE|/P ≤ ${dg.max_energy_imbalance.toExponential(2)} W m⁻²`],
+    ["Solver", `Δt ${(dg.dt_s / 3600).toFixed(2)} h, max Newton iterations ${dg.newton_max}, max residual/tolerance ${dg.residual_ratio.toExponential(2)}`],
+    ["Temperature extent per stratum", dg.extent.map(([a, b], j) => `${D.strata[j].name}: ${a.toFixed(1)}–${b.toFixed(1)} K`).join("; ")],
+  ];
+  if (D.extras.gp) rows.push(["G-P convergence (frozen tolerances)", D.extras.gp.pass ? "PASS" : "FAIL: " + D.extras.gp.failures.slice(0, 6).join("; ")]);
+  else rows.push(["G-P convergence", "not attached"]);
+  if (D.extras.gi) rows.push(["G-I heat1d, max |ΔTs| by level", D.extras.gi.map(l => `L${l.level}: ` + Object.entries(l).filter(([k]) => k !== "level").map(([k, v]) => `${k} ${v.toFixed(2)} K`).join(", ")).join(" | ")]);
+  if (D.extras.l3) rows.push(["L3 VPW99 deep temperatures", D.extras.l3.summary]);
+  for (const [k, v] of Object.entries(D.provenance)) rows.push([k, v]);
+  rows.push(["Configuration", `sha256 ${D.config_sha256.slice(0, 16)}…, code ${String(D.code.git_commit).slice(0, 10)}${D.code.git_dirty ? " (dirty)" : ""}`]);
+  $("evidence").innerHTML = rows.map(([k, v]) => `<tr><th>${k}</th><td>${v}</td></tr>`).join("");
+  $("footnote").textContent = `Displayed values are quantized to ${q} K. ${D.frames} of ${D.samples} retained surface samples are shown; profiles and the section use ${D.profile_frames} samples per day. Full-precision fields stay in the run directory. Longitudes are east-positive; VPW99 quote west longitudes.`;
+}
+
+(async () => {
+  [SURF, SEC, SUB, EMIN, EMAX] = await Promise.all([D.surface, D.section, D.subset, D.env_min, D.env_max].map(inflate));
+  pick = [D.sub_lat.findIndex(v => Math.abs(v) === Math.min(...D.sub_lat.map(Math.abs))), 0];
+  $("slider").max = F - 1; drawScale(); evidence(); render();
+  $("slider").addEventListener("input", e => { frame = +e.target.value; render(); });
+  $("play").addEventListener("click", () => { playing = !playing; $("play").textContent = playing ? "Pause" : "Play"; if (playing) tick(); });
+  $("map").addEventListener("click", e => { const r = e.target.getBoundingClientRect(), lo = (e.clientX - r.left) / r.width * 360, la = 90 - (e.clientY - r.top) / r.height * 180;
+    const near = (arr, v, wrap) => arr.reduce((b, x, i) => { const d = wrap ? Math.abs(((x - v + 540) % 360) - 180) : Math.abs(x - v); return d < b[0] ? [d, i] : b; }, [1e9, 0])[1];
+    pick = [near(D.sub_lat, la, false), near(D.sub_lon, lo, true)]; render(); });
+  let last = 0; function tick(ts = 0) { if (!playing) return; if (ts - last > 80) { frame = (frame + 1) % F; render(); last = ts; } requestAnimationFrame(tick); }
+})();
+</script>
