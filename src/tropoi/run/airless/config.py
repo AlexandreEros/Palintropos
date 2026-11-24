@@ -181,7 +181,7 @@ def _mercury(experiment_id, strata, *, albedo, emissivity, geothermal_flux, colu
         initial_temperature=float(initial_temperature),
         periodicity={"surface_K": 0.5, "subsurface_K": 0.2, "bottom_drift_K": 0.01,
                      "energy_W_m2": 1e-3, "production_cycles_required": 2,
-                     "max_spinup_cycles": 200, "max_production_cycles": 6,
+                     "max_spinup_cycles": 200, "max_production_cycles": 12,
                      "spinup_acceleration": True},
         output={"surface_samples": 720, "profile_samples": 180,
                 "every_step_profiles": columns.get("kind") == "points"},

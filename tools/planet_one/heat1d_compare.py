@@ -23,6 +23,11 @@ Matching:
 * Same emissivity, G and depth.
 * heat1d's surface tolerance ``DTSURF`` is tightened to 1e-9 K, and its
   1 K property cache is disabled (threshold 0).
+* heat1d takes CFL-limited substeps (its own ``computeCFL``) within each of
+  our steps, which is its documented practice for implicit runs. Its
+  surface/interior splitting is not accurate for dt >> dz^2/kappa: a first
+  attempt with a shared fixed dt diverged from us at sunrise under grid
+  refinement, while our solution was grid-converged there.
 
 Formulation differences that remain, listed in the report:
 
@@ -51,6 +56,7 @@ import numpy as np
 import heat1d.profile as h1p
 from heat1d.config import Configurator
 from heat1d.layers import DepthLayer
+from heat1d.solvers import computeCFL
 
 from tropoi.physics.insolation import insolation_from_spec
 from tropoi.physics.materials import ledlow_1992
@@ -141,18 +147,24 @@ def main(argv=None) -> int:
             la, lo = math.radians(lat), math.radians(lon)
             n = (np.array([math.cos(la) * math.cos(lo)]), np.array([math.cos(la) * math.sin(lo)]),
                  np.array([math.sin(la)]))
-            qs = np.array([(1 - cfg.albedo) * float(ins.incident(*n, (k + 1) * dt)[0][0])
-                           for k in range(steps)])
             p = heat1d_profile(args.model, cfg.strata[-1]["bottom"], m, cfg.emissivity)
             # start from our periodic end-of-cycle profile
             p.T = np.interp(p.z, np.r_[0.0, centres], np.r_[ev[-1, 0, c], ev[-1, 1:, c]])
             p.update_properties()
             prev = None
+            absorbed = lambda t: (1 - cfg.albedo) * float(ins.incident(*n, t)[0][0])
             for cyc in range(args.max_cycles):
                 ts = np.empty(steps)
                 for k in range(steps):
-                    p.update_T(dt, Qs=float(qs[k]), Qb=args.geothermal_flux)
-                    p.update_properties()
+                    # heat1d's own practice for implicit runs: CFL-limited
+                    # substeps (its surface/interior operator splitting is
+                    # accurate only for dt ~ dz^2 / kappa), with the absorbed
+                    # flux of the same geometry at every substep
+                    nsub = max(1, math.ceil(dt / computeCFL(p, p.config)))
+                    h = dt / nsub
+                    for j in range(nsub):
+                        p.update_T(h, Qs=absorbed(k * dt + (j + 1) * h), Qb=args.geothermal_flux)
+                        p.update_properties()
                     ts[k] = p.T[0]
                 if prev is not None and np.max(np.abs(ts - prev)) < 0.01:
                     break

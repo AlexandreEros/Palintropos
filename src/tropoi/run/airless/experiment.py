@@ -267,6 +267,20 @@ class AirlessRun:
                          f"dT={diag.get('max_subsurface_change_K')} "
                          f"dE/P={diag['max_energy_imbalance_W_m2']:.3g} "
                          f"({diag['wall_s']:.0f} s)")
+                def accelerate():
+                    nonlocal state, ends, res
+                    ends.append(state)
+                    if per.get("spinup_acceleration") and len(ends) == 3:
+                        a, fa = aitken(ends[0][0], ends[1][0], ends[2][0])
+                        b, _ = aitken(ends[0][1], ends[1][1], ends[2][1])
+                        state = (a, b)
+                        self._event("aitken", cycle=cycle, stage=stage,
+                                    fraction_extrapolated=fa)
+                        ends = []
+                        res = None          # never compare across an extrapolation
+                        return True
+                    return False
+
                 if stage == "production":
                     self._keep_cycle(cycle, res)
                     passes = passes + 1 if diag["periodic"] else 0
@@ -276,15 +290,14 @@ class AirlessRun:
                     n_prod = sum(1 for h in history if h["stage"] == "production")
                     if n_prod >= per["max_production_cycles"]:
                         break
+                    # Re-equilibration after the coarse-to-production switch may
+                    # be accelerated too. Each extrapolation restarts the chain,
+                    # so the claim always rests on unaccelerated consecutive
+                    # production cycles.
+                    if not diag["periodic"] and accelerate():
+                        passes = 0
                 else:
-                    ends.append(state)
-                    if per.get("spinup_acceleration") and len(ends) == 3:
-                        a, fa = aitken(ends[0][0], ends[1][0], ends[2][0])
-                        b, _ = aitken(ends[0][1], ends[1][1], ends[2][1])
-                        state = (a, b)
-                        self._event("aitken", cycle=cycle, fraction_extrapolated=fa)
-                        ends = []
-                        res = None          # do not compare across the jump
+                    accelerate()
                     n_spin = sum(1 for h in history if h["stage"] == "spinup")
                     out_of_time = (max_wall_s is not None
                                    and time.time() - t_start > max_wall_s)
@@ -293,6 +306,7 @@ class AirlessRun:
                         # coarse one: the claim needs production-dt pairs
                         stage = "production"
                         res = None
+                        ends = []
                 if (stage == "production" and max_wall_s is not None
                         and time.time() - t_start > max_wall_s and res is not None):
                     self._event("wall_limit")
