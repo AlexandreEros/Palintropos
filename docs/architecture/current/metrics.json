@@ -1252,7 +1252,7 @@
     "package": "tropoi",
     "src": "src",
     "working_tree": {
-      "base_commit": "be23cdaa3b4662f22e0fea79405f25721abd0b61",
+      "base_commit": "0255a7f873fa52dde1ed1ecbebbc921cbdcb258d",
       "generator": {
         "changes": [],
         "files": {
@@ -1265,8 +1265,8 @@
           "tools/architecture/export.py": "0c912ab5a81b921807c1e57796c486fc2faea5e1be23103d71eea0506a29ffef",
           "tools/architecture/generate.py": "fea9c1242317ce391af6cceaa327f94f377ba11eed42531d16bc0fb94613654e",
           "tools/architecture/imports.py": "be1b9267ae7d2da2d87e60cb3d3abde3011e49a7cfb628fb4222f5382c92d143",
-          "tools/architecture/interactive.py": "77ba7f99cc13567a7c6c9fe9de7965b6da3fb6dd0f787a47340aade7faa83e49",
-          "tools/architecture/interactive_atlas.html": "a7ea96fa0780916c52c889becd088cbfb7dfd44b1e3b479f444b8961c5bc2a10",
+          "tools/architecture/interactive.py": "dcdee1fe7bf1b1db709bdc2faef93de130c378b704d9b7526b9928e44f6d3c54",
+          "tools/architecture/interactive_atlas.html": "3f8af0f291336b7a800a339c68e390951d1c0ccd6ee3466888bea49bc99c97b6",
           "tools/architecture/layers.py": "09a12c6790abad61e6326321180d84f9f01dfc85f9ac798d5e7b5b5186385b23",
           "tools/architecture/mermaid.py": "22550f697f536b96d9adbcd65933841fde6932afdcf5360cbc428f6ec5568184",
           "tools/architecture/metrics.py": "0c449fcc932fbae378a7e1c785506c05cda47d4449225d8d14462ce0de34e4db",
@@ -1278,7 +1278,7 @@
           "tools/architecture/sources.py": "a528464392eba79f1ea73a9e48ac59e51d45d5493c8b79849c27fcdddaf81965",
           "tools/architecture/views.py": "a1b595a64f60367c0f6a475593d2f310d72104d0445eacec5552c63fe3aeb5d2"
         },
-        "sha256": "3760fb47fba493ea108ef1454a884172f8504ea8876e2b9df396d257e5849eab",
+        "sha256": "c39d61336914e8306632bc3c4bb64d22577ed8f9c226fd78a0d895354a3fe1fd",
         "status": "clean"
       },
       "source": {
