@@ -184,6 +184,9 @@ def load_tier2(cycle_dir, name: str, columns=None, mmap: bool = True):
     read so that large runs never load everything. The block layout is in
     ``blocks.json``."""
     d = pathlib.Path(cycle_dir)
+    if not (d / "blocks.json").exists():         # runs written before streaming
+        a = np.load(d / f"{name}.npy", mmap_mode="r" if mmap else None)
+        return np.asarray(a if columns is None else a[..., np.asarray(columns)])
     layout = json.loads((d / "blocks.json").read_text())
     parts = []
     for b, (lo, hi) in enumerate(layout["ranges"]):

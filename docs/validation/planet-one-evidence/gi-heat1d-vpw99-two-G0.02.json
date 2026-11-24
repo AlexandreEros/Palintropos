@@ -1,0 +1,208 @@
+{
+ "heat1d": "phayne/heat1d@5b73a6c1ba5047f59f6210185b37539e46e68136",
+ "model": "TWO",
+ "geothermal_flux": 0.02,
+ "differences": [
+  "cell means (ours) vs node values (heat1d)",
+  "Newton-coupled properties and skin (ours) vs operator-split surface Newton with properties lagged one step (heat1d)",
+  "Kirchhoff half-cell skin flux (ours) vs 3-point surface gradient with k at the surface node (heat1d)",
+  "series half-cell interface conductance (ours) vs node-based property placement with a node at 2 cm (heat1d)"
+ ],
+ "levels": [
+  {
+   "level": 0,
+   "ours": {
+    "grid": [
+     0.002,
+     1.1
+    ],
+    "steps": 2160,
+    "status": {
+     "status": "PERIODIC",
+     "cycle": 31,
+     "stage": "production",
+     "consecutive_periodic_production_cycles": 2,
+     "label": "PERIODIC (G-P2 met in 2 consecutive production cycles)"
+    }
+   },
+   "heat1d": {
+    "m": [
+     40,
+     4
+    ],
+    "steps": 2160
+   },
+   "columns": {
+    "0N 0E": {
+     "heat1d_cycles": 9,
+     "heat1d_last_cycle_change_K": 0.009579067922743434,
+     "max_abs_dTs_K": 3.748896903710147,
+     "rms_dTs_K": 2.1721559969939293,
+     "Tmax_ours": 700.00910985857,
+     "Tmax_heat1d": 700.0476338728515,
+     "Tmin_ours": 107.7899162671556,
+     "Tmin_heat1d": 105.04906786820676,
+     "nodes": 24,
+     "cells_ours": 45
+    },
+    "0N 90E": {
+     "heat1d_cycles": 8,
+     "heat1d_last_cycle_change_K": 0.009167408742214889,
+     "max_abs_dTs_K": 3.7861003523404406,
+     "rms_dTs_K": 2.0288038381818616,
+     "Tmax_ours": 568.0220017740928,
+     "Tmax_heat1d": 568.079319516309,
+     "Tmin_ours": 97.96752261608896,
+     "Tmin_heat1d": 95.43451374216036,
+     "nodes": 24,
+     "cells_ours": 45
+    }
+   }
+  },
+  {
+   "level": 1,
+   "ours": {
+    "grid": [
+     0.001,
+     1.0488
+    ],
+    "steps": 4320,
+    "status": {
+     "status": "PERIODIC",
+     "cycle": 35,
+     "stage": "production",
+     "consecutive_periodic_production_cycles": 2,
+     "label": "PERIODIC (G-P2 met in 2 consecutive production cycles)"
+    }
+   },
+   "heat1d": {
+    "m": [
+     80,
+     8
+    ],
+    "steps": 4320
+   },
+   "columns": {
+    "0N 0E": {
+     "heat1d_cycles": 7,
+     "heat1d_last_cycle_change_K": 0.008782945034340628,
+     "max_abs_dTs_K": 4.097442174561166,
+     "rms_dTs_K": 1.1245962762086397,
+     "Tmax_ours": 700.009049024112,
+     "Tmax_heat1d": 700.0283607763431,
+     "Tmin_ours": 107.79683897664182,
+     "Tmin_heat1d": 106.4213228549068,
+     "nodes": 43,
+     "cells_ours": 86
+    },
+    "0N 90E": {
+     "heat1d_cycles": 6,
+     "heat1d_last_cycle_change_K": 0.008930615697607891,
+     "max_abs_dTs_K": 2.5612143979871576,
+     "rms_dTs_K": 1.0219269145331527,
+     "Tmax_ours": 568.0221246585245,
+     "Tmax_heat1d": 568.050720364098,
+     "Tmin_ours": 97.9733681656895,
+     "Tmin_heat1d": 96.72102598521418,
+     "nodes": 43,
+     "cells_ours": 86
+    }
+   }
+  },
+  {
+   "level": 2,
+   "ours": {
+    "grid": [
+     0.0005,
+     1.0241
+    ],
+    "steps": 8640,
+    "status": {
+     "status": "PERIODIC",
+     "cycle": 34,
+     "stage": "production",
+     "consecutive_periodic_production_cycles": 2,
+     "label": "PERIODIC (G-P2 met in 2 consecutive production cycles)"
+    }
+   },
+   "heat1d": {
+    "m": [
+     160,
+     16
+    ],
+    "steps": 8640
+   },
+   "columns": {
+    "0N 0E": {
+     "heat1d_cycles": 4,
+     "heat1d_last_cycle_change_K": 0.008751621442726787,
+     "max_abs_dTs_K": 2.3978743419692705,
+     "rms_dTs_K": 0.5864991481959448,
+     "Tmax_ours": 700.0091812766365,
+     "Tmax_heat1d": 700.018825814312,
+     "Tmin_ours": 107.79811854627124,
+     "Tmin_heat1d": 107.08699350206061,
+     "nodes": 83,
+     "cells_ours": 167
+    },
+    "0N 90E": {
+     "heat1d_cycles": 4,
+     "heat1d_last_cycle_change_K": 0.007269921207793573,
+     "max_abs_dTs_K": 1.363041532011053,
+     "rms_dTs_K": 0.525456395685156,
+     "Tmax_ours": 568.0221170859123,
+     "Tmax_heat1d": 568.0365736034043,
+     "Tmin_ours": 97.97449461486573,
+     "Tmin_heat1d": 97.33436500141669,
+     "nodes": 83,
+     "cells_ours": 167
+    }
+   }
+  }
+ ],
+ "verdict": {
+  "0N 0E": {
+   "max_abs_dTs_by_level_K": [
+    3.748896903710147,
+    3.0926267997817263,
+    1.6472514643178897
+   ],
+   "rms_dTs_by_level_K": [
+    2.1721559969939293,
+    1.1236038341362649,
+    0.5855139979650794
+   ],
+   "e_ours_K": 0.5923391729600379,
+   "order_ours": 0.9015170139857934,
+   "e_heat1d_K": 1.079401952661704,
+   "order_heat1d": 0.9125199501666663,
+   "bound_K": 1.8717411256217418,
+   "final_max_abs_dTs_K": 1.6472514643178897,
+   "shrinks_rms": true,
+   "shrinks_max_last_step": true,
+   "pass": true
+  },
+  "0N 90E": {
+   "max_abs_dTs_by_level_K": [
+    3.7861003523404406,
+    2.4771819198756333,
+    1.3029618085379724
+   ],
+   "rms_dTs_by_level_K": [
+    2.0288038381818616,
+    1.0215740317837352,
+    0.5252706850115672
+   ],
+   "e_ours_K": 0.5451803070486546,
+   "order_ours": 0.8345280535837147,
+   "e_heat1d_K": 1.0158660617862723,
+   "order_heat1d": 0.9415130299604426,
+   "bound_K": 1.7610463688349267,
+   "final_max_abs_dTs_K": 1.3029618085379724,
+   "shrinks_rms": true,
+   "shrinks_max_last_step": true,
+   "pass": true
+  }
+ },
+ "pass": true
+}
