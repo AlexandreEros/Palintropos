@@ -9,13 +9,30 @@ gate.
 Usage::
 
     python tests/audit_substrate_gates.py OUTDIR [--only G1M,G2,...]
+        [--grids production|historical] [--fixture PATH]
 
-Writes one JSON per gate to OUTDIR. NumPy on CPU (decision D3).
+Writes one JSON per gate to OUTDIR. NumPy on CPU (decision D3). Gate names
+for ``--only`` are those in ``GATES`` (G1M, G1C, G2, G3, G4, G5, G5b); an
+unknown name is an error.
+
+Grids:
+* ``production`` (default) builds every grid with the current public layering
+  API. Columns deeper than 3.5 m (G1-M at P > 12.4 d) and G5b top thicknesses
+  other than 2 cm use ``geometric_interfaces(top, D, stretch=<default
+  stretch>, depth_is_minimum=True)``: the default top and stretch are kept
+  exactly, and the column ends at the first geometric interface at or below
+  the requested depth D. That keeps the depth >= 6 delta requirement and the
+  [1, 1.5] ratio guarantee.
+* ``historical`` reads the exact interface grids of the original milestone-1
+  run from the fixture ``tests/fixtures/substrate_m1_historical_grids.json``,
+  so the frozen results can be reproduced without re-implementing the
+  original grid-extension algorithm.
 """
 from __future__ import annotations
 
 import argparse
 import cmath
+import hashlib
 import json
 import math
 import pathlib
@@ -25,8 +42,7 @@ import time
 
 import numpy as np
 
-from tropoi.physics.substrate import (ConductiveSubstrate, geometric_interfaces,
-                                      _continue_geometric)
+from tropoi.physics.substrate import ConductiveSubstrate, geometric_interfaces
 from tropoi.physics.surface import SlabSurface
 
 DAY = 86400.0
@@ -59,18 +75,28 @@ def default_stretch():
     return float(dz[1] / dz[0])
 
 
+FIXTURE = pathlib.Path(__file__).resolve().parent / "fixtures" / "substrate_m1_historical_grids.json"
+GATE_NAMES = ("G1M", "G1C", "G2", "G3", "G4", "G5", "G5b")
+HISTORICAL = None          # {key: interfaces} when --grids historical
+
+
+def grid(key, build):
+    """Interfaces for one gate configuration: the historical fixture's exact
+    grid in historical mode, otherwise ``build()``."""
+    if HISTORICAL is not None:
+        if key not in HISTORICAL:
+            raise KeyError(f"historical fixture has no grid {key!r}")
+        return tuple(HISTORICAL[key])
+    return tuple(build())
+
+
 def extended_interfaces(depth, top=TOP):
-    """Default geometry, continued geometrically below 3.5 m when depth > 3.5 m
-    (addendum §2). With another top thickness (G5b), the default stretch is
-    used from that top layer down to the depth."""
-    r = default_stretch()
-    if top != TOP:
-        return geometric_interfaces(top, depth, stretch=r)
-    base = list(default_interfaces())
-    if depth <= DEPTH * (1 + 1e-12):
-        return tuple(base)
-    last = base[-1] - base[-2]
-    return _continue_geometric(base, last * r, r, depth)
+    """Production grid for a column of at least ``depth``. Uses the default
+    3.5 m grid when it suffices; otherwise top ``top`` with the default
+    stretch, ending at the first geometric interface at or below ``depth``."""
+    if top == TOP and depth <= DEPTH * (1 + 1e-12):
+        return default_interfaces()
+    return geometric_interfaces(top, depth, stretch=default_stretch(), depth_is_minimum=True)
 
 
 def substrate(interfaces, skin="layer"):
@@ -196,7 +222,8 @@ def gate_g1m():
         P = Pd * DAY
         delta = math.sqrt(KAPPA * P / math.pi)
         D = max(6 * delta, DEPTH)
-        edges = extended_interfaces(D)
+        edges = grid(f"G1M:P={Pd}", lambda: extended_interfaces(D))
+        D_req, D = D, float(edges[-1])
         run = run_periodic(edges, P, DT)
         pts = {"top_centre": 0.5 * (edges[1] - edges[0]), "delta": delta, "two_delta": 2 * delta}
         res = {k: compare_point(run, z) for k, z in pts.items()}
@@ -204,7 +231,8 @@ def gate_g1m():
         passed = all(abs(v["amp_err"]) <= TOL_AMP and abs(v["phase_err_P"]) <= TOL_PHASE for v in res.values())
         if mandatory:
             ok = ok and passed
-        rows.append({"P_days": Pd, "D_m": D, "D_over_delta": D / delta, "layers": len(edges) - 1,
+        rows.append({"P_days": Pd, "D_m": D, "D_requested_m": D_req, "D_over_delta": D / delta,
+                     "layers": len(edges) - 1,
                      "extended": D > DEPTH * (1 + 1e-12), "mandatory": mandatory,
                      "pass": passed, "points": res})
     return {"gate": "G1-M", "mandatory": True, "pass": ok, "dt": DT,
@@ -243,10 +271,10 @@ def gate_g1c():
 
     space = []
     for N in (25, 50, 100, 200):
-        edges = tuple(np.linspace(0.0, DEPTH, N + 1))
+        edges = grid(f"uniform:N={N}", lambda: np.linspace(0.0, DEPTH, N + 1))
         space.append((N, measure(edges, DT)))
     time_ = []
-    edges200 = tuple(np.linspace(0.0, DEPTH, 201))
+    edges200 = grid("uniform:N=200", lambda: np.linspace(0.0, DEPTH, 201))
     for dt in (4800.0, 2400.0, 1200.0, 600.0, 300.0):
         time_.append((dt, measure(edges200, dt)))
     return {"gate": "G1-C", "mandatory": False, "expected_orders": {"space": 2, "time": 1},
@@ -256,7 +284,7 @@ def gate_g1c():
 
 
 def gate_g2():
-    edges = default_interfaces()
+    edges = grid("default", default_interfaces)
     sub = substrate(edges)
     st = sub.initial_state(1)
     F = 100.0
@@ -290,7 +318,7 @@ def gate_g2():
 
 
 def run_robin(skin):
-    edges = default_interfaces()
+    edges = grid("default", default_interfaces)
     sub = substrate(edges, skin)
     L = sub.depth
     h = np.array(H_SET)
@@ -334,7 +362,7 @@ def gate_g3():
 
 
 def gate_g4():
-    sub = substrate((0.0, 1.0))
+    sub = substrate(grid("G4", lambda: (0.0, 1.0)))
     slab = SlabSurface(2.0e6)
     rng = np.random.default_rng(SEED)
     n = 100000
@@ -394,7 +422,7 @@ class ExactSum:
 
 
 def gate_g5():
-    edges = default_interfaces()
+    edges = grid("default", default_interfaces)
     sub = substrate(edges)
     fbs = np.array([0.0, 0.1, -0.1])
     ncol = fbs.size
@@ -445,13 +473,13 @@ def gate_g5b():
         for dt in dts:
             rows = []
             for top in tops:
-                edges = extended_interfaces(D, top)
+                edges = grid(f"G5b:periodic:P={Pd}:top={top}", lambda: extended_interfaces(D, top))
                 run = run_periodic(edges, P, dt)
                 r = run["sub"].skin_resistance
                 T1 = run["Y"][:, 0]
                 ana_s = theta_inf(0.0, run["F0"], run["q"])
                 ana_series = np.real(ana_s * np.exp(1j * run["w"] * run["t"]))
-                row = {"top_m": top, "layers": len(edges) - 1}
+                row = {"top_m": top, "layers": len(edges) - 1, "depth_m": float(edges[-1])}
                 for name, series in (("identification", T1), ("diagnosed", T1 + r * run["flux"])):
                     X = np.column_stack([np.ones_like(run["t"]), np.cos(run["w"] * run["t"]),
                                          np.sin(run["w"] * run["t"])])
@@ -471,7 +499,7 @@ def gate_g5b():
         F = 100.0
         tmax = DEPTH ** 2 / (16 * KAPPA)
         for top in tops:
-            edges = extended_interfaces(DEPTH, top)
+            edges = grid(f"G5b:step:top={top}", lambda: extended_interfaces(DEPTH, top))
             sub = substrate(edges)
             r = sub.skin_resistance
             st = sub.initial_state(1)
@@ -491,7 +519,7 @@ def gate_g5b():
                         err = val / ana - 1.0
                         worst[name] = max(worst[name], abs(err))
                         last[name] = {"t_s": t, "rel_err": err, "dTs_K": val - ana}
-            row = {"top_m": top, "layers": len(edges) - 1}
+            row = {"top_m": top, "layers": len(edges) - 1, "depth_m": float(edges[-1])}
             for name in worst:
                 row[name] = {"max_abs_rel_err": worst[name], "end_of_window": last[name],
                              "flux_err_end_W_m2": {str(h): h * abs(last[name]["dTs_K"]) for h in H_SET}}
@@ -511,6 +539,7 @@ def _orders(rows, tops, names, key):
 
 GATES = [("G1M", gate_g1m), ("G1C", gate_g1c), ("G2", gate_g2), ("G3", gate_g3),
          ("G4", gate_g4), ("G5", gate_g5), ("G5b", gate_g5b)]
+assert tuple(n for n, _ in GATES) == GATE_NAMES
 
 
 def _default(o):
@@ -527,13 +556,27 @@ def main(argv=None):
     ap = argparse.ArgumentParser()
     ap.add_argument("outdir")
     ap.add_argument("--only", default="")
+    ap.add_argument("--grids", choices=("production", "historical"), default="production")
+    ap.add_argument("--fixture", default=str(FIXTURE))
     args = ap.parse_args(argv)
+    only = {s for s in args.only.split(",") if s}
+    unknown = sorted(only - set(GATE_NAMES))
+    if unknown:
+        print(f"unknown gate name(s) {unknown}; valid: {', '.join(GATE_NAMES)}", file=sys.stderr)
+        return 2
+    global HISTORICAL
+    HISTORICAL = None
+    fixture_meta = None
+    if args.grids == "historical":
+        raw = pathlib.Path(args.fixture).read_bytes()
+        HISTORICAL = json.loads(raw)["grids"]
+        fixture_meta = {"path": args.fixture, "sha256": hashlib.sha256(raw).hexdigest()}
     out = pathlib.Path(args.outdir)
     out.mkdir(parents=True, exist_ok=True)
-    only = {s for s in args.only.split(",") if s}
     meta = {"python": sys.version, "numpy": np.__version__, "platform": platform.platform(),
             "default_interfaces": list(default_interfaces()), "default_stretch": default_stretch(),
-            "dt": DT, "k": K, "kappa": KAPPA, "seed": SEED}
+            "dt": DT, "k": K, "kappa": KAPPA, "seed": SEED,
+            "grids": args.grids, "fixture": fixture_meta}
     (out / "meta.json").write_text(json.dumps(meta, indent=1, default=_default))
     for name, fn in GATES:
         if only and name not in only:

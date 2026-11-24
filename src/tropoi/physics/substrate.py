@@ -68,25 +68,52 @@ def _xp(*arrays):
 
 def geometric_interfaces(top_thickness: float, depth: float, *,
                          layers: Optional[int] = None,
-                         stretch: Optional[float] = None) -> tuple:
-    """Layer interfaces (m, from 0 to ``depth``) with thicknesses growing
-    geometrically from ``top_thickness``.
+                         stretch: Optional[float] = None,
+                         depth_is_minimum: bool = False) -> tuple:
+    """Layer interfaces (m, from 0) with thicknesses growing geometrically
+    from ``top_thickness``.
 
-    Give exactly one of ``layers`` and ``stretch``.
+    Give exactly one of ``layers`` and ``stretch``. Both keep
+    ``top_thickness`` exact.
 
     * ``layers``: the ratio is solved so that ``layers`` layers end exactly
-      at ``depth``.
-    * ``stretch``: geometric layers are added while they fit. A remaining
-      gap thinner than half the next geometric layer is merged into the
-      last layer; otherwise it becomes its own layer.
+      at ``depth``. The solved ratio must lie in [1, 1.5].
+    * ``stretch``: layers of thickness ``top * stretch**i`` are added while
+      they fit within ``depth``. A gap g left at the bottom is handled
+      deterministically:
 
-    The ratio must lie in [1, 1.5]."""
+      - if g is zero to within 1e-12 relative, the grid ends exactly at
+        ``depth``;
+      - otherwise two terminations are considered: merging g into the last
+        layer, or keeping g as an extra layer. Each is acceptable only if its
+        final thickness ratio lies in [1, 1.5]. Of the acceptable ones, the
+        one whose final ratio is closest to ``stretch`` is used (merging on a
+        tie). The requested ratio then holds for every layer except the last;
+      - if neither is acceptable, ``ValueError`` is raised. In that case the
+        requested top thickness, depth, stretch and ratio bound are
+        incompatible. Use ``layers`` for an exact geometric fit, choose
+        another depth, or pass ``depth_is_minimum=True``;
+      - with ``depth_is_minimum=True``, ``depth`` is a lower bound: the grid
+        ends at the first exact geometric interface at or below ``depth``.
+        Every ratio is then exactly ``stretch``, and the column is at least
+        as deep as requested.
+
+    **Ratio bounds.** The regolith specification requires only an upper
+    bound, stretch <= 1.5. This function guarantees more: every
+    adjacent-layer ratio of a grid it returns lies in [1, 1.5], so thickness
+    never decreases with depth. Grids passed explicitly as ``interfaces`` to
+    :class:`ConductiveSubstrate`, for example uniform or historical fixture
+    grids, are not subject to that guarantee."""
     top = float(top_thickness)
     total = float(depth)
+    if not (math.isfinite(top) and math.isfinite(total)):
+        raise ValueError("top_thickness and depth must be finite")
     if not (top > 0.0 and total > 0.0 and top <= total):
         raise ValueError("need 0 < top_thickness <= depth")
     if (layers is None) == (stretch is None):
         raise ValueError("give exactly one of layers and stretch")
+    if layers is not None and depth_is_minimum:
+        raise ValueError("depth_is_minimum applies to stretch, not layers")
     if layers is not None:
         n = int(layers)
         if n < 1:
@@ -118,26 +145,41 @@ def geometric_interfaces(top_thickness: float, depth: float, *,
         edges.append(total)
         return tuple(edges)
     ratio = float(stretch)
-    if not (1.0 <= ratio <= _MAX_STRETCH):
+    if not (math.isfinite(ratio) and 1.0 <= ratio <= _MAX_STRETCH):
         raise ValueError(f"stretch must lie in [1, {_MAX_STRETCH}]")
-    return _continue_geometric([0.0], top, ratio, total)
-
-
-def _continue_geometric(edges: list, next_thickness: float, ratio: float,
-                        total: float) -> tuple:
-    edges = list(edges)
-    t = float(next_thickness)
+    edges = [0.0]
+    t = top
     while edges[-1] + t <= total * (1.0 + 1e-12):
         edges.append(edges[-1] + t)
         t *= ratio
     gap = total - edges[-1]
-    if gap > 1e-12 * total:
-        if gap < 0.5 * t and len(edges) > 1:
-            edges[-1] = total
-        else:
-            edges.append(total)
-    else:
+    if gap <= 1e-12 * total:
         edges[-1] = total
+        return tuple(edges)
+    if depth_is_minimum:
+        edges.append(edges[-1] + t)
+        return tuple(edges)
+    dz = [edges[i + 1] - edges[i] for i in range(len(edges) - 1)]
+    candidates = []
+    if len(dz) >= 2:                      # merge into the last layer (never the top one)
+        merged = (dz[-1] + gap) / dz[-2]
+        if 1.0 <= merged <= _MAX_STRETCH:
+            candidates.append((abs(merged - ratio), 0, "merge"))
+    else:
+        merged = math.nan
+    appended = gap / dz[-1]
+    if 1.0 <= appended <= _MAX_STRETCH:
+        candidates.append((abs(appended - ratio), 1, "append"))
+    if not candidates:
+        raise ValueError(
+            f"top_thickness={top}, depth={total}, stretch={ratio} are incompatible with "
+            f"final-layer ratios in [1, {_MAX_STRETCH}]: merging the {gap:.6g} m remainder "
+            f"gives {merged:.4f}, keeping it as a layer gives {appended:.4f}. Use layers= "
+            "for an exact geometric fit, another depth, or depth_is_minimum=True")
+    if min(candidates)[2] == "merge":
+        edges[-1] = total
+    else:
+        edges.append(total)
     return tuple(edges)
 
 
@@ -159,11 +201,17 @@ class ConductiveSubstrate:
     ``thermal_inertia`` (J m^-2 K^-1 s^-1/2) and ``conductivity``
     (W m^-1 K^-1). With neither given, the THAI inertia 2000 is used.
 
-    Geometry, in order of precedence:
-    * explicit ``interfaces`` (m, from 0, increasing);
-    * ``top_thickness`` with ``stretch``;
-    * ``top_thickness`` with ``layers`` (default 30 layers, top 2 cm, to
-      ``depth`` 3.5 m).
+    Geometry, exactly one form:
+    * explicit ``interfaces`` (m, from 0, strictly increasing). These are used
+      as given, with no ratio check; ``depth``, ``top_thickness``, ``layers``
+      and ``stretch`` must then be left unset;
+    * ``top_thickness`` with ``stretch``, to ``depth`` (see
+      :func:`geometric_interfaces`); ``layers`` must be left unset;
+    * ``top_thickness`` with ``layers``, to ``depth``. The default is 30
+      layers, top 2 cm, depth 3.5 m.
+
+    Conflicting geometry arguments raise ``ValueError`` instead of being
+    ignored.
 
     ``bottom_heat_flux`` is the default F_b (W m^-2, positive upward into
     the column). ``albedo`` and ``emissivity`` are carried for the coupling.
@@ -173,8 +221,8 @@ class ConductiveSubstrate:
     def __init__(self, *, volumetric_heat_capacity: float = 2.0e6,
                  thermal_inertia: Optional[float] = None,
                  conductivity: Optional[float] = None,
-                 depth: float = 3.5, top_thickness: float = 0.02,
-                 layers: Optional[int] = 30, stretch: Optional[float] = None,
+                 depth: Optional[float] = None, top_thickness: Optional[float] = None,
+                 layers: Optional[int] = None, stretch: Optional[float] = None,
                  interfaces: Optional[Sequence[float]] = None,
                  bottom_heat_flux: float = 0.0, albedo: float = 0.3,
                  emissivity: float = 1.0, initial_temperature=300.0,
@@ -198,14 +246,27 @@ class ConductiveSubstrate:
         if not (0.0 <= albedo <= 1.0 and 0.0 < emissivity <= 1.0):
             raise ValueError("albedo must be in [0, 1] and emissivity in (0, 1]")
         if interfaces is not None:
+            given = [n for n, v in (("depth", depth), ("top_thickness", top_thickness),
+                                    ("layers", layers), ("stretch", stretch)) if v is not None]
+            if given:
+                raise ValueError(f"interfaces given together with {', '.join(given)}; "
+                                 "explicit interfaces define the whole geometry")
             edges = tuple(float(e) for e in interfaces)
-        elif stretch is not None:
-            edges = geometric_interfaces(top_thickness, depth, stretch=stretch)
         else:
-            edges = geometric_interfaces(top_thickness, depth, layers=layers)
+            if stretch is not None and layers is not None:
+                raise ValueError("give layers or stretch, not both")
+            top = 0.02 if top_thickness is None else top_thickness
+            total = 3.5 if depth is None else depth
+            if stretch is not None:
+                edges = geometric_interfaces(top, total, stretch=stretch)
+            else:
+                edges = geometric_interfaces(top, total, layers=30 if layers is None else layers)
         e = np.asarray(edges, dtype=np.float64)
-        if e.ndim != 1 or e.size < 2 or e[0] != 0.0 or not np.all(np.diff(e) > 0.0):
-            raise ValueError("interfaces must start at 0 and increase strictly")
+        if (e.ndim != 1 or e.size < 2 or not np.all(np.isfinite(e)) or e[0] != 0.0
+                or not np.all(np.diff(e) > 0.0)):
+            raise ValueError("interfaces must be finite, start at 0 and increase strictly")
+        if not math.isfinite(float(bottom_heat_flux)):
+            raise ValueError("bottom_heat_flux must be finite")
         self.volumetric_heat_capacity = cap
         self.conductivity = cond
         self.thermal_inertia = math.sqrt(cond * cap)
@@ -222,6 +283,8 @@ class ConductiveSubstrate:
         init = np.asarray(initial_temperature, dtype=np.float64)
         if init.ndim not in (0, 1) or (init.ndim == 1 and init.size != self.layers):
             raise ValueError("initial_temperature must be a scalar or one value per layer")
+        if not (np.all(np.isfinite(init)) and np.all(init > 0.0)):
+            raise ValueError("initial_temperature must be finite and > 0 K")
         self.initial_temperature = init
         # Per-layer sum of the conductances to the neighbours (0 for L = 1).
         gsum = np.zeros(self.layers)
@@ -294,19 +357,37 @@ class ConductiveSubstrate:
         ``state``. ``flux_derivative`` is a = dF/dT_s there (W m^-2 K^-1,
         <= 0), scalar or per column. ``bottom_heat_flux`` overrides the
         default F_b. Returns the new state; its ``surface_flux`` is the flux
-        actually applied, ``F0 + a (T'_s - T_s)``."""
+        actually applied, ``F0 + a (T'_s - T_s)``.
+
+        Raises ``ValueError`` for a non-finite or non-positive ``dt``,
+        non-finite fluxes, a non-finite or positive ``flux_derivative`` (a
+        positive a is not a physical surface-flux response and can destabilize
+        the solve), and, for the diagnosed skin, a denominator 1 - a r that is
+        not positive. The checks are reductions over the columns; on CuPy each
+        one synchronizes the device (cost to be measured in G7)."""
         theta = state.anomaly
         xp = _xp(theta)
         m, gsum, g = self._constants(xp)
         dt = float(dt)
+        if not (math.isfinite(dt) and dt > 0.0):
+            raise ValueError(f"dt must be finite and > 0, got {dt!r}")
         a = flux_derivative
         fb = self.bottom_heat_flux if bottom_heat_flux is None else bottom_heat_flux
+        if not bool(xp.all(xp.isfinite(xp.asarray(flux)))):
+            raise ValueError("flux must be finite")
+        if not bool(xp.all(xp.isfinite(xp.asarray(fb)))):
+            raise ValueError("bottom_heat_flux must be finite")
+        a_arr = xp.asarray(a)
+        if not bool(xp.all(xp.isfinite(a_arr) & (a_arr <= 0.0))):
+            raise ValueError("flux_derivative must be finite and <= 0")
         if self.skin == "layer":
             a_eff = a
             const = flux - a * theta[0]
         else:
             r = self.skin_resistance
             den = 1.0 - a * r
+            if not bool(xp.all(xp.asarray(den) > 0.0)):
+                raise ValueError("diagnosed-skin denominator 1 - a r must be > 0")
             a_eff = a / den
             const = (flux - a * (theta[0] + r * state.surface_flux)) / den
         # Applied flux: F = const + a_eff * theta'_0 (linear in the new top anomaly).
