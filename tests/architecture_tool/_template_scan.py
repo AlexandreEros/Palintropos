@@ -80,7 +80,8 @@ def is_single_call(expr: str, names: set[str]) -> bool:
 #: Local names that hold embedded data records in the template (``D`` is the
 #: payload; the rest are the aliases its renderers bind records to).
 DATA_ROOTS = ("D", "P", "A", "R", "e", "t", "b", "v", "st", "x", "n", "r", "c", "s", "u",
-              "f", "p", "om", "ln", "sites", "env", "cap", "sy", "tm")
+              "f", "p", "om", "ln", "sites", "env", "cap", "sy", "tm",
+              "ci")  # an observation's static-counterpart call index (e.static)
 _PATH = (r"(?<![\w$.'\"])(?:%s)(?:\.[A-Za-z_$][\w$]*|\[[^\]]*\])*(?![\w$(\[.])"
          % "|".join(DATA_ROOTS))
 
