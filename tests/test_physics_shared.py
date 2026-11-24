@@ -6,6 +6,7 @@ the radiative experiments."""
 from __future__ import annotations
 
 import math
+from fractions import Fraction
 
 import numpy as np
 import pytest
@@ -15,7 +16,7 @@ from tropoi.physics.composition import (COMPOSITIONS, Composition,
                                         NORMALIZATION_GUARD, SUM_TOLERANCE)
 from tropoi.physics.constants import (AU_M, G, L_SUN_W, R_SUN_M, R_UNIVERSAL,
                                       SIGMA_SB, SOLAR_CONSTANT, T_SUN_K)
-from tropoi.physics.insolation import (DiurnalMeanInsolation,
+from tropoi.physics.insolation import (DiurnalMeanInsolation, OrbitalInsolation,
                                        StellarIllumination)
 from tropoi.physics.orbit import (KeplerOrbit, mean_from_true, true_from_mean)
 from tropoi.physics.planets import PLANETS
@@ -292,33 +293,41 @@ def test_rotation_owns_the_spin_state():
     r = Rotation.of(7.292115e-5, obliquity_deg=23.44)
     assert r.sidereal_period_s == pytest.approx(2 * math.pi / 7.292115e-5)
     assert r.obliquity_deg == pytest.approx(23.44)
-    retro = Rotation.from_period(-243.0 * 86400.0)
-    assert retro.angular_velocity < 0.0
+    # Retrograde spin is an obliquity above 90 deg, never a negative rate.
+    retro = Rotation.from_period(243.0 * 86400.0, obliquity_deg=177.36)
+    assert retro.is_retrograde and retro.angular_speed > 0.0
+    with pytest.raises(ValueError, match="angular_speed"):
+        Rotation(-1e-5)
+    with pytest.raises(ValueError):
+        Rotation.from_period(-243.0 * 86400.0)
     with pytest.raises(ValueError, match="obliquity"):
         Rotation.of(1e-5, obliquity_deg=200.0)
     assert Rotation(0.0).sidereal_period_s == math.inf
+    assert Rotation.resonant(100.0, Fraction(3, 2)).angular_speed == \
+        pytest.approx(1.5 * 2 * math.pi / 100.0, rel=1e-15)
 
 
-def test_illumination_from_components_matches_the_prescribed_form():
+def test_illumination_from_components_matches_the_planet_centric_form():
     sun = STARS["sun"]
     orbit = KeplerOrbit.from_irradiance(
         1361.0, sun.luminosity_w, reference="semimajor_axis",
         eccentricity=0.0167, periapsis_longitude_rad=math.radians(282.9))
     rotation = Rotation.of(7.292115e-5, obliquity_deg=23.44)
     combined = StellarIllumination.from_components(sun, orbit, rotation)
-    stated = StellarIllumination.prescribed(
-        1361.0, combined.period_s, 0.0167, 23.44, 282.9)
+    stated = StellarIllumination.planet_centric(
+        irradiance_at_semimajor=1361.0, period_s=combined.period_s,
+        eccentricity=0.0167, obliquity_deg=23.44, perihelion_ls_deg=282.9,
+        angular_speed=7.292115e-5)
     for t in np.linspace(0.0, combined.period_s, 13):
         assert combined.flux_at(float(t)) == pytest.approx(
             stated.flux_at(float(t)), rel=1e-12)
         assert combined.declination(float(t)) == pytest.approx(
             stated.declination(float(t)), abs=1e-12)
-    assert combined.irradiance_at_semimajor == pytest.approx(1361.0, rel=1e-12)
+    # The nominal Sun at the stated distance gives the stated constant at r = a.
+    assert combined.flux_at(0.0) * (1 - 0.0167) ** 2 == pytest.approx(1361.0, rel=1e-12)
     # period from mu = the nominal solar GM: a sidereal year to ~0.1 %
     assert combined.period_s == pytest.approx(365.25 * 86400.0, rel=1e-3)
-    d = combined.as_dict()
-    assert d["stellar_constant"] == pytest.approx(1361.0)
-    assert d["components"]["star"]["key"] == "sun"
+    assert combined.as_dict()["star"]["key"] == "sun"
     with pytest.raises(ValueError, match="gravitational parameter"):
         StellarIllumination.from_components(STARS["sirius_a"], orbit, rotation)
 
@@ -329,32 +338,26 @@ def test_illumination_honours_the_orbits_epoch():
     sun = STARS["sun"]
     orbit = KeplerOrbit.from_au(1.0, eccentricity=0.3,
                                 true_anomaly_epoch_rad=math.pi)
-    rotation = Rotation.of(7.292115e-5)
-    ill = StellarIllumination.from_components(sun, orbit, rotation)
+    ill = StellarIllumination.from_components(sun, orbit, Rotation.of(7.292115e-5))
     mu = sun.gravitational_parameter
     for t in (0.0, 0.25 * ill.period_s, 0.6 * ill.period_s):
         r = orbit.radius_at_time(t, gravitational_parameter=mu)
-        assert ill.flux_at(t) == pytest.approx(sun.irradiance_at(r), rel=1e-9)
-    # An explicit time_of_periapsis still overrides the orbit's epoch.
-    forced = StellarIllumination.from_components(sun, orbit, rotation,
-                                                 time_of_periapsis=0.0)
-    assert forced.time_of_periapsis_s == 0.0
-    assert forced.flux_at(0.0) == pytest.approx(
-        forced.irradiance_at_semimajor / (1.0 - 0.3) ** 2, rel=1e-12)
+        assert ill.flux_at(t) == pytest.approx(sun.irradiance_at(r), rel=1e-12)
 
 
-def test_forcing_conventions_are_preserved():
-    ill = StellarIllumination.prescribed(1000.0, 100.0, 0.3, 25.0, 90.0)
+def test_planet_centric_conventions():
+    ill = StellarIllumination.planet_centric(
+        irradiance_at_semimajor=1000.0, period_s=100.0, eccentricity=0.3,
+        obliquity_deg=25.0, perihelion_ls_deg=90.0)
     # at perihelion (t = 0): flux = S / (1 - e)^2
     assert ill.flux_at(0.0) == pytest.approx(1000.0 / 0.7 ** 2, rel=1e-12)
     # L_s(perihelion) = 90 deg: northern summer solstice => dec = obliquity
+    assert ill.solar_longitude(0.0) == pytest.approx(math.radians(90.0), abs=1e-12)
     assert ill.declination(0.0) == pytest.approx(math.radians(25.0), abs=1e-12)
-    # legacy signature keys stay put for stored manifests
-    sig = DiurnalMeanInsolation(ill).signature()
-    assert sig["kind"] == "diurnal_mean"
-    assert set(sig["orbit"]) == {"stellar_constant", "period", "eccentricity",
-                                 "obliquity_deg", "perihelion_longitude_deg",
-                                 "time_of_perihelion"}
+    later = StellarIllumination.planet_centric(
+        irradiance_at_semimajor=1000.0, period_s=100.0, eccentricity=0.3,
+        time_of_perihelion_s=30.0)
+    assert later.flux_at(30.0) == pytest.approx(1000.0 / 0.7 ** 2, rel=1e-12)
 
 
 def test_planet_presets_carry_the_shared_objects_with_stated_scalars():
@@ -362,13 +365,15 @@ def test_planet_presets_carry_the_shared_objects_with_stated_scalars():
     assert earth.star.key == "sun"
     assert earth.orbit.eccentricity == 0.0167
     assert earth.rotation.obliquity_deg == pytest.approx(23.44)
-    assert earth.illumination.irradiance_at_semimajor == 1361.0   # stated
     assert earth.rotation_rate == 7.292115e-5
-    # the stated constant and the shared objects agree to fact-sheet rounding
-    derived = earth.star.irradiance_at(earth.orbit.semimajor_axis_m)
-    assert derived == pytest.approx(1361.0, rel=2e-3)
+    # the stated constant is the flux at r = a; t = 0 is perihelion
+    assert earth.illumination.flux_at(0.0) * (1 - 0.0167) ** 2 == \
+        pytest.approx(1361.0, rel=1e-12)
+    # ... and agrees with the nominal Sun at the fact-sheet distance to rounding
+    assert earth.star.irradiance_at(earth.orbit.semimajor_axis_m) == \
+        pytest.approx(1361.0, rel=2e-3)
     venus = PLANETS["venus"]
-    assert venus.rotation.angular_velocity < 0.0      # retrograde
+    assert venus.rotation.is_retrograde and venus.rotation_rate > 0.0
 
 
 # ---------------------------------------------------------------- frozen config contract
@@ -389,12 +394,13 @@ def test_radiative_config_hash_still_matches_the_committed_evidence():
 
 def test_insolation_specs_resolve_through_the_shared_illumination():
     from tropoi.run.radiative.model import build_insolation
-    ins = build_insolation({"kind": "diurnal_mean", "stellar_constant": 50.7})
+    ins = build_insolation({"kind": "diurnal_mean", "stellar_constant": 50.7,
+                            "period": 1.0e8})
     assert isinstance(ins, DiurnalMeanInsolation)
-    assert ins.illumination.irradiance_at_semimajor == 50.7
     lat = np.array([0.0])
     flux, mu0 = ins(lat, 0 * lat, 0.0)
     assert flux[0] == pytest.approx(50.7 / math.pi, rel=1e-12)   # SL09 form
-    inst = build_insolation({"kind": "instantaneous", "stellar_constant": 100.0,
-                             "solar_day": 86400.0})
-    assert inst.solar_day == 86400.0
+    inst = build_insolation({"kind": "orbital", "stellar_constant": 100.0,
+                             "period": 1.0e8, "spin": {"mean_solar_day": 86400.0}})
+    assert isinstance(inst, OrbitalInsolation)
+    assert inst.illumination.mean_solar_day == pytest.approx(86400.0, rel=1e-13)

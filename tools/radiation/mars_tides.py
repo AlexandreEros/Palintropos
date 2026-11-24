@@ -6,8 +6,11 @@ to it and no event is appended), and integrates ``--sols`` more sols in
 memory, recording surface pressure, surface temperature and lowest-level air
 temperature at every step.
 
-Each field is fitted per latitude in the sun-synchronous basis of the
-insolation, ``h = longitude + 2 pi t / solar_day`` (``h = 0`` is local noon):
+Each field is fitted per latitude in the mean-solar-time basis
+``h = longitude + 2 pi t / solar_day`` (``h = 0`` is local mean noon), with
+``solar_day`` the mean solar day of the run's orbital geometry. Runs recorded
+before Planet One used a uniform hour angle with exactly that period; current
+runs include the equation of time, which this basis averages over:
 
     x(lon, t) = a(lon) + b(lon) t + sum_{n=1,2} [A_n cos(n h) + B_n sin(n h)],
 
@@ -147,7 +150,7 @@ def main() -> None:
     last = args.window == "last"
     cfg, model, coupling, stepper, physics, ckpt = _restore(
         args.run, -2 if last else -1, args.accept_platform_rounding)
-    solar_day = float(physics.insolation.solar_day)
+    solar_day = float(physics.insolation.illumination.mean_solar_day)
     K = model.nlev
     lat = np.asarray(cp.asnumpy(coupling.latitude))
     lon = np.asarray(cp.asnumpy(coupling.longitude))

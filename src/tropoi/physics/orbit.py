@@ -46,8 +46,8 @@ import numpy as np
 
 from tropoi.physics.constants import AU_M
 
-__all__ = ["KeplerOrbit", "eccentric_from_true", "mean_from_true",
-           "true_from_eccentric", "true_from_mean"]
+__all__ = ["KeplerOrbit", "eccentric_from_mean", "eccentric_from_true",
+           "mean_from_true", "true_from_eccentric", "true_from_mean"]
 
 _TWO_PI = 2.0 * math.pi
 
@@ -70,13 +70,38 @@ def mean_from_true(nu: float, e: float) -> float:
     return ecc - e * math.sin(ecc)
 
 
-def true_from_mean(mean: float, e: float, *, iterations: int = 50) -> float:
-    """True anomaly nu from mean anomaly: Newton on Kepler's equation."""
-    mean = mean % _TWO_PI
-    ecc = mean
-    for _ in range(iterations):
-        ecc -= (ecc - e * math.sin(ecc) - mean) / (1.0 - e * math.cos(ecc))
-    return true_from_eccentric(ecc, e)
+def eccentric_from_mean(mean: float, e: float) -> float:
+    """Solve Kepler's equation ``E - e sin E = M`` for the eccentric
+    anomaly, with M reduced to [-pi, pi) so that E stays small near
+    periapsis, where 1 - e cos E is smallest.
+
+    Uses Newton iteration from ``M + e sin M`` (or from +-pi when
+    e > 0.8). It stops when the residual reaches round-off, 4 eps (|M| + 1),
+    or when the correction stops shrinking. It raises if the residual never
+    reaches round-off."""
+    eps = 2.220446049250313e-16
+    mean = (mean + math.pi) % _TWO_PI - math.pi
+    ecc = (math.copysign(math.pi, mean) if e > 0.8
+           else mean + e * math.sin(mean))
+    floor = 4.0 * eps * (abs(mean) + 1.0)
+    previous = math.inf
+    for _ in range(100):
+        f = ecc - e * math.sin(ecc) - mean
+        if abs(f) <= floor:
+            return ecc
+        step = f / (1.0 - e * math.cos(ecc))
+        if abs(step) >= previous and abs(step) <= 1e-12:
+            break
+        previous = abs(step)
+        ecc -= step
+    if abs(ecc - e * math.sin(ecc) - mean) <= 16.0 * floor:
+        return ecc
+    raise ArithmeticError(f"Kepler solve did not converge (M={mean}, e={e})")
+
+
+def true_from_mean(mean: float, e: float) -> float:
+    """True anomaly nu in [0, 2 pi) from mean anomaly (Kepler's equation)."""
+    return true_from_eccentric(eccentric_from_mean(mean, e), e) % _TWO_PI
 
 
 def _finite(name: str, value: float) -> float:
@@ -205,18 +230,27 @@ class KeplerOrbit:
         return (self.semimajor_axis_m * (1.0 - e * e)
                 / (1.0 + e * math.cos(true_anomaly_rad)))
 
-    def position_at(self, true_anomaly_rad: float) -> np.ndarray:
-        """Position vector (m) in the reference frame at true anomaly nu:
-        the standard rotation by (Omega, i, omega) of the in-plane ellipse."""
+    def orbit_to_inertial(self) -> np.ndarray:
+        """R_OI = R_z(Omega) R_x(i): its columns are the orbit frame's axes
+        (x along the ascending node, z along the orbit normal) expressed in
+        the inertial reference frame."""
+        from tropoi.physics.rotation import rotation_x, rotation_z
+        return rotation_z(self.ascending_node_rad) @ rotation_x(self.inclination_rad)
+
+    def position_in_orbit_frame(self, true_anomaly_rad: float) -> np.ndarray:
+        """Position vector (m) in the orbit frame: r (cos u, sin u, 0), with
+        the argument of latitude u = omega + nu."""
         nu = float(true_anomaly_rad)
         r = self.radius_at(nu)
-        u = self.argument_of_periapsis_rad + nu      # argument of latitude
-        co, so = math.cos(self.ascending_node_rad), math.sin(self.ascending_node_rad)
-        cu, su = math.cos(u), math.sin(u)
-        ci, si = math.cos(self.inclination_rad), math.sin(self.inclination_rad)
-        return r * np.array([co * cu - so * su * ci,
-                             so * cu + co * su * ci,
-                             su * si])
+        u = self.argument_of_periapsis_rad + nu
+        return np.array([r * math.cos(u), r * math.sin(u), 0.0])
+
+    def position_at(self, true_anomaly_rad: float) -> np.ndarray:
+        """Position vector (m) in the inertial reference frame at true
+        anomaly nu: R_z(Omega) R_x(i) R_z(omega) applied to the in-plane
+        ellipse."""
+        return self.orbit_to_inertial() @ self.position_in_orbit_frame(
+            true_anomaly_rad)
 
     # -- propagation -------------------------------------------------------------
 

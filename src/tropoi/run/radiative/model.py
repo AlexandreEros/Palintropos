@@ -14,9 +14,7 @@ import numpy as np
 
 from tropoi.physics.column_model import ColumnPhysics, RadiativeConvectiveColumn
 from tropoi.physics.convection import DryConvectiveAdjustment
-from tropoi.physics.insolation import (DiurnalMeanInsolation, InstantaneousInsolation,
-                                       PrescribedInsolation, StellarIllumination,
-                                       TidallyLockedInsolation, frierson_net_surface_flux)
+from tropoi.physics.insolation import PrescribedInsolation, insolation_from_spec
 from tropoi.physics.radiation.gray import (GrayLongwave, GrayShortwave, OpticalDepthProfile,
                                            SemiInfiniteScatteringShortwave, VerticalPathShortwave,
                                            frierson_longwave)
@@ -146,27 +144,9 @@ def build_radiation(cfg: RadiativeConfig) -> Radiation:
 
 
 def build_insolation(spec: Optional[dict]):
-    if spec is None:
-        return None
-    kind = spec["kind"]
-    if kind == "frierson":
-        return frierson_net_surface_flux(**_options(spec, net_solar_constant=938.4,
-                                                    delta_s=1.4))
-    if kind == "uniform":
-        flux = float(_options(spec, "flux")["flux"])
-        return PrescribedInsolation(lambda lat: flux + 0.0 * lat, "uniform", {"flux": flux})
-    if kind == "tidally_locked":
-        return TidallyLockedInsolation(**_options(spec, "stellar_constant",
-                                                  substellar_longitude=0.0))
-    if kind in ("diurnal_mean", "instantaneous"):
-        o = _options(spec, "stellar_constant", period=365.25 * DAY_SECONDS, eccentricity=0.0,
-                     obliquity_deg=0.0, perihelion_longitude_deg=0.0, time_of_perihelion=0.0,
-                     **({"solar_day": DAY_SECONDS} if kind == "instantaneous" else {}))
-        solar_day = o.pop("solar_day", None)
-        illumination = StellarIllumination.prescribed(**o)
-        return (DiurnalMeanInsolation(illumination) if kind == "diurnal_mean"
-                else InstantaneousInsolation(illumination, solar_day))
-    raise ValueError(f"unknown insolation kind {kind!r}")
+    """The configured insolation (see
+    :func:`tropoi.physics.insolation.insolation_from_spec`)."""
+    return insolation_from_spec(spec)
 
 
 def _global_mean_insolation(cfg: RadiativeConfig) -> Optional[PrescribedInsolation]:

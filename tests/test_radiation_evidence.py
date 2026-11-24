@@ -332,11 +332,16 @@ def test_the_implicit_pair_ran_from_one_commit_on_the_machine_its_names_record()
     assert s1["events"]["last"] <= s2["events"]["first"]          # one after the other
 
 
-def test_the_implicit_presets_reproduce_the_run_identities():
+def test_the_implicit_presets_reproduce_the_recorded_experiments():
+    """Identical to the recorded runs apart from the insolation, which is now
+    stated in the shared geometry (tests/insolation_migration.py)."""
+    from insolation_migration import assert_same_experiment_apart_from_insolation
     from tropoi.run.radiative.config import PRESETS
     preset = PRESETS["dev-mars-gray-flat-sponge-implicit"]
-    assert preset().sha256() == _summary(IMPLICIT_H)["config_sha256"]
-    assert preset(frictional_heating=False).sha256() == _summary(IMPLICIT_U)["config_sha256"]
+    for cfg, run in ((preset(), IMPLICIT_H), (preset(frictional_heating=False), IMPLICIT_U)):
+        recorded = json.loads((EVIDENCE / run / "config.json").read_text(encoding="utf-8"))
+        assert recorded["config_sha256"] == _summary(run)["config_sha256"]
+        assert_same_experiment_apart_from_insolation(cfg, recorded["config"])
 
 
 def test_the_implicit_energy_verdicts_follow_from_the_committed_series():

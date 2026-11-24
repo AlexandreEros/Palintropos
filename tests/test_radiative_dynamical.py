@@ -87,16 +87,20 @@ def test_presets_default_to_frictional_heating_and_name_the_recorded_runs(
     recorded for them: the heated default is the configuration of the
     committed heated run, and ``frictional_heating=False`` is the
     configuration of the committed unheated run, hash for hash."""
+    from insolation_migration import assert_same_experiment_apart_from_insolation
     on = PRESETS[preset]()
     assert on.frictional_heating is True
-    assert on.sha256() == _recorded(heated)["config_sha256"]
-    assert on.sha256().startswith(heated_prefix)
-    assert on.to_dict() == _recorded(heated)["config"]
-
+    assert_same_experiment_apart_from_insolation(on, _recorded(heated)["config"])
     off = PRESETS[preset](frictional_heating=False)
     assert off.frictional_heating is False
     assert "frictional_heating" not in off.to_dict()
-    assert off.sha256() == _recorded(unheated)["config_sha256"] == unheated_digest
+    assert_same_experiment_apart_from_insolation(off, _recorded(unheated)["config"])
+    assert _recorded(unheated)["config_sha256"] == unheated_digest
+    assert _recorded(heated)["config_sha256"].startswith(heated_prefix)
+    # Presets whose insolation form did not change keep the recorded hashes.
+    if on.to_dict()["insolation"] == _recorded(heated)["config"]["insolation"]:
+        assert on.sha256() == _recorded(heated)["config_sha256"]
+        assert off.sha256() == unheated_digest
     assert RadiativeConfig.from_dict(json.loads(on.canonical_json())) == on
     assert RadiativeConfig.from_dict(json.loads(off.canonical_json())) == off
 
@@ -133,9 +137,11 @@ def test_the_command_line_resolves_the_heating_flags(capsys, tmp_path, preset, h
         return json.loads(capsys.readouterr().out)["config_sha256"]
 
     heated_digest = _recorded(heated)["config_sha256"]
-    assert digest("--preset", preset) == heated_digest
-    assert digest("--preset", preset, "--frictional-heating") == heated_digest
-    assert digest("--preset", preset, "--no-frictional-heating") == unheated_digest
+    preset_on = PRESETS[preset]().sha256()
+    preset_off = PRESETS[preset](frictional_heating=False).sha256()
+    assert digest("--preset", preset) == preset_on
+    assert digest("--preset", preset, "--frictional-heating") == preset_on
+    assert digest("--preset", preset, "--no-frictional-heating") == preset_off
     # a configuration file means what it says unless a flag overrides it
     files = {}
     for run in (heated, unheated):
@@ -488,12 +494,14 @@ def test_the_flat_mars_development_preset_matches_m_i_where_it_claims_to():
     assert physics.radiation.longwave.profile.reference == 610.0
     # diurnal + seasonal forcing, year starting at the northern spring equinox
     ins = build_insolation(cfg.insolation)
-    assert ins.solar_day == 88440.0
     ill = ins.illumination
-    assert ill.solar_longitude(0.0) % (2.0 * math.pi) == pytest.approx(0.0, abs=1e-12)
-    assert math.degrees(ill.solar_longitude(ill.time_of_periapsis_s)) % 360.0 == \
-        pytest.approx(250.85, abs=1e-9)
-    assert ill.as_dict()["eccentricity"] == 0.0935
+    assert ill.mean_solar_day == pytest.approx(88440.0, rel=1e-13)
+    assert ill.subsolar_point(0.0)[1] == pytest.approx(0.0, abs=1e-12)   # noon at 0E
+    ls0 = ill.solar_longitude(0.0)
+    assert min(ls0, 2.0 * math.pi - ls0) == pytest.approx(0.0, abs=1e-12)
+    t_peri = cfg.insolation["time_of_perihelion"]
+    assert math.degrees(ill.solar_longitude(t_peri)) % 360.0 == pytest.approx(250.85, abs=1e-9)
+    assert ill.eccentricity == 0.0935
     assert RadiativeConfig.from_dict(json.loads(cfg.canonical_json())) == cfg
 
 
@@ -541,9 +549,11 @@ def test_the_sponge_is_left_out_of_configurations_without_it():
     ev = pathlib.Path(__file__).resolve().parents[1] / "docs" / "radiation" / "evidence"
     for preset_kw, run in (({}, "dev-mars-gray-flat-heated-T21L25-30d-b3aaef8-l4"),
                            ({"frictional_heating": False}, "dev-mars-gray-flat-T21L25-30d-b3aaef8-l4")):
+        from insolation_migration import assert_same_experiment_apart_from_insolation
         cfg = PRESETS["dev-mars-gray-flat"](**preset_kw)
         assert cfg.sponge is None and "sponge" not in cfg.to_dict()
-        assert cfg.sha256() == json.loads((ev / run / "config.json").read_text())["config_sha256"]
+        assert_same_experiment_apart_from_insolation(
+            cfg, json.loads((ev / run / "config.json").read_text())["config"])
 
 
 def test_the_sponge_preset_differs_from_the_pilot_by_the_sponge_alone():
@@ -582,9 +592,11 @@ def test_the_implicit_exchange_preset_moves_no_recorded_identity():
             ("dev-mars-gray-flat-sponge", {}, "dev-mars-gray-flat-sponge-heated-T21L25-30d-e38890e-l4"),
             ("dev-mars-gray-flat-sponge", {"frictional_heating": False},
              "dev-mars-gray-flat-sponge-T21L25-30d-e38890e-l4")):
+        from insolation_migration import assert_same_experiment_apart_from_insolation
         cfg = PRESETS[preset](**kw)
         assert "implicit" not in cfg.sensible
-        assert cfg.sha256() == json.loads((ev / run / "config.json").read_text())["config_sha256"]
+        assert_same_experiment_apart_from_insolation(
+            cfg, json.loads((ev / run / "config.json").read_text())["config"])
     cfg = PRESETS["dev-mars-gray-flat-sponge-implicit"]()
     assert cfg.experiment_id == "dev-mars-gray-flat-sponge-implicit-heated-T21L25"
     assert cfg.days == 60 and cfg.sensible["implicit"] is True

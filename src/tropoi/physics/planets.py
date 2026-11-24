@@ -17,11 +17,12 @@ is written in its own orbital plane with the reference direction at its
 northern spring equinox, so the orbit's longitude of periapsis *is* the
 solar longitude L_s of perihelion and the rotation's equinox longitude is 0.
 
-The body's ``illumination`` keeps the historically stated scalars exactly —
-the fact-sheet stellar constant and period — with the star, orbit and
-rotation attached as the shared objects they reduce from (the IAU nominal
-Sun's luminosity and the fact-sheet distances reproduce the stated
-constants to ~0.1 %, the accuracy of these round values).
+The body's ``illumination`` is the shared orbit/rotation geometry
+(:class:`~tropoi.physics.insolation.StellarIllumination`) built from the
+fact-sheet stellar constant (stated at the semimajor-axis distance), period,
+eccentricity, obliquity and L_s of perihelion. The spin is the sidereal
+angular speed (always >= 0): a retrograde rotator such as Venus has an
+obliquity above 90 degrees, and its body north is the right-hand-rule pole.
 
 Why each body carries its own vertical grid: the sigma interfaces must
 resolve the layers where radiation is absorbed and emitted. A grid that is
@@ -42,6 +43,7 @@ from dataclasses import dataclass, replace
 from typing import Optional
 
 from tropoi.physics.composition import COMPOSITIONS, Composition
+from tropoi.physics.constants import AU_M
 from tropoi.physics.insolation import StellarIllumination
 from tropoi.physics.orbit import KeplerOrbit
 from tropoi.physics.rotation import Rotation
@@ -91,8 +93,9 @@ class PlanetaryBody:
 
     @property
     def rotation_rate(self) -> float:
-        """rad s^-1 (negative = retrograde): the rotation's angular velocity."""
-        return self.rotation.angular_velocity
+        """rad s^-1 (>= 0): the sidereal angular speed about body north (the
+        right-hand-rule pole, so retrograde rotators have obliquity > 90 deg)."""
+        return self.rotation.angular_speed
 
     @property
     def gas_constant(self) -> float:
@@ -144,17 +147,15 @@ def _solar_body(*, name: str, radius: float, gravity: float,
                 stellar_constant: float, period: float, eccentricity: float,
                 obliquity_deg: float, perihelion_ls_deg: float,
                 semimajor_axis_au: float, **kw) -> PlanetaryBody:
-    """A body orbiting the Sun, with the historically stated scalars kept
-    exactly: the fact-sheet stellar constant and period drive the
-    illumination; the fact-sheet semimajor axis fixes the orbit geometry."""
-    rotation = Rotation.of(rotation_rate, obliquity_deg=obliquity_deg)
-    orbit = KeplerOrbit.from_au(semimajor_axis_au, eccentricity=eccentricity,
-                                periapsis_longitude_rad=math.radians(
-                                    perihelion_ls_deg))
-    illumination = StellarIllumination(
-        float(stellar_constant), float(period), float(eccentricity),
-        math.radians(obliquity_deg), math.radians(perihelion_ls_deg),
-        star=_SUN, orbit=orbit, rotation=rotation)
+    """A body orbiting the Sun: the fact-sheet stellar constant (at r = a)
+    and period drive the illumination; the fact-sheet semimajor axis sets
+    the orbit's scale."""
+    illumination = StellarIllumination.planet_centric(
+        irradiance_at_semimajor=float(stellar_constant), period_s=float(period),
+        eccentricity=float(eccentricity), obliquity_deg=float(obliquity_deg),
+        perihelion_ls_deg=float(perihelion_ls_deg), angular_speed=float(rotation_rate),
+        semimajor_axis_m=float(semimajor_axis_au) * AU_M, star=_SUN)
+    rotation, orbit = illumination.rotation, illumination.orbit
     return PlanetaryBody(name=name, radius=radius, gravity=gravity,
                          rotation=rotation,
                          composition=COMPOSITIONS[composition],
@@ -180,7 +181,7 @@ PLANETS: dict[str, PlanetaryBody] = {b.name: b for b in (
                 reference_temperature=200.0, temperature_range=(130.0, 290.0), bond_albedo=0.25,
                 vertical_grid=VerticalGridSpec(30, 2.0e-4, 0.15),
                 notes="no CO2 condensation, dust or seasonal mass cycle; top full level ~0.06 Pa"),
-    _solar_body(name="venus", radius=6.0518e6, gravity=8.87, rotation_rate=-2.9924e-7,
+    _solar_body(name="venus", radius=6.0518e6, gravity=8.87, rotation_rate=2.9924e-7,
                 composition="venus", reference_pressure=9.2e6, has_surface=True,
                 stellar_constant=2601.3, period=224.701 * DAY_SECONDS, eccentricity=0.0068,
                 obliquity_deg=177.36, perihelion_ls_deg=131.0, semimajor_axis_au=0.7233,
