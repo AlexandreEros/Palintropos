@@ -87,6 +87,19 @@ def test_layering_boundary_and_argument_errors():
             geometric_interfaces(top, depth, stretch=1.2)
 
 
+def test_layers_mode_near_uniform_and_argument_checks():
+    # Near ratio 1 the geometric sum is evaluated without cancellation.
+    e = geometric_interfaces(0.1, 1.0 + 1e-9, layers=10)
+    assert e[-1] == 1.0 + 1e-9 and np.all(_ratios(e) >= 1.0 - 1e-9)
+    with pytest.raises(ValueError, match="cannot reach depth"):
+        geometric_interfaces(0.02, 3.5, layers=5)          # needs a ratio of about 2.7
+    for bad in (2.9, True, "30"):
+        with pytest.raises((ValueError, TypeError)):
+            geometric_interfaces(0.02, 3.5, layers=bad)
+    with pytest.raises(ValueError):
+        ConductiveSubstrate(layers=29.9)
+
+
 def test_generated_grids_never_leave_the_ratio_bounds():
     rng = np.random.default_rng(3)
     accepted = rejected = 0
@@ -164,6 +177,14 @@ def test_historical_grids_fixture():
         e = np.asarray(e)
         assert e[0] == 0.0 and np.all(np.diff(e) > 0), key
         ConductiveSubstrate(interfaces=e)            # explicit grids are accepted as given
+    # Every gate grid of the original run is present. 'uniform:N=400' is the extra grid of
+    # the post hoc G1-C supplementary study (not a gate grid), kept so it is documented.
+    expected = {"default", "G4", "uniform:N=400"}
+    expected |= {f"G1M:P={p}" for p in (1.0, 2.0, 6.1, 20.0, 61.0, 200.0)}
+    expected |= {f"uniform:N={n}" for n in (25, 50, 100, 200)}
+    expected |= {f"G5b:periodic:P={p}:top={t}" for p in (1.0, 6.1, 61.0) for t in (0.005, 0.01, 0.02, 0.04)}
+    expected |= {f"G5b:step:top={t}" for t in (0.005, 0.01, 0.02, 0.04)}
+    assert set(grids) == expected
     # The documented historical defect: the 4 cm G5b grid ends with a ratio of 1.657.
     assert math.isclose(_ratios(grids["G5b:step:top=0.04"])[-1], 1.6565, abs_tol=1e-4)
 

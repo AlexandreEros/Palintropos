@@ -13,3 +13,5 @@ original stretch-mode grids, whose final-layer ratios lie outside [1, 1.5],
 and they are not regenerated. `tests/audit_substrate_gates.py --grids
 historical` uses them to reproduce the frozen results, and
 `tests/test_substrate.py` checks them.
+The fixture also holds `uniform:N=400`. That grid belongs to the post hoc G1-C
+supplementary study, not to a gate run, and the gate harness never requests it.

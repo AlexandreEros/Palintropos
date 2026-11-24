@@ -493,7 +493,10 @@ def gate_g5b():
                 row["skin_minus_T1_amplitude_K"] = float(abs(r) * np.max(np.abs(run["flux"])))
                 rows.append(row)
             _orders(rows, tops, ("identification", "diagnosed"), "complex_rel_err")
-            out["periodic"].append({"P_days": Pd, "dt": dt, "D_m": D, "rows": rows})
+            # D_m keeps the frozen run's meaning (the requested depth); the
+            # actual column depth of each grid is rows[*].depth_m.
+            out["periodic"].append({"P_days": Pd, "dt": dt, "D_m": D, "D_requested_m": D,
+                                    "rows": rows})
     for dt in (600.0, 60.0):
         rows = []
         F = 100.0

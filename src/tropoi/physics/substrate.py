@@ -56,6 +56,7 @@ ENERGY_REFERENCE_TEMPERATURE = 300.0
 SKIN_MODES = ("layer", "diagnosed")
 
 _MAX_STRETCH = 1.5
+_RATIO_TOL = 1e-9          # round-off allowance on the [1, 1.5] ratio guarantee
 
 
 def _xp(*arrays):
@@ -100,8 +101,9 @@ def geometric_interfaces(top_thickness: float, depth: float, *,
 
     **Ratio bounds.** The regolith specification requires only an upper
     bound, stretch <= 1.5. This function guarantees more: every
-    adjacent-layer ratio of a grid it returns lies in [1, 1.5], so thickness
-    never decreases with depth. Grids passed explicitly as ``interfaces`` to
+    adjacent-layer ratio of a grid it returns lies in [1, 1.5] (to a
+    round-off allowance of 1e-9, checked on return), so thickness never
+    decreases with depth. ``layers`` must be an integer. Grids passed explicitly as ``interfaces`` to
     :class:`ConductiveSubstrate`, for example uniform or historical fixture
     grids, are not subject to that guarantee."""
     top = float(top_thickness)
@@ -115,6 +117,8 @@ def geometric_interfaces(top_thickness: float, depth: float, *,
     if layers is not None and depth_is_minimum:
         raise ValueError("depth_is_minimum applies to stretch, not layers")
     if layers is not None:
+        if isinstance(layers, bool) or int(layers) != layers:
+            raise ValueError(f"layers must be an integer, got {layers!r}")
         n = int(layers)
         if n < 1:
             raise ValueError("layers must be >= 1")
@@ -124,13 +128,16 @@ def geometric_interfaces(top_thickness: float, depth: float, *,
             return (0.0, total)
         if top * n > total * (1.0 + 1e-12):
             raise ValueError("top_thickness * layers exceeds depth (ratio < 1)")
+        if _geometric_sum(top, _MAX_STRETCH, n) < total * (1.0 - 1e-12):
+            raise ValueError(f"{n} layers from top_thickness={top} cannot reach depth={total} "
+                             f"with a ratio <= {_MAX_STRETCH}")
         if math.isclose(top * n, total, rel_tol=1e-12):
             ratio = 1.0
         else:
             lo, hi = 1.0 + 1e-15, 2.0
             for _ in range(200):
                 mid = 0.5 * (lo + hi)
-                if top * (mid ** n - 1.0) / (mid - 1.0) < total:
+                if _geometric_sum(top, mid, n) < total:
                     lo = mid
                 else:
                     hi = mid
@@ -143,7 +150,7 @@ def geometric_interfaces(top_thickness: float, depth: float, *,
             edges.append(edges[-1] + t)
             t *= ratio
         edges.append(total)
-        return tuple(edges)
+        return _checked(edges)
     ratio = float(stretch)
     if not (math.isfinite(ratio) and 1.0 <= ratio <= _MAX_STRETCH):
         raise ValueError(f"stretch must lie in [1, {_MAX_STRETCH}]")
@@ -155,10 +162,10 @@ def geometric_interfaces(top_thickness: float, depth: float, *,
     gap = total - edges[-1]
     if gap <= 1e-12 * total:
         edges[-1] = total
-        return tuple(edges)
+        return _checked(edges)
     if depth_is_minimum:
         edges.append(edges[-1] + t)
-        return tuple(edges)
+        return _checked(edges)
     dz = [edges[i + 1] - edges[i] for i in range(len(edges) - 1)]
     candidates = []
     if len(dz) >= 2:                      # merge into the last layer (never the top one)
@@ -180,6 +187,27 @@ def geometric_interfaces(top_thickness: float, depth: float, *,
         edges[-1] = total
     else:
         edges.append(total)
+    return _checked(edges)
+
+
+def _geometric_sum(top: float, ratio: float, n: int) -> float:
+    """top * (ratio**n - 1) / (ratio - 1). Near ratio 1 it uses expm1/log1p to
+    avoid cancellation; the plain form is kept elsewhere, so the default grid's
+    arithmetic is unchanged."""
+    x = ratio - 1.0
+    if x < 1e-3:
+        return top * math.expm1(n * math.log1p(x)) / x
+    return top * (ratio ** n - 1.0) / (ratio - 1.0)
+
+
+def _checked(edges) -> tuple:
+    """Assert the documented ratio guarantee (to 1e-9 relative) on a generated grid."""
+    dz = [edges[i + 1] - edges[i] for i in range(len(edges) - 1)]
+    for i in range(1, len(dz)):
+        q = dz[i] / dz[i - 1]
+        if not (1.0 - _RATIO_TOL <= q <= _MAX_STRETCH + _RATIO_TOL):
+            raise ValueError(f"generated grid ratio {q!r} at layer {i} is outside "
+                             f"[1, {_MAX_STRETCH}]; this is a bug or a degenerate request")
     return tuple(edges)
 
 
