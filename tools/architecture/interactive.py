@@ -37,6 +37,7 @@ from __future__ import annotations
 import ast
 import hashlib
 import json
+import math
 import re
 from collections import Counter, defaultdict
 from pathlib import Path
@@ -135,9 +136,57 @@ def load_traces(root: Path, rel: str | None) -> list[dict]:
         if data.get("schema") not in TRACE_SCHEMAS:
             raise AtlasInputError(f"{name}: trace schema {data.get('schema')!r} not in "
                                   f"{TRACE_SCHEMAS} (re-capture with runtime_capture)")
+        _check_trace_types(name, data)
         data["_file"] = {"path": name, "sha256": _sha256_text(path)}
         traces.append(data)
     return traces
+
+
+def _is_int(x) -> bool:
+    return isinstance(x, int) and not isinstance(x, bool)
+
+
+def _is_real(x) -> bool:
+    return (_is_int(x) or isinstance(x, float)) and math.isfinite(x)
+
+
+def _check_trace_types(name: str, data: dict) -> None:
+    """Reject trace fields the page prints whose type is not the captured one.
+
+    ``align_trace`` copies these verbatim into the page; the template escapes
+    them too, but malformed evidence should fail here, not render (issue #62).
+    """
+    def bad(where: str, value) -> AtlasInputError:
+        return AtlasInputError(f"{name}: {where} has unexpected type or value {value!r}")
+
+    edges = data.get("edges", [])
+    if not isinstance(edges, list):
+        raise bad("'edges'", edges)
+    for i, e in enumerate(edges):
+        if not isinstance(e, dict):
+            raise bad(f"edge {i}", e)
+        for k in ("source", "target"):
+            if not isinstance(e.get(k), str):
+                raise bad(f"edge {i} {k!r}", e.get(k))
+        if "count" in e and not _is_int(e["count"]):
+            raise bad(f"edge {i} 'count'", e["count"])
+        if "wall_ns_inclusive" in e and not _is_real(e["wall_ns_inclusive"]):
+            raise bad(f"edge {i} 'wall_ns_inclusive'", e["wall_ns_inclusive"])
+        phases = e.get("phases", {})
+        if not isinstance(phases, dict) or not all(
+                isinstance(p, str) and _is_int(n) for p, n in phases.items()):
+            raise bad(f"edge {i} 'phases'", phases)
+        lines = e.get("lines", [])
+        if not isinstance(lines, list) or not all(
+                isinstance(x, list) and len(x) == 2 and _is_int(x[0]) and isinstance(x[1], str)
+                for x in lines):
+            raise bad(f"edge {i} 'lines'", lines)
+    boundaries = data.get("boundaries", [])
+    if not isinstance(boundaries, list):
+        raise bad("'boundaries'", boundaries)
+    for i, b in enumerate(boundaries):
+        if not isinstance(b, dict) or ("call_index" in b and not _is_int(b["call_index"])):
+            raise bad(f"boundary {i}", b)
 
 
 # ---------------------------------------------------------------------------
