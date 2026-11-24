@@ -15,13 +15,13 @@ Index: [all packages](../index.md) · parent [`tropoi`](tropoi.md) · [`tropoi.p
 | `tropoi.physics.composition` | code | `Composition`, `CompositionError` | `gas_constant_report` |
 | `tropoi.physics.constants` | code | – | – |
 | `tropoi.physics.convection` | code | `DryConvectiveAdjustment` | `neutral_profile` |
-| `tropoi.physics.insolation` | code | `DiurnalMeanInsolation`, `InstantaneousInsolation`, `PrescribedInsolation`, `StellarIllumination`, `TidallyLockedInsolation` | `frierson_net_surface_flux` |
+| `tropoi.physics.insolation` | code | `DiurnalMeanInsolation`, `LightSource`, `OrbitalInsolation`, `PrescribedInsolation`, `StellarIllumination` | `frierson_net_surface_flux`, `illumination_from_spec`, `insolation_from_spec` |
 | `tropoi.physics.monin_obukhov` | code | `MoninObukhovConvergenceError`, `MoninObukhovOptions`, `SurfaceExchange` | `diffusivities`, `solve_zeta`, `stability_derivative_m`, `stability_derivative_t`, `stability_integral_m`, `stability_integral_t`, `stable_mix`, `surface_drag` |
 | `tropoi.physics.monin_obukhov_cuda` | code | – | `clear_cache`, `kernel_available`, `surface_drag_fused` |
-| `tropoi.physics.orbit` | code | `KeplerOrbit` | `eccentric_from_true`, `mean_from_true`, `true_from_eccentric`, `true_from_mean` |
+| `tropoi.physics.orbit` | code | `KeplerOrbit` | `eccentric_from_mean`, `eccentric_from_true`, `mean_from_true`, `true_from_eccentric`, `true_from_mean` |
 | `tropoi.physics.planets` | code | `PlanetaryBody`, `VerticalGridSpec` | – |
 | `tropoi.physics.rayleigh` | code | `OpticalRecord` | `composition_cross_section`, `optical_records`, `rayleigh_cross_section` |
-| `tropoi.physics.rotation` | code | `Rotation` | – |
+| `tropoi.physics.rotation` | code | `Rotation` | `rotation_x`, `rotation_z` |
 | `tropoi.physics.species` | code | `Species` | `dataset_identities`, `load_dataset` |
 | `tropoi.physics.star` | code | `ApparentStar`, `Star` | `planck_radiance` |
 | `tropoi.physics.substrate` | code | `ConductiveSubstrate`, `SubstrateState` | `geometric_interfaces` |
@@ -71,12 +71,15 @@ flowchart LR
     n_tropoi_ophysics_ocolumn__model --> n_tropoi_ophysics_osurface
     n_tropoi_ophysics_ocomposition --> n_tropoi_ophysics_oconstants
     n_tropoi_ophysics_ocomposition --> n_tropoi_ophysics_ospecies
+    n_tropoi_ophysics_oinsolation --> n_tropoi_ophysics_oconstants
     n_tropoi_ophysics_oinsolation --> n_tropoi_ophysics_oorbit
     n_tropoi_ophysics_oinsolation --> n_tropoi_ophysics_orotation
     n_tropoi_ophysics_oinsolation --> n_tropoi_ophysics_ostar
     n_tropoi_ophysics_omonin__obukhov__cuda --> n_tropoi_ophysics_omonin__obukhov
     n_tropoi_ophysics_oorbit --> n_tropoi_ophysics_oconstants
+    n_tropoi_ophysics_oorbit -.-> n_tropoi_ophysics_orotation
     n_tropoi_ophysics_oplanets --> n_tropoi_ophysics_ocomposition
+    n_tropoi_ophysics_oplanets --> n_tropoi_ophysics_oconstants
     n_tropoi_ophysics_oplanets --> n_tropoi_ophysics_oinsolation
     n_tropoi_ophysics_oplanets --> n_tropoi_ophysics_oorbit
     n_tropoi_ophysics_oplanets --> n_tropoi_ophysics_orotation
@@ -183,10 +186,15 @@ classDiagram
     c_tropoi_ophysics_oinsolation_oDiurnalMeanInsolation : +#95;#95;call#95;#95;()
     c_tropoi_ophysics_oinsolation_oDiurnalMeanInsolation : +#95;#95;init#95;#95;()
     c_tropoi_ophysics_oinsolation_oDiurnalMeanInsolation : +signature()
-    class c_tropoi_ophysics_oinsolation_oInstantaneousInsolation["InstantaneousInsolation (physics.insolation)"]
-    c_tropoi_ophysics_oinsolation_oInstantaneousInsolation : +#95;#95;call#95;#95;()
-    c_tropoi_ophysics_oinsolation_oInstantaneousInsolation : +#95;#95;init#95;#95;()
-    c_tropoi_ophysics_oinsolation_oInstantaneousInsolation : +signature()
+    class c_tropoi_ophysics_oinsolation_oLightSource["LightSource (physics.insolation)"]
+    c_tropoi_ophysics_oinsolation_oLightSource : +#95;#95;post#95;init#95;#95;()
+    c_tropoi_ophysics_oinsolation_oLightSource : +position()
+    c_tropoi_ophysics_oinsolation_oLightSource : +to#95;dict()
+    class c_tropoi_ophysics_oinsolation_oOrbitalInsolation["OrbitalInsolation (physics.insolation)"]
+    c_tropoi_ophysics_oinsolation_oOrbitalInsolation : +#95;#95;call#95;#95;()
+    c_tropoi_ophysics_oinsolation_oOrbitalInsolation : +#95;#95;init#95;#95;()
+    c_tropoi_ophysics_oinsolation_oOrbitalInsolation : +incident()
+    c_tropoi_ophysics_oinsolation_oOrbitalInsolation : +signature()
     class c_tropoi_ophysics_oinsolation_oPrescribedInsolation["PrescribedInsolation (physics.insolation)"]
     c_tropoi_ophysics_oinsolation_oPrescribedInsolation : +#95;#95;call#95;#95;()
     c_tropoi_ophysics_oinsolation_oPrescribedInsolation : +#95;#95;init#95;#95;()
@@ -194,17 +202,23 @@ classDiagram
     class c_tropoi_ophysics_oinsolation_oStellarIllumination["StellarIllumination (physics.insolation)"]
     c_tropoi_ophysics_oinsolation_oStellarIllumination : +#95;#95;post#95;init#95;#95;()
     c_tropoi_ophysics_oinsolation_oStellarIllumination : +as#95;dict()
+    c_tropoi_ophysics_oinsolation_oStellarIllumination : +beams()
+    c_tropoi_ophysics_oinsolation_oStellarIllumination : +body#95;to#95;inertial()
     c_tropoi_ophysics_oinsolation_oStellarIllumination : +declination()
+    c_tropoi_ophysics_oinsolation_oStellarIllumination : +eccentricity
     c_tropoi_ophysics_oinsolation_oStellarIllumination : +flux#95;at()
     c_tropoi_ophysics_oinsolation_oStellarIllumination : +from#95;components()$
+    c_tropoi_ophysics_oinsolation_oStellarIllumination : +mean#95;motion
+    c_tropoi_ophysics_oinsolation_oStellarIllumination : +mean#95;solar#95;day
     c_tropoi_ophysics_oinsolation_oStellarIllumination : +obliquity#95;deg
-    c_tropoi_ophysics_oinsolation_oStellarIllumination : +prescribed()$
+    c_tropoi_ophysics_oinsolation_oStellarIllumination : +planet#95;centric()$
+    c_tropoi_ophysics_oinsolation_oStellarIllumination : +planet#95;position()
     c_tropoi_ophysics_oinsolation_oStellarIllumination : +solar#95;longitude()
+    c_tropoi_ophysics_oinsolation_oStellarIllumination : +star#95;direction()
+    c_tropoi_ophysics_oinsolation_oStellarIllumination : +subsolar#95;point()
     c_tropoi_ophysics_oinsolation_oStellarIllumination : +true#95;anomaly()
-    class c_tropoi_ophysics_oinsolation_oTidallyLockedInsolation["TidallyLockedInsolation (physics.insolation)"]
-    c_tropoi_ophysics_oinsolation_oTidallyLockedInsolation : +#95;#95;call#95;#95;()
-    c_tropoi_ophysics_oinsolation_oTidallyLockedInsolation : +#95;#95;init#95;#95;()
-    c_tropoi_ophysics_oinsolation_oTidallyLockedInsolation : +signature()
+    c_tropoi_ophysics_oinsolation_oStellarIllumination : +with#95;rotation()
+    c_tropoi_ophysics_oinsolation_oStellarIllumination : +with#95;subsolar#95;longitude#95;at()
     class c_tropoi_ophysics_omonin__obukhov_oMoninObukhovConvergenceError["MoninObukhovConvergenceError (physics.monin#95;obukhov)"]
     c_tropoi_ophysics_omonin__obukhov_oMoninObukhovConvergenceError : +#95;#95;init#95;#95;()
     c_tropoi_ophysics_omonin__obukhov_oMoninObukhovConvergenceError : external base RuntimeError
@@ -225,9 +239,11 @@ classDiagram
     c_tropoi_ophysics_oorbit_oKeplerOrbit : +from#95;period()$
     c_tropoi_ophysics_oorbit_oKeplerOrbit : +mean#95;anomaly#95;epoch#95;rad
     c_tropoi_ophysics_oorbit_oKeplerOrbit : +mean#95;motion()
+    c_tropoi_ophysics_oorbit_oKeplerOrbit : +orbit#95;to#95;inertial()
     c_tropoi_ophysics_oorbit_oKeplerOrbit : +periapsis#95;m
     c_tropoi_ophysics_oorbit_oKeplerOrbit : +period()
     c_tropoi_ophysics_oorbit_oKeplerOrbit : +position#95;at()
+    c_tropoi_ophysics_oorbit_oKeplerOrbit : +position#95;in#95;orbit#95;frame()
     c_tropoi_ophysics_oorbit_oKeplerOrbit : +radius#95;at()
     c_tropoi_ophysics_oorbit_oKeplerOrbit : +radius#95;at#95;time()
     c_tropoi_ophysics_oorbit_oKeplerOrbit : +to#95;dict()
@@ -251,10 +267,15 @@ classDiagram
     c_tropoi_ophysics_orayleigh_oOpticalRecord : +refractivity()
     class c_tropoi_ophysics_orotation_oRotation["Rotation (physics.rotation)"]
     c_tropoi_ophysics_orotation_oRotation : +#95;#95;post#95;init#95;#95;()
+    c_tropoi_ophysics_orotation_oRotation : +body#95;to#95;orbit()
     c_tropoi_ophysics_orotation_oRotation : +from#95;period()$
+    c_tropoi_ophysics_orotation_oRotation : +is#95;retrograde
     c_tropoi_ophysics_orotation_oRotation : +obliquity#95;deg
     c_tropoi_ophysics_orotation_oRotation : +of()$
+    c_tropoi_ophysics_orotation_oRotation : +prime#95;meridian#95;angle()
+    c_tropoi_ophysics_orotation_oRotation : +resonant()$
     c_tropoi_ophysics_orotation_oRotation : +sidereal#95;period#95;s
+    c_tropoi_ophysics_orotation_oRotation : +synchronous()$
     c_tropoi_ophysics_orotation_oRotation : +to#95;dict()
     c_tropoi_ophysics_orotation_oRotation : +with#95;()
     class c_tropoi_ophysics_ospecies_oSpecies["Species (physics.species)"]

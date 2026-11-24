@@ -9,13 +9,13 @@ Nodes are analysed modules; a directed edge A -> B means A has at least one stat
 * **all imports**: every static import statement, wherever it appears;
 * **import-time**: only edges with at least one import statement at module scope (executed when the importing module is imported). Edges made only of function-scope or `if TYPE_CHECKING:` imports are dropped.
 
-Edge counts by scope set: `function`: 184, `function+module`: 7, `function+type_checking`: 1, `module`: 295, `type_checking`: 6.
+Edge counts by scope set: `function`: 185, `function+module`: 7, `function+type_checking`: 1, `module`: 297, `type_checking`: 6.
 
 | Metric | all imports | import-time |
 |---|---|---|
 | Nodes \|V\| | 158 | 158 |
-| Directed edges \|E\| | 493 | 302 |
-| Density | 0.019874 | 0.012174 |
+| Directed edges \|E\| | 496 | 304 |
+| Density | 0.019995 | 0.012255 |
 | Weakly connected components | 2 | 8 |
 | WCC sizes | 157, 1 | 144, 8, 1, 1, 1, 1, 1, 1 |
 | Strongly connected components | 158 | 158 |
@@ -28,23 +28,23 @@ Edge counts by scope set: `function`: 184, `function+module`: 7, `function+type_
 | Reciprocal pairs | 0 | 0 |
 | Reciprocity | 0 | 0 |
 | In-degree min / median / max | 0 / 2 / 17 | 0 / 1 / 14 |
-| In-degree mean | 3.120253 | 1.911392 |
+| In-degree mean | 3.139241 | 1.924051 |
 | In-degree quartiles | 1, 2, 4 | 0, 1, 2 |
 | In-degree zeros | 6 | 42 |
 | Out-degree min / median / max | 0 / 2 / 23 | 0 / 1 / 9 |
-| Out-degree mean | 3.120253 | 1.911392 |
+| Out-degree mean | 3.139241 | 1.924051 |
 | Out-degree quartiles | 0, 2, 5 | 0, 1, 3 |
 | Out-degree zeros | 41 | 54 |
 | Condensation nodes | 158 | 158 |
-| Condensation edges | 493 | 302 |
+| Condensation edges | 496 | 304 |
 | Condensation sources / sinks | 6 / 41 | 42 / 54 |
 | Condensation longest path (edges) | 14 | 7 |
 
-In-degree histogram (all imports) {degree: modules}: 0: 6, 1: 44, 2: 41, 3: 19, 4: 14, 5: 10, 6: 6, 7: 4, 8: 5, 9: 2, 10: 3, 11: 1, 12: 2, 17: 1
+In-degree histogram (all imports) {degree: modules}: 0: 6, 1: 44, 2: 40, 3: 20, 4: 14, 5: 10, 6: 6, 7: 3, 8: 5, 9: 3, 10: 3, 11: 1, 12: 2, 17: 1
 
-Out-degree histogram (all imports) {degree: modules}: 0: 41, 1: 29, 2: 22, 3: 14, 4: 10, 5: 11, 6: 5, 7: 7, 8: 5, 9: 3, 10: 6, 11: 2, 13: 1, 19: 1, 23: 1
+Out-degree histogram (all imports) {degree: modules}: 0: 41, 1: 28, 2: 23, 3: 13, 4: 11, 5: 11, 6: 4, 7: 8, 8: 5, 9: 3, 10: 6, 11: 2, 13: 1, 19: 1, 23: 1
 
-**Top 10 fan-in (all imports)** (ties at cutoff: 5)
+**Top 10 fan-in (all imports)** (ties at cutoff: 3)
 
 | Node | Degree |
 |---|---|
@@ -55,9 +55,9 @@ Out-degree histogram (all imports) {degree: modules}: 0: 41, 1: 29, 2: 22, 3: 14
 | `tropoi.representation.visual.normalization` | 10 |
 | `tropoi.spatial.specification` | 10 |
 | `tropoi.spatial.states.primitive_equations` | 10 |
+| `tropoi.physics.constants` | 9 |
 | `tropoi.spatial.laplacian` | 9 |
 | `tropoi.temporal.integration` | 9 |
-| `tropoi.representation.archive.initial_state` | 8 |
 
 **Top 10 fan-out (all imports)** (ties at cutoff: 6)
 
@@ -84,7 +84,7 @@ None.
 
 ## Package-aggregated import graph
 
-Every module is mapped to its containing package (a package's `__init__` to the package itself) and parallel edges merged; edges inside one package are not self-loops but are counted separately: 175 module edges stay inside their package.
+Every module is mapped to its containing package (a package's `__init__` to the package itself) and parallel edges merged; edges inside one package are not self-loops but are counted separately: 178 module edges stay inside their package.
 
 | Metric | packages |
 |---|---|
@@ -214,9 +214,9 @@ Module-level import edges involved: 2.
 
 ## Call graph
 
-* Nodes (functions, methods, classes): 2054
-* Edges by kind: `call` 1428, `constructor` 72, `instantiate` 533, `override` 6, `self` 365, `super` 4
-* Call sites by resolution outcome: builtin 4138, external 2691, internal 3198, unresolved 4238
+* Nodes (functions, methods, classes): 2079
+* Edges by kind: `call` 1436, `constructor` 71, `instantiate` 535, `override` 6, `self` 378, `super` 4
+* Call sites by resolution outcome: builtin 4196, external 2705, internal 3221, unresolved 4260
 
 | Scoped graph | Roots | Depth | Nodes | Edges | Truncated nodes | Reachable (unbounded) |
 |---|---|---|---|---|---|---|
@@ -231,7 +231,7 @@ Module-level import edges involved: 2.
 | `calls/cli-run-pe.mmd` | `tropoi.cli.main._cmd_run_pe` | 4 | 57 | 66 | 19 | 180 |
 | `calls/cli-run-swe.mmd` | `tropoi.cli.main._cmd_run_swe` | 4 | 83 | 120 | 15 | 220 |
 | `calls/cli-terrain-run-prepare.mmd` | `tropoi.cli.terrain.run_prepare` | 4 | 46 | 63 | 4 | 98 |
-| `calls/cli-view.mmd` | `tropoi.cli.main._cmd_view` | 4 | 9 | 8 | 2 | 64 |
+| `calls/cli-view.mmd` | `tropoi.cli.main._cmd_view` | 4 | 9 | 8 | 2 | 72 |
 | `calls/custom-initial-states.mmd` | `tropoi.run.custom.execute.run_initial_state`, `tropoi.run.custom.presets.initial_state_from_preset`, `tropoi.run.custom.prepare.prepare_bve_state`, `tropoi.run.custom.prepare.prepare_swe_state` | 4 | 135 | 212 | 12 | 254 |
 | `calls/sky-hypothetical.mmd` | `tropoi.representation.visual.sky.write_sky_page`, `tropoi.representation.visual.sky.standalone_page` | 4 | 15 | 17 | 1 | 16 |
 | `calls/sky-numpy-reference.mmd` | `tropoi.representation.visual.sky.radiance_table`, `tropoi.representation.visual.sky.star_path_column`, `tropoi.representation.visual.sky.optical_depth_diagnostic`, `tropoi.physics.column.thin_atmosphere_mass_kg`, `tropoi.physics.column.thin_atmosphere_surface_pressure_pa`, `tropoi.physics.rayleigh.composition_cross_section` | 4 | 11 | 8 | 0 | 11 |
