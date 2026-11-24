@@ -61,7 +61,7 @@ from heat1d.solvers import computeCFL
 from tropoi.physics.insolation import insolation_from_spec
 from tropoi.physics.materials import ledlow_1992
 from tropoi.run.airless.config import VPW99, mercury_vpw99
-from tropoi.run.airless.experiment import AirlessRun
+from tropoi.run.airless.experiment import AirlessRun, load_tier2
 
 # (our top thickness, stretch), steps per cycle, heat1d (m, n): m nodes per skin
 # depth, node spacing growth 1 + 1/n
@@ -137,7 +137,7 @@ def main(argv=None) -> int:
         if not (rd / "retained" / "status.json").exists():
             AirlessRun(cfg, rd, workers=1, log=lambda s: None).run()
         status = json.loads((rd / "retained" / "status.json").read_text())
-        ev = np.load(rd / "retained" / "every_step.npy")          # (steps, 1+L, ncol)
+        ev = load_tier2(rd / "retained", "every_step")            # (steps, 1+L, ncol)
         centres = np.load(rd / "grid.npz")["centres"]
         ins = insolation_from_spec(cfg.illumination)
         dt = cfg.cycle_s / steps

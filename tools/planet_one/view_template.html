@@ -187,7 +187,7 @@ function drawSeries() {
   $("seriesTitle").textContent = `Surface temperature at ${D.eq_lat.toFixed(0)}°N`;
 }
 
-function profileFrame() { return Math.min(D.profile_frames - 1, Math.floor((frame + 1) * D.profile_frames / F) - 1 + (D.profile_frames >= F ? 0 : 0)); }
+function profileFrame() { return Math.max(0, Math.min(D.profile_frames - 1, Math.floor((frame + 1) * D.profile_frames / F) - 1)); }
 function drawProfile() {
   const c = $("profile"), g = c.getContext("2d"), W = c.width, H = c.height, m = {l: 50, r: 12, t: 10, b: 28};
   g.clearRect(0, 0, W, H); const [ia, ib] = pick, na = D.sub_lat.length, nb = D.sub_lon.length;
@@ -207,7 +207,7 @@ function drawProfile() {
 
 function drawSection() {
   const c = $("section"), g = c.getContext("2d"), W = c.width, H = c.height, m = {l: 50, r: 8, t: 8, b: 24};
-  const pf = profileFrame(), off = new OffscreenCanvas(NO, 120), og = off.getContext("2d"), im = og.createImageData(NO, 120);
+  const pf = Math.min(D.section_frames - 1, Math.floor((frame + 1) * D.section_frames / F) - 1 < 0 ? 0 : Math.floor((frame + 1) * D.section_frames / F) - 1), off = new OffscreenCanvas(NO, 120), og = off.getContext("2d"), im = og.createImageData(NO, 120);
   const zmax = D.centres[L - 1];
   for (let r = 0; r < 120; r++) { const z = (r / 119) ** 2 * zmax; let k = 0; while (k < L - 1 && D.centres[k + 1] < z) k++;
     for (let j = 0; j < NO; j++) { const i = lutIndex(temp(SEC, (pf * L + k) * NO + j)), p = (r * NO + j) * 4;

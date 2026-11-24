@@ -12,8 +12,11 @@ Run directory::
     cycles.json      per-cycle periodicity and energy diagnostics
     grid.npz         latitude/longitude (deg), area weights, depth faces
     series/cycle-KKKK.npz   per-step area-weighted global scalars (tier 1)
-    cycles/cycle-KKKK/      tier-2 samples of production cycles
-                            (the last three are kept)
+    cycles/cycle-KKKK/      tier-2 samples, streamed by each worker into
+                            memory-mapped per-block files (surface-bNNN.npy,
+                            profiles-bNNN.npy, every_step-bNNN.npy, blocks.json,
+                            integrals.npz); the last three cycles are kept.
+                            Read them with load_tier2.
     retained/        the cycle the result is quoted from (tier 2), with
                      its status (PERIODIC or TRANSIENT) in status.json
     SHA256SUMS
@@ -42,7 +45,7 @@ from tropoi.physics.substrate import ConductiveSubstrate
 from tropoi.run.airless.config import AirlessConfig, strata_from_dicts
 from tropoi.run.held_suarez.experiment import RunError, code_identity, environment_identity
 
-__all__ = ["AirlessRun", "build_columns", "build_substrate", "run_block"]
+__all__ = ["AirlessRun", "build_columns", "build_substrate", "load_tier2", "run_block"]
 
 
 def build_columns(cfg: AirlessConfig):
@@ -76,28 +79,53 @@ def build_substrate(cfg: AirlessConfig) -> ConductiveSubstrate:
 
 
 def run_block(cfg_dict: dict, lat_deg, lon_deg, weights, anomaly, surface_anomaly,
-              cycle: int, steps: int, record_profiles_every_step: bool):
+              cycle: int, steps: int, record_profiles_every_step: bool,
+              out_dir: str, prev_dir: Optional[str], block: int):
     """Advance one block of columns through illumination cycle ``cycle``
-    with ``steps`` steps. Returns the final state and the cycle's records.
-    Pure: everything it needs is in its arguments."""
+    with ``steps`` steps.
+
+    Tier-2 samples are streamed into this block's memory-mapped files in
+    ``out_dir`` (``surface-bNNN.npy`` (samples, 5, ncol), ``profiles-bNNN.npy``
+    (samples, L, ncol) and, for point runs, ``every_step-bNNN.npy``), so no
+    process holds a whole cycle in memory. When ``prev_dir`` holds the
+    previous cycle's files for the same block, sampled the same way, the
+    periodicity differences are computed here as the samples are written.
+    The function returns the final state, the tier-1 records and those
+    differences."""
+    from numpy.lib.format import open_memmap
+    from tropoi.physics.substrate import SubstrateState
     cfg = AirlessConfig.from_dict(cfg_dict)
     sub = build_substrate(cfg)
     ins = insolation_from_spec(cfg.illumination)
     lat, lon = np.radians(lat_deg), np.radians(lon_deg)
     nx, ny, nz = np.cos(lat) * np.cos(lon), np.cos(lat) * np.sin(lon), np.sin(lat)
-    from tropoi.physics.substrate import SubstrateState
     st = SubstrateState(np.array(anomaly, dtype=float), np.array(surface_anomaly, dtype=float))
     dt = cfg.cycle_s / steps
     # coarse spin-up cycles sample at the phases both cadences share
     n_surf = math.gcd(int(cfg.output["surface_samples"]), steps)
     n_prof = math.gcd(int(cfg.output["profile_samples"]), steps)
     every_s, every_p = steps // n_surf, steps // n_prof
-    ncol = lat.size
+    ncol, L = lat.size, sub.layers
+    out = pathlib.Path(out_dir)
+    tag = f"b{block:03d}"
+    surf = open_memmap(out / f"surface-{tag}.npy", "w+", np.float64, (n_surf, 5, ncol))
+    prof = open_memmap(out / f"profiles-{tag}.npy", "w+", np.float64, (n_prof, L, ncol))
+    every = (open_memmap(out / f"every_step-{tag}.npy", "w+", np.float64, (steps, 1 + L, ncol))
+             if record_profiles_every_step else None)
+    prev_s = prev_p = None
+    if prev_dir is not None:
+        ps, pp = (pathlib.Path(prev_dir) / f"surface-{tag}.npy",
+                  pathlib.Path(prev_dir) / f"profiles-{tag}.npy")
+        if ps.exists() and pp.exists():
+            prev_s, prev_p = np.load(ps, mmap_mode="r"), np.load(pp, mmap_mode="r")
+            if prev_s.shape != surf.shape or prev_p.shape != prof.shape:
+                prev_s = prev_p = None
+    d_s = d_p = 0.0
     E0 = np.asarray(sub.energy(st)).copy()
     sums = {k: np.zeros(ncol) for k in ("absorbed", "emitted", "conducted", "bottom",
                                         "residual", "tolerance", "abs_conducted")}
     max_ratio = np.zeros(ncol)
-    surf, prof, every = [], [], []
+    ts_lo, ts_hi = np.inf, -np.inf
     g_series = {k: np.zeros(steps) for k in ("energy_tendency", "net", "residual",
                                              "tolerance")}
     iters = np.zeros(steps, dtype=np.int32)
@@ -120,21 +148,62 @@ def run_block(cfg_dict: dict, lat_deg, lon_deg, weights, anomaly, surface_anomal
         g_series["tolerance"][n] = float(weights @ rep.tolerance_sum)
         iters[n] = rep.iterations
         if (n + 1) % every_s == 0:
+            k = (n + 1) // every_s - 1
             ts = sub.surface_temperature(st)
-            surf.append(np.stack([ts, sw, rep.absorbed, rep.emitted, rep.conducted]))
+            surf[k] = np.stack([ts, sw, rep.absorbed, rep.emitted, rep.conducted])
+            ts_lo, ts_hi = min(ts_lo, float(ts.min())), max(ts_hi, float(ts.max()))
+            if prev_s is not None:
+                d_s = max(d_s, float(np.max(np.abs(ts - prev_s[k, 0]))))
         if (n + 1) % every_p == 0:
-            prof.append(sub.temperature(st).copy())
-        if record_profiles_every_step:
-            every.append(np.concatenate([sub.surface_temperature(st)[None],
-                                         sub.temperature(st)]))
-    ext = sub.extent(st)
+            k = (n + 1) // every_p - 1
+            T = sub.temperature(st)
+            prof[k] = T
+            if prev_p is not None:
+                d_p = max(d_p, float(np.max(np.abs(T - prev_p[k]))))
+        if every is not None:
+            every[n, 0] = sub.surface_temperature(st)
+            every[n, 1:] = sub.temperature(st)
+    T_end = sub.temperature(st)
+    drift = (float(np.max(np.abs(T_end[-1] - prev_p[-1, -1]))) if prev_p is not None else None)
+    for arr in (surf, prof, every):
+        if arr is not None:
+            arr.flush()
+    del surf, prof, every, prev_s, prev_p
     return {
         "anomaly": st.anomaly, "surface_anomaly": st.surface_anomaly,
         "energy_start": E0, "energy_end": np.asarray(sub.energy(st)),
         "sums": sums, "max_ratio": max_ratio, "global": g_series, "iterations": iters,
-        "surface": np.stack(surf), "profiles": np.stack(prof),
-        "every_step": np.stack(every) if every else None, "extent": ext,
+        "compared": drift is not None, "d_s": d_s, "d_p": d_p, "drift": drift,
+        "surface_range": (ts_lo, ts_hi), "extent": sub.extent(st),
     }
+
+
+def load_tier2(cycle_dir, name: str, columns=None, mmap: bool = True):
+    """A tier-2 array of a cycle directory, joining the per-block files
+    along the column axis. ``columns`` (global column indices) restricts the
+    read so that large runs never load everything. The block layout is in
+    ``blocks.json``."""
+    d = pathlib.Path(cycle_dir)
+    layout = json.loads((d / "blocks.json").read_text())
+    parts = []
+    for b, (lo, hi) in enumerate(layout["ranges"]):
+        f = d / f"{name}-b{b:03d}.npy"
+        if not f.exists():
+            continue
+        a = np.load(f, mmap_mode="r" if mmap else None)
+        if columns is None:
+            parts.append(np.asarray(a))
+        else:
+            cols = np.asarray(columns)
+            sel = cols[(cols >= lo) & (cols < hi)] - lo
+            if sel.size:
+                parts.append(np.asarray(a[..., sel]))
+    if columns is not None:
+        # keep the order of ``columns``
+        joined = np.concatenate(parts, axis=-1)
+        order = np.argsort(np.argsort(np.asarray(columns)))
+        return joined[..., order]
+    return np.concatenate(parts, axis=-1)
 
 
 def _call(args):
@@ -207,29 +276,40 @@ class AirlessRun:
 
     # -- execution ------------------------------------------------------------------------
 
-    def _cycle(self, pool, state, cycle, steps, record_every):
+    def _cycle(self, pool, state, cycle, steps, record_every, prev_dir):
         n = self.lat.size
-        blocks = np.array_split(np.arange(n), self.workers)
+        blocks = [b for b in np.array_split(np.arange(n), self.workers) if b.size]
+        d = self._mkdir(f"cycles/cycle-{cycle:04d}")
+        (d / "blocks.json").write_text(json.dumps(
+            {"ranges": [[int(b[0]), int(b[-1]) + 1] for b in blocks], "steps": steps}))
         cfgd = self.cfg.to_dict()
         args = [(cfgd, self.lat[b], self.lon[b], self.w[b], state[0][:, b], state[1][b],
-                 cycle, steps, record_every) for b in blocks if b.size]
+                 cycle, steps, record_every, str(d), None if prev_dir is None else str(prev_dir), k)
+                for k, b in enumerate(blocks)]
         parts = pool.map(_call, args) if pool is not None else [_call(a) for a in args]
         out = {"anomaly": np.concatenate([p["anomaly"] for p in parts], axis=1),
                "surface_anomaly": np.concatenate([p["surface_anomaly"] for p in parts]),
                "energy_start": np.concatenate([p["energy_start"] for p in parts]),
                "energy_end": np.concatenate([p["energy_end"] for p in parts]),
                "max_ratio": np.concatenate([p["max_ratio"] for p in parts]),
-               "surface": np.concatenate([p["surface"] for p in parts], axis=2),
-               "profiles": np.concatenate([p["profiles"] for p in parts], axis=2),
-               "iterations": np.max([p["iterations"] for p in parts], axis=0)}
+               "iterations": np.max([p["iterations"] for p in parts], axis=0),
+               "dir": d, "compared": all(p["compared"] for p in parts),
+               "d_s": max(p["d_s"] for p in parts), "d_p": max(p["d_p"] for p in parts),
+               "drift": (max(p["drift"] for p in parts)
+                         if all(p["compared"] for p in parts) else None),
+               "surface_range": (min(p["surface_range"][0] for p in parts),
+                                 max(p["surface_range"][1] for p in parts))}
         out["sums"] = {k: np.concatenate([p["sums"][k] for p in parts]) for k in parts[0]["sums"]}
         out["global"] = {k: np.sum([p["global"][k] for p in parts], axis=0)
                          for k in parts[0]["global"]}
-        out["every_step"] = (np.concatenate([p["every_step"] for p in parts], axis=2)
-                             if record_every else None)
         ext = [p["extent"] for p in parts]
         out["extent"] = [(min(e[j][0] for e in ext), max(e[j][1] for e in ext))
                          for j in range(len(ext[0]))]
+        np.savez(d / "integrals.npz", energy_start=out["energy_start"],
+                 energy_end=out["energy_end"], max_ratio=out["max_ratio"], **out["sums"])
+        kept = sorted((self.dir / "cycles").iterdir())
+        for old in kept[:-3]:
+            shutil.rmtree(old)
         return out
 
     def run(self, max_wall_s: Optional[float] = None) -> dict:
@@ -252,9 +332,10 @@ class AirlessRun:
                 steps = cfg.spinup_cycle_steps if stage == "spinup" else cfg.cycle_steps
                 t0 = time.time()
                 res = self._cycle(pool, state, cycle, steps,
-                                  record_every and stage == "production")
+                                  record_every and stage == "production",
+                                  None if previous is None else previous["dir"])
                 state = (res["anomaly"], res["surface_anomaly"])
-                diag = self._diagnostics(res, previous, steps, stage, cycle)
+                diag = self._diagnostics(res, steps, stage, cycle)
                 diag["wall_s"] = time.time() - t0
                 history.append(diag)
                 self._write_json("cycles.json", history)
@@ -282,7 +363,6 @@ class AirlessRun:
                     return False
 
                 if stage == "production":
-                    self._keep_cycle(cycle, res)
                     passes = passes + 1 if diag["periodic"] else 0
                     if passes >= per["production_cycles_required"]:
                         status = "PERIODIC"
@@ -338,25 +418,12 @@ class AirlessRun:
         p.mkdir(parents=True, exist_ok=True)
         return p
 
-    def _keep_cycle(self, cycle, res):
-        d = self._mkdir(f"cycles/cycle-{cycle:04d}")
-        np.save(d / "surface.npy", res["surface"])          # (samples, 5 fields, ncol)
-        np.save(d / "profiles.npy", res["profiles"])        # (samples, L, ncol)
-        if res["every_step"] is not None:
-            np.save(d / "every_step.npy", res["every_step"])
-        np.savez(d / "integrals.npz", energy_start=res["energy_start"],
-                 energy_end=res["energy_end"], max_ratio=res["max_ratio"], **res["sums"])
-        kept = sorted((self.dir / "cycles").iterdir())
-        for old in kept[:-3]:
-            shutil.rmtree(old)
-
-    def _diagnostics(self, res, previous, steps, stage, cycle):
+    def _diagnostics(self, res, steps, stage, cycle):
         cfg, per = self.cfg, self.cfg.periodicity
         P = cfg.cycle_s
         dE = (res["energy_end"] - res["energy_start"]) / P
         s = res["sums"]
         w = self.w / self.w.sum()
-        bottom = res["profiles"][:, -1, :]
         diag = {"cycle": cycle, "stage": stage, "steps": steps, "dt_s": P / steps,
                 "max_energy_imbalance_W_m2": float(np.max(np.abs(dE))),
                 "mean_absorbed_W_m2": float(w @ (s["absorbed"] / P)),
@@ -365,21 +432,14 @@ class AirlessRun:
                     abs(w @ s["residual"]) / max(w @ s["tolerance"], 1e-300)),
                 "max_cell_residual_ratio": float(np.max(res["max_ratio"])),
                 "max_newton_iterations": int(np.max(res["iterations"])),
-                "extent_K": res["extent"],
-                "surface_T_range_K": [float(res["surface"][:, 0].min()),
-                                      float(res["surface"][:, 0].max())]}
+                "extent_K": res["extent"], "surface_T_range_K": list(res["surface_range"])}
         periodic = False
-        if previous is not None and previous["surface"].shape == res["surface"].shape:
-            d_s = float(np.max(np.abs(res["surface"][:, 0] - previous["surface"][:, 0])))
-            d_p = float(np.max(np.abs(res["profiles"] - previous["profiles"])))
-            drift = float(np.max(np.abs(bottom[-1] - previous["profiles"][-1, -1, :])))
-            diag.update(max_surface_change_K=d_s, max_subsurface_change_K=d_p,
-                        bottom_drift_K=drift)
-            periodic = (d_s <= per["surface_K"] and d_p <= per["subsurface_K"]
-                        and drift <= per["bottom_drift_K"]
+        if res["compared"]:
+            diag.update(max_surface_change_K=res["d_s"], max_subsurface_change_K=res["d_p"],
+                        bottom_drift_K=res["drift"])
+            periodic = (res["d_s"] <= per["surface_K"] and res["d_p"] <= per["subsurface_K"]
+                        and res["drift"] <= per["bottom_drift_K"]
                         and diag["max_energy_imbalance_W_m2"] <= per["energy_W_m2"])
-        elif previous is not None:
-            diag["note"] = "previous cycle sampled differently (stage change); not compared"
         diag["periodic"] = periodic
         return diag
 

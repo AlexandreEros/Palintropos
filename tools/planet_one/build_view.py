@@ -24,6 +24,7 @@ import sys
 import numpy as np
 
 from tropoi.physics.insolation import insolation_from_spec
+from tropoi.run.airless.experiment import load_tier2
 
 Q = 80.0          # quantization: 1/80 K per count
 
@@ -42,16 +43,18 @@ def build(run: pathlib.Path, frames: int, extras: dict) -> str:
     grid = np.load(run / "grid.npz")
     status = json.loads((run / "retained" / "status.json").read_text())
     cycles = json.loads((run / "cycles.json").read_text())
-    surf = np.load(run / "retained" / "surface.npy")       # (S, 5, ncol)
-    prof = np.load(run / "retained" / "profiles.npy")      # (Pn, L, ncol)
+    ret = run / "retained"
+    ts_all = load_tier2(ret, "surface")[:, 0, :]            # (S, ncol): T_s only
+    layout = json.loads((ret / "blocks.json").read_text())
+    prof_shape = np.load(ret / "profiles-b000.npy", mmap_mode="r").shape
     ints = np.load(run / "retained" / "integrals.npz")
-    S, Pn, L = surf.shape[0], prof.shape[0], prof.shape[1]
+    S, Pn, L = ts_all.shape[0], prof_shape[0], prof_shape[1]
     stride = max(1, S // frames)
     sel = np.arange(stride - 1, S, stride)                  # sample indices shown
     P = cfg["cycle_s"]
     cyc = status["cycle"]
     t_sel = cyc * P + (sel + 1) * P / S
-    ts = surf[:, 0, :].reshape(S, nlat, nlon)
+    ts = ts_all.reshape(S, nlat, nlon)
     lat = grid["lat_deg"].reshape(nlat, nlon)[:, 0]
     lon = grid["lon_deg"].reshape(nlat, nlon)[0]
     ieq = int(np.argmin(np.abs(lat)))
@@ -73,18 +76,20 @@ def build(run: pathlib.Path, frames: int, extras: dict) -> str:
                     round(pos[0] / a, 6), round(pos[1] / a, 6),
                     round(math.degrees(ill.true_anomaly(float(t))) % 360, 3),
                     round(ill.flux_at(float(t)), 1), round(math.degrees(w) % 360, 3)])
-    # equatorial section and a subset of columns for depth profiles
-    sec = prof.reshape(Pn, L, nlat, nlon)[:, :, ieq, :]           # (Pn, L, nlon)
-    sub_lat = [i for i in range(nlat) if abs(lat[i]) <= 89 and i % max(1, nlat // 12) == 0]
-    sub_lon = list(range(0, nlon, max(1, nlon // 24)))
-    cube = prof.reshape(Pn, L, nlat, nlon)
-    subset = cube[:, :, sub_lat, :][:, :, :, sub_lon]             # (Pn, L, a, b)
-    env_min, env_max = cube.min(axis=0), cube.max(axis=0)         # (L, nlat, nlon)
+    # equatorial section and a subset of columns for depth profiles, read
+    # column-selectively so that large runs are never loaded whole
+    sec = load_tier2(ret, "profiles", columns=ieq * nlon + np.arange(nlon))[1::2]  # (Pn/2, L, nlon)
+    sub_lat = sorted({int(np.argmin(np.abs(lat - v))) for v in (-75, -45, -15, 15, 45, 75)})
+    sub_lon = sorted({int(np.argmin(np.abs(((lon - v + 180) % 360) - 180)))
+                      for v in range(0, 360, 30)})
+    cols = np.array([i * nlon + j for i in sub_lat for j in sub_lon])
+    subset = load_tier2(ret, "profiles", columns=cols).reshape(Pn, L, len(sub_lat), len(sub_lon))
+    env_min, env_max = subset.min(axis=0), subset.max(axis=0)       # (L, a, b)
     w = grid["weights"] / grid["weights"].sum()
     last = cycles[-1]
     data = {
         "nlat": nlat, "nlon": nlon, "lat": lat.round(4).tolist(), "lon": lon.round(4).tolist(),
-        "frames": len(sel), "samples": S, "profile_frames": Pn, "L": L,
+        "frames": len(sel), "samples": S, "profile_frames": Pn, "section_frames": int(sec.shape[0]), "L": L,
         "centres": grid["centres"].round(6).tolist(), "interfaces": grid["interfaces"].round(6).tolist(),
         "period_days": P / 86400.0, "cycle": cyc, "orbit_days": P / 2 / 86400.0,
         "t_days": ((t_sel - cyc * P) / 86400.0).round(4).tolist(),
@@ -92,8 +97,7 @@ def build(run: pathlib.Path, frames: int, extras: dict) -> str:
         "surface": _pack(ts[sel]), "section": _pack(sec),
         "subset": _pack(subset), "sub_lat": [float(lat[i]) for i in sub_lat],
         "sub_lon": [float(lon[j]) for j in sub_lon],
-        "env_min": _pack(env_min[:, sub_lat][:, :, sub_lon]),
-        "env_max": _pack(env_max[:, sub_lat][:, :, sub_lon]),
+        "env_min": _pack(env_min), "env_max": _pack(env_max),
         "status": status, "experiment": cfg["experiment_id"],
         "config_sha256": meta["config_sha256"], "code": meta["code"],
         "provenance": cfg["provenance"], "strata": cfg["strata"],

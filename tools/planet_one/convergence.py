@@ -22,7 +22,7 @@ import numpy as np
 
 from tropoi.physics.constants import SIGMA_SB
 from tropoi.run.airless.config import PRESETS
-from tropoi.run.airless.experiment import AirlessRun
+from tropoi.run.airless.experiment import AirlessRun, load_tier2
 
 POINTS = {"lat_deg": [0.0, 0.0, 0.0, 0.0, 45.0, 85.0],
           "lon_deg": [0.0, 90.0, 180.0, 270.0, 0.0, 0.0]}
@@ -62,7 +62,7 @@ def quantities(run_dir: pathlib.Path) -> dict:
     P = cfgd["cycle_s"]
     grid = np.load(run_dir / "grid.npz")
     zc = grid["centres"]
-    ev = np.load(run_dir / "retained" / "every_step.npy")     # (steps, 1 + L, ncol)
+    ev = load_tier2(run_dir / "retained", "every_step")      # (steps, 1 + L, ncol)
     ints = np.load(run_dir / "retained" / "integrals.npz")
     steps = ev.shape[0]
     t = (np.arange(steps) + 1) / steps                         # cycle fraction
