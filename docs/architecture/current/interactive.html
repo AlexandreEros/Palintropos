@@ -99893,7 +99893,7 @@ null,
 }
 },
 "meta":{
-"base_commit":"be23cdaa3b4662f22e0fea79405f25721abd0b61",
+"base_commit":"0255a7f873fa52dde1ed1ecbebbc921cbdcb258d",
 "call_depth":4,
 "command":"python -m tools.architecture.generate",
 "dynamic_import_sites":{
@@ -297757,6 +297757,9 @@ const D=JSON.parse(document.getElementById('architecture-data').textContent);
 const ID=D.ids,N=D.nodes,P=D.proposal,EVI=D.meta.evidence,TRAV=new Set(D.meta.traversed);
 const $=id=>document.getElementById(id);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+// A data-derived scalar printed exactly as raw interpolation would (5 -> "5", null -> "null"),
+// but escaped: embedded numbers also come from committed trace files (issue #62).
+const num=x=>esc(String(x));
 const of=new Map(ID.map((x,i)=>[x,i]));
 const kindOf=i=>N[i][0],modOf=i=>N[i][1],lineOf=i=>N[i][2],pkgOf=i=>N[i][3],pathOf=i=>N[modOf(i)][4];
 const isMod=i=>['module','package','namespace'].includes(kindOf(i));
@@ -297795,7 +297798,7 @@ function search(q){q=q.trim().toLowerCase();if(!q)return [];const terms=q.split(
  for(let i=0;i<ID.length;i++){const hay=(ID[i]+' '+(pathOf(i)||'')).toLowerCase();if(terms.every(t=>hay.includes(t))&&inScope(i)){const last=ID[i].split('.').pop().toLowerCase();out.push([last===q?0:last.startsWith(q)?1:2,ID[i].length,i])}}
  out.sort((a,b)=>a[0]-b[0]||a[1]-b[1]);return out.map(x=>x[2])}
 // ---------- rendering helpers ----------
-const nodeBtn=(i,label)=>`<button class="link ${S.sel&&S.sel.t==='node'&&S.sel.i===i?'chosen':''}" data-node="${i}" title="${esc(ID[i])}">${esc(label??ID[i])}</button>`;
+const nodeBtn=(i,label)=>`<button class="link ${S.sel&&S.sel.t==='node'&&S.sel.i===i?'chosen':''}" data-node="${num(i)}" title="${esc(ID[i])}">${esc(label??ID[i])}</button>`;
 const ev=(cls,label)=>`<span class="ev ${esc(cls)}">${esc(label??cls)}</span>`;
 function srcLines(path,lo,hi,hits){const tbl=D.lines[path]||{};let out='',prev=null;for(let n=lo;n<=hi;n++){const t=tbl[n];if(t===undefined)continue;if(prev!==null&&n>prev+1)out+='<span class="gap">     …</span>\n';out+=`<span class="src${hits&&hits.includes(n)?' hit':''}"><span class="n">${n}</span>${esc(t)}</span>`;prev=n}return out?`<pre class="mono">${out}</pre>`:'<div class="note">Source line not embedded.</div>'}
 function sigText(i){const s=D.signatures[i];if(!s)return '';if(kindOf(i)==='class')return `class ${s[0]}(${(s[6]||[]).join(', ')})`;
@@ -297829,7 +297832,7 @@ function egoSvg(i,rel){const cap=12,W=760,BW=230,BH=22;const L=rel.inc.slice(0,c
  let s=`<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="neighbourhood of ${esc(ID[i])}">`;
  const place=(list,x,right)=>list.map((r,k)=>{const y=20+k*(BH+8)+(rows-list.length)*(BH+8)/2;const [col,dash]=STROKE[r.cls]||['#888',''];
   const x1=right?W/2+BW/2:W/2-BW/2,x2=right?x:x+BW;s+=`<path d="M${x1} ${cy} C ${(x1+x2)/2} ${cy}, ${(x1+x2)/2} ${y+BH/2}, ${x2} ${y+BH/2}" fill="none" stroke="${col}" stroke-width="${r.cls==='observed'?3:1.6}" ${dash?`stroke-dasharray="${dash}"`:''}><title>${esc(r.label)}</title></path>`;
-  s+=`<g class="nb" data-node="${r.other}" style="cursor:pointer"><rect x="${x}" y="${y}" width="${BW}" height="${BH}" rx="4"/><text x="${x+6}" y="${y+15}">${esc(tail(r.other).slice(0,34))}</text><title>${esc(ID[r.other])} (${esc(r.label)})</title></g>`});
+  s+=`<g class="nb" data-node="${num(r.other)}" style="cursor:pointer"><rect x="${x}" y="${y}" width="${BW}" height="${BH}" rx="4"/><text x="${x+6}" y="${y+15}">${esc(tail(r.other).slice(0,34))}</text><title>${esc(ID[r.other])} (${esc(r.label)})</title></g>`});
  place(L,8,false);place(R,W-BW-8,true);
  s+=`<g class="center"><rect x="${W/2-BW/2}" y="${cy-BH/2-2}" width="${BW}" height="${BH+4}" rx="5"/><text x="${W/2-BW/2+8}" y="${cy+5}">${esc(tail(i).slice(0,34))}</text></g>`;
  if(rel.inc.length>cap)s+=`<text x="8" y="${H-4}" class="muted">+${rel.inc.length-cap} more incoming (listed below)</text>`;if(rel.out.length>cap)s+=`<text x="${W-BW-8}" y="${H-4}">+${rel.out.length-cap} more outgoing (listed below)</text>`;
@@ -297837,7 +297840,7 @@ function egoSvg(i,rel){const cap=12,W=760,BW=230,BH=22;const L=rel.inc.slice(0,c
 function relRow(r,side,center){const label=r.rel==='call'?ev(r.cls,D.calls[r.k][2]):r.rel==='import'?ev(r.cls,'import '+r.label):ev('observed',r.label);
  const sites=r.rel==='call'?D.call_site_totals[r.k]:r.rel==='import'?D.import_sites[r.k].length+D.import_omitted[r.k]:null;const obs=r.rel==='call'?(obsOf.get(r.k)||[]).filter(([ti])=>traceOk(ti)).reduce((a,[ti,ei])=>a+D.traces[ti].edges[ei].count,0):0;
  const [s,t]=side==='out'?[center,r.other]:[r.other,center];
- return `<div class="row"><button data-edge="${r.rel}:${r.rel==='obs'?r.ti+':'+r.ei:r.k}" title="${esc(ID[s]+' → '+ID[t])}">${esc(side==='out'?'→ ':'← ')}${esc(ID[r.other])}</button>${label}${sites!=null?`<span class="pill">${sites} site${sites===1?'':'s'}</span>`:''}${obs?ev('observed','×'+obs):''}${crossBadge(s,t)}</div>`}
+ return `<div class="row"><button data-edge="${r.rel}:${r.rel==='obs'?r.ti+':'+r.ei:r.k}" title="${esc(ID[s]+' → '+ID[t])}">${esc(side==='out'?'→ ':'← ')}${esc(ID[r.other])}</button>${label}${sites!=null?`<span class="pill">${num(sites)} site${sites===1?'':'s'}</span>`:''}${obs?ev('observed','×'+obs):''}${crossBadge(s,t)}</div>`}
 function renderNeighborhood(){if(!S.sel)return intro();const i=S.sel.t==='node'?S.sel.i:edgeEnds(S.sel)[0];if(i==null)return '<div class="note">This runtime observation has no static node to centre on.</div>';
  const rel=relationsOf(i);let h=`<h2>${esc(ID[i])}</h2><div class="small muted">Immediate neighbourhood: incoming on the left, outgoing on the right. Click a box to move there. ${isMod(i)?'Module view shows import edges; select a function or class for calls.':'Function/class view shows static and observed calls.'}</div>`;
  h+=egoSvg(i,rel);if(isMod(i)){const defs=(children.get(i)||[]);const agg=new Map();for(const d of defs)for(const ci of callOut.get(d)||[]){const t=modOf(D.calls[ci][1]);if(t!==i)agg.set(t,(agg.get(t)||0)+1)}
@@ -297853,23 +297856,23 @@ function legend(){return `<h3>Evidence classes</h3><table>${Object.entries(EVI).
  <tr><td>${ev('observed','observed')}</td><td>A Python call seen in a named runtime capture (its own revision and provenance). Absence from a capture is not evidence of unused code.</td></tr>
  <tr><td>${ev('unresolved','unresolved')}</td><td>Call sites the static resolver did not bind (objects, parameters, callbacks, getattr, decorators). Counted per caller, never drawn as edges.</td></tr>
  <tr><td>${ev('import','import')} ${ev('type-only','type-only')}</td><td>Import edges (grimp), with statement scope: module, function, or TYPE_CHECKING (never executed).</td></tr></table>
- <h3>Static limits</h3><div class="note">${(D.meta.limits||[]).map(esc).join('; ')}. Dynamic import sites: ${Object.keys(D.meta.dynamic_import_sites||{}).length} module(s). Sites are capped at ${D.meta.max_sites} per edge; omissions are counted on each edge.</div>`}
+ <h3>Static limits</h3><div class="note">${(D.meta.limits||[]).map(esc).join('; ')}. Dynamic import sites: ${Object.keys(D.meta.dynamic_import_sites||{}).length} module(s). Sites are capped at ${num(D.meta.max_sites)} per edge; omissions are counted on each edge.</div>`}
 // ---------- inspector ----------
 function inspectNode(i){const k=kindOf(i);let h=`<div class="small muted">${esc(k)} · package ${esc(ID[pkgOf(i)])} · proposed ${esc(pgroup(i))}</div><h2>${esc(ID[i])}</h2>`;
- const path=pathOf(i);if(path)h+=`<div class="mono small">${esc(path)}${isMod(i)?'':':'+lineOf(i)}</div>`;
+ const path=pathOf(i);if(path)h+=`<div class="mono small">${esc(path)}${isMod(i)?'':':'+num(lineOf(i))}</div>`;
  const r=P.rule[i];h+=`<div class="note">Proposed owner <b>${esc(pgroup(i))}</b>: ${r>=0?`rule <code>${esc(P.rules[r].prefix)}</code>${P.rules[r].why?' — '+esc(P.rules[r].why):''}`:'no rule matches (unassigned)'}. Overlay only; nothing has moved.</div>`;
  if(!isMod(i)){const s=D.signatures[i];h+=`<h3>Definition</h3><pre class="mono">${esc(sigText(i))}</pre>`;if(s&&s[3])h+=`<div class="small">${esc(s[3])}</div>`;
   h+=srcLines(path,lineOf(i)-(s&&s[4]?s[4].length:0),lineOf(i)+12,[lineOf(i)]);
   const f=D.fields[i];if(f)h+=`<h3>Annotated fields (source contracts, verbatim)</h3><table><tr><th>field</th><th>annotation</th><th>default</th><th>comment on the line</th></tr>${f.map(r=>`<tr><td class="mono">${esc(r[0])}</td><td class="mono">${esc(r[1])}</td><td class="mono">${esc(r[2]??'')}</td><td>${esc(r[3]??'')}</td></tr>`).join('')}</table><div class="small muted">Units and meanings are shown only where the source states them; nothing is inferred from names.</div>`;
-  const u=D.unresolved[i];if(u)h+=`<h3>Calls without an edge</h3><div>${Object.entries(u[0]).map(([k,v])=>ev(k==='unresolved'?'unresolved':'structural',`${k} ${v}`)).join(' ')}</div>`+(u[1].length?`<table>${u[1].map(x=>`<tr><td class="mono">${x[0]}</td><td>${ev('unresolved',x[1])}</td><td class="mono">${esc(x[2])}</td></tr>`).join('')}</table>`:'');
- }else{const n=N[i];h+=`<div class="small">category ${esc(n[5])}${n[6]?` · <span style="color:var(--possible)">${n[6]} dynamic import site(s) not followed</span>`:''}</div>`}
+  const u=D.unresolved[i];if(u)h+=`<h3>Calls without an edge</h3><div>${Object.entries(u[0]).map(([k,v])=>ev(k==='unresolved'?'unresolved':'structural',`${k} ${v}`)).join(' ')}</div>`+(u[1].length?`<table>${u[1].map(x=>`<tr><td class="mono">${num(x[0])}</td><td>${ev('unresolved',x[1])}</td><td class="mono">${esc(x[2])}</td></tr>`).join('')}</table>`:'');
+ }else{const n=N[i];h+=`<div class="small">category ${esc(n[5])}${n[6]?` · <span style="color:var(--possible)">${num(n[6])} dynamic import site(s) not followed</span>`:''}</div>`}
  const inc=(isMod(i)?impIn:callIn).get(i)||[],out=(isMod(i)?impOut:callOut).get(i)||[];h+=`<div class="note">${out.length} outgoing · ${inc.length} incoming static ${isMod(i)?'import':'call'} edges.</div>`;
  h+=runtimeForNode(i);return h}
 function describe(v,depth=0){if(v==null)return '<span class="muted">—</span>';if(typeof v!=='object')return esc(String(v));
  if('shape' in v)return `<span class="mono">${esc(v.type)} ${esc(JSON.stringify(v.shape))} ${esc(v.dtype||'')} <b>${esc(v.location||'')}</b>${v.fingerprint?' sha256:'+esc(v.fingerprint.slice(0,12)):''}</span>`;
  if('value' in v)return `<span class="mono">${esc(v.type)} ${esc(JSON.stringify(v.value))}${v.truncated?'…':''}${v.redacted?' (redacted)':''}</span>`;
- let s=`<span class="mono">${esc(v.type||'?')}${v.length!=null?' len '+v.length:''}</span>`;if(v.fields&&depth<2)s+='<table>'+Object.entries(v.fields).map(([k,x])=>`<tr><td class="mono">${esc(k)}</td><td>${describe(x,depth+1)}</td></tr>`).join('')+'</table>';if(v.omitted)s+=` <span class="muted">(+${v.omitted} omitted)</span>`;return s}
-function boundaryHtml(b){let h=`<div class="small muted">phase ${esc(b.phase)} · call #${b.call_index} of ${esc(b.function)}</div>`;
+ let s=`<span class="mono">${esc(v.type||'?')}${v.length!=null?' len '+num(v.length):''}</span>`;if(v.fields&&depth<2)s+='<table>'+Object.entries(v.fields).map(([k,x])=>`<tr><td class="mono">${esc(k)}</td><td>${describe(x,depth+1)}</td></tr>`).join('')+'</table>';if(v.omitted)s+=` <span class="muted">(+${num(v.omitted)} omitted)</span>`;return s}
+function boundaryHtml(b){let h=`<div class="small muted">phase ${esc(b.phase)} · call #${num(b.call_index)} of ${esc(b.function)}</div>`;
  const row=(k,v)=>`<tr><td class="mono">${esc(k)}</td><td>${describe(v)}</td></tr>`;
  if(b.args)h+=`<table><tr><th colspan="2">arguments (at entry)</th></tr>${Object.entries(b.args).map(([k,v])=>row(k,v)).join('')}</table>`;
  if('return' in b)h+=`<table><tr><th colspan="2">return value</th></tr>${row('return',b.return)}</table>`;
@@ -297888,8 +297891,8 @@ function inspectCall(k){const [s,t,kind]=D.calls[k],cls=evClass(kind);let h=`<di
  const sites=D.call_sites[k]||[],om=D.call_omitted[k];const target=kind==='instantiate'?ctorOf(t):t;
  if(kind==='constructor')h+=`<div class="note">Structural relation: no call expression corresponds to it.</div>`;
  if(target!=null&&D.signatures[target])h+=`<h3>Callee signature</h3><pre class="mono">${esc(sigText(target))}</pre>`;
- if(sites.length){h+=`<h3>Call sites (${sites.length}${om?` shown, ${om} more omitted by the per-edge cap of ${D.meta.max_sites}`:''})</h3>`;
-  for(const st of sites){h+=`<div class="small mono">${esc(pathOf(s))}:${st[0]}:${st[1]}</div>`+srcLines(pathOf(s),st[0]-2,st[0]+2,[st[0]]);
+ if(sites.length){h+=`<h3>Call sites (${sites.length}${om?` shown, ${num(om)} more omitted by the per-edge cap of ${num(D.meta.max_sites)}`:''})</h3>`;
+  for(const st of sites){h+=`<div class="small mono">${esc(pathOf(s))}:${num(st[0])}:${num(st[1])}</div>`+srcLines(pathOf(s),st[0]-2,st[0]+2,[st[0]]);
    if(st[3].length)h+=`<table><tr><th>parameter</th><th>argument expression</th><th>annotation (as written)</th></tr>${st[3].map(b=>`<tr><td class="mono">${esc(b[0])}</td><td class="mono">${esc(b[1])}</td><td class="mono">${esc(target!=null?paramAnn(target,b[0])??'':'')}</td></tr>`).join('')}</table>`;
    const ret=target!=null&&D.signatures[target]?D.signatures[target][2]:null;if(ret)h+=`<div class="small">return annotation: <code>${esc(ret)}</code></div>`;
    if(st[4])h+=`<div class="note warn">Possible dispatch targets at this site (subclass redefinitions): ${st[4].map(x=>nodeBtn(x)).join(', ')}</div>`}}
@@ -297899,8 +297902,8 @@ function inspectCall(k){const [s,t,kind]=D.calls[k],cls=evClass(kind);let h=`<di
  const b=(boundaryBy.get(t)||[]).filter(([ti])=>traceOk(ti));if(b.length)h+=`<h3>Observed data at the callee boundary</h3>`+b.slice(0,3).map(([ti,bi])=>`<div class="note"><b>${esc(D.traces[ti].scenario)}</b>${boundaryHtml(D.traces[ti].boundaries[bi])}</div>`).join('');
  return h}
 function inspectImport(k){const [s,t,scopes]=D.imports[k];let h=`<div>${ev(scopes==='type_checking'?'type-only':'import','imports')} <span class="pill">scopes ${esc(scopes)}</span> ${crossBadge(s,t)}</div><h2>${nodeBtn(s)} → ${nodeBtn(t)}</h2>`;
- const sites=D.import_sites[k]||[];h+=`<h3>Import statements (${sites.length}${D.import_omitted[k]?`, ${D.import_omitted[k]} omitted`:''})</h3>`;
- for(const st of sites)h+=`<div class="row"><span class="mono small">${esc(pathOf(s))}:${st[0]}</span>${ev(st[1]==='type_checking'?'type-only':'import',st[1])}</div><div class="small">symbols: ${st[2].length?st[2].map(x=>`<code>${esc(x)}</code>`).join(', '):'<span class="muted">module import</span>'}</div>`+srcLines(pathOf(s),st[0]-1,st[0]+1,[st[0]]);
+ const sites=D.import_sites[k]||[];h+=`<h3>Import statements (${sites.length}${D.import_omitted[k]?`, ${num(D.import_omitted[k])} omitted`:''})</h3>`;
+ for(const st of sites)h+=`<div class="row"><span class="mono small">${esc(pathOf(s))}:${num(st[0])}</span>${ev(st[1]==='type_checking'?'type-only':'import',st[1])}</div><div class="small">symbols: ${st[2].length?st[2].map(x=>`<code>${esc(x)}</code>`).join(', '):'<span class="muted">module import</span>'}</div>`+srcLines(pathOf(s),st[0]-1,st[0]+1,[st[0]]);
  if(!sites.length)h+='<div class="note">grimp reported the edge but no statement spelling the target was matched (re-export resolution).</div>';
  return h}
 function inspectObs(ti,ei){const t=D.traces[ti],e=t.edges[ei];let h=`<div>${ev('observed','observed ×'+e.count)} <span class="pill">${esc(e.category)}</span></div><h2>${typeof e.s==='number'?nodeBtn(e.s,e.rs):esc(e.rs)} → ${typeof e.t==='number'?nodeBtn(e.t,e.rt):esc(e.rt)}</h2>`;
@@ -297909,9 +297912,9 @@ function inspectObs(ti,ei){const t=D.traces[ti],e=t.edges[ei];let h=`<div>${ev('
  if(e.static.length)h+=`<h3>Static counterpart</h3>`+e.static.map(([k,ci])=>`<div class="row"><button data-edge="call:${ci}">${esc(ID[D.calls[ci][0]])} → ${esc(ID[D.calls[ci][1]])}</button>${ev(evClass(D.calls[ci][2])||'static-certain',k)}</div>`).join('');
  const prov=t.provenance||{},code=prov.code||{};const same=code.source_sha256&&code.source_sha256===D.meta.source_sha256;
  h+=`<h3>Capture</h3><div class="note">${esc(t.scenario)} · commit <code>${esc((code.commit||'?').slice(0,12))}</code>${code.source_dirty?' <b style="color:var(--possible)">(source dirty)</b>':''} · ${same?'same source content as this static snapshot':'<b style="color:var(--possible)">source content differs from (or is not comparable with) this static snapshot; compare separately</b>'}</div>`;
- if(e.phases)h+=`<table><tr><th>phase</th><th>calls</th></tr>${Object.entries(e.phases).map(([p,n])=>`<tr><td>${esc(p)}</td><td>${n}</td></tr>`).join('')}</table>`;
+ if(e.phases)h+=`<table><tr><th>phase</th><th>calls</th></tr>${Object.entries(e.phases).map(([p,n])=>`<tr><td>${esc(p)}</td><td>${num(n)}</td></tr>`).join('')}</table>`;
  if(e.wall_ns_inclusive!=null)h+=`<div class="small">Python wall time inclusive of callees and of tracing overhead: ${(e.wall_ns_inclusive/1e6).toFixed(3)} ms total. ${esc((t.semantics||{}).gpu_execution_time||'GPU execution time not measured by this capture.')}</div>`;
- if(e.lines&&typeof e.s==='number'){h+=`<h3>Caller lines at the moment of the call</h3>`;for(const [ln,how] of e.lines)h+=`<div class="small">${ln} (${esc(how)})</div>`+(same?srcLines(pathOf(e.s),ln-1,ln+1,[ln]):'<div class="note warn small">Line numbers are from the capture revision.</div>')}
+ if(e.lines&&typeof e.s==='number'){h+=`<h3>Caller lines at the moment of the call</h3>`;for(const [ln,how] of e.lines)h+=`<div class="small">${num(ln)} (${esc(how)})</div>`+(same?srcLines(pathOf(e.s),ln-1,ln+1,[ln]):'<div class="note warn small">Line numbers are from the capture revision.</div>')}
  return h}
 function renderInspector(){const el=$('inspector');const s=S.sel;let h='';
  if(!s)h=`<div class="note">Select a node or relationship to see its source, metadata, proposed owner and runtime evidence.</div>`+legend();
@@ -297932,8 +297935,8 @@ function renderBoundaries(){const rel=S.rel,g=S.grouping;const M=matrix(g,rel);c
   h+=c.edges.slice(0,400).map(i=>{const e=rel==='calls'?D.calls[i]:D.imports[i];const x=exceptionFor(e[0],e[1]);return `<div class="row"><button data-edge="${rel==='calls'?'call':'import'}:${i}">${esc(ID[e[0]])} → ${esc(ID[e[1]])}</button>${rel==='calls'?ev(evClass(e[2]),e[2]):ev(e[2]==='type_checking'?'type-only':'import',e[2])}${x>=0?ev('excepted','exception: '+P.exceptions[x].reason.slice(0,60)):''}</div>`}).join('')}
  if(g==='proposal'){const a=A[rel==='calls'?'calls':'imports']||{};h+=`<h3>Group cycles (${rel==='calls'?'static calls':'executed imports'})</h3>`+((a.group_cycles||[]).length?a.group_cycles.map(c=>`<div class="note warn">${c.map(esc).join(' ⇄ ')} <span class="small">(including declared exceptions)</span></div>`).join(''):'<div class="note">No cycle between proposed groups.</div>')+`<h3>Residual cycles (declared exceptions removed)</h3>`+((a.residual_group_cycles||[]).length?a.residual_group_cycles.map(c=>`<div class="note bad">${c.map(esc).join(' ⇄ ')}</div>`).join(''):'<div class="note">None: every remaining crossing edge follows the declared order.</div>');
   h+=`<h3>By direction</h3><div>${Object.entries(a.by_direction||{}).map(([k,v])=>ev(k==='upward'?'upward':'structural',`${k} ${v}`)).join(' ')}</div>`;
-  h+=`<h3>Declared exceptions</h3>`+((P.exceptions||[]).map((x,i)=>`<div class="note"><code>${esc(x.source)}</code> → <code>${esc(x.target)}</code>: ${esc(x.reason)} <span class="pill">${(A.exceptions_used||[])[i]||0} edges</span></div>`).join('')||'<div class="muted">none</div>');
-  h+=`<h3>Groups</h3><table>${P.group_names.map(n=>`<tr><td class="mono">${esc(n)}</td><td>${(A.members||{})[n]||0}</td><td>${esc((P.groups[n]||{}).role||'')}</td></tr>`).join('')}</table>`}
+  h+=`<h3>Declared exceptions</h3>`+((P.exceptions||[]).map((x,i)=>`<div class="note"><code>${esc(x.source)}</code> → <code>${esc(x.target)}</code>: ${esc(x.reason)} <span class="pill">${num((A.exceptions_used||[])[i]||0)} edges</span></div>`).join('')||'<div class="muted">none</div>');
+  h+=`<h3>Groups</h3><table>${P.group_names.map(n=>`<tr><td class="mono">${esc(n)}</td><td>${num((A.members||{})[n]||0)}</td><td>${esc((P.groups[n]||{}).role||'')}</td></tr>`).join('')}</table>`}
  return h}
 // ---------- runtime ----------
 function renderRuntime(){if(!D.traces.length)return `<h2>Runtime evidence</h2><div class="note">No committed capture. Record one with <code>python -m tools.architecture.runtime_capture</code> and regenerate.</div>`;
@@ -297948,7 +297951,7 @@ function renderRuntime(){if(!D.traces.length)return `<h2>Runtime evidence</h2><d
   <tr><td>capture</td><td>${esc(cap.method||'')}; boundaries ${esc((cap.boundaries||[]).join(', ')||'none')}; limits ${esc(JSON.stringify(cap.limits||{}))}</td></tr>
   <tr><td>synchronization</td><td>inserted by collector: <b>${esc(String(sy.inserted_by_collector))}</b>; observed in scenario: ${esc(JSON.stringify(sy.observed||{}))}; ${esc(sy.note||'')}</td></tr>
   <tr><td>timing</td><td>${esc(JSON.stringify(tm))}</td></tr>
-  <tr><td>alignment</td><td>${Object.entries(t.alignment||{}).map(([k,v])=>`<span class="pill">${esc(k)} ${v}</span>`).join(' ')}</td></tr></table>`;
+  <tr><td>alignment</td><td>${Object.entries(t.alignment||{}).map(([k,v])=>`<span class="pill">${esc(k)} ${num(v)}</span>`).join(' ')}</td></tr></table>`;
   if(t.verification)h+=`<div class="note ${t.verification.passed?'':'bad'}"><b>Verification:</b> ${esc(JSON.stringify(t.verification))}</div>`;
   if(t.error)h+=`<div class="note bad">Scenario failed: ${esc(JSON.stringify(t.error))}</div>`;
   const phases=[...new Set(t.edges.flatMap(e=>Object.keys(e.phases||{})))];h+=`<div class="small">phases: ${phases.map(p=>`<button data-phase="${esc(p)}" class="${S.obsPhase===p?'chosen':''}">${esc(p)}</button>`).join(' ')} <button data-phase="">all</button> · <select data-cat="1"><option value="">all categories</option>${['corroborated','runtime-only','generated-code','unmapped','same-static-node'].map(c=>`<option ${S.obsCat===c?'selected':''}>${c}</option>`).join('')}</select></div>`;
@@ -297956,8 +297959,8 @@ function renderRuntime(){if(!D.traces.length)return `<h2>Runtime evidence</h2><d
   h+=`<div class="small muted">${rows.length} relation(s)${rows.length>200?' · first 200':''}</div>`+rows.slice(0,200).map(([e,ei])=>`<div class="row"><button data-edge="obs:${ti}:${ei}">${esc(e.rs.replace(/^tropoi\./,''))} → ${esc(e.rt.replace(/^tropoi\./,''))}</button>${ev('observed','×'+(S.obsPhase?(e.phases||{})[S.obsPhase]:e.count))}<span class="pill">${esc(e.category)}</span></div>`).join('')});
  return h}
 // ---------- entry ----------
-function renderEntry(){if(!S.entry)return `<h2>Entry paths</h2><div class="note">Choose a CLI handler or declared entry path above. The navigator then shows only what that path reaches statically within the documented depth.</div><table>${Object.entries(D.entries).map(([n,e])=>`<tr><td><button data-entry="${esc(n)}">${esc(n)}</button></td><td>${esc(e.kind)}</td><td>${e.nodes} nodes · depth ≤ ${e.max_depth}${e.truncated_nodes?' · '+e.truncated_nodes+' cut':''}</td></tr>`).join('')}</table>`;
- const e=D.entries[S.entry],R=REACH||reach(S.entry);let h=`<h2>${esc(S.entry)}</h2><div class="small">${esc(e.title||'')} ${e.doc?'· narrative '+esc(e.doc):''}</div><div class="note">Static reach within depth ≤ ${R.max}: <b>${R.depth.size}</b> nodes (generator: ${e.nodes}), ${R.truncated.size} with further calls cut by the depth limit (marked +), ${R.leaving} edges leave the scope. Unbounded static reach: ${e.reachable_nodes_unbounded} nodes. Dynamic dispatch and callbacks are outside static reach.</div>`;
+function renderEntry(){if(!S.entry)return `<h2>Entry paths</h2><div class="note">Choose a CLI handler or declared entry path above. The navigator then shows only what that path reaches statically within the documented depth.</div><table>${Object.entries(D.entries).map(([n,e])=>`<tr><td><button data-entry="${esc(n)}">${esc(n)}</button></td><td>${esc(e.kind)}</td><td>${num(e.nodes)} nodes · depth ≤ ${num(e.max_depth)}${e.truncated_nodes?' · '+num(e.truncated_nodes)+' cut':''}</td></tr>`).join('')}</table>`;
+ const e=D.entries[S.entry],R=REACH||reach(S.entry);let h=`<h2>${esc(S.entry)}</h2><div class="small">${esc(e.title||'')} ${e.doc?'· narrative '+esc(e.doc):''}</div><div class="note">Static reach within depth ≤ ${num(R.max)}: <b>${R.depth.size}</b> nodes (generator: ${num(e.nodes)}), ${R.truncated.size} with further calls cut by the depth limit (marked +), ${R.leaving} edges leave the scope. Unbounded static reach: ${num(e.reachable_nodes_unbounded)} nodes. Dynamic dispatch and callbacks are outside static reach.</div>`;
  const byD=new Map();for(const [n,d] of R.depth)push(byD,d,n);for(const [d,ns] of [...byD.entries()].sort((a,b)=>a[0]-b[0]))h+=`<h3>depth ${d} (${ns.length})</h3>`+ns.sort((a,b)=>ID[a]<ID[b]?-1:1).map(n=>nodeBtn(n,ID[n].replace(/^tropoi\./,'')+(R.truncated.has(n)?' +':''))).join(' ');
  return h}
 // ---------- main ----------
