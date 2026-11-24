@@ -15,7 +15,8 @@ Run directory::
     cycles/cycle-KKKK/      tier-2 samples, streamed by each worker into
                             memory-mapped per-block files (surface-bNNN.npy,
                             profiles-bNNN.npy, every_step-bNNN.npy, blocks.json,
-                            integrals.npz); the last three cycles are kept.
+                            integrals.npz, state.npz with the cycle's start and
+                            end states); the last three cycles are kept.
                             Read them with load_tier2.
     retained/        the cycle the result is quoted from (tier 2), with
                      its status (PERIODIC or TRANSIENT) in status.json
@@ -338,6 +339,11 @@ class AirlessRun:
         ext = [p["extent"] for p in parts]
         out["extent"] = [(min(e[j][0] for e in ext), max(e[j][1] for e in ext))
                          for j in range(len(ext[0]))]
+        # restart states of this cycle (tier 2): the start state is also what
+        # an exact standalone replay of selected columns starts from (G-G)
+        np.savez(d / "state.npz", start_anomaly=state[0], start_surface_anomaly=state[1],
+                 end_anomaly=out["anomaly"], end_surface_anomaly=out["surface_anomaly"],
+                 cycle=cycle, steps=steps)
         np.savez(d / "integrals.npz", energy_start=out["energy_start"],
                  energy_end=out["energy_end"], max_ratio=out["max_ratio"], **out["sums"])
         kept = sorted((self.dir / "cycles").iterdir())
