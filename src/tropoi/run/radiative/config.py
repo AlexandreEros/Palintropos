@@ -17,7 +17,7 @@ from dataclasses import asdict, dataclass, field, replace
 from typing import Any, Optional
 
 __all__ = ["RadiativeConfig", "PRESETS", "CONFIG_SCHEMA", "DAY_SECONDS", "mars_gray_flat_dev",
-           "jupiter_schneider_liu", "earth_gray_dry"]
+           "jupiter_schneider_liu", "earth_gray_dry", "thai_dry_dev", "THAI_DRY_TABLES"]
 
 CONFIG_SCHEMA = "palintropos.radiative.config/1"
 DAY_SECONDS = 86400.0
@@ -436,7 +436,163 @@ def mars_gray_flat_dev(experiment_id: Optional[str] = None, *, days: int = 30,
         **_t21())
 
 
+#: The k-tables of the THAI dry development cases, pinned by content hash
+#: (docs/radiation/OPACITY.md: sources, coverage, assumptions, and the two
+#: commands that fetch and import them into ``opacity_cache/tables``).
+THAI_DRY_TABLES = {
+    "ben1": {"composition": "thai_ben1", "longwave": {
+        "file": "thai-ben1-sp-lw-15-dsa-ar10bar.npz",
+        "sha256": "699c00492b5e5d5b9e6642da054a8daeee3f3269670a351ef689356c350e9038"},
+        "shortwave": {
+            "file": "thai-ben1-sp-sw-43-dsa-ar10bar-trappist1.npz",
+            "sha256": "c473fca1eceb69cbb69016d856eff67093d0183e3c5542301cf28429ae35c09d"},
+        # TRAPPIST-1 flux fraction of the table's 43 bands, increasing in
+        # wavenumber (block 2 of sp_sw_43_dsa_ar10bar_trappist1)
+        "stellar_band_fractions": (
+            0.02656221023, 0.01482918161, 0.01508034607, 0.02695592583, 0.02959266107,
+            0.02208575483, 0.01866939112, 0.01676674122, 0.07782652617, 0.0106526464,
+            0.02536404824, 0.01529585662, 0.04146680899, 0.05677867426, 0.03676360419,
+            0.01185539372, 0.02286220581, 0.02136834353, 0.01518227359, 0.01474203956,
+            0.01975398087, 0.04499964863, 0.03198620258, 0.05168204686, 0.03599036771,
+            0.03338955765, 0.03444872077, 0.01685195291, 0.01830330962, 0.0628369022,
+            0.05388278132, 0.01439385132, 0.01384145534, 0.04184376402, 0.002530298546,
+            0.00102034457, 0.0007771275866, 0.0005825989255, 0.0001044206189,
+            5.747656744e-05, 1.116784097e-05, 1.136564469e-05, 2.481091694e-08)},
+    "ben2": {"composition": "thai_ben2", "longwave": {
+        "file": "thai-ben2-sp-lw-17-dsa-mars.npz",
+        "sha256": "9d4c18a6822690aa12051598695ca4d6946324bb36f8752a35d57b9963087e18"},
+        "shortwave": {
+            "file": "thai-ben2-sp-sw-42-dsa-mars-trappist1.npz",
+            "sha256": "c2e873d40e3da41dd52a9b3187fd47cf65631481b03a152363f6bfc6300e8386"},
+        # the same for the 42 bands of sp_sw_42_dsa_mars_trappist1
+        "stellar_band_fractions": (
+            0.007258484028, 0.006780315862, 0.002870869908, 0.009652540429, 0.0395083342,
+            0.02363320203, 0.01990910171, 0.02146444856, 0.02269817405, 0.01096201485,
+            0.01248332998, 0.02849879125, 0.02621123844, 0.06775044413, 0.0348666271,
+            0.03048862789, 0.03289022826, 0.09284954726, 0.01518227359, 0.01474203956,
+            0.01975398087, 0.04499964863, 0.04929574556, 0.03437250387, 0.03599036771,
+            0.0508297636, 0.05216377736, 0.04110577227, 0.09996624428, 0.003882973633,
+            0.02612883711, 0.004724752917, 0.01099017399, 0.002530298546, 0.00102034457,
+            0.0007771275866, 0.0005825989255, 0.0001044206189, 5.747656744e-05,
+            1.116784097e-05, 1.136564469e-05, 2.481091694e-08)},
+}
+#: Temperature (K) at which the constant c_p of the THAI dry cases is evaluated.
+THAI_CP_TEMPERATURE = 250.0
+
+
+def thai_dry_dev(case: str, experiment_id: Optional[str] = None, *, days: int = 5,
+                 dt: float = 1200.0, frictional_heating: bool = True,
+                 radiation_interval: int = 3,
+                 stellar_absorption: bool = False,
+                 thermal_source: str = "linear") -> RadiativeConfig:
+    """DEVELOPMENT EXPERIMENT with a THAI dry composition and real-gas
+    longwave absorption; not a THAI reproduction (docs/radiation/OPACITY.md,
+    docs/radiation/THAI_BEN_PLAN.md).
+
+    ``case`` is ``"ben1"`` (1 bar N2 with 400 ppmv CO2) or ``"ben2"`` (1 bar
+    CO2). The two differ only through inputs: the composition preset
+    (``thai_ben1`` / ``thai_ben2`` of ``tropoi.physics.composition``) and
+    the premixed longwave k-table imported for it. The bulk thermodynamics
+    come from that same composition - ``gas_constant`` from its molar mass
+    and a constant ``cp`` from its heat capacity at 250 K - and the table
+    loader refuses a table mixed for another gas constant.
+
+    Matched to the THAI protocol (Fauchez et al. 2020): radius 5798 km,
+    g = 9.12 m s^-2, synchronous 6.1-day rotation, 900 W m^-2 on a fixed
+    substellar point, 1 bar, surface albedo 0.3, roughness 1e-2 m, a 300 K
+    isothermal start at rest, dry.
+
+    Longwave: correlated-k, 1-3000 cm^-1, from the ROCKE-3D SOCRATES
+    spectral files ``sp_lw_17_dsa_mars`` (Ben 2: self-broadened CO2 lines,
+    sub-Lorentzian wings, CO2-CO2 CIA) and ``sp_lw_15_dsa_ar10bar`` (Ben 1:
+    air-broadened CO2 lines, N2-N2 CIA; no N2-CO2 CIA). States outside
+    1 Pa - 10 bar or 100 - 400 K are an error.
+
+    SHORTWAVE, two variants. By default (``dev-thai-ben1`` / ``-ben2``, id
+    ``...-lwck-...``) the atmosphere is transparent to starlight: the
+    surface absorbs 70 % of the incident flux. THAI's Bond albedos
+    (0.27-0.30 Ben 1, 0.18-0.22 Ben 2) show the atmosphere absorbs a large
+    share of an M dwarf's light in Ben 2, so that is the largest known
+    departure of the default. ``stellar_absorption=True``
+    (``dev-thai-ben1-ck`` / ``-ben2-ck``, id ``...-ck-...``) adds real-gas
+    stellar absorption, 500-50000 cm^-1, from the TRAPPIST-1 files
+    ``sp_sw_42_dsa_mars_trappist1`` and ``sp_sw_43_dsa_ar10bar_trappist1``
+    with the star's band fluxes as those files give them. Still an
+    approximation: absorption only, NO Rayleigh scattering (its
+    flux-weighted optical depth for this star is 0.008 and 0.005).
+
+    ``thermal_source`` selects the longwave source inside a layer (see
+    :class:`tropoi.physics.radiation.scheme.Radiation`). Any value other
+    than the default ``"linear"`` is appended to the experiment id, so a
+    configuration with another source never shares an id with the recorded
+    ``linear`` runs: ``dev-thai-ben2-ck-layer-linear`` (id
+    ``dev-thai-ben2-ck-layer-linear-heated-T21L40``) centers the linear
+    source on each layer's Planck flux. In the matched 5-day replay of the
+    stellar-absorbing Ben 2 run this reduced the layer-scale temperature
+    alternation about tenfold (docs/radiation/OPACITY.md section 6, issue
+    #47). It does not address the upper-level wind decoherence or the
+    dt = 1200 s instability of #47.
+
+    NOT matched: T21 L40 to 4 Pa with del^8 and no sponge; a one-layer slab
+    of 2e6 J m^-2 K^-1 (the UM's); the FHZ06 dry boundary layer of the Mars
+    development runs in place of each THAI model's own; constant c_p;
+    radiation every ``radiation_interval`` steps (hourly at 1200 s). Short
+    runs from the isothermal start are nowhere near equilibrium.
+    """
+    if case not in THAI_DRY_TABLES:
+        raise ValueError(f"case must be one of {sorted(THAI_DRY_TABLES)}, not {case!r}")
+    from tropoi.physics.composition import COMPOSITIONS
+    from tropoi.physics.thermodynamics import heat_capacity
+    entry = THAI_DRY_TABLES[case]
+    composition = COMPOSITIONS[entry["composition"]]
+    roughness = 1.0e-2
+    shortwave: dict = {"kind": "transparent"}
+    if stellar_absorption:
+        shortwave = {"kind": "correlated_k", "tables": [dict(entry["shortwave"])],
+                     "mass_fractions": {composition.label: 1.0}, "bounds": "error",
+                     "band_fractions": list(entry["stellar_band_fractions"])}
+    tag = "ck" if stellar_absorption else "lwck"
+    if thermal_source != "linear":
+        tag += f"-{thermal_source}"
+    return RadiativeConfig(
+        experiment_id=_preset_id(experiment_id, f"dev-thai-{case}-{tag}", "T21L40",
+                                 frictional_heating),
+        frictional_heating=frictional_heating, radius=5.798e6,
+        omega=2.0 * math.pi / (6.1 * DAY_SECONDS), gravity=9.12,
+        gas_constant=float(composition.gas_constant),
+        cp=float(heat_capacity(composition, THAI_CP_TEMPERATURE)),
+        reference_pressure=1.0e5,
+        vertical={"kind": "stretched", "nlev": 40, "sigma_top": 4.0e-5,
+                  "linear_scale": 0.15},
+        dt=dt, days=days,
+        longwave={"kind": "correlated_k", "tables": [dict(entry["longwave"])],
+                  "mass_fractions": {composition.label: 1.0}, "bounds": "error"},
+        thermal_source=thermal_source,
+        shortwave=shortwave,
+        insolation={"kind": "tidally_locked", "stellar_constant": 900.0},
+        convection=None,
+        surface={"heat_capacity": 2.0e6, "albedo": 0.3, "emissivity": 1.0,
+                 "initial_temperature": 300.0},
+        sensible={"roughness_length": roughness, "critical_richardson": 1.0,
+                  "gustiness": 0.0, "implicit": True},
+        boundary_layer={"roughness_length": roughness, "critical_richardson": 1.0,
+                        "rich_crit_pbl": 1.0, "frac_inner": 0.1, "gustiness": 0.0},
+        drag=None, radiation_interval=radiation_interval,
+        initial={"kind": "isothermal", "temperature": 300.0},
+        checkpoint_every_days=1, state_every_days=1,
+        **_t21())
+
+
 PRESETS = {"jupiter-schneider-liu": jupiter_schneider_liu, "earth-gray-dry": earth_gray_dry,
+           "dev-thai-ben1": functools.partial(thai_dry_dev, "ben1"),
+           "dev-thai-ben2": functools.partial(thai_dry_dev, "ben2"),
+           "dev-thai-ben1-ck": functools.partial(thai_dry_dev, "ben1",
+                                                 stellar_absorption=True),
+           "dev-thai-ben2-ck": functools.partial(thai_dry_dev, "ben2",
+                                                 stellar_absorption=True),
+           "dev-thai-ben2-ck-layer-linear": functools.partial(
+               thai_dry_dev, "ben2", stellar_absorption=True,
+               thermal_source="layer-linear"),
            "dev-mars-gray-flat": mars_gray_flat_dev,
            "dev-mars-gray-flat-sponge": functools.partial(mars_gray_flat_dev, sponge=True),
            "dev-mars-gray-flat-sponge-implicit": functools.partial(

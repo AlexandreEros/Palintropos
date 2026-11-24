@@ -110,6 +110,14 @@
         "function"
       ],
       "source": "tropoi.cli.main",
+      "target": "tropoi.representation.archive.viewer_manifest"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.cli.main",
       "target": "tropoi.representation.visual.compose"
     },
     {
@@ -135,6 +143,14 @@
       ],
       "source": "tropoi.cli.main",
       "target": "tropoi.representation.visual.snapshot"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.cli.main",
+      "target": "tropoi.representation.visual.viewer_server"
     },
     {
       "kind": "imports",
@@ -438,6 +454,14 @@
       "scopes": [
         "module"
       ],
+      "source": "tropoi.physics.radiation.tables",
+      "target": "tropoi.physics.radiation.kdist"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
       "source": "tropoi.physics.rayleigh",
       "target": "tropoi.physics.composition"
     },
@@ -536,6 +560,14 @@
       ],
       "source": "tropoi.representation.archive.capsule",
       "target": "tropoi.representation.archive.pe_context"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.representation.archive.capsule",
+      "target": "tropoi.representation.archive.radiative"
     },
     {
       "kind": "imports",
@@ -734,6 +766,38 @@
       "scopes": [
         "module"
       ],
+      "source": "tropoi.representation.archive.radiative",
+      "target": "tropoi.representation.archive.local_resource"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.representation.archive.radiative",
+      "target": "tropoi.representation.archive.pe_context"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.representation.archive.radiative",
+      "target": "tropoi.representation.archive.schema"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.representation.archive.radiative",
+      "target": "tropoi.spatial.sigma_coordinate"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
       "source": "tropoi.representation.archive.schema",
       "target": "tropoi.spatial.modes"
     },
@@ -744,6 +808,71 @@
       ],
       "source": "tropoi.representation.archive.schema",
       "target": "tropoi.spatial.truncation"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.representation.archive.viewer_diagnostics",
+      "target": "tropoi.representation.archive.local_resource"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.representation.archive.viewer_manifest",
+      "target": "tropoi.representation.archive.capsule"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.representation.archive.viewer_manifest",
+      "target": "tropoi.representation.archive.local_resource"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.representation.archive.viewer_manifest",
+      "target": "tropoi.representation.archive.radiative"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.representation.archive.viewer_manifest",
+      "target": "tropoi.representation.archive.schema"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.representation.archive.viewer_manifest",
+      "target": "tropoi.representation.archive.viewer_diagnostics"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function",
+        "module"
+      ],
+      "source": "tropoi.representation.archive.viewer_manifest",
+      "target": "tropoi.representation.visual.quantities"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.representation.archive.viewer_manifest",
+      "target": "tropoi.spatial.environment"
     },
     {
       "kind": "imports",
@@ -800,6 +929,22 @@
       ],
       "source": "tropoi.representation.diagnostics.pe_levels",
       "target": "tropoi.spatial.transforms.host_synthesis"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.representation.diagnostics.pe_structure",
+      "target": "tropoi.representation.diagnostics.held_suarez_sections"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.representation.diagnostics.pe_structure",
+      "target": "tropoi.representation.diagnostics.pe_levels"
     },
     {
       "kind": "imports",
@@ -1583,6 +1728,118 @@
     {
       "kind": "imports",
       "scopes": [
+        "module"
+      ],
+      "source": "tropoi.representation.visual.viewer_fields",
+      "target": "tropoi.representation.archive.local_resource"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.representation.visual.viewer_fields",
+      "target": "tropoi.representation.archive.pe_context"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.representation.visual.viewer_fields",
+      "target": "tropoi.representation.archive.prepared_terrain"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.representation.visual.viewer_fields",
+      "target": "tropoi.representation.diagnostics.held_suarez_sections"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.representation.visual.viewer_fields",
+      "target": "tropoi.representation.diagnostics.pe_levels"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.representation.visual.viewer_fields",
+      "target": "tropoi.representation.diagnostics.pe_structure"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.representation.visual.viewer_fields",
+      "target": "tropoi.representation.diagnostics.pe_surfaces"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.representation.visual.viewer_fields",
+      "target": "tropoi.spatial.transforms.host_synthesis"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.representation.visual.viewer_fields",
+      "target": "tropoi.spatial.transforms.separable_gauss_sh"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.representation.visual.viewer_fields",
+      "target": "tropoi.spatial.williamson5"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.representation.visual.viewer_server",
+      "target": "tropoi.physics.insolation"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.representation.visual.viewer_server",
+      "target": "tropoi.representation.archive.local_resource"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.representation.visual.viewer_server",
+      "target": "tropoi.representation.archive.viewer_manifest"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.representation.visual.viewer_server",
+      "target": "tropoi.representation.visual.viewer_fields"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
         "function"
       ],
       "source": "tropoi.representation.visual.vorticity_viewer",
@@ -1619,6 +1876,14 @@
       ],
       "source": "tropoi.run.bve.config",
       "target": "tropoi.representation.identity"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.run.bve.config",
+      "target": "tropoi.spatial.truncation"
     },
     {
       "kind": "imports",
@@ -2618,6 +2883,22 @@
         "function"
       ],
       "source": "tropoi.run.radiative.config",
+      "target": "tropoi.physics.composition"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.run.radiative.config",
+      "target": "tropoi.physics.thermodynamics"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.run.radiative.config",
       "target": "tropoi.spatial.truncation"
     },
     {
@@ -2711,10 +2992,26 @@
     {
       "kind": "imports",
       "scopes": [
+        "function"
+      ],
+      "source": "tropoi.run.radiative.model",
+      "target": "tropoi.physics.radiation.kdist"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
         "module"
       ],
       "source": "tropoi.run.radiative.model",
       "target": "tropoi.physics.radiation.scheme"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.run.radiative.model",
+      "target": "tropoi.physics.radiation.tables"
     },
     {
       "kind": "imports",
@@ -3017,6 +3314,14 @@
       "scopes": [
         "module"
       ],
+      "source": "tropoi.spatial.grids.latlon_grid",
+      "target": "tropoi.spatial.transforms.separable_gauss_sh"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
       "source": "tropoi.spatial.initialization.bve",
       "target": "tropoi.spatial.planet"
     },
@@ -3207,6 +3512,14 @@
     {
       "kind": "imports",
       "scopes": [
+        "module"
+      ],
+      "source": "tropoi.spatial.planet",
+      "target": "tropoi.spatial.truncation"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
         "function"
       ],
       "source": "tropoi.spatial.specification",
@@ -3317,6 +3630,14 @@
       ],
       "source": "tropoi.spatial.transforms.optimized_geodesic_sh",
       "target": "tropoi.spatial.transforms.fast_geodesic_sh"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.spatial.transforms.separable_gauss_sh",
+      "target": "tropoi.spatial.transforms.cuda.cuda_utils"
     },
     {
       "kind": "imports",
@@ -3701,7 +4022,8 @@
         "re",
         "subprocess",
         "sys",
-        "typing"
+        "typing",
+        "warnings"
       ],
       "third_party_imports": []
     },
@@ -3909,6 +4231,8 @@
       "stdlib_imports": [
         "__future__",
         "dataclasses",
+        "hashlib",
+        "json",
         "math",
         "typing"
       ],
@@ -3932,6 +4256,20 @@
         "cupy",
         "numpy"
       ]
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.physics.radiation.tables",
+      "is_package": false,
+      "path": "tropoi/physics/radiation/tables.py",
+      "stdlib_imports": [
+        "__future__",
+        "os",
+        "pathlib",
+        "typing"
+      ],
+      "third_party_imports": []
     },
     {
       "category": "code",
@@ -4123,6 +4461,18 @@
     {
       "category": "code",
       "dynamic_import_calls": 0,
+      "id": "tropoi.representation.archive.local_resource",
+      "is_package": false,
+      "path": "tropoi/representation/archive/local_resource.py",
+      "stdlib_imports": [
+        "ntpath",
+        "pathlib"
+      ],
+      "third_party_imports": []
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
       "id": "tropoi.representation.archive.pe_context",
       "is_package": false,
       "path": "tropoi/representation/archive/pe_context.py",
@@ -4164,6 +4514,21 @@
     {
       "category": "code",
       "dynamic_import_calls": 0,
+      "id": "tropoi.representation.archive.radiative",
+      "is_package": false,
+      "path": "tropoi/representation/archive/radiative.py",
+      "stdlib_imports": [
+        "dataclasses",
+        "pathlib",
+        "re"
+      ],
+      "third_party_imports": [
+        "numpy"
+      ]
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
       "id": "tropoi.representation.archive.schema",
       "is_package": false,
       "path": "tropoi/representation/archive/schema.py",
@@ -4172,6 +4537,32 @@
         "collections",
         "dataclasses",
         "math"
+      ],
+      "third_party_imports": []
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.representation.archive.viewer_diagnostics",
+      "is_package": false,
+      "path": "tropoi/representation/archive/viewer_diagnostics.py",
+      "stdlib_imports": [
+        "csv",
+        "json"
+      ],
+      "third_party_imports": [
+        "numpy"
+      ]
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.representation.archive.viewer_manifest",
+      "is_package": false,
+      "path": "tropoi/representation/archive/viewer_manifest.py",
+      "stdlib_imports": [
+        "json",
+        "pathlib"
       ],
       "third_party_imports": []
     },
@@ -4265,6 +4656,20 @@
         "__future__",
         "collections",
         "dataclasses"
+      ],
+      "third_party_imports": [
+        "numpy"
+      ]
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.representation.diagnostics.pe_structure",
+      "is_package": false,
+      "path": "tropoi/representation/diagnostics/pe_structure.py",
+      "stdlib_imports": [
+        "__future__",
+        "math"
       ],
       "third_party_imports": [
         "numpy"
@@ -4701,6 +5106,47 @@
         "shutil",
         "tempfile",
         "typing"
+      ],
+      "third_party_imports": [
+        "numpy"
+      ]
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.representation.visual.viewer_fields",
+      "is_package": false,
+      "path": "tropoi/representation/visual/viewer_fields.py",
+      "stdlib_imports": [
+        "__future__",
+        "functools",
+        "pathlib"
+      ],
+      "third_party_imports": [
+        "numpy",
+        "scipy"
+      ]
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.representation.visual.viewer_server",
+      "is_package": false,
+      "path": "tropoi/representation/visual/viewer_server.py",
+      "stdlib_imports": [
+        "__future__",
+        "collections",
+        "csv",
+        "http",
+        "importlib",
+        "json",
+        "math",
+        "pathlib",
+        "secrets",
+        "struct",
+        "threading",
+        "urllib",
+        "webbrowser"
       ],
       "third_party_imports": [
         "numpy"
@@ -5322,6 +5768,7 @@
       "path": "tropoi/spatial/grids/latlon_grid.py",
       "stdlib_imports": [
         "__future__",
+        "os",
         "warnings"
       ],
       "third_party_imports": [
@@ -5404,7 +5851,9 @@
       "id": "tropoi.spatial.operators.spectral_operators",
       "is_package": false,
       "path": "tropoi/spatial/operators/spectral_operators.py",
-      "stdlib_imports": [],
+      "stdlib_imports": [
+        "warnings"
+      ],
       "third_party_imports": [
         "cupy"
       ]
@@ -5416,7 +5865,8 @@
       "is_package": false,
       "path": "tropoi/spatial/planet.py",
       "stdlib_imports": [
-        "typing"
+        "typing",
+        "warnings"
       ],
       "third_party_imports": [
         "cupy",
@@ -5683,6 +6133,20 @@
         "cupy",
         "numpy",
         "scipy"
+      ]
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.spatial.transforms.separable_gauss_sh",
+      "is_package": false,
+      "path": "tropoi/spatial/transforms/separable_gauss_sh.py",
+      "stdlib_imports": [
+        "__future__"
+      ],
+      "third_party_imports": [
+        "cupy",
+        "numpy"
       ]
     },
     {

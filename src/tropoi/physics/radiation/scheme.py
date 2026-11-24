@@ -193,15 +193,17 @@ class Radiation:
 
     ``longwave`` / ``shortwave`` are optics providers (either may be None).
     ``source`` selects the thermal source inside a layer: ``"linear"`` in
-    optical depth between interpolated interface temperatures, or
-    ``"isothermal"`` layers. ``chunk`` bounds how many spectral points are
-    solved at once.
+    optical depth between interpolated interface temperatures,
+    ``"layer-linear"`` with the same slope centered on the layer's own Planck
+    flux, or ``"isothermal"`` layers. ``chunk`` bounds how many spectral
+    points are solved at once.
     """
 
     def __init__(self, longwave=None, shortwave=None, *, source: str = "linear",
                  chunk: int = 16):
-        if source not in ("linear", "isothermal"):
-            raise ValueError(f"source must be 'linear' or 'isothermal', got {source!r}")
+        if source not in ("linear", "layer-linear", "isothermal"):
+            raise ValueError(f"unknown thermal source {source!r}; expected 'linear', "
+                             "'layer-linear' or 'isothermal'")
         self.longwave = longwave
         self.shortwave = shortwave
         self.source = source
@@ -248,7 +250,7 @@ class Radiation:
             return zeros, zeros.copy()
         up, down = zeros.copy(), zeros.copy()
         t_lay = column.temperature
-        t_int = interface_temperature(column) if self.source == "linear" else None
+        t_int = None if self.source == "isothermal" else interface_temperature(column)
         closed = boundary.kind == "closed"
         if closed:
             # The absorbed stellar flux is re-emitted with the spectral
@@ -263,6 +265,14 @@ class Radiation:
             else:
                 p_all = lw.planck(t_int, pts)
                 p_top, p_bot = p_all[:-1], p_all[1:]
+                if self.source == "layer-linear":
+                    p_center = lw.planck(t_lay, pts)
+                    # Two interpolated faces can miss the layer's own temperature
+                    # on an alternating profile. Retain the inferred slope while
+                    # tying the optical-depth mean to the layer Planck flux.
+                    # Keep both endpoints nonnegative for large face contrasts.
+                    half_slope = xp.clip(0.5 * (p_bot - p_top), -p_center, p_center)
+                    p_top, p_bot = p_center - half_slope, p_center + half_slope
             if closed:
                 share = lw.planck(t_lay[-1], pts) / share_total[:, None]
                 source = bottom_absorbed_stellar[:, None] * share

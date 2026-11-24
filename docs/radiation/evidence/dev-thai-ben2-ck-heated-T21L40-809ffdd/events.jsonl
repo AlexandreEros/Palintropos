@@ -1,0 +1,8 @@
+{"day": 0, "environment": {"cuda_driver": 11080, "cuda_runtime": 11080, "cupy": "13.4.0", "device": "NVIDIA GeForce MX110", "numpy": "2.2.6", "platform": "Windows-11-10.0.26200-SP0", "python": "3.12.12"}, "event": "created", "step": 0, "time": "2026-11-16T20:19:07Z"}
+{"day": 0.0, "event": "checkpoint", "file": "checkpoint-s000000000.npz", "step": 0, "time": "2026-11-16T20:19:07Z"}
+{"day": 1.0, "event": "checkpoint", "file": "checkpoint-s000000072.npz", "step": 72, "time": "2026-11-16T20:22:50Z"}
+{"day": 2.0, "event": "checkpoint", "file": "checkpoint-s000000144.npz", "step": 144, "time": "2026-11-16T20:26:41Z"}
+{"day": 3.0, "event": "checkpoint", "file": "checkpoint-s000000216.npz", "step": 216, "time": "2026-11-16T20:31:05Z"}
+{"day": 4.0, "event": "checkpoint", "file": "checkpoint-s000000288.npz", "step": 288, "time": "2026-11-16T20:35:33Z"}
+{"day": 5.0, "event": "checkpoint", "file": "checkpoint-s000000360.npz", "step": 360, "time": "2026-11-16T20:40:16Z"}
+{"day": 5.0, "event": "completed", "step": 360, "time": "2026-11-16T20:40:16Z"}

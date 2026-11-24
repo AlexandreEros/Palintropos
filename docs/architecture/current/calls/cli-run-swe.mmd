@@ -127,6 +127,7 @@ flowchart LR
         n_tropoi_otemporal_ointegration_ovalidate__snapshot__schedule["validate#95;snapshot#95;schedule()"]
     end
     subgraph g_tropoi_otemporal_omodels["temporal.models"]
+        n_tropoi_otemporal_omodels_o__legacy__grid__type["#95;legacy#95;grid#95;type()"]
         n_tropoi_otemporal_omodels_o__w5__planet__params["#95;w5#95;planet#95;params()"]
         n_tropoi_otemporal_omodels_obuild__swe__model["build#95;swe#95;model()"]
     end
@@ -250,6 +251,7 @@ flowchart LR
     n_tropoi_otemporal_omodels_obuild__swe__model -->|instantiate| n_tropoi_ospatial_oterrain_otopography_oTopography
     n_tropoi_otemporal_omodels_obuild__swe__model --> n_tropoi_ospatial_oterrain_otopography_oTopography_omountain
     n_tropoi_otemporal_omodels_obuild__swe__model --> n_tropoi_ospatial_oterrain_otopography_oTopography_owilliamson5__cone
+    n_tropoi_otemporal_omodels_obuild__swe__model --> n_tropoi_otemporal_omodels_o__legacy__grid__type
     n_tropoi_otemporal_omodels_obuild__swe__model --> n_tropoi_otemporal_omodels_o__w5__planet__params
     n_tropoi_otemporal_omodels_obuild__swe__model -->|instantiate| n_tropoi_otemporal_otendencies_oshallow__water_oShallowWaterModel
     classDef root stroke-width:3px

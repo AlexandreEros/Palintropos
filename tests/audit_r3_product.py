@@ -180,7 +180,9 @@ def main(part: str):
           f"T={T_END_DAYS} d, cut={CUT})")
 
     params = PlanetaryParameters.from_earth_like(day_hours=DAY_HOURS)
-    planet = Planet.generate(params=params, grid_resolution=res, l_max=L_MAX)
+    # Geodesic is the subject of this characterization, not a default.
+    planet = Planet.generate(params=params, grid_resolution=res,
+                             l_max=L_MAX, grid_type="geodesic")
     R, om = params.radius, params.angular_velocity
     sh, so, grid = planet.sh, planet.so, planet.grid
 

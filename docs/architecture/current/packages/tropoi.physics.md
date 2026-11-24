@@ -92,14 +92,17 @@ flowchart LR
     p_tropoi_orepresentation_ovisual -->|1| n_tropoi_ophysics_ocolumn
     p_tropoi_orepresentation_ovisual -->|1| n_tropoi_ophysics_ocomposition
     p_tropoi_orepresentation_ovisual -->|1| n_tropoi_ophysics_oconstants
+    p_tropoi_orepresentation_ovisual -.->|1| n_tropoi_ophysics_oinsolation
     p_tropoi_orepresentation_ovisual -->|1| n_tropoi_ophysics_orayleigh
     p_tropoi_orepresentation_ovisual -->|1| n_tropoi_ophysics_ospecies
     p_tropoi_orepresentation_ovisual -->|1| n_tropoi_ophysics_ostar
     p_tropoi_orun_oradiative -->|1| n_tropoi_ophysics_ocolumn__model
+    p_tropoi_orun_oradiative -.->|1| n_tropoi_ophysics_ocomposition
     p_tropoi_orun_oradiative -->|1| n_tropoi_ophysics_oconvection
     p_tropoi_orun_oradiative -->|1| n_tropoi_ophysics_oinsolation
     p_tropoi_orun_oradiative -.->|1| n_tropoi_ophysics_ospecies
     p_tropoi_orun_oradiative -->|1| n_tropoi_ophysics_osurface
+    p_tropoi_orun_oradiative -.->|1| n_tropoi_ophysics_othermodynamics
     p_tropoi_otemporal_otendencies -->|1| n_tropoi_ophysics_oboundary__layer
     p_tropoi_otemporal_otendencies -->|1| n_tropoi_ophysics_omonin__obukhov
     p_tropoi_otemporal_otendencies -.->|1| n_tropoi_ophysics_omonin__obukhov__cuda

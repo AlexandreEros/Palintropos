@@ -118,7 +118,8 @@ def _levels(levels, nlev: int) -> tuple[int, ...]:
 def reconstruct_levels(frame, context, lat_deg, lon_deg,
                        levels: Sequence[int] | None = None, *,
                        winds: bool = True,
-                       vorticity_divergence: bool = True) -> LevelFields:
+                       vorticity_divergence: bool = True,
+                       heights: bool = True) -> LevelFields:
     """Evaluate the native-level fields of one saved state (see module doc).
 
     ``levels`` are 0-based full-level indices, top to bottom (default:
@@ -126,9 +127,10 @@ def reconstruct_levels(frame, context, lat_deg, lon_deg,
     skips the ``zeta``/``delta`` grid syntheses (a derived-surface export
     that never shows them saves a third of the synthesis work). Geopotential
     height needs the model's gravity: a context without one (a flat run that
-    never defined g) raises.
+    never defined g) raises, unless ``heights=False``, which omits
+    ``geopotential`` and ``geopotential_height`` and needs no gravity.
     """
-    if context.gravity is None:
+    if heights and context.gravity is None:
         raise ValueError(
             "this run defines no gravity, so geopotential height Phi/g is "
             "undefined; supply the gravity the run should be read with "
@@ -138,25 +140,27 @@ def reconstruct_levels(frame, context, lat_deg, lon_deg,
     zeta, delta, _, ln_ps = _frame_parts(frame, nlev, l_max)
     lat = np.asarray(lat_deg, dtype=np.float64)
     lon = np.asarray(lon_deg, dtype=np.float64)
-    g = float(context.gravity)
     full = context.full_levels
-    phi_lm = level_geopotential_coefficients(frame, context)
+    phi_lm = level_geopotential_coefficients(frame, context) if heights else None
     _, _, temperature, _ = _frame_parts(frame, nlev, l_max)
 
     p_s = np.exp(synthesize_latlon(ln_ps, lat, lon))
+    # Phi_s needs no gravity where none is recorded: such runs are flat (zero).
     phi_s = synthesize_latlon(context.surface_geopotential_lm(), lat, lon)
     h_s = (None if context.is_flat
            else synthesize_latlon(context.surface_elevation_lm, lat, lon))
     names = [name for name in LEVEL_FIELDS
              if (winds or name not in ("u", "v"))
-             and (vorticity_divergence or name not in ("zeta", "delta"))]
+             and (vorticity_divergence or name not in ("zeta", "delta"))
+             and (heights or name not in ("geopotential", "geopotential_height"))]
     out = {name: np.empty((len(chosen), lat.size, lon.size)) for name in names}
     for i, k in enumerate(chosen):
         out["temperature"][i] = synthesize_latlon(temperature[k], lat, lon)
         out["pressure"][i] = full[k] * p_s
-        phi = synthesize_latlon(phi_lm[k], lat, lon)
-        out["geopotential"][i] = phi
-        out["geopotential_height"][i] = phi / g
+        if heights:
+            phi = synthesize_latlon(phi_lm[k], lat, lon)
+            out["geopotential"][i] = phi
+            out["geopotential_height"][i] = phi / float(context.gravity)
         if vorticity_divergence:
             out["zeta"][i] = synthesize_latlon(zeta[k], lat, lon)
             out["delta"][i] = synthesize_latlon(delta[k], lat, lon)

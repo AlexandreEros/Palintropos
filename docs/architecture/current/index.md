@@ -11,26 +11,26 @@ Explore dependencies, call sites, possible dispatch, runtime observations and pr
 | [`tropoi`](packages/tropoi.md) | 1 | 0 | 0 | `README.md` |
 | [`tropoi.cli`](packages/tropoi.cli.md) | 6 | 0 | 24 | `README.md` |
 | [`tropoi.physics`](packages/tropoi.physics.md) | 18 | 26 | 39 | `README.md` |
-| [`tropoi.physics.radiation`](packages/tropoi.physics.radiation.md) | 5 | 13 | 18 | `README.md` |
+| [`tropoi.physics.radiation`](packages/tropoi.physics.radiation.md) | 6 | 14 | 23 | `README.md` |
 | [`tropoi.representation`](packages/tropoi.representation.md) | 2 | 0 | 1 | `README.md` |
-| [`tropoi.representation.archive`](packages/tropoi.representation.archive.md) | 9 | 18 | 26 | `README.md` |
-| [`tropoi.representation.diagnostics`](packages/tropoi.representation.diagnostics.md) | 8 | 18 | 25 | `README.md` |
-| [`tropoi.representation.visual`](packages/tropoi.representation.visual.md) | 26 | 57 | 88 | `ATMOSPHERE_VIEW.md`, `HELD_SUAREZ_CLIMATE.md`, `README.md`, `sky_view.html`, `terrain_globe.html` |
+| [`tropoi.representation.archive`](packages/tropoi.representation.archive.md) | 13 | 19 | 30 | `README.md` |
+| [`tropoi.representation.diagnostics`](packages/tropoi.representation.diagnostics.md) | 9 | 19 | 28 | `README.md` |
+| [`tropoi.representation.visual`](packages/tropoi.representation.visual.md) | 28 | 62 | 91 | `ATMOSPHERE_VIEW.md`, `HELD_SUAREZ_CLIMATE.md`, `README.md`, `sky_view.html`, `terrain_globe.html` |
 | [`tropoi.run`](packages/tropoi.run.md) | 2 | 0 | 2 | `README.md` |
 | [`tropoi.run.bve`](packages/tropoi.run.bve.md) | 6 | 2 | 3 | `README.md` |
 | [`tropoi.run.custom`](packages/tropoi.run.custom.md) | 7 | 12 | 15 | `INITIAL_STATES.md`, `README.md` |
-| [`tropoi.run.held_suarez`](packages/tropoi.run.held_suarez.md) | 8 | 5 | 35 | `README.md` |
+| [`tropoi.run.held_suarez`](packages/tropoi.run.held_suarez.md) | 8 | 5 | 37 | `README.md` |
 | [`tropoi.run.pe`](packages/tropoi.run.pe.md) | 5 | 1 | 2 | `GUIDE.md`, `README.md` |
-| [`tropoi.run.radiative`](packages/tropoi.run.radiative.md) | 5 | 2 | 13 | `README.md` |
+| [`tropoi.run.radiative`](packages/tropoi.run.radiative.md) | 5 | 2 | 14 | `README.md` |
 | [`tropoi.run.swe`](packages/tropoi.run.swe.md) | 5 | 1 | 2 | `README.md` |
-| [`tropoi.spatial`](packages/tropoi.spatial.md) | 10 | 18 | 18 | `CONVENTIONS.md`, `README.md` |
-| [`tropoi.spatial.grids`](packages/tropoi.spatial.grids.md) | 8 | 5 | 4 | `README.md` |
+| [`tropoi.spatial`](packages/tropoi.spatial.md) | 10 | 18 | 19 | `CONVENTIONS.md`, `README.md` |
+| [`tropoi.spatial.grids`](packages/tropoi.spatial.grids.md) | 8 | 5 | 5 | `README.md` |
 | [`tropoi.spatial.initialization`](packages/tropoi.spatial.initialization.md) | 4 | 0 | 4 | `README.md` |
 | [`tropoi.spatial.operators`](packages/tropoi.spatial.operators.md) | 2 | 1 | 0 | `README.md` |
 | [`tropoi.spatial.states`](packages/tropoi.spatial.states.md) | 4 | 5 | 1 | `README.md` |
 | [`tropoi.spatial.terrain`](packages/tropoi.spatial.terrain.md) | 8 | 10 | 10 | `IMPORT.md`, `README.md` |
-| [`tropoi.spatial.transforms`](packages/tropoi.spatial.transforms.md) | 5 | 3 | 4 | `README.md` |
-| [`tropoi.spatial.transforms.cuda`](packages/tropoi.spatial.transforms.cuda.md) | 2 | 0 | 2 | `README.md`, `legendre.cu`, `sh_matrix.cu` |
+| [`tropoi.spatial.transforms`](packages/tropoi.spatial.transforms.md) | 6 | 5 | 5 | `README.md` |
+| [`tropoi.spatial.transforms.cuda`](packages/tropoi.spatial.transforms.cuda.md) | 2 | 0 | 2 | `README.md`, `legendre.cu`, `legendre_stages.cu`, `sh_matrix.cu` |
 | [`tropoi.temporal`](packages/tropoi.temporal.md) | 8 | 11 | 17 | `README.md`, `SAVED_RUNS.md`, `SEMI_IMPLICIT.md` |
 | [`tropoi.temporal.tendencies`](packages/tropoi.temporal.tendencies.md) | 7 | 8 | 9 | `PRIMITIVE_EQUATIONS.md`, `README.md`, `RETAINED_TRUNCATION.md`, `SHALLOW_WATER.md` |
 
@@ -51,6 +51,7 @@ Explore dependencies, call sites, possible dispatch, runtime observations and pr
 | [`calls/cli-run-pe.mmd`](calls/cli-run-pe.mmd) | `tropoi.cli.main._cmd_run_pe` |
 | [`calls/cli-run-swe.mmd`](calls/cli-run-swe.mmd) | `tropoi.cli.main._cmd_run_swe` |
 | [`calls/cli-terrain-run-prepare.mmd`](calls/cli-terrain-run-prepare.mmd) | `tropoi.cli.terrain.run_prepare` |
+| [`calls/cli-view.mmd`](calls/cli-view.mmd) | `tropoi.cli.main._cmd_view` |
 
 **Declared Python entry paths** (from the scope file; every public entry point candidate is a root here or listed under exclusions):
 
@@ -65,11 +66,11 @@ Explore dependencies, call sites, possible dispatch, runtime observations and pr
 ## Coverage
 
 * Packages: 25 discovered, 25 with a page.
-* Import module records: 171 discovered (including namespace placeholders), 171 listed on a package page.
-* Classes: 216 discovered, 216 drawn on a package page (21 in [the inheritance overview](class-inheritance.mmd)).
-* Both containment views cover 22 directories, 100 Python files, 216 class definitions, leaving out files and directories that define no class.
-* CLI handlers: 11 discovered, each with a call graph.
-* Public Python entry-point candidates: 37; 14 are roots of declared paths, 23 excluded with a reason.
+* Import module records: 180 discovered (including namespace placeholders), 180 listed on a package page.
+* Classes: 226 discovered, 226 drawn on a package page (21 in [the inheritance overview](class-inheritance.mmd)).
+* Both containment views cover 22 directories, 106 Python files, 226 class definitions, leaving out files and directories that define no class.
+* CLI handlers: 12 discovered, each with a call graph.
+* Public Python entry-point candidates: 39; 14 are roots of declared paths, 25 excluded with a reason.
 
 **Deliberate exclusions**
 
@@ -81,6 +82,7 @@ Explore dependencies, call sites, possible dispatch, runtime observations and pr
 * `tropoi.physics.radiation.gray.isca_mars_shortwave`: gray Mars shortwave optical-depth profile; no caller in the package; used by tests
 * `tropoi.physics.radiation.gray.schneider_liu_longwave`: gray longwave optical-depth profile (Schneider & Liu 2009); no caller in the package; used by tests and tools/radiation/regimes.py
 * `tropoi.physics.radiation.kdist.ktable_from_spectrum`: builds a correlated-k table from a user-supplied absorption function; no caller in the package; used by tests
+* `tropoi.physics.radiation.tables.table_spec`: returns the configuration entry (file and content hash) that pins a stored k-table; no caller in the package; used by tests and by whoever writes a configuration
 * `tropoi.physics.thermodynamics.cp_molar`: isobaric molar heat capacity of one named species; no caller in the package; used by tests
 * `tropoi.physics.thermodynamics.kappa`: R / c_p(T) of a mixture; no caller in the package
 * `tropoi.representation.visual.atmosphere.dequantize_columns`: NumPy reference of the atmosphere page's browser-side dequantization, used by tests to bound the quantization error; no workflow starts here
@@ -95,6 +97,7 @@ Explore dependencies, call sites, possible dispatch, runtime observations and pr
 * `tropoi.run.radiative.config.earth_gray_dry`: reached by name through the run.radiative.config.PRESETS registry (a dict lookup static analysis does not follow)
 * `tropoi.run.radiative.config.jupiter_schneider_liu`: reached by name through the run.radiative.config.PRESETS registry (a dict lookup static analysis does not follow)
 * `tropoi.run.radiative.config.mars_gray_flat_dev`: reached by name through the run.radiative.config.PRESETS registry (a dict lookup static analysis does not follow)
+* `tropoi.run.radiative.config.thai_dry_dev`: reached by name through the run.radiative.config.PRESETS registry (a dict lookup static analysis does not follow)
 * `tropoi.temporal.hooks.rk4_real_axis_limit`: numerical helper (RK4 stability limit on the real axis) used by a stability test; no workflow starts here
 
 **Static-analysis limits** (counts in `coverage.json`): calls through objects, `getattr`, callbacks and decorators are not edges; dynamic imports are counted, not followed; function-local classes are recorded only in the containment views; non-Python files are listed, never read. A missing edge does not mean "never called".

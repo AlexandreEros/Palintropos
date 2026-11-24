@@ -15,6 +15,20 @@ numerical risks that remain open.
 > is not exact dealiasing. Numbers in the tables below are *measurements* of the
 > discrete solver, not analytic guarantees.
 
+> **Provenance of the geodesic figures (added 2026-11-16).** Every geodesic
+> number and figure on this page was measured when the geodesic grid was the
+> implicit default and the dense basis-matrix evaluator was the only one, at
+> the commits each row names. **Neither is a default any more**: new runs
+> default to the Gauss lat–lon grid with the separable FFT+Legendre
+> evaluator, and the `rh4` preset no longer selects geodesic. So the
+> geodesic rows are **historical records, not reproducible by today's
+> defaults** — `tropoi run bve --preset rh4` now runs the lat–lon
+> configuration. Reproducing a geodesic row means checking out the commit it
+> names, or passing `--backend geodesic --resolution 4` explicitly (which
+> warns, being deprecated). The figures have not been superseded by new
+> measurements; they have not been re-run, and nothing here is restated as a
+> current default's behavior.
+
 ## RH4 benchmark
 
 The BVE evidence uses an Earth-like rotating sphere
@@ -29,6 +43,9 @@ versus the analytic 12.260°, while its `(l,m)=(5,4)` amplitude changed by only
 −0.031%.
 
 ### Measured benchmark results
+
+All rows below are historical measurements on the discretizations named;
+see the provenance note above for what today's defaults would run instead.
 
 | Evidence | Exact configuration | Result |
 |---|---|---|

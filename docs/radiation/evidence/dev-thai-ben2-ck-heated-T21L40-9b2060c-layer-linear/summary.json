@@ -1,0 +1,251 @@
+{
+ "aborted": [],
+ "completed": true,
+ "config_sha256": "3f2de9d8985c2bc1405cced826bb84755860ddf6ed68986aeb702186d2536eff",
+ "cp": 791.4851590100508,
+ "daily": {
+  "0": {
+   "absorbed_stellar": 0.0,
+   "bottom_net_down": 0.0,
+   "column_energy_tendency": 0.0,
+   "energy_total": 2603569656.8313036,
+   "max_abs_u": 0.2213002179584926,
+   "max_wind_bottom": 0.22570207437549383,
+   "mean_ps": 99999.99999999987,
+   "mean_surface_temperature": 300.0,
+   "olr": 0.0,
+   "sensible": 0.0,
+   "surface_net": 0.0,
+   "t_max": 299.99999999999994,
+   "t_min": 299.99999999999994,
+   "toa_net_down": 0.0
+  },
+  "1": {
+   "absorbed_stellar": 183.3655145697518,
+   "bottom_net_down": -20.07922328782648,
+   "column_energy_tendency": -214.73493638741442,
+   "energy_rate": -214.3109536250322,
+   "energy_residual": 0.42398276238222365,
+   "energy_total": 2585053190.438101,
+   "max_abs_u": 159.59793642166363,
+   "max_wind_bottom": 1.3719558651230501,
+   "mean_ps": 99999.99989894754,
+   "mean_surface_temperature": 299.1187803577473,
+   "olr": 418.4990537870896,
+   "sensible": 0.31937954209694774,
+   "surface_net": -20.398602829923423,
+   "t_max": 303.4851860920323,
+   "t_min": 175.13200965176117,
+   "toa_net_down": -235.13353921733784
+  },
+  "2": {
+   "absorbed_stellar": 183.3383514515295,
+   "bottom_net_down": -17.78246555207442,
+   "column_energy_tendency": -181.55011488091702,
+   "energy_rate": -181.40195647394216,
+   "energy_residual": 0.14815840697485783,
+   "energy_total": 2569380061.398752,
+   "max_abs_u": 236.48374438673065,
+   "max_wind_bottom": 2.842140463073633,
+   "mean_ps": 99999.99965019207,
+   "mean_surface_temperature": 298.26062081578357,
+   "olr": 384.75327054457154,
+   "sensible": 2.082338660050244,
+   "surface_net": -19.86480421212465,
+   "t_max": 310.289788171312,
+   "t_min": 156.2635323452714,
+   "toa_net_down": -201.4149190930416
+  },
+  "3": {
+   "absorbed_stellar": 183.30977876309436,
+   "bottom_net_down": -16.058873417364026,
+   "column_energy_tendency": -163.7860572550526,
+   "energy_rate": -163.68398500017545,
+   "energy_residual": 0.10207225487715732,
+   "energy_total": 2555237765.094737,
+   "max_abs_u": 255.991511927295,
+   "max_wind_bottom": 5.166382107577061,
+   "mean_ps": 99999.9997541359,
+   "mean_surface_temperature": 297.3717593074385,
+   "olr": 367.6713338965048,
+   "sensible": 4.516624460993934,
+   "surface_net": -20.575497878357954,
+   "t_max": 316.2632074539973,
+   "t_min": 138.48336762107064,
+   "toa_net_down": -184.3615551334105
+  },
+  "4": {
+   "absorbed_stellar": 183.28750282330418,
+   "bottom_net_down": -14.998218325736296,
+   "column_energy_tendency": -150.71067922397052,
+   "energy_rate": -150.6296685106666,
+   "energy_residual": 0.08101071330392529,
+   "energy_total": 2542223361.7354155,
+   "max_abs_u": 260.94920063400895,
+   "max_wind_bottom": 6.179702842518856,
+   "mean_ps": 100000.00013349354,
+   "mean_surface_temperature": 296.4474995358147,
+   "olr": 355.3930841681936,
+   "sensible": 6.396683795182438,
+   "surface_net": -21.39490212091873,
+   "t_max": 322.0207275039738,
+   "t_min": 132.48033801985017,
+   "toa_net_down": -172.10558134488917
+  },
+  "5": {
+   "absorbed_stellar": 183.26802237379712,
+   "bottom_net_down": -14.12203627830195,
+   "column_energy_tendency": -139.89460337864682,
+   "energy_rate": -139.8305578856998,
+   "energy_residual": 0.06404549294703088,
+   "energy_total": 2530142001.534091,
+   "max_abs_u": 241.48038473813034,
+   "max_wind_bottom": 7.2296227770573465,
+   "mean_ps": 99999.99994641694,
+   "mean_surface_temperature": 295.4777987764241,
+   "olr": 345.609402590193,
+   "sensible": 8.324740559446886,
+   "surface_net": -22.446776837748832,
+   "t_max": 326.9487828475635,
+   "t_min": 120.84016202113237,
+   "toa_net_down": -162.34138021639578
+  }
+ },
+ "dt_seconds": 1200.0,
+ "events": [
+  {
+   "day": 0,
+   "event": "created",
+   "step": 0,
+   "time": "2026-11-18T17:50:57Z"
+  },
+  {
+   "day": 0.0,
+   "event": "checkpoint",
+   "file": "checkpoint-s000000000.npz",
+   "step": 0,
+   "time": "2026-11-18T17:50:57Z"
+  },
+  {
+   "day": 1.0,
+   "event": "checkpoint",
+   "file": "checkpoint-s000000072.npz",
+   "step": 72,
+   "time": "2026-11-18T17:55:23Z"
+  },
+  {
+   "day": 2.0,
+   "event": "checkpoint",
+   "file": "checkpoint-s000000144.npz",
+   "step": 144,
+   "time": "2026-11-18T18:00:00Z"
+  },
+  {
+   "day": 3.0,
+   "event": "checkpoint",
+   "file": "checkpoint-s000000216.npz",
+   "step": 216,
+   "time": "2026-11-18T18:04:38Z"
+  },
+  {
+   "day": 4.0,
+   "event": "checkpoint",
+   "file": "checkpoint-s000000288.npz",
+   "step": 288,
+   "time": "2026-11-18T18:10:06Z"
+  },
+  {
+   "day": 5.0,
+   "event": "checkpoint",
+   "file": "checkpoint-s000000360.npz",
+   "step": 360,
+   "time": "2026-11-18T18:17:20Z"
+  },
+  {
+   "day": 5.0,
+   "event": "completed",
+   "step": 360,
+   "time": "2026-11-18T18:17:20Z"
+  }
+ ],
+ "experiment_id": "dev-thai-ben2-ck-heated-T21L40",
+ "gas_constant": 188.926415463956,
+ "git_commit": "9b2060c601d12a7daca0b6ec403e70f72f7d0277",
+ "git_dirty": false,
+ "last_day": 5,
+ "longwave": {
+  "bounds": "error",
+  "kind": "correlated_k",
+  "mass_fractions": {
+   "thai_ben2": 1.0
+  },
+  "tables": [
+   {
+    "file": "thai-ben2-sp-lw-17-dsa-mars.npz",
+    "sha256": "9d4c18a6822690aa12051598695ca4d6946324bb36f8752a35d57b9963087e18"
+   }
+  ]
+ },
+ "max_abs_energy_residual_w_m2": 0.42398276238222365,
+ "radiation_interval_steps": 3,
+ "resumed_at_days": [],
+ "run": "dev-thai-ben2-ck-heated-T21L40-9b2060c-layer-linear",
+ "schema": "palintropos.radiation.thai_dev_run/1",
+ "shortwave": {
+  "band_fractions": [
+   0.007258484028,
+   0.006780315862,
+   0.002870869908,
+   0.009652540429,
+   0.0395083342,
+   0.02363320203,
+   0.01990910171,
+   0.02146444856,
+   0.02269817405,
+   0.01096201485,
+   0.01248332998,
+   0.02849879125,
+   0.02621123844,
+   0.06775044413,
+   0.0348666271,
+   0.03048862789,
+   0.03289022826,
+   0.09284954726,
+   0.01518227359,
+   0.01474203956,
+   0.01975398087,
+   0.04499964863,
+   0.04929574556,
+   0.03437250387,
+   0.03599036771,
+   0.0508297636,
+   0.05216377736,
+   0.04110577227,
+   0.09996624428,
+   0.003882973633,
+   0.02612883711,
+   0.004724752917,
+   0.01099017399,
+   0.002530298546,
+   0.00102034457,
+   0.0007771275866,
+   0.0005825989255,
+   0.0001044206189,
+   5.747656744e-05,
+   1.116784097e-05,
+   1.136564469e-05,
+   2.481091694e-08
+  ],
+  "bounds": "error",
+  "kind": "correlated_k",
+  "mass_fractions": {
+   "thai_ben2": 1.0
+  },
+  "tables": [
+   {
+    "file": "thai-ben2-sp-sw-42-dsa-mars-trappist1.npz",
+    "sha256": "c2e873d40e3da41dd52a9b3187fd47cf65631481b03a152363f6bfc6300e8386"
+   }
+  ]
+ }
+}

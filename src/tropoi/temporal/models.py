@@ -23,6 +23,36 @@ from __future__ import annotations
 
 from typing import Mapping
 
+# These builders take no evaluator parameter. The spherical-harmonic
+# evaluator comes from ``latlon_grid.default_transform_backend()`` (the
+# separable path, or ``TROPOI_SH_BACKEND``), with the dense fallback for
+# grids that cannot factorize. The parameter existed only so a replay could
+# be pinned to the evaluator a run's manifest recorded, i.e. to reproduce
+# obsolete numerical semantics in current code; a run that must reproduce
+# bit-for-bit is reproduced from the commit its manifest records. Callers
+# that genuinely need to choose go through ``Planet.generate`` or
+# ``GaussLatLonSphericalHarmonics`` directly.
+
+#: The grid family a saved configuration that predates the ``grid`` key was
+#: necessarily run on. Kept because it has a *current* use, not to preserve
+#: old API behavior: five committed, receipted BVE capsules under
+#: ``docs/runs/`` omit ``"grid"`` and are resolution-4 geodesic runs --
+#: ``20260712T023305Z_two-vortices_rot24h_r4_l21_dt10h_501bce43`` and its
+#: three ``20260712T03*_two-vortices`` siblings, plus
+#: ``20260712T080551Z_rh4_rot24h_r4_l21_dt6h_0678ac18``. Reading them as
+#: anything else would rebuild the wrong discretization and their published
+#: figures would not reproduce. Unrelated to the *default* grid for new
+#: runs, which is lat-lon: this is how to read those old files correctly,
+#: and it stays only while they are in the repository. (The grid-less
+#: radiative capsules are not affected: that core fixes its own grid and
+#: never reaches this builder.)
+LEGACY_GRID_TYPE = "geodesic"
+
+
+def _legacy_grid_type(run_config: Mapping) -> str:
+    """``run_config``'s grid family, inferring :data:`LEGACY_GRID_TYPE`."""
+    return run_config.get("grid", LEGACY_GRID_TYPE)
+
 
 def build_planet(run_config: Mapping):
     """The BVE run's Planet (grid, transform, backend, operators).
@@ -52,7 +82,7 @@ def build_planet(run_config: Mapping):
         grid_resolution=int(run_config["resolution"]),
         l_max=int(run_config["lmax"]),
         product_quadrature=run_config.get("product_quadrature", "fine"),
-        grid_type=run_config.get("grid", "geodesic"),
+        grid_type=_legacy_grid_type(run_config),
         nlat=int(run_config["nlat"]),
         nlon=int(run_config["nlon"]),
     )
@@ -123,7 +153,7 @@ def build_swe_model(run_config: Mapping, *, topography_lm=None):
         grid_resolution=int(run_config["resolution"]),
         l_max=int(run_config["lmax"]),
         product_quadrature="fine",
-        grid_type=run_config.get("grid", "geodesic"),
+        grid_type=_legacy_grid_type(run_config),
         nlat=int(run_config["nlat"]),
         nlon=int(run_config["nlon"]),
     )
@@ -201,7 +231,7 @@ def build_pe_model(run_config: Mapping, *, topography_lm=None):
         grid_resolution=int(run_config["resolution"]),
         l_max=int(run_config["lmax"]),
         product_quadrature="fine",
-        grid_type=run_config.get("grid", "geodesic"),
+        grid_type=_legacy_grid_type(run_config),
         nlat=int(run_config["nlat"]),
         nlon=int(run_config["nlon"]),
     )

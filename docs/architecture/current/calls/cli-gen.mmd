@@ -54,6 +54,9 @@ flowchart LR
         n_tropoi_ospatial_otransforms_ooptimized__geodesic__sh_oGeodesicSphericalHarmonics{{"GeodesicSphericalHarmonics"}}
         n_tropoi_ospatial_otransforms_ooptimized__geodesic__sh_oGeodesicSphericalHarmonics_o____init____["GeodesicSphericalHarmonics.#95;#95;init#95;#95;()"]
     end
+    subgraph g_tropoi_ospatial_otruncation["spatial.truncation"]
+        n_tropoi_ospatial_otruncation_ogauss__grid__for__truncation["gauss#95;grid#95;for#95;truncation()"]
+    end
     n_tropoi_ocli_ogenerate__planet_orun --> n_tropoi_ocli_ogenerate__planet_oresolve__output__path
     n_tropoi_ocli_ogenerate__planet_orun -->|instantiate| n_tropoi_orepresentation_ovisual_oplanet__viewer_oPlanetViewer
     n_tropoi_ocli_ogenerate__planet_orun --> n_tropoi_ospatial_oenvironment_oPlanetaryParameters_ofrom__earth__like
@@ -79,6 +82,7 @@ flowchart LR
     n_tropoi_ospatial_oplanet_oPlanet_ogenerate -->|instantiate| n_tropoi_ospatial_oterrain_oterrain__spectral_oSpectralTerrainParams
     n_tropoi_ospatial_oplanet_oPlanet_ogenerate --> n_tropoi_ospatial_oterrain_oterrain__spectral_ogenerate__spectral__terrain__gpu
     n_tropoi_ospatial_oplanet_oPlanet_ogenerate -->|instantiate| n_tropoi_ospatial_otransforms_ooptimized__geodesic__sh_oGeodesicSphericalHarmonics
+    n_tropoi_ospatial_oplanet_oPlanet_ogenerate --> n_tropoi_ospatial_otruncation_ogauss__grid__for__truncation
     n_tropoi_ospatial_ospherical__backend_oGeodesicBackend -->|#95;#95;init#95;#95;| n_tropoi_ospatial_ospherical__backend_oGeodesicBackend_o____init____
     n_tropoi_ospatial_ospherical__backend_oLatLonBackend -->|#95;#95;init#95;#95;| n_tropoi_ospatial_ospherical__backend_oLatLonBackend_o____init____
     n_tropoi_ospatial_otransforms_ooptimized__geodesic__sh_oGeodesicSphericalHarmonics -->|#95;#95;init#95;#95;| n_tropoi_ospatial_otransforms_ooptimized__geodesic__sh_oGeodesicSphericalHarmonics_o____init____

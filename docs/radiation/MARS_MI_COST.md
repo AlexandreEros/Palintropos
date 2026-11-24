@@ -1,5 +1,19 @@
 # Mars M-I CV-1: what it would cost, measured (2026-11-14)
 
+> **Superseded in part (2026-11-24).** PR #43 (`0ea4296`) made the separable
+> FFT + Legendre evaluator the default transform. That is candidate 1 of §5,
+> and the transforms README records a T42 Held–Suarez-style step going from
+> 10.76 s to 0.67 s (16×).
+>
+> - **Still valid:** the stability probes (§3), the memory timescales and
+>   the transfer requirements (§4), and the projection arithmetic.
+> - **Out of date:** the costs here (§1, §2), the ranking (§5) and the T42
+>   TDR failure all describe the **dense** evaluator at `cfebd16`. They need
+>   re-measuring on current `main`.
+> - **Reproducing:** the tool now instruments both evaluators and records
+>   which one ran. `TROPOI_SH_BACKEND=dense` reproduces the measurements
+>   below; the default measures the separable one.
+
 **Scope.** This report measures what CV-1 would cost
 (`MARS_MI_PLAN.md` §4.3, §4.4). CV-1 is a T42L25 run of at least 1920 sols
 from L_s 0, whose L_s 225°–315° zonal-mean u is compared against Thomson &

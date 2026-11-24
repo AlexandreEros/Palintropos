@@ -185,6 +185,7 @@ flowchart LR
     end
     subgraph g_tropoi_ospatial_otruncation["spatial.truncation"]
         n_tropoi_ospatial_otruncation_o__min__lmax__retaining["#95;min#95;lmax#95;retaining()"]
+        n_tropoi_ospatial_otruncation_ogauss__grid__for__truncation["gauss#95;grid#95;for#95;truncation()"]
         n_tropoi_ospatial_otruncation_oproduct__truncation__cut["product#95;truncation#95;cut()"]
         n_tropoi_ospatial_otruncation_orequire__scenario__support["require#95;scenario#95;support()"]
     end
@@ -196,6 +197,7 @@ flowchart LR
         n_tropoi_otemporal_ointegration_ointerval__snapshot__times["interval#95;snapshot#95;times()"]
     end
     subgraph g_tropoi_otemporal_omodels["temporal.models"]
+        n_tropoi_otemporal_omodels_o__legacy__grid__type["#95;legacy#95;grid#95;type()"]
         n_tropoi_otemporal_omodels_o__w5__planet__params["#95;w5#95;planet#95;params()"]
         n_tropoi_otemporal_omodels_obuild__planet["build#95;planet()"]
         n_tropoi_otemporal_omodels_obuild__swe__model["build#95;swe#95;model()"]
@@ -365,6 +367,7 @@ flowchart LR
     n_tropoi_ospatial_oplanet_oPlanet_ogenerate -->|instantiate| n_tropoi_ospatial_oterrain_oterrain__spectral_oSpectralTerrainParams
     n_tropoi_ospatial_oplanet_oPlanet_ogenerate --> n_tropoi_ospatial_oterrain_oterrain__spectral_ogenerate__spectral__terrain__gpu
     n_tropoi_ospatial_oplanet_oPlanet_ogenerate -->|instantiate| n_tropoi_ospatial_otransforms_ooptimized__geodesic__sh_oGeodesicSphericalHarmonics
+    n_tropoi_ospatial_oplanet_oPlanet_ogenerate --> n_tropoi_ospatial_otruncation_ogauss__grid__for__truncation
     n_tropoi_ospatial_ospecification_oDiscretizationSpec_ofrom__dict -->|instantiate| n_tropoi_ospatial_ospecification_oSpecificationError
     n_tropoi_ospatial_ospecification_oDiscretizationSpec_ofrom__dict --> n_tropoi_ospatial_ospecification_o__check__document
     n_tropoi_ospatial_ospecification_oFluidLayerSpec_ofrom__dict -->|instantiate| n_tropoi_ospatial_ospecification_oSpecificationError
@@ -401,12 +404,14 @@ flowchart LR
     n_tropoi_otemporal_omodels_obuild__planet --> n_tropoi_ospatial_oenvironment_oPlanetaryParameters_ofrom__earth__like
     n_tropoi_otemporal_omodels_obuild__planet --> n_tropoi_ospatial_oplanet_oPlanet_ogenerate
     n_tropoi_otemporal_omodels_obuild__planet --> n_tropoi_ospatial_ospecification_oPlanetSpec_ofrom__dict
+    n_tropoi_otemporal_omodels_obuild__planet --> n_tropoi_otemporal_omodels_o__legacy__grid__type
     n_tropoi_otemporal_omodels_obuild__swe__model --> n_tropoi_ospatial_oenvironment_oPlanetaryParameters_ofrom__earth__like
     n_tropoi_otemporal_omodels_obuild__swe__model --> n_tropoi_ospatial_oplanet_oPlanet_ogenerate
     n_tropoi_otemporal_omodels_obuild__swe__model --> n_tropoi_ospatial_ospecification_oPlanetSpec_ofrom__dict
     n_tropoi_otemporal_omodels_obuild__swe__model -->|instantiate| n_tropoi_ospatial_oterrain_otopography_oTopography
     n_tropoi_otemporal_omodels_obuild__swe__model --> n_tropoi_ospatial_oterrain_otopography_oTopography_omountain
     n_tropoi_otemporal_omodels_obuild__swe__model --> n_tropoi_ospatial_oterrain_otopography_oTopography_owilliamson5__cone
+    n_tropoi_otemporal_omodels_obuild__swe__model --> n_tropoi_otemporal_omodels_o__legacy__grid__type
     n_tropoi_otemporal_omodels_obuild__swe__model --> n_tropoi_otemporal_omodels_o__w5__planet__params
     n_tropoi_otemporal_omodels_obuild__swe__model -->|instantiate| n_tropoi_otemporal_otendencies_oshallow__water_oShallowWaterModel
     n_tropoi_otemporal_otendencies_oshallow__water_oShallowWaterModel -->|#95;#95;init#95;#95;| n_tropoi_otemporal_otendencies_oshallow__water_oShallowWaterModel_o____init____

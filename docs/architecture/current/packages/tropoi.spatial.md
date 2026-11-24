@@ -16,7 +16,7 @@ Index: [all packages](../index.md) · parent [`tropoi`](tropoi.md) · [`tropoi.s
 | `tropoi.spatial.sigma_coordinate` | code | `SigmaGrid`, `SigmaGridError` | `column_energy_conversion`, `column_mass_tendency`, `column_pressure_work`, `energy_exchange`, `hydrostatic_geopotential`, `interface_mean`, `interface_sigma_dot`, `layer_mass_residual`, `omega_over_p`, `vertical_advection`, `vertical_flux_divergence`, `vertical_sbp` |
 | `tropoi.spatial.specification` | code | `DiscretizationSpec`, `FluidLayerSpec`, `PlanetSpec`, `SpecificationError`, `TopographySpec` | – |
 | `tropoi.spatial.spherical_backend` | code | `GeodesicBackend`, `LatLonBackend`, `PointSetBackend`, `ProductSpace`, `SphericalGridBackend` | `make_backend` |
-| `tropoi.spatial.truncation` | code | – | `product_truncation_cut`, `require_scenario_support`, `require_thermal_wave_support` |
+| `tropoi.spatial.truncation` | code | – | `gauss_grid_for_truncation`, `product_truncation_cut`, `require_scenario_support`, `require_thermal_wave_support` |
 | `tropoi.spatial.williamson5` | code | – | – |
 
 Files shipped in this directory that are **not Python and not analysed** (templates, data): `CONVENTIONS.md`, `README.md`. Their contents (for example JavaScript in an HTML template) are invisible to every graph here.
@@ -60,14 +60,15 @@ flowchart LR
     p_tropoi_otemporal_otendencies["package temporal.tendencies"]
     n_tropoi_ospatial_oplanet --> n_tropoi_ospatial_oenvironment
     n_tropoi_ospatial_oplanet -.-> n_tropoi_ospatial_ospherical__backend
+    n_tropoi_ospatial_oplanet --> n_tropoi_ospatial_otruncation
     n_tropoi_ospatial_ospecification -.-> n_tropoi_ospatial_oenvironment
     n_tropoi_ospatial_ospecification --> n_tropoi_ospatial_owilliamson5
     p_tropoi_ocli -.->|1| n_tropoi_ospatial_oenvironment
     p_tropoi_ocli -.->|1| n_tropoi_ospatial_omodes
     p_tropoi_ocli -.->|1| n_tropoi_ospatial_oplanet
-    p_tropoi_orepresentation_oarchive -.->|1| n_tropoi_ospatial_oenvironment
+    p_tropoi_orepresentation_oarchive -.->|2| n_tropoi_ospatial_oenvironment
     p_tropoi_orepresentation_oarchive -->|5| n_tropoi_ospatial_omodes
-    p_tropoi_orepresentation_oarchive -->|1| n_tropoi_ospatial_osigma__coordinate
+    p_tropoi_orepresentation_oarchive -->|2| n_tropoi_ospatial_osigma__coordinate
     p_tropoi_orepresentation_oarchive -->|2| n_tropoi_ospatial_ospecification
     p_tropoi_orepresentation_oarchive -->|1| n_tropoi_ospatial_otruncation
     p_tropoi_orepresentation_odiagnostics -->|1| n_tropoi_ospatial_olaplacian
@@ -76,7 +77,9 @@ flowchart LR
     p_tropoi_orepresentation_ovisual -->|2| n_tropoi_ospatial_oplanet
     p_tropoi_orepresentation_ovisual -->|2| n_tropoi_ospatial_osigma__coordinate
     p_tropoi_orepresentation_ovisual -.->|1| n_tropoi_ospatial_otruncation
+    p_tropoi_orepresentation_ovisual -->|1| n_tropoi_ospatial_owilliamson5
     p_tropoi_orun_obve -->|1| n_tropoi_ospatial_oplanet
+    p_tropoi_orun_obve -->|1| n_tropoi_ospatial_otruncation
     p_tropoi_orun_ocustom -->|1| n_tropoi_ospatial_olaplacian
     p_tropoi_orun_ocustom -->|1| n_tropoi_ospatial_omodes
     p_tropoi_orun_ocustom -->|7| n_tropoi_ospatial_ospecification

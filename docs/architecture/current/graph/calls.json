@@ -177,6 +177,11 @@
     },
     {
       "kind": "call",
+      "source": "tropoi.cli.main._cmd_inspect",
+      "target": "tropoi.representation.archive.viewer_manifest.viewer_manifest"
+    },
+    {
+      "kind": "call",
       "source": "tropoi.cli.main._cmd_plot",
       "target": "tropoi.cli.main._asset_name"
     },
@@ -264,6 +269,16 @@
       "kind": "call",
       "source": "tropoi.cli.main._cmd_run_swe",
       "target": "tropoi.run.swe.execution.execute_run"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.cli.main._cmd_view",
+      "target": "tropoi.cli.main._error"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.cli.main._cmd_view",
+      "target": "tropoi.representation.visual.viewer_server.serve"
     },
     {
       "kind": "call",
@@ -1341,6 +1356,41 @@
       "target": "tropoi.physics.radiation.scheme._xp"
     },
     {
+      "kind": "instantiate",
+      "source": "tropoi.physics.radiation.tables.check_premixed",
+      "target": "tropoi.physics.radiation.tables.KTableError"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.physics.radiation.tables.load_table",
+      "target": "tropoi.physics.radiation.kdist.KTable.load"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.physics.radiation.tables.load_table",
+      "target": "tropoi.physics.radiation.tables.KTableError"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.physics.radiation.tables.load_table",
+      "target": "tropoi.physics.radiation.tables.resolve_table"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.physics.radiation.tables.resolve_table",
+      "target": "tropoi.physics.radiation.tables.KTableError"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.physics.radiation.tables.resolve_table",
+      "target": "tropoi.physics.radiation.tables.search_path"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.physics.radiation.tables.table_spec",
+      "target": "tropoi.physics.radiation.kdist.KTable.load"
+    },
+    {
       "kind": "call",
       "source": "tropoi.physics.radiation.twostream.adding",
       "target": "tropoi.physics.radiation.twostream._xp"
@@ -1738,37 +1788,52 @@
     {
       "kind": "call",
       "source": "tropoi.representation.archive.capsule.open_simulation",
-      "target": "tropoi.representation.archive.availability.statistics_only_description"
-    },
-    {
-      "kind": "instantiate",
-      "source": "tropoi.representation.archive.capsule.open_simulation",
-      "target": "tropoi.representation.archive.capsule.CapsuleError"
-    },
-    {
-      "kind": "instantiate",
-      "source": "tropoi.representation.archive.capsule.open_simulation",
-      "target": "tropoi.representation.archive.capsule.CapsuleStorage"
-    },
-    {
-      "kind": "call",
-      "source": "tropoi.representation.archive.capsule.open_simulation",
-      "target": "tropoi.representation.archive.capsule.resolve_run_directory"
-    },
-    {
-      "kind": "instantiate",
-      "source": "tropoi.representation.archive.capsule.open_simulation",
-      "target": "tropoi.representation.archive.held_suarez.HeldSuarezStorage"
-    },
-    {
-      "kind": "call",
-      "source": "tropoi.representation.archive.capsule.open_simulation",
-      "target": "tropoi.representation.archive.held_suarez.is_held_suarez_experiment"
+      "target": "tropoi.representation.archive.capsule.open_storage"
     },
     {
       "kind": "instantiate",
       "source": "tropoi.representation.archive.capsule.open_simulation",
       "target": "tropoi.temporal.simulation.Simulation"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.archive.capsule.open_storage",
+      "target": "tropoi.representation.archive.availability.statistics_only_description"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.representation.archive.capsule.open_storage",
+      "target": "tropoi.representation.archive.capsule.CapsuleError"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.representation.archive.capsule.open_storage",
+      "target": "tropoi.representation.archive.capsule.CapsuleStorage"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.archive.capsule.open_storage",
+      "target": "tropoi.representation.archive.capsule._read_json_object"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.archive.capsule.open_storage",
+      "target": "tropoi.representation.archive.capsule.resolve_run_directory"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.representation.archive.capsule.open_storage",
+      "target": "tropoi.representation.archive.held_suarez.HeldSuarezStorage"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.archive.capsule.open_storage",
+      "target": "tropoi.representation.archive.held_suarez.is_held_suarez_experiment"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.representation.archive.capsule.open_storage",
+      "target": "tropoi.representation.archive.radiative.RadiativeStorage"
     },
     {
       "kind": "instantiate",
@@ -2241,6 +2306,71 @@
       "target": "tropoi.representation.archive.prepared_terrain.is_prepared_terrain"
     },
     {
+      "kind": "constructor",
+      "source": "tropoi.representation.archive.radiative.RadiativeStorage",
+      "target": "tropoi.representation.archive.radiative.RadiativeStorage.__init__"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.representation.archive.radiative.RadiativeStorage.__init__",
+      "target": "tropoi.representation.archive.pe_context.PEColumnContext"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.representation.archive.radiative.RadiativeStorage.__init__",
+      "target": "tropoi.representation.archive.radiative.RadiativeStorage._index"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.archive.radiative.RadiativeStorage.__init__",
+      "target": "tropoi.representation.archive.radiative._sigma"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.archive.radiative.RadiativeStorage.__init__",
+      "target": "tropoi.representation.archive.schema.state_schema_for"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.archive.radiative.RadiativeStorage._index",
+      "target": "tropoi.representation.archive.local_resource.resource"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.archive.radiative.RadiativeStorage._read",
+      "target": "tropoi.representation.archive.local_resource.resource"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.representation.archive.radiative.RadiativeStorage.frame",
+      "target": "tropoi.representation.archive.radiative.RadiativeStorage._read"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.representation.archive.radiative.RadiativeStorage.surface",
+      "target": "tropoi.representation.archive.radiative.RadiativeStorage._read"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.representation.archive.radiative._sigma",
+      "target": "tropoi.spatial.sigma_coordinate.SigmaGrid"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.archive.radiative._sigma",
+      "target": "tropoi.spatial.sigma_coordinate.SigmaGrid.frierson"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.archive.radiative._sigma",
+      "target": "tropoi.spatial.sigma_coordinate.SigmaGrid.stretched"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.archive.radiative._sigma",
+      "target": "tropoi.spatial.sigma_coordinate.SigmaGrid.uniform"
+    },
+    {
       "kind": "self",
       "source": "tropoi.representation.archive.schema.StateSchema.__post_init__",
       "target": "tropoi.representation.archive.schema.StateSchema.check_consistency"
@@ -2391,6 +2521,61 @@
       "target": "tropoi.representation.archive.schema._swe_fields"
     },
     {
+      "kind": "call",
+      "source": "tropoi.representation.archive.viewer_diagnostics.diagnostics",
+      "target": "tropoi.representation.archive.local_resource.resource"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.archive.viewer_manifest._derived_fields",
+      "target": "tropoi.representation.visual.quantities.quantity"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.archive.viewer_manifest._derived_fields",
+      "target": "tropoi.representation.visual.quantities.viewer_presentation"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.archive.viewer_manifest.viewer_manifest",
+      "target": "tropoi.representation.archive.capsule.open_storage"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.archive.viewer_manifest.viewer_manifest",
+      "target": "tropoi.representation.archive.local_resource.resource"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.archive.viewer_manifest.viewer_manifest",
+      "target": "tropoi.representation.archive.schema.StateSchema.from_manifest_dict"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.archive.viewer_manifest.viewer_manifest",
+      "target": "tropoi.representation.archive.viewer_diagnostics.diagnostics"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.archive.viewer_manifest.viewer_manifest",
+      "target": "tropoi.representation.archive.viewer_manifest._derived_fields"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.archive.viewer_manifest.viewer_manifest",
+      "target": "tropoi.representation.archive.viewer_manifest._operations"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.archive.viewer_manifest.viewer_manifest",
+      "target": "tropoi.representation.visual.quantities.viewer_presentation"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.archive.viewer_manifest.viewer_manifest",
+      "target": "tropoi.spatial.environment.PlanetaryParameters.from_earth_like"
+    },
+    {
       "kind": "instantiate",
       "source": "tropoi.representation.archive.writer.RunDirectory._validate_completed_manifest",
       "target": "tropoi.representation.archive.writer.RunProvenanceError"
@@ -2469,6 +2654,11 @@
       "kind": "call",
       "source": "tropoi.representation.archive.writer.make_run_id",
       "target": "tropoi.representation.archive.writer._config_hash"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.archive.writer.make_run_id",
+      "target": "tropoi.representation.archive.writer._grid_tag"
     },
     {
       "kind": "call",
@@ -2734,6 +2924,46 @@
       "kind": "call",
       "source": "tropoi.representation.diagnostics.pe_levels.reconstruct_levels",
       "target": "tropoi.spatial.transforms.host_synthesis.synthesize_wind_latlon"
+    },
+    {
+      "kind": "constructor",
+      "source": "tropoi.representation.diagnostics.pe_structure.ZonalMeanAccumulator",
+      "target": "tropoi.representation.diagnostics.pe_structure.ZonalMeanAccumulator.__init__"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.representation.diagnostics.pe_structure.ZonalMeanAccumulator.__init__",
+      "target": "tropoi.representation.diagnostics.held_suarez_sections.SectionAccumulator"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.diagnostics.pe_structure.ZonalMeanAccumulator.__init__",
+      "target": "tropoi.representation.diagnostics.held_suarez_sections.state_grid"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.diagnostics.pe_structure.ZonalMeanAccumulator.add",
+      "target": "tropoi.representation.diagnostics.pe_levels.reconstruct_levels"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.diagnostics.pe_structure.column",
+      "target": "tropoi.representation.diagnostics.pe_levels.reconstruct_levels"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.diagnostics.pe_structure.column",
+      "target": "tropoi.representation.diagnostics.pe_structure._finite_point"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.diagnostics.pe_structure.vertical_section",
+      "target": "tropoi.representation.diagnostics.pe_levels.reconstruct_levels"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.diagnostics.pe_structure.vertical_section",
+      "target": "tropoi.representation.diagnostics.pe_structure._finite_point"
     },
     {
       "kind": "call",
@@ -6102,6 +6332,286 @@
     },
     {
       "kind": "constructor",
+      "source": "tropoi.representation.visual.viewer_fields.FrameProvider",
+      "target": "tropoi.representation.visual.viewer_fields.FrameProvider.__init__"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.representation.visual.viewer_fields.FrameProvider.__init__",
+      "target": "tropoi.spatial.transforms.separable_gauss_sh.SeparableGaussSphericalHarmonics"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.representation.visual.viewer_fields.FrameProvider._context",
+      "target": "tropoi.representation.archive.pe_context.PEColumnContext"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.representation.visual.viewer_fields.FrameProvider._horizontal_slice",
+      "target": "tropoi.representation.visual.viewer_fields.FrameProvider._result"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.representation.visual.viewer_fields.FrameProvider._horizontal_slice",
+      "target": "tropoi.representation.visual.viewer_fields.FrameProvider._scalar"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.viewer_fields.FrameProvider._horizontal_slice",
+      "target": "tropoi.spatial.transforms.host_synthesis.synthesize_wind_latlon"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.viewer_fields.FrameProvider._native_grid",
+      "target": "tropoi.representation.diagnostics.held_suarez_sections.state_grid"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.viewer_fields.FrameProvider._pe_slice",
+      "target": "tropoi.representation.diagnostics.pe_levels.reconstruct_levels"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.viewer_fields.FrameProvider._pe_slice",
+      "target": "tropoi.representation.diagnostics.pe_surfaces.pressure_surface"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.representation.visual.viewer_fields.FrameProvider._pe_slice",
+      "target": "tropoi.representation.visual.viewer_fields.FrameProvider._result"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.viewer_fields.FrameProvider._read",
+      "target": "tropoi.representation.archive.local_resource.resource"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.viewer_fields.FrameProvider._scalar",
+      "target": "tropoi.spatial.transforms.host_synthesis.synthesize_latlon"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.representation.visual.viewer_fields.FrameProvider._slab_point",
+      "target": "tropoi.representation.visual.viewer_fields.FrameProvider._read"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.viewer_fields.FrameProvider._slab_point",
+      "target": "tropoi.representation.visual.viewer_fields._slab_map"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.viewer_fields.FrameProvider._terrain_lm",
+      "target": "tropoi.representation.archive.local_resource.resource"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.viewer_fields.FrameProvider._terrain_lm",
+      "target": "tropoi.representation.archive.prepared_terrain.load_prepared_terrain"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.viewer_fields.FrameProvider._terrain_lm",
+      "target": "tropoi.representation.visual.viewer_fields._cone_coefficients"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.viewer_fields.FrameProvider.column",
+      "target": "tropoi.representation.diagnostics.pe_structure.column"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.representation.visual.viewer_fields.FrameProvider.column",
+      "target": "tropoi.representation.visual.viewer_fields.FrameProvider._native_grid"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.representation.visual.viewer_fields.FrameProvider.column",
+      "target": "tropoi.representation.visual.viewer_fields.FrameProvider._read"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.representation.visual.viewer_fields.FrameProvider.column",
+      "target": "tropoi.representation.visual.viewer_fields.FrameProvider._saved_index"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.representation.visual.viewer_fields.FrameProvider.column",
+      "target": "tropoi.representation.visual.viewer_fields.FrameProvider._slab_point"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.representation.visual.viewer_fields.FrameProvider.column",
+      "target": "tropoi.representation.visual.viewer_fields.FrameProvider._structure_context"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.viewer_fields.FrameProvider.section",
+      "target": "tropoi.representation.diagnostics.pe_structure.vertical_section"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.representation.visual.viewer_fields.FrameProvider.section",
+      "target": "tropoi.representation.visual.viewer_fields.FrameProvider._read"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.representation.visual.viewer_fields.FrameProvider.section",
+      "target": "tropoi.representation.visual.viewer_fields.FrameProvider._saved_index"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.representation.visual.viewer_fields.FrameProvider.section",
+      "target": "tropoi.representation.visual.viewer_fields.FrameProvider._structure_context"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.representation.visual.viewer_fields.FrameProvider.slice",
+      "target": "tropoi.representation.visual.viewer_fields.FrameProvider._horizontal_slice"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.representation.visual.viewer_fields.FrameProvider.slice",
+      "target": "tropoi.representation.visual.viewer_fields.FrameProvider._pe_slice"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.representation.visual.viewer_fields.FrameProvider.slice",
+      "target": "tropoi.representation.visual.viewer_fields.FrameProvider._read"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.representation.visual.viewer_fields.FrameProvider.slice",
+      "target": "tropoi.representation.visual.viewer_fields.FrameProvider._result"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.representation.visual.viewer_fields.FrameProvider.slice",
+      "target": "tropoi.representation.visual.viewer_fields.FrameProvider._scalar"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.viewer_fields.FrameProvider.slice",
+      "target": "tropoi.representation.visual.viewer_fields._slab_map"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.representation.visual.viewer_fields.FrameProvider.terrain",
+      "target": "tropoi.representation.visual.viewer_fields.FrameProvider._scalar"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.representation.visual.viewer_fields.FrameProvider.zonal_mean",
+      "target": "tropoi.representation.diagnostics.pe_structure.ZonalMeanAccumulator"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.viewer_fields.FrameProvider.zonal_mean",
+      "target": "tropoi.representation.diagnostics.pe_structure.mass_streamfunction"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.representation.visual.viewer_fields.FrameProvider.zonal_mean",
+      "target": "tropoi.representation.visual.viewer_fields.FrameProvider._read"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.representation.visual.viewer_fields.FrameProvider.zonal_mean",
+      "target": "tropoi.representation.visual.viewer_fields.FrameProvider._saved_index"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.representation.visual.viewer_fields.FrameProvider.zonal_mean",
+      "target": "tropoi.representation.visual.viewer_fields.FrameProvider._structure_context"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.viewer_fields._slab_map",
+      "target": "tropoi.representation.diagnostics.held_suarez_sections.state_grid"
+    },
+    {
+      "kind": "constructor",
+      "source": "tropoi.representation.visual.viewer_server.ViewerServer",
+      "target": "tropoi.representation.visual.viewer_server.ViewerServer.__init__"
+    },
+    {
+      "kind": "constructor",
+      "source": "tropoi.representation.visual.viewer_server.ViewerSession",
+      "target": "tropoi.representation.visual.viewer_server.ViewerSession.__init__"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.viewer_server.ViewerSession.__init__",
+      "target": "tropoi.representation.archive.viewer_manifest.viewer_manifest"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.viewer_server.ViewerSession.__init__",
+      "target": "tropoi.representation.visual.viewer_server._star"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.representation.visual.viewer_server.ViewerSession._cached",
+      "target": "tropoi.representation.visual.viewer_fields.FrameProvider"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.viewer_server.ViewerSession.diagnostic",
+      "target": "tropoi.representation.archive.local_resource.resource"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.representation.visual.viewer_server.ViewerSession.frame",
+      "target": "tropoi.representation.visual.viewer_server.ViewerSession._cached"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.viewer_server.ViewerSession.frame",
+      "target": "tropoi.representation.visual.viewer_server.encode_frame"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.representation.visual.viewer_server.ViewerSession.structure",
+      "target": "tropoi.representation.visual.viewer_server.ViewerSession._cached"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.viewer_server.ViewerSession.structure",
+      "target": "tropoi.representation.visual.viewer_server._json"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.representation.visual.viewer_server._Handler.do_GET",
+      "target": "tropoi.representation.visual.viewer_server._Handler._reply"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.viewer_server._Handler.do_GET",
+      "target": "tropoi.representation.visual.viewer_server._json"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.viewer_server._star",
+      "target": "tropoi.physics.insolation.StellarIllumination.prescribed"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.viewer_server.encode_frame",
+      "target": "tropoi.representation.visual.viewer_server._json"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.representation.visual.viewer_server.serve",
+      "target": "tropoi.representation.visual.viewer_server.ViewerServer"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.representation.visual.viewer_server.serve",
+      "target": "tropoi.representation.visual.viewer_server.ViewerSession"
+    },
+    {
+      "kind": "constructor",
       "source": "tropoi.representation.visual.vorticity_viewer.VorticityViewer",
       "target": "tropoi.representation.visual.vorticity_viewer.VorticityViewer.__init__"
     },
@@ -6129,6 +6639,11 @@
       "kind": "self",
       "source": "tropoi.run.bve.config.BVERunConfig.__post_init__",
       "target": "tropoi.run.bve.config.BVERunConfig.snapshot_times_seconds"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.bve.config.BVERunConfig.__post_init__",
+      "target": "tropoi.spatial.truncation.gauss_grid_for_truncation"
     },
     {
       "kind": "call",
@@ -7423,6 +7938,16 @@
     {
       "kind": "call",
       "source": "tropoi.run.held_suarez.experiment.HeldSuarezRun._resume",
+      "target": "tropoi.run.held_suarez.experiment.stored_transform_identity"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.held_suarez.experiment.HeldSuarezRun._resume",
+      "target": "tropoi.run.held_suarez.experiment.transform_identity"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.held_suarez.experiment.HeldSuarezRun._resume",
       "target": "tropoi.run.held_suarez.statistics.OnlineStatistics.from_arrays"
     },
     {
@@ -7464,6 +7989,11 @@
       "kind": "call",
       "source": "tropoi.run.held_suarez.experiment.HeldSuarezRun._write_checkpoint",
       "target": "tropoi.run.held_suarez.experiment.protocol_sha256"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.held_suarez.experiment.HeldSuarezRun._write_checkpoint",
+      "target": "tropoi.run.held_suarez.experiment.transform_identity"
     },
     {
       "kind": "call",
@@ -7833,6 +8363,11 @@
     {
       "kind": "call",
       "source": "tropoi.run.pe.config.PERunConfig.__post_init__",
+      "target": "tropoi.spatial.truncation.gauss_grid_for_truncation"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.pe.config.PERunConfig.__post_init__",
       "target": "tropoi.spatial.truncation.require_thermal_wave_support"
     },
     {
@@ -8136,6 +8671,26 @@
       "target": "tropoi.run.radiative.config._time_of_perihelion_for_equinox_start"
     },
     {
+      "kind": "call",
+      "source": "tropoi.run.radiative.config.thai_dry_dev",
+      "target": "tropoi.physics.thermodynamics.heat_capacity"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.run.radiative.config.thai_dry_dev",
+      "target": "tropoi.run.radiative.config.RadiativeConfig"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.radiative.config.thai_dry_dev",
+      "target": "tropoi.run.radiative.config._preset_id"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.radiative.config.thai_dry_dev",
+      "target": "tropoi.run.radiative.config._t21"
+    },
+    {
       "kind": "constructor",
       "source": "tropoi.run.radiative.experiment.RadiativeRun",
       "target": "tropoi.run.radiative.experiment.RadiativeRun.__init__"
@@ -8246,6 +8801,16 @@
       "target": "tropoi.run.held_suarez.experiment.RunError"
     },
     {
+      "kind": "call",
+      "source": "tropoi.run.radiative.experiment.RadiativeRun._resume",
+      "target": "tropoi.run.held_suarez.experiment.stored_transform_identity"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.radiative.experiment.RadiativeRun._resume",
+      "target": "tropoi.run.held_suarez.experiment.transform_identity"
+    },
+    {
       "kind": "self",
       "source": "tropoi.run.radiative.experiment.RadiativeRun._resume",
       "target": "tropoi.run.radiative.experiment.RadiativeRun._event"
@@ -8284,6 +8849,11 @@
       "kind": "call",
       "source": "tropoi.run.radiative.experiment.RadiativeRun._write_checkpoint",
       "target": "tropoi.run.held_suarez.experiment.environment_identity"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.radiative.experiment.RadiativeRun._write_checkpoint",
+      "target": "tropoi.run.held_suarez.experiment.transform_identity"
     },
     {
       "kind": "self",
@@ -8334,6 +8904,31 @@
       "kind": "instantiate",
       "source": "tropoi.run.radiative.experiment.RadiativeRun.run",
       "target": "tropoi.spatial.states.primitive_equations.PrimitiveEquationsStateError"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.run.radiative.model._correlated_k",
+      "target": "tropoi.physics.radiation.kdist.CorrelatedKLongwave"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.run.radiative.model._correlated_k",
+      "target": "tropoi.physics.radiation.kdist.CorrelatedKShortwave"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.radiative.model._correlated_k",
+      "target": "tropoi.physics.radiation.tables.check_premixed"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.radiative.model._correlated_k",
+      "target": "tropoi.physics.radiation.tables.load_table"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.radiative.model._correlated_k",
+      "target": "tropoi.run.radiative.model._options"
     },
     {
       "kind": "call",
@@ -8393,6 +8988,11 @@
     {
       "kind": "call",
       "source": "tropoi.run.radiative.model._longwave",
+      "target": "tropoi.run.radiative.model._correlated_k"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.radiative.model._longwave",
       "target": "tropoi.run.radiative.model._options"
     },
     {
@@ -8414,6 +9014,11 @@
       "kind": "instantiate",
       "source": "tropoi.run.radiative.model._shortwave",
       "target": "tropoi.physics.radiation.gray.VerticalPathShortwave"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.radiative.model._shortwave",
+      "target": "tropoi.run.radiative.model._correlated_k"
     },
     {
       "kind": "call",
@@ -8629,6 +9234,11 @@
       "kind": "call",
       "source": "tropoi.run.radiative.model.reference_column",
       "target": "tropoi.run.radiative.model.build_sigma"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.swe.config.SWERunConfig.__post_init__",
+      "target": "tropoi.spatial.truncation.gauss_grid_for_truncation"
     },
     {
       "kind": "call",
@@ -8871,9 +9481,24 @@
       "target": "tropoi.spatial.grids.latlon_grid.GaussLatLonSphericalHarmonics.__init__"
     },
     {
+      "kind": "call",
+      "source": "tropoi.spatial.grids.latlon_grid.GaussLatLonSphericalHarmonics.__init__",
+      "target": "tropoi.spatial.grids.latlon_grid.default_transform_backend"
+    },
+    {
       "kind": "instantiate",
       "source": "tropoi.spatial.grids.latlon_grid.GaussLatLonSphericalHarmonics.__init__",
       "target": "tropoi.spatial.transforms.fast_geodesic_sh.PointSetSphericalHarmonics"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.spatial.grids.latlon_grid.GaussLatLonSphericalHarmonics.__init__",
+      "target": "tropoi.spatial.transforms.separable_gauss_sh.SeparableGaussSphericalHarmonics"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.spatial.grids.latlon_grid.GaussLatLonSphericalHarmonics.__init__",
+      "target": "tropoi.spatial.transforms.separable_gauss_sh.separable_is_applicable"
     },
     {
       "kind": "call",
@@ -9254,6 +9879,11 @@
       "kind": "instantiate",
       "source": "tropoi.spatial.planet.Planet.generate",
       "target": "tropoi.spatial.transforms.optimized_geodesic_sh.GeodesicSphericalHarmonics"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.spatial.planet.Planet.generate",
+      "target": "tropoi.spatial.truncation.gauss_grid_for_truncation"
     },
     {
       "kind": "instantiate",
@@ -10227,6 +10857,61 @@
     },
     {
       "kind": "constructor",
+      "source": "tropoi.spatial.transforms.separable_gauss_sh.SeparableGaussSphericalHarmonics",
+      "target": "tropoi.spatial.transforms.separable_gauss_sh.SeparableGaussSphericalHarmonics.__init__"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.spatial.transforms.separable_gauss_sh.SeparableGaussSphericalHarmonics.__init__",
+      "target": "tropoi.spatial.transforms.cuda.cuda_utils.raw_module_from_cuda"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.spatial.transforms.separable_gauss_sh.SeparableGaussSphericalHarmonics.__init__",
+      "target": "tropoi.spatial.transforms.separable_gauss_sh.SeparableGaussSphericalHarmonics._build_fourier_bins"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.spatial.transforms.separable_gauss_sh.SeparableGaussSphericalHarmonics.__init__",
+      "target": "tropoi.spatial.transforms.separable_gauss_sh.SeparableGaussSphericalHarmonics._build_legendre_tables"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.spatial.transforms.separable_gauss_sh.SeparableGaussSphericalHarmonics.__init__",
+      "target": "tropoi.spatial.transforms.separable_gauss_sh.SeparableStructureError"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.spatial.transforms.separable_gauss_sh.SeparableGaussSphericalHarmonics.__init__",
+      "target": "tropoi.spatial.transforms.separable_gauss_sh.separable_is_applicable"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.spatial.transforms.separable_gauss_sh.SeparableGaussSphericalHarmonics._build_legendre_tables",
+      "target": "tropoi.spatial.transforms.cuda.cuda_utils.raw_module_from_cuda"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.spatial.transforms.separable_gauss_sh.SeparableGaussSphericalHarmonics.inv_transform",
+      "target": "tropoi.spatial.transforms.separable_gauss_sh.SeparableGaussSphericalHarmonics.inv_transform_batch"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.spatial.transforms.separable_gauss_sh.SeparableGaussSphericalHarmonics.transform",
+      "target": "tropoi.spatial.transforms.separable_gauss_sh.SeparableGaussSphericalHarmonics.transform_batch"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.spatial.transforms.separable_gauss_sh.SeparableGaussSphericalHarmonics.transform_batch",
+      "target": "tropoi.spatial.transforms.separable_gauss_sh.SeparableGaussSphericalHarmonics._as_rows"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.spatial.transforms.separable_gauss_sh.separable_is_applicable",
+      "target": "tropoi.spatial.transforms.separable_gauss_sh.SeparableStructureError"
+    },
+    {
+      "kind": "constructor",
       "source": "tropoi.spatial.transforms.spherical_harmonics.LatLonSphericalHarmonics",
       "target": "tropoi.spatial.transforms.spherical_harmonics.LatLonSphericalHarmonics.__init__"
     },
@@ -10471,6 +11156,11 @@
       "target": "tropoi.spatial.truncation.product_truncation_cut"
     },
     {
+      "kind": "call",
+      "source": "tropoi.temporal.models.build_pe_model",
+      "target": "tropoi.temporal.models._legacy_grid_type"
+    },
+    {
       "kind": "instantiate",
       "source": "tropoi.temporal.models.build_pe_model",
       "target": "tropoi.temporal.tendencies.primitive_equations.PrimitiveEquationsModel"
@@ -10489,6 +11179,11 @@
       "kind": "call",
       "source": "tropoi.temporal.models.build_planet",
       "target": "tropoi.spatial.specification.PlanetSpec.from_dict"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.temporal.models.build_planet",
+      "target": "tropoi.temporal.models._legacy_grid_type"
     },
     {
       "kind": "call",
@@ -10519,6 +11214,11 @@
       "kind": "call",
       "source": "tropoi.temporal.models.build_swe_model",
       "target": "tropoi.spatial.terrain.topography.Topography.williamson5_cone"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.temporal.models.build_swe_model",
+      "target": "tropoi.temporal.models._legacy_grid_type"
     },
     {
       "kind": "call",
@@ -11524,6 +12224,13 @@
       "kind": "function",
       "module": "tropoi.cli.main",
       "qualname": "_cmd_run_swe",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.cli.main._cmd_view",
+      "kind": "function",
+      "module": "tropoi.cli.main",
+      "qualname": "_cmd_view",
       "type": "function"
     },
     {
@@ -13053,6 +13760,13 @@
       "type": "function"
     },
     {
+      "id": "tropoi.physics.radiation.kdist.KTable.content_sha256",
+      "kind": "method",
+      "module": "tropoi.physics.radiation.kdist",
+      "qualname": "KTable.content_sha256",
+      "type": "function"
+    },
+    {
       "id": "tropoi.physics.radiation.kdist.KTable.load",
       "kind": "classmethod",
       "module": "tropoi.physics.radiation.kdist",
@@ -13071,6 +13785,13 @@
       "kind": "property",
       "module": "tropoi.physics.radiation.kdist",
       "qualname": "KTable.n_g",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.radiation.kdist.KTable.point_weights",
+      "kind": "property",
+      "module": "tropoi.physics.radiation.kdist",
+      "qualname": "KTable.point_weights",
       "type": "function"
     },
     {
@@ -13330,6 +14051,48 @@
       "kind": "function",
       "module": "tropoi.physics.radiation.scheme",
       "qualname": "interface_temperature",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.radiation.tables.KTableError",
+      "kind": "class",
+      "module": "tropoi.physics.radiation.tables",
+      "qualname": "KTableError",
+      "type": "class"
+    },
+    {
+      "id": "tropoi.physics.radiation.tables.check_premixed",
+      "kind": "function",
+      "module": "tropoi.physics.radiation.tables",
+      "qualname": "check_premixed",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.radiation.tables.load_table",
+      "kind": "function",
+      "module": "tropoi.physics.radiation.tables",
+      "qualname": "load_table",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.radiation.tables.resolve_table",
+      "kind": "function",
+      "module": "tropoi.physics.radiation.tables",
+      "qualname": "resolve_table",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.radiation.tables.search_path",
+      "kind": "function",
+      "module": "tropoi.physics.radiation.tables",
+      "qualname": "search_path",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.radiation.tables.table_spec",
+      "kind": "function",
+      "module": "tropoi.physics.radiation.tables",
+      "qualname": "table_spec",
       "type": "function"
     },
     {
@@ -14124,6 +14887,13 @@
       "type": "function"
     },
     {
+      "id": "tropoi.representation.archive.capsule.open_storage",
+      "kind": "function",
+      "module": "tropoi.representation.archive.capsule",
+      "qualname": "open_storage",
+      "type": "function"
+    },
+    {
       "id": "tropoi.representation.archive.capsule.read_capsule_metadata",
       "kind": "function",
       "module": "tropoi.representation.archive.capsule",
@@ -14502,6 +15272,20 @@
       "type": "function"
     },
     {
+      "id": "tropoi.representation.archive.local_resource._reserved",
+      "kind": "function",
+      "module": "tropoi.representation.archive.local_resource",
+      "qualname": "_reserved",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.archive.local_resource.resource",
+      "kind": "function",
+      "module": "tropoi.representation.archive.local_resource",
+      "qualname": "resource",
+      "type": "function"
+    },
+    {
       "id": "tropoi.representation.archive.pe_context.PEColumnContext",
       "kind": "class",
       "module": "tropoi.representation.archive.pe_context",
@@ -14660,6 +15444,76 @@
       "kind": "function",
       "module": "tropoi.representation.archive.prepared_terrain",
       "qualname": "summary",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.archive.radiative.RadiativeStorage",
+      "kind": "class",
+      "module": "tropoi.representation.archive.radiative",
+      "qualname": "RadiativeStorage",
+      "type": "class"
+    },
+    {
+      "id": "tropoi.representation.archive.radiative.RadiativeStorage.__init__",
+      "kind": "method",
+      "module": "tropoi.representation.archive.radiative",
+      "qualname": "RadiativeStorage.__init__",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.archive.radiative.RadiativeStorage._index",
+      "kind": "method",
+      "module": "tropoi.representation.archive.radiative",
+      "qualname": "RadiativeStorage._index",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.archive.radiative.RadiativeStorage._read",
+      "kind": "method",
+      "module": "tropoi.representation.archive.radiative",
+      "qualname": "RadiativeStorage._read",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.archive.radiative.RadiativeStorage.frame",
+      "kind": "method",
+      "module": "tropoi.representation.archive.radiative",
+      "qualname": "RadiativeStorage.frame",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.archive.radiative.RadiativeStorage.pe_context",
+      "kind": "method",
+      "module": "tropoi.representation.archive.radiative",
+      "qualname": "RadiativeStorage.pe_context",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.archive.radiative.RadiativeStorage.plot_simulation",
+      "kind": "method",
+      "module": "tropoi.representation.archive.radiative",
+      "qualname": "RadiativeStorage.plot_simulation",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.archive.radiative.RadiativeStorage.quantities",
+      "kind": "method",
+      "module": "tropoi.representation.archive.radiative",
+      "qualname": "RadiativeStorage.quantities",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.archive.radiative.RadiativeStorage.surface",
+      "kind": "method",
+      "module": "tropoi.representation.archive.radiative",
+      "qualname": "RadiativeStorage.surface",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.archive.radiative._sigma",
+      "kind": "function",
+      "module": "tropoi.representation.archive.radiative",
+      "qualname": "_sigma",
       "type": "function"
     },
     {
@@ -14845,6 +15699,34 @@
       "type": "function"
     },
     {
+      "id": "tropoi.representation.archive.viewer_diagnostics.diagnostics",
+      "kind": "function",
+      "module": "tropoi.representation.archive.viewer_diagnostics",
+      "qualname": "diagnostics",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.archive.viewer_manifest._derived_fields",
+      "kind": "function",
+      "module": "tropoi.representation.archive.viewer_manifest",
+      "qualname": "_derived_fields",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.archive.viewer_manifest._operations",
+      "kind": "function",
+      "module": "tropoi.representation.archive.viewer_manifest",
+      "qualname": "_operations",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.archive.viewer_manifest.viewer_manifest",
+      "kind": "function",
+      "module": "tropoi.representation.archive.viewer_manifest",
+      "qualname": "viewer_manifest",
+      "type": "function"
+    },
+    {
       "id": "tropoi.representation.archive.writer.RunDirectory",
       "kind": "class",
       "module": "tropoi.representation.archive.writer",
@@ -14919,6 +15801,13 @@
       "kind": "function",
       "module": "tropoi.representation.archive.writer",
       "qualname": "_git",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.archive.writer._grid_tag",
+      "kind": "function",
+      "module": "tropoi.representation.archive.writer",
+      "qualname": "_grid_tag",
       "type": "function"
     },
     {
@@ -15395,6 +16284,69 @@
       "kind": "function",
       "module": "tropoi.representation.diagnostics.pe_levels",
       "qualname": "reconstruct_levels",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.diagnostics.pe_structure.ZonalMeanAccumulator",
+      "kind": "class",
+      "module": "tropoi.representation.diagnostics.pe_structure",
+      "qualname": "ZonalMeanAccumulator",
+      "type": "class"
+    },
+    {
+      "id": "tropoi.representation.diagnostics.pe_structure.ZonalMeanAccumulator.__init__",
+      "kind": "method",
+      "module": "tropoi.representation.diagnostics.pe_structure",
+      "qualname": "ZonalMeanAccumulator.__init__",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.diagnostics.pe_structure.ZonalMeanAccumulator.add",
+      "kind": "method",
+      "module": "tropoi.representation.diagnostics.pe_structure",
+      "qualname": "ZonalMeanAccumulator.add",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.diagnostics.pe_structure.ZonalMeanAccumulator.count",
+      "kind": "property",
+      "module": "tropoi.representation.diagnostics.pe_structure",
+      "qualname": "ZonalMeanAccumulator.count",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.diagnostics.pe_structure.ZonalMeanAccumulator.means",
+      "kind": "method",
+      "module": "tropoi.representation.diagnostics.pe_structure",
+      "qualname": "ZonalMeanAccumulator.means",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.diagnostics.pe_structure._finite_point",
+      "kind": "function",
+      "module": "tropoi.representation.diagnostics.pe_structure",
+      "qualname": "_finite_point",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.diagnostics.pe_structure.column",
+      "kind": "function",
+      "module": "tropoi.representation.diagnostics.pe_structure",
+      "qualname": "column",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.diagnostics.pe_structure.mass_streamfunction",
+      "kind": "function",
+      "module": "tropoi.representation.diagnostics.pe_structure",
+      "qualname": "mass_streamfunction",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.diagnostics.pe_structure.vertical_section",
+      "kind": "function",
+      "module": "tropoi.representation.diagnostics.pe_structure",
+      "qualname": "vertical_section",
       "type": "function"
     },
     {
@@ -17547,6 +18499,13 @@
       "type": "class"
     },
     {
+      "id": "tropoi.representation.visual.quantities._Presentation",
+      "kind": "class",
+      "module": "tropoi.representation.visual.quantities",
+      "qualname": "_Presentation",
+      "type": "class"
+    },
+    {
       "id": "tropoi.representation.visual.quantities.available_quantities",
       "kind": "function",
       "module": "tropoi.representation.visual.quantities",
@@ -17558,6 +18517,13 @@
       "kind": "function",
       "module": "tropoi.representation.visual.quantities",
       "qualname": "quantity",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.quantities.viewer_presentation",
+      "kind": "function",
+      "module": "tropoi.representation.visual.quantities",
+      "qualname": "viewer_presentation",
       "type": "function"
     },
     {
@@ -18650,6 +19616,265 @@
       "kind": "function",
       "module": "tropoi.representation.visual.timeline",
       "qualname": "select_representative_frame_indices",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.viewer_fields.FrameProvider",
+      "kind": "class",
+      "module": "tropoi.representation.visual.viewer_fields",
+      "qualname": "FrameProvider",
+      "type": "class"
+    },
+    {
+      "id": "tropoi.representation.visual.viewer_fields.FrameProvider.__init__",
+      "kind": "method",
+      "module": "tropoi.representation.visual.viewer_fields",
+      "qualname": "FrameProvider.__init__",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.viewer_fields.FrameProvider._context",
+      "kind": "method",
+      "module": "tropoi.representation.visual.viewer_fields",
+      "qualname": "FrameProvider._context",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.viewer_fields.FrameProvider._horizontal_slice",
+      "kind": "method",
+      "module": "tropoi.representation.visual.viewer_fields",
+      "qualname": "FrameProvider._horizontal_slice",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.viewer_fields.FrameProvider._native_grid",
+      "kind": "method",
+      "module": "tropoi.representation.visual.viewer_fields",
+      "qualname": "FrameProvider._native_grid",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.viewer_fields.FrameProvider._pe_slice",
+      "kind": "method",
+      "module": "tropoi.representation.visual.viewer_fields",
+      "qualname": "FrameProvider._pe_slice",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.viewer_fields.FrameProvider._read",
+      "kind": "method",
+      "module": "tropoi.representation.visual.viewer_fields",
+      "qualname": "FrameProvider._read",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.viewer_fields.FrameProvider._result",
+      "kind": "method",
+      "module": "tropoi.representation.visual.viewer_fields",
+      "qualname": "FrameProvider._result",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.viewer_fields.FrameProvider._saved_index",
+      "kind": "method",
+      "module": "tropoi.representation.visual.viewer_fields",
+      "qualname": "FrameProvider._saved_index",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.viewer_fields.FrameProvider._scalar",
+      "kind": "method",
+      "module": "tropoi.representation.visual.viewer_fields",
+      "qualname": "FrameProvider._scalar",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.viewer_fields.FrameProvider._slab_point",
+      "kind": "method",
+      "module": "tropoi.representation.visual.viewer_fields",
+      "qualname": "FrameProvider._slab_point",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.viewer_fields.FrameProvider._structure_context",
+      "kind": "method",
+      "module": "tropoi.representation.visual.viewer_fields",
+      "qualname": "FrameProvider._structure_context",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.viewer_fields.FrameProvider._terrain_lm",
+      "kind": "method",
+      "module": "tropoi.representation.visual.viewer_fields",
+      "qualname": "FrameProvider._terrain_lm",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.viewer_fields.FrameProvider.column",
+      "kind": "method",
+      "module": "tropoi.representation.visual.viewer_fields",
+      "qualname": "FrameProvider.column",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.viewer_fields.FrameProvider.radius",
+      "kind": "property",
+      "module": "tropoi.representation.visual.viewer_fields",
+      "qualname": "FrameProvider.radius",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.viewer_fields.FrameProvider.section",
+      "kind": "method",
+      "module": "tropoi.representation.visual.viewer_fields",
+      "qualname": "FrameProvider.section",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.viewer_fields.FrameProvider.slice",
+      "kind": "method",
+      "module": "tropoi.representation.visual.viewer_fields",
+      "qualname": "FrameProvider.slice",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.viewer_fields.FrameProvider.terrain",
+      "kind": "method",
+      "module": "tropoi.representation.visual.viewer_fields",
+      "qualname": "FrameProvider.terrain",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.viewer_fields.FrameProvider.zonal_mean",
+      "kind": "method",
+      "module": "tropoi.representation.visual.viewer_fields",
+      "qualname": "FrameProvider.zonal_mean",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.viewer_fields._cone_coefficients",
+      "kind": "function",
+      "module": "tropoi.representation.visual.viewer_fields",
+      "qualname": "_cone_coefficients",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.viewer_fields._slab_map",
+      "kind": "function",
+      "module": "tropoi.representation.visual.viewer_fields",
+      "qualname": "_slab_map",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.viewer_server.ViewerServer",
+      "kind": "class",
+      "module": "tropoi.representation.visual.viewer_server",
+      "qualname": "ViewerServer",
+      "type": "class"
+    },
+    {
+      "id": "tropoi.representation.visual.viewer_server.ViewerServer.__init__",
+      "kind": "method",
+      "module": "tropoi.representation.visual.viewer_server",
+      "qualname": "ViewerServer.__init__",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.viewer_server.ViewerSession",
+      "kind": "class",
+      "module": "tropoi.representation.visual.viewer_server",
+      "qualname": "ViewerSession",
+      "type": "class"
+    },
+    {
+      "id": "tropoi.representation.visual.viewer_server.ViewerSession.__init__",
+      "kind": "method",
+      "module": "tropoi.representation.visual.viewer_server",
+      "qualname": "ViewerSession.__init__",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.viewer_server.ViewerSession._cached",
+      "kind": "method",
+      "module": "tropoi.representation.visual.viewer_server",
+      "qualname": "ViewerSession._cached",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.viewer_server.ViewerSession.diagnostic",
+      "kind": "method",
+      "module": "tropoi.representation.visual.viewer_server",
+      "qualname": "ViewerSession.diagnostic",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.viewer_server.ViewerSession.frame",
+      "kind": "method",
+      "module": "tropoi.representation.visual.viewer_server",
+      "qualname": "ViewerSession.frame",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.viewer_server.ViewerSession.structure",
+      "kind": "method",
+      "module": "tropoi.representation.visual.viewer_server",
+      "qualname": "ViewerSession.structure",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.viewer_server._Handler",
+      "kind": "class",
+      "module": "tropoi.representation.visual.viewer_server",
+      "qualname": "_Handler",
+      "type": "class"
+    },
+    {
+      "id": "tropoi.representation.visual.viewer_server._Handler._reply",
+      "kind": "method",
+      "module": "tropoi.representation.visual.viewer_server",
+      "qualname": "_Handler._reply",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.viewer_server._Handler.do_GET",
+      "kind": "method",
+      "module": "tropoi.representation.visual.viewer_server",
+      "qualname": "_Handler.do_GET",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.viewer_server._Handler.log_message",
+      "kind": "method",
+      "module": "tropoi.representation.visual.viewer_server",
+      "qualname": "_Handler.log_message",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.viewer_server._json",
+      "kind": "function",
+      "module": "tropoi.representation.visual.viewer_server",
+      "qualname": "_json",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.viewer_server._star",
+      "kind": "function",
+      "module": "tropoi.representation.visual.viewer_server",
+      "qualname": "_star",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.viewer_server.encode_frame",
+      "kind": "function",
+      "module": "tropoi.representation.visual.viewer_server",
+      "qualname": "encode_frame",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.viewer_server.serve",
+      "kind": "function",
+      "module": "tropoi.representation.visual.viewer_server",
+      "qualname": "serve",
       "type": "function"
     },
     {
@@ -19913,6 +21138,20 @@
       "type": "function"
     },
     {
+      "id": "tropoi.run.held_suarez.experiment.stored_transform_identity",
+      "kind": "function",
+      "module": "tropoi.run.held_suarez.experiment",
+      "qualname": "stored_transform_identity",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.held_suarez.experiment.transform_identity",
+      "kind": "function",
+      "module": "tropoi.run.held_suarez.experiment",
+      "qualname": "transform_identity",
+      "type": "function"
+    },
+    {
       "id": "tropoi.run.held_suarez.model.build_model",
       "kind": "function",
       "module": "tropoi.run.held_suarez.model",
@@ -20494,6 +21733,13 @@
       "type": "function"
     },
     {
+      "id": "tropoi.run.radiative.config.thai_dry_dev",
+      "kind": "function",
+      "module": "tropoi.run.radiative.config",
+      "qualname": "thai_dry_dev",
+      "type": "function"
+    },
+    {
       "id": "tropoi.run.radiative.experiment.RadiativeRun",
       "kind": "class",
       "module": "tropoi.run.radiative.experiment",
@@ -20575,6 +21821,13 @@
       "kind": "property",
       "module": "tropoi.run.radiative.experiment",
       "qualname": "RadiativeRun.step",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.radiative.model._correlated_k",
+      "kind": "function",
+      "module": "tropoi.run.radiative.model",
+      "qualname": "_correlated_k",
       "type": "function"
     },
     {
@@ -21226,6 +22479,13 @@
       "kind": "method",
       "module": "tropoi.spatial.grids.latlon_grid",
       "qualname": "GaussLatLonSphericalHarmonics.transform_batch",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.spatial.grids.latlon_grid.default_transform_backend",
+      "kind": "function",
+      "module": "tropoi.spatial.grids.latlon_grid",
+      "qualname": "default_transform_backend",
       "type": "function"
     },
     {
@@ -23259,6 +24519,104 @@
       "type": "function"
     },
     {
+      "id": "tropoi.spatial.transforms.separable_gauss_sh.SeparableGaussSphericalHarmonics",
+      "kind": "class",
+      "module": "tropoi.spatial.transforms.separable_gauss_sh",
+      "qualname": "SeparableGaussSphericalHarmonics",
+      "type": "class"
+    },
+    {
+      "id": "tropoi.spatial.transforms.separable_gauss_sh.SeparableGaussSphericalHarmonics.__init__",
+      "kind": "method",
+      "module": "tropoi.spatial.transforms.separable_gauss_sh",
+      "qualname": "SeparableGaussSphericalHarmonics.__init__",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.spatial.transforms.separable_gauss_sh.SeparableGaussSphericalHarmonics.__repr__",
+      "kind": "method",
+      "module": "tropoi.spatial.transforms.separable_gauss_sh",
+      "qualname": "SeparableGaussSphericalHarmonics.__repr__",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.spatial.transforms.separable_gauss_sh.SeparableGaussSphericalHarmonics._as_rows",
+      "kind": "method",
+      "module": "tropoi.spatial.transforms.separable_gauss_sh",
+      "qualname": "SeparableGaussSphericalHarmonics._as_rows",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.spatial.transforms.separable_gauss_sh.SeparableGaussSphericalHarmonics._build_fourier_bins",
+      "kind": "method",
+      "module": "tropoi.spatial.transforms.separable_gauss_sh",
+      "qualname": "SeparableGaussSphericalHarmonics._build_fourier_bins",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.spatial.transforms.separable_gauss_sh.SeparableGaussSphericalHarmonics._build_legendre_tables",
+      "kind": "method",
+      "module": "tropoi.spatial.transforms.separable_gauss_sh",
+      "qualname": "SeparableGaussSphericalHarmonics._build_legendre_tables",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.spatial.transforms.separable_gauss_sh.SeparableGaussSphericalHarmonics.describe",
+      "kind": "method",
+      "module": "tropoi.spatial.transforms.separable_gauss_sh",
+      "qualname": "SeparableGaussSphericalHarmonics.describe",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.spatial.transforms.separable_gauss_sh.SeparableGaussSphericalHarmonics.extended",
+      "kind": "method",
+      "module": "tropoi.spatial.transforms.separable_gauss_sh",
+      "qualname": "SeparableGaussSphericalHarmonics.extended",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.spatial.transforms.separable_gauss_sh.SeparableGaussSphericalHarmonics.inv_transform",
+      "kind": "method",
+      "module": "tropoi.spatial.transforms.separable_gauss_sh",
+      "qualname": "SeparableGaussSphericalHarmonics.inv_transform",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.spatial.transforms.separable_gauss_sh.SeparableGaussSphericalHarmonics.inv_transform_batch",
+      "kind": "method",
+      "module": "tropoi.spatial.transforms.separable_gauss_sh",
+      "qualname": "SeparableGaussSphericalHarmonics.inv_transform_batch",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.spatial.transforms.separable_gauss_sh.SeparableGaussSphericalHarmonics.transform",
+      "kind": "method",
+      "module": "tropoi.spatial.transforms.separable_gauss_sh",
+      "qualname": "SeparableGaussSphericalHarmonics.transform",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.spatial.transforms.separable_gauss_sh.SeparableGaussSphericalHarmonics.transform_batch",
+      "kind": "method",
+      "module": "tropoi.spatial.transforms.separable_gauss_sh",
+      "qualname": "SeparableGaussSphericalHarmonics.transform_batch",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.spatial.transforms.separable_gauss_sh.SeparableStructureError",
+      "kind": "class",
+      "module": "tropoi.spatial.transforms.separable_gauss_sh",
+      "qualname": "SeparableStructureError",
+      "type": "class"
+    },
+    {
+      "id": "tropoi.spatial.transforms.separable_gauss_sh.separable_is_applicable",
+      "kind": "function",
+      "module": "tropoi.spatial.transforms.separable_gauss_sh",
+      "qualname": "separable_is_applicable",
+      "type": "function"
+    },
+    {
       "id": "tropoi.spatial.transforms.spherical_harmonics.LatLonSphericalHarmonics",
       "kind": "class",
       "module": "tropoi.spatial.transforms.spherical_harmonics",
@@ -23319,6 +24677,13 @@
       "kind": "function",
       "module": "tropoi.spatial.truncation",
       "qualname": "_min_lmax_retaining",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.spatial.truncation.gauss_grid_for_truncation",
+      "kind": "function",
+      "module": "tropoi.spatial.truncation",
+      "qualname": "gauss_grid_for_truncation",
       "type": "function"
     },
     {
@@ -23655,6 +25020,13 @@
       "kind": "function",
       "module": "tropoi.temporal.integration",
       "qualname": "validate_snapshot_schedule",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.temporal.models._legacy_grid_type",
+      "kind": "function",
+      "module": "tropoi.temporal.models",
+      "qualname": "_legacy_grid_type",
       "type": "function"
     },
     {

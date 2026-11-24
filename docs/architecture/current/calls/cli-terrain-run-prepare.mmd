@@ -68,6 +68,7 @@ flowchart LR
         n_tropoi_ospatial_otruncation_oproduct__truncation__cut["product#95;truncation#95;cut()"]
     end
     subgraph g_tropoi_otemporal_omodels["temporal.models"]
+        n_tropoi_otemporal_omodels_o__legacy__grid__type["#95;legacy#95;grid#95;type()"]
         n_tropoi_otemporal_omodels_obuild__planet["build#95;planet()"]
     end
     n_tropoi_ocli_oterrain_obuild__raster -->|instantiate| n_tropoi_ospatial_oterrain_oheight__function_oHeightFunctionError
@@ -132,6 +133,7 @@ flowchart LR
     n_tropoi_otemporal_omodels_obuild__planet --> n_tropoi_ospatial_oenvironment_oPlanetaryParameters_ofrom__earth__like
     n_tropoi_otemporal_omodels_obuild__planet --> n_tropoi_ospatial_oplanet_oPlanet_ogenerate
     n_tropoi_otemporal_omodels_obuild__planet --> n_tropoi_ospatial_ospecification_oPlanetSpec_ofrom__dict
+    n_tropoi_otemporal_omodels_obuild__planet --> n_tropoi_otemporal_omodels_o__legacy__grid__type
     classDef root stroke-width:3px
     classDef truncated stroke-dasharray:4 3
     class n_tropoi_ocli_oterrain_orun__prepare root

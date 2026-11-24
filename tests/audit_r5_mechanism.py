@@ -47,7 +47,8 @@ def energy_production_rate(zeta_lm, dzeta_dt_lm, R):
 
 def main():
     params = PlanetaryParameters.from_earth_like(day_hours=DAY_HOURS)
-    planet = Planet.generate(params=params, grid_resolution=RES, l_max=L_MAX)
+    planet = Planet.generate(params=params, grid_resolution=RES,
+                             l_max=L_MAX, grid_type="geodesic")
     sh, so, grid = planet.sh, planet.so, planet.grid
     R, Omega = params.radius, params.angular_velocity
     model = BarotropicVorticity(planet, viscosity=0.0)

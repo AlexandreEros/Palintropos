@@ -201,6 +201,30 @@ class PlanetViewer:
         if isinstance(q, cp.ndarray):
             q = cp.asnumpy(q)
 
+        # A structured grid's fields arrive FLAT, (n_points,) in lat-major
+        # order: that is what the transforms return, and `imshow` below
+        # needs the (nlat, nlon) image back. Without this, a Gauss lat-lon
+        # planet reaches imshow with a 1-D array and fails on an invalid
+        # image shape -- which is what bare `tropoi gen` did once lat-lon
+        # became the default grid. The geodesic path never hit it because
+        # plot_summary interpolates those points onto a 2-D view grid
+        # first.
+        #
+        # Both grid families order latitudes north to south (measured:
+        # Gauss nodes run +73.8 to -73.8 at nlat=8, the view grid +90 to
+        # -90), so the extent and vertical flip below are correct for
+        # either and need no special case.
+        grid_shape = getattr(grid, "grid_shape", None)
+        if (q.ndim == 1 and triangulation is None and grid_shape is not None
+                and q.size == grid_shape[0] * grid_shape[1]):
+            q = q.reshape(grid_shape)
+        if q.ndim == 1 and triangulation is None:
+            raise ValueError(
+                f"cannot render a flat field of {q.size} values on a "
+                f"{type(grid).__name__} with grid_shape={grid_shape!r}: it "
+                "is neither a geodesic point set with faces nor a "
+                "structured grid of matching size")
+
         if ax is None:
             fig, ax = plt.subplots(1, 1)
 
@@ -209,12 +233,19 @@ class PlanetViewer:
             im = ax.tripcolor(triangulation, q, shading='gouraud', cmap=cmap)
         
         else:
-            # Assume structured grid
+            # Assume structured grid. The axis values must be HOST floats:
+            # a Gauss lat-lon geometry carries its axes on the device, and
+            # matplotlib refuses an implicit CuPy->NumPy conversion inside
+            # `extent`. The geodesic path never hit this either, its view
+            # grid being built on the host.
+            def _deg(value) -> float:
+                return float(cp.asnumpy(value)) * 180.0 / np.pi
+
             im = ax.imshow(np.flip(q, axis=0),
-                        extent=(grid.longitudes[0] * 180/np.pi,
-                                grid.longitudes[-1] * 180/np.pi,
-                                -grid.latitudes[-1] * 180/np.pi,
-                                -grid.latitudes[0] * 180/np.pi),
+                        extent=(_deg(grid.longitudes[0]),
+                                _deg(grid.longitudes[-1]),
+                                -_deg(grid.latitudes[-1]),
+                                -_deg(grid.latitudes[0])),
                                 cmap=cmap, origin='lower')
 
         ax.set_aspect('equal')            

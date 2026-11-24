@@ -10,6 +10,7 @@ net downward flux is downward minus upward flux.
 | [twostream.py](twostream.py) | Two-stream layer reflection, transmission, sources, and adding for thermal emission and stellar scattering. |
 | [gray.py](gray.py) | Prescribed optical-depth profiles and gray optics for the idealized presets. |
 | [kdist.py](kdist.py) | Correlated-k tables, quadrature, and longwave and shortwave optics providers. The repository tests the method with a synthetic spectrum and ships no real gas opacity tables. |
+| [tables.py](tables.py) | Finds the k-tables a radiative configuration names, checks their content hashes, and holds a premixed table to the gas it was mixed for. Real-gas tables are imported by `tools/radiation/opacity` ([OPACITY.md](../../../../docs/radiation/OPACITY.md)). |
 
 The [single-column model](../column_model.py) and the
 [primitive-equation coupling](../../temporal/column_coupling.py) share these

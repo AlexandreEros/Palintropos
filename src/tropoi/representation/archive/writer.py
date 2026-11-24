@@ -166,6 +166,33 @@ def _config_hash(config: dict) -> str:
     return hashlib.blake2b(blob, digest_size=4).hexdigest()
 
 
+def _grid_tag(config: dict) -> str:
+    """One token naming the discretization the run actually used.
+
+    ``gl{nlat}x{nlon}`` for the Gauss lat-lon grid (``gl32x64``),
+    ``r{resolution}`` for the geodesic grid, whose subdivision level is
+    what ``resolution`` means. A configuration written before the ``grid``
+    key existed is geodesic — the same legacy inference as
+    ``tropoi.temporal.models.LEGACY_GRID_TYPE``, repeated rather than
+    imported to keep this layer free of a dependency on the cores.
+
+    Why this must stay **exactly one underscore-free token**: run ids are
+    parsed positionally. ``tests/test_custom_initial_states.py`` reads
+    ``run.name.split("_")[6]`` for the scientific hash and asserts an
+    eight-token id, so a two-token grid tag would silently shift every
+    later field.
+
+    Before this existed the tag was always ``r{resolution}``, which named
+    a geodesic subdivision level even for lat-lon runs — and two lat-lon
+    grids four times apart in each dimension could share it
+    (``...r4_l21...`` for both 32x64 and 128x256). Historical ids keep
+    their recorded shape; nothing renames a saved capsule.
+    """
+    if str(config.get("grid", "")) == "latlon":
+        return f"gl{int(config['nlat'])}x{int(config['nlon'])}"
+    return f"r{int(config['resolution'])}"
+
+
 def make_run_id(
     config: dict,
     *,
@@ -174,10 +201,12 @@ def make_run_id(
 ) -> str:
     """Deterministic run identifier from `config` + wall clock + commit.
 
-    Required config keys: ``scenario, day_hours, resolution, lmax,
-    dt_snapshots`` — where ``dt_snapshots`` may be None for count-based
-    snapshot modes without a uniform interval (N=0/N=1), in which case
-    ``n_snapshots`` supplies the `snapN` tag instead.
+    Required config keys: ``scenario, day_hours, lmax, dt_snapshots``,
+    plus the ones the grid family needs — ``nlat``/``nlon`` when ``grid``
+    is ``"latlon"``, else ``resolution`` (see :func:`_grid_tag`).
+    ``dt_snapshots`` may be None for count-based snapshot modes without a
+    uniform interval (N=0/N=1), in which case ``n_snapshots`` supplies the
+    `snapN` tag instead.
     """
     if now is None:
         now = datetime.now(timezone.utc)
@@ -189,7 +218,7 @@ def make_run_id(
         ts,
         _sanitize(str(config.get("scenario", "run"))),
         _rotation_tag(float(config.get("day_hours", math.inf))),
-        f"r{int(config['resolution'])}",
+        _grid_tag(config),
         f"l{int(config['lmax'])}",
         _snapshot_tag(config),
     ]

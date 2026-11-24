@@ -223,10 +223,36 @@ class _Wrapped:
         return getattr(self._target, name)
 
 
+_TIMER: dict[str, Any] = {"current": None}
+
+
+def transform_classes() -> list:
+    """The spherical-harmonic evaluator classes present in this checkout."""
+    from tropoi.spatial.transforms import fast_geodesic_sh as fsh
+    classes = [fsh.PointSetSphericalHarmonics]
+    try:
+        from tropoi.spatial.transforms.separable_gauss_sh import \
+            SeparableGaussSphericalHarmonics
+        classes.append(SeparableGaussSphericalHarmonics)
+    except ImportError:                         # checkouts before PR #43
+        pass
+    return classes
+
+
+def evaluators(model) -> dict[str, Any]:
+    """Which evaluator class each transform of ``model`` uses."""
+    def leaf(sh):
+        return getattr(sh, "sh", sh)
+    out = {"TROPOI_SH_BACKEND": __import__("os").environ.get("TROPOI_SH_BACKEND")}
+    for name, sh in (("state", model.sh), ("product", model._ps.sh),
+                     ("product_ext", model.so._vector_analysis_pieces()[0])):
+        out[name] = type(leaf(sh)).__name__
+    return out
+
+
 def instrument(run, timer: Timer) -> None:
     """Wrap the operators of one RadiativeRun (its stepper, model, coupling,
     boundary layer) and the transform primitives (class level)."""
-    from tropoi.spatial.transforms import fast_geodesic_sh as fsh
     import tropoi.temporal.tendencies.boundary_layer as blmod
     import tropoi.spatial.sigma_coordinate as sigmod
 
@@ -239,22 +265,26 @@ def instrument(run, timer: Timer) -> None:
             return "state"
         return "product_ext" if int(sh.l_max) == l_state + 1 else "product"
 
-    cls = fsh.PointSetSphericalHarmonics
-    if not getattr(cls, "_cost_profile_wrapped", False):
-        for meth in ("transform", "inv_transform", "transform_batch", "inv_transform_batch"):
-            orig = getattr(cls, meth)
+    # both evaluators: the dense basis-matrix one (the default when this
+    # report was measured) and the separable FFT + Legendre one (the default
+    # since PR #43; TROPOI_SH_BACKEND=dense selects the dense one again)
+    for cls in transform_classes():
+        if not cls.__dict__.get("_cost_profile_wrapped", False):
+            for meth in ("transform", "inv_transform", "transform_batch",
+                         "inv_transform_batch"):
+                orig = getattr(cls, meth)
 
-            def make(orig=orig, meth=meth):
-                @functools.wraps(orig)
-                def inner(self, *a, **k):
-                    tm = getattr(cls, "_cost_profile_timer", None)
-                    if tm is None:
-                        return orig(self, *a, **k)
-                    return tm.run(f"sh.{meth}[{grid_name(self)}]", orig, self, *a, **k)
-                return inner
-            setattr(cls, meth, make())
-        cls._cost_profile_wrapped = True
-    cls._cost_profile_timer = timer
+                def make(orig=orig, meth=meth):
+                    @functools.wraps(orig)
+                    def inner(self, *a, **k):
+                        tm = _TIMER["current"]
+                        if tm is None:
+                            return orig(self, *a, **k)
+                        return tm.run(f"sh.{meth}[{grid_name(self)}]", orig, self, *a, **k)
+                    return inner
+                setattr(cls, meth, make())
+            cls._cost_profile_wrapped = True
+    _TIMER["current"] = timer
 
     stepper.step = timer.wrap("step", stepper.step)
     stepper.tendency = timer.wrap("dynamics.tendency", stepper.tendency)
@@ -352,9 +382,11 @@ def micro_transforms(model, repeat: int) -> dict[str, Any]:
                  "inv_transform_batch_K": lambda: sh.inv_transform_batch(c),
                  "transform_scalar": lambda: sh.transform(f[0]),
                  "inv_transform_scalar": lambda: sh.inv_transform(c[0])}
-        rec = {"n_points": int(sh.n_points), "l_max": int(sh.l_max),
-               "n_basis": int(sh.n_basis),
-               "Y_matrix_bytes": int(sh.Y_matrix.nbytes)}
+        leaf = getattr(sh, "sh", sh)
+        y = getattr(leaf, "Y_matrix", None)          # dense evaluator only
+        rec = {"evaluator": type(leaf).__name__, "n_points": int(sh.n_points),
+               "l_max": int(sh.l_max), "n_basis": int(sh.n_basis),
+               "Y_matrix_bytes": None if y is None else int(y.nbytes)}
         for case, fn in cases.items():
             r = benchmark(fn, n_repeat=repeat, n_warmup=3)
             rec[case] = {"gpu_s": _stats(r.gpu_times[0]), "cpu_s": _stats(r.cpu_times)}
@@ -427,6 +459,7 @@ def profile(args) -> dict[str, Any]:
     run = _new_run(cfg, scratch)
     sync()
     doc["build_seconds"] = time.perf_counter() - t_build
+    doc["evaluators"] = evaluators(run.model)
     doc["grid"] = {"state_points": int(run.model.grid.n_points),
                    "product_points": int(run.model._ps.sh.n_points),
                    "nlev": int(run.model.nlev)}
@@ -518,8 +551,7 @@ def profile(args) -> dict[str, Any]:
                                      "attribution from the nsys report, not from here"}
         timer.nvtx = False
     timer.enabled = False
-    from tropoi.spatial.transforms import fast_geodesic_sh as fsh
-    fsh.PointSetSphericalHarmonics._cost_profile_timer = None
+    _TIMER["current"] = None
 
     # 3. I/O, sample and checkpoint (synced)
     spd = cfg.steps_per_day

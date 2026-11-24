@@ -29,7 +29,8 @@ def test_swe_config_defaults():
 
     cfg = SWERunConfig.resolve({})
     assert cfg.scenario == "williamson2"
-    assert cfg.grid == "geodesic"
+    assert cfg.grid == "latlon"
+    assert (cfg.nlat, cfg.nlon) == (32, 64)      # sized from lmax 21
     assert cfg.snapshot_mode == "count" and cfg.n_snapshots == 5
     assert cfg.gravity == pytest.approx(9.80616)
     assert cfg.mean_depth_m == 3000.0

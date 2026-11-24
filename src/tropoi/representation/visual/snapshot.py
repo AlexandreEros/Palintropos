@@ -156,6 +156,16 @@ def build_resources(storage) -> SnapshotResources:
     path the run itself used), never a preset validator, so legacy capsules
     are not re-validated by newer guards. Requires CUDA; a missing CuPy/CUDA
     surfaces as :class:`PlotUnavailableError` with the CPU alternatives.
+
+    The spherical-harmonic evaluator is **not** pinned to the one the
+    manifest records: a replay re-derives diagnostics on the current
+    default, which is the separable path. The two evaluators agree to
+    round-off (1e-16..1e-14 relative), so this changes a replayed
+    diagnostic only in the last couple of digits, and it is not this code's
+    job to reproduce obsolete numerical semantics -- a run that must be
+    reproduced bit-for-bit is reproduced from the commit its manifest
+    records. A run whose own grid cannot factorize still lands on the dense
+    path through the evaluator's own fallback, with its warning.
     """
     solver = storage.solver
     run_config = storage.run_config

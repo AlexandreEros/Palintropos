@@ -53,7 +53,8 @@ IC = "rh4"
 
 def build_planet() -> Planet:
     params = PlanetaryParameters.from_earth_like(day_hours=DAY_HOURS)
-    return Planet.generate(params=params, grid_resolution=RES, l_max=L_MAX)
+    return Planet.generate(params=params, grid_resolution=RES,
+                           l_max=L_MAX, grid_type="geodesic")
 
 
 def base_cfl_dt(planet: Planet) -> float:

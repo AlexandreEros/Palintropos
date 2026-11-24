@@ -43,3 +43,24 @@ and the [preservation record](../../validation/run_archive_2026-11-12/README.md)
 - [CV-1 cost on the MX110](mars-mi-cost-mx110/README.md): s/step and its breakdown by
   operator at T10–T42, time-step probes, slab timescales and the CV-1 wall-clock
   arithmetic behind [MARS_MI_COST.md](../MARS_MI_COST.md).
+- [THAI dry development columns](thai-dev-columns/) and the coupled runs
+  [dev-thai-ben2](dev-thai-ben2-lwck-heated-T21L40-9f8c776/summary.json) and
+  [dev-thai-ben1](dev-thai-ben1-lwck-heated-T21L40-9f8c776/summary.json): real-gas longwave
+  k-tables for the two dry THAI compositions, 5 days from the isothermal start on the MX110.
+  Development runs, not THAI reproductions; the Ben 2 summary holds the stop-and-resume
+  comparison with an uninterrupted control ([OPACITY.md](../OPACITY.md)).
+- The same two with real-gas stellar absorption:
+  [dev-thai-ben2-ck](dev-thai-ben2-ck-heated-T21L40-809ffdd/summary.json) and
+  [dev-thai-ben1-ck](dev-thai-ben1-ck-heated-T21L40-809ffdd/summary.json). They complete and
+  close their budgets, but the unsponged top layers reach 293 and 51 m/s
+  (`state_diagnostics.json`); not usable aloft.
+- Issue #47, vertical structure (`vertical_coherence.json` in each of the four runs above):
+  the Ben 2 stellar run with `thermal_source="layer-linear"`
+  ([9b2060c layer-linear replay](dev-thai-ben2-ck-heated-T21L40-9b2060c-layer-linear/summary.json);
+  run as `dev-thai-ben2-ck` with the source overridden, `3f2de9d8…`, and the same
+  configuration as the later preset `dev-thai-ben2-ck-layer-linear` apart from its id)
+  and its control at the same commit with the historical source
+  ([9b2060c linear control](dev-thai-ben2-ck-heated-T21L40-9b2060c-linear/summary.json),
+  `fdbcf1cf…`, bit-identical to the `809ffdd` run). In this 5-day matched replay the new source reduces the alternating
+  temperature component about tenfold; the loss of upper-level wind coherence remains and comes with stellar absorption
+  ([OPACITY.md](../OPACITY.md) §6).

@@ -1,0 +1,699 @@
+{
+  "command": "python -I tools/radiation/opacity/import_socrates.py --case thai_ben1_shortwave --record-dir docs/radiation/opacity",
+  "file": "thai-ben1-sp-sw-43-dsa-ar10bar-trappist1.npz",
+  "metadata": {
+    "assumptions": {
+      "absent_gases_dropped": [
+        "Ar",
+        "CH4",
+        "H2",
+        "H2O"
+      ],
+      "broadening": "CO2 lines broadened by air (HITRAN air widths; the file's single self-broadening entry is CO2 fraction 0), used here for an N2 background: N2 broadening is approximated by air broadening",
+      "continua": "the documentation lists N2-CH4, N2-N2, N2-H2, H2-CH4, H2-H2 and H2-CO2 CIA for these files; whichever involve only the gases present are kept (see the per-band components). The file's generalised Rayleigh scattering is recorded in the metadata and not applied",
+      "continuum_density": "k_cont q1 q2 rho with rho = p / (R_mix T) of the stated mixture; continuum look-up (10 K steps) interpolated linearly in T to the gas table's temperatures. Where the source data stop (CO2-CO2 below 200 K) the file itself holds the edge value",
+      "far_wings": "not stated in the documentation for this file (the CO2 sub-Lorentzian line shape is listed only for the CO2-rich files)",
+      "line_data": "HITRAN 2012 (Rothman et al. 2013, JQSRT 130, 4)",
+      "overlap": "as flagged in the spectral file: random overlap (products of k-terms) between a gas and a continuum, exact where either has one term. Not a common-wavenumber-grid premix",
+      "random_overlap_bands": [
+        42,
+        41,
+        40
+      ],
+      "self_broadening_axis": {
+        "CO2": {
+          "axis": [
+            0.0
+          ],
+          "used": 0.0
+        }
+      },
+      "thermal_source": "not applicable (stellar stream)"
+    },
+    "bands": [
+      {
+        "band": 43,
+        "components": [
+          "CO2:16"
+        ],
+        "points": 16,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          499.99999999999994,
+          1818.1818181818182
+        ]
+      },
+      {
+        "band": 42,
+        "components": [
+          "CO2:13",
+          "N2-N2:4"
+        ],
+        "points": 52,
+        "random_overlap_acts": true,
+        "wavenumber_cm": [
+          1818.1818181818182,
+          2173.913043478261
+        ]
+      },
+      {
+        "band": 41,
+        "components": [
+          "CO2:18",
+          "N2-N2:2"
+        ],
+        "points": 36,
+        "random_overlap_acts": true,
+        "wavenumber_cm": [
+          2173.913043478261,
+          2439.024390243903
+        ]
+      },
+      {
+        "band": 40,
+        "components": [
+          "CO2:7",
+          "N2-N2:5"
+        ],
+        "points": 35,
+        "random_overlap_acts": true,
+        "wavenumber_cm": [
+          2439.024390243903,
+          2777.777777777778
+        ]
+      },
+      {
+        "band": 39,
+        "components": [
+          "CO2:3",
+          "N2-N2:1"
+        ],
+        "points": 3,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          2777.777777777778,
+          3174.603174603175
+        ]
+      },
+      {
+        "band": 38,
+        "components": [
+          "CO2:12"
+        ],
+        "points": 12,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          3174.603174603175,
+          3508.7719298245615
+        ]
+      },
+      {
+        "band": 37,
+        "components": [
+          "CO2:14"
+        ],
+        "points": 14,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          3508.7719298245615,
+          3773.5849056603774
+        ]
+      },
+      {
+        "band": 36,
+        "components": [
+          "CO2:5"
+        ],
+        "points": 5,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          3773.5849056603774,
+          3999.9999999999995
+        ]
+      },
+      {
+        "band": 35,
+        "components": [
+          "CO2:4"
+        ],
+        "points": 4,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          3999.9999999999995,
+          4672.897196261682
+        ]
+      },
+      {
+        "band": 34,
+        "components": [
+          "CO2:9"
+        ],
+        "points": 9,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          4672.897196261682,
+          4761.904761904762
+        ]
+      },
+      {
+        "band": 33,
+        "components": [
+          "CO2:16"
+        ],
+        "points": 16,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          4761.904761904762,
+          5000.0
+        ]
+      },
+      {
+        "band": 32,
+        "components": [
+          "CO2:15"
+        ],
+        "points": 15,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          5000.0,
+          5154.639175257732
+        ]
+      },
+      {
+        "band": 31,
+        "components": [
+          "CO2:9"
+        ],
+        "points": 9,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          5154.639175257732,
+          5555.555555555556
+        ]
+      },
+      {
+        "band": 30,
+        "components": [
+          "CO2:1"
+        ],
+        "points": 1,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          5555.555555555556,
+          5952.380952380952
+        ]
+      },
+      {
+        "band": 29,
+        "components": [
+          "CO2:10"
+        ],
+        "points": 10,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          5952.380952380952,
+          6172.83950617284
+        ]
+      },
+      {
+        "band": 28,
+        "components": [
+          "CO2:11"
+        ],
+        "points": 11,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          6172.83950617284,
+          6250.0
+        ]
+      },
+      {
+        "band": 27,
+        "components": [
+          "CO2:14"
+        ],
+        "points": 14,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          6250.0,
+          6410.25641025641
+        ]
+      },
+      {
+        "band": 26,
+        "components": [
+          "CO2:10"
+        ],
+        "points": 10,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          6410.25641025641,
+          6578.9473684210525
+        ]
+      },
+      {
+        "band": 25,
+        "components": [
+          "CO2:3"
+        ],
+        "points": 3,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          6578.9473684210525,
+          6711.4093959731545
+        ]
+      },
+      {
+        "band": 24,
+        "components": [
+          "CO2:8"
+        ],
+        "points": 8,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          6711.4093959731545,
+          6849.315068493151
+        ]
+      },
+      {
+        "band": 23,
+        "components": [
+          "CO2:15"
+        ],
+        "points": 15,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          6849.315068493151,
+          7042.253521126761
+        ]
+      },
+      {
+        "band": 22,
+        "components": [
+          "CO2:2"
+        ],
+        "points": 2,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          7042.253521126761,
+          7462.686567164179
+        ]
+      },
+      {
+        "band": 21,
+        "components": [
+          "CO2:6"
+        ],
+        "points": 6,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          7462.686567164179,
+          7692.307692307692
+        ]
+      },
+      {
+        "band": 20,
+        "components": [
+          "CO2:2"
+        ],
+        "points": 2,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          7692.307692307692,
+          8064.5161290322585
+        ]
+      },
+      {
+        "band": 19,
+        "components": [
+          "CO2:11"
+        ],
+        "points": 11,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          8064.5161290322585,
+          8333.333333333334
+        ]
+      },
+      {
+        "band": 18,
+        "components": [
+          "CO2:1"
+        ],
+        "points": 1,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          8333.333333333334,
+          8620.689655172415
+        ]
+      },
+      {
+        "band": 17,
+        "components": [
+          "CO2:1"
+        ],
+        "points": 1,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          8620.689655172415,
+          8928.571428571428
+        ]
+      },
+      {
+        "band": 16,
+        "components": [
+          "CO2:1"
+        ],
+        "points": 1,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          8928.571428571428,
+          9090.90909090909
+        ]
+      },
+      {
+        "band": 15,
+        "components": [
+          "CO2:1"
+        ],
+        "points": 1,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          9090.90909090909,
+          9259.25925925926
+        ]
+      },
+      {
+        "band": 14,
+        "components": [
+          "CO2:1"
+        ],
+        "points": 1,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          9259.25925925926,
+          10000.0
+        ]
+      },
+      {
+        "band": 13,
+        "components": [],
+        "points": 1,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          10000.0,
+          10869.565217391304
+        ]
+      },
+      {
+        "band": 12,
+        "components": [],
+        "points": 1,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          10869.565217391304,
+          11111.111111111111
+        ]
+      },
+      {
+        "band": 11,
+        "components": [
+          "CO2:1"
+        ],
+        "points": 1,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          11111.111111111111,
+          11494.252873563219
+        ]
+      },
+      {
+        "band": 10,
+        "components": [
+          "CO2:1"
+        ],
+        "points": 1,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          11494.252873563219,
+          14492.753623188408
+        ]
+      },
+      {
+        "band": 9,
+        "components": [],
+        "points": 1,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          14492.753623188408,
+          16393.44262295082
+        ]
+      },
+      {
+        "band": 8,
+        "components": [],
+        "points": 1,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          16393.44262295082,
+          18181.81818181818
+        ]
+      },
+      {
+        "band": 7,
+        "components": [],
+        "points": 1,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          18181.81818181818,
+          20000.0
+        ]
+      },
+      {
+        "band": 6,
+        "components": [],
+        "points": 1,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          20000.0,
+          22222.222222222223
+        ]
+      },
+      {
+        "band": 5,
+        "components": [],
+        "points": 1,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          22222.222222222223,
+          23809.52380952381
+        ]
+      },
+      {
+        "band": 4,
+        "components": [],
+        "points": 1,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          23809.52380952381,
+          25974.02597402597
+        ]
+      },
+      {
+        "band": 3,
+        "components": [],
+        "points": 1,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          25974.02597402597,
+          28985.507246376816
+        ]
+      },
+      {
+        "band": 2,
+        "components": [],
+        "points": 1,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          28985.507246376816,
+          33333.333333333336
+        ]
+      },
+      {
+        "band": 1,
+        "components": [],
+        "points": 1,
+        "random_overlap_acts": false,
+        "wavenumber_cm": [
+          33333.333333333336,
+          50000.0
+        ]
+      }
+    ],
+    "coverage": {
+      "documented_accuracy": "below about 5 W m^-2 for all stars, against the 280-band reference",
+      "documented_ranges": "opacity look-up tables 100-400 K; Planck table 1-500 K; long-wave accuracy decreases above about 310 K",
+      "documented_validity": "atmospheres dominated by a mixture of N2 and H2 with up to 1 % CO2 and CH4, surface pressures up to 10 bar",
+      "n_band": 43,
+      "n_points": 337,
+      "n_pressure": 61,
+      "n_temperature": 13,
+      "pressure_pa": [
+        1.0,
+        1000000.0
+      ],
+      "temperature_k": [
+        100.0,
+        400.0
+      ],
+      "wavenumber_cm": [
+        499.99999999999994,
+        50000.0
+      ]
+    },
+    "mass_basis": {
+      "composition": {
+        "CO2": 0.0004,
+        "N2": 0.9996
+      },
+      "composition_label": "thai_ben1",
+      "gas_constant": 296.7289264825303,
+      "kind": "premixed",
+      "mass_fractions": {
+        "CO2": 0.0006282423254658981,
+        "N2": 0.9993717576745341
+      },
+      "molar_mass_kg_per_mol": 0.028020398000000002,
+      "per": "kg of the mixture"
+    },
+    "schema": "palintropos.ktable.metadata/1",
+    "source": {
+      "documentation": {
+        "read": "2026-11-16",
+        "sha256": "ff20b814dd80761e9ebf3e20cb74d914027d5c368a0bf026001d47e1a9a983a6",
+        "url": "https://simplex.giss.nasa.gov/gcm/ROCKE-3D/Spectralfiles.html"
+      },
+      "files": [
+        {
+          "bytes": 116554,
+          "name": "sp_sw_43_dsa_ar10bar_trappist1",
+          "sha256": "704f9776a1fd16f32b7046207c51c5393172e8b591c542aed15a2267aa3c54b4",
+          "url": "https://portal.nccs.nasa.gov/GISS_modelE/ROCKE-3D/spectral_files/sp_sw_dsa_ar10bar/sp_sw_43_dsa_ar10bar_trappist1"
+        },
+        {
+          "bytes": 11400655,
+          "name": "sp_sw_43_dsa_ar10bar_trappist1_k",
+          "sha256": "977f2cdd90f73412f77ac723e4a8ad27408f2de372da80ecea2e72f8344a65c1",
+          "url": "https://portal.nccs.nasa.gov/GISS_modelE/ROCKE-3D/spectral_files/sp_sw_dsa_ar10bar/sp_sw_43_dsa_ar10bar_trappist1_k"
+        }
+      ],
+      "generator": "SOCRATES spectral files prepared for ROCKE-3D by D. S. Amundsen (github.com/DavidSAmundsen/socrates_tools)",
+      "kind": "SOCRATES look-up spectral file"
+    },
+    "stellar": {
+      "band_fractions": [
+        0.02656221023,
+        0.01482918161,
+        0.01508034607,
+        0.02695592583,
+        0.02959266107,
+        0.02208575483,
+        0.01866939112,
+        0.01676674122,
+        0.07782652617,
+        0.0106526464,
+        0.02536404824,
+        0.01529585662,
+        0.04146680899,
+        0.05677867426,
+        0.03676360419,
+        0.01185539372,
+        0.02286220581,
+        0.02136834353,
+        0.01518227359,
+        0.01474203956,
+        0.01975398087,
+        0.04499964863,
+        0.03198620258,
+        0.05168204686,
+        0.03599036771,
+        0.03338955765,
+        0.03444872077,
+        0.01685195291,
+        0.01830330962,
+        0.0628369022,
+        0.05388278132,
+        0.01439385132,
+        0.01384145534,
+        0.04184376402,
+        0.002530298546,
+        0.00102034457,
+        0.0007771275866,
+        0.0005825989255,
+        0.0001044206189,
+        5.747656744e-05,
+        1.116784097e-05,
+        1.136564469e-05,
+        2.481091694e-08
+      ],
+      "band_fractions_sum": 0.999999999971017,
+      "rayleigh_m2_per_kg_of_mixture": [
+        4.01578555074036e-10,
+        1.4663589907670987e-09,
+        2.6092872812370714e-09,
+        4.204922009457805e-09,
+        7.054069855982007e-09,
+        1.1239697758740446e-08,
+        1.5887395310359415e-08,
+        2.0513212596419494e-08,
+        3.2908475368547584e-08,
+        4.444309213744769e-08,
+        5.0903142798766364e-08,
+        5.970817677609128e-08,
+        7.412723277904845e-08,
+        9.984602993829535e-08,
+        1.2136930317744016e-07,
+        1.3382444385607374e-07,
+        1.4427466933323592e-07,
+        1.5994424621846453e-07,
+        1.7538354177789344e-07,
+        1.901591011529794e-07,
+        2.093188990934161e-07,
+        2.498261250188422e-07,
+        2.979692757674097e-07,
+        3.467997456914982e-07,
+        4.072243652193867e-07,
+        4.6580879973249636e-07,
+        5.347858163272436e-07,
+        5.950695762347932e-07,
+        6.402348002179309e-07,
+        7.715086595656398e-07,
+        1.0607167288536031e-06,
+        1.3191914172777623e-06,
+        1.474055593962325e-06,
+        2.2620123814367882e-06,
+        5.1125419313200585e-06,
+        8.153066558911365e-06,
+        1.1896912096433023e-05,
+        1.799988498638645e-05,
+        2.498315046545664e-05,
+        3.4336628205065066e-05,
+        5.070949135875698e-05,
+        8.199266164588914e-05,
+        0.00013213025952404995
+      ],
+      "rayleigh_note": "per band, summed over the gases present with their mass fractions; NOT applied by the provider (absorption only)",
+      "star": "TRAPPIST-1 band fluxes as normalised in block 2 of the spectral file (the documentation does not name the stellar spectrum behind them)"
+    },
+    "stream": "shortwave",
+    "units": {
+      "band_edges": "cm^-1",
+      "k": "m^2 kg^-1 (of mixture)",
+      "pressure": "Pa",
+      "temperature": "K"
+    }
+  },
+  "provenance": "sp_sw_43_dsa_ar10bar_trappist1 (ROCKE-3D SOCRATES) premixed for thai_ben1; source sha256 704f9776a1fd16f3/977f2cdd90f73412",
+  "sha256": "c473fca1eceb69cbb69016d856eff67093d0183e3c5542301cf28429ae35c09d",
+  "species": "thai_ben1"
+}

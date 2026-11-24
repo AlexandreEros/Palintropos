@@ -843,6 +843,10 @@
           "name": "__post_init__"
         },
         {
+          "kind": "method",
+          "name": "content_sha256"
+        },
+        {
           "kind": "classmethod",
           "name": "load"
         },
@@ -853,6 +857,10 @@
         {
           "kind": "property",
           "name": "n_g"
+        },
+        {
+          "kind": "property",
+          "name": "point_weights"
         },
         {
           "kind": "method",
@@ -1000,6 +1008,16 @@
       ],
       "module": "tropoi.physics.radiation.scheme",
       "qualname": "RadiativeFluxes"
+    },
+    {
+      "decorators": [],
+      "external_bases": [
+        "ValueError"
+      ],
+      "id": "tropoi.physics.radiation.tables.KTableError",
+      "members": [],
+      "module": "tropoi.physics.radiation.tables",
+      "qualname": "KTableError"
     },
     {
       "decorators": [
@@ -1631,6 +1649,47 @@
     },
     {
       "decorators": [],
+      "external_bases": [],
+      "id": "tropoi.representation.archive.radiative.RadiativeStorage",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__init__"
+        },
+        {
+          "kind": "method",
+          "name": "_index"
+        },
+        {
+          "kind": "method",
+          "name": "_read"
+        },
+        {
+          "kind": "method",
+          "name": "frame"
+        },
+        {
+          "kind": "method",
+          "name": "pe_context"
+        },
+        {
+          "kind": "method",
+          "name": "plot_simulation"
+        },
+        {
+          "kind": "method",
+          "name": "quantities"
+        },
+        {
+          "kind": "method",
+          "name": "surface"
+        }
+      ],
+      "module": "tropoi.representation.archive.radiative",
+      "qualname": "RadiativeStorage"
+    },
+    {
+      "decorators": [],
       "external_bases": [
         "ValueError"
       ],
@@ -1962,6 +2021,31 @@
       ],
       "module": "tropoi.representation.diagnostics.pe_levels",
       "qualname": "LevelFields"
+    },
+    {
+      "decorators": [],
+      "external_bases": [],
+      "id": "tropoi.representation.diagnostics.pe_structure.ZonalMeanAccumulator",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__init__"
+        },
+        {
+          "kind": "method",
+          "name": "add"
+        },
+        {
+          "kind": "property",
+          "name": "count"
+        },
+        {
+          "kind": "method",
+          "name": "means"
+        }
+      ],
+      "module": "tropoi.representation.diagnostics.pe_structure",
+      "qualname": "ZonalMeanAccumulator"
     },
     {
       "decorators": [
@@ -2710,6 +2794,16 @@
     },
     {
       "decorators": [
+        "dataclass(frozen=True)"
+      ],
+      "external_bases": [],
+      "id": "tropoi.representation.visual.quantities._Presentation",
+      "members": [],
+      "module": "tropoi.representation.visual.quantities",
+      "qualname": "_Presentation"
+    },
+    {
+      "decorators": [
         "runtime_checkable"
       ],
       "external_bases": [
@@ -3201,6 +3295,154 @@
       ],
       "module": "tropoi.representation.visual.timeline",
       "qualname": "FigureTimeline"
+    },
+    {
+      "decorators": [],
+      "external_bases": [],
+      "id": "tropoi.representation.visual.viewer_fields.FrameProvider",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__init__"
+        },
+        {
+          "kind": "method",
+          "name": "_context"
+        },
+        {
+          "kind": "method",
+          "name": "_horizontal_slice"
+        },
+        {
+          "kind": "method",
+          "name": "_native_grid"
+        },
+        {
+          "kind": "method",
+          "name": "_pe_slice"
+        },
+        {
+          "kind": "method",
+          "name": "_read"
+        },
+        {
+          "kind": "method",
+          "name": "_result"
+        },
+        {
+          "kind": "method",
+          "name": "_saved_index"
+        },
+        {
+          "kind": "method",
+          "name": "_scalar"
+        },
+        {
+          "kind": "method",
+          "name": "_slab_point"
+        },
+        {
+          "kind": "method",
+          "name": "_structure_context"
+        },
+        {
+          "kind": "method",
+          "name": "_terrain_lm"
+        },
+        {
+          "kind": "method",
+          "name": "column"
+        },
+        {
+          "kind": "property",
+          "name": "radius"
+        },
+        {
+          "kind": "method",
+          "name": "section"
+        },
+        {
+          "kind": "method",
+          "name": "slice"
+        },
+        {
+          "kind": "method",
+          "name": "terrain"
+        },
+        {
+          "kind": "method",
+          "name": "zonal_mean"
+        }
+      ],
+      "module": "tropoi.representation.visual.viewer_fields",
+      "qualname": "FrameProvider"
+    },
+    {
+      "decorators": [],
+      "external_bases": [
+        "http.server.ThreadingHTTPServer"
+      ],
+      "id": "tropoi.representation.visual.viewer_server.ViewerServer",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__init__"
+        }
+      ],
+      "module": "tropoi.representation.visual.viewer_server",
+      "qualname": "ViewerServer"
+    },
+    {
+      "decorators": [],
+      "external_bases": [],
+      "id": "tropoi.representation.visual.viewer_server.ViewerSession",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__init__"
+        },
+        {
+          "kind": "method",
+          "name": "_cached"
+        },
+        {
+          "kind": "method",
+          "name": "diagnostic"
+        },
+        {
+          "kind": "method",
+          "name": "frame"
+        },
+        {
+          "kind": "method",
+          "name": "structure"
+        }
+      ],
+      "module": "tropoi.representation.visual.viewer_server",
+      "qualname": "ViewerSession"
+    },
+    {
+      "decorators": [],
+      "external_bases": [
+        "http.server.BaseHTTPRequestHandler"
+      ],
+      "id": "tropoi.representation.visual.viewer_server._Handler",
+      "members": [
+        {
+          "kind": "method",
+          "name": "_reply"
+        },
+        {
+          "kind": "method",
+          "name": "do_GET"
+        },
+        {
+          "kind": "method",
+          "name": "log_message"
+        }
+      ],
+      "module": "tropoi.representation.visual.viewer_server",
+      "qualname": "_Handler"
     },
     {
       "decorators": [
@@ -5359,6 +5601,69 @@
       ],
       "module": "tropoi.spatial.transforms.optimized_geodesic_sh",
       "qualname": "GeodesicSphericalHarmonics"
+    },
+    {
+      "decorators": [],
+      "external_bases": [],
+      "id": "tropoi.spatial.transforms.separable_gauss_sh.SeparableGaussSphericalHarmonics",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__init__"
+        },
+        {
+          "kind": "method",
+          "name": "__repr__"
+        },
+        {
+          "kind": "method",
+          "name": "_as_rows"
+        },
+        {
+          "kind": "method",
+          "name": "_build_fourier_bins"
+        },
+        {
+          "kind": "method",
+          "name": "_build_legendre_tables"
+        },
+        {
+          "kind": "method",
+          "name": "describe"
+        },
+        {
+          "kind": "method",
+          "name": "extended"
+        },
+        {
+          "kind": "method",
+          "name": "inv_transform"
+        },
+        {
+          "kind": "method",
+          "name": "inv_transform_batch"
+        },
+        {
+          "kind": "method",
+          "name": "transform"
+        },
+        {
+          "kind": "method",
+          "name": "transform_batch"
+        }
+      ],
+      "module": "tropoi.spatial.transforms.separable_gauss_sh",
+      "qualname": "SeparableGaussSphericalHarmonics"
+    },
+    {
+      "decorators": [],
+      "external_bases": [
+        "ValueError"
+      ],
+      "id": "tropoi.spatial.transforms.separable_gauss_sh.SeparableStructureError",
+      "members": [],
+      "module": "tropoi.spatial.transforms.separable_gauss_sh",
+      "qualname": "SeparableStructureError"
     },
     {
       "decorators": [],

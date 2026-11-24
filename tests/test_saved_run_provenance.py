@@ -36,17 +36,31 @@ from tropoi.spatial.truncation import product_truncation_cut
 NOW = datetime(2026, 7, 19, 12, 0, 0, tzinfo=timezone.utc)
 COMMIT = "abcdef12"
 
-#: Scientific hashes / run ids measured at 0ce4d27 (before this feature)
-#: for representative resolved configurations. They must not move.
+#: Scientific hashes / run ids for representative resolved configurations.
+#: A tripwire: these must not move for any reason that is not a deliberate,
+#: recorded change to what a default run *is*.
+#:
+#: Moved once, deliberately, when Gauss lat-lon became the default grid and
+#: its dimensions began deriving from lmax. The grid family and the grid
+#: dimensions are part of a run's scientific identity, so the hashes had to
+#: move; preserving them was explicitly rejected. Previous values, measured
+#: at 0ce4d27: bve 2df940f0, swe 0e6cfc38, w5 cf9bd4e7, pe fa2db863.
+#:
+#: Moved a second time, also deliberately, when the run id's grid token
+#: began naming the grid family: ``gl{nlat}x{nlon}`` on Gauss lat-lon,
+#: ``r{resolution}`` on geodesic. These runs are lat-lon, so ``r4`` / ``r3``
+#: became ``gl32x64`` / ``gl16x32``. The config HASHES did not move with it,
+#: which is the expected result and worth keeping as a check: the id is
+#: derived from the configuration, not the reverse.
 PINNED = {
-    "bve": ("2df940f0",
-            "20260719T120000Z_two-vortices_norot_r4_l21_dt12h_2df940f0_abcdef12"),
-    "swe": ("0e6cfc38",
-            "20260719T120000Z_williamson2_rot23p93h_r4_l21_dt6h_0e6cfc38_abcdef12"),
-    "w5": ("cf9bd4e7",
-           "20260719T120000Z_williamson5_rot23p93h_r4_l21_dt6h_cf9bd4e7_abcdef12"),
-    "pe": ("fa2db863",
-           "20260719T120000Z_thermal-wave_rot24h_r3_l10_dt15m_fa2db863_abcdef12"),
+    "bve": ("99e6c11b",
+            "20260719T120000Z_two-vortices_norot_gl32x64_l21_dt12h_99e6c11b_abcdef12"),
+    "swe": ("620bb60e",
+            "20260719T120000Z_williamson2_rot23p93h_gl32x64_l21_dt6h_620bb60e_abcdef12"),
+    "w5": ("f726cd65",
+           "20260719T120000Z_williamson5_rot23p93h_gl32x64_l21_dt6h_f726cd65_abcdef12"),
+    "pe": ("071daf45",
+           "20260719T120000Z_thermal-wave_rot24h_gl16x32_l10_dt15m_071daf45_abcdef12"),
 }
 
 

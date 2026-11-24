@@ -71,12 +71,13 @@ BACKEND_CHOICES = ("geodesic", "latlon", "gauss-latlon")
 
 _BVE_EXAMPLES = """\
 examples:
-  tropoi run bve                          geodesic grid, two_vortices, 1 day, 5 snapshots
+  tropoi run bve                          Gauss lat-lon 32x64, two_vortices, 1 day, 5 snapshots
   tropoi run bve --preset rh4             documented RH4 validation configuration
   tropoi run bve --days 1 --n-snapshots 9
   tropoi run bve --n-snapshots 20 --no-plots
   tropoi run bve --n-snapshots 1 --plot summary
-  tropoi run bve --backend gauss-latlon --nlat 12 --nlon 24 --l-max 8 --days 0.02
+  tropoi run bve --l-max 8 --days 0.02    lat-lon dimensions follow --l-max (14x28)
+  tropoi run bve --backend geodesic --resolution 4   deprecated geodesic grid
   tropoi run bve --initial-state states/rh4_small --days 2 --n-snapshots 9
 """
 
@@ -106,10 +107,11 @@ def add_bve_arguments(parser: argparse.ArgumentParser) -> None:
     parser.add_argument(
         "--backend", "--grid", dest="grid", choices=list(BACKEND_CHOICES),
         default=None,
-        help="Numerical backend / grid family [default: geodesic]. "
+        help="Numerical backend / grid family [default: latlon]. "
              "'gauss-latlon' is an alias for 'latlon' (Gauss-Legendre "
-             "latitudes, uniform longitudes). 'geodesic' uses --resolution; "
-             "'latlon' uses --nlat/--nlon.")
+             "latitudes, uniform longitudes). 'latlon' uses --nlat/--nlon, "
+             "which default to the sizing for --l-max; 'geodesic' is "
+             "deprecated and uses --resolution.")
     parser.add_argument(
         "--l-max", "--lmax", dest="lmax", type=int, default=None,
         help="Maximum spherical harmonic degree [default: 21].")
@@ -120,10 +122,12 @@ def add_bve_arguments(parser: argparse.ArgumentParser) -> None:
              "SH basis function (src/tropoi/spatial/CONVENTIONS.md, geodesic sampling).")
     parser.add_argument(
         "--nlat", type=int, default=None,
-        help="Lat-lon backend: number of Gauss-Legendre latitudes [default: 128].")
+        help="Lat-lon backend: number of Gauss-Legendre latitudes "
+             "[default: sized from --l-max by the 3/2 quadratic rule].")
     parser.add_argument(
         "--nlon", type=int, default=None,
-        help="Lat-lon backend: number of uniform longitudes [default: 256].")
+        help="Lat-lon backend: number of uniform longitudes "
+             "[default: 2 x nlat, sized from --l-max].")
     parser.add_argument(
         "--day-hours", type=float, default=None,
         help="Sidereal day length in hours; 'inf' = non-rotating [default: inf].")
@@ -308,7 +312,7 @@ def _cmd_run_bve(args: argparse.Namespace) -> int:
 
 _SWE_EXAMPLES = """\
 examples:
-  tropoi run swe                          Williamson-2 steady flow, 1 day, geodesic grid
+  tropoi run swe                          Williamson-2 steady flow, 1 day, Gauss lat-lon 32x64
   tropoi run swe --backend gauss-latlon --nlat 32 --nlon 64 --l-max 15
   tropoi run swe --scenario gravity_wave --day-hours inf --mean-depth 1000
   tropoi run swe --days 5 --n-snapshots 11 --no-plots
@@ -328,8 +332,9 @@ def add_swe_arguments(parser: argparse.ArgumentParser) -> None:
     parser.add_argument(
         "--backend", "--grid", dest="grid", choices=list(BACKEND_CHOICES),
         default=None,
-        help="Numerical backend / grid family [default: geodesic]. "
-             "'gauss-latlon' is an alias for 'latlon'.")
+        help="Numerical backend / grid family [default: latlon]. "
+             "'gauss-latlon' is an alias for 'latlon'; 'geodesic' is "
+             "deprecated.")
     parser.add_argument(
         "--l-max", "--lmax", dest="lmax", type=int, default=None,
         help="Maximum spherical harmonic degree [default: 21].")
@@ -338,10 +343,12 @@ def add_swe_arguments(parser: argparse.ArgumentParser) -> None:
         help="Geodesic grid subdivision level [default: 4].")
     parser.add_argument(
         "--nlat", type=int, default=None,
-        help="Lat-lon backend: number of Gauss-Legendre latitudes [default: 128].")
+        help="Lat-lon backend: number of Gauss-Legendre latitudes "
+             "[default: sized from --l-max by the 3/2 quadratic rule].")
     parser.add_argument(
         "--nlon", type=int, default=None,
-        help="Lat-lon backend: number of uniform longitudes [default: 256].")
+        help="Lat-lon backend: number of uniform longitudes "
+             "[default: 2 x nlat, sized from --l-max].")
     parser.add_argument(
         "--day-hours", type=float, default=None,
         help="Sidereal day length in hours; 'inf' = non-rotating "
@@ -485,8 +492,9 @@ def add_pe_arguments(parser: argparse.ArgumentParser) -> None:
     parser.add_argument(
         "--backend", "--grid", dest="grid", choices=list(BACKEND_CHOICES),
         default=None,
-        help="Numerical backend / grid family [default: geodesic]. "
-             "'gauss-latlon' is an alias for 'latlon'.")
+        help="Numerical backend / grid family [default: latlon]. "
+             "'gauss-latlon' is an alias for 'latlon'; 'geodesic' is "
+             "deprecated.")
     parser.add_argument(
         "--l-max", "--lmax", dest="lmax", type=int, default=None,
         help="Maximum spherical harmonic degree [default: 10].")
@@ -495,10 +503,12 @@ def add_pe_arguments(parser: argparse.ArgumentParser) -> None:
         help="Geodesic grid subdivision level [default: 3].")
     parser.add_argument(
         "--nlat", type=int, default=None,
-        help="Lat-lon backend: number of Gauss-Legendre latitudes [default: 32].")
+        help="Lat-lon backend: number of Gauss-Legendre latitudes "
+             "[default: sized from --l-max by the 3/2 quadratic rule].")
     parser.add_argument(
         "--nlon", type=int, default=None,
-        help="Lat-lon backend: number of uniform longitudes [default: 64].")
+        help="Lat-lon backend: number of uniform longitudes "
+             "[default: 2 x nlat, sized from --l-max].")
     parser.add_argument(
         "--day-hours", type=float, default=None,
         help="Sidereal day length in hours; 'inf' = non-rotating [default: 24].")
@@ -751,6 +761,15 @@ def _describe_state_fields(manifest: dict, run_config: dict):
 def _cmd_inspect(args: argparse.Namespace) -> int:
     import json
 
+    if getattr(args, "viewer_manifest", False):
+        from tropoi.representation.archive.viewer_manifest import viewer_manifest
+        if args.snapshot is not None or args.field is not None:
+            return _error("--viewer-manifest takes a capsule directory without a snapshot selection")
+        try:
+            print(json.dumps(viewer_manifest(args.run_path), allow_nan=False, indent=2))
+        except (OSError, ValueError, KeyError, TypeError) as err:
+            return _error(str(err))
+        return 0
     if getattr(args, "field", None) is not None and \
             getattr(args, "snapshot", None) is None:
         return _error("--field requires --snapshot INDEX")
@@ -1241,6 +1260,15 @@ def _cmd_gen(args: argparse.Namespace) -> int:
     return generate_planet.run(args)
 
 
+def _cmd_view(args: argparse.Namespace) -> int:
+    from tropoi.representation.visual.viewer_server import serve
+    try:
+        serve(args.capsules, port=args.port, open_browser=not args.no_browser, backend=args.backend)
+    except (KeyError, ValueError, OSError, OverflowError) as err:
+        return _error(str(err))
+    return 0
+
+
 def _cmd_recompile(args: argparse.Namespace) -> int:
     return clear_cache.run(args)
 
@@ -1321,6 +1349,14 @@ def build_parser() -> argparse.ArgumentParser:
         "scenarios", help="Initial-condition scenarios for 'tropoi run bve --scenario'.")
     scenarios_parser.set_defaults(_handler=_cmd_list_scenarios)
 
+    view_parser = commands.add_parser("view", help="Explore local simulation capsules in a browser.")
+    view_parser.add_argument("capsules", nargs="+", metavar="CAPSULE", help="Allowed capsule directories")
+    view_parser.add_argument("--port", type=int, default=0, help="Loopback port (default: automatically assigned)")
+    view_parser.add_argument("--no-browser", action="store_true", help="Print the private URL without opening a tab")
+    view_parser.add_argument("--backend", choices=["cpu", "cuda"], default="cpu",
+                             help="Spectral evaluation backend (default: CPU)")
+    view_parser.set_defaults(_handler=_cmd_view)
+
     # tropoi inspect RUN_PATH
     inspect_parser = commands.add_parser(
         "inspect", help="Summarize a run directory from its manifest.",
@@ -1342,6 +1378,8 @@ def build_parser() -> argparse.ArgumentParser:
         help="With --snapshot: restrict the snapshot description to one "
              "stored field (e.g. zeta, delta, phi, temperature, ln_ps). "
              "The field must belong to the run's solver.")
+    inspect_parser.add_argument("--viewer-manifest", action="store_true",
+                                help="Print Viewer 2 capability manifest JSON for this directory.")
     inspect_parser.set_defaults(_handler=_cmd_inspect)
 
     # tropoi plot RUN_PATH
@@ -1467,6 +1505,11 @@ def build_parser() -> argparse.ArgumentParser:
 
 
 def main(argv: Optional[Sequence[str]] = None) -> int:
+    # Python shows DeprecationWarning only from __main__, which would hide
+    # the deprecated geodesic grid and dense evaluator from exactly the
+    # people running them. "default" prints each distinct one once.
+    import warnings
+    warnings.simplefilter("default", DeprecationWarning)
     parser = build_parser()
     args = parser.parse_args(argv)
     handler = getattr(args, "_handler", None)

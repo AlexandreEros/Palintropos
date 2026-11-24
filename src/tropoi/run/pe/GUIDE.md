@@ -169,7 +169,7 @@ diagnostic Courant number is recorded (derived from the model's validated
 ## CLI
 
 ```powershell
-# Tiny default demonstration (thermal_wave, coarse geodesic, fixed 300 s step)
+# Tiny default demonstration (thermal_wave, Gauss lat-lon 16x32, fixed 300 s step)
 tropoi run pe
 
 # Verify the exact-rest property

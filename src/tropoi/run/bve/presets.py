@@ -23,8 +23,12 @@ PRESETS = {
             "scenario": "two_vortices",
             "lmax": 8,
             "resolution": 3,
-            "nlat": 12,
-            "nlon": 24,
+            # No nlat/nlon: the preset takes the default sizing for lmax 8
+            # (14 x 28). Its historical 12 x 24 was chosen when the grid
+            # default was geodesic and these values were inert; on the
+            # lat-lon default they would select a state grid below the 3/2
+            # quadratic rule (nlat >= 13, nlon >= 25) for no saving worth
+            # having.
             "duration_days": 0.02,
             "dt_snapshots": 864.0,
             "experiment": "quickstart",

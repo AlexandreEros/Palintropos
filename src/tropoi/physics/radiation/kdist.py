@@ -37,14 +37,19 @@ No opacity data ship with the package. The method is verified against a
 line-by-line calculation of synthetic Lorentz-line spectra
 (``tests/test_radiation_kdist.py``); that measures the error of the
 k-distribution method and of this implementation, and says nothing about
-any real gas.
+any real gas. Real-gas tables are imported into the same :class:`KTable`
+format by ``tools/radiation/opacity`` and reach an experiment through
+:mod:`tropoi.physics.radiation.tables` and the ``correlated_k`` kind of the
+radiative configuration (docs/radiation/OPACITY.md).
 
 Import-light: NumPy only; arrays may be NumPy or CuPy.
 """
 from __future__ import annotations
 
+import hashlib
+import json
 import math
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Callable, Mapping, Optional, Union
 
 import numpy as np
@@ -113,6 +118,20 @@ class KTable:
     ``k`` has shape (n_p, n_T, n_band, n_g), in m^2 per kg of the absorber;
     ``pressure`` (Pa) and ``temperature`` (K) are increasing; ``band_edges``
     (n_band + 1,) in cm^-1, increasing; ``g_weights`` (n_g,) sum to 1.
+
+    ``g_weights`` may instead be (n_band, n_g), one quadrature per band,
+    each row summing to 1. A zero weight marks padding: imported tables
+    (SOCRATES spectral files) give every band its own number of k-terms,
+    so shorter bands are padded to the longest; the providers drop padded
+    points and never evaluate them.
+
+    "The absorber" is whatever ``species`` names and the provider's mass
+    fraction multiplies. For a premixed table of a fixed composition it is
+    the mixture itself (mass fraction 1) and ``metadata["mass_basis"]``
+    says so. ``metadata`` is a JSON-serializable record of where the
+    numbers come from (source files and their hashes, units, coverage,
+    broadening, far-wing and continuum assumptions); it is descriptive and
+    not part of :meth:`content_sha256`.
     """
 
     species: str
@@ -122,6 +141,7 @@ class KTable:
     g_weights: np.ndarray
     k: np.ndarray
     provenance: str = ""
+    metadata: dict = field(default_factory=dict)
 
     def __post_init__(self):
         self.pressure = np.asarray(self.pressure, dtype=np.float64)
@@ -129,18 +149,27 @@ class KTable:
         self.band_edges = np.asarray(self.band_edges, dtype=np.float64)
         self.g_weights = np.asarray(self.g_weights, dtype=np.float64)
         self.k = np.asarray(self.k, dtype=np.float64)
-        shape = (self.pressure.size, self.temperature.size, self.band_edges.size - 1,
-                 self.g_weights.size)
+        n_band = self.band_edges.size - 1
+        if self.g_weights.ndim not in (1, 2) or (
+                self.g_weights.ndim == 2 and self.g_weights.shape[0] != n_band):
+            raise ValueError("g_weights must be (n_g,) or (n_band, n_g)")
+        shape = (self.pressure.size, self.temperature.size, n_band,
+                 self.g_weights.shape[-1])
         if self.k.shape != shape:
             raise ValueError(f"k has shape {self.k.shape}, expected {shape}")
         for name in ("pressure", "temperature", "band_edges"):
             a = getattr(self, name)
             if a.size < 2 or np.any(np.diff(a) <= 0) or a[0] <= 0:
                 raise ValueError(f"{name} must be positive and strictly increasing")
-        if abs(self.g_weights.sum() - 1.0) > 1e-10 or np.any(self.g_weights <= 0):
-            raise ValueError("g_weights must be positive and sum to 1")
+        if self.g_weights.ndim == 1:
+            if abs(self.g_weights.sum() - 1.0) > 1e-10 or np.any(self.g_weights <= 0):
+                raise ValueError("g_weights must be positive and sum to 1")
+        elif (np.any(np.abs(self.g_weights.sum(axis=1) - 1.0) > 1e-8)
+              or np.any(self.g_weights < 0)):
+            raise ValueError("per-band g_weights must be >= 0 and each row sum to 1")
         if not np.all(np.isfinite(self.k)) or np.any(self.k < 0):
             raise ValueError("k must be finite and >= 0")
+        json.dumps(self.metadata)        # must be serializable; raises otherwise
 
     @property
     def n_band(self) -> int:
@@ -148,21 +177,45 @@ class KTable:
 
     @property
     def n_g(self) -> int:
-        return self.g_weights.size
+        return self.g_weights.shape[-1]
+
+    @property
+    def point_weights(self) -> np.ndarray:
+        """Quadrature weights (n_band, n_g), whichever form was given."""
+        if self.g_weights.ndim == 2:
+            return self.g_weights
+        return np.tile(self.g_weights, (self.n_band, 1))
+
+    def content_sha256(self) -> str:
+        """SHA-256 of the numbers that determine a result: the species
+        label and the five arrays, as little-endian float64 with their
+        shapes. The ``.npz`` container is not hashed (its bytes depend on
+        the compressor and on timestamps), nor are ``provenance`` and
+        ``metadata``, so a regenerated or re-documented table keeps its
+        identity exactly when its numbers are unchanged."""
+        h = hashlib.sha256()
+        h.update(self.species.encode("utf-8") + b"\0")
+        for name in ("pressure", "temperature", "band_edges", "g_weights", "k"):
+            a = np.ascontiguousarray(getattr(self, name), dtype="<f8")
+            h.update(f"{name}{a.shape}".encode("ascii"))
+            h.update(a.tobytes())
+        return h.hexdigest()
 
     def save(self, path) -> None:
         np.savez_compressed(path, schema=KTABLE_SCHEMA, species=self.species,
                             pressure=self.pressure, temperature=self.temperature,
                             band_edges=self.band_edges, g_weights=self.g_weights, k=self.k,
-                            provenance=self.provenance)
+                            provenance=self.provenance,
+                            metadata=json.dumps(self.metadata, sort_keys=True))
 
     @classmethod
     def load(cls, path) -> "KTable":
         with np.load(path, allow_pickle=False) as d:
             if str(d["schema"]) != KTABLE_SCHEMA:
                 raise ValueError(f"{path}: not a {KTABLE_SCHEMA} file")
+            metadata = json.loads(str(d["metadata"])) if "metadata" in d.files else {}
             return cls(str(d["species"]), d["pressure"], d["temperature"], d["band_edges"],
-                       d["g_weights"], d["k"], str(d["provenance"]))
+                       d["g_weights"], d["k"], str(d["provenance"]), metadata)
 
 
 def ktable_from_spectrum(species: str, wavenumber, absorption: Callable, pressure,
@@ -217,9 +270,13 @@ class _CorrelatedK:
         self.bounds = bounds
         self.band_edges = first.band_edges
         self.n_band, self.n_g = first.n_band, first.n_g
-        self.n_points = self.n_band * self.n_g
-        self._g_weights = np.tile(first.g_weights, self.n_band)        # per point
-        self._band_of_point = np.repeat(np.arange(self.n_band), self.n_g)
+        # A spectral point is a (band, g) pair with a positive weight; the
+        # zero-weight padding of per-band quadratures is dropped here once.
+        weights = first.point_weights.ravel()
+        self._active = np.flatnonzero(weights > 0.0)
+        self.n_points = int(self._active.size)
+        self._g_weights = weights[self._active]                        # per point
+        self._band_of_point = np.repeat(np.arange(self.n_band), self.n_g)[self._active]
         self.clamped_layers = 0
         self._dev: dict = {}
 
@@ -236,8 +293,9 @@ class _CorrelatedK:
         d = self._dev.get(key)
         if d is None:
             t = self.tables[i]
-            lnk = np.log(np.maximum(t.k.reshape(t.pressure.size, t.temperature.size, -1),
-                                    1e-300))
+            lnk = np.log(np.maximum(
+                t.k.reshape(t.pressure.size, t.temperature.size, -1)[:, :, self._active],
+                1e-300))
             d = (xp.asarray(np.log(t.pressure)), xp.asarray(t.temperature), xp.asarray(lnk))
             self._dev[key] = d
         return d

@@ -61,15 +61,17 @@ flowchart LR
     nW3V6EBHY3I6C6["SemiInfiniteScatteringShortwave"]:::classNode
     nQKEENXJGZTG62["VerticalPathShortwave"]:::classNode
     n7T4P6TFFPCETY["kdist.py"]:::moduleNode
-    nLPBEYKYU2KBLM["KTable"]:::classNode
-    n7FK5C2USZB35U["#95;CorrelatedK"]:::classNode
-    nKJAW24BVQCOCW["CorrelatedKLongwave"]:::classNode
-    nZB5JHTLCYTV6O["CorrelatedKShortwave"]:::classNode
+    nGGYM2E4Q4CF5U["KTable"]:::classNode
+    nFDRNUSLGTOJFE["#95;CorrelatedK"]:::classNode
+    nQP7R2XU6Q34EC["CorrelatedKLongwave"]:::classNode
+    nWCTZQZ4QBAXAY["CorrelatedKShortwave"]:::classNode
     nUTFO3UHZ5QSGK["scheme.py"]:::moduleNode
     nCH4F2HNHUGSAK["Column"]:::classNode
     nTHJNB4N226J3C["LowerBoundary"]:::classNode
     nZUKIGTYFUYH3E["RadiativeFluxes"]:::classNode
     nBTNFQKAKLYONK["Radiation"]:::classNode
+    nY7NHLQ2OYOSJS["tables.py"]:::moduleNode
+    nCJ44HFI257NQK["KTableError"]:::classNode
     nUE7HYYFTQULI6["rayleigh.py"]:::moduleNode
     n4EJDWKUMSXYJ2["OpticalRecord"]:::classNode
     nBHK36N3GRK4A4["rotation.py"]:::moduleNode
@@ -101,6 +103,8 @@ flowchart LR
     nYS6R6EV43PKZO["prepared#95;terrain.py"]:::moduleNode
     nJHWSWZZPFJXXK["PreparedTerrainError"]:::classNode
     nOELIHGTMYSFA2["SavedTerrain"]:::classNode
+    nXZKYQWGKOHTN4["radiative.py"]:::moduleNode
+    nGPHC67V2XHEIE["RadiativeStorage"]:::classNode
     n33X5NUFP3SHGK["schema.py"]:::moduleNode
     n5PSHVQHEXLQGM["SchemaError"]:::classNode
     n4VALVWFJNN4TU["UnknownSchemaVersionError"]:::classNode
@@ -108,7 +112,7 @@ flowchart LR
     nJD3LOKIFSK7BM["StateSchema"]:::classNode
     nTQVQ55KMYLDPQ["writer.py"]:::moduleNode
     nQILHV2BDEWVMI["RunProvenanceError"]:::classNode
-    n3I3T5Z4QTPARU["RunDirectory"]:::classNode
+    n5F57I2SQ2EDWM["RunDirectory"]:::classNode
     nWL4YBHQFRE3I2["bve.py"]:::moduleNode
     nVOI5UZ2MNH2JA["DiagnosticsRecorder"]:::classNode
     n2OA2TSUAUH63W["held#95;suarez#95;sections.py"]:::moduleNode
@@ -122,6 +126,8 @@ flowchart LR
     n4TFTGKB4SRLRS["PEDiagnosticsRecorder"]:::classNode
     nF4KQMN3MPPAXG["pe#95;levels.py"]:::moduleNode
     nAROTGQGRRONHG["LevelFields"]:::classNode
+    nNZXUJRIOAPPXS["pe#95;structure.py"]:::moduleNode
+    nIQV73YEMPLA62["ZonalMeanAccumulator"]:::classNode
     nGGMITOKPIGRO4["pe#95;surfaces.py"]:::moduleNode
     n7WDFSWTGBTT4O["SurfaceUnavailableError"]:::classNode
     nRRZSVUHOKIW7A["PressureSurface"]:::classNode
@@ -158,8 +164,9 @@ flowchart LR
     n2ALKKXWJG67JY["planet#95;viewer.py"]:::moduleNode
     nW7QBLLKWXGXN4["PlanetViewer"]:::classNode
     nUHWCTEL2APVEM["quantities.py"]:::moduleNode
-    nPETH6XGMSNBXM["QuantityUnavailableError"]:::classNode
-    nK4QIABERVYSIQ["Quantity"]:::classNode
+    nS6AD5R6YARPXK["#95;Presentation"]:::classNode
+    nIINJSMOPBNVEO["QuantityUnavailableError"]:::classNode
+    nFRN2HITNNODVA["Quantity"]:::classNode
     nWXCKZXJTGCWFO["renderers.py"]:::moduleNode
     n4LSBTSTMYOOJO["Renderer"]:::classNode
     nV5LKYH6ENZOUC["sky.py"]:::moduleNode
@@ -194,6 +201,12 @@ flowchart LR
     nVF7MSZT7JT5TO["timeline.py"]:::moduleNode
     nMX4DWJ6MII7QW["FigureFrame"]:::classNode
     nIP3363CMMC22C["FigureTimeline"]:::classNode
+    n335RXRLBSSG34["viewer#95;fields.py"]:::moduleNode
+    nGWCS36VDHWZU6["FrameProvider"]:::classNode
+    nQTMXWAPPGEPPY["viewer#95;server.py"]:::moduleNode
+    nTGD5L6ZFXHMH6["ViewerSession"]:::classNode
+    n46GRXPVECGEXU["ViewerServer"]:::classNode
+    nIJHLPBTUP7BBC["#95;Handler"]:::classNode
     nBVTRQ6LZTYIQ6["views.py"]:::moduleNode
     nP4RE64PXKMGIC["Sigma"]:::classNode
     nNDKFXUAYLFTHS["Streamlines"]:::classNode
@@ -210,7 +223,7 @@ flowchart LR
     nSKBX35XUINF2M["vorticity#95;viewer.py"]:::moduleNode
     n6E5WUKNYN2X5U["VorticityViewer"]:::classNode
     nYAKL7IXDC2TGG["config.py"]:::moduleNode
-    nUA325NGLUS6TE["BVERunConfig"]:::classNode
+    n3TEN7E7URFTP2["BVERunConfig"]:::classNode
     nJMF35MMXQTSSG["execution.py"]:::moduleNode
     nUYRPTXUWUYAXU["OverwriteCleanupError"]:::classNode
     nC7TC3BSDIFOEO["config.py"]:::moduleNode
@@ -235,17 +248,17 @@ flowchart LR
     nTCPSYSHUOAHTE["HeldSuarezConfig"]:::classNode
     nA3LRHGKNLO6PS["experiment.py"]:::moduleNode
     nBLOTE6XRW3F6K["RunError"]:::classNode
-    nKJVGS2VVLJFMQ["HeldSuarezRun"]:::classNode
+    nRPHDNEN7SSILA["HeldSuarezRun"]:::classNode
     nDJUPDVGDBAUMY["statistics.py"]:::moduleNode
     nQ2G6O5PPXJN5C["OnlineStatistics"]:::classNode
     nFY4EKY6ZIKM4G["config.py"]:::moduleNode
-    nXCBZORSPX7HTC["PERunConfig"]:::classNode
+    nGT7Q3ZVTI7LEQ["PERunConfig"]:::classNode
     nA2OUFHWLYJ24O["config.py"]:::moduleNode
     nQFFPRSOKK7FNM["RadiativeConfig"]:::classNode
     n5PAYCWTZPDESA["experiment.py"]:::moduleNode
-    n4Y5UINLBK4Q5O["RadiativeRun"]:::classNode
+    nQJOE4JZBGC3F6["RadiativeRun"]:::classNode
     nYAN4FO4KE3KOM["config.py"]:::moduleNode
-    nL6UA77ZY5XT6U["SWERunConfig"]:::classNode
+    n4M6QRBCHW5PIK["SWERunConfig"]:::classNode
     nLKK2JKVZ7DQB6["environment.py"]:::moduleNode
     n464I4KVSAELVI["PlanetaryParameters"]:::classNode
     nIJ6R26QBTAX4G["geodesic#95;grid.py"]:::moduleNode
@@ -255,17 +268,17 @@ flowchart LR
     nEE7ZF7EBPCMYO["grid#95;base.py"]:::moduleNode
     nMOI22CPKHUGQK["GridGeometry"]:::classNode
     nCVIOOSQOYSRIA["latlon#95;grid.py"]:::moduleNode
-    nB4MKU4AKNTVWQ["GaussLatLonGridGeometry"]:::classNode
-    nNIDKH5RNEXGHA["GaussLatLonSphericalHarmonics"]:::classNode
+    nNPCXMQNVTBIZG["GaussLatLonGridGeometry"]:::classNode
+    nACB3KFZXIJ4UQ["GaussLatLonSphericalHarmonics"]:::classNode
     nQ2HJGB6D5QTC6["modes.py"]:::moduleNode
     n2QVEONPF7UU5M["SpectralConventionError"]:::classNode
     n2OYKTWNHZSOSE["FieldSpec"]:::classNode
     nZHEPEFPUSKQVQ["SpectralModes"]:::classNode
     nBJTZOYGX2MFOO["SpectralState"]:::classNode
     nS4RCOUUC72XZA["spectral#95;operators.py"]:::moduleNode
-    nNERYKUCAWINUS["SpectralOperators"]:::classNode
+    nU2ACRUCTJB64K["SpectralOperators"]:::classNode
     nOFPLYGEJOKJ2S["planet.py"]:::moduleNode
-    nUB62VT6YLJ3GU["Planet"]:::classNode
+    n32VLR5VRWY7CS["Planet"]:::classNode
     nWVI6XNQA3HJAY["sigma#95;coordinate.py"]:::moduleNode
     nOKQYUXGPBIL7W["SigmaGridError"]:::classNode
     nOENDCHC7PHPEC["SigmaGrid"]:::classNode
@@ -278,9 +291,9 @@ flowchart LR
     nN65HVQAEICNH6["spherical#95;backend.py"]:::moduleNode
     nIEKFBAOLGVR5O["ProductSpace"]:::classNode
     nD7NDYLA37CBOC["SphericalGridBackend"]:::classNode
-    nA6QMVQC5IYKFC["GeodesicBackend"]:::classNode
-    nMK2QMRVXVW7CM["LatLonBackend"]:::classNode
-    nCYM6W26UEI5YI["PointSetBackend"]:::classNode
+    nTF6IK272MDROS["GeodesicBackend"]:::classNode
+    nLB5WNI5656QOI["LatLonBackend"]:::classNode
+    nVKNV2UDIA3GTE["PointSetBackend"]:::classNode
     nCAC5VU2Y2JDJY["barotropic.py"]:::moduleNode
     n6SXTVRYGCVGTO["BarotropicState"]:::classNode
     nRZ6OABD2ZTBQ6["primitive#95;equations.py"]:::moduleNode
@@ -310,6 +323,9 @@ flowchart LR
     nCMMGYA5IPSEXC["PointSetSphericalHarmonics"]:::classNode
     nCS67BHDY7VRVY["optimized#95;geodesic#95;sh.py"]:::moduleNode
     nSZGPYEUNASH2Q["GeodesicSphericalHarmonics"]:::classNode
+    nH5NVGBWK6BNZI["separable#95;gauss#95;sh.py"]:::moduleNode
+    nQKWSN2QA5TIZ6["SeparableStructureError"]:::classNode
+    nL7P2EU2VRYVYQ["SeparableGaussSphericalHarmonics"]:::classNode
     nLSDGJEGXCDEQY["spherical#95;harmonics.py"]:::moduleNode
     n4UB7ULPHEOPCO["LatLonSphericalHarmonics"]:::classNode
     nVHLEQO5BKBHCQ["column#95;coupling.py"]:::moduleNode
@@ -398,15 +414,17 @@ flowchart LR
     nUXAQUP5X7AOV2 --> nW3V6EBHY3I6C6
     nUXAQUP5X7AOV2 --> nQKEENXJGZTG62
     nUPRZB5Y5LKZBK --> n7T4P6TFFPCETY
-    n7T4P6TFFPCETY --> nLPBEYKYU2KBLM
-    n7T4P6TFFPCETY --> n7FK5C2USZB35U
-    n7T4P6TFFPCETY --> nKJAW24BVQCOCW
-    n7T4P6TFFPCETY --> nZB5JHTLCYTV6O
+    n7T4P6TFFPCETY --> nGGYM2E4Q4CF5U
+    n7T4P6TFFPCETY --> nFDRNUSLGTOJFE
+    n7T4P6TFFPCETY --> nQP7R2XU6Q34EC
+    n7T4P6TFFPCETY --> nWCTZQZ4QBAXAY
     nUPRZB5Y5LKZBK --> nUTFO3UHZ5QSGK
     nUTFO3UHZ5QSGK --> nCH4F2HNHUGSAK
     nUTFO3UHZ5QSGK --> nTHJNB4N226J3C
     nUTFO3UHZ5QSGK --> nZUKIGTYFUYH3E
     nUTFO3UHZ5QSGK --> nBTNFQKAKLYONK
+    nUPRZB5Y5LKZBK --> nY7NHLQ2OYOSJS
+    nY7NHLQ2OYOSJS --> nCJ44HFI257NQK
     nUX3XGDIQ6OMYG --> nUE7HYYFTQULI6
     nUE7HYYFTQULI6 --> n4EJDWKUMSXYJ2
     nUX3XGDIQ6OMYG --> nBHK36N3GRK4A4
@@ -438,6 +456,8 @@ flowchart LR
     nDKNJBTA36EPYM --> nYS6R6EV43PKZO
     nYS6R6EV43PKZO --> nJHWSWZZPFJXXK
     nYS6R6EV43PKZO --> nOELIHGTMYSFA2
+    nDKNJBTA36EPYM --> nXZKYQWGKOHTN4
+    nXZKYQWGKOHTN4 --> nGPHC67V2XHEIE
     nDKNJBTA36EPYM --> n33X5NUFP3SHGK
     n33X5NUFP3SHGK --> n5PSHVQHEXLQGM
     n33X5NUFP3SHGK --> n4VALVWFJNN4TU
@@ -445,7 +465,7 @@ flowchart LR
     n33X5NUFP3SHGK --> nJD3LOKIFSK7BM
     nDKNJBTA36EPYM --> nTQVQ55KMYLDPQ
     nTQVQ55KMYLDPQ --> nQILHV2BDEWVMI
-    nTQVQ55KMYLDPQ --> n3I3T5Z4QTPARU
+    nTQVQ55KMYLDPQ --> n5F57I2SQ2EDWM
     nQ7HBGIAMNTAWA --> nWL4YBHQFRE3I2
     nWL4YBHQFRE3I2 --> nVOI5UZ2MNH2JA
     nQ7HBGIAMNTAWA --> n2OA2TSUAUH63W
@@ -459,6 +479,8 @@ flowchart LR
     n7GFIDO4XQWTD2 --> n4TFTGKB4SRLRS
     nQ7HBGIAMNTAWA --> nF4KQMN3MPPAXG
     nF4KQMN3MPPAXG --> nAROTGQGRRONHG
+    nQ7HBGIAMNTAWA --> nNZXUJRIOAPPXS
+    nNZXUJRIOAPPXS --> nIQV73YEMPLA62
     nQ7HBGIAMNTAWA --> nGGMITOKPIGRO4
     nGGMITOKPIGRO4 --> n7WDFSWTGBTT4O
     nGGMITOKPIGRO4 --> nRRZSVUHOKIW7A
@@ -495,8 +517,9 @@ flowchart LR
     n27HUT5DJ4WGUK --> n2ALKKXWJG67JY
     n2ALKKXWJG67JY --> nW7QBLLKWXGXN4
     n27HUT5DJ4WGUK --> nUHWCTEL2APVEM
-    nUHWCTEL2APVEM --> nPETH6XGMSNBXM
-    nUHWCTEL2APVEM --> nK4QIABERVYSIQ
+    nUHWCTEL2APVEM --> nS6AD5R6YARPXK
+    nUHWCTEL2APVEM --> nIINJSMOPBNVEO
+    nUHWCTEL2APVEM --> nFRN2HITNNODVA
     n27HUT5DJ4WGUK --> nWXCKZXJTGCWFO
     nWXCKZXJTGCWFO --> n4LSBTSTMYOOJO
     n27HUT5DJ4WGUK --> nV5LKYH6ENZOUC
@@ -531,6 +554,12 @@ flowchart LR
     n27HUT5DJ4WGUK --> nVF7MSZT7JT5TO
     nVF7MSZT7JT5TO --> nMX4DWJ6MII7QW
     nVF7MSZT7JT5TO --> nIP3363CMMC22C
+    n27HUT5DJ4WGUK --> n335RXRLBSSG34
+    n335RXRLBSSG34 --> nGWCS36VDHWZU6
+    n27HUT5DJ4WGUK --> nQTMXWAPPGEPPY
+    nQTMXWAPPGEPPY --> nTGD5L6ZFXHMH6
+    nQTMXWAPPGEPPY --> n46GRXPVECGEXU
+    nQTMXWAPPGEPPY --> nIJHLPBTUP7BBC
     n27HUT5DJ4WGUK --> nBVTRQ6LZTYIQ6
     nBVTRQ6LZTYIQ6 --> nP4RE64PXKMGIC
     nBVTRQ6LZTYIQ6 --> nNDKFXUAYLFTHS
@@ -547,7 +576,7 @@ flowchart LR
     n27HUT5DJ4WGUK --> nSKBX35XUINF2M
     nSKBX35XUINF2M --> n6E5WUKNYN2X5U
     nXZT3ULTGZ5NLS --> nYAKL7IXDC2TGG
-    nYAKL7IXDC2TGG --> nUA325NGLUS6TE
+    nYAKL7IXDC2TGG --> n3TEN7E7URFTP2
     nXZT3ULTGZ5NLS --> nJMF35MMXQTSSG
     nJMF35MMXQTSSG --> nUYRPTXUWUYAXU
     nVWQX53PEWGYTI --> nC7TC3BSDIFOEO
@@ -572,17 +601,17 @@ flowchart LR
     nFYCO4SNW4PYMA --> nTCPSYSHUOAHTE
     n4NUUNHB43M3Q4 --> nA3LRHGKNLO6PS
     nA3LRHGKNLO6PS --> nBLOTE6XRW3F6K
-    nA3LRHGKNLO6PS --> nKJVGS2VVLJFMQ
+    nA3LRHGKNLO6PS --> nRPHDNEN7SSILA
     n4NUUNHB43M3Q4 --> nDJUPDVGDBAUMY
     nDJUPDVGDBAUMY --> nQ2G6O5PPXJN5C
     nSYGG5C2XTVWAS --> nFY4EKY6ZIKM4G
-    nFY4EKY6ZIKM4G --> nXCBZORSPX7HTC
+    nFY4EKY6ZIKM4G --> nGT7Q3ZVTI7LEQ
     nURGMVQU755XIK --> nA2OUFHWLYJ24O
     nA2OUFHWLYJ24O --> nQFFPRSOKK7FNM
     nURGMVQU755XIK --> n5PAYCWTZPDESA
-    n5PAYCWTZPDESA --> n4Y5UINLBK4Q5O
+    n5PAYCWTZPDESA --> nQJOE4JZBGC3F6
     nA2NP4SSXGJYPS --> nYAN4FO4KE3KOM
-    nYAN4FO4KE3KOM --> nL6UA77ZY5XT6U
+    nYAN4FO4KE3KOM --> n4M6QRBCHW5PIK
     nCKVWON7JUNULM --> nLKK2JKVZ7DQB6
     nLKK2JKVZ7DQB6 --> n464I4KVSAELVI
     nXNSPLEKTMFRB4 --> nIJ6R26QBTAX4G
@@ -592,17 +621,17 @@ flowchart LR
     nXNSPLEKTMFRB4 --> nEE7ZF7EBPCMYO
     nEE7ZF7EBPCMYO --> nMOI22CPKHUGQK
     nXNSPLEKTMFRB4 --> nCVIOOSQOYSRIA
-    nCVIOOSQOYSRIA --> nB4MKU4AKNTVWQ
-    nCVIOOSQOYSRIA --> nNIDKH5RNEXGHA
+    nCVIOOSQOYSRIA --> nNPCXMQNVTBIZG
+    nCVIOOSQOYSRIA --> nACB3KFZXIJ4UQ
     nCKVWON7JUNULM --> nQ2HJGB6D5QTC6
     nQ2HJGB6D5QTC6 --> n2QVEONPF7UU5M
     nQ2HJGB6D5QTC6 --> n2OYKTWNHZSOSE
     nQ2HJGB6D5QTC6 --> nZHEPEFPUSKQVQ
     nQ2HJGB6D5QTC6 --> nBJTZOYGX2MFOO
     nMDDEZ4OXE2WQO --> nS4RCOUUC72XZA
-    nS4RCOUUC72XZA --> nNERYKUCAWINUS
+    nS4RCOUUC72XZA --> nU2ACRUCTJB64K
     nCKVWON7JUNULM --> nOFPLYGEJOKJ2S
-    nOFPLYGEJOKJ2S --> nUB62VT6YLJ3GU
+    nOFPLYGEJOKJ2S --> n32VLR5VRWY7CS
     nCKVWON7JUNULM --> nWVI6XNQA3HJAY
     nWVI6XNQA3HJAY --> nOKQYUXGPBIL7W
     nWVI6XNQA3HJAY --> nOENDCHC7PHPEC
@@ -615,9 +644,9 @@ flowchart LR
     nCKVWON7JUNULM --> nN65HVQAEICNH6
     nN65HVQAEICNH6 --> nIEKFBAOLGVR5O
     nN65HVQAEICNH6 --> nD7NDYLA37CBOC
-    nN65HVQAEICNH6 --> nA6QMVQC5IYKFC
-    nN65HVQAEICNH6 --> nMK2QMRVXVW7CM
-    nN65HVQAEICNH6 --> nCYM6W26UEI5YI
+    nN65HVQAEICNH6 --> nTF6IK272MDROS
+    nN65HVQAEICNH6 --> nLB5WNI5656QOI
+    nN65HVQAEICNH6 --> nVKNV2UDIA3GTE
     nOS3WFX4PPDHMI --> nCAC5VU2Y2JDJY
     nCAC5VU2Y2JDJY --> n6SXTVRYGCVGTO
     nOS3WFX4PPDHMI --> nRZ6OABD2ZTBQ6
@@ -647,6 +676,9 @@ flowchart LR
     nULGTHTZGQJJTG --> nCMMGYA5IPSEXC
     nDZNKIG56YF4Q2 --> nCS67BHDY7VRVY
     nCS67BHDY7VRVY --> nSZGPYEUNASH2Q
+    nDZNKIG56YF4Q2 --> nH5NVGBWK6BNZI
+    nH5NVGBWK6BNZI --> nQKWSN2QA5TIZ6
+    nH5NVGBWK6BNZI --> nL7P2EU2VRYVYQ
     nDZNKIG56YF4Q2 --> nLSDGJEGXCDEQY
     nLSDGJEGXCDEQY --> n4UB7ULPHEOPCO
     n26OGEY2QQJ23S --> nVHLEQO5BKBHCQ
