@@ -1,0 +1,93 @@
+{
+ "level": "L3 (reproduction of a published Mercury model)",
+ "source": "Vasavada, Paige & Wood 1999, Icarus 141, sec. II.B p. 182 (text): temperatures at depth at 0N 0W for Models BOT, TOP, TWO = 365, 463, 427 K; flat surface, internal heat flux neglected",
+ "ours": "production settings (4320 steps/solar day, top cell 1 mm, stretch 1.0488, depth 1 m), G = 0, PERIODIC; cycle-mean temperature at 1 m from the FV reconstruction",
+ "differences_in_formulation": [
+  "point-source Sun (VPW99: finite disk, limb darkening)",
+  "diagnosed Kirchhoff skin (VPW99: 2nd-order extrapolation from three layers)",
+  "idealized fixed-element orbit, exact 3:2",
+  "our grid/timestep from convergence tests; VPW99 used 12-30 layers"
+ ],
+ "uncertainty": "VPW99 values are integers in text (+-0.5 K rounding); no model uncertainty stated",
+ "threshold": "differences > 10 K are investigated (frozen G-M); no parameter changed",
+ "rows": [
+  {
+   "model": "BOT",
+   "VPW99_K": 365.0,
+   "ours_K": 367.85,
+   "difference_K": 2.85,
+   "investigation_required": false
+  },
+  {
+   "model": "TOP",
+   "VPW99_K": 463.0,
+   "ours_K": 470.69,
+   "difference_K": 7.69,
+   "investigation_required": false
+  },
+  {
+   "model": "TWO",
+   "VPW99_K": 427.0,
+   "ours_K": 425.78,
+   "difference_K": -1.22,
+   "investigation_required": false
+  }
+ ],
+ "surface_extrema": {
+  "BOT": {
+   "0N 0E": {
+    "T_mean_at_0.5m": 367.778375665265,
+    "T_mean_at_1m": 367.8511518516065,
+    "amp_at_0.5m": 20.583355340958413,
+    "Ts_max": 699.9817449380355,
+    "Ts_min": 108.44256560799082,
+    "depth_where_amp_below_1K": 0.0
+   },
+   "0N 90E": {
+    "T_mean_at_0.5m": 276.6207054917177,
+    "T_mean_at_1m": 276.65460938667553,
+    "amp_at_0.5m": 18.599092904986797,
+    "Ts_max": 567.9851877093191,
+    "Ts_min": 98.16123997428778,
+    "depth_where_amp_below_1K": 0.0
+   }
+  },
+  "TOP": {
+   "0N 0E": {
+    "T_mean_at_0.5m": 470.6650353044107,
+    "T_mean_at_1m": 470.69435884885,
+    "amp_at_0.5m": 5.2461742081727305,
+    "Ts_max": 700.1154759496133,
+    "Ts_min": 90.21769614440558,
+    "depth_where_amp_below_1K": 0.7179466550821738
+   },
+   "0N 90E": {
+    "T_mean_at_0.5m": 349.13045292213747,
+    "T_mean_at_1m": 349.13910647619764,
+    "amp_at_0.5m": 1.6811757401746128,
+    "Ts_max": 568.2152428754955,
+    "Ts_min": 79.80527399487704,
+    "depth_where_amp_below_1K": 0.565024751087308
+   }
+  },
+  "TWO": {
+   "0N 0E": {
+    "T_mean_at_0.5m": 425.72830726590877,
+    "T_mean_at_1m": 425.7761372676147,
+    "amp_at_0.5m": 13.771024169035972,
+    "Ts_max": 700.0088276590891,
+    "Ts_min": 107.72894508713665,
+    "depth_where_amp_below_1K": 0.0
+   },
+   "0N 90E": {
+    "T_mean_at_0.5m": 320.5477062578124,
+    "T_mean_at_1m": 320.56669112452994,
+    "amp_at_0.5m": 11.569643224082434,
+    "Ts_max": 568.0215952917561,
+    "Ts_min": 97.8804899370779,
+    "depth_where_amp_below_1K": 0.0
+   }
+  }
+ },
+ "summary": "BOT: 367.85 K vs 365 K (+2.85); TOP: 470.69 K vs 463 K (+7.69); TWO: 425.78 K vs 427 K (-1.22)"
+}
