@@ -80,15 +80,48 @@ def quantities(run_dir: pathlib.Path) -> dict:
         q = {"T_max": float(ts.max()), "T_min": float(ts.min()),
              "t_max_frac": float((t[i] + off / steps) % 1.0)}
         prof = ev[:, 1:, c]                                     # (steps, L)
+        zs, rec = _reconstruction(cfgd, grid, ev[:, 0, c], prof)
         for depth, key in ((0.02, "2cm"), (0.10, "10cm"), (0.30, "30cm")):
-            series = np.array([np.interp(depth, zc, row) for row in prof])
+            series = np.array([np.interp(depth, zs, row) for row in rec])
             q[f"T_{key}_mean"] = float(series.mean())
             q[f"T_{key}_amp"] = float(0.5 * (series.max() - series.min()))
+            # the earlier estimator (linear between cell centres only), reported
+            naive = np.array([np.interp(depth, zc, row) for row in prof])
+            q[f"T_{key}_mean_centre_interp"] = float(naive.mean())
+            q[f"T_{key}_amp_centre_interp"] = float(0.5 * (naive.max() - naive.min()))
         q["T_bottom_mean"] = float(prof[:, -1].mean())
+        # supplementary (not a frozen quantity): T at 1 m, the shallow column's depth
+        q["T_1m_mean"] = float(np.array([np.interp(1.0, zs, row) for row in rec]).mean())
         q["emitted"] = float(ints["emitted"][c] / P)
         q["abs_conducted"] = float(ints["abs_conducted"][c] / P)
         out[name] = q
     return out
+
+
+def _reconstruction(cfgd, grid, skin, prof):
+    """The finite-volume solution's own piecewise-linear profile: cell
+    centres plus face temperatures. Interior faces use the flux-continuous
+    value T_f = (g_a T_a + g_b T_b) / (g_a + g_b) with g = k(T)/(dz/2), the
+    same half-cell conductances as the solver. That value is exact at a
+    material interface, where the profile has a kink. The surface face is
+    the skin temperature. Returns (depths, temperatures (steps, n))."""
+    from tropoi.physics.materials import CellMaterials
+    from tropoi.run.airless.config import AirlessConfig
+    from tropoi.run.airless.experiment import build_substrate
+    sub = build_substrate(AirlessConfig.from_dict(cfgd))
+    kc, chi = sub.materials.kc[:, 0], sub.materials.chi_over_tr3[:, 0]
+    half = 0.5 * sub.thickness
+    k = CellMaterials.conductivity(kc[None, :], chi[None, :], prof)      # (steps, L)
+    g = k / half[None, :]
+    faces = (g[:, :-1] * prof[:, :-1] + g[:, 1:] * prof[:, 1:]) / (g[:, :-1] + g[:, 1:])
+    zf = sub.interfaces
+    z = np.empty(2 * sub.layers)
+    z[0::2], z[1::2] = zf[:-1], sub.centres
+    T = np.empty((prof.shape[0], 2 * sub.layers))
+    T[:, 0] = skin
+    T[:, 2::2] = faces
+    T[:, 1::2] = prof
+    return z, T
 
 
 def richardson(values):
@@ -198,6 +231,21 @@ def main(argv=None) -> int:
             scaled = _scaled(key, d0, name, diff)
             report["depth"][name][key] = {"change": scaled, "tolerance": TOL[key],
                                           "pass": scaled <= TOL[key]}
+    report["supplementary_depth_T_1m"] = {
+        name: {"T_1m_depth1.0": d0[name]["T_1m_mean"], "T_1m_depth2.0": d1[name]["T_1m_mean"],
+               "change": abs(d0[name]["T_1m_mean"] - d1[name]["T_1m_mean"])}
+        for name in NAMES}
+    report["notes"] = [
+        "T at 2/10/30 cm is evaluated on the FV reconstruction (cell centres plus "
+        "flux-continuous face temperatures). The earlier centre-only linear "
+        "interpolation is first order across the 2 cm material kink; it is "
+        "reported as *_centre_interp in the quantities.",
+        "The frozen depth criterion on T_bottom_mean compares the bottom cells of "
+        "the 1 m and 2 m columns, which lie at different physical depths. With "
+        "G > 0 they differ by about G * 1 m / k (~2 K) by physics. That criterion "
+        "is reported as frozen. supplementary_depth_T_1m compares the same "
+        "physical depth and is not a frozen criterion; any change to the criterion "
+        "needs owner approval."]
     every = [r["pass"] for part in ("timestep", "grid", "depth")
              for col in report[part].values() for r in col.values()]
     report["all_periodic"] = all(s["status"] == "PERIODIC" for s in status.values())
