@@ -725,7 +725,7 @@
     {
       "id": "tropoi.physics",
       "internal_edges": 28,
-      "modules": 17
+      "modules": 18
     },
     {
       "id": "tropoi.physics.radiation",

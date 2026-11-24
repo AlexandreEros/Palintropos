@@ -5,13 +5,13 @@
 
 | | |
 |---|---|
-| Source base commit | `1860169bb54283273775db6c071372eb6285b7ca` (clean working tree) |
+| Source base commit | `e79fd14ba64d76d7e10f4d01174c201f45192474` (clean working tree) |
 | Analysed package | `tropoi` under `src/` |
 | Generator | `tools.architecture` 2.3.0 |
 | Toolchain | Python 3.12, grimp 3.17, networkx 3.7 |
 | Command | `python -m tools.architecture.generate` |
 
-Source working tree: **clean**. Content SHA-256: `32998baffcc9dc4f0d4e00bceb9482e2e40f7797b4c1a54f899b9e0303ec4da7`. Generator working tree: **clean**. Per-file hashes and scoped Git status are recorded in `metrics.json`. These describe generation time; --check verifies source and generator content hashes before reusing this context across later commits. The base commit alone does not identify uncommitted source.
+Source working tree: **clean**. Content SHA-256: `57c542b09c537fee25e283bddcddd299f96cdfaa9612bb77a222b059073a735c`. Generator working tree: **dirty**. Per-file hashes and scoped Git status are recorded in `metrics.json`. These describe generation time; --check verifies source and generator content hashes before reusing this context across later commits. The base commit alone does not identify uncommitted source.
 
 ## Reproducing
 
@@ -89,7 +89,7 @@ Generated files contain no timestamps, absolute paths, or source line numbers, s
 
 Three generic rules decide what must be documented (`tools/architecture/coverage.py`):
 
-1. **Packages:** every analysed package gets packages/<package>.md with all of its modules, classes and public module-level functions. 25 packages, 25 pages; 180 of 180 modules and 226 of 226 classes rendered (generation fails if any is missing).
+1. **Packages:** every analysed package gets packages/<package>.md with all of its modules, classes and public module-level functions. 25 packages, 25 pages; 181 of 181 modules and 228 of 228 classes rendered (generation fails if any is missing).
 2. **CLI handlers:** every <parser>.set_defaults(<keyword>=<function>) handler gets calls/cli-<name>.mmd. 12 discovered.
 3. **Public Python entry points:** module-level functions exported through some __all__ (re-exports followed) that no analysed function calls; each must be declared as an entry path root or excluded with a reason. 39 candidates: 14 are roots of declared entry paths, 25 excluded with a reason.
 
@@ -107,7 +107,7 @@ The rules are generic path and syntax rules; none names a particular subpackage.
 4. Each module gets a syntactic category: `namespace` (a namespace package directory), `empty` (no statement besides a docstring), `reexport` (only imports, `__all__` assignments, and alias assignments `A = B`), or `code`. Categories are attributes, not filters, with one exception: a `namespace` or `empty` module that no analysed module imports is dropped from the module graph, because it has no code and no edges.
 5. Imports of modules outside the package are not graph edges; they are listed per module (`stdlib_imports`, `third_party_imports` in `graph/modules.json`).
 
-Modules discovered: 180; in the module graph: 157. Categories: code 152, empty 22, namespace 1, reexport 5.
+Modules discovered: 181; in the module graph: 158. Categories: code 153, empty 22, namespace 1, reexport 5.
 
 Excluded by rule 4: `tropoi`, `tropoi.cli`, `tropoi.physics`, `tropoi.physics.radiation`, `tropoi.representation`, `tropoi.representation.diagnostics`, `tropoi.representation.visual`, `tropoi.run`, `tropoi.run.bve`, `tropoi.run.held_suarez`, `tropoi.run.pe`, `tropoi.run.radiative`, `tropoi.run.swe`, `tropoi.spatial`, `tropoi.spatial.grids`, `tropoi.spatial.initialization`, `tropoi.spatial.operators`, `tropoi.spatial.states`, `tropoi.spatial.terrain`, `tropoi.spatial.transforms`, `tropoi.spatial.transforms.cuda`, `tropoi.temporal`, `tropoi.temporal.tendencies`.
 
@@ -153,7 +153,7 @@ The Mermaid tree and the offline atlas each contain every class definition, the 
 
 ### Call graphs (ast)
 
-Each call expression inside a function or method body (nested functions, lambdas, and comprehensions are attributed to the enclosing function) is classified as `internal` (resolved to an analysed definition), `external` (resolved to a name outside the package), `builtin` (an unshadowed builtin), or `unresolved`. Totals: builtin 4064, external 2664, internal 3183, unresolved 4205.
+Each call expression inside a function or method body (nested functions, lambdas, and comprehensions are attributed to the enclosing function) is classified as `internal` (resolved to an analysed definition), `external` (resolved to a name outside the package), `builtin` (an unshadowed builtin), or `unresolved`. Totals: builtin 4138, external 2691, internal 3198, unresolved 4238.
 
 | Edge kind | Syntax | What it claims |
 |---|---|---|
