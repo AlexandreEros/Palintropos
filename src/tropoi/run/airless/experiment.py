@@ -141,18 +141,30 @@ def _call(args):
     return run_block(*args)
 
 
+#: Aitken acceleration is applied only in the asymptotic regime: every
+#: cycle-to-cycle change of the triplet below this (K), and each
+#: extrapolated correction at most this (K).
+AITKEN_MAX_CHANGE_K = 2.0
+AITKEN_MAX_CORRECTION_K = 20.0
+
+
 def aitken(x0, x1, x2, max_ratio=0.97):
     """Componentwise Aitken extrapolation of a geometrically converging
-    sequence of cycle-end states: x2 + d2 r / (1 - r) with r = d2 / d1, applied
-    only where 0 < r < ``max_ratio`` (a clean monotone decay). Elsewhere x2 is
-    kept. Spin-up acceleration only; periodicity is still checked afterwards
-    at the production timestep."""
+    sequence of cycle-end states: x2 + d2 r / (1 - r) with r = d2 / d1.
+
+    It is applied only where 0 < r < ``max_ratio`` (a clean monotone decay),
+    where both changes are below :data:`AITKEN_MAX_CHANGE_K` and where the
+    correction stays within :data:`AITKEN_MAX_CORRECTION_K`. Elsewhere x2 is
+    kept. This only accelerates spin-up; periodicity is still checked
+    afterwards at the production timestep."""
     d1, d2 = x1 - x0, x2 - x1
     with np.errstate(divide="ignore", invalid="ignore"):
         r = np.where(np.abs(d1) > 1e-12, d2 / d1, 0.0)
-    ok = (r > 0.0) & (r < max_ratio)
+        corr = np.where(r < 1.0, d2 * r / (1.0 - r), np.inf)
+    ok = ((r > 0.0) & (r < max_ratio) & (np.abs(d1) <= AITKEN_MAX_CHANGE_K)
+          & (np.abs(d2) <= AITKEN_MAX_CHANGE_K) & (np.abs(corr) <= AITKEN_MAX_CORRECTION_K))
     out = x2.copy()
-    out[ok] = x2[ok] + d2[ok] * r[ok] / (1.0 - r[ok])
+    out[ok] = x2[ok] + corr[ok]
     return out, float(np.mean(ok))
 
 
