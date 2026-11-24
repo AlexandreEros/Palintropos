@@ -80,7 +80,8 @@ def build_substrate(cfg: AirlessConfig) -> ConductiveSubstrate:
 
 def run_block(cfg_dict: dict, lat_deg, lon_deg, weights, anomaly, surface_anomaly,
               cycle: int, steps: int, record_profiles_every_step: bool,
-              out_dir: str, prev_dir: Optional[str], block: int):
+              out_dir: str, prev_dir: Optional[str], block: int,
+              backend: str = "numpy"):
     """Advance one block of columns through illumination cycle ``cycle``
     with ``steps`` steps.
 
@@ -91,15 +92,23 @@ def run_block(cfg_dict: dict, lat_deg, lon_deg, weights, anomaly, surface_anomal
     previous cycle's files for the same block, sampled the same way, the
     periodicity differences are computed here as the samples are written.
     The function returns the final state, the tier-1 records and those
-    differences."""
+    differences.
+
+    ``backend`` is ``"numpy"`` or ``"cupy"``. With CuPy the state, the
+    forcing, the Newton iterations, the tridiagonal solves and every tier-1
+    accumulator stay on the GPU. The host sees only the tier-2 samples, at
+    their sample times, and the final results."""
     from numpy.lib.format import open_memmap
     from tropoi.physics.substrate import SubstrateState
+    xp = _backend(backend)
     cfg = AirlessConfig.from_dict(cfg_dict)
     sub = build_substrate(cfg)
     ins = insolation_from_spec(cfg.illumination)
-    lat, lon = np.radians(lat_deg), np.radians(lon_deg)
-    nx, ny, nz = np.cos(lat) * np.cos(lon), np.cos(lat) * np.sin(lon), np.sin(lat)
-    st = SubstrateState(np.array(anomaly, dtype=float), np.array(surface_anomaly, dtype=float))
+    lat, lon = xp.asarray(np.radians(lat_deg)), xp.asarray(np.radians(lon_deg))
+    nx, ny, nz = xp.cos(lat) * xp.cos(lon), xp.cos(lat) * xp.sin(lon), xp.sin(lat)
+    weights = xp.asarray(weights, dtype=xp.float64)
+    st = SubstrateState(xp.asarray(anomaly, dtype=xp.float64),
+                        xp.asarray(surface_anomaly, dtype=xp.float64))
     dt = cfg.cycle_s / steps
     # coarse spin-up cycles sample at the phases both cadences share
     n_surf = math.gcd(int(cfg.output["surface_samples"]), steps)
@@ -121,12 +130,12 @@ def run_block(cfg_dict: dict, lat_deg, lon_deg, weights, anomaly, surface_anomal
             if prev_s.shape != surf.shape or prev_p.shape != prof.shape:
                 prev_s = prev_p = None
     d_s = d_p = 0.0
-    E0 = np.asarray(sub.energy(st)).copy()
-    sums = {k: np.zeros(ncol) for k in ("absorbed", "emitted", "conducted", "bottom",
+    E0 = _host(sub.energy(st)).copy()
+    sums = {k: xp.zeros(ncol) for k in ("absorbed", "emitted", "conducted", "bottom",
                                         "residual", "tolerance", "abs_conducted")}
-    max_ratio = np.zeros(ncol)
+    max_ratio = xp.zeros(ncol)
     ts_lo, ts_hi = np.inf, -np.inf
-    g_series = {k: np.zeros(steps) for k in ("energy_tendency", "net", "residual",
+    g_series = {k: xp.zeros(steps) for k in ("energy_tendency", "net", "residual",
                                              "tolerance")}
     iters = np.zeros(steps, dtype=np.int32)
     for n in range(steps):
@@ -137,45 +146,62 @@ def run_block(cfg_dict: dict, lat_deg, lon_deg, weights, anomaly, surface_anomal
         sums["absorbed"] += dt * rep.absorbed
         sums["emitted"] += dt * rep.emitted
         sums["conducted"] += dt * rep.conducted
-        sums["abs_conducted"] += dt * np.abs(rep.conducted)
+        sums["abs_conducted"] += dt * xp.abs(rep.conducted)
         sums["bottom"] += dt * rep.bottom
         sums["residual"] += dt * rep.residual_sum
         sums["tolerance"] += dt * rep.tolerance_sum
-        np.maximum(max_ratio, rep.max_residual_ratio, out=max_ratio)
-        g_series["energy_tendency"][n] = float(weights @ rep.energy_tendency)
-        g_series["net"][n] = float(weights @ net)
-        g_series["residual"][n] = float(weights @ rep.residual_sum)
-        g_series["tolerance"][n] = float(weights @ rep.tolerance_sum)
+        xp.maximum(max_ratio, rep.max_residual_ratio, out=max_ratio)
+        # device-side writes: no synchronization in the step loop
+        g_series["energy_tendency"][n] = weights @ rep.energy_tendency
+        g_series["net"][n] = weights @ net
+        g_series["residual"][n] = weights @ rep.residual_sum
+        g_series["tolerance"][n] = weights @ rep.tolerance_sum
         iters[n] = rep.iterations
         if (n + 1) % every_s == 0:
             k = (n + 1) // every_s - 1
-            ts = sub.surface_temperature(st)
-            surf[k] = np.stack([ts, sw, rep.absorbed, rep.emitted, rep.conducted])
+            sample = _host(xp.stack([sub.surface_temperature(st), sw, rep.absorbed,
+                                     rep.emitted, rep.conducted]))
+            surf[k] = sample
+            ts = sample[0]
             ts_lo, ts_hi = min(ts_lo, float(ts.min())), max(ts_hi, float(ts.max()))
             if prev_s is not None:
                 d_s = max(d_s, float(np.max(np.abs(ts - prev_s[k, 0]))))
         if (n + 1) % every_p == 0:
             k = (n + 1) // every_p - 1
-            T = sub.temperature(st)
+            T = _host(sub.temperature(st))
             prof[k] = T
             if prev_p is not None:
                 d_p = max(d_p, float(np.max(np.abs(T - prev_p[k]))))
         if every is not None:
-            every[n, 0] = sub.surface_temperature(st)
-            every[n, 1:] = sub.temperature(st)
-    T_end = sub.temperature(st)
+            every[n, 0] = _host(sub.surface_temperature(st))
+            every[n, 1:] = _host(sub.temperature(st))
+    T_end = _host(sub.temperature(st))
     drift = (float(np.max(np.abs(T_end[-1] - prev_p[-1, -1]))) if prev_p is not None else None)
     for arr in (surf, prof, every):
         if arr is not None:
             arr.flush()
     del surf, prof, every, prev_s, prev_p
     return {
-        "anomaly": st.anomaly, "surface_anomaly": st.surface_anomaly,
-        "energy_start": E0, "energy_end": np.asarray(sub.energy(st)),
-        "sums": sums, "max_ratio": max_ratio, "global": g_series, "iterations": iters,
+        "anomaly": _host(st.anomaly), "surface_anomaly": _host(st.surface_anomaly),
+        "energy_start": E0, "energy_end": _host(sub.energy(st)),
+        "sums": {k: _host(v) for k, v in sums.items()}, "max_ratio": _host(max_ratio),
+        "global": {k: _host(v) for k, v in g_series.items()}, "iterations": iters,
         "compared": drift is not None, "d_s": d_s, "d_p": d_p, "drift": drift,
         "surface_range": (ts_lo, ts_hi), "extent": sub.extent(st),
     }
+
+
+def _backend(name: str):
+    if name == "numpy":
+        return np
+    if name == "cupy":
+        import cupy  # noqa: WPS433
+        return cupy
+    raise ValueError(f"backend must be 'numpy' or 'cupy', not {name!r}")
+
+
+def _host(a):
+    return a.get() if hasattr(a, "get") else np.asarray(a)
 
 
 def load_tier2(cycle_dir, name: str, columns=None, mmap: bool = True):
@@ -245,7 +271,10 @@ class AirlessRun:
     never overwritten)."""
 
     def __init__(self, cfg: AirlessConfig, run_dir, *, workers: int = 1,
-                 allow_dirty: bool = False, log: Callable[[str], None] = print):
+                 backend: str = "numpy", allow_dirty: bool = False,
+                 log: Callable[[str], None] = print):
+        _backend(backend)                       # validate early
+        self.backend = backend
         self.cfg = cfg
         self.dir = pathlib.Path(run_dir)
         self.workers = max(1, int(workers))
@@ -262,7 +291,7 @@ class AirlessRun:
         self._write_json("config.json", {
             "config": cfg.to_dict(), "config_sha256": cfg.sha256(), "code": self.code,
             "environment": environment_identity(), "substrate": self.sub.signature(),
-            "workers": self.workers, "created": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())})
+            "workers": self.workers, "backend": self.backend, "created": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())})
         np.savez(self.dir / "grid.npz", lat_deg=self.lat, lon_deg=self.lon, weights=self.w,
                  interfaces=self.sub.interfaces, centres=self.sub.centres)
         self._event("created", columns=int(self.lat.size), layers=self.sub.layers)
@@ -287,7 +316,8 @@ class AirlessRun:
             {"ranges": [[int(b[0]), int(b[-1]) + 1] for b in blocks], "steps": steps}))
         cfgd = self.cfg.to_dict()
         args = [(cfgd, self.lat[b], self.lon[b], self.w[b], state[0][:, b], state[1][b],
-                 cycle, steps, record_every, str(d), None if prev_dir is None else str(prev_dir), k)
+                 cycle, steps, record_every, str(d), None if prev_dir is None else str(prev_dir), k,
+                 self.backend)
                 for k, b in enumerate(blocks)]
         parts = pool.map(_call, args) if pool is not None else [_call(a) for a in args]
         out = {"anomaly": np.concatenate([p["anomaly"] for p in parts], axis=1),
@@ -328,7 +358,7 @@ class AirlessRun:
         ends = []                       # spin-up cycle-end states, for acceleration
         status = "TRANSIENT"
         t_start = time.time()
-        ctx = mp.get_context("fork")
+        ctx = mp.get_context("spawn" if self.backend == "cupy" else "fork")
         pool = ctx.Pool(self.workers) if self.workers > 1 else None
         try:
             while True:

@@ -138,7 +138,7 @@ def _exact(z, t, kc):
     return T0 + a * psi, a * dpsi, da * psi
 
 
-def _manufactured_run(edges, dt, t_end, strata):
+def _manufactured_run(edges, dt, t_end, strata, xp=np):
     kc = (strata[0].contact_conductivity, strata[1].contact_conductivity)
     sub = ConductiveSubstrate(strata, interfaces=edges, albedo=ALBEDO, emissivity=EMISS)
     xg, wg = np.polynomial.legendre.leggauss(8)
@@ -152,7 +152,7 @@ def _manufactured_run(edges, dt, t_end, strata):
             out[i] = 0.5 * np.dot(wg, fun(z))
         return out
     init = cell_avg(lambda z: _exact(z, 0.0, kc)[0])
-    st = sub.state_at(init[:, None], np.array([_exact(0.0, 0.0, kc)[0]]))
+    st = sub.state_at(init[:, None], np.array([_exact(0.0, 0.0, kc)[0]]), xp=xp)
     which = sub.materials.stratum_of_cell
     steps = int(round(t_end / dt))
     for n in range(1, steps + 1):
@@ -182,8 +182,9 @@ def _manufactured_run(edges, dt, t_end, strata):
         Tb, dTb, _ = _exact(np.array([DEPTH]), t, kc)
         kb = kc[1] * (1 + CHI * (Tb / TR) ** 3)
         g_up = float((kb * dTb)[0])                         # -q_down(D)
-        st, _ = sub.step(st, dt, shortwave_down=sw, bottom_heat_flux=g_up, source=src)
-    T_num = sub.temperature(st)[:, 0]
+        st, _ = sub.step(st, dt, shortwave_down=xp.asarray(sw), bottom_heat_flux=g_up,
+                         source=xp.asarray(src))
+    T_num = np.asarray(sub.temperature(st)[:, 0].get() if xp is not np else sub.temperature(st)[:, 0])
     Ts_num = float(sub.surface_temperature(st)[0])
     T_ex = cell_avg(lambda z: _exact(z, t_end, kc)[0])
     return T_num, T_ex, Ts_num, float(_exact(np.array([0.0]), t_end, kc)[0][0])

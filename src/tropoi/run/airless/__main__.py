@@ -49,7 +49,10 @@ def main(argv=None) -> int:
     ap.add_argument("--cycle-steps", type=int)
     ap.add_argument("--spinup-cycle-steps", type=int)
     ap.add_argument("--no-spinup", action="store_true")
-    ap.add_argument("--workers", type=int, default=1)
+    ap.add_argument("--workers", type=int, default=1,
+                    help="worker processes (blocks of columns); with --backend cupy, 1 per GPU")
+    ap.add_argument("--backend", choices=("numpy", "cupy"), default="numpy",
+                    help="execution backend; the mathematics is identical")
     ap.add_argument("--max-wall-s", type=float)
     ap.add_argument("--allow-dirty", action="store_true")
     args = ap.parse_args(argv)
@@ -60,7 +63,8 @@ def main(argv=None) -> int:
     if not args.out:
         ap.error("run needs --out")
     from tropoi.run.airless.experiment import AirlessRun
-    run = AirlessRun(cfg, args.out, workers=args.workers, allow_dirty=args.allow_dirty)
+    run = AirlessRun(cfg, args.out, workers=args.workers, backend=args.backend,
+                     allow_dirty=args.allow_dirty)
     result = run.run(max_wall_s=args.max_wall_s)
     print(json.dumps(result, indent=1))
     return 0

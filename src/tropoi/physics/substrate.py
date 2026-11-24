@@ -573,28 +573,34 @@ class ConductiveSubstrate:
         n = th_old.shape[1]
         shape = (n,)
 
-        def column(v, name):
-            arr = xp.broadcast_to(xp.asarray(v, dtype=xp.float64), shape)
-            if not bool(xp.all(xp.isfinite(arr))):
-                raise ValueError(f"{name} must be finite")
-            return arr
+        def column(v):
+            return xp.broadcast_to(xp.asarray(v, dtype=xp.float64), shape)
 
-        sw = column(shortwave_down, "shortwave_down")
-        lw = column(longwave_down, "longwave_down")
-        f0 = column(flux, "flux")
-        a = column(flux_derivative, "flux_derivative")
-        if not bool(xp.all(a <= 0.0)):
-            raise ValueError("flux_derivative must be <= 0")
+        sw = column(shortwave_down)
+        lw = column(longwave_down)
+        f0 = column(flux)
+        a = column(flux_derivative)
         # the linearization reference, as an anomaly
-        t_ref = (state.surface_anomaly if flux_reference_temperature is None
-                 else column(flux_reference_temperature, "flux_reference_temperature")
-                 - ENERGY_REFERENCE_TEMPERATURE)
-        gb = column(self.bottom_heat_flux if bottom_heat_flux is None else bottom_heat_flux,
-                    "bottom_heat_flux")
+        given_ref = flux_reference_temperature is not None
+        t_ref = (column(flux_reference_temperature) - ENERGY_REFERENCE_TEMPERATURE
+                 if given_ref else state.surface_anomaly)
+        gb = column(self.bottom_heat_flux if bottom_heat_flux is None else bottom_heat_flux)
         src = (xp.zeros((1, 1)) if source is None
                else xp.asarray(source, dtype=xp.float64))
-        if source is not None and not bool(xp.all(xp.isfinite(src))):
-            raise ValueError("source must be finite")
+        # One device synchronization validates every input; the detailed
+        # message is worked out only on failure.
+        named = {"shortwave_down": sw, "longwave_down": lw, "flux": f0,
+                 "flux_derivative": a, "bottom_heat_flux": gb, "source": src}
+        if given_ref:
+            named["flux_reference_temperature"] = t_ref
+        ok = xp.all(a <= 0.0)
+        for arr in named.values():
+            ok = ok & xp.all(xp.isfinite(arr))
+        if not bool(ok):
+            for name, arr in named.items():
+                if not bool(xp.all(xp.isfinite(arr))):
+                    raise ValueError(f"{name} must be finite")
+            raise ValueError("flux_derivative must be finite and <= 0")
         const = (1.0 - self.albedo) * sw + self.emissivity * lw + f0
         forcing = (const, a, t_ref, gb, src)
 

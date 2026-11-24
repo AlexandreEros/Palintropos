@@ -318,3 +318,38 @@ The bottom face uses the reconstruction described in A1.
 **Result.** G-P (VPW99 TWO, G = 0.02) passes for every quantity in all six
 columns, with every ladder run PERIODIC
 (`planet-one-evidence/gp-vpw99-two-G0.02-amended.json`).
+
+### A2 (2026-11-24, owner-directed): added GPU-parity gate G-GPU
+
+This gate was frozen before any GPU result existed. It adds a requirement;
+it relaxes nothing.
+
+One mathematical implementation runs on two backends (NumPy and CuPy). It
+stays FP64.
+
+Parity is not required to be bitwise. The Newton iteration stops once
+|r| ≤ τ (floor 1e-9 W m⁻²), and the smallest Jacobian diagonal is about
+C/Δt ≈ 0.2 W m⁻² K⁻¹ (top cell, production Δt). Each step's state is
+therefore determined only to about 5e-9 K, and the backends may stop at
+different iterations.
+
+1. **Mercury columns.** Run the six canonical columns (VPW99 TWO, G = 0.02,
+   production settings) for one full production cycle from an identical
+   state on both backends. Require max |T_GPU − T_CPU| ≤ 1e-6 K over every
+   cell, the skin and every step. That bound is 2e5 times below the 0.2 K
+   G-P tolerance and leaves room for accumulation of the ~5e-9 K per-step
+   indeterminacy. Iteration-count differences are reported.
+2. **Energy closure on the GPU.** The G-B identity and its per-step and
+   cumulative bounds hold under random forcing, with both evaluated on the
+   device.
+3. **Manufactured solution on the GPU.** Run the two-stratum transient at two
+   refinement levels. The errors must equal the CPU errors to ≤ 1e-9
+   relative, so the convergence orders are unchanged.
+4. **Applicable original regressions.** On the GPU, G4 (one layer vs slab,
+   round-off) and G5 (energy, ≤ 1e-12 cumulative) must hold. Ben 2's G7
+   bound is not used here, for the reason given above.
+5. **G-G for a GPU global run.** Its standalone columns run on the same
+   backend. CPU/GPU agreement is covered by item 1.
+
+**Profiling first.** The backend-generic tridiagonal solver is profiled on
+the GPU before any specialized CUDA kernel is considered.
