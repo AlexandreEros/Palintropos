@@ -270,3 +270,51 @@ The VPW99 primary text was **not obtained** before the freeze:
 - other copies were unreachable.
 
 Unverified transcriptions from the feasibility study are not used as source-verified coefficients.
+
+## Amendments
+
+### A1 (2026-11-24, approved by the owner): G-P depth criterion
+
+**Original frozen criterion.** Doubling the depth must change the cycle-mean
+bottom temperature by ≤ 0.2 K.
+
+**Result.** FAIL in all six canonical columns. The changes were 1.84–2.15 K
+(VPW99 TWO, G = 0.02 W m⁻²; preserved in
+`planet-one-evidence/gp-vpw99-two-G0.02-pre-amendment.json`).
+
+**Why the criterion was ill-posed.** The two bottom cells lie at different
+physical depths, about 1 m and 2 m. With G > 0 the temperature rises by
+about G·1 m/k ≈ 2 K between them, which is physics, not discretization
+error.
+
+**Amended criterion.** The cycle-mean temperature at the same physical
+depth, 1 m (the shallow column's bottom boundary), must change by ≤ 0.2 K
+under depth doubling. The tolerance is unchanged.
+
+- For the shallow column, the temperature at 1 m is its bottom-face value.
+  That value is reconstructed Kirchhoff-exactly from the prescribed
+  geothermal flux across the bottom half-cell, never clamped to the last
+  cell centre.
+- For the deep column, the temperature at 1 m comes from its
+  finite-volume reconstruction.
+
+All other convergence, periodicity, energy-closure and independent-comparison
+criteria are unchanged.
+
+### E1 (2026-11-24, approved by the owner): diagnostic estimator correction
+
+**Problem.** Subsurface temperatures at fixed depths had been interpolated
+linearly between cell centres. Across the 2 cm material interface this is a
+first-order estimator (observed order 0.9).
+
+**Correction.** Use the finite-volume solution's own reconstruction: cell
+centres plus face temperatures. Interior faces use the flux-continuous
+value with the solver's half-cell conductances. The surface uses the skin.
+The bottom face uses the reconstruction described in A1.
+
+**Tolerances.** Unchanged. Both estimators are kept in the evidence
+(`*_centre_interp`).
+
+**Result.** G-P (VPW99 TWO, G = 0.02) passes for every quantity in all six
+columns, with every ladder run PERIODIC
+(`planet-one-evidence/gp-vpw99-two-G0.02-amended.json`).

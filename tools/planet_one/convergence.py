@@ -90,7 +90,10 @@ def quantities(run_dir: pathlib.Path) -> dict:
             q[f"T_{key}_mean_centre_interp"] = float(naive.mean())
             q[f"T_{key}_amp_centre_interp"] = float(0.5 * (naive.max() - naive.min()))
         q["T_bottom_mean"] = float(prof[:, -1].mean())
-        # supplementary (not a frozen quantity): T at 1 m, the shallow column's depth
+        # amended depth criterion (owner approval 2026-11-24): T at 1 m, the
+        # shallow column's bottom boundary, in both columns
+        if zs[-1] < 1.0 - 1e-12:
+            raise ValueError("the column does not reach 1 m")
         q["T_1m_mean"] = float(np.array([np.interp(1.0, zs, row) for row in rec]).mean())
         q["emitted"] = float(ints["emitted"][c] / P)
         q["abs_conducted"] = float(ints["abs_conducted"][c] / P)
@@ -104,7 +107,11 @@ def _reconstruction(cfgd, grid, skin, prof):
     value T_f = (g_a T_a + g_b T_b) / (g_a + g_b) with g = k(T)/(dz/2), the
     same half-cell conductances as the solver. That value is exact at a
     material interface, where the profile has a kink. The surface face is
-    the skin temperature. Returns (depths, temperatures (steps, n))."""
+    the skin temperature. The bottom face carries the prescribed upward flux
+    G, so its temperature is the Kirchhoff-exact
+    Phi_L(T_b) = Phi_L(T_L) + G dz_L / 2 across the bottom half-cell. It is
+    never clamped to the last cell centre. Returns (depths, temperatures
+    (steps, n))."""
     from tropoi.physics.materials import CellMaterials
     from tropoi.run.airless.config import AirlessConfig
     from tropoi.run.airless.experiment import build_substrate
@@ -114,13 +121,22 @@ def _reconstruction(cfgd, grid, skin, prof):
     k = CellMaterials.conductivity(kc[None, :], chi[None, :], prof)      # (steps, L)
     g = k / half[None, :]
     faces = (g[:, :-1] * prof[:, :-1] + g[:, 1:] * prof[:, 1:]) / (g[:, :-1] + g[:, 1:])
+    # bottom face: Phi(T_b) - Phi(T_L) = G dz_L / 2, by Newton on T_b
+    G = float(cfgd["geothermal_flux"])
+    kl, xl, hl = kc[-1], chi[-1], half[-1]
+    tl = prof[:, -1]
+    tb = tl + G * hl / CellMaterials.conductivity(kl, xl, tl)
+    for _ in range(20):
+        r = CellMaterials.kirchhoff_difference(kl, xl, tb, tl) - G * hl
+        tb = tb - r / CellMaterials.conductivity(kl, xl, tb)
     zf = sub.interfaces
-    z = np.empty(2 * sub.layers)
-    z[0::2], z[1::2] = zf[:-1], sub.centres
-    T = np.empty((prof.shape[0], 2 * sub.layers))
+    z = np.empty(2 * sub.layers + 1)
+    z[0:-1:2], z[1::2], z[-1] = zf[:-1], sub.centres, zf[-1]
+    T = np.empty((prof.shape[0], 2 * sub.layers + 1))
     T[:, 0] = skin
-    T[:, 2::2] = faces
+    T[:, 2:-1:2] = faces
     T[:, 1::2] = prof
+    T[:, -1] = tb
     return z, T
 
 
@@ -223,29 +239,42 @@ def main(argv=None) -> int:
     report["timestep"] = analyse(dt_q, prod_dt)
     report["grid"] = analyse(grid_q, prod_grid)
     d0, d1 = q["depth0"], q["depth1"]
+    report["depth_original_frozen_T_bottom_mean"] = {}
     for name in NAMES:
         report["depth"][name] = {}
         for key in TOL:
+            if key == "T_bottom_mean":
+                # Amended 2026-11-24 with owner approval: compare the same
+                # physical depth (1 m) instead of the two bottom cells. The
+                # original result is kept below.
+                diff = abs(d0[name]["T_1m_mean"] - d1[name]["T_1m_mean"])
+                report["depth"][name]["T_1m_mean"] = {
+                    "change": diff, "tolerance": TOL[key], "pass": diff <= TOL[key],
+                    "criterion": "amended: same physical depth 1 m"}
+                orig = abs(d0[name]["T_bottom_mean"] - d1[name]["T_bottom_mean"])
+                report["depth_original_frozen_T_bottom_mean"][name] = {
+                    "change": orig, "tolerance": TOL[key], "pass": orig <= TOL[key]}
+                continue
             base = key.replace("_rel", "")
             diff = abs(d0[name][base] - d1[name][base])
             scaled = _scaled(key, d0, name, diff)
             report["depth"][name][key] = {"change": scaled, "tolerance": TOL[key],
                                           "pass": scaled <= TOL[key]}
-    report["supplementary_depth_T_1m"] = {
-        name: {"T_1m_depth1.0": d0[name]["T_1m_mean"], "T_1m_depth2.0": d1[name]["T_1m_mean"],
-               "change": abs(d0[name]["T_1m_mean"] - d1[name]["T_1m_mean"])}
-        for name in NAMES}
     report["notes"] = [
         "T at 2/10/30 cm is evaluated on the FV reconstruction (cell centres plus "
         "flux-continuous face temperatures). The earlier centre-only linear "
         "interpolation is first order across the 2 cm material kink; it is "
         "reported as *_centre_interp in the quantities.",
-        "The frozen depth criterion on T_bottom_mean compares the bottom cells of "
-        "the 1 m and 2 m columns, which lie at different physical depths. With "
-        "G > 0 they differ by about G * 1 m / k (~2 K) by physics. That criterion "
-        "is reported as frozen. supplementary_depth_T_1m compares the same "
-        "physical depth and is not a frozen criterion; any change to the criterion "
-        "needs owner approval."]
+        "Depth criterion amended 2026-11-24 with owner approval: the frozen "
+        "comparison of bottom-cell temperatures under depth doubling compared "
+        "different physical depths (1 m vs 2 m), which differ by about "
+        "G * 1 m / k (~2 K) by physics when G > 0. It is replaced by T at the "
+        "same depth, 1 m (the shallow column's reconstructed bottom-boundary "
+        "temperature vs the deep column's reconstruction at 1 m), with the "
+        "original 0.2 K tolerance. The original results are kept in "
+        "depth_original_frozen_T_bottom_mean.",
+        "Estimator correction approved by the owner (tolerance unchanged): "
+        "flux-consistent face reconstruction at material interfaces."]
     every = [r["pass"] for part in ("timestep", "grid", "depth")
              for col in report[part].values() for r in col.values()]
     report["all_periodic"] = all(s["status"] == "PERIODIC" for s in status.values())
