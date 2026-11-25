@@ -11,9 +11,8 @@ import pytest
 from tropoi.physics.column_model import ColumnPhysics, RadiativeConvectiveColumn
 from tropoi.physics.convection import DryConvectiveAdjustment, neutral_profile
 from tropoi.physics.composition import COMPOSITIONS, Composition, CompositionError
-from tropoi.physics.insolation import (DiurnalMeanInsolation, InstantaneousInsolation,
+from tropoi.physics.insolation import (DiurnalMeanInsolation, OrbitalInsolation,
                                        PrescribedInsolation, StellarIllumination,
-                                       TidallyLockedInsolation,
                                        frierson_net_surface_flux)
 from tropoi.physics.planets import PLANETS
 from tropoi.physics.radiation.gray import (GrayLongwave, GrayShortwave, OpticalDepthProfile,
@@ -179,23 +178,32 @@ def test_published_gray_optical_depths():
 def test_insolation_geometries_integrate_to_the_right_global_means():
     lat = np.arcsin(np.linspace(-1, 1, 4001)[1::2])          # equal-area latitudes
     s0 = 1361.0
-    equinox, mu = DiurnalMeanInsolation(StellarIllumination.prescribed(s0))(lat, 0 * lat, 0.0)
+    def stated(period, e=0.0, obliquity=0.0, spin=0.0):
+        return StellarIllumination.planet_centric(
+            irradiance_at_semimajor=s0, period_s=period, eccentricity=e,
+            obliquity_deg=obliquity, angular_speed=spin)
+    equinox, mu = DiurnalMeanInsolation(stated(1.0e8))(lat, 0 * lat, 0.0)
     assert np.allclose(equinox, s0 * np.cos(lat) / math.pi)          # SL09 form
     assert equinox.mean() == pytest.approx(s0 / 4, rel=1e-5)
-    orbit = StellarIllumination.prescribed(s0, 100.0, 0.0, 25.0)
+    orbit = stated(100.0, obliquity=25.0)
     for t in (0.0, 25.0, 60.0):          # any season: global mean stays S0 / 4
         flux, mu = DiurnalMeanInsolation(orbit)(lat, 0 * lat, t)
         assert flux.mean() == pytest.approx(s0 / 4, rel=1e-5)
         assert (mu >= 0).all() and (mu <= 1).all()
+    # instantaneous: the zonal mean at an instant equals the rotation mean
     lon = np.linspace(0, 2 * math.pi, 720, endpoint=False)
     la, lo = np.meshgrid(lat[::40], lon, indexing="ij")
-    inst, _ = InstantaneousInsolation(orbit, 10.0)(la, lo, 25.0)
-    daily, _ = DiurnalMeanInsolation(orbit)(lat[::40], 0 * lat[::40], 25.0)
+    spinning = stated(100.0, obliquity=25.0, spin=2 * math.pi / 0.01)
+    inst, _ = OrbitalInsolation(spinning)(la, lo, 25.0)
+    daily, _ = DiurnalMeanInsolation(spinning)(lat[::40], 0 * lat[::40], 25.0)
     assert np.allclose(inst.mean(axis=1), daily, atol=1e-3 * s0)
-    locked, _ = TidallyLockedInsolation(900.0)(la, lo, 0.0)
+    # a tidally locked planet (circular, synchronous): S0 / 4 on the global mean
+    locked = StellarIllumination.planet_centric(
+        irradiance_at_semimajor=900.0, period_s=100.0, angular_speed=2 * math.pi / 100.0)
+    lit, _ = OrbitalInsolation(locked)(la, lo, 37.0)
     weights = np.ones_like(la) / la.size
-    assert (locked * weights).sum() == pytest.approx(225.0, rel=5e-3)   # coarse test mesh
-    ecc = StellarIllumination.prescribed(s0, 100.0, 0.3)
+    assert (lit * weights).sum() == pytest.approx(225.0, rel=5e-3)   # coarse test mesh
+    ecc = stated(100.0, e=0.3)
     mean_flux = np.mean([ecc.flux_at(t) for t in np.linspace(0, 100, 20001)[:-1]])
     assert mean_flux == pytest.approx(s0 / math.sqrt(1 - 0.09), rel=1e-4)
     fhz, _ = frierson_net_surface_flux()(lat, 0 * lat, 0.0)

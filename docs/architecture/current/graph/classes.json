@@ -361,9 +361,32 @@
       "qualname": "DiurnalMeanInsolation"
     },
     {
+      "decorators": [
+        "dataclass(frozen=True)"
+      ],
+      "external_bases": [],
+      "id": "tropoi.physics.insolation.LightSource",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__post_init__"
+        },
+        {
+          "kind": "method",
+          "name": "position"
+        },
+        {
+          "kind": "method",
+          "name": "to_dict"
+        }
+      ],
+      "module": "tropoi.physics.insolation",
+      "qualname": "LightSource"
+    },
+    {
       "decorators": [],
       "external_bases": [],
-      "id": "tropoi.physics.insolation.InstantaneousInsolation",
+      "id": "tropoi.physics.insolation.OrbitalInsolation",
       "members": [
         {
           "kind": "method",
@@ -375,11 +398,15 @@
         },
         {
           "kind": "method",
+          "name": "incident"
+        },
+        {
+          "kind": "method",
           "name": "signature"
         }
       ],
       "module": "tropoi.physics.insolation",
-      "qualname": "InstantaneousInsolation"
+      "qualname": "OrbitalInsolation"
     },
     {
       "decorators": [],
@@ -419,7 +446,19 @@
         },
         {
           "kind": "method",
+          "name": "beams"
+        },
+        {
+          "kind": "method",
+          "name": "body_to_inertial"
+        },
+        {
+          "kind": "method",
           "name": "declination"
+        },
+        {
+          "kind": "property",
+          "name": "eccentricity"
         },
         {
           "kind": "method",
@@ -431,11 +470,23 @@
         },
         {
           "kind": "property",
+          "name": "mean_motion"
+        },
+        {
+          "kind": "property",
+          "name": "mean_solar_day"
+        },
+        {
+          "kind": "property",
           "name": "obliquity_deg"
         },
         {
           "kind": "classmethod",
-          "name": "prescribed"
+          "name": "planet_centric"
+        },
+        {
+          "kind": "method",
+          "name": "planet_position"
         },
         {
           "kind": "method",
@@ -443,32 +494,27 @@
         },
         {
           "kind": "method",
+          "name": "star_direction"
+        },
+        {
+          "kind": "method",
+          "name": "subsolar_point"
+        },
+        {
+          "kind": "method",
           "name": "true_anomaly"
+        },
+        {
+          "kind": "method",
+          "name": "with_rotation"
+        },
+        {
+          "kind": "method",
+          "name": "with_subsolar_longitude_at"
         }
       ],
       "module": "tropoi.physics.insolation",
       "qualname": "StellarIllumination"
-    },
-    {
-      "decorators": [],
-      "external_bases": [],
-      "id": "tropoi.physics.insolation.TidallyLockedInsolation",
-      "members": [
-        {
-          "kind": "method",
-          "name": "__call__"
-        },
-        {
-          "kind": "method",
-          "name": "__init__"
-        },
-        {
-          "kind": "method",
-          "name": "signature"
-        }
-      ],
-      "module": "tropoi.physics.insolation",
-      "qualname": "TidallyLockedInsolation"
     },
     {
       "decorators": [],
@@ -571,6 +617,10 @@
           "name": "mean_motion"
         },
         {
+          "kind": "method",
+          "name": "orbit_to_inertial"
+        },
+        {
           "kind": "property",
           "name": "periapsis_m"
         },
@@ -581,6 +631,10 @@
         {
           "kind": "method",
           "name": "position_at"
+        },
+        {
+          "kind": "method",
+          "name": "position_in_orbit_frame"
         },
         {
           "kind": "method",
@@ -1062,8 +1116,16 @@
           "name": "__post_init__"
         },
         {
+          "kind": "method",
+          "name": "body_to_orbit"
+        },
+        {
           "kind": "classmethod",
           "name": "from_period"
+        },
+        {
+          "kind": "property",
+          "name": "is_retrograde"
         },
         {
           "kind": "property",
@@ -1074,8 +1136,20 @@
           "name": "of"
         },
         {
+          "kind": "method",
+          "name": "prime_meridian_angle"
+        },
+        {
+          "kind": "classmethod",
+          "name": "resonant"
+        },
+        {
           "kind": "property",
           "name": "sidereal_period_s"
+        },
+        {
+          "kind": "classmethod",
+          "name": "synchronous"
         },
         {
           "kind": "method",

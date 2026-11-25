@@ -797,12 +797,22 @@
     },
     {
       "kind": "constructor",
-      "source": "tropoi.physics.insolation.InstantaneousInsolation",
-      "target": "tropoi.physics.insolation.InstantaneousInsolation.__init__"
+      "source": "tropoi.physics.insolation.OrbitalInsolation",
+      "target": "tropoi.physics.insolation.OrbitalInsolation.__init__"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.physics.insolation.OrbitalInsolation.__call__",
+      "target": "tropoi.physics.insolation.OrbitalInsolation.incident"
     },
     {
       "kind": "call",
-      "source": "tropoi.physics.insolation.InstantaneousInsolation.__call__",
+      "source": "tropoi.physics.insolation.OrbitalInsolation.__call__",
+      "target": "tropoi.physics.insolation._unit_normals"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.physics.insolation.OrbitalInsolation.incident",
       "target": "tropoi.physics.insolation._xp"
     },
     {
@@ -812,12 +822,52 @@
     },
     {
       "kind": "self",
+      "source": "tropoi.physics.insolation.StellarIllumination.beams",
+      "target": "tropoi.physics.insolation.StellarIllumination.body_to_inertial"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.physics.insolation.StellarIllumination.beams",
+      "target": "tropoi.physics.insolation.StellarIllumination.planet_position"
+    },
+    {
+      "kind": "self",
       "source": "tropoi.physics.insolation.StellarIllumination.declination",
-      "target": "tropoi.physics.insolation.StellarIllumination.solar_longitude"
+      "target": "tropoi.physics.insolation.StellarIllumination.star_direction"
     },
     {
       "kind": "self",
       "source": "tropoi.physics.insolation.StellarIllumination.flux_at",
+      "target": "tropoi.physics.insolation.StellarIllumination.beams"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.physics.insolation.StellarIllumination.from_components",
+      "target": "tropoi.physics.insolation.LightSource"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.physics.insolation.StellarIllumination.planet_centric",
+      "target": "tropoi.physics.insolation.LightSource"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.physics.insolation.StellarIllumination.planet_centric",
+      "target": "tropoi.physics.orbit.KeplerOrbit"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.physics.insolation.StellarIllumination.planet_centric",
+      "target": "tropoi.physics.orbit.true_from_mean"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.physics.insolation.StellarIllumination.planet_centric",
+      "target": "tropoi.physics.rotation.Rotation.of"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.physics.insolation.StellarIllumination.planet_position",
       "target": "tropoi.physics.insolation.StellarIllumination.true_anomaly"
     },
     {
@@ -826,18 +876,33 @@
       "target": "tropoi.physics.insolation.StellarIllumination.true_anomaly"
     },
     {
-      "kind": "call",
-      "source": "tropoi.physics.insolation.StellarIllumination.true_anomaly",
-      "target": "tropoi.physics.orbit.true_from_mean"
+      "kind": "self",
+      "source": "tropoi.physics.insolation.StellarIllumination.star_direction",
+      "target": "tropoi.physics.insolation.StellarIllumination.beams"
     },
     {
-      "kind": "constructor",
-      "source": "tropoi.physics.insolation.TidallyLockedInsolation",
-      "target": "tropoi.physics.insolation.TidallyLockedInsolation.__init__"
+      "kind": "self",
+      "source": "tropoi.physics.insolation.StellarIllumination.subsolar_point",
+      "target": "tropoi.physics.insolation.StellarIllumination.star_direction"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.physics.insolation.StellarIllumination.with_rotation",
+      "target": "tropoi.physics.insolation.StellarIllumination"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.physics.insolation.StellarIllumination.with_subsolar_longitude_at",
+      "target": "tropoi.physics.insolation.StellarIllumination.subsolar_point"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.physics.insolation.StellarIllumination.with_subsolar_longitude_at",
+      "target": "tropoi.physics.insolation.StellarIllumination.with_rotation"
     },
     {
       "kind": "call",
-      "source": "tropoi.physics.insolation.TidallyLockedInsolation.__call__",
+      "source": "tropoi.physics.insolation._unit_normals",
       "target": "tropoi.physics.insolation._xp"
     },
     {
@@ -849,6 +914,41 @@
       "kind": "call",
       "source": "tropoi.physics.insolation.frierson_net_surface_flux",
       "target": "tropoi.physics.insolation._xp"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.physics.insolation.illumination_from_spec",
+      "target": "tropoi.physics.insolation.StellarIllumination.planet_centric"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.physics.insolation.illumination_from_spec",
+      "target": "tropoi.physics.insolation._spin_rate"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.physics.insolation.insolation_from_spec",
+      "target": "tropoi.physics.insolation.DiurnalMeanInsolation"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.physics.insolation.insolation_from_spec",
+      "target": "tropoi.physics.insolation.OrbitalInsolation"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.physics.insolation.insolation_from_spec",
+      "target": "tropoi.physics.insolation.PrescribedInsolation"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.physics.insolation.insolation_from_spec",
+      "target": "tropoi.physics.insolation.frierson_net_surface_flux"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.physics.insolation.insolation_from_spec",
+      "target": "tropoi.physics.insolation.illumination_from_spec"
     },
     {
       "kind": "constructor",
@@ -1051,8 +1151,28 @@
       "target": "tropoi.physics.orbit.KeplerOrbit.period"
     },
     {
+      "kind": "call",
+      "source": "tropoi.physics.orbit.KeplerOrbit.orbit_to_inertial",
+      "target": "tropoi.physics.rotation.rotation_x"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.physics.orbit.KeplerOrbit.orbit_to_inertial",
+      "target": "tropoi.physics.rotation.rotation_z"
+    },
+    {
       "kind": "self",
       "source": "tropoi.physics.orbit.KeplerOrbit.position_at",
+      "target": "tropoi.physics.orbit.KeplerOrbit.orbit_to_inertial"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.physics.orbit.KeplerOrbit.position_at",
+      "target": "tropoi.physics.orbit.KeplerOrbit.position_in_orbit_frame"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.physics.orbit.KeplerOrbit.position_in_orbit_frame",
       "target": "tropoi.physics.orbit.KeplerOrbit.radius_at"
     },
     {
@@ -1077,8 +1197,23 @@
     },
     {
       "kind": "call",
+      "source": "tropoi.physics.orbit.eccentric_from_mean",
+      "target": "tropoi.physics.orbit._kepler_mean"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.physics.orbit.mean_from_true",
+      "target": "tropoi.physics.orbit._kepler_mean"
+    },
+    {
+      "kind": "call",
       "source": "tropoi.physics.orbit.mean_from_true",
       "target": "tropoi.physics.orbit.eccentric_from_true"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.physics.orbit.true_from_mean",
+      "target": "tropoi.physics.orbit.eccentric_from_mean"
     },
     {
       "kind": "call",
@@ -1096,24 +1231,14 @@
       "target": "tropoi.physics.thermodynamics.heat_capacity_range"
     },
     {
-      "kind": "instantiate",
-      "source": "tropoi.physics.planets._solar_body",
-      "target": "tropoi.physics.insolation.StellarIllumination"
-    },
-    {
       "kind": "call",
       "source": "tropoi.physics.planets._solar_body",
-      "target": "tropoi.physics.orbit.KeplerOrbit.from_au"
+      "target": "tropoi.physics.insolation.StellarIllumination.planet_centric"
     },
     {
       "kind": "instantiate",
       "source": "tropoi.physics.planets._solar_body",
       "target": "tropoi.physics.planets.PlanetaryBody"
-    },
-    {
-      "kind": "call",
-      "source": "tropoi.physics.planets._solar_body",
-      "target": "tropoi.physics.rotation.Rotation.of"
     },
     {
       "kind": "constructor",
@@ -1502,8 +1627,33 @@
     },
     {
       "kind": "self",
+      "source": "tropoi.physics.rotation.Rotation.body_to_orbit",
+      "target": "tropoi.physics.rotation.Rotation.prime_meridian_angle"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.physics.rotation.Rotation.body_to_orbit",
+      "target": "tropoi.physics.rotation.rotation_x"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.physics.rotation.Rotation.body_to_orbit",
+      "target": "tropoi.physics.rotation.rotation_z"
+    },
+    {
+      "kind": "self",
       "source": "tropoi.physics.rotation.Rotation.from_period",
       "target": "tropoi.physics.rotation.Rotation.of"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.physics.rotation.Rotation.resonant",
+      "target": "tropoi.physics.rotation.Rotation.of"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.physics.rotation.Rotation.synchronous",
+      "target": "tropoi.physics.rotation.Rotation.resonant"
     },
     {
       "kind": "instantiate",
@@ -6648,7 +6798,7 @@
     {
       "kind": "call",
       "source": "tropoi.representation.visual.viewer_server._star",
-      "target": "tropoi.physics.insolation.StellarIllumination.prescribed"
+      "target": "tropoi.physics.insolation.illumination_from_spec"
     },
     {
       "kind": "call",
@@ -9091,39 +9241,9 @@
       "target": "tropoi.temporal.tendencies.boundary_layer.BoundaryLayerDiffusion"
     },
     {
-      "kind": "instantiate",
-      "source": "tropoi.run.radiative.model.build_insolation",
-      "target": "tropoi.physics.insolation.DiurnalMeanInsolation"
-    },
-    {
-      "kind": "instantiate",
-      "source": "tropoi.run.radiative.model.build_insolation",
-      "target": "tropoi.physics.insolation.InstantaneousInsolation"
-    },
-    {
-      "kind": "instantiate",
-      "source": "tropoi.run.radiative.model.build_insolation",
-      "target": "tropoi.physics.insolation.PrescribedInsolation"
-    },
-    {
       "kind": "call",
       "source": "tropoi.run.radiative.model.build_insolation",
-      "target": "tropoi.physics.insolation.StellarIllumination.prescribed"
-    },
-    {
-      "kind": "instantiate",
-      "source": "tropoi.run.radiative.model.build_insolation",
-      "target": "tropoi.physics.insolation.TidallyLockedInsolation"
-    },
-    {
-      "kind": "call",
-      "source": "tropoi.run.radiative.model.build_insolation",
-      "target": "tropoi.physics.insolation.frierson_net_surface_flux"
-    },
-    {
-      "kind": "call",
-      "source": "tropoi.run.radiative.model.build_insolation",
-      "target": "tropoi.run.radiative.model._options"
+      "target": "tropoi.physics.insolation.insolation_from_spec"
     },
     {
       "kind": "call",
@@ -12954,31 +13074,66 @@
       "type": "function"
     },
     {
-      "id": "tropoi.physics.insolation.InstantaneousInsolation",
+      "id": "tropoi.physics.insolation.LightSource",
       "kind": "class",
       "module": "tropoi.physics.insolation",
-      "qualname": "InstantaneousInsolation",
+      "qualname": "LightSource",
       "type": "class"
     },
     {
-      "id": "tropoi.physics.insolation.InstantaneousInsolation.__call__",
+      "id": "tropoi.physics.insolation.LightSource.__post_init__",
       "kind": "method",
       "module": "tropoi.physics.insolation",
-      "qualname": "InstantaneousInsolation.__call__",
+      "qualname": "LightSource.__post_init__",
       "type": "function"
     },
     {
-      "id": "tropoi.physics.insolation.InstantaneousInsolation.__init__",
+      "id": "tropoi.physics.insolation.LightSource.position",
       "kind": "method",
       "module": "tropoi.physics.insolation",
-      "qualname": "InstantaneousInsolation.__init__",
+      "qualname": "LightSource.position",
       "type": "function"
     },
     {
-      "id": "tropoi.physics.insolation.InstantaneousInsolation.signature",
+      "id": "tropoi.physics.insolation.LightSource.to_dict",
       "kind": "method",
       "module": "tropoi.physics.insolation",
-      "qualname": "InstantaneousInsolation.signature",
+      "qualname": "LightSource.to_dict",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.insolation.OrbitalInsolation",
+      "kind": "class",
+      "module": "tropoi.physics.insolation",
+      "qualname": "OrbitalInsolation",
+      "type": "class"
+    },
+    {
+      "id": "tropoi.physics.insolation.OrbitalInsolation.__call__",
+      "kind": "method",
+      "module": "tropoi.physics.insolation",
+      "qualname": "OrbitalInsolation.__call__",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.insolation.OrbitalInsolation.__init__",
+      "kind": "method",
+      "module": "tropoi.physics.insolation",
+      "qualname": "OrbitalInsolation.__init__",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.insolation.OrbitalInsolation.incident",
+      "kind": "method",
+      "module": "tropoi.physics.insolation",
+      "qualname": "OrbitalInsolation.incident",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.insolation.OrbitalInsolation.signature",
+      "kind": "method",
+      "module": "tropoi.physics.insolation",
+      "qualname": "OrbitalInsolation.signature",
       "type": "function"
     },
     {
@@ -13031,10 +13186,31 @@
       "type": "function"
     },
     {
+      "id": "tropoi.physics.insolation.StellarIllumination.beams",
+      "kind": "method",
+      "module": "tropoi.physics.insolation",
+      "qualname": "StellarIllumination.beams",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.insolation.StellarIllumination.body_to_inertial",
+      "kind": "method",
+      "module": "tropoi.physics.insolation",
+      "qualname": "StellarIllumination.body_to_inertial",
+      "type": "function"
+    },
+    {
       "id": "tropoi.physics.insolation.StellarIllumination.declination",
       "kind": "method",
       "module": "tropoi.physics.insolation",
       "qualname": "StellarIllumination.declination",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.insolation.StellarIllumination.eccentricity",
+      "kind": "property",
+      "module": "tropoi.physics.insolation",
+      "qualname": "StellarIllumination.eccentricity",
       "type": "function"
     },
     {
@@ -13052,6 +13228,20 @@
       "type": "function"
     },
     {
+      "id": "tropoi.physics.insolation.StellarIllumination.mean_motion",
+      "kind": "property",
+      "module": "tropoi.physics.insolation",
+      "qualname": "StellarIllumination.mean_motion",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.insolation.StellarIllumination.mean_solar_day",
+      "kind": "property",
+      "module": "tropoi.physics.insolation",
+      "qualname": "StellarIllumination.mean_solar_day",
+      "type": "function"
+    },
+    {
       "id": "tropoi.physics.insolation.StellarIllumination.obliquity_deg",
       "kind": "property",
       "module": "tropoi.physics.insolation",
@@ -13059,10 +13249,17 @@
       "type": "function"
     },
     {
-      "id": "tropoi.physics.insolation.StellarIllumination.prescribed",
+      "id": "tropoi.physics.insolation.StellarIllumination.planet_centric",
       "kind": "classmethod",
       "module": "tropoi.physics.insolation",
-      "qualname": "StellarIllumination.prescribed",
+      "qualname": "StellarIllumination.planet_centric",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.insolation.StellarIllumination.planet_position",
+      "kind": "method",
+      "module": "tropoi.physics.insolation",
+      "qualname": "StellarIllumination.planet_position",
       "type": "function"
     },
     {
@@ -13073,6 +13270,20 @@
       "type": "function"
     },
     {
+      "id": "tropoi.physics.insolation.StellarIllumination.star_direction",
+      "kind": "method",
+      "module": "tropoi.physics.insolation",
+      "qualname": "StellarIllumination.star_direction",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.insolation.StellarIllumination.subsolar_point",
+      "kind": "method",
+      "module": "tropoi.physics.insolation",
+      "qualname": "StellarIllumination.subsolar_point",
+      "type": "function"
+    },
+    {
       "id": "tropoi.physics.insolation.StellarIllumination.true_anomaly",
       "kind": "method",
       "module": "tropoi.physics.insolation",
@@ -13080,31 +13291,31 @@
       "type": "function"
     },
     {
-      "id": "tropoi.physics.insolation.TidallyLockedInsolation",
-      "kind": "class",
-      "module": "tropoi.physics.insolation",
-      "qualname": "TidallyLockedInsolation",
-      "type": "class"
-    },
-    {
-      "id": "tropoi.physics.insolation.TidallyLockedInsolation.__call__",
+      "id": "tropoi.physics.insolation.StellarIllumination.with_rotation",
       "kind": "method",
       "module": "tropoi.physics.insolation",
-      "qualname": "TidallyLockedInsolation.__call__",
+      "qualname": "StellarIllumination.with_rotation",
       "type": "function"
     },
     {
-      "id": "tropoi.physics.insolation.TidallyLockedInsolation.__init__",
+      "id": "tropoi.physics.insolation.StellarIllumination.with_subsolar_longitude_at",
       "kind": "method",
       "module": "tropoi.physics.insolation",
-      "qualname": "TidallyLockedInsolation.__init__",
+      "qualname": "StellarIllumination.with_subsolar_longitude_at",
       "type": "function"
     },
     {
-      "id": "tropoi.physics.insolation.TidallyLockedInsolation.signature",
-      "kind": "method",
+      "id": "tropoi.physics.insolation._spin_rate",
+      "kind": "function",
       "module": "tropoi.physics.insolation",
-      "qualname": "TidallyLockedInsolation.signature",
+      "qualname": "_spin_rate",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.insolation._unit_normals",
+      "kind": "function",
+      "module": "tropoi.physics.insolation",
+      "qualname": "_unit_normals",
       "type": "function"
     },
     {
@@ -13119,6 +13330,20 @@
       "kind": "function",
       "module": "tropoi.physics.insolation",
       "qualname": "frierson_net_surface_flux",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.insolation.illumination_from_spec",
+      "kind": "function",
+      "module": "tropoi.physics.insolation",
+      "qualname": "illumination_from_spec",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.insolation.insolation_from_spec",
+      "kind": "function",
+      "module": "tropoi.physics.insolation",
+      "qualname": "insolation_from_spec",
       "type": "function"
     },
     {
@@ -13360,6 +13585,13 @@
       "type": "function"
     },
     {
+      "id": "tropoi.physics.orbit.KeplerOrbit.orbit_to_inertial",
+      "kind": "method",
+      "module": "tropoi.physics.orbit",
+      "qualname": "KeplerOrbit.orbit_to_inertial",
+      "type": "function"
+    },
+    {
       "id": "tropoi.physics.orbit.KeplerOrbit.periapsis_m",
       "kind": "property",
       "module": "tropoi.physics.orbit",
@@ -13378,6 +13610,13 @@
       "kind": "method",
       "module": "tropoi.physics.orbit",
       "qualname": "KeplerOrbit.position_at",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.orbit.KeplerOrbit.position_in_orbit_frame",
+      "kind": "method",
+      "module": "tropoi.physics.orbit",
+      "qualname": "KeplerOrbit.position_in_orbit_frame",
       "type": "function"
     },
     {
@@ -13420,6 +13659,20 @@
       "kind": "function",
       "module": "tropoi.physics.orbit",
       "qualname": "_finite",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.orbit._kepler_mean",
+      "kind": "function",
+      "module": "tropoi.physics.orbit",
+      "qualname": "_kepler_mean",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.orbit.eccentric_from_mean",
+      "kind": "function",
+      "module": "tropoi.physics.orbit",
+      "qualname": "eccentric_from_mean",
       "type": "function"
     },
     {
@@ -14305,10 +14558,24 @@
       "type": "function"
     },
     {
+      "id": "tropoi.physics.rotation.Rotation.body_to_orbit",
+      "kind": "method",
+      "module": "tropoi.physics.rotation",
+      "qualname": "Rotation.body_to_orbit",
+      "type": "function"
+    },
+    {
       "id": "tropoi.physics.rotation.Rotation.from_period",
       "kind": "classmethod",
       "module": "tropoi.physics.rotation",
       "qualname": "Rotation.from_period",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.rotation.Rotation.is_retrograde",
+      "kind": "property",
+      "module": "tropoi.physics.rotation",
+      "qualname": "Rotation.is_retrograde",
       "type": "function"
     },
     {
@@ -14326,10 +14593,31 @@
       "type": "function"
     },
     {
+      "id": "tropoi.physics.rotation.Rotation.prime_meridian_angle",
+      "kind": "method",
+      "module": "tropoi.physics.rotation",
+      "qualname": "Rotation.prime_meridian_angle",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.rotation.Rotation.resonant",
+      "kind": "classmethod",
+      "module": "tropoi.physics.rotation",
+      "qualname": "Rotation.resonant",
+      "type": "function"
+    },
+    {
       "id": "tropoi.physics.rotation.Rotation.sidereal_period_s",
       "kind": "property",
       "module": "tropoi.physics.rotation",
       "qualname": "Rotation.sidereal_period_s",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.rotation.Rotation.synchronous",
+      "kind": "classmethod",
+      "module": "tropoi.physics.rotation",
+      "qualname": "Rotation.synchronous",
       "type": "function"
     },
     {
@@ -14344,6 +14632,20 @@
       "kind": "method",
       "module": "tropoi.physics.rotation",
       "qualname": "Rotation.with_",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.rotation.rotation_x",
+      "kind": "function",
+      "module": "tropoi.physics.rotation",
+      "qualname": "rotation_x",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.rotation.rotation_z",
+      "kind": "function",
+      "module": "tropoi.physics.rotation",
+      "qualname": "rotation_z",
       "type": "function"
     },
     {

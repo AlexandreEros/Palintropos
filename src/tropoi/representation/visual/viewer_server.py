@@ -42,21 +42,37 @@ def encode_frame(arrays):
 
 
 def _star(manifest):
-    """Geographic substellar point from the run's instantaneous illumination law."""
+    """The geographic substellar point, from the run's instantaneous
+    illumination law.
+
+    Current runs (``orbital``) take it from the shared geometry. Archived
+    runs from before that geometry existed (``tidally_locked``,
+    ``instantaneous``) are described the way those runs computed their
+    forcing: a fixed point, or a uniform hour angle with the orbital
+    declination."""
     physics = manifest["physics"]
     spec = physics.get("insolation") or {}
-    if physics.get("enabled") is False or spec.get("kind") not in ("tidally_locked", "instantaneous"):
+    kind = spec.get("kind")
+    if physics.get("enabled") is False or kind not in ("orbital", "tidally_locked",
+                                                        "instantaneous"):
         return None
     times = manifest["time_axes"]["snapshots"]["values"]
-    if spec["kind"] == "tidally_locked":
+    from tropoi.physics.insolation import illumination_from_spec
+    if kind == "orbital":
+        geometry = illumination_from_spec(spec)
+        positions = []
+        for t in times:
+            lat, lon = geometry.subsolar_point(t)
+            positions.append(dict(latitude=math.degrees(lat), longitude=math.degrees(lon)))
+    elif kind == "tidally_locked":
         point = dict(latitude=0, longitude=math.degrees(spec.get("substellar_longitude", 0)))
         positions = [point] * len(times)
     else:
-        from tropoi.physics.insolation import StellarIllumination
-        orbit = StellarIllumination.prescribed(**{k: v for k, v in spec.items()
-                                                  if k not in ("kind", "solar_day")})
+        legacy = {k: v for k, v in spec.items() if k not in ("kind", "solar_day")}
+        legacy.setdefault("period", 365.25 * 86400.0)
+        geometry = illumination_from_spec(legacy)   # no spin: declination only
         solar_day = spec.get("solar_day", 86400)
-        positions = [dict(latitude=math.degrees(orbit.declination(t)),
+        positions = [dict(latitude=math.degrees(geometry.declination(t)),
                           longitude=(-360 * t / solar_day + 180) % 360 - 180) for t in times]
     return dict(positions=positions, source="configured insolation geometry")
 

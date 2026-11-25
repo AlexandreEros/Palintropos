@@ -10,6 +10,9 @@ heating - and the strictness of that path, not any opacity.
 """
 from __future__ import annotations
 
+import json
+from pathlib import Path
+
 import numpy as np
 import pytest
 
@@ -247,14 +250,26 @@ def test_thai_imported_table_when_present(case):
                    LowerBoundary("surface", temperature=np.full(1, 300.0)))
 
 
-def test_recorded_thai_configurations_keep_their_hashes():
+_THAI_EVIDENCE = Path(__file__).resolve().parents[1] / "docs" / "radiation" / "evidence"
+
+
+def _thai_recorded(run: str) -> dict:
+    return json.loads((_THAI_EVIDENCE / run / "config.json").read_text(encoding="utf-8"))
+
+
+def test_thai_presets_are_the_recorded_experiments():
     """The configurations of the recorded development runs
-    (docs/radiation/evidence/dev-thai-ben*-lwck-heated-T21L40-9f8c776)."""
+    (docs/radiation/evidence/dev-thai-ben*-lwck-heated-T21L40-9f8c776), apart
+    from the fixed substellar point now stated as a circular synchronous orbit
+    in the shared geometry (same forcing to round-off; Planet One)."""
+    from insolation_migration import assert_same_experiment_apart_from_insolation
     from tropoi.run.radiative.config import PRESETS
-    assert PRESETS["dev-thai-ben2"]().sha256() == (
-        "80e5a1824e5b378f4d97491f13e6d0aa0479fb2d41b5ad5647cdc40195dd1d28")
-    assert PRESETS["dev-thai-ben1"]().sha256() == (
-        "72494a3143b330c9221721257d5aa4e9e3ef2379ff99723bda8520b5b0dad0c1")
+    for case, run in (("ben2", "dev-thai-ben2-lwck-heated-T21L40-9f8c776"),
+                      ("ben1", "dev-thai-ben1-lwck-heated-T21L40-9f8c776")):
+        recorded = _thai_recorded(run)
+        assert recorded["config"]["insolation"]["kind"] == "tidally_locked"
+        assert_same_experiment_apart_from_insolation(PRESETS[f"dev-thai-{case}"](),
+                                                     recorded["config"])
 
 
 def test_ben2_layer_linear_preset_is_a_distinct_opt_in_experiment():
@@ -267,17 +282,18 @@ def test_ben2_layer_linear_preset_is_a_distinct_opt_in_experiment():
     overridden."""
     from tropoi.run.radiative.config import PRESETS
     ck, ll = PRESETS["dev-thai-ben2-ck"](), PRESETS["dev-thai-ben2-ck-layer-linear"]()
+    from insolation_migration import assert_same_experiment_apart_from_insolation
     assert ck.thermal_source == "linear"
-    assert ck.sha256() == "fdbcf1cfd7ebcfaaf3ca887896c3cc6a049a371abdadc5985c78131304c209f3"
+    assert_same_experiment_apart_from_insolation(
+        ck, _thai_recorded("dev-thai-ben2-ck-heated-T21L40-809ffdd")["config"])
     assert ll.thermal_source == "layer-linear"
     assert ll.experiment_id == "dev-thai-ben2-ck-layer-linear-heated-T21L40"
-    assert ll.sha256() == "08bc87147ef557ae3161d57b9caa533c3f89caf680151b7dff5dfdc17c374af2"
     d0, d1 = ck.to_dict(), ll.to_dict()
     assert {k for k in d0 if d0[k] != d1[k]} == {"experiment_id", "thermal_source"}
     replay = ll.with_(experiment_id=ck.experiment_id)
     assert replay == ck.with_(thermal_source="layer-linear")
-    assert replay.sha256() == (
-        "3f2de9d8985c2bc1405cced826bb84755860ddf6ed68986aeb702186d2536eff")
+    assert_same_experiment_apart_from_insolation(
+        replay, _thai_recorded("dev-thai-ben2-ck-heated-T21L40-9b2060c-layer-linear")["config"])
     # Ben 1 keeps the historical source; switching it is a separate decision
     assert "dev-thai-ben1-ck-layer-linear" not in PRESETS
 

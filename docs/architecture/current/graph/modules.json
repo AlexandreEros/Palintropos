@@ -343,6 +343,14 @@
         "module"
       ],
       "source": "tropoi.physics.insolation",
+      "target": "tropoi.physics.constants"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.physics.insolation",
       "target": "tropoi.physics.orbit"
     },
     {
@@ -380,10 +388,26 @@
     {
       "kind": "imports",
       "scopes": [
+        "function"
+      ],
+      "source": "tropoi.physics.orbit",
+      "target": "tropoi.physics.rotation"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
         "module"
       ],
       "source": "tropoi.physics.planets",
       "target": "tropoi.physics.composition"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.physics.planets",
+      "target": "tropoi.physics.constants"
     },
     {
       "kind": "imports",
@@ -4139,6 +4163,7 @@
       "stdlib_imports": [
         "__future__",
         "dataclasses",
+        "fractions",
         "math",
         "typing"
       ],
@@ -4309,9 +4334,12 @@
       "stdlib_imports": [
         "__future__",
         "dataclasses",
+        "fractions",
         "math"
       ],
-      "third_party_imports": []
+      "third_party_imports": [
+        "numpy"
+      ]
     },
     {
       "category": "code",

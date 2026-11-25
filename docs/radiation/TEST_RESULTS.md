@@ -151,9 +151,11 @@ The full suite was not run at this commit. What each new test covers is in
 - The correlated-k path with more than one absorber. (On the GPU and coupled
   to the dynamics it has now run, in the two 5-day THAI development runs of
   [OPACITY.md](OPACITY.md) §6, but no automated test does so.)
-- `InstantaneousInsolation` in a 3-D run outside the flat-Mars tests.
-  `TidallyLockedInsolation` has run in 3-D only in those two development
-  runs.
+- `OrbitalInsolation` in a 3-D run. The archived flat-Mars and THAI runs
+  used its predecessors (`InstantaneousInsolation`,
+  `TidallyLockedInsolation`; removed 2026-11-24, see
+  [SHARED_PHYSICS.md](SHARED_PHYSICS.md)). The geometry itself is tested on
+  the CPU (`tests/test_illumination_geometry.py`).
 - `tools/radiation/opacity` (the SOCRATES reader and importer),
   `tools/radiation/thai_column.py` and `thai_dev_evidence.py` have no unit
   tests.

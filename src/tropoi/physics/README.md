@@ -20,13 +20,13 @@ fits, validation and loading stay in Python. See
 | `column.py` | `AtmosphericColumn`: a 1-D hydrostatic (z, ln p, T) column for optics |
 | `star.py` | `Star` (intrinsic: mass, radius, luminosity, T_eff; blackbody consistency) and `ApparentStar` (viewing geometry); catalogue from `data/stars.toml` |
 | `orbit.py` | `KeplerOrbit`: six elements, SI, explicit frame/epoch conventions, propagation with an explicit gravitational parameter |
-| `rotation.py` | `Rotation`: spin axis, angular velocity, phase |
+| `rotation.py` | `Rotation`: non-negative sidereal angular speed about body north, axis orientation relative to the orbit plane (obliquity 0–180°, equinox node), prime-meridian phase; `R_BO(t)` |
 | `planets.py` | Bulk presets with their star/orbit/rotation and stretched vertical grids (idealized configurations, not validated planets) |
 | `radiation/twostream.py` | Two-stream layers and adding, thermal and stellar, absorbing and scattering |
 | `radiation/scheme.py` | Column contract, lower boundaries, spectral loop, heating from flux divergence |
 | `radiation/gray.py` | Gray optics of published idealized models |
 | `radiation/kdist.py` | Correlated-k tables and optics. Method verified on a synthetic spectrum; **no real opacity data** |
-| `insolation.py` | `StellarIllumination` (star + orbit + rotation combined, or prescribed); diurnal-mean, diurnal-cycle, tidally locked and prescribed stellar flux |
+| `insolation.py` | `StellarIllumination`: one orbit/rotation/light-source geometry (body-frame source directions, inverse-square flux, multiple sources); `OrbitalInsolation` (instantaneous), `DiurnalMeanInsolation` (rotation mean) and `PrescribedInsolation` |
 | `convection.py` | Enthalpy-conserving dry convective adjustment in closed form |
 | `surface.py` | Slab surface and bulk sensible heat flux |
 | `column_model.py` | `ColumnPhysics` (shared by all hosts) and the single-column model |

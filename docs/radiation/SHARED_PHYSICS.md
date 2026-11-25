@@ -53,15 +53,24 @@ Design rules, enforced by construction and tests:
   object is accommodated). Apparent angular size and irradiance are viewing
   geometry (`Star.seen_from` → `ApparentStar`); the sky's
   temperature-plus-angular-radius workflow needs no invented mass or
-  distance. `Rotation` owns the spin axis, rate and phase.
-  `StellarIllumination` combines the three (or states the reduced numbers
-  explicitly) and drives the retained forcing modes: prescribed,
-  diurnal-mean, instantaneous, tidally locked.
+  distance. `Rotation` owns the spin: a non-negative sidereal angular speed
+  about body north (the right-hand-rule pole, so retrograde rotators have
+  obliquity > 90°), the axis orientation relative to the orbit plane, and
+  the prime-meridian phase. `StellarIllumination` is the one illumination
+  geometry (since 2026-11-24, Planet One): each source's direction is
+  transformed from the inertial frame to body-fixed coordinates, with
+  inverse-square flux, so tidal locking, eccentricity, resonances,
+  retrograde spin, obliquity and multiple sources are configurations rather
+  than separate algorithms (`tests/test_illumination_geometry.py`, gates
+  G-A of [../validation/PLANET-ONE-GATES.md](../validation/PLANET-ONE-GATES.md)).
+  It drives `OrbitalInsolation` (instantaneous) and the deliberate
+  `DiurnalMeanInsolation` approximation; `PrescribedInsolation` remains for
+  stated latitude functions.
 - **Irradiance-based factories state their reference.**
   `KeplerOrbit.from_irradiance(..., reference=...)` requires
   `"semimajor_axis"`, `"periapsis"`, `"apoapsis"` or `"time_mean"`; nothing
-  is chosen silently. `StellarIllumination.prescribed` documents that its
-  `stellar_constant` is the flux at the semimajor-axis distance.
+  is chosen silently. The configuration form (`illumination_from_spec`)
+  states `stellar_constant` as the flux at the semimajor-axis distance.
 
 ## Removed duplication and the canonical choices
 
@@ -100,26 +109,48 @@ experiment configuration is affected: `RadiativeConfig` stores plain
 unchanged (its masses were already the CIAAW values, and the angular-size
 arithmetic keeps the historical km-constant expressions bit-for-bit).
 
-## Compatibility contracts kept
+## Illumination: what changed on 2026-11-24 (Planet One)
 
-- **Config hashes and resume.** Insolation stays a `{"kind": ...}` spec in
-  `RadiativeConfig`, resolved by `run.radiative.model.build_insolation` into
-  the shared objects. The canonical JSON and `config_sha256` are
-  byte-identical, so existing checkpoints resume unchanged.
-- **Signatures.** `DiurnalMeanInsolation`/`InstantaneousInsolation`
-  signatures keep the legacy `orbit` keys (`stellar_constant`, `period`,
-  `eccentricity`, `obliquity_deg`, `perihelion_longitude_deg`,
-  `time_of_perihelion`); component-built illuminations add a `components`
-  block.
-- **Forcing numerics.** The Kepler solve and the daily-mean/instantaneous
-  formulas are the pre-reconciliation expressions verbatim
-  (`StellarIllumination` reuses them; `tests/test_physics_columns.py` and
-  `tests/test_physics_shared.py` assert the closed forms).
-- **Planet presets.** `physics.planets.PLANETS` keeps every stated
-  fact-sheet scalar exactly and attaches the shared `Star`, `KeplerOrbit`
-  and `Rotation` objects; the stated stellar constants agree with the IAU
-  nominal Sun at the fact-sheet distances to ~0.1 % (the rounding of those
-  references).
+Before Planet One, the reconciliation kept these compatibility contracts:
+byte-identical configuration hashes, legacy signature keys, and forcing
+numerics reproduced verbatim. Planet One replaced them deliberately, because
+backward compatibility is not a project objective (owner decision,
+2026-11-24).
+
+- **One geometry.** `InstantaneousInsolation` (uniform hour angle,
+  free-standing `solar_day`) and `TidallyLockedInsolation` (fixed
+  substellar point, no orbit) are removed. So are their configuration kinds
+  `instantaneous` and `tidally_locked`; the builder rejects them with a
+  pointer to tag `substrate-cpu-verified-v1`, where the code that ran the
+  archived experiments is preserved. `orbital` replaces both.
+- **Presets.**
+  - `dev-thai-*` state the THAI fixed substellar point as a circular,
+    synchronous 6.1-day orbit. The forcing equals the archived formula to
+    ≤ 1e-12 S.
+  - `dev-mars-gray-flat*` state their 88 440 s sol as the mean solar day of
+    the orbital geometry. Declination and distance equal the archived
+    formulas to ≤ 1e-12. The hour angle now includes the equation of time,
+    and the difference from the archived uniform hour angle is checked
+    against its analytic form to ≤ 1e-9 rad.
+  - `jupiter-schneider-liu` states its orbital period. That has no effect
+    at zero eccentricity and obliquity.
+  - `tests/insolation_migration.py` performs these checks against the
+    archived configurations.
+- **Hashes, signatures and resume.** The changed presets have new
+  `config_sha256` values. Archived runs keep theirs, and their evidence is
+  untouched. Checkpoints already refuse to resume across commits.
+  Insolation signatures are now `{"kind": "orbital"|"diurnal_mean",
+  "illumination": ...}`.
+- **Ben 2 (THAI).** The frozen Ben 2 requirement G8 asks for bitwise
+  reproduction of the archived THAI run at a new commit. The unified
+  geometry changes the zenith cosine at round-off level, so that literal
+  comparison no longer holds at current commits. The historical requirement
+  and evidence are not altered. Verification criteria appropriate to the
+  current implementation are to be set when atmospheric coupling resumes.
+- **Planet presets.** `physics.planets.PLANETS` builds each body's geometry
+  from the fact-sheet stellar constant (at r = a), period, eccentricity,
+  obliquity and L_s of perihelion. Venus is ε = 177.36° with a positive
+  angular speed.
 
 ## Packaging
 
