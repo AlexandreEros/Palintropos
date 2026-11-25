@@ -1,0 +1,345 @@
+{
+ "heat1d": "phayne/heat1d@5b73a6c1ba5047f59f6210185b37539e46e68136",
+ "model": "TWO",
+ "geothermal_flux": 0.02,
+ "differences": [
+  "cell means (ours) vs node values (heat1d)",
+  "Newton-coupled properties and skin (ours) vs operator-split surface Newton with properties lagged one step (heat1d)",
+  "Kirchhoff half-cell skin flux (ours) vs 3-point surface gradient with k at the surface node (heat1d)",
+  "series half-cell interface conductance (ours) vs node-based property placement with a node at 2 cm (heat1d)"
+ ],
+ "levels": [
+  {
+   "level": 0,
+   "ours": {
+    "grid": [
+     0.002,
+     1.1
+    ],
+    "steps": 2160,
+    "status": {
+     "status": "PERIODIC",
+     "cycle": 31,
+     "stage": "production",
+     "consecutive_periodic_production_cycles": 2,
+     "label": "PERIODIC (G-P2 met in 2 consecutive production cycles)"
+    }
+   },
+   "heat1d": {
+    "m": [
+     40,
+     4
+    ],
+    "steps": 2160
+   },
+   "columns": {
+    "0N 0E": {
+     "heat1d_cycles": 9,
+     "heat1d_last_cycle_change_K": 0.009579067922743434,
+     "max_abs_dTs_K": 3.748896903710147,
+     "rms_dTs_K": 2.1721559969939293,
+     "Tmax_ours": 700.00910985857,
+     "Tmax_heat1d": 700.0476338728515,
+     "Tmin_ours": 107.7899162671556,
+     "Tmin_heat1d": 105.04906786820676,
+     "nodes": 24,
+     "cells_ours": 45
+    },
+    "0N 90E": {
+     "heat1d_cycles": 8,
+     "heat1d_last_cycle_change_K": 0.009167408742214889,
+     "max_abs_dTs_K": 3.7861003523404406,
+     "rms_dTs_K": 2.0288038381818616,
+     "Tmax_ours": 568.0220017740928,
+     "Tmax_heat1d": 568.079319516309,
+     "Tmin_ours": 97.96752261608896,
+     "Tmin_heat1d": 95.43451374216036,
+     "nodes": 24,
+     "cells_ours": 45
+    }
+   }
+  },
+  {
+   "level": 1,
+   "ours": {
+    "grid": [
+     0.001,
+     1.0488
+    ],
+    "steps": 4320,
+    "status": {
+     "status": "PERIODIC",
+     "cycle": 35,
+     "stage": "production",
+     "consecutive_periodic_production_cycles": 2,
+     "label": "PERIODIC (G-P2 met in 2 consecutive production cycles)"
+    }
+   },
+   "heat1d": {
+    "m": [
+     80,
+     8
+    ],
+    "steps": 4320
+   },
+   "columns": {
+    "0N 0E": {
+     "heat1d_cycles": 7,
+     "heat1d_last_cycle_change_K": 0.008782945034340628,
+     "max_abs_dTs_K": 4.097442174561166,
+     "rms_dTs_K": 1.1245962762086397,
+     "Tmax_ours": 700.009049024112,
+     "Tmax_heat1d": 700.0283607763431,
+     "Tmin_ours": 107.79683897664182,
+     "Tmin_heat1d": 106.4213228549068,
+     "nodes": 43,
+     "cells_ours": 86
+    },
+    "0N 90E": {
+     "heat1d_cycles": 6,
+     "heat1d_last_cycle_change_K": 0.008930615697607891,
+     "max_abs_dTs_K": 2.5612143979871576,
+     "rms_dTs_K": 1.0219269145331527,
+     "Tmax_ours": 568.0221246585245,
+     "Tmax_heat1d": 568.050720364098,
+     "Tmin_ours": 97.9733681656895,
+     "Tmin_heat1d": 96.72102598521418,
+     "nodes": 43,
+     "cells_ours": 86
+    }
+   }
+  },
+  {
+   "level": 2,
+   "ours": {
+    "grid": [
+     0.0005,
+     1.0241
+    ],
+    "steps": 8640,
+    "status": {
+     "status": "PERIODIC",
+     "cycle": 34,
+     "stage": "production",
+     "consecutive_periodic_production_cycles": 2,
+     "label": "PERIODIC (G-P2 met in 2 consecutive production cycles)"
+    }
+   },
+   "heat1d": {
+    "m": [
+     160,
+     16
+    ],
+    "steps": 8640
+   },
+   "columns": {
+    "0N 0E": {
+     "heat1d_cycles": 4,
+     "heat1d_last_cycle_change_K": 0.008751621442726787,
+     "max_abs_dTs_K": 2.3978743419692705,
+     "rms_dTs_K": 0.5864991481959448,
+     "Tmax_ours": 700.0091812766365,
+     "Tmax_heat1d": 700.018825814312,
+     "Tmin_ours": 107.79811854627124,
+     "Tmin_heat1d": 107.08699350206061,
+     "nodes": 83,
+     "cells_ours": 167
+    },
+    "0N 90E": {
+     "heat1d_cycles": 4,
+     "heat1d_last_cycle_change_K": 0.007269921207793573,
+     "max_abs_dTs_K": 1.363041532011053,
+     "rms_dTs_K": 0.525456395685156,
+     "Tmax_ours": 568.0221170859123,
+     "Tmax_heat1d": 568.0365736034043,
+     "Tmin_ours": 97.97449461486573,
+     "Tmin_heat1d": 97.33436500141669,
+     "nodes": 83,
+     "cells_ours": 167
+    }
+   }
+  },
+  {
+   "level": 3,
+   "ours": {
+    "grid": [
+     0.00025,
+     1.012
+    ],
+    "steps": 17280,
+    "status": {
+     "status": "PERIODIC",
+     "cycle": 2,
+     "stage": "production",
+     "consecutive_periodic_production_cycles": 2,
+     "label": "PERIODIC (G-P2 met in 2 consecutive production cycles)"
+    }
+   },
+   "heat1d": {
+    "m": [
+     320,
+     32
+    ],
+    "steps": 17280
+   },
+   "columns": {
+    "0N 0E": {
+     "heat1d_cycles": 3,
+     "heat1d_last_cycle_change_K": 0.006237637885760705,
+     "max_abs_dTs_K": 1.3341841159350594,
+     "rms_dTs_K": 0.29407073079670626,
+     "Tmax_ours": 700.0091992624787,
+     "Tmax_heat1d": 700.0139350660627,
+     "Tmin_ours": 107.7985654944822,
+     "Tmin_heat1d": 107.44128956168545,
+     "nodes": 160,
+     "cells_ours": 330
+    },
+    "0N 90E": {
+     "heat1d_cycles": 3,
+     "heat1d_last_cycle_change_K": 0.00622877557486845,
+     "max_abs_dTs_K": 0.6906466151510955,
+     "rms_dTs_K": 0.26118924484909756,
+     "Tmax_ours": 568.0221259051384,
+     "Tmax_heat1d": 568.0292233317268,
+     "Tmin_ours": 97.97348323915048,
+     "Tmin_heat1d": 97.65430450874284,
+     "nodes": 160,
+     "cells_ours": 330
+    }
+   }
+  }
+ ],
+ "verdict": {
+  "0N 0E": {
+   "strict": {
+    "max_abs_dTs_native_by_level_K": [
+     3.748896903710147,
+     4.097442174561166,
+     2.3978743419692705
+    ],
+    "rms_by_level_K": [
+     2.1721559969939293,
+     1.1245962762086397,
+     0.5864991481959448
+    ],
+    "finest_max_K": 2.3978743419692705,
+    "at_cycle_fraction": 0.7501157407407407,
+    "ours_K": 116.39165292689498,
+    "heat1d_K": 113.9937785849257,
+    "e_ours_K": 0.9794132334802831,
+    "e_heat1d_K": 1.0794122823640417,
+    "order_ours": 0.9015170139857934,
+    "order_heat1d": 0.9125199501666663,
+    "bound_K": 2.258825515844325,
+    "pass": false
+   },
+   "diagnostic_coarse_times": {
+    "max_abs_dTs_by_level_K": [
+     3.748896903710147,
+     3.0926267997817263,
+     1.6472514643178897
+    ],
+    "bound_K": 1.8717411256217418,
+    "would_pass": true
+   }
+  },
+  "0N 90E": {
+   "strict": {
+    "max_abs_dTs_native_by_level_K": [
+     3.7861003523404406,
+     2.5612143979871576,
+     1.363041532011053
+    ],
+    "rms_by_level_K": [
+     2.0288038381818616,
+     1.0219269145331527,
+     0.525456395685156
+    ],
+    "finest_max_K": 1.363041532011053,
+    "at_cycle_fraction": 0.5409722222222222,
+    "ours_K": 106.02431086521784,
+    "heat1d_K": 104.66126933320679,
+    "e_ours_K": 0.624268130338438,
+    "e_heat1d_K": 1.0158660617862723,
+    "order_ours": 0.8345280535837147,
+    "order_heat1d": 0.9415130299604426,
+    "bound_K": 1.84013419212471,
+    "pass": true
+   },
+   "diagnostic_coarse_times": {
+    "max_abs_dTs_by_level_K": [
+     3.7861003523404406,
+     2.4771819198756333,
+     1.3029618085379724
+    ],
+    "bound_K": 1.7610463688349267,
+    "would_pass": true
+   }
+  }
+ },
+ "pass": false,
+ "verdict_note": "Strict evaluation decides. At 0N 0E the finest-level maximum occurs at the first sunrise step. A failure here needs an owner decision; the diagnostic sampling must not be used to pass.",
+ "verdict_R2": {
+  "columns": {
+   "0N 0E": {
+    "finest_native_max_K": 1.3341841159350594,
+    "native_max_by_level_K": [
+     3.748896903710147,
+     4.097442174561166,
+     2.3978743419692705,
+     1.3341841159350594
+    ],
+    "rms_by_level_K": [
+     2.1721559969939293,
+     1.1245962762086397,
+     0.5864991481959448,
+     0.29407073079670626
+    ],
+    "sunrise_window_max_by_level_K": [
+     2.9529708778405848,
+     4.097442174561166,
+     2.3978743419692705,
+     1.3341841159350594
+    ],
+    "at_cycle_fraction": 0.7501736111111111,
+    "e_ours_K": 0.7006779270941333,
+    "e_heat1d_K": 1.1312637255984694,
+    "order_ours": 0.8110276768796187,
+    "order_heat1d": 0.6275460244993921,
+    "bound_K": 2.031941652692603,
+    "satisfied": true
+   },
+   "0N 90E": {
+    "finest_native_max_K": 0.6906466151510955,
+    "native_max_by_level_K": [
+     3.7861003523404406,
+     2.5612143979871576,
+     1.363041532011053,
+     0.6906466151510955
+    ],
+    "rms_by_level_K": [
+     2.0288038381818616,
+     1.0219269145331527,
+     0.525456395685156,
+     0.26118924484909756
+    ],
+    "sunrise_window_max_by_level_K": [
+     0.05768035970095298,
+     0.028758636052884867,
+     0.014541372206622327,
+     0.007139176538430547
+    ],
+    "at_cycle_fraction": 0.5409143518518519,
+    "e_ours_K": 0.2662408486401728,
+    "e_heat1d_K": 0.6429684087791588,
+    "order_ours": 0.9681568680140484,
+    "order_heat1d": 0.8524261757248082,
+    "bound_K": 1.1092092574193315,
+    "satisfied": true
+   }
+  },
+  "satisfied": true,
+  "note": "R2 four-level evidence; R1's three-level FAIL stays recorded"
+ }
+}

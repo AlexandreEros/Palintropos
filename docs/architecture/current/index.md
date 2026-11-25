@@ -10,13 +10,14 @@ Explore dependencies, call sites, possible dispatch, runtime observations and pr
 |---|---|---|---|---|
 | [`tropoi`](packages/tropoi.md) | 1 | 0 | 0 | `README.md` |
 | [`tropoi.cli`](packages/tropoi.cli.md) | 6 | 0 | 24 | `README.md` |
-| [`tropoi.physics`](packages/tropoi.physics.md) | 19 | 28 | 45 | `README.md` |
+| [`tropoi.physics`](packages/tropoi.physics.md) | 20 | 36 | 48 | `README.md` |
 | [`tropoi.physics.radiation`](packages/tropoi.physics.radiation.md) | 6 | 14 | 23 | `README.md` |
 | [`tropoi.representation`](packages/tropoi.representation.md) | 2 | 0 | 1 | `README.md` |
 | [`tropoi.representation.archive`](packages/tropoi.representation.archive.md) | 13 | 19 | 30 | `README.md` |
 | [`tropoi.representation.diagnostics`](packages/tropoi.representation.diagnostics.md) | 9 | 19 | 28 | `README.md` |
 | [`tropoi.representation.visual`](packages/tropoi.representation.visual.md) | 28 | 62 | 91 | `ATMOSPHERE_VIEW.md`, `HELD_SUAREZ_CLIMATE.md`, `README.md`, `sky_view.html`, `terrain_globe.html` |
 | [`tropoi.run`](packages/tropoi.run.md) | 2 | 0 | 2 | `README.md` |
+| [`tropoi.run.airless`](packages/tropoi.run.airless.md) | 4 | 2 | 10 | – |
 | [`tropoi.run.bve`](packages/tropoi.run.bve.md) | 6 | 2 | 3 | `README.md` |
 | [`tropoi.run.custom`](packages/tropoi.run.custom.md) | 7 | 12 | 15 | `INITIAL_STATES.md`, `README.md` |
 | [`tropoi.run.held_suarez`](packages/tropoi.run.held_suarez.md) | 8 | 5 | 37 | `README.md` |
@@ -62,15 +63,16 @@ Explore dependencies, call sites, possible dispatch, runtime observations and pr
 | [`calls/sky-numpy-reference.mmd`](calls/sky-numpy-reference.mmd) | NumPy reference of the sky page's arithmetic (parity tests; the page never calls it) | `tropoi.representation.visual.sky.radiance_table`, `tropoi.representation.visual.sky.star_path_column`, `tropoi.representation.visual.sky.optical_depth_diagnostic`, `tropoi.physics.column.thin_atmosphere_mass_kg`, `tropoi.physics.column.thin_atmosphere_surface_pressure_pa`, `tropoi.physics.rayleigh.composition_cross_section` | [docs/architecture/subsystems/sky.md](../../../docs/architecture/subsystems/sky.md) |
 | [`calls/custom-initial-states.mmd`](calls/custom-initial-states.mmd) | Custom initial states from Python (src/tropoi/run/custom/INITIAL_STATES.md) | `tropoi.run.custom.execute.run_initial_state`, `tropoi.run.custom.presets.initial_state_from_preset`, `tropoi.run.custom.prepare.prepare_bve_state`, `tropoi.run.custom.prepare.prepare_swe_state` | – |
 | [`calls/terrain-raster.mmd`](calls/terrain-raster.mmd) | Terrain rasters from Python: read an elevation file, write 16-bit grey (src/tropoi/spatial/terrain/IMPORT.md) | `tropoi.spatial.terrain.raster.read_elevation`, `tropoi.spatial.terrain.raster.encode_grey16` | – |
+| [`calls/airless-mercury.mmd`](calls/airless-mercury.mmd) | Airless-body thermal experiment: presets and tier-2 output reader (Planet One) | `tropoi.run.airless.config.mercury_vpw99`, `tropoi.run.airless.config.mercury_hayne_analogue`, `tropoi.run.airless.experiment.load_tier2` | [docs/architecture/subsystems/airless.md](../../../docs/architecture/subsystems/airless.md) |
 
 ## Coverage
 
-* Packages: 25 discovered, 25 with a page.
-* Import module records: 181 discovered (including namespace placeholders), 181 listed on a package page.
-* Classes: 228 discovered, 228 drawn on a package page (21 in [the inheritance overview](class-inheritance.mmd)).
-* Both containment views cover 22 directories, 107 Python files, 228 class definitions, leaving out files and directories that define no class.
+* Packages: 26 discovered, 26 with a page.
+* Import module records: 186 discovered (including namespace placeholders), 186 listed on a package page.
+* Classes: 238 discovered, 238 drawn on a package page (21 in [the inheritance overview](class-inheritance.mmd)).
+* Both containment views cover 23 directories, 110 Python files, 238 class definitions, leaving out files and directories that define no class.
 * CLI handlers: 12 discovered, each with a call graph.
-* Public Python entry-point candidates: 39; 14 are roots of declared paths, 25 excluded with a reason.
+* Public Python entry-point candidates: 42; 17 are roots of declared paths, 25 excluded with a reason.
 
 **Deliberate exclusions**
 

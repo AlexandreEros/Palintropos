@@ -1,0 +1,116 @@
+{
+ "run": "global2-gpu-vpw99-two-G0.02",
+ "config_sha256": "df71eaea89885ece85c3a7cb25bb68080100159131f767ebce3ad244e425fdef",
+ "code": {
+  "git_commit": "3d05287f73d9a7fe731b480495ca035c9b3b2f4b",
+  "git_dirty": false
+ },
+ "backend": "cupy",
+ "environment": {
+  "python": "3.13.16",
+  "numpy": "2.4.6",
+  "platform": "Linux-6.6.159+-x86_64-with-glibc2.39",
+  "cupy": "14.0.1",
+  "cuda_runtime": 13000,
+  "cuda_driver": 13000,
+  "device": "Tesla T4"
+ },
+ "hardware": "Google Colab Tesla T4 15360 MiB, driver 580.82.07",
+ "device_memory_used_bytes_profile": 9733120,
+ "grid": "2 deg regular (90 x 180 = 16200 columns), 51 cells to 1 m",
+ "configuration": "VPW99 TWO, G = 0.02 W m^-2, 4320 steps per solar day",
+ "runtime_hours": 1.629,
+ "cycles": {
+  "spinup": 27,
+  "production": 7
+ },
+ "status": {
+  "status": "PERIODIC",
+  "cycle": 33,
+  "stage": "production",
+  "consecutive_periodic_production_cycles": 2,
+  "label": "PERIODIC (G-P2 met in 2 consecutive production cycles)"
+ },
+ "final_cycle": {
+  "cycle": 33,
+  "stage": "production",
+  "steps": 4320,
+  "dt_s": 3518.7786378071046,
+  "max_energy_imbalance_W_m2": 0.000407132873301277,
+  "mean_absorbed_W_m2": 2088.3922108944926,
+  "mean_emitted_W_m2": 2088.4123639896043,
+  "global_residual_over_tolerance": 0.0012306485528849353,
+  "max_cell_residual_ratio": 0.9999997490832252,
+  "max_newton_iterations": 4,
+  "extent_K": [
+   [
+    63.07625902073397,
+    699.9567416154605
+   ],
+   [
+    81.39040515635799,
+    659.2372724606805
+   ]
+  ],
+  "surface_T_range_K": [
+   62.44405477661468,
+   699.9567416154605
+  ],
+  "max_surface_change_K": 0.0005011814373006018,
+  "max_subsurface_change_K": 0.006916858101874368,
+  "bottom_drift_K": 0.00554197056447947,
+  "periodic": true,
+  "wall_s": 456.16409826278687
+ },
+ "G-G": {
+  "run": "/content/runs/planet-one/global2-gpu-vpw99-two-G0.02",
+  "backend": "cupy",
+  "cycle": 33,
+  "steps": 4320,
+  "columns": [
+   7920,
+   7964,
+   8009,
+   8054,
+   12060,
+   15660
+  ],
+  "lat_deg": [
+   -1.0,
+   -1.0,
+   -1.0,
+   -1.0,
+   45.0,
+   85.0
+  ],
+  "lon_deg": [
+   1.0,
+   89.0,
+   179.0,
+   269.0,
+   1.0,
+   1.0
+  ],
+  "max_abs_surface_fields_diff": 0.0,
+  "max_abs_profile_diff_K": 0.0,
+  "max_abs_end_state_diff_K": 0.0,
+  "bound_K": 1e-12,
+  "pass": true
+ },
+ "energy_balance": {
+  "mean_absorbed_W_m2": 2088.3922108944926,
+  "mean_emitted_W_m2": 2088.4123639896043,
+  "emitted_minus_absorbed_W_m2": 0.020153095111709263,
+  "geothermal_flux_W_m2": 0.02
+ },
+ "validity": "temperature extents within the Ledlow 1992 law's positive domain (>10.13 K) in both strata; no EXTRAPOLATED flag",
+ "preserved_locally": {
+  "mercury-view.html": "sha256 6568a84a45fdd5d4b0b71c2242bb5a05b31c9cd8fd070c1d9f50f1fa58d4f47a",
+  "global2-small.tar.gz (config, cycles, events, gg, grid, SHA256SUMS, retained status/integrals/blocks/state, series)": "sha256 59a0d48fad97dbbb4eb414da7862bec4f727fda6f4578d46f39221d7f59a8377",
+  "x_surface_Ts_absorbed.npy (retained cycle, 720 samples x [T_s, absorbed] x 16200, float64)": "sha256 06c2d85795548ee9dc90e818d0df40f5f0a4ed8627b79c557fa8b1e919cb6a55",
+  "x_profiles_subset.npz (full T(z), 180 samples, equatorial row + canonical + 72 subset columns)": "sha256 196bfc247edf8b834681c83f56ec6a28b7eb19738cec36779fdf3fc535c45e5d"
+ },
+ "not_preserved": "The remaining full-precision tier-2 profiles (~2 GB) stayed on the Colab VM (Drive mount needs interactive authentication) and were released with the session.",
+ "colab_compute_units_used_session": 2.58,
+ "reproducibility": "Demonstrated: (1) G-G - replaying the retained cycle of six columns standalone from the saved start state reproduced the global run's tier-2 samples and end state bitwise on the same T4 and software stack; (2) G-GPU - CPU and GPU agree to 1.9e-11 K over a production cycle. Not demonstrated: that rerunning the whole experiment from scratch reproduces the discarded ~2 GB of full-resolution profiles bitwise. That is an expectation (deterministic code, fixed configuration and commit 3d05287, same hardware and software stack), not a tested result; on a different stack only agreement within the G-GPU tolerance is expected."
+}

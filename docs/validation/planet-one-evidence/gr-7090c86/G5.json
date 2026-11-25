@@ -1,0 +1,26 @@
+{
+ "gate": "G5",
+ "mandatory": true,
+ "pass": true,
+ "steps": 100000,
+ "tolerance_ratio": 1e-12,
+ "columns": [
+  {
+   "F_b": 0.0,
+   "max_ratio": 1.9647940752582802e-16,
+   "at_step": 21
+  },
+  {
+   "F_b": 0.1,
+   "max_ratio": 1.411503624687282e-16,
+   "at_step": 6
+  },
+  {
+   "F_b": -0.1,
+   "max_ratio": 1.9727441854257957e-16,
+   "at_step": 9
+  }
+ ],
+ "applied_flux_equals_prescribed_last_step": false,
+ "wall_s": 82.38246154785156
+}

@@ -1,0 +1,9 @@
+{
+ "commit": "3bce170c3f55860ca5cfa753f5e0c68e14dcdd2c (feature/planet-one-geometry, PR #66 head)",
+ "hardware": "Google Colab Tesla T4, driver 580.82.07",
+ "software": {"python": "3.13.16", "numpy": "2.4.6", "scipy": "1.16.3", "cupy": "14.0.1", "cuda_runtime": 13000},
+ "command": "pytest tests/test_radiative_dynamical.py tests/test_physics_columns.py tests/test_physics_shared.py tests/test_illumination_geometry.py tests/test_radiation_ktable_config.py tests/test_radiation_evidence.py",
+ "result": "154 passed, 9 skipped",
+ "covered_on_gpu": "flat-Mars presets through OrbitalInsolation on CuPy, including the one-day atmosphere and slab budget tests (pilot, sponge, implicit exchange)",
+ "not_covered": "THAI Ben 1/2 GPU tests: 9 skipped because the imported THAI k-tables (SOCRATES-derived) are not on the VM; THAI forcing equivalence is covered on the CPU by tests/insolation_migration.py (<= 1e-12 S)"
+}

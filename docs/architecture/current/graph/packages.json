@@ -198,6 +198,20 @@
     },
     {
       "kind": "imports",
+      "module_edges": 4,
+      "runtime_module_edges": 4,
+      "source": "tropoi.run.airless",
+      "target": "tropoi.physics"
+    },
+    {
+      "kind": "imports",
+      "module_edges": 1,
+      "runtime_module_edges": 1,
+      "source": "tropoi.run.airless",
+      "target": "tropoi.run.held_suarez"
+    },
+    {
+      "kind": "imports",
       "module_edges": 1,
       "runtime_module_edges": 1,
       "source": "tropoi.run.bve",
@@ -724,8 +738,8 @@
     },
     {
       "id": "tropoi.physics",
-      "internal_edges": 31,
-      "modules": 18
+      "internal_edges": 34,
+      "modules": 19
     },
     {
       "id": "tropoi.physics.radiation",
@@ -756,6 +770,11 @@
       "id": "tropoi.run",
       "internal_edges": 0,
       "modules": 1
+    },
+    {
+      "id": "tropoi.run.airless",
+      "internal_edges": 3,
+      "modules": 3
     },
     {
       "id": "tropoi.run.bve",

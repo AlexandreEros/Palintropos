@@ -1,0 +1,20 @@
+{
+ "commit": "d3801c76792feb5dcaa73849225f67f63176e00a",
+ "hardware": {"platform": "Google Colab", "gpu": "Tesla T4", "gpu_memory_MiB": 15360, "driver": "580.82.07"},
+ "software": {"python": "3.13.16", "numpy": "2.4.6", "scipy": "1.16.3", "cupy": "14.0.1", "cuda_runtime": 13000, "pytest": "8.4.2"},
+ "precision": "FP64 throughout",
+ "profile_production_grid": {
+  "configuration": "VPW99 TWO, top cell 1 mm, stretch 1.0488, depth 1 m (51 layers), production dt (4320 steps per solar day)",
+  "columns_16200": {"seconds_per_step": 0.0846, "newton_iterations_mean": 3.0, "system_assembly_s": 0.0659, "tridiagonal_s": 0.0338, "production_cycle_minutes": 6.09, "device_memory_bytes": 9733120},
+  "columns_4050": {"seconds_per_step": 0.0613, "system_assembly_s": 0.0330, "tridiagonal_s": 0.0211},
+  "cpu_reference_2000_columns_contended_8_threads": {"seconds_per_step": 0.592, "system_assembly_s": 0.492, "tridiagonal_s": 0.0142},
+  "decision": "No specialized CUDA tridiagonal kernel. The backend-generic Thomas solve is ~31% of the instrumented GPU step, and the step is launch-bound (4x the columns costs only 1.4x the time), so a fused kernel could save at most ~30% of a ~1-1.5 h experiment. The single implementation is kept."
+ },
+ "G-GPU": {
+  "1_mercury_columns_one_production_cycle": {"max_abs_T_GPU_minus_T_CPU_K": 1.8985701899509877e-11, "bound_K": 1e-6, "newton_iteration_count_differences": "0 of 4320", "pass": true},
+  "2_energy_closure_on_gpu": "pass",
+  "3_manufactured_solution_errors_match_cpu_rel_1e-9": "pass",
+  "4_G4_G5_on_gpu": "pass",
+  "suite": "78 passed on the T4 (tests/test_substrate_gpu.py + substrate, nonlinear, heat-capacity, geometry suites)"
+ }
+}

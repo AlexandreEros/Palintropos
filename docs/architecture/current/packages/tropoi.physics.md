@@ -16,6 +16,7 @@ Index: [all packages](../index.md) · parent [`tropoi`](tropoi.md) · [`tropoi.p
 | `tropoi.physics.constants` | code | – | – |
 | `tropoi.physics.convection` | code | `DryConvectiveAdjustment` | `neutral_profile` |
 | `tropoi.physics.insolation` | code | `DiurnalMeanInsolation`, `LightSource`, `OrbitalInsolation`, `PrescribedInsolation`, `StellarIllumination` | `frierson_net_surface_flux`, `illumination_from_spec`, `insolation_from_spec` |
+| `tropoi.physics.materials` | code | `CellMaterials`, `DepthProfile`, `PiecewiseHeatCapacity`, `PolynomialHeatCapacity`, `SaturatingExponentialHeatCapacity`, `Stratum` | `heat_capacity_from_dict`, `ledlow_1992`, `stratified_interfaces` |
 | `tropoi.physics.monin_obukhov` | code | `MoninObukhovConvergenceError`, `MoninObukhovOptions`, `SurfaceExchange` | `diffusivities`, `solve_zeta`, `stability_derivative_m`, `stability_derivative_t`, `stability_integral_m`, `stability_integral_t`, `stable_mix`, `surface_drag` |
 | `tropoi.physics.monin_obukhov_cuda` | code | – | `clear_cache`, `kernel_available`, `surface_drag_fused` |
 | `tropoi.physics.orbit` | code | `KeplerOrbit` | `eccentric_from_mean`, `eccentric_from_true`, `mean_from_true`, `true_from_eccentric`, `true_from_mean` |
@@ -24,7 +25,7 @@ Index: [all packages](../index.md) · parent [`tropoi`](tropoi.md) · [`tropoi.p
 | `tropoi.physics.rotation` | code | `Rotation` | `rotation_x`, `rotation_z` |
 | `tropoi.physics.species` | code | `Species` | `dataset_identities`, `load_dataset` |
 | `tropoi.physics.star` | code | `ApparentStar`, `Star` | `planck_radiance` |
-| `tropoi.physics.substrate` | code | `ConductiveSubstrate`, `SubstrateState` | `geometric_interfaces` |
+| `tropoi.physics.substrate` | code | `ConductiveSubstrate`, `StepReport`, `SubstrateSolveError`, `SubstrateState` | `geometric_interfaces` |
 | `tropoi.physics.surface` | code | `SlabSurface` | `drag_coefficient`, `monin_obukhov_sensible_heat_flux`, `sensible_heat_flux` |
 | `tropoi.physics.thermodynamics` | code | `ThermoRecord` | `cp_molar`, `heat_capacity`, `heat_capacity_range`, `hydrogen_rotational_cv`, `kappa` |
 
@@ -47,6 +48,7 @@ flowchart LR
         n_tropoi_ophysics_oconstants["physics.constants"]
         n_tropoi_ophysics_oconvection["physics.convection"]
         n_tropoi_ophysics_oinsolation["physics.insolation"]
+        n_tropoi_ophysics_omaterials["physics.materials"]
         n_tropoi_ophysics_omonin__obukhov["physics.monin#95;obukhov"]
         n_tropoi_ophysics_omonin__obukhov__cuda["physics.monin#95;obukhov#95;cuda"]
         n_tropoi_ophysics_oorbit["physics.orbit"]
@@ -61,6 +63,7 @@ flowchart LR
     end
     p_tropoi_ophysics_oradiation["package physics.radiation"]
     p_tropoi_orepresentation_ovisual["package representation.visual"]
+    p_tropoi_orun_oairless["package run.airless"]
     p_tropoi_orun_oradiative["package run.radiative"]
     p_tropoi_otemporal_otendencies["package temporal.tendencies"]
     n_tropoi_ophysics_oboundary__layer -.-> n_tropoi_ophysics_omonin__obukhov
@@ -75,6 +78,7 @@ flowchart LR
     n_tropoi_ophysics_oinsolation --> n_tropoi_ophysics_oorbit
     n_tropoi_ophysics_oinsolation --> n_tropoi_ophysics_orotation
     n_tropoi_ophysics_oinsolation --> n_tropoi_ophysics_ostar
+    n_tropoi_ophysics_omaterials -.-> n_tropoi_ophysics_osubstrate
     n_tropoi_ophysics_omonin__obukhov__cuda --> n_tropoi_ophysics_omonin__obukhov
     n_tropoi_ophysics_oorbit --> n_tropoi_ophysics_oconstants
     n_tropoi_ophysics_oorbit -.-> n_tropoi_ophysics_orotation
@@ -90,6 +94,8 @@ flowchart LR
     n_tropoi_ophysics_orayleigh --> n_tropoi_ophysics_ospecies
     n_tropoi_ophysics_ostar --> n_tropoi_ophysics_oconstants
     n_tropoi_ophysics_ostar --> n_tropoi_ophysics_ospecies
+    n_tropoi_ophysics_osubstrate --> n_tropoi_ophysics_oconstants
+    n_tropoi_ophysics_osubstrate --> n_tropoi_ophysics_omaterials
     n_tropoi_ophysics_osurface -.-> n_tropoi_ophysics_omonin__obukhov
     n_tropoi_ophysics_othermodynamics --> n_tropoi_ophysics_ocomposition
     n_tropoi_ophysics_othermodynamics --> n_tropoi_ophysics_oconstants
@@ -101,6 +107,10 @@ flowchart LR
     p_tropoi_orepresentation_ovisual -->|1| n_tropoi_ophysics_orayleigh
     p_tropoi_orepresentation_ovisual -->|1| n_tropoi_ophysics_ospecies
     p_tropoi_orepresentation_ovisual -->|1| n_tropoi_ophysics_ostar
+    p_tropoi_orun_oairless -->|1| n_tropoi_ophysics_oconstants
+    p_tropoi_orun_oairless -->|1| n_tropoi_ophysics_oinsolation
+    p_tropoi_orun_oairless -->|1| n_tropoi_ophysics_omaterials
+    p_tropoi_orun_oairless -->|1| n_tropoi_ophysics_osubstrate
     p_tropoi_orun_oradiative -->|1| n_tropoi_ophysics_ocolumn__model
     p_tropoi_orun_oradiative -.->|1| n_tropoi_ophysics_ocomposition
     p_tropoi_orun_oradiative -->|1| n_tropoi_ophysics_oconvection
@@ -116,13 +126,14 @@ flowchart LR
     classDef other fill:none,stroke-dasharray:3 3
     class p_tropoi_ophysics_oradiation other
     class p_tropoi_orepresentation_ovisual other
+    class p_tropoi_orun_oairless other
     class p_tropoi_orun_oradiative other
     class p_tropoi_otemporal_otendencies other
 ```
 
 ## Classes
 
-28 classes, each with the functions defined in its body (`$`: class/static method; no parentheses: property). Edges: inheritance (`<|--`) and nesting (`*--`) only.
+36 classes, each with the functions defined in its body (`$`: class/static method; no parentheses: property). Edges: inheritance (`<|--`) and nesting (`*--`) only.
 
 ```mermaid
 %% Generated by tools.architecture 2.3.0. Do not edit by hand.
@@ -219,6 +230,35 @@ classDiagram
     c_tropoi_ophysics_oinsolation_oStellarIllumination : +true#95;anomaly()
     c_tropoi_ophysics_oinsolation_oStellarIllumination : +with#95;rotation()
     c_tropoi_ophysics_oinsolation_oStellarIllumination : +with#95;subsolar#95;longitude#95;at()
+    class c_tropoi_ophysics_omaterials_oCellMaterials["CellMaterials (physics.materials)"]
+    c_tropoi_ophysics_omaterials_oCellMaterials : +conductivity()$
+    c_tropoi_ophysics_omaterials_oCellMaterials : +conductivity#95;derivative()$
+    c_tropoi_ophysics_omaterials_oCellMaterials : +enthalpy#95;difference()
+    c_tropoi_ophysics_omaterials_oCellMaterials : +kirchhoff#95;difference()$
+    c_tropoi_ophysics_omaterials_oCellMaterials : +on()
+    c_tropoi_ophysics_omaterials_oCellMaterials : +on#95;grid()$
+    c_tropoi_ophysics_omaterials_oCellMaterials : +specific#95;heat()
+    class c_tropoi_ophysics_omaterials_oDepthProfile["DepthProfile (physics.materials)"]
+    c_tropoi_ophysics_omaterials_oDepthProfile : +#95;#95;call#95;#95;()
+    c_tropoi_ophysics_omaterials_oDepthProfile : +#95;#95;post#95;init#95;#95;()
+    c_tropoi_ophysics_omaterials_oDepthProfile : +to#95;dict()
+    class c_tropoi_ophysics_omaterials_oPiecewiseHeatCapacity["PiecewiseHeatCapacity (physics.materials)"]
+    c_tropoi_ophysics_omaterials_oPiecewiseHeatCapacity : +enthalpy#95;difference()
+    c_tropoi_ophysics_omaterials_oPiecewiseHeatCapacity : +specific#95;heat()
+    c_tropoi_ophysics_omaterials_oPiecewiseHeatCapacity : +to#95;dict()
+    class c_tropoi_ophysics_omaterials_oPolynomialHeatCapacity["PolynomialHeatCapacity (physics.materials)"]
+    c_tropoi_ophysics_omaterials_oPolynomialHeatCapacity : +#95;#95;post#95;init#95;#95;()
+    c_tropoi_ophysics_omaterials_oPolynomialHeatCapacity : +enthalpy#95;difference()
+    c_tropoi_ophysics_omaterials_oPolynomialHeatCapacity : +specific#95;heat()
+    c_tropoi_ophysics_omaterials_oPolynomialHeatCapacity : +to#95;dict()
+    class c_tropoi_ophysics_omaterials_oSaturatingExponentialHeatCapacity["SaturatingExponentialHeatCapacity (physics.materials)"]
+    c_tropoi_ophysics_omaterials_oSaturatingExponentialHeatCapacity : +enthalpy#95;difference()
+    c_tropoi_ophysics_omaterials_oSaturatingExponentialHeatCapacity : +specific#95;heat()
+    c_tropoi_ophysics_omaterials_oSaturatingExponentialHeatCapacity : +to#95;dict()
+    class c_tropoi_ophysics_omaterials_oStratum["Stratum (physics.materials)"]
+    c_tropoi_ophysics_omaterials_oStratum : +#95;#95;post#95;init#95;#95;()
+    c_tropoi_ophysics_omaterials_oStratum : +to#95;dict()
+    c_tropoi_ophysics_omaterials_oStratum : +volumetric()$
     class c_tropoi_ophysics_omonin__obukhov_oMoninObukhovConvergenceError["MoninObukhovConvergenceError (physics.monin#95;obukhov)"]
     c_tropoi_ophysics_omonin__obukhov_oMoninObukhovConvergenceError : +#95;#95;init#95;#95;()
     c_tropoi_ophysics_omonin__obukhov_oMoninObukhovConvergenceError : external base RuntimeError
@@ -309,16 +349,26 @@ classDiagram
     c_tropoi_ophysics_ostar_oStar : +to#95;dict()
     class c_tropoi_ophysics_osubstrate_oConductiveSubstrate["ConductiveSubstrate (physics.substrate)"]
     c_tropoi_ophysics_osubstrate_oConductiveSubstrate : +#95;#95;init#95;#95;()
-    c_tropoi_ophysics_osubstrate_oConductiveSubstrate : +#95;constants()
-    c_tropoi_ophysics_osubstrate_oConductiveSubstrate : +#95;thomas()$
+    c_tropoi_ophysics_osubstrate_oConductiveSubstrate : +#95;consts()
+    c_tropoi_ophysics_osubstrate_oConductiveSubstrate : +#95;report()
+    c_tropoi_ophysics_osubstrate_oConductiveSubstrate : +#95;system()
+    c_tropoi_ophysics_osubstrate_oConductiveSubstrate : +#95;temperature#95;extent()
+    c_tropoi_ophysics_osubstrate_oConductiveSubstrate : +conductivity()
+    c_tropoi_ophysics_osubstrate_oConductiveSubstrate : +constant()$
     c_tropoi_ophysics_osubstrate_oConductiveSubstrate : +depth
     c_tropoi_ophysics_osubstrate_oConductiveSubstrate : +energy()
+    c_tropoi_ophysics_osubstrate_oConductiveSubstrate : +extent()
     c_tropoi_ophysics_osubstrate_oConductiveSubstrate : +initial#95;state()
     c_tropoi_ophysics_osubstrate_oConductiveSubstrate : +layers
     c_tropoi_ophysics_osubstrate_oConductiveSubstrate : +signature()
+    c_tropoi_ophysics_osubstrate_oConductiveSubstrate : +state#95;at()
     c_tropoi_ophysics_osubstrate_oConductiveSubstrate : +step()
     c_tropoi_ophysics_osubstrate_oConductiveSubstrate : +surface#95;temperature()
     c_tropoi_ophysics_osubstrate_oConductiveSubstrate : +temperature()
+    class c_tropoi_ophysics_osubstrate_oStepReport["StepReport (physics.substrate)"]
+    c_tropoi_ophysics_osubstrate_oStepReport : external base typing.NamedTuple
+    class c_tropoi_ophysics_osubstrate_oSubstrateSolveError["SubstrateSolveError (physics.substrate)"]
+    c_tropoi_ophysics_osubstrate_oSubstrateSolveError : external base ArithmeticError
     class c_tropoi_ophysics_osubstrate_oSubstrateState["SubstrateState (physics.substrate)"]
     c_tropoi_ophysics_osubstrate_oSubstrateState : external base typing.NamedTuple
     class c_tropoi_ophysics_osurface_oSlabSurface["SlabSurface (physics.surface)"]
@@ -331,6 +381,7 @@ classDiagram
 
 ## Entry paths through this package
 
+* [`calls/airless-mercury.mmd`](../calls/airless-mercury.mmd)
 * [`calls/sky-hypothetical.mmd`](../calls/sky-hypothetical.mmd)
 * [`calls/sky-numpy-reference.mmd`](../calls/sky-numpy-reference.mmd)
 * [`calls/sky-saved-column.mmd`](../calls/sky-saved-column.mmd)

@@ -165,3 +165,13 @@ reason = "capability probe for callers and tests deciding whether the fused path
 [[excluded]]
 function = "tropoi.physics.monin_obukhov_cuda.clear_cache"
 reason = "drops the compiled RawKernel so a test can force recompilation; no workflow starts here"
+
+[[entry_path]]
+name = "airless-mercury"
+title = "Airless-body thermal experiment: presets and tier-2 output reader (Planet One)"
+roots = [
+  "tropoi.run.airless.config.mercury_vpw99",
+  "tropoi.run.airless.config.mercury_hayne_analogue",
+  "tropoi.run.airless.experiment.load_tier2",
+]
+doc = "docs/architecture/subsystems/airless.md"

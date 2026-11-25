@@ -57,8 +57,8 @@
     {
       "direction": "down",
       "kind": "imports",
-      "module_edges": 11,
-      "package_edges": 2,
+      "module_edges": 15,
+      "package_edges": 3,
       "source": "run",
       "target": "physics",
       "type_checking_only_package_edges": 0
@@ -131,7 +131,7 @@
       "depth": 5,
       "id": "physics",
       "internal_package_edges": 1,
-      "modules": 23,
+      "modules": 24,
       "packages": 2
     },
     {
@@ -144,9 +144,9 @@
     {
       "depth": 1,
       "id": "run",
-      "internal_package_edges": 10,
-      "modules": 32,
-      "packages": 7
+      "internal_package_edges": 11,
+      "modules": 35,
+      "packages": 8
     },
     {
       "depth": 4,
