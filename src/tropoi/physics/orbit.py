@@ -64,38 +64,45 @@ def true_from_eccentric(ecc: float, e: float) -> float:
                             math.sqrt(1.0 - e) * math.cos(0.5 * ecc))
 
 
-def mean_from_true(nu: float, e: float) -> float:
-    """Mean anomaly M from true anomaly (Kepler's equation, radians)."""
-    ecc = eccentric_from_true(nu, e)
+def _kepler_mean(ecc: float, e: float) -> float:
+    if abs(ecc) < 0.5:
+        # Evaluate E - sin(E) by series where direct subtraction loses precision.
+        x2 = ecc * ecc
+        remainder = ecc * x2 * (
+            1 / 6 - x2 * (
+                1 / 120 - x2 * (
+                    1 / 5040 - x2 * (1 / 362880 - x2 * (1 / 39916800 - x2 / 6227020800))
+                )
+            )
+        )
+        return (1.0 - e) * ecc + e * remainder
     return ecc - e * math.sin(ecc)
 
 
-def eccentric_from_mean(mean: float, e: float) -> float:
-    """Solve Kepler's equation ``E - e sin E = M`` for the eccentric
-    anomaly, with M reduced to [-pi, pi) so that E stays small near
-    periapsis, where 1 - e cos E is smallest.
+def mean_from_true(nu: float, e: float) -> float:
+    """Mean anomaly M from true anomaly (Kepler's equation, radians)."""
+    return _kepler_mean(eccentric_from_true(nu, e), e)
 
-    Uses Newton iteration from ``M + e sin M`` (or from +-pi when
-    e > 0.8). It stops when the residual reaches round-off, 4 eps (|M| + 1),
-    or when the correction stops shrinking. It raises if the residual never
-    reaches round-off."""
-    eps = 2.220446049250313e-16
-    mean = (mean + math.pi) % _TWO_PI - math.pi
+
+def eccentric_from_mean(mean: float, e: float) -> float:
+    """Solve E - e sin E = M by Newton iteration with M reduced to [-pi, pi).
+
+    Test the correction in E, since a small residual can still imply a
+    large anomaly error when the derivative is small near periapsis.
+    """
+    mean = math.remainder(mean, _TWO_PI)
+    if mean == math.pi:
+        mean = -math.pi
+    if mean == 0.0:
+        return mean
     ecc = (math.copysign(math.pi, mean) if e > 0.8
            else mean + e * math.sin(mean))
-    floor = 4.0 * eps * (abs(mean) + 1.0)
-    previous = math.inf
     for _ in range(100):
-        f = ecc - e * math.sin(ecc) - mean
-        if abs(f) <= floor:
-            return ecc
-        step = f / (1.0 - e * math.cos(ecc))
-        if abs(step) >= previous and abs(step) <= 1e-12:
-            break
-        previous = abs(step)
+        derivative = (1.0 - e) + 2.0 * e * math.sin(0.5 * ecc)**2
+        step = (_kepler_mean(ecc, e) - mean) / derivative
+        if abs(step) <= 16.0 * math.ulp(ecc):
+            return ecc - step
         ecc -= step
-    if abs(ecc - e * math.sin(ecc) - mean) <= 16.0 * floor:
-        return ecc
     raise ArithmeticError(f"Kepler solve did not converge (M={mean}, e={e})")
 
 
@@ -227,7 +234,7 @@ class KeplerOrbit:
     def radius_at(self, true_anomaly_rad: float) -> float:
         """r(nu) = a (1 - e^2) / (1 + e cos nu)."""
         e = self.eccentricity
-        return (self.semimajor_axis_m * (1.0 - e * e)
+        return (self.periapsis_m * (1.0 + e)
                 / (1.0 + e * math.cos(true_anomaly_rad)))
 
     def orbit_to_inertial(self) -> np.ndarray:

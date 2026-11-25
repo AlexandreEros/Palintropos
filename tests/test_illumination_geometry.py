@@ -296,3 +296,46 @@ def test_spin_specifications():
         illumination_from_spec({**base, "spin": {"mean_solar_day": 1.0, "sidereal_period": 1.0}})
     with pytest.raises(ValueError):
         Rotation(-1.0)
+
+
+def test_near_parabolic_periapsis_and_flux():
+    e = 1.0 - 1.0e-10
+    g = _geometry(e=e, spins=1)
+    periapsis = g.orbit.semimajor_axis_m * (1.0 - e)
+    assert g.true_anomaly(0.0) == 0.0
+    assert np.linalg.norm(g.planet_position(0.0)) == pytest.approx(periapsis, rel=1e-13)
+    assert g.flux_at(0.0) == pytest.approx(L_SUN / (4.0 * math.pi * periapsis**2),
+                                           rel=1e-13)
+
+
+@pytest.mark.parametrize("ecc", [-1.0e-6, 1.0e-6])
+def test_near_parabolic_nonzero_mean_anomaly(ecc):
+    e = math.nextafter(1.0, 0.0)
+    # Kepler's equation from the sine series, without cancellation.
+    mean = (1.0 - e) * ecc + e * (ecc**3 / 6.0 - ecc**5 / 120.0)
+    assert eccentric_from_mean(mean, e) == pytest.approx(ecc, rel=1e-13, abs=0.0)
+
+
+def test_mean_solar_day_requires_central_primary():
+    companion = LightSource(L_SUN, orbit=KeplerOrbit(3.0e11), period_s=40 * DAY)
+    with pytest.raises(ValueError, match="central primary"):
+        _geometry(omega=0.0, sources=(companion,)).mean_solar_day
+    assert _geometry(omega=0.0, sources=(LightSource(L_SUN), companion)
+                     ).mean_solar_day == pytest.approx(10 * DAY)
+
+
+@pytest.mark.parametrize("spin, error", [
+    ({"subsolar_longitude_at_epoch_deg": 10.0}, "exactly one"),
+    ({"sidereal_period": DAY, "subsolar_longitude_at_epoc_deg": 10.0},
+     "subsolar_longitude_at_epoc_deg"),
+])
+def test_orbital_spin_options_are_validated(spin, error):
+    with pytest.raises(ValueError, match=error):
+        insolation_from_spec({"kind": "orbital", "stellar_constant": 589.0,
+                              "period": 10 * DAY, "spin": spin})
+
+
+def test_diurnal_mean_can_omit_spin():
+    forcing = insolation_from_spec({"kind": "diurnal_mean", "stellar_constant": 589.0,
+                                   "period": 10 * DAY})
+    assert isinstance(forcing, DiurnalMeanInsolation)

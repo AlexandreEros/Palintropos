@@ -7,14 +7,15 @@ resume. It never changes a criterion.
 
 ## Branches and PRs
 
-- `feature/planet-one-geometry`: unified orbit/rotation illumination
-  (PR #66, against `main`).
-- `feature/planet-one-thermo`: stacked on the geometry branch. It holds the
-  generalized thermophysics, the airless driver and the Mercury presets.
-  Draft PR.
-- Worktree: `/home/user/Projects/Palintropos-planet-one`, created from tag
+- [PR #66](https://github.com/AlexandreEros/Palintropos/pull/66)
+  (`feature/planet-one-geometry`) contains the unified orbit/rotation
+  illumination. PR #67 incorporates its review fixes.
+- [PR #67](https://github.com/AlexandreEros/Palintropos/pull/67)
+  (`feature/planet-one-thermo`) contains generalized thermophysics, the
+  airless driver and the Mercury presets.
+- The original validation worktree was
+  `/home/user/Projects/Palintropos-planet-one`, created from tag
   `substrate-cpu-verified-v1`.
-- Merging to `main` requires explicit owner approval.
 
 ## Environment
 
@@ -75,10 +76,10 @@ resume. It never changes a criterion.
 
 | Gate | Status | Evidence |
 |---|---|---|
-| G-A geometry | **PASS** (26 tests) | `tests/test_illumination_geometry.py` |
+| G-A geometry | **PASS** (original G-A tests plus seven review regression cases) | `tests/test_illumination_geometry.py` |
 | G-B nonlinear conduction | **PASS**: Jacobian vs FD; manufactured two-stratum transient with space order 1.99 (cells) and 2.00 (skin), time order 0.95 (cells) and 1.00 (skin); steady Kirchhoff order 1.97; zero-k limit; linear one-step limit; stress; energy closure; extents | `tests/test_substrate_nonlinear.py` |
 | Ledlow law | **PASS**: printed values, 350 K step, positivity above 10.13 K, enthalpy vs quadrature, increments down to 1e-11 K including across 350 K | `tests/test_heat_capacity_laws.py` |
-| G-R original substrate gates | **PASS** at commit 7090c86; `src/` is unchanged since then, so this is the final kernel: G1M, G2, G3-D, G4 and G5 pass at the original tolerances; G1C and G5b reported | `planet-one-evidence/gr-7090c86/` |
+| G-R original substrate gates | **PASS** at commit `7090c86`: G1M, G2, G3-D, G4 and G5 pass at the original tolerances. G1C and G5b were also reported | `planet-one-evidence/gr-7090c86/` |
 | G-P Mercury columns | **PASS** (VPW99 TWO, G = 0.02; all six columns; every ladder run PERIODIC). Uses the owner-approved amendment A1 (depth criterion at the same physical depth, 1 m) and estimator correction E1 (flux-consistent face reconstruction). The original frozen depth criterion failed (1.84–2.15 K, a physical geothermal offset) and is preserved | `planet-one-evidence/gp-vpw99-two-G0.02-{pre-amendment,amended}.json` |
 | G-P2 periodicity | Per run, reported in each run's `cycles.json` and `retained/status.json` | |
 | G-I heat1d (L2) | **Satisfied by the owner-approved four-level evidence (R2)**: 0°E 1.33 K against a 2.03 K bound, 90°E 0.69 K against 1.11 K; RMS and maxima decrease at every level after L1. R1's three-level strict FAIL (0°E 2.40 K against 2.26 K) remains recorded. Sunrise attribution: our backward-Euler time error (0.58 K at L3 dt) and heat1d's lag (0.55 K) and spatial error (0.54 K); refined codes agree to 0.15–0.19 K | `planet-one-evidence/gi-heat1d-vpw99-two-G0.02.json`, `gi-sunrise-attribution.json` |
@@ -112,32 +113,24 @@ resume. It never changes a criterion.
 - The calorie convention is ambiguous (6.9e-4 relative effect).
 - The Kepler solve is scalar Python, evaluated once per step. That is
   adequate here.
-- No GPU path has been exercised for the new kernel. The kernel is
-  xp-generic, but CPU/GPU parity is untested.
+- The archived CPU/GPU parity result covers the six production columns
+  for one cycle on a T4. The archived geometry GPU tests cover flat Mars.
 - Ben 2 G8, the bitwise rerun of an archived THAI run, cannot hold at
   current commits (see `docs/radiation/SHARED_PHYSICS.md`). Verification
   criteria for when atmospheric coupling resumes are to be set then.
 
 ## How to resume
 
-1. **Done: G-I resolved by R2** (four levels; see the register). The likely
-   next step, if chosen, is gathering more evidence rather than changing the
-   criterion. Add a fourth joint refinement level to
-   `tools/planet_one/heat1d_compare.py` (LEVELS), rerun it, and call
-   `verdict()`. heat1d's CFL substeps make that level slow on the CPU, about
-   hours.
-2. **GPU runs on Colab:** `colab new -s NAME --gpu T4`, then the bootstrap
+1. **GPU runs on Colab:** `colab new -s NAME --gpu T4`, then the bootstrap
    and launch scripts pattern described in the memory note. Use
    `python -m tropoi.run.airless run ... --backend cupy --workers 1`. Then
    run `tools/planet_one/global_check.py RUN` and
    `tools/planet_one/build_view.py RUN OUT.html --gp/--gi/--l3` on the VM,
    download files of 19 MB or less, and `colab stop`.
-3. **Drive mirror** (main account): folder `planet-one-global2-gpu-evidence`
+2. **Drive mirror** (main account): folder `planet-one-global2-gpu-evidence`
    under the Do-Mercury folder holds the view, the run bundle and the
    profile subset (5 MiB parts with `MANIFEST-v2.txt`). The connector limit
    is about 7 MB.
-4. **Before any merge:** owner review of #66 and #67. Merging needs explicit
-   approval.
 
 ## Results so far (2026-11-25)
 
@@ -147,17 +140,15 @@ resume. It never changes a criterion.
   `runs/planet-one/global2-gpu-vpw99-two-G0.02-download/mercury-view.html`
   (sha256 6568a84a…).
 - **Gate summary:**
-  - pass: G-A, G-B, G-R (at the final kernel), G-P (with A1/E1), G-M L3 (within 10 K; BOT checked on a 2 m column), G-GPU (A2) and G-G;
+  - pass: G-A, G-B, G-R (at `7090c86`), G-P (with A1/E1), G-M L3 (within 10 K; BOT checked on a 2 m column), G-GPU (A2) and G-G;
   - G-I is satisfied by the four-level evidence (R2); R1's three-level FAIL is kept on record;
   - L4 is NOT EVALUATED.
 - **PR #66 GPU coverage:** the CUDA radiative tests pass on a T4 at 3bce170 (154 passed, 9 THAI k-table skips; `planet-one-evidence/geometry-pr66-cuda-tests-t4.json`).
 - **4° CPU run:** finished PERIODIC (supplementary).
 - **View:** published (version 3) and rendered in headless Chromium: no console errors, slider end to end, geometry readouts checked (subsolar point 180°E at the second perihelion, retrograde loop). It states the G-I verdict.
-- **4° CPU run:** supplementary evidence only. The 2° acceptance run is the
-  GPU run.
-- **Remaining before review:** owner review of #66/#67; optionally rerun the
-  full 2° tier-2 retention to a durable store (Drive mount needs interactive
-  authentication).
+- The archived numerical results apply to their recorded commits and
+  run configurations. The #66 review regressions verify the illumination
+  corrections separately. The full 2° tier-2 profiles were discarded.
 
 
 ## Reproducibility of the 2° run (wording corrected 2026-11-25)
