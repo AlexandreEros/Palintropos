@@ -1,6 +1,6 @@
 # Operation Planet One: status and handoff
 
-Updated 2026-11-24. The acceptance register is
+Updated 2026-11-25. The acceptance register is
 [PLANET-ONE-GATES.md](PLANET-ONE-GATES.md), frozen before any result. This
 file records what exists, what is verified, what is outstanding and how to
 resume. It never changes a criterion.
@@ -137,3 +137,19 @@ resume. It never changes a criterion.
    profiles.npy: samples × L × columns; grid.npz).
 6. Rerun G-R at the final commit, regenerate the architecture snapshot, and
    update this file and the PR.
+
+
+## Results so far (2026-11-25)
+
+- **Interactive view:** one full solar day from the 2° GPU run, built on
+  the VM from the retained cycle, published privately at
+  https://claude.ai/artifact/CtuVELqWVUt4UaDqzWdL7Y. The local copy is
+  `runs/planet-one/global2-gpu-vpw99-two-G0.02-download/mercury-view.html`
+  (sha256 6568a84a…).
+- **Every Planet One gate is evaluated:** G-A, G-B, G-R, G-P (with A1/E1),
+  G-I (L2), G-M L3, G-GPU (A2) and G-G pass. L4 is NOT EVALUATED.
+- **4° CPU run:** supplementary evidence only. The 2° acceptance run is the
+  GPU run.
+- **Remaining before review:** owner review of #66/#67; optionally rerun the
+  full 2° tier-2 retention to a durable store (Drive mount needs interactive
+  authentication).
