@@ -9,6 +9,9 @@
       "tropoi.representation.visual.sky.standalone_page",
       "tropoi.representation.visual.sky.star_path_column",
       "tropoi.representation.visual.sky.write_sky_page",
+      "tropoi.run.airless.config.mercury_hayne_analogue",
+      "tropoi.run.airless.config.mercury_vpw99",
+      "tropoi.run.airless.experiment.load_tier2",
       "tropoi.run.custom.execute.run_initial_state",
       "tropoi.run.custom.prepare.prepare_bve_state",
       "tropoi.run.custom.prepare.prepare_swe_state",
@@ -68,6 +71,16 @@
           "tropoi.spatial.terrain.raster.encode_grey16"
         ],
         "title": "Terrain rasters from Python: read an elevation file, write 16-bit grey (src/tropoi/spatial/terrain/IMPORT.md)"
+      },
+      {
+        "doc": "docs/architecture/subsystems/airless.md",
+        "name": "airless-mercury",
+        "roots": [
+          "tropoi.run.airless.config.mercury_vpw99",
+          "tropoi.run.airless.config.mercury_hayne_analogue",
+          "tropoi.run.airless.experiment.load_tier2"
+        ],
+        "title": "Airless-body thermal experiment: presets and tier-2 output reader (Planet One)"
       }
     ],
     "excluded": {
@@ -99,7 +112,7 @@
     }
   },
   "discovered": {
-    "classes": 228,
+    "classes": 238,
     "cli_handlers": {
       "cli-capsule-command": "tropoi.cli.capsule._command",
       "cli-gen": "tropoi.cli.main._cmd_gen",
@@ -185,6 +198,15 @@
       "tropoi.representation.visual.timeline.build_timeline_overview": [
         "tropoi.representation.visual.timeline.build_timeline_overview"
       ],
+      "tropoi.run.airless.config.mercury_hayne_analogue": [
+        "tropoi.run.airless.config.mercury_hayne_analogue"
+      ],
+      "tropoi.run.airless.config.mercury_vpw99": [
+        "tropoi.run.airless.config.mercury_vpw99"
+      ],
+      "tropoi.run.airless.experiment.load_tier2": [
+        "tropoi.run.airless.experiment.load_tier2"
+      ],
       "tropoi.run.custom.execute.run_initial_state": [
         "tropoi.run.custom.execute.run_initial_state",
         "tropoi.run.custom.run_initial_state"
@@ -242,16 +264,16 @@
         "tropoi.temporal.hooks.rk4_real_axis_limit"
       ]
     },
-    "functions": 1851,
-    "modules": 181,
-    "packages": 25
+    "functions": 1921,
+    "modules": 186,
+    "packages": 26
   },
   "limits": {
     "call_sites": {
-      "builtin": 4196,
-      "external": 2705,
-      "internal": 3221,
-      "unresolved": 4260
+      "builtin": 4360,
+      "external": 2829,
+      "internal": 3332,
+      "unresolved": 4493
     },
     "dynamic_import_sites": {
       "tropoi.representation.archive.writer": 1
@@ -265,6 +287,7 @@
       "tropoi.representation.diagnostics",
       "tropoi.representation.visual",
       "tropoi.run",
+      "tropoi.run.airless",
       "tropoi.run.bve",
       "tropoi.run.held_suarez",
       "tropoi.run.pe",
@@ -386,6 +409,17 @@
   },
   "rendered": {
     "call_graphs": {
+      "airless-mercury": {
+        "packages": [
+          "tropoi.physics",
+          "tropoi.run.airless"
+        ],
+        "roots": [
+          "tropoi.run.airless.config.mercury_vpw99",
+          "tropoi.run.airless.config.mercury_hayne_analogue",
+          "tropoi.run.airless.experiment.load_tier2"
+        ]
+      },
       "cli-capsule-command": {
         "packages": [
           "tropoi.cli"
@@ -610,15 +644,15 @@
         ]
       }
     },
-    "classes": 228,
+    "classes": 238,
     "classes_in_inheritance_overview": 21,
     "containment": {
-      "class": 228,
-      "module": 107,
-      "package": 22
+      "class": 238,
+      "module": 110,
+      "package": 23
     },
-    "modules": 181,
-    "package_pages": 25
+    "modules": 186,
+    "package_pages": 26
   },
   "rules": {
     "cli_handlers": "every <parser>.set_defaults(<keyword>=<function>) handler gets calls/cli-<name>.mmd",
@@ -628,6 +662,6 @@
   },
   "scope_file": {
     "path": "docs/architecture/entry-points.toml",
-    "sha256": "ff6839b21d5b4107ee00786decb521ba8213ca6278389b16f027112ff56e7b0e"
+    "sha256": "92f01018d13d19361bc9a4d148ac96327b7cebe94a22016f42a68bde95283173"
   }
 }

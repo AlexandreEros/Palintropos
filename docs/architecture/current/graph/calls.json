@@ -951,6 +951,106 @@
       "target": "tropoi.physics.insolation.illumination_from_spec"
     },
     {
+      "kind": "call",
+      "source": "tropoi.physics.materials.CellMaterials.enthalpy_difference",
+      "target": "tropoi.physics.materials._rows"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.physics.materials.CellMaterials.enthalpy_difference",
+      "target": "tropoi.physics.materials._xpmod"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.physics.materials.CellMaterials.on_grid",
+      "target": "tropoi.physics.materials._evaluate"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.physics.materials.CellMaterials.specific_heat",
+      "target": "tropoi.physics.materials._xpmod"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.physics.materials.PiecewiseHeatCapacity.enthalpy_difference",
+      "target": "tropoi.physics.materials._xpmod"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.physics.materials.PiecewiseHeatCapacity.specific_heat",
+      "target": "tropoi.physics.materials._xpmod"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.physics.materials.PolynomialHeatCapacity.enthalpy_difference",
+      "target": "tropoi.physics.materials._like"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.physics.materials.PolynomialHeatCapacity.specific_heat",
+      "target": "tropoi.physics.materials._like"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.physics.materials.SaturatingExponentialHeatCapacity.enthalpy_difference",
+      "target": "tropoi.physics.materials._xpmod"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.physics.materials.SaturatingExponentialHeatCapacity.specific_heat",
+      "target": "tropoi.physics.materials._xpmod"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.physics.materials.Stratum.__post_init__",
+      "target": "tropoi.physics.materials.heat_capacity_from_dict"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.physics.materials.Stratum.to_dict",
+      "target": "tropoi.physics.materials._describe"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.physics.materials.heat_capacity_from_dict",
+      "target": "tropoi.physics.materials.PiecewiseHeatCapacity"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.physics.materials.heat_capacity_from_dict",
+      "target": "tropoi.physics.materials.PolynomialHeatCapacity"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.physics.materials.heat_capacity_from_dict",
+      "target": "tropoi.physics.materials.SaturatingExponentialHeatCapacity"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.physics.materials.heat_capacity_from_dict",
+      "target": "tropoi.physics.materials.heat_capacity_from_dict"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.physics.materials.ledlow_1992",
+      "target": "tropoi.physics.materials.PiecewiseHeatCapacity"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.physics.materials.ledlow_1992",
+      "target": "tropoi.physics.materials.PolynomialHeatCapacity"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.physics.materials.ledlow_1992",
+      "target": "tropoi.physics.materials.SaturatingExponentialHeatCapacity"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.physics.materials.stratified_interfaces",
+      "target": "tropoi.physics.substrate.geometric_interfaces"
+    },
+    {
       "kind": "constructor",
       "source": "tropoi.physics.monin_obukhov.MoninObukhovConvergenceError",
       "target": "tropoi.physics.monin_obukhov.MoninObukhovConvergenceError.__init__"
@@ -1728,16 +1828,91 @@
     {
       "kind": "call",
       "source": "tropoi.physics.substrate.ConductiveSubstrate.__init__",
+      "target": "tropoi.physics.materials.CellMaterials.on_grid"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.physics.substrate.ConductiveSubstrate.__init__",
+      "target": "tropoi.physics.materials.stratified_interfaces"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.physics.substrate.ConductiveSubstrate._report",
+      "target": "tropoi.physics.substrate.StepReport"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.physics.substrate.ConductiveSubstrate._system",
+      "target": "tropoi.physics.materials.CellMaterials.conductivity"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.physics.substrate.ConductiveSubstrate._system",
+      "target": "tropoi.physics.materials.CellMaterials.conductivity_derivative"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.physics.substrate.ConductiveSubstrate._system",
+      "target": "tropoi.physics.materials.CellMaterials.kirchhoff_difference"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.physics.substrate.ConductiveSubstrate._system",
+      "target": "tropoi.physics.substrate.ConductiveSubstrate._consts"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.physics.substrate.ConductiveSubstrate.conductivity",
+      "target": "tropoi.physics.materials.CellMaterials.conductivity"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.physics.substrate.ConductiveSubstrate.conductivity",
+      "target": "tropoi.physics.substrate.ConductiveSubstrate.temperature"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.physics.substrate.ConductiveSubstrate.conductivity",
+      "target": "tropoi.physics.substrate._xp"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.physics.substrate.ConductiveSubstrate.constant",
+      "target": "tropoi.physics.materials.Stratum.volumetric"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.physics.substrate.ConductiveSubstrate.constant",
       "target": "tropoi.physics.substrate.geometric_interfaces"
     },
     {
       "kind": "self",
       "source": "tropoi.physics.substrate.ConductiveSubstrate.energy",
-      "target": "tropoi.physics.substrate.ConductiveSubstrate._constants"
+      "target": "tropoi.physics.substrate.ConductiveSubstrate.temperature"
     },
     {
       "kind": "call",
       "source": "tropoi.physics.substrate.ConductiveSubstrate.energy",
+      "target": "tropoi.physics.substrate._xp"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.physics.substrate.ConductiveSubstrate.extent",
+      "target": "tropoi.physics.substrate.ConductiveSubstrate.surface_temperature"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.physics.substrate.ConductiveSubstrate.extent",
+      "target": "tropoi.physics.substrate.ConductiveSubstrate.temperature"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.physics.substrate.ConductiveSubstrate.extent",
+      "target": "tropoi.physics.substrate._host"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.physics.substrate.ConductiveSubstrate.extent",
       "target": "tropoi.physics.substrate._xp"
     },
     {
@@ -1746,19 +1921,39 @@
       "target": "tropoi.physics.substrate.SubstrateState"
     },
     {
-      "kind": "self",
-      "source": "tropoi.physics.substrate.ConductiveSubstrate.step",
-      "target": "tropoi.physics.substrate.ConductiveSubstrate._constants"
+      "kind": "instantiate",
+      "source": "tropoi.physics.substrate.ConductiveSubstrate.state_at",
+      "target": "tropoi.physics.substrate.SubstrateState"
     },
     {
       "kind": "self",
       "source": "tropoi.physics.substrate.ConductiveSubstrate.step",
-      "target": "tropoi.physics.substrate.ConductiveSubstrate._thomas"
+      "target": "tropoi.physics.substrate.ConductiveSubstrate._report"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.physics.substrate.ConductiveSubstrate.step",
+      "target": "tropoi.physics.substrate.ConductiveSubstrate._system"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.physics.substrate.ConductiveSubstrate.step",
+      "target": "tropoi.physics.substrate.SubstrateSolveError"
     },
     {
       "kind": "instantiate",
       "source": "tropoi.physics.substrate.ConductiveSubstrate.step",
       "target": "tropoi.physics.substrate.SubstrateState"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.physics.substrate.ConductiveSubstrate.step",
+      "target": "tropoi.physics.substrate._host"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.physics.substrate.ConductiveSubstrate.step",
+      "target": "tropoi.physics.substrate._tridiagonal"
     },
     {
       "kind": "call",
@@ -6829,6 +7024,216 @@
       "kind": "call",
       "source": "tropoi.representation.visual.vorticity_viewer.VorticityViewer.summary_spec",
       "target": "tropoi.representation.visual.bve.build_bve_summary_spec"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.airless.__main__.main",
+      "target": "tropoi.run.airless.__main__._config"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.run.airless.__main__.main",
+      "target": "tropoi.run.airless.experiment.AirlessRun"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.run.airless.config.AirlessConfig.canonical_json",
+      "target": "tropoi.run.airless.config.AirlessConfig.to_dict"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.run.airless.config.AirlessConfig.sha256",
+      "target": "tropoi.run.airless.config.AirlessConfig.canonical_json"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.run.airless.config._mercury",
+      "target": "tropoi.run.airless.config.AirlessConfig"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.run.airless.config._value",
+      "target": "tropoi.physics.materials.DepthProfile"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.run.airless.config.mercury_hayne_analogue",
+      "target": "tropoi.physics.materials.DepthProfile"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.run.airless.config.mercury_hayne_analogue",
+      "target": "tropoi.physics.materials.Stratum"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.airless.config.mercury_hayne_analogue",
+      "target": "tropoi.run.airless.config._mercury"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.airless.config.mercury_vpw99",
+      "target": "tropoi.run.airless.config._mercury"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.airless.config.mercury_vpw99",
+      "target": "tropoi.run.airless.config.vpw99_strata"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.run.airless.config.strata_from_dicts",
+      "target": "tropoi.physics.materials.Stratum"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.airless.config.strata_from_dicts",
+      "target": "tropoi.run.airless.config._value"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.run.airless.config.vpw99_strata",
+      "target": "tropoi.physics.materials.Stratum"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.airless.config.vpw99_strata",
+      "target": "tropoi.physics.materials.ledlow_1992"
+    },
+    {
+      "kind": "constructor",
+      "source": "tropoi.run.airless.experiment.AirlessRun",
+      "target": "tropoi.run.airless.experiment.AirlessRun.__init__"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.run.airless.experiment.AirlessRun.__init__",
+      "target": "tropoi.run.airless.experiment.AirlessRun._event"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.run.airless.experiment.AirlessRun.__init__",
+      "target": "tropoi.run.airless.experiment.AirlessRun._write_json"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.airless.experiment.AirlessRun.__init__",
+      "target": "tropoi.run.airless.experiment._backend"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.airless.experiment.AirlessRun.__init__",
+      "target": "tropoi.run.airless.experiment.build_columns"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.airless.experiment.AirlessRun.__init__",
+      "target": "tropoi.run.airless.experiment.build_substrate"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.run.airless.experiment.AirlessRun.__init__",
+      "target": "tropoi.run.held_suarez.experiment.RunError"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.airless.experiment.AirlessRun.__init__",
+      "target": "tropoi.run.held_suarez.experiment.code_identity"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.airless.experiment.AirlessRun.__init__",
+      "target": "tropoi.run.held_suarez.experiment.environment_identity"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.run.airless.experiment.AirlessRun._cycle",
+      "target": "tropoi.run.airless.experiment.AirlessRun._mkdir"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.airless.experiment.AirlessRun._cycle",
+      "target": "tropoi.run.airless.experiment._call"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.run.airless.experiment.AirlessRun.run",
+      "target": "tropoi.run.airless.experiment.AirlessRun._checksums"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.run.airless.experiment.AirlessRun.run",
+      "target": "tropoi.run.airless.experiment.AirlessRun._cycle"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.run.airless.experiment.AirlessRun.run",
+      "target": "tropoi.run.airless.experiment.AirlessRun._diagnostics"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.run.airless.experiment.AirlessRun.run",
+      "target": "tropoi.run.airless.experiment.AirlessRun._event"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.run.airless.experiment.AirlessRun.run",
+      "target": "tropoi.run.airless.experiment.AirlessRun._mkdir"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.run.airless.experiment.AirlessRun.run",
+      "target": "tropoi.run.airless.experiment.AirlessRun._write_json"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.airless.experiment.AirlessRun.run",
+      "target": "tropoi.run.airless.experiment.aitken"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.airless.experiment._call",
+      "target": "tropoi.run.airless.experiment.run_block"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.run.airless.experiment.build_substrate",
+      "target": "tropoi.physics.substrate.ConductiveSubstrate"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.airless.experiment.build_substrate",
+      "target": "tropoi.run.airless.config.strata_from_dicts"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.airless.experiment.run_block",
+      "target": "tropoi.physics.insolation.insolation_from_spec"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.run.airless.experiment.run_block",
+      "target": "tropoi.physics.substrate.SubstrateState"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.airless.experiment.run_block",
+      "target": "tropoi.run.airless.config.AirlessConfig.from_dict"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.airless.experiment.run_block",
+      "target": "tropoi.run.airless.experiment._backend"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.airless.experiment.run_block",
+      "target": "tropoi.run.airless.experiment._host"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.airless.experiment.run_block",
+      "target": "tropoi.run.airless.experiment.build_substrate"
     },
     {
       "kind": "self",
@@ -13337,6 +13742,265 @@
       "type": "function"
     },
     {
+      "id": "tropoi.physics.materials.CellMaterials",
+      "kind": "class",
+      "module": "tropoi.physics.materials",
+      "qualname": "CellMaterials",
+      "type": "class"
+    },
+    {
+      "id": "tropoi.physics.materials.CellMaterials.conductivity",
+      "kind": "staticmethod",
+      "module": "tropoi.physics.materials",
+      "qualname": "CellMaterials.conductivity",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.materials.CellMaterials.conductivity_derivative",
+      "kind": "staticmethod",
+      "module": "tropoi.physics.materials",
+      "qualname": "CellMaterials.conductivity_derivative",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.materials.CellMaterials.enthalpy_difference",
+      "kind": "method",
+      "module": "tropoi.physics.materials",
+      "qualname": "CellMaterials.enthalpy_difference",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.materials.CellMaterials.kirchhoff_difference",
+      "kind": "staticmethod",
+      "module": "tropoi.physics.materials",
+      "qualname": "CellMaterials.kirchhoff_difference",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.materials.CellMaterials.on",
+      "kind": "method",
+      "module": "tropoi.physics.materials",
+      "qualname": "CellMaterials.on",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.materials.CellMaterials.on_grid",
+      "kind": "classmethod",
+      "module": "tropoi.physics.materials",
+      "qualname": "CellMaterials.on_grid",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.materials.CellMaterials.specific_heat",
+      "kind": "method",
+      "module": "tropoi.physics.materials",
+      "qualname": "CellMaterials.specific_heat",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.materials.DepthProfile",
+      "kind": "class",
+      "module": "tropoi.physics.materials",
+      "qualname": "DepthProfile",
+      "type": "class"
+    },
+    {
+      "id": "tropoi.physics.materials.DepthProfile.__call__",
+      "kind": "method",
+      "module": "tropoi.physics.materials",
+      "qualname": "DepthProfile.__call__",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.materials.DepthProfile.__post_init__",
+      "kind": "method",
+      "module": "tropoi.physics.materials",
+      "qualname": "DepthProfile.__post_init__",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.materials.DepthProfile.to_dict",
+      "kind": "method",
+      "module": "tropoi.physics.materials",
+      "qualname": "DepthProfile.to_dict",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.materials.PiecewiseHeatCapacity",
+      "kind": "class",
+      "module": "tropoi.physics.materials",
+      "qualname": "PiecewiseHeatCapacity",
+      "type": "class"
+    },
+    {
+      "id": "tropoi.physics.materials.PiecewiseHeatCapacity.enthalpy_difference",
+      "kind": "method",
+      "module": "tropoi.physics.materials",
+      "qualname": "PiecewiseHeatCapacity.enthalpy_difference",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.materials.PiecewiseHeatCapacity.specific_heat",
+      "kind": "method",
+      "module": "tropoi.physics.materials",
+      "qualname": "PiecewiseHeatCapacity.specific_heat",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.materials.PiecewiseHeatCapacity.to_dict",
+      "kind": "method",
+      "module": "tropoi.physics.materials",
+      "qualname": "PiecewiseHeatCapacity.to_dict",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.materials.PolynomialHeatCapacity",
+      "kind": "class",
+      "module": "tropoi.physics.materials",
+      "qualname": "PolynomialHeatCapacity",
+      "type": "class"
+    },
+    {
+      "id": "tropoi.physics.materials.PolynomialHeatCapacity.__post_init__",
+      "kind": "method",
+      "module": "tropoi.physics.materials",
+      "qualname": "PolynomialHeatCapacity.__post_init__",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.materials.PolynomialHeatCapacity.enthalpy_difference",
+      "kind": "method",
+      "module": "tropoi.physics.materials",
+      "qualname": "PolynomialHeatCapacity.enthalpy_difference",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.materials.PolynomialHeatCapacity.specific_heat",
+      "kind": "method",
+      "module": "tropoi.physics.materials",
+      "qualname": "PolynomialHeatCapacity.specific_heat",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.materials.PolynomialHeatCapacity.to_dict",
+      "kind": "method",
+      "module": "tropoi.physics.materials",
+      "qualname": "PolynomialHeatCapacity.to_dict",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.materials.SaturatingExponentialHeatCapacity",
+      "kind": "class",
+      "module": "tropoi.physics.materials",
+      "qualname": "SaturatingExponentialHeatCapacity",
+      "type": "class"
+    },
+    {
+      "id": "tropoi.physics.materials.SaturatingExponentialHeatCapacity.enthalpy_difference",
+      "kind": "method",
+      "module": "tropoi.physics.materials",
+      "qualname": "SaturatingExponentialHeatCapacity.enthalpy_difference",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.materials.SaturatingExponentialHeatCapacity.specific_heat",
+      "kind": "method",
+      "module": "tropoi.physics.materials",
+      "qualname": "SaturatingExponentialHeatCapacity.specific_heat",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.materials.SaturatingExponentialHeatCapacity.to_dict",
+      "kind": "method",
+      "module": "tropoi.physics.materials",
+      "qualname": "SaturatingExponentialHeatCapacity.to_dict",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.materials.Stratum",
+      "kind": "class",
+      "module": "tropoi.physics.materials",
+      "qualname": "Stratum",
+      "type": "class"
+    },
+    {
+      "id": "tropoi.physics.materials.Stratum.__post_init__",
+      "kind": "method",
+      "module": "tropoi.physics.materials",
+      "qualname": "Stratum.__post_init__",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.materials.Stratum.to_dict",
+      "kind": "method",
+      "module": "tropoi.physics.materials",
+      "qualname": "Stratum.to_dict",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.materials.Stratum.volumetric",
+      "kind": "classmethod",
+      "module": "tropoi.physics.materials",
+      "qualname": "Stratum.volumetric",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.materials._describe",
+      "kind": "function",
+      "module": "tropoi.physics.materials",
+      "qualname": "_describe",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.materials._evaluate",
+      "kind": "function",
+      "module": "tropoi.physics.materials",
+      "qualname": "_evaluate",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.materials._like",
+      "kind": "function",
+      "module": "tropoi.physics.materials",
+      "qualname": "_like",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.materials._rows",
+      "kind": "function",
+      "module": "tropoi.physics.materials",
+      "qualname": "_rows",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.materials._xpmod",
+      "kind": "function",
+      "module": "tropoi.physics.materials",
+      "qualname": "_xpmod",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.materials.heat_capacity_from_dict",
+      "kind": "function",
+      "module": "tropoi.physics.materials",
+      "qualname": "heat_capacity_from_dict",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.materials.ledlow_1992",
+      "kind": "function",
+      "module": "tropoi.physics.materials",
+      "qualname": "ledlow_1992",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.materials.stratified_interfaces",
+      "kind": "function",
+      "module": "tropoi.physics.materials",
+      "qualname": "stratified_interfaces",
+      "type": "function"
+    },
+    {
       "id": "tropoi.physics.monin_obukhov.MoninObukhovConvergenceError",
       "kind": "class",
       "module": "tropoi.physics.monin_obukhov",
@@ -14891,17 +15555,38 @@
       "type": "function"
     },
     {
-      "id": "tropoi.physics.substrate.ConductiveSubstrate._constants",
+      "id": "tropoi.physics.substrate.ConductiveSubstrate._consts",
       "kind": "method",
       "module": "tropoi.physics.substrate",
-      "qualname": "ConductiveSubstrate._constants",
+      "qualname": "ConductiveSubstrate._consts",
       "type": "function"
     },
     {
-      "id": "tropoi.physics.substrate.ConductiveSubstrate._thomas",
-      "kind": "staticmethod",
+      "id": "tropoi.physics.substrate.ConductiveSubstrate._report",
+      "kind": "method",
       "module": "tropoi.physics.substrate",
-      "qualname": "ConductiveSubstrate._thomas",
+      "qualname": "ConductiveSubstrate._report",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.substrate.ConductiveSubstrate._system",
+      "kind": "method",
+      "module": "tropoi.physics.substrate",
+      "qualname": "ConductiveSubstrate._system",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.substrate.ConductiveSubstrate.conductivity",
+      "kind": "method",
+      "module": "tropoi.physics.substrate",
+      "qualname": "ConductiveSubstrate.conductivity",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.substrate.ConductiveSubstrate.constant",
+      "kind": "classmethod",
+      "module": "tropoi.physics.substrate",
+      "qualname": "ConductiveSubstrate.constant",
       "type": "function"
     },
     {
@@ -14916,6 +15601,13 @@
       "kind": "method",
       "module": "tropoi.physics.substrate",
       "qualname": "ConductiveSubstrate.energy",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.substrate.ConductiveSubstrate.extent",
+      "kind": "method",
+      "module": "tropoi.physics.substrate",
+      "qualname": "ConductiveSubstrate.extent",
       "type": "function"
     },
     {
@@ -14940,6 +15632,13 @@
       "type": "function"
     },
     {
+      "id": "tropoi.physics.substrate.ConductiveSubstrate.state_at",
+      "kind": "method",
+      "module": "tropoi.physics.substrate",
+      "qualname": "ConductiveSubstrate.state_at",
+      "type": "function"
+    },
+    {
       "id": "tropoi.physics.substrate.ConductiveSubstrate.step",
       "kind": "method",
       "module": "tropoi.physics.substrate",
@@ -14961,6 +15660,20 @@
       "type": "function"
     },
     {
+      "id": "tropoi.physics.substrate.StepReport",
+      "kind": "class",
+      "module": "tropoi.physics.substrate",
+      "qualname": "StepReport",
+      "type": "class"
+    },
+    {
+      "id": "tropoi.physics.substrate.SubstrateSolveError",
+      "kind": "class",
+      "module": "tropoi.physics.substrate",
+      "qualname": "SubstrateSolveError",
+      "type": "class"
+    },
+    {
       "id": "tropoi.physics.substrate.SubstrateState",
       "kind": "class",
       "module": "tropoi.physics.substrate",
@@ -14979,6 +15692,20 @@
       "kind": "function",
       "module": "tropoi.physics.substrate",
       "qualname": "_geometric_sum",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.substrate._host",
+      "kind": "function",
+      "module": "tropoi.physics.substrate",
+      "qualname": "_host",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.substrate._tridiagonal",
+      "kind": "function",
+      "module": "tropoi.physics.substrate",
+      "qualname": "_tridiagonal",
       "type": "function"
     },
     {
@@ -20516,6 +21243,244 @@
       "kind": "method",
       "module": "tropoi.representation.visual.vorticity_viewer",
       "qualname": "VorticityViewer.summary_spec",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.airless.__main__._config",
+      "kind": "function",
+      "module": "tropoi.run.airless.__main__",
+      "qualname": "_config",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.airless.__main__.main",
+      "kind": "function",
+      "module": "tropoi.run.airless.__main__",
+      "qualname": "main",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.airless.config.AirlessConfig",
+      "kind": "class",
+      "module": "tropoi.run.airless.config",
+      "qualname": "AirlessConfig",
+      "type": "class"
+    },
+    {
+      "id": "tropoi.run.airless.config.AirlessConfig.__post_init__",
+      "kind": "method",
+      "module": "tropoi.run.airless.config",
+      "qualname": "AirlessConfig.__post_init__",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.airless.config.AirlessConfig.canonical_json",
+      "kind": "method",
+      "module": "tropoi.run.airless.config",
+      "qualname": "AirlessConfig.canonical_json",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.airless.config.AirlessConfig.dt",
+      "kind": "property",
+      "module": "tropoi.run.airless.config",
+      "qualname": "AirlessConfig.dt",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.airless.config.AirlessConfig.from_dict",
+      "kind": "classmethod",
+      "module": "tropoi.run.airless.config",
+      "qualname": "AirlessConfig.from_dict",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.airless.config.AirlessConfig.sha256",
+      "kind": "method",
+      "module": "tropoi.run.airless.config",
+      "qualname": "AirlessConfig.sha256",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.airless.config.AirlessConfig.to_dict",
+      "kind": "method",
+      "module": "tropoi.run.airless.config",
+      "qualname": "AirlessConfig.to_dict",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.airless.config.AirlessConfig.with_",
+      "kind": "method",
+      "module": "tropoi.run.airless.config",
+      "qualname": "AirlessConfig.with_",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.airless.config._mercury",
+      "kind": "function",
+      "module": "tropoi.run.airless.config",
+      "qualname": "_mercury",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.airless.config._value",
+      "kind": "function",
+      "module": "tropoi.run.airless.config",
+      "qualname": "_value",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.airless.config.mercury_hayne_analogue",
+      "kind": "function",
+      "module": "tropoi.run.airless.config",
+      "qualname": "mercury_hayne_analogue",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.airless.config.mercury_vpw99",
+      "kind": "function",
+      "module": "tropoi.run.airless.config",
+      "qualname": "mercury_vpw99",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.airless.config.strata_from_dicts",
+      "kind": "function",
+      "module": "tropoi.run.airless.config",
+      "qualname": "strata_from_dicts",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.airless.config.vpw99_strata",
+      "kind": "function",
+      "module": "tropoi.run.airless.config",
+      "qualname": "vpw99_strata",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.airless.experiment.AirlessRun",
+      "kind": "class",
+      "module": "tropoi.run.airless.experiment",
+      "qualname": "AirlessRun",
+      "type": "class"
+    },
+    {
+      "id": "tropoi.run.airless.experiment.AirlessRun.__init__",
+      "kind": "method",
+      "module": "tropoi.run.airless.experiment",
+      "qualname": "AirlessRun.__init__",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.airless.experiment.AirlessRun._checksums",
+      "kind": "method",
+      "module": "tropoi.run.airless.experiment",
+      "qualname": "AirlessRun._checksums",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.airless.experiment.AirlessRun._cycle",
+      "kind": "method",
+      "module": "tropoi.run.airless.experiment",
+      "qualname": "AirlessRun._cycle",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.airless.experiment.AirlessRun._diagnostics",
+      "kind": "method",
+      "module": "tropoi.run.airless.experiment",
+      "qualname": "AirlessRun._diagnostics",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.airless.experiment.AirlessRun._event",
+      "kind": "method",
+      "module": "tropoi.run.airless.experiment",
+      "qualname": "AirlessRun._event",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.airless.experiment.AirlessRun._mkdir",
+      "kind": "method",
+      "module": "tropoi.run.airless.experiment",
+      "qualname": "AirlessRun._mkdir",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.airless.experiment.AirlessRun._write_json",
+      "kind": "method",
+      "module": "tropoi.run.airless.experiment",
+      "qualname": "AirlessRun._write_json",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.airless.experiment.AirlessRun.run",
+      "kind": "method",
+      "module": "tropoi.run.airless.experiment",
+      "qualname": "AirlessRun.run",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.airless.experiment._backend",
+      "kind": "function",
+      "module": "tropoi.run.airless.experiment",
+      "qualname": "_backend",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.airless.experiment._call",
+      "kind": "function",
+      "module": "tropoi.run.airless.experiment",
+      "qualname": "_call",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.airless.experiment._host",
+      "kind": "function",
+      "module": "tropoi.run.airless.experiment",
+      "qualname": "_host",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.airless.experiment._json_default",
+      "kind": "function",
+      "module": "tropoi.run.airless.experiment",
+      "qualname": "_json_default",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.airless.experiment.aitken",
+      "kind": "function",
+      "module": "tropoi.run.airless.experiment",
+      "qualname": "aitken",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.airless.experiment.build_columns",
+      "kind": "function",
+      "module": "tropoi.run.airless.experiment",
+      "qualname": "build_columns",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.airless.experiment.build_substrate",
+      "kind": "function",
+      "module": "tropoi.run.airless.experiment",
+      "qualname": "build_substrate",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.airless.experiment.load_tier2",
+      "kind": "function",
+      "module": "tropoi.run.airless.experiment",
+      "qualname": "load_tier2",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.airless.experiment.run_block",
+      "kind": "function",
+      "module": "tropoi.run.airless.experiment",
+      "qualname": "run_block",
       "type": "function"
     },
     {

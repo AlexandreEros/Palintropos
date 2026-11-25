@@ -5,13 +5,13 @@
 
 | | |
 |---|---|
-| Source base commit | `755e74ef339d80c87b4c982abf40d4f788835261` (clean working tree) |
+| Source base commit | `3d05287f73d9a7fe731b480495ca035c9b3b2f4b` (clean working tree) |
 | Analysed package | `tropoi` under `src/` |
 | Generator | `tools.architecture` 2.3.0 |
 | Toolchain | Python 3.12, grimp 3.17, networkx 3.7 |
 | Command | `python -m tools.architecture.generate` |
 
-Source working tree: **clean**. Content SHA-256: `19c62031bb87f88b5922dee3bc0d0e29d6d8d877cba46f8eccda49da17ff908a`. Generator working tree: **clean**. Per-file hashes and scoped Git status are recorded in `metrics.json`. These describe generation time; --check verifies source and generator content hashes before reusing this context across later commits. The base commit alone does not identify uncommitted source.
+Source working tree: **clean**. Content SHA-256: `33fe22e2ea5645f296348830e8b070f0166573f8909449473b16ccd603621394`. Generator working tree: **clean**. Per-file hashes and scoped Git status are recorded in `metrics.json`. These describe generation time; --check verifies source and generator content hashes before reusing this context across later commits. The base commit alone does not identify uncommitted source.
 
 ## Reproducing
 
@@ -26,6 +26,7 @@ python -m tools.architecture.generate
 | File | Content |
 |---|---|
 | `README.md` | This file: provenance, extraction rules, exclusions, limitations, metric definitions. |
+| `calls/airless-mercury.mmd` | Scoped static call graph (roots and depth: see *Call graphs* below). |
 | `calls/cli-capsule-command.mmd` | Scoped static call graph (roots and depth: see *Call graphs* below). |
 | `calls/cli-gen.mmd` | Scoped static call graph (roots and depth: see *Call graphs* below). |
 | `calls/cli-inspect.mmd` | Scoped static call graph (roots and depth: see *Call graphs* below). |
@@ -55,6 +56,7 @@ python -m tools.architecture.generate
 | `interactive.html` | Offline architecture atlas: imports, static calls, possible dispatch, runtime observations and proposed ownership, with source sites (see *Interactive atlas*). |
 | `metrics.json` | All measurements, machine-readable. |
 | `metrics.md` | The same measurements as tables, with definitions. |
+| `modules-cycles.mmd` | Module-level import graph restricted to modules in import cycles (nontrivial SCCs). |
 | `packages.mmd` | Package-level import graph, every edge drawn; boxed by declared layer when a declaration applies (see *Package graph*). |
 | `packages/tropoi.cli.md` | Package page: all of its modules, classes and public functions; imports in and out. |
 | `packages/tropoi.md` | Package page: all of its modules, classes and public functions; imports in and out. |
@@ -64,6 +66,7 @@ python -m tools.architecture.generate
 | `packages/tropoi.representation.diagnostics.md` | Package page: all of its modules, classes and public functions; imports in and out. |
 | `packages/tropoi.representation.md` | Package page: all of its modules, classes and public functions; imports in and out. |
 | `packages/tropoi.representation.visual.md` | Package page: all of its modules, classes and public functions; imports in and out. |
+| `packages/tropoi.run.airless.md` | Package page: all of its modules, classes and public functions; imports in and out. |
 | `packages/tropoi.run.bve.md` | Package page: all of its modules, classes and public functions; imports in and out. |
 | `packages/tropoi.run.custom.md` | Package page: all of its modules, classes and public functions; imports in and out. |
 | `packages/tropoi.run.held_suarez.md` | Package page: all of its modules, classes and public functions; imports in and out. |
@@ -89,11 +92,11 @@ Generated files contain no timestamps, absolute paths, or source line numbers, s
 
 Three generic rules decide what must be documented (`tools/architecture/coverage.py`):
 
-1. **Packages:** every analysed package gets packages/<package>.md with all of its modules, classes and public module-level functions. 25 packages, 25 pages; 181 of 181 modules and 228 of 228 classes rendered (generation fails if any is missing).
+1. **Packages:** every analysed package gets packages/<package>.md with all of its modules, classes and public module-level functions. 26 packages, 26 pages; 186 of 186 modules and 238 of 238 classes rendered (generation fails if any is missing).
 2. **CLI handlers:** every <parser>.set_defaults(<keyword>=<function>) handler gets calls/cli-<name>.mmd. 12 discovered.
-3. **Public Python entry points:** module-level functions exported through some __all__ (re-exports followed) that no analysed function calls; each must be declared as an entry path root or excluded with a reason. 39 candidates: 14 are roots of declared entry paths, 25 excluded with a reason.
+3. **Public Python entry points:** module-level functions exported through some __all__ (re-exports followed) that no analysed function calls; each must be declared as an entry path root or excluded with a reason. 42 candidates: 17 are roots of declared entry paths, 25 excluded with a reason.
 
-The declarations are read from `docs/architecture/entry-points.toml` (SHA-256 `ff6839b21d5b4107ee00786decb521ba8213ca6278389b16f027112ff56e7b0e`). Like the layer declaration, they state expectations; unlike it, a gap fails generation: an undeclared candidate, a declared root or exclusion that no longer exists, or a declared narrative page that is missing or does not link its diagram. `--check` therefore fails on any of these too.
+The declarations are read from `docs/architecture/entry-points.toml` (SHA-256 `92f01018d13d19361bc9a4d148ac96327b7cebe94a22016f42a68bde95283173`). Like the layer declaration, they state expectations; unlike it, a gap fails generation: an undeclared candidate, a declared root or exclusion that no longer exists, or a declared narrative page that is missing or does not link its diagram. `--check` therefore fails on any of these too.
 
 What CI establishes: the committed outputs equal what these rules produce from the committed source, and the rules found no undeclared entry point. It does not establish that a diagram is easy to read or that a narrative page is still accurate prose.
 
@@ -107,9 +110,9 @@ The rules are generic path and syntax rules; none names a particular subpackage.
 4. Each module gets a syntactic category: `namespace` (a namespace package directory), `empty` (no statement besides a docstring), `reexport` (only imports, `__all__` assignments, and alias assignments `A = B`), or `code`. Categories are attributes, not filters, with one exception: a `namespace` or `empty` module that no analysed module imports is dropped from the module graph, because it has no code and no edges.
 5. Imports of modules outside the package are not graph edges; they are listed per module (`stdlib_imports`, `third_party_imports` in `graph/modules.json`).
 
-Modules discovered: 181; in the module graph: 158. Categories: code 153, empty 22, namespace 1, reexport 5.
+Modules discovered: 186; in the module graph: 162. Categories: code 157, empty 23, namespace 1, reexport 5.
 
-Excluded by rule 4: `tropoi`, `tropoi.cli`, `tropoi.physics`, `tropoi.physics.radiation`, `tropoi.representation`, `tropoi.representation.diagnostics`, `tropoi.representation.visual`, `tropoi.run`, `tropoi.run.bve`, `tropoi.run.held_suarez`, `tropoi.run.pe`, `tropoi.run.radiative`, `tropoi.run.swe`, `tropoi.spatial`, `tropoi.spatial.grids`, `tropoi.spatial.initialization`, `tropoi.spatial.operators`, `tropoi.spatial.states`, `tropoi.spatial.terrain`, `tropoi.spatial.transforms`, `tropoi.spatial.transforms.cuda`, `tropoi.temporal`, `tropoi.temporal.tendencies`.
+Excluded by rule 4: `tropoi`, `tropoi.cli`, `tropoi.physics`, `tropoi.physics.radiation`, `tropoi.representation`, `tropoi.representation.diagnostics`, `tropoi.representation.visual`, `tropoi.run`, `tropoi.run.airless`, `tropoi.run.bve`, `tropoi.run.held_suarez`, `tropoi.run.pe`, `tropoi.run.radiative`, `tropoi.run.swe`, `tropoi.spatial`, `tropoi.spatial.grids`, `tropoi.spatial.initialization`, `tropoi.spatial.operators`, `tropoi.spatial.states`, `tropoi.spatial.terrain`, `tropoi.spatial.transforms`, `tropoi.spatial.transforms.cuda`, `tropoi.temporal`, `tropoi.temporal.tendencies`.
 
 `reexport` modules (kept): `tropoi.representation.archive`, `tropoi.run.bve.model`, `tropoi.run.custom`, `tropoi.run.pe.model`, `tropoi.run.swe.model`.
 
@@ -153,7 +156,7 @@ The Mermaid tree and the offline atlas each contain every class definition, the 
 
 ### Call graphs (ast)
 
-Each call expression inside a function or method body (nested functions, lambdas, and comprehensions are attributed to the enclosing function) is classified as `internal` (resolved to an analysed definition), `external` (resolved to a name outside the package), `builtin` (an unshadowed builtin), or `unresolved`. Totals: builtin 4196, external 2705, internal 3221, unresolved 4260.
+Each call expression inside a function or method body (nested functions, lambdas, and comprehensions are attributed to the enclosing function) is classified as `internal` (resolved to an analysed definition), `external` (resolved to a name outside the package), `builtin` (an unshadowed builtin), or `unresolved`. Totals: builtin 4360, external 2829, internal 3332, unresolved 4493.
 
 | Edge kind | Syntax | What it claims |
 |---|---|---|
@@ -172,6 +175,7 @@ Scoped graphs follow edges of kinds `call`, `instantiate`, `constructor`, `self`
 
 | Graph | Roots | Depth |
 |---|---|---|
+| `calls/airless-mercury.mmd` | `tropoi.run.airless.config.mercury_vpw99`, `tropoi.run.airless.config.mercury_hayne_analogue`, `tropoi.run.airless.experiment.load_tier2` | 4 |
 | `calls/cli-capsule-command.mmd` | `tropoi.cli.capsule._command` | 4 |
 | `calls/cli-gen.mmd` | `tropoi.cli.main._cmd_gen` | 4 |
 | `calls/cli-inspect.mmd` | `tropoi.cli.main._cmd_inspect` | 4 |

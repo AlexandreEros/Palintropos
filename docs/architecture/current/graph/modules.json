@@ -372,6 +372,14 @@
     {
       "kind": "imports",
       "scopes": [
+        "function"
+      ],
+      "source": "tropoi.physics.materials",
+      "target": "tropoi.physics.substrate"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
         "module"
       ],
       "source": "tropoi.physics.monin_obukhov_cuda",
@@ -520,6 +528,23 @@
       ],
       "source": "tropoi.physics.star",
       "target": "tropoi.physics.species"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.physics.substrate",
+      "target": "tropoi.physics.constants"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function",
+        "module"
+      ],
+      "source": "tropoi.physics.substrate",
+      "target": "tropoi.physics.materials"
     },
     {
       "kind": "imports",
@@ -1892,6 +1917,72 @@
       ],
       "source": "tropoi.representation.visual.vorticity_viewer",
       "target": "tropoi.spatial.planet"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.run.airless.__main__",
+      "target": "tropoi.run.airless.config"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.run.airless.__main__",
+      "target": "tropoi.run.airless.experiment"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.run.airless.config",
+      "target": "tropoi.physics.constants"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function",
+        "module"
+      ],
+      "source": "tropoi.run.airless.config",
+      "target": "tropoi.physics.materials"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.run.airless.experiment",
+      "target": "tropoi.physics.insolation"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function",
+        "module"
+      ],
+      "source": "tropoi.run.airless.experiment",
+      "target": "tropoi.physics.substrate"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.run.airless.experiment",
+      "target": "tropoi.run.airless.config"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.run.airless.experiment",
+      "target": "tropoi.run.held_suarez.experiment"
     },
     {
       "kind": "imports",
@@ -4175,6 +4266,23 @@
     {
       "category": "code",
       "dynamic_import_calls": 0,
+      "id": "tropoi.physics.materials",
+      "is_package": false,
+      "path": "tropoi/physics/materials.py",
+      "stdlib_imports": [
+        "__future__",
+        "dataclasses",
+        "math",
+        "typing"
+      ],
+      "third_party_imports": [
+        "cupy",
+        "numpy"
+      ]
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
       "id": "tropoi.physics.monin_obukhov",
       "is_package": false,
       "path": "tropoi/physics/monin_obukhov.py",
@@ -5217,6 +5325,58 @@
       "path": "tropoi/representation/visual/vorticity_viewer.py",
       "stdlib_imports": [
         "__future__"
+      ],
+      "third_party_imports": [
+        "cupy",
+        "numpy"
+      ]
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.run.airless.__main__",
+      "is_package": false,
+      "path": "tropoi/run/airless/__main__.py",
+      "stdlib_imports": [
+        "__future__",
+        "argparse",
+        "json",
+        "sys"
+      ],
+      "third_party_imports": []
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.run.airless.config",
+      "is_package": false,
+      "path": "tropoi/run/airless/config.py",
+      "stdlib_imports": [
+        "__future__",
+        "dataclasses",
+        "hashlib",
+        "json",
+        "math",
+        "typing"
+      ],
+      "third_party_imports": []
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.run.airless.experiment",
+      "is_package": false,
+      "path": "tropoi/run/airless/experiment.py",
+      "stdlib_imports": [
+        "__future__",
+        "hashlib",
+        "json",
+        "math",
+        "multiprocessing",
+        "pathlib",
+        "shutil",
+        "time",
+        "typing"
       ],
       "third_party_imports": [
         "cupy",

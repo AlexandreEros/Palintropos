@@ -517,6 +517,164 @@
       "qualname": "StellarIllumination"
     },
     {
+      "decorators": [
+        "dataclass"
+      ],
+      "external_bases": [],
+      "id": "tropoi.physics.materials.CellMaterials",
+      "members": [
+        {
+          "kind": "staticmethod",
+          "name": "conductivity"
+        },
+        {
+          "kind": "staticmethod",
+          "name": "conductivity_derivative"
+        },
+        {
+          "kind": "method",
+          "name": "enthalpy_difference"
+        },
+        {
+          "kind": "staticmethod",
+          "name": "kirchhoff_difference"
+        },
+        {
+          "kind": "method",
+          "name": "on"
+        },
+        {
+          "kind": "classmethod",
+          "name": "on_grid"
+        },
+        {
+          "kind": "method",
+          "name": "specific_heat"
+        }
+      ],
+      "module": "tropoi.physics.materials",
+      "qualname": "CellMaterials"
+    },
+    {
+      "decorators": [
+        "dataclass(frozen=True)"
+      ],
+      "external_bases": [],
+      "id": "tropoi.physics.materials.DepthProfile",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__call__"
+        },
+        {
+          "kind": "method",
+          "name": "__post_init__"
+        },
+        {
+          "kind": "method",
+          "name": "to_dict"
+        }
+      ],
+      "module": "tropoi.physics.materials",
+      "qualname": "DepthProfile"
+    },
+    {
+      "decorators": [
+        "dataclass(frozen=True)"
+      ],
+      "external_bases": [],
+      "id": "tropoi.physics.materials.PiecewiseHeatCapacity",
+      "members": [
+        {
+          "kind": "method",
+          "name": "enthalpy_difference"
+        },
+        {
+          "kind": "method",
+          "name": "specific_heat"
+        },
+        {
+          "kind": "method",
+          "name": "to_dict"
+        }
+      ],
+      "module": "tropoi.physics.materials",
+      "qualname": "PiecewiseHeatCapacity"
+    },
+    {
+      "decorators": [
+        "dataclass(frozen=True)"
+      ],
+      "external_bases": [],
+      "id": "tropoi.physics.materials.PolynomialHeatCapacity",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__post_init__"
+        },
+        {
+          "kind": "method",
+          "name": "enthalpy_difference"
+        },
+        {
+          "kind": "method",
+          "name": "specific_heat"
+        },
+        {
+          "kind": "method",
+          "name": "to_dict"
+        }
+      ],
+      "module": "tropoi.physics.materials",
+      "qualname": "PolynomialHeatCapacity"
+    },
+    {
+      "decorators": [
+        "dataclass(frozen=True)"
+      ],
+      "external_bases": [],
+      "id": "tropoi.physics.materials.SaturatingExponentialHeatCapacity",
+      "members": [
+        {
+          "kind": "method",
+          "name": "enthalpy_difference"
+        },
+        {
+          "kind": "method",
+          "name": "specific_heat"
+        },
+        {
+          "kind": "method",
+          "name": "to_dict"
+        }
+      ],
+      "module": "tropoi.physics.materials",
+      "qualname": "SaturatingExponentialHeatCapacity"
+    },
+    {
+      "decorators": [
+        "dataclass(frozen=True)"
+      ],
+      "external_bases": [],
+      "id": "tropoi.physics.materials.Stratum",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__post_init__"
+        },
+        {
+          "kind": "method",
+          "name": "to_dict"
+        },
+        {
+          "kind": "classmethod",
+          "name": "volumetric"
+        }
+      ],
+      "module": "tropoi.physics.materials",
+      "qualname": "Stratum"
+    },
+    {
       "decorators": [],
       "external_bases": [
         "RuntimeError"
@@ -1311,11 +1469,23 @@
         },
         {
           "kind": "method",
-          "name": "_constants"
+          "name": "_consts"
         },
         {
-          "kind": "staticmethod",
-          "name": "_thomas"
+          "kind": "method",
+          "name": "_report"
+        },
+        {
+          "kind": "method",
+          "name": "_system"
+        },
+        {
+          "kind": "method",
+          "name": "conductivity"
+        },
+        {
+          "kind": "classmethod",
+          "name": "constant"
         },
         {
           "kind": "property",
@@ -1324,6 +1494,10 @@
         {
           "kind": "method",
           "name": "energy"
+        },
+        {
+          "kind": "method",
+          "name": "extent"
         },
         {
           "kind": "method",
@@ -1336,6 +1510,10 @@
         {
           "kind": "method",
           "name": "signature"
+        },
+        {
+          "kind": "method",
+          "name": "state_at"
         },
         {
           "kind": "method",
@@ -1352,6 +1530,26 @@
       ],
       "module": "tropoi.physics.substrate",
       "qualname": "ConductiveSubstrate"
+    },
+    {
+      "decorators": [],
+      "external_bases": [
+        "typing.NamedTuple"
+      ],
+      "id": "tropoi.physics.substrate.StepReport",
+      "members": [],
+      "module": "tropoi.physics.substrate",
+      "qualname": "StepReport"
+    },
+    {
+      "decorators": [],
+      "external_bases": [
+        "ArithmeticError"
+      ],
+      "id": "tropoi.physics.substrate.SubstrateSolveError",
+      "members": [],
+      "module": "tropoi.physics.substrate",
+      "qualname": "SubstrateSolveError"
     },
     {
       "decorators": [],
@@ -3759,6 +3957,86 @@
       ],
       "module": "tropoi.representation.visual.vorticity_viewer",
       "qualname": "VorticityViewer"
+    },
+    {
+      "decorators": [
+        "dataclass(frozen=True)"
+      ],
+      "external_bases": [],
+      "id": "tropoi.run.airless.config.AirlessConfig",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__post_init__"
+        },
+        {
+          "kind": "method",
+          "name": "canonical_json"
+        },
+        {
+          "kind": "property",
+          "name": "dt"
+        },
+        {
+          "kind": "classmethod",
+          "name": "from_dict"
+        },
+        {
+          "kind": "method",
+          "name": "sha256"
+        },
+        {
+          "kind": "method",
+          "name": "to_dict"
+        },
+        {
+          "kind": "method",
+          "name": "with_"
+        }
+      ],
+      "module": "tropoi.run.airless.config",
+      "qualname": "AirlessConfig"
+    },
+    {
+      "decorators": [],
+      "external_bases": [],
+      "id": "tropoi.run.airless.experiment.AirlessRun",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__init__"
+        },
+        {
+          "kind": "method",
+          "name": "_checksums"
+        },
+        {
+          "kind": "method",
+          "name": "_cycle"
+        },
+        {
+          "kind": "method",
+          "name": "_diagnostics"
+        },
+        {
+          "kind": "method",
+          "name": "_event"
+        },
+        {
+          "kind": "method",
+          "name": "_mkdir"
+        },
+        {
+          "kind": "method",
+          "name": "_write_json"
+        },
+        {
+          "kind": "method",
+          "name": "run"
+        }
+      ],
+      "module": "tropoi.run.airless.experiment",
+      "qualname": "AirlessRun"
     },
     {
       "decorators": [
