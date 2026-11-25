@@ -383,3 +383,63 @@ At 0°N 0°E the native maxima are 3.75, 4.10 and 2.40 K, which do not shrink
 monotonically, while the RMS halves at each level (2.17, 1.12, 0.59 K). The
 failure is reported to the owner for a methodological decision. The
 criterion is not changed here.
+
+### R2 (2026-11-25, owner-approved): G-I fourth refinement level, protocol frozen before running
+
+R1 and its failed strict verdict for the three-level ladder stand
+unchanged. R2 adds evidence; it does not re-evaluate R1. The G-I bound is
+unchanged: max |ΔT_s| ≤ e_ours + e_heat1d + 0.2 K.
+
+**Level 3 settings** (each a joint halving of level 2):
+- **Ours:** top cell 0.25 mm, stretch 1.012, 17 280 steps per solar day.
+- **heat1d:** m = 320 nodes per skin depth, n = 32 (spacing growth
+  1 + 1/n), DTSURF 1e-9 K, property cache disabled, CFL-limited substeps
+  (heat1d's own `computeCFL`), with the absorbed flux from the same
+  geometry at every substep.
+- Same columns (0°N 0°E and 0°N 90°E), materials, G = 0.02 W m⁻² and 1 m
+  depth as levels 0–2.
+
+**Initial conditions.** Both codes start from the verified level-2 periodic
+solution, interpolated on the finite-volume reconstruction. That makes it
+cheaper, but the periodicity checks are unchanged:
+- ours must meet G-P2 in ≥ 2 consecutive production cycles;
+- heat1d must change by < 0.01 K between its last two cycles.
+
+**Sample alignment.**
+- *Finest-level maximum:* max |ΔT_s| over **every native level-3 sample**
+  (17 280 per day). It is never subsampled.
+- *Error estimates:* d = max |Q3 − Q2| on the level-2 times (the densest
+  set where both codes have two levels), and order p from the three-level
+  estimate on the level-1 times (levels 1, 2 and 3). Then
+  e = d / (2^p − 1), or 2d if p ≤ 0.5. This is the R1 procedure shifted up
+  one level.
+
+**Decision.** G-I is satisfied by the four-level evidence if and only if,
+**for both columns**, all three of these hold:
+1. the level-3 native maximum is ≤ e_ours + e_heat1d + 0.2 K;
+2. the RMS difference decreases at every level;
+3. the native maximum at level 3 is below that at level 2.
+
+Otherwise G-I stays failed and is reported as such. The maximum within
+the sunrise window (cycle fraction 0.749–0.752 at 0°E) is reported
+separately at native resolution for every level.
+
+**Sunrise attribution experiment** (diagnostic, no pass/fail):
+- **Common start:** both codes start from the level-3 periodic state at the
+  last level-3 sample before the first sunrise at 0°E, and integrate for
+  2 Earth days.
+- **Variants:**
+  - O1: ours at level-3 grid and dt.
+  - O2: ours at level-3 grid, dt / 16 (temporal discretization).
+  - O3: ours on a grid 4× finer, dt / 16 (spatial, including the skin).
+  - H1: heat1d at level-3 nodes, Fourier number F = 0.5 (heat1d's default
+    CFL substeps).
+  - H2: as H1 with F = 0.05 (time-lagged properties and operator splitting).
+  - H3: heat1d on 4× finer nodes, F = 0.5 (its 3-point surface gradient and
+    spatial error).
+- **Reading:**
+  - O1 ≈ O2 ≈ O3 would show ours converged at sunrise.
+  - H2 or H3 moving toward ours would attribute heat1d's offset to lag or
+    splitting (H2), or to surface-gradient and spatial error (H3).
+  - The remaining O-to-H gap at the finest variants is the formulation
+    difference.
