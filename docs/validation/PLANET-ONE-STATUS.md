@@ -120,24 +120,24 @@ resume. It never changes a criterion.
 
 ## How to resume
 
-1. Wait for, or rerun, the ladder: `PYTHONPATH=src:. python
-   tools/planet_one/convergence.py runs/planet-one/gp-vpw99-two-G0.02 --model
-   TWO --geothermal-flux 0.02 --workers 8`. Completed run directories are
-   reused; `--tables-only` recomputes `gp.json` only.
-2. If G-P passes at the base settings (4320 steps per cycle, top 1 mm,
-   stretch 1.0488, depth 1 m), run the L3 reproductions with the same
-   settings: `python -m tropoi.run.airless run --preset mercury-vpw99 --model
-   {TWO,TOP,BOT} --geothermal-flux 0 --points 0,0 --out ...`.
-3. G-I: write `tools/planet_one/heat1d_compare.py` as planned above.
-4. Global: `python -m tropoi.run.airless run --preset mercury-vpw99 --grid
-   90x180 --workers 8 --out runs/planet-one/global-vpw99-two`, then compare
-   selected columns with standalone runs at identical coordinates (G-G).
-5. Visualization: a self-contained HTML built from `retained/`
-   (surface.npy: samples × [T_s, SW, absorbed, emitted, q_s] × columns;
-   profiles.npy: samples × L × columns; grid.npz).
-6. Rerun G-R at the final commit, regenerate the architecture snapshot, and
-   update this file and the PR.
-
+1. **Pending owner decision: G-I at 0°N 0°E** (register R1). The likely
+   next step, if chosen, is gathering more evidence rather than changing the
+   criterion. Add a fourth joint refinement level to
+   `tools/planet_one/heat1d_compare.py` (LEVELS), rerun it, and call
+   `verdict()`. heat1d's CFL substeps make that level slow on the CPU, about
+   hours.
+2. **GPU runs on Colab:** `colab new -s NAME --gpu T4`, then the bootstrap
+   and launch scripts pattern described in the memory note. Use
+   `python -m tropoi.run.airless run ... --backend cupy --workers 1`. Then
+   run `tools/planet_one/global_check.py RUN` and
+   `tools/planet_one/build_view.py RUN OUT.html --gp/--gi/--l3` on the VM,
+   download files of 19 MB or less, and `colab stop`.
+3. **Drive mirror** (main account): folder `planet-one-global2-gpu-evidence`
+   under the Do-Mercury folder holds the view, the run bundle and the
+   profile subset (5 MiB parts with `MANIFEST-v2.txt`). The connector limit
+   is about 7 MB.
+4. **Before any merge:** owner review of #66 and #67. Merging needs explicit
+   approval.
 
 ## Results so far (2026-11-25)
 
