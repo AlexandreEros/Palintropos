@@ -31507,7 +31507,7 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 [],
 [
 [
-298,
+307,
 8,
 "self._event('created', columns=int(self.lat.size), layers=self.sub.layers)",
 [
@@ -31528,9 +31528,9 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ],
 [
 [
-292,
+298,
 8,
-"self._write_json('config.json', {'config': cfg.to_dict(), 'config_sha256': cfg.sha256(), 'code': self.code, 'environment': environment_identity(), 'substrate': self.sub.signature(), 'workers': self.workers, 'backend': self.backend, 'create…",
+"self._write_json('config.json', {'config': cfg.to_dict(), 'config_sha256': cfg.sha256(), 'code': self.code, 'environment': environment_identity(), 'substrate': self.sub.signature(), 'workers': self.workers, 'backend': self.backend, 'initia…",
 [
 [
 "name",
@@ -31545,7 +31545,7 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ],
 [
 [
-277,
+283,
 8,
 "_backend(backend)",
 [
@@ -31558,7 +31558,7 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ],
 [
 [
-291,
+297,
 37,
 "build_columns(cfg)",
 [
@@ -31571,7 +31571,7 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ],
 [
 [
-290,
+296,
 19,
 "build_substrate(cfg)",
 [
@@ -31584,13 +31584,13 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ],
 [
 [
-285,
+291,
 18,
 "RunError('refusing to run from an unidentified or modified source tree (pass allow_dirty for development runs)')",
 []
 ],
 [
-288,
+294,
 18,
 "RunError(f'{self.dir} is not empty; airless runs never overwrite')",
 []
@@ -31598,7 +31598,7 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ],
 [
 [
-283,
+289,
 20,
 "code_identity()",
 []
@@ -31606,7 +31606,7 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ],
 [
 [
-294,
+300,
 27,
 "environment_identity()",
 []
@@ -31614,7 +31614,7 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ],
 [
 [
-315,
+324,
 12,
 "self._mkdir(f'cycles/cycle-{cycle:04d}')",
 [
@@ -31627,7 +31627,7 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ],
 [
 [
-323,
+332,
 64,
 "_call(a)",
 [
@@ -31640,7 +31640,7 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ],
 [
 [
-452,
+465,
 8,
 "self._checksums()",
 []
@@ -31648,7 +31648,7 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ],
 [
 [
-373,
+386,
 22,
 "self._cycle(pool, state, cycle, steps, record_every and stage == 'production', None if previous is None else previous['dir'])",
 [
@@ -31681,7 +31681,7 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ],
 [
 [
-377,
+390,
 23,
 "self._diagnostics(res, steps, stage, cycle)",
 [
@@ -31706,7 +31706,7 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ],
 [
 [
-383,
+396,
 16,
 "self._event('cycle', **{k: v for k, v in diag.items() if not isinstance(v, (list, dict))})",
 [
@@ -31721,7 +31721,7 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ]
 ],
 [
-431,
+444,
 20,
 "self._event('wall_limit')",
 [
@@ -31732,7 +31732,7 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ]
 ],
 [
-397,
+410,
 24,
 "self._event('aitken', cycle=cycle, stage=stage, fraction_extrapolated=fa)",
 [
@@ -31755,7 +31755,7 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ]
 ],
 [
-451,
+464,
 8,
 "self._event('completed', status=status)",
 [
@@ -31772,7 +31772,7 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ],
 [
 [
-381,
+394,
 25,
 "self._mkdir('series')",
 [
@@ -31783,7 +31783,7 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ]
 ],
 [
-449,
+462,
 12,
 "self._mkdir('retained')",
 [
@@ -31796,7 +31796,7 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ],
 [
 [
-380,
+393,
 16,
 "self._write_json('cycles.json', history)",
 [
@@ -31813,7 +31813,7 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ],
 [
 [
-394,
+407,
 32,
 "aitken(ends[0][0], ends[1][0], ends[2][0])",
 [
@@ -31832,7 +31832,7 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ]
 ],
 [
-395,
+408,
 31,
 "aitken(ends[0][1], ends[1][1], ends[2][1])",
 [
@@ -95896,114 +95896,121 @@ null,
 "270":"class AirlessRun:",
 "274":"    def __init__(self, cfg: AirlessConfig, run_dir, *, workers: int = 1,",
 "275":"                 backend: str = \"numpy\", allow_dirty: bool = False,",
-"276":"                 log: Callable[[str], None] = print):",
-"277":"        _backend(backend)                       # validate early",
-"278":"        self.backend = backend",
-"279":"        self.cfg = cfg",
-"281":"        self.workers = max(1, int(workers))",
-"282":"        self.log = log",
-"283":"        self.code = code_identity()",
-"284":"        if not allow_dirty and (self.code.get(\"git_commit\") is None or self.code.get(\"git_dirty\")):",
-"285":"            raise RunError(\"refusing to run from an unidentified or modified source tree \"",
-"286":"                           \"(pass allow_dirty for development runs)\")",
-"287":"        if self.dir.exists() and any(self.dir.iterdir()):",
-"288":"            raise RunError(f\"{self.dir} is not empty; airless runs never overwrite\")",
-"289":"        self.dir.mkdir(parents=True, exist_ok=True)",
-"290":"        self.sub = build_substrate(cfg)",
-"291":"        self.lat, self.lon, self.w = build_columns(cfg)",
-"292":"        self._write_json(\"config.json\", {",
-"293":"            \"config\": cfg.to_dict(), \"config_sha256\": cfg.sha256(), \"code\": self.code,",
-"294":"            \"environment\": environment_identity(), \"substrate\": self.sub.signature(),",
-"295":"            \"workers\": self.workers, \"backend\": self.backend, \"created\": time.strftime(\"%Y-%m-%dT%H:%M:%SZ\", time.gmtime())})",
-"296":"        np.savez(self.dir / \"grid.npz\", lat_deg=self.lat, lon_deg=self.lon, weights=self.w,",
-"297":"                 interfaces=self.sub.interfaces, centres=self.sub.centres)",
-"298":"        self._event(\"created\", columns=int(self.lat.size), layers=self.sub.layers)",
-"299":"",
-"300":"    # -- io -----------------------------------------------------------------------------",
-"302":"    def _write_json(self, name, obj):",
-"303":"        (self.dir / name).write_text(json.dumps(obj, indent=1, default=_json_default))",
-"305":"    def _event(self, event, **fields):",
-"306":"        with open(self.dir / \"events.jsonl\", \"a\") as fh:",
-"307":"            fh.write(json.dumps({\"event\": event, \"time\": time.time(), **fields},",
-"312":"    def _cycle(self, pool, state, cycle, steps, record_every, prev_dir):",
-"313":"        n = self.lat.size",
-"314":"        blocks = [b for b in np.array_split(np.arange(n), self.workers) if b.size]",
-"315":"        d = self._mkdir(f\"cycles/cycle-{cycle:04d}\")",
-"316":"        (d / \"blocks.json\").write_text(json.dumps(",
-"317":"            {\"ranges\": [[int(b[0]), int(b[-1]) + 1] for b in blocks], \"steps\": steps}))",
-"318":"        cfgd = self.cfg.to_dict()",
-"321":"                 self.backend)",
-"322":"                for k, b in enumerate(blocks)]",
-"323":"        parts = pool.map(_call, args) if pool is not None else [_call(a) for a in args]",
-"324":"        out = {\"anomaly\": np.concatenate([p[\"anomaly\"] for p in parts], axis=1),",
-"325":"               \"surface_anomaly\": np.concatenate([p[\"surface_anomaly\"] for p in parts]),",
-"349":"        kept = sorted((self.dir / \"cycles\").iterdir())",
-"354":"    def run(self, max_wall_s: Optional[float] = None) -\u003e dict:",
-"355":"        cfg = self.cfg",
-"357":"        st = self.sub.initial_state(self.lat.size)",
-"359":"        record_every = bool(cfg.output.get(\"every_step_profiles\"))",
-"368":"        pool = ctx.Pool(self.workers) if self.workers \u003e 1 else None",
-"371":"                steps = cfg.spinup_cycle_steps if stage == \"spinup\" else cfg.cycle_steps",
-"372":"                t0 = time.time()",
-"373":"                res = self._cycle(pool, state, cycle, steps,",
-"374":"                                  record_every and stage == \"production\",",
-"375":"                                  None if previous is None else previous[\"dir\"])",
-"376":"                state = (res[\"anomaly\"], res[\"surface_anomaly\"])",
-"377":"                diag = self._diagnostics(res, steps, stage, cycle)",
-"378":"                diag[\"wall_s\"] = time.time() - t0",
-"379":"                history.append(diag)",
-"380":"                self._write_json(\"cycles.json\", history)",
-"381":"                np.savez(self._mkdir(\"series\") / f\"cycle-{cycle:04d}.npz\",",
-"382":"                         iterations=res[\"iterations\"], **res[\"global\"])",
-"383":"                self._event(\"cycle\", **{k: v for k, v in diag.items()",
-"384":"                                        if not isinstance(v, (list, dict))})",
-"385":"                self.log(f\"cycle {cycle} [{stage}] {diag['periodic']} \"",
-"386":"                         f\"dTs={diag.get('max_surface_change_K')} \"",
-"392":"                    ends.append(state)",
-"393":"                    if per.get(\"spinup_acceleration\") and len(ends) == 3:",
-"394":"                        a, fa = aitken(ends[0][0], ends[1][0], ends[2][0])",
-"395":"                        b, _ = aitken(ends[0][1], ends[1][1], ends[2][1])",
-"396":"                        state = (a, b)",
-"397":"                        self._event(\"aitken\", cycle=cycle, stage=stage,",
-"398":"                                    fraction_extrapolated=fa)",
-"399":"                        ends = []",
-"400":"                        res = None          # never compare across an extrapolation",
-"429":"                if (stage == \"production\" and max_wall_s is not None",
+"276":"                 log: Callable[[str], None] = print,",
+"277":"                 initial_state=None, initial_state_source: Optional[str] = None):",
+"278":"        \"\"\"``initial_state`` = (anomaly (L, ncol), surface_anomaly (ncol,)), in",
+"281":"        interpolated). Its provenance goes into config.json as",
+"282":"        ``initial_state_source``. The periodicity criteria are unchanged.\"\"\"",
+"283":"        _backend(backend)                       # validate early",
+"284":"        self.backend = backend",
+"285":"        self.cfg = cfg",
+"287":"        self.workers = max(1, int(workers))",
+"288":"        self.log = log",
+"289":"        self.code = code_identity()",
+"290":"        if not allow_dirty and (self.code.get(\"git_commit\") is None or self.code.get(\"git_dirty\")):",
+"291":"            raise RunError(\"refusing to run from an unidentified or modified source tree \"",
+"292":"                           \"(pass allow_dirty for development runs)\")",
+"293":"        if self.dir.exists() and any(self.dir.iterdir()):",
+"294":"            raise RunError(f\"{self.dir} is not empty; airless runs never overwrite\")",
+"295":"        self.dir.mkdir(parents=True, exist_ok=True)",
+"296":"        self.sub = build_substrate(cfg)",
+"297":"        self.lat, self.lon, self.w = build_columns(cfg)",
+"298":"        self._write_json(\"config.json\", {",
+"299":"            \"config\": cfg.to_dict(), \"config_sha256\": cfg.sha256(), \"code\": self.code,",
+"300":"            \"environment\": environment_identity(), \"substrate\": self.sub.signature(),",
+"301":"            \"workers\": self.workers, \"backend\": self.backend,",
+"302":"            \"initial_state_source\": initial_state_source if initial_state is not None else None,",
+"303":"            \"created\": time.strftime(\"%Y-%m-%dT%H:%M:%SZ\", time.gmtime())})",
+"304":"        self.initial_state = initial_state",
+"305":"        np.savez(self.dir / \"grid.npz\", lat_deg=self.lat, lon_deg=self.lon, weights=self.w,",
+"306":"                 interfaces=self.sub.interfaces, centres=self.sub.centres)",
+"307":"        self._event(\"created\", columns=int(self.lat.size), layers=self.sub.layers)",
+"308":"",
+"309":"    # -- io -----------------------------------------------------------------------------",
+"311":"    def _write_json(self, name, obj):",
+"312":"        (self.dir / name).write_text(json.dumps(obj, indent=1, default=_json_default))",
+"314":"    def _event(self, event, **fields):",
+"315":"        with open(self.dir / \"events.jsonl\", \"a\") as fh:",
+"316":"            fh.write(json.dumps({\"event\": event, \"time\": time.time(), **fields},",
+"321":"    def _cycle(self, pool, state, cycle, steps, record_every, prev_dir):",
+"322":"        n = self.lat.size",
+"323":"        blocks = [b for b in np.array_split(np.arange(n), self.workers) if b.size]",
+"324":"        d = self._mkdir(f\"cycles/cycle-{cycle:04d}\")",
+"325":"        (d / \"blocks.json\").write_text(json.dumps(",
+"326":"            {\"ranges\": [[int(b[0]), int(b[-1]) + 1] for b in blocks], \"steps\": steps}))",
+"327":"        cfgd = self.cfg.to_dict()",
+"330":"                 self.backend)",
+"331":"                for k, b in enumerate(blocks)]",
+"332":"        parts = pool.map(_call, args) if pool is not None else [_call(a) for a in args]",
+"333":"        out = {\"anomaly\": np.concatenate([p[\"anomaly\"] for p in parts], axis=1),",
+"334":"               \"surface_anomaly\": np.concatenate([p[\"surface_anomaly\"] for p in parts]),",
+"358":"        kept = sorted((self.dir / \"cycles\").iterdir())",
+"363":"    def run(self, max_wall_s: Optional[float] = None) -\u003e dict:",
+"364":"        cfg = self.cfg",
+"370":"            st = self.sub.initial_state(self.lat.size)",
+"372":"        record_every = bool(cfg.output.get(\"every_step_profiles\"))",
+"381":"        pool = ctx.Pool(self.workers) if self.workers \u003e 1 else None",
+"384":"                steps = cfg.spinup_cycle_steps if stage == \"spinup\" else cfg.cycle_steps",
+"385":"                t0 = time.time()",
+"386":"                res = self._cycle(pool, state, cycle, steps,",
+"387":"                                  record_every and stage == \"production\",",
+"388":"                                  None if previous is None else previous[\"dir\"])",
+"389":"                state = (res[\"anomaly\"], res[\"surface_anomaly\"])",
+"390":"                diag = self._diagnostics(res, steps, stage, cycle)",
+"391":"                diag[\"wall_s\"] = time.time() - t0",
+"392":"                history.append(diag)",
+"393":"                self._write_json(\"cycles.json\", history)",
+"394":"                np.savez(self._mkdir(\"series\") / f\"cycle-{cycle:04d}.npz\",",
+"395":"                         iterations=res[\"iterations\"], **res[\"global\"])",
+"396":"                self._event(\"cycle\", **{k: v for k, v in diag.items()",
+"397":"                                        if not isinstance(v, (list, dict))})",
+"398":"                self.log(f\"cycle {cycle} [{stage}] {diag['periodic']} \"",
+"399":"                         f\"dTs={diag.get('max_surface_change_K')} \"",
+"405":"                    ends.append(state)",
+"406":"                    if per.get(\"spinup_acceleration\") and len(ends) == 3:",
+"407":"                        a, fa = aitken(ends[0][0], ends[1][0], ends[2][0])",
+"408":"                        b, _ = aitken(ends[0][1], ends[1][1], ends[2][1])",
+"409":"                        state = (a, b)",
+"410":"                        self._event(\"aitken\", cycle=cycle, stage=stage,",
+"411":"                                    fraction_extrapolated=fa)",
+"412":"                        ends = []",
+"413":"                        res = None          # never compare across an extrapolation",
 "43":"",
-"430":"                        and time.time() - t_start \u003e max_wall_s and res is not None):",
-"431":"                    self._event(\"wall_limit\")",
-"432":"                    break",
-"433":"                previous = res",
 "44":"from tropoi.physics.insolation import insolation_from_spec",
-"447":"            shutil.copytree(src, self.dir / \"retained\")",
-"448":"        else:",
-"449":"            self._mkdir(\"retained\")",
+"442":"                if (stage == \"production\" and max_wall_s is not None",
+"443":"                        and time.time() - t_start \u003e max_wall_s and res is not None):",
+"444":"                    self._event(\"wall_limit\")",
+"445":"                    break",
+"446":"                previous = res",
 "45":"from tropoi.physics.substrate import ConductiveSubstrate",
-"450":"        (self.dir / \"retained\" / \"status.json\").write_text(json.dumps(retained, indent=1))",
-"451":"        self._event(\"completed\", status=status)",
-"452":"        self._checksums()",
-"453":"        return retained",
-"454":"",
-"455":"    def _mkdir(self, name):",
-"456":"        p = self.dir / name",
-"457":"        p.mkdir(parents=True, exist_ok=True)",
 "46":"from tropoi.run.airless.config import AirlessConfig, strata_from_dicts",
-"460":"    def _diagnostics(self, res, steps, stage, cycle):",
-"461":"        cfg, per = self.cfg, self.cfg.periodicity",
-"465":"        w = self.w / self.w.sum()",
+"460":"            shutil.copytree(src, self.dir / \"retained\")",
+"461":"        else:",
+"462":"            self._mkdir(\"retained\")",
+"463":"        (self.dir / \"retained\" / \"status.json\").write_text(json.dumps(retained, indent=1))",
+"464":"        self._event(\"completed\", status=status)",
+"465":"        self._checksums()",
+"466":"        return retained",
+"467":"",
+"468":"    def _mkdir(self, name):",
+"469":"        p = self.dir / name",
 "47":"from tropoi.run.held_suarez.experiment import RunError, code_identity, environment_identity",
-"477":"            diag.update(max_surface_change_K=res[\"d_s\"], max_subsurface_change_K=res[\"d_p\"],",
+"470":"        p.mkdir(parents=True, exist_ok=True)",
+"473":"    def _diagnostics(self, res, steps, stage, cycle):",
+"474":"        cfg, per = self.cfg, self.cfg.periodicity",
+"478":"        w = self.w / self.w.sum()",
 "48":"",
-"485":"    def _checksums(self):",
-"486":"        lines = []",
-"487":"        for p in sorted(self.dir.rglob(\"*\")):",
-"488":"            if p.is_file() and p.name != \"SHA256SUMS\":",
-"489":"                h = hashlib.sha256(p.read_bytes()).hexdigest()",
-"490":"                lines.append(f\"{h}  {p.relative_to(self.dir)}\")",
-"494":"def _json_default(o):",
-"495":"    if isinstance(o, (np.floating, np.integer)):",
-"496":"        return o.item()",
-"498":"        return o.tolist()",
+"490":"            diag.update(max_surface_change_K=res[\"d_s\"], max_subsurface_change_K=res[\"d_p\"],",
+"498":"    def _checksums(self):",
+"499":"        lines = []",
+"500":"        for p in sorted(self.dir.rglob(\"*\")):",
+"501":"            if p.is_file() and p.name != \"SHA256SUMS\":",
+"502":"                h = hashlib.sha256(p.read_bytes()).hexdigest()",
+"503":"                lines.append(f\"{h}  {p.relative_to(self.dir)}\")",
+"507":"def _json_default(o):",
+"508":"    if isinstance(o, (np.floating, np.integer)):",
+"509":"        return o.item()",
+"511":"        return o.tolist()",
 "52":"def build_columns(cfg: AirlessConfig):",
 "53":"    \"\"\"(lat_deg, lon_deg, area weights): weights are R^2 dlambda (sin phi_N -",
 "65":"        return la.ravel(), lo.ravel(), np.array(w).ravel()",
@@ -104600,7 +104607,7 @@ null,
 }
 },
 "meta":{
-"base_commit":"3d05287f73d9a7fe731b480495ca035c9b3b2f4b",
+"base_commit":"44295e41bfee436c17ee2aca70f123be84bd06fc",
 "call_depth":4,
 "command":"python -m tools.architecture.generate",
 "dynamic_import_sites":{
@@ -104644,7 +104651,7 @@ null,
 "max_sites":8,
 "package":"tropoi",
 "source_commit":null,
-"source_sha256":"33fe22e2ea5645f296348830e8b070f0166573f8909449473b16ccd603621394",
+"source_sha256":"669ae9073290cb9bd40d9176de881529f03280995034c3d8934f7d4c2efa4298",
 "source_status":"clean",
 "title":"current",
 "tool_version":"2.3.0",
@@ -113025,43 +113032,43 @@ null,
 [
 "method",
 1346,
-485,
+498,
 1327
 ],
 [
 "method",
 1346,
-312,
+321,
 1327
 ],
 [
 "method",
 1346,
-460,
+473,
 1327
 ],
 [
 "method",
 1346,
-305,
+314,
 1327
 ],
 [
 "method",
 1346,
-455,
+468,
 1327
 ],
 [
 "method",
 1346,
-302,
+311,
 1327
 ],
 [
 "method",
 1346,
-354,
+363,
 1327
 ],
 [
@@ -113085,7 +113092,7 @@ null,
 [
 "function",
 1346,
-494,
+507,
 1327
 ],
 [
@@ -133023,7 +133030,7 @@ null
 null,
 "One experiment directory (fresh runs only; a finished directory is never overwritten).",
 [],
-491,
+504,
 []
 ],
 "1348":[
@@ -133070,12 +133077,24 @@ null
 "log",
 "Callable[[str], None]",
 "print"
+],
+[
+"kw",
+"initial_state",
+null,
+"None"
+],
+[
+"kw",
+"initial_state_source",
+"Optional[str]",
+"None"
 ]
 ],
 null,
-"",
+"``initial_state`` = (anomaly (L, ncol), surface_anomaly (ncol,)), in K relative to 300 K, optionally replaces the configured isothermal start (for example a verified periodic solution on another grid, interpolated). Its provenance goes into config.json as ``initial_state_source``. The periodicity criteria are unchanged.",
 [],
-298
+307
 ],
 "1349":[
 "_checksums",
@@ -133090,7 +133109,7 @@ null
 null,
 "",
 [],
-491
+504
 ],
 "135":[
 "__init__",
@@ -133174,7 +133193,7 @@ null
 null,
 "",
 [],
-352
+361
 ],
 "1351":[
 "_diagnostics",
@@ -133213,7 +133232,7 @@ null
 null,
 "",
 [],
-483
+496
 ],
 "1352":[
 "_event",
@@ -133240,7 +133259,7 @@ null
 null,
 "",
 [],
-308
+317
 ],
 "1353":[
 "_mkdir",
@@ -133261,7 +133280,7 @@ null
 null,
 "",
 [],
-458
+471
 ],
 "1354":[
 "_write_json",
@@ -133288,7 +133307,7 @@ null
 null,
 "",
 [],
-303
+312
 ],
 "1355":[
 "run",
@@ -133309,7 +133328,7 @@ null
 "dict",
 "",
 [],
-453
+466
 ],
 "1356":[
 "_backend",
@@ -133369,7 +133388,7 @@ null
 null,
 "",
 [],
-501
+514
 ],
 "136":[
 "adjust",
@@ -298139,22 +298158,22 @@ null
 },
 [
 [
-284,
+290,
 "unresolved",
 "self.code.get"
 ],
 [
-284,
+290,
 "unresolved",
 "self.code.get"
 ],
 [
-287,
+293,
 "unresolved",
 "self.dir.exists"
 ],
 [
-287,
+293,
 "unresolved",
 "self.dir.iterdir"
 ]
@@ -298168,22 +298187,22 @@ null
 },
 [
 [
-487,
+500,
 "unresolved",
 "self.dir.rglob"
 ],
 [
-488,
+501,
 "unresolved",
 "p.is_file"
 ],
 [
-489,
+502,
 "unresolved",
 "hashlib.sha256(p.read_bytes()).hexdigest"
 ],
 [
-490,
+503,
 "unresolved",
 "lines.append"
 ]
@@ -298197,22 +298216,22 @@ null
 },
 [
 [
-316,
+325,
 "unresolved",
 "(d / 'blocks.json').write_text"
 ],
 [
-318,
+327,
 "unresolved",
 "self.cfg.to_dict"
 ],
 [
-323,
+332,
 "unresolved",
 "pool.map"
 ],
 [
-349,
+358,
 "unresolved",
 "(self.dir / 'cycles').iterdir"
 ]
@@ -298226,12 +298245,12 @@ null
 },
 [
 [
-465,
+478,
 "unresolved",
 "self.w.sum"
 ],
 [
-477,
+490,
 "unresolved",
 "diag.update"
 ]
@@ -298245,7 +298264,7 @@ null
 },
 [
 [
-307,
+316,
 "unresolved",
 "fh.write"
 ]
@@ -298257,7 +298276,7 @@ null
 },
 [
 [
-457,
+470,
 "unresolved",
 "p.mkdir"
 ]
@@ -298270,7 +298289,7 @@ null
 },
 [
 [
-303,
+312,
 "unresolved",
 "(self.dir / name).write_text"
 ]
@@ -298279,27 +298298,27 @@ null
 "1355":[
 {
 "builtin":5,
-"external":11,
+"external":13,
 "unresolved":16
 },
 [
 [
-357,
+370,
 "unresolved",
 "self.sub.initial_state"
 ],
 [
-359,
+372,
 "unresolved",
 "cfg.output.get"
 ],
 [
-368,
+381,
 "unresolved",
 "ctx.Pool"
 ],
 [
-379,
+392,
 "unresolved",
 "history.append"
 ]
@@ -298332,12 +298351,12 @@ null
 },
 [
 [
-496,
+509,
 "unresolved",
 "o.item"
 ],
 [
-498,
+511,
 "unresolved",
 "o.tolist"
 ]
