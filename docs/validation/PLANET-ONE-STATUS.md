@@ -153,7 +153,7 @@ resume. It never changes a criterion.
   - L4 is NOT EVALUATED.
 - **PR #66 GPU coverage:** the CUDA radiative tests pass on a T4 at 3bce170 (154 passed, 9 THAI k-table skips; `planet-one-evidence/geometry-pr66-cuda-tests-t4.json`).
 - **4° CPU run:** finished PERIODIC (supplementary).
-- **View:** published, but not yet rendered in a browser (only `node --check` was run). Version 2 states the G-I verdict.
+- **View:** published (version 3) and rendered in headless Chromium: no console errors, slider end to end, geometry readouts checked (subsolar point 180°E at the second perihelion, retrograde loop). It states the G-I verdict.
 - **4° CPU run:** supplementary evidence only. The 2° acceptance run is the
   GPU run.
 - **Remaining before review:** owner review of #66/#67; optionally rerun the
