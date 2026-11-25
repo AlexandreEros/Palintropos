@@ -81,7 +81,7 @@ resume. It never changes a criterion.
 | G-R original substrate gates | **PASS** at commit 7090c86; `src/` is unchanged since then, so this is the final kernel: G1M, G2, G3-D, G4 and G5 pass at the original tolerances; G1C and G5b reported | `planet-one-evidence/gr-7090c86/` |
 | G-P Mercury columns | **PASS** (VPW99 TWO, G = 0.02; all six columns; every ladder run PERIODIC). Uses the owner-approved amendment A1 (depth criterion at the same physical depth, 1 m) and estimator correction E1 (flux-consistent face reconstruction). The original frozen depth criterion failed (1.84–2.15 K, a physical geothermal offset) and is preserved | `planet-one-evidence/gp-vpw99-two-G0.02-{pre-amendment,amended}.json` |
 | G-P2 periodicity | Per run, reported in each run's `cycles.json` and `retained/status.json` | |
-| G-I heat1d (L2) | **FAIL at 0°N 0°E, PASS at 0°N 90°E (strict evaluation; owner decision pending)**. At 0°E the finest-level max \|ΔTs\| is 2.40 K at the first sunrise step, against a bound of 2.26 K, and the native maxima run 3.75/4.10/2.40 K (not monotone). At 90°E: 1.36 K against 1.84 K. RMS halves per level at both columns. An earlier PASS used coarse-time sampling chosen after the results were seen; it is withdrawn (register R1) | `planet-one-evidence/gi-heat1d-vpw99-two-G0.02.json` |
+| G-I heat1d (L2) | **Satisfied by the owner-approved four-level evidence (R2)**: 0°E 1.33 K against a 2.03 K bound, 90°E 0.69 K against 1.11 K; RMS and maxima decrease at every level after L1. R1's three-level strict FAIL (0°E 2.40 K against 2.26 K) remains recorded. Sunrise attribution: our backward-Euler time error (0.58 K at L3 dt) and heat1d's lag (0.55 K) and spatial error (0.54 K); refined codes agree to 0.15–0.19 K | `planet-one-evidence/gi-heat1d-vpw99-two-G0.02.json`, `gi-sunrise-attribution.json` |
 | G-M L3 (VPW99) | **EVALUATED**, G = 0, production settings, temperature at depth at 0°N 0°: BOT 367.85 vs 365 K (+2.85), TOP 470.69 vs 463 K (+7.69), TWO 425.78 vs 427 K (−1.22). All within the 10 K investigation threshold; no parameter changed | `planet-one-evidence/l3-vpw99.json` |
 | G-G global | **PASS** (2°, 90×180 = 16 200 columns, CuPy FP64 on a Colab T4, commit 3d05287, 1.63 h): PERIODIC, with G-P2 met in 2 consecutive production cycles; the standalone replay of six columns is bitwise identical (0.0 K); global emitted − absorbed = 0.0202 W m⁻² = G; extents within the c_p law's domain. A supplementary 4° CPU run exists | `planet-one-evidence/global2-gpu-t4.json`; local download `runs/planet-one/global2-gpu-vpw99-two-G0.02-download/` |
 | G-GPU parity (A2) | **PASS** on a T4: max \|T_GPU − T_CPU\| = 1.9e-11 K over a production cycle of the six columns (bound 1e-6 K), with no Newton-iteration differences; energy closure, G4/G5 and manufactured parity on the GPU; 78 tests pass on the T4 | `planet-one-evidence/gpu-t4-2026-11-24.json` |
@@ -120,7 +120,7 @@ resume. It never changes a criterion.
 
 ## How to resume
 
-1. **Pending owner decision: G-I at 0°N 0°E** (register R1). The likely
+1. **Done: G-I resolved by R2** (four levels; see the register). The likely
    next step, if chosen, is gathering more evidence rather than changing the
    criterion. Add a fourth joint refinement level to
    `tools/planet_one/heat1d_compare.py` (LEVELS), rerun it, and call
@@ -148,7 +148,7 @@ resume. It never changes a criterion.
   (sha256 6568a84a…).
 - **Gate summary:**
   - pass: G-A, G-B, G-R (at the final kernel), G-P (with A1/E1), G-M L3 (within 10 K; BOT checked on a 2 m column), G-GPU (A2) and G-G;
-  - **G-I fails at 0°N 0°E** under the strict evaluation (owner decision pending);
+  - G-I is satisfied by the four-level evidence (R2); R1's three-level FAIL is kept on record;
   - L4 is NOT EVALUATED.
 - **PR #66 GPU coverage:** the CUDA radiative tests pass on a T4 at 3bce170 (154 passed, 9 THAI k-table skips; `planet-one-evidence/geometry-pr66-cuda-tests-t4.json`).
 - **4° CPU run:** finished PERIODIC (supplementary).
@@ -163,3 +163,5 @@ resume. It never changes a criterion.
 ## Reproducibility of the 2° run (wording corrected 2026-11-25)
 
 Demonstrated: (1) G-G – replaying the retained cycle of six columns standalone from the saved start state reproduced the global run's tier-2 samples and end state bitwise on the same T4 and software stack; (2) G-GPU – CPU and GPU agree to 1.9e-11 K over a production cycle. Not demonstrated: that rerunning the whole experiment from scratch reproduces the discarded ~2 GB of full-resolution profiles bitwise. That is an expectation (deterministic code, fixed configuration and commit 3d05287, same hardware and software stack), not a tested result; on a different stack only agreement within the G-GPU tolerance is expected.
+
+- **Known limitation (from R2):** at the production timestep the surface temperature in the first hours after sunrise has a backward-Euler error of about 1 K. A higher-order or adaptive time integrator would reduce it.

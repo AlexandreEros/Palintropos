@@ -158,6 +158,56 @@
      "cells_ours": 167
     }
    }
+  },
+  {
+   "level": 3,
+   "ours": {
+    "grid": [
+     0.00025,
+     1.012
+    ],
+    "steps": 17280,
+    "status": {
+     "status": "PERIODIC",
+     "cycle": 2,
+     "stage": "production",
+     "consecutive_periodic_production_cycles": 2,
+     "label": "PERIODIC (G-P2 met in 2 consecutive production cycles)"
+    }
+   },
+   "heat1d": {
+    "m": [
+     320,
+     32
+    ],
+    "steps": 17280
+   },
+   "columns": {
+    "0N 0E": {
+     "heat1d_cycles": 3,
+     "heat1d_last_cycle_change_K": 0.006237637885760705,
+     "max_abs_dTs_K": 1.3341841159350594,
+     "rms_dTs_K": 0.29407073079670626,
+     "Tmax_ours": 700.0091992624787,
+     "Tmax_heat1d": 700.0139350660627,
+     "Tmin_ours": 107.7985654944822,
+     "Tmin_heat1d": 107.44128956168545,
+     "nodes": 160,
+     "cells_ours": 330
+    },
+    "0N 90E": {
+     "heat1d_cycles": 3,
+     "heat1d_last_cycle_change_K": 0.00622877557486845,
+     "max_abs_dTs_K": 0.6906466151510955,
+     "rms_dTs_K": 0.26118924484909756,
+     "Tmax_ours": 568.0221259051384,
+     "Tmax_heat1d": 568.0292233317268,
+     "Tmin_ours": 97.97348323915048,
+     "Tmin_heat1d": 97.65430450874284,
+     "nodes": 160,
+     "cells_ours": 330
+    }
+   }
   }
  ],
  "verdict": {
@@ -229,5 +279,67 @@
   }
  },
  "pass": false,
- "verdict_note": "Strict evaluation decides. At 0N 0E the finest-level maximum occurs at the first sunrise step. A failure here needs an owner decision; the diagnostic sampling must not be used to pass."
+ "verdict_note": "Strict evaluation decides. At 0N 0E the finest-level maximum occurs at the first sunrise step. A failure here needs an owner decision; the diagnostic sampling must not be used to pass.",
+ "verdict_R2": {
+  "columns": {
+   "0N 0E": {
+    "finest_native_max_K": 1.3341841159350594,
+    "native_max_by_level_K": [
+     3.748896903710147,
+     4.097442174561166,
+     2.3978743419692705,
+     1.3341841159350594
+    ],
+    "rms_by_level_K": [
+     2.1721559969939293,
+     1.1245962762086397,
+     0.5864991481959448,
+     0.29407073079670626
+    ],
+    "sunrise_window_max_by_level_K": [
+     2.9529708778405848,
+     4.097442174561166,
+     2.3978743419692705,
+     1.3341841159350594
+    ],
+    "at_cycle_fraction": 0.7501736111111111,
+    "e_ours_K": 0.7006779270941333,
+    "e_heat1d_K": 1.1312637255984694,
+    "order_ours": 0.8110276768796187,
+    "order_heat1d": 0.6275460244993921,
+    "bound_K": 2.031941652692603,
+    "satisfied": true
+   },
+   "0N 90E": {
+    "finest_native_max_K": 0.6906466151510955,
+    "native_max_by_level_K": [
+     3.7861003523404406,
+     2.5612143979871576,
+     1.363041532011053,
+     0.6906466151510955
+    ],
+    "rms_by_level_K": [
+     2.0288038381818616,
+     1.0219269145331527,
+     0.525456395685156,
+     0.26118924484909756
+    ],
+    "sunrise_window_max_by_level_K": [
+     0.05768035970095298,
+     0.028758636052884867,
+     0.014541372206622327,
+     0.007139176538430547
+    ],
+    "at_cycle_fraction": 0.5409143518518519,
+    "e_ours_K": 0.2662408486401728,
+    "e_heat1d_K": 0.6429684087791588,
+    "order_ours": 0.9681568680140484,
+    "order_heat1d": 0.8524261757248082,
+    "bound_K": 1.1092092574193315,
+    "satisfied": true
+   }
+  },
+  "satisfied": true,
+  "note": "R2 four-level evidence; R1's three-level FAIL stays recorded"
+ }
 }

@@ -443,3 +443,39 @@ separately at native resolution for every level.
     splitting (H2), or to surface-gradient and spatial error (H3).
   - The remaining O-to-H gap at the finest variants is the formulation
     difference.
+
+#### R2 result (2026-11-25)
+
+The four-level evidence **satisfies G-I** under the frozen R2 procedure.
+R1's three-level FAIL remains recorded.
+
+| Column | Level-3 native max | Bound | Native max, L0 → L3 | RMS, L0 → L3 |
+|---|---|---|---|---|
+| 0°N 0°E (at sunrise) | 1.33 K | 2.03 K | 3.75, 4.10, 2.40, 1.33 K | 2.17, 1.13, 0.59, 0.29 K |
+| 0°N 90°E | 0.69 K | 1.11 K | 3.79, 2.56, 1.36, 0.69 K | 2.03, 1.02, 0.53, 0.26 K |
+
+Observed orders at 0°E are 0.81 (ours) and 0.63 (heat1d); at 90°E they
+are 0.97 and 0.85.
+
+**Initial conditions.** Ours started from the verified level-2 periodic
+solution. heat1d started from our verified level-3 periodic profile,
+because heat1d's level-2 profiles were not stored, which departs from the
+protocol text "level-2". Both met their periodicity checks: ours G-P2;
+heat1d's last-cycle change was 0.006 K.
+
+**Sunrise attribution.** Maximum differences over 2 days from the
+pre-sunrise level-3 state:
+
+| Comparison | Max difference | Attribution |
+|---|---|---|
+| O1–O2 | 0.58 K | our temporal discretization (backward Euler) |
+| O2–O3 | 0.011 K | our grid and skin: negligible |
+| H1–H2 | 0.55 K | heat1d's lagged properties and operator splitting |
+| H1–H3 | 0.54 K | heat1d's surface gradient and spatial error |
+| O2–H2 | 0.19 K | refined ours vs refined heat1d |
+| O3–H3 | 0.15 K | the formulation difference that remains after refinement |
+
+A consequence, now a stated limitation: at the production timestep the
+surface temperature in the first hours after sunrise carries a
+backward-Euler error of order 1 K. This is a fast transient, not one of the
+frozen G-P quantities.
