@@ -23,9 +23,13 @@ import sys
 
 import numpy as np
 
-from tools.planet_one.heat1d_compare import LEVELS, _require_heat1d_periodicity
 from tropoi.physics.insolation import insolation_from_spec
 from tropoi.run.airless.experiment import load_tier2
+
+if __package__:
+    from .heat1d_compare import LEVELS, _require_heat1d_periodicity
+else:
+    from heat1d_compare import LEVELS, _require_heat1d_periodicity
 
 Q = 80.0          # quantization: 1/80 K per count
 

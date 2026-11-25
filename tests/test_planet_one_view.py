@@ -1,4 +1,8 @@
 import json
+import os
+import subprocess
+import sys
+from pathlib import Path
 
 import numpy as np
 import pytest
@@ -76,3 +80,14 @@ def test_viewer_omits_old_verdict_when_heat1d_periodicity_is_unverified():
     summary = _summaries({"gi": gi})
     assert "gi_verdict" not in summary
     assert summary["gi_unverified"]
+
+
+def test_viewer_script_starts_with_only_src_on_pythonpath():
+    root = Path(__file__).resolve().parents[1]
+    result = subprocess.run(
+        [sys.executable, "tools/planet_one/build_view.py", "--help"], cwd=root,
+        env={**os.environ, "PYTHONPATH": str(root / "src")},
+        capture_output=True, text=True, timeout=15,
+    )
+    assert result.returncode == 0, result.stderr
+    assert "--l3" in result.stdout
