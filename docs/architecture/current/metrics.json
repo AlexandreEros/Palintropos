@@ -1,13 +1,13 @@
 {
   "atlas": {
-    "call_edges": 2430,
+    "call_edges": 2432,
     "call_sites_omitted_by_cap": 35,
-    "call_sites_recorded": 3195,
+    "call_sites_recorded": 3197,
     "import_edges": 496,
     "import_sites_omitted_by_cap": 0,
     "import_sites_recorded": 557,
     "max_sites_per_edge": 8,
-    "nodes": 2260,
+    "nodes": 2261,
     "proposal": {
       "call_edges_by_direction": {
         "downward": 426,
@@ -68,7 +68,7 @@
         "run": 92,
         "setup": 292,
         "spectral": 249,
-        "world": 160
+        "world": 161
       },
       "path": "docs/architecture/proposed-packages.json",
       "rules_matching_nothing": [],
@@ -159,24 +159,24 @@
         "sha256": "1dcfeb9400fd06152e45cd607c8648f54d8fa8f41c02b0fcd8ee9310a03c28a4"
       }
     ],
-    "source_lines_embedded": 18954
+    "source_lines_embedded": 18962
   },
   "call_graph": {
     "call_sites": {
-      "builtin": 4196,
+      "builtin": 4197,
       "external": 2705,
-      "internal": 3221,
-      "unresolved": 4260
+      "internal": 3223,
+      "unresolved": 4259
     },
     "edges_by_kind": {
-      "call": 1436,
+      "call": 1438,
       "constructor": 71,
       "instantiate": 535,
       "override": 6,
       "self": 378,
       "super": 4
     },
-    "nodes": 2079,
+    "nodes": 2080,
     "scoped": {
       "cli-capsule-command": {
         "edges": 21,
@@ -292,7 +292,7 @@
         "edges": 8,
         "max_depth": 4,
         "nodes": 9,
-        "reachable_nodes_unbounded": 72,
+        "reachable_nodes_unbounded": 73,
         "roots": [
           "tropoi.cli.main._cmd_view"
         ],
@@ -1255,7 +1255,7 @@
     "package": "tropoi",
     "src": "src",
     "working_tree": {
-      "base_commit": "755e74ef339d80c87b4c982abf40d4f788835261",
+      "base_commit": "36d2f7a48bfb35440bc678edbf85ea721bf1fbd9",
       "generator": {
         "changes": [],
         "files": {
@@ -1301,10 +1301,10 @@
           "src/tropoi/physics/composition.py": "3c83a7abe1060f4b8209f13819420b9b97fccf2bc29348d2663ea1b3400921e2",
           "src/tropoi/physics/constants.py": "97c07ad424b13bc018c45a2b5036054e2ce0d2107281a814109aa62cd20cff93",
           "src/tropoi/physics/convection.py": "593c1a1ac1b1974c98ca84acb2727a2f1d57260996b832ba75779354b516e09e",
-          "src/tropoi/physics/insolation.py": "1d2443d913e95a574cc0b745fe62599ff79761e6235b2e1eacd3394993335a5c",
+          "src/tropoi/physics/insolation.py": "1f95aeef8c044228e6b24f673a99cc9e5f5329ae4f696fe05ae2cf4a5643e9b8",
           "src/tropoi/physics/monin_obukhov.py": "8e92212937c71d91262f9b8808e583d9f27b1802cc5a402d171c96ab635d4708",
           "src/tropoi/physics/monin_obukhov_cuda.py": "a08db2faa45575b8b3a9bcc7c2fa9655dcd148db216011866a8de35b507be457",
-          "src/tropoi/physics/orbit.py": "e3fe67c2bacedecfc00659dd2070f7c030cb9551f581a5c02831253d0a6fc065",
+          "src/tropoi/physics/orbit.py": "944f8c0443a4b263fda23d00f8532e2ab3e70aa2cc257fb0a918ad6f0fdff73f",
           "src/tropoi/physics/planets.py": "3ea7d5851f4c14c2d1b703cfdb83fd5321392093a310cdb8b0cff1707e0ee90e",
           "src/tropoi/physics/radiation/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
           "src/tropoi/physics/radiation/gray.py": "1c32cb04dd77aa8129b2225a2a250515bfa5cb6522244ac6b606cb51016ab6b4",
@@ -1474,7 +1474,7 @@
           "src/tropoi/temporal/tendencies/primitive_equations.py": "848c6fe9406a7c1c465c0aa9459760b01c542164c8cc9395797a3c4a60793e52",
           "src/tropoi/temporal/tendencies/shallow_water.py": "7ae521f2378824e89f88bc467fc99321d1ef4224b037c865137e076a601da3c8"
         },
-        "sha256": "19c62031bb87f88b5922dee3bc0d0e29d6d8d877cba46f8eccda49da17ff908a",
+        "sha256": "ed5ab7255b3de8e0adeafb3a05f191a8a1d8586c01f1dc804bf057506fa030fc",
         "status": "clean"
       }
     }

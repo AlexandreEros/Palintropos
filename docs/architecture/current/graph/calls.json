@@ -1197,6 +1197,16 @@
     },
     {
       "kind": "call",
+      "source": "tropoi.physics.orbit.eccentric_from_mean",
+      "target": "tropoi.physics.orbit._kepler_mean"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.physics.orbit.mean_from_true",
+      "target": "tropoi.physics.orbit._kepler_mean"
+    },
+    {
+      "kind": "call",
       "source": "tropoi.physics.orbit.mean_from_true",
       "target": "tropoi.physics.orbit.eccentric_from_true"
     },
@@ -13649,6 +13659,13 @@
       "kind": "function",
       "module": "tropoi.physics.orbit",
       "qualname": "_finite",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.orbit._kepler_mean",
+      "kind": "function",
+      "module": "tropoi.physics.orbit",
+      "qualname": "_kepler_mean",
       "type": "function"
     },
     {
