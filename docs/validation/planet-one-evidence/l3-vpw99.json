@@ -89,5 +89,16 @@
    }
   }
  },
- "summary": "BOT: 367.85 K vs 365 K (+2.85); TOP: 470.69 K vs 463 K (+7.69); TWO: 425.78 K vs 427 K (-1.22)"
+ "summary": "BOT: 367.85 K vs 365 K (+2.85); TOP: 470.69 K vs 463 K (+7.69); TWO: 425.78 K vs 427 K (-1.22)",
+ "depth_check_BOT": {
+  "note": "BOT's thermal wave reaches deeper than the 1 m depth G-P validated for TWO; BOT was rerun on a 2 m column (production settings otherwise, G = 0)",
+  "mean_T_at_1m_depth1m_column_K": 367.851,
+  "mean_T_at_1m_depth2m_column_K": 367.79,
+  "mean_T_bottom_depth2m_column_K": 367.763,
+  "diurnal_amplitude_at_1m_K": {
+   "1m_column": 2.248,
+   "2m_column": 1.138
+  },
+  "conclusion": "depth changes the BOT deep temperature by <= 0.09 K; the L3 difference (+2.8 K vs 365 K) is unchanged"
+ }
 }

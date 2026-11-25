@@ -78,7 +78,7 @@ resume. It never changes a criterion.
 | G-A geometry | **PASS** (26 tests) | `tests/test_illumination_geometry.py` |
 | G-B nonlinear conduction | **PASS**: Jacobian vs FD; manufactured two-stratum transient with space order 1.99 (cells) and 2.00 (skin), time order 0.95 (cells) and 1.00 (skin); steady Kirchhoff order 1.97; zero-k limit; linear one-step limit; stress; energy closure; extents | `tests/test_substrate_nonlinear.py` |
 | Ledlow law | **PASS**: printed values, 350 K step, positivity above 10.13 K, enthalpy vs quadrature, increments down to 1e-11 K including across 350 K | `tests/test_heat_capacity_laws.py` |
-| G-R original substrate gates | **PASS** (G1M, G2, G3-D, G4, G5; G1C and G5b reported). Run on commit fe74bb7^, before the heat-capacity-law refactor | Must be **rerun at the final commit**: `python tests/audit_substrate_gates.py OUT` |
+| G-R original substrate gates | **PASS** at commit 7090c86; `src/` is unchanged since then, so this is the final kernel: G1M, G2, G3-D, G4 and G5 pass at the original tolerances; G1C and G5b reported | `planet-one-evidence/gr-7090c86/` |
 | G-P Mercury columns | **PASS** (VPW99 TWO, G = 0.02; all six columns; every ladder run PERIODIC). Uses the owner-approved amendment A1 (depth criterion at the same physical depth, 1 m) and estimator correction E1 (flux-consistent face reconstruction). The original frozen depth criterion failed (1.84–2.15 K, a physical geothermal offset) and is preserved | `planet-one-evidence/gp-vpw99-two-G0.02-{pre-amendment,amended}.json` |
 | G-P2 periodicity | Per run, reported in each run's `cycles.json` and `retained/status.json` | |
 | G-I heat1d (L2) | **FAIL at 0°N 0°E, PASS at 0°N 90°E (strict evaluation; owner decision pending)**. At 0°E the finest-level max \|ΔTs\| is 2.40 K at the first sunrise step, against a bound of 2.26 K, and the native maxima run 3.75/4.10/2.40 K (not monotone). At 90°E: 1.36 K against 1.84 K. RMS halves per level at both columns. An earlier PASS used coarse-time sampling chosen after the results were seen; it is withdrawn (register R1) | `planet-one-evidence/gi-heat1d-vpw99-two-G0.02.json` |
@@ -147,8 +147,7 @@ resume. It never changes a criterion.
   `runs/planet-one/global2-gpu-vpw99-two-G0.02-download/mercury-view.html`
   (sha256 6568a84a…).
 - **Gate summary:**
-  - pass: G-A, G-B, G-P (with A1/E1), G-M L3 (within 10 K), G-GPU (A2) and G-G;
-  - G-R is being rerun at the final commit;
+  - pass: G-A, G-B, G-R (at the final kernel), G-P (with A1/E1), G-M L3 (within 10 K; BOT checked on a 2 m column), G-GPU (A2) and G-G;
   - **G-I fails at 0°N 0°E** under the strict evaluation (owner decision pending);
   - L4 is NOT EVALUATED.
 - **PR #66 GPU coverage:** the CUDA radiative tests pass on a T4 at 3bce170 (154 passed, 9 THAI k-table skips; `planet-one-evidence/geometry-pr66-cuda-tests-t4.json`).

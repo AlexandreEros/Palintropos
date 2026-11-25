@@ -1,0 +1,50 @@
+{
+ "gate": "G3-D",
+ "mandatory": true,
+ "pass": true,
+ "tolerance": 0.01,
+ "production_formulation": "diagnosed skin",
+ "G3-D_diagnosed": [
+  {
+   "h": 0.93,
+   "Bi": 1.6275000000000002,
+   "mu1": 1.0137273285517363,
+   "efold_days_analytic": 137.96852999765946,
+   "lambda_analytic": 8.388923237980734e-08,
+   "lambda_num": 8.382359159023291e-08,
+   "rel_err": -0.000782469784408546,
+   "fit_points": 49669
+  },
+  {
+   "h": 2.93,
+   "Bi": 5.1275,
+   "mu1": 1.3190125889101374,
+   "efold_days_analytic": 81.49378048084007,
+   "lambda_analytic": 1.4202401711864677e-07,
+   "lambda_num": 1.4181929121519412e-07,
+   "rel_err": -0.0014414879089190702,
+   "fit_points": 29338
+  },
+  {
+   "h": 8.14,
+   "Bi": 14.245000000000001,
+   "mu1": 1.4680983007960253,
+   "efold_days_analytic": 65.78275747059357,
+   "lambda_analytic": 1.7594388741225932e-07,
+   "lambda_num": 1.7561778406919874e-07,
+   "rel_err": -0.0018534508237644243,
+   "fit_points": 23682
+  },
+  {
+   "h": 30.0,
+   "Bi": 52.5,
+   "mu1": 1.5414439227320575,
+   "efold_days_analytic": 59.671490576284825,
+   "lambda_analytic": 1.9396321362674232e-07,
+   "lambda_num": 1.9356071121365573e-07,
+   "rel_err": -0.0020751481972306474,
+   "fit_points": 21482
+  }
+ ],
+ "wall_s": 46.98592257499695
+}
