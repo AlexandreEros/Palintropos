@@ -162,47 +162,72 @@
  ],
  "verdict": {
   "0N 0E": {
-   "max_abs_dTs_by_level_K": [
-    3.748896903710147,
-    3.0926267997817263,
-    1.6472514643178897
-   ],
-   "rms_dTs_by_level_K": [
-    2.1721559969939293,
-    1.1236038341362649,
-    0.5855139979650794
-   ],
-   "e_ours_K": 0.5923391729600379,
-   "order_ours": 0.9015170139857934,
-   "e_heat1d_K": 1.079401952661704,
-   "order_heat1d": 0.9125199501666663,
-   "bound_K": 1.8717411256217418,
-   "final_max_abs_dTs_K": 1.6472514643178897,
-   "shrinks_rms": true,
-   "shrinks_max_last_step": true,
-   "pass": true
+   "strict": {
+    "max_abs_dTs_native_by_level_K": [
+     3.748896903710147,
+     4.097442174561166,
+     2.3978743419692705
+    ],
+    "rms_by_level_K": [
+     2.1721559969939293,
+     1.1245962762086397,
+     0.5864991481959448
+    ],
+    "finest_max_K": 2.3978743419692705,
+    "at_cycle_fraction": 0.7501157407407407,
+    "ours_K": 116.39165292689498,
+    "heat1d_K": 113.9937785849257,
+    "e_ours_K": 0.9794132334802831,
+    "e_heat1d_K": 1.0794122823640417,
+    "order_ours": 0.9015170139857934,
+    "order_heat1d": 0.9125199501666663,
+    "bound_K": 2.258825515844325,
+    "pass": false
+   },
+   "diagnostic_coarse_times": {
+    "max_abs_dTs_by_level_K": [
+     3.748896903710147,
+     3.0926267997817263,
+     1.6472514643178897
+    ],
+    "bound_K": 1.8717411256217418,
+    "would_pass": true
+   }
   },
   "0N 90E": {
-   "max_abs_dTs_by_level_K": [
-    3.7861003523404406,
-    2.4771819198756333,
-    1.3029618085379724
-   ],
-   "rms_dTs_by_level_K": [
-    2.0288038381818616,
-    1.0215740317837352,
-    0.5252706850115672
-   ],
-   "e_ours_K": 0.5451803070486546,
-   "order_ours": 0.8345280535837147,
-   "e_heat1d_K": 1.0158660617862723,
-   "order_heat1d": 0.9415130299604426,
-   "bound_K": 1.7610463688349267,
-   "final_max_abs_dTs_K": 1.3029618085379724,
-   "shrinks_rms": true,
-   "shrinks_max_last_step": true,
-   "pass": true
+   "strict": {
+    "max_abs_dTs_native_by_level_K": [
+     3.7861003523404406,
+     2.5612143979871576,
+     1.363041532011053
+    ],
+    "rms_by_level_K": [
+     2.0288038381818616,
+     1.0219269145331527,
+     0.525456395685156
+    ],
+    "finest_max_K": 1.363041532011053,
+    "at_cycle_fraction": 0.5409722222222222,
+    "ours_K": 106.02431086521784,
+    "heat1d_K": 104.66126933320679,
+    "e_ours_K": 0.624268130338438,
+    "e_heat1d_K": 1.0158660617862723,
+    "order_ours": 0.8345280535837147,
+    "order_heat1d": 0.9415130299604426,
+    "bound_K": 1.84013419212471,
+    "pass": true
+   },
+   "diagnostic_coarse_times": {
+    "max_abs_dTs_by_level_K": [
+     3.7861003523404406,
+     2.4771819198756333,
+     1.3029618085379724
+    ],
+    "bound_K": 1.7610463688349267,
+    "would_pass": true
+   }
   }
  },
- "pass": true
+ "pass": false,
+ "verdict_note": "Strict evaluation decides. At 0N 0E the finest-level maximum occurs at the first sunrise step. A failure here needs an owner decision; the diagnostic sampling must not be used to pass."
 }

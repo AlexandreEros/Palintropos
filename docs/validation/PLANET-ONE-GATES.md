@@ -353,3 +353,33 @@ different iterations.
 
 **Profiling first.** The backend-generic tridiagonal solver is profiled on
 the GPU before any specialized CUDA kernel is considered.
+
+
+### Erratum X1 (2026-11-25): nominal mean solar day
+
+The conventions section defines the "nominal" mean solar day as
+2π/|Ω − n cos ε|. The long-term mean solar day is actually
+2π/|Ω − n sign(cos ε)|: over one orbit the star's right ascension advances
+one full turn, whatever the obliquity. The code
+(`StellarIllumination.mean_solar_day`) uses the correct form. The two
+agree for ε ∈ {0, π}, which are the only cases the G-A gate 7 tests. No gate
+or result changes.
+
+### Record R1 (2026-11-25): G-I evaluation
+
+G-I was first evaluated with all three levels sampled at the coarsest
+level's times, a rule chosen after the levels were seen. On that sampling
+both columns passed. The frozen wording is "max |ΔT_s|", so the strict
+evaluation now takes the finest level's own samples. Its bound uses error
+estimates on the densest time set where both codes have two levels (the
+level-1 times).
+
+| Column | Finest-level max | Bound | Verdict |
+|---|---|---|---|
+| 0°N 90°E | 1.36 K | 1.84 K | PASS |
+| 0°N 0°E | 2.40 K, at the first sunrise step | 2.26 K | **FAIL** |
+
+At 0°N 0°E the native maxima are 3.75, 4.10 and 2.40 K, which do not shrink
+monotonically, while the RMS halves at each level (2.17, 1.12, 0.59 K). The
+failure is reported to the owner for a methodological decision. The
+criterion is not changed here.

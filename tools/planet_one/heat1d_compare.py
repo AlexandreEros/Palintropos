@@ -189,43 +189,62 @@ if __name__ == "__main__":
 
 
 def verdict(outdir) -> dict:
-    """The frozen G-I criterion on a finished comparison: the difference
-    shrinks under joint refinement, and at the finest level
-    max|dTs| <= e_ours + e_heat1d + 0.2 K, where each e is that code's own
-    Richardson estimate from its three levels sampled at the coarsest
-    level's times: e = d2 / (2^p - 1), with p = log2(d1 / d2) and
-    d_i = max_t |Q_i - Q_(i-1)|. If p <= 0.5 the conservative 2 d2 is used."""
+    """The frozen G-I criterion: the difference shrinks under joint
+    refinement, and at the finest level max|dTs| <= e_ours + e_heat1d + 0.2 K,
+    where each e is that code's own Richardson estimate.
+
+    Strict evaluation (decides pass/fail): max|dTs| over the finest level's
+    own samples, against a bound whose error estimates come from the
+    densest time set where both codes have two levels. That set is the
+    level-1 times: d = max|Q2 - Q1|, and e = d / (2^p - 1), with the order p
+    taken from the three-level estimate on the level-0 times.
+
+    Diagnostic only: the same statistics sampled at the coarsest level's
+    times. That sampling was chosen after the levels were seen, so it never
+    decides the verdict."""
     out = pathlib.Path(outdir)
     rep = json.loads((out / "gi.json").read_text())
     res = {}
     for name in COLUMNS:
         tag = name.replace(" ", "_")
-        ours, h1d = [], []
-        for i in range(len(LEVELS)):
-            ev = load_tier2(out / f"ours-L{i}" / "retained", "every_step")
-            c = list(COLUMNS).index(name)
-            stride = 2 ** i
-            ours.append(ev[stride - 1::stride, 0, c])
-            h1d.append(np.load(out / f"heat1d-L{i}-{tag}.npy")[stride - 1::stride])
+        c = list(COLUMNS).index(name)
+        o = [load_tier2(out / f"ours-L{i}" / "retained", "every_step")[:, 0, c]
+             for i in range(len(LEVELS))]
+        h = [np.load(out / f"heat1d-L{i}-{tag}.npy") for i in range(len(LEVELS))]
+        oc = [o[i][2 ** i - 1::2 ** i] for i in range(3)]
+        hc = [h[i][2 ** i - 1::2 ** i] for i in range(3)]
 
-        def est(seq):
+        def order(seq):
             d1 = float(np.max(np.abs(seq[1] - seq[0])))
             d2 = float(np.max(np.abs(seq[2] - seq[1])))
-            p = math.log2(d1 / d2) if d1 > 0 and d2 > 0 else 0.0
-            return (d2 / (2 ** p - 1) if p > 0.5 else 2 * d2), p, d1, d2
-        eo, po, *_ = est(ours)
-        eh, ph, *_ = est(h1d)
-        diffs = [float(np.max(np.abs(o - h))) for o, h in zip(ours, h1d)]
-        rms = [float(np.sqrt(np.mean((o - h) ** 2))) for o, h in zip(ours, h1d)]
+            return (math.log2(d1 / d2) if d1 > 0 and d2 > 0 else 0.0), d2
+        po, d2o_c = order(oc)
+        ph, d2h_c = order(hc)
+        d2o = float(np.max(np.abs(o[2][1::2] - o[1])))
+        d2h = float(np.max(np.abs(h[2][1::2] - h[1])))
+        eo = d2o / (2 ** po - 1) if po > 0.5 else 2 * d2o
+        eh = d2h / (2 ** ph - 1) if ph > 0.5 else 2 * d2h
+        native = [float(np.max(np.abs(o[i] - h[i]))) for i in range(3)]
+        rms = [float(np.sqrt(np.mean((o[i] - h[i]) ** 2))) for i in range(3)]
+        k = int(np.argmax(np.abs(o[2] - h[2])))
         bound = eo + eh + 0.2
-        res[name] = {"max_abs_dTs_by_level_K": diffs, "rms_dTs_by_level_K": rms,
-                     "e_ours_K": eo, "order_ours": po, "e_heat1d_K": eh, "order_heat1d": ph,
-                     "bound_K": bound, "final_max_abs_dTs_K": diffs[-1],
-                     "shrinks_rms": rms[0] > rms[1] > rms[2],
-                     "shrinks_max_last_step": diffs[-1] < diffs[-2],
-                     "pass": diffs[-1] <= bound and rms[0] > rms[1] > rms[2]
-                     and diffs[-1] < diffs[-2]}
+        strict = native[2] <= bound and rms[0] > rms[1] > rms[2] and native[2] < native[1]
+        coarse = [float(np.max(np.abs(oc[i] - hc[i]))) for i in range(3)]
+        eo_c = d2o_c / (2 ** po - 1) if po > 0.5 else 2 * d2o_c
+        eh_c = d2h_c / (2 ** ph - 1) if ph > 0.5 else 2 * d2h_c
+        res[name] = {
+            "strict": {"max_abs_dTs_native_by_level_K": native, "rms_by_level_K": rms,
+                       "finest_max_K": native[2], "at_cycle_fraction": (k + 1) / len(o[2]),
+                       "ours_K": float(o[2][k]), "heat1d_K": float(h[2][k]),
+                       "e_ours_K": eo, "e_heat1d_K": eh, "order_ours": po, "order_heat1d": ph,
+                       "bound_K": bound, "pass": bool(strict)},
+            "diagnostic_coarse_times": {"max_abs_dTs_by_level_K": coarse,
+                                        "bound_K": eo_c + eh_c + 0.2,
+                                        "would_pass": coarse[2] <= eo_c + eh_c + 0.2}}
     rep["verdict"] = res
-    rep["pass"] = all(r["pass"] for r in res.values())
+    rep["pass"] = all(r["strict"]["pass"] for r in res.values())
+    rep["verdict_note"] = ("Strict evaluation decides. At 0N 0E the finest-level maximum "
+                           "occurs at the first sunrise step. A failure here needs an owner "
+                           "decision; the diagnostic sampling must not be used to pass.")
     (out / "gi.json").write_text(json.dumps(rep, indent=1))
     return rep

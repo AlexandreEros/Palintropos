@@ -235,7 +235,9 @@ function evidence() {
   const mat = D.strata.map(s => s.name).join(" / ");
   const ext = dg.extent.some(([lo, hi], j) => { const r = D.strata[j].heat_capacity_range; return r && (lo < r[0] || (r[1] != null && hi > r[1])); });
   chips.push(`<span class="chip">L1 numerical verification</span>`);
-  if (D.extras.gi) chips.push(`<span class="chip">L2 heat1d compared</span>`);
+  if (D.extras.gi_verdict) { const ok = Object.values(D.extras.gi_verdict).every(v => v.pass);
+    chips.push(`<span class="chip ${ok ? "good" : "warn"}">L2 heat1d ${ok ? "PASS" : "partly FAIL"}</span>`); }
+  else if (D.extras.gi) chips.push(`<span class="chip">L2 heat1d compared</span>`);
   chips.push(`<span class="chip ${D.extras.l3 ? "" : "warn"}">L3 ${D.extras.l3 ? "VPW99 compared" : "NOT EVALUATED"}</span>`);
   chips.push(`<span class="chip warn">L4 NOT EVALUATED</span>`);
   if (ext) chips.push(`<span class="chip bad">EXTRAPOLATED c_p</span>`);
@@ -252,6 +254,7 @@ function evidence() {
   ];
   if (D.extras.gp) rows.push(["G-P convergence (frozen tolerances)", D.extras.gp.pass ? "PASS" : "FAIL: " + D.extras.gp.failures.slice(0, 6).join("; ")]);
   else rows.push(["G-P convergence", "not attached"]);
+  if (D.extras.gi_verdict) rows.push(["G-I heat1d (L2) verdict, strict", Object.entries(D.extras.gi_verdict).map(([k, v]) => `${k}: ${v.pass ? "PASS" : "FAIL"} (${v.finest_K.toFixed(2)} K vs bound ${v.bound_K.toFixed(2)} K)`).join("; ")]);
   if (D.extras.gi) rows.push(["G-I heat1d, max |ΔTs| by level", D.extras.gi.map(l => `L${l.level}: ` + Object.entries(l).filter(([k]) => k !== "level").map(([k, v]) => `${k} ${v.toFixed(2)} K`).join(", ")).join(" | ")]);
   if (D.extras.l3) rows.push(["L3 VPW99 deep temperatures", D.extras.l3.summary]);
   for (const [k, v] of Object.entries(D.provenance)) rows.push([k, v]);

@@ -81,7 +81,7 @@ resume. It never changes a criterion.
 | G-R original substrate gates | **PASS** (G1M, G2, G3-D, G4, G5; G1C and G5b reported). Run on commit fe74bb7^, before the heat-capacity-law refactor | Must be **rerun at the final commit**: `python tests/audit_substrate_gates.py OUT` |
 | G-P Mercury columns | **PASS** (VPW99 TWO, G = 0.02; all six columns; every ladder run PERIODIC). Uses the owner-approved amendment A1 (depth criterion at the same physical depth, 1 m) and estimator correction E1 (flux-consistent face reconstruction). The original frozen depth criterion failed (1.84–2.15 K, a physical geothermal offset) and is preserved | `planet-one-evidence/gp-vpw99-two-G0.02-{pre-amendment,amended}.json` |
 | G-P2 periodicity | Per run, reported in each run's `cycles.json` and `retained/status.json` | |
-| G-I heat1d (L2) | **PASS**. heat1d uses CFL substeps. At common times the max \|ΔTs\| goes 3.75 → 3.09 → 1.65 K (0°E) and 3.79 → 2.48 → 1.30 K (90°E); RMS 2.17 → 1.12 → 0.59 K; final ≤ e_ours + e_heat1d + 0.2 K (1.87 and 1.76 K). Both codes converge at first order. Tmax agrees to ≤ 0.02 K. Attempt 1 (fixed shared dt) is kept | `planet-one-evidence/gi-heat1d-vpw99-two-G0.02.json` |
+| G-I heat1d (L2) | **FAIL at 0°N 0°E, PASS at 0°N 90°E (strict evaluation; owner decision pending)**. At 0°E the finest-level max \|ΔTs\| is 2.40 K at the first sunrise step, against a bound of 2.26 K, and the native maxima run 3.75/4.10/2.40 K (not monotone). At 90°E: 1.36 K against 1.84 K. RMS halves per level at both columns. An earlier PASS used coarse-time sampling chosen after the results were seen; it is withdrawn (register R1) | `planet-one-evidence/gi-heat1d-vpw99-two-G0.02.json` |
 | G-M L3 (VPW99) | **EVALUATED**, G = 0, production settings, temperature at depth at 0°N 0°: BOT 367.85 vs 365 K (+2.85), TOP 470.69 vs 463 K (+7.69), TWO 425.78 vs 427 K (−1.22). All within the 10 K investigation threshold; no parameter changed | `planet-one-evidence/l3-vpw99.json` |
 | G-G global | **PASS** (2°, 90×180 = 16 200 columns, CuPy FP64 on a Colab T4, commit 3d05287, 1.63 h): PERIODIC, with G-P2 met in 2 consecutive production cycles; the standalone replay of six columns is bitwise identical (0.0 K); global emitted − absorbed = 0.0202 W m⁻² = G; extents within the c_p law's domain. A supplementary 4° CPU run exists | `planet-one-evidence/global2-gpu-t4.json`; local download `runs/planet-one/global2-gpu-vpw99-two-G0.02-download/` |
 | G-GPU parity (A2) | **PASS** on a T4: max \|T_GPU − T_CPU\| = 1.9e-11 K over a production cycle of the six columns (bound 1e-6 K), with no Newton-iteration differences; energy closure, G4/G5 and manufactured parity on the GPU; 78 tests pass on the T4 | `planet-one-evidence/gpu-t4-2026-11-24.json` |
@@ -146,8 +146,14 @@ resume. It never changes a criterion.
   https://claude.ai/artifact/CtuVELqWVUt4UaDqzWdL7Y. The local copy is
   `runs/planet-one/global2-gpu-vpw99-two-G0.02-download/mercury-view.html`
   (sha256 6568a84a…).
-- **Every Planet One gate is evaluated:** G-A, G-B, G-R, G-P (with A1/E1),
-  G-I (L2), G-M L3, G-GPU (A2) and G-G pass. L4 is NOT EVALUATED.
+- **Gate summary:**
+  - pass: G-A, G-B, G-P (with A1/E1), G-M L3 (within 10 K), G-GPU (A2) and G-G;
+  - G-R is being rerun at the final commit;
+  - **G-I fails at 0°N 0°E** under the strict evaluation (owner decision pending);
+  - L4 is NOT EVALUATED.
+- **PR #66 GPU coverage:** the CUDA radiative tests pass on a T4 at 3bce170 (154 passed, 9 THAI k-table skips; `planet-one-evidence/geometry-pr66-cuda-tests-t4.json`).
+- **4° CPU run:** finished PERIODIC (supplementary).
+- **View:** published, but not yet rendered in a browser (only `node --check` was run). Version 2 states the G-I verdict.
 - **4° CPU run:** supplementary evidence only. The 2° acceptance run is the
   GPU run.
 - **Remaining before review:** owner review of #66/#67; optionally rerun the

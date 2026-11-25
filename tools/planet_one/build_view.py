@@ -153,6 +153,10 @@ def _summaries(extras: dict) -> dict:
     if gi:
         out["gi"] = [{"level": lv["level"], **{k: v["max_abs_dTs_K"] for k, v in lv["columns"].items()}}
                      for lv in gi["levels"]]
+        if "verdict" in gi:
+            out["gi_verdict"] = {k: {"pass": v["strict"]["pass"], "finest_K": v["strict"]["finest_max_K"],
+                                     "bound_K": v["strict"]["bound_K"]}
+                                 for k, v in gi["verdict"].items()}
     if extras.get("l3"):
         out["l3"] = extras["l3"]
     return out
