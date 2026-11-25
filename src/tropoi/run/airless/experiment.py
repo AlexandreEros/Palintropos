@@ -273,7 +273,13 @@ class AirlessRun:
 
     def __init__(self, cfg: AirlessConfig, run_dir, *, workers: int = 1,
                  backend: str = "numpy", allow_dirty: bool = False,
-                 log: Callable[[str], None] = print):
+                 log: Callable[[str], None] = print,
+                 initial_state=None, initial_state_source: Optional[str] = None):
+        """``initial_state`` = (anomaly (L, ncol), surface_anomaly (ncol,)), in
+        K relative to 300 K, optionally replaces the configured isothermal
+        start (for example a verified periodic solution on another grid,
+        interpolated). Its provenance goes into config.json as
+        ``initial_state_source``. The periodicity criteria are unchanged."""
         _backend(backend)                       # validate early
         self.backend = backend
         self.cfg = cfg
@@ -292,7 +298,10 @@ class AirlessRun:
         self._write_json("config.json", {
             "config": cfg.to_dict(), "config_sha256": cfg.sha256(), "code": self.code,
             "environment": environment_identity(), "substrate": self.sub.signature(),
-            "workers": self.workers, "backend": self.backend, "created": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())})
+            "workers": self.workers, "backend": self.backend,
+            "initial_state_source": initial_state_source if initial_state is not None else None,
+            "created": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())})
+        self.initial_state = initial_state
         np.savez(self.dir / "grid.npz", lat_deg=self.lat, lon_deg=self.lon, weights=self.w,
                  interfaces=self.sub.interfaces, centres=self.sub.centres)
         self._event("created", columns=int(self.lat.size), layers=self.sub.layers)
@@ -354,8 +363,12 @@ class AirlessRun:
     def run(self, max_wall_s: Optional[float] = None) -> dict:
         cfg = self.cfg
         per = cfg.periodicity
-        st = self.sub.initial_state(self.lat.size)
-        state = (np.asarray(st.anomaly), np.asarray(st.surface_anomaly))
+        if self.initial_state is not None:
+            state = (np.array(self.initial_state[0], dtype=float),
+                     np.array(self.initial_state[1], dtype=float))
+        else:
+            st = self.sub.initial_state(self.lat.size)
+            state = (np.asarray(st.anomaly), np.asarray(st.surface_anomaly))
         record_every = bool(cfg.output.get("every_step_profiles"))
         history, previous = [], None
         stage = "spinup" if cfg.spinup_cycle_steps else "production"

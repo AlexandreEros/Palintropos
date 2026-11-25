@@ -67,6 +67,8 @@ from tropoi.run.airless.experiment import AirlessRun, load_tier2
 # depth, node spacing growth 1 + 1/n
 LEVELS = [((2e-3, 1.1), 2160, (40, 4)), ((1e-3, 1.0488), 4320, (80, 8)),
           ((5e-4, 1.0241), 8640, (160, 16))]
+#: R2 (register): the fourth joint level, a joint halving of level 2
+LEVEL3 = ((2.5e-4, 1.012), 17280, (320, 32))
 COLUMNS = {"0N 0E": (0.0, 0.0), "0N 90E": (0.0, 90.0)}
 LAW = ledlow_1992()
 
@@ -111,6 +113,8 @@ def main(argv=None) -> int:
     ap.add_argument("--model", default="TWO")
     ap.add_argument("--geothermal-flux", type=float, default=0.02)
     ap.add_argument("--max-cycles", type=int, default=40)
+    ap.add_argument("--with-level3", action="store_true",
+                    help="R2: add the fourth joint level, warm-started from level 2")
     args = ap.parse_args(argv)
     out = pathlib.Path(args.outdir)
     out.mkdir(parents=True, exist_ok=True)
@@ -128,14 +132,25 @@ def main(argv=None) -> int:
                               "series half-cell interface conductance (ours) vs node-based "
                               "property placement with a node at 2 cm (heat1d)"],
               "levels": []}
-    for i, (grid, steps, m) in enumerate(LEVELS):
+    levels = LEVELS + ([LEVEL3] if args.with_level3 else [])
+    if (out / "gi.json").exists():          # keep every completed level and verdict
+        report = json.loads((out / "gi.json").read_text())
+    done = {lv["level"] for lv in report["levels"]}
+    for i, (grid, steps, m) in enumerate(levels):
+        warm = i == 3
         cfg = mercury_vpw99(model=args.model, geothermal_flux=args.geothermal_flux,
                             columns={"kind": "points", "lat_deg": lats, "lon_deg": lons},
                             top_thickness=grid[0], max_stretch=grid[1], cycle_steps=steps,
-                            spinup_cycle_steps=360)
+                            spinup_cycle_steps=None if warm else 360)
         rd = out / f"ours-L{i}"
         if not (rd / "retained" / "status.json").exists():
-            AirlessRun(cfg, rd, workers=1, log=lambda s: None).run()
+            init, src = (warm_start(out / "ours-L2", cfg), "verified level-2 periodic "
+                         "solution (ours-L2 retained cycle end), interpolated on its FV "
+                         "reconstruction") if warm else (None, None)
+            AirlessRun(cfg, rd, workers=1, log=lambda s: None, initial_state=init,
+                       initial_state_source=src).run()
+        if i in done:
+            continue
         status = json.loads((rd / "retained" / "status.json").read_text())
         ev = load_tier2(rd / "retained", "every_step")            # (steps, 1+L, ncol)
         centres = np.load(rd / "grid.npz")["centres"]
@@ -148,7 +163,8 @@ def main(argv=None) -> int:
             n = (np.array([math.cos(la) * math.cos(lo)]), np.array([math.cos(la) * math.sin(lo)]),
                  np.array([math.sin(la)]))
             p = heat1d_profile(args.model, cfg.strata[-1]["bottom"], m, cfg.emissivity)
-            # start from our periodic end-of-cycle profile
+            # start from our periodic end-of-cycle profile at this level (a
+            # verified periodic solution); heat1d's own periodicity is checked
             p.T = np.interp(p.z, np.r_[0.0, centres], np.r_[ev[-1, 0, c], ev[-1, 1:, c]])
             p.update_properties()
             prev = None
@@ -186,6 +202,76 @@ def main(argv=None) -> int:
 
 if __name__ == "__main__":
     sys.exit(main())
+
+
+def warm_start(prev_run, cfg):
+    """The end-of-cycle state of a verified periodic point run, interpolated
+    onto ``cfg``'s grid via its FV reconstruction (anomalies, K - 300)."""
+    from tropoi.run.airless.experiment import build_substrate
+    from tools.planet_one.convergence import _reconstruction
+    meta = json.loads((prev_run / "config.json").read_text())["config"]
+    grid = np.load(prev_run / "grid.npz")
+    ev = load_tier2(prev_run / "retained", "every_step")
+    sub = build_substrate(cfg)
+    cols = ev.shape[2]
+    anom = np.empty((sub.layers, cols))
+    skin = np.empty(cols)
+    for c in range(cols):
+        z, T = _reconstruction(meta, grid, ev[-1:, 0, c], ev[-1:, 1:, c])
+        anom[:, c] = np.interp(sub.centres, z, T[0]) - 300.0
+        skin[c] = ev[-1, 0, c] - 300.0
+    return anom, skin
+
+
+def verdict4(outdir) -> dict:
+    """R2 (register): the four-level G-I evaluation, exactly as frozen.
+
+    * Finest maximum: every native level-3 sample.
+    * d = max|Q3 - Q2| on the level-2 times; p from levels 1, 2 and 3 on the
+      level-1 times; e = d / (2^p - 1), or 2 d if p <= 0.5.
+    * Satisfied for a column iff L3 max <= e_ours + e_heat1d + 0.2 K, the RMS
+      decreases at every level, and the L3 native max is below L2's.
+    * Also reported: the maximum within the 0E sunrise window (cycle fraction
+      0.749-0.752) at native resolution for every level.
+
+    R1's three-level verdict is left in gi.json untouched."""
+    out = pathlib.Path(outdir)
+    rep = json.loads((out / "gi.json").read_text())
+    res = {}
+    for name in COLUMNS:
+        tag = name.replace(" ", "_")
+        c = list(COLUMNS).index(name)
+        o = [load_tier2(out / f"ours-L{i}" / "retained", "every_step")[:, 0, c] for i in range(4)]
+        h = [np.load(out / f"heat1d-L{i}-{tag}.npy") for i in range(4)]
+        at = lambda a, i, base: a[i][2 ** (i - base) - 1::2 ** (i - base)]   # level i at level-base times
+        def order(seq):
+            q1 = [at(seq, i, 1) for i in (1, 2, 3)]
+            d1 = float(np.max(np.abs(q1[1] - q1[0])))
+            d2 = float(np.max(np.abs(q1[2] - q1[1])))
+            return math.log2(d1 / d2) if d1 > 0 and d2 > 0 else 0.0
+        po, ph = order(o), order(h)
+        do = float(np.max(np.abs(at(o, 3, 2) - o[2])))
+        dh = float(np.max(np.abs(at(h, 3, 2) - h[2])))
+        eo = do / (2 ** po - 1) if po > 0.5 else 2 * do
+        eh = dh / (2 ** ph - 1) if ph > 0.5 else 2 * dh
+        native = [float(np.max(np.abs(o[i] - h[i]))) for i in range(4)]
+        rms = [float(np.sqrt(np.mean((o[i] - h[i]) ** 2))) for i in range(4)]
+        sunrise = []
+        for i in range(4):
+            f = (np.arange(o[i].size) + 1) / o[i].size
+            w = (f >= 0.749) & (f <= 0.752)
+            sunrise.append(float(np.max(np.abs(o[i][w] - h[i][w]))))
+        bound = eo + eh + 0.2
+        k = int(np.argmax(np.abs(o[3] - h[3])))
+        ok = native[3] <= bound and all(rms[i] > rms[i + 1] for i in range(3)) and native[3] < native[2]
+        res[name] = {"finest_native_max_K": native[3], "native_max_by_level_K": native,
+                     "rms_by_level_K": rms, "sunrise_window_max_by_level_K": sunrise,
+                     "at_cycle_fraction": (k + 1) / o[3].size, "e_ours_K": eo, "e_heat1d_K": eh,
+                     "order_ours": po, "order_heat1d": ph, "bound_K": bound, "satisfied": bool(ok)}
+    rep["verdict_R2"] = {"columns": res, "satisfied": all(r["satisfied"] for r in res.values()),
+                         "note": "R2 four-level evidence; R1's three-level FAIL stays recorded"}
+    (out / "gi.json").write_text(json.dumps(rep, indent=1))
+    return rep
 
 
 def verdict(outdir) -> dict:
