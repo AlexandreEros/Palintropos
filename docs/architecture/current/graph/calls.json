@@ -1846,6 +1846,11 @@
       "target": "tropoi.physics.materials.stratified_interfaces"
     },
     {
+      "kind": "self",
+      "source": "tropoi.physics.substrate.ConductiveSubstrate._report",
+      "target": "tropoi.physics.substrate.ConductiveSubstrate._temperature_extent"
+    },
+    {
       "kind": "instantiate",
       "source": "tropoi.physics.substrate.ConductiveSubstrate._report",
       "target": "tropoi.physics.substrate.StepReport"
@@ -1908,17 +1913,7 @@
     {
       "kind": "self",
       "source": "tropoi.physics.substrate.ConductiveSubstrate.extent",
-      "target": "tropoi.physics.substrate.ConductiveSubstrate.surface_temperature"
-    },
-    {
-      "kind": "self",
-      "source": "tropoi.physics.substrate.ConductiveSubstrate.extent",
-      "target": "tropoi.physics.substrate.ConductiveSubstrate.temperature"
-    },
-    {
-      "kind": "call",
-      "source": "tropoi.physics.substrate.ConductiveSubstrate.extent",
-      "target": "tropoi.physics.substrate._host"
+      "target": "tropoi.physics.substrate.ConductiveSubstrate._temperature_extent"
     },
     {
       "kind": "call",
@@ -15590,6 +15585,13 @@
       "kind": "method",
       "module": "tropoi.physics.substrate",
       "qualname": "ConductiveSubstrate._system",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.physics.substrate.ConductiveSubstrate._temperature_extent",
+      "kind": "method",
+      "module": "tropoi.physics.substrate",
+      "qualname": "ConductiveSubstrate._temperature_extent",
       "type": "function"
     },
     {

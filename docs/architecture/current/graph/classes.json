@@ -1481,6 +1481,10 @@
         },
         {
           "kind": "method",
+          "name": "_temperature_extent"
+        },
+        {
+          "kind": "method",
           "name": "conductivity"
         },
         {

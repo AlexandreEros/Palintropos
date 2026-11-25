@@ -1,13 +1,13 @@
 {
   "atlas": {
-    "call_edges": 2513,
-    "call_sites_omitted_by_cap": 39,
-    "call_sites_recorded": 3304,
+    "call_edges": 2512,
+    "call_sites_omitted_by_cap": 40,
+    "call_sites_recorded": 3301,
     "import_edges": 507,
     "import_sites_omitted_by_cap": 0,
     "import_sites_recorded": 571,
     "max_sites_per_edge": 8,
-    "nodes": 2346,
+    "nodes": 2347,
     "proposal": {
       "call_edges_by_direction": {
         "downward": 435,
@@ -64,7 +64,7 @@
         "cli": 66,
         "dynamics": 119,
         "integration": 92,
-        "physics": 320,
+        "physics": 321,
         "run": 130,
         "setup": 292,
         "spectral": 249,
@@ -159,24 +159,24 @@
         "sha256": "1dcfeb9400fd06152e45cd607c8648f54d8fa8f41c02b0fcd8ee9310a03c28a4"
       }
     ],
-    "source_lines_embedded": 19622
+    "source_lines_embedded": 19618
   },
   "call_graph": {
     "call_sites": {
-      "builtin": 4361,
-      "external": 2831,
-      "internal": 3334,
-      "unresolved": 4492
+      "builtin": 4360,
+      "external": 2836,
+      "internal": 3332,
+      "unresolved": 4505
     },
     "edges_by_kind": {
-      "call": 1484,
+      "call": 1483,
       "constructor": 72,
       "instantiate": 554,
       "override": 6,
       "self": 393,
       "super": 4
     },
-    "nodes": 2160,
+    "nodes": 2161,
     "scoped": {
       "airless-mercury": {
         "edges": 11,
@@ -1281,7 +1281,7 @@
     "package": "tropoi",
     "src": "src",
     "working_tree": {
-      "base_commit": "21c6451493841e2ae4659b7217e2a433d0f91073",
+      "base_commit": "67ca450920edf4d093eef098de31152fdb3c8347",
       "generator": {
         "changes": [],
         "files": {
@@ -1328,7 +1328,7 @@
           "src/tropoi/physics/constants.py": "97c07ad424b13bc018c45a2b5036054e2ce0d2107281a814109aa62cd20cff93",
           "src/tropoi/physics/convection.py": "593c1a1ac1b1974c98ca84acb2727a2f1d57260996b832ba75779354b516e09e",
           "src/tropoi/physics/insolation.py": "1f95aeef8c044228e6b24f673a99cc9e5f5329ae4f696fe05ae2cf4a5643e9b8",
-          "src/tropoi/physics/materials.py": "834005a05737d69939bccc7a0ef10867f3d682b974e284c5252660da6931acf8",
+          "src/tropoi/physics/materials.py": "2ac3fd00c0656421bcc2045a7d92093e25e839e01718ded72856351f530baf91",
           "src/tropoi/physics/monin_obukhov.py": "8e92212937c71d91262f9b8808e583d9f27b1802cc5a402d171c96ab635d4708",
           "src/tropoi/physics/monin_obukhov_cuda.py": "a08db2faa45575b8b3a9bcc7c2fa9655dcd148db216011866a8de35b507be457",
           "src/tropoi/physics/orbit.py": "944f8c0443a4b263fda23d00f8532e2ab3e70aa2cc257fb0a918ad6f0fdff73f",
@@ -1343,7 +1343,7 @@
           "src/tropoi/physics/rotation.py": "ab8b4e9b1289aa2591a2ac1f4346753a993445d15519f0d3eb210ebb8d1fa44a",
           "src/tropoi/physics/species.py": "e9cf7b23887f5ae8f620daf7faab6fb253fb402ab88419c1dc99aa75a9c860e1",
           "src/tropoi/physics/star.py": "48e443fa8c47c6091ea899bbbe53ed9efa27360bc4cb03549fc9ca0eea277443",
-          "src/tropoi/physics/substrate.py": "fc95e21578cdb4525c3152fac7c5896d216013bf45723a258f89a9503afaf92a",
+          "src/tropoi/physics/substrate.py": "68d4f63bc2e20a9ec8be758647725ae59122534e2f1b09ae6966590ff11756f9",
           "src/tropoi/physics/surface.py": "eae85c36e3da3be57c2dd369b386c937693bf95d15f57adfe17b5047732f155d",
           "src/tropoi/physics/thermodynamics.py": "037c8eb1952dfe0face3313f67d38af4862eaa89d9451a361af5aed8e4752d38",
           "src/tropoi/representation/__init__.py": "88477f9f4ebfdf96b2d33b5e6612d29b172238b1bd486e7100523ae1a79384a5",
@@ -1405,7 +1405,7 @@
           "src/tropoi/run/airless/__init__.py": "4eacd9f550f9829fccc087a027d35f60c6bbb99e57d15d8c0d89ede496857f68",
           "src/tropoi/run/airless/__main__.py": "e6e96bd95d9369d6372ea65f4101e30254b840e1da0ff7a592b0f886730e6988",
           "src/tropoi/run/airless/config.py": "2634a6d90425974e6397af2a1a434bdafffab98de2556c1149fcfb8261223b28",
-          "src/tropoi/run/airless/experiment.py": "5f2b5c3bd376d3c9070a03cf3af59e08f7d79c6730a0ddb49eef52957633ab07",
+          "src/tropoi/run/airless/experiment.py": "db761377263231bdd5acf2121b3f262e6914764f771ab09c8044e1c5497e54d5",
           "src/tropoi/run/bve/__init__.py": "dc2f43732af56efca1d2801705e6d92ab8cdcfb64d91b00f7dfc012fcbce8bfa",
           "src/tropoi/run/bve/config.py": "7b44a7d627c53b28e0315710d209b12d3689d247f4feb093e8cd8703c43dd406",
           "src/tropoi/run/bve/execution.py": "e812726e0351f85ee2520ab85f4396432d790db315f7158e5ab91c89d081cfba",
@@ -1505,7 +1505,7 @@
           "src/tropoi/temporal/tendencies/primitive_equations.py": "848c6fe9406a7c1c465c0aa9459760b01c542164c8cc9395797a3c4a60793e52",
           "src/tropoi/temporal/tendencies/shallow_water.py": "7ae521f2378824e89f88bc467fc99321d1ef4224b037c865137e076a601da3c8"
         },
-        "sha256": "da4b694766f4a32b0cc53ccd4835afcb95c564e847c93941c5cb8dd7a9d3e213",
+        "sha256": "dfbc0ac35de7d08664f6edf2c53745e2c30d36dd5166567ee1bfa6ffbc3c75a5",
         "status": "clean"
       }
     }

@@ -352,6 +352,7 @@ classDiagram
     c_tropoi_ophysics_osubstrate_oConductiveSubstrate : +#95;consts()
     c_tropoi_ophysics_osubstrate_oConductiveSubstrate : +#95;report()
     c_tropoi_ophysics_osubstrate_oConductiveSubstrate : +#95;system()
+    c_tropoi_ophysics_osubstrate_oConductiveSubstrate : +#95;temperature#95;extent()
     c_tropoi_ophysics_osubstrate_oConductiveSubstrate : +conductivity()
     c_tropoi_ophysics_osubstrate_oConductiveSubstrate : +constant()$
     c_tropoi_ophysics_osubstrate_oConductiveSubstrate : +depth
