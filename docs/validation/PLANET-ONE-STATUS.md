@@ -158,3 +158,8 @@ resume. It never changes a criterion.
 - **Remaining before review:** owner review of #66/#67; optionally rerun the
   full 2° tier-2 retention to a durable store (Drive mount needs interactive
   authentication).
+
+
+## Reproducibility of the 2° run (wording corrected 2026-11-25)
+
+Demonstrated: (1) G-G – replaying the retained cycle of six columns standalone from the saved start state reproduced the global run's tier-2 samples and end state bitwise on the same T4 and software stack; (2) G-GPU – CPU and GPU agree to 1.9e-11 K over a production cycle. Not demonstrated: that rerunning the whole experiment from scratch reproduces the discarded ~2 GB of full-resolution profiles bitwise. That is an expectation (deterministic code, fixed configuration and commit 3d05287, same hardware and software stack), not a tested result; on a different stack only agreement within the G-GPU tolerance is expected.

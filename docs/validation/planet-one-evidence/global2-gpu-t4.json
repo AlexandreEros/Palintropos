@@ -110,6 +110,7 @@
   "x_surface_Ts_absorbed.npy (retained cycle, 720 samples x [T_s, absorbed] x 16200, float64)": "sha256 06c2d85795548ee9dc90e818d0df40f5f0a4ed8627b79c557fa8b1e919cb6a55",
   "x_profiles_subset.npz (full T(z), 180 samples, equatorial row + canonical + 72 subset columns)": "sha256 196bfc247edf8b834681c83f56ec6a28b7eb19738cec36779fdf3fc535c45e5d"
  },
- "not_preserved": "the remaining full-precision tier-2 profiles (~2 GB) stayed on the Colab VM (Drive mount needs interactive auth) and were released with the session; they are reproducible bit for bit by rerunning commit 3d05287 with the same configuration on the same software stack (the G-G replay demonstrates bitwise determinism)",
- "colab_compute_units_used_session": 2.58
+ "not_preserved": "The remaining full-precision tier-2 profiles (~2 GB) stayed on the Colab VM (Drive mount needs interactive authentication) and were released with the session.",
+ "colab_compute_units_used_session": 2.58,
+ "reproducibility": "Demonstrated: (1) G-G - replaying the retained cycle of six columns standalone from the saved start state reproduced the global run's tier-2 samples and end state bitwise on the same T4 and software stack; (2) G-GPU - CPU and GPU agree to 1.9e-11 K over a production cycle. Not demonstrated: that rerunning the whole experiment from scratch reproduces the discarded ~2 GB of full-resolution profiles bitwise. That is an expectation (deterministic code, fixed configuration and commit 3d05287, same hardware and software stack), not a tested result; on a different stack only agreement within the G-GPU tolerance is expected."
 }
