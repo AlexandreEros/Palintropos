@@ -272,14 +272,16 @@ class StellarIllumination:
 
     @property
     def mean_solar_day(self) -> float:
-        """Long-term mean solar day relative to the primary:
+        """Long-term mean solar day relative to the central primary:
         2 pi / |Omega - n sign(cos epsilon)|. Over one orbit the primary's
         right ascension advances by one full turn (prograde for
         obliquity below 90 degrees, retrograde above), whatever the
         eccentricity. This is a mean only: in an eccentric or oblique
         configuration the instantaneous solar day varies. Returns
         infinity for a synchronous lock, and NaN at an obliquity of
-        exactly 90 degrees."""
+        exactly 90 degrees. An orbiting primary is unsupported."""
+        if self.sources[0].orbit is not None:
+            raise ValueError("mean solar day requires a central primary")
         eps = self.rotation.obliquity_rad
         c = math.cos(eps)
         if abs(c) < 1e-15:
@@ -455,9 +457,15 @@ def illumination_from_spec(spec: dict) -> StellarIllumination:
         raise ValueError(f"unknown illumination options {sorted(unknown)}")
     period = float(spec["period"])
     obliquity = float(spec.get("obliquity_deg", 0.0))
-    spin = dict(spec.get("spin") or {})
-    target = spin.pop("subsolar_longitude_at_epoch_deg", None)
-    omega = _spin_rate(spin, period, obliquity) if spin else 0.0
+    spin = dict(spec["spin"]) if "spin" in spec else None
+    target = None
+    omega = 0.0
+    if spin is not None:
+        target = spin.pop("subsolar_longitude_at_epoch_deg", None)
+        unknown = set(spin) - set(_SPIN_KEYS)
+        if unknown:
+            raise ValueError(f"unknown spin options {sorted(unknown)}")
+        omega = _spin_rate(spin, period, obliquity)
     ill = StellarIllumination.planet_centric(
         irradiance_at_semimajor=float(spec["stellar_constant"]),
         period_s=period, eccentricity=float(spec.get("eccentricity", 0.0)),
