@@ -200,9 +200,6 @@ def main(argv=None) -> int:
     return 0
 
 
-if __name__ == "__main__":
-    sys.exit(main())
-
 
 def warm_start(prev_run, cfg):
     """The end-of-cycle state of a verified periodic point run, interpolated
@@ -334,3 +331,7 @@ def verdict(outdir) -> dict:
                            "decision; the diagnostic sampling must not be used to pass.")
     (out / "gi.json").write_text(json.dumps(rep, indent=1))
     return rep
+
+
+if __name__ == "__main__":
+    sys.exit(main())
