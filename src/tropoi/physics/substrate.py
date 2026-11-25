@@ -260,7 +260,8 @@ class StepReport(NamedTuple):
 
     ``max_residual_ratio`` is the largest \\|r\\|/tau over the column (<= 1 once
     converged). ``extent`` holds the (min, max) temperature reached in each
-    stratum over all columns, with the skin counted in the top stratum."""
+    stratum over all columns, with the skin counted in the top stratum.
+    Each pair contains backend scalars in kelvin."""
     iterations: int
     energy_tendency: object
     absorbed: object
@@ -642,10 +643,10 @@ class ConductiveSubstrate:
             x = x + lam[None] * delta
             Ts, T = x[0], x[1:]
             it += 1
-        report = self._report(xp, sysm, it, gb, src, n)
-        return SubstrateState(T, Ts), report
+        new_state = SubstrateState(T, Ts)
+        return new_state, self._report(xp, sysm, it, gb, src, n, new_state)
 
-    def _report(self, xp, sysm, it, gb, src, n):
+    def _report(self, xp, sysm, it, gb, src, n, state):
         src_sum = (xp.broadcast_to(src, (self.layers, n)).sum(axis=0)
                    if src.size > 1 else src.reshape(()) * self.layers + xp.zeros(n))
         storage = sysm["storage"].sum(axis=0)
@@ -654,24 +655,25 @@ class ConductiveSubstrate:
         ratio = xp.maximum(xp.max(xp.abs(sysm["r"]) / sysm["tau"], axis=0),
                            xp.abs(sysm["r_s"]) / sysm["tau_s"])
         return StepReport(it, storage, sysm["absorbed"], sysm["emitted"], sysm["q_s"],
-                          gb + 0.0 * storage, src_sum, resid, tol, ratio, ())
+                          gb + 0.0 * storage, src_sum, resid, tol, ratio,
+                          self._temperature_extent(state, xp))
+
+    def _temperature_extent(self, state: SubstrateState, xp) -> tuple:
+        bounds = []
+        for start, end, _ in self.materials.segments:
+            cells = state.anomaly[start:end]
+            lo, hi = cells.min(), cells.max()
+            if start == 0:
+                skin = state.surface_anomaly
+                lo, hi = xp.minimum(lo, skin.min()), xp.maximum(hi, skin.max())
+            bounds.append((ENERGY_REFERENCE_TEMPERATURE + lo, ENERGY_REFERENCE_TEMPERATURE + hi))
+        return tuple(bounds)
 
     def extent(self, state: SubstrateState) -> list:
-        """(min, max) temperature in each stratum over all columns, with the
-        skin counted in the top stratum. Use it to check each law's
-        validity range."""
-        xp = _xp(state.anomaly)
-        T = _host(self.temperature(state), xp)
-        which = self.materials.stratum_of_cell
-        out = []
-        for j in range(len(self.strata)):
-            vals = T[which == j]
-            lo, hi = float(vals.min()), float(vals.max())
-            if j == 0:
-                ts = _host(self.surface_temperature(state), xp)
-                lo, hi = min(lo, float(ts.min())), max(hi, float(ts.max()))
-            out.append((lo, hi))
-        return out
+        """Host (min, max) temperature pairs by stratum, including the skin
+        in the top stratum."""
+        return [(float(lo), float(hi))
+                for lo, hi in self._temperature_extent(state, _xp(state.anomaly))]
 
 
 def _host(a, xp):

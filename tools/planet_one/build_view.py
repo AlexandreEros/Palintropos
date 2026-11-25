@@ -23,6 +23,7 @@ import sys
 
 import numpy as np
 
+from tools.planet_one.heat1d_compare import LEVELS, _require_heat1d_periodicity
 from tropoi.physics.insolation import insolation_from_spec
 from tropoi.run.airless.experiment import load_tier2
 
@@ -35,17 +36,16 @@ def _pack(a: np.ndarray) -> str:
 
 
 def build(run: pathlib.Path, frames: int, extras: dict) -> str:
-    meta = json.loads((run / "config.json").read_text())
+    meta = json.loads((run / "config.json").read_text(encoding="utf-8"))
     cfg = meta["config"]
     if cfg["columns"]["kind"] != "latlon":
         raise SystemExit("the view needs a lat/lon run")
     nlat, nlon = int(cfg["columns"]["nlat"]), int(cfg["columns"]["nlon"])
     grid = np.load(run / "grid.npz")
-    status = json.loads((run / "retained" / "status.json").read_text())
-    cycles = json.loads((run / "cycles.json").read_text())
+    status = json.loads((run / "retained" / "status.json").read_text(encoding="utf-8"))
+    cycles = json.loads((run / "cycles.json").read_text(encoding="utf-8"))
     ret = run / "retained"
     ts_all = load_tier2(ret, "surface")[:, 0, :]            # (S, ncol): T_s only
-    layout = json.loads((ret / "blocks.json").read_text())
     prof_shape = np.load(ret / "profiles-b000.npy", mmap_mode="r").shape
     ints = np.load(run / "retained" / "integrals.npz")
     S, Pn, L = ts_all.shape[0], prof_shape[0], prof_shape[1]
@@ -112,12 +112,15 @@ def build(run: pathlib.Path, frames: int, extras: dict) -> str:
                  "bottom_drift": last.get("bottom_drift_K"),
                  "residual_ratio": last["max_cell_residual_ratio"],
                  "newton_max": last["max_newton_iterations"],
-                 "extent": last["extent_K"], "dt_s": last["dt_s"],
+                 "extent": last["extent_K"], "extent_scope": last.get("extent_scope", "final_state"),
+                 "dt_s": last["dt_s"],
                  "cycles_run": len(cycles)},
         "extras": extras, "quantum_K": 1.0 / Q,
     }
-    page = (pathlib.Path(__file__).with_name("view_template.html")).read_text()
-    return page.replace("/*__DATA__*/null", json.dumps(data, separators=(",", ":")))
+    page = (pathlib.Path(__file__).with_name("view_template.html")).read_text(encoding="utf-8")
+    # The HTML parser recognizes script end tags even inside a JS string.
+    payload = json.dumps(data, separators=(",", ":")).replace("<", "\\u003c")
+    return page.replace("/*__DATA__*/null", payload)
 
 
 def main(argv=None) -> int:
@@ -133,9 +136,9 @@ def main(argv=None) -> int:
     for key in ("gp", "gi", "l3"):
         path = getattr(args, key)
         if path:
-            extras[key] = json.loads(pathlib.Path(path).read_text())
+            extras[key] = json.loads(pathlib.Path(path).read_text(encoding="utf-8"))
     html = build(pathlib.Path(args.run), args.frames, _summaries(extras))
-    pathlib.Path(args.out).write_text(html)
+    pathlib.Path(args.out).write_text(html, encoding="utf-8")
     print(f"{args.out}: {len(html) / 1e6:.2f} MB")
     return 0
 
@@ -154,9 +157,15 @@ def _summaries(extras: dict) -> dict:
         out["gi"] = [{"level": lv["level"], **{k: v["max_abs_dTs_K"] for k, v in lv["columns"].items()}}
                      for lv in gi["levels"]]
         if "verdict" in gi:
-            out["gi_verdict"] = {k: {"pass": v["strict"]["pass"], "finest_K": v["strict"]["finest_max_K"],
-                                     "bound_K": v["strict"]["bound_K"]}
-                                 for k, v in gi["verdict"].items()}
+            try:
+                _require_heat1d_periodicity(gi, len(LEVELS))
+            except ValueError:
+                out["gi_unverified"] = True
+            else:
+                out["gi_verdict"] = {
+                    k: {"pass": v["strict"]["pass"], "finest_K": v["strict"]["finest_max_K"],
+                        "bound_K": v["strict"]["bound_K"]} for k, v in gi["verdict"].items()
+                }
     if extras.get("l3"):
         out["l3"] = extras["l3"]
     return out

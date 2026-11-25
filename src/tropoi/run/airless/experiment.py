@@ -136,6 +136,7 @@ def run_block(cfg_dict: dict, lat_deg, lon_deg, weights, anomaly, surface_anomal
                                         "residual", "tolerance", "abs_conducted")}
     max_ratio = xp.zeros(ncol)
     ts_lo, ts_hi = np.inf, -np.inf
+    extent_min, extent_max = xp.asarray(sub.extent(st)).T
     g_series = {k: xp.zeros(steps) for k in ("energy_tendency", "net", "residual",
                                              "tolerance")}
     iters = np.zeros(steps, dtype=np.int32)
@@ -143,6 +144,9 @@ def run_block(cfg_dict: dict, lat_deg, lon_deg, weights, anomaly, surface_anomal
         t = (cycle * steps + n + 1) * dt              # backward Euler: forcing at t^{n+1}
         sw, _ = ins.incident(nx, ny, nz, t)
         st, rep = sub.step(st, dt, shortwave_down=sw)
+        lows, highs = zip(*rep.extent)
+        xp.minimum(extent_min, xp.stack(lows), out=extent_min)
+        xp.maximum(extent_max, xp.stack(highs), out=extent_max)
         net = rep.absorbed - rep.emitted + rep.bottom + rep.source
         sums["absorbed"] += dt * rep.absorbed
         sums["emitted"] += dt * rep.emitted
@@ -188,7 +192,8 @@ def run_block(cfg_dict: dict, lat_deg, lon_deg, weights, anomaly, surface_anomal
         "sums": {k: _host(v) for k, v in sums.items()}, "max_ratio": _host(max_ratio),
         "global": {k: _host(v) for k, v in g_series.items()}, "iterations": iters,
         "compared": drift is not None, "d_s": d_s, "d_p": d_p, "drift": drift,
-        "surface_range": (ts_lo, ts_hi), "extent": sub.extent(st),
+        "surface_range": (ts_lo, ts_hi),
+        "extent": _host(xp.stack((extent_min, extent_max), axis=1)).tolist(),
     }
 
 
@@ -211,29 +216,41 @@ def load_tier2(cycle_dir, name: str, columns=None, mmap: bool = True):
     read so that large runs never load everything. The block layout is in
     ``blocks.json``."""
     d = pathlib.Path(cycle_dir)
+    mode = "r" if mmap else None
+    cols = None if columns is None else np.asarray(columns)
+    if cols is not None:
+        if cols.ndim != 1 or (cols.size and not np.issubdtype(cols.dtype, np.integer)):
+            raise IndexError("columns must be a one-dimensional sequence of integer indices")
+        if not cols.size:
+            cols = cols.astype(np.intp)
     if not (d / "blocks.json").exists():         # runs written before streaming
-        a = np.load(d / f"{name}.npy", mmap_mode="r" if mmap else None)
-        return np.asarray(a if columns is None else a[..., np.asarray(columns)])
-    layout = json.loads((d / "blocks.json").read_text())
-    parts = []
-    for b, (lo, hi) in enumerate(layout["ranges"]):
+        a = np.load(d / f"{name}.npy", mmap_mode=mode)
+        return np.asarray(a if cols is None else a[..., cols])
+    ranges = json.loads((d / "blocks.json").read_text())["ranges"]
+    if cols is not None:
+        total = ranges[-1][1]
+        if np.any(cols >= total) or np.any(cols < -total):
+            raise IndexError("column index out of range")
+        cols = cols.astype(np.intp, copy=True)
+        cols[cols < 0] += total
+    parts, positions = [], []
+    for b, (lo, hi) in enumerate(ranges):
         f = d / f"{name}-b{b:03d}.npy"
-        if not f.exists():
-            continue
-        a = np.load(f, mmap_mode="r" if mmap else None)
-        if columns is None:
-            parts.append(np.asarray(a))
+        if cols is None:
+            if f.exists():
+                parts.append(np.asarray(np.load(f, mmap_mode=mode)))
+        elif not cols.size and f.exists():
+            return np.asarray(np.load(f, mmap_mode=mode)[..., :0])
         else:
-            cols = np.asarray(columns)
-            sel = cols[(cols >= lo) & (cols < hi)] - lo
-            if sel.size:
-                parts.append(np.asarray(a[..., sel]))
-    if columns is not None:
-        # keep the order of ``columns``
-        joined = np.concatenate(parts, axis=-1)
-        order = np.argsort(np.argsort(np.asarray(columns)))
-        return joined[..., order]
-    return np.concatenate(parts, axis=-1)
+            selected = np.flatnonzero((cols >= lo) & (cols < hi))
+            if selected.size:
+                a = np.load(f, mmap_mode=mode)
+                parts.append(np.asarray(a[..., cols[selected] - lo]))
+                positions.append(selected)
+    joined = np.concatenate(parts, axis=-1)
+    if cols is not None:
+        joined = joined[..., np.argsort(np.concatenate(positions))]
+    return joined
 
 
 def _call(args):
@@ -484,7 +501,8 @@ class AirlessRun:
                     abs(w @ s["residual"]) / max(w @ s["tolerance"], 1e-300)),
                 "max_cell_residual_ratio": float(np.max(res["max_ratio"])),
                 "max_newton_iterations": int(np.max(res["iterations"])),
-                "extent_K": res["extent"], "surface_T_range_K": list(res["surface_range"])}
+                "extent_K": res["extent"], "extent_scope": "cycle",
+                "surface_T_range_K": list(res["surface_range"])}
         periodic = False
         if res["compared"]:
             diag.update(max_surface_change_K=res["d_s"], max_subsurface_change_K=res["d_p"],

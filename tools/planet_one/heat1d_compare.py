@@ -53,11 +53,6 @@ import types
 
 import numpy as np
 
-import heat1d.profile as h1p
-from heat1d.config import Configurator
-from heat1d.layers import DepthLayer
-from heat1d.solvers import computeCFL
-
 from tropoi.physics.insolation import insolation_from_spec
 from tropoi.physics.materials import ledlow_1992
 from tropoi.run.airless.config import VPW99, mercury_vpw99
@@ -71,9 +66,14 @@ LEVELS = [((2e-3, 1.1), 2160, (40, 4)), ((1e-3, 1.0488), 4320, (80, 8)),
 LEVEL3 = ((2.5e-4, 1.012), 17280, (320, 32))
 COLUMNS = {"0N 0E": (0.0, 0.0), "0N 90E": (0.0, 90.0)}
 LAW = ledlow_1992()
+PERIODICITY_K = 0.01
 
 
 def heat1d_profile(model, depth, mn, emissivity):
+    import heat1d.profile as h1p
+    from heat1d.config import Configurator
+    from heat1d.layers import DepthLayer
+
     m, n = mn
     t, b = VPW99["top"], VPW99["bottom"]
     planet = types.SimpleNamespace(
@@ -107,6 +107,44 @@ def heat1d_profile(model, depth, mn, emissivity):
     return p
 
 
+def _run_heat1d_cycles(profile, dt, steps, max_cycles, absorbed, geothermal_flux, compute_cfl):
+    prev = None
+    change = None
+    for cycle in range(1, max_cycles + 1):
+        ts = np.empty(steps)
+        for k in range(steps):
+            # Resolve heat1d's operator splitting with its own CFL-limited substeps.
+            nsub = max(1, math.ceil(dt / compute_cfl(profile, profile.config)))
+            h = dt / nsub
+            for j in range(nsub):
+                profile.update_T(h, Qs=absorbed(k * dt + (j + 1) * h), Qb=geothermal_flux)
+                profile.update_properties()
+            ts[k] = profile.T[0]
+        if prev is not None:
+            change = float(np.max(np.abs(ts - prev)))
+            if change < PERIODICITY_K:
+                break
+        prev = ts
+    return ts, cycle, change
+
+
+def _heat1d_is_periodic(column):
+    change = column.get("heat1d_last_cycle_change_K")
+    if change is None or not 0.0 <= change < PERIODICITY_K or column.get("heat1d_cycles", 0) < 2:
+        return False
+    # Legacy zeroes cannot distinguish a true zero from a self-comparison
+    # after exhausting the cycle limit. New reports attest to the comparison.
+    return column.get("heat1d_converged", change > 0.0) is True
+
+
+def _require_heat1d_periodicity(report, nlevels):
+    levels = {row["level"]: row["columns"] for row in report["levels"]}
+    for i in range(nlevels):
+        for name in COLUMNS:
+            if not _heat1d_is_periodic(levels.get(i, {}).get(name, {})):
+                raise ValueError(f"level {i}, {name}: heat1d periodicity is unverified")
+
+
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("outdir")
@@ -116,6 +154,11 @@ def main(argv=None) -> int:
     ap.add_argument("--with-level3", action="store_true",
                     help="R2: add the fourth joint level, warm-started from level 2")
     args = ap.parse_args(argv)
+    if args.max_cycles < 1:
+        ap.error("--max-cycles must be positive")
+    import heat1d.profile as h1p
+    from heat1d.solvers import computeCFL
+
     out = pathlib.Path(args.outdir)
     out.mkdir(parents=True, exist_ok=True)
     # matched heat capacity: Ledlow eqs. (6)-(7) for heat1d as well
@@ -135,7 +178,8 @@ def main(argv=None) -> int:
     levels = LEVELS + ([LEVEL3] if args.with_level3 else [])
     if (out / "gi.json").exists():          # keep every completed level and verdict
         report = json.loads((out / "gi.json").read_text())
-    done = {lv["level"] for lv in report["levels"]}
+    done = {lv["level"] for lv in report["levels"]
+            if all(_heat1d_is_periodic(lv["columns"].get(name, {})) for name in COLUMNS)}
     for i, (grid, steps, m) in enumerate(levels):
         warm = i == 3
         cfg = mercury_vpw99(model=args.model, geothermal_flux=args.geothermal_flux,
@@ -167,38 +211,35 @@ def main(argv=None) -> int:
             # verified periodic solution); heat1d's own periodicity is checked
             p.T = np.interp(p.z, np.r_[0.0, centres], np.r_[ev[-1, 0, c], ev[-1, 1:, c]])
             p.update_properties()
-            prev = None
             absorbed = lambda t: (1 - cfg.albedo) * float(ins.incident(*n, t)[0][0])
-            for cyc in range(args.max_cycles):
-                ts = np.empty(steps)
-                for k in range(steps):
-                    # heat1d's own practice for implicit runs: CFL-limited
-                    # substeps (its surface/interior operator splitting is
-                    # accurate only for dt ~ dz^2 / kappa), with the absorbed
-                    # flux of the same geometry at every substep
-                    nsub = max(1, math.ceil(dt / computeCFL(p, p.config)))
-                    h = dt / nsub
-                    for j in range(nsub):
-                        p.update_T(h, Qs=absorbed(k * dt + (j + 1) * h), Qb=args.geothermal_flux)
-                        p.update_properties()
-                    ts[k] = p.T[0]
-                if prev is not None and np.max(np.abs(ts - prev)) < 0.01:
-                    break
-                prev = ts
+            ts, cycles, change = _run_heat1d_cycles(
+                p, dt, steps, args.max_cycles, absorbed, args.geothermal_flux, computeCFL)
             ours = ev[:, 0, c]
             d = ts - ours
             level["columns"][name] = {
-                "heat1d_cycles": cyc + 1, "heat1d_last_cycle_change_K": float(np.max(np.abs(ts - prev))) if prev is not None else None,
+                "heat1d_cycles": cycles, "heat1d_last_cycle_change_K": change,
+                "heat1d_converged": change is not None and change < PERIODICITY_K,
                 "max_abs_dTs_K": float(np.max(np.abs(d))), "rms_dTs_K": float(np.sqrt(np.mean(d * d))),
                 "Tmax_ours": float(ours.max()), "Tmax_heat1d": float(ts.max()),
                 "Tmin_ours": float(ours.min()), "Tmin_heat1d": float(ts.min()),
                 "nodes": int(p.z.size), "cells_ours": int(centres.size)}
             np.save(out / f"heat1d-L{i}-{name.replace(' ', '_')}.npy", ts)
-        report["levels"].append(level)
+        report["levels"] = sorted(
+            [lv for lv in report["levels"] if lv["level"] != i] + [level],
+            key=lambda lv: lv["level"])
+        # A retried level supersedes any verdict that used its old series.
+        report.pop("verdict_R2", None)
+        if i < len(LEVELS):
+            for key in ("verdict", "pass", "verdict_note"):
+                report.pop(key, None)
         (out / "gi.json").write_text(json.dumps(report, indent=1))
         print(json.dumps(level["columns"], indent=1), flush=True)
+    try:
+        _require_heat1d_periodicity(report, len(levels))
+    except ValueError as exc:
+        print(exc, file=sys.stderr)
+        return 1
     return 0
-
 
 
 def warm_start(prev_run, cfg):
@@ -234,6 +275,7 @@ def verdict4(outdir) -> dict:
     R1's three-level verdict is left in gi.json untouched."""
     out = pathlib.Path(outdir)
     rep = json.loads((out / "gi.json").read_text())
+    _require_heat1d_periodicity(rep, 4)
     res = {}
     for name in COLUMNS:
         tag = name.replace(" ", "_")
@@ -287,6 +329,7 @@ def verdict(outdir) -> dict:
     decides the verdict."""
     out = pathlib.Path(outdir)
     rep = json.loads((out / "gi.json").read_text())
+    _require_heat1d_periodicity(rep, len(LEVELS))
     res = {}
     for name in COLUMNS:
         tag = name.replace(" ", "_")

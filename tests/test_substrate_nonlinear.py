@@ -398,7 +398,19 @@ def test_energy_identity_and_cumulative_closure_under_random_forcing():
 def test_stratum_extents_are_recorded_for_validity_checks():
     sub = ConductiveSubstrate(_two_strata(), top_thickness=1e-3, max_stretch=1.25,
                               albedo=ALBEDO, emissivity=EMISS, initial_temperature=150.0)
-    st, _ = sub.step(sub.initial_state(2), 3600.0, shortwave_down=np.array([9000.0, 0.0]))
-    (lo0, hi0), (lo1, hi1) = sub.extent(st)
+    st, report = sub.step(sub.initial_state(2), 3600.0, shortwave_down=np.array([9000.0, 0.0]))
+    (lo0, hi0), (lo1, hi1) = report.extent
+    np.testing.assert_array_equal(report.extent, sub.extent(st))
     assert hi0 == pytest.approx(float(np.max(sub.surface_temperature(st))))
     assert lo0 <= hi0 and lo1 <= hi1 and hi1 < hi0
+
+
+@pytest.mark.parametrize("top, stretch", [(0.009, 1.1), (0.003, 1.0)])
+def test_stratified_grid_rejects_incompatible_stretch(top, stretch):
+    with pytest.raises(ValueError, match="max_stretch"):
+        stratified_interfaces([0.02], top, stretch)
+
+
+def test_stratified_grid_accepts_exact_uniform_fit():
+    edges = stratified_interfaces([0.021], 0.003, 1.0)
+    np.testing.assert_allclose(np.diff(edges), 0.003, rtol=1e-13)

@@ -26,6 +26,9 @@ import sys
 
 import numpy as np
 
+import heat1d.profile as h1p
+from heat1d.solvers import computeCFL
+
 import tools.planet_one.heat1d_compare as hc
 from tools.planet_one.convergence import _reconstruction
 from tropoi.physics.insolation import insolation_from_spec
@@ -38,7 +41,7 @@ WINDOW = 2 * 86400.0
 
 def main(argv=None) -> int:
     gi = pathlib.Path((argv or sys.argv[1:])[0])
-    hc.h1p.heatCapacity = lambda planet, T, model="polynomial": hc.LAW.specific_heat(np.asarray(T))
+    h1p.heatCapacity = lambda planet, T, model="polynomial": hc.LAW.specific_heat(np.asarray(T))
     (grid3, steps3, mn3) = hc.LEVEL3
     base = dict(model="TWO", geothermal_flux=0.02,
                 columns={"kind": "points", "lat_deg": [0.0], "lon_deg": [0.0]})
@@ -81,7 +84,7 @@ def main(argv=None) -> int:
         p.update_properties()
         out, t = [], t0
         for tk in times:
-            nsub = max(1, math.ceil((tk - t) / hc.computeCFL(p, p.config)))
+            nsub = max(1, math.ceil((tk - t) / computeCFL(p, p.config)))
             h = (tk - t) / nsub
             for j in range(nsub):
                 p.update_T(h, Qs=absorbed(t + (j + 1) * h), Qb=0.02)

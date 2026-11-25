@@ -84,13 +84,35 @@ resume. It never changes a criterion.
 | G-P2 periodicity | Per run, reported in each run's `cycles.json` and `retained/status.json` | |
 | G-I heat1d (L2) | **Satisfied by the owner-approved four-level evidence (R2)**: 0°E 1.33 K against a 2.03 K bound, 90°E 0.69 K against 1.11 K; RMS and maxima decrease at every level after L1. R1's three-level strict FAIL (0°E 2.40 K against 2.26 K) remains recorded. Sunrise attribution: our backward-Euler time error (0.58 K at L3 dt) and heat1d's lag (0.55 K) and spatial error (0.54 K); refined codes agree to 0.15–0.19 K | `planet-one-evidence/gi-heat1d-vpw99-two-G0.02.json`, `gi-sunrise-attribution.json` |
 | G-M L3 (VPW99) | **EVALUATED**, G = 0, production settings, temperature at depth at 0°N 0°: BOT 367.85 vs 365 K (+2.85), TOP 470.69 vs 463 K (+7.69), TWO 425.78 vs 427 K (−1.22). All within the 10 K investigation threshold; no parameter changed | `planet-one-evidence/l3-vpw99.json` |
-| G-G global | **PASS** (2°, 90×180 = 16 200 columns, CuPy FP64 on a Colab T4, commit 3d05287, 1.63 h): PERIODIC, with G-P2 met in 2 consecutive production cycles; the standalone replay of six columns is bitwise identical (0.0 K); global emitted − absorbed = 0.0202 W m⁻² = G; extents within the c_p law's domain. A supplementary 4° CPU run exists | `planet-one-evidence/global2-gpu-t4.json`; local download `runs/planet-one/global2-gpu-vpw99-two-G0.02-download/` |
+| G-G global | **PASS** (2°, 90×180 = 16 200 columns, CuPy FP64 on a Colab T4, commit 3d05287, 1.63 h): PERIODIC, with G-P2 met in 2 consecutive production cycles; the standalone replay of six columns is bitwise identical (0.0 K); global emitted − absorbed = 0.0202 W m⁻² = G. Archived material-range coverage is described below. A supplementary 4° CPU run exists | `planet-one-evidence/global2-gpu-t4.json`; local download `runs/planet-one/global2-gpu-vpw99-two-G0.02-download/` |
 | G-GPU parity (A2) | **PASS** on a T4: max \|T_GPU − T_CPU\| = 1.9e-11 K over a production cycle of the six columns (bound 1e-6 K), with no Newton-iteration differences; energy closure, G4/G5 and manufactured parity on the GPU; 78 tests pass on the T4 | `planet-one-evidence/gpu-t4-2026-11-24.json` |
 | L4 observational | **NOT EVALUATED** | |
 
 **Exploratory runs, not evidence:** coarse settings, dirty tree. BOT at
 0°N 0° gave a deep T of about 368 K; hot and warm-meridian maxima were about
 700 K and 568 K. These only show that the pipeline works.
+
+## Effect of the #67 review corrections on archived evidence
+
+- **G-I:** All eight archived heat1d column/level records report a nonzero
+  measured last-cycle difference of 0.00623–0.00958 K. Each is below the
+  frozen 0.01 K limit. The old cycle-limit self-comparison produced exactly
+  zero, so it does not account for these records. The R1 and R2 verdicts stand.
+- **Grid and retained replay:** The archived VPW99 ladder and production
+  grid settings produce identical cell faces with stretch enforcement.
+  The 2° replay used increasing column indices, so the retained-column
+  ordering defect does not affect its comparison.
+- **Material temperature range:** The archived 2° run’s `extent_K` covers
+  only the final state. Its sampled surface range was 62.44–699.96 K.
+  Those samples and the final-state extents are within the Ledlow law’s
+  positive domain. The archive does not establish the complete cycle’s
+  per-stratum extrema. This limits the material-range claim. The separate
+  G-G replay, energy closure, and periodicity evidence still stand.
+  New runs accumulate temperatures from the cycle start through every
+  step, including the skin. The rebuilt viewer labels legacy extents
+  as final-state values and flags unverified full-cycle coverage.
+- **Viewer:** New exports render run and evidence text literally. The
+  published artifact and checksums remain historical records.
 
 ## Measured costs
 
@@ -145,7 +167,7 @@ resume. It never changes a criterion.
   - L4 is NOT EVALUATED.
 - **PR #66 GPU coverage:** the CUDA radiative tests pass on a T4 at 3bce170 (154 passed, 9 THAI k-table skips; `planet-one-evidence/geometry-pr66-cuda-tests-t4.json`).
 - **4° CPU run:** finished PERIODIC (supplementary).
-- **View:** published (version 3) and rendered in headless Chromium: no console errors, slider end to end, geometry readouts checked (subsolar point 180°E at the second perihelion, retrograde loop). It states the G-I verdict.
+- **View:** published (version 3) and rendered in headless Chromium: no console errors, slider end to end, geometry readouts checked (subsolar point 180°E at the second perihelion, retrograde loop). It displays the verdict from the supplied G-I evidence.
 - The archived numerical results apply to their recorded commits and
   run configurations. The #66 review regressions verify the illumination
   corrections separately. The full 2° tier-2 profiles were discarded.

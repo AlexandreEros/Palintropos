@@ -432,13 +432,15 @@ def stratified_interfaces(boundaries: Sequence[float], top_thickness: float,
         raise ValueError("max_stretch must lie in [1, 1.5]")
     edges = [0.0]
     first = float(top_thickness)
+    if not math.isfinite(first) or first <= 0 or first > b[0]:
+        raise ValueError("need 0 < top_thickness <= first stratum depth")
     top = 0.0
     for bottom in b:
         length = bottom - top
         if first >= length * (1.0 - 1e-12):
             seg = (0.0, length)
         else:
-            n = max(1, int(length // first))
+            n = int((length / first) * (1.0 + 1e-12))
             seg = None
             for n_try in range(1, n + 1):
                 try:
@@ -450,7 +452,8 @@ def stratified_interfaces(boundaries: Sequence[float], top_thickness: float,
                     seg = cand
                     break
             if seg is None:
-                seg = geometric_interfaces(first, length, layers=n)
+                raise ValueError(f"cannot fit stratum ending at {bottom} m with "
+                                 f"first cell {first} m and max_stretch={max_stretch}")
         edges.extend(top + x for x in seg[1:])
         edges[-1] = bottom
         first = edges[-1] - edges[-2]

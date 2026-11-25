@@ -1,7 +1,6 @@
+<meta charset="utf-8">
 <title>Mercury Thermal Day</title>
 <meta name="claude:viewport-fit-sides" content="cover">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap">
 <style>
 /* Layout: an instrument console. Map and globe lead, orbit and controls beside
    them, then the time series, depth profile and section, then the evidence.
@@ -218,12 +217,20 @@ function drawSection() {
   for (const lo of [0, 90, 180, 270]) g.fillText(lo + "°E", m.l + lo / 360 * (W - m.l - m.r), H - 6);
 }
 
+function textElement(tag, text, className) {
+  const el = document.createElement(tag);
+  el.textContent = String(text);
+  if (className) el.className = className;
+  return el;
+}
+
 function readout() {
   const [slat, slon, , , nu, flux] = D.geo[frame], t = D.t_days[frame];
   const prev = D.geo[(frame - 1 + F) % F][1], dl = ((slon - prev + 540) % 360) - 180;
-  $("readout").innerHTML = [["time since perihelion", t.toFixed(2) + " d"], ["orbit", (t / D.orbit_days < 1 ? "1st" : "2nd") + " of 2"],
+  const pairs = [["time since perihelion", t.toFixed(2) + " d"], ["orbit", (t / D.orbit_days < 1 ? "1st" : "2nd") + " of 2"],
     ["true anomaly", nu.toFixed(1) + "°"], ["irradiance", flux.toFixed(0) + " W m⁻²"], ["subsolar point", `${slat.toFixed(1)}°, ${slon.toFixed(1)}°E`],
-    ["apparent Sun", dl > 0 ? "moving east (retrograde loop)" : "moving west"]].map(([k, v]) => `<span>${k}</span><span>${v}</span>`).join("");
+    ["apparent Sun", dl > 0 ? "moving east (retrograde loop)" : "moving west"]];
+  $("readout").replaceChildren(...pairs.flatMap(([k, v]) => [textElement("span", k), textElement("span", v)]));
 }
 
 function render() { drawMap(); drawGlobe(); drawOrbit(); drawSeries(); drawProfile(); drawSection(); readout(); $("slider").value = frame; }
@@ -231,26 +238,30 @@ function render() { drawMap(); drawGlobe(); drawOrbit(); drawSeries(); drawProfi
 function evidence() {
   const st = D.status, dg = D.diag, chips = [];
   const label = st.status === "PERIODIC" ? ["good", "PERIODIC"] : ["warn", "TRANSIENT"];
-  chips.push(`<span class="chip ${label[0]}">${label[1]}</span>`);
+  const chip = (text, style = "") => chips.push(textElement("span", text, `chip ${style}`));
+  chip(label[1], label[0]);
   const mat = D.strata.map(s => s.name).join(" / ");
   const ext = dg.extent.some(([lo, hi], j) => { const r = D.strata[j].heat_capacity_range; return r && (lo < r[0] || (r[1] != null && hi > r[1])); });
-  chips.push(`<span class="chip">L1 numerical verification</span>`);
-  if (D.extras.gi_verdict) { const ok = Object.values(D.extras.gi_verdict).every(v => v.pass);
-    chips.push(`<span class="chip ${ok ? "good" : "warn"}">L2 heat1d ${ok ? "PASS" : "partly FAIL"}</span>`); }
-  else if (D.extras.gi) chips.push(`<span class="chip">L2 heat1d compared</span>`);
-  chips.push(`<span class="chip ${D.extras.l3 ? "" : "warn"}">L3 ${D.extras.l3 ? "VPW99 compared" : "NOT EVALUATED"}</span>`);
-  chips.push(`<span class="chip warn">L4 NOT EVALUATED</span>`);
-  if (ext) chips.push(`<span class="chip bad">EXTRAPOLATED c_p</span>`);
-  $("chips").innerHTML = chips.join("");
+  chip("L1 numerical verification");
+  if (D.extras.gi_verdict) {
+    const ok = Object.values(D.extras.gi_verdict).every(v => v.pass);
+    chip(`L2 heat1d ${ok ? "PASS" : "partly FAIL"}`, ok ? "good" : "warn");
+  } else if (D.extras.gi_unverified) chip("L2 heat1d periodicity unverified", "warn");
+  else if (D.extras.gi) chip("L2 heat1d compared");
+  chip(D.extras.l3 ? "L3 VPW99 compared" : "L3 NOT EVALUATED", D.extras.l3 ? "" : "warn");
+  chip("L4 NOT EVALUATED", "warn");
+  if (ext) chip("EXTRAPOLATED c_p", "bad");
+  if (dg.extent_scope !== "cycle") chip("CYCLE EXTENT UNVERIFIED", "warn");
+  $("chips").replaceChildren(...chips);
   $("subtitle").textContent = `${D.experiment}: idealized airless Mercury, eccentric orbit, exact 3:2 spin–orbit resonance, ${mat}. One full solar day of ${D.period_days.toFixed(2)} Earth days (two orbits).`;
   const rows = [
     ["Result status", st.label], ["Material", mat],
     ["Albedo, emissivity, geothermal flux", `${D.albedo}, ${D.emissivity}, ${D.geothermal_flux} W m⁻²`],
-    ["Surface range (this day)", `${dg.Ts_min.toFixed(1)}–${dg.Ts_max.toFixed(1)} K`],
+    ["Sampled surface range (this day)", `${dg.Ts_min.toFixed(1)}–${dg.Ts_max.toFixed(1)} K`],
     ["Global mean absorbed / emitted", `${dg.mean_absorbed.toFixed(2)} / ${dg.mean_emitted.toFixed(2)} W m⁻²`],
     ["Periodicity (last vs previous day)", dg.max_surface_change == null ? "not compared" : `surface ${dg.max_surface_change.toExponential(2)} K, subsurface ${dg.max_subsurface_change.toExponential(2)} K, bottom drift ${dg.bottom_drift.toExponential(2)} K, |ΔE|/P ≤ ${dg.max_energy_imbalance.toExponential(2)} W m⁻²`],
     ["Solver", `Δt ${(dg.dt_s / 3600).toFixed(2)} h, max Newton iterations ${dg.newton_max}, max residual/tolerance ${dg.residual_ratio.toExponential(2)}`],
-    ["Temperature extent per stratum", dg.extent.map(([a, b], j) => `${D.strata[j].name}: ${a.toFixed(1)}–${b.toFixed(1)} K`).join("; ")],
+    ["Temperature extent per stratum (" + (dg.extent_scope === "cycle" ? "whole cycle" : "final state") + ")", dg.extent.map(([a, b], j) => `${D.strata[j].name}: ${a.toFixed(1)}–${b.toFixed(1)} K`).join("; ")],
   ];
   if (D.extras.gp) rows.push(["G-P convergence (frozen tolerances)", D.extras.gp.pass ? "PASS" : "FAIL: " + D.extras.gp.failures.slice(0, 6).join("; ")]);
   else rows.push(["G-P convergence", "not attached"]);
@@ -259,7 +270,11 @@ function evidence() {
   if (D.extras.l3) rows.push(["L3 VPW99 deep temperatures", D.extras.l3.summary]);
   for (const [k, v] of Object.entries(D.provenance)) rows.push([k, v]);
   rows.push(["Configuration", `sha256 ${D.config_sha256.slice(0, 16)}…, code ${String(D.code.git_commit).slice(0, 10)}${D.code.git_dirty ? " (dirty)" : ""}`]);
-  $("evidence").innerHTML = rows.map(([k, v]) => `<tr><th>${k}</th><td>${v}</td></tr>`).join("");
+  $("evidence").replaceChildren(...rows.map(([k, v]) => {
+    const row = document.createElement("tr");
+    row.append(textElement("th", k), textElement("td", v));
+    return row;
+  }));
   $("footnote").textContent = `Displayed values are quantized to ${q} K. ${D.frames} of ${D.samples} retained surface samples are shown; profiles and the section use ${D.profile_frames} samples per day. Full-precision fields stay in the run directory. Longitudes are east-positive; VPW99 quote west longitudes.`;
 }
 
