@@ -151,7 +151,10 @@ def config_from_document(doc) -> AirlessConfig:
         raise ValueError("not an airless configuration: "
                          + "; ".join(p for p in (f"missing {missing}" if missing else "",
                                                  f"unknown {unknown}" if unknown else "") if p))
-    cfg = AirlessConfig.from_dict(body)
+    try:
+        cfg = AirlessConfig.from_dict(body)
+    except (TypeError, KeyError, AttributeError) as exc:      # wrongly typed fields
+        raise ValueError(f"not an airless configuration: {type(exc).__name__}: {exc}") from exc
     if stated is not None and stated != cfg.sha256():
         raise ValueError(f"the document states config_sha256 {stated}, but its configuration "
                          f"hashes to {cfg.sha256()}")

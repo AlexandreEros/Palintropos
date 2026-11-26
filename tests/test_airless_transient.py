@@ -154,3 +154,45 @@ def test_cli_preset_periodic_run_with_one_worker(tmp_path):
     cycles = json.loads((out / "cycles.json").read_text())
     assert [c["stage"] for c in cycles] == ["spinup", "production"]
     assert all(c["periodic"] is False for c in cycles)
+
+
+def test_short_final_segment_keeps_the_production_cadence(tmp_path):
+    """A 7-step final segment samples every 2 steps (24 steps / 12 samples),
+    not gcd(12, 7) = 1 sample; a 1-step segment has none and no range."""
+    cfg = _short_ceres()
+    run = AirlessRun(cfg, tmp_path / "a", allow_dirty=True, log=lambda s: None)
+    run.run_transient(31)
+    ret = tmp_path / "a" / "retained"
+    assert np.load(ret / "surface-b000.npy").shape[0] == 3
+    assert np.load(ret / "profiles-b000.npy").shape[0] == 3
+    assert tuple(np.load(ret / "state.npz")["sample_every"]) == (2, 2)
+    run = AirlessRun(cfg, tmp_path / "b", allow_dirty=True, log=lambda s: None)
+    run.run_transient(25)
+    cycles = json.loads((tmp_path / "b" / "cycles.json").read_text())
+    assert cycles[-1]["steps"] == 1 and cycles[-1]["surface_T_range_K"] is None
+    assert cycles[0]["surface_T_range_K"] is not None
+
+
+def test_standalone_replay_of_a_transient_tail(tmp_path):
+    """G-G replays a retained short transient segment with its own timing."""
+    from tools.planet_one.global_check import main as gg
+    cfg = _short_ceres()
+    run = AirlessRun(cfg, tmp_path / "run", allow_dirty=True, log=lambda s: None)
+    run.run_transient(31)
+    assert gg([str(tmp_path / "run"), "--columns", "0"]) == 0
+    report = json.loads((tmp_path / "run" / "gg.json").read_text())
+    assert report["timing"]["first_step"] == 24 and report["timing"]["sample_every"] == [2, 2]
+    assert report["pass"] and report["max_abs_end_state_diff_K"] == 0.0
+
+
+def test_transient_refuses_fractional_steps(tmp_path):
+    run = AirlessRun(_short_ceres(), tmp_path / "run", allow_dirty=True, log=lambda s: None)
+    for bad in (2.5, 0, True):
+        with pytest.raises(ValueError, match="whole number"):
+            run.run_transient(bad)
+
+
+def test_config_document_reports_wrong_types_as_value_errors():
+    doc = json.loads(CERES.read_text())
+    with pytest.raises(ValueError, match="not an airless configuration"):
+        config_from_document({**doc["config"], "cycle_steps": "4320"})

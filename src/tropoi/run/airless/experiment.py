@@ -93,7 +93,7 @@ def run_block(cfg_dict: dict, lat_deg, lon_deg, weights, anomaly, surface_anomal
               cycle: int, steps: int, record_profiles_every_step: bool,
               out_dir: str, prev_dir: Optional[str], block: int,
               backend: str = "numpy", dt: Optional[float] = None,
-              first_step: Optional[int] = None):
+              first_step: Optional[int] = None, sample_every: Optional[tuple] = None):
     """Advance one block of columns through illumination cycle ``cycle``
     with ``steps`` steps.
 
@@ -103,6 +103,14 @@ def run_block(cfg_dict: dict, lat_deg, lon_deg, weights, anomaly, surface_anomal
     step ``n`` is then forced at ``(first_step + n + 1) * dt``. With
     ``dt = cfg.cycle_s / steps`` and ``first_step = cycle * steps`` the two
     forms are the same arithmetic.
+
+    By default the samples are the ``gcd`` of the configured sample count
+    and ``steps``, evenly spaced (a coarse spin-up cycle samples at the
+    phases both cadences share). ``sample_every = (surface, profile)``
+    fixes the cadence in steps instead: a sample after every that many
+    steps, ``steps // cadence`` of them. A transient passes its production
+    cadence, so a short final segment keeps it; steps after the last sample
+    of a segment are then not sampled (the end state is still returned).
 
     Tier-2 samples are streamed into this block's memory-mapped files in
     ``out_dir`` (``surface-bNNN.npy`` (samples, 5, ncol), ``profiles-bNNN.npy``
@@ -130,10 +138,16 @@ def run_block(cfg_dict: dict, lat_deg, lon_deg, weights, anomaly, surface_anomal
                         xp.asarray(surface_anomaly, dtype=xp.float64))
     dt = cfg.cycle_s / steps if dt is None else float(dt)
     first = cycle * steps if first_step is None else int(first_step)
-    # coarse spin-up cycles sample at the phases both cadences share
-    n_surf = math.gcd(int(cfg.output["surface_samples"]), steps)
-    n_prof = math.gcd(int(cfg.output["profile_samples"]), steps)
-    every_s, every_p = steps // n_surf, steps // n_prof
+    if sample_every is None:
+        # coarse spin-up cycles sample at the phases both cadences share
+        n_surf = math.gcd(int(cfg.output["surface_samples"]), steps)
+        n_prof = math.gcd(int(cfg.output["profile_samples"]), steps)
+        every_s, every_p = steps // n_surf, steps // n_prof
+    else:
+        every_s, every_p = (int(v) for v in sample_every)
+        if every_s < 1 or every_p < 1:
+            raise ValueError(f"sample_every must be positive, got {sample_every!r}")
+        n_surf, n_prof = steps // every_s, steps // every_p
     ncol, L = lat.size, sub.layers
     out = pathlib.Path(out_dir)
     tag = f"b{block:03d}"
@@ -212,7 +226,8 @@ def run_block(cfg_dict: dict, lat_deg, lon_deg, weights, anomaly, surface_anomal
         "sums": {k: _host(v) for k, v in sums.items()}, "max_ratio": _host(max_ratio),
         "global": {k: _host(v) for k, v in g_series.items()}, "iterations": iters,
         "compared": drift is not None, "d_s": d_s, "d_p": d_p, "drift": drift,
-        "surface_range": (ts_lo, ts_hi),
+        # None when no surface sample fell in this call (a short transient tail)
+        "surface_range": (ts_lo, ts_hi) if ts_lo <= ts_hi else None,
         "extent": _host(xp.stack((extent_min, extent_max), axis=1)).tolist(),
     }
 
@@ -300,6 +315,14 @@ def transient_steps(cfg: AirlessConfig, *, steps: Optional[int] = None,
     n = max(n, 1)
     return n, {"duration_s": T, "steps": n, "dt_s": dt, "final_time_s": n * dt,
                "rule": "first step reaching the requested time (1e-9 relative snap)"}
+
+
+def _join_ranges(ranges):
+    """The (min, max) over the blocks' ranges, skipping None; None if all are."""
+    found = [r for r in ranges if r is not None]
+    if not found:
+        return None
+    return (min(r[0] for r in found), max(r[1] for r in found))
 
 
 def _call(args):
@@ -407,7 +430,7 @@ class AirlessRun:
         return (np.asarray(st.anomaly), np.asarray(st.surface_anomaly))
 
     def _cycle(self, pool, state, cycle, steps, record_every, prev_dir, dt=None,
-               first_step=None):
+               first_step=None, sample_every=None):
         n = self.lat.size
         blocks = [b for b in np.array_split(np.arange(n), self.workers) if b.size]
         d = self._mkdir(f"cycles/cycle-{cycle:04d}")
@@ -416,7 +439,7 @@ class AirlessRun:
         cfgd = self.cfg.to_dict()
         args = [(cfgd, self.lat[b], self.lon[b], self.w[b], state[0][:, b], state[1][b],
                  cycle, steps, record_every, str(d), None if prev_dir is None else str(prev_dir), k,
-                 self.backend, dt, first_step)
+                 self.backend, dt, first_step, sample_every)
                 for k, b in enumerate(blocks)]
         parts = pool.map(_call, args) if pool is not None else [_call(a) for a in args]
         expected = self.cfg.sha256()
@@ -435,8 +458,7 @@ class AirlessRun:
                "d_s": max(p["d_s"] for p in parts), "d_p": max(p["d_p"] for p in parts),
                "drift": (max(p["drift"] for p in parts)
                          if all(p["compared"] for p in parts) else None),
-               "surface_range": (min(p["surface_range"][0] for p in parts),
-                                 max(p["surface_range"][1] for p in parts))}
+               "surface_range": _join_ranges([p["surface_range"] for p in parts])}
         out["sums"] = {k: np.concatenate([p["sums"][k] for p in parts]) for k in parts[0]["sums"]}
         out["global"] = {k: np.sum([p["global"][k] for p in parts], axis=0)
                          for k in parts[0]["global"]}
@@ -445,9 +467,14 @@ class AirlessRun:
                          for j in range(len(ext[0]))]
         # restart states of this cycle (tier 2): the start state is also what
         # an exact standalone replay of selected columns starts from (G-G)
+        # dt and first_step let a standalone replay (G-G) use this cycle's own
+        # timing; sample_every is stored only when the cadence was fixed
+        timing = {"dt": out["worker_dt_s"], "first_step": out["worker_first_step"]}
+        if sample_every is not None:
+            timing["sample_every"] = np.asarray(sample_every, dtype=np.int64)
         np.savez(d / "state.npz", start_anomaly=state[0], start_surface_anomaly=state[1],
                  end_anomaly=out["anomaly"], end_surface_anomaly=out["surface_anomaly"],
-                 cycle=cycle, steps=steps)
+                 cycle=cycle, steps=steps, **timing)
         np.savez(d / "integrals.npz", energy_start=out["energy_start"],
                  energy_end=out["energy_end"], max_ratio=out["max_ratio"], **out["sums"])
         kept = sorted((self.dir / "cycles").iterdir())
@@ -564,7 +591,12 @@ class AirlessRun:
         with the same tier-1 and tier-2 output and the same numerical
         diagnostics as a cycle of :meth:`run`. Step ``m`` (from 0) is forced
         at ``(m + 1) * dt``, which for whole segments is the same arithmetic
-        as cycle ``c`` of :meth:`run` at the production timestep.
+        as cycle ``c`` of :meth:`run` at the production timestep. Every
+        segment samples at the production cadence (``cycle_steps /
+        surface_samples`` and ``cycle_steps / profile_samples`` steps), so
+        a short final segment keeps it; steps after its last sample are not
+        sampled, and a segment shorter than the cadence has no samples
+        (its surface range is then None).
 
         ``request`` records how the stopping point was asked for (see
         :func:`transient_steps`). The retained status is
@@ -572,13 +604,19 @@ class AirlessRun:
         nothing beyond them: not numerical reproduction (no reference is
         compared), not periodic equilibrium, not physical validity."""
         cfg = self.cfg
+        if isinstance(steps, bool) or int(steps) != steps or int(steps) < 1:
+            raise ValueError(f"a transient needs a positive whole number of steps, "
+                             f"got {steps!r}")
         total = int(steps)
-        if total < 1:
-            raise ValueError(f"a transient needs at least one step, got {steps!r}")
         seg_len = int(cfg.cycle_steps)
         dt = cfg.cycle_s / seg_len
+        # the production sampling cadence, kept by every segment (a short final
+        # segment included) instead of the spin-up gcd rule
+        cadence = (seg_len // int(cfg.output["surface_samples"]),
+                   seg_len // int(cfg.output["profile_samples"]))
         spec = {"steps": total, "dt_s": dt, "final_time_s": total * dt,
                 "segment_steps": seg_len, "segments": -(-total // seg_len),
+                "sample_every_steps": {"surface": cadence[0], "profile": cadence[1]},
                 "start": "configured initial state" if self.initial_state is None
                          else "supplied initial state",
                 "spinup": "none (spinup_cycle_steps is not used by a transient)",
@@ -593,7 +631,7 @@ class AirlessRun:
                 k = min(seg_len, total - done)
                 t0 = time.time()
                 res = self._cycle(pool, state, seg, k, record_every, None, dt=dt,
-                                  first_step=done)
+                                  first_step=done, sample_every=cadence)
                 state = (res["anomaly"], res["surface_anomaly"])
                 diag = self._diagnostics(res, k, "transient", seg,
                                          duration=cfg.cycle_s * (k / seg_len))
@@ -666,7 +704,8 @@ class AirlessRun:
                 "max_cell_residual_ratio": float(np.max(res["max_ratio"])),
                 "max_newton_iterations": int(np.max(res["iterations"])),
                 "extent_K": res["extent"], "extent_scope": "cycle",
-                "surface_T_range_K": list(res["surface_range"])}
+                "surface_T_range_K": (None if res["surface_range"] is None
+                                      else list(res["surface_range"]))}
         periodic = False
         if res["compared"]:
             diag.update(max_surface_change_K=res["d_s"], max_subsurface_change_K=res["d_p"],
