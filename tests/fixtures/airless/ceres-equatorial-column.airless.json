@@ -1,0 +1,60 @@
+{
+ "_schema": "tropoi.run.airless.config.AirlessConfig (commit d11afe82a5490f4344bd67c2a3e12c2230a16d3f); field layout follows config.json as written by AirlessRun",
+ "config": {
+  "experiment_id": "ceres-equatorial-column-TI15",
+  "illumination": {
+   "kind": "orbital",
+   "stellar_constant": 178.003,
+   "period": 145119400.0,
+   "eccentricity": 0.0791,
+   "obliquity_deg": 4.0,
+   "perihelion_longitude_deg": 0.0,
+   "time_of_perihelion": 0.0,
+   "spin": {
+    "sidereal_period": 32667.012,
+    "subsolar_longitude_at_epoch_deg": 0.0
+   }
+  },
+  "strata": [
+   {
+    "name": "Ceres fine regolith, constant properties (TI = 15 J m^-2 K^-1 s^-1/2)",
+    "bottom": 1.0,
+    "density": 1300.0,
+    "contact_conductivity": 2.3077e-4,
+    "radiative_coefficient": 0.0,
+    "radiative_reference_temperature": 350.0,
+    "heat_capacity": {"law": "polynomial", "coefficients": [750.0], "center": 0.0, "scale": 1.0, "factor": 1.0},
+    "heat_capacity_range": null,
+    "source": "INFERRED: k = TI^2 / (rho c_p) with TI 15 (Rognini et al. 2020, JGR Planets 125, e2019JE006308: bulk surface 1-15 to 50-60); rho 1300 and c_p 750 ASSUMED (dry fine regolith, Mercury/lunar analogue values)"
+   }
+  ],
+  "albedo": 0.037,
+  "emissivity": 0.90,
+  "geothermal_flux": 0.0,
+  "columns": {"kind": "points", "lat_deg": [0.0], "lon_deg": [0.0]},
+  "vertical": {"top_thickness": 0.001, "max_stretch": 1.1},
+  "cycle_s": 32674.367,
+  "cycle_steps": 4320,
+  "spinup_cycle_steps": 720,
+  "initial_temperature": 160.0,
+  "periodicity": {
+   "surface_K": 0.5, "subsurface_K": 0.2, "bottom_drift_K": 0.01, "energy_W_m2": 0.001,
+   "production_cycles_required": 2, "max_spinup_cycles": 200, "max_production_cycles": 12,
+   "spinup_acceleration": true
+  },
+  "output": {"surface_samples": 720, "profile_samples": 180, "every_step_profiles": true},
+  "radius_m": 469700.0,
+  "provenance": {
+   "orbit": "MEASURED: a = 2.7653 au, e = 0.0791, JPL SSD small-body element table (epoch MJD 55400); period 1.451194e8 s (1679.6 d) from Kepler III with the IAU 2015 B3 nominal GM_sun 1.3271244e20 m^3 s^-2 (same convention as the Mercury presets); epoch t = 0 at perihelion",
+   "irradiance": "IAU 2015 B3 nominal L_sun 3.828e26 W over 4 pi a^2 = 178.0 W m^-2 at r = a; point-source Sun",
+   "spin": "MEASURED: sidereal rotation 9.074170 h = 32667.012 s (Dawn; Wikipedia infobox 9.074169392 h); prograde; obliquity 3.997 deg rounded to 4.0 (Ermakov et al. 2017, via Wikipedia); subsolar longitude 0 at perihelion is an ASSUMPTION",
+   "forcing_period": "DERIVED: mean solar day 1/P_sol = 1/P_rot - 1/P_orb = 32674.367 s (4442.38 rotations per orbit). Used as cycle_s. Not an exact recurrence of the geometry: with e = 0.0791 and 4 deg obliquity successive solar days differ slightly (ASSUMPTION that cycle-to-cycle drift stays within the periodicity thresholds)",
+   "albedo": "MEASURED: Bond albedo 0.037 +/- 0.002 at 555 nm, Li et al. 2019 (arXiv:1812.08361), Dawn FC",
+   "emissivity": "ASSUMED 0.90 (common airless-regolith value; not a Ceres measurement)",
+   "geothermal_flux": "ASSUMED 0 (Ceres radiogenic flux is a few mW m^-2, negligible for a diurnal column)",
+   "material": "INFERRED/ASSUMED: single stratum, constant k, rho, c_p, no radiative (T^3) conductivity term; TI 15 is the low end of the global Dawn VIR range, chosen for the bland equatorial regolith away from Haulani/Occator anomalies",
+   "geography": "smooth sphere, flat surface, uniform material, no topography or shadowing; radius 469.7 km (Dawn, Park et al. 2016)",
+   "initial_temperature": "ASSUMED 160 K (near expected diurnal mean at the equator)"
+  }
+ }
+}
