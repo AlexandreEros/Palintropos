@@ -7036,9 +7036,19 @@
       "target": "tropoi.run.airless.__main__._config"
     },
     {
+      "kind": "call",
+      "source": "tropoi.run.airless.__main__.main",
+      "target": "tropoi.run.airless.config.load_config_document"
+    },
+    {
       "kind": "instantiate",
       "source": "tropoi.run.airless.__main__.main",
       "target": "tropoi.run.airless.experiment.AirlessRun"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.airless.__main__.main",
+      "target": "tropoi.run.airless.experiment.transient_steps"
     },
     {
       "kind": "self",
@@ -7059,6 +7069,16 @@
       "kind": "instantiate",
       "source": "tropoi.run.airless.config._value",
       "target": "tropoi.physics.materials.DepthProfile"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.airless.config.config_from_document",
+      "target": "tropoi.run.airless.config.AirlessConfig.from_dict"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.airless.config.load_config_document",
+      "target": "tropoi.run.airless.config.config_from_document"
     },
     {
       "kind": "instantiate",
@@ -7161,6 +7181,11 @@
       "target": "tropoi.run.airless.experiment._call"
     },
     {
+      "kind": "instantiate",
+      "source": "tropoi.run.airless.experiment.AirlessRun._cycle",
+      "target": "tropoi.run.held_suarez.experiment.RunError"
+    },
+    {
       "kind": "self",
       "source": "tropoi.run.airless.experiment.AirlessRun.run",
       "target": "tropoi.run.airless.experiment.AirlessRun._checksums"
@@ -7188,12 +7213,62 @@
     {
       "kind": "self",
       "source": "tropoi.run.airless.experiment.AirlessRun.run",
+      "target": "tropoi.run.airless.experiment.AirlessRun._pool"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.run.airless.experiment.AirlessRun.run",
+      "target": "tropoi.run.airless.experiment.AirlessRun._start_state"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.run.airless.experiment.AirlessRun.run",
       "target": "tropoi.run.airless.experiment.AirlessRun._write_json"
     },
     {
       "kind": "call",
       "source": "tropoi.run.airless.experiment.AirlessRun.run",
       "target": "tropoi.run.airless.experiment.aitken"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.run.airless.experiment.AirlessRun.run_transient",
+      "target": "tropoi.run.airless.experiment.AirlessRun._checksums"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.run.airless.experiment.AirlessRun.run_transient",
+      "target": "tropoi.run.airless.experiment.AirlessRun._cycle"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.run.airless.experiment.AirlessRun.run_transient",
+      "target": "tropoi.run.airless.experiment.AirlessRun._diagnostics"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.run.airless.experiment.AirlessRun.run_transient",
+      "target": "tropoi.run.airless.experiment.AirlessRun._event"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.run.airless.experiment.AirlessRun.run_transient",
+      "target": "tropoi.run.airless.experiment.AirlessRun._mkdir"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.run.airless.experiment.AirlessRun.run_transient",
+      "target": "tropoi.run.airless.experiment.AirlessRun._pool"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.run.airless.experiment.AirlessRun.run_transient",
+      "target": "tropoi.run.airless.experiment.AirlessRun._start_state"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.run.airless.experiment.AirlessRun.run_transient",
+      "target": "tropoi.run.airless.experiment.AirlessRun._write_json"
     },
     {
       "kind": "call",
@@ -21349,6 +21424,20 @@
       "type": "function"
     },
     {
+      "id": "tropoi.run.airless.config.config_from_document",
+      "kind": "function",
+      "module": "tropoi.run.airless.config",
+      "qualname": "config_from_document",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.airless.config.load_config_document",
+      "kind": "function",
+      "module": "tropoi.run.airless.config",
+      "qualname": "load_config_document",
+      "type": "function"
+    },
+    {
       "id": "tropoi.run.airless.config.mercury_hayne_analogue",
       "kind": "function",
       "module": "tropoi.run.airless.config",
@@ -21426,6 +21515,20 @@
       "type": "function"
     },
     {
+      "id": "tropoi.run.airless.experiment.AirlessRun._pool",
+      "kind": "method",
+      "module": "tropoi.run.airless.experiment",
+      "qualname": "AirlessRun._pool",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.airless.experiment.AirlessRun._start_state",
+      "kind": "method",
+      "module": "tropoi.run.airless.experiment",
+      "qualname": "AirlessRun._start_state",
+      "type": "function"
+    },
+    {
       "id": "tropoi.run.airless.experiment.AirlessRun._write_json",
       "kind": "method",
       "module": "tropoi.run.airless.experiment",
@@ -21437,6 +21540,13 @@
       "kind": "method",
       "module": "tropoi.run.airless.experiment",
       "qualname": "AirlessRun.run",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.airless.experiment.AirlessRun.run_transient",
+      "kind": "method",
+      "module": "tropoi.run.airless.experiment",
+      "qualname": "AirlessRun.run_transient",
       "type": "function"
     },
     {
@@ -21500,6 +21610,13 @@
       "kind": "function",
       "module": "tropoi.run.airless.experiment",
       "qualname": "run_block",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.airless.experiment.transient_steps",
+      "kind": "function",
+      "module": "tropoi.run.airless.experiment",
+      "qualname": "transient_steps",
       "type": "function"
     },
     {

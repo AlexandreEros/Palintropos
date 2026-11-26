@@ -4032,11 +4032,23 @@
         },
         {
           "kind": "method",
+          "name": "_pool"
+        },
+        {
+          "kind": "method",
+          "name": "_start_state"
+        },
+        {
+          "kind": "method",
           "name": "_write_json"
         },
         {
           "kind": "method",
           "name": "run"
+        },
+        {
+          "kind": "method",
+          "name": "run_transient"
         }
       ],
       "module": "tropoi.run.airless.experiment",
