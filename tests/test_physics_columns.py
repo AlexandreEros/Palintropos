@@ -254,7 +254,7 @@ def test_bulk_exchange_follows_the_published_drag_law():
     down, _ = sensible_heat_flux(np.array(280.0), np.array(290.0), np.array(50.0), np.array(8.0),
                                  np.array(1.2), 1004.0, 9.8)
     assert up > 0.0 and down <= 0.0 and abs(down) < up     # stable side is throttled
-    assert float(SlabSurface(1e7).advance(np.array(280.0), np.array(100.0), 1e5)) == pytest.approx(281.0)
+    assert float(SlabSurface(1e7, albedo=0.0, emissivity=1.0).advance(np.array(280.0), np.array(100.0), 1e5)) == pytest.approx(281.0)
 
 
 # ---------------------------------------------------------------- equilibria
@@ -265,7 +265,7 @@ def test_radiative_equilibrium_column_converges_to_the_analytic_solution():
         Radiation(GrayLongwave(OpticalDepthProfile([(1.0, 1.0)], equator=tau_s)),
                   GrayShortwave(OpticalDepthProfile([(1.0, 1.0)], equator=1e-12)),
                   source="isothermal"),
-        gravity=9.8, cp=1004.0, gas_constant=287.0, surface=SlabSurface(1e6),
+        gravity=9.8, cp=1004.0, gas_constant=287.0, surface=SlabSurface(1e6, albedo=0.0, emissivity=1.0),
         insolation=PrescribedInsolation(lambda lat: flux + 0 * lat, "uniform", {}))
     model = RadiativeConvectiveColumn(physics, (sig * 1e5)[:, None], np.full((K, 1), 250.0),
                                       latitude=np.zeros(1), longitude=np.zeros(1),
@@ -371,7 +371,7 @@ def _mars_bottom_exchange(implicit: bool):
     if implicit:
         sensible["implicit"] = True
     physics = ColumnPhysics(Radiation(isca_mars_longwave(), None), gravity=3.71, cp=844.8,
-                            gas_constant=192.0, surface=SlabSurface(8.257737e6, albedo=0.3),
+                            gas_constant=192.0, surface=SlabSurface(8.257737e6, albedo=0.3, emissivity=1.0),
                             sensible=sensible)
     sigma = np.array(SigmaGrid.stretched(25, 1e-4, None).interfaces)
     sigma[-2] = 1.0 - 0.73 / 610.0                     # Isca's bottom layer

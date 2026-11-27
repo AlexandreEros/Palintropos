@@ -72,8 +72,8 @@ def test_energy_closure_on_the_gpu():
 
 
 def test_g4_and_g5_on_the_gpu():
-    sub = ConductiveSubstrate.constant(emissivity=0.0, interfaces=(0.0, 1.0))
-    slab = SlabSurface(2.0e6)
+    sub = ConductiveSubstrate.constant(emissivity=0.0, interfaces=(0.0, 1.0), albedo=0.0, bottom_heat_flux=0.0, initial_temperature=300.0, thermal_inertia=2000.0, volumetric_heat_capacity=2.0e6)
+    slab = SlabSurface(2.0e6, albedo=0.0, emissivity=1.0)
     rng = np.random.default_rng(2)
     st = sub.initial_state(1, xp=cp)
     T = np.array([300.0])
@@ -84,7 +84,7 @@ def test_g4_and_g5_on_the_gpu():
     assert abs(float(sub.temperature(st)[0, 0]) - float(T[0])) < 1000 * np.spacing(300.0)
     from tropoi.spatial.vertical import geometric_interfaces
     sub = ConductiveSubstrate.constant(emissivity=0.0,
-                                       interfaces=geometric_interfaces(0.02, 3.5, layers=30))
+                                       interfaces=geometric_interfaces(0.02, 3.5, layers=30), albedo=0.0, bottom_heat_flux=0.0, initial_temperature=300.0, thermal_inertia=2000.0, volumetric_heat_capacity=2.0e6)
     fb = cp.asarray([0.0, 0.1, -0.1])
     st = sub.initial_state(3, xp=cp)
     inflow, denom = np.zeros(3), np.zeros(3)

@@ -109,7 +109,7 @@ def substrate(interfaces):
     """The THAI constant-property column with a non-radiating surface: the
     forcing of every gate is the prescribed flux alone."""
     return ConductiveSubstrate.constant(volumetric_heat_capacity=C_V, thermal_inertia=INERTIA,
-                                        interfaces=interfaces, emissivity=0.0)
+                                        interfaces=interfaces, emissivity=0.0, albedo=0.0, bottom_heat_flux=0.0, initial_temperature=300.0)
 
 
 # ------------------------------------------------------------------ reconstruction
@@ -375,7 +375,7 @@ def gate_g3():
 
 def gate_g4():
     sub = substrate(grid("G4", lambda: (0.0, 1.0)))
-    slab = SlabSurface(2.0e6)
+    slab = SlabSurface(2.0e6, albedo=0.0, emissivity=1.0)
     rng = np.random.default_rng(SEED)
     n = 100000
     F = rng.uniform(-200.0, 200.0, size=n)

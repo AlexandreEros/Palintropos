@@ -26,11 +26,17 @@ from tropoi.spatial.vertical import geometric_interfaces
 THAI_GRID = geometric_interfaces(0.02, 3.5, layers=30)
 
 
+#: The THAI test material (Fauchez et al. 2020, Table 2): C = 2e6 J m^-3 K^-1,
+#: I = 2000 J m^-2 K^-1 s^-1/2 (k = 2 W m^-1 K^-1), started at 300 K. A test
+#: configuration, not a default of the substrate.
+THAI = dict(volumetric_heat_capacity=2.0e6, thermal_inertia=2000.0)
+PRESCRIBED = dict(emissivity=0.0, albedo=0.0, bottom_heat_flux=0.0, initial_temperature=300.0)
+
+
 def _prescribed(**kw):
-    """A constant-property column with a non-radiating surface: the forcing
-    is the prescribed flux alone. The mesh defaults to THAI_GRID here."""
-    kw.setdefault("interfaces", THAI_GRID)
-    return ConductiveSubstrate.constant(emissivity=0.0, **kw)
+    """The THAI test column with a non-radiating surface: the forcing is the
+    prescribed flux alone. Any setting can be overridden."""
+    return ConductiveSubstrate.constant(**{"interfaces": THAI_GRID, **THAI, **PRESCRIBED, **kw})
 
 
 def test_thai_test_column_layering():
@@ -149,7 +155,7 @@ def test_substrate_takes_an_explicit_mesh_only():
     for kwargs in (dict(depth=3.5), dict(layers=30), dict(top_thickness=0.02), dict(stretch=1.1)):
         with pytest.raises(TypeError):
             ConductiveSubstrate.constant(interfaces=(0.0, 1.0), **kwargs)
-    sub = ConductiveSubstrate.constant(interfaces=geometric_interfaces(0.1, 1.0, stretch=1.2))
+    sub = ConductiveSubstrate.constant(interfaces=geometric_interfaces(0.1, 1.0, stretch=1.2), albedo=0.0, emissivity=1.0, bottom_heat_flux=0.0, initial_temperature=300.0, thermal_inertia=2000.0, volumetric_heat_capacity=2.0e6)
     assert sub.layers == 6 and sub.depth == 1.0
 
 
@@ -157,9 +163,10 @@ def test_constructor_rejects_nonfinite_parameters():
     for kwargs in (dict(bottom_heat_flux=float("nan")), dict(initial_temperature=float("nan")),
                    dict(initial_temperature=0.0), dict(interfaces=(0.0, float("nan"))),
                    dict(albedo=float("nan")), dict(volumetric_heat_capacity=float("inf")),
-                   dict(thermal_inertia=2000.0, conductivity=2.0)):
+                   dict(thermal_inertia=2000.0, conductivity=2.0),
+                   dict(thermal_inertia=None, conductivity=None)):
         with pytest.raises(ValueError):
-            ConductiveSubstrate.constant(**{"interfaces": THAI_GRID, **kwargs})
+            _prescribed(**kwargs)
 
 
 def test_step_rejects_invalid_inputs():
@@ -195,7 +202,7 @@ def test_historical_grids_fixture():
     for key, e in grids.items():
         e = np.asarray(e)
         assert e[0] == 0.0 and np.all(np.diff(e) > 0), key
-        ConductiveSubstrate.constant(interfaces=e)   # explicit grids are accepted as given
+        ConductiveSubstrate.constant(interfaces=e, albedo=0.0, emissivity=1.0, bottom_heat_flux=0.0, initial_temperature=300.0, thermal_inertia=2000.0, volumetric_heat_capacity=2.0e6)   # explicit grids are accepted as given
     # Every gate grid of the original run is present. 'uniform:N=400' is the extra grid of
     # the post hoc G1-C supplementary study (not a gate grid), kept so it is documented.
     expected = {"default", "G4", "uniform:N=400"}
@@ -248,7 +255,7 @@ def test_energy_identity_with_signs():
 
 def test_one_layer_matches_slab():
     sub = _prescribed(interfaces=(0.0, 1.0))
-    slab = SlabSurface(2.0e6)
+    slab = SlabSurface(2.0e6, albedo=0.0, emissivity=1.0)
     rng = np.random.default_rng(2)
     st = sub.initial_state(1)
     T = np.array([ENERGY_REFERENCE_TEMPERATURE])
@@ -287,3 +294,32 @@ def test_step_flux_surface_response():
     ana = 2 * F / k * s * (math.exp(-x * x) / math.sqrt(math.pi) - x * math.erfc(x))
     # layer mean against point value at the centre differs at O(dz^2); 1 % covers it
     assert abs(float(st.anomaly[0, 0]) / ana - 1.0) < 0.01
+
+
+def test_no_experiment_defaults_in_the_substrate():
+    """Albedo, emissivity, geothermal flux, initial temperature and the
+    material belong to the experiment: none has a default."""
+    from tropoi.physics.materials import Stratum
+    strata = [Stratum.volumetric(3.5, 2.0e6, 2.0)]
+    full = dict(interfaces=THAI_GRID, albedo=0.0, emissivity=1.0, bottom_heat_flux=0.0,
+                initial_temperature=300.0)
+    ConductiveSubstrate(strata, **full)
+    for missing in ("albedo", "emissivity", "bottom_heat_flux", "initial_temperature"):
+        with pytest.raises(TypeError):
+            ConductiveSubstrate(strata, **{k: v for k, v in full.items() if k != missing})
+    with pytest.raises(TypeError):                       # no default material
+        ConductiveSubstrate.constant(**{**full, "thermal_inertia": 2000.0})
+    with pytest.raises(ValueError, match="conductivity or the thermal inertia"):
+        ConductiveSubstrate.constant(**{**full, "volumetric_heat_capacity": 2.0e6})
+    # the initial temperature is independent of the internal enthalpy reference
+    sub = ConductiveSubstrate(strata, **{**full, "initial_temperature": 150.0})
+    assert np.all(sub.temperature(sub.initial_state(1)) == 150.0)
+    assert ENERGY_REFERENCE_TEMPERATURE == 300.0
+
+
+def test_slab_surface_has_no_default_optics():
+    with pytest.raises(TypeError):
+        SlabSurface(2.0e6)
+    with pytest.raises(TypeError):
+        SlabSurface(2.0e6, albedo=0.3)
+    assert SlabSurface(2.0e6, albedo=0.3, emissivity=1.0).albedo == 0.3
