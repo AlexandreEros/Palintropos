@@ -1,13 +1,13 @@
 {
   "atlas": {
-    "call_edges": 2530,
+    "call_edges": 2533,
     "call_sites_omitted_by_cap": 40,
-    "call_sites_recorded": 3323,
+    "call_sites_recorded": 3325,
     "import_edges": 507,
     "import_sites_omitted_by_cap": 0,
     "import_sites_recorded": 572,
     "max_sites_per_edge": 8,
-    "nodes": 2356,
+    "nodes": 2358,
     "proposal": {
       "call_edges_by_direction": {
         "downward": 435,
@@ -65,7 +65,7 @@
         "dynamics": 119,
         "integration": 92,
         "physics": 321,
-        "run": 139,
+        "run": 141,
         "setup": 292,
         "spectral": 249,
         "world": 161
@@ -159,24 +159,24 @@
         "sha256": "1dcfeb9400fd06152e45cd607c8648f54d8fa8f41c02b0fcd8ee9310a03c28a4"
       }
     ],
-    "source_lines_embedded": 19731
+    "source_lines_embedded": 19745
   },
   "call_graph": {
     "call_sites": {
-      "builtin": 4412,
+      "builtin": 4423,
       "external": 2849,
-      "internal": 3354,
-      "unresolved": 4540
+      "internal": 3356,
+      "unresolved": 4544
     },
     "edges_by_kind": {
-      "call": 1490,
+      "call": 1491,
       "constructor": 72,
       "instantiate": 555,
       "override": 6,
-      "self": 403,
+      "self": 405,
       "super": 4
     },
-    "nodes": 2170,
+    "nodes": 2172,
     "scoped": {
       "airless-mercury": {
         "edges": 11,
@@ -1281,7 +1281,7 @@
     "package": "tropoi",
     "src": "src",
     "working_tree": {
-      "base_commit": "da83dad291806c938464a13852e7fb20d7e80f5e",
+      "base_commit": "fff9d4bab9e6289ce872e8e2569227ef3df8f221",
       "generator": {
         "changes": [],
         "files": {
@@ -1311,7 +1311,9 @@
         "status": "clean"
       },
       "source": {
-        "changes": [],
+        "changes": [
+          " M src/tropoi/run/airless/experiment.py"
+        ],
         "files": {
           "src/tropoi/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
           "src/tropoi/cli/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
@@ -1405,7 +1407,7 @@
           "src/tropoi/run/airless/__init__.py": "4eacd9f550f9829fccc087a027d35f60c6bbb99e57d15d8c0d89ede496857f68",
           "src/tropoi/run/airless/__main__.py": "4079efb484c2b9c4ba5d27c23418b7a713428d5af00a6820a8982329d5db26c6",
           "src/tropoi/run/airless/config.py": "8db3478eaab980d5bd7eeb922d0d46e97242e58a538bf2e028194b75d6374142",
-          "src/tropoi/run/airless/experiment.py": "ed6c981854704c4a8698cda21cfc95997d81343642a846381d13c91aa9b71350",
+          "src/tropoi/run/airless/experiment.py": "3a442aa32bea57fc9448053ba0532dcf51f5c2236abea860808b46e444a729d1",
           "src/tropoi/run/bve/__init__.py": "dc2f43732af56efca1d2801705e6d92ab8cdcfb64d91b00f7dfc012fcbce8bfa",
           "src/tropoi/run/bve/config.py": "7b44a7d627c53b28e0315710d209b12d3689d247f4feb093e8cd8703c43dd406",
           "src/tropoi/run/bve/execution.py": "e812726e0351f85ee2520ab85f4396432d790db315f7158e5ab91c89d081cfba",
@@ -1505,8 +1507,8 @@
           "src/tropoi/temporal/tendencies/primitive_equations.py": "848c6fe9406a7c1c465c0aa9459760b01c542164c8cc9395797a3c4a60793e52",
           "src/tropoi/temporal/tendencies/shallow_water.py": "7ae521f2378824e89f88bc467fc99321d1ef4224b037c865137e076a601da3c8"
         },
-        "sha256": "dc64025fbc737dd06b5f11446dc748fb5135dbc7cb42fed17ec8e2da0f76ef44",
-        "status": "clean"
+        "sha256": "8b97ac9c169db19633d97505ead32ec22f2bd1502a0e3b7b9c59d758b1dc423c",
+        "status": "dirty"
       }
     }
   },
