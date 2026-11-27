@@ -242,6 +242,13 @@
       "kind": "imports",
       "module_edges": 1,
       "runtime_module_edges": 1,
+      "source": "tropoi.run.airless",
+      "target": "tropoi.temporal"
+    },
+    {
+      "kind": "imports",
+      "module_edges": 1,
+      "runtime_module_edges": 1,
       "source": "tropoi.run.bve",
       "target": "tropoi.representation"
     },
@@ -702,6 +709,20 @@
     },
     {
       "kind": "imports",
+      "module_edges": 1,
+      "runtime_module_edges": 1,
+      "source": "tropoi.temporal",
+      "target": "tropoi.numerics"
+    },
+    {
+      "kind": "imports",
+      "module_edges": 3,
+      "runtime_module_edges": 3,
+      "source": "tropoi.temporal",
+      "target": "tropoi.physics"
+    },
+    {
+      "kind": "imports",
       "module_edges": 9,
       "runtime_module_edges": 9,
       "source": "tropoi.temporal",
@@ -772,8 +793,13 @@
       "modules": 5
     },
     {
+      "id": "tropoi.numerics",
+      "internal_edges": 0,
+      "modules": 1
+    },
+    {
       "id": "tropoi.physics",
-      "internal_edges": 33,
+      "internal_edges": 32,
       "modules": 19
     },
     {
@@ -884,7 +910,7 @@
     {
       "id": "tropoi.temporal",
       "internal_edges": 3,
-      "modules": 7
+      "modules": 8
     },
     {
       "id": "tropoi.temporal.tendencies",

@@ -527,14 +527,6 @@
         "module"
       ],
       "source": "tropoi.physics.substrate",
-      "target": "tropoi.physics.constants"
-    },
-    {
-      "kind": "imports",
-      "scopes": [
-        "module"
-      ],
-      "source": "tropoi.physics.substrate",
       "target": "tropoi.physics.materials"
     },
     {
@@ -2014,6 +2006,14 @@
       ],
       "source": "tropoi.run.airless.experiment",
       "target": "tropoi.spatial.vertical"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.run.airless.experiment",
+      "target": "tropoi.temporal.substrate"
     },
     {
       "kind": "imports",
@@ -3950,6 +3950,38 @@
       "scopes": [
         "module"
       ],
+      "source": "tropoi.temporal.substrate",
+      "target": "tropoi.numerics.tridiagonal"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.temporal.substrate",
+      "target": "tropoi.physics.constants"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.temporal.substrate",
+      "target": "tropoi.physics.materials"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.temporal.substrate",
+      "target": "tropoi.physics.substrate"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
       "source": "tropoi.temporal.tendencies.barotropic",
       "target": "tropoi.spatial.laplacian"
     },
@@ -4205,6 +4237,17 @@
       "third_party_imports": [
         "matplotlib"
       ]
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.numerics.tridiagonal",
+      "is_package": false,
+      "path": "tropoi/numerics/tridiagonal.py",
+      "stdlib_imports": [
+        "__future__"
+      ],
+      "third_party_imports": []
     },
     {
       "category": "code",
@@ -6569,6 +6612,22 @@
         "typing"
       ],
       "third_party_imports": []
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.temporal.substrate",
+      "is_package": false,
+      "path": "tropoi/temporal/substrate.py",
+      "stdlib_imports": [
+        "__future__",
+        "math",
+        "typing"
+      ],
+      "third_party_imports": [
+        "cupy",
+        "numpy"
+      ]
     },
     {
       "category": "code",

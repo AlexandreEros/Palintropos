@@ -90,10 +90,8 @@ flowchart LR
     nQKUTWWZ2QAMDY["Star"]:::classNode
     nW547YWF2ZHDDC["ApparentStar"]:::classNode
     nHANDLBR54BLYC["substrate.py"]:::moduleNode
-    nLTKJTLCOVFMVQ["SubstrateSolveError"]:::classNode
-    nXGW2ZNG7B6CI4["SubstrateState"]:::classNode
-    nKENCJ56ZNVG7A["StepReport"]:::classNode
-    nGAS6JR42I7UX2["ConductiveSubstrate"]:::classNode
+    nGTDGFGUSOW57C["SubstrateState"]:::classNode
+    nVSB66NDB44YQ6["ConductiveSubstrate"]:::classNode
     nEYDASM3LWUZZI["surface.py"]:::moduleNode
     nQWDJAP4RSI3FM["SlabSurface"]:::classNode
     nHVCS3EULEALZS["thermodynamics.py"]:::moduleNode
@@ -238,7 +236,7 @@ flowchart LR
     nUBY55ZNNAHFJE["config.py"]:::moduleNode
     nTWP4V5DLT2AU4["AirlessConfig"]:::classNode
     nITBWZF2RB2STK["experiment.py"]:::moduleNode
-    nCRLKKCT5T2Q6E["AirlessRun"]:::classNode
+    nTJX7I3CLBMXFQ["AirlessRun"]:::classNode
     nYAKL7IXDC2TGG["config.py"]:::moduleNode
     n3TEN7E7URFTP2["BVERunConfig"]:::classNode
     nJMF35MMXQTSSG["execution.py"]:::moduleNode
@@ -364,6 +362,10 @@ flowchart LR
     n7HMJL7KKPO23K["steppers.py"]:::moduleNode
     nLW6Q7B7K6E5HQ["TimeStepper"]:::classNode
     n6MYRCAZ6FQL6Y["RK4Stepper"]:::classNode
+    n6UYHHNPDEPC5W["substrate.py"]:::moduleNode
+    n7Y7ECKMKLOVVA["SubstrateSolveError"]:::classNode
+    nJI3IDYULZSTEE["StepReport"]:::classNode
+    nUHQB3WHQQ5XSA["BackwardEulerSubstrate"]:::classNode
     n2QABI7D7Q57D6["barotropic.py"]:::moduleNode
     nEPO4LOVLPTMGC["BarotropicVorticity"]:::classNode
     nBIRMLFO55DXCQ["boundary#95;layer.py"]:::moduleNode
@@ -462,10 +464,8 @@ flowchart LR
     nAJFCGCCQTYXXW --> nQKUTWWZ2QAMDY
     nAJFCGCCQTYXXW --> nW547YWF2ZHDDC
     nUX3XGDIQ6OMYG --> nHANDLBR54BLYC
-    nHANDLBR54BLYC --> nLTKJTLCOVFMVQ
-    nHANDLBR54BLYC --> nXGW2ZNG7B6CI4
-    nHANDLBR54BLYC --> nKENCJ56ZNVG7A
-    nHANDLBR54BLYC --> nGAS6JR42I7UX2
+    nHANDLBR54BLYC --> nGTDGFGUSOW57C
+    nHANDLBR54BLYC --> nVSB66NDB44YQ6
     nUX3XGDIQ6OMYG --> nEYDASM3LWUZZI
     nEYDASM3LWUZZI --> nQWDJAP4RSI3FM
     nUX3XGDIQ6OMYG --> nHVCS3EULEALZS
@@ -610,7 +610,7 @@ flowchart LR
     nTA54JF5K7CEVU --> nUBY55ZNNAHFJE
     nUBY55ZNNAHFJE --> nTWP4V5DLT2AU4
     nTA54JF5K7CEVU --> nITBWZF2RB2STK
-    nITBWZF2RB2STK --> nCRLKKCT5T2Q6E
+    nITBWZF2RB2STK --> nTJX7I3CLBMXFQ
     nXZT3ULTGZ5NLS --> nYAKL7IXDC2TGG
     nYAKL7IXDC2TGG --> n3TEN7E7URFTP2
     nXZT3ULTGZ5NLS --> nJMF35MMXQTSSG
@@ -736,6 +736,10 @@ flowchart LR
     n26OGEY2QQJ23S --> n7HMJL7KKPO23K
     n7HMJL7KKPO23K --> nLW6Q7B7K6E5HQ
     n7HMJL7KKPO23K --> n6MYRCAZ6FQL6Y
+    n26OGEY2QQJ23S --> n6UYHHNPDEPC5W
+    n6UYHHNPDEPC5W --> n7Y7ECKMKLOVVA
+    n6UYHHNPDEPC5W --> nJI3IDYULZSTEE
+    n6UYHHNPDEPC5W --> nUHQB3WHQQ5XSA
     nP2JJN5FALZZZM --> n2QABI7D7Q57D6
     n2QABI7D7Q57D6 --> nEPO4LOVLPTMGC
     nP2JJN5FALZZZM --> nBIRMLFO55DXCQ

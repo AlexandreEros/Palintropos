@@ -67,6 +67,7 @@ from typing import Callable, Optional
 
 import numpy as np
 
+from tropoi.temporal.substrate import BackwardEulerSubstrate
 from tropoi.physics.insolation import insolation_from_spec
 from tropoi.physics.substrate import ConductiveSubstrate
 from tropoi.spatial.grids.quadrature import ColumnSet
@@ -162,6 +163,7 @@ def run_block(cfg_dict: dict, lat, lon, weights, anomaly, surface_anomaly,
     xp = _backend(backend)
     cfg = AirlessConfig.from_dict(cfg_dict)
     sub = build_substrate(cfg)
+    stepper = BackwardEulerSubstrate(sub)
     ins = insolation_from_spec(cfg.illumination)
     lat, lon = xp.asarray(lat), xp.asarray(lon)
     nx, ny, nz = xp.cos(lat) * xp.cos(lon), xp.cos(lat) * xp.sin(lon), xp.sin(lat)
@@ -209,7 +211,7 @@ def run_block(cfg_dict: dict, lat, lon, weights, anomaly, surface_anomaly,
     for n in range(steps):
         t = (first + n + 1) * dt                      # backward Euler: forcing at t^{n+1}
         sw, _ = ins.incident(nx, ny, nz, t)
-        st, rep = sub.step(st, dt, shortwave_down=sw)
+        st, rep = stepper.step(st, dt, shortwave_down=sw)
         lows, highs = zip(*rep.extent)
         xp.minimum(extent_min, xp.stack(lows), out=extent_min)
         xp.maximum(extent_max, xp.stack(highs), out=extent_max)

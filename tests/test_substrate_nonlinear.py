@@ -13,11 +13,13 @@ import math
 import numpy as np
 import pytest
 
+from tropoi.temporal.substrate import BackwardEulerSubstrate
 from tropoi.physics.constants import SIGMA_SB
 from tropoi.physics.materials import (CellMaterials, DepthProfile, PolynomialHeatCapacity,
                                       Stratum)
 from tropoi.spatial.vertical import stratified_interfaces
-from tropoi.physics.substrate import (ConductiveSubstrate, SubstrateSolveError,
+from tropoi.temporal.substrate import SubstrateSolveError
+from tropoi.physics.substrate import (ConductiveSubstrate,
                                       ENERGY_REFERENCE_TEMPERATURE as REF)
 
 
@@ -99,12 +101,12 @@ def test_analytic_jacobian_matches_finite_differences():
     forcing = (rng.uniform(0.0, 9000.0, n), -rng.uniform(0.0, 5.0, n),
                rng.uniform(-50.0, 50.0, n), np.full(n, 0.02), np.zeros((1, 1)))
     dt = 1800.0
-    out = sub._system(np, th, ths, th_old, dt, forcing, jacobian=True)
+    out = BackwardEulerSubstrate(sub)._system(np, th, ths, th_old, dt, forcing, jacobian=True)
     lower, diag, upper = out["jacobian"]
     x0 = np.concatenate([ths[None], th], axis=0)
 
     def resid(x):
-        o = sub._system(np, x[1:], x[0], th_old, dt, forcing, jacobian=False)
+        o = BackwardEulerSubstrate(sub)._system(np, x[1:], x[0], th_old, dt, forcing, jacobian=False)
         return np.concatenate([o["r_s"][None], o["r"]], axis=0)
 
     for c in range(n):
@@ -189,7 +191,7 @@ def _manufactured_run(edges, dt, t_end, strata, xp=np):
         Tb, dTb, _ = _exact(np.array([DEPTH]), t, kc)
         kb = kc[1] * (1 + CHI * (Tb / TR) ** 3)
         g_up = float((kb * dTb)[0])                         # -q_down(D)
-        st, _ = sub.step(st, dt, shortwave_down=xp.asarray(sw), bottom_heat_flux=g_up,
+        st, _ = BackwardEulerSubstrate(sub).step(st, dt, shortwave_down=xp.asarray(sw), bottom_heat_flux=g_up,
                          source=xp.asarray(src))
     T_num = np.asarray(sub.temperature(st)[:, 0].get() if xp is not np else sub.temperature(st)[:, 0])
     Ts_num = float(sub.surface_temperature(st)[0])
@@ -267,10 +269,10 @@ def test_steady_kirchhoff_profile_and_interface_flux():
         exact = _steady_analytic(centres, strata, ts, G)
         st = sub.state_at(exact[:, None] + 5.0, np.array([ts + 5.0]))
         for _ in range(3):                                      # steady: dt -> infinity
-            st, rep = sub.step(st, 1e25, shortwave_down=F)
+            st, rep = BackwardEulerSubstrate(sub).step(st, 1e25, shortwave_down=F)
         T = sub.temperature(st)[:, 0]
         errs.append(np.max(np.abs(T - exact)))
-        out = sub._system(np, st.anomaly, st.surface_anomaly, st.anomaly, 1e25,
+        out = BackwardEulerSubstrate(sub)._system(np, st.anomaly, st.surface_anomaly, st.anomaly, 1e25,
                           ((1 - ALBEDO) * np.array([F]), np.zeros(1), np.zeros(1),
                            np.array([G]), np.zeros((1, 1))), jacobian=False)
         assert np.max(np.abs(out["faces"][:, 0] + G)) <= 1e-9 + 1e-12 * G   # q = -G everywhere
@@ -293,13 +295,13 @@ def test_vanishing_conductivity_tends_to_radiative_equilibrium():
                                   initial_temperature=100.0)
         st = sub.initial_state(1)
         for _ in range(60):
-            st, _ = sub.step(st, 60.0, shortwave_down=F)
+            st, _ = BackwardEulerSubstrate(sub).step(st, 60.0, shortwave_down=F)
         gaps.append(t_eq - float(sub.surface_temperature(st)[0]))
     assert all(g > 0 for g in gaps) and all(b < a for a, b in zip(gaps, gaps[1:]))
     tiny = [Stratum(0.5, 1500.0, 1e-30, (700.0,))]
     sub = ConductiveSubstrate(tiny, interfaces=_mesh(tiny, 1e-3, 1.2), albedo=ALBEDO,
                               emissivity=EMISS, initial_temperature=100.0, bottom_heat_flux=0.0)
-    st, _ = sub.step(sub.initial_state(1), 60.0, shortwave_down=F)
+    st, _ = BackwardEulerSubstrate(sub).step(sub.initial_state(1), 60.0, shortwave_down=F)
     assert float(sub.surface_temperature(st)[0]) == pytest.approx(t_eq, rel=1e-12)
 
 
@@ -315,7 +317,7 @@ def test_constant_property_linear_problem_is_one_newton_step(h):
     L = sub.layers
     st = sub.state_at(300.0 + rng.uniform(-20, 20, size=(L, 1)), np.array([310.0]))
     F0, dt = 150.0, 3600.0
-    new, rep = sub.step(st, dt, flux=F0, flux_derivative=-h)
+    new, rep = BackwardEulerSubstrate(sub).step(st, dt, flux=F0, flux_derivative=-h)
     assert rep.iterations == 1
     # independent dense solve in anomalies: unknowns (theta_s, theta_1..L)
     dz = np.diff(e)
@@ -355,7 +357,7 @@ def test_cold_start_into_perihelion_noon():
     st = sub.initial_state(3)
     iters = []
     for _ in range(20):
-        st, rep = sub.step(st, 3600.0, shortwave_down=np.array([14500.0, 7000.0, 0.0]))
+        st, rep = BackwardEulerSubstrate(sub).step(st, 3600.0, shortwave_down=np.array([14500.0, 7000.0, 0.0]))
         iters.append(rep.iterations)
         assert np.all(sub.temperature(st) > 0) and np.all(sub.surface_temperature(st) > 0)
     print("iterations per step", iters)
@@ -364,7 +366,7 @@ def test_cold_start_into_perihelion_noon():
         weak = ConductiveSubstrate(_two_strata(), interfaces=_mesh(_two_strata(), 5e-4, 1.2),
                                    albedo=ALBEDO, emissivity=EMISS, initial_temperature=40.0,
                                    max_iterations=1, bottom_heat_flux=0.0)
-        weak.step(weak.initial_state(3), 3600.0, shortwave_down=np.array([14500.0, 7000.0, 0.0]))
+        BackwardEulerSubstrate(weak).step(weak.initial_state(3), 3600.0, shortwave_down=np.array([14500.0, 7000.0, 0.0]))
 
 
 # -- 7: energy closure ------------------------------------------------------------------------
@@ -382,7 +384,7 @@ def test_energy_identity_and_cumulative_closure_under_random_forcing():
     for _ in range(400):
         sw = rng.uniform(0.0, 12000.0, n) * (rng.uniform(size=n) > 0.4)
         gb = rng.uniform(-0.05, 0.05, n)
-        st, rep = sub.step(st, dt, shortwave_down=sw, bottom_heat_flux=gb)
+        st, rep = BackwardEulerSubstrate(sub).step(st, dt, shortwave_down=sw, bottom_heat_flux=gb)
         net = rep.absorbed - rep.emitted + rep.bottom + rep.source
         # the identity, term by term (sign of r_s included)
         assert np.all(np.abs(rep.energy_tendency - net - rep.residual_sum)
@@ -405,7 +407,7 @@ def test_energy_identity_and_cumulative_closure_under_random_forcing():
 def test_stratum_extents_are_recorded_for_validity_checks():
     sub = ConductiveSubstrate(_two_strata(), interfaces=_mesh(_two_strata(), 1e-3, 1.25),
                               albedo=ALBEDO, emissivity=EMISS, initial_temperature=150.0, bottom_heat_flux=0.0)
-    st, report = sub.step(sub.initial_state(2), 3600.0, shortwave_down=np.array([9000.0, 0.0]))
+    st, report = BackwardEulerSubstrate(sub).step(sub.initial_state(2), 3600.0, shortwave_down=np.array([9000.0, 0.0]))
     (lo0, hi0), (lo1, hi1) = report.extent
     np.testing.assert_array_equal(report.extent, sub.extent(st))
     assert hi0 == pytest.approx(float(np.max(sub.surface_temperature(st))))

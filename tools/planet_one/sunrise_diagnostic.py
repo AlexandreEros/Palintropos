@@ -31,6 +31,7 @@ from heat1d.solvers import computeCFL
 
 import tools.planet_one.heat1d_compare as hc
 from tools.planet_one.convergence import _reconstruction
+from tropoi.temporal.substrate import BackwardEulerSubstrate
 from tropoi.physics.insolation import insolation_from_spec
 from tropoi.physics.substrate import SubstrateState
 from tropoi.run.airless.config import mercury_vpw99
@@ -73,7 +74,7 @@ def main(argv=None) -> int:
         for _ in times:
             for _ in range(sub_steps):
                 t += h
-                st, _r = sub.step(st, h, shortwave_down=np.array([absorbed(t) / (1 - cfg.albedo)]))
+                st, _r = BackwardEulerSubstrate(sub).step(st, h, shortwave_down=np.array([absorbed(t) / (1 - cfg.albedo)]))
             out.append(float(sub.surface_temperature(st)[0]))
         return np.array(out)
 

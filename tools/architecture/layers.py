@@ -48,6 +48,9 @@ DEFAULT_LAYERS: list[tuple[str, tuple[str, ...]]] = [
     # nothing from tropoi, so that it can serve any dynamical core. It is
     # declared last: nothing below it, and spatial does not use it.
     ("physics", ("tropoi.physics",)),
+    # Shared numerical algorithms (and their hardware-specific
+    # implementations) import nothing from tropoi; every layer may use them.
+    ("numerics", ("tropoi.numerics",)),
 ]
 
 #: Where :data:`DEFAULT_LAYERS` comes from, as stated in every output that

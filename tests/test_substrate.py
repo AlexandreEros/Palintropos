@@ -17,6 +17,7 @@ import sys
 import numpy as np
 import pytest
 
+from tropoi.temporal.substrate import BackwardEulerSubstrate
 from tropoi.physics.substrate import ConductiveSubstrate, ENERGY_REFERENCE_TEMPERATURE
 from tropoi.physics.surface import SlabSurface
 from tropoi.spatial.vertical import geometric_interfaces
@@ -175,15 +176,15 @@ def test_step_rejects_invalid_inputs():
     f = np.array([10.0, -10.0])
     for dt in (0.0, -600.0, float("nan"), float("inf")):
         with pytest.raises(ValueError):
-            sub.step(st, dt, flux=f)
+            BackwardEulerSubstrate(sub).step(st, dt, flux=f)
     with pytest.raises(ValueError):
-        sub.step(st, 600.0, flux=np.array([np.nan, 1.0]))
+        BackwardEulerSubstrate(sub).step(st, 600.0, flux=np.array([np.nan, 1.0]))
     with pytest.raises(ValueError):
-        sub.step(st, 600.0, flux=f, bottom_heat_flux=np.array([0.0, np.inf]))
+        BackwardEulerSubstrate(sub).step(st, 600.0, flux=f, bottom_heat_flux=np.array([0.0, np.inf]))
     for a in (np.array([-1.0, 200.0]), np.array([-1.0, np.nan]), 1e-9):
         with pytest.raises(ValueError):
-            sub.step(st, 600.0, flux=f, flux_derivative=a)
-    ok, _ = sub.step(st, 600.0, flux=f, flux_derivative=np.array([-5.0, 0.0]))
+            BackwardEulerSubstrate(sub).step(st, 600.0, flux=f, flux_derivative=a)
+    ok, _ = BackwardEulerSubstrate(sub).step(st, 600.0, flux=f, flux_derivative=np.array([-5.0, 0.0]))
     assert np.all(np.isfinite(ok.anomaly))
 
 
@@ -228,7 +229,7 @@ def test_gate_harness_rejects_unknown_gate_names(tmp_path, capsys):
 
 def test_bottom_flux_enters_bottom_row():
     sub = _prescribed()
-    st, _ = sub.step(sub.initial_state(1), 600.0, flux=0.0, bottom_heat_flux=5.0)
+    st, _ = BackwardEulerSubstrate(sub).step(sub.initial_state(1), 600.0, flux=0.0, bottom_heat_flux=5.0)
     theta = st.anomaly[:, 0]
     assert theta[-1] > 0.0
     assert np.all(np.diff(theta) >= 0.0)                # warms from below
@@ -245,7 +246,7 @@ def test_energy_identity_with_signs():
     denom = np.zeros(3)
     for _ in range(2000):
         f = rng.uniform(-200.0, 200.0, size=3)
-        st, rep = sub.step(st, 600.0, flux=f, bottom_heat_flux=fb)
+        st, rep = BackwardEulerSubstrate(sub).step(st, 600.0, flux=f, bottom_heat_flux=fb)
         assert rep.iterations == 1                       # linear problem: one Newton step
         inflow += 600.0 * (rep.conducted + fb)
         denom += 600.0 * np.abs(rep.conducted + fb)
@@ -261,7 +262,7 @@ def test_one_layer_matches_slab():
     T = np.array([ENERGY_REFERENCE_TEMPERATURE])
     for _ in range(1000):
         f = rng.uniform(-200.0, 200.0, size=1)
-        st, _ = sub.step(st, 600.0, flux=f)
+        st, _ = BackwardEulerSubstrate(sub).step(st, 600.0, flux=f)
         T = slab.advance(T, f, 600.0)
     assert abs(float(sub.temperature(st)[0, 0]) - float(T[0])) < 1000 * np.spacing(300.0)
 
@@ -272,7 +273,7 @@ def test_robin_linearization_is_exact():
     st = sub.initial_state(1)
     st = st._replace(anomaly=st.anomaly + 5.0, surface_anomaly=st.surface_anomaly + 5.0)
     ts_old = float(sub.surface_temperature(st)[0]) - 300.0
-    new, rep = sub.step(st, 600.0, flux=np.array([-h * ts_old]), flux_derivative=-h)
+    new, rep = BackwardEulerSubstrate(sub).step(st, 600.0, flux=np.array([-h * ts_old]), flux_derivative=-h)
     t1 = float(new.anomaly[0, 0])
     r = sub.thickness[0] / (2.0 * 2.0)
     assert math.isclose(float(rep.conducted[0]), -h * t1 / (1.0 + h * r), rel_tol=1e-12)
@@ -287,7 +288,7 @@ def test_step_flux_surface_response():
     F, dt, k, kappa = 100.0, 600.0, 2.0, 1e-6
     z = 0.5 * sub.thickness[0]
     for n in range(1, 400):
-        st, _ = sub.step(st, dt, flux=np.array([F]))
+        st, _ = BackwardEulerSubstrate(sub).step(st, dt, flux=np.array([F]))
     t = 399 * dt
     s = math.sqrt(kappa * t)
     x = z / (2 * s)
