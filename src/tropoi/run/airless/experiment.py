@@ -69,66 +69,59 @@ import numpy as np
 
 from tropoi.physics.insolation import insolation_from_spec
 from tropoi.physics.substrate import ConductiveSubstrate
+from tropoi.spatial.grids.quadrature import ColumnSet
+from tropoi.spatial.vertical import stratified_interfaces
 from tropoi.run.airless.config import AirlessConfig, strata_from_dicts
 from tropoi.run.held_suarez.experiment import RunError, code_identity, environment_identity
 
-__all__ = ["AirlessRun", "COLUMN_KINDS", "build_columns", "build_substrate", "column_kind",
-           "load_tier2", "run_block", "transient_steps"]
+__all__ = ["AirlessRun", "build_columns", "build_substrate", "load_tier2", "run_block",
+           "transient_steps"]
 
-#: Configured column layouts and what they are: a ``global`` discretization
-#: with physical area weights, or a ``diagnostic`` point collection without.
-COLUMN_KINDS = {"latlon": "global", "points": "diagnostic"}
 #: Per-step series of a run; global runs store their area integrals (W) under
 #: these names, diagnostic collections per point under ``per_point_<name>_W_m2``.
 SERIES = ("energy_tendency", "net", "residual", "tolerance")
 
 
-def column_kind(cfg: AirlessConfig) -> str:
-    """``"global"`` or ``"diagnostic"`` (see :data:`COLUMN_KINDS`)."""
-    kind = cfg.columns.get("kind")
-    if kind not in COLUMN_KINDS:
-        raise ValueError(f"unknown column kind {kind!r}")
-    return COLUMN_KINDS[kind]
+def build_columns(cfg: AirlessConfig) -> ColumnSet:
+    """The configured columns (:class:`~tropoi.spatial.grids.quadrature.ColumnSet`):
 
-
-def build_columns(cfg: AirlessConfig):
-    """(lat_deg, lon_deg, weights). For the regular grid the weights are the
-    exact cell areas R^2 dlambda (sin phi_N - sin phi_S) (m^2). A point
-    collection has no physical area: its weights are None."""
+    * ``latlon``: regular cell-centred grid, latitudes south to north, with
+      exact cell areas R^2 dlambda (sin phi_N - sin phi_S) as weights (m^2);
+    * ``gauss``: the Gauss-Legendre grid of the spectral models, with exactly
+      their nodes, ordering (north to south, longitudes from 0) and weights
+      R^2 (2 pi / nlon) w_i, and no spectral transform;
+    * ``points``: a diagnostic collection, no weights."""
     c = cfg.columns
-    if c["kind"] == "latlon":
-        nlat, nlon = int(c["nlat"]), int(c["nlon"])
-        edges = np.linspace(-90.0, 90.0, nlat + 1)
-        lat = 0.5 * (edges[1:] + edges[:-1])
-        lon = (np.arange(nlon) + 0.5) * (360.0 / nlon)
-        la, lo = np.meshgrid(lat, lon, indexing="ij")
-        band = np.sin(np.radians(edges[1:])) - np.sin(np.radians(edges[:-1]))
-        w = cfg.radius_m ** 2 * math.radians(360.0 / nlon) * np.broadcast_to(
-            band[:, None], la.shape)
-        return la.ravel(), lo.ravel(), np.array(w).ravel()
-    if c["kind"] == "points":
-        lat = np.asarray(c["lat_deg"], dtype=float)
-        lon = np.asarray(c["lon_deg"], dtype=float)
-        return lat, lon, None
-    raise ValueError(f"unknown column kind {c['kind']!r}")
+    kind = c.get("kind")
+    if kind == "latlon":
+        return ColumnSet.regular(c["nlat"], c["nlon"], cfg.radius_m)
+    if kind == "gauss":
+        return ColumnSet.gauss(c["nlat"], c["nlon"], cfg.radius_m)
+    if kind == "points":
+        return ColumnSet.points(c["lat_deg"], c["lon_deg"], cfg.radius_m)
+    raise ValueError(f"unknown column kind {kind!r}")
 
 
 def build_substrate(cfg: AirlessConfig) -> ConductiveSubstrate:
-    return ConductiveSubstrate(strata_from_dicts(cfg.strata),
-                               top_thickness=cfg.vertical["top_thickness"],
-                               max_stretch=cfg.vertical["max_stretch"],
+    """The configured substrate on its configured vertical mesh (the mesh is
+    spatial discretization, built here and handed to the physics)."""
+    strata = strata_from_dicts(cfg.strata)
+    faces = stratified_interfaces([s.bottom for s in strata], cfg.vertical["top_thickness"],
+                                  cfg.vertical["max_stretch"])
+    return ConductiveSubstrate(strata, interfaces=faces,
                                albedo=cfg.albedo, emissivity=cfg.emissivity,
                                bottom_heat_flux=cfg.geothermal_flux,
                                initial_temperature=cfg.initial_temperature)
 
 
-def run_block(cfg_dict: dict, lat_deg, lon_deg, weights, anomaly, surface_anomaly,
+def run_block(cfg_dict: dict, lat, lon, weights, anomaly, surface_anomaly,
               cycle: int, steps: int, record_profiles_every_step: bool,
               out_dir: str, prev_dir: Optional[str], block: int,
               backend: str = "numpy", dt: Optional[float] = None,
               first_step: Optional[int] = None, sample_every: Optional[tuple] = None):
     """Advance one block of columns through illumination cycle ``cycle``
-    with ``steps`` steps.
+    with ``steps`` steps. ``lat`` and ``lon`` are the columns' coordinates in
+    radians (a :class:`ColumnSet`'s ``lat`` and ``lon``).
 
     By default the timestep is ``cfg.cycle_s / steps`` and step ``n`` is
     forced at ``(cycle * steps + n + 1) * dt``. A transient segment passes
@@ -170,7 +163,7 @@ def run_block(cfg_dict: dict, lat_deg, lon_deg, weights, anomaly, surface_anomal
     cfg = AirlessConfig.from_dict(cfg_dict)
     sub = build_substrate(cfg)
     ins = insolation_from_spec(cfg.illumination)
-    lat, lon = xp.asarray(np.radians(lat_deg)), xp.asarray(np.radians(lon_deg))
+    lat, lon = xp.asarray(lat), xp.asarray(lon)
     nx, ny, nz = xp.cos(lat) * xp.cos(lon), xp.cos(lat) * xp.sin(lon), xp.sin(lat)
     per_point = weights is None
     if not per_point:
@@ -429,8 +422,10 @@ class AirlessRun:
             raise RunError(f"{self.dir} is not empty; airless runs never overwrite")
         self.dir.mkdir(parents=True, exist_ok=True)
         self.sub = build_substrate(cfg)
-        self.lat, self.lon, self.w = build_columns(cfg)
-        self.kind = column_kind(cfg)
+        self.columns = build_columns(cfg)
+        self.kind = self.columns.kind
+        self.lat, self.lon, self.w = (self.columns.lat_deg, self.columns.lon_deg,
+                                      self.columns.weights)
         self._write_json("config.json", {
             "config": cfg.to_dict(), "config_sha256": cfg.sha256(), "code": self.code,
             "environment": environment_identity(), "substrate": self.sub.signature(),
@@ -441,7 +436,9 @@ class AirlessRun:
         self.initial_state = initial_state
         areas = {} if self.w is None else {"weights": self.w}
         np.savez(self.dir / "grid.npz", lat_deg=self.lat, lon_deg=self.lon,
-                 column_kind=np.array(self.kind), interfaces=self.sub.interfaces,
+                 lat_rad=self.columns.lat, lon_rad=self.columns.lon,
+                 column_kind=np.array(self.kind), layout=np.array(self.columns.layout),
+                 interfaces=self.sub.interfaces,
                  centres=self.sub.centres, **areas)
         self._event("created", columns=int(self.lat.size), layers=self.sub.layers)
 
@@ -481,7 +478,8 @@ class AirlessRun:
         (d / "blocks.json").write_text(json.dumps(
             {"ranges": [[int(b[0]), int(b[-1]) + 1] for b in blocks], "steps": steps}))
         cfgd = self.cfg.to_dict()
-        args = [(cfgd, self.lat[b], self.lon[b], None if self.w is None else self.w[b],
+        args = [(cfgd, self.columns.lat[b], self.columns.lon[b],
+                 None if self.w is None else self.w[b],
                  state[0][:, b], state[1][b],
                  cycle, steps, record_every, str(d), None if prev_dir is None else str(prev_dir), k,
                  self.backend, dt, first_step, sample_every)

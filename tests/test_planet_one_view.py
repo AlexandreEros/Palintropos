@@ -31,7 +31,8 @@ def _viewer(tmp_path, mark, *, cycle_extent):
     if cycle_extent:
         cycles["extent_scope"] = "cycle"
     (tmp_path / "cycles.json").write_text(json.dumps([cycles]), encoding="utf-8")
-    lat, lon, weights = build_columns(cfg)
+    cols = build_columns(cfg)
+    lat, lon, weights = cols.lat_deg, cols.lon_deg, cols.weights
     sub = build_substrate(cfg)
     np.savez(tmp_path / "grid.npz", lat_deg=lat, lon_deg=lon, weights=weights,
              centres=sub.centres, interfaces=sub.interfaces)

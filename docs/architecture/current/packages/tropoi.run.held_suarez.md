@@ -40,6 +40,7 @@ flowchart LR
     p_tropoi_orun_oairless["package run.airless"]
     p_tropoi_orun_oradiative["package run.radiative"]
     p_tropoi_ospatial["package spatial"]
+    p_tropoi_ospatial_ogrids["package spatial.grids"]
     p_tropoi_ospatial_ostates["package spatial.states"]
     p_tropoi_otemporal["package temporal"]
     p_tropoi_otemporal_otendencies["package temporal.tendencies"]
@@ -63,10 +64,12 @@ flowchart LR
     n_tropoi_orun_oheld__suarez_omodel -.->|1| p_tropoi_ospatial_ostates
     n_tropoi_orun_oheld__suarez_omodel -.->|1| p_tropoi_otemporal
     n_tropoi_orun_oheld__suarez_omodel -->|2| p_tropoi_otemporal_otendencies
+    n_tropoi_orun_oheld__suarez_oreport -.->|1| p_tropoi_ospatial_ogrids
     classDef other fill:none,stroke-dasharray:3 3
     class p_tropoi_orun_oairless other
     class p_tropoi_orun_oradiative other
     class p_tropoi_ospatial other
+    class p_tropoi_ospatial_ogrids other
     class p_tropoi_ospatial_ostates other
     class p_tropoi_otemporal other
     class p_tropoi_otemporal_otendencies other

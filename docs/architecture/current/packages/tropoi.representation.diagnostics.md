@@ -44,6 +44,7 @@ flowchart LR
     p_tropoi_orun_ope["package run.pe"]
     p_tropoi_orun_oswe["package run.swe"]
     p_tropoi_ospatial["package spatial"]
+    p_tropoi_ospatial_ogrids["package spatial.grids"]
     p_tropoi_ospatial_otransforms["package spatial.transforms"]
     p_tropoi_otemporal_otendencies["package temporal.tendencies"]
     n_tropoi_orepresentation_odiagnostics_ope__structure --> n_tropoi_orepresentation_odiagnostics_oheld__suarez__sections
@@ -60,6 +61,7 @@ flowchart LR
     p_tropoi_orun_ope -->|1| n_tropoi_orepresentation_odiagnostics_ope
     p_tropoi_orun_oswe -->|1| n_tropoi_orepresentation_odiagnostics_oswe
     n_tropoi_orepresentation_odiagnostics_obve -->|2| p_tropoi_ospatial
+    n_tropoi_orepresentation_odiagnostics_oheld__suarez__sections -.->|1| p_tropoi_ospatial_ogrids
     n_tropoi_orepresentation_odiagnostics_oheld__suarez__sections -->|1| p_tropoi_ospatial_otransforms
     n_tropoi_orepresentation_odiagnostics_ope -->|1| p_tropoi_otemporal_otendencies
     n_tropoi_orepresentation_odiagnostics_ope__levels -->|1| p_tropoi_ospatial
@@ -71,6 +73,7 @@ flowchart LR
     class p_tropoi_orun_ope other
     class p_tropoi_orun_oswe other
     class p_tropoi_ospatial other
+    class p_tropoi_ospatial_ogrids other
     class p_tropoi_ospatial_otransforms other
     class p_tropoi_otemporal_otendencies other
 ```

@@ -41,13 +41,16 @@ def main(argv=None) -> int:
     backend = args.backend or meta.get("backend", "numpy")
     grid = np.load(run / "grid.npz")
     lat, lon = grid["lat_deg"], grid["lon_deg"]
+    # the run's own radians (runs before they were stored converted degrees)
+    lat_rad = grid["lat_rad"] if "lat_rad" in grid.files else np.radians(lat)
+    lon_rad = grid["lon_rad"] if "lon_rad" in grid.files else np.radians(lon)
     # a diagnostic point collection has no area weights (runs before the
     # distinction stored ones; the replay uses whatever the run used)
     w = grid["weights"] if "weights" in grid.files else None
     if args.columns:
         cols = np.array([int(c) for c in args.columns.split(",")])
-    elif cfg["columns"]["kind"] != "latlon":
-        ap.error("--columns is required for a run whose columns are not a latlon grid")
+    elif cfg["columns"]["kind"] not in ("latlon", "gauss"):
+        ap.error("--columns is required for a run whose columns are not a grid")
     else:                                   # canonical-like points of the grid
         nlat, nlon = cfg["columns"]["nlat"], cfg["columns"]["nlon"]
         la, lo = lat.reshape(nlat, nlon)[:, 0], lon.reshape(nlat, nlon)[0]
@@ -69,7 +72,7 @@ def main(argv=None) -> int:
     with tempfile.TemporaryDirectory() as tmp:
         out = pathlib.Path(tmp)
         (out / "blocks.json").write_text(json.dumps({"ranges": [[0, cols.size]], "steps": steps}))
-        res = run_block(cfg, lat[cols], lon[cols], None if w is None else w[cols],
+        res = run_block(cfg, lat_rad[cols], lon_rad[cols], None if w is None else w[cols],
                         state["start_anomaly"][:, cols],
                         state["start_surface_anomaly"][cols], cycle, steps, False,
                         str(out), None, 0, backend, **timing)

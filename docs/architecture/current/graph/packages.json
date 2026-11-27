@@ -96,6 +96,13 @@
       "module_edges": 1,
       "runtime_module_edges": 1,
       "source": "tropoi.representation.archive",
+      "target": "tropoi.spatial.grids"
+    },
+    {
+      "kind": "imports",
+      "module_edges": 1,
+      "runtime_module_edges": 1,
+      "source": "tropoi.representation.archive",
       "target": "tropoi.temporal"
     },
     {
@@ -104,6 +111,13 @@
       "runtime_module_edges": 3,
       "source": "tropoi.representation.diagnostics",
       "target": "tropoi.spatial"
+    },
+    {
+      "kind": "imports",
+      "module_edges": 1,
+      "runtime_module_edges": 1,
+      "source": "tropoi.representation.diagnostics",
+      "target": "tropoi.spatial.grids"
     },
     {
       "kind": "imports",
@@ -149,8 +163,8 @@
     },
     {
       "kind": "imports",
-      "module_edges": 9,
-      "runtime_module_edges": 9,
+      "module_edges": 10,
+      "runtime_module_edges": 10,
       "source": "tropoi.representation.visual",
       "target": "tropoi.spatial.grids"
     },
@@ -209,6 +223,20 @@
       "runtime_module_edges": 1,
       "source": "tropoi.run.airless",
       "target": "tropoi.run.held_suarez"
+    },
+    {
+      "kind": "imports",
+      "module_edges": 1,
+      "runtime_module_edges": 1,
+      "source": "tropoi.run.airless",
+      "target": "tropoi.spatial"
+    },
+    {
+      "kind": "imports",
+      "module_edges": 1,
+      "runtime_module_edges": 1,
+      "source": "tropoi.run.airless",
+      "target": "tropoi.spatial.grids"
     },
     {
       "kind": "imports",
@@ -363,6 +391,13 @@
       "runtime_module_edges": 4,
       "source": "tropoi.run.held_suarez",
       "target": "tropoi.spatial"
+    },
+    {
+      "kind": "imports",
+      "module_edges": 1,
+      "runtime_module_edges": 1,
+      "source": "tropoi.run.held_suarez",
+      "target": "tropoi.spatial.grids"
     },
     {
       "kind": "imports",
@@ -738,7 +773,7 @@
     },
     {
       "id": "tropoi.physics",
-      "internal_edges": 34,
+      "internal_edges": 33,
       "modules": 19
     },
     {
@@ -809,12 +844,12 @@
     {
       "id": "tropoi.spatial",
       "internal_edges": 5,
-      "modules": 9
+      "modules": 10
     },
     {
       "id": "tropoi.spatial.grids",
-      "internal_edges": 6,
-      "modules": 7
+      "internal_edges": 7,
+      "modules": 8
     },
     {
       "id": "tropoi.spatial.initialization",

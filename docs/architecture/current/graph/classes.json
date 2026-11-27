@@ -5042,6 +5042,37 @@
         "dataclass(frozen=True)"
       ],
       "external_bases": [],
+      "id": "tropoi.spatial.grids.quadrature.ColumnSet",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__post_init__"
+        },
+        {
+          "kind": "classmethod",
+          "name": "gauss"
+        },
+        {
+          "kind": "classmethod",
+          "name": "points"
+        },
+        {
+          "kind": "classmethod",
+          "name": "regular"
+        },
+        {
+          "kind": "property",
+          "name": "size"
+        }
+      ],
+      "module": "tropoi.spatial.grids.quadrature",
+      "qualname": "ColumnSet"
+    },
+    {
+      "decorators": [
+        "dataclass(frozen=True)"
+      ],
+      "external_bases": [],
       "id": "tropoi.spatial.modes.FieldSpec",
       "members": [
         {

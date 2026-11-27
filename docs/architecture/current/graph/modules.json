@@ -372,14 +372,6 @@
     {
       "kind": "imports",
       "scopes": [
-        "function"
-      ],
-      "source": "tropoi.physics.materials",
-      "target": "tropoi.physics.substrate"
-    },
-    {
-      "kind": "imports",
-      "scopes": [
         "module"
       ],
       "source": "tropoi.physics.monin_obukhov_cuda",
@@ -540,7 +532,6 @@
     {
       "kind": "imports",
       "scopes": [
-        "function",
         "module"
       ],
       "source": "tropoi.physics.substrate",
@@ -869,6 +860,14 @@
     {
       "kind": "imports",
       "scopes": [
+        "function"
+      ],
+      "source": "tropoi.representation.archive.viewer_diagnostics",
+      "target": "tropoi.spatial.grids.quadrature"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
         "module"
       ],
       "source": "tropoi.representation.archive.viewer_manifest",
@@ -946,6 +945,14 @@
       ],
       "source": "tropoi.representation.diagnostics.bve",
       "target": "tropoi.spatial.truncation"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.representation.diagnostics.held_suarez_sections",
+      "target": "tropoi.spatial.grids.quadrature"
     },
     {
       "kind": "imports",
@@ -1833,6 +1840,14 @@
     {
       "kind": "imports",
       "scopes": [
+        "function"
+      ],
+      "source": "tropoi.representation.visual.viewer_fields",
+      "target": "tropoi.spatial.grids.quadrature"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
         "module"
       ],
       "source": "tropoi.representation.visual.viewer_fields",
@@ -1983,6 +1998,22 @@
       ],
       "source": "tropoi.run.airless.experiment",
       "target": "tropoi.run.held_suarez.experiment"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.run.airless.experiment",
+      "target": "tropoi.spatial.grids.quadrature"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.run.airless.experiment",
+      "target": "tropoi.spatial.vertical"
     },
     {
       "kind": "imports",
@@ -2765,6 +2796,14 @@
       "scopes": [
         "function"
       ],
+      "source": "tropoi.run.held_suarez.report",
+      "target": "tropoi.spatial.grids.quadrature"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
       "source": "tropoi.run.lifecycle",
       "target": "tropoi.representation.archive.schema"
     },
@@ -3415,6 +3454,14 @@
       ],
       "source": "tropoi.spatial.grids.latlon_grid",
       "target": "tropoi.spatial.grids.grid_base"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.spatial.grids.latlon_grid",
+      "target": "tropoi.spatial.grids.quadrature"
     },
     {
       "kind": "imports",
@@ -5984,6 +6031,22 @@
     {
       "category": "code",
       "dynamic_import_calls": 0,
+      "id": "tropoi.spatial.grids.quadrature",
+      "is_package": false,
+      "path": "tropoi/spatial/grids/quadrature.py",
+      "stdlib_imports": [
+        "__future__",
+        "dataclasses",
+        "math",
+        "typing"
+      ],
+      "third_party_imports": [
+        "numpy"
+      ]
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
       "id": "tropoi.spatial.initialization.bve",
       "is_package": false,
       "path": "tropoi/spatial/initialization/bve.py",
@@ -6376,6 +6439,21 @@
         "__future__"
       ],
       "third_party_imports": []
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.spatial.vertical",
+      "is_package": false,
+      "path": "tropoi/spatial/vertical.py",
+      "stdlib_imports": [
+        "__future__",
+        "math",
+        "typing"
+      ],
+      "third_party_imports": [
+        "numpy"
+      ]
     },
     {
       "category": "code",
