@@ -367,17 +367,20 @@ def section_components(args, ctx) -> dict:
         m._tridiagonal = timed("tridiagonal", orig_tri, mode)
         f = timed("forcing", forcing, mode)
         try:
+            # _time_step runs a warm repeat and one measured repeat, each of
+            # args.steps identical steps from the same state, and the wrappers
+            # accumulate over both: hence the division by 2 * args.steps below.
             ts, _, _ = _time_step(sub, ctx, f, cfg.dt, args.steps, 1)
         finally:
             m.ConductiveSubstrate._system, m._tridiagonal = orig_sys, orig_tri
         if mode == "sync":
             out["synchronized_inclusive_ms_per_step"] = {
-                k: 1e3 * v / args.steps for k, v in wall.items()}
+                k: 1e3 * v / (2 * args.steps) for k, v in wall.items()}
             out["synchronized_step_ms"] = 1e3 * ts[0]
         else:
             sync()
             out["cuda_event_span_ms_per_step"] = {
-                k: sum(cp.cuda.get_elapsed_time(a, b) for a, b in v) / args.steps
+                k: sum(cp.cuda.get_elapsed_time(a, b) for a, b in v) / (2 * args.steps)
                 for k, v in events.items()}
             out["event_instrumented_step_ms"] = 1e3 * ts[0]
     out["note"] = ("Synchronized inclusive times include the drain each synchronization "
