@@ -252,3 +252,18 @@ def test_cli_refuses_an_empty_config_path(tmp_path, capsys):
         main(["show-config", "--config", ""])
     assert exc.value.code == 2
     assert "--config needs a file path" in capsys.readouterr().err
+
+
+def test_standalone_replay_end_state_includes_the_skin(tmp_path):
+    """The end-state verdict covers the skin as well as the cells: a corrupted
+    retained skin fails the replay of a sample-free segment."""
+    from tools.planet_one.global_check import main as gg
+    run = AirlessRun(_short_ceres(), tmp_path / "run", allow_dirty=True, log=lambda s: None)
+    run.run_transient(25)
+    path = tmp_path / "run" / "retained" / "state.npz"
+    z = dict(np.load(path))
+    z["end_surface_anomaly"] = z["end_surface_anomaly"] + 1e-6
+    np.savez(path, **z)
+    assert gg([str(tmp_path / "run"), "--columns", "0"]) == 1
+    report = json.loads((tmp_path / "run" / "gg.json").read_text())
+    assert report["compared"] == ["end_state"] and not report["pass"]

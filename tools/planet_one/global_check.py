@@ -78,7 +78,11 @@ def main(argv=None) -> int:
     # as a zero difference, and the verdict rests only on what was compared.
     diffs = {"surface_fields": _max_abs_diff(s_rep, s_glob),
              "profiles": _max_abs_diff(p_rep, p_glob),
-             "end_state": float(np.max(np.abs(res["anomaly"] - state["end_anomaly"][:, cols])))}
+             # cells and the diagnosed skin both: a sample-free segment is judged on these alone
+             "end_state": max(
+                 float(np.max(np.abs(res["anomaly"] - state["end_anomaly"][:, cols]))),
+                 float(np.max(np.abs(res["surface_anomaly"]
+                                     - state["end_surface_anomaly"][cols]))))}
     compared = [k for k, v in diffs.items() if v is not None]
     bound = 1e-12
     report = {"run": str(run), "backend": backend, "cycle": cycle, "steps": steps,
