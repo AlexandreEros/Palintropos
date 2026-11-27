@@ -927,21 +927,22 @@ contracts) and F2 (`--fmad=false` changes libdevice).
 | U5 | **approved** | the section 11 correction as its own PR: per-point diagnostics with units and column identities for diagnostic collections; area-weighted diagnostics only for global discretizations; an output-schema distinction; historical evidence stays interpretable |
 | U6 | **approved** | explicit device, then `TROPOI_EXECUTION=cpu-verification`, then the CUDA default; conflicts are errors; no fallback; CPU hidden from production controls; provenance records backend, hardware and precision; CPU-only imports never initialize CUDA |
 
-**P3 counting protocol (definition requested by the owner).** These count
-per production step, from Nsight Systems over a warm segment of at least 20
-steps:
+**P3 counting protocol (definition requested by the owner; corrected
+2026-11-27).** The figures come from Nsight Systems over two warm segments of
+N1 and N2 production steps (24 and 96), with tier-2 output sampled only at
+the end of each segment. The per-step figure is (count(N2) - count(N1)) /
+(N2 - N1), so the segment's setup and teardown cancel. Counted per step:
 
 * *kernel launches*: `cuLaunchKernel` plus `cudaLaunchKernel`;
-* *host synchronizations*: `cudaStreamSynchronize` plus
-  `cudaDeviceSynchronize`, plus every device-to-host copy.
+* *host synchronizations*: synchronization events. A CuPy device-to-host
+  copy is itself a stream synchronization, so a copy and its
+  synchronization count once, not twice. The first census
+  (`0c00121`) double-counted them and included setup and teardown.
 
-Scheduled output operations are counted **separately** and reported beside
-the per-step figure. These are the tier-2 surface and profile samples at
-their configured cadence (every 6 and 24 production steps for VPW99). P3
-applies to the steps between outputs. The output operations themselves are
-reported as launches and synchronizations per output event, with the
-cadence stated, so they cannot hide inside an average and cannot be
-excluded silently either.
+Scheduled output operations are counted **separately**: they are the
+difference between a production-cadence run and an end-only run, reported
+per step beside the figure between outputs. This is
+`tools/colab/substrate_nsys.py` on the production branch.
 
 **Adapted stage order.** The native build is a dependency of the language
 migration, and spatial and defaults work is pure Python. So the order
@@ -957,3 +958,31 @@ becomes:
 | F | GPU-first execution policy and provenance (D6/U6) | product policy | CLI/API tests; no CUDA initialization in CPU-only imports |
 | G | removal of the superseded Python implementation (U9); final regression | removal | all gates of D and E; full CPU suite; T4 CUDA regression; G-gates; Ceres; VPW99 |
 | H | boundary-layer diffusion through `numerics` (D3 equivalence study, P6) | arithmetic change (approved in principle) | documented equivalence before migration |
+
+## 16. Implementation status (2026-11-27)
+
+| PR | Stage | State | Evidence |
+| --- | --- | --- | --- |
+| #73 | 1: PR #72 review fixes | **merged** (`fff9d4b`) | CI |
+| #75 | A: diagnostic point collections | open, CI green | lat-lon runs bitwise against `main`; analytical quadrature tests |
+| #76 | B: canonical quadrature and vertical meshes | open, CI green | bitwise against #75; `GaussLatLonGridGeometry` bitwise against `main` (36 arrays, MX110); the import cycle removed |
+| #77 | C: experiment defaults removed | open, CI green | bitwise against #76; preset hashes unchanged |
+| #78 | D1: step moved to `temporal`; `numerics` layer | open, CI green | bitwise against #77 |
+| #79 | D2: portable C++ canonical step | open, CI green | T4: the representative state regenerated bitwise (`ef413855…`); 200 steps bitwise against the CuPy reference |
+| #80 | E1: Newton residual reuse; per-substrate caching | open | T4: full N1 bitwise (production, terminator, constant, Ceres); G-gates identical; `run_block` **21.0 ms/step**; P1, P2, P3 synchronizations, P4 and P5 cold met; **P3 launches 122 > 20** |
+
+**Outstanding.**
+
+* **P3 launches.** About 7 operations are order-dependent reductions kept
+  in CuPy by U3. Fusing the rest bitwise reaches roughly 30. Getting to
+  ≤ 20 needs the forcing (insolation) in the canonical C++, which is a
+  scope decision for the owner.
+* **P5 warm cache:** not yet measured separately.
+* **Stage F (GPU-first execution policy), stage G (removal of the Python
+  reference) and stage H (boundary-layer diffusion, P6):** not started.
+
+The PRs are stacked. They merge bottom-up (#75, then #76 to #80), and after a
+squash merge each child must be re-synced with its new base. The
+`tools/colab/` prototypes and the first benchmark on this branch use APIs
+from before #76; the current tools are `tools/colab/substrate_gate.py` and
+`substrate_nsys.py` on #79 and #80.
