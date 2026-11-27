@@ -12,14 +12,14 @@ from __future__ import annotations
 import hashlib
 import json
 import math
-from dataclasses import asdict, dataclass, field, replace
+from dataclasses import asdict, dataclass, field, fields, replace
 from typing import Optional
 
 from tropoi.physics.constants import AU_M, L_SUN_W
 from tropoi.physics.materials import DepthProfile, Stratum
 
-__all__ = ["AirlessConfig", "PRESETS", "mercury_hayne_analogue", "mercury_vpw99",
-           "strata_from_dicts", "vpw99_strata"]
+__all__ = ["AirlessConfig", "PRESETS", "config_from_document", "load_config_document",
+           "mercury_hayne_analogue", "mercury_vpw99", "strata_from_dicts", "vpw99_strata"]
 
 DAY = 86400.0
 #: IAU 2015 Resolution B3 nominal solar mass parameter (m^3 s^-2).
@@ -65,8 +65,12 @@ class AirlessConfig:
     * ``cycle_steps``: steps per illumination cycle at the production
       timestep. ``spinup_cycle_steps`` is the coarse spin-up count, or None
       for no coarse stage.
-    * ``cycle_s``: length of the illumination cycle, an exact recurrence
-      period of the geometry (Mercury: two orbits).
+    * ``cycle_s``: length of the illumination cycle. A periodic run
+      compares successive cycles, so there it must be an exact recurrence
+      period of the geometry (Mercury: two orbits). A transient run
+      (:meth:`AirlessRun.run_transient`) asserts no recurrence: it uses
+      ``cycle_s / cycle_steps`` as the timestep and ``cycle_steps`` as the
+      length of its output segments.
     * ``periodicity``: the frozen G-P2 thresholds and cycle limits.
     * ``output``: tier-2 sampling per cycle (``surface_samples``,
       ``profile_samples``) and ``every_step_profiles`` for point runs.
@@ -119,6 +123,55 @@ class AirlessConfig:
 
     def with_(self, **changes) -> "AirlessConfig":
         return replace(self, **changes)
+
+
+_CONFIG_FIELDS = tuple(f.name for f in fields(AirlessConfig))
+_REQUIRED_FIELDS = tuple(f.name for f in fields(AirlessConfig) if f.name != "provenance")
+
+
+def config_from_document(doc) -> AirlessConfig:
+    """The configuration held by a saved document.
+
+    The document is either the configuration itself (the
+    :meth:`AirlessConfig.to_dict` form) or an envelope holding it under
+    ``"config"``, as a run's ``config.json`` does. Other envelope keys are
+    ignored, except ``config_sha256``: when present it must equal the
+    loaded configuration's hash. The configuration is taken as saved:
+    nothing is filled in or recomputed."""
+    if not isinstance(doc, dict):
+        raise ValueError(f"an airless configuration document is a JSON object, not "
+                         f"{type(doc).__name__}")
+    if isinstance(doc.get("config"), dict):
+        body, stated = doc["config"], doc.get("config_sha256")
+    else:
+        body, stated = doc, None
+    missing = [k for k in _REQUIRED_FIELDS if k not in body]
+    unknown = sorted(set(body) - set(_CONFIG_FIELDS))
+    if missing or unknown:
+        raise ValueError("not an airless configuration: "
+                         + "; ".join(p for p in (f"missing {missing}" if missing else "",
+                                                 f"unknown {unknown}" if unknown else "") if p))
+    try:
+        cfg = AirlessConfig.from_dict(body)
+    except (TypeError, KeyError, AttributeError) as exc:      # wrongly typed fields
+        raise ValueError(f"not an airless configuration: {type(exc).__name__}: {exc}") from exc
+    if stated is not None and stated != cfg.sha256():
+        raise ValueError(f"the document states config_sha256 {stated}, but its configuration "
+                         f"hashes to {cfg.sha256()}")
+    return cfg
+
+
+def load_config_document(path) -> tuple:
+    """``(config, source)`` from a saved JSON document
+    (:func:`config_from_document`). ``source`` records the path, the
+    file's SHA-256 and whether the configuration came from an envelope."""
+    import pathlib
+    p = pathlib.Path(path)
+    raw = p.read_bytes()
+    doc = json.loads(raw)
+    cfg = config_from_document(doc)
+    return cfg, {"path": str(p), "file_sha256": hashlib.sha256(raw).hexdigest(),
+                 "envelope": isinstance(doc.get("config"), dict)}
 
 
 # -- Mercury -----------------------------------------------------------------------------

@@ -1,11 +1,21 @@
-"""``python -m tropoi.run.airless {show-config,run} --preset NAME [...]``."""
+"""``python -m tropoi.run.airless {show-config,run} (--preset NAME [...] | --config FILE)
+[--steps N | --duration SECONDS]``.
+
+Without ``--steps``/``--duration`` a run iterates cycles until periodic or a
+cycle limit (``AirlessRun.run``). With one of them it is a finite transient
+at the production timestep that stops at that point (``AirlessRun.run_transient``).
+"""
 from __future__ import annotations
 
 import argparse
 import json
 import sys
 
-from tropoi.run.airless.config import PRESETS
+from tropoi.run.airless.config import PRESETS, load_config_document
+
+#: options that build or adjust a preset; a saved document is used as saved
+_PRESET_OPTIONS = ("points", "grid", "model", "geothermal_flux", "depth", "top_thickness",
+                   "max_stretch", "cycle_steps", "spinup_cycle_steps", "experiment_id")
 
 
 def _config(args):
@@ -36,7 +46,12 @@ def _config(args):
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(prog="python -m tropoi.run.airless")
     ap.add_argument("command", choices=("show-config", "run"))
-    ap.add_argument("--preset", required=True, choices=sorted(PRESETS))
+    source = ap.add_mutually_exclusive_group(required=True)
+    source.add_argument("--preset", choices=sorted(PRESETS))
+    source.add_argument("--config", metavar="FILE",
+                        help="saved configuration JSON: the configuration itself or an "
+                             "envelope holding it under \"config\" (e.g. a run's config.json); "
+                             "used exactly as saved")
     ap.add_argument("--out")
     ap.add_argument("--experiment-id")
     ap.add_argument("--points", nargs="*", help="LAT,LON pairs in degrees")
@@ -49,6 +64,13 @@ def main(argv=None) -> int:
     ap.add_argument("--cycle-steps", type=int)
     ap.add_argument("--spinup-cycle-steps", type=int)
     ap.add_argument("--no-spinup", action="store_true")
+    stop = ap.add_mutually_exclusive_group()
+    stop.add_argument("--steps", type=int,
+                      help="finite transient: this many steps at dt = cycle_s/cycle_steps "
+                           "from the initial state, then stop (no periodicity test)")
+    stop.add_argument("--duration", type=float, metavar="SECONDS",
+                      help="finite transient: run until this simulated time (the first step "
+                           "reaching it); the actual final time is reported")
     ap.add_argument("--workers", type=int, default=1,
                     help="worker processes (blocks of columns); with --backend cupy, 1 per GPU")
     ap.add_argument("--backend", choices=("numpy", "cupy"), default="numpy",
@@ -56,16 +78,48 @@ def main(argv=None) -> int:
     ap.add_argument("--max-wall-s", type=float)
     ap.add_argument("--allow-dirty", action="store_true")
     args = ap.parse_args(argv)
-    cfg = _config(args)
+    source_info = None
+    if args.config:
+        given = [n for n in _PRESET_OPTIONS if getattr(args, n) not in (None, [])]
+        if args.no_spinup:
+            given.append("no_spinup")
+        if given:
+            ap.error("--config runs the saved configuration as saved; these options only "
+                     "adjust presets: " + ", ".join("--" + g.replace("_", "-") for g in given))
+        try:
+            cfg, source_info = load_config_document(args.config)
+        except (OSError, ValueError) as exc:
+            ap.error(f"--config {args.config}: {exc}")
+    else:
+        cfg = _config(args)
+    transient = args.steps is not None or args.duration is not None
+    if transient and args.max_wall_s is not None:
+        ap.error("a transient stops at --steps/--duration; --max-wall-s applies to periodic runs")
+    plan = None
+    if transient:
+        from tropoi.run.airless.experiment import transient_steps
+        try:
+            steps, request = transient_steps(cfg, steps=args.steps, duration_s=args.duration)
+        except ValueError as exc:
+            ap.error(str(exc))
+        plan = {"mode": "transient", **request}
     if args.command == "show-config":
-        print(json.dumps({"config": cfg.to_dict(), "config_sha256": cfg.sha256()}, indent=1))
+        out = {"config": cfg.to_dict(), "config_sha256": cfg.sha256()}
+        if source_info is not None:
+            out["config_source"] = source_info
+        if plan is not None:
+            out["run_plan"] = plan
+        print(json.dumps(out, indent=1))
         return 0
     if not args.out:
         ap.error("run needs --out")
     from tropoi.run.airless.experiment import AirlessRun
     run = AirlessRun(cfg, args.out, workers=args.workers, backend=args.backend,
-                     allow_dirty=args.allow_dirty)
-    result = run.run(max_wall_s=args.max_wall_s)
+                     allow_dirty=args.allow_dirty, config_source=source_info)
+    if transient:
+        result = run.run_transient(steps, request=request)
+    else:
+        result = run.run(max_wall_s=args.max_wall_s)
     print(json.dumps(result, indent=1))
     return 0
 

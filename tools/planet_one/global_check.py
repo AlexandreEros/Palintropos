@@ -5,7 +5,10 @@
 The retained cycle of a global run is replayed for selected columns as an
 independent standalone run. The replay uses the same float coordinates
 (read from the run's grid.npz), the same start state (retained/state.npz),
-the same cycle index, timestep and settings, and the same backend. Every
+the same cycle index, timestep and settings, and the same backend. A
+retained transient segment is replayed with its recorded timestep, first
+global step and sampling cadence; runs that predate those records use the
+cycle form (timestep cycle_s/steps, first step cycle*steps). Every
 tier-2 sample of the replay (surface fields and full T(z)) is compared with
 the global run's. The frozen bound is 1e-12 K. Writes RUN_DIR/gg.json.
 """
@@ -46,12 +49,20 @@ def main(argv=None) -> int:
     state = np.load(ret / "state.npz")
     steps = int(state["steps"])
     cycle = int(state["cycle"])
+    # the retained cycle's own timing and cadence when recorded (transient
+    # segments need them); older runs fall back to run_block's cycle form
+    timing = {}
+    if "dt" in state.files:
+        timing["dt"] = float(state["dt"])
+        timing["first_step"] = int(state["first_step"])
+    if "sample_every" in state.files:
+        timing["sample_every"] = tuple(int(v) for v in state["sample_every"])
     with tempfile.TemporaryDirectory() as tmp:
         out = pathlib.Path(tmp)
         (out / "blocks.json").write_text(json.dumps({"ranges": [[0, cols.size]], "steps": steps}))
         res = run_block(cfg, lat[cols], lon[cols], w[cols], state["start_anomaly"][:, cols],
                         state["start_surface_anomaly"][cols], cycle, steps, False,
-                        str(out), None, 0, backend)
+                        str(out), None, 0, backend, **timing)
         s_rep = load_tier2(out, "surface")
         p_rep = load_tier2(out, "profiles")
     s_glob = load_tier2(ret, "surface", columns=cols)
@@ -60,6 +71,7 @@ def main(argv=None) -> int:
     d_p = float(np.max(np.abs(p_rep - p_glob)))
     d_end = float(np.max(np.abs(res["anomaly"] - state["end_anomaly"][:, cols])))
     report = {"run": str(run), "backend": backend, "cycle": cycle, "steps": steps,
+              "timing": {k: list(v) if isinstance(v, tuple) else v for k, v in timing.items()},
               "columns": cols.tolist(), "lat_deg": lat[cols].tolist(), "lon_deg": lon[cols].tolist(),
               "max_abs_surface_fields_diff": d_s, "max_abs_profile_diff_K": d_p,
               "max_abs_end_state_diff_K": d_end, "bound_K": 1e-12,

@@ -70,6 +70,7 @@ resume. It never changes a criterion.
 | Enthalpy-form Newton backward Euler, Kirchhoff skin, radiative top, geothermal bottom, sources, energy identity in every step report | `physics/substrate.py` |
 | Airless experiment driver: worker processes, tiered output, periodicity monitor, guarded Aitken spin-up | `run/airless/` (`python -m tropoi.run.airless`) |
 | Presets: `mercury-vpw99` (models TWO/TOP/BOT, any G) is primary; `mercury-hayne2017-analogue` | `run/airless/config.py` |
+| Saved configuration documents (`--config`, bare or `config.json` envelope) and finite transients (`--steps`/`--duration`, status `COMPLETED_TRANSIENT`, no periodicity claim) | `run/airless/` ([subsystem page](../architecture/subsystems/airless.md)) |
 | G-P ladder tool | `tools/planet_one/convergence.py` |
 
 ## Verification status

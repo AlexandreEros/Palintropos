@@ -1,5 +1,14 @@
 # Test fixtures
 
+[airless/ceres-equatorial-column.airless.json](airless/ceres-equatorial-column.airless.json)
+is a saved airless configuration document (a `config.json`-style envelope)
+for one equatorial column on an idealized Ceres. Its configuration hashes to
+`13dfd66a305cadb5932c8c7e001ef9a3e2f90c6b8eb304ce0788969812750c8a`.
+[test_airless_transient.py](../test_airless_transient.py) loads it through
+`--config` and runs shortened transients from it. It is an input example,
+not a validated Ceres model; its `provenance` block says which inputs are
+measured, derived, inferred or assumed.
+
 [hs-T21L10-dev4](hs-T21L10-dev4/README.md) is a compact Held–Suarez run
 fixture for checking report and plot behavior on a CPU. Its receipt covers
 the preserved run files. The [climate fixture test](../test_held_suarez_climate_fixture.py)
