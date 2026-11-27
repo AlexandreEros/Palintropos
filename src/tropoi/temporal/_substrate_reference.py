@@ -260,6 +260,8 @@ class ReferenceBackwardEulerSubstrate:
         tol = sysm["tau"].sum(axis=0) + sysm["tau_s"]
         ratio = xp.maximum(xp.max(xp.abs(sysm["r"]) / sysm["tau"], axis=0),
                            xp.abs(sysm["r_s"]) / sysm["tau_s"])
+        extent = sub._temperature_extent(state, xp)
+        lows, highs = zip(*extent)
         return StepReport(it, storage, sysm["absorbed"], sysm["emitted"], sysm["q_s"],
-                          gb + 0.0 * storage, src_sum, resid, tol, ratio,
-                          sub._temperature_extent(state, xp))
+                          gb + 0.0 * storage, src_sum, resid, tol, ratio, extent,
+                          (xp.stack(lows), xp.stack(highs)))

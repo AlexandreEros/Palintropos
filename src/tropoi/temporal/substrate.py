@@ -41,9 +41,11 @@ so the per-step energy closure is bounded by the Newton tolerances. Every
 implementation (``tropoi/{numerics,physics,temporal}/native/pt``), run by
 :mod:`tropoi.temporal.substrate_native`: compiled for the GPU at run time
 (CuPy arrays) or by the CPU library built at installation (NumPy arrays).
-Python validates the inputs, prepares the per-column forcing and computes
-the step report from the converged evaluation with the same reductions as
-before. A step whose Newton iteration fails in any column raises
+The native step also validates the forcing and forms the absorbed constant.
+Python reads one small summary per step and computes the step report from
+the converged evaluation, with the same reductions as before. Forcing that
+is not finite, or a positive ``flux_derivative``, raises ValueError. A step
+whose Newton iteration fails in any column raises
 :class:`SubstrateSolveError`; no unconverged state is returned.
 
 Import-light: NumPy at import; CuPy only for CuPy arrays.
@@ -93,7 +95,9 @@ class StepReport(NamedTuple):
     ``max_residual_ratio`` is the largest \\|r\\|/tau over the column (<= 1 once
     converged). ``extent`` holds the (min, max) temperature reached in each
     stratum over all columns, with the skin counted in the top stratum.
-    Each pair contains backend scalars in kelvin."""
+    Each pair contains backend scalars in kelvin. ``extent_bounds`` holds the
+    same values as two (strata,) arrays (lowest, highest), for accumulating
+    them without a host transfer."""
     iterations: int
     energy_tendency: object
     absorbed: object
@@ -105,6 +109,7 @@ class StepReport(NamedTuple):
     tolerance_sum: object
     max_residual_ratio: object
     extent: tuple
+    extent_bounds: tuple = None
 
 
 
@@ -153,44 +158,21 @@ class BackwardEulerSubstrate:
         if not (math.isfinite(dt) and dt > 0.0):
             raise ValueError(f"dt must be finite and > 0, got {dt!r}")
         n = th_old.shape[1]
-        shape = (n,)
-
-        def column(v):
-            return xp.broadcast_to(xp.asarray(v, dtype=xp.float64), shape)
-
-        sw = column(shortwave_down)
-        lw = column(longwave_down)
-        f0 = column(flux)
-        a = column(flux_derivative)
-        # the linearization reference, as an anomaly
-        given_ref = flux_reference_temperature is not None
-        t_ref = (column(flux_reference_temperature) - ENERGY_REFERENCE_TEMPERATURE
-                 if given_ref else state.surface_anomaly)
-        gb = column(sub.bottom_heat_flux if bottom_heat_flux is None else bottom_heat_flux)
-        src = (xp.zeros((1, 1)) if source is None
-               else xp.asarray(source, dtype=xp.float64))
-        # One device synchronization validates every input; the detailed
-        # message is worked out only on failure.
-        named = {"shortwave_down": sw, "longwave_down": lw, "flux": f0,
-                 "flux_derivative": a, "bottom_heat_flux": gb, "source": src}
-        if given_ref:
-            named["flux_reference_temperature"] = t_ref
-        ok = xp.all(a <= 0.0)
-        for arr in named.values():
-            ok = ok & xp.all(xp.isfinite(arr))
-        if not bool(ok):
-            for name, arr in named.items():
-                if not bool(xp.all(xp.isfinite(arr))):
-                    raise ValueError(f"{name} must be finite")
-            raise ValueError("flux_derivative must be finite and <= 0")
-        const = (1.0 - sub.albedo) * sw + sub.emissivity * lw + f0
-        cells = None if source is None else xp.broadcast_to(src, (sub.layers, n))
-        out = run_step(sub, xp, th_old, state.surface_anomaly, dt, const, a, t_ref, gb, cells,
-                       sub.max_iterations)
-        # One device-to-host transfer per step: the iteration count and whether
-        # any column failed (decision U2).
-        summary = _host(xp.stack([xp.max(out["iterations"]), xp.max(out["failed"])]), xp)
-        it, failed = int(summary[0]), bool(summary[1])
+        gb = sub.bottom_heat_flux if bottom_heat_flux is None else bottom_heat_flux
+        src = None if source is None else xp.asarray(source, dtype=xp.float64)
+        # The native step validates the forcing, forms the absorbed constant
+        # (1 - A) SW + eps LW + F_0 and solves; one device-to-host transfer per
+        # step then reads the largest iteration count, whether any column
+        # failed and whether any forcing was invalid (decision U2).
+        out = run_step(sub, xp, th_old, state.surface_anomaly, dt, shortwave=shortwave_down,
+                       longwave=longwave_down, flux=flux, dflux=flux_derivative,
+                       fref_temperature=flux_reference_temperature, bottom=gb, source=src,
+                       max_iterations=sub.max_iterations)
+        summary = _host(out["summary"], xp)
+        it, failed, invalid = int(summary[0]), bool(summary[1]), bool(summary[2])
+        if invalid:
+            self._raise_invalid(xp, n, shortwave_down, longwave_down, flux, flux_derivative,
+                                flux_reference_temperature, gb, src)
         if failed:
             bad = np.flatnonzero(_host(out["failed"], xp))
             raise SubstrateSolveError(
@@ -198,19 +180,80 @@ class BackwardEulerSubstrate:
                 f"(first {bad[:8].tolist()}); worst residual/tolerance "
                 f"{float(xp.max(out['ratio'])):.3e}")
         new_state = SubstrateState(out["th"], out["ths"])
-        return new_state, self._report(xp, out, it, gb, src, n, new_state)
+        return new_state, self._report(xp, out, it, gb, src, n)
 
-    def _report(self, xp, out, it, gb, src, n, state):
+    @staticmethod
+    def _raise_invalid(xp, n, sw, lw, f0, a, fref, gb, src):
+        """The message for invalid forcing, checked in the documented order
+        (only after the native step has flagged it)."""
+        def column(v):
+            return xp.broadcast_to(xp.asarray(v, dtype=xp.float64), (n,))
+        named = {"shortwave_down": column(sw), "longwave_down": column(lw),
+                 "flux": column(f0), "flux_derivative": column(a),
+                 "bottom_heat_flux": column(gb),
+                 "source": xp.zeros((1, 1)) if src is None else src}
+        if fref is not None:
+            named["flux_reference_temperature"] = column(fref) - ENERGY_REFERENCE_TEMPERATURE
+        for name, arr in named.items():
+            if not bool(xp.all(xp.isfinite(arr))):
+                raise ValueError(f"{name} must be finite")
+        if not bool(xp.all(named["flux_derivative"] <= 0.0)):
+            raise ValueError("flux_derivative must be finite and <= 0")
+        raise RuntimeError("the native step flagged forcing that validates here")
+
+    def _report(self, xp, out, it, gb, src, n):
         """The step report from the converged evaluation, with the reductions
-        of the reference implementation (bitwise, decision U3)."""
+        of the reference implementation (bitwise, decision U3). The largest
+        |r| / tau is the native evaluation's own (a maximum is exact in any
+        order), and so are the extents (per column, then reduced here)."""
         sub = self.substrate
-        src_sum = (xp.broadcast_to(src, (sub.layers, n)).sum(axis=0)
-                   if src.size > 1 else src.reshape(()) * sub.layers + xp.zeros(n))
         storage = out["storage"].sum(axis=0)
-        resid = out["r"].sum(axis=0) - out["r_s"]
-        tol = out["tau"].sum(axis=0) + out["tau_s"]
-        ratio = xp.maximum(xp.max(xp.abs(out["r"]) / out["tau"], axis=0),
-                           xp.abs(out["r_s"]) / out["tau_s"])
-        return StepReport(it, storage, out["absorbed"], out["emitted"], out["q_s"],
-                          gb + 0.0 * storage, src_sum, resid, tol, ratio,
-                          sub._temperature_extent(state, xp))
+        r_sum = out["r"].sum(axis=0)
+        tau_sum = out["tau"].sum(axis=0)
+        S = out["extent"].shape[0] // 2
+        lows, highs = out["extent"][:S].min(axis=1), out["extent"][S:].max(axis=1)
+        scalar_source = src is None or src.size == 1
+        if xp is np:
+            src_sum = ((src.reshape(()) if src is not None else np.zeros(())) * sub.layers
+                       + np.zeros(n)) if scalar_source else \
+                np.broadcast_to(src, (sub.layers, n)).sum(axis=0)
+            resid = r_sum - out["r_s"]
+            tol = tau_sum + out["tau_s"]
+            bottom = gb + 0.0 * storage
+        else:
+            kernels = _fused_report_kernels()
+            if scalar_source:
+                s0 = 0.0 if src is None else src.reshape(())
+                resid, tol, bottom, src_sum = kernels[1](r_sum, out["r_s"], tau_sum,
+                                                         out["tau_s"], gb, storage, s0,
+                                                         float(sub.layers))
+            else:
+                src_sum = xp.broadcast_to(src, (sub.layers, n)).sum(axis=0)
+                resid, tol, bottom = kernels[0](r_sum, out["r_s"], tau_sum, out["tau_s"], gb,
+                                                storage)
+        extent = tuple((lows[s], highs[s]) for s in range(S))
+        return StepReport(it, storage, out["absorbed"], out["emitted"], out["q_s"], bottom,
+                          src_sum, resid, tol, out["ratio"], extent, (lows, highs))
+
+
+_REPORT_KERNELS = None
+
+
+def _fused_report_kernels():
+    """The elementwise part of the report as one kernel each (CuPy), in the
+    reference's operation order; products as __dmul_rn, never contracted."""
+    global _REPORT_KERNELS
+    if _REPORT_KERNELS is None:
+        import cupy as cp
+        params = ("float64 r_sum, float64 r_s, float64 tau_sum, float64 tau_s, float64 gb, "
+                  "float64 storage")
+        body = ("resid = r_sum - r_s; tol = tau_sum + tau_s; "
+                "bottom = gb + __dmul_rn(0.0, storage);")
+        _REPORT_KERNELS = (
+            cp.ElementwiseKernel(params, "float64 resid, float64 tol, float64 bottom", body,
+                                 "pt_substrate_report"),
+            cp.ElementwiseKernel(params + ", float64 s0, float64 layers",
+                                 "float64 resid, float64 tol, float64 bottom, float64 src_sum",
+                                 body + " src_sum = __dmul_rn(s0, layers) + 0.0;",
+                                 "pt_substrate_report_scalar_source"))
+    return _REPORT_KERNELS
