@@ -1,0 +1,53 @@
+         2052275 function calls (2051843 primitive calls) in 21.213 seconds
+
+   Ordered by: internal time
+   List reduced from 479 to 45 due to restriction <45>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+      456    7.243    0.016    7.520    0.016 /content/final/Palintropos/src/tropoi/physics/radiation/twostream.py:168(adding)
+      456    2.339    0.005    2.505    0.005 /content/final/Palintropos/src/tropoi/physics/radiation/kdist.py:303(_layer_k)
+    14670    1.389    0.000    1.755    0.000 /content/final/Palintropos/src/tropoi/spatial/operators/spectral_operators.py:139(sin_theta_d_theta_coeffs)
+      108    1.115    0.010    1.159    0.011 /content/final/Palintropos/src/tropoi/physics/boundary_layer.py:196(implicit_column_diffusion)
+      300    0.552    0.002    6.214    0.021 /content/final/Palintropos/src/tropoi/physics/radiation/twostream.py:227(stellar_fluxes)
+    20430    0.506    0.000    0.536    0.000 /content/final/Palintropos/src/tropoi/spatial/operators/spectral_operators.py:131(d_lambda_coeffs)
+      108    0.501    0.005    0.524    0.005 /content/final/Palintropos/src/tropoi/spatial/sigma_coordinate.py:351(vertical_advection)
+      300    0.399    0.001    0.408    0.001 /content/final/Palintropos/src/tropoi/physics/radiation/twostream.py:132(direct_layer)
+   565479    0.389    0.000    0.600    0.000 /usr/local/lib/python3.13/dist-packages/numpy/_core/numeric.py:1975(isscalar)
+     5760    0.353    0.000    0.353    0.000 /content/final/Palintropos/src/tropoi/spatial/operators/spectral_operators.py:373(_adjoint_ext)
+       72    0.343    0.005    0.939    0.013 /content/final/Palintropos/src/tropoi/spatial/operators/spectral_operators.py:354(vector_curl_div_spectral_batch)
+    11646    0.329    0.000    0.329    0.000 {method 'copy' of 'cupy._core.core._ndarray_base' objects}
+       72    0.308    0.004    0.322    0.004 /content/final/Palintropos/src/tropoi/spatial/sigma_coordinate.py:235(hydrostatic_geopotential)
+     8288    0.272    0.000    0.773    0.000 /usr/local/lib/python3.13/dist-packages/cupy/fft/_fft.py:83(_exec_fft)
+     8288    0.254    0.000    0.364    0.000 /usr/local/lib/python3.13/dist-packages/cupy/fft/_fft.py:41(_cook_shape)
+       36    0.247    0.007    0.308    0.009 /content/final/Palintropos/src/tropoi/physics/boundary_layer.py:69(boundary_layer_depth)
+       36    0.245    0.007    5.203    0.145 /content/final/Palintropos/src/tropoi/temporal/tendencies/boundary_layer.py:158(__call__)
+   654855    0.176    0.000    0.218    0.000 {built-in method builtins.isinstance}
+      456    0.167    0.000    0.169    0.000 /content/final/Palintropos/src/tropoi/physics/radiation/twostream.py:94(diffuse_layer)
+    22454    0.166    0.000    0.166    0.000 {method 'memset_async' of 'cupy.cuda.memory.MemoryPointer' objects}
+     3114    0.144    0.000    2.242    0.001 /content/final/Palintropos/src/tropoi/temporal/tendencies/primitive_equations.py:213(_deriv_fields)
+      108    0.144    0.001    0.152    0.001 /content/final/Palintropos/src/tropoi/spatial/sigma_coordinate.py:283(_thickness_weighted)
+     6524    0.144    0.000    1.512    0.000 /content/final/Palintropos/src/tropoi/spatial/transforms/separable_gauss_sh.py:293(inv_transform_batch)
+     3258    0.139    0.000    0.229    0.000 /content/final/Palintropos/src/tropoi/spatial/laplacian.py:32(invert_laplacian)
+    14982    0.132    0.000    0.378    0.000 /usr/local/lib/python3.13/dist-packages/cupy/_creation/basic.py:257(zeros_like)
+      216    0.131    0.001    1.948    0.009 /content/final/Palintropos/src/tropoi/temporal/tendencies/primitive_equations.py:704(_stack_derivs)
+    17788    0.129    0.000    0.129    0.000 /usr/local/lib/python3.13/dist-packages/cupy/_creation/basic.py:15(empty)
+     4320    0.128    0.000    0.128    0.000 /content/final/Palintropos/src/tropoi/temporal/tendencies/primitive_equations.py:530(_truncate)
+      869    0.124    0.000    0.127    0.000 {built-in method cupy._core._routines_manipulation.concatenate_method}
+       36    0.120    0.003    0.177    0.005 /content/final/Palintropos/src/tropoi/spatial/sigma_coordinate.py:444(omega_over_p)
+      312    0.112    0.000    0.135    0.000 /content/final/Palintropos/src/tropoi/physics/radiation/kdist.py:368(planck)
+     6524    0.106    0.000    0.110    0.000 /usr/local/lib/python3.13/dist-packages/cupy/fft/_fft.py:675(_compat_caster)
+     2074    0.099    0.000    0.099    0.000 {method 'sum' of 'cupy._core.core._ndarray_base' objects}
+    20105    0.098    0.000    0.100    0.000 {built-in method cupy._core.core.array}
+     8288    0.096    0.000    1.262    0.000 /usr/local/lib/python3.13/dist-packages/cupy/fft/_fft.py:221(_fft)
+     1557    0.095    0.000    2.337    0.002 /content/final/Palintropos/src/tropoi/temporal/tendencies/primitive_equations.py:221(_wind_from)
+     4296    0.087    0.000    0.097    0.000 /usr/local/lib/python3.13/dist-packages/cupy/_sorting/search.py:175(where)
+     8288    0.085    0.000    0.085    0.000 {method 'fft' of 'cupy.cuda.cufft.Plan1d' objects}
+    31880    0.072    0.000    0.149    0.000 {built-in method cupy._core._routines_manipulation._expand_dims}
+     6379    0.071    0.000    1.598    0.000 /content/final/Palintropos/src/tropoi/spatial/transforms/separable_gauss_sh.py:319(inv_transform)
+       36    0.070    0.002    0.128    0.004 /content/final/Palintropos/src/tropoi/spatial/sigma_coordinate.py:297(interface_sigma_dot)
+    15138    0.069    0.000    0.143    0.000 /usr/local/lib/python3.13/dist-packages/cupy/_creation/basic.py:37(_new_like_order_and_strides)
+      456    0.069    0.000    2.618    0.006 /content/final/Palintropos/src/tropoi/physics/radiation/kdist.py:333(_tau)
+    19722    0.067    0.000    0.067    0.000 {method 'reshape' of 'cupy._core.core._ndarray_base' objects}
+      156    0.066    0.000    0.079    0.001 /content/final/Palintropos/src/tropoi/physics/radiation/twostream.py:110(thermal_layer_sources)
+
+

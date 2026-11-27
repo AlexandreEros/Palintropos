@@ -1,0 +1,39 @@
+label                                                      calls/step    incl ms    excl ms
+physics.radiation.fluxes                                         0.33     316.70     316.70
+dynamics.tendency                                                1.00      67.60      54.19
+term.boundary_layer_diffusion                                    1.00     132.94      40.14
+transform.synthesis.scalar@term.boundary_layer_diffusion       162.00      35.22      35.22
+bl.implicit_column_diffusion                                     3.00      31.11      31.11
+term.momentum_sink_heating                                       1.00      25.54      24.93
+transform.vector_curl_div@term.boundary_layer_diffusion          1.00      12.59      12.59
+transform.vector_curl_div@dynamics.tendency                      1.00      12.19      12.19
+bl.boundary_layer_depth                                          1.00       7.78       7.78
+transform.analysis.scalar@term.boundary_layer_diffusion         42.00       5.15       5.15
+transform.synthesis.scalar@diagnostics.daily_sample             10.19       2.02       2.02
+term.column_physics_coupling                                     1.00     321.59       1.92
+dynamics.implicit_solve                                          1.00       1.92       1.92
+diagnostics.daily_sample                                         0.03       3.64       1.62
+step                                                             1.00     551.17       1.60
+physics.radiation_and_boundary                                   1.00     318.19       1.49
+transform.synthesis.scalar@term.column_physics_coupling          5.00       1.07       1.07
+output.checkpoint                                                0.03       0.91       0.91
+transform.synthesis.batch@dynamics.tendency                      1.00       0.83       0.83
+transform.synthesis.batch@term.momentum_sink_heating             1.00       0.46       0.46
+bl.exchange_coefficient                                          1.00       0.43       0.43
+transform.analysis.batch@dynamics.tendency                       1.00       0.40       0.40
+bl.diffusivity_profile                                           1.00       0.28       0.28
+transform.synthesis.batch@term.boundary_layer_diffusion          1.00       0.24       0.24
+transform.synthesis.batch@term.column_physics_coupling           1.00       0.24       0.24
+transform.analysis.batch@term.column_physics_coupling            1.00       0.16       0.16
+transform.analysis.batch@term.momentum_sink_heating              1.00       0.15       0.15
+transform.synthesis.batch@diagnostics.daily_sample               0.03       0.01       0.01
+physics.convection                                               1.00       0.00       0.00
+
+transforms by caller (ms per step; calls per step in brackets)
+  term.boundary_layer_diffusion         53.2   synthesis.scalar 35.2 [162.0]; vector_curl_div 12.6 [1.0]; analysis.scalar 5.1 [42.0]; synthesis.batch 0.2 [1.0]
+  dynamics.tendency                     13.4   vector_curl_div 12.2 [1.0]; synthesis.batch 0.8 [1.0]; analysis.batch 0.4 [1.0]
+  diagnostics.daily_sample               2.0   synthesis.scalar 2.0 [10.2]; synthesis.batch 0.0 [0.0]
+  term.column_physics_coupling           1.5   synthesis.scalar 1.1 [5.0]; synthesis.batch 0.2 [1.0]; analysis.batch 0.2 [1.0]
+  term.momentum_sink_heating             0.6   synthesis.batch 0.5 [1.0]; analysis.batch 0.1 [1.0]
+
+synchronised step: 551.2 ms

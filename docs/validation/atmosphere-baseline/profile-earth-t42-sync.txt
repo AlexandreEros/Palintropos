@@ -1,0 +1,29 @@
+label                                                      calls/step    incl ms    excl ms
+dynamics.tendency                                                1.00      44.53      34.48
+physics.radiation.fluxes                                         1.00      32.77      32.77
+term.momentum_sink_heating                                       1.00      16.86      15.27
+transform.vector_curl_div@dynamics.tendency                      1.00       7.46       7.46
+physics.convection                                               1.00       4.46       4.46
+transform.synthesis.batch@dynamics.tendency                      1.00       1.99       1.99
+term.column_physics_coupling                                     1.00      42.05       1.99
+dynamics.implicit_solve                                          1.00       1.88       1.88
+output.checkpoint                                                0.03       1.75       1.75
+step                                                             1.00     106.84       1.52
+transform.synthesis.batch@term.momentum_sink_heating             1.00       1.40       1.40
+diagnostics.daily_sample                                         0.03       2.75       1.38
+transform.synthesis.scalar@diagnostics.daily_sample              6.44       1.36       1.36
+physics.radiation_and_boundary                                   1.00      34.06       1.28
+transform.synthesis.scalar@term.column_physics_coupling          5.00       1.10       1.10
+transform.analysis.batch@dynamics.tendency                       1.00       0.60       0.60
+transform.synthesis.batch@term.column_physics_coupling           1.00       0.25       0.25
+transform.analysis.batch@term.column_physics_coupling            1.00       0.20       0.20
+transform.analysis.batch@term.momentum_sink_heating              1.00       0.20       0.20
+transform.synthesis.batch@diagnostics.daily_sample               0.03       0.01       0.01
+
+transforms by caller (ms per step; calls per step in brackets)
+  dynamics.tendency                     10.1   vector_curl_div 7.5 [1.0]; synthesis.batch 2.0 [1.0]; analysis.batch 0.6 [1.0]
+  term.momentum_sink_heating             1.6   synthesis.batch 1.4 [1.0]; analysis.batch 0.2 [1.0]
+  term.column_physics_coupling           1.6   synthesis.scalar 1.1 [5.0]; synthesis.batch 0.2 [1.0]; analysis.batch 0.2 [1.0]
+  diagnostics.daily_sample               1.4   synthesis.scalar 1.4 [6.4]; synthesis.batch 0.0 [0.0]
+
+synchronised step: 106.8 ms

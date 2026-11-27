@@ -1,0 +1,53 @@
+         544824 function calls in 4.913 seconds
+
+   Ordered by: cumulative time
+   List reduced from 435 to 45 due to restriction <45>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+        1    0.000    0.000    4.914    4.914 /content/final/Palintropos/tools/colab/radiative_pilot.py:351(stretch)
+       36    0.000    0.000    4.746    0.132 /content/final/Palintropos/src/tropoi/temporal/semi_implicit.py:546(step)
+       36    0.012    0.000    4.746    0.132 /content/final/Palintropos/src/tropoi/temporal/semi_implicit.py:578(_leapfrog)
+       36    0.003    0.000    2.039    0.057 /content/final/Palintropos/src/tropoi/temporal/tendencies/primitive_equations.py:668(tendency)
+       36    0.054    0.002    2.036    0.057 /content/final/Palintropos/src/tropoi/temporal/tendencies/primitive_equations.py:710(_tendency_batched)
+       36    0.323    0.009    1.718    0.048 /content/final/Palintropos/src/tropoi/temporal/column_coupling.py:159(__call__)
+      216    0.100    0.000    1.487    0.007 /content/final/Palintropos/src/tropoi/temporal/tendencies/primitive_equations.py:704(_stack_derivs)
+       36    0.017    0.000    1.149    0.032 /content/final/Palintropos/src/tropoi/physics/column_model.py:140(compute)
+       36    0.005    0.000    1.093    0.030 /content/final/Palintropos/src/tropoi/physics/radiation/scheme.py:290(fluxes)
+     7410    0.813    0.000    1.019    0.000 /content/final/Palintropos/src/tropoi/spatial/operators/spectral_operators.py:139(sin_theta_d_theta_coeffs)
+       72    0.796    0.011    0.828    0.011 /content/final/Palintropos/src/tropoi/physics/radiation/twostream.py:168(adding)
+       36    0.026    0.001    0.810    0.022 /content/final/Palintropos/src/tropoi/temporal/tendencies/drag.py:162(__call__)
+       36    0.006    0.000    0.580    0.016 /content/final/Palintropos/src/tropoi/physics/radiation/scheme.py:218(_stellar)
+       36    0.050    0.001    0.549    0.015 /content/final/Palintropos/src/tropoi/physics/radiation/twostream.py:227(stellar_fluxes)
+       36    0.004    0.000    0.503    0.014 /content/final/Palintropos/src/tropoi/physics/radiation/scheme.py:245(_thermal)
+       36    0.005    0.000    0.461    0.013 /content/final/Palintropos/src/tropoi/physics/radiation/twostream.py:202(thermal_fluxes)
+      108    0.385    0.004    0.402    0.004 /content/final/Palintropos/src/tropoi/spatial/sigma_coordinate.py:351(vertical_advection)
+       36    0.127    0.004    0.363    0.010 /content/final/Palintropos/src/tropoi/spatial/operators/spectral_operators.py:354(vector_curl_div_spectral_batch)
+     9210    0.259    0.000    0.274    0.000 /content/final/Palintropos/src/tropoi/spatial/operators/spectral_operators.py:131(d_lambda_coeffs)
+     7662    0.077    0.000    0.216    0.000 /usr/local/lib/python3.13/dist-packages/cupy/_creation/basic.py:257(zeros_like)
+      509    0.013    0.000    0.202    0.000 /usr/local/lib/python3.13/dist-packages/cupy/_manipulation/join.py:147(stack)
+   130962    0.111    0.000    0.183    0.000 /usr/local/lib/python3.13/dist-packages/numpy/_core/numeric.py:1975(isscalar)
+       87    0.006    0.000    0.139    0.002 /content/final/Palintropos/src/tropoi/temporal/tendencies/primitive_equations.py:221(_wind_from)
+     1800    0.137    0.000    0.137    0.000 /content/final/Palintropos/src/tropoi/spatial/operators/spectral_operators.py:373(_adjoint_ext)
+       36    0.091    0.003    0.135    0.004 /content/final/Palintropos/src/tropoi/spatial/sigma_coordinate.py:444(omega_over_p)
+      521    0.013    0.000    0.134    0.000 /content/final/Palintropos/src/tropoi/spatial/transforms/separable_gauss_sh.py:293(inv_transform_batch)
+      174    0.008    0.000    0.133    0.001 /content/final/Palintropos/src/tropoi/temporal/tendencies/primitive_equations.py:213(_deriv_fields)
+       36    0.124    0.003    0.129    0.004 /content/final/Palintropos/src/tropoi/spatial/sigma_coordinate.py:235(hydrostatic_geopotential)
+      701    0.008    0.000    0.116    0.000 /usr/local/lib/python3.13/dist-packages/cupy/fft/_fft.py:221(_fft)
+      797    0.001    0.000    0.116    0.000 /usr/local/lib/python3.13/dist-packages/cupy/_manipulation/join.py:39(concatenate)
+      797    0.112    0.000    0.115    0.000 {built-in method cupy._core._routines_manipulation.concatenate_method}
+       36    0.003    0.000    0.114    0.003 /content/final/Palintropos/src/tropoi/physics/column_model.py:226(adjust)
+      108    0.108    0.001    0.114    0.001 /content/final/Palintropos/src/tropoi/spatial/sigma_coordinate.py:283(_thickness_weighted)
+      521    0.003    0.000    0.113    0.000 /usr/local/lib/python3.13/dist-packages/cupy/fft/_fft.py:860(irfft)
+      252    0.017    0.000    0.112    0.000 /usr/local/lib/python3.13/dist-packages/cupy/linalg/_einsum.py:443(einsum)
+       36    0.001    0.000    0.111    0.003 /content/final/Palintropos/src/tropoi/physics/convection.py:107(adjust)
+       36    0.086    0.002    0.110    0.003 /content/final/Palintropos/src/tropoi/physics/convection.py:43(neutral_profile)
+        1    0.001    0.001    0.110    0.110 /content/final/Palintropos/src/tropoi/run/radiative/experiment.py:142(_sample)
+      412    0.000    0.000    0.109    0.000 /content/final/Palintropos/src/tropoi/spatial/grids/latlon_grid.py:291(inv_transform)
+      412    0.005    0.000    0.109    0.000 /content/final/Palintropos/src/tropoi/spatial/transforms/separable_gauss_sh.py:319(inv_transform)
+    16325    0.012    0.000    0.105    0.000 /usr/local/lib/python3.13/dist-packages/cupy/_manipulation/dims.py:134(expand_dims)
+       36    0.001    0.000    0.101    0.003 /content/final/Palintropos/src/tropoi/temporal/semi_implicit.py:375(advance)
+       36    0.038    0.001    0.100    0.003 /content/final/Palintropos/src/tropoi/temporal/semi_implicit.py:415(_advance_centred)
+       36    0.053    0.001    0.098    0.003 /content/final/Palintropos/src/tropoi/spatial/sigma_coordinate.py:297(interface_sigma_dot)
+    16325    0.046    0.000    0.094    0.000 {built-in method cupy._core._routines_manipulation._expand_dims}
+
+
