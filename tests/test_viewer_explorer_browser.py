@@ -317,6 +317,15 @@ def test_pending_request_never_draws_stale_data(browser):
             # Returning to the loaded column while a new mean is pending shows the column at once.
             explore(page, "preset", "column")
             until(page, READY + " && viewer.explorer.spec.kind === 'line'")
+            # A mean requested and abandoned before it arrives never replaces the column on hand.
+            explore(page, "preset", "zonal_mean")
+            until(page, "held.length === 1")
+            explore(page, "preset", "column")
+            until(page, READY + " && viewer.explorer.spec.kind === 'line'")
+            page.eval("held.shift()()")
+            page.eval("new Promise(resolve => setTimeout(resolve, 400))")
+            assert page.eval("viewer.explorer.spec.kind") == "line"
+            assert page.eval(f"{LOADED}.longitude.role") == "fixed"
             set_control(page, "time", 7, "input")
             until(page, f"{LOADED}?.time.index === 7 && " + READY)
             assert page.eval("viewer.explorer.spec.kind") == "line"

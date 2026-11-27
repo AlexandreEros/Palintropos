@@ -224,12 +224,17 @@ function drawLine(canvas, plot, width, ratio) {
   const ca = plot.coordinate, cs = ca.values.map(v => unit(ca, v));
   const vs = plot.values;
   const markerC = (plot.markers || []).map(m => unit(ca, m.position)), markerV = (plot.markers || []).map(m => m.value);
-  const finite = a => a.filter(Number.isFinite);
-  let [vlo, vhi] = [Math.min(...finite([...vs, ...markerV])), Math.max(...finite([...vs, ...markerV]))];
+  // Bounds by loop: long records exceed the argument limit of Math.min(...values).
+  const bounds = arrays => {
+    let lo = Infinity, hi = -Infinity;
+    for (const a of arrays) for (const v of a) if (Number.isFinite(v)) { if (v < lo) lo = v; if (v > hi) hi = v; }
+    return [lo, hi];
+  };
+  let [vlo, vhi] = bounds([vs, markerV]);
   if (plot.diverging) { vlo = Math.min(vlo, 0); vhi = Math.max(vhi, 0); }
   if (vlo === vhi) { vlo -= 1; vhi += 1; }
   const pad = (vhi - vlo) * 0.06; vlo -= pad; vhi += pad;
-  let [clo, chi] = [Math.min(...finite([...cs, ...markerC])), Math.max(...finite([...cs, ...markerC]))];
+  let [clo, chi] = bounds([cs, markerC]);
   if (clo === chi) { clo -= 1; chi += 1; }
   const along = c => (c - clo) / (chi - clo), across = v => (v - vlo) / (vhi - vlo);
   // A profile puts the coordinate on Y (downward axes grow downward) and the value on X.
@@ -646,7 +651,12 @@ export class Explorer {
       return;
     }
     const key = JSON.stringify(selection);
-    if (key === this.loaded && this.data) { this.status(""); this.draw(); return; }
+    if (key === this.loaded && this.data) {
+      // Back to what is on hand: a request still in flight is for something else.
+      this.abort?.abort(); this.pending = null;
+      this.status(""); this.c.png.disabled = false; this.draw();
+      return;
+    }
     if (key === this.pending) return;
     this.pending = key;
     this.abort?.abort();
