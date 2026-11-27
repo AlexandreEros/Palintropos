@@ -112,7 +112,7 @@
     }
   },
   "discovered": {
-    "classes": 245,
+    "classes": 246,
     "cli_handlers": {
       "cli-capsule-command": "tropoi.cli.capsule._command",
       "cli-gen": "tropoi.cli.main._cmd_gen",
@@ -264,16 +264,16 @@
         "tropoi.temporal.hooks.rk4_real_axis_limit"
       ]
     },
-    "functions": 1972,
-    "modules": 197,
+    "functions": 1977,
+    "modules": 198,
     "packages": 30
   },
   "limits": {
     "call_sites": {
-      "builtin": 4502,
-      "external": 2906,
-      "internal": 3420,
-      "unresolved": 4673
+      "builtin": 4513,
+      "external": 2916,
+      "internal": 3432,
+      "unresolved": 4679
     },
     "dynamic_import_sites": {
       "tropoi.representation.archive.writer": 1
@@ -649,14 +649,14 @@
         ]
       }
     },
-    "classes": 245,
+    "classes": 246,
     "classes_in_inheritance_overview": 21,
     "containment": {
-      "class": 245,
-      "module": 114,
+      "class": 246,
+      "module": 115,
       "package": 23
     },
-    "modules": 197,
+    "modules": 198,
     "package_pages": 30
   },
   "rules": {

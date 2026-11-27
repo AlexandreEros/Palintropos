@@ -115,7 +115,7 @@ def test_airless_run_on_gauss_columns_and_its_replay(tmp_path):
     cols = build_columns(cfg)
     assert cols.kind == "global"
     np.testing.assert_array_equal(cols.lat, ColumnSet.gauss(4, 8, cfg.radius_m).lat)
-    AirlessRun(cfg, tmp_path / "run", allow_dirty=True, log=lambda s: None,
+    AirlessRun(cfg, tmp_path / "run", backend="numpy", allow_dirty=True, log=lambda s: None,
                workers=2).run_transient(24)
     grid = np.load(tmp_path / "run" / "grid.npz")
     assert str(grid["column_kind"]) == "global"

@@ -4341,6 +4341,16 @@
       "external_bases": [
         "RuntimeError"
       ],
+      "id": "tropoi.run.execution.ExecutionError",
+      "members": [],
+      "module": "tropoi.run.execution",
+      "qualname": "ExecutionError"
+    },
+    {
+      "decorators": [],
+      "external_bases": [
+        "RuntimeError"
+      ],
       "id": "tropoi.run.held_suarez.checkpoint.CheckpointError",
       "members": [],
       "module": "tropoi.run.held_suarez.checkpoint",

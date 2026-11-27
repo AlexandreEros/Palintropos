@@ -1944,6 +1944,14 @@
     {
       "kind": "imports",
       "scopes": [
+        "function"
+      ],
+      "source": "tropoi.run.airless.__main__",
+      "target": "tropoi.run.execution"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
         "module"
       ],
       "source": "tropoi.run.airless.config",
@@ -1982,6 +1990,14 @@
       ],
       "source": "tropoi.run.airless.experiment",
       "target": "tropoi.run.airless.config"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.run.airless.experiment",
+      "target": "tropoi.run.execution"
     },
     {
       "kind": "imports",
@@ -5698,6 +5714,23 @@
         "__future__"
       ],
       "third_party_imports": []
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.run.execution",
+      "is_package": false,
+      "path": "tropoi/run/execution.py",
+      "stdlib_imports": [
+        "__future__",
+        "os",
+        "platform",
+        "typing"
+      ],
+      "third_party_imports": [
+        "cupy",
+        "numpy"
+      ]
     },
     {
       "category": "code",
