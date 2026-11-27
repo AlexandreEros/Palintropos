@@ -20,6 +20,20 @@ relies on:
 | `n_points`, `grid_shape` | Sample count; `(nlat, nlon)` for structured grids, `None` otherwise |
 | `cfl_length_scale` | Advective length for the timestep ceiling. `None` means "none defined", and callers then use an explicit fallback rather than guess |
 
+## Canonical quadrature (CPU-only)
+
+[`quadrature.py`](quadrature.py) is NumPy-only and never imports CuPy. It is
+the single construction of the Gauss–Legendre nodes and weights.
+`GaussLatLonGridGeometry`, the airless runner's `gauss` columns and the
+diagnostics all take theirs from it, so they agree bit for bit in
+coordinates, ordering (north to south, longitudes from 0, lat-major) and
+physical weights `W_ij = R² (2π/N_lon) w_i`.
+
+`ColumnSet` distinguishes a **global** discretization, whose area weights
+tile the sphere and are checked on construction, from a **diagnostic**
+point collection, which has no weights. Vertical column meshes live
+alongside in [`../vertical.py`](../vertical.py).
+
 ## Production geometries
 
 | Geometry | Points | Weights | Exactness | CFL length |

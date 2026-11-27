@@ -75,8 +75,10 @@ class AirlessConfig:
     * ``strata``: material strata in :meth:`Stratum.to_dict` form, top to
       bottom. The last ``bottom`` is the column depth.
     * ``columns``: ``{"kind": "latlon", "nlat", "nlon"}`` (regular,
-      cell-centred, latitudes south to north, east longitudes from 0) or
-      ``{"kind": "points", "lat_deg": [...], "lon_deg": [...]}``.
+      cell-centred, latitudes south to north, east longitudes from 0),
+      ``{"kind": "gauss", "nlat", "nlon"}`` (the spectral models' Gauss grid:
+      the same nodes, ordering and weights, no spectral transform), or
+      ``{"kind": "points", "lat_deg": [...], "lon_deg": [...]}`` (diagnostic).
     * ``vertical``: ``{"top_thickness", "max_stretch"}``.
     * ``cycle_steps``: steps per illumination cycle at the production
       timestep. ``spinup_cycle_steps`` is the coarse spin-up count, or None

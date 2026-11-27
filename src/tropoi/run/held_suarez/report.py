@@ -317,7 +317,8 @@ def _ours_summary(run: dict, lat_ref: np.ndarray) -> dict:
 
 
 def _gauss_weights(lat_deg: np.ndarray) -> np.ndarray:
-    x, w = np.polynomial.legendre.leggauss(lat_deg.size)
+    from tropoi.spatial.grids.quadrature import gauss_legendre
+    x, w = gauss_legendre(lat_deg.size)
     lat_g = np.degrees(np.arcsin(x))
     if np.allclose(np.sort(lat_g), np.sort(lat_deg), atol=1e-6):
         return w[np.argsort(lat_g)] / 2.0 if np.all(np.diff(lat_deg) > 0) else w / 2.0

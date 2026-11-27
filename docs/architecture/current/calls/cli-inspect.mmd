@@ -63,6 +63,10 @@ flowchart LR
     subgraph g_tropoi_ospatial_oenvironment["spatial.environment"]
         n_tropoi_ospatial_oenvironment_oPlanetaryParameters_ofrom__earth__like["PlanetaryParameters.from#95;earth#95;like()"]
     end
+    subgraph g_tropoi_ospatial_ogrids_oquadrature["spatial.grids.quadrature"]
+        n_tropoi_ospatial_ogrids_oquadrature_ogauss__latitude__nodes["gauss#95;latitude#95;nodes()"]
+        n_tropoi_ospatial_ogrids_oquadrature_ogauss__latitudes["gauss#95;latitudes()"]
+    end
     subgraph g_tropoi_ospatial_omodes["spatial.modes"]
         n_tropoi_ospatial_omodes_oFieldSpec{{"FieldSpec"}}
         n_tropoi_ospatial_omodes_oFieldSpec_ofrom__dict["FieldSpec.from#95;dict()"]
@@ -123,6 +127,7 @@ flowchart LR
     n_tropoi_orepresentation_oarchive_oschema_ostate__schema__for --> n_tropoi_orepresentation_oarchive_oschema_o__pe__fields
     n_tropoi_orepresentation_oarchive_oschema_ostate__schema__for --> n_tropoi_orepresentation_oarchive_oschema_o__swe__fields
     n_tropoi_orepresentation_oarchive_oviewer__diagnostics_odiagnostics --> n_tropoi_orepresentation_oarchive_olocal__resource_oresource
+    n_tropoi_orepresentation_oarchive_oviewer__diagnostics_odiagnostics --> n_tropoi_ospatial_ogrids_oquadrature_ogauss__latitudes
     n_tropoi_orepresentation_oarchive_oviewer__manifest_o__derived__fields --> n_tropoi_orepresentation_ovisual_oquantities_oquantity
     n_tropoi_orepresentation_oarchive_oviewer__manifest_o__derived__fields --> n_tropoi_orepresentation_ovisual_oquantities_oviewer__presentation
     n_tropoi_orepresentation_oarchive_oviewer__manifest_oviewer__manifest --> n_tropoi_orepresentation_oarchive_ocapsule_oopen__storage
@@ -134,6 +139,7 @@ flowchart LR
     n_tropoi_orepresentation_oarchive_oviewer__manifest_oviewer__manifest --> n_tropoi_orepresentation_ovisual_oquantities_oviewer__presentation
     n_tropoi_orepresentation_oarchive_oviewer__manifest_oviewer__manifest --> n_tropoi_ospatial_oenvironment_oPlanetaryParameters_ofrom__earth__like
     n_tropoi_orepresentation_ovisual_oquantities_oquantity -->|instantiate| n_tropoi_orepresentation_ovisual_oquantities_oQuantityUnavailableError
+    n_tropoi_ospatial_ogrids_oquadrature_ogauss__latitudes --> n_tropoi_ospatial_ogrids_oquadrature_ogauss__latitude__nodes
     n_tropoi_otemporal_osimulation_oSimulation -->|#95;#95;init#95;#95;| n_tropoi_otemporal_osimulation_oSimulation_o____init____
     classDef root stroke-width:3px
     classDef truncated stroke-dasharray:4 3
@@ -141,3 +147,4 @@ flowchart LR
     class n_tropoi_orepresentation_oarchive_ocapsule_oCapsuleStorage_o____init____ truncated
     class n_tropoi_orepresentation_oarchive_oheld__suarez_oHeldSuarezStorage_o____init____ truncated
     class n_tropoi_orepresentation_oarchive_oradiative_oRadiativeStorage_o____init____ truncated
+    class n_tropoi_ospatial_ogrids_oquadrature_ogauss__latitude__nodes truncated

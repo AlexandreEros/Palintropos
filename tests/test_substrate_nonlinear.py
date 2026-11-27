@@ -15,9 +15,16 @@ import pytest
 
 from tropoi.physics.constants import SIGMA_SB
 from tropoi.physics.materials import (CellMaterials, DepthProfile, PolynomialHeatCapacity,
-                                      Stratum, stratified_interfaces)
+                                      Stratum)
+from tropoi.spatial.vertical import stratified_interfaces
 from tropoi.physics.substrate import (ConductiveSubstrate, SubstrateSolveError,
                                       ENERGY_REFERENCE_TEMPERATURE as REF)
+
+
+def _mesh(strata, top_thickness, max_stretch):
+    """The stratified mesh of ``strata`` (the spatial layer's construction,
+    as the airless runner builds it)."""
+    return stratified_interfaces([s.bottom for s in strata], top_thickness, max_stretch)
 
 TR = 350.0
 CHI = 2.0          # one chi in both strata keeps the manufactured interface exact
@@ -75,7 +82,7 @@ def test_strata_must_lie_on_faces_and_grids_honour_boundaries():
     assert any(math.isclose(e, 0.03, rel_tol=1e-12) for e in edges)
     dz = np.diff(edges)
     assert dz[0] == pytest.approx(1e-3) and edges[-1] == 0.25
-    sub = ConductiveSubstrate(strata, top_thickness=1e-3, max_stretch=1.2)
+    sub = ConductiveSubstrate(strata, interfaces=_mesh(strata, 1e-3, 1.2))
     assert sub.materials.stratum_of_cell[0] == 0 and sub.materials.stratum_of_cell[-1] == 1
 
 
@@ -281,7 +288,7 @@ def test_vanishing_conductivity_tends_to_radiative_equilibrium():
     gaps = []
     for scale in (1e-2, 1e-4, 1e-6, 1e-8):
         strata = [Stratum(0.5, 1500.0, 0.01 * scale, (700.0,), radiative_coefficient=1.0)]
-        sub = ConductiveSubstrate(strata, top_thickness=1e-3, max_stretch=1.2,
+        sub = ConductiveSubstrate(strata, interfaces=_mesh(strata, 1e-3, 1.2),
                                   albedo=ALBEDO, emissivity=EMISS, bottom_heat_flux=0.0,
                                   initial_temperature=100.0)
         st = sub.initial_state(1)
@@ -290,7 +297,7 @@ def test_vanishing_conductivity_tends_to_radiative_equilibrium():
         gaps.append(t_eq - float(sub.surface_temperature(st)[0]))
     assert all(g > 0 for g in gaps) and all(b < a for a, b in zip(gaps, gaps[1:]))
     tiny = [Stratum(0.5, 1500.0, 1e-30, (700.0,))]
-    sub = ConductiveSubstrate(tiny, top_thickness=1e-3, max_stretch=1.2, albedo=ALBEDO,
+    sub = ConductiveSubstrate(tiny, interfaces=_mesh(tiny, 1e-3, 1.2), albedo=ALBEDO,
                               emissivity=EMISS, initial_temperature=100.0)
     st, _ = sub.step(sub.initial_state(1), 60.0, shortwave_down=F)
     assert float(sub.surface_temperature(st)[0]) == pytest.approx(t_eq, rel=1e-12)
@@ -342,7 +349,7 @@ def test_constant_property_linear_problem_is_one_newton_step(h):
 # -- 6: stress and failure reporting ------------------------------------------------------
 
 def test_cold_start_into_perihelion_noon():
-    sub = ConductiveSubstrate(_two_strata(), top_thickness=5e-4, max_stretch=1.2,
+    sub = ConductiveSubstrate(_two_strata(), interfaces=_mesh(_two_strata(), 5e-4, 1.2),
                               albedo=ALBEDO, emissivity=EMISS, initial_temperature=40.0,
                               bottom_heat_flux=0.02)
     st = sub.initial_state(3)
@@ -354,7 +361,7 @@ def test_cold_start_into_perihelion_noon():
     print("iterations per step", iters)
     assert max(iters) <= 30
     with pytest.raises(SubstrateSolveError, match=r"columns \(first \[0, 1"):
-        weak = ConductiveSubstrate(_two_strata(), top_thickness=5e-4, max_stretch=1.2,
+        weak = ConductiveSubstrate(_two_strata(), interfaces=_mesh(_two_strata(), 5e-4, 1.2),
                                    albedo=ALBEDO, emissivity=EMISS, initial_temperature=40.0,
                                    max_iterations=1)
         weak.step(weak.initial_state(3), 3600.0, shortwave_down=np.array([14500.0, 7000.0, 0.0]))
@@ -364,7 +371,7 @@ def test_cold_start_into_perihelion_noon():
 
 def test_energy_identity_and_cumulative_closure_under_random_forcing():
     rng = np.random.default_rng(5)
-    sub = ConductiveSubstrate(_two_strata(), top_thickness=1e-3, max_stretch=1.25,
+    sub = ConductiveSubstrate(_two_strata(), interfaces=_mesh(_two_strata(), 1e-3, 1.25),
                               albedo=ALBEDO, emissivity=EMISS, initial_temperature=250.0)
     n = 3
     st = sub.initial_state(n)
@@ -396,7 +403,7 @@ def test_energy_identity_and_cumulative_closure_under_random_forcing():
 # -- 8: validity ranges ---------------------------------------------------------------------
 
 def test_stratum_extents_are_recorded_for_validity_checks():
-    sub = ConductiveSubstrate(_two_strata(), top_thickness=1e-3, max_stretch=1.25,
+    sub = ConductiveSubstrate(_two_strata(), interfaces=_mesh(_two_strata(), 1e-3, 1.25),
                               albedo=ALBEDO, emissivity=EMISS, initial_temperature=150.0)
     st, report = sub.step(sub.initial_state(2), 3600.0, shortwave_down=np.array([9000.0, 0.0]))
     (lo0, hi0), (lo1, hi1) = report.extent

@@ -1046,11 +1046,6 @@
       "target": "tropoi.physics.materials.SaturatingExponentialHeatCapacity"
     },
     {
-      "kind": "call",
-      "source": "tropoi.physics.materials.stratified_interfaces",
-      "target": "tropoi.physics.substrate.geometric_interfaces"
-    },
-    {
       "kind": "constructor",
       "source": "tropoi.physics.monin_obukhov.MoninObukhovConvergenceError",
       "target": "tropoi.physics.monin_obukhov.MoninObukhovConvergenceError.__init__"
@@ -1841,11 +1836,6 @@
       "target": "tropoi.physics.materials.CellMaterials.on_grid"
     },
     {
-      "kind": "call",
-      "source": "tropoi.physics.substrate.ConductiveSubstrate.__init__",
-      "target": "tropoi.physics.materials.stratified_interfaces"
-    },
-    {
       "kind": "self",
       "source": "tropoi.physics.substrate.ConductiveSubstrate._report",
       "target": "tropoi.physics.substrate.ConductiveSubstrate._temperature_extent"
@@ -1894,11 +1884,6 @@
       "kind": "call",
       "source": "tropoi.physics.substrate.ConductiveSubstrate.constant",
       "target": "tropoi.physics.materials.Stratum.volumetric"
-    },
-    {
-      "kind": "call",
-      "source": "tropoi.physics.substrate.ConductiveSubstrate.constant",
-      "target": "tropoi.physics.substrate.geometric_interfaces"
     },
     {
       "kind": "self",
@@ -1964,16 +1949,6 @@
       "kind": "call",
       "source": "tropoi.physics.substrate.ConductiveSubstrate.step",
       "target": "tropoi.physics.substrate._xp"
-    },
-    {
-      "kind": "call",
-      "source": "tropoi.physics.substrate.geometric_interfaces",
-      "target": "tropoi.physics.substrate._checked"
-    },
-    {
-      "kind": "call",
-      "source": "tropoi.physics.substrate.geometric_interfaces",
-      "target": "tropoi.physics.substrate._geometric_sum"
     },
     {
       "kind": "constructor",
@@ -2922,6 +2897,11 @@
     },
     {
       "kind": "call",
+      "source": "tropoi.representation.archive.viewer_diagnostics.diagnostics",
+      "target": "tropoi.spatial.grids.quadrature.gauss_latitudes"
+    },
+    {
+      "kind": "call",
       "source": "tropoi.representation.archive.viewer_manifest._derived_fields",
       "target": "tropoi.representation.visual.quantities.quantity"
     },
@@ -3209,6 +3189,11 @@
       "kind": "instantiate",
       "source": "tropoi.representation.diagnostics.held_suarez_sections.gaussian_latitudes_deg",
       "target": "tropoi.representation.diagnostics.held_suarez_sections.SectionError"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.diagnostics.held_suarez_sections.gaussian_latitudes_deg",
+      "target": "tropoi.spatial.grids.quadrature.gauss_latitudes"
     },
     {
       "kind": "instantiate",
@@ -6922,6 +6907,11 @@
     },
     {
       "kind": "call",
+      "source": "tropoi.representation.visual.viewer_fields._cone_coefficients",
+      "target": "tropoi.spatial.grids.quadrature.gauss_legendre"
+    },
+    {
+      "kind": "call",
       "source": "tropoi.representation.visual.viewer_fields._slab_map",
       "target": "tropoi.representation.diagnostics.held_suarez_sections.state_grid"
     },
@@ -7166,11 +7156,6 @@
       "target": "tropoi.run.airless.experiment.build_substrate"
     },
     {
-      "kind": "call",
-      "source": "tropoi.run.airless.experiment.AirlessRun.__init__",
-      "target": "tropoi.run.airless.experiment.column_kind"
-    },
-    {
       "kind": "instantiate",
       "source": "tropoi.run.airless.experiment.AirlessRun.__init__",
       "target": "tropoi.run.held_suarez.experiment.RunError"
@@ -7306,6 +7291,21 @@
       "target": "tropoi.run.airless.experiment.run_block"
     },
     {
+      "kind": "call",
+      "source": "tropoi.run.airless.experiment.build_columns",
+      "target": "tropoi.spatial.grids.quadrature.ColumnSet.gauss"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.airless.experiment.build_columns",
+      "target": "tropoi.spatial.grids.quadrature.ColumnSet.points"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.airless.experiment.build_columns",
+      "target": "tropoi.spatial.grids.quadrature.ColumnSet.regular"
+    },
+    {
       "kind": "instantiate",
       "source": "tropoi.run.airless.experiment.build_substrate",
       "target": "tropoi.physics.substrate.ConductiveSubstrate"
@@ -7314,6 +7314,11 @@
       "kind": "call",
       "source": "tropoi.run.airless.experiment.build_substrate",
       "target": "tropoi.run.airless.config.strata_from_dicts"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.airless.experiment.build_substrate",
+      "target": "tropoi.spatial.vertical.stratified_interfaces"
     },
     {
       "kind": "call",
@@ -8847,6 +8852,11 @@
     },
     {
       "kind": "call",
+      "source": "tropoi.run.held_suarez.report._gauss_weights",
+      "target": "tropoi.spatial.grids.quadrature.gauss_legendre"
+    },
+    {
+      "kind": "call",
       "source": "tropoi.run.held_suarez.report._tier",
       "target": "tropoi.run.held_suarez.report.worst"
     },
@@ -10156,6 +10166,16 @@
       "target": "tropoi.spatial.grids.latlon_grid.GaussLatLonGridGeometry.__init__"
     },
     {
+      "kind": "call",
+      "source": "tropoi.spatial.grids.latlon_grid.GaussLatLonGridGeometry.__init__",
+      "target": "tropoi.spatial.grids.quadrature.gauss_latitude_nodes"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.spatial.grids.latlon_grid.GaussLatLonGridGeometry.__init__",
+      "target": "tropoi.spatial.grids.quadrature.gauss_longitudes"
+    },
+    {
       "kind": "constructor",
       "source": "tropoi.spatial.grids.latlon_grid.GaussLatLonSphericalHarmonics",
       "target": "tropoi.spatial.grids.latlon_grid.GaussLatLonSphericalHarmonics.__init__"
@@ -10179,6 +10199,31 @@
       "kind": "call",
       "source": "tropoi.spatial.grids.latlon_grid.GaussLatLonSphericalHarmonics.__init__",
       "target": "tropoi.spatial.transforms.separable_gauss_sh.separable_is_applicable"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.spatial.grids.quadrature.ColumnSet.gauss",
+      "target": "tropoi.spatial.grids.quadrature.gauss_latitude_nodes"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.spatial.grids.quadrature.ColumnSet.gauss",
+      "target": "tropoi.spatial.grids.quadrature.gauss_latitudes"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.spatial.grids.quadrature.ColumnSet.gauss",
+      "target": "tropoi.spatial.grids.quadrature.gauss_longitudes"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.spatial.grids.quadrature.gauss_latitude_nodes",
+      "target": "tropoi.spatial.grids.quadrature.gauss_legendre"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.spatial.grids.quadrature.gauss_latitudes",
+      "target": "tropoi.spatial.grids.quadrature.gauss_latitude_nodes"
     },
     {
       "kind": "call",
@@ -11644,6 +11689,21 @@
       "kind": "call",
       "source": "tropoi.spatial.truncation.require_thermal_wave_support",
       "target": "tropoi.spatial.truncation.product_truncation_cut"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.spatial.vertical.geometric_interfaces",
+      "target": "tropoi.spatial.vertical._checked"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.spatial.vertical.geometric_interfaces",
+      "target": "tropoi.spatial.vertical._geometric_sum"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.spatial.vertical.stratified_interfaces",
+      "target": "tropoi.spatial.vertical.geometric_interfaces"
     },
     {
       "kind": "constructor",
@@ -14104,13 +14164,6 @@
       "type": "function"
     },
     {
-      "id": "tropoi.physics.materials.stratified_interfaces",
-      "kind": "function",
-      "module": "tropoi.physics.materials",
-      "qualname": "stratified_interfaces",
-      "type": "function"
-    },
-    {
       "id": "tropoi.physics.monin_obukhov.MoninObukhovConvergenceError",
       "kind": "class",
       "module": "tropoi.physics.monin_obukhov",
@@ -15805,20 +15858,6 @@
       "type": "class"
     },
     {
-      "id": "tropoi.physics.substrate._checked",
-      "kind": "function",
-      "module": "tropoi.physics.substrate",
-      "qualname": "_checked",
-      "type": "function"
-    },
-    {
-      "id": "tropoi.physics.substrate._geometric_sum",
-      "kind": "function",
-      "module": "tropoi.physics.substrate",
-      "qualname": "_geometric_sum",
-      "type": "function"
-    },
-    {
       "id": "tropoi.physics.substrate._host",
       "kind": "function",
       "module": "tropoi.physics.substrate",
@@ -15837,13 +15876,6 @@
       "kind": "function",
       "module": "tropoi.physics.substrate",
       "qualname": "_xp",
-      "type": "function"
-    },
-    {
-      "id": "tropoi.physics.substrate.geometric_interfaces",
-      "kind": "function",
-      "module": "tropoi.physics.substrate",
-      "qualname": "geometric_interfaces",
       "type": "function"
     },
     {
@@ -21657,13 +21689,6 @@
       "type": "function"
     },
     {
-      "id": "tropoi.run.airless.experiment.column_kind",
-      "kind": "function",
-      "module": "tropoi.run.airless.experiment",
-      "qualname": "column_kind",
-      "type": "function"
-    },
-    {
       "id": "tropoi.run.airless.experiment.load_tier2",
       "kind": "function",
       "module": "tropoi.run.airless.experiment",
@@ -24114,6 +24139,76 @@
       "type": "function"
     },
     {
+      "id": "tropoi.spatial.grids.quadrature.ColumnSet",
+      "kind": "class",
+      "module": "tropoi.spatial.grids.quadrature",
+      "qualname": "ColumnSet",
+      "type": "class"
+    },
+    {
+      "id": "tropoi.spatial.grids.quadrature.ColumnSet.__post_init__",
+      "kind": "method",
+      "module": "tropoi.spatial.grids.quadrature",
+      "qualname": "ColumnSet.__post_init__",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.spatial.grids.quadrature.ColumnSet.gauss",
+      "kind": "classmethod",
+      "module": "tropoi.spatial.grids.quadrature",
+      "qualname": "ColumnSet.gauss",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.spatial.grids.quadrature.ColumnSet.points",
+      "kind": "classmethod",
+      "module": "tropoi.spatial.grids.quadrature",
+      "qualname": "ColumnSet.points",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.spatial.grids.quadrature.ColumnSet.regular",
+      "kind": "classmethod",
+      "module": "tropoi.spatial.grids.quadrature",
+      "qualname": "ColumnSet.regular",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.spatial.grids.quadrature.ColumnSet.size",
+      "kind": "property",
+      "module": "tropoi.spatial.grids.quadrature",
+      "qualname": "ColumnSet.size",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.spatial.grids.quadrature.gauss_latitude_nodes",
+      "kind": "function",
+      "module": "tropoi.spatial.grids.quadrature",
+      "qualname": "gauss_latitude_nodes",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.spatial.grids.quadrature.gauss_latitudes",
+      "kind": "function",
+      "module": "tropoi.spatial.grids.quadrature",
+      "qualname": "gauss_latitudes",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.spatial.grids.quadrature.gauss_legendre",
+      "kind": "function",
+      "module": "tropoi.spatial.grids.quadrature",
+      "qualname": "gauss_legendre",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.spatial.grids.quadrature.gauss_longitudes",
+      "kind": "function",
+      "module": "tropoi.spatial.grids.quadrature",
+      "qualname": "gauss_longitudes",
+      "type": "function"
+    },
+    {
       "id": "tropoi.spatial.initialization.bve._equatorial_vortices",
       "kind": "function",
       "module": "tropoi.spatial.initialization.bve",
@@ -26330,6 +26425,34 @@
       "kind": "function",
       "module": "tropoi.spatial.truncation",
       "qualname": "require_thermal_wave_support",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.spatial.vertical._checked",
+      "kind": "function",
+      "module": "tropoi.spatial.vertical",
+      "qualname": "_checked",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.spatial.vertical._geometric_sum",
+      "kind": "function",
+      "module": "tropoi.spatial.vertical",
+      "qualname": "_geometric_sum",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.spatial.vertical.geometric_interfaces",
+      "kind": "function",
+      "module": "tropoi.spatial.vertical",
+      "qualname": "geometric_interfaces",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.spatial.vertical.stratified_interfaces",
+      "kind": "function",
+      "module": "tropoi.spatial.vertical",
+      "qualname": "stratified_interfaces",
       "type": "function"
     },
     {

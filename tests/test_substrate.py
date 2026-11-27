@@ -17,18 +17,23 @@ import sys
 import numpy as np
 import pytest
 
-from tropoi.physics.substrate import (ConductiveSubstrate, ENERGY_REFERENCE_TEMPERATURE,
-                                      geometric_interfaces)
+from tropoi.physics.substrate import ConductiveSubstrate, ENERGY_REFERENCE_TEMPERATURE
 from tropoi.physics.surface import SlabSurface
+from tropoi.spatial.vertical import geometric_interfaces
+
+#: The THAI test column's mesh: 30 layers from a 2 cm top cell to 3.5 m. It is
+#: an explicit test configuration, not a default of the substrate.
+THAI_GRID = geometric_interfaces(0.02, 3.5, layers=30)
 
 
 def _prescribed(**kw):
     """A constant-property column with a non-radiating surface: the forcing
-    is the prescribed flux alone."""
+    is the prescribed flux alone. The mesh defaults to THAI_GRID here."""
+    kw.setdefault("interfaces", THAI_GRID)
     return ConductiveSubstrate.constant(emissivity=0.0, **kw)
 
 
-def test_default_layering_is_thai_column():
+def test_thai_test_column_layering():
     sub = _prescribed()
     assert sub.layers == 30
     assert sub.interfaces[0] == 0.0 and sub.interfaces[-1] == 3.5
@@ -107,7 +112,7 @@ def test_layers_mode_near_uniform_and_argument_checks():
         with pytest.raises((ValueError, TypeError)):
             geometric_interfaces(0.02, 3.5, layers=bad)
     with pytest.raises(ValueError):
-        ConductiveSubstrate.constant(layers=29.9)
+        geometric_interfaces(0.02, 3.5, layers=29.9)
 
 
 def test_generated_grids_never_leave_the_ratio_bounds():
@@ -135,13 +140,16 @@ def test_generated_grids_never_leave_the_ratio_bounds():
     assert accepted > 0 and rejected > 0
 
 
-def test_constructor_rejects_conflicting_geometry():
-    for kwargs in (dict(interfaces=(0.0, 1.0), depth=3.5), dict(interfaces=(0.0, 1.0), layers=1),
-                   dict(interfaces=(0.0, 1.0), top_thickness=0.02),
-                   dict(interfaces=(0.0, 1.0), stretch=1.1), dict(layers=18, stretch=1.2)):
-        with pytest.raises(ValueError):
-            ConductiveSubstrate.constant(**kwargs)
-    sub = ConductiveSubstrate.constant(stretch=1.2, depth=1.0, top_thickness=0.1)
+def test_substrate_takes_an_explicit_mesh_only():
+    """The substrate never builds its own mesh (spatial discretization is
+    the caller's): interfaces are required, and mesh-building arguments are
+    not accepted."""
+    with pytest.raises(TypeError):
+        ConductiveSubstrate.constant()
+    for kwargs in (dict(depth=3.5), dict(layers=30), dict(top_thickness=0.02), dict(stretch=1.1)):
+        with pytest.raises(TypeError):
+            ConductiveSubstrate.constant(interfaces=(0.0, 1.0), **kwargs)
+    sub = ConductiveSubstrate.constant(interfaces=geometric_interfaces(0.1, 1.0, stretch=1.2))
     assert sub.layers == 6 and sub.depth == 1.0
 
 
@@ -151,7 +159,7 @@ def test_constructor_rejects_nonfinite_parameters():
                    dict(albedo=float("nan")), dict(volumetric_heat_capacity=float("inf")),
                    dict(thermal_inertia=2000.0, conductivity=2.0)):
         with pytest.raises(ValueError):
-            ConductiveSubstrate.constant(**kwargs)
+            ConductiveSubstrate.constant(**{"interfaces": THAI_GRID, **kwargs})
 
 
 def test_step_rejects_invalid_inputs():
@@ -181,8 +189,9 @@ def test_historical_grids_fixture():
     fx = _fixture()
     assert fx["source_commit"].startswith("cc33bfb")
     grids = fx["grids"]
-    # The production default is bitwise the grid the original run used.
-    assert list(ConductiveSubstrate.constant().interfaces) == grids["default"]
+    # The THAI recipe (30 layers, 2 cm to 3.5 m) is bitwise the grid the original run used.
+    assert list(THAI_GRID) == grids["default"]
+    assert list(_prescribed().interfaces) == grids["default"]
     for key, e in grids.items():
         e = np.asarray(e)
         assert e[0] == 0.0 and np.all(np.diff(e) > 0), key

@@ -82,7 +82,9 @@ def test_g4_and_g5_on_the_gpu():
         st, _ = sub.step(st, 600.0, flux=cp.asarray(f))
         T = slab.advance(T, f, 600.0)
     assert abs(float(sub.temperature(st)[0, 0]) - float(T[0])) < 1000 * np.spacing(300.0)
-    sub = ConductiveSubstrate.constant(emissivity=0.0)
+    from tropoi.spatial.vertical import geometric_interfaces
+    sub = ConductiveSubstrate.constant(emissivity=0.0,
+                                       interfaces=geometric_interfaces(0.02, 3.5, layers=30))
     fb = cp.asarray([0.0, 0.1, -0.1])
     st = sub.initial_state(3, xp=cp)
     inflow, denom = np.zeros(3), np.zeros(3)

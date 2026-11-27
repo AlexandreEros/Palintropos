@@ -11,7 +11,7 @@ Index: [all packages](../index.md) · parent [`tropoi.run`](tropoi.run.md)
 | `tropoi.run.airless` | empty | – | – |
 | `tropoi.run.airless.__main__` | code | – | `main` |
 | `tropoi.run.airless.config` | code | `AirlessConfig` | `config_from_document`, `load_config_document`, `mercury_hayne_analogue`, `mercury_vpw99`, `strata_from_dicts`, `vpw99_strata` |
-| `tropoi.run.airless.experiment` | code | `AirlessRun` | `aitken`, `build_columns`, `build_substrate`, `column_kind`, `load_tier2`, `run_block`, `transient_steps` |
+| `tropoi.run.airless.experiment` | code | `AirlessRun` | `aitken`, `build_columns`, `build_substrate`, `load_tier2`, `run_block`, `transient_steps` |
 
 ## Imports
 
@@ -29,15 +29,21 @@ flowchart LR
     end
     p_tropoi_ophysics["package physics"]
     p_tropoi_orun_oheld__suarez["package run.held#95;suarez"]
+    p_tropoi_ospatial["package spatial"]
+    p_tropoi_ospatial_ogrids["package spatial.grids"]
     n_tropoi_orun_oairless_o____main____ --> n_tropoi_orun_oairless_oconfig
     n_tropoi_orun_oairless_o____main____ -.-> n_tropoi_orun_oairless_oexperiment
     n_tropoi_orun_oairless_oexperiment --> n_tropoi_orun_oairless_oconfig
     n_tropoi_orun_oairless_oconfig -->|2| p_tropoi_ophysics
     n_tropoi_orun_oairless_oexperiment -->|2| p_tropoi_ophysics
     n_tropoi_orun_oairless_oexperiment -->|1| p_tropoi_orun_oheld__suarez
+    n_tropoi_orun_oairless_oexperiment -->|1| p_tropoi_ospatial
+    n_tropoi_orun_oairless_oexperiment -->|1| p_tropoi_ospatial_ogrids
     classDef other fill:none,stroke-dasharray:3 3
     class p_tropoi_ophysics other
     class p_tropoi_orun_oheld__suarez other
+    class p_tropoi_ospatial other
+    class p_tropoi_ospatial_ogrids other
 ```
 
 ## Classes

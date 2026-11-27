@@ -62,13 +62,11 @@ from tropoi.physics.constants import SIGMA_SB
 from tropoi.physics.materials import CellMaterials, Stratum
 
 __all__ = ["ConductiveSubstrate", "StepReport", "SubstrateSolveError",
-           "SubstrateState", "geometric_interfaces", "ENERGY_REFERENCE_TEMPERATURE"]
+           "SubstrateState", "ENERGY_REFERENCE_TEMPERATURE"]
 
 #: Reference temperature (K) of the substrate energy.
 ENERGY_REFERENCE_TEMPERATURE = 300.0
 
-_MAX_STRETCH = 1.5
-_RATIO_TOL = 1e-9          # round-off allowance on the [1, 1.5] ratio guarantee
 _EPS = 2.220446049250313e-16
 #: Residual tolerance floor (W m^-2) and round-off multiple (frozen in
 #: docs/validation/PLANET-ONE-GATES.md, G-B).
@@ -82,150 +80,6 @@ def _xp(*arrays):
             import cupy  # noqa: WPS433
             return cupy
     return np
-
-
-def geometric_interfaces(top_thickness: float, depth: float, *,
-                         layers: Optional[int] = None,
-                         stretch: Optional[float] = None,
-                         depth_is_minimum: bool = False) -> tuple:
-    """Layer interfaces (m, from 0) with thicknesses growing geometrically
-    from ``top_thickness``.
-
-    Give exactly one of ``layers`` and ``stretch``. Both keep
-    ``top_thickness`` exact.
-
-    * ``layers``: the ratio is solved so that ``layers`` layers end exactly
-      at ``depth``. The solved ratio must lie in [1, 1.5].
-    * ``stretch``: layers of thickness ``top * stretch**i`` are added while
-      they fit within ``depth``. A gap g left at the bottom is handled
-      deterministically:
-
-      - if g is zero to within 1e-12 relative, the grid ends exactly at
-        ``depth``;
-      - otherwise two terminations are considered: merging g into the last
-        layer, or keeping g as an extra layer. Each is acceptable only if its
-        final thickness ratio lies in [1, 1.5]. Of the acceptable ones, the
-        one whose final ratio is closest to ``stretch`` is used (merging on a
-        tie). The requested ratio then holds for every layer except the last;
-      - if neither is acceptable, ``ValueError`` is raised. In that case the
-        requested top thickness, depth, stretch and ratio bound are
-        incompatible. Use ``layers`` for an exact geometric fit, choose
-        another depth, or pass ``depth_is_minimum=True``;
-      - with ``depth_is_minimum=True``, ``depth`` is a lower bound: the grid
-        ends at the first exact geometric interface at or below ``depth``.
-        Every ratio is then exactly ``stretch``, and the column is at least
-        as deep as requested.
-
-    **Ratio bounds.** The regolith specification requires only an upper
-    bound, stretch <= 1.5. This function guarantees more: every
-    adjacent-layer ratio of a grid it returns lies in [1, 1.5] (to a
-    round-off allowance of 1e-9, checked on return), so thickness never
-    decreases with depth. ``layers`` must be an integer. Grids passed explicitly as ``interfaces`` to
-    :class:`ConductiveSubstrate`, for example uniform or historical fixture
-    grids, are not subject to that guarantee."""
-    top = float(top_thickness)
-    total = float(depth)
-    if not (math.isfinite(top) and math.isfinite(total)):
-        raise ValueError("top_thickness and depth must be finite")
-    if not (top > 0.0 and total > 0.0 and top <= total):
-        raise ValueError("need 0 < top_thickness <= depth")
-    if (layers is None) == (stretch is None):
-        raise ValueError("give exactly one of layers and stretch")
-    if layers is not None and depth_is_minimum:
-        raise ValueError("depth_is_minimum applies to stretch, not layers")
-    if layers is not None:
-        if isinstance(layers, bool) or int(layers) != layers:
-            raise ValueError(f"layers must be an integer, got {layers!r}")
-        n = int(layers)
-        if n < 1:
-            raise ValueError("layers must be >= 1")
-        if n == 1:
-            if not math.isclose(top, total, rel_tol=1e-12):
-                raise ValueError("one layer requires top_thickness == depth")
-            return (0.0, total)
-        if top * n > total * (1.0 + 1e-12):
-            raise ValueError("top_thickness * layers exceeds depth (ratio < 1)")
-        if _geometric_sum(top, _MAX_STRETCH, n) < total * (1.0 - 1e-12):
-            raise ValueError(f"{n} layers from top_thickness={top} cannot reach depth={total} "
-                             f"with a ratio <= {_MAX_STRETCH}")
-        if math.isclose(top * n, total, rel_tol=1e-12):
-            ratio = 1.0
-        else:
-            lo, hi = 1.0 + 1e-15, 2.0
-            for _ in range(200):
-                mid = 0.5 * (lo + hi)
-                if _geometric_sum(top, mid, n) < total:
-                    lo = mid
-                else:
-                    hi = mid
-            ratio = 0.5 * (lo + hi)
-        if ratio > _MAX_STRETCH:
-            raise ValueError(f"solved stretch {ratio:.6f} exceeds {_MAX_STRETCH}")
-        edges = [0.0]
-        t = top
-        for _ in range(n - 1):
-            edges.append(edges[-1] + t)
-            t *= ratio
-        edges.append(total)
-        return _checked(edges)
-    ratio = float(stretch)
-    if not (math.isfinite(ratio) and 1.0 <= ratio <= _MAX_STRETCH):
-        raise ValueError(f"stretch must lie in [1, {_MAX_STRETCH}]")
-    edges = [0.0]
-    t = top
-    while edges[-1] + t <= total * (1.0 + 1e-12):
-        edges.append(edges[-1] + t)
-        t *= ratio
-    gap = total - edges[-1]
-    if gap <= 1e-12 * total:
-        edges[-1] = total
-        return _checked(edges)
-    if depth_is_minimum:
-        edges.append(edges[-1] + t)
-        return _checked(edges)
-    dz = [edges[i + 1] - edges[i] for i in range(len(edges) - 1)]
-    candidates = []
-    if len(dz) >= 2:                      # merge into the last layer (never the top one)
-        merged = (dz[-1] + gap) / dz[-2]
-        if 1.0 <= merged <= _MAX_STRETCH:
-            candidates.append((abs(merged - ratio), 0, "merge"))
-    else:
-        merged = math.nan
-    appended = gap / dz[-1]
-    if 1.0 <= appended <= _MAX_STRETCH:
-        candidates.append((abs(appended - ratio), 1, "append"))
-    if not candidates:
-        raise ValueError(
-            f"top_thickness={top}, depth={total}, stretch={ratio} are incompatible with "
-            f"final-layer ratios in [1, {_MAX_STRETCH}]: merging the {gap:.6g} m remainder "
-            f"gives {merged:.4f}, keeping it as a layer gives {appended:.4f}. Use layers= "
-            "for an exact geometric fit, another depth, or depth_is_minimum=True")
-    if min(candidates)[2] == "merge":
-        edges[-1] = total
-    else:
-        edges.append(total)
-    return _checked(edges)
-
-
-def _geometric_sum(top: float, ratio: float, n: int) -> float:
-    """top * (ratio**n - 1) / (ratio - 1). Near ratio 1 it uses expm1/log1p to
-    avoid cancellation; the plain form is kept elsewhere, so the default grid's
-    arithmetic is unchanged."""
-    x = ratio - 1.0
-    if x < 1e-3:
-        return top * math.expm1(n * math.log1p(x)) / x
-    return top * (ratio ** n - 1.0) / (ratio - 1.0)
-
-
-def _checked(edges) -> tuple:
-    """Assert the documented ratio guarantee (to 1e-9 relative) on a generated grid."""
-    dz = [edges[i + 1] - edges[i] for i in range(len(edges) - 1)]
-    for i in range(1, len(dz)):
-        q = dz[i] / dz[i - 1]
-        if not (1.0 - _RATIO_TOL <= q <= _MAX_STRETCH + _RATIO_TOL):
-            raise ValueError(f"generated grid ratio {q!r} at layer {i} is outside "
-                             f"[1, {_MAX_STRETCH}]; this is a bug or a degenerate request")
-    return tuple(edges)
 
 
 class SubstrateSolveError(ArithmeticError):
@@ -299,10 +153,10 @@ class ConductiveSubstrate:
     """A stratified conductive column (see the module docstring).
 
     ``strata`` are listed top to bottom. The last stratum's ``bottom`` is
-    the column depth. The grid is either explicit ``interfaces`` (m, from 0,
-    strictly increasing, containing every stratum boundary), or
-    ``top_thickness`` with ``max_stretch``, which is passed to
-    :func:`~tropoi.physics.materials.stratified_interfaces`.
+    the column depth. ``interfaces`` are the cell faces (m, from 0, strictly
+    increasing, containing every stratum boundary), built by the caller, for
+    example with :func:`tropoi.spatial.vertical.stratified_interfaces`. The
+    substrate never builds its own mesh.
 
     ``albedo`` and ``emissivity`` (both in [0, 1]) enter f(T_s).
     Emissivity 0 gives a non-radiating surface, as used by
@@ -311,25 +165,12 @@ class ConductiveSubstrate:
     ``initial_temperature`` is a scalar or a per-cell profile (K).
     ``max_iterations`` caps Newton iterations per step."""
 
-    def __init__(self, strata: Sequence[Stratum], *,
-                 interfaces: Optional[Sequence[float]] = None,
-                 top_thickness: Optional[float] = None,
-                 max_stretch: Optional[float] = None,
+    def __init__(self, strata: Sequence[Stratum], *, interfaces: Sequence[float],
                  albedo: float = 0.0, emissivity: float = 1.0,
                  bottom_heat_flux: float = 0.0, initial_temperature=300.0,
                  max_iterations: int = 50):
-        from tropoi.physics.materials import stratified_interfaces
         strata = tuple(strata)
-        if interfaces is not None:
-            if top_thickness is not None or max_stretch is not None:
-                raise ValueError("give interfaces or top_thickness/max_stretch, not both")
-            edges = tuple(float(x) for x in interfaces)
-        else:
-            if top_thickness is None or max_stretch is None:
-                raise ValueError("give interfaces, or top_thickness and max_stretch")
-            edges = stratified_interfaces([s.bottom for s in strata],
-                                          top_thickness, max_stretch)
-        e = np.asarray(edges, dtype=np.float64)
+        e = np.asarray(tuple(float(x) for x in interfaces), dtype=np.float64)
         if (e.ndim != 1 or e.size < 2 or not np.all(np.isfinite(e)) or e[0] != 0.0
                 or not np.all(np.diff(e) > 0.0)):
             raise ValueError("interfaces must be finite, start at 0 and increase strictly")
@@ -355,26 +196,16 @@ class ConductiveSubstrate:
         self._device: dict = {}
 
     @classmethod
-    def constant(cls, *, volumetric_heat_capacity: float = 2.0e6,
+    def constant(cls, *, interfaces: Sequence[float],
+                 volumetric_heat_capacity: float = 2.0e6,
                  conductivity: Optional[float] = None,
                  thermal_inertia: Optional[float] = None,
-                 interfaces: Optional[Sequence[float]] = None,
-                 depth: Optional[float] = None, top_thickness: Optional[float] = None,
-                 layers: Optional[int] = None, stretch: Optional[float] = None,
                  **kw) -> "ConductiveSubstrate":
-        """One constant-property stratum, given by C and either k or the
-        thermal inertia I = sqrt(k C). The defaults are the THAI
-        substrate's: C = 2e6, I = 2000 (k = 2), with 30 layers from a 2 cm
-        top to 3.5 m.
-
-        The grid takes exactly one form:
-
-        * explicit ``interfaces``;
-        * ``top_thickness`` to ``depth`` with ``layers`` (default 30);
-        * ``top_thickness`` to ``depth`` with ``stretch``
-          (:func:`geometric_interfaces`).
-
-        Conflicting arguments raise ``ValueError``."""
+        """One constant-property stratum on the explicit grid ``interfaces``
+        (build one with :mod:`tropoi.spatial.vertical`), given by C and either
+        k or the thermal inertia I = sqrt(k C). The column depth is the last
+        interface. The material defaults are the THAI substrate's: C = 2e6,
+        I = 2000 (k = 2)."""
         cap = float(volumetric_heat_capacity)
         if not (math.isfinite(cap) and cap > 0.0):
             raise ValueError("volumetric_heat_capacity must be finite and > 0")
@@ -387,20 +218,6 @@ class ConductiveSubstrate:
             conductivity = inertia * inertia / cap
         if not (math.isfinite(float(conductivity)) and float(conductivity) > 0.0):
             raise ValueError("conductivity must be finite and > 0")
-        if interfaces is not None:
-            given = [n for n, v in (("depth", depth), ("top_thickness", top_thickness),
-                                    ("layers", layers), ("stretch", stretch)) if v is not None]
-            if given:
-                raise ValueError(f"interfaces given together with {', '.join(given)}; "
-                                 "explicit interfaces define the whole geometry")
-        else:
-            if stretch is not None and layers is not None:
-                raise ValueError("give layers or stretch, not both")
-            top = 0.02 if top_thickness is None else top_thickness
-            total = 3.5 if depth is None else depth
-            interfaces = (geometric_interfaces(top, total, stretch=stretch)
-                          if stretch is not None else
-                          geometric_interfaces(top, total, layers=30 if layers is None else layers))
         bottom = float(interfaces[-1])
         if not math.isfinite(bottom):
             raise ValueError("interfaces must be finite")

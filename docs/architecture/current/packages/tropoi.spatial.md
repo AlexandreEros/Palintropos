@@ -17,6 +17,7 @@ Index: [all packages](../index.md) · parent [`tropoi`](tropoi.md) · [`tropoi.s
 | `tropoi.spatial.specification` | code | `DiscretizationSpec`, `FluidLayerSpec`, `PlanetSpec`, `SpecificationError`, `TopographySpec` | – |
 | `tropoi.spatial.spherical_backend` | code | `GeodesicBackend`, `LatLonBackend`, `PointSetBackend`, `ProductSpace`, `SphericalGridBackend` | `make_backend` |
 | `tropoi.spatial.truncation` | code | – | `gauss_grid_for_truncation`, `product_truncation_cut`, `require_scenario_support`, `require_thermal_wave_support` |
+| `tropoi.spatial.vertical` | code | – | `geometric_interfaces`, `stratified_interfaces` |
 | `tropoi.spatial.williamson5` | code | – | – |
 
 Files shipped in this directory that are **not Python and not analysed** (templates, data): `CONVENTIONS.md`, `README.md`. Their contents (for example JavaScript in an HTML template) are invisible to every graph here.
@@ -39,12 +40,14 @@ flowchart LR
         n_tropoi_ospatial_ospecification["spatial.specification"]
         n_tropoi_ospatial_ospherical__backend["spatial.spherical#95;backend"]
         n_tropoi_ospatial_otruncation["spatial.truncation"]
+        n_tropoi_ospatial_overtical["spatial.vertical"]
         n_tropoi_ospatial_owilliamson5["spatial.williamson5"]
     end
     p_tropoi_ocli["package cli"]
     p_tropoi_orepresentation_oarchive["package representation.archive"]
     p_tropoi_orepresentation_odiagnostics["package representation.diagnostics"]
     p_tropoi_orepresentation_ovisual["package representation.visual"]
+    p_tropoi_orun_oairless["package run.airless"]
     p_tropoi_orun_obve["package run.bve"]
     p_tropoi_orun_ocustom["package run.custom"]
     p_tropoi_orun_oheld__suarez["package run.held#95;suarez"]
@@ -78,6 +81,7 @@ flowchart LR
     p_tropoi_orepresentation_ovisual -->|2| n_tropoi_ospatial_osigma__coordinate
     p_tropoi_orepresentation_ovisual -.->|1| n_tropoi_ospatial_otruncation
     p_tropoi_orepresentation_ovisual -->|1| n_tropoi_ospatial_owilliamson5
+    p_tropoi_orun_oairless -->|1| n_tropoi_ospatial_overtical
     p_tropoi_orun_obve -->|1| n_tropoi_ospatial_oplanet
     p_tropoi_orun_obve -->|1| n_tropoi_ospatial_otruncation
     p_tropoi_orun_ocustom -->|1| n_tropoi_ospatial_olaplacian
@@ -127,6 +131,7 @@ flowchart LR
     class p_tropoi_orepresentation_oarchive other
     class p_tropoi_orepresentation_odiagnostics other
     class p_tropoi_orepresentation_ovisual other
+    class p_tropoi_orun_oairless other
     class p_tropoi_orun_obve other
     class p_tropoi_orun_ocustom other
     class p_tropoi_orun_oheld__suarez other

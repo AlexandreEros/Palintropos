@@ -11,8 +11,7 @@ import numpy as np
 import pytest
 
 from tropoi.run.airless.config import mercury_vpw99
-from tropoi.run.airless.experiment import (AirlessRun, build_columns, column_kind,
-                                           load_tier2)
+from tropoi.run.airless.experiment import AirlessRun, build_columns, load_tier2
 
 EPS = np.finfo(float).eps
 
@@ -32,7 +31,8 @@ def _independent_bands(nlat, R):
 @pytest.mark.parametrize("nlat,nlon", [(6, 8), (45, 90), (90, 180)])
 def test_regular_grid_weights_are_exact_cell_areas_summing_to_the_sphere(nlat, nlon):
     cfg = _latlon(nlat, nlon)
-    lat, lon, w = build_columns(cfg)
+    c = build_columns(cfg)
+    lat, lon, w = c.lat_deg, c.lon_deg, c.weights
     R = cfg.radius_m
     _, _, band = _independent_bands(nlat, R)
     expected = np.repeat(band * (2.0 * math.pi / nlon), nlon)
@@ -40,13 +40,14 @@ def test_regular_grid_weights_are_exact_cell_areas_summing_to_the_sphere(nlat, n
     np.testing.assert_allclose(w, expected, rtol=8 * EPS, atol=0)
     # a sum of n positive terms carries at most about n eps relative error
     assert abs(w.sum() / (4.0 * math.pi * R * R) - 1.0) <= w.size * EPS
-    assert column_kind(cfg) == "global"
+    assert build_columns(cfg).kind == "global"
 
 
 @pytest.mark.parametrize("nlat,nlon", [(6, 8), (90, 180)])
 def test_area_weighted_quadrature_identities(nlat, nlon):
     cfg = _latlon(nlat, nlon)
-    lat, _, w = build_columns(cfg)
+    c = build_columns(cfg)
+    lat, w = c.lat_deg, c.weights
     R = cfg.radius_m
     area = 4.0 * math.pi * R * R
     phi = np.radians(lat)
@@ -65,7 +66,8 @@ def test_sin_squared_mean_converges_at_second_order():
     errors = []
     for nlat in (20, 40, 80):
         cfg = _latlon(nlat, 4)
-        lat, _, w = build_columns(cfg)
+        c = build_columns(cfg)
+        lat, w = c.lat_deg, c.weights
         errors.append(abs(w @ np.sin(np.radians(lat)) ** 2 / w.sum() - 1.0 / 3.0))
     ratios = [errors[i] / errors[i + 1] for i in range(2)]
     assert all(3.9 < r < 4.1 for r in ratios), ratios
@@ -73,9 +75,10 @@ def test_sin_squared_mean_converges_at_second_order():
 
 def test_points_are_a_diagnostic_collection_without_weights():
     cfg = mercury_vpw99(columns={"kind": "points", "lat_deg": [0.0, 30.0], "lon_deg": [0.0, 90.0]})
-    lat, lon, w = build_columns(cfg)
+    c = build_columns(cfg)
+    lat, lon, w = c.lat_deg, c.lon_deg, c.weights
     assert w is None
-    assert column_kind(cfg) == "diagnostic"
+    assert build_columns(cfg).kind == "diagnostic"
 
 
 def _short(cfg):
@@ -124,7 +127,8 @@ def test_global_series_are_area_integrals_of_the_per_point_physics(tmp_path):
     weights (computed here) times a point run's per-point series at the same
     coordinates."""
     g = _short(_latlon(4, 6))
-    lat, lon, _ = build_columns(g)
+    c = build_columns(g)
+    lat, lon = c.lat_deg, c.lon_deg
     AirlessRun(g, tmp_path / "g", allow_dirty=True, log=lambda s: None).run_transient(24)
     p = g.with_(columns={"kind": "points", "lat_deg": lat.tolist(), "lon_deg": lon.tolist()},
                 output={**g.output, "every_step_profiles": False})

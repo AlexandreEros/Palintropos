@@ -15,6 +15,12 @@ CERES = pathlib.Path(__file__).parent / "fixtures" / "airless" / "ceres-equatori
 CERES_SHA = "13dfd66a305cadb5932c8c7e001ef9a3e2f90c6b8eb304ce0788969812750c8a"
 
 
+def _columns(cfg):
+    """(lat, lon in radians, weights) of the configured columns, as run_block takes them."""
+    c = build_columns(cfg)
+    return c.lat, c.lon, c.weights
+
+
 def _short_ceres(cycle_steps=24):
     """The Ceres fixture with a short segment, for fast runs (test only)."""
     cfg, _ = load_config_document(CERES)
@@ -56,7 +62,7 @@ def test_explicit_time_arguments_are_the_cycle_form(tmp_path):
     for i, extra in enumerate(({}, {"dt": cfg.cycle_s / steps, "first_step": cycle * steps})):
         d = tmp_path / str(i)
         d.mkdir()
-        runs.append(run_block(cfg.to_dict(), *build_columns(cfg), st.anomaly, st.surface_anomaly,
+        runs.append(run_block(cfg.to_dict(), *_columns(cfg), st.anomaly, st.surface_anomaly,
                               cycle, steps, True, str(d), None, 0, **extra))
     a, b = runs
     for key in ("anomaly", "surface_anomaly", "energy_end", "iterations"):
@@ -95,7 +101,8 @@ def test_transient_equals_consecutive_worker_cycles(tmp_path):
     assert claims["numerical_reproduction"].startswith("not evaluated")
     assert claims["periodic_equilibrium"].startswith("not evaluated")
     assert claims["physical_validation"] == "none"
-    lat, lon, w = build_columns(cfg)
+    c = build_columns(cfg)
+    lat, lon, w = c.lat, c.lon, c.weights
     st = build_substrate(cfg).initial_state(1)
     state = (st.anomaly, st.surface_anomaly)
     for c in range(2):

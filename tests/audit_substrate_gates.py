@@ -47,7 +47,8 @@ import time
 
 import numpy as np
 
-from tropoi.physics.substrate import ConductiveSubstrate, geometric_interfaces
+from tropoi.physics.substrate import ConductiveSubstrate
+from tropoi.spatial.vertical import geometric_interfaces
 from tropoi.physics.surface import SlabSurface
 
 DAY = 86400.0

@@ -16,7 +16,7 @@ Index: [all packages](../index.md) · parent [`tropoi`](tropoi.md) · [`tropoi.p
 | `tropoi.physics.constants` | code | – | – |
 | `tropoi.physics.convection` | code | `DryConvectiveAdjustment` | `neutral_profile` |
 | `tropoi.physics.insolation` | code | `DiurnalMeanInsolation`, `LightSource`, `OrbitalInsolation`, `PrescribedInsolation`, `StellarIllumination` | `frierson_net_surface_flux`, `illumination_from_spec`, `insolation_from_spec` |
-| `tropoi.physics.materials` | code | `CellMaterials`, `DepthProfile`, `PiecewiseHeatCapacity`, `PolynomialHeatCapacity`, `SaturatingExponentialHeatCapacity`, `Stratum` | `heat_capacity_from_dict`, `ledlow_1992`, `stratified_interfaces` |
+| `tropoi.physics.materials` | code | `CellMaterials`, `DepthProfile`, `PiecewiseHeatCapacity`, `PolynomialHeatCapacity`, `SaturatingExponentialHeatCapacity`, `Stratum` | `heat_capacity_from_dict`, `ledlow_1992` |
 | `tropoi.physics.monin_obukhov` | code | `MoninObukhovConvergenceError`, `MoninObukhovOptions`, `SurfaceExchange` | `diffusivities`, `solve_zeta`, `stability_derivative_m`, `stability_derivative_t`, `stability_integral_m`, `stability_integral_t`, `stable_mix`, `surface_drag` |
 | `tropoi.physics.monin_obukhov_cuda` | code | – | `clear_cache`, `kernel_available`, `surface_drag_fused` |
 | `tropoi.physics.orbit` | code | `KeplerOrbit` | `eccentric_from_mean`, `eccentric_from_true`, `mean_from_true`, `true_from_eccentric`, `true_from_mean` |
@@ -25,7 +25,7 @@ Index: [all packages](../index.md) · parent [`tropoi`](tropoi.md) · [`tropoi.p
 | `tropoi.physics.rotation` | code | `Rotation` | `rotation_x`, `rotation_z` |
 | `tropoi.physics.species` | code | `Species` | `dataset_identities`, `load_dataset` |
 | `tropoi.physics.star` | code | `ApparentStar`, `Star` | `planck_radiance` |
-| `tropoi.physics.substrate` | code | `ConductiveSubstrate`, `StepReport`, `SubstrateSolveError`, `SubstrateState` | `geometric_interfaces` |
+| `tropoi.physics.substrate` | code | `ConductiveSubstrate`, `StepReport`, `SubstrateSolveError`, `SubstrateState` | – |
 | `tropoi.physics.surface` | code | `SlabSurface` | `drag_coefficient`, `monin_obukhov_sensible_heat_flux`, `sensible_heat_flux` |
 | `tropoi.physics.thermodynamics` | code | `ThermoRecord` | `cp_molar`, `heat_capacity`, `heat_capacity_range`, `hydrogen_rotational_cv`, `kappa` |
 
@@ -78,7 +78,6 @@ flowchart LR
     n_tropoi_ophysics_oinsolation --> n_tropoi_ophysics_oorbit
     n_tropoi_ophysics_oinsolation --> n_tropoi_ophysics_orotation
     n_tropoi_ophysics_oinsolation --> n_tropoi_ophysics_ostar
-    n_tropoi_ophysics_omaterials -.-> n_tropoi_ophysics_osubstrate
     n_tropoi_ophysics_omonin__obukhov__cuda --> n_tropoi_ophysics_omonin__obukhov
     n_tropoi_ophysics_oorbit --> n_tropoi_ophysics_oconstants
     n_tropoi_ophysics_oorbit -.-> n_tropoi_ophysics_orotation

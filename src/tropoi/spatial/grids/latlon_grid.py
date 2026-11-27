@@ -36,6 +36,7 @@ import numpy as np
 import cupy as cp
 
 from tropoi.spatial.grids.grid_base import GridGeometry
+from tropoi.spatial.grids.quadrature import gauss_latitude_nodes, gauss_longitudes
 from tropoi.spatial.transforms.fast_geodesic_sh import PointSetSphericalHarmonics
 from tropoi.spatial.transforms.separable_gauss_sh import (
     SeparableGaussSphericalHarmonics, separable_is_applicable)
@@ -110,14 +111,13 @@ class GaussLatLonGridGeometry(GridGeometry):
         self.nlon = int(nlon)
         self.radius = float(radius)
 
-        # Gauss-Legendre nodes x_j = cos(colat_j) and weights on [-1, 1].
-        x, w_gl = np.polynomial.legendre.leggauss(self.nlat)
-        order = np.argsort(-x)              # x descending == colat ascending
-        x, w_gl = x[order], w_gl[order]
+        # Gauss-Legendre nodes x_j = cos(colat_j) and weights on [-1, 1],
+        # x descending (colat ascending): the canonical construction of
+        # tropoi.spatial.grids.quadrature, shared with CPU-only code.
+        x, w_gl = gauss_latitude_nodes(self.nlat)
         colat = np.arccos(x)                # (nlat,), in (0, pi): no poles
         self._latitudes_np = np.pi / 2.0 - colat
-        self._longitudes_np = np.linspace(0.0, 2.0 * np.pi, self.nlon,
-                                          endpoint=False)
+        self._longitudes_np = gauss_longitudes(self.nlon)
         self._gl_weights = w_gl             # sum == 2 exactly
 
         self._latitudes = cp.asarray(self._latitudes_np)
