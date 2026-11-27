@@ -1,13 +1,13 @@
 {
   "atlas": {
-    "call_edges": 2586,
+    "call_edges": 2597,
     "call_sites_omitted_by_cap": 40,
-    "call_sites_recorded": 3380,
+    "call_sites_recorded": 3391,
     "import_edges": 524,
     "import_sites_omitted_by_cap": 0,
     "import_sites_recorded": 589,
     "max_sites_per_edge": 8,
-    "nodes": 2406,
+    "nodes": 2415,
     "proposal": {
       "call_edges_by_direction": {
         "downward": 450,
@@ -65,9 +65,9 @@
         "archive": 203,
         "cli": 66,
         "dynamics": 119,
-        "integration": 131,
+        "integration": 137,
         "physics": 311,
-        "run": 140,
+        "run": 143,
         "setup": 292,
         "spectral": 265,
         "unassigned": 4,
@@ -166,24 +166,24 @@
         "sha256": "1dcfeb9400fd06152e45cd607c8648f54d8fa8f41c02b0fcd8ee9310a03c28a4"
       }
     ],
-    "source_lines_embedded": 20052
+    "source_lines_embedded": 20115
   },
   "call_graph": {
     "call_sites": {
-      "builtin": 4487,
-      "external": 2891,
-      "internal": 3411,
-      "unresolved": 4669
+      "builtin": 4502,
+      "external": 2908,
+      "internal": 3422,
+      "unresolved": 4674
     },
     "edges_by_kind": {
-      "call": 1531,
+      "call": 1539,
       "constructor": 74,
-      "instantiate": 567,
+      "instantiate": 569,
       "override": 6,
-      "self": 404,
+      "self": 405,
       "super": 4
     },
-    "nodes": 2209,
+    "nodes": 2218,
     "scoped": {
       "airless-mercury": {
         "edges": 11,
@@ -382,7 +382,7 @@
     }
   },
   "class_graph": {
-    "classes": 244,
+    "classes": 245,
     "classes_in_inherits_edges": 21,
     "external_bases": {
       "ArithmeticError": 1,
@@ -391,7 +391,7 @@
       "ValueError": 22,
       "abc.ABC": 2,
       "collections.abc.Mapping": 1,
-      "ctypes.Structure": 2,
+      "ctypes.Structure": 3,
       "enum.Enum": 2,
       "http.server.BaseHTTPRequestHandler": 1,
       "http.server.ThreadingHTTPServer": 1,
@@ -1294,7 +1294,7 @@
     "package": "tropoi",
     "src": "src",
     "working_tree": {
-      "base_commit": "d81d547c01474783cf6c95a59173fa214c04e71e",
+      "base_commit": "9afbb3fcfcbffde1cae909c7ad06ff89e5e66ea5",
       "generator": {
         "changes": [],
         "files": {
@@ -1422,7 +1422,7 @@
           "src/tropoi/run/airless/__init__.py": "4eacd9f550f9829fccc087a027d35f60c6bbb99e57d15d8c0d89ede496857f68",
           "src/tropoi/run/airless/__main__.py": "4079efb484c2b9c4ba5d27c23418b7a713428d5af00a6820a8982329d5db26c6",
           "src/tropoi/run/airless/config.py": "164afc2cddf3142f5e53e5b1841d83d8e35963ae5477891833fdd1e923ba4cb7",
-          "src/tropoi/run/airless/experiment.py": "8ba8328ac224402e0a1aee96871bcbcc993360301f29d787304c64c6d1a755c0",
+          "src/tropoi/run/airless/experiment.py": "8f97166ff0e469bab13d44cd73edb7d579527d186eb60ee588aeaaa204b570e4",
           "src/tropoi/run/bve/__init__.py": "dc2f43732af56efca1d2801705e6d92ab8cdcfb64d91b00f7dfc012fcbce8bfa",
           "src/tropoi/run/bve/config.py": "7b44a7d627c53b28e0315710d209b12d3689d247f4feb093e8cd8703c43dd406",
           "src/tropoi/run/bve/execution.py": "e812726e0351f85ee2520ab85f4396432d790db315f7158e5ab91c89d081cfba",
@@ -1509,19 +1509,19 @@
           "src/tropoi/spatial/vertical.py": "150c67d1154877340d28ba8ec3444f687050a5abf36f1c1f5ed982a167efa756",
           "src/tropoi/spatial/williamson5.py": "d980a4f4495f5a8724b62dbe7899b6f312af8c8ac034eeeedb4dc996baea9071",
           "src/tropoi/temporal/__init__.py": "b8b4efaf006eb548659313a955c754c1b5084e828b9d2fc679c5ae2a469e335b",
-          "src/tropoi/temporal/_substrate_reference.py": "528953507f283209737bd2fcf18994333c71cf6172a17f4ec438749911079342",
+          "src/tropoi/temporal/_substrate_reference.py": "7f4b13309ddc43caf2b0977b117fa01671e50309b7b9fa9f46ee92075f99d51c",
           "src/tropoi/temporal/column_coupling.py": "63c4054e7979b6119ee426f3dd578e248a7d4f4bfee3ea05d55c397b6adf9ac4",
           "src/tropoi/temporal/hooks.py": "ca7a91e6779a79deb31f5bc756f3e8407e020e1eb258834d4f06c3e2f80b0970",
           "src/tropoi/temporal/integration.py": "7db1e68852007669f0b6c1359d9feef3ccd2d3c8507e186abd90272f23e4cd8b",
           "src/tropoi/temporal/models.py": "e95aae258ef93b98ce16e1b1acde1034867d334dc33aef0a4b14d807061413d9",
           "src/tropoi/temporal/native/__init__.py": "ff1680674fd07353371ec76b66201e846c678c58562dc1d67449633a020b4842",
           "src/tropoi/temporal/native/build_identity.py": "6ebb1559ba454579dc15f1ee9d6c3a76a21a6417ea3ceffd4ce19c7f11ca5cbb",
-          "src/tropoi/temporal/native/drivers/cuda_driver.cu": "a33ba27287fbfeca9ceedd50d8c26adbeaf225360dcba6ea62bdce7f8292487c",
+          "src/tropoi/temporal/native/drivers/cuda_driver.cu": "ae64635117f32af9ca5d2b40170e5cead363451b89b646fcd276d13f8c65d6dc",
           "src/tropoi/temporal/semi_implicit.py": "c49e36947a4f13bac655f93eb374e70196f946669a55177316686070a22eb6bd",
           "src/tropoi/temporal/simulation.py": "8da9cae224660d0c16c057466939cb78be277b085cbd8027437d37cf36e54b3b",
           "src/tropoi/temporal/steppers.py": "d318a44ce7277cac5e43cd54d9c0f090fc8d55f4f3ea67735cfa1df6f8ad10c4",
-          "src/tropoi/temporal/substrate.py": "1df5bc1504a65735518191c019926e7a2481e93310f3c63d4256f25cf673ca4d",
-          "src/tropoi/temporal/substrate_native.py": "3ad5ec47d58eb94b653d5841e83d4b5b1152b770cc66ba80af17f900358074c0",
+          "src/tropoi/temporal/substrate.py": "54e673fea1f68c313486836094985ea11f397e83407cb1e10fa2747adc6feff3",
+          "src/tropoi/temporal/substrate_native.py": "ca949b2f18fafd187f497db9e7e3f448c47f66fa2fe012de63190497fddfca75",
           "src/tropoi/temporal/tendencies/__init__.py": "64ae205b8d8abf902f9b9f285faae34048856829c3be34925b3af5f94ad71a20",
           "src/tropoi/temporal/tendencies/barotropic.py": "eca288b7ac2cff04787d2cc1a5340f37364de3ee511b0ffd6598798c4201ebef",
           "src/tropoi/temporal/tendencies/boundary_layer.py": "de3b800d4c2ae35d1cc144cf9528b39eb7cd3baf5786664efac0d031b9fb4194",
@@ -1530,7 +1530,7 @@
           "src/tropoi/temporal/tendencies/primitive_equations.py": "848c6fe9406a7c1c465c0aa9459760b01c542164c8cc9395797a3c4a60793e52",
           "src/tropoi/temporal/tendencies/shallow_water.py": "7ae521f2378824e89f88bc467fc99321d1ef4224b037c865137e076a601da3c8"
         },
-        "sha256": "a437f6dc320f84e2e88940b8580ba99dadbe3ae80f3488f85aad3bc0c5b731a9",
+        "sha256": "317ee82571dc0c77cb64076428f5243ab058d8b713a70bcd0a2301808e2cb653",
         "status": "clean"
       }
     }

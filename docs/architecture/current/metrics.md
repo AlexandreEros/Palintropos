@@ -207,17 +207,17 @@ Module-level import edges involved: 2.
 
 ## Class graph
 
-* Classes: 244
-* Classes in at least one `inherits` edge (drawn in `class-inheritance.mmd`): 21; with neither an analysed base nor an analysed subclass: 223
+* Classes: 245
+* Classes in at least one `inherits` edge (drawn in `class-inheritance.mmd`): 21; with neither an analysed base nor an analysed subclass: 224
 * `inherits` edges between analysed classes: 14
 * `nests` edges (class defined in a class body): 0
-* Bases outside the analysed package: `ArithmeticError` x1, `RuntimeError` x8, `UserWarning` x1, `ValueError` x22, `abc.ABC` x2, `collections.abc.Mapping` x1, `ctypes.Structure` x2, `enum.Enum` x2, `http.server.BaseHTTPRequestHandler` x1, `http.server.ThreadingHTTPServer` x1, `str` x2, `typing.NamedTuple` x2, `typing.Protocol` x3
+* Bases outside the analysed package: `ArithmeticError` x1, `RuntimeError` x8, `UserWarning` x1, `ValueError` x22, `abc.ABC` x2, `collections.abc.Mapping` x1, `ctypes.Structure` x3, `enum.Enum` x2, `http.server.BaseHTTPRequestHandler` x1, `http.server.ThreadingHTTPServer` x1, `str` x2, `typing.NamedTuple` x2, `typing.Protocol` x3
 
 ## Call graph
 
-* Nodes (functions, methods, classes): 2209
-* Edges by kind: `call` 1531, `constructor` 74, `instantiate` 567, `override` 6, `self` 404, `super` 4
-* Call sites by resolution outcome: builtin 4487, external 2891, internal 3411, unresolved 4669
+* Nodes (functions, methods, classes): 2218
+* Edges by kind: `call` 1539, `constructor` 74, `instantiate` 569, `override` 6, `self` 405, `super` 4
+* Call sites by resolution outcome: builtin 4502, external 2908, internal 3422, unresolved 4674
 
 | Scoped graph | Roots | Depth | Nodes | Edges | Truncated nodes | Reachable (unbounded) |
 |---|---|---|---|---|---|---|

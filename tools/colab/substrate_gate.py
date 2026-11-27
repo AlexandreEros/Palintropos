@@ -41,6 +41,36 @@ import time
 
 import numpy as np
 
+#: run in a fresh process after the cold compile, with the same CUPY_CACHE_DIR:
+#: the kernel's load from CuPy's disk cache (audit P5, warm), and the first step
+#: against a later one
+WARM_LOAD = """
+import json, time
+t0 = time.perf_counter()
+import cupy as cp
+from tropoi.run.airless.config import mercury_vpw99
+from tropoi.run.airless.experiment import build_substrate
+from tropoi.temporal import substrate_native
+from tropoi.temporal.substrate import BackwardEulerSubstrate
+cfg = mercury_vpw99(columns={"kind": "latlon", "nlat": 90, "nlon": 180})
+sub = build_substrate(cfg)
+cp.cuda.Device().synchronize()
+t1 = time.perf_counter()
+substrate_native._device_kernel(sub)
+cp.cuda.Device().synchronize()
+t2 = time.perf_counter()
+stepper = BackwardEulerSubstrate(sub)
+st = sub.initial_state(16200, xp=cp)
+sw = cp.full(16200, 2000.0)
+times = []
+for _ in range(3):
+    cp.cuda.Device().synchronize(); a = time.perf_counter()
+    st, _ = stepper.step(st, cfg.dt, shortwave_down=sw)
+    cp.cuda.Device().synchronize(); times.append(time.perf_counter() - a)
+print(json.dumps({"kernel_load_from_cache_s": t2 - t1, "imports_and_setup_s": t1 - t0,
+                  "first_step_s": times[0], "third_step_s": times[2],
+                  "first_step_excess_s": times[0] - times[2]}))
+"""
 AUDIT_STATE = "ef413855553df37ba5aa1d23121526375bcbe38b1727407de8cb62b814964998"
 FIELDS = ("energy_tendency", "absorbed", "emitted", "conducted", "bottom", "source",
           "residual_sum", "tolerance_sum", "max_residual_ratio")
@@ -65,6 +95,21 @@ class _DescribedReference:
         ref.describe = lambda backend: {"implementation": "Python migration reference",
                                         "backend": backend}
         return ref
+
+
+def _same_results(a: dict, b: dict) -> dict:
+    """Bitwise comparison of two run_block results (every array)."""
+    def flat(r, pre=""):
+        for k, v in r.items():
+            if isinstance(v, dict):
+                yield from flat(v, f"{pre}{k}/")
+            elif v is not None and not isinstance(v, str):
+                yield f"{pre}{k}", np.asarray(v, dtype=float if isinstance(v, (list, tuple))
+                                              else None)
+    fa, fb = dict(flat(a)), dict(flat(b))
+    differ = sorted(k for k in fa if k not in fb or fa[k].shape != fb[k].shape
+                    or fa[k].tobytes() != fb[k].tobytes())
+    return {"compared": len(fa), "differing": differ, "identical": not differ}
 
 
 def ceres_check() -> dict:
@@ -185,7 +230,7 @@ def main(argv=None) -> int:
     native, ref = BackwardEulerSubstrate(sub), ReferenceBackwardEulerSubstrate(sub)
     x = SubstrateState(cp.asarray(a), cp.asarray(s))
     y = SubstrateState(cp.asarray(a), cp.asarray(s))
-    mism = {"state": 0, "report": 0, "iterations": 0}
+    mism = {"state": 0, "report": 0, "iterations": 0, "extent": 0}
     for k in range(args.steps):
         sw = forcing(k)
         x, rx = native.step(x, cfg.dt, shortwave_down=sw)
@@ -195,10 +240,22 @@ def main(argv=None) -> int:
         mism["report"] += 0 if all(bool(cp.array_equal(getattr(rx, f), getattr(ry, f)))
                                    for f in FIELDS) else 1
         mism["iterations"] += 0 if rx.iterations == ry.iterations else 1
+        mism["extent"] += 0 if ([tuple(map(float, e)) for e in rx.extent]
+                                == [tuple(map(float, e)) for e in ry.extent]) else 1
         if mism["state"]:
             y = SubstrateState(x.anomaly.copy(), x.surface_anomaly.copy())
     doc["gpu_bitwise_against_reference"] = {"steps": args.steps, **{f"{k}_mismatched_steps": v
                                                                      for k, v in mism.items()}}
+    save()
+
+    # P5 warm: a fresh process, with the cache now holding every kernel of a
+    # step, loading the native kernel and taking its first steps
+    import sys
+    warm = subprocess.run([sys.executable, "-c", WARM_LOAD], capture_output=True, text=True,
+                          env=dict(os.environ))
+    if warm.returncode:
+        raise RuntimeError(f"warm-cache load failed: {warm.stderr[-800:]}")
+    doc["native_kernel_warm_cache_load"] = json.loads(warm.stdout.strip().splitlines()[-1])
     save()
 
     # 3. timings: the complete production runner and the bare step
@@ -206,9 +263,14 @@ def main(argv=None) -> int:
                cfg.cycle_steps // cfg.output["profile_samples"])
     import tropoi.run.airless.experiment as experiment
 
-    def time_run_block(stepper_cls):
+    results = {}
+
+    def time_run_block(stepper_cls, label="native", incident=None):
         original = experiment.BackwardEulerSubstrate
         experiment.BackwardEulerSubstrate = stepper_cls
+        original_ins = experiment.insolation_from_spec
+        if incident is not None:
+            experiment.insolation_from_spec = lambda spec: incident
         pool = cp.get_default_memory_pool()
         pool.free_all_blocks()
         ts, iters = [], []
@@ -225,8 +287,10 @@ def main(argv=None) -> int:
                     if rep:
                         ts.append((time.perf_counter() - t0) / args.timed_steps)
                         iters.append(float(np.mean(r["iterations"])))
+                    results[label] = r
         finally:
             experiment.BackwardEulerSubstrate = original
+            experiment.insolation_from_spec = original_ins
         return {"median_s": statistics.median(ts), "min_s": min(ts), "max_s": max(ts),
                 "n": len(ts), "newton_iterations_mean": statistics.median(iters),
                 "memory_pool_total_bytes": int(pool.total_bytes()),
@@ -245,9 +309,43 @@ def main(argv=None) -> int:
         return {"median_s": statistics.median(ts), "min_s": min(ts), "max_s": max(ts)}
 
     doc["run_block"] = {"native": time_run_block(BackwardEulerSubstrate),
-                        "reference": time_run_block(ReferenceBackwardEulerSubstrate)}
+                        "reference": time_run_block(ReferenceBackwardEulerSubstrate,
+                                                    "reference")}
     doc["run_block"]["speedup"] = (doc["run_block"]["reference"]["median_s"]
                                    / doc["run_block"]["native"]["median_s"])
+    doc["run_block"]["outputs_bitwise_native_vs_reference"] = _same_results(
+        results["native"], results["reference"])
+    save()
+
+    # 3b. the wall-clock cost of the insolation forcing inside the runner: the
+    # same run_block with the forcing replayed from arrays computed beforehand
+    class Replayed:
+        def __init__(self):
+            self.cache = {}
+
+        def incident(self, nx, ny, nz, t):
+            key = float(t)
+            if key not in self.cache:
+                self.cache[key] = ins.incident(nx, ny, nz, t)
+            return self.cache[key]
+
+    replay = Replayed()
+    time_run_block(BackwardEulerSubstrate, "replay-fill", replay)            # fills the cache
+    replayed = time_run_block(BackwardEulerSubstrate, "replayed", replay)
+    ts = []
+    for rep in range(args.repeats + 1):
+        sync(); t0 = time.perf_counter()
+        for k in range(args.timed_steps):
+            ins.incident(*nv, (first + k + 1) * cfg.dt)
+        sync()
+        if rep:
+            ts.append((time.perf_counter() - t0) / args.timed_steps)
+    doc["insolation"] = {
+        "run_block_with_forcing_replayed": replayed,
+        "runner_wall_clock_share_s": (doc["run_block"]["native"]["median_s"]
+                                      - replayed["median_s"]),
+        "incident_alone_synchronized_median_s": statistics.median(ts),
+        "replayed_outputs_bitwise": _same_results(results["native"], results["replayed"])}
     doc["step"] = {"native": time_step(native), "reference": time_step(ref)}
     save()
 
@@ -290,7 +388,7 @@ def main(argv=None) -> int:
         nat, rf = BackwardEulerSubstrate(tsub), ReferenceBackwardEulerSubstrate(tsub)
         x = tsub.initial_state(16200, xp=cp)
         y = tsub.initial_state(16200, xp=cp)
-        bad = {"state": 0, "report": 0, "iterations": 0}
+        bad = {"state": 0, "report": 0, "iterations": 0, "extent": 0}
         for k in range(args.steps):
             sw = ins.incident(*tn, (k + 1) * cfg.dt)[0]
             x, rx = nat.step(x, cfg.dt, shortwave_down=sw)
@@ -300,6 +398,8 @@ def main(argv=None) -> int:
             bad["report"] += 0 if all(bool(cp.array_equal(getattr(rx, f), getattr(ry, f)))
                                       for f in FIELDS) else 1
             bad["iterations"] += 0 if rx.iterations == ry.iterations else 1
+            bad["extent"] += 0 if ([tuple(map(float, e)) for e in rx.extent]
+                                   == [tuple(map(float, e)) for e in ry.extent]) else 1
             if bad["state"]:
                 y = SubstrateState(x.anomaly.copy(), x.surface_anomaly.copy())
         doc["terminator_bitwise"][label] = {"steps": args.steps, "layers": tsub.layers,

@@ -7232,6 +7232,16 @@
     },
     {
       "kind": "call",
+      "source": "tropoi.run.airless.experiment.accumulate",
+      "target": "tropoi.run.airless.experiment._accumulate_kernel"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.airless.experiment.accumulate",
+      "target": "tropoi.run.airless.experiment.accumulate_reference"
+    },
+    {
+      "kind": "call",
       "source": "tropoi.run.airless.experiment.build_columns",
       "target": "tropoi.spatial.grids.quadrature.ColumnSet.gauss"
     },
@@ -7284,6 +7294,11 @@
       "kind": "call",
       "source": "tropoi.run.airless.experiment.run_block",
       "target": "tropoi.run.airless.experiment._host"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.airless.experiment.run_block",
+      "target": "tropoi.run.airless.experiment.accumulate"
     },
     {
       "kind": "call",
@@ -12182,6 +12197,11 @@
     },
     {
       "kind": "call",
+      "source": "tropoi.temporal.substrate.BackwardEulerSubstrate._report",
+      "target": "tropoi.temporal.substrate._fused_report_kernels"
+    },
+    {
+      "kind": "call",
       "source": "tropoi.temporal.substrate.BackwardEulerSubstrate.describe",
       "target": "tropoi.temporal.substrate_native.describe"
     },
@@ -12189,6 +12209,11 @@
       "kind": "instantiate",
       "source": "tropoi.temporal.substrate.BackwardEulerSubstrate.step",
       "target": "tropoi.physics.substrate.SubstrateState"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.temporal.substrate.BackwardEulerSubstrate.step",
+      "target": "tropoi.temporal.substrate.BackwardEulerSubstrate._raise_invalid"
     },
     {
       "kind": "self",
@@ -12209,6 +12234,11 @@
       "kind": "call",
       "source": "tropoi.temporal.substrate.BackwardEulerSubstrate.step",
       "target": "tropoi.temporal.substrate._xp"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.temporal.substrate.BackwardEulerSubstrate.step",
+      "target": "tropoi.temporal.substrate_native.is_host_scalar"
     },
     {
       "kind": "call",
@@ -12267,6 +12297,11 @@
     },
     {
       "kind": "call",
+      "source": "tropoi.temporal.substrate_native.column_input",
+      "target": "tropoi.temporal.substrate_native.is_host_scalar"
+    },
+    {
+      "kind": "call",
       "source": "tropoi.temporal.substrate_native.describe",
       "target": "tropoi.temporal.native.build_identity.digest"
     },
@@ -12289,6 +12324,11 @@
       "kind": "instantiate",
       "source": "tropoi.temporal.substrate_native.evaluate_host",
       "target": "tropoi.temporal.substrate_native._ColumnArrays"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.temporal.substrate_native.evaluate_host",
+      "target": "tropoi.temporal.substrate_native._ColumnInput"
     },
     {
       "kind": "instantiate",
@@ -12348,6 +12388,11 @@
     {
       "kind": "instantiate",
       "source": "tropoi.temporal.substrate_native.run_step",
+      "target": "tropoi.temporal.substrate_native._ColumnInput"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.temporal.substrate_native.run_step",
       "target": "tropoi.temporal.substrate_native._StepScalars"
     },
     {
@@ -12359,6 +12404,16 @@
       "kind": "call",
       "source": "tropoi.temporal.substrate_native.run_step",
       "target": "tropoi.temporal.substrate_native._step_scalars"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.temporal.substrate_native.run_step",
+      "target": "tropoi.temporal.substrate_native.column_input"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.temporal.substrate_native.run_step",
+      "target": "tropoi.temporal.substrate_native.source_view"
     },
     {
       "kind": "call",
@@ -21796,6 +21851,13 @@
       "type": "function"
     },
     {
+      "id": "tropoi.run.airless.experiment._accumulate_kernel",
+      "kind": "function",
+      "module": "tropoi.run.airless.experiment",
+      "qualname": "_accumulate_kernel",
+      "type": "function"
+    },
+    {
       "id": "tropoi.run.airless.experiment._backend",
       "kind": "function",
       "module": "tropoi.run.airless.experiment",
@@ -21828,6 +21890,20 @@
       "kind": "function",
       "module": "tropoi.run.airless.experiment",
       "qualname": "_json_default",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.airless.experiment.accumulate",
+      "kind": "function",
+      "module": "tropoi.run.airless.experiment",
+      "qualname": "accumulate",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.airless.experiment.accumulate_reference",
+      "kind": "function",
+      "module": "tropoi.run.airless.experiment",
+      "qualname": "accumulate_reference",
       "type": "function"
     },
     {
@@ -27697,6 +27773,13 @@
       "type": "function"
     },
     {
+      "id": "tropoi.temporal.substrate.BackwardEulerSubstrate._raise_invalid",
+      "kind": "staticmethod",
+      "module": "tropoi.temporal.substrate",
+      "qualname": "BackwardEulerSubstrate._raise_invalid",
+      "type": "function"
+    },
+    {
       "id": "tropoi.temporal.substrate.BackwardEulerSubstrate._report",
       "kind": "method",
       "module": "tropoi.temporal.substrate",
@@ -27732,6 +27815,13 @@
       "type": "class"
     },
     {
+      "id": "tropoi.temporal.substrate._fused_report_kernels",
+      "kind": "function",
+      "module": "tropoi.temporal.substrate",
+      "qualname": "_fused_report_kernels",
+      "type": "function"
+    },
+    {
       "id": "tropoi.temporal.substrate._host",
       "kind": "function",
       "module": "tropoi.temporal.substrate",
@@ -27757,6 +27847,13 @@
       "kind": "class",
       "module": "tropoi.temporal.substrate_native",
       "qualname": "_ColumnArrays",
+      "type": "class"
+    },
+    {
+      "id": "tropoi.temporal.substrate_native._ColumnInput",
+      "kind": "class",
+      "module": "tropoi.temporal.substrate_native",
+      "qualname": "_ColumnInput",
       "type": "class"
     },
     {
@@ -27809,6 +27906,13 @@
       "type": "function"
     },
     {
+      "id": "tropoi.temporal.substrate_native.column_input",
+      "kind": "function",
+      "module": "tropoi.temporal.substrate_native",
+      "qualname": "column_input",
+      "type": "function"
+    },
+    {
       "id": "tropoi.temporal.substrate_native.describe",
       "kind": "function",
       "module": "tropoi.temporal.substrate_native",
@@ -27830,6 +27934,13 @@
       "type": "function"
     },
     {
+      "id": "tropoi.temporal.substrate_native.is_host_scalar",
+      "kind": "function",
+      "module": "tropoi.temporal.substrate_native",
+      "qualname": "is_host_scalar",
+      "type": "function"
+    },
+    {
       "id": "tropoi.temporal.substrate_native.law_parameters",
       "kind": "function",
       "module": "tropoi.temporal.substrate_native",
@@ -27848,6 +27959,13 @@
       "kind": "function",
       "module": "tropoi.temporal.substrate_native",
       "qualname": "scalars",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.temporal.substrate_native.source_view",
+      "kind": "function",
+      "module": "tropoi.temporal.substrate_native",
+      "qualname": "source_view",
       "type": "function"
     },
     {

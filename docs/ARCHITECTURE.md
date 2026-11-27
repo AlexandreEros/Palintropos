@@ -536,8 +536,17 @@ canonical implementation in portable C++:
 * `src/tropoi/temporal/native`: the backward-Euler composition and the CUDA
   and CPU drivers.
 
-Python composes, configures and validates; `tropoi.temporal.substrate_native`
-launches the native code.
+Python composes and configures; `tropoi.temporal.substrate_native` launches
+the native code. One launch per step validates the forcing, forms the
+absorbed constant, solves every column and writes the converged evaluation
+and each column's temperature extent. The host then reads one three-integer
+summary: the largest iteration count, whether any column failed, and whether
+any forcing was invalid. Python works out the exact error message only after
+a failure. The report's sums stay CuPy reductions, in the reference order
+(decision U3). Its elementwise remainder and the airless runner's per-step
+accumulation are each one CuPy kernel, written in the reference's operation
+order with `__dmul_rn` products; tests check them bit for bit against the
+plain-expression forms.
 
 * **GPU.** Nothing needs to be built. The headers ship as package data and
   NVRTC compiles them through CuPy at run time, specialized for each

@@ -52,6 +52,7 @@ PT_HD bool operator>(real a, real b) { return a.v > b.v; }
 PT_HD bool operator>=(real a, real b) { return a.v >= b.v; }
 
 PT_HD bool is_nan(real a) { return isnan(a.v); }
+PT_HD bool is_finite(real a) { return isfinite(a.v); }
 PT_HD real exp(real a) { return real(::exp(a.v)); }
 PT_HD real expm1(real a) { return real(::expm1(a.v)); }
 PT_HD real pow(real a, double b) { return real(::pow(a.v, b)); }

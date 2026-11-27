@@ -1,0 +1,140 @@
+{
+ "environment": {
+  "gpu": "Tesla T4",
+  "nvidia_smi": "Tesla T4, 580.82.07",
+  "cpu": "Intel(R) Xeon(R) CPU @ 2.00GHz",
+  "vcpus": 2,
+  "python": "3.13.16",
+  "numpy": "2.4.6",
+  "cupy": "14.0.1",
+  "commit": "92c883d73a8913b6d54a6ef33c5bb186c53968b5"
+ },
+ "implementation": {
+  "implementation": "native C++ (tropoi pt headers), backward Euler + safeguarded Newton + Thomas, FP64, no FMA contraction",
+  "source_digest_host": "8362b46efd6385bfc9c27dc8dcc88b103b07cb1f3300c549ded2f118d83f2bfb",
+  "source_digest_device": "f2ac773242322a9640e0257f36f7dc48ace2d10b783a2325ed0f1a221387bfcf",
+  "backend": "cupy",
+  "nvrtc_version": [
+   13,
+   0
+  ],
+  "device_specialization": "substrate_step<51, pt::StaticLaws<pt::Piecewise<pt::Poly<5>, pt::SatExp>, pt::Piecewise<pt::Poly<5>, pt::SatExp>>>",
+  "device_options": [
+   "--std=c++14"
+  ]
+ },
+ "native_kernel_cold_compile_s": 2.779753067999991,
+ "native_kernel": {
+  "registers": 172,
+  "local_bytes": 6160
+ },
+ "state": {
+  "sha256": "ef413855553df37ba5aa1d23121526375bcbe38b1727407de8cb62b814964998",
+  "audit_sha256": "ef413855553df37ba5aa1d23121526375bcbe38b1727407de8cb62b814964998",
+  "identical_to_audit_state": true,
+  "spinup_wall_s": 72.212190174
+ },
+ "gpu_bitwise_against_reference": {
+  "steps": 200,
+  "state_mismatched_steps": 0,
+  "report_mismatched_steps": 0,
+  "iterations_mismatched_steps": 0,
+  "extent_mismatched_steps": 0
+ },
+ "native_kernel_warm_cache_load": {
+  "kernel_load_from_cache_s": 0.026712786000018696,
+  "imports_and_setup_s": 0.6455666429999951,
+  "first_step_s": 0.07051361999998562,
+  "third_step_s": 0.017713886999956685,
+  "first_step_excess_s": 0.05279973300002894
+ },
+ "run_block": {
+  "native": {
+   "median_s": 0.019390819416666243,
+   "min_s": 0.019350241716666498,
+   "max_s": 0.020187590433332996,
+   "n": 5,
+   "newton_iterations_mean": 3.7333333333333334,
+   "memory_pool_total_bytes": 101616640,
+   "column_steps_per_second": 835446.9015412644
+  },
+  "reference": {
+   "median_s": 0.11012569478333299,
+   "min_s": 0.10879990706666737,
+   "max_s": 0.11107938444999946,
+   "n": 5,
+   "newton_iterations_mean": 3.7333333333333334,
+   "memory_pool_total_bytes": 375344128,
+   "column_steps_per_second": 147104.63377209762
+  },
+  "speedup": 5.679269783136699,
+  "outputs_bitwise_native_vs_reference": {
+   "compared": 24,
+   "differing": [],
+   "identical": true
+  }
+ },
+ "insolation": {
+  "run_block_with_forcing_replayed": {
+   "median_s": 0.019460600283333445,
+   "min_s": 0.018856792799999765,
+   "max_s": 0.019661025316667254,
+   "n": 5,
+   "newton_iterations_mean": 3.7333333333333334,
+   "memory_pool_total_bytes": 121446400,
+   "column_steps_per_second": 832451.1969897503
+  },
+  "runner_wall_clock_share_s": -6.978086666720174e-05,
+  "incident_alone_synchronized_median_s": 0.00034794146666664955,
+  "replayed_outputs_bitwise": {
+   "compared": 24,
+   "differing": [],
+   "identical": true
+  }
+ },
+ "step": {
+  "native": {
+   "median_s": 0.01710329773333304,
+   "min_s": 0.017102677199999524,
+   "max_s": 0.017126054533333483
+  },
+  "reference": {
+   "median_s": 0.10298367961666675,
+   "min_s": 0.10269424156666673,
+   "max_s": 0.11085077313333329
+  }
+ },
+ "cpu_against_reference": {
+  "columns": 438,
+  "steps": 10,
+  "max_abs_difference_K": 1.1368683772161603e-13,
+  "g_gpu_bound_K": 1e-06,
+  "within_bound": true,
+  "newton_counts_identical": true,
+  "bitwise": false,
+  "host_build": "x86_64-linux-gnu-gcc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0; -O2 -std=c++14 -ffp-contract=off -fno-fast-math"
+ },
+ "terminator_bitwise": {
+  "vpw99_two": {
+   "steps": 200,
+   "layers": 51,
+   "state_mismatched_steps": 0,
+   "report_mismatched_steps": 0,
+   "iterations_mismatched_steps": 0,
+   "extent_mismatched_steps": 0
+  },
+  "constant_thai_like": {
+   "steps": 200,
+   "layers": 30,
+   "state_mismatched_steps": 0,
+   "report_mismatched_steps": 0,
+   "iterations_mismatched_steps": 0,
+   "extent_mismatched_steps": 0
+  }
+ },
+ "ceres_fixture": {
+  "steps": 8640,
+  "arrays_and_values_compared": 122,
+  "differing": 0
+ }
+}

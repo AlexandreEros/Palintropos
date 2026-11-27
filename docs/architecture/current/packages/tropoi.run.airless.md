@@ -11,7 +11,7 @@ Index: [all packages](../index.md) · parent [`tropoi.run`](tropoi.run.md)
 | `tropoi.run.airless` | empty | – | – |
 | `tropoi.run.airless.__main__` | code | – | `main` |
 | `tropoi.run.airless.config` | code | `AirlessConfig` | `config_from_document`, `load_config_document`, `mercury_hayne_analogue`, `mercury_vpw99`, `strata_from_dicts`, `vpw99_strata` |
-| `tropoi.run.airless.experiment` | code | `AirlessRun` | `aitken`, `build_columns`, `build_substrate`, `load_tier2`, `run_block`, `transient_steps` |
+| `tropoi.run.airless.experiment` | code | `AirlessRun` | `accumulate`, `accumulate_reference`, `aitken`, `build_columns`, `build_substrate`, `load_tier2`, `run_block`, `transient_steps` |
 
 ## Imports
 

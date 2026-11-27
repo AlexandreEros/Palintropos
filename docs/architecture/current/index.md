@@ -20,7 +20,7 @@ Explore dependencies, call sites, possible dispatch, runtime observations and pr
 | [`tropoi.representation.diagnostics`](packages/tropoi.representation.diagnostics.md) | 9 | 19 | 28 | `README.md` |
 | [`tropoi.representation.visual`](packages/tropoi.representation.visual.md) | 28 | 62 | 91 | `ATMOSPHERE_VIEW.md`, `HELD_SUAREZ_CLIMATE.md`, `README.md`, `sky_view.html`, `terrain_globe.html` |
 | [`tropoi.run`](packages/tropoi.run.md) | 2 | 0 | 2 | `README.md` |
-| [`tropoi.run.airless`](packages/tropoi.run.airless.md) | 4 | 2 | 13 | – |
+| [`tropoi.run.airless`](packages/tropoi.run.airless.md) | 4 | 2 | 15 | – |
 | [`tropoi.run.bve`](packages/tropoi.run.bve.md) | 6 | 2 | 3 | `README.md` |
 | [`tropoi.run.custom`](packages/tropoi.run.custom.md) | 7 | 12 | 15 | `INITIAL_STATES.md`, `README.md` |
 | [`tropoi.run.held_suarez`](packages/tropoi.run.held_suarez.md) | 8 | 5 | 37 | `README.md` |
@@ -35,7 +35,7 @@ Explore dependencies, call sites, possible dispatch, runtime observations and pr
 | [`tropoi.spatial.terrain`](packages/tropoi.spatial.terrain.md) | 8 | 10 | 10 | `IMPORT.md`, `README.md` |
 | [`tropoi.spatial.transforms`](packages/tropoi.spatial.transforms.md) | 6 | 5 | 5 | `README.md` |
 | [`tropoi.spatial.transforms.cuda`](packages/tropoi.spatial.transforms.cuda.md) | 2 | 0 | 2 | `README.md`, `legendre.cu`, `legendre_stages.cu`, `sh_matrix.cu` |
-| [`tropoi.temporal`](packages/tropoi.temporal.md) | 11 | 18 | 24 | `README.md`, `SAVED_RUNS.md`, `SEMI_IMPLICIT.md` |
+| [`tropoi.temporal`](packages/tropoi.temporal.md) | 11 | 19 | 27 | `README.md`, `SAVED_RUNS.md`, `SEMI_IMPLICIT.md` |
 | [`tropoi.temporal.native`](packages/tropoi.temporal.native.md) | 2 | 0 | 2 | – |
 | [`tropoi.temporal.tendencies`](packages/tropoi.temporal.tendencies.md) | 7 | 8 | 9 | `PRIMITIVE_EQUATIONS.md`, `README.md`, `RETAINED_TRUNCATION.md`, `SHALLOW_WATER.md` |
 
@@ -73,8 +73,8 @@ Explore dependencies, call sites, possible dispatch, runtime observations and pr
 
 * Packages: 30 discovered, 30 with a page.
 * Import module records: 197 discovered (including namespace placeholders), 197 listed on a package page.
-* Classes: 244 discovered, 244 drawn on a package page (21 in [the inheritance overview](class-inheritance.mmd)).
-* Both containment views cover 23 directories, 114 Python files, 244 class definitions, leaving out files and directories that define no class.
+* Classes: 245 discovered, 245 drawn on a package page (21 in [the inheritance overview](class-inheritance.mmd)).
+* Both containment views cover 23 directories, 114 Python files, 245 class definitions, leaving out files and directories that define no class.
 * CLI handlers: 12 discovered, each with a call graph.
 * Public Python entry-point candidates: 42; 17 are roots of declared paths, 25 excluded with a reason.
 

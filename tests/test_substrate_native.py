@@ -202,3 +202,90 @@ def test_provenance_describes_the_native_build():
     assert d["source_digest_host"] == build_identity.digest(build_identity.HOST_FLAGS)
     assert "-ffp-contract=off" in d["host_build"]
     assert d["host_layer_capacity"] >= 51
+
+
+def _backend(name):
+    if name == "numpy":
+        return np
+    cp = pytest.importorskip("cupy")
+    try:
+        cp.cuda.runtime.getDeviceCount()
+    except Exception:
+        pytest.skip("no usable CUDA device")
+    return cp
+
+
+BAD_FORCING = [
+    ({"shortwave_down": np.inf}, "shortwave_down must be finite"),
+    ({"longwave_down": "column-nan"}, "longwave_down must be finite"),
+    ({"flux": -np.inf}, "flux must be finite"),
+    ({"flux_derivative": np.nan}, "flux_derivative must be finite"),
+    ({"flux_derivative": 0.5}, r"flux_derivative must be finite and <= 0"),
+    ({"bottom_heat_flux": "column-nan"}, "bottom_heat_flux must be finite"),
+    ({"source": "cell-nan"}, "source must be finite"),
+    ({"flux_reference_temperature": "column-inf"}, "flux_reference_temperature must be finite"),
+    ({"shortwave_down": np.nan, "flux_derivative": 1.0}, "shortwave_down must be finite"),
+]
+
+
+@pytest.mark.parametrize("backend", ["numpy", "cupy"])
+@pytest.mark.parametrize("bad, message", BAD_FORCING)
+def test_invalid_forcing_is_refused_as_by_the_reference(backend, bad, message):
+    """The native step validates the forcing itself; the refusal (type and
+    message, in the documented order) is the reference's, and no state is
+    returned."""
+    xp = _backend(backend)
+    sub = _three_strata()
+    n = 6
+    kw = {"shortwave_down": xp.full(n, 500.0), "flux_reference_temperature": xp.full(n, 280.0)}
+    for k, v in bad.items():
+        if v == "column-nan" or v == "column-inf":
+            arr = np.full(n, 1.0)
+            arr[3] = np.nan if v == "column-nan" else np.inf
+            kw[k] = xp.asarray(arr)
+        elif v == "cell-nan":
+            arr = np.zeros((sub.layers, n))
+            arr[sub.layers - 1, 4] = np.nan
+            kw[k] = xp.asarray(arr)
+        else:
+            kw[k] = v
+    st = sub.initial_state(n, xp=xp)
+    for impl in (BackwardEulerSubstrate(sub), ReferenceBackwardEulerSubstrate(sub)):
+        with pytest.raises(ValueError, match=message):
+            impl.step(st, 3600.0, **kw)
+
+
+@pytest.mark.parametrize("backend", ["numpy", "cupy"])
+def test_extent_bounds_are_the_extent(backend):
+    xp = _backend(backend)
+    sub = _three_strata()
+    st, rep = BackwardEulerSubstrate(sub).step(sub.initial_state(9, xp=xp), 3600.0,
+                                               shortwave_down=xp.linspace(0.0, 8000.0, 9))
+    lows, highs = rep.extent_bounds
+    assert [(float(a), float(b)) for a, b in rep.extent] == \
+           list(zip(_host(lows).tolist(), _host(highs).tolist()))
+    assert [tuple(map(float, e)) for e in rep.extent] == sub.extent(st)
+
+
+@pytest.mark.parametrize("backend", ["numpy", "cupy"])
+def test_forcing_accepts_sequences_and_other_dtypes(backend):
+    """Lists and tuples are per-column forcing, and integer or float32
+    arrays are converted to float64, as before the fusion; the result is the
+    same as with float64 arrays."""
+    xp = _backend(backend)
+    sub = _three_strata()
+    n = 3
+    st = sub.initial_state(n, xp=xp)
+    stepper = BackwardEulerSubstrate(sub)
+    a, ra = stepper.step(st, 3600.0, shortwave_down=[100.0, 2000.0, 0.0],
+                         longwave_down=(5.0, 6.0, 7.0),
+                         bottom_heat_flux=xp.asarray([1, 0, 2], dtype=xp.float32),
+                         flux_derivative=xp.asarray([0, -1, 0], dtype=xp.int64))
+    b, rb = stepper.step(st, 3600.0, shortwave_down=xp.asarray([100.0, 2000.0, 0.0]),
+                         longwave_down=xp.asarray([5.0, 6.0, 7.0]),
+                         bottom_heat_flux=xp.asarray([1.0, 0.0, 2.0]),
+                         flux_derivative=xp.asarray([0.0, -1.0, 0.0]))
+    assert bool(xp.array_equal(a.anomaly, b.anomaly))
+    for f in ("bottom", "energy_tendency", "residual_sum", "absorbed"):
+        assert bool(xp.array_equal(getattr(ra, f), getattr(rb, f))), f
+    assert float(ra.bottom[2]) == 2.0
