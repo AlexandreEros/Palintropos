@@ -572,10 +572,19 @@ plain-expression forms.
 * **Floating point.** FP64. No product is contracted into an FMA: on the
   device every product is `__dmul_rn` and CuPy's default flags are used, and
   the host builds with `-ffp-contract=off`.
+* **Execution policy.** Runs execute on CUDA. The CPU build is for
+  verification, selected only explicitly: `backend="numpy"`, the hidden
+  `--device cpu` of the airless command, or
+  `TROPOI_EXECUTION=cpu-verification` (`tropoi.run.execution`; decisions
+  D6/U6). There is no fallback: without a usable GPU a run fails and says
+  how to request CPU verification.
 * **Provenance.** Every airless run records the implementation in
   `config.json` (`substrate_implementation`): the source digests, the
   backend, the device specialization and NVRTC version, or the host
-  library's compiler and flags.
+  library's compiler and flags. Its `environment` records what ran: the
+  backend, `precision: float64`, and the GPU for a CUDA run or the CPU
+  model for a CPU run (`execution_identity`, which does not import CuPy for
+  a CPU run).
 
 ### Tests
 

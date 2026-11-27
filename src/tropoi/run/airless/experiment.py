@@ -73,7 +73,8 @@ from tropoi.physics.substrate import ConductiveSubstrate
 from tropoi.spatial.grids.quadrature import ColumnSet
 from tropoi.spatial.vertical import stratified_interfaces
 from tropoi.run.airless.config import AirlessConfig, strata_from_dicts
-from tropoi.run.held_suarez.experiment import RunError, code_identity, environment_identity
+from tropoi.run.execution import execution_identity, resolve_backend
+from tropoi.run.held_suarez.experiment import RunError, code_identity
 
 __all__ = ["AirlessRun", "build_columns", "build_substrate", "load_tier2", "run_block",
            "transient_steps"]
@@ -461,11 +462,16 @@ class AirlessRun:
     never overwritten)."""
 
     def __init__(self, cfg: AirlessConfig, run_dir, *, workers: int = 1,
-                 backend: str = "numpy", allow_dirty: bool = False,
+                 backend: Optional[str] = None, allow_dirty: bool = False,
                  log: Callable[[str], None] = print,
                  initial_state=None, initial_state_source: Optional[str] = None,
                  config_source: Optional[dict] = None):
-        """``initial_state`` = (anomaly (L, ncol), surface_anomaly (ncol,)), in
+        """``backend`` is ``"cupy"`` or ``"numpy"``; by default CUDA, unless
+        ``TROPOI_EXECUTION=cpu-verification`` is set (see
+        :mod:`tropoi.run.execution`). CUDA that is unusable is an error, never
+        a fallback to the CPU.
+
+        ``initial_state`` = (anomaly (L, ncol), surface_anomaly (ncol,)), in
         K relative to 300 K, optionally replaces the configured isothermal
         start (for example a verified periodic solution on another grid,
         interpolated). Its provenance goes into config.json as
@@ -474,8 +480,9 @@ class AirlessRun:
         ``config_source`` records where the configuration came from when it
         was loaded from a saved document (``load_config_document``); it goes
         into config.json unchanged."""
-        _backend(backend)                       # validate early
-        self.backend = backend
+        # GPU first: CUDA unless CPU verification is requested explicitly
+        # (tropoi.run.execution); never a fallback
+        self.backend = resolve_backend(backend=backend)
         self.cfg = cfg
         self.dir = pathlib.Path(run_dir)
         self.workers = max(1, int(workers))
@@ -494,7 +501,7 @@ class AirlessRun:
                                       self.columns.weights)
         self._write_json("config.json", {
             "config": cfg.to_dict(), "config_sha256": cfg.sha256(), "code": self.code,
-            "environment": environment_identity(), "substrate": self.sub.signature(),
+            "environment": execution_identity(self.backend), "substrate": self.sub.signature(),
             "workers": self.workers, "backend": self.backend,
             "initial_state_source": initial_state_source if initial_state is not None else None,
             "config_source": config_source, "column_kind": self.kind,

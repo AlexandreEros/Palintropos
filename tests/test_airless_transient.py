@@ -91,7 +91,7 @@ def test_transient_equals_consecutive_worker_cycles(tmp_path):
     """run_transient over whole segments is the same arithmetic as calling
     the worker cycle by cycle (the scratch reference of the Ceres transient)."""
     cfg = _short_ceres()
-    run = AirlessRun(cfg, tmp_path / "run", allow_dirty=True, log=lambda s: None)
+    run = AirlessRun(cfg, tmp_path / "run", backend="numpy", allow_dirty=True, log=lambda s: None)
     result = run.run_transient(48)
     assert result["status"] == "COMPLETED_TRANSIENT"
     assert result["final_time_s"] == 48 * (cfg.cycle_s / 24)
@@ -124,7 +124,7 @@ def test_cli_runs_a_saved_envelope_as_a_transient(tmp_path):
     doc.write_text(json.dumps({"note": "envelope", "config": cfg.to_dict()}))
     out = tmp_path / "run"
     assert main(["run", "--config", str(doc), "--steps", "30", "--out", str(out),
-                 "--allow-dirty"]) == 0
+                 "--allow-dirty", "--device", "cpu"]) == 0
     meta = json.loads((out / "config.json").read_text())
     assert meta["config_sha256"] == cfg.sha256()
     assert meta["config_source"]["envelope"] is True
@@ -152,7 +152,7 @@ def test_cli_preset_periodic_run_with_one_worker(tmp_path):
     out = tmp_path / "run"
     assert main(["run", "--preset", "mercury-vpw99", "--points", "0,90", "--cycle-steps", "720",
                  "--spinup-cycle-steps", "72", "--max-wall-s", "0", "--out", str(out),
-                 "--allow-dirty"]) == 0
+                 "--allow-dirty", "--device", "cpu"]) == 0
     status = json.loads((out / "retained" / "status.json").read_text())
     assert status["status"] == "TRANSIENT"
     assert status["label"].startswith("TRANSIENT (cycle 1; G-P2 not met)")
@@ -167,13 +167,13 @@ def test_short_final_segment_keeps_the_production_cadence(tmp_path):
     """A 7-step final segment samples every 2 steps (24 steps / 12 samples),
     not gcd(12, 7) = 1 sample; a 1-step segment has none and no range."""
     cfg = _short_ceres()
-    run = AirlessRun(cfg, tmp_path / "a", allow_dirty=True, log=lambda s: None)
+    run = AirlessRun(cfg, tmp_path / "a", backend="numpy", allow_dirty=True, log=lambda s: None)
     run.run_transient(31)
     ret = tmp_path / "a" / "retained"
     assert np.load(ret / "surface-b000.npy").shape[0] == 3
     assert np.load(ret / "profiles-b000.npy").shape[0] == 3
     assert tuple(np.load(ret / "state.npz")["sample_every"]) == (2, 2)
-    run = AirlessRun(cfg, tmp_path / "b", allow_dirty=True, log=lambda s: None)
+    run = AirlessRun(cfg, tmp_path / "b", backend="numpy", allow_dirty=True, log=lambda s: None)
     run.run_transient(25)
     cycles = json.loads((tmp_path / "b" / "cycles.json").read_text())
     assert cycles[-1]["steps"] == 1 and cycles[-1]["surface_T_range_K"] is None
@@ -184,7 +184,7 @@ def test_standalone_replay_of_a_transient_tail(tmp_path):
     """G-G replays a retained short transient segment with its own timing."""
     from tools.planet_one.global_check import main as gg
     cfg = _short_ceres()
-    run = AirlessRun(cfg, tmp_path / "run", allow_dirty=True, log=lambda s: None)
+    run = AirlessRun(cfg, tmp_path / "run", backend="numpy", allow_dirty=True, log=lambda s: None)
     run.run_transient(31)
     assert gg([str(tmp_path / "run"), "--columns", "0"]) == 0
     report = json.loads((tmp_path / "run" / "gg.json").read_text())
@@ -193,7 +193,8 @@ def test_standalone_replay_of_a_transient_tail(tmp_path):
 
 
 def test_transient_refuses_fractional_steps(tmp_path):
-    run = AirlessRun(_short_ceres(), tmp_path / "run", allow_dirty=True, log=lambda s: None)
+    run = AirlessRun(_short_ceres(), tmp_path / "run", backend="numpy", allow_dirty=True,
+                     log=lambda s: None)
     for bad in (2.5, 0, True):
         with pytest.raises(ValueError, match="whole number"):
             run.run_transient(bad)
@@ -209,7 +210,8 @@ def test_standalone_replay_of_a_segment_without_samples(tmp_path):
     """A 1-step tail holds no tier-2 samples: the replay reports them as not
     compared (None, never 0) and judges the end state alone."""
     from tools.planet_one.global_check import main as gg
-    run = AirlessRun(_short_ceres(), tmp_path / "run", allow_dirty=True, log=lambda s: None)
+    run = AirlessRun(_short_ceres(), tmp_path / "run", backend="numpy", allow_dirty=True,
+                     log=lambda s: None)
     run.run_transient(25)
     assert gg([str(tmp_path / "run"), "--columns", "0"]) == 0
     report = json.loads((tmp_path / "run" / "gg.json").read_text())
@@ -223,7 +225,8 @@ def test_standalone_replay_of_a_segment_without_samples(tmp_path):
 
 def test_standalone_replay_needs_columns_for_point_runs(tmp_path):
     from tools.planet_one.global_check import main as gg
-    run = AirlessRun(_short_ceres(), tmp_path / "run", allow_dirty=True, log=lambda s: None)
+    run = AirlessRun(_short_ceres(), tmp_path / "run", backend="numpy", allow_dirty=True,
+                     log=lambda s: None)
     run.run_transient(24)
     with pytest.raises(SystemExit):
         gg([str(tmp_path / "run")])
@@ -265,7 +268,8 @@ def test_standalone_replay_end_state_includes_the_skin(tmp_path):
     """The end-state verdict covers the skin as well as the cells: a corrupted
     retained skin fails the replay of a sample-free segment."""
     from tools.planet_one.global_check import main as gg
-    run = AirlessRun(_short_ceres(), tmp_path / "run", allow_dirty=True, log=lambda s: None)
+    run = AirlessRun(_short_ceres(), tmp_path / "run", backend="numpy", allow_dirty=True,
+                     log=lambda s: None)
     run.run_transient(25)
     path = tmp_path / "run" / "retained" / "state.npz"
     with np.load(path) as f:
@@ -290,7 +294,8 @@ def test_standalone_replay_with_a_different_sample_count_fails_with_a_report(tmp
     """A replay that cannot reproduce the run's sample layout is a failed
     replay with a written report, not a traceback."""
     from tools.planet_one.global_check import main as gg
-    run = AirlessRun(_short_ceres(), tmp_path / "run", allow_dirty=True, log=lambda s: None)
+    run = AirlessRun(_short_ceres(), tmp_path / "run", backend="numpy", allow_dirty=True,
+                     log=lambda s: None)
     run.run_transient(24)
     path = tmp_path / "run" / "retained" / "state.npz"
     with np.load(path) as f:

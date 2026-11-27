@@ -6977,6 +6977,11 @@
     },
     {
       "kind": "call",
+      "source": "tropoi.run.airless.__main__.main",
+      "target": "tropoi.run.execution.resolve_backend"
+    },
+    {
+      "kind": "call",
       "source": "tropoi.run.airless.config.AirlessConfig.__post_init__",
       "target": "tropoi.run.airless.config._is_count"
     },
@@ -7078,17 +7083,22 @@
     {
       "kind": "call",
       "source": "tropoi.run.airless.experiment.AirlessRun.__init__",
-      "target": "tropoi.run.airless.experiment._backend"
-    },
-    {
-      "kind": "call",
-      "source": "tropoi.run.airless.experiment.AirlessRun.__init__",
       "target": "tropoi.run.airless.experiment.build_columns"
     },
     {
       "kind": "call",
       "source": "tropoi.run.airless.experiment.AirlessRun.__init__",
       "target": "tropoi.run.airless.experiment.build_substrate"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.airless.experiment.AirlessRun.__init__",
+      "target": "tropoi.run.execution.execution_identity"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.airless.experiment.AirlessRun.__init__",
+      "target": "tropoi.run.execution.resolve_backend"
     },
     {
       "kind": "instantiate",
@@ -7099,11 +7109,6 @@
       "kind": "call",
       "source": "tropoi.run.airless.experiment.AirlessRun.__init__",
       "target": "tropoi.run.held_suarez.experiment.code_identity"
-    },
-    {
-      "kind": "call",
-      "source": "tropoi.run.airless.experiment.AirlessRun.__init__",
-      "target": "tropoi.run.held_suarez.experiment.environment_identity"
     },
     {
       "kind": "instantiate",
@@ -8264,6 +8269,41 @@
       "kind": "call",
       "source": "tropoi.run.custom.resources.resolve_topography",
       "target": "tropoi.spatial.terrain.topography.Topography.williamson5_cone"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.run.execution._environment",
+      "target": "tropoi.run.execution.ExecutionError"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.run.execution.execution_identity",
+      "target": "tropoi.run.execution.ExecutionError"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.execution.execution_identity",
+      "target": "tropoi.run.execution._cpu_model"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.run.execution.require_cuda",
+      "target": "tropoi.run.execution.ExecutionError"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.run.execution.resolve_backend",
+      "target": "tropoi.run.execution.ExecutionError"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.execution.resolve_backend",
+      "target": "tropoi.run.execution._environment"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.execution.resolve_backend",
+      "target": "tropoi.run.execution.require_cuda"
     },
     {
       "kind": "call",
@@ -22632,6 +22672,48 @@
       "kind": "function",
       "module": "tropoi.run.custom.resources",
       "qualname": "resolve_topography",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.execution.ExecutionError",
+      "kind": "class",
+      "module": "tropoi.run.execution",
+      "qualname": "ExecutionError",
+      "type": "class"
+    },
+    {
+      "id": "tropoi.run.execution._cpu_model",
+      "kind": "function",
+      "module": "tropoi.run.execution",
+      "qualname": "_cpu_model",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.execution._environment",
+      "kind": "function",
+      "module": "tropoi.run.execution",
+      "qualname": "_environment",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.execution.execution_identity",
+      "kind": "function",
+      "module": "tropoi.run.execution",
+      "qualname": "execution_identity",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.execution.require_cuda",
+      "kind": "function",
+      "module": "tropoi.run.execution",
+      "qualname": "require_cuda",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.execution.resolve_backend",
+      "kind": "function",
+      "module": "tropoi.run.execution",
+      "qualname": "resolve_backend",
       "type": "function"
     },
     {

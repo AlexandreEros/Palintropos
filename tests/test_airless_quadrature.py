@@ -89,7 +89,7 @@ def _short(cfg):
 def test_point_run_publishes_per_point_diagnostics_and_nothing_global(tmp_path):
     cfg = _short(mercury_vpw99(columns={"kind": "points", "lat_deg": [0.0, 45.0, -60.0],
                                         "lon_deg": [10.0, 200.0, 300.0]}))
-    AirlessRun(cfg, tmp_path / "run", allow_dirty=True, log=lambda s: None,
+    AirlessRun(cfg, tmp_path / "run", backend="numpy", allow_dirty=True, log=lambda s: None,
                workers=2).run_transient(30)
     grid = np.load(tmp_path / "run" / "grid.npz")
     assert "weights" not in grid.files and str(grid["column_kind"]) == "diagnostic"
@@ -129,10 +129,12 @@ def test_global_series_are_area_integrals_of_the_per_point_physics(tmp_path):
     g = _short(_latlon(4, 6))
     c = build_columns(g)
     lat, lon = c.lat_deg, c.lon_deg
-    AirlessRun(g, tmp_path / "g", allow_dirty=True, log=lambda s: None).run_transient(24)
+    AirlessRun(g, tmp_path / "g", backend="numpy", allow_dirty=True,
+               log=lambda s: None).run_transient(24)
     p = g.with_(columns={"kind": "points", "lat_deg": lat.tolist(), "lon_deg": lon.tolist()},
                 output={**g.output, "every_step_profiles": False})
-    AirlessRun(p, tmp_path / "p", allow_dirty=True, log=lambda s: None).run_transient(24)
+    AirlessRun(p, tmp_path / "p", backend="numpy", allow_dirty=True,
+               log=lambda s: None).run_transient(24)
     _, _, band = _independent_bands(4, g.radius_m)
     w = np.repeat(band * (2.0 * math.pi / 6), 6)
     gs = np.load(tmp_path / "g" / "series" / "cycle-0000.npz")
@@ -149,6 +151,7 @@ def test_global_series_are_area_integrals_of_the_per_point_physics(tmp_path):
 def test_view_builder_refuses_a_diagnostic_collection(tmp_path):
     from tools.planet_one.build_view import build
     cfg = _short(mercury_vpw99(columns={"kind": "points", "lat_deg": [0.0], "lon_deg": [0.0]}))
-    AirlessRun(cfg, tmp_path / "run", allow_dirty=True, log=lambda s: None).run_transient(24)
+    AirlessRun(cfg, tmp_path / "run", backend="numpy", allow_dirty=True,
+               log=lambda s: None).run_transient(24)
     with pytest.raises(SystemExit, match="lat/lon run"):
         build(tmp_path / "run", 2, {})

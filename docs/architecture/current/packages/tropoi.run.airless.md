@@ -28,6 +28,7 @@ flowchart LR
         n_tropoi_orun_oairless_oexperiment["run.airless.experiment"]
     end
     p_tropoi_ophysics["package physics"]
+    p_tropoi_orun["package run"]
     p_tropoi_orun_oheld__suarez["package run.held#95;suarez"]
     p_tropoi_ospatial["package spatial"]
     p_tropoi_ospatial_ogrids["package spatial.grids"]
@@ -35,14 +36,17 @@ flowchart LR
     n_tropoi_orun_oairless_o____main____ --> n_tropoi_orun_oairless_oconfig
     n_tropoi_orun_oairless_o____main____ -.-> n_tropoi_orun_oairless_oexperiment
     n_tropoi_orun_oairless_oexperiment --> n_tropoi_orun_oairless_oconfig
+    n_tropoi_orun_oairless_o____main____ -.->|1| p_tropoi_orun
     n_tropoi_orun_oairless_oconfig -->|2| p_tropoi_ophysics
     n_tropoi_orun_oairless_oexperiment -->|2| p_tropoi_ophysics
+    n_tropoi_orun_oairless_oexperiment -->|1| p_tropoi_orun
     n_tropoi_orun_oairless_oexperiment -->|1| p_tropoi_orun_oheld__suarez
     n_tropoi_orun_oairless_oexperiment -->|1| p_tropoi_ospatial
     n_tropoi_orun_oairless_oexperiment -->|1| p_tropoi_ospatial_ogrids
     n_tropoi_orun_oairless_oexperiment -->|1| p_tropoi_otemporal
     classDef other fill:none,stroke-dasharray:3 3
     class p_tropoi_ophysics other
+    class p_tropoi_orun other
     class p_tropoi_orun_oheld__suarez other
     class p_tropoi_ospatial other
     class p_tropoi_ospatial_ogrids other
