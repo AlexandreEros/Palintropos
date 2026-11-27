@@ -976,30 +976,77 @@ becomes:
 | G | removal of the superseded Python implementation (U9); final regression | removal | all gates of D and E; full CPU suite; T4 CUDA regression; G-gates; Ceres; VPW99 |
 | H | boundary-layer diffusion through `numerics` (D3 equivalence study, P6) | arithmetic change (approved in principle) | documented equivalence before migration |
 
-## 16. Implementation status (2026-11-27)
+## 16. Implementation status (2026-11-27, reconciled with `main`)
 
-| PR | Stage | State | Evidence |
+| PR | Stage | On `main` | Evidence |
 | --- | --- | --- | --- |
-| #73 | 1: PR #72 review fixes | **merged** (`fff9d4b`) | CI |
-| #75 | A: diagnostic point collections | open, CI green | lat-lon runs bitwise against `main`; analytical quadrature tests |
-| #76 | B: canonical quadrature and vertical meshes | open, CI green | bitwise against #75; `GaussLatLonGridGeometry` bitwise against `main` (36 arrays, MX110); the import cycle removed |
-| #77 | C: experiment defaults removed | open, CI green | bitwise against #76; preset hashes unchanged |
-| #78 | D1: step moved to `temporal`; `numerics` layer | open, CI green | bitwise against #77 |
-| #79 | D2: portable C++ canonical step | open, CI green | T4: the representative state regenerated bitwise (`ef413855…`); 200 steps bitwise against the CuPy reference |
-| #80 | E1: Newton residual reuse; per-substrate caching | open | T4: full N1 bitwise (production, terminator, constant, Ceres); G-gates identical; `run_block` **21.0 ms/step**; P1, P2, P3 synchronizations, P4 and P5 cold met; **P3 launches 122 > 20** |
+| #73 | 1: PR #72 review fixes | `fff9d4b` | CI |
+| #75 | A: diagnostic point collections (U5) | `aca766d` | lat-lon runs bitwise against the previous `main`; analytical quadrature tests |
+| #76 | B: canonical quadrature and vertical meshes (D2) | `6d69a54` | bitwise; `GaussLatLonGridGeometry` bitwise against the previous `main` (36 arrays); the import cycle removed |
+| #77 | C: experiment defaults removed | `7e61b6e` | bitwise; preset hashes unchanged |
+| #78 | D1: the step moved to `temporal`; the `numerics` layer (D1, D4) | `af7794e` | bitwise |
+| #79 | D2: portable C++ canonical step (U1, U7, U8) | `12c644e` | T4: the representative state regenerated bitwise (`ef413855…`); 200 steps bitwise against the CuPy reference |
+| #80 | E1: each Newton residual evaluated once; per-substrate caching | `afa4588` | T4: full N1 bitwise (production, terminator, constant, Ceres); G-gates identical; `run_block` 21.0 ms/step |
+| #81 | E2: fused validation, forcing, report, extents and accumulation; cached kernel | `d4cf351` | T4 at `92c883d`: N1 bitwise (extents and runner outputs included); `run_block` **19.4 ms/step**; **1 synchronization and 40 launches per step**; memory pool 102 MB; warm-cache load **0.027 s** |
+| #82 | F: GPU-first execution policy (D6, U6) | `6eb7849` | CLI/API tests; a CPU verification run never imports CuPy |
+| #83 | G: the Python migration reference removed (U9) | see the pull request | T4 regression at `7622a74`: state bitwise; `run_block` 19.5 ms/step; warm-cache load 0.037 s; CPU against CUDA within 1.1e-13 K |
+| (study) | H: the D3 equivalence study of the boundary-layer solve | not merged | `tools/colab/bl_thomas_equivalence.py`; see "Outstanding" |
+
+The evidence files and the map from each evidence commit to its pull
+request and squash commit are in `docs/validation/consolidation-evidence/`.
+
+**Acceptance criteria (T4, complete production runner, after #81 and #83).**
+
+| | Criterion | Result |
+| --- | --- | --- |
+| P1 | ≤ 88 ms/step | **met**: 19.4-19.5 ms (reference 110.1 ms) |
+| P2 | ≤ 25 ms/step | **met** |
+| P3 | ≤ 2 synchronizations per step | **met**: 1 |
+| P3 | ≤ 20 kernel launches per step | **not met: 40**. Outstanding; integration was authorized with it outstanding (section 17), not satisfied or weakened |
+| P4 | ≤ 120 MB memory pool | **met**: 93-102 MB |
+| P5 | ≤ 10 s cold compile; ≤ 1 s warm cache | **met**: 2.8-3.2 s cold; 0.027-0.037 s warm |
+| P6 | boundary-layer solve ≤ 1.0 ms at T21L40 | provisional; not migrated (stage H) |
+| N1 | bitwise against the reference over the listed cases | **met**, at `92c883d`, before the reference was removed |
 
 **Outstanding.**
 
-* **P3 launches.** About 7 operations are order-dependent reductions kept
-  in CuPy by U3. Fusing the rest bitwise reaches roughly 30. Getting to
-  ≤ 20 needs the forcing (insolation) in the canonical C++, which is a
-  scope decision for the owner.
-* **P5 warm cache:** not yet measured separately.
-* **Stage F (GPU-first execution policy), stage G (removal of the Python
-  reference) and stage H (boundary-layer diffusion, P6):** not started.
+* **P3 launches (40 > 20).** Of the 40, the forcing launches 14. On the
+  T4 the insolation costs no measurable wall-clock time: the runner with
+  the forcing replayed from precomputed arrays takes the same time (19.46
+  against 19.39 ms), because its launches overlap the native kernel. As the
+  owner directed, native insolation is not pursued for P3 alone. The other
+  launches are the report's order-dependent CuPy sums (U3), two segmented
+  extent reductions, the per-step area integrals and small runner
+  operations.
+* **Stage H (D3, P6).** The equivalence study measures the boundary
+  layer's elimination against the canonical `pt::thomas` on captured T21L40
+  systems, and the per-solve time. Migrating needs two owner decisions: whether
+  the measured differences are acceptable (no tolerance is agreed for
+  atmospheric arithmetic), and where the CPU path of a canonical
+  `numerics` solve lives (the native CPU library is the substrate's,
+  in `temporal`).
+* **Audit finding 7** (the airless and radiative runners import run
+  helpers from `run/held_suarez/experiment.py`) is not addressed.
+* **CPU bitwise status.** The CPU build agrees with the CUDA build within
+  1.1e-13 K with identical Newton counts; it is bitwise with Clang on the
+  development machine and not with Colab's g++. The cause (math library or
+  compiler) is unresolved; the owner accepted the G-GPU bound for the CPU.
+* **Device dependence of the representative state (uncertainty).** The
+  same code gives the audit's state hash on the T4 and a different one on
+  the MX110. The cause has not been established. The native step's
+  arithmetic is fixed by `__dmul_rn` and libdevice, so the device-side
+  CuPy forcing and reductions are the likely source; that is unverified.
+  The audit hash is therefore a T4 regression value only.
 
-The PRs are stacked. They merge bottom-up (#75, then #76 to #80), and after a
-squash merge each child must be re-synced with its new base. The
-`tools/colab/` prototypes and the first benchmark on this branch use APIs
-from before #76; the current tools are `tools/colab/substrate_gate.py` and
-`substrate_nsys.py` on #79 and #80.
+## 17. Owner decisions on integration (2026-11-27)
+
+| Decision | Binding details |
+| --- | --- |
+| Merge authorization | #75-#80, then later pull requests within the approved consolidation scope, may be merged without individual approval when each satisfies its scientific, numerical, architectural and CI requirements: the latest diff and findings reviewed, substantive findings resolved, the exact candidate's checks green, bottom-up with dependent branches re-synced, `main` and its architecture snapshot consistent, evidence and provenance preserved. Stop on a substantive regression |
+| P3 | the outstanding launch criterion does not block integration of verified improvements; it is documented as outstanding, never marked satisfied or weakened |
+| Insolation | not to be moved into native code solely for P3; its wall-clock cost to be measured after the other optimizations (done: none measurable) |
+| P5 | the warm-cache measurement to be completed (done: 0.027-0.037 s, after the cache fix of #81) |
+| Stages F, G, H | to proceed under their approved scope; the Python reference removed once the independent verification is complete |
+| Hardware | the MX110 for small correctness checks; the T4 for production performance |
+| Next | after consolidation, a clean atmospheric T4 baseline of the complete primitive-equation step, with measured bottlenecks and proposed priorities presented before any broader atmospheric refactor |
+| Unchanged | changes to governing equations, numerical acceptance thresholds or architectural policy still need the owner's approval |
