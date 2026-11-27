@@ -63,7 +63,8 @@ def diagnostics(root, vertical, cfg):
                             raise ValueError(f"{name}:{key} disagrees with configured vertical grid")
             if "lat" in archive:
                 lat = archive["lat"]
-                expected_lat = np.rad2deg(np.arcsin(np.polynomial.legendre.leggauss(cfg["nlat"])[0][::-1]))
+                from tropoi.spatial.grids.quadrature import gauss_latitudes
+                expected_lat = np.rad2deg(gauss_latitudes(cfg["nlat"]))
                 if lat.shape != expected_lat.shape or not np.allclose(lat, expected_lat, atol=1e-8):
                     raise ValueError(f"{name}:lat disagrees with configured Gaussian grid")
             if name == "means.npz":

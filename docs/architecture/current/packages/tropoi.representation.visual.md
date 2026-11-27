@@ -198,6 +198,7 @@ flowchart LR
     n_tropoi_orepresentation_ovisual_oviewer__fields -->|3| p_tropoi_orepresentation_oarchive
     n_tropoi_orepresentation_ovisual_oviewer__fields -->|4| p_tropoi_orepresentation_odiagnostics
     n_tropoi_orepresentation_ovisual_oviewer__fields -->|1| p_tropoi_ospatial
+    n_tropoi_orepresentation_ovisual_oviewer__fields -.->|1| p_tropoi_ospatial_ogrids
     n_tropoi_orepresentation_ovisual_oviewer__fields -->|2| p_tropoi_ospatial_otransforms
     n_tropoi_orepresentation_ovisual_oviewer__server -.->|1| p_tropoi_ophysics
     n_tropoi_orepresentation_ovisual_oviewer__server -->|2| p_tropoi_orepresentation_oarchive

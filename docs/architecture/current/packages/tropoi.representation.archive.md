@@ -56,6 +56,7 @@ flowchart LR
     p_tropoi_orun_ope["package run.pe"]
     p_tropoi_orun_oswe["package run.swe"]
     p_tropoi_ospatial["package spatial"]
+    p_tropoi_ospatial_ogrids["package spatial.grids"]
     p_tropoi_otemporal["package temporal"]
     n_tropoi_orepresentation_oarchive --> n_tropoi_orepresentation_oarchive_ocapsule
     n_tropoi_orepresentation_oarchive --> n_tropoi_orepresentation_oarchive_oschema
@@ -113,6 +114,7 @@ flowchart LR
     n_tropoi_orepresentation_oarchive_oprepared__terrain -->|2| p_tropoi_ospatial
     n_tropoi_orepresentation_oarchive_oradiative -->|1| p_tropoi_ospatial
     n_tropoi_orepresentation_oarchive_oschema -->|2| p_tropoi_ospatial
+    n_tropoi_orepresentation_oarchive_oviewer__diagnostics -.->|1| p_tropoi_ospatial_ogrids
     n_tropoi_orepresentation_oarchive_oviewer__manifest -->|1| p_tropoi_orepresentation_ovisual
     n_tropoi_orepresentation_oarchive_oviewer__manifest -.->|1| p_tropoi_ospatial
     n_tropoi_orepresentation_oarchive_owriter -->|1| p_tropoi_orepresentation
@@ -126,6 +128,7 @@ flowchart LR
     class p_tropoi_orun_ope other
     class p_tropoi_orun_oswe other
     class p_tropoi_ospatial other
+    class p_tropoi_ospatial_ogrids other
     class p_tropoi_otemporal other
 ```
 

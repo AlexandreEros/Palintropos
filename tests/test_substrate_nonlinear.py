@@ -13,11 +13,20 @@ import math
 import numpy as np
 import pytest
 
+from tropoi.temporal.substrate import BackwardEulerSubstrate
 from tropoi.physics.constants import SIGMA_SB
 from tropoi.physics.materials import (CellMaterials, DepthProfile, PolynomialHeatCapacity,
-                                      Stratum, stratified_interfaces)
-from tropoi.physics.substrate import (ConductiveSubstrate, SubstrateSolveError,
+                                      Stratum)
+from tropoi.spatial.vertical import stratified_interfaces
+from tropoi.temporal.substrate import SubstrateSolveError
+from tropoi.physics.substrate import (ConductiveSubstrate,
                                       ENERGY_REFERENCE_TEMPERATURE as REF)
+
+
+def _mesh(strata, top_thickness, max_stretch):
+    """The stratified mesh of ``strata`` (the spatial layer's construction,
+    as the airless runner builds it)."""
+    return stratified_interfaces([s.bottom for s in strata], top_thickness, max_stretch)
 
 TR = 350.0
 CHI = 2.0          # one chi in both strata keeps the manufactured interface exact
@@ -29,9 +38,9 @@ def _two_strata(zi=0.03, depth=0.25, kc=(0.004, 0.02), chi=(CHI, CHI)):
     jump at zi."""
     return [
         Stratum(zi, 1300.0, kc[0], (150.0, 2.2, -1.5e-3), radiative_coefficient=chi[0],
-                name="upper", source="test material"),
+                name="upper", source="test material", radiative_reference_temperature=350.0),
         Stratum(depth, DepthProfile(1500.0, 1900.0, 0.05), kc[1], (250.0, 1.8, -1.0e-3),
-                radiative_coefficient=chi[1], name="lower", source="test material"),
+                radiative_coefficient=chi[1], name="lower", source="test material", radiative_reference_temperature=350.0),
     ]
 
 
@@ -70,12 +79,12 @@ def test_material_differences_match_exact_integrals_without_cancellation():
 def test_strata_must_lie_on_faces_and_grids_honour_boundaries():
     strata = _two_strata()
     with pytest.raises(ValueError, match="not a cell face"):
-        ConductiveSubstrate(strata, interfaces=np.linspace(0.0, 0.25, 8))
+        ConductiveSubstrate(strata, interfaces=np.linspace(0.0, 0.25, 8), albedo=0.0, emissivity=1.0, bottom_heat_flux=0.0, initial_temperature=300.0)
     edges = stratified_interfaces([0.03, 0.25], 1e-3, 1.2)
     assert any(math.isclose(e, 0.03, rel_tol=1e-12) for e in edges)
     dz = np.diff(edges)
     assert dz[0] == pytest.approx(1e-3) and edges[-1] == 0.25
-    sub = ConductiveSubstrate(strata, top_thickness=1e-3, max_stretch=1.2)
+    sub = ConductiveSubstrate(strata, interfaces=_mesh(strata, 1e-3, 1.2), albedo=0.0, emissivity=1.0, bottom_heat_flux=0.0, initial_temperature=300.0)
     assert sub.materials.stratum_of_cell[0] == 0 and sub.materials.stratum_of_cell[-1] == 1
 
 
@@ -84,7 +93,7 @@ def test_strata_must_lie_on_faces_and_grids_honour_boundaries():
 def test_analytic_jacobian_matches_finite_differences():
     rng = np.random.default_rng(7)
     edges = _faces(0.03, 0.25, 5, 7)
-    sub = ConductiveSubstrate(_two_strata(), interfaces=edges, albedo=0.1, emissivity=0.95)
+    sub = ConductiveSubstrate(_two_strata(), interfaces=edges, albedo=0.1, emissivity=0.95, bottom_heat_flux=0.0, initial_temperature=300.0)
     n, L = 4, sub.layers
     th_old = rng.uniform(-200.0, 300.0, size=(L, n))
     th = th_old + rng.uniform(-30.0, 30.0, size=(L, n))
@@ -92,23 +101,24 @@ def test_analytic_jacobian_matches_finite_differences():
     forcing = (rng.uniform(0.0, 9000.0, n), -rng.uniform(0.0, 5.0, n),
                rng.uniform(-50.0, 50.0, n), np.full(n, 0.02), np.zeros((1, 1)))
     dt = 1800.0
-    out = sub._system(np, th, ths, th_old, dt, forcing, jacobian=True)
-    lower, diag, upper = out["jacobian"]
+    # the native implementation's residual and analytic Jacobian, per column
+    from tropoi.temporal.substrate_native import evaluate_host
+    const, a, t_ref, gb, _ = forcing
     x0 = np.concatenate([ths[None], th], axis=0)
 
-    def resid(x):
-        o = sub._system(np, x[1:], x[0], th_old, dt, forcing, jacobian=False)
-        return np.concatenate([o["r_s"][None], o["r"]], axis=0)
+    def native(x, c):
+        return evaluate_host(sub, th_old[:, c], x, dt, const[c], a[c], t_ref[c], gb[c])
 
     for c in range(n):
-        dense = np.diag(diag[:, c]) + np.diag(lower[:, c], -1) + np.diag(upper[:, c], 1)
+        _, lower, diag, upper = native(x0[:, c], c)
+        dense = np.diag(diag) + np.diag(lower, -1) + np.diag(upper, 1)
         fd = np.empty_like(dense)
         for j in range(L + 1):
             h = math.sqrt(np.finfo(float).eps) * (REF + abs(x0[j, c]))
-            xp_, xm = x0.copy(), x0.copy()
-            xp_[j, c] += h
-            xm[j, c] -= h
-            fd[:, j] = (resid(xp_)[:, c] - resid(xm)[:, c]) / (2 * h)
+            xp_, xm = x0[:, c].copy(), x0[:, c].copy()
+            xp_[j] += h
+            xm[j] -= h
+            fd[:, j] = (native(xp_, c)[0] - native(xm, c)[0]) / (2 * h)
         scale = np.max(np.abs(dense), axis=1, keepdims=True)
         assert np.max(np.abs(fd - dense) / scale) <= 1e-6
 
@@ -140,7 +150,7 @@ def _exact(z, t, kc):
 
 def _manufactured_run(edges, dt, t_end, strata, xp=np):
     kc = (strata[0].contact_conductivity, strata[1].contact_conductivity)
-    sub = ConductiveSubstrate(strata, interfaces=edges, albedo=ALBEDO, emissivity=EMISS)
+    sub = ConductiveSubstrate(strata, interfaces=edges, albedo=ALBEDO, emissivity=EMISS, bottom_heat_flux=0.0, initial_temperature=300.0)
     xg, wg = np.polynomial.legendre.leggauss(8)
     e = sub.interfaces
     L = sub.layers
@@ -182,7 +192,7 @@ def _manufactured_run(edges, dt, t_end, strata, xp=np):
         Tb, dTb, _ = _exact(np.array([DEPTH]), t, kc)
         kb = kc[1] * (1 + CHI * (Tb / TR) ** 3)
         g_up = float((kb * dTb)[0])                         # -q_down(D)
-        st, _ = sub.step(st, dt, shortwave_down=xp.asarray(sw), bottom_heat_flux=g_up,
+        st, _ = BackwardEulerSubstrate(sub).step(st, dt, shortwave_down=xp.asarray(sw), bottom_heat_flux=g_up,
                          source=xp.asarray(src))
     T_num = np.asarray(sub.temperature(st)[:, 0].get() if xp is not np else sub.temperature(st)[:, 0])
     Ts_num = float(sub.surface_temperature(st)[0])
@@ -247,26 +257,30 @@ def _steady_analytic(z, strata, ts, g):
 
 
 def test_steady_kirchhoff_profile_and_interface_flux():
-    strata = [Stratum(0.03, 1300.0, 9e-4, (600.0,), radiative_coefficient=1.5, name="a"),
-              Stratum(0.6, 1800.0, 9e-3, (700.0,), radiative_coefficient=0.07, name="b")]
+    strata = [Stratum(0.03, 1300.0, 9e-4, (600.0,), radiative_coefficient=1.5, name="a", radiative_reference_temperature=350.0),
+              Stratum(0.6, 1800.0, 9e-3, (700.0,), radiative_coefficient=0.07, name="b", radiative_reference_temperature=350.0)]
     F, G = 3000.0, 0.5
     ts = ((ALBEDO * 0 + (1 - ALBEDO) * F + G) / (EMISS * SIGMA_SB)) ** 0.25
     errs = []
     for k, (nu, nl) in enumerate(((5, 10), (10, 20), (20, 40), (40, 80))):
         e = _faces(0.03, 0.6, nu, nl)
         sub = ConductiveSubstrate(strata, interfaces=e, albedo=ALBEDO, emissivity=EMISS,
-                                  bottom_heat_flux=G)
+                                  bottom_heat_flux=G, initial_temperature=300.0)
         centres = 0.5 * (e[1:] + e[:-1])
         exact = _steady_analytic(centres, strata, ts, G)
         st = sub.state_at(exact[:, None] + 5.0, np.array([ts + 5.0]))
         for _ in range(3):                                      # steady: dt -> infinity
-            st, rep = sub.step(st, 1e25, shortwave_down=F)
+            st, rep = BackwardEulerSubstrate(sub).step(st, 1e25, shortwave_down=F)
         T = sub.temperature(st)[:, 0]
         errs.append(np.max(np.abs(T - exact)))
-        out = sub._system(np, st.anomaly, st.surface_anomaly, st.anomaly, 1e25,
-                          ((1 - ALBEDO) * np.array([F]), np.zeros(1), np.zeros(1),
-                           np.array([G]), np.zeros((1, 1))), jacobian=False)
-        assert np.max(np.abs(out["faces"][:, 0] + G)) <= 1e-9 + 1e-12 * G   # q = -G everywhere
+        # q = -G everywhere: the skin flux is -G and no cell stores or loses
+        # energy (each residual -(F_in - F_out) vanishes, so every face carries -G)
+        from tropoi.temporal.substrate_native import evaluate_host
+        R, _, _, _ = evaluate_host(sub, st.anomaly[:, 0], np.concatenate([st.surface_anomaly,
+                                                                          st.anomaly[:, 0]]),
+                                   1e25, (1 - ALBEDO) * F, 0.0, float(st.surface_anomaly[0]), G)
+        assert abs(float(rep.conducted[0]) + G) <= 1e-9 + 1e-12 * G
+        assert np.max(np.abs(R[1:])) <= 1e-9 + 1e-12 * G
         Ts = float(sub.surface_temperature(st)[0])
         assert EMISS * SIGMA_SB * Ts ** 4 == pytest.approx((1 - ALBEDO) * F + G, rel=1e-10)
     print("steady errors", errs, "orders", _order(errs))
@@ -280,19 +294,19 @@ def test_vanishing_conductivity_tends_to_radiative_equilibrium():
     t_eq = ((1 - ALBEDO) * F / (EMISS * SIGMA_SB)) ** 0.25
     gaps = []
     for scale in (1e-2, 1e-4, 1e-6, 1e-8):
-        strata = [Stratum(0.5, 1500.0, 0.01 * scale, (700.0,), radiative_coefficient=1.0)]
-        sub = ConductiveSubstrate(strata, top_thickness=1e-3, max_stretch=1.2,
+        strata = [Stratum(0.5, 1500.0, 0.01 * scale, (700.0,), radiative_coefficient=1.0, radiative_reference_temperature=350.0)]
+        sub = ConductiveSubstrate(strata, interfaces=_mesh(strata, 1e-3, 1.2),
                                   albedo=ALBEDO, emissivity=EMISS, bottom_heat_flux=0.0,
                                   initial_temperature=100.0)
         st = sub.initial_state(1)
         for _ in range(60):
-            st, _ = sub.step(st, 60.0, shortwave_down=F)
+            st, _ = BackwardEulerSubstrate(sub).step(st, 60.0, shortwave_down=F)
         gaps.append(t_eq - float(sub.surface_temperature(st)[0]))
     assert all(g > 0 for g in gaps) and all(b < a for a, b in zip(gaps, gaps[1:]))
     tiny = [Stratum(0.5, 1500.0, 1e-30, (700.0,))]
-    sub = ConductiveSubstrate(tiny, top_thickness=1e-3, max_stretch=1.2, albedo=ALBEDO,
-                              emissivity=EMISS, initial_temperature=100.0)
-    st, _ = sub.step(sub.initial_state(1), 60.0, shortwave_down=F)
+    sub = ConductiveSubstrate(tiny, interfaces=_mesh(tiny, 1e-3, 1.2), albedo=ALBEDO,
+                              emissivity=EMISS, initial_temperature=100.0, bottom_heat_flux=0.0)
+    st, _ = BackwardEulerSubstrate(sub).step(sub.initial_state(1), 60.0, shortwave_down=F)
     assert float(sub.surface_temperature(st)[0]) == pytest.approx(t_eq, rel=1e-12)
 
 
@@ -304,11 +318,11 @@ def test_constant_property_linear_problem_is_one_newton_step(h):
     C, k = 1.2e6, 0.8
     e = _faces(0.1, 1.0, 6, 10)
     sub = ConductiveSubstrate([Stratum.volumetric(0.1, C, k), Stratum.volumetric(1.0, 2 * C, 3 * k)],
-                              interfaces=e, emissivity=0.0, bottom_heat_flux=0.3)
+                              interfaces=e, emissivity=0.0, bottom_heat_flux=0.3, albedo=0.0, initial_temperature=300.0)
     L = sub.layers
     st = sub.state_at(300.0 + rng.uniform(-20, 20, size=(L, 1)), np.array([310.0]))
     F0, dt = 150.0, 3600.0
-    new, rep = sub.step(st, dt, flux=F0, flux_derivative=-h)
+    new, rep = BackwardEulerSubstrate(sub).step(st, dt, flux=F0, flux_derivative=-h)
     assert rep.iterations == 1
     # independent dense solve in anomalies: unknowns (theta_s, theta_1..L)
     dz = np.diff(e)
@@ -342,30 +356,30 @@ def test_constant_property_linear_problem_is_one_newton_step(h):
 # -- 6: stress and failure reporting ------------------------------------------------------
 
 def test_cold_start_into_perihelion_noon():
-    sub = ConductiveSubstrate(_two_strata(), top_thickness=5e-4, max_stretch=1.2,
+    sub = ConductiveSubstrate(_two_strata(), interfaces=_mesh(_two_strata(), 5e-4, 1.2),
                               albedo=ALBEDO, emissivity=EMISS, initial_temperature=40.0,
                               bottom_heat_flux=0.02)
     st = sub.initial_state(3)
     iters = []
     for _ in range(20):
-        st, rep = sub.step(st, 3600.0, shortwave_down=np.array([14500.0, 7000.0, 0.0]))
+        st, rep = BackwardEulerSubstrate(sub).step(st, 3600.0, shortwave_down=np.array([14500.0, 7000.0, 0.0]))
         iters.append(rep.iterations)
         assert np.all(sub.temperature(st) > 0) and np.all(sub.surface_temperature(st) > 0)
     print("iterations per step", iters)
     assert max(iters) <= 30
     with pytest.raises(SubstrateSolveError, match=r"columns \(first \[0, 1"):
-        weak = ConductiveSubstrate(_two_strata(), top_thickness=5e-4, max_stretch=1.2,
+        weak = ConductiveSubstrate(_two_strata(), interfaces=_mesh(_two_strata(), 5e-4, 1.2),
                                    albedo=ALBEDO, emissivity=EMISS, initial_temperature=40.0,
-                                   max_iterations=1)
-        weak.step(weak.initial_state(3), 3600.0, shortwave_down=np.array([14500.0, 7000.0, 0.0]))
+                                   max_iterations=1, bottom_heat_flux=0.0)
+        BackwardEulerSubstrate(weak).step(weak.initial_state(3), 3600.0, shortwave_down=np.array([14500.0, 7000.0, 0.0]))
 
 
 # -- 7: energy closure ------------------------------------------------------------------------
 
 def test_energy_identity_and_cumulative_closure_under_random_forcing():
     rng = np.random.default_rng(5)
-    sub = ConductiveSubstrate(_two_strata(), top_thickness=1e-3, max_stretch=1.25,
-                              albedo=ALBEDO, emissivity=EMISS, initial_temperature=250.0)
+    sub = ConductiveSubstrate(_two_strata(), interfaces=_mesh(_two_strata(), 1e-3, 1.25),
+                              albedo=ALBEDO, emissivity=EMISS, initial_temperature=250.0, bottom_heat_flux=0.0)
     n = 3
     st = sub.initial_state(n)
     E0 = np.asarray(sub.energy(st)).copy()
@@ -375,7 +389,7 @@ def test_energy_identity_and_cumulative_closure_under_random_forcing():
     for _ in range(400):
         sw = rng.uniform(0.0, 12000.0, n) * (rng.uniform(size=n) > 0.4)
         gb = rng.uniform(-0.05, 0.05, n)
-        st, rep = sub.step(st, dt, shortwave_down=sw, bottom_heat_flux=gb)
+        st, rep = BackwardEulerSubstrate(sub).step(st, dt, shortwave_down=sw, bottom_heat_flux=gb)
         net = rep.absorbed - rep.emitted + rep.bottom + rep.source
         # the identity, term by term (sign of r_s included)
         assert np.all(np.abs(rep.energy_tendency - net - rep.residual_sum)
@@ -396,9 +410,9 @@ def test_energy_identity_and_cumulative_closure_under_random_forcing():
 # -- 8: validity ranges ---------------------------------------------------------------------
 
 def test_stratum_extents_are_recorded_for_validity_checks():
-    sub = ConductiveSubstrate(_two_strata(), top_thickness=1e-3, max_stretch=1.25,
-                              albedo=ALBEDO, emissivity=EMISS, initial_temperature=150.0)
-    st, report = sub.step(sub.initial_state(2), 3600.0, shortwave_down=np.array([9000.0, 0.0]))
+    sub = ConductiveSubstrate(_two_strata(), interfaces=_mesh(_two_strata(), 1e-3, 1.25),
+                              albedo=ALBEDO, emissivity=EMISS, initial_temperature=150.0, bottom_heat_flux=0.0)
+    st, report = BackwardEulerSubstrate(sub).step(sub.initial_state(2), 3600.0, shortwave_down=np.array([9000.0, 0.0]))
     (lo0, hi0), (lo1, hi1) = report.extent
     np.testing.assert_array_equal(report.extent, sub.extent(st))
     assert hi0 == pytest.approx(float(np.max(sub.surface_temperature(st))))
@@ -414,3 +428,27 @@ def test_stratified_grid_rejects_incompatible_stretch(top, stretch):
 def test_stratified_grid_accepts_exact_uniform_fit():
     edges = stratified_interfaces([0.021], 0.003, 1.0)
     np.testing.assert_allclose(np.diff(edges), 0.003, rtol=1e-13)
+
+
+def test_radiative_reference_temperature_is_required_only_with_a_radiative_term():
+    from tropoi.run.airless.config import VPW99, strata_from_dicts, vpw99_strata
+    with pytest.raises(ValueError, match="reference temperature"):
+        Stratum(0.5, 1500.0, 1e-3, (700.0,), radiative_coefficient=1.0)
+    with pytest.raises(ValueError, match="reference temperature"):
+        Stratum(0.5, DepthProfile(1.0, 2.0, 0.1), 1e-3, (700.0,),
+                radiative_coefficient=DepthProfile(0.0, 1.0, 0.1))
+    plain = Stratum(0.5, 1500.0, 1e-3, (700.0,))
+    assert plain.radiative_reference_temperature is None
+    assert plain.to_dict()["radiative_reference_temperature"] is None
+    with pytest.raises(ValueError, match="finite and > 0"):
+        Stratum(0.5, 1500.0, 1e-3, (700.0,), radiative_coefficient=1.0,
+                radiative_reference_temperature=0.0)
+    # a saved radiative stratum without T_r is rejected, never filled in
+    d = vpw99_strata("TWO", 1.0)[0].to_dict()
+    assert d["radiative_reference_temperature"] == VPW99["T_r"] == 350.0
+    del d["radiative_reference_temperature"]
+    with pytest.raises(ValueError, match="reference temperature"):
+        strata_from_dicts([d])
+    # chi = 0 needs none, and its cells carry chi / T_r^3 = 0
+    m = CellMaterials.on_grid([plain], np.array([0.0, 0.25, 0.5]))
+    assert np.all(m.chi_over_tr3 == 0.0)

@@ -43,8 +43,10 @@ def strata_from_dicts(items) -> list:
                            _value(d["contact_conductivity"]),
                            d["heat_capacity"],
                            radiative_coefficient=_value(d.get("radiative_coefficient", 0.0)),
-                           radiative_reference_temperature=float(
-                               d.get("radiative_reference_temperature", 350.0)),
+                           # never filled in: a radiative term must state its T_r
+                           radiative_reference_temperature=(
+                               None if d.get("radiative_reference_temperature") is None
+                               else float(d["radiative_reference_temperature"])),
                            heat_capacity_range=None if rng is None else tuple(rng),
                            name=d.get("name", "stratum"), source=d.get("source", "")))
     return out
@@ -75,8 +77,10 @@ class AirlessConfig:
     * ``strata``: material strata in :meth:`Stratum.to_dict` form, top to
       bottom. The last ``bottom`` is the column depth.
     * ``columns``: ``{"kind": "latlon", "nlat", "nlon"}`` (regular,
-      cell-centred, latitudes south to north, east longitudes from 0) or
-      ``{"kind": "points", "lat_deg": [...], "lon_deg": [...]}``.
+      cell-centred, latitudes south to north, east longitudes from 0),
+      ``{"kind": "gauss", "nlat", "nlon"}`` (the spectral models' Gauss grid:
+      the same nodes, ordering and weights, no spectral transform), or
+      ``{"kind": "points", "lat_deg": [...], "lon_deg": [...]}`` (diagnostic).
     * ``vertical``: ``{"top_thickness", "max_stretch"}``.
     * ``cycle_steps``: steps per illumination cycle at the production
       timestep. ``spinup_cycle_steps`` is the coarse spin-up count, or None
@@ -212,6 +216,9 @@ def load_config_document(path) -> tuple:
 HAYNE_2017 = {
     "rho_s": 1100.0, "rho_d": 1800.0, "K_s": 7.4e-4, "K_d": 3.4e-3, "H": 0.06,
     "chi": 2.7, "cp": (-3.6125, 2.7431, 2.3616e-3, -1.2340e-5, 8.9093e-9),
+    # K = K_c [1 + chi (T/350 K)^3], the Appendix A form; this preset used 350 K
+    # through the former Stratum default, so its configuration is unchanged
+    "T_r": 350.0,
     "emissivity": 0.95,
     # "The polynomial fit cp(T) is valid for temperatures from < 90 K to > 400 K"
     "cp_valid_range_K": (90.0, 400.0),
@@ -278,6 +285,8 @@ VPW99 = {
     "top": {"bottom": 0.02, "rho": 1300.0, "kc": 9.22e-4, "chi": 1.48},
     "bottom": {"rho": 1800.0, "kc": 9.3e-3, "chi": 0.073},
     "albedo": 0.10, "emissivity": 0.95, "internal_heat_flux": 0.020,
+    # k = kc [1 + chi (T/350)^3] (VPW99 sec. II.A)
+    "T_r": 350.0,
 }
 LEDLOW_POSITIVE_ABOVE_K = 10.13     # eq. (6) of Ledlow et al. 1992 is negative below
 
@@ -295,7 +304,8 @@ def vpw99_strata(model: str, depth: float) -> list:
 
     def layer(props, bottom, name):
         return Stratum(bottom, props["rho"], props["kc"], law,
-                       radiative_coefficient=props["chi"], heat_capacity_range=rng,
+                       radiative_coefficient=props["chi"],
+                       radiative_reference_temperature=VPW99["T_r"], heat_capacity_range=rng,
                        name=name, source=src)
     if model == "TWO":
         return [layer(t, t["bottom"], "VPW99 top layer"), layer(b, depth, "VPW99 bottom layer")]
@@ -355,7 +365,9 @@ def mercury_hayne_analogue(experiment_id: str = "mercury-hayne2017-analogue", *,
     h = HAYNE_2017
     stratum = Stratum(depth, DepthProfile(h["rho_s"], h["rho_d"], h["H"]),
                       DepthProfile(h["K_s"], h["K_d"], h["H"]), h["cp"],
-                      radiative_coefficient=h["chi"], heat_capacity_range=h["cp_valid_range_K"],
+                      radiative_coefficient=h["chi"],
+                      radiative_reference_temperature=h["T_r"],
+                      heat_capacity_range=h["cp_valid_range_K"],
                       name="lunar regolith (Hayne et al. 2017)",
                       source="Hayne et al. 2017 Table A1 (arXiv:1711.00977, Appendix A)")
     return _mercury(

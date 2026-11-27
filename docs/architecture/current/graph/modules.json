@@ -372,14 +372,6 @@
     {
       "kind": "imports",
       "scopes": [
-        "function"
-      ],
-      "source": "tropoi.physics.materials",
-      "target": "tropoi.physics.substrate"
-    },
-    {
-      "kind": "imports",
-      "scopes": [
         "module"
       ],
       "source": "tropoi.physics.monin_obukhov_cuda",
@@ -532,15 +524,6 @@
     {
       "kind": "imports",
       "scopes": [
-        "module"
-      ],
-      "source": "tropoi.physics.substrate",
-      "target": "tropoi.physics.constants"
-    },
-    {
-      "kind": "imports",
-      "scopes": [
-        "function",
         "module"
       ],
       "source": "tropoi.physics.substrate",
@@ -869,6 +852,14 @@
     {
       "kind": "imports",
       "scopes": [
+        "function"
+      ],
+      "source": "tropoi.representation.archive.viewer_diagnostics",
+      "target": "tropoi.spatial.grids.quadrature"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
         "module"
       ],
       "source": "tropoi.representation.archive.viewer_manifest",
@@ -946,6 +937,14 @@
       ],
       "source": "tropoi.representation.diagnostics.bve",
       "target": "tropoi.spatial.truncation"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.representation.diagnostics.held_suarez_sections",
+      "target": "tropoi.spatial.grids.quadrature"
     },
     {
       "kind": "imports",
@@ -1833,6 +1832,14 @@
     {
       "kind": "imports",
       "scopes": [
+        "function"
+      ],
+      "source": "tropoi.representation.visual.viewer_fields",
+      "target": "tropoi.spatial.grids.quadrature"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
         "module"
       ],
       "source": "tropoi.representation.visual.viewer_fields",
@@ -1983,6 +1990,30 @@
       ],
       "source": "tropoi.run.airless.experiment",
       "target": "tropoi.run.held_suarez.experiment"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.run.airless.experiment",
+      "target": "tropoi.spatial.grids.quadrature"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.run.airless.experiment",
+      "target": "tropoi.spatial.vertical"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.run.airless.experiment",
+      "target": "tropoi.temporal.substrate"
     },
     {
       "kind": "imports",
@@ -2765,6 +2796,14 @@
       "scopes": [
         "function"
       ],
+      "source": "tropoi.run.held_suarez.report",
+      "target": "tropoi.spatial.grids.quadrature"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
       "source": "tropoi.run.lifecycle",
       "target": "tropoi.representation.archive.schema"
     },
@@ -3422,6 +3461,14 @@
         "module"
       ],
       "source": "tropoi.spatial.grids.latlon_grid",
+      "target": "tropoi.spatial.grids.quadrature"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.spatial.grids.latlon_grid",
       "target": "tropoi.spatial.transforms.fast_geodesic_sh"
     },
     {
@@ -3773,6 +3820,46 @@
     {
       "kind": "imports",
       "scopes": [
+        "module"
+      ],
+      "source": "tropoi.temporal._substrate_reference",
+      "target": "tropoi.numerics.tridiagonal"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.temporal._substrate_reference",
+      "target": "tropoi.physics.constants"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.temporal._substrate_reference",
+      "target": "tropoi.physics.materials"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.temporal._substrate_reference",
+      "target": "tropoi.physics.substrate"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.temporal._substrate_reference",
+      "target": "tropoi.temporal.substrate"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
         "function"
       ],
       "source": "tropoi.temporal.column_coupling",
@@ -3897,6 +3984,54 @@
       ],
       "source": "tropoi.temporal.steppers",
       "target": "tropoi.temporal.integration"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.temporal.substrate",
+      "target": "tropoi.physics.substrate"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.temporal.substrate",
+      "target": "tropoi.temporal.substrate_native"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.temporal.substrate_native",
+      "target": "tropoi.physics.constants"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.temporal.substrate_native",
+      "target": "tropoi.physics.materials"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.temporal.substrate_native",
+      "target": "tropoi.physics.substrate"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.temporal.substrate_native",
+      "target": "tropoi.temporal.native.build_identity"
     },
     {
       "kind": "imports",
@@ -4158,6 +4293,17 @@
       "third_party_imports": [
         "matplotlib"
       ]
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.numerics.tridiagonal",
+      "is_package": false,
+      "path": "tropoi/numerics/tridiagonal.py",
+      "stdlib_imports": [
+        "__future__"
+      ],
+      "third_party_imports": []
     },
     {
       "category": "code",
@@ -5984,6 +6130,22 @@
     {
       "category": "code",
       "dynamic_import_calls": 0,
+      "id": "tropoi.spatial.grids.quadrature",
+      "is_package": false,
+      "path": "tropoi/spatial/grids/quadrature.py",
+      "stdlib_imports": [
+        "__future__",
+        "dataclasses",
+        "math",
+        "typing"
+      ],
+      "third_party_imports": [
+        "numpy"
+      ]
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
       "id": "tropoi.spatial.initialization.bve",
       "is_package": false,
       "path": "tropoi/spatial/initialization/bve.py",
@@ -6380,6 +6542,21 @@
     {
       "category": "code",
       "dynamic_import_calls": 0,
+      "id": "tropoi.spatial.vertical",
+      "is_package": false,
+      "path": "tropoi/spatial/vertical.py",
+      "stdlib_imports": [
+        "__future__",
+        "math",
+        "typing"
+      ],
+      "third_party_imports": [
+        "numpy"
+      ]
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
       "id": "tropoi.spatial.williamson5",
       "is_package": false,
       "path": "tropoi/spatial/williamson5.py",
@@ -6388,6 +6565,21 @@
         "math"
       ],
       "third_party_imports": []
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.temporal._substrate_reference",
+      "is_package": false,
+      "path": "tropoi/temporal/_substrate_reference.py",
+      "stdlib_imports": [
+        "__future__",
+        "math"
+      ],
+      "third_party_imports": [
+        "cupy",
+        "numpy"
+      ]
     },
     {
       "category": "code",
@@ -6451,6 +6643,19 @@
     {
       "category": "code",
       "dynamic_import_calls": 0,
+      "id": "tropoi.temporal.native.build_identity",
+      "is_package": false,
+      "path": "tropoi/temporal/native/build_identity.py",
+      "stdlib_imports": [
+        "__future__",
+        "hashlib",
+        "pathlib"
+      ],
+      "third_party_imports": []
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
       "id": "tropoi.temporal.semi_implicit",
       "is_package": false,
       "path": "tropoi/temporal/semi_implicit.py",
@@ -6491,6 +6696,39 @@
         "typing"
       ],
       "third_party_imports": []
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.temporal.substrate",
+      "is_package": false,
+      "path": "tropoi/temporal/substrate.py",
+      "stdlib_imports": [
+        "__future__",
+        "math",
+        "typing"
+      ],
+      "third_party_imports": [
+        "cupy",
+        "numpy"
+      ]
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
+      "id": "tropoi.temporal.substrate_native",
+      "is_package": false,
+      "path": "tropoi/temporal/substrate_native.py",
+      "stdlib_imports": [
+        "__future__",
+        "ctypes",
+        "importlib",
+        "typing"
+      ],
+      "third_party_imports": [
+        "cupy",
+        "numpy"
+      ]
     },
     {
       "category": "code",

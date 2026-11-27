@@ -29,15 +29,24 @@ flowchart LR
     end
     p_tropoi_ophysics["package physics"]
     p_tropoi_orun_oheld__suarez["package run.held#95;suarez"]
+    p_tropoi_ospatial["package spatial"]
+    p_tropoi_ospatial_ogrids["package spatial.grids"]
+    p_tropoi_otemporal["package temporal"]
     n_tropoi_orun_oairless_o____main____ --> n_tropoi_orun_oairless_oconfig
     n_tropoi_orun_oairless_o____main____ -.-> n_tropoi_orun_oairless_oexperiment
     n_tropoi_orun_oairless_oexperiment --> n_tropoi_orun_oairless_oconfig
     n_tropoi_orun_oairless_oconfig -->|2| p_tropoi_ophysics
     n_tropoi_orun_oairless_oexperiment -->|2| p_tropoi_ophysics
     n_tropoi_orun_oairless_oexperiment -->|1| p_tropoi_orun_oheld__suarez
+    n_tropoi_orun_oairless_oexperiment -->|1| p_tropoi_ospatial
+    n_tropoi_orun_oairless_oexperiment -->|1| p_tropoi_ospatial_ogrids
+    n_tropoi_orun_oairless_oexperiment -->|1| p_tropoi_otemporal
     classDef other fill:none,stroke-dasharray:3 3
     class p_tropoi_ophysics other
     class p_tropoi_orun_oheld__suarez other
+    class p_tropoi_ospatial other
+    class p_tropoi_ospatial_ogrids other
+    class p_tropoi_otemporal other
 ```
 
 ## Classes
@@ -65,6 +74,7 @@ classDiagram
     c_tropoi_orun_oairless_oexperiment_oAirlessRun : +#95;event()
     c_tropoi_orun_oairless_oexperiment_oAirlessRun : +#95;mkdir()
     c_tropoi_orun_oairless_oexperiment_oAirlessRun : +#95;pool()
+    c_tropoi_orun_oairless_oexperiment_oAirlessRun : +#95;save#95;series()
     c_tropoi_orun_oairless_oexperiment_oAirlessRun : +#95;start#95;state()
     c_tropoi_orun_oairless_oexperiment_oAirlessRun : +#95;write#95;json()
     c_tropoi_orun_oairless_oexperiment_oAirlessRun : +run()

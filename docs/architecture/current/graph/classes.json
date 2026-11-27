@@ -1473,14 +1473,6 @@
         },
         {
           "kind": "method",
-          "name": "_report"
-        },
-        {
-          "kind": "method",
-          "name": "_system"
-        },
-        {
-          "kind": "method",
           "name": "_temperature_extent"
         },
         {
@@ -1521,10 +1513,6 @@
         },
         {
           "kind": "method",
-          "name": "step"
-        },
-        {
-          "kind": "method",
           "name": "surface_temperature"
         },
         {
@@ -1534,26 +1522,6 @@
       ],
       "module": "tropoi.physics.substrate",
       "qualname": "ConductiveSubstrate"
-    },
-    {
-      "decorators": [],
-      "external_bases": [
-        "typing.NamedTuple"
-      ],
-      "id": "tropoi.physics.substrate.StepReport",
-      "members": [],
-      "module": "tropoi.physics.substrate",
-      "qualname": "StepReport"
-    },
-    {
-      "decorators": [],
-      "external_bases": [
-        "ArithmeticError"
-      ],
-      "id": "tropoi.physics.substrate.SubstrateSolveError",
-      "members": [],
-      "module": "tropoi.physics.substrate",
-      "qualname": "SubstrateSolveError"
     },
     {
       "decorators": [],
@@ -4036,6 +4004,10 @@
         },
         {
           "kind": "method",
+          "name": "_save_series"
+        },
+        {
+          "kind": "method",
           "name": "_start_state"
         },
         {
@@ -5032,6 +5004,37 @@
       ],
       "module": "tropoi.spatial.grids.latlon_grid",
       "qualname": "GaussLatLonSphericalHarmonics"
+    },
+    {
+      "decorators": [
+        "dataclass(frozen=True)"
+      ],
+      "external_bases": [],
+      "id": "tropoi.spatial.grids.quadrature.ColumnSet",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__post_init__"
+        },
+        {
+          "kind": "classmethod",
+          "name": "gauss"
+        },
+        {
+          "kind": "classmethod",
+          "name": "points"
+        },
+        {
+          "kind": "classmethod",
+          "name": "regular"
+        },
+        {
+          "kind": "property",
+          "name": "size"
+        }
+      ],
+      "module": "tropoi.spatial.grids.quadrature",
+      "qualname": "ColumnSet"
     },
     {
       "decorators": [
@@ -6136,6 +6139,31 @@
     {
       "decorators": [],
       "external_bases": [],
+      "id": "tropoi.temporal._substrate_reference.ReferenceBackwardEulerSubstrate",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__init__"
+        },
+        {
+          "kind": "method",
+          "name": "_report"
+        },
+        {
+          "kind": "method",
+          "name": "_system"
+        },
+        {
+          "kind": "method",
+          "name": "step"
+        }
+      ],
+      "module": "tropoi.temporal._substrate_reference",
+      "qualname": "ReferenceBackwardEulerSubstrate"
+    },
+    {
+      "decorators": [],
+      "external_bases": [],
       "id": "tropoi.temporal.column_coupling.ColumnPhysicsCoupling",
       "members": [
         {
@@ -6631,6 +6659,81 @@
       ],
       "module": "tropoi.temporal.steppers",
       "qualname": "TimeStepper"
+    },
+    {
+      "decorators": [],
+      "external_bases": [],
+      "id": "tropoi.temporal.substrate.BackwardEulerSubstrate",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__init__"
+        },
+        {
+          "kind": "method",
+          "name": "_report"
+        },
+        {
+          "kind": "method",
+          "name": "describe"
+        },
+        {
+          "kind": "method",
+          "name": "step"
+        }
+      ],
+      "module": "tropoi.temporal.substrate",
+      "qualname": "BackwardEulerSubstrate"
+    },
+    {
+      "decorators": [],
+      "external_bases": [
+        "typing.NamedTuple"
+      ],
+      "id": "tropoi.temporal.substrate.StepReport",
+      "members": [],
+      "module": "tropoi.temporal.substrate",
+      "qualname": "StepReport"
+    },
+    {
+      "decorators": [],
+      "external_bases": [
+        "ArithmeticError"
+      ],
+      "id": "tropoi.temporal.substrate.SubstrateSolveError",
+      "members": [],
+      "module": "tropoi.temporal.substrate",
+      "qualname": "SubstrateSolveError"
+    },
+    {
+      "decorators": [],
+      "external_bases": [
+        "RuntimeError"
+      ],
+      "id": "tropoi.temporal.substrate_native.NativeLibraryError",
+      "members": [],
+      "module": "tropoi.temporal.substrate_native",
+      "qualname": "NativeLibraryError"
+    },
+    {
+      "decorators": [],
+      "external_bases": [
+        "ctypes.Structure"
+      ],
+      "id": "tropoi.temporal.substrate_native._ColumnArrays",
+      "members": [],
+      "module": "tropoi.temporal.substrate_native",
+      "qualname": "_ColumnArrays"
+    },
+    {
+      "decorators": [],
+      "external_bases": [
+        "ctypes.Structure"
+      ],
+      "id": "tropoi.temporal.substrate_native._StepScalars",
+      "members": [],
+      "module": "tropoi.temporal.substrate_native",
+      "qualname": "_StepScalars"
     },
     {
       "decorators": [],

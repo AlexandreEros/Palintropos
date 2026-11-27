@@ -10,7 +10,10 @@ Explore dependencies, call sites, possible dispatch, runtime observations and pr
 |---|---|---|---|---|
 | [`tropoi`](packages/tropoi.md) | 1 | 0 | 0 | `README.md` |
 | [`tropoi.cli`](packages/tropoi.cli.md) | 6 | 0 | 24 | `README.md` |
-| [`tropoi.physics`](packages/tropoi.physics.md) | 20 | 36 | 48 | `README.md` |
+| [`tropoi.numerics`](packages/tropoi.numerics.md) | 2 | 0 | 1 | – |
+| [`tropoi.numerics.native`](packages/tropoi.numerics.native.md) | 1 | 0 | 0 | – |
+| [`tropoi.physics`](packages/tropoi.physics.md) | 20 | 34 | 46 | `README.md` |
+| [`tropoi.physics.native`](packages/tropoi.physics.native.md) | 1 | 0 | 0 | – |
 | [`tropoi.physics.radiation`](packages/tropoi.physics.radiation.md) | 6 | 14 | 23 | `README.md` |
 | [`tropoi.representation`](packages/tropoi.representation.md) | 2 | 0 | 1 | `README.md` |
 | [`tropoi.representation.archive`](packages/tropoi.representation.archive.md) | 13 | 19 | 30 | `README.md` |
@@ -24,15 +27,16 @@ Explore dependencies, call sites, possible dispatch, runtime observations and pr
 | [`tropoi.run.pe`](packages/tropoi.run.pe.md) | 5 | 1 | 2 | `GUIDE.md`, `README.md` |
 | [`tropoi.run.radiative`](packages/tropoi.run.radiative.md) | 5 | 2 | 14 | `README.md` |
 | [`tropoi.run.swe`](packages/tropoi.run.swe.md) | 5 | 1 | 2 | `README.md` |
-| [`tropoi.spatial`](packages/tropoi.spatial.md) | 10 | 18 | 19 | `CONVENTIONS.md`, `README.md` |
-| [`tropoi.spatial.grids`](packages/tropoi.spatial.grids.md) | 8 | 5 | 5 | `README.md` |
+| [`tropoi.spatial`](packages/tropoi.spatial.md) | 11 | 18 | 21 | `CONVENTIONS.md`, `README.md` |
+| [`tropoi.spatial.grids`](packages/tropoi.spatial.grids.md) | 9 | 6 | 9 | `README.md` |
 | [`tropoi.spatial.initialization`](packages/tropoi.spatial.initialization.md) | 4 | 0 | 4 | `README.md` |
 | [`tropoi.spatial.operators`](packages/tropoi.spatial.operators.md) | 2 | 1 | 0 | `README.md` |
 | [`tropoi.spatial.states`](packages/tropoi.spatial.states.md) | 4 | 5 | 1 | `README.md` |
 | [`tropoi.spatial.terrain`](packages/tropoi.spatial.terrain.md) | 8 | 10 | 10 | `IMPORT.md`, `README.md` |
 | [`tropoi.spatial.transforms`](packages/tropoi.spatial.transforms.md) | 6 | 5 | 5 | `README.md` |
 | [`tropoi.spatial.transforms.cuda`](packages/tropoi.spatial.transforms.cuda.md) | 2 | 0 | 2 | `README.md`, `legendre.cu`, `legendre_stages.cu`, `sh_matrix.cu` |
-| [`tropoi.temporal`](packages/tropoi.temporal.md) | 8 | 11 | 17 | `README.md`, `SAVED_RUNS.md`, `SEMI_IMPLICIT.md` |
+| [`tropoi.temporal`](packages/tropoi.temporal.md) | 11 | 18 | 24 | `README.md`, `SAVED_RUNS.md`, `SEMI_IMPLICIT.md` |
+| [`tropoi.temporal.native`](packages/tropoi.temporal.native.md) | 2 | 0 | 2 | – |
 | [`tropoi.temporal.tendencies`](packages/tropoi.temporal.tendencies.md) | 7 | 8 | 9 | `PRIMITIVE_EQUATIONS.md`, `README.md`, `RETAINED_TRUNCATION.md`, `SHALLOW_WATER.md` |
 
 ## Entry paths
@@ -67,10 +71,10 @@ Explore dependencies, call sites, possible dispatch, runtime observations and pr
 
 ## Coverage
 
-* Packages: 26 discovered, 26 with a page.
-* Import module records: 186 discovered (including namespace placeholders), 186 listed on a package page.
-* Classes: 238 discovered, 238 drawn on a package page (21 in [the inheritance overview](class-inheritance.mmd)).
-* Both containment views cover 23 directories, 110 Python files, 238 class definitions, leaving out files and directories that define no class.
+* Packages: 30 discovered, 30 with a page.
+* Import module records: 197 discovered (including namespace placeholders), 197 listed on a package page.
+* Classes: 244 discovered, 244 drawn on a package page (21 in [the inheritance overview](class-inheritance.mmd)).
+* Both containment views cover 23 directories, 114 Python files, 244 class definitions, leaving out files and directories that define no class.
 * CLI handlers: 12 discovered, each with a call graph.
 * Public Python entry-point candidates: 42; 17 are roots of declared paths, 25 excluded with a reason.
 

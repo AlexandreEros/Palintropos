@@ -12,6 +12,41 @@ per-block files and read back with `load_tier2`.
 * acceptance register: [`../../validation/PLANET-ONE-GATES.md`](../../validation/PLANET-ONE-GATES.md)
 * status and handoff: [`../../validation/PLANET-ONE-STATUS.md`](../../validation/PLANET-ONE-STATUS.md)
 
+## Global discretizations and diagnostic points
+
+A `latlon` grid (regular, cell-centred) or a `gauss` grid (the
+Gauss–Legendre grid of the spectral atmospheric models, with exactly their
+nodes, ordering and weights, and no spectral transform; see
+[`spatial/grids/quadrature.py`](../../../src/tropoi/spatial/grids/quadrature.py))
+is a **global** discretization. Its columns carry their exact
+cell areas (m², summing to 4πR²), and the run publishes area integrals
+(`series/*.npz`, in W) and area means (`mean_absorbed_W_m2`,
+`mean_emitted_W_m2`, `global_residual_over_tolerance` in `cycles.json`).
+
+A `points` collection is **diagnostic**. Its columns are independent sample
+locations with no physical area, so the run publishes nothing global:
+
+* `grid.npz` has no `weights`;
+* `series/*.npz` holds `per_point_<quantity>_W_m2` with shape (steps,
+  points);
+* each `cycles.json` entry lists `points` (column index, latitude,
+  longitude, absorbed, emitted, energy imbalance and residual/tolerance per
+  point).
+
+The vertical mesh is spatial discretization. `build_substrate` builds it
+with `tropoi.spatial.vertical.stratified_interfaces`, and the substrate
+receives explicit faces. `grid.npz` stores the column coordinates in
+radians (`lat_rad`, `lon_rad`), which is what the runner uses, as well as in
+degrees.
+
+`column_kind` (`global` or `diagnostic`) is recorded in `config.json`,
+`grid.npz` and every cycle entry.
+
+Point runs written before this distinction stored unit weights. Their
+`series` values are plain sums over the points, and their `mean_*` and
+`global_*` values are unweighted point averages, not global quantities. Read
+them per point from `integrals.npz` instead.
+
 ## Running a saved configuration
 
 Any body the configuration schema can describe runs from its saved JSON

@@ -25,7 +25,8 @@ def _cone_coefficients(physics, geometry, lmax):
     if geometry["grid"] != "latlon" or physics.get("w5_projection") != W5_PROJECTION_POLICY:
         raise ValueError("Williamson-5 terrain needs the Gaussian state-grid projection")
     nlat, nlon = geometry["nlat"], geometry["nlon"]
-    nodes, weights = np.polynomial.legendre.leggauss(nlat)
+    from tropoi.spatial.grids.quadrature import gauss_legendre
+    nodes, weights = gauss_legendre(nlat)
     lat = np.arcsin(nodes)
     lon = 2 * np.pi * np.arange(nlon) / nlon
     dlon = (lon - np.radians(physics["w5_cone_lon_deg"]) + np.pi) % (2*np.pi) - np.pi

@@ -3,8 +3,8 @@
 A column is a stack of physical :class:`Stratum` objects. The number of
 strata has nothing to do with the number of numerical cells: each stratum
 is resolved by as many cells as the grid gives it, and every stratum
-boundary must coincide with a cell face (:func:`stratified_interfaces`
-builds such grids).
+boundary must coincide with a cell face
+(:func:`tropoi.spatial.vertical.stratified_interfaces` builds such grids).
 
 **Property families.** These are the ones every built-in material uses.
 Depth z is in m, positive downward; temperature T is in K.
@@ -39,7 +39,7 @@ import numpy as np
 
 __all__ = ["CAL_G_TO_J_KG", "CellMaterials", "DepthProfile", "PiecewiseHeatCapacity",
            "PolynomialHeatCapacity", "SaturatingExponentialHeatCapacity", "Stratum",
-           "heat_capacity_from_dict", "ledlow_1992", "stratified_interfaces"]
+           "heat_capacity_from_dict", "ledlow_1992"]
 
 
 @dataclass(frozen=True)
@@ -261,14 +261,17 @@ class Stratum:
     ``heat_capacity_range`` is the (low, high) temperature range the source
     states the law is valid for (``high`` may be None when no upper limit is
     stated), or None when the law is exact, as for a prescribed constant.
-    ``source`` says where the numbers come from."""
+    ``source`` says where the numbers come from.
+    ``radiative_reference_temperature`` T_r of the cubic radiative term has
+    no default: it is required when ``radiative_coefficient`` is non-zero
+    (VPW99 and Hayne et al. 2017 both use 350 K) and is None otherwise."""
 
     bottom: float
     density: Value
     contact_conductivity: Value
     heat_capacity: object
     radiative_coefficient: Value = 0.0
-    radiative_reference_temperature: float = 350.0
+    radiative_reference_temperature: Optional[float] = None
     heat_capacity_range: Optional[tuple] = None
     name: str = "stratum"
     source: str = ""
@@ -280,8 +283,15 @@ class Stratum:
         if not hasattr(law, "enthalpy_difference"):
             law = heat_capacity_from_dict(law)
         object.__setattr__(self, "heat_capacity", law)
-        if not self.radiative_reference_temperature > 0.0:
-            raise ValueError("radiative_reference_temperature must be > 0")
+        radiative = (isinstance(self.radiative_coefficient, DepthProfile)
+                     or float(self.radiative_coefficient) != 0.0)
+        t_r = self.radiative_reference_temperature
+        if t_r is None:
+            if radiative:
+                raise ValueError("a radiative conductivity term needs its reference "
+                                 "temperature T_r (k = k_c [1 + chi (T/T_r)^3]); it has no default")
+        elif not (math.isfinite(float(t_r)) and float(t_r) > 0.0):
+            raise ValueError("radiative_reference_temperature must be finite and > 0")
         if self.heat_capacity_range is not None:
             lo, hi = self.heat_capacity_range
             lo = float(lo)
@@ -356,7 +366,9 @@ class CellMaterials:
             z = centres[cells]
             rho[cells] = _evaluate(s.density, z)
             kc[cells] = _evaluate(s.contact_conductivity, z)
-            chi[cells] = (_evaluate(s.radiative_coefficient, z)
+            # no radiative term: no reference temperature, and chi / T_r^3 = 0
+            chi[cells] = (0.0 if s.radiative_reference_temperature is None else
+                          _evaluate(s.radiative_coefficient, z)
                           / s.radiative_reference_temperature ** 3)
             rows = np.flatnonzero(cells)
             segments.append((int(rows[0]), int(rows[-1]) + 1, s.heat_capacity))
@@ -411,51 +423,3 @@ class CellMaterials:
 
 def _rows(a, r0, r1):
     return a[r0:r1] if getattr(a, "ndim", 0) >= 1 else a
-
-
-def stratified_interfaces(boundaries: Sequence[float], top_thickness: float,
-                          max_stretch: float) -> tuple:
-    """Cell faces from 0 to ``boundaries[-1]`` with a face at every stratum
-    boundary.
-
-    The first cell is ``top_thickness`` thick. Within each stratum the cells
-    grow geometrically, using the fewest cells whose exact geometric fit has
-    a ratio no larger than ``max_stretch``. Each stratum after the first
-    starts with a cell as thick as the last cell above it, so thickness
-    never drops across a boundary unless the stratum is thinner than that
-    cell (then it is one cell)."""
-    from tropoi.physics.substrate import geometric_interfaces
-    b = [float(x) for x in boundaries]
-    if not b or any(x <= 0 for x in b) or any(y <= x for x, y in zip(b, b[1:])):
-        raise ValueError("boundaries must be positive and increasing")
-    if not 1.0 <= max_stretch <= 1.5:
-        raise ValueError("max_stretch must lie in [1, 1.5]")
-    edges = [0.0]
-    first = float(top_thickness)
-    if not math.isfinite(first) or first <= 0 or first > b[0]:
-        raise ValueError("need 0 < top_thickness <= first stratum depth")
-    top = 0.0
-    for bottom in b:
-        length = bottom - top
-        if first >= length * (1.0 - 1e-12):
-            seg = (0.0, length)
-        else:
-            n = int((length / first) * (1.0 + 1e-12))
-            seg = None
-            for n_try in range(1, n + 1):
-                try:
-                    cand = geometric_interfaces(first, length, layers=n_try)
-                except ValueError:
-                    continue
-                dz = np.diff(cand)
-                if len(dz) < 2 or np.max(dz[1:] / dz[:-1]) <= max_stretch * (1 + 1e-12):
-                    seg = cand
-                    break
-            if seg is None:
-                raise ValueError(f"cannot fit stratum ending at {bottom} m with "
-                                 f"first cell {first} m and max_stretch={max_stretch}")
-        edges.extend(top + x for x in seg[1:])
-        edges[-1] = bottom
-        first = edges[-1] - edges[-2]
-        top = bottom
-    return tuple(edges)

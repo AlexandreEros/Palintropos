@@ -15,11 +15,15 @@ result does not depend on how the columns are split.
 
 Run directory::
 
-    config.json      configuration, sha256, code and environment identity
+    config.json      configuration, sha256, code and environment identity,
+                     column_kind
     events.jsonl     created / cycle / periodic / transient / completed
     cycles.json      per-cycle periodicity and energy diagnostics
-    grid.npz         latitude/longitude (deg), area weights, depth faces
-    series/cycle-KKKK.npz   per-step area-weighted global scalars (tier 1)
+    grid.npz         latitude/longitude (deg), column_kind, depth faces and,
+                     for a global discretization only, area weights (m^2)
+    series/cycle-KKKK.npz   per-step series (tier 1): area integrals (W) over
+                     a global discretization, or per-point values (W m^-2,
+                     shape (steps, points)) for a diagnostic collection
     cycles/cycle-KKKK/      tier-2 samples, streamed by each worker into
                             memory-mapped per-block files (surface-bNNN.npy,
                             profiles-bNNN.npy, every_step-bNNN.npy, blocks.json,
@@ -31,9 +35,22 @@ Run directory::
                      run, COMPLETED_TRANSIENT) in status.json
     SHA256SUMS
 
+**Column kinds.** A ``latlon`` grid is a *global* discretization: its
+columns carry the exact cell areas as weights (m^2, summing to 4 pi R^2), and
+the run reports area integrals (``series``) and area means (``mean_*``,
+``global_*`` in ``cycles.json``). A ``points`` collection is *diagnostic*: its
+columns are independent sample locations with no physical area, so nothing
+global is published for it. Its series and cycle diagnostics are per point,
+in W m^-2, identified by column index and coordinates. Runs written before
+this distinction stored unit weights for point collections; their ``series``
+values there are plain sums over the points, and their ``mean_*`` and
+``global_residual_over_tolerance`` values are unweighted point averages, not
+global quantities.
+
 Tier 1 runs every step but is never stored per column per step: it keeps
 per-column cycle integrals of every surface flux term, the residual sums
-and tolerances, and per-step global scalars. Tier 2 holds, per cycle, the
+and tolerances, and per-step series (global integrals, or per-point values
+for a diagnostic collection). Tier 2 holds, per cycle, the
 surface fields at ``surface_samples`` phases, full T(z) at
 ``profile_samples`` phases and, for point runs, T(z) at every step.
 """
@@ -50,52 +67,62 @@ from typing import Callable, Optional
 
 import numpy as np
 
+from tropoi.temporal.substrate import BackwardEulerSubstrate
 from tropoi.physics.insolation import insolation_from_spec
 from tropoi.physics.substrate import ConductiveSubstrate
+from tropoi.spatial.grids.quadrature import ColumnSet
+from tropoi.spatial.vertical import stratified_interfaces
 from tropoi.run.airless.config import AirlessConfig, strata_from_dicts
 from tropoi.run.held_suarez.experiment import RunError, code_identity, environment_identity
 
 __all__ = ["AirlessRun", "build_columns", "build_substrate", "load_tier2", "run_block",
            "transient_steps"]
 
+#: Per-step series of a run; global runs store their area integrals (W) under
+#: these names, diagnostic collections per point under ``per_point_<name>_W_m2``.
+SERIES = ("energy_tendency", "net", "residual", "tolerance")
 
-def build_columns(cfg: AirlessConfig):
-    """(lat_deg, lon_deg, area weights): weights are R^2 dlambda (sin phi_N -
-    sin phi_S) for the regular grid (exact cell areas), 1 for points."""
+
+def build_columns(cfg: AirlessConfig) -> ColumnSet:
+    """The configured columns (:class:`~tropoi.spatial.grids.quadrature.ColumnSet`):
+
+    * ``latlon``: regular cell-centred grid, latitudes south to north, with
+      exact cell areas R^2 dlambda (sin phi_N - sin phi_S) as weights (m^2);
+    * ``gauss``: the Gauss-Legendre grid of the spectral models, with exactly
+      their nodes, ordering (north to south, longitudes from 0) and weights
+      R^2 (2 pi / nlon) w_i, and no spectral transform;
+    * ``points``: a diagnostic collection, no weights."""
     c = cfg.columns
-    if c["kind"] == "latlon":
-        nlat, nlon = int(c["nlat"]), int(c["nlon"])
-        edges = np.linspace(-90.0, 90.0, nlat + 1)
-        lat = 0.5 * (edges[1:] + edges[:-1])
-        lon = (np.arange(nlon) + 0.5) * (360.0 / nlon)
-        la, lo = np.meshgrid(lat, lon, indexing="ij")
-        band = np.sin(np.radians(edges[1:])) - np.sin(np.radians(edges[:-1]))
-        w = cfg.radius_m ** 2 * math.radians(360.0 / nlon) * np.broadcast_to(
-            band[:, None], la.shape)
-        return la.ravel(), lo.ravel(), np.array(w).ravel()
-    if c["kind"] == "points":
-        lat = np.asarray(c["lat_deg"], dtype=float)
-        lon = np.asarray(c["lon_deg"], dtype=float)
-        return lat, lon, np.ones_like(lat)
-    raise ValueError(f"unknown column kind {c['kind']!r}")
+    kind = c.get("kind")
+    if kind == "latlon":
+        return ColumnSet.regular(c["nlat"], c["nlon"], cfg.radius_m)
+    if kind == "gauss":
+        return ColumnSet.gauss(c["nlat"], c["nlon"], cfg.radius_m)
+    if kind == "points":
+        return ColumnSet.points(c["lat_deg"], c["lon_deg"], cfg.radius_m)
+    raise ValueError(f"unknown column kind {kind!r}")
 
 
 def build_substrate(cfg: AirlessConfig) -> ConductiveSubstrate:
-    return ConductiveSubstrate(strata_from_dicts(cfg.strata),
-                               top_thickness=cfg.vertical["top_thickness"],
-                               max_stretch=cfg.vertical["max_stretch"],
+    """The configured substrate on its configured vertical mesh (the mesh is
+    spatial discretization, built here and handed to the physics)."""
+    strata = strata_from_dicts(cfg.strata)
+    faces = stratified_interfaces([s.bottom for s in strata], cfg.vertical["top_thickness"],
+                                  cfg.vertical["max_stretch"])
+    return ConductiveSubstrate(strata, interfaces=faces,
                                albedo=cfg.albedo, emissivity=cfg.emissivity,
                                bottom_heat_flux=cfg.geothermal_flux,
                                initial_temperature=cfg.initial_temperature)
 
 
-def run_block(cfg_dict: dict, lat_deg, lon_deg, weights, anomaly, surface_anomaly,
+def run_block(cfg_dict: dict, lat, lon, weights, anomaly, surface_anomaly,
               cycle: int, steps: int, record_profiles_every_step: bool,
               out_dir: str, prev_dir: Optional[str], block: int,
               backend: str = "numpy", dt: Optional[float] = None,
               first_step: Optional[int] = None, sample_every: Optional[tuple] = None):
     """Advance one block of columns through illumination cycle ``cycle``
-    with ``steps`` steps.
+    with ``steps`` steps. ``lat`` and ``lon`` are the columns' coordinates in
+    radians (a :class:`ColumnSet`'s ``lat`` and ``lon``).
 
     By default the timestep is ``cfg.cycle_s / steps`` and step ``n`` is
     forced at ``(cycle * steps + n + 1) * dt``. A transient segment passes
@@ -121,6 +148,12 @@ def run_block(cfg_dict: dict, lat_deg, lon_deg, weights, anomaly, surface_anomal
     The function returns the final state, the tier-1 records and those
     differences.
 
+    ``weights`` are the columns' area weights (m^2) of a global
+    discretization, or None for a diagnostic point collection. With weights
+    the per-step series are area integrals (W, key ``"global"`` of the
+    result); without, they are kept per point (W m^-2, (steps, points), key
+    ``"per_point"``).
+
     ``backend`` is ``"numpy"`` or ``"cupy"``. With CuPy the state, the
     forcing, the Newton iterations, the tridiagonal solves and every tier-1
     accumulator stay on the GPU. The host sees only the tier-2 samples, at
@@ -130,10 +163,13 @@ def run_block(cfg_dict: dict, lat_deg, lon_deg, weights, anomaly, surface_anomal
     xp = _backend(backend)
     cfg = AirlessConfig.from_dict(cfg_dict)
     sub = build_substrate(cfg)
+    stepper = BackwardEulerSubstrate(sub)
     ins = insolation_from_spec(cfg.illumination)
-    lat, lon = xp.asarray(np.radians(lat_deg)), xp.asarray(np.radians(lon_deg))
+    lat, lon = xp.asarray(lat), xp.asarray(lon)
     nx, ny, nz = xp.cos(lat) * xp.cos(lon), xp.cos(lat) * xp.sin(lon), xp.sin(lat)
-    weights = xp.asarray(weights, dtype=xp.float64)
+    per_point = weights is None
+    if not per_point:
+        weights = xp.asarray(weights, dtype=xp.float64)
     st = SubstrateState(xp.asarray(anomaly, dtype=xp.float64),
                         xp.asarray(surface_anomaly, dtype=xp.float64))
     dt = cfg.cycle_s / steps if dt is None else float(dt)
@@ -170,13 +206,12 @@ def run_block(cfg_dict: dict, lat_deg, lon_deg, weights, anomaly, surface_anomal
     max_ratio = xp.zeros(ncol)
     ts_lo, ts_hi = np.inf, -np.inf
     extent_min, extent_max = xp.asarray(sub.extent(st)).T
-    g_series = {k: xp.zeros(steps) for k in ("energy_tendency", "net", "residual",
-                                             "tolerance")}
+    g_series = {k: xp.zeros((steps, ncol) if per_point else steps) for k in SERIES}
     iters = np.zeros(steps, dtype=np.int32)
     for n in range(steps):
         t = (first + n + 1) * dt                      # backward Euler: forcing at t^{n+1}
         sw, _ = ins.incident(nx, ny, nz, t)
-        st, rep = sub.step(st, dt, shortwave_down=sw)
+        st, rep = stepper.step(st, dt, shortwave_down=sw)
         lows, highs = zip(*rep.extent)
         xp.minimum(extent_min, xp.stack(lows), out=extent_min)
         xp.maximum(extent_max, xp.stack(highs), out=extent_max)
@@ -190,10 +225,10 @@ def run_block(cfg_dict: dict, lat_deg, lon_deg, weights, anomaly, surface_anomal
         sums["tolerance"] += dt * rep.tolerance_sum
         xp.maximum(max_ratio, rep.max_residual_ratio, out=max_ratio)
         # device-side writes: no synchronization in the step loop
-        g_series["energy_tendency"][n] = weights @ rep.energy_tendency
-        g_series["net"][n] = weights @ net
-        g_series["residual"][n] = weights @ rep.residual_sum
-        g_series["tolerance"][n] = weights @ rep.tolerance_sum
+        values = {"energy_tendency": rep.energy_tendency, "net": net,
+                  "residual": rep.residual_sum, "tolerance": rep.tolerance_sum}
+        for k in SERIES:
+            g_series[k][n] = values[k] if per_point else weights @ values[k]
         iters[n] = rep.iterations
         if (n + 1) % every_s == 0:
             k = (n + 1) // every_s - 1
@@ -224,7 +259,8 @@ def run_block(cfg_dict: dict, lat_deg, lon_deg, weights, anomaly, surface_anomal
         "anomaly": _host(st.anomaly), "surface_anomaly": _host(st.surface_anomaly),
         "energy_start": E0, "energy_end": _host(sub.energy(st)),
         "sums": {k: _host(v) for k, v in sums.items()}, "max_ratio": _host(max_ratio),
-        "global": {k: _host(v) for k, v in g_series.items()}, "iterations": iters,
+        ("per_point" if per_point else "global"): {k: _host(v) for k, v in g_series.items()},
+        "iterations": iters,
         "compared": drift is not None, "d_s": d_s, "d_p": d_p, "drift": drift,
         # None when no surface sample fell in this call (a short transient tail)
         "surface_range": (ts_lo, ts_hi) if ts_lo <= ts_hi else None,
@@ -388,17 +424,25 @@ class AirlessRun:
             raise RunError(f"{self.dir} is not empty; airless runs never overwrite")
         self.dir.mkdir(parents=True, exist_ok=True)
         self.sub = build_substrate(cfg)
-        self.lat, self.lon, self.w = build_columns(cfg)
+        self.columns = build_columns(cfg)
+        self.kind = self.columns.kind
+        self.lat, self.lon, self.w = (self.columns.lat_deg, self.columns.lon_deg,
+                                      self.columns.weights)
         self._write_json("config.json", {
             "config": cfg.to_dict(), "config_sha256": cfg.sha256(), "code": self.code,
             "environment": environment_identity(), "substrate": self.sub.signature(),
             "workers": self.workers, "backend": self.backend,
             "initial_state_source": initial_state_source if initial_state is not None else None,
-            "config_source": config_source,
+            "config_source": config_source, "column_kind": self.kind,
+            "substrate_implementation": BackwardEulerSubstrate(self.sub).describe(self.backend),
             "created": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())})
         self.initial_state = initial_state
-        np.savez(self.dir / "grid.npz", lat_deg=self.lat, lon_deg=self.lon, weights=self.w,
-                 interfaces=self.sub.interfaces, centres=self.sub.centres)
+        areas = {} if self.w is None else {"weights": self.w}
+        np.savez(self.dir / "grid.npz", lat_deg=self.lat, lon_deg=self.lon,
+                 lat_rad=self.columns.lat, lon_rad=self.columns.lon,
+                 column_kind=np.array(self.kind), layout=np.array(self.columns.layout),
+                 interfaces=self.sub.interfaces,
+                 centres=self.sub.centres, **areas)
         self._event("created", columns=int(self.lat.size), layers=self.sub.layers)
 
     # -- io -----------------------------------------------------------------------------
@@ -437,7 +481,9 @@ class AirlessRun:
         (d / "blocks.json").write_text(json.dumps(
             {"ranges": [[int(b[0]), int(b[-1]) + 1] for b in blocks], "steps": steps}))
         cfgd = self.cfg.to_dict()
-        args = [(cfgd, self.lat[b], self.lon[b], self.w[b], state[0][:, b], state[1][b],
+        args = [(cfgd, self.columns.lat[b], self.columns.lon[b],
+                 None if self.w is None else self.w[b],
+                 state[0][:, b], state[1][b],
                  cycle, steps, record_every, str(d), None if prev_dir is None else str(prev_dir), k,
                  self.backend, dt, first_step, sample_every)
                 for k, b in enumerate(blocks)]
@@ -460,8 +506,12 @@ class AirlessRun:
                          if all(p["compared"] for p in parts) else None),
                "surface_range": _join_ranges([p["surface_range"] for p in parts])}
         out["sums"] = {k: np.concatenate([p["sums"][k] for p in parts]) for k in parts[0]["sums"]}
-        out["global"] = {k: np.sum([p["global"][k] for p in parts], axis=0)
-                         for k in parts[0]["global"]}
+        if self.w is None:              # per point: join the blocks along the point axis
+            out["per_point"] = {k: np.concatenate([p["per_point"][k] for p in parts], axis=1)
+                                for k in SERIES}
+        else:                           # area integrals: sum the blocks' partial integrals
+            out["global"] = {k: np.sum([p["global"][k] for p in parts], axis=0)
+                             for k in parts[0]["global"]}
         ext = [p["extent"] for p in parts]
         out["extent"] = [(min(e[j][0] for e in ext), max(e[j][1] for e in ext))
                          for j in range(len(ext[0]))]
@@ -507,8 +557,7 @@ class AirlessRun:
                 diag["wall_s"] = time.time() - t0
                 history.append(diag)
                 self._write_json("cycles.json", history)
-                np.savez(self._mkdir("series") / f"cycle-{cycle:04d}.npz",
-                         iterations=res["iterations"], **res["global"])
+                self._save_series(cycle, res)
                 self._event("cycle", **{k: v for k, v in diag.items()
                                         if not isinstance(v, (list, dict))})
                 self.log(f"cycle {cycle} [{stage}] {diag['periodic']} "
@@ -643,8 +692,7 @@ class AirlessRun:
                             wall_s=time.time() - t0)
                 history.append(diag)
                 self._write_json("cycles.json", history)
-                np.savez(self._mkdir("series") / f"cycle-{seg:04d}.npz",
-                         iterations=res["iterations"], **res["global"])
+                self._save_series(seg, res)
                 self._event("segment", **{k_: v for k_, v in diag.items()
                                           if not isinstance(v, (list, dict))})
                 self.log(f"segment {seg} steps {done}-{done + k - 1} "
@@ -681,6 +729,14 @@ class AirlessRun:
         self._checksums()
         return retained
 
+    def _save_series(self, index, res):
+        if self.w is None:
+            series = {f"per_point_{k}_W_m2": v for k, v in res["per_point"].items()}
+        else:
+            series = res["global"]
+        np.savez(self._mkdir("series") / f"cycle-{index:04d}.npz",
+                 iterations=res["iterations"], **series)
+
     def _mkdir(self, name):
         p = self.dir / name
         p.mkdir(parents=True, exist_ok=True)
@@ -694,18 +750,32 @@ class AirlessRun:
         P = cfg.cycle_s if duration is None else duration
         dE = (res["energy_end"] - res["energy_start"]) / P
         s = res["sums"]
-        w = self.w / self.w.sum()
         diag = {"cycle": cycle, "stage": stage, "steps": steps, "dt_s": P / steps,
-                "max_energy_imbalance_W_m2": float(np.max(np.abs(dE))),
+                "column_kind": self.kind,
+                "max_energy_imbalance_W_m2": float(np.max(np.abs(dE)))}
+        if self.w is None:
+            # a diagnostic collection: per point, never a global mean
+            diag["points"] = [
+                {"column": int(i), "lat_deg": float(self.lat[i]), "lon_deg": float(self.lon[i]),
+                 "absorbed_W_m2": float(s["absorbed"][i] / P),
+                 "emitted_W_m2": float(s["emitted"][i] / P),
+                 "energy_imbalance_W_m2": float(dE[i]),
+                 "residual_over_tolerance": float(abs(s["residual"][i])
+                                                  / max(s["tolerance"][i], 1e-300))}
+                for i in range(self.lat.size)]
+        else:
+            w = self.w / self.w.sum()
+            diag.update({
                 "mean_absorbed_W_m2": float(w @ (s["absorbed"] / P)),
                 "mean_emitted_W_m2": float(w @ (s["emitted"] / P)),
                 "global_residual_over_tolerance": float(
-                    abs(w @ s["residual"]) / max(w @ s["tolerance"], 1e-300)),
-                "max_cell_residual_ratio": float(np.max(res["max_ratio"])),
-                "max_newton_iterations": int(np.max(res["iterations"])),
-                "extent_K": res["extent"], "extent_scope": "cycle",
-                "surface_T_range_K": (None if res["surface_range"] is None
-                                      else list(res["surface_range"]))}
+                    abs(w @ s["residual"]) / max(w @ s["tolerance"], 1e-300))})
+        diag.update({
+            "max_cell_residual_ratio": float(np.max(res["max_ratio"])),
+            "max_newton_iterations": int(np.max(res["iterations"])),
+            "extent_K": res["extent"], "extent_scope": "cycle",
+            "surface_T_range_K": (None if res["surface_range"] is None
+                                  else list(res["surface_range"]))})
         periodic = False
         if res["compared"]:
             diag.update(max_surface_change_K=res["d_s"], max_subsurface_change_K=res["d_p"],

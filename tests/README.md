@@ -1,6 +1,10 @@
 # Verification
 
-Tests combine CPU interface/data checks and CUDA numerical checks. CPU CI
+Tests combine CPU interface/data checks and CUDA numerical checks. The CPU
+substrate tests need the native CPU library (`pip install -e .` or
+`python setup.py build_ext --inplace`; see
+[native substrate code](../docs/ARCHITECTURE.md#native-substrate-code-c)): without it they fail,
+they do not skip. CPU CI
 installs dependencies without CuPy and runs `python -m pytest -q`; GPU tests
 skip when CUDA dependencies are unavailable. A CPU pass does not run or
 validate the GPU solvers.

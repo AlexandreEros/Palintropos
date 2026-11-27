@@ -136,8 +136,7 @@ class SlabSurface:
     """A surface layer of areal heat capacity ``heat_capacity`` (J K^-1 m^-2)
     with one temperature: ``C dT_s/dt = net flux into the surface``."""
 
-    def __init__(self, heat_capacity: float, *, albedo: float = 0.0,
-                 emissivity: float = 1.0):
+    def __init__(self, heat_capacity: float, *, albedo: float, emissivity: float):
         if not (math.isfinite(heat_capacity) and heat_capacity > 0.0):
             raise ValueError("heat_capacity must be finite and > 0")
         if not (0.0 <= albedo <= 1.0 and 0.0 < emissivity <= 1.0):

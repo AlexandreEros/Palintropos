@@ -117,16 +117,14 @@ class SectionError(ValueError):
 def gaussian_latitudes_deg(nlat: int) -> np.ndarray:
     """Gauss–Legendre latitudes, north -> south, in degrees.
 
-    The construction of ``GaussLatLonGridGeometry`` (nodes of
-    ``leggauss(nlat)`` in sin(lat), sorted descending, ``lat = pi/2 -
-    arccos(x)``), repeated here so this module never imports CuPy.
+    The grid's own construction, from the CuPy-free
+    :mod:`tropoi.spatial.grids.quadrature`.
     """
+    from tropoi.spatial.grids.quadrature import gauss_latitudes
     nlat = int(nlat)
     if nlat < 2:
         raise SectionError(f"nlat must be >= 2, got {nlat}")
-    x, _ = np.polynomial.legendre.leggauss(nlat)
-    x = x[np.argsort(-x)]
-    return np.degrees(np.pi / 2.0 - np.arccos(x))
+    return np.degrees(gauss_latitudes(nlat))
 
 
 def state_grid(nlat: int, nlon: int, stored_lat_deg=None

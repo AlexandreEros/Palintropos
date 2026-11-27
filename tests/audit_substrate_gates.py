@@ -47,7 +47,9 @@ import time
 
 import numpy as np
 
-from tropoi.physics.substrate import ConductiveSubstrate, geometric_interfaces
+from tropoi.temporal.substrate import BackwardEulerSubstrate
+from tropoi.physics.substrate import ConductiveSubstrate
+from tropoi.spatial.vertical import geometric_interfaces
 from tropoi.physics.surface import SlabSurface
 
 DAY = 86400.0
@@ -108,7 +110,7 @@ def substrate(interfaces):
     """The THAI constant-property column with a non-radiating surface: the
     forcing of every gate is the prescribed flux alone."""
     return ConductiveSubstrate.constant(volumetric_heat_capacity=C_V, thermal_inertia=INERTIA,
-                                        interfaces=interfaces, emissivity=0.0)
+                                        interfaces=interfaces, emissivity=0.0, albedo=0.0, bottom_heat_flux=0.0, initial_temperature=300.0)
 
 
 # ------------------------------------------------------------------ reconstruction
@@ -186,7 +188,7 @@ def run_periodic(edges, P, dt, F0=100.0):
     for n in range(nsteps):
         t0, t1 = n * dt, (n + 1) * dt
         fbar = F0 / (w * dt) * (math.sin(w * t1) - math.sin(w * t0))
-        st, rep = sub.step(st, dt, flux=np.array([fbar]))
+        st, rep = BackwardEulerSubstrate(sub).step(st, dt, flux=np.array([fbar]))
         if t1 > 5 * P:
             t_s.append(t1)
             th_s.append(st.anomaly[:, 0].copy())
@@ -304,7 +306,7 @@ def gate_g2():
     samples = []
     while True:
         n += 1
-        st, _ = sub.step(st, DT, flux=np.array([F]))
+        st, _ = BackwardEulerSubstrate(sub).step(st, DT, flux=np.array([F]))
         t = n * DT
         if t > tmax:
             break
@@ -345,7 +347,7 @@ def run_robin():
     ts, Es = [], []
     for n in range(nsteps):
         ts_old = sub.surface_temperature(st) - 300.0
-        st, _ = sub.step(st, DT, flux=-h * ts_old, flux_derivative=-h)
+        st, _ = BackwardEulerSubstrate(sub).step(st, DT, flux=-h * ts_old, flux_derivative=-h)
         ts.append((n + 1) * DT)
         Es.append(np.asarray(sub.energy(st)).copy())
     ts = np.array(ts)
@@ -374,7 +376,7 @@ def gate_g3():
 
 def gate_g4():
     sub = substrate(grid("G4", lambda: (0.0, 1.0)))
-    slab = SlabSurface(2.0e6)
+    slab = SlabSurface(2.0e6, albedo=0.0, emissivity=1.0)
     rng = np.random.default_rng(SEED)
     n = 100000
     F = rng.uniform(-200.0, 200.0, size=n)
@@ -388,7 +390,7 @@ def gate_g4():
     for j in range(n):
         theta_j = float(st.anomaly[0, 0])
         Fj = np.array([F[j]])
-        st, _ = sub.step(st, DT, flux=Fj)
+        st, _ = BackwardEulerSubstrate(sub).step(st, DT, flux=Fj)
         T_slab = slab.advance(T_slab, Fj, DT)
         delta_j = abs(DT * F[j] / m)
         acc += g2 * delta_j + 0.5 * float(np.spacing(abs(T_slab[0]))) + g3 * (abs(theta_j) + delta_j)
@@ -448,7 +450,7 @@ def gate_g5():
     worst = np.zeros(ncol)
     worst_step = np.zeros(ncol, dtype=int)
     for k in range(n):
-        st, rep = sub.step(st, DT, flux=F[k], bottom_heat_flux=fbs)
+        st, rep = BackwardEulerSubstrate(sub).step(st, DT, flux=F[k], bottom_heat_flux=fbs)
         applied = rep.conducted
         prod = m * st.anomaly
         for c in range(ncol):
@@ -520,7 +522,7 @@ def gate_g5b():
             last = {}
             while True:
                 n += 1
-                st, _ = sub.step(st, dt, flux=np.array([F]))
+                st, _ = BackwardEulerSubstrate(sub).step(st, dt, flux=np.array([F]))
                 t = n * dt
                 if t > tmax:
                     break

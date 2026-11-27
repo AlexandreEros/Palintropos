@@ -1,0 +1,102 @@
+{
+ "environment": {
+  "gpu": "Tesla T4",
+  "nvidia_smi": "Tesla T4, 580.82.07",
+  "cpu": "Intel(R) Xeon(R) CPU @ 2.00GHz",
+  "vcpus": 2,
+  "python": "3.13.16",
+  "numpy": "2.4.6",
+  "cupy": "14.0.1",
+  "commit": "a07b0b569eeb7a4983335f023e8271dbca3d439a"
+ },
+ "implementation": {
+  "implementation": "native C++ (tropoi pt headers), backward Euler + safeguarded Newton + Thomas, FP64, no FMA contraction",
+  "source_digest_host": "e60cb32f2816ba7b205bf99a2ddae843f66ac8c1223bcd62f96677a24dd39811",
+  "source_digest_device": "9771ca6da3b15eddb6195ed3e62ee326d7e487829d2a125fb5e74fa9feb6f761",
+  "backend": "cupy",
+  "nvrtc_version": [
+   13,
+   0
+  ],
+  "device_specialization": "substrate_step<51, pt::StaticLaws<pt::Piecewise<pt::Poly<5>, pt::SatExp>, pt::Piecewise<pt::Poly<5>, pt::SatExp>>>",
+  "device_options": [
+   "--std=c++14"
+  ]
+ },
+ "native_kernel_cold_compile_s": 3.881480253999996,
+ "native_kernel": {
+  "registers": 174,
+  "local_bytes": 6160
+ },
+ "state": {
+  "sha256": "ef413855553df37ba5aa1d23121526375bcbe38b1727407de8cb62b814964998",
+  "audit_sha256": "ef413855553df37ba5aa1d23121526375bcbe38b1727407de8cb62b814964998",
+  "identical_to_audit_state": true,
+  "spinup_wall_s": 86.345160964
+ },
+ "gpu_bitwise_against_reference": {
+  "steps": 200,
+  "state_mismatched_steps": 0,
+  "report_mismatched_steps": 0,
+  "iterations_mismatched_steps": 0
+ },
+ "run_block": {
+  "native": {
+   "median_s": 0.02101464330000056,
+   "min_s": 0.020966373966666653,
+   "max_s": 0.021204671566666396,
+   "n": 5,
+   "newton_iterations_mean": 3.7333333333333334,
+   "memory_pool_total_bytes": 114834944,
+   "column_steps_per_second": 770891.0291139497
+  },
+  "reference": {
+   "median_s": 0.10685926743333311,
+   "min_s": 0.10586175861666618,
+   "max_s": 0.11468357628333384,
+   "n": 5,
+   "newton_iterations_mean": 3.7333333333333334,
+   "memory_pool_total_bytes": 375342592,
+   "column_steps_per_second": 151601.26387827602
+  },
+  "speedup": 5.084990780373144
+ },
+ "step": {
+  "native": {
+   "median_s": 0.018764670666666917,
+   "min_s": 0.01824884455000036,
+   "max_s": 0.01918713651666716
+  },
+  "reference": {
+   "median_s": 0.11128618546666663,
+   "min_s": 0.10276756385,
+   "max_s": 0.11262680824999999
+  }
+ },
+ "cpu_against_reference": {
+  "columns": 438,
+  "steps": 10,
+  "max_abs_difference_K": 1.1368683772161603e-13,
+  "g_gpu_bound_K": 1e-06,
+  "within_bound": true,
+  "newton_counts_identical": true,
+  "bitwise": false,
+  "host_build": "x86_64-linux-gnu-gcc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0; -O2 -std=c++14 -ffp-contract=off -fno-fast-math"
+ },
+ "terminator_bitwise": {
+  "vpw99_two": {
+   "steps": 200,
+   "layers": 51,
+   "state_mismatched_steps": 0,
+   "report_mismatched_steps": 0,
+   "iterations_mismatched_steps": 0
+  },
+  "constant_thai_like": {
+   "steps": 200,
+   "layers": 30,
+   "state_mismatched_steps": 0,
+   "report_mismatched_steps": 0,
+   "iterations_mismatched_steps": 0
+  }
+ }
+}

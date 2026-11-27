@@ -54,6 +54,12 @@ include = ["tropoi*"]
 # identities and molar masses, thermodynamic records, Rayleigh optical
 # records, mixture presets and the star catalogue.
 "tropoi.physics" = ["data/*.toml"]
+# The canonical native (C++) substrate sources: compiled into the CPU library
+# at installation and by NVRTC at run time for the GPU, so they ship with the
+# package. Their digest identifies the build (temporal/native/build_identity.py).
+"tropoi.numerics.native" = ["pt/*.h", "pt/numerics/*.h"]
+"tropoi.physics.native" = ["pt/physics/*.h"]
+"tropoi.temporal.native" = ["pt/temporal/*.h", "drivers/*.h", "drivers/*.cu", "drivers/*.cpp"]
 
 [tool.deptry]
 # Treat the "dev" PEP 621 optional-dependency group as development-only.
