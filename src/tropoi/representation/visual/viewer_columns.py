@@ -105,7 +105,10 @@ class ColumnArchiveProvider:
 
     def select(self, sel):
         quantity = self.quantities[sel["quantity"]]
-        handler = getattr(self, "_" + sel["product"], None)
+        handler = {"map": self._map, "meridional_section": self._meridional_section,
+                   "zonal_section": self._zonal_section, "column": self._column,
+                   "time_series": self._time_series, "time_section": self._time_section,
+                   }.get(sel["product"])
         if handler is None:
             raise SelectionError("Product not offered by columnar archives")
         return handler(sel, quantity)
