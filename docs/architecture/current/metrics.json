@@ -1,13 +1,13 @@
 {
   "atlas": {
-    "call_edges": 2603,
+    "call_edges": 2597,
     "call_sites_omitted_by_cap": 40,
-    "call_sites_recorded": 3401,
-    "import_edges": 526,
+    "call_sites_recorded": 3391,
+    "import_edges": 524,
     "import_sites_omitted_by_cap": 0,
-    "import_sites_recorded": 591,
+    "import_sites_recorded": 589,
     "max_sites_per_edge": 8,
-    "nodes": 2421,
+    "nodes": 2415,
     "proposal": {
       "call_edges_by_direction": {
         "downward": 450,
@@ -65,9 +65,9 @@
         "archive": 203,
         "cli": 66,
         "dynamics": 119,
-        "integration": 136,
+        "integration": 137,
         "physics": 311,
-        "run": 150,
+        "run": 143,
         "setup": 292,
         "spectral": 265,
         "unassigned": 4,
@@ -166,24 +166,24 @@
         "sha256": "1dcfeb9400fd06152e45cd607c8648f54d8fa8f41c02b0fcd8ee9310a03c28a4"
       }
     ],
-    "source_lines_embedded": 20172
+    "source_lines_embedded": 20115
   },
   "call_graph": {
     "call_sites": {
-      "builtin": 4513,
-      "external": 2916,
-      "internal": 3432,
-      "unresolved": 4679
+      "builtin": 4502,
+      "external": 2908,
+      "internal": 3422,
+      "unresolved": 4674
     },
     "edges_by_kind": {
-      "call": 1541,
+      "call": 1539,
       "constructor": 74,
-      "instantiate": 573,
+      "instantiate": 569,
       "override": 6,
       "self": 405,
       "super": 4
     },
-    "nodes": 2223,
+    "nodes": 2218,
     "scoped": {
       "airless-mercury": {
         "edges": 11,
@@ -382,11 +382,11 @@
     }
   },
   "class_graph": {
-    "classes": 246,
+    "classes": 245,
     "classes_in_inherits_edges": 21,
     "external_bases": {
       "ArithmeticError": 1,
-      "RuntimeError": 9,
+      "RuntimeError": 8,
       "UserWarning": 1,
       "ValueError": 22,
       "abc.ABC": 2,
@@ -437,13 +437,13 @@
       "tropoi.temporal.tendencies"
     ],
     "module_categories": {
-      "code": 165,
+      "code": 164,
       "empty": 27,
       "namespace": 1,
       "reexport": 5
     },
-    "modules_discovered": 198,
-    "modules_in_graph": 170,
+    "modules_discovered": 197,
+    "modules_in_graph": 169,
     "reexport_modules": [
       "tropoi.representation.archive",
       "tropoi.run.bve.model",
@@ -696,14 +696,14 @@
   "module_graph": {
     "all_imports": {
       "condensation": {
-        "edges": 526,
+        "edges": 524,
         "longest_path_edges": 14,
-        "nodes": 170,
-        "sinks": 45,
+        "nodes": 169,
+        "sinks": 44,
         "sources": 7
       },
-      "density": 0.018308,
-      "edges": 526,
+      "density": 0.018456,
+      "edges": 524,
       "in_degree": {
         "histogram": {
           "0": 7,
@@ -712,7 +712,7 @@
           "11": 1,
           "12": 3,
           "17": 1,
-          "2": 42,
+          "2": 41,
           "3": 20,
           "4": 17,
           "5": 10,
@@ -722,7 +722,7 @@
           "9": 2
         },
         "max": 17,
-        "mean": 3.094118,
+        "mean": 3.100592,
         "median": 2.0,
         "min": 0,
         "quartiles": [
@@ -732,7 +732,7 @@
         ],
         "zeros": 7
       },
-      "nodes": 170,
+      "nodes": 169,
       "nodes_in_cycles": {
         "count": 0,
         "fraction": 0.0
@@ -744,24 +744,24 @@
       },
       "out_degree": {
         "histogram": {
-          "0": 45,
+          "0": 44,
           "1": 28,
           "10": 5,
           "11": 3,
           "13": 1,
           "19": 1,
-          "2": 27,
+          "2": 28,
           "23": 1,
-          "3": 13,
+          "3": 12,
           "4": 13,
           "5": 12,
           "6": 4,
-          "7": 8,
-          "8": 6,
+          "7": 9,
+          "8": 5,
           "9": 3
         },
         "max": 23,
-        "mean": 3.094118,
+        "mean": 3.100592,
         "median": 2.0,
         "min": 0,
         "quartiles": [
@@ -769,7 +769,7 @@
           2.0,
           5.0
         ],
-        "zeros": 45
+        "zeros": 44
       },
       "reciprocal_pairs": {
         "count": 0,
@@ -777,10 +777,10 @@
       },
       "reciprocity": 0.0,
       "self_loops": 0,
-      "sinks": 45,
+      "sinks": 44,
       "sources": 7,
       "strongly_connected_components": {
-        "count": 170
+        "count": 169
       },
       "top_fan_in": {
         "nodes": [
@@ -875,31 +875,31 @@
       "weakly_connected_components": {
         "count": 1,
         "sizes": [
-          170
+          169
         ]
       }
     },
     "edge_scopes": {
-      "function": 195,
+      "function": 194,
       "function+module": 9,
       "function+type_checking": 1,
-      "module": 315,
+      "module": 314,
       "type_checking": 6
     },
     "import_time": {
       "condensation": {
-        "edges": 324,
+        "edges": 323,
         "longest_path_edges": 7,
-        "nodes": 170,
-        "sinks": 59,
+        "nodes": 169,
+        "sinks": 58,
         "sources": 45
       },
-      "density": 0.011277,
-      "edges": 324,
+      "density": 0.011376,
+      "edges": 323,
       "in_degree": {
         "histogram": {
           "0": 45,
-          "1": 56,
+          "1": 55,
           "11": 1,
           "14": 1,
           "2": 27,
@@ -912,7 +912,7 @@
           "9": 3
         },
         "max": 14,
-        "mean": 1.905882,
+        "mean": 1.911243,
         "median": 1.0,
         "min": 0,
         "quartiles": [
@@ -922,7 +922,7 @@
         ],
         "zeros": 45
       },
-      "nodes": 170,
+      "nodes": 169,
       "nodes_in_cycles": {
         "count": 0,
         "fraction": 0.0
@@ -934,19 +934,19 @@
       },
       "out_degree": {
         "histogram": {
-          "0": 59,
+          "0": 58,
           "1": 38,
           "2": 24,
           "3": 16,
           "4": 10,
           "5": 8,
           "6": 6,
-          "7": 2,
-          "8": 3,
+          "7": 3,
+          "8": 2,
           "9": 4
         },
         "max": 9,
-        "mean": 1.905882,
+        "mean": 1.911243,
         "median": 1.0,
         "min": 0,
         "quartiles": [
@@ -954,7 +954,7 @@
           1.0,
           3.0
         ],
-        "zeros": 59
+        "zeros": 58
       },
       "reciprocal_pairs": {
         "count": 0,
@@ -962,10 +962,10 @@
       },
       "reciprocity": 0.0,
       "self_loops": 0,
-      "sinks": 59,
+      "sinks": 58,
       "sources": 45,
       "strongly_connected_components": {
-        "count": 170
+        "count": 169
       },
       "top_fan_in": {
         "nodes": [
@@ -1036,10 +1036,6 @@
           },
           {
             "degree": 8,
-            "node": "tropoi.run.airless.experiment"
-          },
-          {
-            "degree": 8,
             "node": "tropoi.run.radiative.model"
           },
           {
@@ -1051,6 +1047,10 @@
             "node": "tropoi.representation.visual.sky"
           },
           {
+            "degree": 7,
+            "node": "tropoi.run.airless.experiment"
+          },
+          {
             "degree": 6,
             "node": "tropoi.cli.main"
           }
@@ -1060,7 +1060,7 @@
       "weakly_connected_components": {
         "count": 8,
         "sizes": [
-          155,
+          154,
           8,
           2,
           1,
@@ -1074,14 +1074,14 @@
   },
   "package_graph": {
     "condensation": {
-      "edges": 81,
+      "edges": 80,
       "longest_path_edges": 11,
       "nodes": 23,
       "sinks": 6,
       "sources": 3
     },
-    "density": 0.162393,
-    "edges": 114,
+    "density": 0.160969,
+    "edges": 113,
     "in_degree": {
       "histogram": {
         "0": 3,
@@ -1090,14 +1090,14 @@
         "15": 1,
         "2": 5,
         "3": 1,
-        "4": 3,
-        "5": 3,
+        "4": 4,
+        "5": 2,
         "6": 2,
         "7": 1,
         "8": 2
       },
       "max": 15,
-      "mean": 4.222222,
+      "mean": 4.185185,
       "median": 4.0,
       "min": 0,
       "quartiles": [
@@ -1149,13 +1149,12 @@
         "2": 1,
         "3": 2,
         "4": 2,
-        "5": 3,
-        "6": 1,
+        "5": 4,
         "7": 2,
         "9": 2
       },
       "max": 11,
-      "mean": 4.222222,
+      "mean": 4.185185,
       "median": 4.0,
       "min": 0,
       "quartiles": [
@@ -1186,7 +1185,7 @@
         ]
       ]
     },
-    "reciprocity": 0.070175,
+    "reciprocity": 0.070796,
     "self_loops": 0,
     "sinks": 6,
     "sources": 3,
@@ -1233,10 +1232,10 @@
         },
         {
           "degree": 5,
-          "node": "tropoi.run"
+          "node": "tropoi.spatial.terrain"
         }
       ],
-      "ties_at_cutoff": 3
+      "ties_at_cutoff": 2
     },
     "top_fan_out": {
       "nodes": [
@@ -1273,15 +1272,15 @@
           "node": "tropoi.temporal"
         },
         {
-          "degree": 6,
-          "node": "tropoi.run.airless"
+          "degree": 5,
+          "node": "tropoi.representation.archive"
         },
         {
           "degree": 5,
-          "node": "tropoi.representation.archive"
+          "node": "tropoi.run.airless"
         }
       ],
-      "ties_at_cutoff": 3
+      "ties_at_cutoff": 4
     },
     "weakly_connected_components": {
       "count": 1,
@@ -1295,7 +1294,7 @@
     "package": "tropoi",
     "src": "src",
     "working_tree": {
-      "base_commit": "e7333cfcc56cd6dab6c6069058a4e89cee09a629",
+      "base_commit": "9afbb3fcfcbffde1cae909c7ad06ff89e5e66ea5",
       "generator": {
         "changes": [],
         "files": {
@@ -1325,10 +1324,7 @@
         "status": "clean"
       },
       "source": {
-        "changes": [
-          "M  src/tropoi/temporal/native/drivers/cuda_driver.cu",
-          "M  src/tropoi/temporal/substrate_native.py"
-        ],
+        "changes": [],
         "files": {
           "src/tropoi/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
           "src/tropoi/cli/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
@@ -1424,9 +1420,9 @@
           "src/tropoi/representation/visual/vorticity_viewer.py": "30c3f401cc653cc7856f829bbd5427fe2178cd425d5124f29bf2297d289d04f3",
           "src/tropoi/run/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
           "src/tropoi/run/airless/__init__.py": "4eacd9f550f9829fccc087a027d35f60c6bbb99e57d15d8c0d89ede496857f68",
-          "src/tropoi/run/airless/__main__.py": "522846f00381aa73c5854b9ea23b151bbfb377164f7189bc751153cb4242178a",
+          "src/tropoi/run/airless/__main__.py": "4079efb484c2b9c4ba5d27c23418b7a713428d5af00a6820a8982329d5db26c6",
           "src/tropoi/run/airless/config.py": "164afc2cddf3142f5e53e5b1841d83d8e35963ae5477891833fdd1e923ba4cb7",
-          "src/tropoi/run/airless/experiment.py": "5c5c11c8f636046a349b5eb40c5517713e6de41a73f8f76227398354b3aadc90",
+          "src/tropoi/run/airless/experiment.py": "8f97166ff0e469bab13d44cd73edb7d579527d186eb60ee588aeaaa204b570e4",
           "src/tropoi/run/bve/__init__.py": "dc2f43732af56efca1d2801705e6d92ab8cdcfb64d91b00f7dfc012fcbce8bfa",
           "src/tropoi/run/bve/config.py": "7b44a7d627c53b28e0315710d209b12d3689d247f4feb093e8cd8703c43dd406",
           "src/tropoi/run/bve/execution.py": "e812726e0351f85ee2520ab85f4396432d790db315f7158e5ab91c89d081cfba",
@@ -1440,7 +1436,6 @@
           "src/tropoi/run/custom/prepare.py": "9b2f4b5b61c24161b1ad7d33495f160841047b3ac0ef07f9ccd8011348146659",
           "src/tropoi/run/custom/presets.py": "d6702bc8f212a9908f5db1d15f0e3e1d0dca819c4637cff501415a68b995699a",
           "src/tropoi/run/custom/resources.py": "f3d1222161a012ecc357d739bd3c4c13bd891691ec1a9964650c989224b12739",
-          "src/tropoi/run/execution.py": "70842cc0413d16401deeec21fccc6c48e9552bb85ffe048676af98d02cbb8519",
           "src/tropoi/run/held_suarez/__init__.py": "90e964df6996aa5976524c7d34a8692bc7126b848bb2272188651570218cf211",
           "src/tropoi/run/held_suarez/__main__.py": "0de0dfde61e9ed18c0d9da9197d29e9bac7abda227f8f19aa304272c08156226",
           "src/tropoi/run/held_suarez/checkpoint.py": "56ab7fe0da2730208bdd78cb862b4ec909cff6024a746008e3ae258b86a8060e",
@@ -1525,8 +1520,8 @@
           "src/tropoi/temporal/semi_implicit.py": "c49e36947a4f13bac655f93eb374e70196f946669a55177316686070a22eb6bd",
           "src/tropoi/temporal/simulation.py": "8da9cae224660d0c16c057466939cb78be277b085cbd8027437d37cf36e54b3b",
           "src/tropoi/temporal/steppers.py": "d318a44ce7277cac5e43cd54d9c0f090fc8d55f4f3ea67735cfa1df6f8ad10c4",
-          "src/tropoi/temporal/substrate.py": "867457792066eaf00ca89b2141830a142ff45dc0a428497e732d69f309188fa3",
-          "src/tropoi/temporal/substrate_native.py": "02cdcff7e356c196ee8018ab7ce6228aceb27cdca4654bd16ae9a367ded813fa",
+          "src/tropoi/temporal/substrate.py": "54e673fea1f68c313486836094985ea11f397e83407cb1e10fa2747adc6feff3",
+          "src/tropoi/temporal/substrate_native.py": "ca949b2f18fafd187f497db9e7e3f448c47f66fa2fe012de63190497fddfca75",
           "src/tropoi/temporal/tendencies/__init__.py": "64ae205b8d8abf902f9b9f285faae34048856829c3be34925b3af5f94ad71a20",
           "src/tropoi/temporal/tendencies/barotropic.py": "eca288b7ac2cff04787d2cc1a5340f37364de3ee511b0ffd6598798c4201ebef",
           "src/tropoi/temporal/tendencies/boundary_layer.py": "de3b800d4c2ae35d1cc144cf9528b39eb7cd3baf5786664efac0d031b9fb4194",
@@ -1535,8 +1530,8 @@
           "src/tropoi/temporal/tendencies/primitive_equations.py": "848c6fe9406a7c1c465c0aa9459760b01c542164c8cc9395797a3c4a60793e52",
           "src/tropoi/temporal/tendencies/shallow_water.py": "7ae521f2378824e89f88bc467fc99321d1ef4224b037c865137e076a601da3c8"
         },
-        "sha256": "aa0f3d242597c3a13762e66d659090534acb8ca799e86a00e57e472b58db67d8",
-        "status": "dirty"
+        "sha256": "317ee82571dc0c77cb64076428f5243ab058d8b713a70bcd0a2301808e2cb653",
+        "status": "clean"
       }
     }
   },
