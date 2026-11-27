@@ -2,6 +2,8 @@
 import json
 from pathlib import Path
 
+from tropoi.representation.archive.airless import READER as AIRLESS_READER
+from tropoi.representation.archive.airless import AirlessArchive, is_airless_archive
 from tropoi.representation.archive.capsule import open_storage
 from tropoi.representation.archive.local_resource import resource
 from tropoi.representation.archive.radiative import FORMAT, RadiativeStorage
@@ -71,6 +73,8 @@ def _operations(fields, vertical, physics, diagnostics):
             ops["pressure"] = reconstructed
             if physics.get("gravity") and (physics.get("r_dry") or physics.get("gas_constant")):
                 ops["geopotential_height"] = reconstructed
+                # Z − Zₛ uses the same inversion with a per-column target.
+                ops["height_above_surface"] = reconstructed
                 # Columns, sections and native-grid zonal reductions need the
                 # full column and a pure-sigma vertical from 0 to 1.
                 interfaces = vertical.get("interfaces") or []
@@ -85,11 +89,44 @@ def _operations(fields, vertical, physics, diagnostics):
     return ops
 
 
+def _columns_manifest(root):
+    """A columnar substrate archive (``archive.airless`` contract)."""
+    from tropoi.representation.visual.viewer_columns import describe
+
+    archive = AirlessArchive(root)
+    cfg = archive.config
+    axes, explorer = describe(archive)
+    receipt = "SHA256SUMS" if resource(root, "SHA256SUMS").is_file() else None
+    status = archive.status or {}
+    source = dict(directory=root.name, reader=AIRLESS_READER, receipt=receipt, solver=None,
+                  model="independent conductive columns", run_id=cfg.get("experiment_id") or root.name,
+                  git=archive.document.get("code"), config_sha256=archive.document.get("config_sha256"),
+                  format="airless-columns", status=status.get("status"),
+                  completion=status.get("label"), retained_cycle=status.get("cycle"),
+                  created=archive.document.get("created"))
+    geometry = dict(reference_radius_m=float(cfg["radius_m"]), grid=archive.kind,
+                    horizontal=explorer["horizontal"])
+    physics = dict(enabled=True, insolation=cfg.get("illumination"),
+                   albedo=cfg.get("albedo"), emissivity=cfg.get("emissivity"),
+                   geothermal_flux=cfg.get("geothermal_flux"), strata=cfg.get("strata"),
+                   provenance=cfg.get("provenance"))
+    vertical = dict(domain="substrate", interfaces=archive.interfaces.tolist(),
+                    centres=archive.centres.tolist(), units="m", positive="downward",
+                    skin="diagnosed massless skin at depth 0")
+    output = dict(schema="palintropos.viewer/1.0", source=source, resources={}, fields={},
+                  axes=dict(substrate=vertical), geometry=geometry, physics=physics, diagnostics={},
+                  time_axes=axes, operations={}, unavailable=dict(explorer["unavailable"]),
+                  explorer=explorer)
+    return output
+
+
 def viewer_manifest(directory):
     """Describe one explicit archive. All resource references are archive-relative."""
     root = Path(directory).resolve(strict=True)
     if not root.is_dir():
         raise ValueError(f"Expected a capsule directory: {root}")
+    if is_airless_archive(root):
+        return _columns_manifest(root)
     # Do not follow latest_run pointers from the selected filesystem boundary.
     config = resource(root, "config.json")
     manifest = resource(root, "manifest.json")
@@ -203,6 +240,7 @@ def viewer_manifest(directory):
     output["operations"] = _operations(output["fields"], vertical, output["physics"], products)
     if "terrain" in output["unavailable"]:
         output["operations"].pop("geopotential_height", None)
+        output["operations"].pop("height_above_surface", None)
     if (any(field.get("levels") for field in output["fields"].values())
             and not output["physics"].get("gravity")):
         output["unavailable"]["vertical_surfaces"] = (
