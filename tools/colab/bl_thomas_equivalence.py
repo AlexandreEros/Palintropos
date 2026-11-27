@@ -2,7 +2,7 @@
 solved with its own elimination and with the canonical ``pt::thomas``.
 
     PYTHONPATH=src:. python tools/colab/bl_thomas_equivalence.py --out study.json \
-        [--case thai-ben2-ck|earth] [--warm-steps 144] [--captures 30]
+        [--warm-steps 144] [--captures 30]
 
 Measurement only: nothing in the package changes. The script
 
@@ -22,8 +22,13 @@ Measurement only: nothing in the package changes. The script
    ``|q|``; and compares the conservation of the mass-weighted column
    integral (zero-flux systems);
 4. times one solve both ways (synchronized, median of repeats), and the u/v
-   pair with one factorization for both right-hand sides (P6: <= 1.0 ms per
-   solve at T21L40).
+   pair in one launch that assembles the matrix once (P6: <= 1.0 ms per solve
+   at T21L40). ``pt::thomas`` repeats the elimination for each right-hand
+   side, so the pair shares assembly and the launch, not a factorization.
+
+Errors against the extended-precision solution are differences taken in
+``longdouble``: the double-precision results are promoted, not the reference
+rounded.
 
 The GPU model is recorded; the T4 is the reference device for the timings.
 """
@@ -45,7 +50,8 @@ KERNEL = r'''
 #define CAP 128
 // Assemble the boundary layer's system with its arithmetic, then eliminate
 // with pt::thomas: diag b_k = m_k + w (g_above + g_below), lower = upper =
-// -w g, rhs d_k = m_k q_k. nrhs right-hand sides share the factorization.
+// -w g, rhs d_k = m_k q_k. nrhs right-hand sides share the assembled matrix;
+// pt::thomas eliminates it again for each one (no factorization reuse).
 extern "C" __global__ void bl_thomas(const int K, const int n, const int nrhs,
                                      const double* q, const double* mass,
                                      const double* cond, const int has_bottom,
@@ -131,7 +137,8 @@ def main(argv=None) -> int:
     import cupy as cp
     ap = argparse.ArgumentParser()
     ap.add_argument("--out", required=True)
-    ap.add_argument("--case", default="thai-ben2-ck", choices=("thai-ben2-ck", "earth"))
+    ap.add_argument("--case", default="thai-ben2-ck", choices=("thai-ben2-ck",),
+                    help="a preset with a boundary layer (the Earth gray preset has none)")
     ap.add_argument("--warm-steps", type=int, default=144)
     ap.add_argument("--captures", type=int, default=30)
     ap.add_argument("--repeats", type=int, default=20)
@@ -141,11 +148,12 @@ def main(argv=None) -> int:
     from tropoi.physics.boundary_layer import implicit_column_diffusion
     from tropoi.run.radiative.config import PRESETS
     from tropoi.run.radiative.experiment import RadiativeRun
-    cfg = (PRESETS["dev-thai-ben2-ck"]() if args.case == "thai-ben2-ck"
-           else PRESETS["earth-gray-dry"]().with_(frictional_heating=True))
+    cfg = PRESETS["dev-" + args.case]()
     if args.tiny:
         cfg = cfg.with_(experiment_id=cfg.experiment_id + "-tiny", l_max=10,
                         retained_truncation=9, nlat=16, nlon=32)
+    if cfg.boundary_layer is None:
+        ap.error(f"case {args.case!r} has no boundary layer: no solve would be captured")
     run = RadiativeRun(cfg, pathlib.Path(tempfile.mkdtemp()) / "run", allow_dirty=True,
                        log=lambda s: None)
     for _ in range(args.warm_steps):
@@ -178,8 +186,9 @@ def main(argv=None) -> int:
         P, N = prod.get(), nat.get()
         scale = np.max(np.abs(h["q"]), axis=0)
         scale = np.where(scale > 0, scale, 1.0)
-        e_prod = np.abs(P - ext.astype(np.float64)) / scale
-        e_nat = np.abs(N - ext.astype(np.float64)) / scale
+        L = np.longdouble
+        e_prod = (np.abs(P.astype(L) - ext) / scale).astype(np.float64)
+        e_nat = (np.abs(N.astype(L) - ext) / scale).astype(np.float64)
         d = np.abs(P - N) / scale
         exactly = float(np.mean(P == N))
         # rows coupled to a neighbour (above the boundary layer the system is
@@ -233,7 +242,7 @@ def main(argv=None) -> int:
         "production_uv_pair_s": timed(lambda: [implicit_column_diffusion(
             q, mom["mass"], mom["cond"], mom["w"], bottom_conductance=mom["bottom"])
             for q in uv]),
-        "canonical_uv_pair_one_factorization_s": timed(lambda: solve_native(
+        "canonical_uv_pair_one_launch_s": timed(lambda: solve_native(
             cp, kernel, uv, mom["mass"], mom["cond"], mom["w"], mom["bottom"])),
     }
     props = cp.cuda.runtime.getDeviceProperties(0)

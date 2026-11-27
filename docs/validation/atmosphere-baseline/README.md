@@ -92,11 +92,11 @@ three ways:
 | Largest difference between the two (column scale) | 1.3e-16 | |
 | 99th percentile of the difference | 0 | |
 | Values bitwise equal to the other (all rows; see the caveat below) | 99.56% | |
-| Largest error against extended precision (column scale) | 2.10e-16 | 2.10e-16 |
-| Mean error against extended precision | 9.558e-18 | 9.541e-18 |
+| Largest distance to the rounded extended solution (column scale; see below) | 2.10e-16 | 2.10e-16 |
+| Mean distance to the rounded extended solution | 9.558e-18 | 9.541e-18 |
 | Largest column-integral conservation error (zero-flux systems) | 4.8e-17 | 4.7e-17 |
 | One solve (T4) | **9.14 ms** | **0.20 ms** |
-| The u/v pair | 18.2 ms (two factorizations) | **0.29 ms** (one) |
+| The u/v pair | 18.2 ms (two calls) | **0.29 ms** (one launch; see below) |
 
 **Caveat on the bitwise fraction.** It counts every row. Above the
 boundary layer the conductances are zero, the system is diagonal, and
@@ -105,8 +105,25 @@ fraction. The fraction over rows with non-zero coupling has not been
 measured; the tool now reports it for the next run. The bound that
 matters is the largest difference, 1.3e-16 of the column scale.
 
-The two eliminations agree to round-off. The canonical one is as accurate,
-or very slightly more accurate, and conserves as well. The prototype meets
+**What the accuracy rows measured.** The recorded run (`bdd3fcd`) rounded
+the extended-precision solution to float64 before subtracting, so these rows
+are distances to the correctly rounded reference, not errors against the
+extended solution itself. Each can differ from the true error by up to half a
+unit in the last place of the value, which is the same order as the figures.
+The tool now subtracts in `longdouble`; the true errors have not been
+re-measured.
+
+**What the pair timing measured.** The canonical kernel assembles the matrix
+once and runs `pt::thomas` for each right-hand side in the same launch.
+`pt::thomas` recomputes the elimination every time, so the 0.29 ms shares
+assembly and the launch, not a factorization. Reusing the factorization is
+not measured. The JSON key `canonical_uv_pair_one_factorization_s` is the
+old, inaccurate name; the tool now writes `canonical_uv_pair_one_launch_s`.
+
+The two eliminations agree to round-off. Within this metric's resolution
+they are equally accurate, and they conserve equally well. The recorded
+means differ by less than that resolution, so they do not show that either
+elimination is more accurate. The prototype meets
 P6 (≤ 1.0 ms per solve at T21L40) by a factor of five per solve, and the
 u/v pair by more.
 
@@ -128,8 +145,8 @@ scale.
      measured by a prototype, as the substrate's was.
 2. **The boundary layer**, in two parts:
    - (a) **stage H**, the implicit solves through a canonical `numerics`
-     tridiagonal solver, with one factorization for u and v (measured
-     above). Migration needs the decisions below.
+     tridiagonal solver, assembling the u/v matrix once (measured above;
+     factorization reuse not measured). Migration needs the decisions below.
    - (b) the 162 per-level syntheses and the per-level elementwise work.
      Batching them may change rounding, so each needs its own equivalence
      check.
@@ -144,7 +161,17 @@ The insolation and the substrate are not on this list: the substrate step
 now takes 17-19 ms at 16,200 columns, and the forcing costs no measurable
 wall-clock time.
 
-**Decisions needed before stage H's migration:**
+**Owner rulings (2026-11-27):**
+- Shared native numerical infrastructure is the agreed direction. Reusable
+  numerical kernels have canonical ownership below the physics layer.
+- The proposed ordering of the atmospheric optimizations above is agreed.
+- Stage H's arithmetic-equivalence criteria must be established explicitly
+  before production migration. The agreement measured here is evidence, not
+  an acceptance threshold.
+- Neither stage H's production migration nor further atmospheric
+  optimization is started on that date.
+
+**Decisions that were requested before stage H's migration:**
 - whether the measured differences above (≤ 1.3e-16 of column scale, equal
   accuracy and conservation) are acceptable, since no
   tolerance has been agreed for atmospheric arithmetic;
