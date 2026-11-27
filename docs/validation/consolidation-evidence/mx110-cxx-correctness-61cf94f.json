@@ -1,0 +1,243 @@
+{
+ "device": "NVIDIA GeForce MX110",
+ "commit": "af67d115ac2708e84e96a012efabcacadfbf0333",
+ "cases": {
+  "production_vpw99_two_90x180": {
+   "columns": 16200,
+   "layers": 51,
+   "strata": 2,
+   "start": "saved state",
+   "cxx_cuda_compile_s": 3.3851722160179634,
+   "cxx_cuda_specialization": "substrate_step<51, pt::Piecewise<pt::Poly<5>, pt::SatExp>, pt::Piecewise<pt::Poly<5>, pt::SatExp>>",
+   "tracer_compile_s": 0.003748899995116517,
+   "cxx_host_build_s": 0.9514544550038408,
+   "cxx_host_compiled_now": true,
+   "cxx_host_compiler": "/home/user/.venvs/consolidation-gpu/bin/python -m ziglang c++ (clang version 22.1.8)",
+   "cxx_cuda_vs_cupy": {
+    "steps": 8,
+    "bitwise_identical_steps": 8,
+    "max_abs_difference_K": 0.0,
+    "newton_counts_identical": true
+   },
+   "tracer_vs_cupy": {
+    "steps": 8,
+    "bitwise_identical_steps": 8,
+    "max_abs_difference_K": 0.0,
+    "newton_counts_identical": true
+   },
+   "cxx_host_vs_numpy": {
+    "steps": 3,
+    "bitwise_identical_steps": 3,
+    "max_abs_difference_K": 0.0,
+    "newton_counts_identical": true
+   },
+   "cxx_host_vs_cxx_cuda": {
+    "steps": 3,
+    "bitwise_identical_steps": 0,
+    "max_abs_difference_K": 1.7053025658242404e-13,
+    "newton_counts_identical": true
+   },
+   "seconds_per_step": {
+    "cupy_production": {
+     "median": 0.5499726710004325,
+     "min": 0.5499726710004325,
+     "max": 0.5499726710004325,
+     "n": 1
+    },
+    "tracer_kernel": {
+     "median": 0.2317205491272034,
+     "min": 0.2317205491272034,
+     "max": 0.2317205491272034,
+     "n": 1
+    },
+    "cxx_cuda": {
+     "median": 0.2388896391275921,
+     "min": 0.2388896391275921,
+     "max": 0.2388896391275921,
+     "n": 1
+    },
+    "numpy_production": {
+     "median": 1.0255160343367606,
+     "min": 1.0255160343367606,
+     "max": 1.0255160343367606,
+     "n": 1
+    },
+    "cxx_host_single_thread": {
+     "median": 0.3423751426647262,
+     "min": 0.3423751426647262,
+     "max": 0.3423751426647262,
+     "n": 1
+    }
+   },
+   "cxx_cuda_over_tracer_time": 1.0309385163611589,
+   "cxx_cuda_speedup_vs_cupy": 2.3022039507820153,
+   "cxx_host_speedup_vs_numpy": 2.995299326800153,
+   "cxx_cuda_kernel": {
+    "registers": 255,
+    "local_bytes": 7120
+   },
+   "tracer_kernel": {
+    "registers": 255,
+    "local_bytes": 4928
+   }
+  },
+  "terminator_vpw99_two_512": {
+   "columns": 512,
+   "layers": 51,
+   "strata": 2,
+   "start": "24 steps from isothermal",
+   "cxx_cuda_compile_s": 0.0018999000021722168,
+   "cxx_cuda_specialization": "substrate_step<51, pt::Piecewise<pt::Poly<5>, pt::SatExp>, pt::Piecewise<pt::Poly<5>, pt::SatExp>>",
+   "tracer_compile_s": 0.0005093000072520226,
+   "cxx_host_build_s": 0.5945941160025541,
+   "cxx_host_compiled_now": false,
+   "cxx_host_compiler": "/home/user/.venvs/consolidation-gpu/bin/python -m ziglang c++ (clang version 22.1.8)",
+   "cxx_cuda_vs_cupy": {
+    "steps": 8,
+    "bitwise_identical_steps": 8,
+    "max_abs_difference_K": 0.0,
+    "newton_counts_identical": true
+   },
+   "tracer_vs_cupy": {
+    "steps": 8,
+    "bitwise_identical_steps": 8,
+    "max_abs_difference_K": 0.0,
+    "newton_counts_identical": true
+   },
+   "cxx_host_vs_numpy": {
+    "steps": 3,
+    "bitwise_identical_steps": 3,
+    "max_abs_difference_K": 0.0,
+    "newton_counts_identical": true
+   },
+   "cxx_host_vs_cxx_cuda": {
+    "steps": 3,
+    "bitwise_identical_steps": 0,
+    "max_abs_difference_K": 5.3290705182007514e-14,
+    "newton_counts_identical": true
+   },
+   "seconds_per_step": {
+    "cupy_production": {
+     "median": 0.09232284000245272,
+     "min": 0.09232284000245272,
+     "max": 0.09232284000245272,
+     "n": 1
+    },
+    "tracer_kernel": {
+     "median": 0.01070987525235978,
+     "min": 0.01070987525235978,
+     "max": 0.01070987525235978,
+     "n": 1
+    },
+    "cxx_cuda": {
+     "median": 0.00868524974794127,
+     "min": 0.00868524974794127,
+     "max": 0.00868524974794127,
+     "n": 1
+    },
+    "numpy_production": {
+     "median": 0.02247659133475584,
+     "min": 0.02247659133475584,
+     "max": 0.02247659133475584,
+     "n": 1
+    },
+    "cxx_host_single_thread": {
+     "median": 0.010784529333856577,
+     "min": 0.010784529333856577,
+     "max": 0.010784529333856577,
+     "n": 1
+    }
+   },
+   "cxx_cuda_over_tracer_time": 0.8109571347273714,
+   "cxx_cuda_speedup_vs_cupy": 10.629842857925496,
+   "cxx_host_speedup_vs_numpy": 2.0841513467067694,
+   "cxx_cuda_kernel": {
+    "registers": 255,
+    "local_bytes": 7120
+   },
+   "tracer_kernel": {
+    "registers": 255,
+    "local_bytes": 4928
+   }
+  },
+  "terminator_constant_512": {
+   "columns": 512,
+   "layers": 31,
+   "strata": 1,
+   "start": "24 steps from isothermal",
+   "cxx_cuda_compile_s": 2.9566892510047182,
+   "cxx_cuda_specialization": "substrate_step<31, pt::Poly<1>, pt::Poly<1>>",
+   "tracer_compile_s": 0.0027669989794958383,
+   "cxx_host_build_s": 0.6625041420047637,
+   "cxx_host_compiled_now": true,
+   "cxx_host_compiler": "/home/user/.venvs/consolidation-gpu/bin/python -m ziglang c++ (clang version 22.1.8)",
+   "cxx_cuda_vs_cupy": {
+    "steps": 8,
+    "bitwise_identical_steps": 8,
+    "max_abs_difference_K": 0.0,
+    "newton_counts_identical": true
+   },
+   "tracer_vs_cupy": {
+    "steps": 8,
+    "bitwise_identical_steps": 8,
+    "max_abs_difference_K": 0.0,
+    "newton_counts_identical": true
+   },
+   "cxx_host_vs_numpy": {
+    "steps": 3,
+    "bitwise_identical_steps": 3,
+    "max_abs_difference_K": 0.0,
+    "newton_counts_identical": true
+   },
+   "cxx_host_vs_cxx_cuda": {
+    "steps": 3,
+    "bitwise_identical_steps": 0,
+    "max_abs_difference_K": 7.105427357601002e-15,
+    "newton_counts_identical": true
+   },
+   "seconds_per_step": {
+    "cupy_production": {
+     "median": 0.03760141037491849,
+     "min": 0.03760141037491849,
+     "max": 0.03760141037491849,
+     "n": 1
+    },
+    "tracer_kernel": {
+     "median": 0.002995848877617391,
+     "min": 0.002995848877617391,
+     "max": 0.002995848877617391,
+     "n": 1
+    },
+    "cxx_cuda": {
+     "median": 0.002893061377108097,
+     "min": 0.002893061377108097,
+     "max": 0.002893061377108097,
+     "n": 1
+    },
+    "numpy_production": {
+     "median": 0.006343597672336425,
+     "min": 0.006343597672336425,
+     "max": 0.006343597672336425,
+     "n": 1
+    },
+    "cxx_host_single_thread": {
+     "median": 0.001887432668202867,
+     "min": 0.001887432668202867,
+     "max": 0.001887432668202867,
+     "n": 1
+    }
+   },
+   "cxx_cuda_over_tracer_time": 0.9656900248616542,
+   "cxx_cuda_speedup_vs_cupy": 12.997100812463524,
+   "cxx_host_speedup_vs_numpy": 3.360966342908819,
+   "cxx_cuda_kernel": {
+    "registers": 255,
+    "local_bytes": 3376
+   },
+   "tracer_kernel": {
+    "registers": 255,
+    "local_bytes": 2448
+   }
+  }
+ }
+}
