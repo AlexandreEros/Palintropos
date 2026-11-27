@@ -22,7 +22,6 @@ from __future__ import annotations
 
 import ctypes
 import importlib.util
-from typing import Optional
 
 import numpy as np
 
@@ -30,7 +29,7 @@ from tropoi.temporal.native import build_identity
 
 __all__ = ["NativeLibraryError", "describe", "host_library", "law_parameters", "specialization"]
 
-ABI_VERSION = 2
+ABI_VERSION = 3
 REBUILD = ("build it with a C++ compiler (GCC or Clang): `pip install -e .` from the "
            "repository, or `python setup.py build_ext --inplace` for a source tree used "
            "through PYTHONPATH")
@@ -145,7 +144,8 @@ def host_library():
                       ("pt_substrate_layer_capacity", ctypes.c_int),
                       ("pt_substrate_max_strata", ctypes.c_int),
                       ("pt_substrate_step", ctypes.c_int),
-                      ("pt_substrate_evaluate", ctypes.c_int)):
+                      ("pt_substrate_evaluate", ctypes.c_int),
+                      ("pt_numerics_thomas", ctypes.c_int)):
         getattr(lib, name).restype = res
     abi = lib.pt_substrate_abi_version()
     built = lib.pt_substrate_build_digest().decode()
@@ -373,6 +373,22 @@ def evaluate_host(sub, th_old, x, dt, absorbed, dflux, fref, bottom, source=None
     if status:
         raise NativeLibraryError(f"the CPU substrate library rejected the column ({status})")
     return R, lo, di, up
+
+
+def thomas_host(lower, diag, upper, rhs) -> np.ndarray:
+    """Solve one tridiagonal system (diag (n,), lower and upper (n - 1,))
+    with the native pt::thomas of the CPU library: for verifying the
+    numerics against an independent solver."""
+    lib = host_library()
+    f = lambda a: np.ascontiguousarray(a, dtype=np.float64)                    # noqa: E731
+    lower, diag, upper, rhs = f(lower), f(diag), f(upper), f(rhs)
+    n = diag.size
+    x = np.empty(n)
+    p = lambda a: a.ctypes.data_as(ctypes.c_void_p)                            # noqa: E731
+    if lib.pt_numerics_thomas(ctypes.c_int(n), p(lower), p(diag), p(upper), p(rhs), p(x)):
+        raise ValueError(f"the CPU library solves systems of 1 to {lib.layer_capacity + 1} "
+                         f"rows, not {n}")
+    return x
 
 
 def describe(sub, backend: str) -> dict:

@@ -716,15 +716,8 @@
     },
     {
       "kind": "imports",
-      "module_edges": 1,
-      "runtime_module_edges": 1,
-      "source": "tropoi.temporal",
-      "target": "tropoi.numerics"
-    },
-    {
-      "kind": "imports",
-      "module_edges": 7,
-      "runtime_module_edges": 7,
+      "module_edges": 4,
+      "runtime_module_edges": 4,
       "source": "tropoi.temporal",
       "target": "tropoi.physics"
     },
@@ -805,11 +798,6 @@
       "id": "tropoi.cli",
       "internal_edges": 4,
       "modules": 5
-    },
-    {
-      "id": "tropoi.numerics",
-      "internal_edges": 0,
-      "modules": 1
     },
     {
       "id": "tropoi.physics",
@@ -923,8 +911,8 @@
     },
     {
       "id": "tropoi.temporal",
-      "internal_edges": 5,
-      "modules": 10
+      "internal_edges": 4,
+      "modules": 9
     },
     {
       "id": "tropoi.temporal.native",

@@ -102,16 +102,7 @@
     {
       "direction": "down",
       "kind": "imports",
-      "module_edges": 1,
-      "package_edges": 1,
-      "source": "temporal",
-      "target": "numerics",
-      "type_checking_only_package_edges": 0
-    },
-    {
-      "direction": "down",
-      "kind": "imports",
-      "module_edges": 11,
+      "module_edges": 8,
       "package_edges": 2,
       "source": "temporal",
       "target": "physics",
@@ -134,13 +125,6 @@
       "id": "cli",
       "internal_package_edges": 0,
       "modules": 5,
-      "packages": 1
-    },
-    {
-      "depth": 6,
-      "id": "numerics",
-      "internal_package_edges": 0,
-      "modules": 1,
       "packages": 1
     },
     {
@@ -175,7 +159,7 @@
       "depth": 3,
       "id": "temporal",
       "internal_package_edges": 3,
-      "modules": 17,
+      "modules": 16,
       "packages": 3
     }
   ]

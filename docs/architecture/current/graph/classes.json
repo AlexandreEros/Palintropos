@@ -528,10 +528,6 @@
           "name": "conductivity"
         },
         {
-          "kind": "staticmethod",
-          "name": "conductivity_derivative"
-        },
-        {
           "kind": "method",
           "name": "enthalpy_difference"
         },
@@ -6145,31 +6141,6 @@
       ],
       "module": "tropoi.spatial.transforms.spherical_harmonics",
       "qualname": "LatLonSphericalHarmonics"
-    },
-    {
-      "decorators": [],
-      "external_bases": [],
-      "id": "tropoi.temporal._substrate_reference.ReferenceBackwardEulerSubstrate",
-      "members": [
-        {
-          "kind": "method",
-          "name": "__init__"
-        },
-        {
-          "kind": "method",
-          "name": "_report"
-        },
-        {
-          "kind": "method",
-          "name": "_system"
-        },
-        {
-          "kind": "method",
-          "name": "step"
-        }
-      ],
-      "module": "tropoi.temporal._substrate_reference",
-      "qualname": "ReferenceBackwardEulerSubstrate"
     },
     {
       "decorators": [],

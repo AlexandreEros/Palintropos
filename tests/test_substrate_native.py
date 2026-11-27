@@ -1,19 +1,16 @@
-"""Migration gates of the native (C++) substrate step against the Python
-reference implementation, plus the native library's guards.
+"""The native (C++) substrate step across its two backends, and the native
+library's guards.
 
-* GPU: the native kernel must agree with the reference on CuPy **bit for
-  bit** in the state and every StepReport field (same arithmetic, same
-  reductions; audit N1).
-* CPU: the native library must agree with the reference on NumPy within the
-  existing G-GPU criteria (|dT| <= 1e-6 K and identical Newton counts) and
-  close the energy identity. Bit-for-bit agreement depends on the host's
-  math library and compiler (it holds with clang on the development
-  machine, not with every g++/glibc pair) and is reported, not required.
-
-These are comparisons of two implementations; the independent verification
-of the shared equations is in test_substrate.py and
+The step's equations are verified independently in test_substrate.py and
 test_substrate_nonlinear.py (analytical, manufactured, finite-difference
-Jacobian and conservation tests).
+Jacobian and conservation tests), and its Thomas elimination here against
+numpy.linalg.solve. Comparisons of the CUDA and the CPU builds of the same
+code check consistency across backends, not correctness: they agree
+within the G-GPU criteria (|dT| <= 1e-6 K, identical Newton counts), and bit
+for bit only where the host's math library rounds as libdevice does.
+
+The bitwise migration gates against the former Python implementation
+(audit N1) are recorded in docs/validation/consolidation-evidence/.
 """
 import re
 
@@ -24,15 +21,11 @@ from tropoi.physics.materials import DepthProfile, Stratum, ledlow_1992
 from tropoi.physics.substrate import ConductiveSubstrate
 from tropoi.spatial.vertical import stratified_interfaces
 from tropoi.temporal import substrate_native
-from tropoi.temporal._substrate_reference import ReferenceBackwardEulerSubstrate
 from tropoi.temporal.native import build_identity
 from tropoi.temporal.substrate import BackwardEulerSubstrate, SubstrateSolveError
 
 #: the existing G-GPU bound (docs/validation/PLANET-ONE-GATES.md, A2)
 G_GPU_K = 1e-6
-FIELDS = ("energy_tendency", "absorbed", "emitted", "conducted", "bottom", "source",
-          "residual_sum", "tolerance_sum", "max_residual_ratio")
-
 
 def _three_strata():
     """Three strata of three law families: constant c_p, the Ledlow piecewise
@@ -69,80 +62,76 @@ def _forcings(rng, n, L, steps):
         yield kw
 
 
-def _run_both(sub, xp, steps=12, n=37, seed=5, dt=3600.0):
-    rng = np.random.default_rng(seed)
-    a = sub.initial_state(n, xp=xp)
-    b = sub.initial_state(n, xp=xp)
-    native, ref = BackwardEulerSubstrate(sub), ReferenceBackwardEulerSubstrate(sub)
-    for kw in _forcings(rng, n, sub.layers, steps):
-        kw = {k: (xp.asarray(v) if isinstance(v, np.ndarray) else v) for k, v in kw.items()}
-        a, ra = native.step(a, dt, **kw)
-        b, rb = ref.step(b, dt, **kw)
-        yield a, ra, b, rb
+def _cupy():
+    cp = pytest.importorskip("cupy")
+    try:
+        cp.cuda.runtime.getDeviceCount()
+    except Exception:
+        pytest.skip("no usable CUDA device")
+    return cp
 
 
 def _host(v):
     return v.get() if hasattr(v, "get") else np.asarray(v)
 
 
-def test_cpu_native_matches_the_reference_within_the_g_gpu_criteria():
-    sub = _three_strata()
-    bitwise = True
-    for a, ra, b, rb in _run_both(sub, np):
-        assert ra.iterations == rb.iterations
-        assert np.max(np.abs(a.anomaly - b.anomaly)) <= G_GPU_K
-        assert np.max(np.abs(a.surface_anomaly - b.surface_anomaly)) <= G_GPU_K
-        assert np.all(np.abs(ra.residual_sum) <= ra.tolerance_sum)      # energy identity
-        bitwise &= (np.array_equal(a.anomaly, b.anomaly)
-                    and np.array_equal(a.surface_anomaly, b.surface_anomaly)
-                    and all(np.array_equal(getattr(ra, f), getattr(rb, f)) for f in FIELDS))
-    print("CPU native vs reference bitwise:", bitwise)
-
-
-def test_gpu_native_matches_the_reference_bit_for_bit():
-    cp = pytest.importorskip("cupy")
-    try:
-        cp.cuda.runtime.getDeviceCount()
-    except Exception:
-        pytest.skip("no usable CUDA device")
+def test_cuda_and_cpu_builds_agree_within_the_g_gpu_criteria():
+    """The same randomized forcing (every input of step(), every form) on
+    both backends, from the same state: the G-GPU criteria every step, and
+    the energy identity on each."""
+    cp = _cupy()
     from tropoi.run.airless.config import mercury_vpw99
     from tropoi.run.airless.experiment import build_substrate
     for sub in (_three_strata(), build_substrate(mercury_vpw99())):
-        for a, ra, b, rb in _run_both(sub, cp, steps=10, n=129):
+        rng = np.random.default_rng(5)
+        n = 37
+        a, b = sub.initial_state(n, xp=cp), sub.initial_state(n)
+        stepper = BackwardEulerSubstrate(sub)
+        bitwise = True
+        for kw in _forcings(rng, n, sub.layers, 12):
+            a, ra = stepper.step(a, 3600.0, **{k: (cp.asarray(v) if isinstance(v, np.ndarray)
+                                                   else v) for k, v in kw.items()})
+            b, rb = stepper.step(b, 3600.0, **kw)
             assert ra.iterations == rb.iterations
-            assert bool(cp.array_equal(a.anomaly, b.anomaly))
-            assert bool(cp.array_equal(a.surface_anomaly, b.surface_anomaly))
-            for f in FIELDS:
-                assert bool(cp.array_equal(getattr(ra, f), getattr(rb, f))), f
-            assert [tuple(map(float, e)) for e in ra.extent] == \
-                   [tuple(map(float, e)) for e in rb.extent]
+            assert np.max(np.abs(_host(a.anomaly) - b.anomaly)) <= G_GPU_K
+            assert np.max(np.abs(_host(a.surface_anomaly) - b.surface_anomaly)) <= G_GPU_K
+            for r in (ra, rb):
+                assert np.all(np.abs(_host(r.residual_sum)) <= _host(r.tolerance_sum))
+            bitwise &= bool(np.array_equal(_host(a.anomaly), b.anomaly))
+        print(sub.layers, "layers: CUDA and CPU bitwise:", bitwise)
+
+
+def test_native_thomas_matches_an_independent_solver():
+    """pt::thomas against numpy.linalg.solve on diagonally dominant systems
+    of 1 to the full capacity of rows; larger systems are refused."""
+    rng = np.random.default_rng(11)
+    cap = substrate_native.host_library().layer_capacity + 1
+    for n in (1, 2, 3, 17, 52, cap):
+        lower, upper = rng.uniform(-1, 1, n - 1), rng.uniform(-1, 1, n - 1)
+        diag = (np.abs(np.r_[lower, 0.0]) + np.abs(np.r_[0.0, upper])
+                + rng.uniform(0.5, 2.0, n)) * rng.choice([-1.0, 1.0], n)
+        rhs = rng.uniform(-10, 10, n)
+        A = np.diag(diag) + np.diag(lower, -1) + np.diag(upper, 1)
+        x = substrate_native.thomas_host(lower, diag, upper, rhs)
+        np.testing.assert_allclose(x, np.linalg.solve(A, rhs), rtol=1e-12, atol=1e-12)
+        np.testing.assert_allclose(A @ x, rhs, rtol=1e-12, atol=1e-11)
+    with pytest.raises(ValueError, match="rows"):
+        substrate_native.thomas_host(np.ones(cap), np.full(cap + 1, 4.0), np.ones(cap),
+                                     np.ones(cap + 1))
 
 
 @pytest.mark.parametrize("backend", ["numpy", "cupy"])
-def test_convergence_failure_is_raised_as_by_the_reference(backend):
-    if backend == "cupy":
-        cp = pytest.importorskip("cupy")
-        try:
-            cp.cuda.runtime.getDeviceCount()
-        except Exception:
-            pytest.skip("no usable CUDA device")
-        xp = cp
-    else:
-        xp = np
+def test_convergence_failure_raises_and_names_the_columns(backend):
+    xp = np if backend == "numpy" else _cupy()
     sub = _three_strata()
     sub.max_iterations = 1
     st = sub.initial_state(5, xp=xp)
     sw = xp.asarray([9000.0, 0.0, 9000.0, 0.0, 9000.0])
-    messages = []
-    for impl in (BackwardEulerSubstrate(sub), ReferenceBackwardEulerSubstrate(sub)):
-        with pytest.raises(SubstrateSolveError) as exc:
-            impl.step(st, 86400.0, shortwave_down=sw)
-        messages.append(str(exc.value))
-    assert re.match(r"Newton did not converge in 1 iterations for \d+ columns", messages[0])
-    if backend == "cupy":
-        assert messages[0] == messages[1]
-    else:                                  # the worst ratio's last digits may differ on a host
-        assert messages[0].split("; worst")[0] == messages[1].split("; worst")[0]
+    with pytest.raises(SubstrateSolveError) as exc:
+        BackwardEulerSubstrate(sub).step(st, 86400.0, shortwave_down=sw)
+    assert re.fullmatch(r"Newton did not converge in 1 iterations for \d+ columns "
+                        r"\(first \[[\d, ]+\]\); worst residual/tolerance \d\.\d{3}e[+-]\d+",
+                        str(exc.value)), str(exc.value)
 
 
 def test_host_capacity_and_law_limits_are_enforced_never_truncated():
@@ -205,14 +194,7 @@ def test_provenance_describes_the_native_build():
 
 
 def _backend(name):
-    if name == "numpy":
-        return np
-    cp = pytest.importorskip("cupy")
-    try:
-        cp.cuda.runtime.getDeviceCount()
-    except Exception:
-        pytest.skip("no usable CUDA device")
-    return cp
+    return np if name == "numpy" else _cupy()
 
 
 BAD_FORCING = [
@@ -230,10 +212,9 @@ BAD_FORCING = [
 
 @pytest.mark.parametrize("backend", ["numpy", "cupy"])
 @pytest.mark.parametrize("bad, message", BAD_FORCING)
-def test_invalid_forcing_is_refused_as_by_the_reference(backend, bad, message):
-    """The native step validates the forcing itself; the refusal (type and
-    message, in the documented order) is the reference's, and no state is
-    returned."""
+def test_invalid_forcing_is_refused_in_the_documented_order(backend, bad, message):
+    """The native step validates the forcing itself; the refusal names the
+    first invalid input in the documented order, and no state is returned."""
     xp = _backend(backend)
     sub = _three_strata()
     n = 6
@@ -250,9 +231,8 @@ def test_invalid_forcing_is_refused_as_by_the_reference(backend, bad, message):
         else:
             kw[k] = v
     st = sub.initial_state(n, xp=xp)
-    for impl in (BackwardEulerSubstrate(sub), ReferenceBackwardEulerSubstrate(sub)):
-        with pytest.raises(ValueError, match=message):
-            impl.step(st, 3600.0, **kw)
+    with pytest.raises(ValueError, match=message):
+        BackwardEulerSubstrate(sub).step(st, 3600.0, **kw)
 
 
 @pytest.mark.parametrize("backend", ["numpy", "cupy"])

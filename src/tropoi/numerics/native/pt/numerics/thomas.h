@@ -3,8 +3,9 @@
 // Solves one tridiagonal system of n <= CAP rows: lower[i-1] couples row i to
 // row i-1 and upper[i] couples row i to row i+1. No pivoting: the caller
 // guarantees a system that is stable without it (diagonal dominance or an
-// M-matrix). The operation order is the reference order of
-// tropoi.numerics.tridiagonal.thomas.
+// M-matrix). The operation order is that of the former Python reference
+// (tropoi.numerics.tridiagonal.thomas), which was removed once the native
+// step had passed its migration gates against it.
 #pragma once
 #include "../portable.h"
 

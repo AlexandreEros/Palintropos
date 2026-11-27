@@ -13,3 +13,16 @@ PR #74 (`docs/validation/CONSOLIDATION-AUDIT.md` there).
 | `t4-census-d81d547.json` | Nsight census (P3 protocol): per step as the difference of 24- and 96-step traces (setup and teardown cancel). Between outputs: **122 kernel launches** and **2 synchronizations**, each a device-to-host copy (validation, and the iteration/failure summary). Output events: +1.0 launch and +0.21 synchronizations per step at the production cadence. Launches by NVTX phase (nested ranges; approximately): forcing 14, step validation and preparation ~13, native kernel 3, report 33, extents 18, runner accumulation ~33 |
 
 An earlier census at `0c00121` counted each device-to-host copy a second time as a synchronization, and divided the whole `run_block` call, setup and teardown included, by the step count ("3.0 + 3.0 per step"). It was superseded by `t4-census-d81d547.json` and removed. A census at the production cadence in that session had failed to parse and read as zero; such failures now raise.
+
+## After stage G
+
+The Python migration reference (`tropoi/temporal/_substrate_reference.py`)
+and the Python Thomas solver (`tropoi/numerics/tridiagonal.py`) were removed
+once the native step had passed every gate above against them. The files
+here remain the record of those comparisons, at the commits named in their
+file names. Since then `tools/colab/substrate_gate.py` is a regression gate:
+it regenerates the representative state (SHA-256 against the audit's) and
+compares the CPU and CUDA builds; the independent verification of the
+equations is in `tests/test_substrate.py` and
+`tests/test_substrate_nonlinear.py`, and of the Thomas elimination in
+`tests/test_substrate_native.py` (against `numpy.linalg.solve`).

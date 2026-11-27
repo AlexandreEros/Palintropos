@@ -11707,66 +11707,6 @@
     },
     {
       "kind": "constructor",
-      "source": "tropoi.temporal._substrate_reference.ReferenceBackwardEulerSubstrate",
-      "target": "tropoi.temporal._substrate_reference.ReferenceBackwardEulerSubstrate.__init__"
-    },
-    {
-      "kind": "instantiate",
-      "source": "tropoi.temporal._substrate_reference.ReferenceBackwardEulerSubstrate._report",
-      "target": "tropoi.temporal.substrate.StepReport"
-    },
-    {
-      "kind": "call",
-      "source": "tropoi.temporal._substrate_reference.ReferenceBackwardEulerSubstrate._system",
-      "target": "tropoi.physics.materials.CellMaterials.conductivity"
-    },
-    {
-      "kind": "call",
-      "source": "tropoi.temporal._substrate_reference.ReferenceBackwardEulerSubstrate._system",
-      "target": "tropoi.physics.materials.CellMaterials.conductivity_derivative"
-    },
-    {
-      "kind": "call",
-      "source": "tropoi.temporal._substrate_reference.ReferenceBackwardEulerSubstrate._system",
-      "target": "tropoi.physics.materials.CellMaterials.kirchhoff_difference"
-    },
-    {
-      "kind": "call",
-      "source": "tropoi.temporal._substrate_reference.ReferenceBackwardEulerSubstrate.step",
-      "target": "tropoi.numerics.tridiagonal.thomas"
-    },
-    {
-      "kind": "instantiate",
-      "source": "tropoi.temporal._substrate_reference.ReferenceBackwardEulerSubstrate.step",
-      "target": "tropoi.physics.substrate.SubstrateState"
-    },
-    {
-      "kind": "self",
-      "source": "tropoi.temporal._substrate_reference.ReferenceBackwardEulerSubstrate.step",
-      "target": "tropoi.temporal._substrate_reference.ReferenceBackwardEulerSubstrate._report"
-    },
-    {
-      "kind": "self",
-      "source": "tropoi.temporal._substrate_reference.ReferenceBackwardEulerSubstrate.step",
-      "target": "tropoi.temporal._substrate_reference.ReferenceBackwardEulerSubstrate._system"
-    },
-    {
-      "kind": "call",
-      "source": "tropoi.temporal._substrate_reference.ReferenceBackwardEulerSubstrate.step",
-      "target": "tropoi.temporal._substrate_reference._host"
-    },
-    {
-      "kind": "call",
-      "source": "tropoi.temporal._substrate_reference.ReferenceBackwardEulerSubstrate.step",
-      "target": "tropoi.temporal._substrate_reference._xp"
-    },
-    {
-      "kind": "instantiate",
-      "source": "tropoi.temporal._substrate_reference.ReferenceBackwardEulerSubstrate.step",
-      "target": "tropoi.temporal.substrate.SubstrateSolveError"
-    },
-    {
-      "kind": "constructor",
       "source": "tropoi.temporal.column_coupling.ColumnPhysicsCoupling",
       "target": "tropoi.temporal.column_coupling.ColumnPhysicsCoupling.__init__"
     },
@@ -12449,6 +12389,11 @@
       "kind": "call",
       "source": "tropoi.temporal.substrate_native.specialization",
       "target": "tropoi.temporal.substrate_native._law"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.temporal.substrate_native.thomas_host",
+      "target": "tropoi.temporal.substrate_native.host_library"
     },
     {
       "kind": "constructor",
@@ -13432,13 +13377,6 @@
       "type": "function"
     },
     {
-      "id": "tropoi.numerics.tridiagonal.thomas",
-      "kind": "function",
-      "module": "tropoi.numerics.tridiagonal",
-      "qualname": "thomas",
-      "type": "function"
-    },
-    {
       "id": "tropoi.physics.boundary_layer._xp",
       "kind": "function",
       "module": "tropoi.physics.boundary_layer",
@@ -14220,13 +14158,6 @@
       "kind": "staticmethod",
       "module": "tropoi.physics.materials",
       "qualname": "CellMaterials.conductivity",
-      "type": "function"
-    },
-    {
-      "id": "tropoi.physics.materials.CellMaterials.conductivity_derivative",
-      "kind": "staticmethod",
-      "module": "tropoi.physics.materials",
-      "qualname": "CellMaterials.conductivity_derivative",
       "type": "function"
     },
     {
@@ -26774,55 +26705,6 @@
       "type": "function"
     },
     {
-      "id": "tropoi.temporal._substrate_reference.ReferenceBackwardEulerSubstrate",
-      "kind": "class",
-      "module": "tropoi.temporal._substrate_reference",
-      "qualname": "ReferenceBackwardEulerSubstrate",
-      "type": "class"
-    },
-    {
-      "id": "tropoi.temporal._substrate_reference.ReferenceBackwardEulerSubstrate.__init__",
-      "kind": "method",
-      "module": "tropoi.temporal._substrate_reference",
-      "qualname": "ReferenceBackwardEulerSubstrate.__init__",
-      "type": "function"
-    },
-    {
-      "id": "tropoi.temporal._substrate_reference.ReferenceBackwardEulerSubstrate._report",
-      "kind": "method",
-      "module": "tropoi.temporal._substrate_reference",
-      "qualname": "ReferenceBackwardEulerSubstrate._report",
-      "type": "function"
-    },
-    {
-      "id": "tropoi.temporal._substrate_reference.ReferenceBackwardEulerSubstrate._system",
-      "kind": "method",
-      "module": "tropoi.temporal._substrate_reference",
-      "qualname": "ReferenceBackwardEulerSubstrate._system",
-      "type": "function"
-    },
-    {
-      "id": "tropoi.temporal._substrate_reference.ReferenceBackwardEulerSubstrate.step",
-      "kind": "method",
-      "module": "tropoi.temporal._substrate_reference",
-      "qualname": "ReferenceBackwardEulerSubstrate.step",
-      "type": "function"
-    },
-    {
-      "id": "tropoi.temporal._substrate_reference._host",
-      "kind": "function",
-      "module": "tropoi.temporal._substrate_reference",
-      "qualname": "_host",
-      "type": "function"
-    },
-    {
-      "id": "tropoi.temporal._substrate_reference._xp",
-      "kind": "function",
-      "module": "tropoi.temporal._substrate_reference",
-      "qualname": "_xp",
-      "type": "function"
-    },
-    {
       "id": "tropoi.temporal.column_coupling.ColumnPhysicsCoupling",
       "kind": "class",
       "module": "tropoi.temporal.column_coupling",
@@ -28038,6 +27920,13 @@
       "kind": "function",
       "module": "tropoi.temporal.substrate_native",
       "qualname": "specialization",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.temporal.substrate_native.thomas_host",
+      "kind": "function",
+      "module": "tropoi.temporal.substrate_native",
+      "qualname": "thomas_host",
       "type": "function"
     },
     {

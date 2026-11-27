@@ -9,7 +9,6 @@ Index: [all packages](../index.md) · parent [`tropoi`](tropoi.md) · [`tropoi.n
 | Module | Category | Classes | Public functions |
 |---|---|---|---|
 | `tropoi.numerics` | empty | – | – |
-| `tropoi.numerics.tridiagonal` | code | – | `thomas` |
 
 ## Imports
 
@@ -21,12 +20,8 @@ This package's modules and the import edges between them; every other package is
 flowchart LR
     subgraph g_tropoi_onumerics["numerics"]
         n_tropoi_onumerics["numerics"]
-        n_tropoi_onumerics_otridiagonal["numerics.tridiagonal"]
     end
-    p_tropoi_otemporal["package temporal"]
-    p_tropoi_otemporal -->|1| n_tropoi_onumerics_otridiagonal
     classDef other fill:none,stroke-dasharray:3 3
-    class p_tropoi_otemporal other
 ```
 
 ## Classes

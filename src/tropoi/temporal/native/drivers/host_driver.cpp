@@ -28,7 +28,7 @@ void configure_host(HostSubstrate& ph, const pt::ColumnArrays& a, const pt::Step
 extern "C" {
 
 //: bumped whenever an exported signature changes
-int pt_substrate_abi_version() { return 2; }
+int pt_substrate_abi_version() { return 3; }
 const char* pt_substrate_build_digest() { return PT_BUILD_DIGEST; }
 const char* pt_substrate_build_flags() { return PT_BUILD_FLAGS; }
 int pt_substrate_layer_capacity() { return HOST_LAYER_CAP; }
@@ -83,6 +83,24 @@ int pt_substrate_evaluate(const pt::ColumnArrays* a, const pt::StepScalars* s,
     be.jacobian(x, lo, di, up);
     for (int i = 0; i <= L; ++i) { R[i] = r[i].v; diag[i] = di[i].v; }
     for (int i = 0; i < L; ++i) { lower[i] = lo[i].v; upper[i] = up[i].v; }
+    return 0;
+}
+
+// One tridiagonal system of n rows with pt::thomas, for verifying the
+// numerics against an independent solver. Returns 0, or -1 if n is out of
+// range.
+int pt_numerics_thomas(int n, const double* lower, const double* diag, const double* upper,
+                       const double* rhs, double* x) {
+    constexpr int CAP = HOST_LAYER_CAP + 1;
+    if (n < 1 || n > CAP) return -1;
+    pt::real lo[CAP], di[CAP], up[CAP], r[CAP], c[CAP], out[CAP];
+    for (int i = 0; i < n; ++i) {
+        di[i] = diag[i];
+        r[i] = rhs[i];
+        if (i < n - 1) { lo[i] = lower[i]; up[i] = upper[i]; }
+    }
+    pt::thomas<CAP>(n, lo, di, up, r, c, out);
+    for (int i = 0; i < n; ++i) x[i] = out[i].v;
     return 0;
 }
 
