@@ -1,8 +1,10 @@
 # Consolidation evidence (machine-readable)
 
-T4 measurements of the substrate consolidation. The audit and the earlier
-evidence (baseline, kernel census, prototypes) are in the decision record,
-PR #74 (`docs/validation/CONSOLIDATION-AUDIT.md` there).
+T4 measurements of the substrate consolidation. The audit, its decisions
+and the implementation status are in
+[`../CONSOLIDATION-AUDIT.md`](../CONSOLIDATION-AUDIT.md) (merged from PR
+#74), whose evidence (baseline, kernel census, prototypes) is in this
+directory too.
 
 | File | What it records |
 | --- | --- |
@@ -29,7 +31,7 @@ pull request's head (`refs/pull/N/head`).
 | `7a47d2b` | #79 (portable C++ step) | `12c644e` |
 | `83320e0`, `a07b0b5`, `d81d547` | #80 (Newton reuse, preparation cache, census) | `afa4588` |
 | `92c883d` | #81 (fusion) | `d4cf351` |
-| `7622a74` | #83 (removal of the Python reference) | (this pull request) |
+| `7622a74` | #83 (removal of the Python reference) | `48dcef6` |
 
 ## After stage G
 
