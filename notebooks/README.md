@@ -3,6 +3,7 @@
 | Notebook | Runtime and use | Evidence |
 | --- | --- | --- |
 | [Heated radiative runs](radiative_colab_pilot.ipynb) | Colab GPU. Time a warmed-up Earth or Jupiter run, profile it, or resume from a checkpoint. | [Colab run results](../docs/radiation/README.md#the-same-heated-runs-on-a-colab-tesla-t4-2026-11-1112-commit-d38d2a3), [full capsule catalogue](../docs/runs/README.md) |
+| [Substrate GPU benchmark](substrate_benchmark_colab.ipynb) | Colab T4. Commit-pinned throughput, call counts, scaling, compilation and the compiled-Thomas prototype for the conductive substrate; optional Nsight kernel census. | [Consolidation audit](../docs/validation/CONSOLIDATION-AUDIT.md) |
 | [CUDA regression suite](Palintropos-Colab-CUDA-Regression.ipynb) | Colab GPU. Run pytest against a selected revision and download the logs and JUnit results. | [Recorded Linux/CUDA regression](../docs/radiation/TEST_RESULTS.md#full-suite-on-linuxcuda-at-341acfe-2026-11-12-colab-tesla-t4) |
 | [Held–Suarez launcher](held_suarez_colab.ipynb) | Colab GPU and Google Drive. Launch or resume the pinned 1200-day T42L20 experiment with a verified Dinosaur reference and a runtime budget gate. | [Protocol and acceptance record](../docs/held_suarez/README.md), [preserved production run](../docs/runs/README.md#hs-t42l20-prod-002) |
 | [Williamson 5 reference preparation](mri_w5_reference_preparation.ipynb) | CPU. Prepare and verify the MRI-JMA reference package for T42 and T63. | [Williamson 5 validation report](../docs/validation/williamson5_mri_2026-07-30.md) |
