@@ -7051,6 +7051,16 @@
       "target": "tropoi.run.airless.experiment.transient_steps"
     },
     {
+      "kind": "call",
+      "source": "tropoi.run.airless.config.AirlessConfig.__post_init__",
+      "target": "tropoi.run.airless.config._is_count"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.run.airless.config.AirlessConfig.__post_init__",
+      "target": "tropoi.run.airless.config._is_real"
+    },
+    {
       "kind": "self",
       "source": "tropoi.run.airless.config.AirlessConfig.canonical_json",
       "target": "tropoi.run.airless.config.AirlessConfig.to_dict"
@@ -21412,6 +21422,20 @@
       "kind": "method",
       "module": "tropoi.run.airless.config",
       "qualname": "AirlessConfig.with_",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.airless.config._is_count",
+      "kind": "function",
+      "module": "tropoi.run.airless.config",
+      "qualname": "_is_count",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.airless.config._is_real",
+      "kind": "function",
+      "module": "tropoi.run.airless.config",
+      "qualname": "_is_real",
       "type": "function"
     },
     {
