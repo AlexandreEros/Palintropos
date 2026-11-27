@@ -58,8 +58,11 @@ def main(argv=None) -> int:
     out = {"device": cp.cuda.runtime.getDeviceProperties(0)["name"].decode(),
            "commit": sb.git("rev-parse", "HEAD"), "steps": args.steps, "cases": {}}
     for name, (c, s, forcing, (a0, s0, first)) in cases.items():
+        # RawKernel compiles lazily; force it here (the launcher sets an empty
+        # CUPY_CACHE_DIR, so this is a cold NVRTC compile)
         t0 = time.perf_counter()
         fused = fp.FusedStep(s)
+        fused.kernel.compile()
         sync()
         compile_s = time.perf_counter() - t0
         # bitwise trajectory comparison
@@ -93,9 +96,13 @@ def main(argv=None) -> int:
                     ts.append((time.perf_counter() - t) / args.steps)
             return {"median": statistics.median(ts), "min": min(ts), "max": max(ts), "n": len(ts)}
         t_ref = timed(lambda st, sw: s.step(st, c.dt, shortwave_down=sw)[0])
+        pool = cp.get_default_memory_pool()
+        pool.free_all_blocks()
         t_fused = timed(lambda st, sw: fused.step(st, c.dt, sw)[0])
+        fused_pool = int(pool.total_bytes())
         row = {"columns": int(a0.shape[1]), "layers": s.layers, "strata": len(s.strata),
                "compile_s": compile_s,
+               "memory_pool_total_bytes_after_fused_steps": fused_pool,
                "steps_bitwise_identical": args.steps - mismatched_steps,
                "steps_compared": args.steps, "max_abs_state_difference_K": max_abs,
                "newton_iterations_production": it_ref, "newton_iterations_fused_max": it_got,

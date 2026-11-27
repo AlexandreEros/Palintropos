@@ -8,9 +8,13 @@ What is single-source and what is not:
   derivative, the Kirchhoff difference) are **generated** from the unmodified
   ``tropoi.physics.materials`` methods by ``trace_prototype`` (no hand-written
   CUDA for them).
-* The substrate's cell, face and skin arithmetic (storage, series face
-  conductance, the skin equation, residual tolerances, the Jacobian rows) is
-  **restated by hand below**, following ``ConductiveSubstrate._system`` term by
+* The face conductance, face flux, backward-Euler storage rate and cell
+  conservation residual are **generated** from the plain Python pointwise
+  functions in this module (``POINTWISE``), the form proposed for
+  ``physics.substrate`` and ``temporal.implicit``. This demonstrates that the
+  temporal term can be owned outside the physics and still be fused.
+* The rest of the substrate's arithmetic (the skin equation, residual
+  tolerances, the Jacobian rows) is still **restated by hand below**, following ``ConductiveSubstrate._system`` term by
   term in its operation order. This is exactly the duplication that decisions
   D4/D9 must resolve before production. The prototype only measures what
   fusion achieves and whether bitwise agreement is reachable.
@@ -77,8 +81,8 @@ __device__ double sub_system(const double* x, const double* tho, const int jac,
     const double q_s = MUL(two_over_dz1, law_kirchhoff(kc[0], chi[0], Ts, T0, ths - x[1]));
     F[0] = q_s;
     for (int i = 0; i < L - 1; ++i) {{
-        const double g = 1.0 / (half[i] / k[i] + half[i + 1] / k[i + 1]);
-        F[i + 1] = MUL(g, x[i + 1] - x[i + 2]);
+        const double g = pw_face_conductance(half[i], k[i], half[i + 1], k[i + 1]);
+        F[i + 1] = pw_face_flux(g, x[i + 1], x[i + 2]);
     }}
     F[L] = -g_b;
     double ratio = 0.0;
@@ -86,8 +90,8 @@ __device__ double sub_system(const double* x, const double* tho, const int jac,
         const double T = TREF + x[i + 1];
         const double Told = TREF + tho[i];
         const double dh = {ENTHALPY}(i, T, Told, x[i + 1] - tho[i]);
-        const double storage = MUL(cap[i], dh) / dt;
-        r[i] = storage - (F[i] - F[i + 1]) - 0.0;
+        const double storage = pw_backward_euler_storage(cap[i], dh, dt);
+        r[i] = pw_cell_residual(storage, F[i], F[i + 1], 0.0);
         const double tau = FLOOR + MUL(ROUND, fabs(storage) + fabs(F[i]) + fabs(F[i + 1]) + 0.0);
         ratio = (i == 0) ? fabs(r[i]) / tau : dmax_(ratio, fabs(r[i]) / tau);
     }}
@@ -111,7 +115,7 @@ __device__ double sub_system(const double* x, const double* tho, const int jac,
             d = d + MUL(0.0, T);
             if (i == 0) d = d - dq_dt1;
             if (i < L - 1) {{
-                const double g = 1.0 / (half[i] / k[i] + half[i + 1] / k[i + 1]);
+                const double g = pw_face_conductance(half[i], k[i], half[i + 1], k[i + 1]);
                 const double drift = x[i + 1] - x[i + 2];
                 const double gg = MUL(g, g);
                 const double dki = law_conductivity_derivative(kc[i], chi[i], T);
@@ -201,6 +205,40 @@ void fused_substrate_step(const double* __restrict__ th_old_g, const double* __r
 """
 
 
+# -- pointwise functions, traced into the kernel ------------------------------------
+#
+# Stand-ins for the proposed production owners (audit section 12): the first two
+# would live in physics.substrate, the backward-Euler storage rate in
+# temporal.implicit, and the residual of the conservation law beside it. They
+# are written once, in the form that also applies to whole arrays (the
+# NumPy/CuPy path). Their operation order is ConductiveSubstrate._system's.
+
+def face_conductance(half_a, k_a, half_b, k_b):
+    """Series conductance of the two half cells either side of a face."""
+    return 1.0 / (half_a / k_a + half_b / k_b)
+
+
+def face_flux(g, th_a, th_b):
+    """Downward conductive flux through the face (positive from a to b)."""
+    return g * (th_a - th_b)
+
+
+def backward_euler_storage(cap, dh, dt):
+    """Backward-Euler rate of enthalpy storage: C [h(T) - h(T^n)] / dt."""
+    return cap * dh / dt
+
+
+def cell_residual(storage, flux_in, flux_out, source):
+    """Finite-volume conservation residual of one cell."""
+    return storage - (flux_in - flux_out) - source
+
+
+POINTWISE = {"pw_face_conductance": (face_conductance, ["half_a", "k_a", "half_b", "k_b"]),
+             "pw_face_flux": (face_flux, ["g", "th_a", "th_b"]),
+             "pw_backward_euler_storage": (backward_euler_storage, ["cap", "dh", "dt"]),
+             "pw_cell_residual": (cell_residual, ["storage", "flux_in", "flux_out", "source"])}
+
+
 def _source(sub) -> str:
     import trace_prototype as tp
     from tropoi.physics.materials import CellMaterials
@@ -211,6 +249,7 @@ def _source(sub) -> str:
                                 "law_conductivity_derivative"),
              tp.device_function(CellMaterials.kirchhoff_difference, ["kc", "chi", "a", "b", "d"],
                                 "law_kirchhoff")]
+    parts += [tp.device_function(fn, names, fname) for fname, (fn, names) in POINTWISE.items()]
     # one generated enthalpy / specific-heat function per stratum segment
     dh_cases, cp_cases = [], []
     for s, (r0, r1, law) in enumerate(sub.materials.segments):
