@@ -21,7 +21,9 @@ What is single-source and what is not:
   column's line search only ever sees its own trial. So the per-column loop
   should reproduce each column's trajectory exactly.
 
-Compiled with ``--fmad=false``. Per-cell arrays live in thread-local arrays,
+Every product is ``__dmul_rn`` (never contracted into an FMA) and the
+kernel is compiled with CuPy's default flags, so libdevice ``pow`` rounds as
+it does in CuPy's own ``x ** 4`` (it does not under ``--fmad=false``). Per-cell arrays live in thread-local arrays,
 which CUDA interleaves across the threads of a warp, so accesses coalesce.
 The prototype supports what the production configuration uses: no source
 term, scalar or per-column forcing. Its outputs are the new state, per-column
@@ -41,6 +43,8 @@ _DRIVER = r"""
 #define NR {NR}
 #define TREF 300.0
 #define FLOOR {FLOOR}
+// every product is __dmul_rn: never contracted into an FMA
+#define MUL(a, b) __dmul_rn((a), (b))
 #define ROUND {ROUND}
 
 __device__ __forceinline__ double dmax_(double a, double b) {{
@@ -67,14 +71,14 @@ __device__ double sub_system(const double* x, const double* tho, const int jac,
     for (int i = 0; i < L; ++i) {{
         const double T = TREF + x[i + 1];
         k[i] = law_conductivity(kc[i], chi[i], T);
-        cap[i] = rho[i] * dz[i];
+        cap[i] = MUL(rho[i], dz[i]);
     }}
     const double T0 = TREF + x[1];
-    const double q_s = two_over_dz1 * law_kirchhoff(kc[0], chi[0], Ts, T0, ths - x[1]);
+    const double q_s = MUL(two_over_dz1, law_kirchhoff(kc[0], chi[0], Ts, T0, ths - x[1]));
     F[0] = q_s;
     for (int i = 0; i < L - 1; ++i) {{
         const double g = 1.0 / (half[i] / k[i] + half[i + 1] / k[i + 1]);
-        F[i + 1] = g * (x[i + 1] - x[i + 2]);
+        F[i + 1] = MUL(g, x[i + 1] - x[i + 2]);
     }}
     F[L] = -g_b;
     double ratio = 0.0;
@@ -82,39 +86,39 @@ __device__ double sub_system(const double* x, const double* tho, const int jac,
         const double T = TREF + x[i + 1];
         const double Told = TREF + tho[i];
         const double dh = {ENTHALPY}(i, T, Told, x[i + 1] - tho[i]);
-        const double storage = cap[i] * dh / dt;
+        const double storage = MUL(cap[i], dh) / dt;
         r[i] = storage - (F[i] - F[i + 1]) - 0.0;
-        const double tau = FLOOR + ROUND * (fabs(storage) + fabs(F[i]) + fabs(F[i + 1]) + 0.0);
+        const double tau = FLOOR + MUL(ROUND, fabs(storage) + fabs(F[i]) + fabs(F[i + 1]) + 0.0);
         ratio = (i == 0) ? fabs(r[i]) / tau : dmax_(ratio, fabs(r[i]) / tau);
     }}
-    const double lin = a * (ths - t_ref);
-    const double emitted = eps_sigma * pow(Ts, 4.0);
+    const double lin = MUL(a, ths - t_ref);
+    const double emitted = MUL(eps_sigma, pow(Ts, 4.0));
     const double rs = c + lin - emitted - q_s;
-    const double taus = FLOOR + ROUND * (fabs(c) + fabs(lin) + emitted + fabs(q_s));
+    const double taus = FLOOR + MUL(ROUND, fabs(c) + fabs(lin) + emitted + fabs(q_s));
     *rs_out = rs;
     ratio = dmax_(ratio, fabs(rs) / taus);
     if (jac) {{
-        const double dq_dts = two_over_dz1 * law_conductivity(kc[0], chi[0], Ts);
-        const double dq_dt1 = neg_two_over_dz1 * k[0];
-        di[0] = a - four_eps_sigma * pow(Ts, 3.0) - dq_dts;
+        const double dq_dts = MUL(two_over_dz1, law_conductivity(kc[0], chi[0], Ts));
+        const double dq_dt1 = MUL(neg_two_over_dz1, k[0]);
+        di[0] = a - MUL(four_eps_sigma, pow(Ts, 3.0)) - dq_dts;
         up[0] = -dq_dt1;
         lo[0] = -dq_dts;
         double dfa_prev = 0.0, dfb_prev = 0.0;
         for (int i = 0; i < L; ++i) {{
             const double T = TREF + x[i + 1];
             const double cpv = {SPECIFIC_HEAT}(i, T);
-            double d = cap[i] * cpv / dt;
-            d = d + 0.0 * T;
+            double d = MUL(cap[i], cpv) / dt;
+            d = d + MUL(0.0, T);
             if (i == 0) d = d - dq_dt1;
             if (i < L - 1) {{
                 const double g = 1.0 / (half[i] / k[i] + half[i + 1] / k[i + 1]);
                 const double drift = x[i + 1] - x[i + 2];
-                const double gg = g * g;
+                const double gg = MUL(g, g);
                 const double dki = law_conductivity_derivative(kc[i], chi[i], T);
                 const double Tn = TREF + x[i + 2];
                 const double dkn = law_conductivity_derivative(kc[i + 1], chi[i + 1], Tn);
-                const double dfa = g + drift * gg * half[i] * dki / (k[i] * k[i]);
-                const double dfb = -g + drift * gg * half[i + 1] * dkn / (k[i + 1] * k[i + 1]);
+                const double dfa = g + MUL(MUL(MUL(drift, gg), half[i]), dki) / MUL(k[i], k[i]);
+                const double dfb = -g + MUL(MUL(MUL(drift, gg), half[i + 1]), dkn) / MUL(k[i + 1], k[i + 1]);
                 d = d + dfa;
                 lo[i + 1] = -dfa;
                 up[i + 1] = dfb;
@@ -165,29 +169,29 @@ void fused_substrate_step(const double* __restrict__ th_old_g, const double* __r
         cp_[0] = cc; delta[0] = dd;
         for (int i = 1; i < NR; ++i) {{
             const double l = lo[i - 1];
-            const double den = di[i] - l * cc;
+            const double den = di[i] - MUL(l, cc);
             if (i < NR - 1) cc = up[i] / den;
-            dd = ((-r[i - 1]) - l * dd) / den;
+            dd = ((-r[i - 1]) - MUL(l, dd)) / den;
             cp_[i] = cc; delta[i] = dd;
         }}
         double xv = dd;
-        for (int i = NR - 2; i >= 0; --i) {{ xv = delta[i] - cp_[i] * xv; delta[i] = xv; }}
+        for (int i = NR - 2; i >= 0; --i) {{ xv = delta[i] - MUL(cp_[i], xv); delta[i] = xv; }}
         // positivity: never more than halve an absolute temperature
         double m = INFINITY;
         for (int i = 0; i < NR; ++i) {{
-            const double s = (delta[i] < 0.0) ? (-0.5 * (TREF + x[i])) / delta[i] : INFINITY;
+            const double s = (delta[i] < 0.0) ? MUL(-0.5, TREF + x[i]) / delta[i] : INFINITY;
             m = (i == 0) ? s : min(m, s);
         }}
         double lam = dmin_(1.0, m);
         for (int t = 0; t < 30; ++t) {{
-            for (int i = 0; i < NR; ++i) xt[i] = x[i] + lam * delta[i];
+            for (int i = 0; i < NR; ++i) xt[i] = x[i] + MUL(lam, delta[i]);
             const double tr = sub_system(xt, tho, 0, c, a, t_ref, g_b, rho, kc, chi, dz, half, dt,
                                          two_over_dz1, neg_two_over_dz1, eps_sigma,
                                          four_eps_sigma, rt, &rst, lo, di, up);
             if ((tr < ratio) | (tr <= 1.0)) break;
-            lam = 0.5 * lam;
+            lam = MUL(0.5, lam);
         }}
-        for (int i = 0; i < NR; ++i) x[i] = x[i] + lam * delta[i];
+        for (int i = 0; i < NR; ++i) x[i] = x[i] + MUL(lam, delta[i]);
         ++it;
     }}
     for (int i = 0; i < L; ++i) th_out[(long)i * n + j] = x[i + 1];
@@ -235,7 +239,7 @@ class FusedStep:
         from tropoi.physics.constants import SIGMA_SB
         self.sub, self.block = sub, block
         self.source = _source(sub)
-        self.kernel = cp.RawKernel(self.source, "fused_substrate_step", options=("--fmad=false",))
+        self.kernel = cp.RawKernel(self.source, "fused_substrate_step", options=())
         rho, kc, chi = sub.materials.on(cp)
         self.rho, self.kc, self.chi = (cp.ascontiguousarray(v.ravel()) for v in (rho, kc, chi))
         dz, half = sub._consts(cp)

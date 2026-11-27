@@ -6,12 +6,15 @@ The law methods in ``tropoi.physics.materials`` are left exactly as they are.
 They are called once with :class:`Sym` arguments. ``Sym`` is a stand-in that
 records each arithmetic operation as one SSA statement of C (``double _v7 =
 _v3 * _v5;``) in the order Python performs it. The recorded statements become
-the body of a CuPy ``ElementwiseKernel`` (or a ``__device__`` function)
-compiled with ``--fmad=false``.
+the body of a CuPy ``ElementwiseKernel`` (or a ``__device__`` function).
 
-Without contraction and with the same operation order, the compiled law is
-expected to agree with the CuPy evaluation of the same methods bit for bit,
-since each CuPy ufunc is one rounded IEEE operation. ``exp``/``expm1`` are
+Every multiplication is emitted as ``__dmul_rn``, which is never contracted
+into an FMA, so the traced arithmetic is one rounded IEEE operation per
+Python operation whatever the compiler flags. The kernel itself is compiled
+with CuPy's default flags, because libdevice functions (``pow`` measurably)
+round differently under ``--fmad=false`` than in CuPy's own ufuncs. With the
+same operation order, the compiled law is then expected to agree with the
+CuPy evaluation of the same methods bit for bit. ``exp``/``expm1`` are
 the same libdevice functions in both. ``minimum``/``maximum``/``where`` use
 CuPy's own definitions, NaN propagation included.
 
@@ -73,6 +76,8 @@ class Sym:
 
     def _bin(self, op, other, reverse=False, ctype="double"):
         a, b = (self._o(other), self.name) if reverse else (self.name, self._o(other))
+        if op == "*":                 # never contracted into an FMA, whatever the flags
+            return self.trace.emit(ctype, f"__dmul_rn({a}, {b})")
         return self.trace.emit(ctype, f"{a} {op} {b}")
 
     __add__ = lambda s, o: s._bin("+", o)
@@ -114,6 +119,8 @@ class Sym:
         if name in ("add", "subtract", "multiply", "true_divide") and len(inputs) == 2:
             op = {"add": "+", "subtract": "-", "multiply": "*", "true_divide": "/"}[name]
             a, b = (self._o(x) for x in inputs)
+            if op == "*":
+                return self.trace.emit("double", f"__dmul_rn({a}, {b})")
             return self.trace.emit("double", f"{a} {op} {b}")
         raise TypeError(f"ufunc {name} is not supported in a traced law")
 
@@ -145,7 +152,7 @@ _PREAMBLE = """
 """
 
 
-def elementwise(fn, names, kernel_name, fmad=False):
+def elementwise(fn, names, kernel_name, fmad=True):
     """A CuPy ElementwiseKernel computing ``y = fn(*inputs)`` from one trace."""
     import cupy as cp
     lines, result = trace(fn, names)
