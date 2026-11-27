@@ -910,3 +910,50 @@ contracts) and F2 (`--fmad=false` changes libdevice).
    Keep the analytical references in the tests.
 5. The boundary-layer tridiagonal moves to `numerics` after its D3
    equivalence study.
+
+## 15. Owner decisions on the portable C++ direction (2026-11-27) and the adapted stage order
+
+**Decisions.**
+
+| | Ruling | Binding details |
+| --- | --- | --- |
+| U1 | **superseded by portable C++** | C++ is canonical for the migrated physics and numerical algorithms; Python keeps composition, configuration, orchestration, arrays, diagnostics and visualization; CuPy keeps GPU arrays and kernel launch. The tracer stays as feasibility evidence only, never as a production path. Scope: the conductive substrate and the shared numerics only |
+| U7 | **approved** | standard native build backend at install or packaging; small C ABI; the CPU path needs no CUDA, CuPy or CUDA compiler and no run-time C++ compilation; GPU through CuPy/NVRTC at run time; documented editable and CI builds; native sources, headers, options, specialization and toolchain identities in cache keys and provenance; no permanent Zig dependency; prebuilt wheels where practical |
+| U8 | **approved in principle** | GPU keeps exact compile-time specialization; the CPU may select laws at run time using the same canonical functions. A fixed capacity must be documented and validated before execution, **never silently truncating** a configuration |
+| U9 | **approved** | the Python production implementation is removed after verification. Independence comes from analytical, manufactured and convergence, independent reference, constitutive-law and Jacobian-derivative, conservation and energy-identity tests, the G-gates, VPW99, Ceres transient and replay, and hard forcing, stratification and failure cases. A test that computes its expectation with the canonical implementation is **not** independent. CPU/GPU comparison detects hardware, compiler and driver discrepancies; it is **not** independent verification of shared equations |
+| U2 | **approved** | convergence failure is detected every step; an unconverged or invalid state is never accepted, propagated or published; diagnostics are kept |
+| U3 | **approved** | report sums keep the reference reduction arithmetic, bitwise; any later reordering is characterized and justified separately; the energy-identity bound alone is not sufficient |
+| U4 | **approved** | P1-P5 and N1 as stated in M5; P6 provisional pending the diffusion equivalence study. P2 is measured with the **complete production runner** (forcing, convergence checks, diagnostics, accumulation, configured sampling) from the representative state, never from the isothermal prototype figure |
+| U5 | **approved** | the section 11 correction as its own PR: per-point diagnostics with units and column identities for diagnostic collections; area-weighted diagnostics only for global discretizations; an output-schema distinction; historical evidence stays interpretable |
+| U6 | **approved** | explicit device, then `TROPOI_EXECUTION=cpu-verification`, then the CUDA default; conflicts are errors; no fallback; CPU hidden from production controls; provenance records backend, hardware and precision; CPU-only imports never initialize CUDA |
+
+**P3 counting protocol (definition requested by the owner).** These count
+per production step, from Nsight Systems over a warm segment of at least 20
+steps:
+
+* *kernel launches*: `cuLaunchKernel` plus `cudaLaunchKernel`;
+* *host synchronizations*: `cudaStreamSynchronize` plus
+  `cudaDeviceSynchronize`, plus every device-to-host copy.
+
+Scheduled output operations are counted **separately** and reported beside
+the per-step figure. These are the tier-2 surface and profile samples at
+their configured cadence (every 6 and 24 production steps for VPW99). P3
+applies to the steps between outputs. The output operations themselves are
+reported as launches and synchronizations per output event, with the
+cadence stated, so they cannot hide inside an average and cannot be
+excluded silently either.
+
+**Adapted stage order.** The native build is a dependency of the language
+migration, and spatial and defaults work is pure Python. So the order
+becomes:
+
+| PR | Stage | Kind | Gate |
+| --- | --- | --- | --- |
+| A | global-quadrature correction (U5) | correctness | analytical quadrature identities; global runs bitwise unchanged |
+| B | canonical spatial infrastructure: `spatial.grids.quadrature`, `ColumnSet`, Gauss airless columns, `spatial.vertical`; the substrate takes explicit interfaces (D2) | architecture, no arithmetic change | bitwise |
+| C | removal of experiment-specific defaults (section 3) | architecture | bitwise |
+| D | native build (U7) plus canonical C++ `numerics`, substrate physics and backward Euler; `ConductiveSubstrate.step` delegates to C++ (CUDA and CPU); the Python implementation kept as a test-only migration reference | **language migration** | GPU bitwise against the Python/CuPy reference (N1); CPU within the approved bounds, discrepancies characterized; all independent tests unchanged |
+| E | performance: no redundant assemblies, device-resident step with bitwise report sums (U3), per-step failure detection (U2), `run_block` accumulation; T4 acceptance P1-P5 with the full runner | **performance** (arithmetic-preserving) | N1 bitwise; P1-P5 |
+| F | GPU-first execution policy and provenance (D6/U6) | product policy | CLI/API tests; no CUDA initialization in CPU-only imports |
+| G | removal of the superseded Python implementation (U9); final regression | removal | all gates of D and E; full CPU suite; T4 CUDA regression; G-gates; Ceres; VPW99 |
+| H | boundary-layer diffusion through `numerics` (D3 equivalence study, P6) | arithmetic change (approved in principle) | documented equivalence before migration |
