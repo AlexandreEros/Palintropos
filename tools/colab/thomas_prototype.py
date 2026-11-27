@@ -20,9 +20,13 @@ Arithmetic: the same operations in the same order as ``_tridiagonal``:
 CuPy evaluates each of those as a separate elementwise kernel, so nothing is
 fused into an FMA there. NVRTC contracts ``a - b * c`` into an FMA by
 default, which rounds differently. ``fmad=False`` (NVRTC ``--fmad=false``)
-forbids contraction, so the prototype is expected to agree with the CuPy
-and NumPy solves bit for bit. ``fmad=True`` is measured separately; it
-changes rounding and would need the owner's approval.
+forbids contraction, so the prototype agrees with the CuPy and NumPy solves
+bit for bit (measured). ``fmad=True`` is measured separately; it changes
+rounding and needs the owner's approval (D5). This kernel calls no libdevice
+function, so ``--fmad=false`` suffices here. The rule for production kernels
+is the one in ``fused_newton_prototype`` and audit finding F2: write every
+product as ``__dmul_rn`` and keep the default flags, because ``--fmad=false``
+also changes libdevice ``pow``.
 """
 from __future__ import annotations
 
