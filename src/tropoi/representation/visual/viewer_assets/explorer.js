@@ -115,7 +115,10 @@ function tickSet(axis, lo, hi) {
   if (axis.scale === "log") {
     const ticks = [];
     for (let d = Math.ceil(lo); d <= Math.floor(hi); d++) ticks.push(d);
-    return {ticks, label: d => axis.representation === "pressure" ? pressureText(10 ** d) : "10" + superscript(d)};
+    if (ticks.length >= 3) return {ticks, label: d => axis.representation === "pressure" ? pressureText(10 ** d) : "10" + superscript(d)};
+    // Less than about three decades: rounded steps in log10, labelled with their values.
+    return {ticks: niceTicks(lo, hi), label: d => axis.representation === "pressure" ? pressureText(10 ** d) :
+      (axis.representation === "sigma" ? "σ " : "") + numberText(Number((10 ** d).toPrecision(3)))};
   }
   return {ticks: niceTicks(lo, hi), label: t => numberText(t)};
 }
@@ -221,12 +224,17 @@ function drawLine(canvas, plot, width, ratio) {
   const ca = plot.coordinate, cs = ca.values.map(v => unit(ca, v));
   const vs = plot.values;
   const markerC = (plot.markers || []).map(m => unit(ca, m.position)), markerV = (plot.markers || []).map(m => m.value);
-  const finite = a => a.filter(Number.isFinite);
-  let [vlo, vhi] = [Math.min(...finite([...vs, ...markerV])), Math.max(...finite([...vs, ...markerV]))];
+  // Bounds by loop: long records exceed the argument limit of Math.min(...values).
+  const bounds = arrays => {
+    let lo = Infinity, hi = -Infinity;
+    for (const a of arrays) for (const v of a) if (Number.isFinite(v)) { if (v < lo) lo = v; if (v > hi) hi = v; }
+    return [lo, hi];
+  };
+  let [vlo, vhi] = bounds([vs, markerV]);
   if (plot.diverging) { vlo = Math.min(vlo, 0); vhi = Math.max(vhi, 0); }
   if (vlo === vhi) { vlo -= 1; vhi += 1; }
   const pad = (vhi - vlo) * 0.06; vlo -= pad; vhi += pad;
-  let [clo, chi] = [Math.min(...finite([...cs, ...markerC])), Math.max(...finite([...cs, ...markerC]))];
+  let [clo, chi] = bounds([cs, markerC]);
   if (clo === chi) { clo -= 1; chi += 1; }
   const along = c => (c - clo) / (chi - clo), across = v => (v - vlo) / (vhi - vlo);
   // A profile puts the coordinate on Y (downward axes grow downward) and the value on X.
@@ -581,10 +589,11 @@ export class Explorer {
     this.cursor = cursor;
     this.rows.latitude.value.value = String(Number(cursor.lat.toFixed(4)));
     this.rows.longitude.value.value = String(Number((((cursor.lon % 360) + 360) % 360).toFixed(4)));
-    return this.update();
+    return this.update(false);
   }
 
-  follow() { return this.update(); }
+  /** Selection A changed: follow it, but never push a map back to it. */
+  follow() { return this.update(false); }
 
   get rangeKey() {
     const p = this.data?.product;
@@ -622,7 +631,8 @@ export class Explorer {
     return Number.isFinite(lo) && Number.isFinite(hi) && hi > lo ? [lo, hi] : null;
   }
 
-  async update() {
+  /** ``push``: a map selection made here is sent to selection A (explorer controls only). */
+  async update(push = true) {
     this.syncRows();
     const {selection, product, error} = this.selection();
     const c = this.c;
@@ -637,11 +647,16 @@ export class Explorer {
       this.status("A longitude × latitude selection is drawn on the globe and map of selection A.");
       c.plot.hidden = true; c.table.hidden = true; c.notes.replaceChildren(); c.png.disabled = true;
       this.data = null;
-      this.links.showMap(selection);
+      if (push) this.links.showMap(selection);
       return;
     }
     const key = JSON.stringify(selection);
-    if (key === this.loaded && this.data) { this.status(""); this.draw(); return; }
+    if (key === this.loaded && this.data) {
+      // Back to what is on hand: a request still in flight is for something else.
+      this.abort?.abort(); this.pending = null;
+      this.status(""); this.c.png.disabled = false; this.draw();
+      return;
+    }
     if (key === this.pending) return;
     this.pending = key;
     this.abort?.abort();

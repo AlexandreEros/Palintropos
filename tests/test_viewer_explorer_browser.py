@@ -317,6 +317,15 @@ def test_pending_request_never_draws_stale_data(browser):
             # Returning to the loaded column while a new mean is pending shows the column at once.
             explore(page, "preset", "column")
             until(page, READY + " && viewer.explorer.spec.kind === 'line'")
+            # A mean requested and abandoned before it arrives never replaces the column on hand.
+            explore(page, "preset", "zonal_mean")
+            until(page, "held.length === 1")
+            explore(page, "preset", "column")
+            until(page, READY + " && viewer.explorer.spec.kind === 'line'")
+            page.eval("held.shift()()")
+            page.eval("new Promise(resolve => setTimeout(resolve, 400))")
+            assert page.eval("viewer.explorer.spec.kind") == "line"
+            assert page.eval(f"{LOADED}.longitude.role") == "fixed"
             set_control(page, "time", 7, "input")
             until(page, f"{LOADED}?.time.index === 7 && " + READY)
             assert page.eval("viewer.explorer.spec.kind") == "line"
@@ -376,8 +385,18 @@ def test_airless_archive_in_the_same_application(browser, tmp_path):
             until(page, f"{LOADED}?.time.role === 'x' && " + EXPLORED)
             assert page.eval("viewer.explorer.spec.kind") == "field"
             assert page.eval("viewer.explorer.layout.strip") > 0           # the skin strip, apart from the cells
+            # The map preset is sent to selection A once; the page then settles.
+            page.eval("""(() => {const f0 = window.fetch; window.selects = 0;
+                window.fetch = (u, o) => { if (String(u).includes("select")) selects++; return f0(u, o); };})()""")
             explore(page, "preset", "map")
             until(page, "document.querySelector('[data-e=status]').textContent.includes('globe')")
+            page.eval("new Promise(resolve => setTimeout(resolve, 1500))")
+            assert page.eval("selects") <= 2
+            # A level chosen in selection A afterwards stays chosen.
+            set_control(page, "level", 3)
+            until(page, READY.split(" && ")[0])
+            page.eval("new Promise(resolve => setTimeout(resolve, 800))")
+            assert page.eval("document.querySelector('[data-id=level]').value") == "3"
             for preset, message in (("zonal_mean", "not available"),):
                 explore(page, "preset", preset)
                 until(page, f"document.querySelector('[data-e=status]').textContent.includes({json.dumps(message)})")

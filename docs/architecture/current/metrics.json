@@ -163,11 +163,11 @@
         "sha256": "1dcfeb9400fd06152e45cd607c8648f54d8fa8f41c02b0fcd8ee9310a03c28a4"
       }
     ],
-    "source_lines_embedded": 20720
+    "source_lines_embedded": 20721
   },
   "call_graph": {
     "call_sites": {
-      "builtin": 4707,
+      "builtin": 4708,
       "external": 3002,
       "internal": 3562,
       "unresolved": 4785
@@ -1297,7 +1297,7 @@
     "package": "tropoi",
     "src": "src",
     "working_tree": {
-      "base_commit": "a09b293dff485fd1847ac4091d5e0462a7d91000",
+      "base_commit": "0491c5ae914f89f959a3d962266fb8bcf9663f8a",
       "generator": {
         "changes": [],
         "files": {
@@ -1418,7 +1418,7 @@
           "src/tropoi/representation/visual/terrain_globe.html": "786cc4074b4d81f0d1aefe78aaa933d36be8d03517a9e2dbd0e9a0d1009a7fbf",
           "src/tropoi/representation/visual/timeline.py": "daf63d0946317b3930cae59770a3c264e43018420d631db55cd82fe6c786d83e",
           "src/tropoi/representation/visual/viewer_assets/index.html": "cb7d32217ded2a4ec64855ebb3d40fc328aaab04c642f0ac3e5ef7732b6a39b6",
-          "src/tropoi/representation/visual/viewer_atmosphere.py": "d0eb290da03829b530aea7659c7941e948f79842c18cd9923d8e0cd278b8bad2",
+          "src/tropoi/representation/visual/viewer_atmosphere.py": "13c71b5dbf96c6e2cc87b4b8b534a65bf4fab4dd4f97cea8c77ce2c20088625c",
           "src/tropoi/representation/visual/viewer_columns.py": "06af31785d95f16eeea5b03381fd0bc12e4aa6ab063dad12b0c957c14f43adeb",
           "src/tropoi/representation/visual/viewer_fields.py": "67b47f60de66353b0f9bdaef014a01d97ec31e68c21dcaedb567f7f73c60e106",
           "src/tropoi/representation/visual/viewer_server.py": "492af574f5b28ea7d652a7d0d0319c4d4abaaa350a28a49b85c5113314cd13ac",
@@ -1536,7 +1536,7 @@
           "src/tropoi/temporal/tendencies/primitive_equations.py": "848c6fe9406a7c1c465c0aa9459760b01c542164c8cc9395797a3c4a60793e52",
           "src/tropoi/temporal/tendencies/shallow_water.py": "7ae521f2378824e89f88bc467fc99321d1ef4224b037c865137e076a601da3c8"
         },
-        "sha256": "9de6fa9d63ccb25a152477d4756dd42bf59cef553ccbb4b8156fa19bd9b0d4d2",
+        "sha256": "6ee519807fa6411cd4ac5cea1784fde8601b51d661a2eb0a932d89a52d80ec7d",
         "status": "clean"
       }
     }
