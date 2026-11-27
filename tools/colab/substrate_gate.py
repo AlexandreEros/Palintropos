@@ -55,6 +55,57 @@ def sha(*arrays) -> str:
     return h.hexdigest()
 
 
+class _DescribedReference:
+    """The migration reference as AirlessRun uses a stepper (it records the
+    implementation's provenance)."""
+
+    def __new__(cls, sub):
+        from tropoi.temporal._substrate_reference import ReferenceBackwardEulerSubstrate
+        ref = ReferenceBackwardEulerSubstrate(sub)
+        ref.describe = lambda backend: {"implementation": "Python migration reference",
+                                        "backend": backend}
+        return ref
+
+
+def ceres_check() -> dict:
+    """The Ceres finite-transient fixture, end to end through AirlessRun on
+    the GPU, with the native and the reference step: every output array and
+    every cycles.json value compared."""
+    import tropoi.run.airless.experiment as experiment
+    from tropoi.run.airless.config import load_config_document
+    from tropoi.run.airless.experiment import AirlessRun
+    from tropoi.temporal.substrate import BackwardEulerSubstrate
+    ceres, _ = load_config_document("tests/fixtures/airless/ceres-equatorial-column.airless.json")
+    with tempfile.TemporaryDirectory() as tmp:
+        dirs = {}
+        for label, cls in (("native", BackwardEulerSubstrate), ("reference", _DescribedReference)):
+            original = experiment.BackwardEulerSubstrate
+            experiment.BackwardEulerSubstrate = cls
+            try:
+                d = pathlib.Path(tmp) / label
+                AirlessRun(ceres, d, backend="cupy", allow_dirty=True,
+                           log=lambda m: None).run_transient(2 * ceres.cycle_steps)
+            finally:
+                experiment.BackwardEulerSubstrate = original
+            dirs[label] = d
+        compared = differing = 0
+        for f in sorted(dirs["reference"].rglob("*.np[yz]")):
+            g = dirs["native"] / f.relative_to(dirs["reference"])
+            A, B = np.load(f), np.load(g)
+            for key in (A.files if f.suffix == ".npz" else [None]):
+                compared += 1
+                differing += 0 if np.array_equal(A[key] if key else A, B[key] if key else B) else 1
+        ca = json.loads((dirs["reference"] / "cycles.json").read_text())
+        cb = json.loads((dirs["native"] / "cycles.json").read_text())
+        for u, v in zip(ca, cb):
+            for key in u:
+                if key != "wall_s":
+                    compared += 1
+                    differing += 0 if u[key] == v[key] else 1
+    return {"steps": 2 * ceres.cycle_steps, "arrays_and_values_compared": compared,
+            "differing": differing}
+
+
 def main(argv=None) -> int:
     import cupy as cp
     from tropoi.physics.insolation import insolation_from_spec
@@ -69,7 +120,13 @@ def main(argv=None) -> int:
     ap.add_argument("--steps", type=int, default=200)
     ap.add_argument("--timed-steps", type=int, default=60)
     ap.add_argument("--repeats", type=int, default=5)
+    ap.add_argument("--only", choices=("all", "ceres"), default="all")
     args = ap.parse_args(argv)
+    if args.only == "ceres":
+        result = {"ceres_fixture": ceres_check()}
+        pathlib.Path(args.out).write_text(json.dumps(result, indent=1))
+        print(json.dumps(result, indent=1))
+        return 0
     sync = lambda: cp.cuda.Device().synchronize()                       # noqa: E731
     props = cp.cuda.runtime.getDeviceProperties(0)
     doc = {"environment": {
@@ -249,39 +306,7 @@ def main(argv=None) -> int:
                                             **{f"{k}_mismatched_steps": v for k, v in bad.items()}}
         save()
 
-    # 5b. the Ceres finite-transient fixture, end to end through AirlessRun
-    from tropoi.run.airless.config import load_config_document
-    from tropoi.run.airless.experiment import AirlessRun
-    ceres, _ = load_config_document("tests/fixtures/airless/ceres-equatorial-column.airless.json")
-    with tempfile.TemporaryDirectory() as tmp:
-        dirs = {}
-        for label, cls in (("native", BackwardEulerSubstrate),
-                           ("reference", ReferenceBackwardEulerSubstrate)):
-            original = experiment.BackwardEulerSubstrate
-            experiment.BackwardEulerSubstrate = cls
-            try:
-                d = pathlib.Path(tmp) / label
-                AirlessRun(ceres, d, backend="cupy", allow_dirty=True,
-                           log=lambda m: None).run_transient(2 * ceres.cycle_steps)
-            finally:
-                experiment.BackwardEulerSubstrate = original
-            dirs[label] = d
-        compared = differing = 0
-        for f in sorted(dirs["reference"].rglob("*.np[yz]")):
-            g = dirs["native"] / f.relative_to(dirs["reference"])
-            A, B = np.load(f), np.load(g)
-            for key in (A.files if f.suffix == ".npz" else [None]):
-                compared += 1
-                differing += 0 if np.array_equal(A[key] if key else A, B[key] if key else B) else 1
-        ca = json.loads((dirs["reference"] / "cycles.json").read_text())
-        cb = json.loads((dirs["native"] / "cycles.json").read_text())
-        for u, v in zip(ca, cb):
-            for key in u:
-                if key != "wall_s":
-                    compared += 1
-                    differing += 0 if u[key] == v[key] else 1
-        doc["ceres_fixture"] = {"steps": 2 * ceres.cycle_steps, "arrays_and_values_compared":
-                                compared, "differing": differing}
+    doc['ceres_fixture'] = ceres_check()
     save()
     print(json.dumps(doc, indent=1, default=float))
     return 0

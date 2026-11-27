@@ -98,8 +98,9 @@ def child(args) -> None:
 
 
 def _stats(report: str, rep: pathlib.Path) -> list:
-    out = subprocess.run(["nsys", "stats", "-q", "--report", report, "--format", "csv",
-                          "--output", "-", str(rep)], capture_output=True, text=True)
+    out = subprocess.run(["nsys", "stats", "-q", "--force-export=true", "--report", report,
+                          "--format", "csv", "--output", "-", str(rep)],
+                         capture_output=True, text=True)
     lines = out.stdout.splitlines()
     head = next((i for i, l in enumerate(lines) if "," in l and ("Time" in l or "Range" in l)),
                 None)
