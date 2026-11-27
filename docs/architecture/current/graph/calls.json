@@ -12218,7 +12218,7 @@
     {
       "kind": "call",
       "source": "tropoi.temporal.substrate_native._device_kernel",
-      "target": "tropoi.temporal.native.build_identity.digest"
+      "target": "tropoi.temporal.substrate_native._digest"
     },
     {
       "kind": "call",
@@ -12227,8 +12227,43 @@
     },
     {
       "kind": "call",
+      "source": "tropoi.temporal.substrate_native._digest",
+      "target": "tropoi.temporal.native.build_identity.digest"
+    },
+    {
+      "kind": "call",
       "source": "tropoi.temporal.substrate_native._law",
       "target": "tropoi.temporal.substrate_native._law"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.temporal.substrate_native._prepared",
+      "target": "tropoi.temporal.substrate_native._check_host_capacity"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.temporal.substrate_native._prepared",
+      "target": "tropoi.temporal.substrate_native._device_kernel"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.temporal.substrate_native._prepared",
+      "target": "tropoi.temporal.substrate_native.host_library"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.temporal.substrate_native._prepared",
+      "target": "tropoi.temporal.substrate_native.law_parameters"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.temporal.substrate_native._prepared",
+      "target": "tropoi.temporal.substrate_native.specialization"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.temporal.substrate_native._step_scalars",
+      "target": "tropoi.temporal.substrate_native.scalars"
     },
     {
       "kind": "call",
@@ -12286,14 +12321,14 @@
       "target": "tropoi.temporal.substrate_native.specialization"
     },
     {
-      "kind": "call",
-      "source": "tropoi.temporal.substrate_native.host_library",
-      "target": "tropoi.temporal.native.build_identity.digest"
-    },
-    {
       "kind": "instantiate",
       "source": "tropoi.temporal.substrate_native.host_library",
       "target": "tropoi.temporal.substrate_native.NativeLibraryError"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.temporal.substrate_native.host_library",
+      "target": "tropoi.temporal.substrate_native._digest"
     },
     {
       "kind": "call",
@@ -12318,32 +12353,12 @@
     {
       "kind": "call",
       "source": "tropoi.temporal.substrate_native.run_step",
-      "target": "tropoi.temporal.substrate_native._check_host_capacity"
+      "target": "tropoi.temporal.substrate_native._prepared"
     },
     {
       "kind": "call",
       "source": "tropoi.temporal.substrate_native.run_step",
-      "target": "tropoi.temporal.substrate_native._device_kernel"
-    },
-    {
-      "kind": "call",
-      "source": "tropoi.temporal.substrate_native.run_step",
-      "target": "tropoi.temporal.substrate_native.host_library"
-    },
-    {
-      "kind": "call",
-      "source": "tropoi.temporal.substrate_native.run_step",
-      "target": "tropoi.temporal.substrate_native.law_parameters"
-    },
-    {
-      "kind": "call",
-      "source": "tropoi.temporal.substrate_native.run_step",
-      "target": "tropoi.temporal.substrate_native.scalars"
-    },
-    {
-      "kind": "call",
-      "source": "tropoi.temporal.substrate_native.run_step",
-      "target": "tropoi.temporal.substrate_native.specialization"
+      "target": "tropoi.temporal.substrate_native._step_scalars"
     },
     {
       "kind": "call",
@@ -27766,10 +27781,31 @@
       "type": "function"
     },
     {
+      "id": "tropoi.temporal.substrate_native._digest",
+      "kind": "function",
+      "module": "tropoi.temporal.substrate_native",
+      "qualname": "_digest",
+      "type": "function"
+    },
+    {
       "id": "tropoi.temporal.substrate_native._law",
       "kind": "function",
       "module": "tropoi.temporal.substrate_native",
       "qualname": "_law",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.temporal.substrate_native._prepared",
+      "kind": "function",
+      "module": "tropoi.temporal.substrate_native",
+      "qualname": "_prepared",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.temporal.substrate_native._step_scalars",
+      "kind": "function",
+      "module": "tropoi.temporal.substrate_native",
+      "qualname": "_step_scalars",
       "type": "function"
     },
     {
