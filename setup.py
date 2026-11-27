@@ -26,6 +26,13 @@ class BuildNative(build_ext):
     """Record the compiler identity next to the flags in the library."""
 
     def build_extensions(self):
+        if self.compiler.compiler_type == "msvc":
+            # MSVC would ignore the GCC/Clang flags (no -ffp-contract=off) while
+            # the library would still carry a digest claiming them: skip it.
+            self.warn("the native CPU substrate library needs GCC or Clang; not built "
+                      "(GPU execution is unaffected, CPU execution will report it)")
+            self.extensions = []
+            return
         cxx = self.compiler.compiler_so[0] if getattr(self.compiler, "compiler_so", None) else "?"
         try:
             version = subprocess.run([cxx, "--version"], capture_output=True, text=True,
