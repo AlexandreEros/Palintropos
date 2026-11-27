@@ -29,6 +29,12 @@ classDiagram
     c_tropoi_orepresentation_oarchive_oschema_oSchemaError : external base ValueError
     class c_tropoi_orepresentation_oarchive_oschema_oUnknownSchemaVersionError["UnknownSchemaVersionError (representation.archive.schema)"]
     class c_tropoi_orepresentation_oarchive_oschema_oUnsupportedConventionError["UnsupportedConventionError (representation.archive.schema)"]
+    class c_tropoi_orepresentation_odiagnostics_ope__surfaces_oGeopotentialHeightSurface["GeopotentialHeightSurface (representation.diagnostics.pe#95;surfaces)"]
+    c_tropoi_orepresentation_odiagnostics_ope__surfaces_oGeopotentialHeightSurface : +#95;#95;post#95;init#95;#95;()
+    c_tropoi_orepresentation_odiagnostics_ope__surfaces_oGeopotentialHeightSurface : +label
+    c_tropoi_orepresentation_odiagnostics_ope__surfaces_oGeopotentialHeightSurface : +value
+    class c_tropoi_orepresentation_odiagnostics_ope__surfaces_oHeightAboveSurface["HeightAboveSurface (representation.diagnostics.pe#95;surfaces)"]
+    c_tropoi_orepresentation_odiagnostics_ope__surfaces_oHeightAboveSurface : +label
     class c_tropoi_ospatial_ogrids_ogeodesic__grid_oGeodesicGridGeometry["GeodesicGridGeometry (spatial.grids.geodesic#95;grid)"]
     c_tropoi_ospatial_ogrids_ogeodesic__grid_oGeodesicGridGeometry : +#95;#95;init#95;#95;()
     c_tropoi_ospatial_ogrids_ogeodesic__grid_oGeodesicGridGeometry : +#95;compute#95;voronoi#95;areas()
@@ -104,6 +110,7 @@ classDiagram
     c_tropoi_orepresentation_oarchive_oinitial__state_oInitialStateError <|-- c_tropoi_orepresentation_oarchive_oprepared__terrain_oPreparedTerrainError
     c_tropoi_orepresentation_oarchive_oschema_oSchemaError <|-- c_tropoi_orepresentation_oarchive_oschema_oUnknownSchemaVersionError
     c_tropoi_orepresentation_oarchive_oschema_oSchemaError <|-- c_tropoi_orepresentation_oarchive_oschema_oUnsupportedConventionError
+    c_tropoi_orepresentation_odiagnostics_ope__surfaces_oGeopotentialHeightSurface <|-- c_tropoi_orepresentation_odiagnostics_ope__surfaces_oHeightAboveSurface
     c_tropoi_ospatial_ogrids_ogrid__base_oGridGeometry <|-- c_tropoi_ospatial_ogrids_ogeodesic__grid_oGeodesicGridGeometry
     c_tropoi_ospatial_ogrids_ogrid__base_oGridGeometry <|-- c_tropoi_ospatial_ogrids_ogrid_oLatLonGridGeometry
     c_tropoi_ospatial_ogrids_ogrid__base_oGridGeometry <|-- c_tropoi_ospatial_ogrids_olatlon__grid_oGaussLatLonGridGeometry

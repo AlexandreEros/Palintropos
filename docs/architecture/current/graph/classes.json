@@ -39,6 +39,12 @@
     {
       "kind": "inherits",
       "position": 0,
+      "source": "tropoi.representation.diagnostics.pe_surfaces.HeightAboveSurface",
+      "target": "tropoi.representation.diagnostics.pe_surfaces.GeopotentialHeightSurface"
+    },
+    {
+      "kind": "inherits",
+      "position": 0,
       "source": "tropoi.spatial.grids.geodesic_grid.GeodesicGridGeometry",
       "target": "tropoi.spatial.grids.grid_base.GridGeometry"
     },
@@ -1567,6 +1573,110 @@
     },
     {
       "decorators": [],
+      "external_bases": [],
+      "id": "tropoi.representation.archive.airless.AirlessArchive",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__init__"
+        },
+        {
+          "kind": "method",
+          "name": "_blocks"
+        },
+        {
+          "kind": "method",
+          "name": "_columns"
+        },
+        {
+          "kind": "method",
+          "name": "_files"
+        },
+        {
+          "kind": "method",
+          "name": "_gather"
+        },
+        {
+          "kind": "method",
+          "name": "_locate"
+        },
+        {
+          "kind": "method",
+          "name": "_mapped"
+        },
+        {
+          "kind": "method",
+          "name": "_timing"
+        },
+        {
+          "kind": "method",
+          "name": "cell_edges"
+        },
+        {
+          "kind": "method",
+          "name": "directories"
+        },
+        {
+          "kind": "method",
+          "name": "every_step"
+        },
+        {
+          "kind": "method",
+          "name": "history"
+        },
+        {
+          "kind": "method",
+          "name": "layout"
+        },
+        {
+          "kind": "method",
+          "name": "nearest_column"
+        },
+        {
+          "kind": "method",
+          "name": "profile"
+        },
+        {
+          "kind": "method",
+          "name": "segments"
+        },
+        {
+          "kind": "method",
+          "name": "steps"
+        },
+        {
+          "kind": "method",
+          "name": "surface"
+        },
+        {
+          "kind": "method",
+          "name": "times"
+        }
+      ],
+      "module": "tropoi.representation.archive.airless",
+      "qualname": "AirlessArchive"
+    },
+    {
+      "decorators": [
+        "dataclass(frozen=True)"
+      ],
+      "external_bases": [],
+      "id": "tropoi.representation.archive.airless.Segment",
+      "members": [
+        {
+          "kind": "method",
+          "name": "step_index"
+        },
+        {
+          "kind": "method",
+          "name": "times"
+        }
+      ],
+      "module": "tropoi.representation.archive.airless",
+      "qualname": "Segment"
+    },
+    {
+      "decorators": [],
       "external_bases": [
         "ValueError"
       ],
@@ -2375,6 +2485,21 @@
     },
     {
       "decorators": [
+        "dataclass(frozen=True)"
+      ],
+      "external_bases": [],
+      "id": "tropoi.representation.diagnostics.pe_surfaces.HeightAboveSurface",
+      "members": [
+        {
+          "kind": "property",
+          "name": "label"
+        }
+      ],
+      "module": "tropoi.representation.diagnostics.pe_surfaces",
+      "qualname": "HeightAboveSurface"
+    },
+    {
+      "decorators": [
         "dataclass(frozen=True, eq=False)"
       ],
       "external_bases": [],
@@ -3135,6 +3260,16 @@
       "qualname": "Renderer"
     },
     {
+      "decorators": [],
+      "external_bases": [
+        "ValueError"
+      ],
+      "id": "tropoi.representation.visual.selection.SelectionError",
+      "members": [],
+      "module": "tropoi.representation.visual.selection",
+      "qualname": "SelectionError"
+    },
+    {
       "decorators": [
         "dataclass(frozen=True)"
       ],
@@ -3602,6 +3737,99 @@
     {
       "decorators": [],
       "external_bases": [],
+      "id": "tropoi.representation.visual.viewer_columns.ColumnArchiveProvider",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__init__"
+        },
+        {
+          "kind": "method",
+          "name": "_cells"
+        },
+        {
+          "kind": "method",
+          "name": "_cells_axis"
+        },
+        {
+          "kind": "method",
+          "name": "_column"
+        },
+        {
+          "kind": "method",
+          "name": "_column_index"
+        },
+        {
+          "kind": "method",
+          "name": "_flux"
+        },
+        {
+          "kind": "method",
+          "name": "_level"
+        },
+        {
+          "kind": "method",
+          "name": "_map"
+        },
+        {
+          "kind": "method",
+          "name": "_meridional_section"
+        },
+        {
+          "kind": "method",
+          "name": "_payload"
+        },
+        {
+          "kind": "method",
+          "name": "_range"
+        },
+        {
+          "kind": "method",
+          "name": "_read_level"
+        },
+        {
+          "kind": "method",
+          "name": "_section"
+        },
+        {
+          "kind": "method",
+          "name": "_skin"
+        },
+        {
+          "kind": "method",
+          "name": "_skin_at"
+        },
+        {
+          "kind": "method",
+          "name": "_time"
+        },
+        {
+          "kind": "method",
+          "name": "_time_section"
+        },
+        {
+          "kind": "method",
+          "name": "_time_series"
+        },
+        {
+          "kind": "method",
+          "name": "_vertical_axis"
+        },
+        {
+          "kind": "method",
+          "name": "_zonal_section"
+        },
+        {
+          "kind": "method",
+          "name": "select"
+        }
+      ],
+      "module": "tropoi.representation.visual.viewer_columns",
+      "qualname": "ColumnArchiveProvider"
+    },
+    {
+      "decorators": [],
+      "external_bases": [],
       "id": "tropoi.representation.visual.viewer_fields.FrameProvider",
       "members": [
         {
@@ -3666,6 +3894,10 @@
         },
         {
           "kind": "method",
+          "name": "select"
+        },
+        {
+          "kind": "method",
           "name": "slice"
         },
         {
@@ -3710,15 +3942,11 @@
         },
         {
           "kind": "method",
-          "name": "diagnostic"
+          "name": "recorded"
         },
         {
           "kind": "method",
-          "name": "frame"
-        },
-        {
-          "kind": "method",
-          "name": "structure"
+          "name": "select"
         }
       ],
       "module": "tropoi.representation.visual.viewer_server",

@@ -132,4 +132,4 @@ classDiagram
 
 ## Entry paths through this package
 
-None of the scoped call graphs reaches this package.
+* [`calls/cli-run-airless.mmd`](../calls/cli-run-airless.mmd)

@@ -16,11 +16,11 @@ Explore dependencies, call sites, possible dispatch, runtime observations and pr
 | [`tropoi.physics.native`](packages/tropoi.physics.native.md) | 1 | 0 | 0 | – |
 | [`tropoi.physics.radiation`](packages/tropoi.physics.radiation.md) | 6 | 14 | 23 | `README.md` |
 | [`tropoi.representation`](packages/tropoi.representation.md) | 2 | 0 | 1 | `README.md` |
-| [`tropoi.representation.archive`](packages/tropoi.representation.archive.md) | 13 | 19 | 30 | `README.md` |
-| [`tropoi.representation.diagnostics`](packages/tropoi.representation.diagnostics.md) | 9 | 19 | 28 | `README.md` |
-| [`tropoi.representation.visual`](packages/tropoi.representation.visual.md) | 28 | 62 | 91 | `ATMOSPHERE_VIEW.md`, `HELD_SUAREZ_CLIMATE.md`, `README.md`, `sky_view.html`, `terrain_globe.html` |
+| [`tropoi.representation.archive`](packages/tropoi.representation.archive.md) | 14 | 21 | 31 | `README.md` |
+| [`tropoi.representation.diagnostics`](packages/tropoi.representation.diagnostics.md) | 9 | 20 | 28 | `README.md` |
+| [`tropoi.representation.visual`](packages/tropoi.representation.visual.md) | 31 | 64 | 103 | `ATMOSPHERE_VIEW.md`, `HELD_SUAREZ_CLIMATE.md`, `README.md`, `sky_view.html`, `terrain_globe.html` |
 | [`tropoi.run`](packages/tropoi.run.md) | 3 | 1 | 5 | `README.md` |
-| [`tropoi.run.airless`](packages/tropoi.run.airless.md) | 4 | 2 | 15 | – |
+| [`tropoi.run.airless`](packages/tropoi.run.airless.md) | 4 | 2 | 17 | – |
 | [`tropoi.run.bve`](packages/tropoi.run.bve.md) | 6 | 2 | 3 | `README.md` |
 | [`tropoi.run.custom`](packages/tropoi.run.custom.md) | 7 | 12 | 15 | `INITIAL_STATES.md`, `README.md` |
 | [`tropoi.run.held_suarez`](packages/tropoi.run.held_suarez.md) | 8 | 5 | 37 | `README.md` |
@@ -52,6 +52,7 @@ Explore dependencies, call sites, possible dispatch, runtime observations and pr
 | [`calls/cli-list-scenarios.mmd`](calls/cli-list-scenarios.mmd) | `tropoi.cli.main._cmd_list_scenarios` |
 | [`calls/cli-plot.mmd`](calls/cli-plot.mmd) | `tropoi.cli.main._cmd_plot` |
 | [`calls/cli-recompile.mmd`](calls/cli-recompile.mmd) | `tropoi.cli.main._cmd_recompile` |
+| [`calls/cli-run-airless.mmd`](calls/cli-run-airless.mmd) | `tropoi.cli.main._cmd_run_airless` |
 | [`calls/cli-run-bve.mmd`](calls/cli-run-bve.mmd) | `tropoi.cli.main._cmd_run_bve` |
 | [`calls/cli-run-pe.mmd`](calls/cli-run-pe.mmd) | `tropoi.cli.main._cmd_run_pe` |
 | [`calls/cli-run-swe.mmd`](calls/cli-run-swe.mmd) | `tropoi.cli.main._cmd_run_swe` |
@@ -72,10 +73,10 @@ Explore dependencies, call sites, possible dispatch, runtime observations and pr
 ## Coverage
 
 * Packages: 30 discovered, 30 with a page.
-* Import module records: 196 discovered (including namespace placeholders), 196 listed on a package page.
-* Classes: 245 discovered, 245 drawn on a package page (21 in [the inheritance overview](class-inheritance.mmd)).
-* Both containment views cover 23 directories, 114 Python files, 245 class definitions, leaving out files and directories that define no class.
-* CLI handlers: 12 discovered, each with a call graph.
+* Import module records: 200 discovered (including namespace placeholders), 200 listed on a package page.
+* Classes: 250 discovered, 250 drawn on a package page (23 in [the inheritance overview](class-inheritance.mmd)).
+* Both containment views cover 23 directories, 117 Python files, 250 class definitions, leaving out files and directories that define no class.
+* CLI handlers: 13 discovered, each with a call graph.
 * Public Python entry-point candidates: 42; 17 are roots of declared paths, 25 excluded with a reason.
 
 **Deliberate exclusions**
