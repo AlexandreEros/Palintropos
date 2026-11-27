@@ -79,7 +79,9 @@ def main(argv=None) -> int:
     ap.add_argument("--allow-dirty", action="store_true")
     args = ap.parse_args(argv)
     source_info = None
-    if args.config:
+    if args.config is not None:
+        if not args.config.strip():
+            ap.error("--config needs a file path")
         given = [n for n in _PRESET_OPTIONS if getattr(args, n) not in (None, [])]
         if args.no_spinup:
             given.append("no_spinup")

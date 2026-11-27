@@ -196,3 +196,59 @@ def test_config_document_reports_wrong_types_as_value_errors():
     doc = json.loads(CERES.read_text())
     with pytest.raises(ValueError, match="not an airless configuration"):
         config_from_document({**doc["config"], "cycle_steps": "4320"})
+
+
+def test_standalone_replay_of_a_segment_without_samples(tmp_path):
+    """A 1-step tail holds no tier-2 samples: the replay reports them as not
+    compared (None, never 0) and judges the end state alone."""
+    from tools.planet_one.global_check import main as gg
+    run = AirlessRun(_short_ceres(), tmp_path / "run", allow_dirty=True, log=lambda s: None)
+    run.run_transient(25)
+    assert gg([str(tmp_path / "run"), "--columns", "0"]) == 0
+    report = json.loads((tmp_path / "run" / "gg.json").read_text())
+    assert report["samples"] == {"surface": 0, "profiles": 0}
+    assert report["max_abs_surface_fields_diff"] is None
+    assert report["max_abs_profile_diff_K"] is None
+    assert report["compared"] == ["end_state"]
+    assert set(report["not_compared"]) == {"surface_fields", "profiles"}
+    assert report["pass"] and report["max_abs_end_state_diff_K"] == 0.0
+
+
+def test_standalone_replay_needs_columns_for_point_runs(tmp_path):
+    from tools.planet_one.global_check import main as gg
+    run = AirlessRun(_short_ceres(), tmp_path / "run", allow_dirty=True, log=lambda s: None)
+    run.run_transient(24)
+    with pytest.raises(SystemExit):
+        gg([str(tmp_path / "run")])
+
+
+@pytest.mark.parametrize("key", ["surface_samples", "profile_samples"])
+@pytest.mark.parametrize("bad", [0, -4, 2.0, "12", True, None])
+def test_config_refuses_bad_sample_counts(key, bad):
+    """A zero sample count used to raise ZeroDivisionError in validation."""
+    doc = json.loads(CERES.read_text())
+    body = {**doc["config"], "output": {**doc["config"]["output"], key: bad}}
+    with pytest.raises(ValueError, match=f"output {key} must be a positive integer"):
+        AirlessConfig.from_dict(body)
+    with pytest.raises(ValueError, match="not an airless configuration"):
+        config_from_document(body)
+
+
+@pytest.mark.parametrize("key,bad", [("albedo", "0.1"), ("emissivity", None),
+                                     ("geothermal_flux", float("nan")), ("cycle_s", True),
+                                     ("radius_m", -1.0), ("initial_temperature", 0.0),
+                                     ("cycle_steps", 0), ("cycle_steps", 24.0),
+                                     ("spinup_cycle_steps", 0)])
+def test_config_refuses_wrongly_typed_or_out_of_range_scalars(key, bad):
+    """Checked, not coerced: a string albedo used to load and fail later."""
+    doc = json.loads(CERES.read_text())
+    with pytest.raises(ValueError, match="not an airless configuration"):
+        config_from_document({**doc["config"], key: bad})
+
+
+def test_cli_refuses_an_empty_config_path(tmp_path, capsys):
+    """An empty --config used to fall through to PRESETS[None] (KeyError)."""
+    with pytest.raises(SystemExit) as exc:
+        main(["show-config", "--config", ""])
+    assert exc.value.code == 2
+    assert "--config needs a file path" in capsys.readouterr().err
