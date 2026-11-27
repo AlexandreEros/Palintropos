@@ -392,8 +392,7 @@
       "tropoi.temporal": [
         "README.md",
         "SAVED_RUNS.md",
-        "SEMI_IMPLICIT.md",
-        "_substrate_native.cpython-313-x86_64-linux-gnu.so"
+        "SEMI_IMPLICIT.md"
       ],
       "tropoi.temporal.tendencies": [
         "PRIMITIVE_EQUATIONS.md",

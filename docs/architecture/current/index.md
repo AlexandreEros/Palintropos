@@ -35,7 +35,7 @@ Explore dependencies, call sites, possible dispatch, runtime observations and pr
 | [`tropoi.spatial.terrain`](packages/tropoi.spatial.terrain.md) | 8 | 10 | 10 | `IMPORT.md`, `README.md` |
 | [`tropoi.spatial.transforms`](packages/tropoi.spatial.transforms.md) | 6 | 5 | 5 | `README.md` |
 | [`tropoi.spatial.transforms.cuda`](packages/tropoi.spatial.transforms.cuda.md) | 2 | 0 | 2 | `README.md`, `legendre.cu`, `legendre_stages.cu`, `sh_matrix.cu` |
-| [`tropoi.temporal`](packages/tropoi.temporal.md) | 11 | 18 | 24 | `README.md`, `SAVED_RUNS.md`, `SEMI_IMPLICIT.md`, `_substrate_native.cpython-313-x86_64-linux-gnu.so` |
+| [`tropoi.temporal`](packages/tropoi.temporal.md) | 11 | 18 | 24 | `README.md`, `SAVED_RUNS.md`, `SEMI_IMPLICIT.md` |
 | [`tropoi.temporal.native`](packages/tropoi.temporal.native.md) | 2 | 0 | 2 | – |
 | [`tropoi.temporal.tendencies`](packages/tropoi.temporal.tendencies.md) | 7 | 8 | 9 | `PRIMITIVE_EQUATIONS.md`, `README.md`, `RETAINED_TRUNCATION.md`, `SHALLOW_WATER.md` |
 

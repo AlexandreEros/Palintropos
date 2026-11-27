@@ -20,7 +20,7 @@ Index: [all packages](../index.md) · parent [`tropoi`](tropoi.md) · [`tropoi.t
 | `tropoi.temporal.substrate` | code | `BackwardEulerSubstrate`, `StepReport`, `SubstrateSolveError` | – |
 | `tropoi.temporal.substrate_native` | code | `NativeLibraryError`, `_ColumnArrays`, `_StepScalars` | `describe`, `evaluate_host`, `host_library`, `law_parameters`, `run_step`, `scalars`, `specialization` |
 
-Files shipped in this directory that are **not Python and not analysed** (templates, data): `README.md`, `SAVED_RUNS.md`, `SEMI_IMPLICIT.md`, `_substrate_native.cpython-313-x86_64-linux-gnu.so`. Their contents (for example JavaScript in an HTML template) are invisible to every graph here.
+Files shipped in this directory that are **not Python and not analysed** (templates, data): `README.md`, `SAVED_RUNS.md`, `SEMI_IMPLICIT.md`. Their contents (for example JavaScript in an HTML template) are invisible to every graph here.
 
 ## Imports
 
