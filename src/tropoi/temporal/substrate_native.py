@@ -138,23 +138,28 @@ def host_library():
         raise NativeLibraryError("the native CPU substrate library tropoi.temporal."
                                  f"_substrate_native is not built; {REBUILD}")
     lib = ctypes.CDLL(spec.origin)
-    for name, res in (("pt_substrate_abi_version", ctypes.c_int),
-                      ("pt_substrate_build_digest", ctypes.c_char_p),
-                      ("pt_substrate_build_flags", ctypes.c_char_p),
-                      ("pt_substrate_layer_capacity", ctypes.c_int),
-                      ("pt_substrate_max_strata", ctypes.c_int),
-                      ("pt_substrate_step", ctypes.c_int),
-                      ("pt_substrate_evaluate", ctypes.c_int),
-                      ("pt_numerics_thomas", ctypes.c_int)):
-        getattr(lib, name).restype = res
-    abi = lib.pt_substrate_abi_version()
-    built = lib.pt_substrate_build_digest().decode()
+    # identity first: a library from other sources may lack later exports
+    try:
+        lib.pt_substrate_abi_version.restype = ctypes.c_int
+        lib.pt_substrate_build_digest.restype = ctypes.c_char_p
+        abi = lib.pt_substrate_abi_version()
+        built = lib.pt_substrate_build_digest().decode()
+    except AttributeError as exc:
+        raise NativeLibraryError(f"the library at {spec.origin} is not a native CPU substrate "
+                                 f"library ({exc}); rebuild it: {REBUILD}") from exc
     expected = _digest(build_identity.HOST_FLAGS)
     if abi != ABI_VERSION or built != expected:
         raise NativeLibraryError(
             f"the native CPU substrate library at {spec.origin} was built from other sources "
             f"(ABI {abi}, digest {built[:16]}...; these sources: ABI {ABI_VERSION}, "
             f"{expected[:16]}...); rebuild it: {REBUILD}")
+    for name, res in (("pt_substrate_build_flags", ctypes.c_char_p),
+                      ("pt_substrate_layer_capacity", ctypes.c_int),
+                      ("pt_substrate_max_strata", ctypes.c_int),
+                      ("pt_substrate_step", ctypes.c_int),
+                      ("pt_substrate_evaluate", ctypes.c_int),
+                      ("pt_numerics_thomas", ctypes.c_int)):
+        getattr(lib, name).restype = res
     lib.origin = spec.origin
     lib.digest = built
     lib.flags = lib.pt_substrate_build_flags().decode()

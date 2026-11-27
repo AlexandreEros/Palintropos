@@ -168,6 +168,26 @@ def test_a_stale_or_missing_library_is_refused(monkeypatch):
         substrate_native.host_library()
 
 
+def test_an_older_library_is_refused_before_its_newer_exports_are_resolved(monkeypatch):
+    """A library of an earlier ABI (without, say, pt_numerics_thomas) is
+    reported as stale with the rebuild instructions, not as a missing
+    symbol; provenance then records it as unavailable."""
+    class Older:
+        def __init__(self):
+            self.pt_substrate_abi_version = lambda: substrate_native.ABI_VERSION - 1
+            self.pt_substrate_build_digest = lambda: b"0" * 64
+
+    monkeypatch.setattr(substrate_native, "_HOST", None)
+    monkeypatch.setattr(substrate_native.ctypes, "CDLL", lambda path: Older())
+    with pytest.raises(substrate_native.NativeLibraryError, match="other sources"):
+        substrate_native.host_library()
+    d = substrate_native.describe(_three_strata(), "numpy")
+    assert d["host_library"].startswith("unavailable")
+    monkeypatch.setattr(substrate_native.ctypes, "CDLL", lambda path: object())
+    with pytest.raises(substrate_native.NativeLibraryError, match="not a native"):
+        substrate_native.host_library()
+
+
 def test_native_include_direction_follows_the_layers():
     """numerics headers include only numerics; physics headers include
     numerics and physics; nothing includes upward."""
