@@ -24,59 +24,38 @@
       </div>
     </div>
     <div id="views"></div>
-    <section id="structure" class="panel" hidden>
-      <div class="panel-heading"><h2>Vertical structure</h2><button data-s="png" disabled>Save PNG</button></div>
+    <section id="explorer" class="panel" hidden>
+      <div class="panel-heading"><h2>Explorer</h2><button data-e="png" disabled>Save PNG</button></div>
       <div class="panel-layout">
         <div class="controls">
-          <label>Product<select data-s="product"></select></label>
-          <label data-s="field-wrap">Quantity<select data-s="field"></select></label>
-          <fieldset><legend>Location</legend>
-            <p class="hint">Click the map or globe, or a section, to move the linked cursor.</p>
-            <div class="pair">
-              <label>Latitude (°N)<input data-s="lat" type="number" min="-90" max="90" step="any" required></label>
-              <label>Longitude (°E)<input data-s="lon" type="number" step="any" required></label>
-            </div>
-            <label data-s="snap-wrap" class="check"><input data-s="snap" type="checkbox" checked> Snap to native grid node</label>
-          </fieldset>
-          <fieldset><legend>Saved time</legend>
-            <label class="check"><input data-s="follow" type="checkbox" checked> Follow selection A</label>
-            <label>First saved state<select data-s="first"></select></label>
-            <label data-s="last-wrap">Last saved state<select data-s="last"></select></label>
-          </fieldset>
-          <label data-s="axis-wrap">Vertical axis<select data-s="axis">
-            <option value="height">Geopotential height Z</option>
-            <option value="pressure">Pressure p (log)</option>
-            <option value="sigma">Nominal σ (log)</option></select></label>
-          <fieldset data-s="range-fieldset"><legend>Section colours</legend>
-            <label>Colour range<select data-s="range-mode">
+          <label>Quantity<select data-e="quantity"></select></label>
+          <div class="record"><span data-e="classification"></span><p data-e="definition"></p></div>
+          <label>Preset<select data-e="preset"></select></label>
+          <fieldset data-e="coords" class="coords"></fieldset>
+          <p class="hint">Give each coordinate a role. Two plotting axes give a map or a section, one a line.
+            Only the combinations this archive supports are evaluated. Click the map, globe or a plot to move the linked cursor.</p>
+          <p data-e="product" class="product"></p>
+          <label data-e="snap-wrap" class="check"><input data-e="snap" type="checkbox" checked> Snap to native grid node</label>
+          <fieldset data-e="range-fieldset"><legend>Colours</legend>
+            <label>Colour range<select data-e="range-mode">
               <option value="auto">Automatic (all plotted values)</option>
               <option value="fixed">Fixed minimum and maximum</option></select></label>
-            <div data-s="range-wrap" class="pair" hidden>
-              <label>Minimum<input data-s="range-min" type="number" step="any"></label>
-              <label>Maximum<input data-s="range-max" type="number" step="any"></label>
+            <div data-e="range-wrap" class="pair" hidden>
+              <label>Minimum<input data-e="range-min" type="number" step="any"></label>
+              <label>Maximum<input data-e="range-max" type="number" step="any"></label>
             </div>
             <p class="hint">Kept for each quantity across saved times. Independent of the map.</p>
           </fieldset>
-          <label class="check"><input data-s="link-level" type="checkbox" checked> A clicked level selects it on the map</label>
+          <label class="check"><input data-e="link-level" type="checkbox" checked> A clicked level selects it on the map</label>
         </div>
         <div class="visual">
-          <p data-s="status" class="status" role="status"></p>
-          <canvas data-s="plot" class="structure-plot" aria-label="Vertical structure plot. Hover for values; click to move the cursor or select a level."></canvas>
-          <div data-s="readout" class="surface-readout" aria-live="polite"></div>
-          <div data-s="notes" class="notes"></div>
-          <table data-s="table" class="levels" hidden>
-            <thead><tr><th>Level</th><th>σ</th><th>p (Pa)</th><th>Z (m)</th><th>T (K)</th><th>u (m s⁻¹)</th><th>v (m s⁻¹)</th></tr></thead>
-            <tbody></tbody>
-          </table>
+          <p data-e="status" class="status" role="status"></p>
+          <canvas data-e="plot" class="structure-plot" aria-label="Explorer plot. Hover for values; click to move the cursor or select a level."></canvas>
+          <div data-e="readout" class="surface-readout" aria-live="polite"></div>
+          <div data-e="notes" class="notes"></div>
+          <table data-e="table" class="levels" hidden><thead><tr></tr></thead><tbody></tbody></table>
         </div>
       </div>
-    </section>
-    <section id="series" hidden>
-      <h2>Recorded series</h2>
-      <div class="series-toolbar"><label>Diagnostic<select id="diagnostic"></select></label>
-        <button id="series-png" disabled>Save PNG</button></div>
-      <p id="series-note" role="status"></p>
-      <canvas id="chart" width="1100" height="440" aria-label="Recorded diagnostic over time"></canvas>
     </section>
   </main>
   <template id="panel">
@@ -104,7 +83,7 @@
           </fieldset>
           <fieldset data-id="vertical"><legend>Vertical selection</legend>
             <label>Coordinate<select data-id="coordinate"></select></label>
-            <label data-id="level-wrap">Native level<select data-id="level"></select></label>
+            <label data-id="level-wrap"><span data-id="level-label">Native level</span><select data-id="level"></select></label>
             <label data-id="value-wrap"><span data-id="value-label"></span>
               <input data-id="value" type="number" step="any" required></label>
           </fieldset>

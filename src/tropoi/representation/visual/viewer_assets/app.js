@@ -1,33 +1,31 @@
 import {loadFrame} from "./data.js";
 import {SurfaceView} from "./render.js";
-import {StructureView} from "./structure.js";
+import {Explorer, dayText} from "./explorer.js";
+
+// The viewer opens any archive through its explorer description: quantities,
+// their coordinates, native levels, time axes and supported products. Map
+// panels are the longitude × latitude product; the explorer covers the rest.
 
 const byId = id => document.getElementById(id);
 const panels = [];
-const coordinates = {
-  native: "Native full level",
-  pressure: "Pressure (Pa)",
-  sigma: "Nominal sigma (p/pₛ)",
-  geopotential_height: "Geopotential height (m)",
-};
 let manifest;
-let times;
-let levels;
+let quantities;
 let cursor;
-let structure;
+let explorer;
 
-// One geographic cursor links the globes, maps, column and sections.
 function setCursor(point) {
   if (!point || !Number.isFinite(point.lat) || !Number.isFinite(point.lon)) return;
   cursor = {lat: Math.max(-90, Math.min(90, point.lat)), lon: ((point.lon % 360) + 360) % 360};
   for (const panel of panels) panel.view.setCursor(cursor);
-  structure?.setCursor(cursor);
+  explorer?.setCursor(cursor);
 }
 
-// A level chosen in the column or a section becomes selection A's native level.
+// A level chosen in a profile or section becomes selection A's native level.
 function selectLevel(k) {
   const panel = panels[0];
-  if (!panel?.field.levels || !Number.isInteger(k) || k < 0 || k >= levels.length) return;
+  const levels = panel?.quantity.vertical?.levels;
+  if (!levels || !Number.isInteger(k) || !levels.some(l => l.index === k)) return;
+  if (![...panel.controls.coordinate.options].some(o => o.value === "native")) return;
   panel.controls.coordinate.value = "native";
   panel.updateCoordinate();
   panel.controls.level.value = String(k);
@@ -53,8 +51,8 @@ function download(blob, name) {
   setTimeout(() => URL.revokeObjectURL(url), 5000);
 }
 
-function quantityLabel(field) {
-  const {name, symbol, units} = field.presentation;
+function quantityLabel(q) {
+  const {name, symbol, units} = q.presentation;
   return [symbol ? name + " (" + symbol + ")" : name, units].filter(Boolean).join(" · ");
 }
 
@@ -62,24 +60,36 @@ function runName() {
   return manifest.source.run_id || manifest.source.directory;
 }
 
-function timeLabel(index) {
-  const seconds = times[index];
-  return "Day " + Number((seconds / 86400).toPrecision(8)) + " · " + seconds + " s";
+const axisValues = axis => manifest.time_axes[axis]?.values || [];
+
+function timeText(axis, index) {
+  const seconds = axisValues(axis)[index];
+  const name = manifest.time_axes[axis]?.label;
+  return dayText(seconds).replace("day", "Day") + " · " + seconds + " s" + (name ? " · " + name : "");
+}
+
+/** The sample of ``axis`` nearest ``seconds`` without passing it (the first otherwise). */
+function sampleAtOrBefore(axis, seconds) {
+  const values = axisValues(axis);
+  const k = values.findIndex(s => s > seconds);
+  return k < 0 ? values.length - 1 : Math.max(0, k - 1);
 }
 
 function sync(source, dimension) {
   if (panels.length !== 2 || !byId("link-" + dimension).checked) return;
   const target = panels.find(panel => panel !== source);
   if (dimension === "time") {
-    target.controls.time.value = source.controls.time.value;
+    target.controls.time.value = String(sampleAtOrBefore(target.axis, source.seconds));
   } else {
-    if (!target.field.levels || !source.field.levels) return;
+    if (!target.quantity.vertical || !source.quantity.vertical) return;
     const selection = source.controls.coordinate.value;
     if (![...target.controls.coordinate.options].some(o => o.value === selection)) return;
     target.controls.coordinate.value = selection;
-    target.controls.level.value = source.controls.level.value;
     target.updateCoordinate();
+    if ([...target.controls.level.options].some(o => o.value === source.controls.level.value))
+      target.controls.level.value = source.controls.level.value;
     target.controls.value.value = source.controls.value.value;
+    target.updateAxis();
   }
   return target.load();
 }
@@ -89,14 +99,12 @@ function scaleTogether() {
   let range;
   if (a && b && a.frame && b.frame && a.key === b.key && byId("link-color").checked) {
     const ranges = [a.extent, b.extent];
-    if (ranges.every(Boolean)) {
-      range = [Math.min(...ranges.map(r => r[0])), Math.max(...ranges.map(r => r[1]))];
-    }
+    if (ranges.every(Boolean)) range = [Math.min(...ranges.map(r => r[0])), Math.max(...ranges.map(r => r[1]))];
   }
-  for (const panel of panels) {
-    if (panel.frame) panel.draw(range);
-  }
+  for (const panel of panels) if (panel.frame) panel.draw(range);
 }
+
+const mapKeys = () => Object.keys(quantities).filter(k => "map" in quantities[k].products);
 
 class Panel {
   constructor(letter, initial) {
@@ -110,26 +118,20 @@ class Panel {
     this.view.onSelect = setCursor;
     this.view.cursor = cursor;
     this.playing = false;
-    const keys = (manifest.operations.map || []).filter(key => key !== "wind");
-    options(c.field, keys.map(key => [key, quantityLabel(manifest.fields[key])]));
+    const keys = mapKeys();
+    options(c.field, keys.map(key => [key, quantityLabel(quantities[key])]));
     c.field.value = initial?.key ||
       ["temperature", "free_surface_height", "zeta"].find(key => keys.includes(key)) || keys[0];
-    c.time.max = String(times.length - 1);
-    const requested = new URLSearchParams(location.search).get("time");
-    const initialTime = /^\d+$/.test(requested) && Number(requested) < times.length ? requested : "0";
-    c.time.value = initial?.controls.time.value || initialTime;
+    const atmosphere = Object.values(quantities).some(q => q.vertical?.domain === "atmosphere");
     c.exaggeration.value = initial?.controls.exaggeration.value ||
-      String(manifest.fields.free_surface_height ? 75 : levels.length ? 8 : 1);
+      String(manifest.fields.free_surface_height ? 75 : atmosphere ? 8 : 1);
     c.opacity.value = initial?.controls.opacity.value || (manifest.fields.free_surface_height ? "0.45" : "0.9");
-    options(c.level, levels.map((sigma, index) => [index, (index + 1) + " · σ = " + Number(sigma.toPrecision(6))]));
-    c.level.value = initial?.controls.level.value || String(levels.length - 1);
-    this.updateField();
-    if (initial && this.field.levels) {
-      c.coordinate.value = initial.controls.coordinate.value;
-      this.updateCoordinate();
-      c.value.value = initial.controls.value.value;
-    }
-    c.field.onchange = () => { this.updateField(); this.load(); };
+    this.updateField(initial);
+    const requested = new URLSearchParams(location.search).get("time");
+    const count = axisValues(this.axis).length;
+    c.time.value = initial ? String(sampleAtOrBefore(this.axis, initial.seconds)) :
+      /^\d+$/.test(requested) && Number(requested) < count ? requested : "0";
+    c.field.onchange = () => { const seconds = this.seconds; this.updateField(); this.keepTime(seconds); this.load(); };
     c.time.oninput = () => this.changeTime(Number(c.time.value));
     c.previous.onclick = () => this.changeTime(Number(c.time.value) - 1);
     c.next.onclick = () => this.changeTime(Number(c.time.value) + 1);
@@ -147,88 +149,128 @@ class Panel {
     };
     c["range-min"].onchange = c["range-max"].onchange = () => scaleTogether();
     for (const id of ["opacity", "exaggeration", "light", "winds"]) {
-      c[id].oninput = () => {
-        if (c.exaggeration.validity.valid) scaleTogether();
-      };
+      c[id].oninput = () => { if (c.exaggeration.validity.valid) scaleTogether(); };
     }
     c.png.onclick = async () => {
-      const selection = this.key + "-t" + times[Number(c.time.value)] + "-" + this.surfaceLabel();
+      const selection = this.key + "-t" + this.seconds + "-" + this.surfaceLabel();
       try { download(await this.view.png(), runName() + "-" + selection); }
       catch (error) { this.status(error.message, true); }
     };
   }
 
   get key() { return this.controls.field.value; }
-  get field() { return manifest.fields[this.key]; }
-  get coordinate() { return this.field.levels ? this.controls.coordinate.value : "native"; }
+  get quantity() { return quantities[this.key]; }
+  get field() { return manifest.fields[this.key] || {}; }
+  get coordinate() { return this.quantity.vertical ? this.controls.coordinate.value : "native"; }
+  get discrete() { return this.coordinate === "native" || this.quantity.vertical?.domain === "substrate"; }
+  get level() {
+    const levels = this.quantity.vertical?.levels || [];
+    return levels.find(l => String(l.index) === this.controls.level.value) || null;
+  }
+  /** The time axis of the selection: a native level's own, else the quantity's. */
+  get axis() {
+    return (this.discrete && this.level?.time_axis) || this.quantity.time_axis;
+  }
+  get seconds() { return axisValues(this.axis)[Number(this.controls.time.value)]; }
 
-  updateField() {
-    const c = this.controls;
-    const p = this.field.presentation;
+  keepTime(seconds) {
+    if (seconds !== undefined) this.controls.time.value = String(sampleAtOrBefore(this.axis, seconds));
+    this.updateAxis();
+  }
+
+  updateAxis() {
+    const c = this.controls, count = axisValues(this.axis).length;
+    c.time.max = String(Math.max(0, count - 1));
+    if (Number(c.time.value) > count - 1) c.time.value = String(count - 1);
+  }
+
+  updateField(initial) {
+    const c = this.controls, q = this.quantity, p = q.presentation;
     c.classification.textContent = p.role + " · " + p.origin;
-    c.definition.textContent = p.definition;
-    c.vertical.hidden = !this.field.levels;
-    const old = c.coordinate.value;
-    options(c.coordinate, Object.entries(coordinates).filter(([key]) => {
-      if (key === "pressure" && this.key === "pressure") return false;
-      if (key === "geopotential_height" && ["geopotential_height", "geopotential"].includes(this.key)) return false;
-      return key === "native" || manifest.operations[key]?.includes(this.key);
-    }));
-    if ([...c.coordinate.options].some(o => o.value === old)) c.coordinate.value = old;
+    c.definition.textContent = p.definition + (q.evaluation ? " Evaluation: " + q.evaluation + "." : "");
+    c.vertical.hidden = !q.vertical;
+    if (q.vertical) {
+      const old = initial?.controls.coordinate.value || c.coordinate.value;
+      const reps = q.products.map.vertical;
+      options(c.coordinate, reps.map(r => [r, q.vertical.representations[r].label]));
+      if (reps.includes(old)) c.coordinate.value = old;
+      const keep = initial?.controls.level.value || c.level.value;
+      this.fillLevels();
+      const levels = q.vertical.levels;
+      c.level.value = levels.some(l => String(l.index) === keep) ? keep :
+        String(q.vertical.domain === "substrate" ? levels[0].index : levels[levels.length - 1].index);
+    }
     const shell = this.shell();
-    c["wind-wrap"].hidden = !manifest.operations.wind || (levels.length > 0 && !this.field.levels);
+    c["wind-wrap"].hidden = !manifest.operations.wind || (q.vertical === null && Object.values(quantities).some(x => x.vertical));
     c["opacity-wrap"].hidden = !shell;
     c["exaggeration-wrap"].hidden = !shell && !manifest.fields.terrain;
-    c["light-wrap"].hidden = !manifest.star?.positions;
-    this.updateCoordinate();
+    c["light-wrap"].hidden = !manifest.star?.axes;
+    this.updateCoordinate(initial);
+  }
+
+  fillLevels() {
+    const c = this.controls, q = this.quantity, rep = this.coordinate;
+    options(c.level, q.vertical.levels.map(l => [l.index, rep === "native" || !(rep in l) ? l.label :
+      q.vertical.representations[rep].label.split(" (")[0] + " = " + Number(l[rep].toPrecision(6)) + " m" +
+      (l.kind === "surface" ? " · diagnosed skin" : "")]));
   }
 
   shell() {
-    // A level is lifted to its geopotential height; without the run's gravity
-    // there is none, and the level is drawn as a flat map on the sphere.
-    return Boolean((this.field.levels && manifest.fields.geopotential_height) || manifest.fields.free_surface_height);
+    // An atmospheric level is lifted to its geopotential height; without the
+    // run's gravity there is none, and the level is drawn as a flat map.
+    return Boolean((this.quantity.vertical?.domain === "atmosphere" && manifest.fields.geopotential_height) ||
+      manifest.fields.free_surface_height);
   }
 
-  updateCoordinate() {
-    const c = this.controls;
-    const coord = this.coordinate;
-    c["level-wrap"].hidden = coord !== "native";
-    c["value-wrap"].hidden = coord === "native";
-    if (coord === "native") return;
-    const sigma = levels[Number(c.level.value)] ?? 0.5;
+  updateCoordinate(initial) {
+    const c = this.controls, coord = this.coordinate;
+    if (!this.quantity.vertical) { this.updateAxis(); return; }
+    const keep = c.level.value;
+    this.fillLevels();
+    if ([...c.level.options].some(o => o.value === keep)) c.level.value = keep;
+    c["level-wrap"].hidden = !this.discrete;
+    c["value-wrap"].hidden = this.discrete;
+    c["level-label"].textContent = coord === "native" ? "Native level" : "Native depth";
+    this.updateAxis();
+    if (this.discrete) return;
+    const level = this.quantity.vertical.levels.find(l => String(l.index) === c.level.value);
+    const sigma = level?.sigma ?? 0.5;
     const reference = manifest.physics.reference_pressure ?? manifest.physics.surface_pressure;
     const defaults = {sigma, pressure: reference ? Math.round(reference * sigma) : 50000,
-      geopotential_height: 1000};
-    c["value-label"].textContent = coordinates[coord];
+      geopotential_height: 1000, height_above_surface: 1000};
+    const rep = this.quantity.vertical.representations[coord];
+    c["value-label"].textContent = rep.label + (rep.units ? " (" + rep.units + ")" : "");
     c.value.removeAttribute("max");
     c.value.removeAttribute("min");
     if (coord === "sigma") { c.value.min = "0"; c.value.max = "1"; }
     if (coord === "pressure") c.value.min = "0";
-    c.value.value = String(defaults[coord]);
+    c.value.value = initial?.controls.value.value || String(defaults[coord]);
   }
 
   changeLevel() {
+    this.keepTime(this.seconds);
     sync(this, "level");
     return this.load();
   }
 
   async changeTime(index) {
-    this.controls.time.value = String(Math.max(0, Math.min(times.length - 1, index)));
+    this.controls.time.value = String(Math.max(0, Math.min(axisValues(this.axis).length - 1, index)));
     await Promise.all([sync(this, "time"), this.load()]);
   }
 
   async play() {
-    if (this.playing || times.length < 2) return;
+    const count = axisValues(this.axis).length;
+    if (this.playing || count < 2) return;
     panels.forEach(panel => panel.stop());
     this.playing = true;
     const generation = this.playGeneration;
     this.controls.play.textContent = "Pause";
-    if (Number(this.controls.time.value) === times.length - 1) await this.changeTime(0);
+    if (Number(this.controls.time.value) === count - 1) await this.changeTime(0);
     while (this.playing && generation === this.playGeneration) {
       await new Promise(done => setTimeout(done, 1000 / Number(this.controls.speed.value)));
       if (!this.playing || generation !== this.playGeneration) return;
       let index = Number(this.controls.time.value) + 1;
-      if (index === times.length) {
+      if (index === count) {
         if (!this.controls.loop.checked) break;
         index = 0;
       }
@@ -244,13 +286,46 @@ class Panel {
   }
 
   surfaceLabel() {
-    const c = this.controls;
-    if (!this.field.levels) {
+    const c = this.controls, q = this.quantity;
+    if (!q.vertical) {
       if (manifest.fields.free_surface_height) return "Shallow-water free surface";
-      return levels.length ? "Lower boundary" : "Horizontal field";
+      if (Object.values(quantities).some(x => x.vertical?.domain === "substrate")) return "Surface";
+      return Object.values(quantities).some(x => x.vertical) ? "Lower boundary" : "Horizontal field";
     }
-    if (this.coordinate === "native") return "Native level " + c.level.selectedOptions[0].text;
-    return coordinates[this.coordinate] + " = " + c.value.value;
+    if (this.discrete) return (this.coordinate === "native" ? "Native level " : "") + c.level.selectedOptions[0].text;
+    return q.vertical.representations[this.coordinate].label + " = " + c.value.value;
+  }
+
+  selection() {
+    const c = this.controls, q = this.quantity;
+    const sel = {quantity: this.key, longitude: {role: "x"}, latitude: {role: "y"},
+      time: {role: "fixed", index: Number(c.time.value)}, vertical: {role: "none"}};
+    if (q.vertical) {
+      const rep = this.coordinate;
+      const value = rep === "native" ? this.level.index : this.discrete ? this.level[rep] : c.value.valueAsNumber;
+      sel.vertical = {role: "fixed", representation: rep, value};
+    }
+    return sel;
+  }
+
+  /** Show a longitude × latitude selection made in the explorer. */
+  show(selection) {
+    const c = this.controls;
+    if (!(selection.quantity in quantities) || !("map" in quantities[selection.quantity].products)) return;
+    if (c.field.value !== selection.quantity) { c.field.value = selection.quantity; this.updateField(); }
+    const v = selection.vertical;
+    if (v.role === "fixed" && [...c.coordinate.options].some(o => o.value === v.representation)) {
+      c.coordinate.value = v.representation;
+      this.updateCoordinate();
+      const levels = this.quantity.vertical.levels;
+      const level = v.representation === "native" ? levels.find(l => l.index === v.value) :
+        levels.find(l => l[v.representation] === v.value);
+      if (level) c.level.value = String(level.index);
+      else c.value.value = String(v.value);
+    }
+    this.updateAxis();
+    if (Number.isInteger(selection.time.index)) c.time.value = String(selection.time.index);
+    return this.load();
   }
 
   status(message, error = false) {
@@ -265,26 +340,27 @@ class Panel {
     this.request = request;
     this.frame = this.extent = null;
     c.png.disabled = c.surface.hidden = true;
-    const time = Number(c.time.value);
-    c["time-label"].textContent = timeLabel(time) + " · " + (time + 1) + "/" + times.length;
+    const time = Number(c.time.value), count = axisValues(this.axis).length;
+    c["time-label"].textContent = timeText(this.axis, time) + " · " + (time + 1) + "/" + count;
     c.previous.disabled = time === 0;
-    c.next.disabled = time === times.length - 1;
-    c.play.disabled = c.time.disabled = times.length <= 1;
-    const axis = manifest.time_axes[this.field.time_axis];
-    if (this.field.time_axis === "slab" && !axis.values.includes(times[time])) {
+    c.next.disabled = time === count - 1;
+    c.play.disabled = c.time.disabled = count <= 1;
+    const slab = manifest.time_axes[this.field.time_axis];
+    if (this.field.time_axis === "slab" && !slab.values.includes(this.seconds)) {
       this.status("No slab snapshot was saved at this time.");
       return;
     }
     const coord = this.coordinate;
-    const value = coord === "native" ? (this.field.levels ? Number(c.level.value) : 0) : c.value.valueAsNumber;
-    if (coord !== "native" && (!c.value.validity.valid || !Number.isFinite(value) ||
-        (["sigma", "pressure"].includes(coord) && value <= 0))) {
-      this.status("Enter a valid " + coordinates[coord] + " selection.", true);
-      return;
+    if (!this.discrete) {
+      const value = c.value.valueAsNumber;
+      if (!c.value.validity.valid || !Number.isFinite(value) || (["sigma", "pressure"].includes(coord) && value <= 0)) {
+        this.status("Enter a valid " + this.quantity.vertical.representations[coord].label + " selection.", true);
+        return;
+      }
     }
-    this.status("Loading " + this.field.presentation.name.toLowerCase() + "…");
+    this.status("Loading " + this.quantity.presentation.name.toLowerCase() + "…");
     try {
-      const frame = await loadFrame({time, field: this.key, coordinate: coord, value}, request.signal);
+      const frame = await loadFrame(this.selection(), request.signal);
       if (this.request !== request || request.signal.aborted) return;
       this.frame = frame;
       // Avoid a negative displayed radius when exaggerating terrain below datum.
@@ -300,9 +376,10 @@ class Panel {
       this.draw();
       this.extent = this.view.range?.slice();
       if (panels.length > 1) scaleTogether();
-      this.status("");
+      this.status(frame.cells ? "Native cells: the flat map and its readout show each archived cell's value; " +
+        "the globe interpolates between cell centres." : "");
       c.png.disabled = false;
-      if (this === panels[0]) structure?.follow();
+      if (this === panels[0]) explorer?.follow();
     } catch (error) {
       if (!request.signal.aborted && this.request === request) {
         this.frame = null;
@@ -325,16 +402,17 @@ class Panel {
     range = this.fixedRange() || range;
     const time = Number(c.time.value);
     const geo = manifest.geometry;
-    const p = this.field.presentation;
+    const p = this.quantity.presentation;
     this.view.draw(this.frame, {
       radius: geo.dynamical_radius_m || geo.reference_radius_m,
       title: runName(), field: this.key, label: p.name + (p.symbol ? " (" + p.symbol + ")" : ""),
-      units: p.units, selection: timeLabel(time) + " · " + this.surfaceLabel() + " · " + p.role + " · " + p.origin +
+      units: p.units, selection: timeText(this.axis, time) + " · " + this.surfaceLabel() + " · " + p.role + " · " + p.origin +
         (this.fixedRange() ? " · fixed colour range" : ""),
       winds: !c["wind-wrap"].hidden && c.winds.checked, shell: this.shell(),
       opacity: Number(c.opacity.value), exaggeration: Number(c.exaggeration.value),
-      star: c.light.value === "star" ? manifest.star?.positions?.[time] : null, center: geo.initial_center,
-      maskLabels: {1: manifest.fields.free_surface_height ? "Nonpositive fluid thickness" : "Below terrain", 2: "Above highest sampled full level", 3: "Below lowest sampled full level"},
+      star: c.light.value === "star" ? manifest.star?.axes?.[this.axis]?.[time] : null, center: geo.initial_center,
+      maskLabels: {1: manifest.fields.free_surface_height ? "Nonpositive fluid thickness" : "Below terrain",
+        2: "Above highest sampled full level", 3: "Below lowest sampled full level"},
       range
     });
   }
@@ -355,102 +433,34 @@ function compare() {
   byId("compare").setAttribute("aria-pressed", String(enabled));
   byId("compare").textContent = enabled ? "Close comparison" : "Compare selections";
   byId("links").hidden = !enabled;
-  byId("link-level-label").hidden = !levels.length;
+  byId("link-level-label").hidden = !Object.values(quantities).some(q => q.vertical);
   if (enabled) panels[1].load();
   else scaleTogether();
 }
 
-// Keep the recorded samples in their own cadence, including real gaps.
-function plotSeries({x, y, x_label, units}, name, key, source) {
-  const canvas = byId("chart");
-  const ctx = canvas.getContext("2d");
-  let xmin = Infinity, xmax = -Infinity, ymin = Infinity, ymax = -Infinity;
-  if (x.length !== y.length) throw new Error("Diagnostic time and value counts disagree.");
-  for (let i = 0; i < x.length; i++) {
-    if (!Number.isFinite(x[i]) || !Number.isFinite(y[i])) continue;
-    xmin = Math.min(xmin, x[i]); xmax = Math.max(xmax, x[i]);
-    ymin = Math.min(ymin, y[i]); ymax = Math.max(ymax, y[i]);
+function facts() {
+  const h = manifest.explorer.horizontal || {}, out = [];
+  if (manifest.source.solver) out.push(manifest.source.solver.toUpperCase());
+  if (manifest.source.model) out.push(manifest.source.model);
+  if (h.kind === "points") out.push(h.columns + " diagnostic point" + (h.columns === 1 ? "" : "s") + " (no global field)");
+  else if (h.columns) out.push(h.columns + " columns, " + h.kind + " " + h.nlat + " × " + h.nlon);
+  const levels = (manifest.axes.vertical?.full_levels || []).length;
+  if (levels) out.push(levels + " full levels");
+  const cells = (manifest.axes.substrate?.centres || []).length;
+  if (cells) out.push(cells + " substrate cells and the diagnosed skin");
+  for (const [name, axis] of Object.entries(manifest.time_axes)) {
+    if (!axis.values?.length || name === "slab" || name === "daily") continue;
+    out.push(axis.values.length + " " + (axis.label || "saved state") + "s, " + dayText(axis.values[0]) + " to " +
+      dayText(axis.values[axis.values.length - 1]));
   }
-  if (!Number.isFinite(xmin)) throw new Error("No finite diagnostic samples.");
-  const left = 115, top = 92, right = canvas.width - 45, bottom = canvas.height - 65;
-  const scale = (v, lo, hi) => lo === hi ? 0.5 : (v - lo) / (hi - lo);
-  const px = value => left + (right - left) * scale(value, xmin, xmax);
-  const py = value => bottom - (bottom - top) * scale(value, ymin, ymax);
-  const tick = v => Number(v.toPrecision(5)).toString();
-  ctx.fillStyle = "#fffef9";
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-  ctx.fillStyle = "#19383b";
-  ctx.font = "24px Georgia";
-  ctx.fillText(name + (units ? " (" + units + ")" : ""), 22, 32, canvas.width - 44);
-  ctx.font = "14px sans-serif";
-  ctx.fillText(runName() + " · " + source + " · " + key, 23, 58, canvas.width - 46);
-  for (let i = 0; i <= 4; i++) {
-    const f = i / 4;
-    if (ymin !== ymax || i === 2) {
-      const value = ymin + f * (ymax - ymin);
-      const row = py(value);
-      ctx.strokeStyle = "#d5deda"; ctx.beginPath(); ctx.moveTo(left, row); ctx.lineTo(right, row); ctx.stroke();
-      ctx.textAlign = "right"; ctx.fillText(tick(value), left - 12, row + 5);
-    }
-    if (xmin !== xmax || i === 2) {
-      const value = xmin + f * (xmax - xmin);
-      ctx.textAlign = "center"; ctx.fillText(tick(value), px(value), bottom + 23);
-    }
-  }
-  ctx.textAlign = "center";
-  ctx.fillText(x_label || "Time", (right + left) / 2, bottom + 51);
-  ctx.textAlign = "left";
-  ctx.strokeStyle = "#106d6c"; ctx.lineWidth = 2;
-  ctx.beginPath();
-  let joined = false;
-  for (let i = 0; i < y.length; i++) {
-    if (!Number.isFinite(x[i]) || !Number.isFinite(y[i])) { joined = false; continue; }
-    const xx = px(x[i]), yy = py(y[i]);
-    if (joined) ctx.lineTo(xx, yy);
-    else ctx.moveTo(xx, yy);
-    joined = true;
-    ctx.fillRect(xx - 1, yy - 1, 2, 2);
-  }
-  ctx.stroke();
-  return y.length;
-}
-
-function showDiagnostics(keys) {
-  byId("series").hidden = false;
-  const select = byId("diagnostic");
-  const nameFor = key => manifest.diagnostics[key].presentation?.name || key;
-  options(select, keys.map(key => [key, nameFor(key)]));
-  select.value = keys.includes("mean_T") ? "mean_T" : keys[0];
-  let request;
-  async function load() {
-    request?.abort();
-    request = new AbortController();
-    const {signal} = request;
-    const key = select.value;
-    byId("series-png").disabled = byId("chart").hidden = true;
-    byId("series-note").textContent = "Loading series…";
-    try {
-      const data = await json("diagnostic?" + new URLSearchParams({field: key}), signal);
-      if (signal.aborted) return;
-      const product = manifest.diagnostics[key];
-      const samples = plotSeries(data, nameFor(key), key, product.path);
-      byId("series-note").textContent = [samples + " samples", product.time_axis, product.path].join(" · ");
-      byId("series-png").disabled = byId("chart").hidden = false;
-    } catch (error) {
-      if (!signal.aborted) byId("series-note").textContent = error.message;
-    }
-  }
-  select.onchange = load;
-  byId("series-png").onclick = () => {
-    const key = select.value;
-    byId("chart").toBlob(blob => { if (blob) download(blob, runName() + "-" + key); });
-  };
-  return load();
+  if (manifest.source.completion) out.push(manifest.source.completion);
+  return out.filter(Boolean).join(" · ");
 }
 
 async function openArchive() {
   const [inventory, metadata] = await Promise.all([json("runs"), json("manifest")]);
   manifest = metadata;
+  quantities = manifest.explorer.quantities;
   byId("run-title").textContent = runName();
   document.title = runName() + " · Palintropos";
   if (inventory.runs.length > 1) {
@@ -461,55 +471,48 @@ async function openArchive() {
     select.onchange = () => {
       const run = inventory.runs.find(run => String(run.id) === select.value);
       if (!run) return;
-      // Carry the geographic cursor and structure product; saved times differ per archive.
+      // Carry the geographic cursor; saved times differ per archive.
       const keep = cursor ? {lat: cursor.lat, lon: cursor.lon} : {};
-      if (structure) keep.product = structure.product;
       location.assign(run.url + "?" + new URLSearchParams(keep));
     };
   }
-  times = manifest.time_axes.snapshots?.values || [];
-  levels = manifest.axes.vertical?.full_levels || [];
-  const facts = [manifest.source.solver?.toUpperCase(), times.length + " saved states"];
-  if (levels.length) facts.push(levels.length + " full levels");
-  if (times.length) facts.push(timeLabel(0).split(" · ")[0] + " to " + timeLabel(times.length - 1).split(" · ")[0]);
-  byId("run-facts").textContent = facts.filter(Boolean).join(" · ");
-  if (times.length && manifest.operations.map?.length) {
-    const query = new URLSearchParams(location.search);
-    const star = manifest.star?.positions?.[0];
-    const center = manifest.geometry.initial_center;
-    cursor = {lat: Number(query.get("lat") ?? star?.latitude ?? center?.latitude ?? 0),
-      lon: Number(query.get("lon") ?? star?.longitude ?? center?.longitude ?? 0)};
-    if (!Number.isFinite(cursor.lat) || !Number.isFinite(cursor.lon)) cursor = {lat: 0, lon: 0};
+  byId("run-facts").textContent = facts();
+  const query = new URLSearchParams(location.search);
+  const points = manifest.explorer.horizontal?.points;
+  const star = manifest.star?.axes && Object.values(manifest.star.axes)[0]?.[0];
+  const center = manifest.geometry.initial_center;
+  cursor = {lat: Number(query.get("lat") ?? points?.[0]?.latitude ?? star?.latitude ?? center?.latitude ?? 0),
+    lon: Number(query.get("lon") ?? points?.[0]?.longitude ?? star?.longitude ?? center?.longitude ?? 0)};
+  if (!Number.isFinite(cursor.lat) || !Number.isFinite(cursor.lon)) cursor = {lat: 0, lon: 0};
+  let first = null;
+  if (mapKeys().length) {
     byId("toolbar").hidden = false;
-    const first = new Panel("A");
+    first = new Panel("A");
     panels.push(first);
     byId("compare").onclick = compare;
     byId("link-color").onchange = scaleTogether;
     byId("link-time").onchange = () => sync(first, "time");
     byId("link-level").onchange = () => sync(first, "level");
-    if (manifest.operations.structure?.length) {
-      structure = new StructureView(byId("structure"), {
-        manifest, runName, timeLabel,
-        getTime: () => Number(first.controls.time.value),
-        getField: () => first.key,
-        getLevel: () => first.field.levels && first.coordinate === "native" ? Number(first.controls.level.value) : null,
-        onCursor: setCursor, onLevel: selectLevel,
-      });
-      const product = query.get("product");
-      if (product && [...structure.c.product.options].some(o => o.value === product)) structure.c.product.value = product;
-    }
-    setCursor(cursor);
-    // Inspection handle for acceptance tests and the browser console.
-    window.viewer = {panels, get structure() { return structure; }, get cursor() { return cursor; }};
-    await first.load();
-  } else {
-    const keys = (manifest.operations.series || []).filter(k => !manifest.diagnostics[k].columns);
-    if (keys.length) await showDiagnostics(keys);
-    const reasons = Object.values(manifest.unavailable);
-    if (reasons.length || !keys.length) {
-      byId("notice").hidden = false;
-      byId("notice").textContent = reasons.join(" · ") || "No supported fields or recorded series in this archive.";
-    }
+  }
+  const explorable = Object.values(quantities).some(q => Object.keys(q.products).some(p => p !== "map"));
+  if (explorable) {
+    explorer = new Explorer(byId("explorer"), {
+      manifest, runName, timeText,
+      getMap: () => first && {quantity: first.key, axis: first.axis, time: Number(first.controls.time.value)},
+      showMap: selection => first?.show(selection),
+      getLevel: () => first?.quantity.vertical?.domain === "atmosphere" && first.coordinate === "native" ?
+        Number(first.controls.level.value) : null,
+      onCursor: setCursor, onLevel: selectLevel,
+    });
+  }
+  setCursor(cursor);
+  // Inspection handle for acceptance tests and the browser console.
+  window.viewer = {panels, get explorer() { return explorer; }, get cursor() { return cursor; }};
+  if (first) await first.load();
+  const reasons = Object.values(manifest.unavailable).filter(v => typeof v === "string");
+  if (!first && !explorable) {
+    byId("notice").hidden = false;
+    byId("notice").textContent = reasons.join(" · ") || "No supported quantities in this archive.";
   }
 }
 

@@ -15,12 +15,17 @@ function raster(frame,options,scale,w,h) {
   const values=frame.values;
   for (let y=0;y<h;y++) {
     const lat=90-180*(y+.5)/h, [j,fy]=latitudeCell(frame.lat,lat);
-    const outside=lat<frame.lat[0] || lat>frame.lat[frame.lat.length-1];
+    // Native cells cover the sphere: polar half-rows belong to the polar cells.
+    const outside=!frame.cells && (lat<frame.lat[0] || lat>frame.lat[frame.lat.length-1]);
     for (let x=0;x<w;x++) {
       const [i,fx]=cols[x],a=j*width+i,e=j*width+(i+1)%width,d=e+width;
       const b=fx>=fy ? e : d,c=fx>=fy ? d : a+width;
       let rgb=[159,166,167];
-      if (!outside && valid[a] && valid[b] && valid[c]) {
+      if (frame.cells) {
+        // Native cells: the value of the cell whose centre is nearest.
+        const k=(fy<.5 ? j : j+1)*width+(fx<.5 ? i : (i+1)%width);
+        if (!outside && valid[k]) rgb=scale.color(values[k]);
+      } else if (!outside && valid[a] && valid[b] && valid[c]) {
         const u=1-Math.max(fx,fy), v=fx>=fy ? fx-fy : fx, t=1-u-v;
         rgb=scale.color(u*values[a]+v*values[b]+t*values[c]);
       }
