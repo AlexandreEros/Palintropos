@@ -1,8 +1,10 @@
 # Consolidation evidence (machine-readable)
 
-T4 measurements of the substrate consolidation. The audit and the earlier
-evidence (baseline, kernel census, prototypes) are in the decision record,
-PR #74 (`docs/validation/CONSOLIDATION-AUDIT.md` there).
+T4 measurements of the substrate consolidation. The audit, its decisions
+and the implementation status are in
+[`../CONSOLIDATION-AUDIT.md`](../CONSOLIDATION-AUDIT.md) (merged from PR
+#74), whose evidence (baseline, kernel census, prototypes) is in this
+directory too.
 
 | File | What it records |
 | --- | --- |
