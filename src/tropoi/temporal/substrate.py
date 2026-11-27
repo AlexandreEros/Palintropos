@@ -150,7 +150,7 @@ class BackwardEulerSubstrate:
 
         Returns ``(new_state, report)``. Raises :class:`SubstrateSolveError`
         if the Newton iteration fails to reach the residual tolerance."""
-        from tropoi.temporal.substrate_native import run_step
+        from tropoi.temporal.substrate_native import is_host_scalar, run_step
         sub = self.substrate
         th_old = state.anomaly
         xp = _xp(th_old)
@@ -159,6 +159,9 @@ class BackwardEulerSubstrate:
             raise ValueError(f"dt must be finite and > 0, got {dt!r}")
         n = th_old.shape[1]
         gb = sub.bottom_heat_flux if bottom_heat_flux is None else bottom_heat_flux
+        # G as the report uses it: a host scalar by value, anything else as a
+        # backend float64 array (it broadcasts over the columns)
+        gb = float(gb) if is_host_scalar(gb) else xp.asarray(gb, dtype=xp.float64)
         src = None if source is None else xp.asarray(source, dtype=xp.float64)
         # The native step validates the forcing, forms the absorbed constant
         # (1 - A) SW + eps LW + F_0 and solves; one device-to-host transfer per

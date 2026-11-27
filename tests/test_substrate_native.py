@@ -265,3 +265,27 @@ def test_extent_bounds_are_the_extent(backend):
     assert [(float(a), float(b)) for a, b in rep.extent] == \
            list(zip(_host(lows).tolist(), _host(highs).tolist()))
     assert [tuple(map(float, e)) for e in rep.extent] == sub.extent(st)
+
+
+@pytest.mark.parametrize("backend", ["numpy", "cupy"])
+def test_forcing_accepts_sequences_and_other_dtypes(backend):
+    """Lists and tuples are per-column forcing, and integer or float32
+    arrays are converted to float64, as before the fusion; the result is the
+    same as with float64 arrays."""
+    xp = _backend(backend)
+    sub = _three_strata()
+    n = 3
+    st = sub.initial_state(n, xp=xp)
+    stepper = BackwardEulerSubstrate(sub)
+    a, ra = stepper.step(st, 3600.0, shortwave_down=[100.0, 2000.0, 0.0],
+                         longwave_down=(5.0, 6.0, 7.0),
+                         bottom_heat_flux=xp.asarray([1, 0, 2], dtype=xp.float32),
+                         flux_derivative=xp.asarray([0, -1, 0], dtype=xp.int64))
+    b, rb = stepper.step(st, 3600.0, shortwave_down=xp.asarray([100.0, 2000.0, 0.0]),
+                         longwave_down=xp.asarray([5.0, 6.0, 7.0]),
+                         bottom_heat_flux=xp.asarray([1.0, 0.0, 2.0]),
+                         flux_derivative=xp.asarray([0.0, -1.0, 0.0]))
+    assert bool(xp.array_equal(a.anomaly, b.anomaly))
+    for f in ("bottom", "energy_tendency", "residual_sum", "absorbed"):
+        assert bool(xp.array_equal(getattr(ra, f), getattr(rb, f))), f
+    assert float(ra.bottom[2]) == 2.0

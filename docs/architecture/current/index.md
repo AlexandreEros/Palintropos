@@ -10,7 +10,7 @@ Explore dependencies, call sites, possible dispatch, runtime observations and pr
 |---|---|---|---|---|
 | [`tropoi`](packages/tropoi.md) | 1 | 0 | 0 | `README.md` |
 | [`tropoi.cli`](packages/tropoi.cli.md) | 6 | 0 | 24 | `README.md` |
-| [`tropoi.numerics`](packages/tropoi.numerics.md) | 1 | 0 | 0 | – |
+| [`tropoi.numerics`](packages/tropoi.numerics.md) | 2 | 0 | 1 | – |
 | [`tropoi.numerics.native`](packages/tropoi.numerics.native.md) | 1 | 0 | 0 | – |
 | [`tropoi.physics`](packages/tropoi.physics.md) | 20 | 34 | 46 | `README.md` |
 | [`tropoi.physics.native`](packages/tropoi.physics.native.md) | 1 | 0 | 0 | – |
@@ -35,7 +35,7 @@ Explore dependencies, call sites, possible dispatch, runtime observations and pr
 | [`tropoi.spatial.terrain`](packages/tropoi.spatial.terrain.md) | 8 | 10 | 10 | `IMPORT.md`, `README.md` |
 | [`tropoi.spatial.transforms`](packages/tropoi.spatial.transforms.md) | 6 | 5 | 5 | `README.md` |
 | [`tropoi.spatial.transforms.cuda`](packages/tropoi.spatial.transforms.cuda.md) | 2 | 0 | 2 | `README.md`, `legendre.cu`, `legendre_stages.cu`, `sh_matrix.cu` |
-| [`tropoi.temporal`](packages/tropoi.temporal.md) | 10 | 18 | 27 | `README.md`, `SAVED_RUNS.md`, `SEMI_IMPLICIT.md` |
+| [`tropoi.temporal`](packages/tropoi.temporal.md) | 11 | 19 | 27 | `README.md`, `SAVED_RUNS.md`, `SEMI_IMPLICIT.md` |
 | [`tropoi.temporal.native`](packages/tropoi.temporal.native.md) | 2 | 0 | 2 | – |
 | [`tropoi.temporal.tendencies`](packages/tropoi.temporal.tendencies.md) | 7 | 8 | 9 | `PRIMITIVE_EQUATIONS.md`, `README.md`, `RETAINED_TRUNCATION.md`, `SHALLOW_WATER.md` |
 
@@ -72,9 +72,9 @@ Explore dependencies, call sites, possible dispatch, runtime observations and pr
 ## Coverage
 
 * Packages: 30 discovered, 30 with a page.
-* Import module records: 196 discovered (including namespace placeholders), 196 listed on a package page.
-* Classes: 245 discovered, 245 drawn on a package page (21 in [the inheritance overview](class-inheritance.mmd)).
-* Both containment views cover 23 directories, 114 Python files, 245 class definitions, leaving out files and directories that define no class.
+* Import module records: 198 discovered (including namespace placeholders), 198 listed on a package page.
+* Classes: 246 discovered, 246 drawn on a package page (21 in [the inheritance overview](class-inheritance.mmd)).
+* Both containment views cover 23 directories, 115 Python files, 246 class definitions, leaving out files and directories that define no class.
 * CLI handlers: 12 discovered, each with a call graph.
 * Public Python entry-point candidates: 42; 17 are roots of declared paths, 25 excluded with a reason.
 

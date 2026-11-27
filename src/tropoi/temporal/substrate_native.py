@@ -253,12 +253,19 @@ def _step_scalars(prep, sub, xp, dt):
 
 # -- one step -------------------------------------------------------------------------------
 
+def is_host_scalar(v) -> bool:
+    """A Python or NumPy scalar (or 0-d NumPy array): passed to the native
+    step by value. Sequences and device arrays are arrays."""
+    if isinstance(v, (np.ndarray, np.generic)):
+        return np.ndim(v) == 0
+    return not hasattr(v, "shape") and np.ndim(v) == 0
+
+
 def column_input(v, xp, n):
     """A per-column forcing input as (array or None, stride in elements,
     scalar value): a host scalar is passed by value; an array is broadcast to
     (n,) and passed as a strided view, so nothing is copied or materialized."""
-    if not hasattr(v, "shape") or isinstance(v, np.generic) or (isinstance(v, np.ndarray)
-                                                                and v.ndim == 0):
+    if is_host_scalar(v):
         return None, -1, float(np.asarray(v, dtype=np.float64))
     arr = xp.broadcast_to(xp.asarray(v, dtype=xp.float64), (n,))
     stride = arr.strides[0] // arr.itemsize

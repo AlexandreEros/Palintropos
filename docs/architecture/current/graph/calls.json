@@ -12218,6 +12218,11 @@
     {
       "kind": "call",
       "source": "tropoi.temporal.substrate.BackwardEulerSubstrate.step",
+      "target": "tropoi.temporal.substrate_native.is_host_scalar"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.temporal.substrate.BackwardEulerSubstrate.step",
       "target": "tropoi.temporal.substrate_native.run_step"
     },
     {
@@ -12269,6 +12274,11 @@
       "kind": "call",
       "source": "tropoi.temporal.substrate_native._step_scalars",
       "target": "tropoi.temporal.substrate_native.scalars"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.temporal.substrate_native.column_input",
+      "target": "tropoi.temporal.substrate_native.is_host_scalar"
     },
     {
       "kind": "call",
@@ -27885,6 +27895,13 @@
       "kind": "function",
       "module": "tropoi.temporal.substrate_native",
       "qualname": "host_library",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.temporal.substrate_native.is_host_scalar",
+      "kind": "function",
+      "module": "tropoi.temporal.substrate_native",
+      "qualname": "is_host_scalar",
       "type": "function"
     },
     {
