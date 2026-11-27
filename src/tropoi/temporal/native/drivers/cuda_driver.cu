@@ -1,6 +1,6 @@
 // CUDA execution driver of the substrate step: one thread per column.
-// Compiled at run time by NVRTC through CuPy (CuPy's default flags), with the
-// template specialization chosen by name expression, for example
+// Compiled at run time by NVRTC through CuPy (CuPy's default flags), for the
+// exact specialization, for example
 //   substrate_step<51, pt::StaticLaws<pt::Piecewise<pt::Poly<5>, pt::SatExp>, ...>>
 //
 // A forcing input is (pointer, stride, value): stride < 0 means the scalar
@@ -13,21 +13,33 @@
 #define PT_INPUT(name) const double *name##_p, const long long name##_stride, const double name##_v
 #define PT_COLUMN(name) pt::ColumnInput{name##_stride < 0 ? nullptr : name##_p, name##_stride, name##_v}
 
+#define PT_STEP_PARAMS                                                                     \
+    const int L, const int n, const int strata, const double *th_old, const double *ths_old, \
+        PT_INPUT(sw), PT_INPUT(lw), PT_INPUT(f0), PT_INPUT(dflux), PT_INPUT(fref),           \
+        const int has_fref, PT_INPUT(bottom), const double *source, const int has_source,    \
+        const long long source_row, const long long source_col, const double *rho,           \
+        const double *kc, const double *chi, const double *dz, const double *half,           \
+        const int *stratum, const double *law_params, const double *sd,                      \
+        const int max_iterations, double *th_out, double *ths_out, int *iterations,          \
+        int *failed, int *invalid, double *ratio, double *rep_storage, double *rep_r,        \
+        double *rep_tau, double *rep_rs, double *rep_taus, double *rep_qs,                   \
+        double *rep_emitted, double *rep_absorbed, double *extent, int *summary
+#define PT_ARG(name) name##_p, name##_stride, name##_v
+#define PT_STEP_ARGS                                                                          \
+    L, n, strata, th_old, ths_old, PT_ARG(sw), PT_ARG(lw), PT_ARG(f0), PT_ARG(dflux),         \
+        PT_ARG(fref), has_fref, PT_ARG(bottom), source, has_source, source_row, source_col,  \
+        rho, kc, chi, dz, half, stratum, law_params, sd, max_iterations, th_out, ths_out,    \
+        iterations, failed, invalid, ratio, rep_storage, rep_r, rep_tau, rep_rs, rep_taus,   \
+        rep_qs, rep_emitted, rep_absorbed, extent, summary
+
+// The step of column j = blockIdx.x * blockDim.x + threadIdx.x. The kernel is
+// the extern "C" entry that substrate_native.py appends for the exact
+// specialization, for example
+//   extern "C" __global__ void pt_substrate_step(PT_STEP_PARAMS) {
+//       substrate_step<51, pt::StaticLaws<...>>(PT_STEP_ARGS); }
+// (a plain entry, so that CuPy caches the compiled module on disk).
 template <int LAYER_CAP, class Laws>
-__global__ void substrate_step(const int L, const int n, const int strata, const double* th_old,
-                               const double* ths_old, PT_INPUT(sw), PT_INPUT(lw), PT_INPUT(f0),
-                               PT_INPUT(dflux), PT_INPUT(fref), const int has_fref,
-                               PT_INPUT(bottom), const double* source, const int has_source,
-                               const long long source_row, const long long source_col,
-                               const double* rho, const double* kc, const double* chi,
-                               const double* dz, const double* half, const int* stratum,
-                               const double* law_params, const double* sd,
-                               const int max_iterations, double* th_out, double* ths_out,
-                               int* iterations, int* failed, int* invalid, double* ratio,
-                               double* rep_storage, double* rep_r, double* rep_tau,
-                               double* rep_rs, double* rep_taus, double* rep_qs,
-                               double* rep_emitted, double* rep_absorbed, double* extent,
-                               int* summary) {
+__device__ __forceinline__ void substrate_step(PT_STEP_PARAMS) {
     const int j = blockIdx.x * blockDim.x + threadIdx.x;
     if (j >= n) return;
     const pt::StepScalars s{sd[0], sd[1], sd[2], sd[3], sd[4], sd[5], sd[6], sd[7], sd[8]};

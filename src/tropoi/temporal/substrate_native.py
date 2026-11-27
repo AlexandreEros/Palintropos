@@ -182,6 +182,8 @@ def _check_host_capacity(sub, lib, strata, depth, poly):
 # -- GPU module ---------------------------------------------------------------------------
 
 _KERNELS: dict = {}
+#: the kernel's entry point
+ENTRY = "pt_substrate_step"
 _DIGESTS: dict = {}
 
 
@@ -200,12 +202,17 @@ def _device_kernel(sub):
     name = f"substrate_step<{sub.layers}, {laws}>"
     key = (name, _digest(build_identity.DEVICE_OPTIONS))
     if key not in _KERNELS:
+        # A plain extern "C" entry for the specialization, not a name
+        # expression: CuPy does not cache modules compiled with name
+        # expressions on disk. The cache key is this source (with the digest
+        # of every header) and the options.
         code = (f"// pt sources {key[1]}\n"
-                + (build_identity.DRIVERS / "cuda_driver.cu").read_text())
+                + (build_identity.DRIVERS / "cuda_driver.cu").read_text()
+                + f'\nextern "C" __global__ void {ENTRY}(PT_STEP_PARAMS) {{\n'
+                  f"    {name}(PT_STEP_ARGS);\n}}\n")
         options = tuple(f"-I{d}" for d in (*build_identity.INCLUDE_DIRS, build_identity.DRIVERS))
-        module = cp.RawModule(code=code, options=options + build_identity.DEVICE_OPTIONS,
-                              name_expressions=[name])
-        _KERNELS[key] = module.get_function(name)
+        module = cp.RawModule(code=code, options=options + build_identity.DEVICE_OPTIONS)
+        _KERNELS[key] = module.get_function(ENTRY)
     return _KERNELS[key], name
 
 
