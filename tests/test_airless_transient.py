@@ -261,9 +261,36 @@ def test_standalone_replay_end_state_includes_the_skin(tmp_path):
     run = AirlessRun(_short_ceres(), tmp_path / "run", allow_dirty=True, log=lambda s: None)
     run.run_transient(25)
     path = tmp_path / "run" / "retained" / "state.npz"
-    z = dict(np.load(path))
+    with np.load(path) as f:
+        z = dict(f)
     z["end_surface_anomaly"] = z["end_surface_anomaly"] + 1e-6
     np.savez(path, **z)
     assert gg([str(tmp_path / "run"), "--columns", "0"]) == 1
     report = json.loads((tmp_path / "run" / "gg.json").read_text())
     assert report["compared"] == ["end_state"] and not report["pass"]
+
+
+@pytest.mark.parametrize("key", ["albedo", "cycle_s"])
+def test_config_refuses_integers_too_large_for_a_float(key):
+    """math.isfinite(10**400) raises OverflowError; it must surface as a
+    configuration error."""
+    doc = json.loads(CERES.read_text())
+    with pytest.raises(ValueError, match="not an airless configuration"):
+        config_from_document({**doc["config"], key: 10 ** 400})
+
+
+def test_standalone_replay_with_a_different_sample_count_fails_with_a_report(tmp_path):
+    """A replay that cannot reproduce the run's sample layout is a failed
+    replay with a written report, not a traceback."""
+    from tools.planet_one.global_check import main as gg
+    run = AirlessRun(_short_ceres(), tmp_path / "run", allow_dirty=True, log=lambda s: None)
+    run.run_transient(24)
+    path = tmp_path / "run" / "retained" / "state.npz"
+    with np.load(path) as f:
+        z = dict(f)
+    z["sample_every"] = np.asarray([4, 4], dtype=np.int64)       # the run sampled every 2
+    np.savez(path, **z)
+    assert gg([str(tmp_path / "run"), "--columns", "0"]) == 1
+    report = json.loads((tmp_path / "run" / "gg.json").read_text())
+    assert not report["pass"]
+    assert "replay produced" in report["not_compared"]["surface_fields"]

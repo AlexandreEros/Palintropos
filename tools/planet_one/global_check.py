@@ -76,8 +76,12 @@ def main(argv=None) -> int:
     # A segment can hold no samples of a kind (a transient tail shorter than
     # the cadence). Such a quantity is reported as not compared (None), never
     # as a zero difference, and the verdict rests only on what was compared.
-    diffs = {"surface_fields": _max_abs_diff(s_rep, s_glob),
-             "profiles": _max_abs_diff(p_rep, p_glob),
+    shape_errors = {k: f"replay produced {a.shape}, the run holds {b.shape}"
+                    for k, a, b in (("surface_fields", s_rep, s_glob), ("profiles", p_rep, p_glob))
+                    if a.shape != b.shape}
+    diffs = {"surface_fields": None if "surface_fields" in shape_errors
+             else _max_abs_diff(s_rep, s_glob),
+             "profiles": None if "profiles" in shape_errors else _max_abs_diff(p_rep, p_glob),
              # cells and the diagnosed skin both: a sample-free segment is judged on these alone
              "end_state": max(
                  float(np.max(np.abs(res["anomaly"] - state["end_anomaly"][:, cols]))),
@@ -93,20 +97,18 @@ def main(argv=None) -> int:
               "max_abs_profile_diff_K": diffs["profiles"],
               "max_abs_end_state_diff_K": diffs["end_state"], "bound_K": bound,
               "compared": compared,
-              "not_compared": {k: "no samples in the retained segment"
+              "not_compared": {k: shape_errors.get(k, "no samples in the retained segment")
                                for k, v in diffs.items() if v is None},
-              "pass": all(diffs[k] <= bound for k in compared)}
+              # a sample-count mismatch is a failed replay, never a skipped comparison
+              "pass": not shape_errors and all(diffs[k] <= bound for k in compared)}
     (run / "gg.json").write_text(json.dumps(report, indent=1))
     print(json.dumps(report, indent=1))
     return 0 if report["pass"] else 1
 
 
 def _max_abs_diff(replayed, retained):
-    """max |replayed - retained|, or None when there is nothing to compare.
-    The two must have the same shape (same sample count) to be compared."""
-    if replayed.shape != retained.shape:
-        raise ValueError(f"replay produced {replayed.shape} samples, the run holds "
-                         f"{retained.shape}")
+    """max |replayed - retained| of two same-shaped arrays, or None when there
+    is nothing to compare."""
     if replayed.size == 0:
         return None
     return float(np.max(np.abs(replayed - retained)))
