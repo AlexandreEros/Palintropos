@@ -16,7 +16,14 @@ CUDA; the [architecture](../../../docs/ARCHITECTURE.md#cpu-and-gpu-requirements)
 defines the boundary. Detailed examples live with their
 [owning subsystems](../README.md), rather than in duplicate CLI guides.
 
-`tropoi view CAPSULE [CAPSULE ...]` opens the local offline globe and map viewer.
+`tropoi run airless` runs an airless-body experiment of independent conductive
+columns. It takes the options of `python -m tropoi.run.airless run`, which
+stays available unchanged, plus `--show-config` in place of its
+`show-config` command.
+
+`tropoi view RUN_DIR [RUN_DIR ...]` opens the local offline viewer. The same
+page explores atmospheric capsules and airless archives.
 Pass the intended capsule directories explicitly. See the
 [interactive viewer guide](../representation/visual/README.md#interactive-capsule-viewer)
-for fields, vertical coordinates, backend selection and PNG export.
+for quantities, the four-coordinate explorer, vertical coordinates, backend
+selection and PNG export.

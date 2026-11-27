@@ -304,7 +304,12 @@ export class Explorer {
     const linked = links.getMap()?.quantity;
     c.quantity.value = keys.includes(linked) ? linked : keys.includes("temperature") ? "temperature" : keys[0];
     this.buildRows();
-    c.quantity.onchange = () => { this.applyPreset(this.firstPreset()); this.update(); };
+    // A new quantity keeps the roles when it supports them.
+    c.quantity.onchange = () => {
+      const product = this.product();
+      this.applyPreset(product && product in this.quantity.products ? product : this.firstPreset());
+      this.update();
+    };
     c.preset.onchange = () => { if (c.preset.value) { this.applyPreset(c.preset.value); this.update(); } };
     c.snap.onchange = () => this.update();
     c["range-mode"].onchange = () => {
@@ -320,7 +325,8 @@ export class Explorer {
     c.plot.addEventListener("pointerleave", () => { c.readout.textContent = ""; });
     c.plot.addEventListener("click", e => this.click(e));
     new ResizeObserver(() => { if (this.data && this.node.clientWidth !== this.width) this.draw(); }).observe(node);
-    this.applyPreset(this.firstPreset());
+    const requested = new URLSearchParams(location.search).get("product");
+    this.applyPreset(requested && requested in this.quantity.products ? requested : this.firstPreset());
     node.hidden = false;
   }
 
@@ -466,7 +472,10 @@ export class Explorer {
       if (select.dataset.axis !== this.timeAxis()) {
         select.replaceChildren(...values.map((s, i) => option(i, this.links.timeText(this.timeAxis(), i))));
         select.dataset.axis = this.timeAxis();
-        select.value = select === t.last ? String(values.length - 1) : "0";
+        // Atmospheric histories synthesize a column per saved state: default to the last 60.
+        const span = this.quantity.vertical?.domain === "atmosphere" ? 60 : values.length;
+        select.value = select === t.last ? String(values.length - 1) :
+          select === t.first ? String(Math.max(0, values.length - span)) : "0";
       } else select.value = old;
     };
     [t.index, t.first, t.last].forEach(fill);
@@ -503,7 +512,7 @@ export class Explorer {
           numberText(l[rep]) + " m" + (l.kind === "surface" ? " · diagnosed skin" : "")))));
       const linked = this.links.getLevel?.();
       v.level.value = q.vertical.levels.some(l => String(l.index) === keep) ? keep :
-        String(linked ?? q.vertical.levels[q.vertical.levels.length - 1].index);
+        String(linked ?? q.vertical.levels[q.vertical.domain === "substrate" ? 0 : q.vertical.levels.length - 1].index);
     }
     if (fixed && !discrete && v.value.value === "") v.value.value = rep === "sigma" ? "0.5" : rep === "pressure" ? "50000" : "1000";
   }
@@ -517,7 +526,8 @@ export class Explorer {
       return {error: this.explorer.products[product].label + " is not available for " + q.presentation.name.toLowerCase() +
         (reason ? ": " + reason : ".")};
     }
-    const sel = {quantity: this.c.quantity.value, options: {snap: this.c.snap.checked}};
+    // Snapping to a native node is offered only on Gaussian grids; elsewhere the point is exact.
+    const sel = {quantity: this.c.quantity.value, options: {snap: !this.c["snap-wrap"].hidden && this.c.snap.checked}};
     for (const name of ["longitude", "latitude"]) {
       const r = this.rows[name], role = r.role.value;
       sel[name] = {role};

@@ -9,7 +9,8 @@ read here without importing it:
   ``cycle_s`` and ``cycle_steps``;
 * ``grid.npz``: ``lat_deg``, ``lon_deg`` and ``weights`` per column,
   ``interfaces`` and ``centres`` (depth, m, positive downward) and, in
-  archives written after the distinction was made, ``column_kind``;
+  archives written after the distinction was made, ``column_kind``
+  (``global`` or ``diagnostic``);
 * ``cycles.json``: one record per cycle or transient segment (``cycle``,
   ``steps``, ``dt_s`` and, for transients, ``first_step``);
 * tier-2 directories ``cycles/cycle-KKKK`` and ``retained``, each with
@@ -110,13 +111,17 @@ class AirlessArchive:
             self.interfaces = np.asarray(grid["interfaces"], dtype=float)
             self.centres = np.asarray(grid["centres"], dtype=float)
             stored_kind = str(grid["column_kind"]) if "column_kind" in grid else None
+        # The grid family is configured; grid.npz records (in newer archives)
+        # whether it is a global discretization or a diagnostic collection.
         self.kind = self.config["columns"]["kind"]
-        if stored_kind is not None and stored_kind != self.kind:
-            raise ValueError(f"grid.npz column_kind {stored_kind!r} disagrees with the "
-                             f"configured {self.kind!r}")
-        self.kind_source = "grid.npz:column_kind" if stored_kind else "config.json:columns.kind"
         if self.kind not in (*GLOBAL_KINDS, "points"):
             raise ValueError(f"Unknown column kind {self.kind!r}")
+        expected = "diagnostic" if self.kind == "points" else "global"
+        if stored_kind is not None and stored_kind != expected:
+            raise ValueError(f"grid.npz column_kind {stored_kind!r} disagrees with the "
+                             f"configured {self.kind!r} columns")
+        self.kind_source = ("config.json:columns.kind, confirmed by grid.npz:column_kind" if stored_kind
+                            else "config.json:columns.kind")
         n = self.lat.size
         if self.lat.shape != (n,) or self.lon.shape != (n,) or n == 0:
             raise ValueError("grid.npz coordinates must be one value per column")

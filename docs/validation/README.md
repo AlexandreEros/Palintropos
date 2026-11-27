@@ -21,6 +21,7 @@ implementation paths or fixed timesteps as current API guidance.
 | [Derived surfaces](derived_surfaces_2026-11-08/README.md) | Geopotential-height/sigma surfaces and vorticity/divergence measurements |
 | [Substrate consolidation audit](CONSOLIDATION-AUDIT.md) | T4 substrate baseline, kernel census, compiled-Thomas and device-resident Newton feasibility (bitwise), ownership audit and plan; [evidence](consolidation-evidence/) |
 | [Atmospheric T4 baseline](atmosphere-baseline/README.md) | The complete primitive-equation step by component after the substrate consolidation; the D3 boundary-layer solve study; proposed native-migration priorities |
+| [Viewer 3 selection model](viewer3/README.md) | Byte-identical maps and exactly equal columns, sections and zonal means against Viewer 2 on four atmospheric archives; airless archives read at native levels with verified sample times, cadences and bounded memory |
 
 The adjacent Williamson artifact directories retain machine-readable
 receipts and committed smoke evidence. Most long-run raw data is local or

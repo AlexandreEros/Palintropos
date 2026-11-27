@@ -255,9 +255,13 @@ class _Handler(BaseHTTPRequestHandler):
             if not 0 <= run < len(session.roots):
                 raise ValueError("Unknown capsule")
             entry = parts[3] or "index.html"
-            query = parse_qs(url.query, strict_parsing=True, max_num_fields=1) if url.query else {}
-            if set(query) - {"q"} or any(len(values) != 1 for values in query.values()):
-                raise ValueError("The only query parameter is one selection, q")
+            # The page carries its own state (time, cursor, preset); a selection
+            # request carries exactly one parameter, q.
+            query = parse_qs(url.query, strict_parsing=True, max_num_fields=6) if url.query else {}
+            if any(len(values) != 1 for values in query.values()):
+                raise ValueError("Repeated query parameter")
+            if entry == "select" and set(query) != {"q"}:
+                raise ValueError("The only query parameter of a selection is q")
             mime = "application/json"
             if entry == "manifest":
                 data = _json(session.manifests[run])

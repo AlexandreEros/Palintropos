@@ -1,4 +1,8 @@
-"""Ben 2 investigations through the actual Viewer 2 page in network-isolated Chromium."""
+"""The explorer through the actual viewer page in network-isolated Chromium.
+
+Ported from the Vertical-structure panel's tests: the same archives and the
+same scientific assertions, now made through the four-coordinate explorer.
+"""
 import json
 import threading
 from pathlib import Path
@@ -13,13 +17,14 @@ from test_viewer_local_browser import set_control, until
 ROOT = Path(__file__).resolve().parents[1]
 STEM = "runs/dev-thai-ben2-ck-heated-T21L40-f44c039-layer-linear-dt600-"
 A, B30, BEXT = (ROOT / (STEM + s) for s in ("30d", "spongeB-120d", "spongeB-120d-from-d030"))
-READY = ('document.querySelector(\'[data-id="png"]\')?.disabled === false && '
-         'document.querySelector(\'[data-s="png"]\')?.disabled === false && '
-         'document.querySelector(\'[data-s="status"]\')?.textContent === ""')
+EXPLORED = ('document.querySelector(\'[data-e="png"]\')?.disabled === false && '
+            'document.querySelector(\'[data-e="status"]\')?.textContent === ""')
+READY = 'document.querySelector(\'[data-id="png"]\')?.disabled === false && ' + EXPLORED
+LOADED = "JSON.parse(viewer.explorer.loaded || 'null')"
 
 
-def structure(page, key, value):
-    selector = json.dumps(f'[data-s="{key}"]')
+def explore(page, key, value):
+    selector = json.dumps(f'[data-e="{key}"]')
     page.eval(f"(() => {{const el=document.querySelector({selector}); el.value={json.dumps(str(value))};"
               "el.dispatchEvent(new Event('change',{bubbles:true}));})()")
 
@@ -42,7 +47,7 @@ def browser():
 
 def serve(paths):
     for path in paths:
-        if not path.is_dir():
+        if not Path(path).is_dir():
             pytest.skip(f"Missing archive: {path}")
     server = ViewerServer(ViewerSession(paths))
     thread = threading.Thread(target=server.serve_forever, daemon=True)
@@ -62,12 +67,14 @@ def test_day30_nightside_surface_temperature(browser):
             assert page.eval("viewer.cursor.lon") == 0
             click_map(page, 0, 179)
             until(page, "Math.abs(viewer.cursor.lat) < 2 && Math.abs(viewer.cursor.lon - 180) < 2 && " + READY)
-            data = page.eval("viewer.structure.data")
+            data = page.eval("viewer.explorer.data")
             slab = np.load(A / "states/surface-d00030.npy").reshape(32, 64)
-            i = int(np.abs(np.degrees(np.arcsin(np.polynomial.legendre.leggauss(32)[0][::-1])) - data["latitude"]).argmin())
-            assert data["surface_temperature"]["value"] == slab[i, round(data["longitude"] / 5.625) % 64]
-            notes = page.eval("document.querySelector('[data-s=notes]').innerText")
-            assert "is not a surface temperature" in notes and "Slab surface temperature" in notes
+            lat, lon = data["location"]["latitude"], data["location"]["longitude"]
+            i = int(np.abs(np.degrees(np.arcsin(np.polynomial.legendre.leggauss(32)[0][::-1])) - lat).argmin())
+            surface = [m for m in data["markers"] if m["kind"] == "surface"][0]
+            assert surface["value"] == slab[i, round(lon / 5.625) % 64]
+            notes = page.eval("document.querySelector('[data-e=notes]').innerText")
+            assert "not a surface temperature" in notes and "Slab surface temperature" in notes
             # The automatic range spans the dayside; a fixed range resolves the nightside.
             set_control(page, "range-mode", "fixed")
             low, high = (float(page.eval(f"document.querySelector('[data-id=range-{k}]').value")) for k in ("min", "max"))
@@ -90,17 +97,19 @@ def test_cold_event_column_section_and_level_link(browser):
             page.call("Page.navigate", url=server.url + "?time=54&lat=-19.4&lon=281&product=column")
             until(page, READY)
             assert page.eval("document.querySelector('[data-id=time-label]').textContent").startswith("Day 85 ")
-            row = page.eval("document.querySelector('[data-s=table]').tBodies[0].rows[1].innerText").split("\t")
-            assert row[0] == "2" and abs(float(row[4]) - 123.28) < 0.01 and 5 < float(row[2]) < 5.3
+            row = page.eval("document.querySelector('[data-e=table]').tBodies[0].rows[1].innerText").split("\t")
+            assert row[0] == "2" and abs(float(row[5]) - 123.28) < 0.01 and 5 < float(row[2]) < 5.3
             # Clicking the level in the column selects it on the map.
-            page.eval("document.querySelector('[data-s=table]').tBodies[0].rows[1].click()")
+            page.eval("document.querySelector('[data-e=table]').tBodies[0].rows[1].click()")
             until(page, "document.querySelector('[data-id=level]').value === '1' && " + READY)
             assert page.eval("viewer.panels[0].view.range[0]") > 122.0
-            for product in ("meridional", "zonal", "zonal_mean", "streamfunction"):
-                structure(page, "product", product)
-                until(page, READY)
+            for preset in ("meridional_section", "zonal_section", "zonal_mean"):
+                explore(page, "preset", preset)
+                until(page, f"{LOADED}?.latitude && " + EXPLORED)
+            explore(page, "quantity", "mass_streamfunction")
+            until(page, "viewer.explorer.data?.quantity === 'mass_streamfunction' && " + EXPLORED)
             # A click in the streamfunction section moves the cursor latitude only.
-            page.eval("""(() => {const s = viewer.structure, L = s.layout, r = s.c.plot.getBoundingClientRect();
+            page.eval("""(() => {const s = viewer.explorer, L = s.layout, r = s.c.plot.getBoundingClientRect();
                 const x = L.X(30), y = L.box.y + L.box.h / 2;
                 s.c.plot.dispatchEvent(new MouseEvent('click', {clientX: r.left + x * r.width / L.width,
                     clientY: r.top + y * r.height / L.height, bubbles: true}));})()""")
@@ -127,14 +136,14 @@ def test_equatorial_jets_days_30_to_120_across_two_directories(browser):
                 for day in days:
                     index = day - (1 if run == 0 else 31)
                     set_control(page, "time", index, "input")
-                    until(page, f"viewer.structure.query?.first === {index} && " + READY)
-                    structure(page, "field", "u")
-                    until(page, READY)
-                    title = page.eval("viewer.structure.spec.title.join(' | ')")
+                    until(page, f"{LOADED}?.time.index === {index} && " + EXPLORED)
+                    explore(page, "quantity", "u")
+                    until(page, f"{LOADED}?.quantity === 'u' && {LOADED}?.longitude.role === 'reduce' && " + EXPLORED)
+                    title = page.eval("viewer.explorer.spec.title.join(' | ')")
                     assert f"Day {day} " in title and "config 8ad59ee8124c" in title
                     assert ("from-d030" in title) == bool(run)
-                    data = page.eval("viewer.structure.data")
-                    u, lat = np.array(data["u"]), np.array(data["lat"])
+                    data = page.eval("viewer.explorer.data")
+                    u, lat = np.array(data["values"]), np.array(data["x"]["values"])
                     native = u[:, np.abs(lat) < 3].mean(axis=1)
                     reference = np.array(ext["daily"]["eq_u"][str(day)])
                     peaks[day] = native.max()
@@ -160,11 +169,11 @@ def test_phone_width_has_no_horizontal_scroll(browser):
 
 
 def section_state(page):
-    return page.eval("""(() => {const s = viewer.structure, c = s.c;
+    return page.eval("""(() => {const s = viewer.explorer, c = s.c;
         return {mode: c["range-mode"].value, min: c["range-min"].value, max: c["range-max"].value,
                 hidden: c["range-fieldset"].hidden, inputs: c["range-wrap"].hidden ? null : true,
-                drawn: s.layout?.range ?? null, spec: s.spec?.range ?? null, time: s.query?.time,
-                title: s.spec?.title.join(" | ")};})()""")
+                drawn: s.layout?.range ?? null, spec: s.spec?.range ?? null,
+                time: JSON.parse(s.loaded || "null")?.time.index, title: s.spec?.title.join(" | ")};})()""")
 
 
 def export_top_colour_rows(page):
@@ -177,7 +186,7 @@ def export_top_colour_rows(page):
         const click = HTMLAnchorElement.prototype.click;
         HTMLAnchorElement.prototype.click = function () { name = this.download; };
         try {
-          viewer.structure.c.png.click();
+          viewer.explorer.c.png.click();
           for (let i = 0; i < 100 && !name; i++) await new Promise(r => setTimeout(r, 50));
         } finally {
           HTMLCanvasElement.prototype.toBlob = blob;
@@ -195,24 +204,24 @@ def test_section_fixed_colour_range_persists_by_quantity_and_exports(browser):
     server, thread = serve([A])
     try:
         with OfflinePage(browser, width=1400, height=1800, loopback_port=server.server_port) as page:
-            page.call("Page.navigate", url=server.url + "?time=29&lat=-40&lon=90&product=meridional")
+            page.call("Page.navigate", url=server.url + "?time=29&lat=-40&lon=90&product=meridional_section")
             until(page, READY)
-            structure(page, "field", "temperature")
+            explore(page, "quantity", "temperature")
             until(page, READY)
             state = section_state(page)
             assert state["mode"] == "auto" and not state["hidden"] and state["spec"] is None
             auto = state["drawn"]
             map_range = page.eval("viewer.panels[0].view.range")
             # Choosing a fixed range starts from the automatic one.
-            structure(page, "range-mode", "fixed")
+            explore(page, "range-mode", "fixed")
             state = section_state(page)
             assert state["inputs"] and [float(state["min"]), float(state["max"])] == [
                 float(f"{auto[0]:.6g}"), float(f"{auto[1]:.6g}")]
-            structure(page, "range-min", 150)
-            structure(page, "range-max", 300)
+            explore(page, "range-min", 150)
+            explore(page, "range-max", 300)
             state = section_state(page)
             assert state["drawn"] == [150, 300] and state["spec"] == [150, 300]
-            notes = page.eval("document.querySelector('[data-s=notes]').innerText")
+            notes = page.eval("document.querySelector('[data-e=notes]').innerText")
             assert "Fixed colour range 150 to 300" in notes
             # The map keeps its own automatic range.
             assert page.eval("document.querySelector('[data-id=range-mode]').value") == "auto"
@@ -220,36 +229,40 @@ def test_section_fixed_colour_range_persists_by_quantity_and_exports(browser):
             assert page.eval("viewer.panels[0].view.range") == map_range
             # Another saved time keeps the fixed range for the same quantity.
             set_control(page, "time", 20, "input")
-            until(page, "viewer.structure.query?.time === 20 && " + READY)
+            until(page, f"{LOADED}?.time.index === 20 && " + READY)
             state = section_state(page)
             assert "Day 21 " in state["title"]
             assert (state["mode"], state["min"], state["max"]) == ("fixed", "150", "300")
             assert state["drawn"] == [150, 300]
             # Other quantities have their own setting; returning restores this one.
-            structure(page, "field", "u")
-            until(page, READY)
+            explore(page, "quantity", "u")
+            until(page, f"{LOADED}?.quantity === 'u' && " + READY)
             state = section_state(page)
             assert state["mode"] == "auto" and state["spec"] is None and state["inputs"] is None
             assert state["drawn"][0] == -state["drawn"][1]
-            structure(page, "field", "temperature")
-            until(page, READY)
+            explore(page, "quantity", "temperature")
+            until(page, f"{LOADED}?.quantity === 'temperature' && " + READY)
             assert section_state(page)["drawn"] == [150, 300]
             # The same quantity keeps its range in the zonal section; ψ has its own; columns have none.
-            structure(page, "product", "zonal")
-            until(page, READY)
+            explore(page, "preset", "zonal_section")
+            until(page, f"{LOADED}?.longitude.role === 'x' && " + READY)
             assert section_state(page)["drawn"] == [150, 300]
-            structure(page, "product", "streamfunction")
-            until(page, READY)
+            explore(page, "preset", "zonal_mean")
+            until(page, f"{LOADED}?.longitude.role === 'reduce' && " + READY)
+            explore(page, "quantity", "mass_streamfunction")
+            until(page, f"{LOADED}?.quantity === 'mass_streamfunction' && " + READY)
             assert section_state(page)["spec"] is None
-            structure(page, "product", "column")
-            until(page, READY)
+            explore(page, "quantity", "temperature")
+            until(page, f"{LOADED}?.quantity === 'temperature' && " + READY)
+            explore(page, "preset", "column")
+            until(page, f"{LOADED}?.vertical.role === 'y' && {LOADED}?.latitude.role === 'fixed' && " + READY)
             assert section_state(page)["hidden"]
-            structure(page, "product", "meridional")
-            until(page, READY)
+            explore(page, "preset", "meridional_section")
+            until(page, f"{LOADED}?.latitude.role === 'x' && " + READY)
             # An invalid range falls back to automatic and is flagged.
-            structure(page, "range-max", 100)
+            explore(page, "range-max", 100)
             assert section_state(page)["spec"] is None
-            assert not page.eval("document.querySelector('[data-s=range-max]').checkValidity()")
+            assert not page.eval("document.querySelector('[data-e=range-max]').checkValidity()")
             # A fixed map range leaves the section unchanged.
             set_control(page, "range-mode", "fixed")
             set_control(page, "range-min", 200)
@@ -257,13 +270,13 @@ def test_section_fixed_colour_range_persists_by_quantity_and_exports(browser):
             until(page, "viewer.panels[0].view.range[0] === 200")
             assert section_state(page)["spec"] is None
             # PNG export uses the section range: [0, 1] K puts every cell at the top colour.
-            structure(page, "range-min", 0)
-            structure(page, "range-max", 1)
+            explore(page, "range-min", 0)
+            explore(page, "range-max", 1)
             fixed = export_top_colour_rows(page)
-            structure(page, "range-mode", "auto")
+            explore(page, "range-mode", "auto")
             automatic = export_top_colour_rows(page)
             assert fixed["width"] == automatic["width"] == 1650
-            assert fixed["name"].endswith("-meridional-temperature-t20.png")
+            assert fixed["name"].endswith("-meridional_section-temperature-t20.png")
             assert fixed["rows"] > 500 > 100 > automatic["rows"]
             assert not page.exceptions, page.exceptions
     finally:
@@ -271,46 +284,42 @@ def test_section_fixed_colour_range_persists_by_quantity_and_exports(browser):
         thread.join()
 
 
-def test_pending_structure_request_never_draws_stale_data(browser, tmp_path):
-    """Changing the quantity while a zonal mean is in flight must not draw the old column as a mean."""
+def test_pending_request_never_draws_stale_data(browser):
+    """Changing the quantity while a zonal mean is in flight must not draw an old result as the new one."""
     from test_viewer_fields import MARS
     server, thread = serve([MARS])
     try:
         with OfflinePage(browser, width=1400, height=1800, loopback_port=server.server_port) as page:
             page.call("Page.navigate", url=server.url + "?time=8&product=column")
             until(page, READY)
-            assert page.eval("viewer.structure.spec.kind") == "profile"
-            # Hold zonal-mean responses until released.
+            assert page.eval("viewer.explorer.spec.kind") == "line"
+            # Hold zonal-mean responses (the longitude is reduced) until released.
             page.eval("""(() => {const fetch0 = window.fetch; window.held = [];
-                window.fetch = (url, options) => String(url).includes("kind=zonal_mean") ?
-                  new Promise(resolve => held.push(() => resolve(fetch0(url, options)))) : fetch0(url, options);})()""")
-            structure(page, "product", "zonal_mean")
+                window.fetch = (url, options) => decodeURIComponent(String(url)).includes('"reduce"') ?
+                  new Promise(resolve => held.push(() => resolve(fetch0(url, options).catch(e => {throw e;})))) :
+                  fetch0(url, options);})()""")
+            explore(page, "preset", "zonal_mean")
             until(page, "held.length === 1")
-            structure(page, "field", "u")       # same request: previously redrew the column as a mean
-            structure(page, "range-mode", "fixed")
-            assert page.eval("held.length") == 1
-            assert page.eval("viewer.structure.spec.kind") == "profile"
-            assert page.eval("viewer.structure.c.png.disabled")
+            explore(page, "quantity", "u")
+            until(page, "held.length === 2")
+            explore(page, "range-mode", "fixed")
+            assert page.eval("viewer.explorer.spec.kind") == "line"
+            assert page.eval("viewer.explorer.c.png.disabled")
             assert not page.exceptions, page.exceptions
-            page.eval("held.shift()()")
-            until(page, READY)
-            spec = page.eval("({kind: viewer.structure.spec.kind, label: viewer.structure.spec.label,"
-                             " lat: viewer.structure.data.lat.length})")
-            assert spec["kind"] == "section" and spec["label"].startswith("Zonal mean [u]") and spec["lat"] == 34
-            # Returning to the loaded column while a new mean is pending shows the column at once.
-            structure(page, "product", "column")
-            until(page, READY + " && viewer.structure.spec.kind === 'profile'")
-            structure(page, "product", "streamfunction")       # ψ is also served by kind=zonal_mean
-            until(page, "held.length === 1")
-            page.eval("held.shift()()")
-            until(page, "viewer.structure.spec.kind === 'section' && " + READY)
-            set_control(page, "time", 7, "input")
-            until(page, "held.length === 1")
-            structure(page, "product", "column")
-            until(page, "viewer.structure.query.kind === 'column' && viewer.structure.query.time === 7 && " + READY)
-            page.eval("held.shift()()")
+            page.eval("held.shift()()")                 # the superseded temperature mean
             page.eval("new Promise(resolve => setTimeout(resolve, 300))")
-            assert page.eval("viewer.structure.spec.kind") == "profile"
+            assert page.eval("viewer.explorer.spec.kind") == "line"
+            page.eval("held.shift()()")
+            until(page, "viewer.explorer.spec.kind === 'field' && " + READY)
+            spec = page.eval("({quantity: viewer.explorer.data.quantity, label: viewer.explorer.spec.label,"
+                             " lat: viewer.explorer.data.x.values.length})")
+            assert spec["quantity"] == "u" and spec["label"].startswith("Eastward wind") and spec["lat"] == 34
+            # Returning to the loaded column while a new mean is pending shows the column at once.
+            explore(page, "preset", "column")
+            until(page, READY + " && viewer.explorer.spec.kind === 'line'")
+            set_control(page, "time", 7, "input")
+            until(page, f"{LOADED}?.time.index === 7 && " + READY)
+            assert page.eval("viewer.explorer.spec.kind") == "line"
             assert not page.exceptions, page.exceptions
     finally:
         server.shutdown()
@@ -327,7 +336,7 @@ def test_flat_gravity_free_and_geodesic_capsules_open(browser, tmp_path):
             page.call("Page.navigate", url=server.url + "?time=8")
             until(page, 'document.querySelector(\'[data-id="png"]\')?.disabled === false')
             assert page.eval("document.querySelector('[data-id=field]').value") == "temperature"
-            assert page.eval("document.getElementById('structure').hidden")
+            assert page.eval("document.getElementById('explorer').hidden")
             coordinates = page.eval("[...document.querySelector('[data-id=coordinate]').options].map(o => o.value)")
             assert coordinates == ["native"]
             assert page.eval("document.querySelector('[data-id=opacity-wrap]').hidden")
@@ -337,11 +346,41 @@ def test_flat_gravity_free_and_geodesic_capsules_open(browser, tmp_path):
             page.eval('(() => {const el=document.getElementById("runs"); el.selectedIndex=1;'
                       'el.dispatchEvent(new Event("change"));})()')
             until(page, 'location.pathname.endsWith("/1/") && ' + READY)
-            assert page.eval("document.querySelector('[data-s=snap-wrap]').hidden")
-            assert page.eval("viewer.structure.query.snap") == 0
-            assert page.eval("viewer.structure.data.sampling") == "exact band-limited synthesis at the requested point"
-            products = page.eval("[...viewer.structure.c.product.options].map(o => o.value)")
-            assert products == ["column", "meridional", "zonal"]
+            assert page.eval("document.querySelector('[data-e=snap-wrap]').hidden")
+            assert page.eval(f"{LOADED}.options.snap") is False
+            assert page.eval("viewer.explorer.data.sampling") == "exact band-limited synthesis at the requested point"
+            products = page.eval("[...viewer.explorer.c.preset.options].filter(o => o.value && !o.disabled).map(o => o.value)")
+            assert products == ["map", "meridional_section", "zonal_section", "column", "time_series", "time_section"]
+            assert not page.exceptions, page.exceptions
+    finally:
+        server.shutdown()
+        thread.join()
+
+
+def test_airless_archive_in_the_same_application(browser, tmp_path):
+    """A columnar archive opens in the same page: a skin map, a column with the skin apart, time × depth."""
+    from test_viewer_airless import _run
+    root = _run(tmp_path / "latlon", {"kind": "latlon", "nlat": 6, "nlon": 12}, 30)
+    server, thread = serve([root])
+    try:
+        with OfflinePage(browser, width=1400, height=1800, loopback_port=server.server_port) as page:
+            page.call("Page.navigate", url=server.url + "?lat=10&lon=40")
+            until(page, READY)
+            assert page.eval("viewer.panels[0].key") == "temperature"
+            assert "diagnosed skin" in page.eval("document.querySelector('[data-id=level]').selectedOptions[0].text")
+            assert "Native cells" in page.eval("document.querySelector('[data-id=status]').textContent")
+            data = page.eval("viewer.explorer.data")
+            assert data["product"] == "column" and data["y"]["representation"] in ("depth", "height_above_surface")
+            assert [m["kind"] for m in data["markers"]] == ["surface"]
+            explore(page, "preset", "time_section")
+            until(page, f"{LOADED}?.time.role === 'x' && " + EXPLORED)
+            assert page.eval("viewer.explorer.spec.kind") == "field"
+            assert page.eval("viewer.explorer.layout.strip") > 0           # the skin strip, apart from the cells
+            explore(page, "preset", "map")
+            until(page, "document.querySelector('[data-e=status]').textContent.includes('globe')")
+            for preset, message in (("zonal_mean", "not available"),):
+                explore(page, "preset", preset)
+                until(page, f"document.querySelector('[data-e=status]').textContent.includes({json.dumps(message)})")
             assert not page.exceptions, page.exceptions
     finally:
         server.shutdown()
