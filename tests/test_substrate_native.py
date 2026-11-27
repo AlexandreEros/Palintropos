@@ -167,6 +167,7 @@ def test_host_capacity_and_law_limits_are_enforced_never_truncated():
 def test_a_stale_or_missing_library_is_refused(monkeypatch):
     substrate_native.host_library()                    # the real one loads
     monkeypatch.setattr(substrate_native, "_HOST", None)
+    monkeypatch.setattr(substrate_native, "_DIGESTS", {})
     monkeypatch.setattr(build_identity, "digest", lambda flags=None: "0" * 64)
     with pytest.raises(substrate_native.NativeLibraryError, match="other sources"):
         substrate_native.host_library()

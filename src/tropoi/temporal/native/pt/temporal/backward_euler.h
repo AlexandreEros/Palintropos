@@ -33,18 +33,16 @@ struct BackwardEulerColumn {
         double *r_s, *tau_s, *q_s, *emitted, *absorbed;  // skin
     };
 
-    PT_HD real evaluate(const real* x, bool jacobian, real* R, real* lo, real* di, real* up,
-                        const Report* out = nullptr) const {
+    // Residuals R (n) at x and the largest |r| / tolerance; with `out`, the
+    // converged evaluation's quantities for the step report.
+    PT_HD real residual(const real* x, real* R, const Report* out = nullptr) const {
         constexpr int LC = Physics::LAYER_CAP;
         const int L = ph.L;
         const real T_ref(SUBSTRATE_TREF);
-        real k[LC], F[LC + 1], cap[LC];
+        real k[LC], F[LC + 1];
         const real ths = x[0];
         const real Ts = T_ref + ths;
-        for (int i = 0; i < L; ++i) {
-            k[i] = ph.k(i, T_ref + x[i + 1]);
-            cap[i] = ph.heat_capacity(i);
-        }
+        for (int i = 0; i < L; ++i) k[i] = ph.k(i, T_ref + x[i + 1]);
         const real q_s = ph.skin_flux(Ts, T_ref + x[1], ths, x[1]);
         F[0] = q_s;
         for (int i = 0; i < L - 1; ++i)
@@ -54,7 +52,7 @@ struct BackwardEulerColumn {
         for (int i = 0; i < L; ++i) {
             const real dh = ph.enthalpy_difference(i, T_ref + x[i + 1], T_ref + th_old[i],
                                                    x[i + 1] - th_old[i]);
-            const real storage = storage_rate(cap[i], dh, dt);
+            const real storage = storage_rate(ph.heat_capacity(i), dh, dt);
             const real s = src(i);
             const real r = storage - (F[i] - F[i + 1]) - s;
             const real tau = ph.cell_tolerance(storage, F[i], F[i + 1], s);
@@ -73,36 +71,44 @@ struct BackwardEulerColumn {
             *out->r_s = rs.v; *out->tau_s = taus.v; *out->q_s = q_s.v;
             *out->emitted = emit.v; *out->absorbed = (absorbed_const + lin).v;
         }
-        if (jacobian) {
-            const real dqs = ph.dq_dts(Ts);
-            const real dq1 = ph.dq_dt1(k[0]);
-            di[0] = flux_derivative - ph.demitted_dts(Ts) - dqs;
-            up[0] = -dq1;
-            lo[0] = -dqs;
-            real dfb_prev(0.0);
-            for (int i = 0; i < L; ++i) {
-                const real T = T_ref + x[i + 1];
-                real d = cap[i] * ph.specific_heat(i, T) / dt;   // d(storage)/dT: the BE term
-                d = d + real(0.0) * T;
-                if (i == 0) d = d - dq1;
-                if (i < L - 1) {
-                    const real g = ph.face_conductance(i, k[i], k[i + 1]);
-                    const real drift = x[i + 1] - x[i + 2];
-                    const real dfa = ph.dface_upper(g, drift, i, ph.dk(i, T), k[i]);
-                    const real dfb = ph.dface_lower(g, drift, i, ph.dk(i + 1, T_ref + x[i + 2]),
-                                                    k[i + 1]);
-                    d = d + dfa;
-                    lo[i + 1] = -dfa;
-                    up[i + 1] = dfb;
-                    if (i > 0) d = d - dfb_prev;
-                    dfb_prev = dfb;
-                } else if (i > 0) {
-                    d = d - dfb_prev;
-                }
-                di[i + 1] = d;
-            }
-        }
         return ratio;
+    }
+
+    // The tridiagonal Jacobian of the residual at x.
+    PT_HD void jacobian(const real* x, real* lo, real* di, real* up) const {
+        constexpr int LC = Physics::LAYER_CAP;
+        const int L = ph.L;
+        const real T_ref(SUBSTRATE_TREF);
+        real k[LC];
+        for (int i = 0; i < L; ++i) k[i] = ph.k(i, T_ref + x[i + 1]);
+        const real Ts = T_ref + x[0];
+        const real dqs = ph.dq_dts(Ts);
+        const real dq1 = ph.dq_dt1(k[0]);
+        di[0] = flux_derivative - ph.demitted_dts(Ts) - dqs;
+        up[0] = -dq1;
+        lo[0] = -dqs;
+        real dfb_prev(0.0);
+        for (int i = 0; i < L; ++i) {
+            const real T = T_ref + x[i + 1];
+            real d = ph.heat_capacity(i) * ph.specific_heat(i, T) / dt;   // d(storage)/dT: BE
+            d = d + real(0.0) * T;
+            if (i == 0) d = d - dq1;
+            if (i < L - 1) {
+                const real g = ph.face_conductance(i, k[i], k[i + 1]);
+                const real drift = x[i + 1] - x[i + 2];
+                const real dfa = ph.dface_upper(g, drift, i, ph.dk(i, T), k[i]);
+                const real dfb = ph.dface_lower(g, drift, i, ph.dk(i + 1, T_ref + x[i + 2]),
+                                                k[i + 1]);
+                d = d + dfa;
+                lo[i + 1] = -dfa;
+                up[i + 1] = dfb;
+                if (i > 0) d = d - dfb_prev;
+                dfb_prev = dfb;
+            } else if (i > 0) {
+                d = d - dfb_prev;
+            }
+            di[i + 1] = d;
+        }
     }
 
     PT_HD real admissible_fraction(const real* x, const real* dx) const {

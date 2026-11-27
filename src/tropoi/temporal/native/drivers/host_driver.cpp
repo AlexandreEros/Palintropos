@@ -67,7 +67,8 @@ int pt_substrate_evaluate(const pt::ColumnArrays* a, const pt::StepScalars* s,
     pt::BackwardEulerColumn<HostSubstrate> be{ph, tho, a->source ? src : nullptr, pt::real(s->dt),
                                               pt::real(a->absorbed[0]), pt::real(a->dflux[0]),
                                               pt::real(a->fref[0]), pt::real(a->bottom[0])};
-    be.evaluate(x, true, r, lo, di, up);
+    be.residual(x, r);
+    be.jacobian(x, lo, di, up);
     for (int i = 0; i <= L; ++i) { R[i] = r[i].v; diag[i] = di[i].v; }
     for (int i = 0; i < L; ++i) { lower[i] = lo[i].v; upper[i] = up[i].v; }
     return 0;

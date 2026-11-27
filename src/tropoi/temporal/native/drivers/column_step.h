@@ -69,14 +69,14 @@ PT_HD void column_step(const Physics& ph, const ColumnArrays& a, const StepScala
     a.failed[j] = o.failed;
     a.ratio[j] = o.ratio.v;
     if (a.rep_storage) {
-        // the converged evaluation, re-evaluated (it is deterministic: the same
-        // arithmetic as Newton's last pass), written for the step report
+        // the converged evaluation, re-evaluated (deterministic: the same
+        // arithmetic as Newton's last residual), written for the step report
         real R[LC + 1];
         double storage[LC], r[LC], tau[LC];
         typename BackwardEulerColumn<Physics>::Report out{
             storage, r, tau, &a.rep_rs[j], &a.rep_taus[j], &a.rep_qs[j], &a.rep_emitted[j],
             &a.rep_absorbed[j]};
-        be.evaluate(x, false, R, nullptr, nullptr, nullptr, &out);
+        be.residual(x, R, &out);
         for (int i = 0; i < L; ++i) {
             a.rep_storage[(long)i * n + j] = storage[i];
             a.rep_r[(long)i * n + j] = r[i];

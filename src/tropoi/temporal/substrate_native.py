@@ -137,7 +137,7 @@ def host_library():
         getattr(lib, name).restype = res
     abi = lib.pt_substrate_abi_version()
     built = lib.pt_substrate_build_digest().decode()
-    expected = build_identity.digest(build_identity.HOST_FLAGS)
+    expected = _digest(build_identity.HOST_FLAGS)
     if abi != ABI_VERSION or built != expected:
         raise NativeLibraryError(
             f"the native CPU substrate library at {spec.origin} was built from other sources "
@@ -170,13 +170,23 @@ def _check_host_capacity(sub, lib, strata, depth, poly):
 # -- GPU module ---------------------------------------------------------------------------
 
 _KERNELS: dict = {}
+_DIGESTS: dict = {}
+
+
+def _digest(flags) -> str:
+    """The source digest, computed once per process (sources do not change
+    under a running process)."""
+    key = tuple(flags)
+    if key not in _DIGESTS:
+        _DIGESTS[key] = build_identity.digest(flags)
+    return _DIGESTS[key]
 
 
 def _device_kernel(sub):
     import cupy as cp
     laws, _, _, _, _ = specialization(sub)
     name = f"substrate_step<{sub.layers}, {laws}>"
-    key = (name, build_identity.digest(build_identity.DEVICE_OPTIONS))
+    key = (name, _digest(build_identity.DEVICE_OPTIONS))
     if key not in _KERNELS:
         code = (f"// pt sources {key[1]}\n"
                 + (build_identity.DRIVERS / "cuda_driver.cu").read_text())
@@ -185,6 +195,36 @@ def _device_kernel(sub):
                               name_expressions=[name])
         _KERNELS[key] = module.get_function(name)
     return _KERNELS[key], name
+
+
+def _prepared(sub, xp) -> dict:
+    """Per-substrate data of the native step on backend ``xp``, prepared once
+    (specialization, law and stratum data, materials, the kernel) and cached
+    on the substrate, so a step does no host work for them."""
+    cache = sub.__dict__.setdefault("_native", {})
+    key = xp.__name__
+    if key not in cache:
+        laws, strat, strata, depth, poly = specialization(sub)
+        rho, kc, chi = (xp.ascontiguousarray(v.ravel()) for v in sub.materials.on(xp))
+        dz, half = (xp.ascontiguousarray(v.ravel()) for v in sub._consts(xp))
+        prep = {"strata": strata, "depth": depth, "poly": poly, "rho": rho, "kc": kc,
+                "chi": chi, "dz": dz, "half": half,
+                "strat": xp.asarray(np.ascontiguousarray(strat)),
+                "params": xp.asarray(law_parameters(sub)), "scalars": {}}
+        if xp is np:
+            prep["lib"] = host_library()
+            _check_host_capacity(sub, prep["lib"], strata, depth, poly)
+        else:
+            prep["kernel"], _ = _device_kernel(sub)
+        cache[key] = prep
+    return cache[key]
+
+
+def _step_scalars(prep, sub, xp, dt):
+    """The step scalars for ``dt`` (cached: production steps share one dt)."""
+    if dt not in prep["scalars"]:
+        prep["scalars"] = {dt: (scalars(sub, dt) if xp is np else xp.asarray(scalars(sub, dt)))}
+    return prep["scalars"][dt]
 
 
 # -- one step -------------------------------------------------------------------------------
@@ -200,42 +240,38 @@ def run_step(sub, xp, th_old, ths_old, dt, absorbed, dflux, fref, bottom, source
     th_old, ths_old = f64(th_old), f64(ths_old)
     absorbed, dflux, fref, bottom = f64(absorbed), f64(dflux), f64(fref), f64(bottom)
     src = None if source is None else f64(source)
-    rho, kc, chi = (xp.ascontiguousarray(v.ravel()) for v in sub.materials.on(xp))
-    dz, half = (xp.ascontiguousarray(v.ravel()) for v in sub._consts(xp))
-    laws, strat, strata, depth, poly = specialization(sub)
+    prep = _prepared(sub, xp)
     out = {"th": xp.empty((L, n)), "ths": xp.empty(n),
            "iterations": xp.empty(n, dtype=xp.int32), "failed": xp.empty(n, dtype=xp.int32),
            "ratio": xp.empty(n), "storage": xp.empty((L, n)), "r": xp.empty((L, n)),
            "tau": xp.empty((L, n)), "r_s": xp.empty(n), "tau_s": xp.empty(n),
            "q_s": xp.empty(n), "emitted": xp.empty(n), "absorbed": xp.empty(n)}
-    params = law_parameters(sub)
-    sd = scalars(sub, dt)
+    sd = _step_scalars(prep, sub, xp, float(dt))
     if xp is np:
-        lib = host_library()
-        _check_host_capacity(sub, lib, strata, depth, poly)
-        keep = [th_old, ths_old, absorbed, dflux, fref, bottom, src, rho, kc, chi, dz, half,
-                np.ascontiguousarray(strat)]
+        lib = prep["lib"]
+        keep = [th_old, ths_old, absorbed, dflux, fref, bottom, src, prep["rho"], prep["kc"],
+                prep["chi"], prep["dz"], prep["half"], prep["strat"]]
         ptr = lambda a: None if a is None else a.ctypes.data                  # noqa: E731
         arrays = _ColumnArrays(L, n, *[ptr(a) for a in keep],
                                *[ptr(out[k]) for k in ("th", "ths", "iterations", "failed",
                                                        "ratio", "storage", "r", "tau", "r_s",
                                                        "tau_s", "q_s", "emitted", "absorbed")])
-        p = params.ctypes.data_as(ctypes.c_void_p)
+        p = prep["params"].ctypes.data_as(ctypes.c_void_p)
         status = lib.pt_substrate_step(ctypes.byref(arrays), ctypes.byref(_StepScalars(*sd)), p,
-                                       ctypes.c_int(strata), ctypes.c_int(max_iterations))
+                                       ctypes.c_int(prep["strata"]), ctypes.c_int(max_iterations))
         if status:
             raise NativeLibraryError(f"the CPU substrate library rejected the column (status "
                                      f"{status})")
         return out
-    kernel, _ = _device_kernel(sub)
-    d = lambda a: xp.asarray(a)                                            # noqa: E731
-    dummy = xp.zeros(1)
-    kernel(((n + block - 1) // block,), (block,),
-           (np.int32(L), np.int32(n), th_old, ths_old, absorbed, dflux, fref, bottom,
-            dummy if src is None else src, np.int32(src is not None), rho, kc, chi, dz, half,
-            d(strat), d(params), d(sd), np.int32(max_iterations), out["th"], out["ths"],
-            out["iterations"], out["failed"], out["ratio"], out["storage"], out["r"], out["tau"],
-            out["r_s"], out["tau_s"], out["q_s"], out["emitted"], out["absorbed"]))
+    dummy = prep.setdefault("dummy", xp.zeros(1))
+    prep["kernel"](((n + block - 1) // block,), (block,),
+                   (np.int32(L), np.int32(n), th_old, ths_old, absorbed, dflux, fref, bottom,
+                    dummy if src is None else src, np.int32(src is not None), prep["rho"],
+                    prep["kc"], prep["chi"], prep["dz"], prep["half"], prep["strat"],
+                    prep["params"], sd, np.int32(max_iterations), out["th"], out["ths"],
+                    out["iterations"], out["failed"], out["ratio"], out["storage"], out["r"],
+                    out["tau"], out["r_s"], out["tau_s"], out["q_s"], out["emitted"],
+                    out["absorbed"]))
     return out
 
 
