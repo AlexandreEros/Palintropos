@@ -73,7 +73,8 @@ from tropoi.physics.substrate import ConductiveSubstrate
 from tropoi.spatial.grids.quadrature import ColumnSet
 from tropoi.spatial.vertical import stratified_interfaces
 from tropoi.run.airless.config import AirlessConfig, strata_from_dicts
-from tropoi.run.held_suarez.experiment import RunError, code_identity, environment_identity
+from tropoi.run.execution import execution_identity, resolve_backend
+from tropoi.run.held_suarez.experiment import RunError, code_identity
 
 __all__ = ["AirlessRun", "build_columns", "build_substrate", "load_tier2", "run_block",
            "transient_steps"]
@@ -212,23 +213,13 @@ def run_block(cfg_dict: dict, lat, lon, weights, anomaly, surface_anomaly,
         t = (first + n + 1) * dt                      # backward Euler: forcing at t^{n+1}
         sw, _ = ins.incident(nx, ny, nz, t)
         st, rep = stepper.step(st, dt, shortwave_down=sw)
-        lows, highs = zip(*rep.extent)
-        xp.minimum(extent_min, xp.stack(lows), out=extent_min)
-        xp.maximum(extent_max, xp.stack(highs), out=extent_max)
-        net = rep.absorbed - rep.emitted + rep.bottom + rep.source
-        sums["absorbed"] += dt * rep.absorbed
-        sums["emitted"] += dt * rep.emitted
-        sums["conducted"] += dt * rep.conducted
-        sums["abs_conducted"] += dt * xp.abs(rep.conducted)
-        sums["bottom"] += dt * rep.bottom
-        sums["residual"] += dt * rep.residual_sum
-        sums["tolerance"] += dt * rep.tolerance_sum
-        xp.maximum(max_ratio, rep.max_residual_ratio, out=max_ratio)
-        # device-side writes: no synchronization in the step loop
-        values = {"energy_tendency": rep.energy_tendency, "net": net,
-                  "residual": rep.residual_sum, "tolerance": rep.tolerance_sum}
-        for k in SERIES:
-            g_series[k][n] = values[k] if per_point else weights @ values[k]
+        xp.minimum(extent_min, rep.extent_bounds[0], out=extent_min)
+        xp.maximum(extent_max, rep.extent_bounds[1], out=extent_max)
+        rows = {k: g_series[k][n] for k in SERIES} if per_point else None
+        values = accumulate(xp, dt, rep, sums, max_ratio, rows)
+        if not per_point:
+            for k in SERIES:
+                g_series[k][n] = weights @ values[k]
         iters[n] = rep.iterations
         if (n + 1) % every_s == 0:
             k = (n + 1) // every_s - 1
@@ -266,6 +257,80 @@ def run_block(cfg_dict: dict, lat, lon, weights, anomaly, surface_anomaly,
         "surface_range": (ts_lo, ts_hi) if ts_lo <= ts_hi else None,
         "extent": _host(xp.stack((extent_min, extent_max), axis=1)).tolist(),
     }
+
+
+def accumulate_reference(xp, dt, rep, sums, max_ratio, rows=None) -> dict:
+    """Add one step's report to the block's accumulators (in place) and
+    return the step's per-column series values; with ``rows`` (per-point
+    runs), also write those values into the given series rows. The
+    reference form, for any backend; :func:`accumulate` is the same
+    arithmetic fused into one kernel on CuPy."""
+    net = rep.absorbed - rep.emitted + rep.bottom + rep.source
+    sums["absorbed"] += dt * rep.absorbed
+    sums["emitted"] += dt * rep.emitted
+    sums["conducted"] += dt * rep.conducted
+    sums["abs_conducted"] += dt * xp.abs(rep.conducted)
+    sums["bottom"] += dt * rep.bottom
+    sums["residual"] += dt * rep.residual_sum
+    sums["tolerance"] += dt * rep.tolerance_sum
+    xp.maximum(max_ratio, rep.max_residual_ratio, out=max_ratio)
+    values = {"energy_tendency": rep.energy_tendency, "net": net,
+              "residual": rep.residual_sum, "tolerance": rep.tolerance_sum}
+    if rows is not None:
+        for k in SERIES:
+            rows[k][...] = values[k]
+    return values
+
+
+_ACCUMULATE = {}
+
+
+def _accumulate_kernel(per_point: bool):
+    """One CuPy kernel for :func:`accumulate_reference`: the same operations
+    in the same order, products as __dmul_rn (never contracted into an FMA),
+    the maximum NaN-propagating as in CuPy's."""
+    if per_point not in _ACCUMULATE:
+        import cupy as cp
+        body = (
+            "net = absorbed - emitted + bottom + source;"
+            " s_absorbed = s_absorbed + __dmul_rn(dt, absorbed);"
+            " s_emitted = s_emitted + __dmul_rn(dt, emitted);"
+            " s_conducted = s_conducted + __dmul_rn(dt, conducted);"
+            " s_abs_conducted = s_abs_conducted + __dmul_rn(dt, fabs(conducted));"
+            " s_bottom = s_bottom + __dmul_rn(dt, bottom);"
+            " s_residual = s_residual + __dmul_rn(dt, residual);"
+            " s_tolerance = s_tolerance + __dmul_rn(dt, tolerance);"
+            " max_ratio = (isnan(max_ratio) || isnan(ratio)) ? (max_ratio + ratio)"
+            " : (ratio > max_ratio ? ratio : max_ratio);")
+        outs = ("float64 net, float64 s_absorbed, float64 s_emitted, float64 s_conducted, "
+                "float64 s_abs_conducted, float64 s_bottom, float64 s_residual, "
+                "float64 s_tolerance, float64 max_ratio")
+        if per_point:
+            body += " row_e = energy; row_r = residual; row_t = tolerance;"
+            outs += ", float64 row_e, float64 row_r, float64 row_t"
+        _ACCUMULATE[per_point] = cp.ElementwiseKernel(
+            "float64 dt, float64 absorbed, float64 emitted, float64 conducted, "
+            "float64 bottom, float64 source, float64 residual, float64 tolerance, "
+            "float64 ratio, float64 energy", outs, body,
+            "airless_accumulate_rows" if per_point else "airless_accumulate")
+    return _ACCUMULATE[per_point]
+
+
+def accumulate(xp, dt, rep, sums, max_ratio, rows=None) -> dict:
+    """:func:`accumulate_reference`, as one kernel launch on CuPy."""
+    if xp is np:
+        return accumulate_reference(xp, dt, rep, sums, max_ratio, rows)
+    kernel = _accumulate_kernel(rows is not None)
+    net = rows["net"] if rows is not None else xp.empty_like(rep.absorbed)
+    args = [float(dt), rep.absorbed, rep.emitted, rep.conducted, rep.bottom, rep.source,
+            rep.residual_sum, rep.tolerance_sum, rep.max_residual_ratio, rep.energy_tendency,
+            net, sums["absorbed"], sums["emitted"], sums["conducted"], sums["abs_conducted"],
+            sums["bottom"], sums["residual"], sums["tolerance"], max_ratio]
+    if rows is not None:
+        args += [rows["energy_tendency"], rows["residual"], rows["tolerance"]]
+    kernel(*args)
+    return {"energy_tendency": rep.energy_tendency, "net": net,
+            "residual": rep.residual_sum, "tolerance": rep.tolerance_sum}
 
 
 def _backend(name: str):
@@ -397,11 +462,16 @@ class AirlessRun:
     never overwritten)."""
 
     def __init__(self, cfg: AirlessConfig, run_dir, *, workers: int = 1,
-                 backend: str = "numpy", allow_dirty: bool = False,
+                 backend: Optional[str] = None, allow_dirty: bool = False,
                  log: Callable[[str], None] = print,
                  initial_state=None, initial_state_source: Optional[str] = None,
                  config_source: Optional[dict] = None):
-        """``initial_state`` = (anomaly (L, ncol), surface_anomaly (ncol,)), in
+        """``backend`` is ``"cupy"`` or ``"numpy"``; by default CUDA, unless
+        ``TROPOI_EXECUTION=cpu-verification`` is set (see
+        :mod:`tropoi.run.execution`). CUDA that is unusable is an error, never
+        a fallback to the CPU.
+
+        ``initial_state`` = (anomaly (L, ncol), surface_anomaly (ncol,)), in
         K relative to 300 K, optionally replaces the configured isothermal
         start (for example a verified periodic solution on another grid,
         interpolated). Its provenance goes into config.json as
@@ -410,8 +480,9 @@ class AirlessRun:
         ``config_source`` records where the configuration came from when it
         was loaded from a saved document (``load_config_document``); it goes
         into config.json unchanged."""
-        _backend(backend)                       # validate early
-        self.backend = backend
+        # GPU first: CUDA unless CPU verification is requested explicitly
+        # (tropoi.run.execution); never a fallback
+        self.backend = resolve_backend(backend=backend)
         self.cfg = cfg
         self.dir = pathlib.Path(run_dir)
         self.workers = max(1, int(workers))
@@ -430,7 +501,7 @@ class AirlessRun:
                                       self.columns.weights)
         self._write_json("config.json", {
             "config": cfg.to_dict(), "config_sha256": cfg.sha256(), "code": self.code,
-            "environment": environment_identity(), "substrate": self.sub.signature(),
+            "environment": execution_identity(self.backend), "substrate": self.sub.signature(),
             "workers": self.workers, "backend": self.backend,
             "initial_state_source": initial_state_source if initial_state is not None else None,
             "config_source": config_source, "column_kind": self.kind,

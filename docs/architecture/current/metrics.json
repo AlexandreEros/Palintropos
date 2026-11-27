@@ -1,18 +1,17 @@
 {
   "atlas": {
-    "call_edges": 2586,
+    "call_edges": 2594,
     "call_sites_omitted_by_cap": 40,
-    "call_sites_recorded": 3380,
-    "import_edges": 524,
+    "call_sites_recorded": 3392,
+    "import_edges": 521,
     "import_sites_omitted_by_cap": 0,
-    "import_sites_recorded": 589,
+    "import_sites_recorded": 586,
     "max_sites_per_edge": 8,
-    "nodes": 2406,
+    "nodes": 2412,
     "proposal": {
       "call_edges_by_direction": {
-        "downward": 450,
+        "downward": 446,
         "lateral": 6,
-        "undeclared": 1,
         "upward": 3
       },
       "call_group_cycles_without_exceptions": [
@@ -21,8 +20,8 @@
           "archive"
         ]
       ],
-      "crossing_call_edges": 480,
-      "crossing_import_edges": 305,
+      "crossing_call_edges": 475,
+      "crossing_import_edges": 301,
       "exceptions_used": [
         11,
         6,
@@ -35,9 +34,8 @@
         3
       ],
       "import_edges_by_direction": {
-        "downward": 283,
+        "downward": 280,
         "lateral": 4,
-        "undeclared": 1,
         "upward": 1
       },
       "import_group_cycles": [
@@ -65,12 +63,12 @@
         "archive": 203,
         "cli": 66,
         "dynamics": 119,
-        "integration": 131,
-        "physics": 311,
-        "run": 140,
+        "integration": 130,
+        "physics": 310,
+        "run": 150,
         "setup": 292,
         "spectral": 265,
-        "unassigned": 4,
+        "unassigned": 2,
         "world": 161
       },
       "path": "docs/architecture/proposed-packages.json",
@@ -79,8 +77,7 @@
       "status": "hypothesis-for-review",
       "unassigned_modules": [
         "tropoi.numerics",
-        "tropoi.numerics.native",
-        "tropoi.numerics.tridiagonal"
+        "tropoi.numerics.native"
       ]
     },
     "runtime_traces": [
@@ -166,24 +163,24 @@
         "sha256": "1dcfeb9400fd06152e45cd607c8648f54d8fa8f41c02b0fcd8ee9310a03c28a4"
       }
     ],
-    "source_lines_embedded": 20052
+    "source_lines_embedded": 20103
   },
   "call_graph": {
     "call_sites": {
-      "builtin": 4487,
-      "external": 2891,
-      "internal": 3411,
-      "unresolved": 4669
+      "builtin": 4497,
+      "external": 2917,
+      "internal": 3423,
+      "unresolved": 4619
     },
     "edges_by_kind": {
-      "call": 1531,
-      "constructor": 74,
-      "instantiate": 567,
+      "call": 1538,
+      "constructor": 73,
+      "instantiate": 570,
       "override": 6,
-      "self": 404,
+      "self": 403,
       "super": 4
     },
-    "nodes": 2209,
+    "nodes": 2216,
     "scoped": {
       "airless-mercury": {
         "edges": 11,
@@ -382,16 +379,16 @@
     }
   },
   "class_graph": {
-    "classes": 244,
+    "classes": 245,
     "classes_in_inherits_edges": 21,
     "external_bases": {
       "ArithmeticError": 1,
-      "RuntimeError": 8,
+      "RuntimeError": 9,
       "UserWarning": 1,
       "ValueError": 22,
       "abc.ABC": 2,
       "collections.abc.Mapping": 1,
-      "ctypes.Structure": 2,
+      "ctypes.Structure": 3,
       "enum.Enum": 2,
       "http.server.BaseHTTPRequestHandler": 1,
       "http.server.ThreadingHTTPServer": 1,
@@ -437,13 +434,13 @@
       "tropoi.temporal.tendencies"
     ],
     "module_categories": {
-      "code": 164,
+      "code": 163,
       "empty": 27,
       "namespace": 1,
       "reexport": 5
     },
-    "modules_discovered": 197,
-    "modules_in_graph": 169,
+    "modules_discovered": 196,
+    "modules_in_graph": 168,
     "reexport_modules": [
       "tropoi.representation.archive",
       "tropoi.run.bve.model",
@@ -454,10 +451,10 @@
   },
   "layer_graph": {
     "condensation": {
-      "edges": 10,
+      "edges": 9,
       "longest_path_edges": 4,
-      "nodes": 6,
-      "sinks": 2,
+      "nodes": 5,
+      "sinks": 1,
       "sources": 1
     },
     "declared": [
@@ -505,32 +502,32 @@
       }
     ],
     "declared_by": "DEFAULT_LAYERS in tools/architecture/layers.py",
-    "density": 0.333333,
-    "edges": 14,
+    "density": 0.433333,
+    "edges": 13,
     "in_degree": {
       "histogram": {
         "0": 1,
-        "1": 2,
+        "1": 1,
         "2": 1,
         "3": 2,
         "4": 1
       },
       "max": 4,
-      "mean": 2.0,
-      "median": 2.0,
+      "mean": 2.166667,
+      "median": 2.5,
       "min": 0,
       "quartiles": [
-        1.0,
-        2.0,
+        1.25,
+        2.5,
         3.0
       ],
       "zeros": 1
     },
     "modules_in_upward_edges": 2,
-    "nodes": 7,
+    "nodes": 6,
     "nodes_in_cycles": {
       "count": 2,
-      "fraction": 0.285714
+      "fraction": 0.333333
     },
     "nontrivial_sccs": {
       "count": 1,
@@ -546,28 +543,26 @@
     },
     "out_degree": {
       "histogram": {
-        "0": 2,
+        "0": 1,
         "1": 1,
-        "3": 3,
+        "2": 1,
+        "3": 2,
         "4": 1
       },
       "max": 4,
-      "mean": 2.0,
-      "median": 3.0,
+      "mean": 2.166667,
+      "median": 2.5,
       "min": 0,
       "quartiles": [
-        0.5,
-        3.0,
+        1.25,
+        2.5,
         3.0
       ],
-      "zeros": 2
+      "zeros": 1
     },
     "packages_by_layer": {
       "cli": [
         "tropoi.cli"
-      ],
-      "numerics": [
-        "tropoi.numerics"
       ],
       "physics": [
         "tropoi.physics",
@@ -614,12 +609,12 @@
         ]
       ]
     },
-    "reciprocity": 0.142857,
+    "reciprocity": 0.153846,
     "self_loops": 0,
-    "sinks": 2,
+    "sinks": 1,
     "sources": 1,
     "strongly_connected_components": {
-      "count": 6
+      "count": 5
     },
     "top_fan_in": {
       "nodes": [
@@ -641,14 +636,10 @@
         },
         {
           "degree": 1,
-          "node": "numerics"
-        },
-        {
-          "degree": 1,
           "node": "run"
         }
       ],
-      "ties_at_cutoff": 2
+      "ties_at_cutoff": 1
     },
     "top_fan_out": {
       "nodes": [
@@ -665,7 +656,7 @@
           "node": "representation"
         },
         {
-          "degree": 3,
+          "degree": 2,
           "node": "temporal"
         },
         {
@@ -689,32 +680,32 @@
     "weakly_connected_components": {
       "count": 1,
       "sizes": [
-        7
+        6
       ]
     }
   },
   "module_graph": {
     "all_imports": {
       "condensation": {
-        "edges": 524,
+        "edges": 521,
         "longest_path_edges": 14,
-        "nodes": 169,
+        "nodes": 168,
         "sinks": 44,
-        "sources": 7
+        "sources": 6
       },
-      "density": 0.018456,
-      "edges": 524,
+      "density": 0.01857,
+      "edges": 521,
       "in_degree": {
         "histogram": {
-          "0": 7,
+          "0": 6,
           "1": 49,
           "10": 3,
-          "11": 1,
-          "12": 3,
+          "11": 2,
+          "12": 2,
           "17": 1,
           "2": 41,
-          "3": 20,
-          "4": 17,
+          "3": 22,
+          "4": 15,
           "5": 10,
           "6": 7,
           "7": 3,
@@ -722,7 +713,7 @@
           "9": 2
         },
         "max": 17,
-        "mean": 3.100592,
+        "mean": 3.10119,
         "median": 2.0,
         "min": 0,
         "quartiles": [
@@ -730,9 +721,9 @@
           2.0,
           4.0
         ],
-        "zeros": 7
+        "zeros": 6
       },
-      "nodes": 169,
+      "nodes": 168,
       "nodes_in_cycles": {
         "count": 0,
         "fraction": 0.0
@@ -750,18 +741,18 @@
           "11": 3,
           "13": 1,
           "19": 1,
-          "2": 28,
+          "2": 27,
           "23": 1,
-          "3": 12,
+          "3": 13,
           "4": 13,
-          "5": 12,
+          "5": 11,
           "6": 4,
-          "7": 9,
-          "8": 5,
+          "7": 8,
+          "8": 6,
           "9": 3
         },
         "max": 23,
-        "mean": 3.100592,
+        "mean": 3.10119,
         "median": 2.0,
         "min": 0,
         "quartiles": [
@@ -778,9 +769,9 @@
       "reciprocity": 0.0,
       "self_loops": 0,
       "sinks": 44,
-      "sources": 7,
+      "sources": 6,
       "strongly_connected_components": {
-        "count": 169
+        "count": 168
       },
       "top_fan_in": {
         "nodes": [
@@ -790,15 +781,15 @@
           },
           {
             "degree": 12,
-            "node": "tropoi.physics.constants"
-          },
-          {
-            "degree": 12,
             "node": "tropoi.representation.archive.schema"
           },
           {
             "degree": 12,
             "node": "tropoi.spatial.sigma_coordinate"
+          },
+          {
+            "degree": 11,
+            "node": "tropoi.physics.constants"
           },
           {
             "degree": 11,
@@ -875,35 +866,35 @@
       "weakly_connected_components": {
         "count": 1,
         "sizes": [
-          169
+          168
         ]
       }
     },
     "edge_scopes": {
-      "function": 194,
+      "function": 195,
       "function+module": 9,
       "function+type_checking": 1,
-      "module": 314,
+      "module": 310,
       "type_checking": 6
     },
     "import_time": {
       "condensation": {
-        "edges": 323,
+        "edges": 319,
         "longest_path_edges": 7,
-        "nodes": 169,
+        "nodes": 168,
         "sinks": 58,
-        "sources": 45
+        "sources": 44
       },
-      "density": 0.011376,
-      "edges": 323,
+      "density": 0.01137,
+      "edges": 319,
       "in_degree": {
         "histogram": {
-          "0": 45,
-          "1": 55,
-          "11": 1,
+          "0": 44,
+          "1": 56,
+          "10": 1,
           "14": 1,
-          "2": 27,
-          "3": 17,
+          "2": 28,
+          "3": 15,
           "4": 5,
           "5": 6,
           "6": 4,
@@ -912,7 +903,7 @@
           "9": 3
         },
         "max": 14,
-        "mean": 1.911243,
+        "mean": 1.89881,
         "median": 1.0,
         "min": 0,
         "quartiles": [
@@ -920,9 +911,9 @@
           1.0,
           2.0
         ],
-        "zeros": 45
+        "zeros": 44
       },
-      "nodes": 169,
+      "nodes": 168,
       "nodes_in_cycles": {
         "count": 0,
         "fraction": 0.0
@@ -939,14 +930,14 @@
           "2": 24,
           "3": 16,
           "4": 10,
-          "5": 8,
+          "5": 7,
           "6": 6,
-          "7": 3,
-          "8": 2,
+          "7": 2,
+          "8": 3,
           "9": 4
         },
         "max": 9,
-        "mean": 1.911243,
+        "mean": 1.89881,
         "median": 1.0,
         "min": 0,
         "quartiles": [
@@ -963,9 +954,9 @@
       "reciprocity": 0.0,
       "self_loops": 0,
       "sinks": 58,
-      "sources": 45,
+      "sources": 44,
       "strongly_connected_components": {
-        "count": 169
+        "count": 168
       },
       "top_fan_in": {
         "nodes": [
@@ -974,7 +965,7 @@
             "node": "tropoi.spatial.truncation"
           },
           {
-            "degree": 11,
+            "degree": 10,
             "node": "tropoi.physics.constants"
           },
           {
@@ -1036,6 +1027,10 @@
           },
           {
             "degree": 8,
+            "node": "tropoi.run.airless.experiment"
+          },
+          {
+            "degree": 8,
             "node": "tropoi.run.radiative.model"
           },
           {
@@ -1047,10 +1042,6 @@
             "node": "tropoi.representation.visual.sky"
           },
           {
-            "degree": 7,
-            "node": "tropoi.run.airless.experiment"
-          },
-          {
             "degree": 6,
             "node": "tropoi.cli.main"
           }
@@ -1060,7 +1051,7 @@
       "weakly_connected_components": {
         "count": 8,
         "sizes": [
-          154,
+          153,
           8,
           2,
           1,
@@ -1076,42 +1067,42 @@
     "condensation": {
       "edges": 80,
       "longest_path_edges": 11,
-      "nodes": 23,
-      "sinks": 6,
+      "nodes": 22,
+      "sinks": 5,
       "sources": 3
     },
-    "density": 0.160969,
+    "density": 0.173846,
     "edges": 113,
     "in_degree": {
       "histogram": {
         "0": 3,
-        "1": 4,
+        "1": 3,
         "10": 2,
         "15": 1,
         "2": 5,
         "3": 1,
-        "4": 4,
-        "5": 2,
+        "4": 3,
+        "5": 3,
         "6": 2,
         "7": 1,
         "8": 2
       },
       "max": 15,
-      "mean": 4.185185,
+      "mean": 4.346154,
       "median": 4.0,
       "min": 0,
       "quartiles": [
-        1.5,
+        2.0,
         4.0,
         6.0
       ],
       "zeros": 3
     },
-    "intra_package_module_edges": 185,
-    "nodes": 27,
+    "intra_package_module_edges": 184,
+    "nodes": 26,
     "nodes_in_cycles": {
       "count": 8,
-      "fraction": 0.296296
+      "fraction": 0.307692
     },
     "nontrivial_sccs": {
       "count": 4,
@@ -1142,27 +1133,28 @@
     },
     "out_degree": {
       "histogram": {
-        "0": 6,
+        "0": 5,
         "1": 4,
         "10": 3,
         "11": 1,
         "2": 1,
         "3": 2,
         "4": 2,
-        "5": 4,
-        "7": 2,
+        "5": 3,
+        "6": 2,
+        "7": 1,
         "9": 2
       },
       "max": 11,
-      "mean": 4.185185,
+      "mean": 4.346154,
       "median": 4.0,
       "min": 0,
       "quartiles": [
         1.0,
         4.0,
-        7.0
+        6.75
       ],
-      "zeros": 6
+      "zeros": 5
     },
     "reciprocal_pairs": {
       "count": 4,
@@ -1187,10 +1179,10 @@
     },
     "reciprocity": 0.070796,
     "self_loops": 0,
-    "sinks": 6,
+    "sinks": 5,
     "sources": 3,
     "strongly_connected_components": {
-      "count": 23
+      "count": 22
     },
     "top_fan_in": {
       "nodes": [
@@ -1232,10 +1224,10 @@
         },
         {
           "degree": 5,
-          "node": "tropoi.spatial.terrain"
+          "node": "tropoi.run"
         }
       ],
-      "ties_at_cutoff": 2
+      "ties_at_cutoff": 3
     },
     "top_fan_out": {
       "nodes": [
@@ -1268,24 +1260,24 @@
           "node": "tropoi.run.radiative"
         },
         {
-          "degree": 7,
+          "degree": 6,
+          "node": "tropoi.run.airless"
+        },
+        {
+          "degree": 6,
           "node": "tropoi.temporal"
         },
         {
           "degree": 5,
           "node": "tropoi.representation.archive"
-        },
-        {
-          "degree": 5,
-          "node": "tropoi.run.airless"
         }
       ],
-      "ties_at_cutoff": 4
+      "ties_at_cutoff": 3
     },
     "weakly_connected_components": {
       "count": 1,
       "sizes": [
-        27
+        26
       ]
     }
   },
@@ -1294,11 +1286,9 @@
     "package": "tropoi",
     "src": "src",
     "working_tree": {
-      "base_commit": "6e55235cc0262e27cc8f311d2744046417869447",
+      "base_commit": "8093d4bac1ad2b2af455b2e235927b7001d290e7",
       "generator": {
-        "changes": [
-          "M  tools/architecture/layers.py"
-        ],
+        "changes": [],
         "files": {
           "tools/architecture/__init__.py": "ee8a500e3bcfc5ce06dd4ed8dab5edff0c1057becab341ea2cd9b4cd11b6042f",
           "tools/architecture/calls.py": "fe492066691403114d3adef4eade7541d55afd75bfbd02d14c72871bfd824e92",
@@ -1323,41 +1313,23 @@
           "tools/architecture/views.py": "a1b595a64f60367c0f6a475593d2f310d72104d0445eacec5552c63fe3aeb5d2"
         },
         "sha256": "bd666fb3a4f679c2d6005453c90cb4a8acf447ae2e2f7f988e7d1b07fc445eed",
-        "status": "dirty"
+        "status": "clean"
       },
       "source": {
         "changes": [
-          "A  src/tropoi/numerics/__init__.py",
-          "A  src/tropoi/numerics/native/__init__.py",
-          "A  src/tropoi/numerics/native/pt/numerics/newton.h",
-          "A  src/tropoi/numerics/native/pt/numerics/thomas.h",
-          "A  src/tropoi/numerics/native/pt/portable.h",
-          "A  src/tropoi/numerics/tridiagonal.py",
+          "M  src/tropoi/numerics/native/pt/numerics/thomas.h",
+          "M  src/tropoi/numerics/native/pt/portable.h",
+          "D  src/tropoi/numerics/tridiagonal.py",
           "M  src/tropoi/physics/materials.py",
-          "A  src/tropoi/physics/native/__init__.py",
-          "A  src/tropoi/physics/native/pt/physics/materials.h",
-          "A  src/tropoi/physics/native/pt/physics/substrate.h",
-          "M  src/tropoi/physics/substrate.py",
-          "M  src/tropoi/physics/surface.py",
-          "M  src/tropoi/representation/archive/viewer_diagnostics.py",
-          "M  src/tropoi/representation/diagnostics/held_suarez_sections.py",
-          "M  src/tropoi/representation/visual/viewer_fields.py",
-          "M  src/tropoi/run/airless/config.py",
+          "M  src/tropoi/run/airless/__main__.py",
           "M  src/tropoi/run/airless/experiment.py",
-          "M  src/tropoi/run/held_suarez/report.py",
-          "M  src/tropoi/spatial/grids/README.md",
-          "M  src/tropoi/spatial/grids/latlon_grid.py",
-          "A  src/tropoi/spatial/grids/quadrature.py",
-          "A  src/tropoi/spatial/vertical.py",
-          "A  src/tropoi/temporal/_substrate_reference.py",
-          "A  src/tropoi/temporal/native/__init__.py",
-          "A  src/tropoi/temporal/native/build_identity.py",
-          "A  src/tropoi/temporal/native/drivers/column_step.h",
-          "A  src/tropoi/temporal/native/drivers/cuda_driver.cu",
-          "A  src/tropoi/temporal/native/drivers/host_driver.cpp",
-          "A  src/tropoi/temporal/native/pt/temporal/backward_euler.h",
-          "A  src/tropoi/temporal/substrate.py",
-          "A  src/tropoi/temporal/substrate_native.py"
+          "A  src/tropoi/run/execution.py",
+          "D  src/tropoi/temporal/_substrate_reference.py",
+          "M  src/tropoi/temporal/native/drivers/column_step.h",
+          "M  src/tropoi/temporal/native/drivers/cuda_driver.cu",
+          "M  src/tropoi/temporal/native/drivers/host_driver.cpp",
+          "M  src/tropoi/temporal/substrate.py",
+          "M  src/tropoi/temporal/substrate_native.py"
         ],
         "files": {
           "src/tropoi/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
@@ -1369,7 +1341,6 @@
           "src/tropoi/cli/terrain.py": "040ca209c2096d99704976279d9d78e35f39e7f3070d8de7c66b9e2867ee3ae6",
           "src/tropoi/numerics/__init__.py": "5e943d348e1542e0569bc0af956ea6d41f3ac8a5ac1b3ee62086187c852af76b",
           "src/tropoi/numerics/native/__init__.py": "28b03473b7bf4dcce8ad7f1d3aa5977881b57b31c700eb2e8fe2eb9eef51fdd5",
-          "src/tropoi/numerics/tridiagonal.py": "ef64b745943b60b9d466196bd6e3a686057d7a516874413e098fcb94502ffe16",
           "src/tropoi/physics/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
           "src/tropoi/physics/boundary_layer.py": "4b4538402e6c864eb8b379f8009784209cb76faef8b92449dd8ce76fe8aa3846",
           "src/tropoi/physics/column.py": "4d7383cf032d6bcde432fc9de2710415740f48f0f10dee2a2e992e8e0252181b",
@@ -1378,7 +1349,7 @@
           "src/tropoi/physics/constants.py": "97c07ad424b13bc018c45a2b5036054e2ce0d2107281a814109aa62cd20cff93",
           "src/tropoi/physics/convection.py": "593c1a1ac1b1974c98ca84acb2727a2f1d57260996b832ba75779354b516e09e",
           "src/tropoi/physics/insolation.py": "1f95aeef8c044228e6b24f673a99cc9e5f5329ae4f696fe05ae2cf4a5643e9b8",
-          "src/tropoi/physics/materials.py": "84c185fa0d86c1a584ce8532e2d7f85edcf7fa354d4a647efea3d4de1ae3ce92",
+          "src/tropoi/physics/materials.py": "5c35e41073fd1497e545db8c4786c5a3d0465e58085c2146c12c4865605cb903",
           "src/tropoi/physics/monin_obukhov.py": "8e92212937c71d91262f9b8808e583d9f27b1802cc5a402d171c96ab635d4708",
           "src/tropoi/physics/monin_obukhov_cuda.py": "a08db2faa45575b8b3a9bcc7c2fa9655dcd148db216011866a8de35b507be457",
           "src/tropoi/physics/native/__init__.py": "505663398baf7400524e511d23f9b384bfd5d934b29f2b6dd05633bf706a1db3",
@@ -1454,9 +1425,9 @@
           "src/tropoi/representation/visual/vorticity_viewer.py": "30c3f401cc653cc7856f829bbd5427fe2178cd425d5124f29bf2297d289d04f3",
           "src/tropoi/run/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
           "src/tropoi/run/airless/__init__.py": "4eacd9f550f9829fccc087a027d35f60c6bbb99e57d15d8c0d89ede496857f68",
-          "src/tropoi/run/airless/__main__.py": "4079efb484c2b9c4ba5d27c23418b7a713428d5af00a6820a8982329d5db26c6",
+          "src/tropoi/run/airless/__main__.py": "522846f00381aa73c5854b9ea23b151bbfb377164f7189bc751153cb4242178a",
           "src/tropoi/run/airless/config.py": "164afc2cddf3142f5e53e5b1841d83d8e35963ae5477891833fdd1e923ba4cb7",
-          "src/tropoi/run/airless/experiment.py": "8ba8328ac224402e0a1aee96871bcbcc993360301f29d787304c64c6d1a755c0",
+          "src/tropoi/run/airless/experiment.py": "5c5c11c8f636046a349b5eb40c5517713e6de41a73f8f76227398354b3aadc90",
           "src/tropoi/run/bve/__init__.py": "dc2f43732af56efca1d2801705e6d92ab8cdcfb64d91b00f7dfc012fcbce8bfa",
           "src/tropoi/run/bve/config.py": "7b44a7d627c53b28e0315710d209b12d3689d247f4feb093e8cd8703c43dd406",
           "src/tropoi/run/bve/execution.py": "e812726e0351f85ee2520ab85f4396432d790db315f7158e5ab91c89d081cfba",
@@ -1470,6 +1441,7 @@
           "src/tropoi/run/custom/prepare.py": "9b2f4b5b61c24161b1ad7d33495f160841047b3ac0ef07f9ccd8011348146659",
           "src/tropoi/run/custom/presets.py": "d6702bc8f212a9908f5db1d15f0e3e1d0dca819c4637cff501415a68b995699a",
           "src/tropoi/run/custom/resources.py": "f3d1222161a012ecc357d739bd3c4c13bd891691ec1a9964650c989224b12739",
+          "src/tropoi/run/execution.py": "70842cc0413d16401deeec21fccc6c48e9552bb85ffe048676af98d02cbb8519",
           "src/tropoi/run/held_suarez/__init__.py": "90e964df6996aa5976524c7d34a8692bc7126b848bb2272188651570218cf211",
           "src/tropoi/run/held_suarez/__main__.py": "0de0dfde61e9ed18c0d9da9197d29e9bac7abda227f8f19aa304272c08156226",
           "src/tropoi/run/held_suarez/checkpoint.py": "56ab7fe0da2730208bdd78cb862b4ec909cff6024a746008e3ae258b86a8060e",
@@ -1543,19 +1515,18 @@
           "src/tropoi/spatial/vertical.py": "150c67d1154877340d28ba8ec3444f687050a5abf36f1c1f5ed982a167efa756",
           "src/tropoi/spatial/williamson5.py": "d980a4f4495f5a8724b62dbe7899b6f312af8c8ac034eeeedb4dc996baea9071",
           "src/tropoi/temporal/__init__.py": "b8b4efaf006eb548659313a955c754c1b5084e828b9d2fc679c5ae2a469e335b",
-          "src/tropoi/temporal/_substrate_reference.py": "528953507f283209737bd2fcf18994333c71cf6172a17f4ec438749911079342",
           "src/tropoi/temporal/column_coupling.py": "63c4054e7979b6119ee426f3dd578e248a7d4f4bfee3ea05d55c397b6adf9ac4",
           "src/tropoi/temporal/hooks.py": "ca7a91e6779a79deb31f5bc756f3e8407e020e1eb258834d4f06c3e2f80b0970",
           "src/tropoi/temporal/integration.py": "7db1e68852007669f0b6c1359d9feef3ccd2d3c8507e186abd90272f23e4cd8b",
           "src/tropoi/temporal/models.py": "e95aae258ef93b98ce16e1b1acde1034867d334dc33aef0a4b14d807061413d9",
           "src/tropoi/temporal/native/__init__.py": "ff1680674fd07353371ec76b66201e846c678c58562dc1d67449633a020b4842",
           "src/tropoi/temporal/native/build_identity.py": "6ebb1559ba454579dc15f1ee9d6c3a76a21a6417ea3ceffd4ce19c7f11ca5cbb",
-          "src/tropoi/temporal/native/drivers/cuda_driver.cu": "a33ba27287fbfeca9ceedd50d8c26adbeaf225360dcba6ea62bdce7f8292487c",
+          "src/tropoi/temporal/native/drivers/cuda_driver.cu": "ae64635117f32af9ca5d2b40170e5cead363451b89b646fcd276d13f8c65d6dc",
           "src/tropoi/temporal/semi_implicit.py": "c49e36947a4f13bac655f93eb374e70196f946669a55177316686070a22eb6bd",
           "src/tropoi/temporal/simulation.py": "8da9cae224660d0c16c057466939cb78be277b085cbd8027437d37cf36e54b3b",
           "src/tropoi/temporal/steppers.py": "d318a44ce7277cac5e43cd54d9c0f090fc8d55f4f3ea67735cfa1df6f8ad10c4",
-          "src/tropoi/temporal/substrate.py": "1df5bc1504a65735518191c019926e7a2481e93310f3c63d4256f25cf673ca4d",
-          "src/tropoi/temporal/substrate_native.py": "3ad5ec47d58eb94b653d5841e83d4b5b1152b770cc66ba80af17f900358074c0",
+          "src/tropoi/temporal/substrate.py": "54e673fea1f68c313486836094985ea11f397e83407cb1e10fa2747adc6feff3",
+          "src/tropoi/temporal/substrate_native.py": "4209312d62521910c5073c8c5d184b2aaf3743b8dcecb4eeb145b512bb7658dd",
           "src/tropoi/temporal/tendencies/__init__.py": "64ae205b8d8abf902f9b9f285faae34048856829c3be34925b3af5f94ad71a20",
           "src/tropoi/temporal/tendencies/barotropic.py": "eca288b7ac2cff04787d2cc1a5340f37364de3ee511b0ffd6598798c4201ebef",
           "src/tropoi/temporal/tendencies/boundary_layer.py": "de3b800d4c2ae35d1cc144cf9528b39eb7cd3baf5786664efac0d031b9fb4194",
@@ -1564,7 +1535,7 @@
           "src/tropoi/temporal/tendencies/primitive_equations.py": "848c6fe9406a7c1c465c0aa9459760b01c542164c8cc9395797a3c4a60793e52",
           "src/tropoi/temporal/tendencies/shallow_water.py": "7ae521f2378824e89f88bc467fc99321d1ef4224b037c865137e076a601da3c8"
         },
-        "sha256": "a437f6dc320f84e2e88940b8580ba99dadbe3ae80f3488f85aad3bc0c5b731a9",
+        "sha256": "4bde49ccb81e75566acfd169db6a10011b1d526f8bb72e218f0d49178d3528bb",
         "status": "dirty"
       }
     }

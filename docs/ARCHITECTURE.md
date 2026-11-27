@@ -536,8 +536,17 @@ canonical implementation in portable C++:
 * `src/tropoi/temporal/native`: the backward-Euler composition and the CUDA
   and CPU drivers.
 
-Python composes, configures and validates; `tropoi.temporal.substrate_native`
-launches the native code.
+Python composes and configures; `tropoi.temporal.substrate_native` launches
+the native code. One launch per step validates the forcing, forms the
+absorbed constant, solves every column and writes the converged evaluation
+and each column's temperature extent. The host then reads one three-integer
+summary: the largest iteration count, whether any column failed, and whether
+any forcing was invalid. Python works out the exact error message only after
+a failure. The report's sums stay CuPy reductions, in the reference order
+(decision U3). Its elementwise remainder and the airless runner's per-step
+accumulation are each one CuPy kernel, written in the reference's operation
+order with `__dmul_rn` products; tests check them bit for bit against the
+plain-expression forms.
 
 * **GPU.** Nothing needs to be built. The headers ship as package data and
   NVRTC compiles them through CuPy at run time, specialized for each
@@ -563,10 +572,19 @@ launches the native code.
 * **Floating point.** FP64. No product is contracted into an FMA: on the
   device every product is `__dmul_rn` and CuPy's default flags are used, and
   the host builds with `-ffp-contract=off`.
+* **Execution policy.** Runs execute on CUDA. The CPU build is for
+  verification, selected only explicitly: `backend="numpy"`, the hidden
+  `--device cpu` of the airless command, or
+  `TROPOI_EXECUTION=cpu-verification` (`tropoi.run.execution`; decisions
+  D6/U6). There is no fallback: without a usable GPU a run fails and says
+  how to request CPU verification.
 * **Provenance.** Every airless run records the implementation in
   `config.json` (`substrate_implementation`): the source digests, the
   backend, the device specialization and NVRTC version, or the host
-  library's compiler and flags.
+  library's compiler and flags. Its `environment` records what ran: the
+  backend, `precision: float64`, and the GPU for a CUDA run or the CPU
+  model for a CPU run (`execution_identity`, which does not import CuPy for
+  a CPU run).
 
 ### Tests
 

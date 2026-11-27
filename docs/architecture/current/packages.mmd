@@ -7,7 +7,7 @@ flowchart TD
         n_tropoi_ocli["cli (5 modules)"]
     end
     subgraph g_run["layer run"]
-        n_tropoi_orun["run (1 module)"]
+        n_tropoi_orun["run (2 modules)"]
         n_tropoi_orun_oairless["run.airless (3 modules)"]
         n_tropoi_orun_obve["run.bve (5 modules)"]
         n_tropoi_orun_ocustom["run.custom (7 modules)"]
@@ -23,7 +23,7 @@ flowchart TD
         n_tropoi_orepresentation_ovisual["representation.visual (27 modules)"]
     end
     subgraph g_temporal["layer temporal"]
-        n_tropoi_otemporal["temporal (10 modules)"]
+        n_tropoi_otemporal["temporal (9 modules)"]
         n_tropoi_otemporal_onative["temporal.native (1 module)"]
         n_tropoi_otemporal_otendencies["temporal.tendencies (6 modules)"]
     end
@@ -40,9 +40,6 @@ flowchart TD
     subgraph g_physics["layer physics"]
         n_tropoi_ophysics["physics (19 modules)"]
         n_tropoi_ophysics_oradiation["physics.radiation (5 modules)"]
-    end
-    subgraph g_numerics["layer numerics"]
-        n_tropoi_onumerics["numerics (1 module)"]
     end
     n_tropoi_ocli -->|5| n_tropoi_orepresentation_oarchive
     n_tropoi_ocli -->|7| n_tropoi_orepresentation_ovisual
@@ -75,6 +72,7 @@ flowchart TD
     n_tropoi_orepresentation_ovisual -->|2| n_tropoi_otemporal_otendencies
     n_tropoi_orun -->|2| n_tropoi_orepresentation_oarchive
     n_tropoi_orun_oairless -->|4| n_tropoi_ophysics
+    n_tropoi_orun_oairless -->|2| n_tropoi_orun
     n_tropoi_orun_oairless -->|1| n_tropoi_orun_oheld__suarez
     n_tropoi_orun_oairless -->|1| n_tropoi_ospatial
     n_tropoi_orun_oairless -->|1| n_tropoi_ospatial_ogrids
@@ -145,8 +143,7 @@ flowchart TD
     n_tropoi_ospatial_oterrain -.->|"1, type-only"| n_tropoi_ospatial_otransforms
     n_tropoi_ospatial_otransforms -->|2| n_tropoi_ospatial_ogrids
     n_tropoi_ospatial_otransforms -->|3| n_tropoi_ospatial_otransforms_ocuda
-    n_tropoi_otemporal -->|1| n_tropoi_onumerics
-    n_tropoi_otemporal -->|7| n_tropoi_ophysics
+    n_tropoi_otemporal -->|4| n_tropoi_ophysics
     n_tropoi_otemporal -->|9| n_tropoi_ospatial
     n_tropoi_otemporal -->|1| n_tropoi_ospatial_ostates
     n_tropoi_otemporal -->|1| n_tropoi_ospatial_oterrain
@@ -157,5 +154,5 @@ flowchart TD
     n_tropoi_otemporal_otendencies -->|3| n_tropoi_ospatial_ostates
     n_tropoi_otemporal_otendencies -->|1| n_tropoi_ospatial_oterrain
     n_tropoi_otemporal_otendencies -->|2| n_tropoi_otemporal
-    linkStyle 94 stroke:#d62728,stroke-width:2px
+    linkStyle 95 stroke:#d62728,stroke-width:2px
     style legend fill:none,stroke:#999,stroke-dasharray:2 2

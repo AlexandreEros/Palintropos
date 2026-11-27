@@ -117,9 +117,9 @@ flowchart LR
     p_tropoi_orun_oradiative -.->|1| n_tropoi_ophysics_ospecies
     p_tropoi_orun_oradiative -->|1| n_tropoi_ophysics_osurface
     p_tropoi_orun_oradiative -.->|1| n_tropoi_ophysics_othermodynamics
-    p_tropoi_otemporal -->|2| n_tropoi_ophysics_oconstants
-    p_tropoi_otemporal -->|2| n_tropoi_ophysics_omaterials
-    p_tropoi_otemporal -->|3| n_tropoi_ophysics_osubstrate
+    p_tropoi_otemporal -.->|1| n_tropoi_ophysics_oconstants
+    p_tropoi_otemporal -.->|1| n_tropoi_ophysics_omaterials
+    p_tropoi_otemporal -->|2| n_tropoi_ophysics_osubstrate
     p_tropoi_otemporal_otendencies -->|1| n_tropoi_ophysics_oboundary__layer
     p_tropoi_otemporal_otendencies -->|1| n_tropoi_ophysics_omonin__obukhov
     p_tropoi_otemporal_otendencies -.->|1| n_tropoi_ophysics_omonin__obukhov__cuda
@@ -235,7 +235,6 @@ classDiagram
     c_tropoi_ophysics_oinsolation_oStellarIllumination : +with#95;subsolar#95;longitude#95;at()
     class c_tropoi_ophysics_omaterials_oCellMaterials["CellMaterials (physics.materials)"]
     c_tropoi_ophysics_omaterials_oCellMaterials : +conductivity()$
-    c_tropoi_ophysics_omaterials_oCellMaterials : +conductivity#95;derivative()$
     c_tropoi_ophysics_omaterials_oCellMaterials : +enthalpy#95;difference()
     c_tropoi_ophysics_omaterials_oCellMaterials : +kirchhoff#95;difference()$
     c_tropoi_ophysics_omaterials_oCellMaterials : +on()

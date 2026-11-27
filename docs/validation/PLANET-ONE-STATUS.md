@@ -146,7 +146,8 @@ resume. It never changes a criterion.
 
 1. **GPU runs on Colab:** `colab new -s NAME --gpu T4`, then the bootstrap
    and launch scripts pattern described in the memory note. Use
-   `python -m tropoi.run.airless run ... --backend cupy --workers 1`. Then
+   `python -m tropoi.run.airless run ... --workers 1` (CUDA is the default and only
+   production device; before the GPU-first policy this needed `--backend cupy`). Then
    run `tools/planet_one/global_check.py RUN` and
    `tools/planet_one/build_view.py RUN OUT.html --gp/--gi/--l3` on the VM,
    download files of 19 MB or less, and `colab stop`.

@@ -2,8 +2,12 @@
 
 `tropoi.run.airless` runs independent conductive columns
 (`tropoi.physics.substrate.ConductiveSubstrate`) under the shared orbit and
-rotation illumination geometry (`tropoi.physics.insolation`). It runs on the
-NumPy or the CuPy backend, and both share one implementation. Presets are
+rotation illumination geometry (`tropoi.physics.insolation`). Runs execute on
+CUDA (CuPy); the canonical C++ step is the same on the CPU, which is used for
+verification only and only when requested (`--device cpu`, hidden from
+`--help`, or `TROPOI_EXECUTION=cpu-verification`; see
+[`run/execution.py`](../../../src/tropoi/run/execution.py)). Without a usable
+GPU a run fails at once instead of falling back to the CPU. Presets are
 configurations of that machinery; Mercury with the Vasavada, Paige & Wood
 (1999) regolith is the primary one. Tier-2 output is streamed to disk in
 per-block files and read back with `load_tier2`.

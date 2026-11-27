@@ -9,6 +9,16 @@ installs dependencies without CuPy and runs `python -m pytest -q`; GPU tests
 skip when CUDA dependencies are unavailable. A CPU pass does not run or
 validate the GPU solvers.
 
+**CPU verification runs.** Production runs execute on CUDA, and a run
+without a usable GPU fails instead of falling back to the CPU
+(`tropoi.run.execution`). Tests and verification scripts select the CPU
+explicitly: `backend="numpy"` in a runner's Python API, the hidden
+`--device cpu` option of `python -m tropoi.run.airless run`, or
+`TROPOI_EXECUTION=cpu-verification` in the environment of a subprocess. An
+explicit CUDA request while that variable is set is an error. The run's
+`config.json` records the backend, the CPU model and the precision, and a CPU
+run never imports CuPy (`tests/test_run_execution.py`).
+
 The [architecture test instructions](../docs/ARCHITECTURE.md#tests) define
 routine GPU regression (`-m "not slow"`), long convergence (`-m slow`) and
 release selections. [`architecture_tool/`](architecture_tool/README.md) tests source extraction, graph

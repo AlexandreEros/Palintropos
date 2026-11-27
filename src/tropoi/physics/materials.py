@@ -392,10 +392,6 @@ class CellMaterials:
         return kc * (1.0 + chi * T * T * T)
 
     @staticmethod
-    def conductivity_derivative(kc, chi, T):
-        return 3.0 * kc * chi * T * T
-
-    @staticmethod
     def kirchhoff_difference(kc, chi, a, b, delta=None):
         """Phi(a) - Phi(b), where Phi = integral of k dT, written as
         (a - b) times a symmetric sum so that no cancellation occurs.

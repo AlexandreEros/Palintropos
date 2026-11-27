@@ -1944,6 +1944,14 @@
     {
       "kind": "imports",
       "scopes": [
+        "function"
+      ],
+      "source": "tropoi.run.airless.__main__",
+      "target": "tropoi.run.execution"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
         "module"
       ],
       "source": "tropoi.run.airless.config",
@@ -1982,6 +1990,14 @@
       ],
       "source": "tropoi.run.airless.experiment",
       "target": "tropoi.run.airless.config"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.run.airless.experiment",
+      "target": "tropoi.run.execution"
     },
     {
       "kind": "imports",
@@ -3820,46 +3836,6 @@
     {
       "kind": "imports",
       "scopes": [
-        "module"
-      ],
-      "source": "tropoi.temporal._substrate_reference",
-      "target": "tropoi.numerics.tridiagonal"
-    },
-    {
-      "kind": "imports",
-      "scopes": [
-        "module"
-      ],
-      "source": "tropoi.temporal._substrate_reference",
-      "target": "tropoi.physics.constants"
-    },
-    {
-      "kind": "imports",
-      "scopes": [
-        "module"
-      ],
-      "source": "tropoi.temporal._substrate_reference",
-      "target": "tropoi.physics.materials"
-    },
-    {
-      "kind": "imports",
-      "scopes": [
-        "module"
-      ],
-      "source": "tropoi.temporal._substrate_reference",
-      "target": "tropoi.physics.substrate"
-    },
-    {
-      "kind": "imports",
-      "scopes": [
-        "module"
-      ],
-      "source": "tropoi.temporal._substrate_reference",
-      "target": "tropoi.temporal.substrate"
-    },
-    {
-      "kind": "imports",
-      "scopes": [
         "function"
       ],
       "source": "tropoi.temporal.column_coupling",
@@ -4293,17 +4269,6 @@
       "third_party_imports": [
         "matplotlib"
       ]
-    },
-    {
-      "category": "code",
-      "dynamic_import_calls": 0,
-      "id": "tropoi.numerics.tridiagonal",
-      "is_package": false,
-      "path": "tropoi/numerics/tridiagonal.py",
-      "stdlib_imports": [
-        "__future__"
-      ],
-      "third_party_imports": []
     },
     {
       "category": "code",
@@ -5702,6 +5667,23 @@
     {
       "category": "code",
       "dynamic_import_calls": 0,
+      "id": "tropoi.run.execution",
+      "is_package": false,
+      "path": "tropoi/run/execution.py",
+      "stdlib_imports": [
+        "__future__",
+        "os",
+        "platform",
+        "typing"
+      ],
+      "third_party_imports": [
+        "cupy",
+        "numpy"
+      ]
+    },
+    {
+      "category": "code",
+      "dynamic_import_calls": 0,
       "id": "tropoi.run.held_suarez.__main__",
       "is_package": false,
       "path": "tropoi/run/held_suarez/__main__.py",
@@ -6569,21 +6551,6 @@
     {
       "category": "code",
       "dynamic_import_calls": 0,
-      "id": "tropoi.temporal._substrate_reference",
-      "is_package": false,
-      "path": "tropoi/temporal/_substrate_reference.py",
-      "stdlib_imports": [
-        "__future__",
-        "math"
-      ],
-      "third_party_imports": [
-        "cupy",
-        "numpy"
-      ]
-    },
-    {
-      "category": "code",
-      "dynamic_import_calls": 0,
       "id": "tropoi.temporal.column_coupling",
       "is_package": false,
       "path": "tropoi/temporal/column_coupling.py",
@@ -6722,8 +6689,7 @@
       "stdlib_imports": [
         "__future__",
         "ctypes",
-        "importlib",
-        "typing"
+        "importlib"
       ],
       "third_party_imports": [
         "cupy",

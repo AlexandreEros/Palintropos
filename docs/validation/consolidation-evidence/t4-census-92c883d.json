@@ -1,0 +1,118 @@
+{
+ "runs": {
+  "none-24": {
+   "steps": 24,
+   "cadence": "none",
+   "launches": 1246.0,
+   "synchronizations": 49.0,
+   "device_to_host_copies": 48.0,
+   "launches_in_ranges": {
+    "": 531.0,
+    "extent": 18.0,
+    "forcing": 336.0,
+    "native": 25.0,
+    "report": 144.0,
+    "step": 169.0,
+    "CCCL:cub::DeviceReduce::Reduce": 12.0,
+    "CCCL:cub::DeviceReduce::Sum": 192.0,
+    "CCCL:cub::DeviceSegmentedReduce::Reduce": 48.0
+   },
+   "kernel_ms": 489.382024
+  },
+  "none-96": {
+   "steps": 96,
+   "cadence": "none",
+   "launches": 4126.0,
+   "synchronizations": 121.0,
+   "device_to_host_copies": 120.0,
+   "launches_in_ranges": {
+    "": 1323.0,
+    "extent": 18.0,
+    "forcing": 1344.0,
+    "native": 97.0,
+    "report": 576.0,
+    "step": 673.0,
+    "CCCL:cub::DeviceReduce::Reduce": 12.0,
+    "CCCL:cub::DeviceReduce::Sum": 768.0,
+    "CCCL:cub::DeviceSegmentedReduce::Reduce": 192.0
+   },
+   "kernel_ms": 1536.447214
+  },
+  "production-24": {
+   "steps": 24,
+   "cadence": "production",
+   "launches": 1264.0,
+   "synchronizations": 52.0,
+   "device_to_host_copies": 51.0,
+   "launches_in_ranges": {
+    "": 549.0,
+    "extent": 18.0,
+    "forcing": 336.0,
+    "native": 25.0,
+    "report": 144.0,
+    "step": 169.0,
+    "CCCL:cub::DeviceReduce::Reduce": 12.0,
+    "CCCL:cub::DeviceReduce::Sum": 192.0,
+    "CCCL:cub::DeviceSegmentedReduce::Reduce": 48.0
+   },
+   "kernel_ms": 473.877469
+  },
+  "production-96": {
+   "steps": 96,
+   "cadence": "production",
+   "launches": 4219.0,
+   "synchronizations": 139.0,
+   "device_to_host_copies": 138.0,
+   "launches_in_ranges": {
+    "": 1416.0,
+    "extent": 18.0,
+    "forcing": 1344.0,
+    "native": 97.0,
+    "report": 576.0,
+    "step": 673.0,
+    "CCCL:cub::DeviceReduce::Reduce": 12.0,
+    "CCCL:cub::DeviceReduce::Sum": 768.0,
+    "CCCL:cub::DeviceSegmentedReduce::Reduce": 192.0
+   },
+   "kernel_ms": 1523.114218
+  }
+ },
+ "protocol": "per step = (count(N2) - count(N1)) / (N2 - N1)",
+ "per_step_none": {
+  "launches": 40.0,
+  "synchronizations": 1.0,
+  "device_to_host_copies": 1.0,
+  "launches_by_range": {
+   "": 11.0,
+   "CCCL:cub::DeviceReduce::Reduce": 0.0,
+   "CCCL:cub::DeviceReduce::Sum": 8.0,
+   "CCCL:cub::DeviceSegmentedReduce::Reduce": 2.0,
+   "extent": 0.0,
+   "forcing": 14.0,
+   "native": 1.0,
+   "report": 6.0,
+   "step": 7.0
+  }
+ },
+ "per_step_production": {
+  "launches": 41.041666666666664,
+  "synchronizations": 1.2083333333333333,
+  "device_to_host_copies": 1.2083333333333333,
+  "launches_by_range": {
+   "": 12.041666666666666,
+   "CCCL:cub::DeviceReduce::Reduce": 0.0,
+   "CCCL:cub::DeviceReduce::Sum": 8.0,
+   "CCCL:cub::DeviceSegmentedReduce::Reduce": 2.0,
+   "extent": 0.0,
+   "forcing": 14.0,
+   "native": 1.0,
+   "report": 6.0,
+   "step": 7.0
+  }
+ },
+ "output_events_per_step": {
+  "launches": 1.0416666666666643,
+  "synchronizations": 0.20833333333333326,
+  "device_to_host_copies": 0.20833333333333326
+ }
+}

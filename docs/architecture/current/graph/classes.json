@@ -528,10 +528,6 @@
           "name": "conductivity"
         },
         {
-          "kind": "staticmethod",
-          "name": "conductivity_derivative"
-        },
-        {
           "kind": "method",
           "name": "enthalpy_difference"
         },
@@ -4341,6 +4337,16 @@
       "external_bases": [
         "RuntimeError"
       ],
+      "id": "tropoi.run.execution.ExecutionError",
+      "members": [],
+      "module": "tropoi.run.execution",
+      "qualname": "ExecutionError"
+    },
+    {
+      "decorators": [],
+      "external_bases": [
+        "RuntimeError"
+      ],
       "id": "tropoi.run.held_suarez.checkpoint.CheckpointError",
       "members": [],
       "module": "tropoi.run.held_suarez.checkpoint",
@@ -6139,31 +6145,6 @@
     {
       "decorators": [],
       "external_bases": [],
-      "id": "tropoi.temporal._substrate_reference.ReferenceBackwardEulerSubstrate",
-      "members": [
-        {
-          "kind": "method",
-          "name": "__init__"
-        },
-        {
-          "kind": "method",
-          "name": "_report"
-        },
-        {
-          "kind": "method",
-          "name": "_system"
-        },
-        {
-          "kind": "method",
-          "name": "step"
-        }
-      ],
-      "module": "tropoi.temporal._substrate_reference",
-      "qualname": "ReferenceBackwardEulerSubstrate"
-    },
-    {
-      "decorators": [],
-      "external_bases": [],
       "id": "tropoi.temporal.column_coupling.ColumnPhysicsCoupling",
       "members": [
         {
@@ -6670,6 +6651,10 @@
           "name": "__init__"
         },
         {
+          "kind": "staticmethod",
+          "name": "_raise_invalid"
+        },
+        {
           "kind": "method",
           "name": "_report"
         },
@@ -6724,6 +6709,16 @@
       "members": [],
       "module": "tropoi.temporal.substrate_native",
       "qualname": "_ColumnArrays"
+    },
+    {
+      "decorators": [],
+      "external_bases": [
+        "ctypes.Structure"
+      ],
+      "id": "tropoi.temporal.substrate_native._ColumnInput",
+      "members": [],
+      "module": "tropoi.temporal.substrate_native",
+      "qualname": "_ColumnInput"
     },
     {
       "decorators": [],

@@ -1,6 +1,10 @@
 """``python -m tropoi.run.airless {show-config,run} (--preset NAME [...] | --config FILE)
 [--steps N | --duration SECONDS]``.
 
+Runs execute on CUDA (CuPy); there is no CPU fallback. CPU execution is for
+verification: the hidden ``--device cpu`` or
+``TROPOI_EXECUTION=cpu-verification`` (:mod:`tropoi.run.execution`).
+
 Without ``--steps``/``--duration`` a run iterates cycles until periodic or a
 cycle limit (``AirlessRun.run``). With one of them it is a finite transient
 at the production timestep that stops at that point (``AirlessRun.run_transient``).
@@ -72,9 +76,10 @@ def main(argv=None) -> int:
                       help="finite transient: run until this simulated time (the first step "
                            "reaching it); the actual final time is reported")
     ap.add_argument("--workers", type=int, default=1,
-                    help="worker processes (blocks of columns); with --backend cupy, 1 per GPU")
-    ap.add_argument("--backend", choices=("numpy", "cupy"), default="numpy",
-                    help="execution backend; the mathematics is identical")
+                    help="worker processes (blocks of columns); 1 per GPU")
+    # Runs execute on CUDA. CPU execution is for verification (tests/README.md):
+    # --device cpu or TROPOI_EXECUTION=cpu-verification; hidden from --help.
+    ap.add_argument("--device", choices=("cuda", "cpu"), help=argparse.SUPPRESS)
     ap.add_argument("--max-wall-s", type=float)
     ap.add_argument("--allow-dirty", action="store_true")
     args = ap.parse_args(argv)
@@ -116,7 +121,13 @@ def main(argv=None) -> int:
     if not args.out:
         ap.error("run needs --out")
     from tropoi.run.airless.experiment import AirlessRun
-    run = AirlessRun(cfg, args.out, workers=args.workers, backend=args.backend,
+    from tropoi.run.execution import ExecutionError, resolve_backend
+    try:
+        backend = resolve_backend(device=args.device)
+    except ExecutionError as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return 2
+    run = AirlessRun(cfg, args.out, workers=args.workers, backend=backend,
                      allow_dirty=args.allow_dirty, config_source=source_info)
     if transient:
         result = run.run_transient(steps, request=request)
