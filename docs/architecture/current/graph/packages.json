@@ -716,8 +716,8 @@
     },
     {
       "kind": "imports",
-      "module_edges": 3,
-      "runtime_module_edges": 3,
+      "module_edges": 7,
+      "runtime_module_edges": 7,
       "source": "tropoi.temporal",
       "target": "tropoi.physics"
     },
@@ -741,6 +741,13 @@
       "runtime_module_edges": 1,
       "source": "tropoi.temporal",
       "target": "tropoi.spatial.terrain"
+    },
+    {
+      "kind": "imports",
+      "module_edges": 1,
+      "runtime_module_edges": 1,
+      "source": "tropoi.temporal",
+      "target": "tropoi.temporal.native"
     },
     {
       "kind": "imports",
@@ -909,8 +916,13 @@
     },
     {
       "id": "tropoi.temporal",
-      "internal_edges": 3,
-      "modules": 8
+      "internal_edges": 5,
+      "modules": 10
+    },
+    {
+      "id": "tropoi.temporal.native",
+      "internal_edges": 0,
+      "modules": 1
     },
     {
       "id": "tropoi.temporal.tendencies",

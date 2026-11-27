@@ -40,5 +40,11 @@ jobs:
           python -m pip install -r ci-requirements.txt pytest "netCDF4==1.7.4"
           python -m pip install --no-deps -e .
 
+      # The CPU substrate library is an optional extension (the package must
+      # install without a compiler); CI has g++ and must actually build it, so
+      # its absence fails here instead of skipping into the Python reference.
+      - name: Check the native CPU substrate library
+        run: python -c "from tropoi.temporal.substrate_native import host_library as h; l = h(); print(l.origin, l.flags, l.digest)"
+
       - name: Run the CPU test suite
         run: python -m pytest -q

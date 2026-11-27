@@ -101,23 +101,24 @@ def test_analytic_jacobian_matches_finite_differences():
     forcing = (rng.uniform(0.0, 9000.0, n), -rng.uniform(0.0, 5.0, n),
                rng.uniform(-50.0, 50.0, n), np.full(n, 0.02), np.zeros((1, 1)))
     dt = 1800.0
-    out = BackwardEulerSubstrate(sub)._system(np, th, ths, th_old, dt, forcing, jacobian=True)
-    lower, diag, upper = out["jacobian"]
+    # the native implementation's residual and analytic Jacobian, per column
+    from tropoi.temporal.substrate_native import evaluate_host
+    const, a, t_ref, gb, _ = forcing
     x0 = np.concatenate([ths[None], th], axis=0)
 
-    def resid(x):
-        o = BackwardEulerSubstrate(sub)._system(np, x[1:], x[0], th_old, dt, forcing, jacobian=False)
-        return np.concatenate([o["r_s"][None], o["r"]], axis=0)
+    def native(x, c):
+        return evaluate_host(sub, th_old[:, c], x, dt, const[c], a[c], t_ref[c], gb[c])
 
     for c in range(n):
-        dense = np.diag(diag[:, c]) + np.diag(lower[:, c], -1) + np.diag(upper[:, c], 1)
+        _, lower, diag, upper = native(x0[:, c], c)
+        dense = np.diag(diag) + np.diag(lower, -1) + np.diag(upper, 1)
         fd = np.empty_like(dense)
         for j in range(L + 1):
             h = math.sqrt(np.finfo(float).eps) * (REF + abs(x0[j, c]))
-            xp_, xm = x0.copy(), x0.copy()
-            xp_[j, c] += h
-            xm[j, c] -= h
-            fd[:, j] = (resid(xp_)[:, c] - resid(xm)[:, c]) / (2 * h)
+            xp_, xm = x0[:, c].copy(), x0[:, c].copy()
+            xp_[j] += h
+            xm[j] -= h
+            fd[:, j] = (native(xp_, c)[0] - native(xm, c)[0]) / (2 * h)
         scale = np.max(np.abs(dense), axis=1, keepdims=True)
         assert np.max(np.abs(fd - dense) / scale) <= 1e-6
 
@@ -272,10 +273,14 @@ def test_steady_kirchhoff_profile_and_interface_flux():
             st, rep = BackwardEulerSubstrate(sub).step(st, 1e25, shortwave_down=F)
         T = sub.temperature(st)[:, 0]
         errs.append(np.max(np.abs(T - exact)))
-        out = BackwardEulerSubstrate(sub)._system(np, st.anomaly, st.surface_anomaly, st.anomaly, 1e25,
-                          ((1 - ALBEDO) * np.array([F]), np.zeros(1), np.zeros(1),
-                           np.array([G]), np.zeros((1, 1))), jacobian=False)
-        assert np.max(np.abs(out["faces"][:, 0] + G)) <= 1e-9 + 1e-12 * G   # q = -G everywhere
+        # q = -G everywhere: the skin flux is -G and no cell stores or loses
+        # energy (each residual -(F_in - F_out) vanishes, so every face carries -G)
+        from tropoi.temporal.substrate_native import evaluate_host
+        R, _, _, _ = evaluate_host(sub, st.anomaly[:, 0], np.concatenate([st.surface_anomaly,
+                                                                          st.anomaly[:, 0]]),
+                                   1e25, (1 - ALBEDO) * F, 0.0, float(st.surface_anomaly[0]), G)
+        assert abs(float(rep.conducted[0]) + G) <= 1e-9 + 1e-12 * G
+        assert np.max(np.abs(R[1:])) <= 1e-9 + 1e-12 * G
         Ts = float(sub.surface_temperature(st)[0])
         assert EMISS * SIGMA_SB * Ts ** 4 == pytest.approx((1 - ALBEDO) * F + G, rel=1e-10)
     print("steady errors", errs, "orders", _order(errs))

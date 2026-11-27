@@ -6139,6 +6139,31 @@
     {
       "decorators": [],
       "external_bases": [],
+      "id": "tropoi.temporal._substrate_reference.ReferenceBackwardEulerSubstrate",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__init__"
+        },
+        {
+          "kind": "method",
+          "name": "_report"
+        },
+        {
+          "kind": "method",
+          "name": "_system"
+        },
+        {
+          "kind": "method",
+          "name": "step"
+        }
+      ],
+      "module": "tropoi.temporal._substrate_reference",
+      "qualname": "ReferenceBackwardEulerSubstrate"
+    },
+    {
+      "decorators": [],
+      "external_bases": [],
       "id": "tropoi.temporal.column_coupling.ColumnPhysicsCoupling",
       "members": [
         {
@@ -6650,7 +6675,7 @@
         },
         {
           "kind": "method",
-          "name": "_system"
+          "name": "describe"
         },
         {
           "kind": "method",
@@ -6679,6 +6704,36 @@
       "members": [],
       "module": "tropoi.temporal.substrate",
       "qualname": "SubstrateSolveError"
+    },
+    {
+      "decorators": [],
+      "external_bases": [
+        "RuntimeError"
+      ],
+      "id": "tropoi.temporal.substrate_native.NativeLibraryError",
+      "members": [],
+      "module": "tropoi.temporal.substrate_native",
+      "qualname": "NativeLibraryError"
+    },
+    {
+      "decorators": [],
+      "external_bases": [
+        "ctypes.Structure"
+      ],
+      "id": "tropoi.temporal.substrate_native._ColumnArrays",
+      "members": [],
+      "module": "tropoi.temporal.substrate_native",
+      "qualname": "_ColumnArrays"
+    },
+    {
+      "decorators": [],
+      "external_bases": [
+        "ctypes.Structure"
+      ],
+      "id": "tropoi.temporal.substrate_native._StepScalars",
+      "members": [],
+      "module": "tropoi.temporal.substrate_native",
+      "qualname": "_StepScalars"
     },
     {
       "decorators": [],
