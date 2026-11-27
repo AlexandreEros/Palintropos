@@ -23,7 +23,8 @@ flowchart TD
         n_tropoi_orepresentation_ovisual["representation.visual (27 modules)"]
     end
     subgraph g_temporal["layer temporal"]
-        n_tropoi_otemporal["temporal (8 modules)"]
+        n_tropoi_otemporal["temporal (10 modules)"]
+        n_tropoi_otemporal_onative["temporal.native (1 module)"]
         n_tropoi_otemporal_otendencies["temporal.tendencies (6 modules)"]
     end
     subgraph g_spatial["layer spatial"]
@@ -145,10 +146,11 @@ flowchart TD
     n_tropoi_ospatial_otransforms -->|2| n_tropoi_ospatial_ogrids
     n_tropoi_ospatial_otransforms -->|3| n_tropoi_ospatial_otransforms_ocuda
     n_tropoi_otemporal -->|1| n_tropoi_onumerics
-    n_tropoi_otemporal -->|3| n_tropoi_ophysics
+    n_tropoi_otemporal -->|7| n_tropoi_ophysics
     n_tropoi_otemporal -->|9| n_tropoi_ospatial
     n_tropoi_otemporal -->|1| n_tropoi_ospatial_ostates
     n_tropoi_otemporal -->|1| n_tropoi_ospatial_oterrain
+    n_tropoi_otemporal -->|1| n_tropoi_otemporal_onative
     n_tropoi_otemporal -->|2| n_tropoi_otemporal_otendencies
     n_tropoi_otemporal_otendencies -->|4| n_tropoi_ophysics
     n_tropoi_otemporal_otendencies -->|11| n_tropoi_ospatial

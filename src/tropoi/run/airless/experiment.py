@@ -434,6 +434,7 @@ class AirlessRun:
             "workers": self.workers, "backend": self.backend,
             "initial_state_source": initial_state_source if initial_state is not None else None,
             "config_source": config_source, "column_kind": self.kind,
+            "substrate_implementation": BackwardEulerSubstrate(self.sub).describe(self.backend),
             "created": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())})
         self.initial_state = initial_state
         areas = {} if self.w is None else {"weights": self.w}

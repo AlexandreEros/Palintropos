@@ -345,6 +345,8 @@ flowchart LR
     nL7P2EU2VRYVYQ["SeparableGaussSphericalHarmonics"]:::classNode
     nLSDGJEGXCDEQY["spherical#95;harmonics.py"]:::moduleNode
     n4UB7ULPHEOPCO["LatLonSphericalHarmonics"]:::classNode
+    nPGBNMIY2J3THW["#95;substrate#95;reference.py"]:::moduleNode
+    nB4H65LLINISO2["ReferenceBackwardEulerSubstrate"]:::classNode
     nVHLEQO5BKBHCQ["column#95;coupling.py"]:::moduleNode
     nHTOUGSMJC4SB4["ColumnPhysicsCoupling"]:::classNode
     nPTHRT3ILDQUPW["hooks.py"]:::moduleNode
@@ -363,9 +365,13 @@ flowchart LR
     nLW6Q7B7K6E5HQ["TimeStepper"]:::classNode
     n6MYRCAZ6FQL6Y["RK4Stepper"]:::classNode
     n6UYHHNPDEPC5W["substrate.py"]:::moduleNode
-    n7Y7ECKMKLOVVA["SubstrateSolveError"]:::classNode
-    nJI3IDYULZSTEE["StepReport"]:::classNode
-    nUHQB3WHQQ5XSA["BackwardEulerSubstrate"]:::classNode
+    nNWXFIIEUDER3W["SubstrateSolveError"]:::classNode
+    nTIX4NTZWB7CDY["StepReport"]:::classNode
+    nRJBJWPAGPE66I["BackwardEulerSubstrate"]:::classNode
+    n244B2F7LAHIGA["substrate#95;native.py"]:::moduleNode
+    nGWOCA6FYFRCG4["NativeLibraryError"]:::classNode
+    nLKFCUJPOP2J32["#95;StepScalars"]:::classNode
+    nLYICPVXYVPJQG["#95;ColumnArrays"]:::classNode
     n2QABI7D7Q57D6["barotropic.py"]:::moduleNode
     nEPO4LOVLPTMGC["BarotropicVorticity"]:::classNode
     nBIRMLFO55DXCQ["boundary#95;layer.py"]:::moduleNode
@@ -719,6 +725,8 @@ flowchart LR
     nH5NVGBWK6BNZI --> nL7P2EU2VRYVYQ
     nDZNKIG56YF4Q2 --> nLSDGJEGXCDEQY
     nLSDGJEGXCDEQY --> n4UB7ULPHEOPCO
+    n26OGEY2QQJ23S --> nPGBNMIY2J3THW
+    nPGBNMIY2J3THW --> nB4H65LLINISO2
     n26OGEY2QQJ23S --> nVHLEQO5BKBHCQ
     nVHLEQO5BKBHCQ --> nHTOUGSMJC4SB4
     n26OGEY2QQJ23S --> nPTHRT3ILDQUPW
@@ -737,9 +745,13 @@ flowchart LR
     n7HMJL7KKPO23K --> nLW6Q7B7K6E5HQ
     n7HMJL7KKPO23K --> n6MYRCAZ6FQL6Y
     n26OGEY2QQJ23S --> n6UYHHNPDEPC5W
-    n6UYHHNPDEPC5W --> n7Y7ECKMKLOVVA
-    n6UYHHNPDEPC5W --> nJI3IDYULZSTEE
-    n6UYHHNPDEPC5W --> nUHQB3WHQQ5XSA
+    n6UYHHNPDEPC5W --> nNWXFIIEUDER3W
+    n6UYHHNPDEPC5W --> nTIX4NTZWB7CDY
+    n6UYHHNPDEPC5W --> nRJBJWPAGPE66I
+    n26OGEY2QQJ23S --> n244B2F7LAHIGA
+    n244B2F7LAHIGA --> nGWOCA6FYFRCG4
+    n244B2F7LAHIGA --> nLKFCUJPOP2J32
+    n244B2F7LAHIGA --> nLYICPVXYVPJQG
     nP2JJN5FALZZZM --> n2QABI7D7Q57D6
     n2QABI7D7Q57D6 --> nEPO4LOVLPTMGC
     nP2JJN5FALZZZM --> nBIRMLFO55DXCQ

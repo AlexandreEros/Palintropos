@@ -51,3 +51,7 @@ notebooks/*_browser_handoff.ipynb
 # Fetched opacity inputs and imported k-tables, never committed:
 # tools/radiation/opacity/fetch_socrates.py and import_socrates.py write here.
 opacity_cache/
+
+# In-place builds of the native CPU substrate library (python setup.py build_ext --inplace)
+src/tropoi/temporal/_substrate_native*.so
+src/tropoi/temporal/_substrate_native*.pyd

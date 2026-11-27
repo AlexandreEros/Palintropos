@@ -5,13 +5,13 @@
 
 | | |
 |---|---|
-| Source base commit | `3f98c0506d05bf9b23c6aaf06a2bb080a10b423f` (plus uncommitted working-tree changes) |
+| Source base commit | `e658ef3159dca1e638d8e0ef8f3cb65a470c8312` (plus uncommitted working-tree changes) |
 | Analysed package | `tropoi` under `src/` |
 | Generator | `tools.architecture` 2.3.0 |
 | Toolchain | Python 3.12, grimp 3.17, networkx 3.7 |
 | Command | `python -m tools.architecture.generate` |
 
-Source working tree: **dirty**. Content SHA-256: `fce46f772014ee366f1f68fcf1e18fa014a33ac4a20115d2678852c598823602`. Generator working tree: **dirty**. Per-file hashes and scoped Git status are recorded in `metrics.json`. These describe generation time; --check verifies source and generator content hashes before reusing this context across later commits. The base commit alone does not identify uncommitted source.
+Source working tree: **dirty**. Content SHA-256: `8c1f66984e1c89397e83732cc59bdf6c55e7d041798c1af444cd4723e63f7b07`. Generator working tree: **clean**. Per-file hashes and scoped Git status are recorded in `metrics.json`. These describe generation time; --check verifies source and generator content hashes before reusing this context across later commits. The base commit alone does not identify uncommitted source.
 
 ## Reproducing
 
@@ -60,7 +60,9 @@ python -m tools.architecture.generate
 | `packages/tropoi.cli.md` | Package page: all of its modules, classes and public functions; imports in and out. |
 | `packages/tropoi.md` | Package page: all of its modules, classes and public functions; imports in and out. |
 | `packages/tropoi.numerics.md` | Package page: all of its modules, classes and public functions; imports in and out. |
+| `packages/tropoi.numerics.native.md` | Package page: all of its modules, classes and public functions; imports in and out. |
 | `packages/tropoi.physics.md` | Package page: all of its modules, classes and public functions; imports in and out. |
+| `packages/tropoi.physics.native.md` | Package page: all of its modules, classes and public functions; imports in and out. |
 | `packages/tropoi.physics.radiation.md` | Package page: all of its modules, classes and public functions; imports in and out. |
 | `packages/tropoi.representation.archive.md` | Package page: all of its modules, classes and public functions; imports in and out. |
 | `packages/tropoi.representation.diagnostics.md` | Package page: all of its modules, classes and public functions; imports in and out. |
@@ -83,6 +85,7 @@ python -m tools.architecture.generate
 | `packages/tropoi.spatial.transforms.cuda.md` | Package page: all of its modules, classes and public functions; imports in and out. |
 | `packages/tropoi.spatial.transforms.md` | Package page: all of its modules, classes and public functions; imports in and out. |
 | `packages/tropoi.temporal.md` | Package page: all of its modules, classes and public functions; imports in and out. |
+| `packages/tropoi.temporal.native.md` | Package page: all of its modules, classes and public functions; imports in and out. |
 | `packages/tropoi.temporal.tendencies.md` | Package page: all of its modules, classes and public functions; imports in and out. |
 | `structure.mmd` | Every class definition, with the Python files and directories that contain it. |
 
@@ -92,7 +95,7 @@ Generated files contain no timestamps, absolute paths, or source line numbers, s
 
 Three generic rules decide what must be documented (`tools/architecture/coverage.py`):
 
-1. **Packages:** every analysed package gets packages/<package>.md with all of its modules, classes and public module-level functions. 27 packages, 27 pages; 191 of 191 modules and 240 of 240 classes rendered (generation fails if any is missing).
+1. **Packages:** every analysed package gets packages/<package>.md with all of its modules, classes and public module-level functions. 30 packages, 30 pages; 197 of 197 modules and 244 of 244 classes rendered (generation fails if any is missing).
 2. **CLI handlers:** every <parser>.set_defaults(<keyword>=<function>) handler gets calls/cli-<name>.mmd. 12 discovered.
 3. **Public Python entry points:** module-level functions exported through some __all__ (re-exports followed) that no analysed function calls; each must be declared as an entry path root or excluded with a reason. 42 candidates: 17 are roots of declared entry paths, 25 excluded with a reason.
 
@@ -110,9 +113,9 @@ The rules are generic path and syntax rules; none names a particular subpackage.
 4. Each module gets a syntactic category: `namespace` (a namespace package directory), `empty` (no statement besides a docstring), `reexport` (only imports, `__all__` assignments, and alias assignments `A = B`), or `code`. Categories are attributes, not filters, with one exception: a `namespace` or `empty` module that no analysed module imports is dropped from the module graph, because it has no code and no edges.
 5. Imports of modules outside the package are not graph edges; they are listed per module (`stdlib_imports`, `third_party_imports` in `graph/modules.json`).
 
-Modules discovered: 191; in the module graph: 166. Categories: code 161, empty 24, namespace 1, reexport 5.
+Modules discovered: 197; in the module graph: 169. Categories: code 164, empty 27, namespace 1, reexport 5.
 
-Excluded by rule 4: `tropoi`, `tropoi.cli`, `tropoi.numerics`, `tropoi.physics`, `tropoi.physics.radiation`, `tropoi.representation`, `tropoi.representation.diagnostics`, `tropoi.representation.visual`, `tropoi.run`, `tropoi.run.airless`, `tropoi.run.bve`, `tropoi.run.held_suarez`, `tropoi.run.pe`, `tropoi.run.radiative`, `tropoi.run.swe`, `tropoi.spatial`, `tropoi.spatial.grids`, `tropoi.spatial.initialization`, `tropoi.spatial.operators`, `tropoi.spatial.states`, `tropoi.spatial.terrain`, `tropoi.spatial.transforms`, `tropoi.spatial.transforms.cuda`, `tropoi.temporal`, `tropoi.temporal.tendencies`.
+Excluded by rule 4: `tropoi`, `tropoi.cli`, `tropoi.numerics`, `tropoi.numerics.native`, `tropoi.physics`, `tropoi.physics.native`, `tropoi.physics.radiation`, `tropoi.representation`, `tropoi.representation.diagnostics`, `tropoi.representation.visual`, `tropoi.run`, `tropoi.run.airless`, `tropoi.run.bve`, `tropoi.run.held_suarez`, `tropoi.run.pe`, `tropoi.run.radiative`, `tropoi.run.swe`, `tropoi.spatial`, `tropoi.spatial.grids`, `tropoi.spatial.initialization`, `tropoi.spatial.operators`, `tropoi.spatial.states`, `tropoi.spatial.terrain`, `tropoi.spatial.transforms`, `tropoi.spatial.transforms.cuda`, `tropoi.temporal`, `tropoi.temporal.native`, `tropoi.temporal.tendencies`.
 
 `reexport` modules (kept): `tropoi.representation.archive`, `tropoi.run.bve.model`, `tropoi.run.custom`, `tropoi.run.pe.model`, `tropoi.run.swe.model`.
 
@@ -156,7 +159,7 @@ The Mermaid tree and the offline atlas each contain every class definition, the 
 
 ### Call graphs (ast)
 
-Each call expression inside a function or method body (nested functions, lambdas, and comprehensions are attributed to the enclosing function) is classified as `internal` (resolved to an analysed definition), `external` (resolved to a name outside the package), `builtin` (an unshadowed builtin), or `unresolved`. Totals: builtin 4447, external 2854, internal 3366, unresolved 4550.
+Each call expression inside a function or method body (nested functions, lambdas, and comprehensions are attributed to the enclosing function) is classified as `internal` (resolved to an analysed definition), `external` (resolved to a name outside the package), `builtin` (an unshadowed builtin), or `unresolved`. Totals: builtin 4485, external 2891, internal 3407, unresolved 4668.
 
 | Edge kind | Syntax | What it claims |
 |---|---|---|

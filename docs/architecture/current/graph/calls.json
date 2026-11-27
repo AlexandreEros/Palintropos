@@ -7106,6 +7106,11 @@
       "target": "tropoi.run.held_suarez.experiment.environment_identity"
     },
     {
+      "kind": "instantiate",
+      "source": "tropoi.run.airless.experiment.AirlessRun.__init__",
+      "target": "tropoi.temporal.substrate.BackwardEulerSubstrate"
+    },
+    {
       "kind": "self",
       "source": "tropoi.run.airless.experiment.AirlessRun._cycle",
       "target": "tropoi.run.airless.experiment.AirlessRun._mkdir"
@@ -11647,6 +11652,66 @@
     },
     {
       "kind": "constructor",
+      "source": "tropoi.temporal._substrate_reference.ReferenceBackwardEulerSubstrate",
+      "target": "tropoi.temporal._substrate_reference.ReferenceBackwardEulerSubstrate.__init__"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.temporal._substrate_reference.ReferenceBackwardEulerSubstrate._report",
+      "target": "tropoi.temporal.substrate.StepReport"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.temporal._substrate_reference.ReferenceBackwardEulerSubstrate._system",
+      "target": "tropoi.physics.materials.CellMaterials.conductivity"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.temporal._substrate_reference.ReferenceBackwardEulerSubstrate._system",
+      "target": "tropoi.physics.materials.CellMaterials.conductivity_derivative"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.temporal._substrate_reference.ReferenceBackwardEulerSubstrate._system",
+      "target": "tropoi.physics.materials.CellMaterials.kirchhoff_difference"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.temporal._substrate_reference.ReferenceBackwardEulerSubstrate.step",
+      "target": "tropoi.numerics.tridiagonal.thomas"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.temporal._substrate_reference.ReferenceBackwardEulerSubstrate.step",
+      "target": "tropoi.physics.substrate.SubstrateState"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.temporal._substrate_reference.ReferenceBackwardEulerSubstrate.step",
+      "target": "tropoi.temporal._substrate_reference.ReferenceBackwardEulerSubstrate._report"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.temporal._substrate_reference.ReferenceBackwardEulerSubstrate.step",
+      "target": "tropoi.temporal._substrate_reference.ReferenceBackwardEulerSubstrate._system"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.temporal._substrate_reference.ReferenceBackwardEulerSubstrate.step",
+      "target": "tropoi.temporal._substrate_reference._host"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.temporal._substrate_reference.ReferenceBackwardEulerSubstrate.step",
+      "target": "tropoi.temporal._substrate_reference._xp"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.temporal._substrate_reference.ReferenceBackwardEulerSubstrate.step",
+      "target": "tropoi.temporal.substrate.SubstrateSolveError"
+    },
+    {
+      "kind": "constructor",
       "source": "tropoi.temporal.column_coupling.ColumnPhysicsCoupling",
       "target": "tropoi.temporal.column_coupling.ColumnPhysicsCoupling.__init__"
     },
@@ -11911,6 +11976,11 @@
       "target": "tropoi.temporal.tendencies.shallow_water.ShallowWaterModel"
     },
     {
+      "kind": "call",
+      "source": "tropoi.temporal.native.build_identity.digest",
+      "target": "tropoi.temporal.native.build_identity.source_files"
+    },
+    {
       "kind": "constructor",
       "source": "tropoi.temporal.semi_implicit.SemiImplicitLeapfrogStepper",
       "target": "tropoi.temporal.semi_implicit.SemiImplicitLeapfrogStepper.__init__"
@@ -12112,23 +12182,8 @@
     },
     {
       "kind": "call",
-      "source": "tropoi.temporal.substrate.BackwardEulerSubstrate._system",
-      "target": "tropoi.physics.materials.CellMaterials.conductivity"
-    },
-    {
-      "kind": "call",
-      "source": "tropoi.temporal.substrate.BackwardEulerSubstrate._system",
-      "target": "tropoi.physics.materials.CellMaterials.conductivity_derivative"
-    },
-    {
-      "kind": "call",
-      "source": "tropoi.temporal.substrate.BackwardEulerSubstrate._system",
-      "target": "tropoi.physics.materials.CellMaterials.kirchhoff_difference"
-    },
-    {
-      "kind": "call",
-      "source": "tropoi.temporal.substrate.BackwardEulerSubstrate.step",
-      "target": "tropoi.numerics.tridiagonal.thomas"
+      "source": "tropoi.temporal.substrate.BackwardEulerSubstrate.describe",
+      "target": "tropoi.temporal.substrate_native.describe"
     },
     {
       "kind": "instantiate",
@@ -12139,11 +12194,6 @@
       "kind": "self",
       "source": "tropoi.temporal.substrate.BackwardEulerSubstrate.step",
       "target": "tropoi.temporal.substrate.BackwardEulerSubstrate._report"
-    },
-    {
-      "kind": "self",
-      "source": "tropoi.temporal.substrate.BackwardEulerSubstrate.step",
-      "target": "tropoi.temporal.substrate.BackwardEulerSubstrate._system"
     },
     {
       "kind": "instantiate",
@@ -12159,6 +12209,146 @@
       "kind": "call",
       "source": "tropoi.temporal.substrate.BackwardEulerSubstrate.step",
       "target": "tropoi.temporal.substrate._xp"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.temporal.substrate.BackwardEulerSubstrate.step",
+      "target": "tropoi.temporal.substrate_native.run_step"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.temporal.substrate_native._device_kernel",
+      "target": "tropoi.temporal.native.build_identity.digest"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.temporal.substrate_native._device_kernel",
+      "target": "tropoi.temporal.substrate_native.specialization"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.temporal.substrate_native._law",
+      "target": "tropoi.temporal.substrate_native._law"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.temporal.substrate_native.describe",
+      "target": "tropoi.temporal.native.build_identity.digest"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.temporal.substrate_native.describe",
+      "target": "tropoi.temporal.substrate_native.host_library"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.temporal.substrate_native.describe",
+      "target": "tropoi.temporal.substrate_native.specialization"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.temporal.substrate_native.evaluate_host",
+      "target": "tropoi.temporal.substrate_native.NativeLibraryError"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.temporal.substrate_native.evaluate_host",
+      "target": "tropoi.temporal.substrate_native._ColumnArrays"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.temporal.substrate_native.evaluate_host",
+      "target": "tropoi.temporal.substrate_native._StepScalars"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.temporal.substrate_native.evaluate_host",
+      "target": "tropoi.temporal.substrate_native._check_host_capacity"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.temporal.substrate_native.evaluate_host",
+      "target": "tropoi.temporal.substrate_native.host_library"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.temporal.substrate_native.evaluate_host",
+      "target": "tropoi.temporal.substrate_native.law_parameters"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.temporal.substrate_native.evaluate_host",
+      "target": "tropoi.temporal.substrate_native.scalars"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.temporal.substrate_native.evaluate_host",
+      "target": "tropoi.temporal.substrate_native.specialization"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.temporal.substrate_native.host_library",
+      "target": "tropoi.temporal.native.build_identity.digest"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.temporal.substrate_native.host_library",
+      "target": "tropoi.temporal.substrate_native.NativeLibraryError"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.temporal.substrate_native.law_parameters",
+      "target": "tropoi.temporal.substrate_native._law"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.temporal.substrate_native.run_step",
+      "target": "tropoi.temporal.substrate_native.NativeLibraryError"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.temporal.substrate_native.run_step",
+      "target": "tropoi.temporal.substrate_native._ColumnArrays"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.temporal.substrate_native.run_step",
+      "target": "tropoi.temporal.substrate_native._StepScalars"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.temporal.substrate_native.run_step",
+      "target": "tropoi.temporal.substrate_native._check_host_capacity"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.temporal.substrate_native.run_step",
+      "target": "tropoi.temporal.substrate_native._device_kernel"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.temporal.substrate_native.run_step",
+      "target": "tropoi.temporal.substrate_native.host_library"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.temporal.substrate_native.run_step",
+      "target": "tropoi.temporal.substrate_native.law_parameters"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.temporal.substrate_native.run_step",
+      "target": "tropoi.temporal.substrate_native.scalars"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.temporal.substrate_native.run_step",
+      "target": "tropoi.temporal.substrate_native.specialization"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.temporal.substrate_native.specialization",
+      "target": "tropoi.temporal.substrate_native._law"
     },
     {
       "kind": "constructor",
@@ -26421,6 +26611,55 @@
       "type": "function"
     },
     {
+      "id": "tropoi.temporal._substrate_reference.ReferenceBackwardEulerSubstrate",
+      "kind": "class",
+      "module": "tropoi.temporal._substrate_reference",
+      "qualname": "ReferenceBackwardEulerSubstrate",
+      "type": "class"
+    },
+    {
+      "id": "tropoi.temporal._substrate_reference.ReferenceBackwardEulerSubstrate.__init__",
+      "kind": "method",
+      "module": "tropoi.temporal._substrate_reference",
+      "qualname": "ReferenceBackwardEulerSubstrate.__init__",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.temporal._substrate_reference.ReferenceBackwardEulerSubstrate._report",
+      "kind": "method",
+      "module": "tropoi.temporal._substrate_reference",
+      "qualname": "ReferenceBackwardEulerSubstrate._report",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.temporal._substrate_reference.ReferenceBackwardEulerSubstrate._system",
+      "kind": "method",
+      "module": "tropoi.temporal._substrate_reference",
+      "qualname": "ReferenceBackwardEulerSubstrate._system",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.temporal._substrate_reference.ReferenceBackwardEulerSubstrate.step",
+      "kind": "method",
+      "module": "tropoi.temporal._substrate_reference",
+      "qualname": "ReferenceBackwardEulerSubstrate.step",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.temporal._substrate_reference._host",
+      "kind": "function",
+      "module": "tropoi.temporal._substrate_reference",
+      "qualname": "_host",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.temporal._substrate_reference._xp",
+      "kind": "function",
+      "module": "tropoi.temporal._substrate_reference",
+      "qualname": "_xp",
+      "type": "function"
+    },
+    {
       "id": "tropoi.temporal.column_coupling.ColumnPhysicsCoupling",
       "kind": "class",
       "module": "tropoi.temporal.column_coupling",
@@ -26761,6 +27000,20 @@
       "kind": "function",
       "module": "tropoi.temporal.models",
       "qualname": "build_swe_model",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.temporal.native.build_identity.digest",
+      "kind": "function",
+      "module": "tropoi.temporal.native.build_identity",
+      "qualname": "digest",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.temporal.native.build_identity.source_files",
+      "kind": "function",
+      "module": "tropoi.temporal.native.build_identity",
+      "qualname": "source_files",
       "type": "function"
     },
     {
@@ -27436,10 +27689,10 @@
       "type": "function"
     },
     {
-      "id": "tropoi.temporal.substrate.BackwardEulerSubstrate._system",
+      "id": "tropoi.temporal.substrate.BackwardEulerSubstrate.describe",
       "kind": "method",
       "module": "tropoi.temporal.substrate",
-      "qualname": "BackwardEulerSubstrate._system",
+      "qualname": "BackwardEulerSubstrate.describe",
       "type": "function"
     },
     {
@@ -27475,6 +27728,97 @@
       "kind": "function",
       "module": "tropoi.temporal.substrate",
       "qualname": "_xp",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.temporal.substrate_native.NativeLibraryError",
+      "kind": "class",
+      "module": "tropoi.temporal.substrate_native",
+      "qualname": "NativeLibraryError",
+      "type": "class"
+    },
+    {
+      "id": "tropoi.temporal.substrate_native._ColumnArrays",
+      "kind": "class",
+      "module": "tropoi.temporal.substrate_native",
+      "qualname": "_ColumnArrays",
+      "type": "class"
+    },
+    {
+      "id": "tropoi.temporal.substrate_native._StepScalars",
+      "kind": "class",
+      "module": "tropoi.temporal.substrate_native",
+      "qualname": "_StepScalars",
+      "type": "class"
+    },
+    {
+      "id": "tropoi.temporal.substrate_native._check_host_capacity",
+      "kind": "function",
+      "module": "tropoi.temporal.substrate_native",
+      "qualname": "_check_host_capacity",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.temporal.substrate_native._device_kernel",
+      "kind": "function",
+      "module": "tropoi.temporal.substrate_native",
+      "qualname": "_device_kernel",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.temporal.substrate_native._law",
+      "kind": "function",
+      "module": "tropoi.temporal.substrate_native",
+      "qualname": "_law",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.temporal.substrate_native.describe",
+      "kind": "function",
+      "module": "tropoi.temporal.substrate_native",
+      "qualname": "describe",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.temporal.substrate_native.evaluate_host",
+      "kind": "function",
+      "module": "tropoi.temporal.substrate_native",
+      "qualname": "evaluate_host",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.temporal.substrate_native.host_library",
+      "kind": "function",
+      "module": "tropoi.temporal.substrate_native",
+      "qualname": "host_library",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.temporal.substrate_native.law_parameters",
+      "kind": "function",
+      "module": "tropoi.temporal.substrate_native",
+      "qualname": "law_parameters",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.temporal.substrate_native.run_step",
+      "kind": "function",
+      "module": "tropoi.temporal.substrate_native",
+      "qualname": "run_step",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.temporal.substrate_native.scalars",
+      "kind": "function",
+      "module": "tropoi.temporal.substrate_native",
+      "qualname": "scalars",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.temporal.substrate_native.specialization",
+      "kind": "function",
+      "module": "tropoi.temporal.substrate_native",
+      "qualname": "specialization",
       "type": "function"
     },
     {

@@ -524,6 +524,50 @@ python -c "from pathlib import Path; from tropoi.representation.diagnostics.bve 
 5. Run the same transform, Jacobian, velocity, diagnostics, RH4, provenance, and
    end-to-end tests used for both current backends.
 
+### Native substrate code (C++)
+
+The conductive substrate's physics and its numerical algorithms have one
+canonical implementation in portable C++:
+
+* `src/tropoi/numerics/native/pt`: the portability layer, Thomas and
+  safeguarded Newton;
+* `src/tropoi/physics/native/pt`: material laws and the substrate's
+  pointwise terms;
+* `src/tropoi/temporal/native`: the backward-Euler composition and the CUDA
+  and CPU drivers.
+
+Python composes, configures and validates; `tropoi.temporal.substrate_native`
+launches the native code.
+
+* **GPU.** Nothing needs to be built. The headers ship as package data and
+  NVRTC compiles them through CuPy at run time, specialized for each
+  configuration. CuPy caches the result on disk, and a digest of every
+  header is part of the cache key.
+* **CPU.** The library `tropoi.temporal._substrate_native` is built once, by
+  setuptools, with GCC or Clang. Nothing is compiled at run time. Build it
+  in either of these ways:
+
+  ```bash
+  pip install -e .                      # editable install (also builds it)
+  python setup.py build_ext --inplace   # a source tree used with PYTHONPATH=src
+  ```
+
+  The extension is optional, so a machine without a C++ compiler still
+  installs the package and runs on the GPU. CPU execution then fails, and
+  says how to build the library. A library built from other sources or flags
+  is refused at load, through the digest in
+  `temporal/native/build_identity.py`, so rebuild after changing a header.
+  Each worktree builds its own copy. CI builds the library and asserts that
+  it loads. Windows/MSVC is not supported for the CPU build yet. Colab has
+  `g++`, so `pip install -e .` there builds it.
+* **Floating point.** FP64. No product is contracted into an FMA: on the
+  device every product is `__dmul_rn` and CuPy's default flags are used, and
+  the host builds with `-ffp-contract=off`.
+* **Provenance.** Every airless run records the implementation in
+  `config.json` (`substrate_implementation`): the source digests, the
+  backend, the device specialization and NVRTC version, or the host
+  library's compiler and flags.
+
 ### Tests
 
 ```powershell

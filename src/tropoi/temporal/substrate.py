@@ -37,7 +37,16 @@ satisfies
 so the per-step energy closure is bounded by the Newton tolerances. Every
 :class:`StepReport` carries both sides of the identity.
 
-Import-light: NumPy only; arrays may be NumPy or CuPy.
+**Implementation.** The arithmetic is the canonical native (C++)
+implementation (``tropoi/{numerics,physics,temporal}/native/pt``), run by
+:mod:`tropoi.temporal.substrate_native`: compiled for the GPU at run time
+(CuPy arrays) or by the CPU library built at installation (NumPy arrays).
+Python validates the inputs, prepares the per-column forcing and computes
+the step report from the converged evaluation with the same reductions as
+before. A step whose Newton iteration fails in any column raises
+:class:`SubstrateSolveError`; no unconverged state is returned.
+
+Import-light: NumPy at import; CuPy only for CuPy arrays.
 """
 from __future__ import annotations
 
@@ -46,9 +55,6 @@ from typing import NamedTuple
 
 import numpy as np
 
-from tropoi.numerics.tridiagonal import thomas
-from tropoi.physics.constants import SIGMA_SB
-from tropoi.physics.materials import CellMaterials
 from tropoi.physics.substrate import (ENERGY_REFERENCE_TEMPERATURE, TOLERANCE_FLOOR,
                                       TOLERANCE_ROUNDOFF, ConductiveSubstrate, SubstrateState)
 
@@ -110,66 +116,11 @@ class BackwardEulerSubstrate:
     def __init__(self, substrate: ConductiveSubstrate):
         self.substrate = substrate
 
-    def _system(self, xp, th, ths, th_old, dt, forcing, jacobian):
-        """Residuals (and the Jacobian) at anomalies ``th`` (cells) and
-        ``ths`` (skin). Differences are formed from anomalies."""
-        sub = self.substrate
-        rho, kc, chi = sub.materials.on(xp)
-        dz, half = sub._consts(xp)
-        const, a, t_ref, gb, src = forcing
-        T = ENERGY_REFERENCE_TEMPERATURE + th
-        Ts = ENERGY_REFERENCE_TEMPERATURE + ths
-        T_old = ENERGY_REFERENCE_TEMPERATURE + th_old
-        k = CellMaterials.conductivity(kc, chi, T)
-        dz1 = float(sub.thickness[0])
-        q_s = (2.0 / dz1) * CellMaterials.kirchhoff_difference(kc[0], chi[0], Ts, T[0],
-                                                              delta=ths - th[0])
-        res_half = half / k                                   # (L, n)
-        g = 1.0 / (res_half[:-1] + res_half[1:])              # (L-1, n)
-        f_int = g * (th[:-1] - th[1:])
-        faces = xp.concatenate([q_s[None], f_int, xp.broadcast_to(-gb, Ts.shape)[None]],
-                               axis=0)                       # (L+1, n), downward
-        cap = rho * dz
-        storage = cap * sub.materials.enthalpy_difference(T, T_old, delta=th - th_old) / dt
-        r = storage - (faces[:-1] - faces[1:]) - src
-        lin = a * (ths - t_ref)
-        emitted = (sub.emissivity * SIGMA_SB) * Ts ** 4
-        r_s = const + lin - emitted - q_s
-        tau = TOLERANCE_FLOOR + TOLERANCE_ROUNDOFF * (
-            xp.abs(storage) + xp.abs(faces[:-1]) + xp.abs(faces[1:]) + xp.abs(src))
-        tau_s = TOLERANCE_FLOOR + TOLERANCE_ROUNDOFF * (
-            xp.abs(const) + xp.abs(lin) + emitted + xp.abs(q_s))
-        out = dict(r=r, r_s=r_s, tau=tau, tau_s=tau_s, storage=storage,
-                   q_s=q_s, emitted=emitted, absorbed=const + lin, faces=faces)
-        if jacobian:
-            dk = CellMaterials.conductivity_derivative(kc, chi, T)
-            dq_dts = (2.0 / dz1) * CellMaterials.conductivity(kc[0], chi[0], Ts)
-            dq_dt1 = -(2.0 / dz1) * k[0]
-            drift = th[:-1] - th[1:]
-            gg = g * g
-            dfa = g + drift * gg * half[:-1] * dk[:-1] / (k[:-1] * k[:-1])   # dF/dT_upper
-            dfb = -g + drift * gg * half[1:] * dk[1:] / (k[1:] * k[1:])      # dF/dT_lower
-            cpv = sub.materials.specific_heat(T)
-            n = T.shape[1]
-            L = T.shape[0]
-            diag = xp.empty((L + 1, n))
-            lower = xp.empty((L, n))
-            upper = xp.empty((L, n))
-            diag[0] = a - 4.0 * sub.emissivity * SIGMA_SB * Ts ** 3 - dq_dts
-            upper[0] = -dq_dt1
-            # cell rows: r_i = storage_i - F_{i-1/2} + F_{i+1/2} - S_i
-            d_cells = cap * cpv / dt
-            d_cells = d_cells + 0.0 * T
-            d_cells[0] = d_cells[0] - dq_dt1
-            d_cells[:-1] = d_cells[:-1] + dfa
-            d_cells[1:] = d_cells[1:] - dfb
-            diag[1:] = d_cells
-            lower[0] = -dq_dts
-            if L > 1:
-                lower[1:] = -dfa
-                upper[1:] = dfb
-            out["jacobian"] = (lower, diag, upper)
-        return out
+    def describe(self, backend: str) -> dict:
+        """Provenance of the implementation used on ``backend``
+        (``"cupy"`` or ``"numpy"``)."""
+        from tropoi.temporal.substrate_native import describe
+        return describe(self.substrate, backend)
 
     def step(self, state: SubstrateState, dt: float, *, shortwave_down=0.0,
              longwave_down=0.0, flux=0.0, flux_derivative=0.0,
@@ -194,6 +145,7 @@ class BackwardEulerSubstrate:
 
         Returns ``(new_state, report)``. Raises :class:`SubstrateSolveError`
         if the Newton iteration fails to reach the residual tolerance."""
+        from tropoi.temporal.substrate_native import run_step
         sub = self.substrate
         th_old = state.anomaly
         xp = _xp(th_old)
@@ -232,58 +184,33 @@ class BackwardEulerSubstrate:
                     raise ValueError(f"{name} must be finite")
             raise ValueError("flux_derivative must be finite and <= 0")
         const = (1.0 - sub.albedo) * sw + sub.emissivity * lw + f0
-        forcing = (const, a, t_ref, gb, src)
+        cells = None if source is None else xp.broadcast_to(src, (sub.layers, n))
+        out = run_step(sub, xp, th_old, state.surface_anomaly, dt, const, a, t_ref, gb, cells,
+                       sub.max_iterations)
+        # One device-to-host transfer per step: the iteration count and whether
+        # any column failed (decision U2).
+        summary = _host(xp.stack([xp.max(out["iterations"]), xp.max(out["failed"])]), xp)
+        it, failed = int(summary[0]), bool(summary[1])
+        if failed:
+            bad = np.flatnonzero(_host(out["failed"], xp))
+            raise SubstrateSolveError(
+                f"Newton did not converge in {it} iterations for {bad.size} columns "
+                f"(first {bad[:8].tolist()}); worst residual/tolerance "
+                f"{float(xp.max(out['ratio'])):.3e}")
+        new_state = SubstrateState(out["th"], out["ths"])
+        return new_state, self._report(xp, out, it, gb, src, n, new_state)
 
-        T = th_old.copy()
-        Ts = xp.array(state.surface_anomaly, dtype=xp.float64, copy=True)
-        it = 0
-        while True:
-            sysm = self._system(xp, T, Ts, th_old, dt, forcing, jacobian=True)
-            ratio = xp.maximum(xp.max(xp.abs(sysm["r"]) / sysm["tau"], axis=0),
-                               xp.abs(sysm["r_s"]) / sysm["tau_s"])
-            done = ratio <= 1.0
-            if bool(xp.all(done)):
-                break
-            if it >= sub.max_iterations:
-                bad = np.flatnonzero(~np.asarray(_host(done, xp)))
-                raise SubstrateSolveError(
-                    f"Newton did not converge in {it} iterations for {bad.size} columns "
-                    f"(first {bad[:8].tolist()}); worst residual/tolerance "
-                    f"{float(xp.max(ratio)):.3e}")
-            lower, diag, upper = sysm["jacobian"]
-            rhs = -xp.concatenate([sysm["r_s"][None], sysm["r"]], axis=0)
-            delta = thomas(lower, diag, upper, rhs, xp)
-            x = xp.concatenate([Ts[None], T], axis=0)
-            # positivity: never more than halve an absolute temperature in one update
-            absolute = ENERGY_REFERENCE_TEMPERATURE + x
-            shrink = xp.where(delta < 0.0,
-                              -0.5 * absolute / xp.where(delta < 0.0, delta, -1.0), xp.inf)
-            lam = xp.minimum(1.0, xp.min(shrink, axis=0))
-            lam = xp.where(done, 0.0, lam)
-            for _ in range(30):
-                xt = x + lam[None] * delta
-                trial = self._system(xp, xt[1:], xt[0], th_old, dt, forcing, jacobian=False)
-                tr = xp.maximum(xp.max(xp.abs(trial["r"]) / trial["tau"], axis=0),
-                                xp.abs(trial["r_s"]) / trial["tau_s"])
-                ok = (tr < ratio) | (tr <= 1.0) | done
-                if bool(xp.all(ok)):
-                    break
-                lam = xp.where(ok, lam, 0.5 * lam)
-            x = x + lam[None] * delta
-            Ts, T = x[0], x[1:]
-            it += 1
-        new_state = SubstrateState(T, Ts)
-        return new_state, self._report(xp, sysm, it, gb, src, n, new_state)
-
-    def _report(self, xp, sysm, it, gb, src, n, state):
+    def _report(self, xp, out, it, gb, src, n, state):
+        """The step report from the converged evaluation, with the reductions
+        of the reference implementation (bitwise, decision U3)."""
         sub = self.substrate
         src_sum = (xp.broadcast_to(src, (sub.layers, n)).sum(axis=0)
                    if src.size > 1 else src.reshape(()) * sub.layers + xp.zeros(n))
-        storage = sysm["storage"].sum(axis=0)
-        resid = sysm["r"].sum(axis=0) - sysm["r_s"]
-        tol = sysm["tau"].sum(axis=0) + sysm["tau_s"]
-        ratio = xp.maximum(xp.max(xp.abs(sysm["r"]) / sysm["tau"], axis=0),
-                           xp.abs(sysm["r_s"]) / sysm["tau_s"])
-        return StepReport(it, storage, sysm["absorbed"], sysm["emitted"], sysm["q_s"],
+        storage = out["storage"].sum(axis=0)
+        resid = out["r"].sum(axis=0) - out["r_s"]
+        tol = out["tau"].sum(axis=0) + out["tau_s"]
+        ratio = xp.maximum(xp.max(xp.abs(out["r"]) / out["tau"], axis=0),
+                           xp.abs(out["r_s"]) / out["tau_s"])
+        return StepReport(it, storage, out["absorbed"], out["emitted"], out["q_s"],
                           gb + 0.0 * storage, src_sum, resid, tol, ratio,
                           sub._temperature_extent(state, xp))
