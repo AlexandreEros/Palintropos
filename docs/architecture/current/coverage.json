@@ -271,7 +271,7 @@
   },
   "limits": {
     "call_sites": {
-      "builtin": 4707,
+      "builtin": 4708,
       "external": 3002,
       "internal": 3562,
       "unresolved": 4785

@@ -30904,7 +30904,7 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 []
 ],
 [
-243,
+244,
 10,
 "SelectionError('Product not offered by atmospheric archives')",
 []
@@ -30990,7 +30990,7 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ],
 [
 [
-232,
+233,
 29,
 "time_axis(times)",
 [
@@ -31001,7 +31001,7 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ]
 ],
 [
-237,
+238,
 29,
 "time_axis(times)",
 [
@@ -31044,7 +31044,7 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ]
 ],
 [
-237,
+238,
 49,
 "_sigma_axis(c0['sigma'], 'Nominal σ, native full levels (log)')",
 [
@@ -100962,20 +100962,21 @@ null,
 "221":"            raise SelectionError(f\"Select at most {MAX_STATES} saved states for one history\")",
 "222":"        lat, lon = sel[\"latitude\"][\"value\"], sel[\"longitude\"][\"value\"]",
 "223":"        snap = bool(sel[\"options\"].get(\"snap\", True))",
-"229":"            level = int(sel[\"vertical\"][\"value\"])",
-"230":"            if not 0 \u003c= level \u003c len(c0[\"sigma\"]):",
+"229":"            level = sel[\"vertical\"][\"value\"]",
+"230":"            if level != int(level) or not 0 \u003c= level \u003c len(c0[\"sigma\"]):",
 "231":"                raise SelectionError(\"Native level outside the saved axis\")",
-"232":"            payload.update(x=time_axis(times), y=dict(label=quantity[\"presentation\"][\"name\"],",
-"233":"                                                      units=quantity[\"presentation\"][\"units\"]),",
-"234":"                           values=[c[key][level] for c in columns], level=f\"native level {level + 1}\",",
-"235":"                           location=location, sampling=c0[\"sampling\"] + \", at every saved state of the range\")",
-"236":"        else:",
-"237":"            payload.update(x=time_axis(times), y=_sigma_axis(c0[\"sigma\"], \"Nominal σ, native full levels (log)\"),",
-"238":"                           values=[[c[key][k] for c in columns] for k in range(len(c0[\"sigma\"]))],",
-"239":"                           location=location, sampling=c0[\"sampling\"] + \", at every saved state of the range\")",
-"241":"        payload[\"notes\"].append(\"Saved states only: variations between saved states are not represented.\")",
-"242":"        return \"json\", payload",
-"243":"    raise SelectionError(\"Product not offered by atmospheric archives\")",
+"232":"            level = int(level)",
+"233":"            payload.update(x=time_axis(times), y=dict(label=quantity[\"presentation\"][\"name\"],",
+"234":"                                                      units=quantity[\"presentation\"][\"units\"]),",
+"235":"                           values=[c[key][level] for c in columns], level=f\"native level {level + 1}\",",
+"236":"                           location=location, sampling=c0[\"sampling\"] + \", at every saved state of the range\")",
+"237":"        else:",
+"238":"            payload.update(x=time_axis(times), y=_sigma_axis(c0[\"sigma\"], \"Nominal σ, native full levels (log)\"),",
+"239":"                           values=[[c[key][k] for c in columns] for k in range(len(c0[\"sigma\"]))],",
+"240":"                           location=location, sampling=c0[\"sampling\"] + \", at every saved state of the range\")",
+"242":"        payload[\"notes\"].append(\"Saved states only: variations between saved states are not represented.\")",
+"243":"        return \"json\", payload",
+"244":"    raise SelectionError(\"Product not offered by atmospheric archives\")",
 "42":"def _excluded(representation, field):",
 "43":"    \"\"\"A surface of constant p shows p; of constant Z shows Z: not offered.\"\"\"",
 "49":"def describe(manifest) -\u003e dict:",
@@ -111288,7 +111289,7 @@ null,
 }
 },
 "meta":{
-"base_commit":"a09b293dff485fd1847ac4091d5e0462a7d91000",
+"base_commit":"0491c5ae914f89f959a3d962266fb8bcf9663f8a",
 "call_depth":4,
 "command":"python -m tools.architecture.generate",
 "dynamic_import_sites":{
@@ -111332,7 +111333,7 @@ null,
 "max_sites":8,
 "package":"tropoi",
 "source_commit":null,
-"source_sha256":"9de6fa9d63ccb25a152477d4756dd42bf59cef553ccbb4b8156fa19bd9b0d4d2",
+"source_sha256":"6ee519807fa6411cd4ac5cea1784fde8601b51d661a2eb0a932d89a52d80ec7d",
 "source_status":"clean",
 "title":"current",
 "tool_version":"2.3.0",
@@ -140154,7 +140155,7 @@ null
 null,
 "",
 [],
-243
+244
 ],
 "1303":[
 "ColumnArchiveProvider",
@@ -308337,7 +308338,7 @@ null
 ],
 "1301":[
 {
-"builtin":29,
+"builtin":30,
 "unresolved":21
 },
 [
