@@ -1,0 +1,1207 @@
+{
+ "tool": "tools/colab/substrate_benchmark.py",
+ "argv": [
+  "all",
+  "--out",
+  "/content/bench/results-9f8c0fb.json",
+  "--state-file",
+  "/content/bench/state.npz"
+ ],
+ "started_utc": "2026-11-27T05:06:01Z",
+ "environment": {
+  "gpu": "Tesla T4",
+  "compute_capability": "7.5",
+  "multiprocessors": 40,
+  "gpu_memory_MiB": 14912,
+  "nvidia_smi": "Tesla T4, 580.82.07, 15360 MiB, 1590 MHz",
+  "cuda_runtime": 13000,
+  "cuda_driver": 13000,
+  "cpu_model": "Intel(R) Xeon(R) CPU @ 2.00GHz",
+  "vcpus": 2,
+  "python": "3.13.16",
+  "platform": "Linux-6.6.159+-x86_64-with-glibc2.39",
+  "numpy": "2.4.6",
+  "cupy": "14.0.1",
+  "commit": "9f8c0fb9b1cedc9577909575f1641e0c597bbfdb",
+  "dirty": false,
+  "precision": "FP64 throughout"
+ },
+ "section_wall_s": {
+  "environment": 1.0992969360000018,
+  "state": 347.84373683700005,
+  "end_to_end": 78.64846159799998,
+  "counts": 12.95993583400002,
+  "components": 25.908066471999973,
+  "scaling": 584.2879241049999,
+  "compile": 10.992561906999981,
+  "thomas": 148.10250328999996,
+  "diffusion": 2.6043687830001545
+ },
+ "state": {
+  "config_sha256": "df71eaea89885ece85c3a7cb25bb68080100159131f767ebce3ad244e425fdef",
+  "columns": 16200,
+  "layers": 51,
+  "origin": "3 coarse cycles of 720 steps, then 432 production steps, from the configured 350.0 K isothermal start (348 s)",
+  "next_step": 13392,
+  "sha256": "ef413855553df37ba5aa1d23121526375bcbe38b1727407de8cb62b814964998",
+  "surface_T_K": {
+   "min": 84.35448434173648,
+   "max": 631.1658409224808
+  }
+ },
+ "end_to_end": {
+  "configuration": "Mercury VPW99 TWO production: 90x180 (16200 columns), 51 layers, dt = cycle_s/4320, from the representative state",
+  "steps_per_repeat": 60,
+  "run_block_seconds_per_step": {
+   "median": 0.10911649758333321,
+   "min": 0.10697426939999938,
+   "max": 0.11224434776666688,
+   "n": 5
+  },
+  "run_block_newton_iterations_mean": {
+   "median": 3.7333333333333334,
+   "min": 3.7333333333333334,
+   "max": 3.7333333333333334,
+   "n": 5
+  },
+  "run_block_column_steps_per_second": 148465.17583308538,
+  "run_block_production_cycle_minutes": 7.856387825999991,
+  "substrate_step_seconds_per_step": {
+   "median": 0.10890732418333186,
+   "min": 0.10545713878333345,
+   "max": 0.10930351016666767,
+   "n": 5
+  },
+  "substrate_step_newton_iterations_mean": {
+   "median": 3.7333333333333334,
+   "min": 3.7333333333333334,
+   "max": 3.7333333333333334,
+   "n": 5
+  },
+  "outside_step_fraction_of_run_block": 0.0019169731858520445,
+  "memory_pool_total_bytes_after_run_block": 357458432,
+  "device_memory_used_bytes": 565051392
+ },
+ "counts": {
+  "production_state": {
+   "system_jacobian": 4.733333333333333,
+   "system_trial": 3.7333333333333334,
+   "tridiagonal": 3.7333333333333334,
+   "newton_iterations": 3.7333333333333334,
+   "host_synchronizations": 9.466666666666667,
+   "unused_final_jacobians": 1.0,
+   "trial_residuals_recomputed_with_jacobian": 3.7333333333333334
+  },
+  "reading": "Each Newton pass assembles residual + Jacobian at the accepted trial point, whose residual the line search has just computed; the last pass assembles a Jacobian that is never used. Reusing them is arithmetic-preserving (same function of the same arrays)."
+ },
+ "components": {
+  "synchronized_inclusive_ms_per_step": {
+   "system_jacobian": 94.11544280001938,
+   "system_trial": 48.562965783304435,
+   "tridiagonal": 56.51882484997941,
+   "forcing": 0.9858543166766746
+  },
+  "synchronized_step_ms": 112.19440736666684,
+  "cuda_event_span_ms_per_step": {
+   "system_jacobian": 93.5323827902476,
+   "system_trial": 48.069438370068866,
+   "tridiagonal": 56.15650504430135,
+   "forcing": 0.9287056023875873
+  },
+  "event_instrumented_step_ms": 110.50099646666732,
+  "note": "Synchronized inclusive times include the drain each synchronization forces; event spans include device idle time while the host launches. Neither set is an additive decomposition of the uninstrumented step."
+ },
+ "scaling": {
+  "rows": [
+   {
+    "material": "vpw99_two",
+    "strata": 2,
+    "layers": 31,
+    "columns": 256,
+    "forcing": "smooth",
+    "seconds_per_step": {
+     "median": 0.04413799525000286,
+     "min": 0.03787752599999976,
+     "max": 0.05090445499999987,
+     "n": 5
+    },
+    "newton_iterations_mean": 2.45,
+    "seconds_per_newton_iteration": 0.018015508265307286,
+    "column_steps_per_second": 5799.991561691589
+   },
+   {
+    "material": "vpw99_two",
+    "strata": 2,
+    "layers": 31,
+    "columns": 1024,
+    "forcing": "smooth",
+    "seconds_per_step": {
+     "median": 0.05118420994999724,
+     "min": 0.05052199410000071,
+     "max": 0.05873253040000463,
+     "n": 5
+    },
+    "newton_iterations_mean": 2.45,
+    "seconds_per_newton_iteration": 0.020891514265304997,
+    "column_steps_per_second": 20006.16989107312
+   },
+   {
+    "material": "vpw99_two",
+    "strata": 2,
+    "layers": 31,
+    "columns": 2048,
+    "forcing": "smooth",
+    "seconds_per_step": {
+     "median": 0.043983443299998724,
+     "min": 0.03827983955000036,
+     "max": 0.052742897999996784,
+     "n": 5
+    },
+    "newton_iterations_mean": 2.45,
+    "seconds_per_newton_iteration": 0.017952425836734173,
+    "column_steps_per_second": 46562.975664073565
+   },
+   {
+    "material": "vpw99_two",
+    "strata": 2,
+    "layers": 31,
+    "columns": 4096,
+    "forcing": "smooth",
+    "seconds_per_step": {
+     "median": 0.0515778457500005,
+     "min": 0.05089470835000043,
+     "max": 0.058045019650000994,
+     "n": 5
+    },
+    "newton_iterations_mean": 2.45,
+    "seconds_per_newton_iteration": 0.021052181938775713,
+    "column_steps_per_second": 79413.94101361746
+   },
+   {
+    "material": "vpw99_two",
+    "strata": 2,
+    "layers": 31,
+    "columns": 8192,
+    "forcing": "smooth",
+    "seconds_per_step": {
+     "median": 0.045649099100000964,
+     "min": 0.03898910505000117,
+     "max": 0.05703288724999993,
+     "n": 5
+    },
+    "newton_iterations_mean": 2.45,
+    "seconds_per_newton_iteration": 0.018632285346939167,
+    "column_steps_per_second": 179455.89642534318
+   },
+   {
+    "material": "vpw99_two",
+    "strata": 2,
+    "layers": 31,
+    "columns": 16200,
+    "forcing": "smooth",
+    "seconds_per_step": {
+     "median": 0.05827032424999743,
+     "min": 0.04348982975000126,
+     "max": 0.06386027149999904,
+     "n": 5
+    },
+    "newton_iterations_mean": 2.45,
+    "seconds_per_newton_iteration": 0.02378380581632548,
+    "column_steps_per_second": 278014.5847566777
+   },
+   {
+    "material": "vpw99_two",
+    "strata": 2,
+    "layers": 31,
+    "columns": 18432,
+    "forcing": "smooth",
+    "seconds_per_step": {
+     "median": 0.05123134164999783,
+     "min": 0.0441713517500034,
+     "max": 0.06041918139999893,
+     "n": 5
+    },
+    "newton_iterations_mean": 2.45,
+    "seconds_per_newton_iteration": 0.020910751693876666,
+    "column_steps_per_second": 359779.76383916894
+   },
+   {
+    "material": "vpw99_two",
+    "strata": 2,
+    "layers": 31,
+    "columns": 32768,
+    "forcing": "smooth",
+    "seconds_per_step": {
+     "median": 0.07756990954999879,
+     "min": 0.06783515125000009,
+     "max": 0.09911145574999977,
+     "n": 5
+    },
+    "newton_iterations_mean": 2.45,
+    "seconds_per_newton_iteration": 0.03166118757142807,
+    "column_steps_per_second": 422431.8449008751
+   },
+   {
+    "material": "vpw99_two",
+    "strata": 2,
+    "layers": 31,
+    "columns": 256,
+    "forcing": "terminator",
+    "seconds_per_step": {
+     "median": 0.0643444061499963,
+     "min": 0.05414217619999704,
+     "max": 0.07713061280000488,
+     "n": 5
+    },
+    "newton_iterations_mean": 3.1,
+    "seconds_per_newton_iteration": 0.0207562600483859,
+    "column_steps_per_second": 3978.5898311537176
+   },
+   {
+    "material": "vpw99_two",
+    "strata": 2,
+    "layers": 31,
+    "columns": 1024,
+    "forcing": "terminator",
+    "seconds_per_step": {
+     "median": 0.060791458699998205,
+     "min": 0.05587544289999755,
+     "max": 0.06333674589999987,
+     "n": 5
+    },
+    "newton_iterations_mean": 3.1,
+    "seconds_per_newton_iteration": 0.019610147967741357,
+    "column_steps_per_second": 16844.471606667175
+   },
+   {
+    "material": "vpw99_two",
+    "strata": 2,
+    "layers": 31,
+    "columns": 2048,
+    "forcing": "terminator",
+    "seconds_per_step": {
+     "median": 0.06873797270000068,
+     "min": 0.05827110765000043,
+     "max": 0.08454216629999678,
+     "n": 5
+    },
+    "newton_iterations_mean": 3.05,
+    "seconds_per_newton_iteration": 0.02253704022950842,
+    "column_steps_per_second": 29794.303200332528
+   },
+   {
+    "material": "vpw99_two",
+    "strata": 2,
+    "layers": 31,
+    "columns": 4096,
+    "forcing": "terminator",
+    "seconds_per_step": {
+     "median": 0.05733967875000303,
+     "min": 0.05671134564999534,
+     "max": 0.06667191450000018,
+     "n": 5
+    },
+    "newton_iterations_mean": 3.1,
+    "seconds_per_newton_iteration": 0.018496670564517106,
+    "column_steps_per_second": 71433.95444990671
+   },
+   {
+    "material": "vpw99_two",
+    "strata": 2,
+    "layers": 31,
+    "columns": 8192,
+    "forcing": "terminator",
+    "seconds_per_step": {
+     "median": 0.0577078771999993,
+     "min": 0.056290497549997556,
+     "max": 0.06369349845000442,
+     "n": 5
+    },
+    "newton_iterations_mean": 3.1,
+    "seconds_per_newton_iteration": 0.01861544425806429,
+    "column_steps_per_second": 141956.35669648406
+   },
+   {
+    "material": "vpw99_two",
+    "strata": 2,
+    "layers": 31,
+    "columns": 16200,
+    "forcing": "terminator",
+    "seconds_per_step": {
+     "median": 0.06305182699999819,
+     "min": 0.06145000205000315,
+     "max": 0.08630120574999864,
+     "n": 5
+    },
+    "newton_iterations_mean": 3.1,
+    "seconds_per_newton_iteration": 0.02033929903225748,
+    "column_steps_per_second": 256931.49224685377
+   },
+   {
+    "material": "vpw99_two",
+    "strata": 2,
+    "layers": 31,
+    "columns": 18432,
+    "forcing": "terminator",
+    "seconds_per_step": {
+     "median": 0.06424019085000054,
+     "min": 0.06301836579999645,
+     "max": 0.06490779970000063,
+     "n": 5
+    },
+    "newton_iterations_mean": 3.1,
+    "seconds_per_newton_iteration": 0.020722642209677594,
+    "column_steps_per_second": 286923.1824519065
+   },
+   {
+    "material": "vpw99_two",
+    "strata": 2,
+    "layers": 31,
+    "columns": 32768,
+    "forcing": "terminator",
+    "seconds_per_step": {
+     "median": 0.09775714835000145,
+     "min": 0.09637804074999963,
+     "max": 0.10079109489999497,
+     "n": 5
+    },
+    "newton_iterations_mean": 3.1,
+    "seconds_per_newton_iteration": 0.03153456398387143,
+    "column_steps_per_second": 335197.9937332073
+   },
+   {
+    "material": "vpw99_two",
+    "strata": 2,
+    "layers": 51,
+    "columns": 256,
+    "forcing": "smooth",
+    "seconds_per_step": {
+     "median": 0.04671824934999904,
+     "min": 0.04511293994999619,
+     "max": 0.09054611505000025,
+     "n": 5
+    },
+    "newton_iterations_mean": 2.05,
+    "seconds_per_newton_iteration": 0.0227893899268288,
+    "column_steps_per_second": 5479.6573836088155
+   },
+   {
+    "material": "vpw99_two",
+    "strata": 2,
+    "layers": 51,
+    "columns": 1024,
+    "forcing": "smooth",
+    "seconds_per_step": {
+     "median": 0.0620150990500008,
+     "min": 0.04571975030000317,
+     "max": 0.06632632619999868,
+     "n": 5
+    },
+    "newton_iterations_mean": 2.05,
+    "seconds_per_newton_iteration": 0.030251267829268687,
+    "column_steps_per_second": 16512.107788046607
+   },
+   {
+    "material": "vpw99_two",
+    "strata": 2,
+    "layers": 51,
+    "columns": 2048,
+    "forcing": "smooth",
+    "seconds_per_step": {
+     "median": 0.04575628299999721,
+     "min": 0.04480492080000431,
+     "max": 0.061170758399998706,
+     "n": 5
+    },
+    "newton_iterations_mean": 2.05,
+    "seconds_per_newton_iteration": 0.02232013804877913,
+    "column_steps_per_second": 44758.880436160536
+   },
+   {
+    "material": "vpw99_two",
+    "strata": 2,
+    "layers": 51,
+    "columns": 4096,
+    "forcing": "smooth",
+    "seconds_per_step": {
+     "median": 0.06450691920000509,
+     "min": 0.05386218334999739,
+     "max": 0.06535781199999632,
+     "n": 5
+    },
+    "newton_iterations_mean": 2.05,
+    "seconds_per_newton_iteration": 0.031466789853661026,
+    "column_steps_per_second": 63497.06435832509
+   },
+   {
+    "material": "vpw99_two",
+    "strata": 2,
+    "layers": 51,
+    "columns": 8192,
+    "forcing": "smooth",
+    "seconds_per_step": {
+     "median": 0.04794342020000499,
+     "min": 0.044615568099999336,
+     "max": 0.06428565549999803,
+     "n": 5
+    },
+    "newton_iterations_mean": 2.05,
+    "seconds_per_newton_iteration": 0.023387034243904876,
+    "column_steps_per_second": 170868.07670010882
+   },
+   {
+    "material": "vpw99_two",
+    "strata": 2,
+    "layers": 51,
+    "columns": 16200,
+    "forcing": "smooth",
+    "seconds_per_step": {
+     "median": 0.06233171620000348,
+     "min": 0.0617400559000032,
+     "max": 0.10088103325000475,
+     "n": 5
+    },
+    "newton_iterations_mean": 2.05,
+    "seconds_per_newton_iteration": 0.030405715219513896,
+    "column_steps_per_second": 259899.79079060067
+   },
+   {
+    "material": "vpw99_two",
+    "strata": 2,
+    "layers": 51,
+    "columns": 18432,
+    "forcing": "smooth",
+    "seconds_per_step": {
+     "median": 0.07919550010000194,
+     "min": 0.06883565130000306,
+     "max": 0.0984594756999968,
+     "n": 5
+    },
+    "newton_iterations_mean": 2.05,
+    "seconds_per_newton_iteration": 0.038631951268293635,
+    "column_steps_per_second": 232740.49632523942
+   },
+   {
+    "material": "vpw99_two",
+    "strata": 2,
+    "layers": 51,
+    "columns": 32768,
+    "forcing": "smooth",
+    "seconds_per_step": {
+     "median": 0.11008450809999885,
+     "min": 0.10833686369999782,
+     "max": 0.15556565834999675,
+     "n": 5
+    },
+    "newton_iterations_mean": 2.05,
+    "seconds_per_newton_iteration": 0.05369976004877993,
+    "column_steps_per_second": 297662.2284602854
+   },
+   {
+    "material": "vpw99_two",
+    "strata": 2,
+    "layers": 51,
+    "columns": 256,
+    "forcing": "terminator",
+    "seconds_per_step": {
+     "median": 0.06690778370000316,
+     "min": 0.061739467350003,
+     "max": 0.09201172694999968,
+     "n": 5
+    },
+    "newton_iterations_mean": 3.1,
+    "seconds_per_newton_iteration": 0.021583156032259083,
+    "column_steps_per_second": 3826.161708596363
+   },
+   {
+    "material": "vpw99_two",
+    "strata": 2,
+    "layers": 51,
+    "columns": 1024,
+    "forcing": "terminator",
+    "seconds_per_step": {
+     "median": 0.06487815474999933,
+     "min": 0.06319598455000346,
+     "max": 0.07346193624999842,
+     "n": 5
+    },
+    "newton_iterations_mean": 3.1,
+    "seconds_per_newton_iteration": 0.020928437016128818,
+    "column_steps_per_second": 15783.432866515219
+   },
+   {
+    "material": "vpw99_two",
+    "strata": 2,
+    "layers": 51,
+    "columns": 2048,
+    "forcing": "terminator",
+    "seconds_per_step": {
+     "median": 0.06448508104999746,
+     "min": 0.06225361974999828,
+     "max": 0.06456636954999909,
+     "n": 5
+    },
+    "newton_iterations_mean": 3.05,
+    "seconds_per_newton_iteration": 0.021142649524589333,
+    "column_steps_per_second": 31759.28395611562
+   },
+   {
+    "material": "vpw99_two",
+    "strata": 2,
+    "layers": 51,
+    "columns": 4096,
+    "forcing": "terminator",
+    "seconds_per_step": {
+     "median": 0.06508838159999755,
+     "min": 0.06219765129999928,
+     "max": 0.09076142570000342,
+     "n": 5
+    },
+    "newton_iterations_mean": 3.1,
+    "seconds_per_newton_iteration": 0.02099625212903147,
+    "column_steps_per_second": 62929.81787705341
+   },
+   {
+    "material": "vpw99_two",
+    "strata": 2,
+    "layers": 51,
+    "columns": 8192,
+    "forcing": "terminator",
+    "seconds_per_step": {
+     "median": 0.06539873350000107,
+     "min": 0.06423637215000326,
+     "max": 0.08571815790000414,
+     "n": 5
+    },
+    "newton_iterations_mean": 3.1,
+    "seconds_per_newton_iteration": 0.021096365645161635,
+    "column_steps_per_second": 125262.36459915338
+   },
+   {
+    "material": "vpw99_two",
+    "strata": 2,
+    "layers": 51,
+    "columns": 16200,
+    "forcing": "terminator",
+    "seconds_per_step": {
+     "median": 0.08845968850000077,
+     "min": 0.08637470395000264,
+     "max": 0.08851702769999861,
+     "n": 5
+    },
+    "newton_iterations_mean": 3.1,
+    "seconds_per_newton_iteration": 0.028535383387097022,
+    "column_steps_per_second": 183134.2645978214
+   },
+   {
+    "material": "vpw99_two",
+    "strata": 2,
+    "layers": 51,
+    "columns": 18432,
+    "forcing": "terminator",
+    "seconds_per_step": {
+     "median": 0.09787487005000343,
+     "min": 0.09514097190000256,
+     "max": 0.09893501165000203,
+     "n": 5
+    },
+    "newton_iterations_mean": 3.1,
+    "seconds_per_newton_iteration": 0.03157253872580756,
+    "column_steps_per_second": 188322.0891183125
+   },
+   {
+    "material": "vpw99_two",
+    "strata": 2,
+    "layers": 51,
+    "columns": 32768,
+    "forcing": "terminator",
+    "seconds_per_step": {
+     "median": 0.15466617915000141,
+     "min": 0.1512610921500027,
+     "max": 0.16335082439999837,
+     "n": 5
+    },
+    "newton_iterations_mean": 3.1,
+    "seconds_per_newton_iteration": 0.049892315854839164,
+    "column_steps_per_second": 211862.7367669068
+   },
+   {
+    "material": "vpw99_two",
+    "strata": 2,
+    "layers": 85,
+    "columns": 256,
+    "forcing": "smooth",
+    "seconds_per_step": {
+     "median": 0.0724452824000025,
+     "min": 0.05977241845000094,
+     "max": 0.076915222949998,
+     "n": 5
+    },
+    "newton_iterations_mean": 2.05,
+    "seconds_per_newton_iteration": 0.03533916214634269,
+    "column_steps_per_second": 3533.7014574187256
+   },
+   {
+    "material": "vpw99_two",
+    "strata": 2,
+    "layers": 85,
+    "columns": 1024,
+    "forcing": "smooth",
+    "seconds_per_step": {
+     "median": 0.05717595909999886,
+     "min": 0.054567293600001676,
+     "max": 0.07764142390000188,
+     "n": 5
+    },
+    "newton_iterations_mean": 2.05,
+    "seconds_per_newton_iteration": 0.027890711756097007,
+    "column_steps_per_second": 17909.625236177635
+   },
+   {
+    "material": "vpw99_two",
+    "strata": 2,
+    "layers": 85,
+    "columns": 2048,
+    "forcing": "smooth",
+    "seconds_per_step": {
+     "median": 0.05603292679999754,
+     "min": 0.05474716389999799,
+     "max": 0.1040512182499981,
+     "n": 5
+    },
+    "newton_iterations_mean": 2.05,
+    "seconds_per_newton_iteration": 0.027333135024389044,
+    "column_steps_per_second": 36549.937991104365
+   },
+   {
+    "material": "vpw99_two",
+    "strata": 2,
+    "layers": 85,
+    "columns": 4096,
+    "forcing": "smooth",
+    "seconds_per_step": {
+     "median": 0.07537989059999858,
+     "min": 0.05399158590000184,
+     "max": 0.079018514400002,
+     "n": 5
+    },
+    "newton_iterations_mean": 2.05,
+    "seconds_per_newton_iteration": 0.03677067834146273,
+    "column_steps_per_second": 54338.09955675469
+   },
+   {
+    "material": "vpw99_two",
+    "strata": 2,
+    "layers": 85,
+    "columns": 8192,
+    "forcing": "smooth",
+    "seconds_per_step": {
+     "median": 0.08047365494999781,
+     "min": 0.06512031500000148,
+     "max": 0.0927564623999956,
+     "n": 5
+    },
+    "newton_iterations_mean": 2.05,
+    "seconds_per_newton_iteration": 0.03925544143902333,
+    "column_steps_per_second": 101797.29012047593
+   },
+   {
+    "material": "vpw99_two",
+    "strata": 2,
+    "layers": 85,
+    "columns": 16200,
+    "forcing": "smooth",
+    "seconds_per_step": {
+     "median": 0.11223607665000372,
+     "min": 0.10062040270000239,
+     "max": 0.13781855700000278,
+     "n": 5
+    },
+    "newton_iterations_mean": 2.05,
+    "seconds_per_newton_iteration": 0.05474930568292865,
+    "column_steps_per_second": 144338.61627681425
+   },
+   {
+    "material": "vpw99_two",
+    "strata": 2,
+    "layers": 85,
+    "columns": 18432,
+    "forcing": "smooth",
+    "seconds_per_step": {
+     "median": 0.1178068028000041,
+     "min": 0.10939998489999994,
+     "max": 0.15337480499999856,
+     "n": 5
+    },
+    "newton_iterations_mean": 2.05,
+    "seconds_per_newton_iteration": 0.05746673307317274,
+    "column_steps_per_second": 156459.55549181034
+   },
+   {
+    "material": "vpw99_two",
+    "strata": 2,
+    "layers": 85,
+    "columns": 32768,
+    "forcing": "smooth",
+    "seconds_per_step": {
+     "median": 0.1827045819500029,
+     "min": 0.17540098174999913,
+     "max": 0.24397978115000002,
+     "n": 5
+    },
+    "newton_iterations_mean": 2.05,
+    "seconds_per_newton_iteration": 0.08912418631707458,
+    "column_steps_per_second": 179349.63453169973
+   },
+   {
+    "material": "vpw99_two",
+    "strata": 2,
+    "layers": 85,
+    "columns": 256,
+    "forcing": "terminator",
+    "seconds_per_step": {
+     "median": 0.08006723220000253,
+     "min": 0.07739182640000308,
+     "max": 0.11452593619999903,
+     "n": 5
+    },
+    "newton_iterations_mean": 3.1,
+    "seconds_per_newton_iteration": 0.025828139419355654,
+    "column_steps_per_second": 3197.312970186472
+   },
+   {
+    "material": "vpw99_two",
+    "strata": 2,
+    "layers": 85,
+    "columns": 1024,
+    "forcing": "terminator",
+    "seconds_per_step": {
+     "median": 0.07923456930000157,
+     "min": 0.0773899538500018,
+     "max": 0.10579865749999726,
+     "n": 5
+    },
+    "newton_iterations_mean": 3.1,
+    "seconds_per_newton_iteration": 0.025559538483871474,
+    "column_steps_per_second": 12923.651999960826
+   },
+   {
+    "material": "vpw99_two",
+    "strata": 2,
+    "layers": 85,
+    "columns": 2048,
+    "forcing": "terminator",
+    "seconds_per_step": {
+     "median": 0.0790340040999979,
+     "min": 0.07570521904999623,
+     "max": 0.10889237244999776,
+     "n": 5
+    },
+    "newton_iterations_mean": 3.05,
+    "seconds_per_newton_iteration": 0.02591278822950751,
+    "column_steps_per_second": 25912.89690205705
+   },
+   {
+    "material": "vpw99_two",
+    "strata": 2,
+    "layers": 85,
+    "columns": 4096,
+    "forcing": "terminator",
+    "seconds_per_step": {
+     "median": 0.07872847799999931,
+     "min": 0.07692123674999607,
+     "max": 0.08539726740000333,
+     "n": 5
+    },
+    "newton_iterations_mean": 3.1,
+    "seconds_per_newton_iteration": 0.02539628322580623,
+    "column_steps_per_second": 52026.917121400926
+   },
+   {
+    "material": "vpw99_two",
+    "strata": 2,
+    "layers": 85,
+    "columns": 8192,
+    "forcing": "terminator",
+    "seconds_per_step": {
+     "median": 0.09366460260000053,
+     "min": 0.09248093749999953,
+     "max": 0.09548938085000032,
+     "n": 5
+    },
+    "newton_iterations_mean": 3.1,
+    "seconds_per_newton_iteration": 0.030214387935484043,
+    "column_steps_per_second": 87461.00204988169
+   },
+   {
+    "material": "vpw99_two",
+    "strata": 2,
+    "layers": 85,
+    "columns": 16200,
+    "forcing": "terminator",
+    "seconds_per_step": {
+     "median": 0.14592803939999613,
+     "min": 0.14082764589999214,
+     "max": 0.1613259303500058,
+     "n": 5
+    },
+    "newton_iterations_mean": 3.1,
+    "seconds_per_newton_iteration": 0.047073561096772944,
+    "column_steps_per_second": 111013.6205941545
+   },
+   {
+    "material": "vpw99_two",
+    "strata": 2,
+    "layers": 85,
+    "columns": 18432,
+    "forcing": "terminator",
+    "seconds_per_step": {
+     "median": 0.1564323619999982,
+     "min": 0.15458296924999787,
+     "max": 0.17096267105000607,
+     "n": 5
+    },
+    "newton_iterations_mean": 3.1,
+    "seconds_per_newton_iteration": 0.05046205225806393,
+    "column_steps_per_second": 117827.28179991436
+   },
+   {
+    "material": "vpw99_two",
+    "strata": 2,
+    "layers": 85,
+    "columns": 32768,
+    "forcing": "terminator",
+    "seconds_per_step": {
+     "median": 0.2554741538500025,
+     "min": 0.24281847659999584,
+     "max": 0.2604412090999972,
+     "n": 5
+    },
+    "newton_iterations_mean": 3.1,
+    "seconds_per_newton_iteration": 0.08241101737096855,
+    "column_steps_per_second": 128263.46425337101
+   },
+   {
+    "material": "vpw99_top",
+    "strata": 1,
+    "layers": 49,
+    "columns": 2048,
+    "forcing": "smooth",
+    "seconds_per_step": {
+     "median": 0.050094969449992276,
+     "min": 0.04403633790000185,
+     "max": 0.0543743617500013,
+     "n": 5
+    },
+    "newton_iterations_mean": 3.0,
+    "seconds_per_newton_iteration": 0.016698323149997425,
+    "column_steps_per_second": 40882.34851693908
+   },
+   {
+    "material": "vpw99_top",
+    "strata": 1,
+    "layers": 49,
+    "columns": 16200,
+    "forcing": "smooth",
+    "seconds_per_step": {
+     "median": 0.08190909189999047,
+     "min": 0.06001740585001016,
+     "max": 0.08262149075000025,
+     "n": 5
+    },
+    "newton_iterations_mean": 3.0,
+    "seconds_per_newton_iteration": 0.027303030633330158,
+    "column_steps_per_second": 197780.241780484
+   },
+   {
+    "material": "vpw99_top",
+    "strata": 1,
+    "layers": 49,
+    "columns": 2048,
+    "forcing": "terminator",
+    "seconds_per_step": {
+     "median": 0.05212984449999567,
+     "min": 0.051284071049997236,
+     "max": 0.07510945974999003,
+     "n": 5
+    },
+    "newton_iterations_mean": 3.15,
+    "seconds_per_newton_iteration": 0.01654915698412561,
+    "column_steps_per_second": 39286.516574975976
+   },
+   {
+    "material": "vpw99_top",
+    "strata": 1,
+    "layers": 49,
+    "columns": 16200,
+    "forcing": "terminator",
+    "seconds_per_step": {
+     "median": 0.0872062719500036,
+     "min": 0.0831921585000032,
+     "max": 0.09734668090000013,
+     "n": 5
+    },
+    "newton_iterations_mean": 3.15,
+    "seconds_per_newton_iteration": 0.027684530777778923,
+    "column_steps_per_second": 185766.45506974147
+   },
+   {
+    "material": "constant",
+    "strata": 1,
+    "layers": 31,
+    "columns": 2048,
+    "forcing": "smooth",
+    "seconds_per_step": {
+     "median": 0.025384106650005834,
+     "min": 0.024785590149997462,
+     "max": 0.03135449390000531,
+     "n": 5
+    },
+    "newton_iterations_mean": 2.05,
+    "seconds_per_newton_iteration": 0.012382491048783334,
+    "column_steps_per_second": 80680.40479965165
+   },
+   {
+    "material": "constant",
+    "strata": 1,
+    "layers": 31,
+    "columns": 16200,
+    "forcing": "smooth",
+    "seconds_per_step": {
+     "median": 0.0282993263000094,
+     "min": 0.02682868980000421,
+     "max": 0.03459181384999965,
+     "n": 5
+    },
+    "newton_iterations_mean": 2.05,
+    "seconds_per_newton_iteration": 0.013804549414638732,
+    "column_steps_per_second": 572451.7901330612
+   },
+   {
+    "material": "constant",
+    "strata": 1,
+    "layers": 31,
+    "columns": 2048,
+    "forcing": "terminator",
+    "seconds_per_step": {
+     "median": 0.03463816144999328,
+     "min": 0.02522525530000621,
+     "max": 0.03606053150000434,
+     "n": 5
+    },
+    "newton_iterations_mean": 2.05,
+    "seconds_per_newton_iteration": 0.016896664121947944,
+    "column_steps_per_second": 59125.53999024095
+   },
+   {
+    "material": "constant",
+    "strata": 1,
+    "layers": 31,
+    "columns": 16200,
+    "forcing": "terminator",
+    "seconds_per_step": {
+     "median": 0.02726733189999777,
+     "min": 0.026991198350003742,
+     "max": 0.029650006549991302,
+     "n": 5
+    },
+    "newton_iterations_mean": 2.05,
+    "seconds_per_newton_iteration": 0.013301137512194035,
+    "column_steps_per_second": 594117.534469932
+   },
+   {
+    "material": "constant",
+    "strata": 1,
+    "layers": 47,
+    "columns": 2048,
+    "forcing": "smooth",
+    "seconds_per_step": {
+     "median": 0.03054669150000109,
+     "min": 0.02877962135000871,
+     "max": 0.035997198999996274,
+     "n": 5
+    },
+    "newton_iterations_mean": 2.05,
+    "seconds_per_newton_iteration": 0.014900825121951752,
+    "column_steps_per_second": 67044.90402831111
+   },
+   {
+    "material": "constant",
+    "strata": 1,
+    "layers": 47,
+    "columns": 16200,
+    "forcing": "smooth",
+    "seconds_per_step": {
+     "median": 0.04604617095000094,
+     "min": 0.0415637848499955,
+     "max": 0.049018232499997795,
+     "n": 5
+    },
+    "newton_iterations_mean": 2.05,
+    "seconds_per_newton_iteration": 0.02246154680487851,
+    "column_steps_per_second": 351820.7847855733
+   },
+   {
+    "material": "constant",
+    "strata": 1,
+    "layers": 47,
+    "columns": 2048,
+    "forcing": "terminator",
+    "seconds_per_step": {
+     "median": 0.029723856200007504,
+     "min": 0.028931010450003215,
+     "max": 0.032005817549998025,
+     "n": 5
+    },
+    "newton_iterations_mean": 2.05,
+    "seconds_per_newton_iteration": 0.01449944204878415,
+    "column_steps_per_second": 68900.88507424158
+   },
+   {
+    "material": "constant",
+    "strata": 1,
+    "layers": 47,
+    "columns": 16200,
+    "forcing": "terminator",
+    "seconds_per_step": {
+     "median": 0.03823455785000078,
+     "min": 0.03736048935001009,
+     "max": 0.040906098799996474,
+     "n": 5
+    },
+    "newton_iterations_mean": 2.05,
+    "seconds_per_newton_iteration": 0.018651003829268674,
+    "column_steps_per_second": 423700.46656626026
+   }
+  ],
+  "gauss_grid_columns": {
+   "T21 32x64": 2048,
+   "T42 64x128": 8192,
+   "T63 96x192": 18432
+  },
+  "fit_seconds_per_newton_iteration": {
+   "model": "a + b*L + c*n*L (VPW99 TWO rows)",
+   "a_s": 0.009533560869660786,
+   "b_s_per_layer": 0.0001931100254380615,
+   "c_s_per_cell": 1.8804436727446008e-08,
+   "max_relative_misfit": 0.32683102124555286
+  }
+ },
+ "compile": {
+  "cold_empty_cache": {
+   "import_and_setup_s": 1.365312387000131,
+   "first_step_s": 6.906885538999859,
+   "warm_step_s": 0.10884535000013784,
+   "first_step_overhead_s": 6.798040188999721
+  },
+  "warm_disk_cache": {
+   "import_and_setup_s": 0.49482916800002386,
+   "first_step_s": 0.3667463110000426,
+   "warm_step_s": 0.10969843299994864,
+   "first_step_overhead_s": 0.257047878000094
+  },
+  "cache_files": 59
+ },
+ "thomas": {
+  "systems_compared": 26,
+  "fmad_false": {
+   "bitwise_equal_to_cupy_systems": 26,
+   "bitwise_equal_to_numpy_systems": 26,
+   "max_relative_difference_vs_cupy": 0.0,
+   "max_relative_difference_vs_numpy": 0.0
+  },
+  "fmad_true": {
+   "bitwise_equal_to_cupy_systems": 0,
+   "bitwise_equal_to_numpy_systems": 0,
+   "max_relative_difference_vs_cupy": 4.070364436865111e-11,
+   "max_relative_difference_vs_numpy": 4.070364436865111e-11
+  },
+  "isolated_solve_seconds": {
+   "cupy_python_thomas": {
+    "median": 0.006695010200000979,
+    "min": 0.006533990679999988,
+    "max": 0.007465802719998464,
+    "n": 5
+   },
+   "compiled_fmad_false": {
+    "median": 0.0004610524600002464,
+    "min": 0.00046050111999647927,
+    "max": 0.0004970252000020992,
+    "n": 5
+   },
+   "compiled_fmad_true": {
+    "median": 0.00040498372000001835,
+    "min": 0.0004043995800020639,
+    "max": 0.000405128360002891,
+    "n": 5
+   }
+  },
+  "patched": {
+   "baseline": {
+    "substrate_step_seconds_per_step": {
+     "median": 0.11112675510000068,
+     "min": 0.10512558898333282,
+     "max": 0.11325098344999938,
+     "n": 5
+    },
+    "run_block_seconds_per_step": {
+     "median": 0.11154935876666817,
+     "min": 0.10901740266666593,
+     "max": 0.1127748628333355,
+     "n": 5
+    },
+    "end_state_sha256": "e3193bffccc53fab3decd710098e9c548ca587e7eb051b0815b70798de87cbd4"
+   },
+   "compiled_fmad_false": {
+    "substrate_step_seconds_per_step": {
+     "median": 0.08204340106666828,
+     "min": 0.08194278900000047,
+     "max": 0.08516173833333293,
+     "n": 5
+    },
+    "run_block_seconds_per_step": {
+     "median": 0.08402350418333147,
+     "min": 0.08340687306666345,
+     "max": 0.08743128648333519,
+     "n": 5
+    },
+    "end_state_sha256": "e3193bffccc53fab3decd710098e9c548ca587e7eb051b0815b70798de87cbd4"
+   },
+   "end_states_bitwise_equal": true,
+   "run_block_speedup": 1.3275970795419083
+  }
+ },
+ "diffusion": {
+  "T21L40": {
+   "seconds_per_solve": {
+    "median": 0.009492312150007365,
+    "min": 0.009357588350007972,
+    "max": 0.010235268150006504,
+    "n": 5
+   },
+   "solves_per_boundary_layer_call": 3,
+   "note": "u and v share one matrix; dse uses the heat conductance"
+  },
+  "T42L40": {
+   "seconds_per_solve": {
+    "median": 0.009725986299997658,
+    "min": 0.009601061950002076,
+    "max": 0.010588020149998555,
+    "n": 5
+   },
+   "solves_per_boundary_layer_call": 3,
+   "note": "u and v share one matrix; dse uses the heat conductance"
+  },
+  "T21L25": {
+   "seconds_per_solve": {
+    "median": 0.0059873411000012314,
+    "min": 0.005939486499994473,
+    "max": 0.006101349300001857,
+    "n": 5
+   },
+   "solves_per_boundary_layer_call": 3,
+   "note": "u and v share one matrix; dse uses the heat conductance"
+  }
+ },
+ "finished_utc": "2026-11-27T05:26:14Z"
+}

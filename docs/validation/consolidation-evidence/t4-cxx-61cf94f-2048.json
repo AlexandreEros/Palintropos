@@ -1,0 +1,243 @@
+{
+ "device": "Tesla T4",
+ "commit": "61cf94faf11a6210485a8e9f72706539a582dadd",
+ "cases": {
+  "production_vpw99_two_90x180": {
+   "columns": 16200,
+   "layers": 51,
+   "strata": 2,
+   "start": "isothermal start",
+   "cxx_cuda_compile_s": 5.353139081000023,
+   "cxx_cuda_specialization": "substrate_step<51, pt::Piecewise<pt::Poly<5>, pt::SatExp>, pt::Piecewise<pt::Poly<5>, pt::SatExp>>",
+   "tracer_compile_s": 5.605013729000007,
+   "cxx_host_build_s": 0.6301421199999879,
+   "cxx_host_compiled_now": true,
+   "cxx_host_compiler": "g++ (g++ (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0)",
+   "cxx_cuda_vs_cupy": {
+    "steps": 200,
+    "bitwise_identical_steps": 200,
+    "max_abs_difference_K": 0.0,
+    "newton_counts_identical": true
+   },
+   "tracer_vs_cupy": {
+    "steps": 200,
+    "bitwise_identical_steps": 200,
+    "max_abs_difference_K": 0.0,
+    "newton_counts_identical": true
+   },
+   "cxx_host_vs_numpy": {
+    "steps": 10,
+    "bitwise_identical_steps": 0,
+    "max_abs_difference_K": 1.7053025658242404e-13,
+    "newton_counts_identical": true
+   },
+   "cxx_host_vs_cxx_cuda": {
+    "steps": 10,
+    "bitwise_identical_steps": 0,
+    "max_abs_difference_K": 1.7053025658242404e-13,
+    "newton_counts_identical": true
+   },
+   "seconds_per_step": {
+    "cupy_production": {
+     "median": 0.09029739603333363,
+     "min": 0.08780549781666688,
+     "max": 0.09480468049999995,
+     "n": 5
+    },
+    "tracer_kernel": {
+     "median": 0.020411761983334033,
+     "min": 0.02030445024999968,
+     "max": 0.02050869106666653,
+     "n": 5
+    },
+    "cxx_cuda": {
+     "median": 0.021217228199999265,
+     "min": 0.021156554749999636,
+     "max": 0.021274333916666895,
+     "n": 5
+    },
+    "numpy_production": {
+     "median": 1.4563893683999936,
+     "min": 1.4563893683999936,
+     "max": 1.4563893683999936,
+     "n": 1
+    },
+    "cxx_host_single_thread": {
+     "median": 0.6001855178000028,
+     "min": 0.6001855178000028,
+     "max": 0.6001855178000028,
+     "n": 1
+    }
+   },
+   "cxx_cuda_over_tracer_time": 1.0394608861950716,
+   "cxx_cuda_speedup_vs_cupy": 4.2558526110086685,
+   "cxx_host_speedup_vs_numpy": 2.4265653288976887,
+   "cxx_cuda_kernel": {
+    "registers": 255,
+    "local_bytes": 6752
+   },
+   "tracer_kernel": {
+    "registers": 255,
+    "local_bytes": 6400
+   }
+  },
+  "terminator_vpw99_two_2048": {
+   "columns": 2048,
+   "layers": 51,
+   "strata": 2,
+   "start": "24 steps from isothermal",
+   "cxx_cuda_compile_s": 0.001114653999991333,
+   "cxx_cuda_specialization": "substrate_step<51, pt::Piecewise<pt::Poly<5>, pt::SatExp>, pt::Piecewise<pt::Poly<5>, pt::SatExp>>",
+   "tracer_compile_s": 0.0007690769999726399,
+   "cxx_host_build_s": 0.0043210569999700965,
+   "cxx_host_compiled_now": false,
+   "cxx_host_compiler": "g++ (g++ (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0)",
+   "cxx_cuda_vs_cupy": {
+    "steps": 200,
+    "bitwise_identical_steps": 200,
+    "max_abs_difference_K": 0.0,
+    "newton_counts_identical": true
+   },
+   "tracer_vs_cupy": {
+    "steps": 200,
+    "bitwise_identical_steps": 200,
+    "max_abs_difference_K": 0.0,
+    "newton_counts_identical": true
+   },
+   "cxx_host_vs_numpy": {
+    "steps": 10,
+    "bitwise_identical_steps": 0,
+    "max_abs_difference_K": 5.3290705182007514e-14,
+    "newton_counts_identical": true
+   },
+   "cxx_host_vs_cxx_cuda": {
+    "steps": 10,
+    "bitwise_identical_steps": 0,
+    "max_abs_difference_K": 6.039613253960852e-14,
+    "newton_counts_identical": true
+   },
+   "seconds_per_step": {
+    "cupy_production": {
+     "median": 0.05882740818333332,
+     "min": 0.058706870283333504,
+     "max": 0.0666703592999994,
+     "n": 5
+    },
+    "tracer_kernel": {
+     "median": 0.004398284633332613,
+     "min": 0.004363182366666744,
+     "max": 0.004656928633334208,
+     "n": 5
+    },
+    "cxx_cuda": {
+     "median": 0.0044764799333336215,
+     "min": 0.004327707199999508,
+     "max": 0.0046791110166670554,
+     "n": 5
+    },
+    "numpy_production": {
+     "median": 0.11080355259999805,
+     "min": 0.11080355259999805,
+     "max": 0.11080355259999805,
+     "n": 1
+    },
+    "cxx_host_single_thread": {
+     "median": 0.05415861040000891,
+     "min": 0.05415861040000891,
+     "max": 0.05415861040000891,
+     "n": 1
+    }
+   },
+   "cxx_cuda_over_tracer_time": 1.017778590182273,
+   "cxx_cuda_speedup_vs_cupy": 13.141443513525306,
+   "cxx_host_speedup_vs_numpy": 2.0459083381500465,
+   "cxx_cuda_kernel": {
+    "registers": 255,
+    "local_bytes": 6752
+   },
+   "tracer_kernel": {
+    "registers": 255,
+    "local_bytes": 6400
+   }
+  },
+  "terminator_constant_2048": {
+   "columns": 2048,
+   "layers": 31,
+   "strata": 1,
+   "start": "24 steps from isothermal",
+   "cxx_cuda_compile_s": 3.518824058000007,
+   "cxx_cuda_specialization": "substrate_step<31, pt::Poly<1>, pt::Poly<1>>",
+   "tracer_compile_s": 2.33124126499996,
+   "cxx_host_build_s": 0.26816422100000636,
+   "cxx_host_compiled_now": true,
+   "cxx_host_compiler": "g++ (g++ (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0)",
+   "cxx_cuda_vs_cupy": {
+    "steps": 200,
+    "bitwise_identical_steps": 200,
+    "max_abs_difference_K": 0.0,
+    "newton_counts_identical": true
+   },
+   "tracer_vs_cupy": {
+    "steps": 200,
+    "bitwise_identical_steps": 200,
+    "max_abs_difference_K": 0.0,
+    "newton_counts_identical": true
+   },
+   "cxx_host_vs_numpy": {
+    "steps": 10,
+    "bitwise_identical_steps": 0,
+    "max_abs_difference_K": 8.881784197001252e-15,
+    "newton_counts_identical": true
+   },
+   "cxx_host_vs_cxx_cuda": {
+    "steps": 10,
+    "bitwise_identical_steps": 0,
+    "max_abs_difference_K": 1.0658141036401503e-14,
+    "newton_counts_identical": true
+   },
+   "seconds_per_step": {
+    "cupy_production": {
+     "median": 0.02565393305000043,
+     "min": 0.024618246950000373,
+     "max": 0.03355219161666696,
+     "n": 5
+    },
+    "tracer_kernel": {
+     "median": 0.0011979047000001705,
+     "min": 0.001165573666667304,
+     "max": 0.0016488575333331332,
+     "n": 5
+    },
+    "cxx_cuda": {
+     "median": 0.0013644944333331447,
+     "min": 0.0013482396166665466,
+     "max": 0.0013866725833329005,
+     "n": 5
+    },
+    "numpy_production": {
+     "median": 0.03561618859999953,
+     "min": 0.03561618859999953,
+     "max": 0.03561618859999953,
+     "n": 1
+    },
+    "cxx_host_single_thread": {
+     "median": 0.01037337899999784,
+     "min": 0.01037337899999784,
+     "max": 0.01037337899999784,
+     "n": 1
+    }
+   },
+   "cxx_cuda_over_tracer_time": 1.1390676013984673,
+   "cxx_cuda_speedup_vs_cupy": 18.80105365276852,
+   "cxx_host_speedup_vs_numpy": 3.433422089370006,
+   "cxx_cuda_kernel": {
+    "registers": 255,
+    "local_bytes": 3184
+   },
+   "tracer_kernel": {
+    "registers": 255,
+    "local_bytes": 2720
+   }
+  }
+ }
+}

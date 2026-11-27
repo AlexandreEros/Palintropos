@@ -1,0 +1,124 @@
+{
+ "steps": 20,
+ "thomas_prototype": false,
+ "traced_wall_s": 2.5892696780001643,
+ "iterations_mean": 3.8,
+ "kernel_launches_per_step": 3857.45,
+ "kernel_time_ms_per_step": 75.72152125,
+ "traced_wall_ms_per_step": 129.4634839000082,
+ "gpu_busy_fraction_of_traced_wall": 0.5848870968780966,
+ "api_calls_per_step": {
+  "cuLaunchKernel": 3836.85,
+  "cudaMemcpyAsync": 283.3,
+  "cudaLaunchKernel": 20.6,
+  "cudaStreamSynchronize": 10.85,
+  "cudaMemsetAsync": 5.6,
+  "cudaStreamIsCapturing_v10000": 11.5,
+  "cuKernelGetName": 20.6,
+  "cudaEventQuery": 1.35,
+  "cudaEventRecord": 0.65,
+  "cudaEventCreateWithFlags": 0.65,
+  "cudaEventDestroy": 0.65,
+  "cuProfilerStart": 0.05,
+  "cudaDeviceSynchronize": 0.05
+ },
+ "memcpy_per_step": {
+  "[CUDA memcpy Device-to-Device]": 271.8,
+  "[CUDA memcpy Device-to-Host]": 10.85,
+  "[CUDA memcpy Host-to-Device]": 0.65,
+  "[CUDA memset]": 5.6
+ },
+ "top_kernels": [
+  {
+   "name": "cupy_multiply__float64_float64_float64",
+   "instances_per_step": 1007.7,
+   "ms_per_step": 17.425127800000002,
+   "avg_us": 17.292
+  },
+  {
+   "name": "cupy_add__float64_float64_float64",
+   "instances_per_step": 322.0,
+   "ms_per_step": 11.94152785,
+   "avg_us": 37.0855
+  },
+  {
+   "name": "cupy_multiply__float_float64_float64",
+   "instances_per_step": 322.25,
+   "ms_per_step": 7.3117166,
+   "avg_us": 22.6896
+  },
+  {
+   "name": "cupy_true_divide__float64_float_float64",
+   "instances_per_step": 172.8,
+   "ms_per_step": 6.9867372,
+   "avg_us": 40.4325
+  },
+  {
+   "name": "cupy_subtract__float64_float64_float64",
+   "instances_per_step": 719.6,
+   "ms_per_step": 6.1548183000000005,
+   "avg_us": 8.5531
+  },
+  {
+   "name": "cupy_true_divide__float64_float64_float64",
+   "instances_per_step": 432.6,
+   "ms_per_step": 3.6643498,
+   "avg_us": 8.4705
+  },
+  {
+   "name": "cupy_add__float_float64_float64",
+   "instances_per_step": 127.3,
+   "ms_per_step": 3.4431776999999997,
+   "avg_us": 27.0477
+  },
+  {
+   "name": "cupy_absolute__float64_float64",
+   "instances_per_step": 80.4,
+   "ms_per_step": 2.0322387500000003,
+   "avg_us": 25.2766
+  },
+  {
+   "name": "cupy_subtract__float64_float_float64",
+   "instances_per_step": 71.4,
+   "ms_per_step": 1.8968634999999998,
+   "avg_us": 26.5667
+  },
+  {
+   "name": "cupy_negative__float64_float64",
+   "instances_per_step": 76.0,
+   "ms_per_step": 1.8781872,
+   "avg_us": 24.713
+  },
+  {
+   "name": "cupy_where__bool_float64_float64_float64",
+   "instances_per_step": 44.4,
+   "ms_per_step": 1.75382535,
+   "avg_us": 39.5006
+  },
+  {
+   "name": "cupy_exp__float64_float64",
+   "instances_per_step": 27.0,
+   "ms_per_step": 1.6320424,
+   "avg_us": 60.446
+  },
+  {
+   "name": "cupy_expm1__float64_float64",
+   "instances_per_step": 17.4,
+   "ms_per_step": 1.3185449,
+   "avg_us": 75.77839999999999
+  },
+  {
+   "name": "cupy_minimum__float64_float_float64",
+   "instances_per_step": 34.6,
+   "ms_per_step": 0.98092335,
+   "avg_us": 28.3504
+  },
+  {
+   "name": "cupy_maximum__float64_float_float64",
+   "instances_per_step": 35.6,
+   "ms_per_step": 0.9804693500000001,
+   "avg_us": 27.5413
+  }
+ ],
+ "unparsed_reports": {}
+}
