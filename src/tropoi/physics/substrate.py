@@ -161,14 +161,17 @@ class ConductiveSubstrate:
     ``albedo`` and ``emissivity`` (both in [0, 1]) enter f(T_s).
     Emissivity 0 gives a non-radiating surface, as used by
     prescribed-flux verification problems. ``bottom_heat_flux`` is the
-    default geothermal G (W m^-2, upward into the column).
-    ``initial_temperature`` is a scalar or a per-cell profile (K).
-    ``max_iterations`` caps Newton iterations per step."""
+    geothermal G (W m^-2, upward into the column; a step may override it).
+    ``initial_temperature`` is a scalar or a per-cell profile (K); it is an
+    experiment's physical choice and is unrelated to the internal enthalpy
+    reference :data:`ENERGY_REFERENCE_TEMPERATURE`. All four are required:
+    they belong to the experiment, not to the substrate.
+    ``max_iterations`` (numerical configuration, recorded in the signature)
+    caps Newton iterations per step."""
 
     def __init__(self, strata: Sequence[Stratum], *, interfaces: Sequence[float],
-                 albedo: float = 0.0, emissivity: float = 1.0,
-                 bottom_heat_flux: float = 0.0, initial_temperature=300.0,
-                 max_iterations: int = 50):
+                 albedo: float, emissivity: float, bottom_heat_flux: float,
+                 initial_temperature, max_iterations: int = 50):
         strata = tuple(strata)
         e = np.asarray(tuple(float(x) for x in interfaces), dtype=np.float64)
         if (e.ndim != 1 or e.size < 2 or not np.all(np.isfinite(e)) or e[0] != 0.0
@@ -196,23 +199,27 @@ class ConductiveSubstrate:
         self._device: dict = {}
 
     @classmethod
-    def constant(cls, *, interfaces: Sequence[float],
-                 volumetric_heat_capacity: float = 2.0e6,
+    def constant(cls, *, interfaces: Sequence[float], volumetric_heat_capacity: float,
                  conductivity: Optional[float] = None,
                  thermal_inertia: Optional[float] = None,
                  **kw) -> "ConductiveSubstrate":
         """One constant-property stratum on the explicit grid ``interfaces``
-        (build one with :mod:`tropoi.spatial.vertical`), given by C and either
-        k or the thermal inertia I = sqrt(k C). The column depth is the last
-        interface. The material defaults are the THAI substrate's: C = 2e6,
-        I = 2000 (k = 2)."""
+        (build one with :mod:`tropoi.spatial.vertical`), given by its
+        volumetric heat capacity C and exactly one of the conductivity k or
+        the thermal inertia I = sqrt(k C). The column depth is the last
+        interface. There are no material defaults: the experiment states
+        them (THAI's sand, for example, is C = 2e6, I = 2000). The remaining
+        keywords (albedo, emissivity, bottom_heat_flux, initial_temperature)
+        are required as for the constructor."""
         cap = float(volumetric_heat_capacity)
         if not (math.isfinite(cap) and cap > 0.0):
             raise ValueError("volumetric_heat_capacity must be finite and > 0")
         if thermal_inertia is not None and conductivity is not None:
             raise ValueError("give thermal_inertia or conductivity, not both")
+        if thermal_inertia is None and conductivity is None:
+            raise ValueError("give the conductivity or the thermal inertia")
         if conductivity is None:
-            inertia = 2000.0 if thermal_inertia is None else float(thermal_inertia)
+            inertia = float(thermal_inertia)
             if not (math.isfinite(inertia) and inertia > 0.0):
                 raise ValueError("thermal_inertia must be finite and > 0")
             conductivity = inertia * inertia / cap

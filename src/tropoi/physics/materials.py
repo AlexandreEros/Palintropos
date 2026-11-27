@@ -261,14 +261,17 @@ class Stratum:
     ``heat_capacity_range`` is the (low, high) temperature range the source
     states the law is valid for (``high`` may be None when no upper limit is
     stated), or None when the law is exact, as for a prescribed constant.
-    ``source`` says where the numbers come from."""
+    ``source`` says where the numbers come from.
+    ``radiative_reference_temperature`` T_r of the cubic radiative term has
+    no default: it is required when ``radiative_coefficient`` is non-zero
+    (VPW99 and Hayne et al. 2017 both use 350 K) and is None otherwise."""
 
     bottom: float
     density: Value
     contact_conductivity: Value
     heat_capacity: object
     radiative_coefficient: Value = 0.0
-    radiative_reference_temperature: float = 350.0
+    radiative_reference_temperature: Optional[float] = None
     heat_capacity_range: Optional[tuple] = None
     name: str = "stratum"
     source: str = ""
@@ -280,8 +283,15 @@ class Stratum:
         if not hasattr(law, "enthalpy_difference"):
             law = heat_capacity_from_dict(law)
         object.__setattr__(self, "heat_capacity", law)
-        if not self.radiative_reference_temperature > 0.0:
-            raise ValueError("radiative_reference_temperature must be > 0")
+        radiative = (isinstance(self.radiative_coefficient, DepthProfile)
+                     or float(self.radiative_coefficient) != 0.0)
+        t_r = self.radiative_reference_temperature
+        if t_r is None:
+            if radiative:
+                raise ValueError("a radiative conductivity term needs its reference "
+                                 "temperature T_r (k = k_c [1 + chi (T/T_r)^3]); it has no default")
+        elif not (math.isfinite(float(t_r)) and float(t_r) > 0.0):
+            raise ValueError("radiative_reference_temperature must be finite and > 0")
         if self.heat_capacity_range is not None:
             lo, hi = self.heat_capacity_range
             lo = float(lo)
@@ -356,7 +366,9 @@ class CellMaterials:
             z = centres[cells]
             rho[cells] = _evaluate(s.density, z)
             kc[cells] = _evaluate(s.contact_conductivity, z)
-            chi[cells] = (_evaluate(s.radiative_coefficient, z)
+            # no radiative term: no reference temperature, and chi / T_r^3 = 0
+            chi[cells] = (0.0 if s.radiative_reference_temperature is None else
+                          _evaluate(s.radiative_coefficient, z)
                           / s.radiative_reference_temperature ** 3)
             rows = np.flatnonzero(cells)
             segments.append((int(rows[0]), int(rows[-1]) + 1, s.heat_capacity))
