@@ -19,6 +19,7 @@ implementation paths or fixed timesteps as current API guidance.
 | [Pressure slices](pressure_surface_2026-11-07/README.md) | Fixed-pressure interpolation/masks, export cost and browser playback |
 | [Interactive pressure](interactive_pressure_2026-11-08/README.md) | Browser interpolation/quantization, latency and payload measurements |
 | [Derived surfaces](derived_surfaces_2026-11-08/README.md) | Geopotential-height/sigma surfaces and vorticity/divergence measurements |
+| [Substrate consolidation audit](CONSOLIDATION-AUDIT.md) | T4 substrate baseline, kernel census, compiled-Thomas and device-resident Newton feasibility (bitwise), ownership audit and plan; [evidence](consolidation-evidence/) |
 
 The adjacent Williamson artifact directories retain machine-readable
 receipts and committed smoke evidence. Most long-run raw data is local or
