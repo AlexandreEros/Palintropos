@@ -989,8 +989,8 @@ becomes:
 | #80 | E1: each Newton residual evaluated once; per-substrate caching | `afa4588` | T4: full N1 bitwise (production, terminator, constant, Ceres); G-gates identical; `run_block` 21.0 ms/step |
 | #81 | E2: fused validation, forcing, report, extents and accumulation; cached kernel | `d4cf351` | T4 at `92c883d`: N1 bitwise (extents and runner outputs included); `run_block` **19.4 ms/step**; **1 synchronization and 40 launches per step**; memory pool 102 MB; warm-cache load **0.027 s** |
 | #82 | F: GPU-first execution policy (D6, U6) | `6eb7849` | CLI/API tests; a CPU verification run never imports CuPy |
-| #83 | G: the Python migration reference removed (U9) | see the pull request | T4 regression at `7622a74`: state bitwise; `run_block` 19.5 ms/step; warm-cache load 0.037 s; CPU against CUDA within 1.1e-13 K |
-| (study) | H: the D3 equivalence study of the boundary-layer solve | not merged | `tools/colab/bl_thomas_equivalence.py`; see "Outstanding" |
+| #83 | G: the Python migration reference removed (U9) | `48dcef6` | T4 regression at `7622a74`: state bitwise; `run_block` 19.5 ms/step; warm-cache load 0.037 s; CPU against CUDA within 1.1e-13 K |
+| #84 | H, study only: the D3 equivalence study of the boundary-layer solve, and the atmospheric T4 baseline | open, for the owner's decision | 99.56% bitwise, ≤ 1.3e-16 of column scale, equal accuracy and conservation; 9.14 → 0.20 ms per solve (P6 met by the prototype); see "Outstanding" |
 
 The evidence files and the map from each evidence commit to its pull
 request and squash commit are in `docs/validation/consolidation-evidence/`.
@@ -1018,13 +1018,19 @@ request and squash commit are in `docs/validation/consolidation-evidence/`.
   launches are the report's order-dependent CuPy sums (U3), two segmented
   extent reductions, the per-step area integrals and small runner
   operations.
-* **Stage H (D3, P6).** The equivalence study measures the boundary
-  layer's elimination against the canonical `pt::thomas` on captured T21L40
-  systems, and the per-solve time. Migrating needs two owner decisions: whether
-  the measured differences are acceptable (no tolerance is agreed for
-  atmospheric arithmetic), and where the CPU path of a canonical
-  `numerics` solve lives (the native CPU library is the substrate's,
-  in `temporal`).
+* **Stage H (D3, P6), PR #84.** On 30 captured THAI T21L40 systems the
+  canonical `pt::thomas` agrees with the boundary layer's own elimination
+  bit for bit on 99.56% of values and within 1.3e-16 of the column scale
+  elsewhere, with the same accuracy against extended precision and the
+  same conservation; a prototype solve takes 0.20 ms against 9.14 ms (P6:
+  ≤ 1.0 ms). Migrating needs two owner decisions: whether these
+  differences are acceptable (no tolerance is agreed for atmospheric
+  arithmetic), and where the CPU path of a canonical `numerics` solve
+  lives (the native CPU library is the substrate's, in `temporal`).
+* **Atmospheric baseline (PR #84).** The complete primitive-equation step
+  is launch-bound on the T4; radiative transfer is 57% of the THAI step
+  and the boundary layer 24%. The proposed priorities for the next native
+  migration are in `docs/validation/atmosphere-baseline/README.md` on #84.
 * **Audit finding 7** (the airless and radiative runners import run
   helpers from `run/held_suarez/experiment.py`) is not addressed.
 * **CPU bitwise status.** The CPU build agrees with the CUDA build within
