@@ -67,12 +67,20 @@ def child(args) -> None:
     print(json.dumps({"traced_wall_s": wall, "iterations_mean": float(np.mean(r["iterations"]))}))
 
 
+_RAW: dict = {}
+
+
 def _csv(report: str, rep: pathlib.Path) -> list:
     out = subprocess.run(["nsys", "stats", "-q", "--report", report, "--format", "csv",
                           "--output", "-", str(rep)], capture_output=True, text=True)
     text = out.stdout
-    start = text.find('"')
-    rows = list(csv.DictReader(io.StringIO(text[start:] if start >= 0 else text)))
+    # the CSV starts at its header line; anything before it is nsys chatter
+    lines = text.splitlines()
+    head = next((i for i, l in enumerate(lines) if "Time" in l and "," in l), None)
+    rows = (list(csv.DictReader(io.StringIO("\n".join(lines[head:]))))
+            if head is not None else [])
+    if not rows:
+        _RAW[report] = {"stdout_head": text[:1500], "stderr_head": out.stderr[:1500]}
     return rows
 
 
@@ -117,7 +125,8 @@ def parent(args) -> int:
            "top_kernels": [{"name": r.get("Name", "")[:120],
                             "instances_per_step": num(r, "Instances") / steps,
                             "ms_per_step": num(r, "Total Time (ns)") / 1e6 / steps,
-                            "avg_us": num(r, "Avg (ns)") / 1e3} for r in top]}
+                            "avg_us": num(r, "Avg (ns)") / 1e3} for r in top],
+           "unparsed_reports": _RAW}
     pathlib.Path(args.out).write_text(json.dumps(doc, indent=1))
     print(json.dumps({k: v for k, v in doc.items() if k != "top_kernels"}, indent=1))
     return 0
