@@ -36,12 +36,21 @@ boundary layer and the radiative fluxes):
 | Earth T42L25 | **0.113** | 0.107 | (not traced) | 386 MB |
 | THAI Ben 2 ck T21L40 | **0.556** | 0.551 | 24,640 | 459 MB |
 
+**Caveats.**
+- Each throughput figure is one stretch of 72 steps (n = 1).
+- The first case ran with a cold CuPy cache.
+- The synchronized T42 step came out faster than T21's, which is
+  unexplained.
+- The ranking below does not depend on these figures, but they are not
+  precise timings.
+
 **The step is bound by kernel launches, not by arithmetic.**
 - Earth T42 has 4 times the columns of T21 but takes only 21% longer.
 - The THAI step launches 24,640 kernels, and 41,497 in each radiation call.
-- The average kernel lasts about 10-12 µs, roughly a launch's own cost. In
-  the THAI trace, the GPU's kernel time is about half of the
-  uninstrumented wall time.
+- The average kernel lasts about 10-12 µs, roughly a launch's own cost.
+- In the THAI trace, the GPU's kernel time is roughly half of the
+  uninstrumented wall time. This is an estimate: the trace's kernel total
+  includes model setup and the warm steps.
 
 ## Where the THAI step goes (T21L40, synchronized component times)
 
@@ -80,14 +89,21 @@ three ways:
 
 | | Production | Canonical `pt::thomas` |
 | --- | --- | --- |
-| Values bitwise equal to the other | 99.56% | |
 | Largest difference between the two (column scale) | 1.3e-16 | |
 | 99th percentile of the difference | 0 | |
+| Values bitwise equal to the other (all rows; see the caveat below) | 99.56% | |
 | Largest error against extended precision (column scale) | 2.10e-16 | 2.10e-16 |
 | Mean error against extended precision | 9.558e-18 | 9.541e-18 |
 | Largest column-integral conservation error (zero-flux systems) | 4.8e-17 | 4.7e-17 |
 | One solve (T4) | **9.14 ms** | **0.20 ms** |
 | The u/v pair | 18.2 ms (two factorizations) | **0.29 ms** (one) |
+
+**Caveat on the bitwise fraction.** It counts every row. Above the
+boundary layer the conductances are zero, the system is diagonal, and
+both eliminations return `D/B` exactly, so these rows inflate the
+fraction. The fraction over rows with non-zero coupling has not been
+measured; the tool now reports it for the next run. The bound that
+matters is the largest difference, 1.3e-16 of the column scale.
 
 The two eliminations agree to round-off. The canonical one is as accurate,
 or very slightly more accurate, and conserves as well. The prototype meets
@@ -129,8 +145,8 @@ now takes 17-19 ms at 16,200 columns, and the forcing costs no measurable
 wall-clock time.
 
 **Decisions needed before stage H's migration:**
-- whether the measured differences above (99.6% bitwise, ≤ 1.3e-16 of
-  column scale, equal accuracy and conservation) are acceptable, since no
+- whether the measured differences above (≤ 1.3e-16 of column scale, equal
+  accuracy and conservation) are acceptable, since no
   tolerance has been agreed for atmospheric arithmetic;
 - where the CPU path of a canonical `numerics` solve lives. Today the native
   CPU library belongs to the substrate (`temporal`); the options are a

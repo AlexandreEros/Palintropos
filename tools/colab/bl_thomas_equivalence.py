@@ -182,9 +182,21 @@ def main(argv=None) -> int:
         e_nat = np.abs(N - ext.astype(np.float64)) / scale
         d = np.abs(P - N) / scale
         exactly = float(np.mean(P == N))
+        # rows coupled to a neighbour (above the boundary layer the system is
+        # diagonal and every elimination returns D/B exactly)
+        g = h["cond"]
+        coupled = np.zeros(P.shape, dtype=bool)
+        coupled[:-1] |= g != 0
+        coupled[1:] |= g != 0
+        if h["bottom"] is not None:
+            coupled[-1] |= h["bottom"] != 0
+        exactly_coupled = (float(np.mean(P[coupled] == N[coupled])) if coupled.any()
+                           else None)
         row = {"window_s": h["w"], "levels": int(P.shape[0]), "columns": int(P.shape[1]),
                "bottom_stress": h["bottom"] is not None,
                "fraction_bitwise_equal": exactly,
+               "fraction_coupled_rows": float(coupled.mean()),
+               "fraction_bitwise_equal_coupled_rows": exactly_coupled,
                "max_rel_difference": float(d.max()), "p99_rel_difference": float(
                    np.percentile(d, 99)),
                "max_ulps_production_vs_canonical": float(np.max(_ulps(P, N))),
@@ -226,7 +238,8 @@ def main(argv=None) -> int:
     }
     props = cp.cuda.runtime.getDeviceProperties(0)
     keys = [k for k in rows[0] if k.startswith(("max_", "mean_", "p99_", "fraction"))]
-    summary = {k: (min if k.startswith("fraction") else max)(r[k] for r in rows if k in r)
+    summary = {k: (min if k.startswith("fraction") else max)(r[k] for r in rows
+                                                            if r.get(k) is not None)
                for k in keys + ["max_conservation_rel_error_production",
                                 "max_conservation_rel_error_canonical"]
                if any(k in r for r in rows)}
