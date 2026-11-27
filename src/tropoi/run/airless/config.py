@@ -50,6 +50,22 @@ def strata_from_dicts(items) -> list:
     return out
 
 
+def _is_real(v) -> bool:
+    """A finite int or float, not a bool or a string (an int too large for a
+    float is not finite)."""
+    if not isinstance(v, (int, float)) or isinstance(v, bool):
+        return False
+    try:
+        return math.isfinite(v)
+    except OverflowError:
+        return False
+
+
+def _is_count(v) -> bool:
+    """A positive int, not a bool."""
+    return isinstance(v, int) and not isinstance(v, bool) and v > 0
+
+
 @dataclass(frozen=True)
 class AirlessConfig:
     """One experiment.
@@ -95,11 +111,26 @@ class AirlessConfig:
 
     def __post_init__(self):
         object.__setattr__(self, "strata", tuple(dict(s) for s in self.strata))
-        if self.cycle_steps <= 0 or (self.spinup_cycle_steps is not None
-                                     and self.spinup_cycle_steps <= 0):
-            raise ValueError("cycle step counts must be positive")
+        # Values are checked, never coerced: the configuration is hashed as given.
+        for key in ("albedo", "emissivity", "geothermal_flux", "cycle_s",
+                    "initial_temperature", "radius_m"):
+            if not _is_real(getattr(self, key)):
+                raise ValueError(f"{key} must be a finite number, got "
+                                 f"{getattr(self, key)!r}")
+        if not (self.cycle_s > 0.0 and self.radius_m > 0.0
+                and self.initial_temperature > 0.0):
+            raise ValueError("cycle_s, radius_m and initial_temperature must be > 0")
+        if not _is_count(self.cycle_steps) or not (
+                self.spinup_cycle_steps is None or _is_count(self.spinup_cycle_steps)):
+            raise ValueError("cycle step counts must be positive integers, got "
+                             f"cycle_steps={self.cycle_steps!r}, "
+                             f"spinup_cycle_steps={self.spinup_cycle_steps!r}")
+        if not isinstance(self.output, dict):
+            raise ValueError(f"output must be an object, got {self.output!r}")
         for key in ("surface_samples", "profile_samples"):
-            n = int(self.output[key])
+            n = self.output.get(key)
+            if not _is_count(n):
+                raise ValueError(f"output {key} must be a positive integer, got {n!r}")
             if self.cycle_steps % n:
                 raise ValueError(f"{key}={n} must divide the production cycle steps "
                                  f"{self.cycle_steps}")
@@ -153,7 +184,7 @@ def config_from_document(doc) -> AirlessConfig:
                                                  f"unknown {unknown}" if unknown else "") if p))
     try:
         cfg = AirlessConfig.from_dict(body)
-    except (TypeError, KeyError, AttributeError) as exc:      # wrongly typed fields
+    except (TypeError, KeyError, AttributeError, ValueError) as exc:  # wrongly typed fields
         raise ValueError(f"not an airless configuration: {type(exc).__name__}: {exc}") from exc
     if stated is not None and stated != cfg.sha256():
         raise ValueError(f"the document states config_sha256 {stated}, but its configuration "

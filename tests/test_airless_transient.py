@@ -196,3 +196,101 @@ def test_config_document_reports_wrong_types_as_value_errors():
     doc = json.loads(CERES.read_text())
     with pytest.raises(ValueError, match="not an airless configuration"):
         config_from_document({**doc["config"], "cycle_steps": "4320"})
+
+
+def test_standalone_replay_of_a_segment_without_samples(tmp_path):
+    """A 1-step tail holds no tier-2 samples: the replay reports them as not
+    compared (None, never 0) and judges the end state alone."""
+    from tools.planet_one.global_check import main as gg
+    run = AirlessRun(_short_ceres(), tmp_path / "run", allow_dirty=True, log=lambda s: None)
+    run.run_transient(25)
+    assert gg([str(tmp_path / "run"), "--columns", "0"]) == 0
+    report = json.loads((tmp_path / "run" / "gg.json").read_text())
+    assert report["samples"] == {"surface": 0, "profiles": 0}
+    assert report["max_abs_surface_fields_diff"] is None
+    assert report["max_abs_profile_diff_K"] is None
+    assert report["compared"] == ["end_state"]
+    assert set(report["not_compared"]) == {"surface_fields", "profiles"}
+    assert report["pass"] and report["max_abs_end_state_diff_K"] == 0.0
+
+
+def test_standalone_replay_needs_columns_for_point_runs(tmp_path):
+    from tools.planet_one.global_check import main as gg
+    run = AirlessRun(_short_ceres(), tmp_path / "run", allow_dirty=True, log=lambda s: None)
+    run.run_transient(24)
+    with pytest.raises(SystemExit):
+        gg([str(tmp_path / "run")])
+
+
+@pytest.mark.parametrize("key", ["surface_samples", "profile_samples"])
+@pytest.mark.parametrize("bad", [0, -4, 2.0, "12", True, None])
+def test_config_refuses_bad_sample_counts(key, bad):
+    """A zero sample count used to raise ZeroDivisionError in validation."""
+    doc = json.loads(CERES.read_text())
+    body = {**doc["config"], "output": {**doc["config"]["output"], key: bad}}
+    with pytest.raises(ValueError, match=f"output {key} must be a positive integer"):
+        AirlessConfig.from_dict(body)
+    with pytest.raises(ValueError, match="not an airless configuration"):
+        config_from_document(body)
+
+
+@pytest.mark.parametrize("key,bad", [("albedo", "0.1"), ("emissivity", None),
+                                     ("geothermal_flux", float("nan")), ("cycle_s", True),
+                                     ("radius_m", -1.0), ("initial_temperature", 0.0),
+                                     ("cycle_steps", 0), ("cycle_steps", 24.0),
+                                     ("spinup_cycle_steps", 0)])
+def test_config_refuses_wrongly_typed_or_out_of_range_scalars(key, bad):
+    """Checked, not coerced: a string albedo used to load and fail later."""
+    doc = json.loads(CERES.read_text())
+    with pytest.raises(ValueError, match="not an airless configuration"):
+        config_from_document({**doc["config"], key: bad})
+
+
+def test_cli_refuses_an_empty_config_path(tmp_path, capsys):
+    """An empty --config used to fall through to PRESETS[None] (KeyError)."""
+    with pytest.raises(SystemExit) as exc:
+        main(["show-config", "--config", ""])
+    assert exc.value.code == 2
+    assert "--config needs a file path" in capsys.readouterr().err
+
+
+def test_standalone_replay_end_state_includes_the_skin(tmp_path):
+    """The end-state verdict covers the skin as well as the cells: a corrupted
+    retained skin fails the replay of a sample-free segment."""
+    from tools.planet_one.global_check import main as gg
+    run = AirlessRun(_short_ceres(), tmp_path / "run", allow_dirty=True, log=lambda s: None)
+    run.run_transient(25)
+    path = tmp_path / "run" / "retained" / "state.npz"
+    with np.load(path) as f:
+        z = dict(f)
+    z["end_surface_anomaly"] = z["end_surface_anomaly"] + 1e-6
+    np.savez(path, **z)
+    assert gg([str(tmp_path / "run"), "--columns", "0"]) == 1
+    report = json.loads((tmp_path / "run" / "gg.json").read_text())
+    assert report["compared"] == ["end_state"] and not report["pass"]
+
+
+@pytest.mark.parametrize("key", ["albedo", "cycle_s"])
+def test_config_refuses_integers_too_large_for_a_float(key):
+    """math.isfinite(10**400) raises OverflowError; it must surface as a
+    configuration error."""
+    doc = json.loads(CERES.read_text())
+    with pytest.raises(ValueError, match="not an airless configuration"):
+        config_from_document({**doc["config"], key: 10 ** 400})
+
+
+def test_standalone_replay_with_a_different_sample_count_fails_with_a_report(tmp_path):
+    """A replay that cannot reproduce the run's sample layout is a failed
+    replay with a written report, not a traceback."""
+    from tools.planet_one.global_check import main as gg
+    run = AirlessRun(_short_ceres(), tmp_path / "run", allow_dirty=True, log=lambda s: None)
+    run.run_transient(24)
+    path = tmp_path / "run" / "retained" / "state.npz"
+    with np.load(path) as f:
+        z = dict(f)
+    z["sample_every"] = np.asarray([4, 4], dtype=np.int64)       # the run sampled every 2
+    np.savez(path, **z)
+    assert gg([str(tmp_path / "run"), "--columns", "0"]) == 1
+    report = json.loads((tmp_path / "run" / "gg.json").read_text())
+    assert not report["pass"]
+    assert "replay produced" in report["not_compared"]["surface_fields"]

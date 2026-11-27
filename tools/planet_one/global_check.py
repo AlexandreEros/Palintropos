@@ -10,7 +10,11 @@ retained transient segment is replayed with its recorded timestep, first
 global step and sampling cadence; runs that predate those records use the
 cycle form (timestep cycle_s/steps, first step cycle*steps). Every
 tier-2 sample of the replay (surface fields and full T(z)) is compared with
-the global run's. The frozen bound is 1e-12 K. Writes RUN_DIR/gg.json.
+the global run's. The frozen bound is 1e-12 K. A kind of sample the
+retained segment does not hold (a transient tail shorter than the sampling
+cadence) is reported as not compared, never as a zero difference, and the
+verdict rests on the quantities that were compared (the end state always
+is). Writes RUN_DIR/gg.json; exits 0 on a pass and 1 otherwise.
 """
 from __future__ import annotations
 
@@ -39,6 +43,8 @@ def main(argv=None) -> int:
     lat, lon, w = grid["lat_deg"], grid["lon_deg"], grid["weights"]
     if args.columns:
         cols = np.array([int(c) for c in args.columns.split(",")])
+    elif cfg["columns"]["kind"] != "latlon":
+        ap.error("--columns is required for a run whose columns are not a latlon grid")
     else:                                   # canonical-like points of the grid
         nlat, nlon = cfg["columns"]["nlat"], cfg["columns"]["nlon"]
         la, lo = lat.reshape(nlat, nlon)[:, 0], lon.reshape(nlat, nlon)[0]
@@ -67,18 +73,45 @@ def main(argv=None) -> int:
         p_rep = load_tier2(out, "profiles")
     s_glob = load_tier2(ret, "surface", columns=cols)
     p_glob = load_tier2(ret, "profiles", columns=cols)
-    d_s = float(np.max(np.abs(s_rep - s_glob)))
-    d_p = float(np.max(np.abs(p_rep - p_glob)))
-    d_end = float(np.max(np.abs(res["anomaly"] - state["end_anomaly"][:, cols])))
+    # A segment can hold no samples of a kind (a transient tail shorter than
+    # the cadence). Such a quantity is reported as not compared (None), never
+    # as a zero difference, and the verdict rests only on what was compared.
+    shape_errors = {k: f"replay produced {a.shape}, the run holds {b.shape}"
+                    for k, a, b in (("surface_fields", s_rep, s_glob), ("profiles", p_rep, p_glob))
+                    if a.shape != b.shape}
+    diffs = {"surface_fields": None if "surface_fields" in shape_errors
+             else _max_abs_diff(s_rep, s_glob),
+             "profiles": None if "profiles" in shape_errors else _max_abs_diff(p_rep, p_glob),
+             # cells and the diagnosed skin both: a sample-free segment is judged on these alone
+             "end_state": max(
+                 float(np.max(np.abs(res["anomaly"] - state["end_anomaly"][:, cols]))),
+                 float(np.max(np.abs(res["surface_anomaly"]
+                                     - state["end_surface_anomaly"][cols]))))}
+    compared = [k for k, v in diffs.items() if v is not None]
+    bound = 1e-12
     report = {"run": str(run), "backend": backend, "cycle": cycle, "steps": steps,
               "timing": {k: list(v) if isinstance(v, tuple) else v for k, v in timing.items()},
               "columns": cols.tolist(), "lat_deg": lat[cols].tolist(), "lon_deg": lon[cols].tolist(),
-              "max_abs_surface_fields_diff": d_s, "max_abs_profile_diff_K": d_p,
-              "max_abs_end_state_diff_K": d_end, "bound_K": 1e-12,
-              "pass": max(d_s, d_p, d_end) <= 1e-12}
+              "samples": {"surface": int(s_glob.shape[0]), "profiles": int(p_glob.shape[0])},
+              "max_abs_surface_fields_diff": diffs["surface_fields"],
+              "max_abs_profile_diff_K": diffs["profiles"],
+              "max_abs_end_state_diff_K": diffs["end_state"], "bound_K": bound,
+              "compared": compared,
+              "not_compared": {k: shape_errors.get(k, "no samples in the retained segment")
+                               for k, v in diffs.items() if v is None},
+              # a sample-count mismatch is a failed replay, never a skipped comparison
+              "pass": not shape_errors and all(diffs[k] <= bound for k in compared)}
     (run / "gg.json").write_text(json.dumps(report, indent=1))
     print(json.dumps(report, indent=1))
-    return 0
+    return 0 if report["pass"] else 1
+
+
+def _max_abs_diff(replayed, retained):
+    """max |replayed - retained| of two same-shaped arrays, or None when there
+    is nothing to compare."""
+    if replayed.size == 0:
+        return None
+    return float(np.max(np.abs(replayed - retained)))
 
 
 if __name__ == "__main__":
