@@ -51,9 +51,14 @@ def strata_from_dicts(items) -> list:
 
 
 def _is_real(v) -> bool:
-    """A finite int or float, not a bool or a string."""
-    return (isinstance(v, (int, float)) and not isinstance(v, bool)
-            and math.isfinite(v))
+    """A finite int or float, not a bool or a string (an int too large for a
+    float is not finite)."""
+    if not isinstance(v, (int, float)) or isinstance(v, bool):
+        return False
+    try:
+        return math.isfinite(v)
+    except OverflowError:
+        return False
 
 
 def _is_count(v) -> bool:
