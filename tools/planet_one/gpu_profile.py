@@ -46,7 +46,7 @@ def main(argv=None) -> int:
         st, _ = BackwardEulerSubstrate(sub).step(st, dt, shortwave_down=ins.incident(*n, (k + 1) * dt)[0])
     sync()
     timing = {"system": 0.0, "tridiagonal": 0.0, "calls_system": 0, "calls_tridiagonal": 0}
-    orig_sys, orig_tri = substrate_mod.BackwardEulerSubstrate._system, substrate_mod._tridiagonal
+    orig_sys, orig_tri = substrate_mod.BackwardEulerSubstrate._system, substrate_mod.thomas
 
     def timed_sys(self, *a, **k):
         sync(); t = time.perf_counter(); out = orig_sys(self, *a, **k); sync()
@@ -67,13 +67,13 @@ def main(argv=None) -> int:
     sync()
     total = (time.perf_counter() - t0) / args.steps
     substrate_mod.BackwardEulerSubstrate._system = timed_sys
-    substrate_mod._tridiagonal = timed_tri
+    substrate_mod.thomas = timed_tri
     t0 = time.perf_counter()
     for k in range(args.steps):
         st, rep = BackwardEulerSubstrate(sub).step(st, dt, shortwave_down=ins.incident(*n, (k + 6 + args.steps) * dt)[0])
     sync()
     instrumented = (time.perf_counter() - t0) / args.steps
-    substrate_mod.BackwardEulerSubstrate._system, substrate_mod._tridiagonal = orig_sys, orig_tri
+    substrate_mod.BackwardEulerSubstrate._system, substrate_mod.thomas = orig_sys, orig_tri
     out = {"backend": args.backend, "columns": args.columns, "layers": sub.layers,
            "seconds_per_step": total, "newton_iterations_mean": float(np.mean(iters)),
            "instrumented_seconds_per_step": instrumented,
