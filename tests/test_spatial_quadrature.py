@@ -92,8 +92,10 @@ def test_held_suarez_section_latitudes_are_the_grid_construction():
 
 def test_gauss_columns_are_the_spectral_grid_bit_for_bit():
     cp = pytest.importorskip("cupy", reason="the spectral grid geometry needs CuPy")
-    if not cp.is_available():
-        pytest.skip("needs a CUDA GPU")
+    try:                       # can raise (e.g. cudaErrorInsufficientDriver), not just be 0
+        cp.cuda.runtime.getDeviceCount()
+    except Exception:
+        pytest.skip("no usable CUDA device")
     from tropoi.spatial.grids.latlon_grid import GaussLatLonGridGeometry
     for nlat, nlon, R in ((32, 64, 6.371e6), (64, 128, 9.0e6)):
         g = GaussLatLonGridGeometry(nlat, nlon, radius=R)
