@@ -1,0 +1,59 @@
+{
+ "device": {
+  "name": "Tesla T4",
+  "total_memory_gb": 14.56317138671875,
+  "cupy": "14.0.1",
+  "nvidia_smi": "Tesla T4, 580.82.07, 15360 MiB"
+ },
+ "throughput": [
+  {
+   "case": "earth",
+   "resolution": "t21",
+   "steps": 72,
+   "seconds_per_step": 0.0935379065555553,
+   "nlat": 32,
+   "nlon": 64,
+   "nlev": 25,
+   "dt": 1200.0,
+   "memory_pool_total_bytes": 68040192,
+   "code": {
+    "git_commit": "7622a744976e19dfd606f938c5abf0c12b6546a3",
+    "git_dirty": false
+   },
+   "config_sha256": "748cec4b170c40a170cb14efbd6bac2e59618be54fafe6c7bc4a84ead23dd2be"
+  },
+  {
+   "case": "earth",
+   "resolution": "t42",
+   "steps": 72,
+   "seconds_per_step": 0.11296769756944355,
+   "nlat": 64,
+   "nlon": 128,
+   "nlev": 25,
+   "dt": 600.0,
+   "memory_pool_total_bytes": 385550848,
+   "code": {
+    "git_commit": "7622a744976e19dfd606f938c5abf0c12b6546a3",
+    "git_dirty": false
+   },
+   "config_sha256": "ccc301454af5fbcd624ae73c85f2efd52503f67f76dea92b26f25f71fd1ad8a0"
+  },
+  {
+   "case": "thai-ben2-ck",
+   "resolution": "t21",
+   "steps": 72,
+   "seconds_per_step": 0.5563870222361105,
+   "nlat": 32,
+   "nlon": 64,
+   "nlev": 40,
+   "dt": 1200.0,
+   "memory_pool_total_bytes": 458951168,
+   "code": {
+    "git_commit": "7622a744976e19dfd606f938c5abf0c12b6546a3",
+    "git_dirty": false
+   },
+   "config_sha256": "a963e4a71d599972a59e6aaa6449f7be53e0a4cbc570c3fd48983f8547a89a06"
+  }
+ ],
+ "errors": []
+}

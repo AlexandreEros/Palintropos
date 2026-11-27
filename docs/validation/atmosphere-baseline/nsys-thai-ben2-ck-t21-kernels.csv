@@ -1,0 +1,104 @@
+Time (%),Total Time (ns),Instances,Avg (ns),Med (ns),Min (ns),Max (ns),StdDev (ns),Name
+29.7,2358536636,220708,10686.2,2656.0,1311,131967,29525.7,cupy_multiply__float64_float64_float64
+19.8,1575645990,1043,1510686.5,1468859.0,3327,3842260,453876.6,"void cub::CUB_300102_SM_750_800_860_890_900_1000_1200::detail::reduce::DeviceSegmentedReduceKernel<cub::CUB_300102_SM_750_800_860_890_900_1000_1200::detail::reduce::policy_hub<double, int, cuda::std::__4::plus<void>>::Policy1000, double *, double *, thrust::THRUST_300102_SM_750_800_860_890_900_1000_1200_NS::transform_iterator<_arange, thrust::THRUST_300102_SM_750_800_860_890_900_1000_1200_NS::counting_iterator<int, thrust::THRUST_300102_SM_750_800_860_890_900_1000_1200_NS::use_default, thrust::THRUST_300102_SM_750_800_860_890_900_1000_1200_NS::use_default, thrust::THRUST_300102_SM_750_800_860_890_900_1000_1200_NS::use_default, thrust::THRUST_300102_SM_750_800_860_890_900_1000_1200_NS::compile_time_value<(int)1>>, thrust::THRUST_300102_SM_750_800_860_890_900_1000_1200_NS::use_default, thrust::THRUST_300102_SM_750_800_860_890_900_1000_1200_NS::use_default>, thrust::THRUST_300102_SM_750_800_860_890_900_1000_1200_NS::transform_iterator<_arange, thrust::THRUST_300102_SM_750_800_860_890_900_1000_1200_NS::counting_iterator<int, thrust::THRUST_300102_SM_750_800_860_890_900_1000_1200_NS::use_default, thrust::THRUST_300102_SM_750_800_860_890_900_1000_1200_NS::use_default, thrust::THRUST_300102_SM_750_800_860_890_900_1000_1200_NS::use_default, thrust::THRUST_300102_SM_750_800_860_890_900_1000_1200_NS::compile_time_value<(int)1>>, thrust::THRUST_300102_SM_750_800_860_890_900_1000_1200_NS::use_default, thrust::THRUST_300102_SM_750_800_860_890_900_1000_1200_NS::use_default>, int, cuda::std::__4::plus<void>, double, double>(T2, T3, T4, T5, T7, T8)"
+10.9,866348082,118554,7307.6,2112.0,1311,137888,24111.7,cupy_add__float64_float64_float64
+5.8,461479497,28987,15920.2,1376.0,1311,130432,38924.8,cupy_subtract__float64_float64_float64
+5.4,430426066,14679,29322.6,2272.0,1600,629854,74870.3,cupy_true_divide__float64_float64_float64
+4.0,317499906,30079,10555.5,1280.0,1216,102400,25963.9,cupy_multiply__float_float64_float64
+4.0,314064941,20383,15408.2,1824.0,1312,87776,30371.5,cupy_subtract__float_float64_float64
+3.3,263004952,1358,193670.8,194319.5,2240,604670,79310.2,cupy_exp__float64_float64
+1.5,116691836,1420,82177.3,86336.0,1312,87680,15061.0,cupy_add__float_float64_float64
+1.3,107077698,1517,70585.2,86528.0,1216,88160,31969.6,cupy_negative__float64_float64
+1.2,97228669,4320,22506.6,6016.0,2208,100896,23153.5,cupy_take
+1.2,96984233,380,255221.7,251903.0,75711,698654,72204.2,cupy_expm1__float64_float64
+1.2,96540399,1268,76136.0,86656.0,1344,105248,27292.7,cupy_maximum__float64_float_float64
+1.2,95179985,55253,1722.6,1696.0,1471,4544,380.9,cupy_multiply__complex128_complex128_complex128
+0.8,65302108,1029,63461.7,96736.0,1472,257823,53985.8,cupy_sqrt__float64_float64
+0.8,63506020,15321,4145.0,4032.0,1632,10208,981.4,cupy_true_divide__float_float64_float64
+0.8,60936482,5044,12081.0,8832.0,8736,371871,29037.9,"void prime_fft_c2r<(unsigned int)67, EPT<(unsigned int)2>, (unsigned int)8, (unsigned int)7, (unsigned int)1, (padding_t)14, (twiddle_t)0, (loadstore_modifier_t)2, (layout_t)0, unsigned int, double>(kernel_arguments_t<T10>)"
+0.7,57879963,37447,1545.7,1440.0,1375,13664,598.0,cupy_add__complex128_complex128_complex128
+0.6,50074009,6118,8184.7,5792.0,5664,182048,12999.0,legendre_synthesis
+0.6,46988330,1680,27969.2,1312.0,1248,142912,46129.1,cupy_where__bool_float64_float64_float64
+0.5,38736846,15168,2553.9,1504.0,1408,128800,5092.7,cupy_true_divide__float64_float_float64
+0.5,36635390,1389,26375.4,14688.0,14527,414303,37971.9,"void prime_fft_r2c<(unsigned int)67, EPT<(unsigned int)2>, (unsigned int)8, (unsigned int)7, (unsigned int)1, (padding_t)14, (twiddle_t)0, (loadstore_modifier_t)2, (layout_t)0, unsigned int, double>(kernel_arguments_t<T10>)"
+0.4,33803340,15911,2124.5,1440.0,1216,77984,5518.1,cupy_copy__complex128_complex128
+0.3,23243050,991,23454.1,2624.0,1248,87135,35894.9,cupy_multiply__float64_float_float64
+0.3,21280783,258,82483.7,86799.5,2752,89056,16483.0,cupy_absolute__float64_float64
+0.2,19688985,380,51813.1,52864.0,29376,61311,5309.8,cupy_less__float64_float_bool
+0.2,16593188,1482,11196.5,7904.0,7648,97535,8529.7,legendre_analysis
+0.2,12850475,3046,4218.8,3456.0,3008,9440,1194.5,cupy_prepare_array_indexing
+0.2,12821178,2540,5047.7,6176.0,1280,8608,1942.3,cupy_add__int64_int_int64
+0.2,12597470,1074,11729.5,4864.0,4735,217311,21715.8,"void vector_fft_c2r<(unsigned int)64, EPT<(unsigned int)8>, (unsigned int)8, (unsigned int)18, (padding_t)14, (twiddle_t)0, (loadstore_modifier_t)2, (layout_t)0, unsigned int, double>(kernel_arguments_t<T9>)"
+0.1,11869751,5041,2354.6,2240.0,2176,5664,532.5,cupy_true_divide__complex128_complex_complex128
+0.1,11790863,447,26377.8,28576.0,4192,65599,10749.6,cupy_sum
+0.1,11667453,66,176779.6,176479.0,175583,179295,1036.4,cupy_inclusive_batch_scan_kernel
+0.1,11557465,160,72234.2,91407.5,2976,92288,34710.4,cupy_where__bool_float_float64_float64
+0.1,11021746,419,26304.9,5664.0,1440,76704,30978.4,cupy_power__float64_float_float64
+0.1,10206942,3,3402314.0,3330581.0,2873302,4003059,568284.2,generate_sph_harm_basis
+0.1,10188545,470,21677.8,24448.0,2719,64416,10789.5,cupy_log__float64_float64
+0.1,9884892,145,68171.7,57568.0,57183,112512,21067.8,volta_zgemm_32x32_nn
+0.1,9252739,2916,3173.1,2528.0,2464,18208,1662.1,cupy_true_divide__complex128_float64_complex128
+0.1,6562017,760,8634.2,8384.0,7039,21376,1905.6,cupy_searchsorted_kernel
+0.1,6145735,4725,1300.7,1216.0,1056,2976,337.7,cupy_fill
+0.1,5163225,2881,1792.2,1440.0,1408,9312,1138.5,cupy_subtract__complex128_complex128_complex128
+0.1,4882099,2903,1681.7,1440.0,1407,8192,877.6,cupy_multiply__complex_complex128_complex128
+0.1,4284426,2310,1854.7,2176.0,1216,5344,662.7,cupy_bitwise_or__bool_bool_bool
+0.1,4213873,1840,2290.1,1248.0,1184,24608,3199.3,cupy_copy__float64_float64
+0.0,3674222,33,111340.1,111263.0,109279,114143,1165.4,cupy_concatenate
+0.0,3310292,760,4355.6,4128.0,3936,10240,962.3,cupy_clip__float64_float64_float64_float64
+0.0,3010487,790,3810.7,4064.0,2944,8992,840.7,cupy_less__float64_float64_bool
+0.0,2807638,1431,1962.0,1280.0,1247,7712,1657.3,cupy_subtract__float64_float_float64
+0.0,2660694,1733,1535.3,1344.0,1280,4512,462.0,cupy_where__bool_float64_float_float64
+0.0,2360441,760,3105.8,2976.0,2688,6880,619.0,cupy_greater__float64_float64_bool
+0.0,2268658,1491,1521.6,1312.0,1248,3936,460.7,cupy_greater__float64_float_bool
+0.0,2018678,760,2656.2,2528.0,2400,5888,544.1,cupy_clip__int64_int_int_int64
+0.0,1923934,760,2531.5,2432.0,2240,5824,524.6,cupy_subtract__int64_int_int64
+0.0,1832664,592,3095.7,2624.0,2400,9120,924.1,cupy_concatenate_same_size
+0.0,1618227,535,3024.7,2592.0,1632,9792,1746.3,cupy_multiply__float64_complex128_complex128
+0.0,1578745,1170,1349.4,1248.0,1216,3040,358.0,cupy_bitwise_and__bool_bool_bool
+0.0,1525437,1170,1303.8,1216.0,1183,2976,342.2,cupy_invert__bool_bool
+0.0,1319775,498,2650.2,2720.0,2240,7584,681.5,"void cub::CUB_300102_SM_750_800_860_890_900_1000_1200::detail::reduce::DeviceReduceSingleTileKernel<cub::CUB_300102_SM_750_800_860_890_900_1000_1200::detail::reduce::policy_hub<double, unsigned int, cuda::std::__4::plus<void>>::Policy1000, double *, double *, unsigned int, cuda::std::__4::plus<void>, double, double, cuda::std::__4::identity>(T2, T3, T4, T5, T6, T8)"
+0.0,1163902,93,12515.1,15520.0,5248,27232,4966.3,"void vector_fft_r2c<(unsigned int)64, EPT<(unsigned int)8>, (unsigned int)8, (unsigned int)18, (padding_t)14, (twiddle_t)0, (loadstore_modifier_t)2, (layout_t)0, unsigned int, double>(kernel_arguments_t<T9>)"
+0.0,1116025,154,7246.9,6832.0,6656,18303,1870.9,"void cub::CUB_300102_SM_750_800_860_890_900_1000_1200::detail::reduce::DeviceReduceKernel<cub::CUB_300102_SM_750_800_860_890_900_1000_1200::detail::reduce::policy_hub<double, unsigned int, nan_handling_max<double>>::Policy1000, double *, unsigned int, nan_handling_max<double>, double, cuda::std::__4::identity>(T2, T5 *, T3, cub::CUB_300102_SM_750_800_860_890_900_1000_1200::GridEvenShare<T3>, T4, T6)"
+0.0,960799,350,2745.1,1760.0,1376,9664,1277.6,cupy_clip__float64_float_float_float64
+0.0,938716,482,1947.5,1984.0,1792,7968,398.0,cupy_absolute__complex128_float64
+0.0,905566,126,7187.0,6784.0,6688,18432,1868.3,"void cub::CUB_300102_SM_750_800_860_890_900_1000_1200::detail::reduce::DeviceReduceSingleTileKernel<cub::CUB_300102_SM_750_800_860_890_900_1000_1200::detail::reduce::policy_hub<double, unsigned int, nan_handling_max<double>>::Policy1000, double *, double *, unsigned int, nan_handling_max<double>, double, double, cuda::std::__4::identity>(T2, T3, T4, T5, T6, T8)"
+0.0,828541,120,6904.5,6912.0,6592,7136,49.5,"void cub::CUB_300102_SM_750_800_860_890_900_1000_1200::detail::reduce::DeviceReduceSingleTileKernel<cub::CUB_300102_SM_750_800_860_890_900_1000_1200::detail::reduce::policy_hub<double, unsigned int, nan_handling_min<double>>::Policy1000, double *, double *, unsigned int, nan_handling_min<double>, double, double, cuda::std::__4::identity>(T2, T3, T4, T5, T6, T8)"
+0.0,822590,120,6854.9,6880.0,6560,7040,96.9,"void cub::CUB_300102_SM_750_800_860_890_900_1000_1200::detail::reduce::DeviceReduceKernel<cub::CUB_300102_SM_750_800_860_890_900_1000_1200::detail::reduce::policy_hub<double, unsigned int, nan_handling_min<double>>::Policy1000, double *, unsigned int, nan_handling_min<double>, double, cuda::std::__4::identity>(T2, T5 *, T3, cub::CUB_300102_SM_750_800_860_890_900_1000_1200::GridEvenShare<T3>, T4, T6)"
+0.0,615517,260,2367.4,2368.0,1376,3584,934.1,cupy_subtract__float64_int64_float64
+0.0,503072,260,1934.9,1936.0,1280,2720,610.8,cupy_copy__float64_int64
+0.0,475678,2,237839.0,237839.0,237407,238271,610.9,"void generate_seed_pseudo<rng_config<curandStateXORWOW, (curandOrdering)101>>(unsigned long long, unsigned long long, unsigned long long, curandOrdering, curandStateXORWOW *, unsigned int *)"
+0.0,447422,154,2905.3,2528.0,2496,7648,776.9,"void cub::CUB_300102_SM_750_800_860_890_900_1000_1200::detail::reduce::DeviceReduceSingleTileKernel<cub::CUB_300102_SM_750_800_860_890_900_1000_1200::detail::reduce::policy_hub<double, unsigned int, nan_handling_max<double>>::Policy1000, double *, double *, int, nan_handling_max<double>, double, double, cuda::std::__4::identity>(T2, T3, T4, T5, T6, T8)"
+0.0,424512,58,7319.2,7312.0,7136,7520,66.4,"void gemv2T_kernel_val<int, int, double2, double2, double2, double2, (int)128, (int)16, (int)4, (int)4, (bool)0, (bool)0, cublasGemvParamsEx<int, cublasGemvTensorStridedBatched<const double2>, cublasGemvTensorStridedBatched<const double2>, cublasGemvTensorStridedBatched<double2>, double2>>(T13, T6, T6)"
+0.0,356192,207,1720.7,1536.0,1248,3008,459.7,cupy_copy__float64_complex128
+0.0,300894,120,2507.4,2464.0,2208,3808,181.4,"void cub::CUB_300102_SM_750_800_860_890_900_1000_1200::detail::reduce::DeviceReduceSingleTileKernel<cub::CUB_300102_SM_750_800_860_890_900_1000_1200::detail::reduce::policy_hub<double, unsigned int, nan_handling_min<double>>::Policy1000, double *, double *, int, nan_handling_min<double>, double, double, cuda::std::__4::identity>(T2, T3, T4, T5, T6, T8)"
+0.0,229854,159,1445.6,1344.0,1280,3456,431.6,cupy_add__float64_float_float64
+0.0,198432,66,3006.5,3440.0,2272,5344,720.1,cupy_multiply__complex128_complex_complex128
+0.0,106656,37,2882.6,2816.0,2752,4896,344.6,cupy_negative__complex128_complex128
+0.0,82880,23,3603.5,2976.0,2368,6368,1458.8,cupy_cos__float64_float64
+0.0,79104,23,3439.3,2848.0,2208,6144,1435.2,cupy_sin__float64_float64
+0.0,75552,6,12592.0,12512.0,2816,22464,10697.9,cupy_all
+0.0,47584,33,1441.9,1408.0,1376,2432,179.6,cupy_add__complex128_float64_complex128
+0.0,16416,6,2736.0,2720.0,2592,2880,102.7,cupy_arange__float_float_float64
+0.0,15840,10,1584.0,1280.0,1248,2976,639.2,cupy_where__bool_float_float_float64
+0.0,15808,3,5269.3,5184.0,5024,5600,297.3,cupy_scatter_update
+0.0,13632,1,13632.0,13632.0,13632,13632,0.0,cupy_var_core_float64
+0.0,8992,3,2997.3,2944.0,2912,3136,121.2,cupy_isfinite__complex128_bool
+0.0,8128,2,4064.0,4064.0,3936,4192,181.0,cupy_multiply__complex128_float64_complex128
+0.0,8096,1,8096.0,8096.0,8096,8096,0.0,"void gen_sequenced<curandStateXORWOW, double2, normal_args_double_st, &curand_normal_scaled2_double<curandStateXORWOW>, rng_config<curandStateXORWOW, (curandOrdering)101>>(T1 *, T2 *, unsigned long, unsigned long, T3)"
+0.0,7712,1,7712.0,7712.0,7712,7712,0.0,cupy_exp__complex128_complex128
+0.0,7296,2,3648.0,3648.0,3488,3808,226.3,cupy_less_equal__float64_float64_bool
+0.0,6496,1,6496.0,6496.0,6496,6496,0.0,"void cub::CUB_300102_SM_750_800_860_890_900_1000_1200::detail::reduce::DeviceSegmentedReduceKernel<cub::CUB_300102_SM_750_800_860_890_900_1000_1200::detail::reduce::policy_hub<thrust::THRUST_300102_SM_750_800_860_890_900_1000_1200_NS::complex<double>, int, cuda::std::__4::plus<void>>::Policy1000, thrust::THRUST_300102_SM_750_800_860_890_900_1000_1200_NS::complex<double> *, thrust::THRUST_300102_SM_750_800_860_890_900_1000_1200_NS::complex<double> *, thrust::THRUST_300102_SM_750_800_860_890_900_1000_1200_NS::transform_iterator<_arange, thrust::THRUST_300102_SM_750_800_860_890_900_1000_1200_NS::counting_iterator<int, thrust::THRUST_300102_SM_750_800_860_890_900_1000_1200_NS::use_default, thrust::THRUST_300102_SM_750_800_860_890_900_1000_1200_NS::use_default, thrust::THRUST_300102_SM_750_800_860_890_900_1000_1200_NS::use_default, thrust::THRUST_300102_SM_750_800_860_890_900_1000_1200_NS::compile_time_value<(int)1>>, thrust::THRUST_300102_SM_750_800_860_890_900_1000_1200_NS::use_default, thrust::THRUST_300102_SM_750_800_860_890_900_1000_1200_NS::use_default>, thrust::THRUST_300102_SM_750_800_860_890_900_1000_1200_NS::transform_iterator<_arange, thrust::THRUST_300102_SM_750_800_860_890_900_1000_1200_NS::counting_iterator<int, thrust::THRUST_300102_SM_750_800_860_890_900_1000_1200_NS::use_default, thrust::THRUST_300102_SM_750_800_860_890_900_1000_1200_NS::use_default, thrust::THRUST_300102_SM_750_800_860_890_900_1000_1200_NS::use_default, thrust::THRUST_300102_SM_750_800_860_890_900_1000_1200_NS::compile_time_value<(int)1>>, thrust::THRUST_300102_SM_750_800_860_890_900_1000_1200_NS::use_default, thrust::THRUST_300102_SM_750_800_860_890_900_1000_1200_NS::use_default>, int, cuda::std::__4::plus<void>, thrust::THRUST_300102_SM_750_800_860_890_900_1000_1200_NS::complex<double>, thrust::THRUST_300102_SM_750_800_860_890_900_1000_1200_NS::complex<double>>(T2, T3, T4, T5, T7, T8)"
+0.0,6496,2,3248.0,3248.0,3104,3392,203.6,cupy_conjugate__complex128_complex128
+0.0,6240,2,3120.0,3120.0,3040,3200,113.1,cupy_copy__int64_int64
+0.0,6240,2,3120.0,3120.0,3040,3200,113.1,cupy_multiply__complex_float64_complex128
+0.0,6080,2,3040.0,3040.0,2944,3136,135.8,"void cub::CUB_300102_SM_750_800_860_890_900_1000_1200::detail::reduce::DeviceReduceKernel<cub::CUB_300102_SM_750_800_860_890_900_1000_1200::detail::reduce::policy_hub<double, unsigned int, cuda::std::__4::plus<void>>::Policy1000, double *, unsigned int, cuda::std::__4::plus<void>, double, cuda::std::__4::identity>(T2, T5 *, T3, cub::CUB_300102_SM_750_800_860_890_900_1000_1200::GridEvenShare<T3>, T4, T6)"
+0.0,5344,2,2672.0,2672.0,2656,2688,22.6,cupy_arange__int_int_int64
+0.0,4160,2,2080.0,2080.0,2080,2080,0.0,"void cub::CUB_300102_SM_750_800_860_890_900_1000_1200::detail::reduce::DeviceReduceSingleTileKernel<cub::CUB_300102_SM_750_800_860_890_900_1000_1200::detail::reduce::policy_hub<double, unsigned int, cuda::std::__4::plus<void>>::Policy1000, double *, double *, int, cuda::std::__4::plus<void>, double, double, cuda::std::__4::identity>(T2, T3, T4, T5, T6, T8)"
+0.0,3936,3,1312.0,1312.0,1312,1312,0.0,cupy_isfinite__float64_bool
+0.0,3680,1,3680.0,3680.0,3680,3680,0.0,cupy_where__bool_complex128_complex_complex128
+0.0,3264,1,3264.0,3264.0,3264,3264,0.0,"void gen_sequenced<curandStateXORWOW, double, int, &curand_uniform_double_noargs<curandStateXORWOW>, rng_config<curandStateXORWOW, (curandOrdering)101>>(T1 *, T2 *, unsigned long, unsigned long, T3)"
+0.0,3008,1,3008.0,3008.0,3008,3008,0.0,cupy_less_equal__int64_int64_bool
+0.0,2976,1,2976.0,2976.0,2976,2976,0.0,cupy_scale
+0.0,2944,1,2944.0,2944.0,2944,2944,0.0,cupy_random_x_mod_1
+0.0,2592,1,2592.0,2592.0,2592,2592,0.0,cupy_copy__float_float64

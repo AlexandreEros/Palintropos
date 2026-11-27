@@ -1,0 +1,383 @@
+{
+  "case": "thai-ben2-ck",
+  "code": {
+    "git_commit": "7622a744976e19dfd606f938c5abf0c12b6546a3",
+    "git_dirty": false
+  },
+  "config_sha256": "a963e4a71d599972a59e6aaa6449f7be53e0a4cbc570c3fd48983f8547a89a06",
+  "device": {
+    "cupy": "14.0.1",
+    "name": "Tesla T4",
+    "nvidia_smi": "Tesla T4, 580.82.07, 15360 MiB",
+    "total_memory_gb": 14.56317138671875
+  },
+  "experiment_id": "dev-thai-ben2-ck-heated-T21L40",
+  "instrumented": [
+    "GaussLatLonSphericalHarmonics.transform",
+    "GaussLatLonSphericalHarmonics.transform_batch",
+    "GaussLatLonSphericalHarmonics.inv_transform",
+    "GaussLatLonSphericalHarmonics.inv_transform_batch",
+    "GaussLatLonSphericalHarmonics.transform",
+    "GaussLatLonSphericalHarmonics.transform_batch",
+    "GaussLatLonSphericalHarmonics.inv_transform",
+    "GaussLatLonSphericalHarmonics.inv_transform_batch",
+    "so.vector_curl_div_spectral_batch",
+    "bl.implicit_column_diffusion",
+    "bl.monin_obukhov_diffusivity_profile",
+    "bl.boundary_layer_depth",
+    "bl.diffusivity_profile",
+    "bl.exchange_coefficient",
+    "radiation.fluxes"
+  ],
+  "kind": "profile",
+  "labels": {
+    "bl.boundary_layer_depth": {
+      "calls": 36,
+      "calls_per_step": 1.0,
+      "exclusive_fraction_of_step": 0.014114382336128654,
+      "exclusive_ms_per_step": 7.779477749993349,
+      "exclusive_seconds": 0.28006119899976056,
+      "inclusive_ms_per_step": 7.779477749993349,
+      "inclusive_seconds": 0.28006119899976056
+    },
+    "bl.diffusivity_profile": {
+      "calls": 36,
+      "calls_per_step": 1.0,
+      "exclusive_fraction_of_step": 0.0005070321938117094,
+      "exclusive_ms_per_step": 0.279462861098207,
+      "exclusive_seconds": 0.010060662999535452,
+      "inclusive_ms_per_step": 0.279462861098207,
+      "inclusive_seconds": 0.010060662999535452
+    },
+    "bl.exchange_coefficient": {
+      "calls": 36,
+      "calls_per_step": 1.0,
+      "exclusive_fraction_of_step": 0.000783519392492539,
+      "exclusive_ms_per_step": 0.43185536110791467,
+      "exclusive_seconds": 0.015546792999884929,
+      "inclusive_ms_per_step": 0.43185536110791467,
+      "inclusive_seconds": 0.015546792999884929
+    },
+    "bl.implicit_column_diffusion": {
+      "calls": 108,
+      "calls_per_step": 3.0,
+      "exclusive_fraction_of_step": 0.05644525458157642,
+      "exclusive_ms_per_step": 31.111145472237922,
+      "exclusive_seconds": 1.1200012370005652,
+      "inclusive_ms_per_step": 31.111145472237922,
+      "inclusive_seconds": 1.1200012370005652
+    },
+    "diagnostics.daily_sample": {
+      "calls": 1,
+      "calls_per_step": 0.027777777777777776,
+      "exclusive_fraction_of_step": 0.002939395582056126,
+      "exclusive_ms_per_step": 1.6201178333182673,
+      "exclusive_seconds": 0.05832424199945763,
+      "inclusive_ms_per_step": 3.644271499998316,
+      "inclusive_seconds": 0.13119377399993937
+    },
+    "dynamics.implicit_solve": {
+      "calls": 36,
+      "calls_per_step": 1.0,
+      "exclusive_fraction_of_step": 0.003480469669777734,
+      "exclusive_ms_per_step": 1.9183436944495549,
+      "exclusive_seconds": 0.06906037300018397,
+      "inclusive_ms_per_step": 1.9183436944495549,
+      "inclusive_seconds": 0.06906037300018397
+    },
+    "dynamics.tendency": {
+      "calls": 36,
+      "calls_per_step": 1.0,
+      "exclusive_fraction_of_step": 0.09831218287698838,
+      "exclusive_ms_per_step": 54.18709944445115,
+      "exclusive_seconds": 1.9507355800002415,
+      "inclusive_ms_per_step": 67.59906050001203,
+      "inclusive_seconds": 2.433566178000433
+    },
+    "output.checkpoint": {
+      "calls": 1,
+      "calls_per_step": 0.027777777777777776,
+      "exclusive_fraction_of_step": 0.0016581040815263274,
+      "exclusive_ms_per_step": 0.9139035277788329,
+      "exclusive_seconds": 0.03290052700003798,
+      "inclusive_ms_per_step": 0.9139035277788329,
+      "inclusive_seconds": 0.03290052700003798
+    },
+    "physics.convection": {
+      "calls": 36,
+      "calls_per_step": 1.0,
+      "exclusive_fraction_of_step": 8.097163630351999e-06,
+      "exclusive_ms_per_step": 0.004462944449162226,
+      "exclusive_seconds": 0.00016066600016984012,
+      "inclusive_ms_per_step": 0.004462944449162226,
+      "inclusive_seconds": 0.00016066600016984012
+    },
+    "physics.radiation.fluxes": {
+      "calls": 12,
+      "calls_per_step": 0.3333333333333333,
+      "exclusive_fraction_of_step": 0.574596928430206,
+      "exclusive_ms_per_step": 316.70277263888937,
+      "exclusive_seconds": 11.401299815000016,
+      "inclusive_ms_per_step": 316.70277263888937,
+      "inclusive_seconds": 11.401299815000016
+    },
+    "physics.radiation_and_boundary": {
+      "calls": 36,
+      "calls_per_step": 1.0,
+      "exclusive_fraction_of_step": 0.002700444385852554,
+      "exclusive_ms_per_step": 1.4884141944391003,
+      "exclusive_seconds": 0.05358291099980761,
+      "inclusive_ms_per_step": 318.1911868333284,
+      "inclusive_seconds": 11.454882725999823
+    },
+    "step": {
+      "calls": 36,
+      "calls_per_step": 1.0,
+      "exclusive_fraction_of_step": 0.002895741223119768,
+      "exclusive_ms_per_step": 1.5960566944070504,
+      "exclusive_seconds": 0.057458040998653814,
+      "inclusive_ms_per_step": 551.173800222216,
+      "inclusive_seconds": 19.842256807999775
+    },
+    "term.boundary_layer_diffusion": {
+      "calls": 36,
+      "calls_per_step": 1.0,
+      "exclusive_fraction_of_step": 0.07281757392721118,
+      "exclusive_ms_per_step": 40.13513894442313,
+      "exclusive_seconds": 1.4448650019992328,
+      "inclusive_ms_per_step": 132.93741691667708,
+      "inclusive_seconds": 4.785747009000374
+    },
+    "term.column_physics_coupling": {
+      "calls": 36,
+      "calls_per_step": 1.0,
+      "exclusive_fraction_of_step": 0.003482208887239581,
+      "exclusive_ms_per_step": 1.9193023055474139,
+      "exclusive_seconds": 0.0690948829997069,
+      "inclusive_ms_per_step": 321.5858036944389,
+      "inclusive_seconds": 11.5770889329998
+    },
+    "term.momentum_sink_heating": {
+      "calls": 36,
+      "calls_per_step": 1.0,
+      "exclusive_fraction_of_step": 0.04523930894988361,
+      "exclusive_ms_per_step": 24.93472183333425,
+      "exclusive_seconds": 0.8976499860000331,
+      "inclusive_ms_per_step": 25.537118722231373,
+      "inclusive_seconds": 0.9193362740003295
+    },
+    "transform.analysis.batch@dynamics.tendency": {
+      "calls": 36,
+      "calls_per_step": 1.0,
+      "exclusive_fraction_of_step": 0.0007263307364414142,
+      "exclusive_ms_per_step": 0.40033447222261503,
+      "exclusive_seconds": 0.014412041000014142,
+      "inclusive_ms_per_step": 0.40033447222261503,
+      "inclusive_seconds": 0.014412041000014142
+    },
+    "transform.analysis.batch@term.column_physics_coupling": {
+      "calls": 36,
+      "calls_per_step": 1.0,
+      "exclusive_fraction_of_step": 0.00028408129451556373,
+      "exclusive_ms_per_step": 0.1565781666701898,
+      "exclusive_seconds": 0.005636814000126833,
+      "inclusive_ms_per_step": 0.1565781666701898,
+      "inclusive_seconds": 0.005636814000126833
+    },
+    "transform.analysis.batch@term.momentum_sink_heating": {
+      "calls": 36,
+      "calls_per_step": 1.0,
+      "exclusive_fraction_of_step": 0.00026324818041484447,
+      "exclusive_ms_per_step": 0.14509550000083335,
+      "exclusive_seconds": 0.005223438000030001,
+      "inclusive_ms_per_step": 0.14509550000083335,
+      "inclusive_seconds": 0.005223438000030001
+    },
+    "transform.analysis.scalar@term.boundary_layer_diffusion": {
+      "calls": 1512,
+      "calls_per_step": 42.0,
+      "exclusive_fraction_of_step": 0.009340823616608296,
+      "exclusive_ms_per_step": 5.148417249971418,
+      "exclusive_seconds": 0.18534302099897104,
+      "inclusive_ms_per_step": 5.148417249971418,
+      "inclusive_seconds": 0.18534302099897104
+    },
+    "transform.synthesis.batch@diagnostics.daily_sample": {
+      "calls": 1,
+      "calls_per_step": 0.027777777777777776,
+      "exclusive_fraction_of_step": 1.1414074629639356e-05,
+      "exclusive_ms_per_step": 0.006291138889638306,
+      "exclusive_seconds": 0.00022648100002697902,
+      "inclusive_ms_per_step": 0.006291138889638306,
+      "inclusive_seconds": 0.00022648100002697902
+    },
+    "transform.synthesis.batch@dynamics.tendency": {
+      "calls": 36,
+      "calls_per_step": 1.0,
+      "exclusive_fraction_of_step": 0.0014973205561924078,
+      "exclusive_ms_per_step": 0.8252838611074114,
+      "exclusive_seconds": 0.02971021899986681,
+      "inclusive_ms_per_step": 0.8252838611074114,
+      "inclusive_seconds": 0.02971021899986681
+    },
+    "transform.synthesis.batch@term.boundary_layer_diffusion": {
+      "calls": 36,
+      "calls_per_step": 1.0,
+      "exclusive_fraction_of_step": 0.0004418868319878097,
+      "exclusive_ms_per_step": 0.24355644445487692,
+      "exclusive_seconds": 0.00876803200037557,
+      "inclusive_ms_per_step": 0.24355644445487692,
+      "inclusive_seconds": 0.00876803200037557
+    },
+    "transform.synthesis.batch@term.column_physics_coupling": {
+      "calls": 36,
+      "calls_per_step": 1.0,
+      "exclusive_fraction_of_step": 0.00043567428258470075,
+      "exclusive_ms_per_step": 0.24013224999129712,
+      "exclusive_seconds": 0.008644760999686696,
+      "inclusive_ms_per_step": 0.24013224999129712,
+      "inclusive_seconds": 0.008644760999686696
+    },
+    "transform.synthesis.batch@term.momentum_sink_heating": {
+      "calls": 36,
+      "calls_per_step": 1.0,
+      "exclusive_fraction_of_step": 0.0008296863688221728,
+      "exclusive_ms_per_step": 0.4573013888962881,
+      "exclusive_seconds": 0.01646285000026637,
+      "inclusive_ms_per_step": 0.4573013888962881,
+      "inclusive_seconds": 0.01646285000026637
+    },
+    "transform.synthesis.scalar@diagnostics.daily_sample": {
+      "calls": 367,
+      "calls_per_step": 10.194444444444445,
+      "exclusive_fraction_of_step": 0.0036610276594730576,
+      "exclusive_ms_per_step": 2.01786252779041,
+      "exclusive_seconds": 0.07264305100045476,
+      "inclusive_ms_per_step": 2.01786252779041,
+      "inclusive_seconds": 0.07264305100045476
+    },
+    "transform.synthesis.scalar@term.boundary_layer_diffusion": {
+      "calls": 5832,
+      "calls_per_step": 162.0,
+      "exclusive_fraction_of_step": 0.06390018153029252,
+      "exclusive_ms_per_step": 35.22010588894078,
+      "exclusive_seconds": 1.267923812001868,
+      "inclusive_ms_per_step": 35.22010588894078,
+      "inclusive_seconds": 1.267923812001868
+    },
+    "transform.synthesis.scalar@term.column_physics_coupling": {
+      "calls": 180,
+      "calls_per_step": 5.0,
+      "exclusive_fraction_of_step": 0.00194882484258021,
+      "exclusive_ms_per_step": 1.0741411944523962,
+      "exclusive_seconds": 0.038669083000286264,
+      "inclusive_ms_per_step": 1.0741411944523962,
+      "inclusive_seconds": 0.038669083000286264
+    },
+    "transform.vector_curl_div@dynamics.tendency": {
+      "calls": 36,
+      "calls_per_step": 1.0,
+      "exclusive_fraction_of_step": 0.02210980042468945,
+      "exclusive_ms_per_step": 12.186342722230847,
+      "exclusive_seconds": 0.4387083380003105,
+      "inclusive_ms_per_step": 12.186342722230847,
+      "inclusive_seconds": 0.4387083380003105
+    },
+    "transform.vector_curl_div@term.boundary_layer_diffusion": {
+      "calls": 36,
+      "calls_per_step": 1.0,
+      "exclusive_fraction_of_step": 0.022838997316952065,
+      "exclusive_ms_per_step": 12.588256944449464,
+      "exclusive_seconds": 0.4531772500001807,
+      "inclusive_ms_per_step": 12.588256944449464,
+      "inclusive_seconds": 0.4531772500001807
+    }
+  },
+  "mode": "sync",
+  "resolution": {
+    "dt": 1200.0,
+    "l_max": 22,
+    "nlat": 32,
+    "nlev": 40,
+    "nlon": 64,
+    "retained": 21
+  },
+  "steps": 36,
+  "synchronised_seconds_per_step": 0.551173800222216,
+  "transforms_by_caller": {
+    "diagnostics.daily_sample": {
+      "synthesis.batch": {
+        "calls_per_step": 0.027777777777777776,
+        "ms_per_step": 0.006291138889638306
+      },
+      "synthesis.scalar": {
+        "calls_per_step": 10.194444444444445,
+        "ms_per_step": 2.01786252779041
+      },
+      "total_ms_per_step": 2.0241536666800486
+    },
+    "dynamics.tendency": {
+      "analysis.batch": {
+        "calls_per_step": 1.0,
+        "ms_per_step": 0.40033447222261503
+      },
+      "synthesis.batch": {
+        "calls_per_step": 1.0,
+        "ms_per_step": 0.8252838611074114
+      },
+      "total_ms_per_step": 13.411961055560875,
+      "vector_curl_div": {
+        "calls_per_step": 1.0,
+        "ms_per_step": 12.186342722230847
+      }
+    },
+    "term.boundary_layer_diffusion": {
+      "analysis.scalar": {
+        "calls_per_step": 42.0,
+        "ms_per_step": 5.148417249971418
+      },
+      "synthesis.batch": {
+        "calls_per_step": 1.0,
+        "ms_per_step": 0.24355644445487692
+      },
+      "synthesis.scalar": {
+        "calls_per_step": 162.0,
+        "ms_per_step": 35.22010588894078
+      },
+      "total_ms_per_step": 53.20033652781653,
+      "vector_curl_div": {
+        "calls_per_step": 1.0,
+        "ms_per_step": 12.588256944449464
+      }
+    },
+    "term.column_physics_coupling": {
+      "analysis.batch": {
+        "calls_per_step": 1.0,
+        "ms_per_step": 0.1565781666701898
+      },
+      "synthesis.batch": {
+        "calls_per_step": 1.0,
+        "ms_per_step": 0.24013224999129712
+      },
+      "synthesis.scalar": {
+        "calls_per_step": 5.0,
+        "ms_per_step": 1.0741411944523962
+      },
+      "total_ms_per_step": 1.4708516111138832
+    },
+    "term.momentum_sink_heating": {
+      "analysis.batch": {
+        "calls_per_step": 1.0,
+        "ms_per_step": 0.14509550000083335
+      },
+      "synthesis.batch": {
+        "calls_per_step": 1.0,
+        "ms_per_step": 0.4573013888962881
+      },
+      "total_ms_per_step": 0.6023968888971214
+    }
+  },
+  "utc": "2026-11-27T12:54:55+00:00",
+  "wall_seconds": 20.00666081600002,
+  "warm_steps": 6
+}
