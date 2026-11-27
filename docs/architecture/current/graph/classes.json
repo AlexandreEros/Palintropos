@@ -4036,6 +4036,10 @@
         },
         {
           "kind": "method",
+          "name": "_save_series"
+        },
+        {
+          "kind": "method",
           "name": "_start_state"
         },
         {

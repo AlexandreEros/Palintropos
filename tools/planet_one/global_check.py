@@ -40,7 +40,10 @@ def main(argv=None) -> int:
     cfg = meta["config"]
     backend = args.backend or meta.get("backend", "numpy")
     grid = np.load(run / "grid.npz")
-    lat, lon, w = grid["lat_deg"], grid["lon_deg"], grid["weights"]
+    lat, lon = grid["lat_deg"], grid["lon_deg"]
+    # a diagnostic point collection has no area weights (runs before the
+    # distinction stored ones; the replay uses whatever the run used)
+    w = grid["weights"] if "weights" in grid.files else None
     if args.columns:
         cols = np.array([int(c) for c in args.columns.split(",")])
     elif cfg["columns"]["kind"] != "latlon":
@@ -66,7 +69,8 @@ def main(argv=None) -> int:
     with tempfile.TemporaryDirectory() as tmp:
         out = pathlib.Path(tmp)
         (out / "blocks.json").write_text(json.dumps({"ranges": [[0, cols.size]], "steps": steps}))
-        res = run_block(cfg, lat[cols], lon[cols], w[cols], state["start_anomaly"][:, cols],
+        res = run_block(cfg, lat[cols], lon[cols], None if w is None else w[cols],
+                        state["start_anomaly"][:, cols],
                         state["start_surface_anomaly"][cols], cycle, steps, False,
                         str(out), None, 0, backend, **timing)
         s_rep = load_tier2(out, "surface")

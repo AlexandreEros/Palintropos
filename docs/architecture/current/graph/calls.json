@@ -7166,6 +7166,11 @@
       "target": "tropoi.run.airless.experiment.build_substrate"
     },
     {
+      "kind": "call",
+      "source": "tropoi.run.airless.experiment.AirlessRun.__init__",
+      "target": "tropoi.run.airless.experiment.column_kind"
+    },
+    {
       "kind": "instantiate",
       "source": "tropoi.run.airless.experiment.AirlessRun.__init__",
       "target": "tropoi.run.held_suarez.experiment.RunError"
@@ -7202,6 +7207,11 @@
     },
     {
       "kind": "self",
+      "source": "tropoi.run.airless.experiment.AirlessRun._save_series",
+      "target": "tropoi.run.airless.experiment.AirlessRun._mkdir"
+    },
+    {
+      "kind": "self",
       "source": "tropoi.run.airless.experiment.AirlessRun.run",
       "target": "tropoi.run.airless.experiment.AirlessRun._checksums"
     },
@@ -7229,6 +7239,11 @@
       "kind": "self",
       "source": "tropoi.run.airless.experiment.AirlessRun.run",
       "target": "tropoi.run.airless.experiment.AirlessRun._pool"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.run.airless.experiment.AirlessRun.run",
+      "target": "tropoi.run.airless.experiment.AirlessRun._save_series"
     },
     {
       "kind": "self",
@@ -7268,12 +7283,12 @@
     {
       "kind": "self",
       "source": "tropoi.run.airless.experiment.AirlessRun.run_transient",
-      "target": "tropoi.run.airless.experiment.AirlessRun._mkdir"
+      "target": "tropoi.run.airless.experiment.AirlessRun._pool"
     },
     {
       "kind": "self",
       "source": "tropoi.run.airless.experiment.AirlessRun.run_transient",
-      "target": "tropoi.run.airless.experiment.AirlessRun._pool"
+      "target": "tropoi.run.airless.experiment.AirlessRun._save_series"
     },
     {
       "kind": "self",
@@ -21551,6 +21566,13 @@
       "type": "function"
     },
     {
+      "id": "tropoi.run.airless.experiment.AirlessRun._save_series",
+      "kind": "method",
+      "module": "tropoi.run.airless.experiment",
+      "qualname": "AirlessRun._save_series",
+      "type": "function"
+    },
+    {
       "id": "tropoi.run.airless.experiment.AirlessRun._start_state",
       "kind": "method",
       "module": "tropoi.run.airless.experiment",
@@ -21632,6 +21654,13 @@
       "kind": "function",
       "module": "tropoi.run.airless.experiment",
       "qualname": "build_substrate",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.run.airless.experiment.column_kind",
+      "kind": "function",
+      "module": "tropoi.run.airless.experiment",
+      "qualname": "column_kind",
       "type": "function"
     },
     {
