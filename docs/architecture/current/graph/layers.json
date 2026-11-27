@@ -84,8 +84,8 @@
     {
       "direction": "down",
       "kind": "imports",
-      "module_edges": 25,
-      "package_edges": 12,
+      "module_edges": 26,
+      "package_edges": 13,
       "source": "run",
       "target": "temporal",
       "type_checking_only_package_edges": 0
@@ -102,8 +102,17 @@
     {
       "direction": "down",
       "kind": "imports",
-      "module_edges": 4,
+      "module_edges": 1,
       "package_edges": 1,
+      "source": "temporal",
+      "target": "numerics",
+      "type_checking_only_package_edges": 0
+    },
+    {
+      "direction": "down",
+      "kind": "imports",
+      "module_edges": 7,
+      "package_edges": 2,
       "source": "temporal",
       "target": "physics",
       "type_checking_only_package_edges": 0
@@ -125,6 +134,13 @@
       "id": "cli",
       "internal_package_edges": 0,
       "modules": 5,
+      "packages": 1
+    },
+    {
+      "depth": 6,
+      "id": "numerics",
+      "internal_package_edges": 0,
+      "modules": 1,
       "packages": 1
     },
     {
@@ -159,7 +175,7 @@
       "depth": 3,
       "id": "temporal",
       "internal_package_edges": 2,
-      "modules": 13,
+      "modules": 14,
       "packages": 2
     }
   ]

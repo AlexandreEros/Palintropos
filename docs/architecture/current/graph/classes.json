@@ -1473,14 +1473,6 @@
         },
         {
           "kind": "method",
-          "name": "_report"
-        },
-        {
-          "kind": "method",
-          "name": "_system"
-        },
-        {
-          "kind": "method",
           "name": "_temperature_extent"
         },
         {
@@ -1521,10 +1513,6 @@
         },
         {
           "kind": "method",
-          "name": "step"
-        },
-        {
-          "kind": "method",
           "name": "surface_temperature"
         },
         {
@@ -1534,26 +1522,6 @@
       ],
       "module": "tropoi.physics.substrate",
       "qualname": "ConductiveSubstrate"
-    },
-    {
-      "decorators": [],
-      "external_bases": [
-        "typing.NamedTuple"
-      ],
-      "id": "tropoi.physics.substrate.StepReport",
-      "members": [],
-      "module": "tropoi.physics.substrate",
-      "qualname": "StepReport"
-    },
-    {
-      "decorators": [],
-      "external_bases": [
-        "ArithmeticError"
-      ],
-      "id": "tropoi.physics.substrate.SubstrateSolveError",
-      "members": [],
-      "module": "tropoi.physics.substrate",
-      "qualname": "SubstrateSolveError"
     },
     {
       "decorators": [],
@@ -6666,6 +6634,51 @@
       ],
       "module": "tropoi.temporal.steppers",
       "qualname": "TimeStepper"
+    },
+    {
+      "decorators": [],
+      "external_bases": [],
+      "id": "tropoi.temporal.substrate.BackwardEulerSubstrate",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__init__"
+        },
+        {
+          "kind": "method",
+          "name": "_report"
+        },
+        {
+          "kind": "method",
+          "name": "_system"
+        },
+        {
+          "kind": "method",
+          "name": "step"
+        }
+      ],
+      "module": "tropoi.temporal.substrate",
+      "qualname": "BackwardEulerSubstrate"
+    },
+    {
+      "decorators": [],
+      "external_bases": [
+        "typing.NamedTuple"
+      ],
+      "id": "tropoi.temporal.substrate.StepReport",
+      "members": [],
+      "module": "tropoi.temporal.substrate",
+      "qualname": "StepReport"
+    },
+    {
+      "decorators": [],
+      "external_bases": [
+        "ArithmeticError"
+      ],
+      "id": "tropoi.temporal.substrate.SubstrateSolveError",
+      "members": [],
+      "module": "tropoi.temporal.substrate",
+      "qualname": "SubstrateSolveError"
     },
     {
       "decorators": [],

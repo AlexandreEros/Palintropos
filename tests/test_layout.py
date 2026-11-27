@@ -33,11 +33,15 @@ def _imports(path: pathlib.Path):
 ALLOWED = {
     # Column physics is a leaf: reusable by any dynamical core, it may not
     # know about grids, spectral states or steppers.
-    "tropoi.physics": ("tropoi.physics",),
-    "tropoi.spatial": ("tropoi.spatial",),
-    "tropoi.temporal": ("tropoi.physics", "tropoi.spatial", "tropoi.temporal"),
-    "tropoi.representation": ("tropoi.physics", "tropoi.spatial", "tropoi.temporal",
-                              "tropoi.representation"),
+    # Numerical algorithms are the bottom layer: they know no physics, grids
+    # or steppers, and every other layer may use them.
+    "tropoi.numerics": ("tropoi.numerics",),
+    "tropoi.physics": ("tropoi.numerics", "tropoi.physics"),
+    "tropoi.spatial": ("tropoi.numerics", "tropoi.spatial"),
+    "tropoi.temporal": ("tropoi.numerics", "tropoi.physics", "tropoi.spatial",
+                        "tropoi.temporal"),
+    "tropoi.representation": ("tropoi.numerics", "tropoi.physics", "tropoi.spatial",
+                              "tropoi.temporal", "tropoi.representation"),
 }
 #: Deliberate, documented exceptions (docs/ARCHITECTURE.md). Empty: the
 #: layering is strict, so the layer graph has no cycle. Any entry added here

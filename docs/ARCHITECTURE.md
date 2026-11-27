@@ -70,6 +70,12 @@ It is documented in [SAVED_RUNS.md](../src/tropoi/temporal/SAVED_RUNS.md).
 
 ### Dependency direction
 
+`numerics` (shared numerical algorithms such as batched tridiagonal
+solution, with their hardware-specific implementations) is the bottom
+layer: it imports no other `tropoi` package and contains no planetary
+physics, and every other layer may import it. Physical models supply their
+own equations and admissibility constraints to it.
+
 `physics` (the shared physical world: species/composition/star/orbit data
 and the column physics — gas properties, radiation, convection, surface;
 NumPy/CuPy-agnostic) imports no other `tropoi` package, so it can serve any
@@ -79,8 +85,10 @@ import it ([radiation status](radiation/README.md),
 packaged TOML/CSV files loaded through `importlib.resources` and identified
 by SHA-256 in run provenance.
 
-`spatial` imports only `spatial`; `temporal` imports `spatial` and
-`temporal`; `representation` imports all three layers. Orchestration
+`spatial` imports only `spatial` (and `numerics`); `temporal` imports
+`physics`, `spatial` and `temporal` (and `numerics`); time stepping of a
+physical model, such as the substrate's backward Euler
+(`temporal.substrate`), lives here and not in `physics`; `representation` imports all three layers. Orchestration
 (`run`, `cli`) sits above them. Mathematical helpers stay below their
 consumers: the product cut lives in `spatial.truncation`, which the
 operators, the tendencies, the diagnostics and the configuration layer all
@@ -89,7 +97,7 @@ initializers receive a model object but reference its class only for type
 annotations. `tests/test_layout.py` enforces this direction by parsing every
 import. Every runtime dependency points down, so the runtime layer
 graph is acyclic and the layers can be levelized (`cli` -> `run` ->
-`representation` -> `temporal` -> `spatial`).
+`representation` -> `temporal` -> `spatial`/`physics` -> `numerics`).
 
 Two shared rules that orchestration might seem to own live below it,
 because the representation layer needs them with no configuration object in

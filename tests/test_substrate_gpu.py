@@ -13,6 +13,7 @@ try:
 except Exception:                                   # pragma: no cover
     pytest.skip("no CUDA device", allow_module_level=True)
 
+from tropoi.temporal.substrate import BackwardEulerSubstrate
 from tropoi.physics.insolation import insolation_from_spec
 from tropoi.physics.surface import SlabSurface
 from tropoi.physics.substrate import ConductiveSubstrate
@@ -34,7 +35,7 @@ def _mercury_cycle(xp, steps=4320, cycles=1):
     out, iters = [], []
     for k in range(steps * cycles):
         sw, _ = ins.incident(*n, (k + 1) * dt)
-        st, rep = sub.step(st, dt, shortwave_down=sw)
+        st, rep = BackwardEulerSubstrate(sub).step(st, dt, shortwave_down=sw)
         out.append(cp.asnumpy(xp.concatenate([st.surface_anomaly[None], st.anomaly]))
                    if xp is cp else np.concatenate([st.surface_anomaly[None], st.anomaly]))
         iters.append(rep.iterations)
@@ -59,7 +60,7 @@ def test_energy_closure_on_the_gpu():
     net_sum, bound = cp.zeros(3), cp.zeros(3)
     for _ in range(300):
         sw = cp.asarray(rng.uniform(0, 12000, 3) * (rng.uniform(size=3) > 0.4))
-        st, rep = sub.step(st, 900.0, shortwave_down=sw, bottom_heat_flux=0.02)
+        st, rep = BackwardEulerSubstrate(sub).step(st, 900.0, shortwave_down=sw, bottom_heat_flux=0.02)
         net = rep.absorbed - rep.emitted + rep.bottom + rep.source
         assert bool(cp.all(cp.abs(rep.energy_tendency - net - rep.residual_sum)
                            <= 1e-12 * (cp.abs(rep.energy_tendency) + cp.abs(net)) + 1e-12))
@@ -79,7 +80,7 @@ def test_g4_and_g5_on_the_gpu():
     T = np.array([300.0])
     for _ in range(1000):
         f = rng.uniform(-200, 200, size=1)
-        st, _ = sub.step(st, 600.0, flux=cp.asarray(f))
+        st, _ = BackwardEulerSubstrate(sub).step(st, 600.0, flux=cp.asarray(f))
         T = slab.advance(T, f, 600.0)
     assert abs(float(sub.temperature(st)[0, 0]) - float(T[0])) < 1000 * np.spacing(300.0)
     from tropoi.spatial.vertical import geometric_interfaces
@@ -90,7 +91,7 @@ def test_g4_and_g5_on_the_gpu():
     inflow, denom = np.zeros(3), np.zeros(3)
     for _ in range(2000):
         f = cp.asarray(rng.uniform(-200, 200, size=3))
-        st, rep = sub.step(st, 600.0, flux=f, bottom_heat_flux=fb)
+        st, rep = BackwardEulerSubstrate(sub).step(st, 600.0, flux=f, bottom_heat_flux=fb)
         a = cp.asnumpy(rep.conducted + fb)
         inflow += 600.0 * a
         denom += 600.0 * np.abs(a)
