@@ -115,7 +115,10 @@ function tickSet(axis, lo, hi) {
   if (axis.scale === "log") {
     const ticks = [];
     for (let d = Math.ceil(lo); d <= Math.floor(hi); d++) ticks.push(d);
-    return {ticks, label: d => axis.representation === "pressure" ? pressureText(10 ** d) : "10" + superscript(d)};
+    if (ticks.length >= 3) return {ticks, label: d => axis.representation === "pressure" ? pressureText(10 ** d) : "10" + superscript(d)};
+    // Less than about three decades: rounded steps in log10, labelled with their values.
+    return {ticks: niceTicks(lo, hi), label: d => axis.representation === "pressure" ? pressureText(10 ** d) :
+      (axis.representation === "sigma" ? "σ " : "") + numberText(Number((10 ** d).toPrecision(3)))};
   }
   return {ticks: niceTicks(lo, hi), label: t => numberText(t)};
 }
@@ -581,10 +584,11 @@ export class Explorer {
     this.cursor = cursor;
     this.rows.latitude.value.value = String(Number(cursor.lat.toFixed(4)));
     this.rows.longitude.value.value = String(Number((((cursor.lon % 360) + 360) % 360).toFixed(4)));
-    return this.update();
+    return this.update(false);
   }
 
-  follow() { return this.update(); }
+  /** Selection A changed: follow it, but never push a map back to it. */
+  follow() { return this.update(false); }
 
   get rangeKey() {
     const p = this.data?.product;
@@ -622,7 +626,8 @@ export class Explorer {
     return Number.isFinite(lo) && Number.isFinite(hi) && hi > lo ? [lo, hi] : null;
   }
 
-  async update() {
+  /** ``push``: a map selection made here is sent to selection A (explorer controls only). */
+  async update(push = true) {
     this.syncRows();
     const {selection, product, error} = this.selection();
     const c = this.c;
@@ -637,7 +642,7 @@ export class Explorer {
       this.status("A longitude × latitude selection is drawn on the globe and map of selection A.");
       c.plot.hidden = true; c.table.hidden = true; c.notes.replaceChildren(); c.png.disabled = true;
       this.data = null;
-      this.links.showMap(selection);
+      if (push) this.links.showMap(selection);
       return;
     }
     const key = JSON.stringify(selection);

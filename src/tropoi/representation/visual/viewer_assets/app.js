@@ -131,12 +131,13 @@ class Panel {
     const count = axisValues(this.axis).length;
     c.time.value = initial ? String(sampleAtOrBefore(this.axis, initial.seconds)) :
       /^\d+$/.test(requested) && Number(requested) < count ? requested : "0";
-    c.field.onchange = () => { const seconds = this.seconds; this.updateField(); this.keepTime(seconds); this.load(); };
+    // A new quantity or level may have its own time axis: keep the time last shown.
+    c.field.onchange = () => { const seconds = this.shownSeconds; this.updateField(); this.keepTime(seconds); this.load(); };
     c.time.oninput = () => this.changeTime(Number(c.time.value));
     c.previous.onclick = () => this.changeTime(Number(c.time.value) - 1);
     c.next.onclick = () => this.changeTime(Number(c.time.value) + 1);
-    c.coordinate.onchange = () => { this.updateCoordinate(); this.changeLevel(); };
-    c.value.onchange = c.level.onchange = () => this.changeLevel();
+    c.coordinate.onchange = () => { const seconds = this.shownSeconds; this.updateCoordinate(); this.changeLevel(seconds); };
+    c.value.onchange = c.level.onchange = () => this.changeLevel(this.shownSeconds);
     c.play.onclick = () => this.playing ? this.stop() : this.play();
     c["range-mode"].onchange = () => {
       const fixed = c["range-mode"].value === "fixed";
@@ -247,8 +248,8 @@ class Panel {
     c.value.value = initial?.controls.value.value || String(defaults[coord]);
   }
 
-  changeLevel() {
-    this.keepTime(this.seconds);
+  changeLevel(seconds = this.seconds) {
+    this.keepTime(seconds);
     sync(this, "level");
     return this.load();
   }
@@ -341,6 +342,7 @@ class Panel {
     this.frame = this.extent = null;
     c.png.disabled = c.surface.hidden = true;
     const time = Number(c.time.value), count = axisValues(this.axis).length;
+    this.shownSeconds = this.seconds;
     c["time-label"].textContent = timeText(this.axis, time) + " · " + (time + 1) + "/" + count;
     c.previous.disabled = time === 0;
     c.next.disabled = time === count - 1;

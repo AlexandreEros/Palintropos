@@ -376,8 +376,18 @@ def test_airless_archive_in_the_same_application(browser, tmp_path):
             until(page, f"{LOADED}?.time.role === 'x' && " + EXPLORED)
             assert page.eval("viewer.explorer.spec.kind") == "field"
             assert page.eval("viewer.explorer.layout.strip") > 0           # the skin strip, apart from the cells
+            # The map preset is sent to selection A once; the page then settles.
+            page.eval("""(() => {const f0 = window.fetch; window.selects = 0;
+                window.fetch = (u, o) => { if (String(u).includes("select")) selects++; return f0(u, o); };})()""")
             explore(page, "preset", "map")
             until(page, "document.querySelector('[data-e=status]').textContent.includes('globe')")
+            page.eval("new Promise(resolve => setTimeout(resolve, 1500))")
+            assert page.eval("selects") <= 2
+            # A level chosen in selection A afterwards stays chosen.
+            set_control(page, "level", 3)
+            until(page, READY.split(" && ")[0])
+            page.eval("new Promise(resolve => setTimeout(resolve, 800))")
+            assert page.eval("document.querySelector('[data-id=level]').value") == "3"
             for preset, message in (("zonal_mean", "not available"),):
                 explore(page, "preset", preset)
                 until(page, f"document.querySelector('[data-e=status]').textContent.includes({json.dumps(message)})")

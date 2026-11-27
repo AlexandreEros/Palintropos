@@ -89,3 +89,18 @@ directly. Tests: `tests/test_viewer_airless.py` and
 - Atmospheric surfaces of constant σ, p or Z as time histories: histories use
   native levels.
 - Coordinates other than geocentric longitude, latitude and elapsed time.
+
+## Mercury demonstration (`mercury/`)
+
+The viewer's own PNG exports of the 4° VPW99 model TWO archive
+(`global4-vpw99-two-G0.02`, PERIODIC at cycle 35; written by the Planet One
+runner before `column_kind` and `state.npz` existed). This archive is not in
+the repository, so these figures are its record.
+
+| File | Selection |
+| --- | --- |
+| `1-surface-skin-map.png` | Map of the diagnosed skin temperature at the first kept surface sample (day 5806.23) |
+| `2-subsurface-cell-21-map.png` | Map of cell 21 (depth 0.0517 m) at the first cell-profile sample (day 5806.96) |
+| `3-meridional-section.png` | Latitude × depth at 2°E: cells between their archived faces, the skin as its own strip |
+| `4-column-profile.png` | The column nearest 0°N 0°E: 51 cells on the nonuniform mesh, with the skin marked at depth 0 |
+| `5-time-depth.png` | Time × depth at that column over the three kept cycles (540 cell samples) |

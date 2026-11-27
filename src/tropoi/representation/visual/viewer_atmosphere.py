@@ -226,9 +226,10 @@ def select(provider, sel):
         c0 = columns[0]
         location = dict(latitude=c0["latitude"], longitude=c0["longitude"], sampling=c0["sampling"])
         if product == "time_series":
-            level = int(sel["vertical"]["value"])
-            if not 0 <= level < len(c0["sigma"]):
+            level = sel["vertical"]["value"]
+            if level != int(level) or not 0 <= level < len(c0["sigma"]):
                 raise SelectionError("Native level outside the saved axis")
+            level = int(level)
             payload.update(x=time_axis(times), y=dict(label=quantity["presentation"]["name"],
                                                       units=quantity["presentation"]["units"]),
                            values=[c[key][level] for c in columns], level=f"native level {level + 1}",
