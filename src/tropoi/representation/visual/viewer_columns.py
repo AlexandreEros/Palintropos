@@ -28,7 +28,8 @@ import numpy as np
 
 from tropoi.representation.archive.airless import SURFACE_PLANES, AirlessArchive
 from tropoi.representation.visual.selection import (
-    MAX_SAMPLES, MAX_STATES, SelectionError, axis, latitude_axis, level_time_axis, longitude_axis)
+    MAX_SAMPLES, MAX_STATES, TIME_MEAN, SelectionError, axis, latitude_axis, level_time_axis, longitude_axis,
+    reductions)
 
 SKIN = ("The surface temperature is the diagnosed, massless skin of each column (depth 0). "
         "It is its own native level, not the top cell, and it is drawn apart from the cells.")
@@ -39,7 +40,7 @@ NO_CELL_MEAN = ("a mean over substrate cells needs a thickness weighting rule, w
                 "does not define")
 MEAN = dict(longitude="plain mean over the archived meridians of a row (cells of equal area)",
             latitude="mean over the archived rows weighted by the recorded column area weights",
-            time="equal-weight mean over the saved samples first..last inclusive")
+            time=TIME_MEAN)
 
 
 class ColumnArchiveProvider:
@@ -317,12 +318,12 @@ def describe(archive: AirlessArchive) -> tuple[dict, dict]:
         weights = archive.weights is not None
         horizontal = dict(roles=["x", "y", "fixed"] + (["reduce"] if weights else []),
                           unavailable={} if weights else dict(reduce=NO_WEIGHTS))
-        horizontal_caps = {c: dict(horizontal, **({"reduce": {"mean": MEAN[c]}} if weights else {}))
+        horizontal_caps = {c: dict(horizontal, **({"reduce": reductions(MEAN[c])} if weights else {}))
                            for c in ("longitude", "latitude")}
     else:
         horizontal_caps = {c: dict(roles=["fixed"], unavailable=dict(x=POINTS, y=POINTS, reduce=POINTS))
                            for c in ("longitude", "latitude")}
-    time = dict(roles=["x", "y", "fixed", "reduce"], reduce={"mean": MEAN["time"]})
+    time = dict(roles=["x", "y", "fixed", "reduce"], reduce=reductions(MEAN["time"]))
     vertical_reps = ["depth", "height_above_surface"]
     quantities = dict(temperature=dict(
         presentation=dict(name="Temperature", symbol="T", units="K", role="prognostic", origin="stored",

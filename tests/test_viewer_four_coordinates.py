@@ -77,7 +77,9 @@ def test_time_mean_longitude_latitude_field(hs):
         total += f
     np.testing.assert_array_equal(array(mean["values"]), total / 3)
     time = mean["coordinates"]["time"]
-    assert time["count"] == 3 and time["op"] == "mean" and "not weighted by the intervals" in time["rule"]
+    # Regular cadence: the approved cell weights are all equal, so the mean is the plain 1/N mean, bit for bit.
+    assert time["count"] == 3 and time["op"] == "mean" and time["weighting"] == "equal (regular cadence)"
+    assert "interval it stands for" in time["rule"] and time["cadence"] == "regular"
 
 
 def test_vertical_profile_at_a_point_and_a_saved_time(hs):

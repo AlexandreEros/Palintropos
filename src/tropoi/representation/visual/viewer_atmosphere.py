@@ -38,7 +38,7 @@ from tropoi.representation.diagnostics.pe_levels import LEVEL_FIELDS, reconstruc
 from tropoi.representation.diagnostics.pe_structure import mass_streamfunction
 from tropoi.representation.diagnostics.pe_surfaces import pressure_surface
 from tropoi.representation.visual.selection import (
-    MAX_STATES, SelectionError, axis, latitude_axis, longitude_axis)
+    MAX_STATES, TIME_MEAN, SelectionError, axis, latitude_axis, longitude_axis, reductions)
 from tropoi.spatial.grids.quadrature import gauss_latitude_nodes
 from tropoi.spatial.transforms.host_synthesis import synthesize_latlon, synthesize_wind_latlon
 
@@ -82,7 +82,8 @@ NO_QUADRATURE = ("this archive's native grid is not a Gaussian latitude–longit
 MEAN = dict(
     longitude="plain mean over the equally spaced longitudes of the native Gaussian grid",
     latitude="area-weighted mean over the native Gauss–Legendre latitudes (Gauss weights, ∝ cos φ dφ)",
-    time="equal-weight mean over the saved states first..last inclusive")
+    time=TIME_MEAN)
+NATIVE_LEVELS = "the native full levels of the column"
 
 
 def _excluded(representation, field):
@@ -101,7 +102,7 @@ def _horizontal_caps(quadrature):
     roles = ["x", "y", "fixed"] + (["reduce"] if quadrature else [])
     out = dict(roles=roles)
     if quadrature:
-        return {c: dict(out, reduce={"mean": MEAN[c]}) for c in ("longitude", "latitude")}
+        return {c: dict(out, reduce=reductions(MEAN[c])) for c in ("longitude", "latitude")}
     return {c: dict(out, unavailable=dict(reduce=NO_QUADRATURE)) for c in ("longitude", "latitude")}
 
 
@@ -116,7 +117,7 @@ def describe(manifest) -> dict:
     levels = [dict(index=k, label=f"{k + 1} · σ = {float(s):.6g}", sigma=float(s))
               for k, s in enumerate(full)]
     spectral = manifest["source"].get("solver") in ("bve", "swe", "pe")
-    time = dict(roles=["x", "y", "fixed", "reduce"], reduce={"mean": MEAN["time"]})
+    time = dict(roles=["x", "y", "fixed", "reduce"], reduce=reductions(MEAN["time"]))
     no_axis = "this archive has no native-level column evaluator" if "structure" not in ops else None
     quantities = {}
     for key in ops.get("map", []):
@@ -134,12 +135,14 @@ def describe(manifest) -> dict:
             on_axis = "structure" in ops and key in AXIS_FIELDS
             per_sample = [r for r in ("geopotential_height", "height_above_surface", "pressure")
                           if (r != "height_above_surface" or "height_above_surface" in ops)] if on_axis else []
-            vertical = dict(roles=["fixed"] + (["x", "y"] if on_axis else []), fixed=fixed,
+            # Min/Max over the native levels need no weights; the mean needs an approved rule.
+            vertical = dict(roles=["fixed"] + (["x", "y", "reduce"] if on_axis else []), fixed=fixed,
                             axis=["sigma"] if on_axis else [], per_sample=per_sample,
-                            unavailable=dict(reduce=NO_VERTICAL_MEAN))
+                            reduce=reductions() if on_axis else {},
+                            reduce_unavailable=dict(mean=NO_VERTICAL_MEAN), unavailable={})
             if not on_axis:
-                vertical["unavailable"].update(x=no_axis or "not reconstructed on native levels",
-                                               y=no_axis or "not reconstructed on native levels")
+                reason = no_axis or "not reconstructed on native levels"
+                vertical["unavailable"].update(x=reason, y=reason, reduce=reason)
             coordinates["vertical"] = vertical
             q["vertical"] = dict(domain="atmosphere", levels=levels,
                                  representations={r: REPRESENTATIONS[r] for r in REPRESENTATIONS})
@@ -158,6 +161,7 @@ def describe(manifest) -> dict:
                                   for k, s in enumerate(interfaces)]),
             coordinates=dict(
                 longitude=dict(roles=["reduce"], reduce={"mean": MEAN["longitude"]},
+                               reduce_unavailable=dict(min=only_mean, max=only_mean),
                                unavailable=dict(x=only_mean, y=only_mean, fixed=only_mean)),
                 latitude=dict(roles=["x", "y"], unavailable=dict(
                     fixed="ψ is offered as a latitude × σ field", reduce="ψ is offered as a latitude × σ field")),
@@ -165,6 +169,8 @@ def describe(manifest) -> dict:
                     fixed="ψ is offered as a latitude × σ field", reduce=NO_VERTICAL_MEAN)),
                 time=dict(roles=["fixed", "reduce"], reduce={"mean": MEAN["time"] + "; ψ is formed from the "
                                                                              "time mean of [pₛ v]"},
+                          reduce_unavailable=dict(min="ψ is formed from the time mean of [pₛ v]",
+                                                  max="ψ is formed from the time mean of [pₛ v]"),
                           unavailable=dict(x="ψ histories are not offered in this release",
                                            y="ψ histories are not offered in this release"))))
     for key, product in manifest["diagnostics"].items():
@@ -281,6 +287,12 @@ def _vertical_plan(provider, sel, quantity, out):
                                        label=REPRESENTATIONS[rep]["label"], interpolation=INTERPOLATION[rep])
         return
     context = provider._structure_context()
+    if v["role"] == "reduce":
+        coordinates["vertical"] = dict(role="reduce", op=v["op"], representation="native",
+                                       nodes=f"{len(context.full_levels)} native full levels",
+                                       domain=NATIVE_LEVELS)
+        out["vertical"] = dict(heights=context.gravity is not None)
+        return
     coordinates["vertical"] = dict(role=v["role"], representation=rep, sampling="native full levels")
     heights = context.gravity is not None
     if rep == "sigma":
