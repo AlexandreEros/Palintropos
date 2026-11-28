@@ -189,3 +189,14 @@ wall-clock time.
 | `profile-<case>-cprofile-{tottime,cumulative}.txt` | host profiles |
 | `nsys-<case>-nvtx-gpu-projection.csv`, `nsys-<case>-kernels.csv` | Nsight Systems: GPU time and kernels per NVTX range; kernel summary |
 | `t4-bl-thomas-equivalence-bdd3fcd.json` | the D3 study, per captured system |
+
+## Commits named here and where they landed
+
+The evidence files name the commit that produced them. The squash merge put
+another commit on `main`. The named commits stay reachable through the pull
+request's head (`refs/pull/84/head`, `f267e1d`).
+
+| Evidence commit | Pull request | Squash commit on `main` |
+| --- | --- | --- |
+| `7622a74` (throughput, profiles, Nsight) | #84 | `b595e01` |
+| `bdd3fcd` (D3 study) | #84 | `b595e01` |
