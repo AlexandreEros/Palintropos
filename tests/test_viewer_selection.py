@@ -54,11 +54,11 @@ def test_fractional_native_level_and_unknown_members_are_refused():
     session, _ = _provider(MOLA)
     fixed = lambda v: dict(role="fixed", value=v)
     base = dict(quantity="temperature", longitude=fixed(10), latitude=fixed(10), time=dict(role="x", first=0, last=2))
-    with pytest.raises(SelectionError, match="outside"):
+    with pytest.raises(SelectionError, match="Native level must be a zero-based full-level index"):
         session.select(0, json.dumps(dict(base, vertical=dict(role="fixed", representation="native", value=1.5))))
     with pytest.raises(SelectionError, match="Unknown selection member"):
         session.select(0, json.dumps(dict(base, vertical=dict(role="fixed", representation="native", value=1),
                                           extra=1)))
-    with pytest.raises(SelectionError, match="not available"):
-        session.select(0, json.dumps(dict(base, quantity="zeta", vertical=dict(role="fixed", representation="native",
-                                                                               value=1))))
+    with pytest.raises(SelectionError, match="Only one coordinate"):
+        session.select(0, json.dumps(dict(base, latitude=dict(role="x"),
+                                          vertical=dict(role="fixed", representation="native", value=1))))

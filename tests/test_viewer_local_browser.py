@@ -81,7 +81,7 @@ def test_ben_to_shallow_water_and_bve_in_same_application():
                                    fluid.colors.some((v,k) => v!==recoloured.colors[k]);
                         })()""")
                 page.eval('document.getElementById("runs").selectedIndex=3;document.getElementById("runs").dispatchEvent(new Event("change"))')
-                until(page, 'location.pathname.endsWith("/3/") && window.viewer?.explorer?.data?.product === "recorded_series" && '
+                until(page, 'location.pathname.endsWith("/3/") && window.viewer?.explorer?.data?.description === "Recorded series" && '
                       'document.querySelector(\'[data-e="png"]\')?.disabled === false')
                 assert not page.exceptions, page.exceptions
                 assert all(url.startswith("http://"+server.authority+"/") or url.startswith(("data:", "blob:"))

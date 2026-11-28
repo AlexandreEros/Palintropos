@@ -25,15 +25,17 @@
     </div>
     <div id="views"></div>
     <section id="explorer" class="panel" hidden>
-      <div class="panel-heading"><h2>Explorer</h2><button data-e="png" disabled>Save PNG</button></div>
+      <div class="panel-heading"><h2>Explorer</h2><span><button data-e="globe" hidden>Show on the globe</button>
+        <button data-e="png" disabled>Save PNG</button></span></div>
       <div class="panel-layout">
         <div class="controls">
           <label>Quantity<select data-e="quantity"></select></label>
           <div class="record"><span data-e="classification"></span><p data-e="definition"></p></div>
           <label>Preset<select data-e="preset"></select></label>
           <fieldset data-e="coords" class="coords"></fieldset>
-          <p class="hint">Give each coordinate a role. Two plotting axes give a map or a section, one a line.
-            Only the combinations this archive supports are evaluated. Click the map, globe or a plot to move the linked cursor.</p>
+          <p class="hint">Give each coordinate a role. Two plotting axes give a field, one a line, none a single value.
+            A preset only fills in the roles. Roles a coordinate does not accept are disabled, with the reason.
+            Click the map, globe or a plot to move the linked cursor.</p>
           <p data-e="product" class="product"></p>
           <label data-e="snap-wrap" class="check"><input data-e="snap" type="checkbox" checked> Snap to native grid node</label>
           <fieldset data-e="range-fieldset"><legend>Colours</legend>

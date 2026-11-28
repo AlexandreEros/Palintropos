@@ -265,16 +265,16 @@
         "tropoi.temporal.hooks.rk4_real_axis_limit"
       ]
     },
-    "functions": 2040,
+    "functions": 2056,
     "modules": 200,
     "packages": 30
   },
   "limits": {
     "call_sites": {
-      "builtin": 4708,
-      "external": 3002,
-      "internal": 3562,
-      "unresolved": 4785
+      "builtin": 4771,
+      "external": 3033,
+      "internal": 3594,
+      "unresolved": 4827
     },
     "dynamic_import_sites": {
       "tropoi.representation.archive.writer": 1

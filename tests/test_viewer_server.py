@@ -74,7 +74,7 @@ def test_final_saved_frame_on_wire(live, index, field, coord, value):
     times = manifest["time_axes"]["snapshots"]["values"]
     vertical = surface(coord, value) if coord else dict(role="none")
     url = select(base, quantity=field, longitude=dict(role="x"), latitude=dict(role="y"),
-                 vertical=vertical, time=dict(role="fixed", index=len(times)-1))
+                 vertical=vertical, time=dict(role="fixed", index=len(times)-1), options=dict(format="frame"))
     arrays = frame(url)
     n = arrays["lat"].size * arrays["lon"].size
     assert arrays["values"].size == arrays["height"].size == arrays["terrain"].size == n
@@ -116,13 +116,14 @@ def test_recorded_series_and_invalid_requests(live):
 def test_structure_selections_on_ben2_and_statistics_core(live):
     manifest = json.loads(fetch(live.url + "manifest"))
     quantities = manifest["explorer"]["quantities"]
-    assert "zonal_mean" in quantities["mass_streamfunction"]["products"]
+    assert quantities["mass_streamfunction"]["coordinates"]["longitude"]["roles"] == ["reduce"]
     last = len(manifest["time_axes"]["snapshots"]["values"]) - 1
     fixed = lambda v: dict(role="fixed", value=v)
     column = json.loads(fetch(select(live.url, quantity="temperature", longitude=fixed(-79), latitude=fixed(-19.4),
                                      vertical=dict(role="y", representation="geopotential_height"),
                                      time=dict(role="fixed", index=last))))
-    assert column["sampling"] == "native Gaussian grid node" and column["location"]["longitude"] == 281.25
+    where = column["coordinates"]["longitude"]
+    assert where["sampling"] == "native Gaussian grid node" and where["value"] == 281.25
     assert len(column["values"]) == len(column["y"]["values"]) == 40
     # Slab Tₛ and the lowest-level air temperature are separate quantities.
     surface_t = [m for m in column["markers"] if m["kind"] == "surface"][0]
@@ -137,7 +138,7 @@ def test_structure_selections_on_ben2_and_statistics_core(live):
                                    longitude=dict(role="reduce", op="mean"),
                                    vertical=dict(role="y", representation="sigma"),
                                    time=dict(role="reduce", op="mean", first=last-1, last=last))))
-    assert mean["sample"]["count"] == 2 and len(mean["values"]) == 41
+    assert mean["coordinates"]["time"]["count"] == 2 and len(mean["values"]) == 41
     assert np.all(np.array(mean["values"][0]) == 0)
     assert live.session.bytes_used <= live.session.cache_bytes
     core = live.url.removesuffix("0/") + "4/"

@@ -84,6 +84,7 @@ output { font-size: .9rem }
 .levels tr.selected { background: #ffe8cf }
 #explorer { margin-top: .85rem }
 .coords .coord { display: flex; flex-direction: column; gap: .3rem; margin-top: .5rem }
-.coords .coord > select, .coords .coord > input { width: 100% }
+.coords .coord select, .coords .coord input { width: 100%; min-width: 0; max-width: 100% }
+.coords .coord .pair { margin-top: 0 }
 .product { font-size: .85rem; font-weight: 650; color: #2d6660 }
 @media(max-width: 720px) { .levels { font-size: .72rem } .levels th, .levels td { padding: .15rem .25rem } }

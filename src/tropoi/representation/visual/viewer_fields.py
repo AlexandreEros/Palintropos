@@ -92,10 +92,29 @@ class FrameProvider:
         elif backend == "cuda":
             self.backend_reason = "The atmospheric column evaluator uses NumPy."
 
-    def select(self, selection):
-        """Evaluate a parsed viewer selection (``viewer_atmosphere.select``)."""
-        from tropoi.representation.visual.viewer_atmosphere import select
-        return select(self, selection)
+    # The viewer's selection protocol (``selection.evaluate``): sample sets per
+    # role and per-state evaluation live in ``viewer_atmosphere``.
+    def plan(self, selection):
+        from tropoi.representation.visual import viewer_atmosphere
+        return viewer_atmosphere.plan(self, selection)
+
+    def samples(self, selection, plan, indices):
+        from tropoi.representation.visual import viewer_atmosphere
+        return viewer_atmosphere.samples(self, selection, plan, indices)
+
+    def post(self, selection, plan, cube):
+        from tropoi.representation.visual import viewer_atmosphere
+        return viewer_atmosphere.post(self, selection, plan, cube)
+
+    def finish(self, selection, plan, payload):
+        from tropoi.representation.visual import viewer_atmosphere
+        viewer_atmosphere.finish(self, selection, plan, payload)
+
+    def frame(self, selection):
+        """One saved state on one surface for the globe: :meth:`slice`."""
+        vertical = selection["vertical"]
+        return self.slice(selection["time"]["index"], selection["quantity"],
+                          vertical.get("representation", "native"), vertical.get("value", 0))
 
     def _scalar(self, coeffs):
         if self._gpu is not None:
@@ -248,6 +267,9 @@ class FrameProvider:
     # Linked vertical structure (PE only). Scientific reductions use the
     # run's own Gaussian state grid; columns and sections are exact
     # band-limited point synthesis, never values read off the 2° mesh.
+    # The viewer evaluates selections through ``selection.evaluate``; the
+    # methods below remain the library entry points of the Ben-2
+    # acceptance tests, on the same kernels.
     # ------------------------------------------------------------------
 
     def _structure_context(self):

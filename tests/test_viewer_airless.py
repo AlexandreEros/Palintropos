@@ -101,7 +101,8 @@ def test_maps_are_archived_values_at_native_levels(archives, kind):
     surface = load_tier2(last, "surface")
     profiles = load_tier2(last, "profiles")
     n_surface = len(manifest["time_axes"]["surface_samples"]["values"])
-    base = dict(quantity="temperature", longitude=dict(role="x"), latitude=dict(role="y"))
+    base = dict(quantity="temperature", longitude=dict(role="x"), latitude=dict(role="y"),
+                options=dict(format="frame"))
     skin = _frame(_select(session, 0, **base, vertical=dict(role="fixed", representation="native", value=0),
                           time=dict(role="fixed", index=n_surface - 1)))
     np.testing.assert_array_equal(skin["values"], surface[-1, 0][index].ravel().astype("<f4"))
@@ -124,7 +125,8 @@ def test_maps_are_archived_values_at_native_levels(archives, kind):
         _select(session, 0, **base, vertical=dict(role="fixed", representation="native", value=1),
                 time=dict(role="fixed", index=n_surface - 1))
     flux = _frame(_select(session, 0, quantity="conducted_flux", longitude=dict(role="x"), latitude=dict(role="y"),
-                          vertical=dict(role="none"), time=dict(role="fixed", index=3)))
+                          vertical=dict(role="none"), time=dict(role="fixed", index=3),
+                          options=dict(format="frame")))
     np.testing.assert_array_equal(flux["values"], load_tier2(_directories(root)[0], "surface")[3, 4][index]
                                   .ravel().astype("<f4"))
 
@@ -139,7 +141,7 @@ def test_column_section_and_histories(archives):
     lat, lon = float(a.lat[j]), float(a.lon[j])
     column = _select(session, 0, quantity="temperature", longitude=fixed(lon + 1), latitude=fixed(lat - 1),
                      vertical=dict(role="y", representation="height_above_surface"), time=dict(role="fixed", index=2))
-    assert column["location"]["column"] == j
+    assert column["coordinates"]["latitude"]["column"] == j
     first = _directories(root)[0]
     np.testing.assert_array_equal(column["values"], load_tier2(first, "profiles")[2, :, j])
     np.testing.assert_array_equal(column["y"]["values"], -a.centres)
@@ -177,17 +179,18 @@ def test_point_collection_is_not_a_global_field(archives):
     quantity = manifest["explorer"]["quantities"]["temperature"]
     assert manifest["explorer"]["horizontal"]["kind"] == "points"
     assert manifest["explorer"]["horizontal"]["area_weights"] is False
-    assert set(quantity["products"]) == {"column", "time_series", "time_section"}
-    assert "global field" in quantity["unavailable"]["map"]
+    for c in ("longitude", "latitude"):
+        assert quantity["coordinates"][c]["roles"] == ["fixed"]
+        assert all("global field" in quantity["coordinates"][c]["unavailable"][r] for r in ("x", "y", "reduce"))
     assert quantity["time_axis"] == "every_step"
-    with pytest.raises(SelectionError, match="not available"):
+    with pytest.raises(SelectionError, match="global field"):
         _select(session, 0, quantity="temperature", longitude=dict(role="x"), latitude=dict(role="y"),
                 vertical=dict(role="fixed", representation="native", value=0), time=dict(role="fixed", index=0))
     every = np.concatenate([load_tier2(d, "every_step")[:, :, 1] for d in _directories(root)])
     history = _select(session, 0, quantity="temperature", longitude=dict(role="fixed", value=200),
                       latitude=dict(role="fixed", value=-35), vertical=dict(role="y", representation="depth"),
                       time=dict(role="x", first=0, last=29))
-    assert history["location"]["column"] == 1 and len(history["x"]["values"]) == 30
+    assert history["coordinates"]["latitude"]["column"] == 1 and len(history["x"]["values"]) == 30
     np.testing.assert_array_equal(np.array(history["values"]).T, every[:, 1:])
     np.testing.assert_array_equal(history["surface"], every[:, 0])
 

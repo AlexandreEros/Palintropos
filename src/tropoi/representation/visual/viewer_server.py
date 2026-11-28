@@ -18,7 +18,8 @@ import numpy as np
 from tropoi.representation.archive.local_resource import resource
 from tropoi.representation.archive.airless import READER as AIRLESS_READER
 from tropoi.representation.archive.viewer_manifest import viewer_manifest
-from tropoi.representation.visual.selection import PRODUCTS, parse_selection, time_axis
+from tropoi.representation.visual.selection import (
+    PRESETS, SelectionError, evaluate, parse_selection, time_axis)
 
 
 def _json(value):
@@ -118,8 +119,8 @@ class ViewerSession:
             if "explorer" not in manifest:
                 from tropoi.representation.visual.viewer_atmosphere import describe
                 manifest["explorer"] = describe(manifest)
-            manifest["explorer"]["products"] = {k: dict(label=v["label"], roles=v["roles"])
-                                                for k, v in PRODUCTS.items()}
+            # Named role assignments for the page's convenience; capability is per coordinate.
+            manifest["explorer"]["presets"] = PRESETS
             self.manifests.append(manifest)
         self.backend = backend
         self.cache_bytes = cache_bytes
@@ -131,22 +132,30 @@ class ViewerSession:
     def select(self, run, text):
         """Evaluate one selection (``selection.parse_selection``).
 
-        Returns ``(bytes, mime)``: a binary frame for a map, JSON otherwise."""
+        Every selection is evaluated by ``selection.evaluate`` and returned as
+        JSON. ``options.format = "frame"`` asks instead for the binary frame
+        the globe draws: one saved state on one surface, longitude × latitude
+        on the display mesh, with its terrain, heights, winds and mask.
+        Returns ``(bytes, mime)``."""
         manifest = self.manifests[run]
         selection = parse_selection(manifest, text)
         key = ("select", run, json.dumps(selection, sort_keys=True))
-        if selection["product"] == "recorded_series":
-            data = self._cached(run, key, lambda provider: _json(self.recorded(run, selection["quantity"])),
-                                locked=False)
+        quantity = manifest["explorer"]["quantities"][selection["quantity"]]
+        if quantity.get("recorded"):
+            data = self._cached(run, key, lambda provider: _json(self.recorded(run, selection)), locked=False)
             return data, "application/json"
-        frame = selection["product"] == "map"
+        frame = selection["options"]["format"] == "frame"
+        if frame and not (selection["axes"] == dict(x="longitude", y="latitude")
+                          and selection["time"]["role"] == "fixed"
+                          and selection["vertical"]["role"] in ("fixed", "none")):
+            raise SelectionError("The globe draws one saved state on one surface: longitude as x, latitude "
+                                 "as y, a fixed time and a fixed vertical coordinate")
 
-        def evaluate(provider):
-            kind, result = provider.select(selection)
-            return encode_frame(result) if kind == "frame" else _json(result)
+        def run_selection(provider):
+            return encode_frame(provider.frame(selection)) if frame else _json(evaluate(provider, selection))
 
-        # Maps keep the lock: the optional CUDA synthesis object is not thread-safe.
-        data = self._cached(run, key, evaluate, locked=frame)
+        # Frames keep the lock: the optional CUDA synthesis object is not thread-safe.
+        data = self._cached(run, key, run_selection, locked=frame)
         return data, "application/octet-stream" if frame else "application/json"
 
     def _cached(self, run, key, evaluate, locked):
@@ -176,9 +185,10 @@ class ViewerSession:
                     self.bytes_used += len(data)
             return data
 
-    def recorded(self, run, quantity):
+    def recorded(self, run, selection):
         """A recorded series, at its own cadence, as a selection payload."""
         manifest = self.manifests[run]
+        quantity = selection["quantity"]
         field = manifest["explorer"]["quantities"][quantity]["recorded"]
         product = manifest["diagnostics"].get(field)
         if not product or product["kind"] != "series":
@@ -202,10 +212,14 @@ class ViewerSession:
 def _series(quantity, product, x, y):
     if len(x) != len(y):
         raise ValueError("Recorded time and value counts disagree")
-    return dict(product="recorded_series", quantity=quantity, presentation=product["presentation"],
-                x=time_axis(x, label="Recorded time"),
-                y=dict(label=product["presentation"]["name"], units=product["presentation"].get("units")),
-                values=y, sampling=f"recorded in {product['path']} at the run's own cadence", notes=[])
+    none = dict(role="none")
+    return dict(quantity=quantity, presentation=product["presentation"],
+                roles=dict(longitude="none", latitude="none", vertical="none", time="x"),
+                axes=dict(x="time", y=None), description="Recorded series",
+                coordinates=dict(longitude=none, latitude=none, vertical=none,
+                                 time=dict(role="x", axis="recorded", count=len(x))),
+                x=time_axis(x, label="Recorded time"), values=y, companions=None,
+                sampling=f"recorded in {product['path']} at the run's own cadence", notes=[])
 
 
 def provider_for(root, manifest, *, backend="cpu"):

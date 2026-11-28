@@ -60,7 +60,7 @@ flowchart LR
     p_tropoi_orepresentation_ovisual -->|1| n_tropoi_ospatial_ogrids_ogrid__base
     p_tropoi_orepresentation_ovisual -->|3| n_tropoi_ospatial_ogrids_ogrid__interpolation
     p_tropoi_orepresentation_ovisual -.->|1| n_tropoi_ospatial_ogrids_olatlon__grid
-    p_tropoi_orepresentation_ovisual -.->|1| n_tropoi_ospatial_ogrids_oquadrature
+    p_tropoi_orepresentation_ovisual -->|2| n_tropoi_ospatial_ogrids_oquadrature
     p_tropoi_orun_oairless -->|1| n_tropoi_ospatial_ogrids_oquadrature
     p_tropoi_orun_oheld__suarez -.->|1| n_tropoi_ospatial_ogrids_oquadrature
     p_tropoi_ospatial -->|2| n_tropoi_ospatial_ogrids_ogeodesic__grid

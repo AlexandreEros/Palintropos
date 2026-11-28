@@ -18,7 +18,7 @@ Explore dependencies, call sites, possible dispatch, runtime observations and pr
 | [`tropoi.representation`](packages/tropoi.representation.md) | 2 | 0 | 1 | `README.md` |
 | [`tropoi.representation.archive`](packages/tropoi.representation.archive.md) | 14 | 21 | 31 | `README.md` |
 | [`tropoi.representation.diagnostics`](packages/tropoi.representation.diagnostics.md) | 9 | 20 | 28 | `README.md` |
-| [`tropoi.representation.visual`](packages/tropoi.representation.visual.md) | 31 | 64 | 103 | `ATMOSPHERE_VIEW.md`, `HELD_SUAREZ_CLIMATE.md`, `README.md`, `sky_view.html`, `terrain_globe.html` |
+| [`tropoi.representation.visual`](packages/tropoi.representation.visual.md) | 31 | 64 | 107 | `ATMOSPHERE_VIEW.md`, `HELD_SUAREZ_CLIMATE.md`, `README.md`, `sky_view.html`, `terrain_globe.html` |
 | [`tropoi.run`](packages/tropoi.run.md) | 3 | 1 | 5 | `README.md` |
 | [`tropoi.run.airless`](packages/tropoi.run.airless.md) | 4 | 2 | 17 | – |
 | [`tropoi.run.bve`](packages/tropoi.run.bve.md) | 6 | 2 | 3 | `README.md` |

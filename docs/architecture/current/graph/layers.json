@@ -39,7 +39,7 @@
     {
       "direction": "down",
       "kind": "imports",
-      "module_edges": 42,
+      "module_edges": 44,
       "package_edges": 10,
       "source": "representation",
       "target": "spatial",
