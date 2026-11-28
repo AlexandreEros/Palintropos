@@ -179,7 +179,9 @@ class ColumnArchiveProvider:
         out["read"] = (family, list(range(1, self.archive.layers + 1)) if family == "every_step" else None)
         out["axes"]["vertical"] = self._vertical_axis(quantity, v["representation"])
         out["cell_axis"] = cell_axis
-        out["companions"]["skin"] = dict(label="Diagnosed skin Tₛ (depth 0)", units="K", surface=True)
+        # The skin is the quantity itself at depth 0: it takes the quantity's statistic.
+        out["companions"]["skin"] = dict(label="Diagnosed skin Tₛ (depth 0)", units="K", surface=True,
+                                         statistic="quantity")
         coordinates["vertical"] = dict(role=v["role"], representation=v["representation"],
                                        sampling="native cell centres; the skin is shown as its own level")
         out["notes"].append(SKIN)
@@ -248,7 +250,8 @@ class ColumnArchiveProvider:
         profile = v["role"] in ("x", "y") and all(sel[c]["role"] in ("fixed", "reduce")
                                                    for c in ("longitude", "latitude", "time"))
         if profile:
-            mean = " (mean)" if any(sel[c]["role"] == "reduce" for c in ("longitude", "latitude", "time")) else ""
+            reduced = [c for c in ("longitude", "latitude", "time") if sel[c]["role"] == "reduce"]
+            mean = (" (" + ", ".join(f"{c} {sel[c]['op']}" for c in reduced) + ")") if reduced else ""
             skin = comp.get("skin", {}).get("values")
             depth = self.archive.centres
             payload["markers"] = [] if skin is None else [dict(

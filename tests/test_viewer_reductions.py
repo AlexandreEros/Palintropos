@@ -282,3 +282,33 @@ def test_archived_mean_T_is_a_sigma_weighted_vertical_mean(hs):
                    latitude=dict(role="reduce", op="mean"), vertical=dict(role="y", representation="sigma"),
                    time=dict(role="fixed", index=index))
         assert abs(float(np.dot(dsig, d["values"])) - series[day]) <= 1e-9 * series[day]
+
+
+def test_minimum_profile_labels_its_statistic_and_keeps_position_means(hs):
+    """Under a minimum the quantity's table column and marker say so; p and Z stay level-position means."""
+    session, _ = hs
+    d = select(session, quantity="temperature", longitude=dict(role="fixed", value=10.0),
+               latitude=dict(role="fixed", value=-30.0), vertical=dict(role="y", representation="sigma"),
+               time=dict(role="reduce", op="min", first=60, last=63))
+    assert d["table"]["columns"][5] == "T (K) (time min)" and d["table"]["columns"][2] == "p (Pa) (mean)"
+    assert d["markers"][0]["label"].startswith("Lowest full level air T (time min) = ")
+    assert d["markers"][0]["value"] == d["values"][-1]
+
+
+def test_value_companion_takes_the_quantity_statistic():
+    """A companion flagged statistic="quantity" (a skin, a slab Tₛ) is reduced like the quantity."""
+    class Skin(Synthetic):
+        def plan(self, sel):
+            out = super().plan(sel)
+            out["companions"]["skin"] = dict(label="skin", units="K", surface=True, statistic="quantity")
+            return out
+
+        def samples(self, sel, plan, indices):
+            for (t, values, companions), i in zip(super().samples(sel, plan, indices), indices):
+                yield t, values, dict(companions, skin=np.full((1, NLAT, NLON), float(i)))
+
+    d = run(Skin(), longitude=dict(role="reduce", op="mean"), latitude=dict(role="reduce", op="mean"),
+            vertical=dict(role="y", representation="native"), time=dict(role="reduce", op="max", first=0, last=4))
+    assert d["companions"]["skin"]["values"] == 4.0                                # max of 0..4, not the mean
+    pos = (np.array([100.0 * t for t in TIMES])).mean()                            # positions: the plain mean
+    assert d["companions"]["pos"]["values"] == pytest.approx([pos] * NV, rel=1e-15)

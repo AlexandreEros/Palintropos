@@ -104,7 +104,7 @@ def test_time_mean_vertical_profile(hs):
     for e in each:
         total += e
     np.testing.assert_array_equal(array(mean["values"]), total / 4)
-    assert "(mean)" in mean["table"]["columns"][-1]
+    assert mean["table"]["columns"][-1].endswith("(time mean)") and mean["table"]["columns"][2] == "p (Pa) (mean)"
     # The level positions of p and Z differ between samples: refused locally, with the reason.
     with pytest.raises(SelectionError, match="differ from column to column"):
         evaluate(session, **dict(base, vertical=dict(role="y", representation="pressure")),

@@ -314,7 +314,8 @@ def _vertical_plan(provider, sel, quantity, out):
         for name, (label, units) in dict(temperature=("T", "K"), u=("u", "m s⁻¹"), v=("v", "m s⁻¹")).items():
             out["companions"].setdefault(name, dict(label=label, units=units))
         if sel["quantity"] == "temperature" and "surface_temperature" in provider.manifest["fields"]:
-            out["companions"]["surface_temperature"] = dict(label="Tₛ (slab)", units="K", surface=True)
+            out["companions"]["surface_temperature"] = dict(label="Tₛ (slab)", units="K", surface=True,
+                                                            statistic="quantity")
     out["vertical"] = dict(heights=heights)
 
 
@@ -490,7 +491,9 @@ def finish(provider, sel, plan_, payload):
                                                for c in ("longitude", "latitude", "time"))
     if profile and "temperature" in comp:
         reduced = [c for c in ("longitude", "latitude", "time") if sel[c]["role"] == "reduce"]
-        mean = " (mean)" if reduced else ""
+        # The quantity's statistic(s); level positions (p, Z) are always means (selection module docs).
+        mean = (" (" + ", ".join(f"{c} {sel[c]['op']}" for c in reduced) + ")") if reduced else ""
+        position = " (mean)" if reduced else ""
         sigma = list(provider._context.full_levels)
         z = comp.get("geopotential_height", {}).get("values")
         zs = comp.get("surface_height", {}).get("values")
@@ -499,13 +502,13 @@ def finish(provider, sel, plan_, payload):
             rows.append([k + 1, s, comp["pressure"]["values"][k], None if z is None else z[k],
                          None if z is None else z[k] - zs, comp["temperature"]["values"][k],
                          comp["u"]["values"][k], comp["v"]["values"][k]])
-        payload["table"] = dict(columns=["Level", "σ", f"p (Pa){mean}", f"Z (m){mean}", f"Z − Zₛ (m){mean}",
+        payload["table"] = dict(columns=["Level", "σ", f"p (Pa){position}", f"Z (m){position}", f"Z − Zₛ (m){position}",
                                          f"T (K){mean}", f"u (m s⁻¹){mean}", f"v (m s⁻¹){mean}"], rows=rows)
         payload["notes"] += [LOWEST_AIR + ".", *CONVENTIONS.values()]
         if reduced:
-            payload["notes"].append("Means are taken on native σ levels: each row is the mean of the level's "
-                                    "values over " + " and ".join(reduced) + ", and its p and Z are the means "
-                                    "of that level's p_k and Z_k, not a mean on a surface of constant p or Z.")
+            payload["notes"].append("Reductions are taken on native σ levels: each row is the statistic of the "
+                                    "level's values over " + " and ".join(reduced) + ", and its p and Z are the "
+                                    "means of that level's p_k and Z_k, not values on a surface of constant p or Z.")
         payload["markers"] = []
         if sel["quantity"] == "temperature":
             y = payload[v["role"]]["values"]

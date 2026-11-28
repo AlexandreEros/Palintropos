@@ -376,18 +376,24 @@ def _reduce(array, weights, axis, op="mean", masked=None):
     return (array * w.reshape(shape)).sum(axis=axis, keepdims=True) / w.sum()
 
 
-def _spatial(array, plan, sel, counts=None):
+def _spatial(array, plan, sel, counts=None, same=False):
     """Reduce one saved sample ``(nvertical, nlat, nlon)``: longitude, latitude,
     then vertical (:data:`REDUCTION_ORDER`). ``counts`` is None for companions,
-    which take the mean whatever the quantity's operator."""
+    which take the mean whatever the quantity's operator unless ``same`` (a
+    companion that is a value of the quantity, such as a skin temperature)."""
     for c, axis_ in (("longitude", -1), ("latitude", -2), ("vertical", -3)):
         part = sel[c]
         if part["role"] != "reduce":
             continue
-        op = part["op"] if counts is not None else "mean"
+        op = part["op"] if counts is not None or same else "mean"
         array = _reduce(array, (plan.get(c) or {}).get("weights"), axis_, op,
                         None if counts is None else counts[c])
     return array
+
+
+def _same(plan, name):
+    """A companion that is a value of the quantity itself takes the quantity's statistic."""
+    return (plan.get("companions") or {}).get(name, {}).get("statistic") == "quantity"
 
 
 def time_weights(seconds):
@@ -407,28 +413,36 @@ def time_weights(seconds):
 class _TimeReduction:
     """Accumulates one reduction over saved samples in bounded memory."""
 
-    def __init__(self, op, weights):
+    def __init__(self, op, weights, same=()):
         self.op, self.weights, self.masked, self.n = op, weights, [0], 0
-        self.value, self.companions = None, {}
+        self.value, self.companions, self.same = None, {}, set(same)
+
+    def _accumulate(self, total, values, op, w):
+        if total is None:
+            total = np.zeros_like(values) if op == "mean" else np.full_like(values, np.nan)
+        if op == "mean":
+            return total + (values if self.weights is None else w * values)
+        return (np.fmin if op == "min" else np.fmax)(total, values)
 
     def add(self, values, companions):
         w = 1.0 if self.weights is None else self.weights[self.n]
         self.n += 1
-        if self.value is None:
-            self.value = np.zeros_like(values) if self.op == "mean" else np.full_like(values, np.nan)
-            self.companions = {k: np.zeros_like(a) for k, a in companions.items()}
-        if self.op == "mean":
-            self.value += values if self.weights is None else w * values
-        else:
+        if self.op != "mean":
             self.masked[0] += int(np.isnan(values).sum())
-            self.value = (np.fmin if self.op == "min" else np.fmax)(self.value, values)
+        if self.value is None and self.op == "mean":
+            self.value = np.zeros_like(values)
+            self.value += values if self.weights is None else w * values      # the original arithmetic
+        else:
+            self.value = self._accumulate(self.value, values, self.op, w)
         for k, a in companions.items():
-            self.companions[k] += a if self.weights is None else w * a
+            op = self.op if k in self.same else "mean"
+            self.companions[k] = self._accumulate(self.companions.get(k), a, op, w)
 
     def result(self):
         total = self.n if self.weights is None else float(np.sum(self.weights))
         value = self.value / total if self.op == "mean" else self.value
-        return value[None], {k: (a / total)[None] for k, a in self.companions.items()}
+        return value[None], {k: (a if k in self.same and self.op != "mean" else a / total)[None]
+                             for k, a in self.companions.items()}
 
 
 def evaluate(provider, sel):
@@ -453,10 +467,12 @@ def evaluate(provider, sel):
         values_ = (provider.manifest["time_axes"].get(sel["time"]["axis"]) or {}).get("values") or []
         weights = (time_weights([values_[i] for i in indices]) if sel["time"]["op"] == "mean"
                    and values_ and len(values_) > indices[-1] else None)
-        reduction = _TimeReduction(sel["time"]["op"], weights)
+        reduction = _TimeReduction(sel["time"]["op"], weights,
+                                   [k for k in plan.get("companions") or {} if _same(plan, k)])
     for t, values, companions in provider.samples(sel, plan, indices):
         values = _spatial(np.asarray(values, dtype=float), plan, sel, counts)
-        companions = {k: _spatial(np.asarray(a, dtype=float), plan, sel) for k, a in companions.items()}
+        companions = {k: _spatial(np.asarray(a, dtype=float), plan, sel, same=_same(plan, k))
+                      for k, a in companions.items()}
         seconds.append(t)
         if reduction is not None:
             reduction.add(values, companions)
