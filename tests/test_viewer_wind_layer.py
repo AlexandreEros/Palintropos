@@ -49,7 +49,8 @@ def test_capability_is_described_per_quantity(hs):
     session, _ = hs
     quantities = session.manifests[0]["explorer"]["quantities"]
     assert quantities["temperature"]["layers"]["wind"]["available"] is True
-    assert quantities["temperature"]["layers"]["wind"]["styles"] == ["streamlines"]
+    assert quantities["temperature"]["layers"]["wind"]["styles"] == ["psi_contours", "streamlines", "quiver"]
+    assert quantities["temperature"]["layers"]["wind"]["psi_surfaces"] == ["native", "sigma"]
     assert "not trajectories" in quantities["temperature"]["layers"]["wind"]["definition"]
     psi = quantities["mass_streamfunction"]["layers"]["wind"]
     assert psi["available"] is False and "latitude × σ" in psi["reason"]

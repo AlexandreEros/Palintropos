@@ -9,42 +9,42 @@ Nodes are analysed modules; a directed edge A -> B means A has at least one stat
 * **all imports**: every static import statement, wherever it appears;
 * **import-time**: only edges with at least one import statement at module scope (executed when the importing module is imported). Edges made only of function-scope or `if TYPE_CHECKING:` imports are dropped.
 
-Edge counts by scope set: `function`: 201, `function+module`: 9, `function+type_checking`: 1, `module`: 324, `type_checking`: 6.
+Edge counts by scope set: `function`: 201, `function+module`: 9, `function+type_checking`: 1, `module`: 326, `type_checking`: 6.
 
 | Metric | all imports | import-time |
 |---|---|---|
 | Nodes \|V\| | 172 | 172 |
-| Directed edges \|E\| | 541 | 333 |
-| Density | 0.018394 | 0.011322 |
-| Weakly connected components | 1 | 8 |
-| WCC sizes | 172 | 157, 8, 2, 1, 1, 1, 1, 1 |
+| Directed edges \|E\| | 543 | 335 |
+| Density | 0.018462 | 0.01139 |
+| Weakly connected components | 1 | 7 |
+| WCC sizes | 172 | 158, 8, 2, 1, 1, 1, 1 |
 | Strongly connected components | 171 | 172 |
 | Nontrivial SCCs | 1 | 0 |
 | Nontrivial SCC sizes | 2 | - |
 | Nodes in cycles | 2 | 0 |
 | Fraction of nodes in cycles | 0.011628 | 0 |
-| Sources (in-degree 0) | 5 | 46 |
+| Sources (in-degree 0) | 5 | 45 |
 | Sinks (out-degree 0) | 45 | 59 |
 | Reciprocal pairs | 1 | 0 |
-| Reciprocity | 0.003697 | 0 |
+| Reciprocity | 0.003683 | 0 |
 | In-degree min / median / max | 0 / 2 / 17 | 0 / 1 / 14 |
-| In-degree mean | 3.145349 | 1.936047 |
+| In-degree mean | 3.156977 | 1.947674 |
 | In-degree quartiles | 1, 2, 4 | 0, 1, 3 |
-| In-degree zeros | 5 | 46 |
+| In-degree zeros | 5 | 45 |
 | Out-degree min / median / max | 0 / 2 / 24 | 0 / 1 / 9 |
-| Out-degree mean | 3.145349 | 1.936047 |
+| Out-degree mean | 3.156977 | 1.947674 |
 | Out-degree quartiles | 0, 2, 5 | 0, 1, 3 |
 | Out-degree zeros | 45 | 59 |
 | Condensation nodes | 171 | 172 |
-| Condensation edges | 532 | 333 |
-| Condensation sources / sinks | 5 / 45 | 46 / 59 |
+| Condensation edges | 534 | 335 |
+| Condensation sources / sinks | 5 / 45 | 45 / 59 |
 | Condensation longest path (edges) | 14 | 7 |
 
-In-degree histogram (all imports) {degree: modules}: 0: 5, 1: 48, 2: 44, 3: 24, 4: 16, 5: 6, 6: 10, 7: 4, 8: 5, 9: 2, 10: 3, 11: 2, 12: 2, 17: 1
+In-degree histogram (all imports) {degree: modules}: 0: 5, 1: 48, 2: 43, 3: 25, 4: 16, 5: 6, 6: 10, 7: 4, 8: 5, 9: 1, 10: 4, 11: 2, 12: 2, 17: 1
 
-Out-degree histogram (all imports) {degree: modules}: 0: 45, 1: 29, 2: 28, 3: 13, 4: 12, 5: 11, 6: 4, 7: 7, 8: 7, 9: 5, 10: 5, 11: 2, 12: 1, 13: 1, 19: 1, 24: 1
+Out-degree histogram (all imports) {degree: modules}: 0: 45, 1: 29, 2: 28, 3: 13, 4: 12, 5: 11, 6: 4, 7: 7, 8: 6, 9: 5, 10: 6, 11: 2, 12: 1, 13: 1, 19: 1, 24: 1
 
-**Top 10 fan-in (all imports)** (ties at cutoff: 2)
+**Top 10 fan-in (all imports)** (ties at cutoff: 1)
 
 | Node | Degree |
 |---|---|
@@ -54,12 +54,12 @@ Out-degree histogram (all imports) {degree: modules}: 0: 45, 1: 29, 2: 28, 3: 13
 | `tropoi.physics.constants` | 11 |
 | `tropoi.spatial.planet` | 11 |
 | `tropoi.representation.visual.normalization` | 10 |
+| `tropoi.spatial.laplacian` | 10 |
 | `tropoi.spatial.specification` | 10 |
 | `tropoi.spatial.states.primitive_equations` | 10 |
-| `tropoi.spatial.laplacian` | 9 |
 | `tropoi.temporal.integration` | 9 |
 
-**Top 10 fan-out (all imports)** (ties at cutoff: 5)
+**Top 10 fan-out (all imports)** (ties at cutoff: 6)
 
 | Node | Degree |
 |---|---|
@@ -72,7 +72,7 @@ Out-degree histogram (all imports) {degree: modules}: 0: 45, 1: 29, 2: 28, 3: 13
 | `tropoi.representation.visual.compose` | 10 |
 | `tropoi.representation.visual.evaluate` | 10 |
 | `tropoi.representation.visual.sky` | 10 |
-| `tropoi.run.custom.prepare` | 10 |
+| `tropoi.representation.visual.viewer_atmosphere` | 10 |
 
 **Nontrivial strongly connected components (all imports)**
 
@@ -215,9 +215,9 @@ Module-level import edges involved: 2.
 
 ## Call graph
 
-* Nodes (functions, methods, classes): 2318
-* Edges by kind: `call` 1627, `constructor` 76, `instantiate` 590, `override` 6, `self` 433, `super` 4
-* Call sites by resolution outcome: builtin 4798, external 3053, internal 3616, unresolved 4874
+* Nodes (functions, methods, classes): 2322
+* Edges by kind: `call` 1639, `constructor` 76, `instantiate` 590, `override` 6, `self` 433, `super` 4
+* Call sites by resolution outcome: builtin 4819, external 3067, internal 3629, unresolved 4886
 
 | Scoped graph | Roots | Depth | Nodes | Edges | Truncated nodes | Reachable (unbounded) |
 |---|---|---|---|---|---|---|

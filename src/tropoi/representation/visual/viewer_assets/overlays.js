@@ -15,8 +15,31 @@ function advance(p,distance,d) {
   return normalize(p.map((x,i)=>x+distance*d[i]));
 }
 
-export function streamlines(frame, shell) {
+// Occupancy bins of about `separation` degrees on the sphere (longitude bins
+// widen toward the poles so each bin spans a similar distance).
+function binner(separation) {
+  const rows=Math.max(1,Math.round(180/separation));
+  const counts=Array.from({length:rows},(_,j)=>{
+    const c=Math.cos(((j+0.5)*180/rows-90)*DEG);
+    return Math.max(1,Math.round(360*c/separation));
+  });
+  return (lat,lon)=>{
+    const j=Math.min(rows-1,Math.max(0,Math.floor((lat+90)/180*rows)));
+    const n=counts[j], i=Math.min(n-1,Math.floor((((lon%360)+360)%360)/360*n));
+    return j*4096+i;
+  };
+}
+
+/** Streamlines of frame.u, frame.v: [[lat, lon], …] per line, upstream end first.
+ * options (the globe uses the defaults): seeds (Fibonacci seed count, 80),
+ * maxArc (degrees traced each way from a seed, 18), maxSteps (each way, 96),
+ * separation (degrees; when set, a line stops where it would enter a bin
+ * another line occupies, and a seed in an occupied bin starts no line, so the
+ * lines are evenly spaced instead of crowding: null). */
+export function streamlines(frame, shell, options={}) {
   if (!frame.u || !frame.v) return [];
+  const seeds=options.seeds ?? 80, maxArc=options.maxArc ?? 18, maxSteps=options.maxSteps ?? 96;
+  const bin=options.separation ? binner(options.separation) : null, owner=new Map();
   const cartesian=Array.from({length:3},()=>new Float32Array(frame.values.length));
   let maxSpeed=0, minCell=360/frame.lon.length;
   for (let j=0;j<frame.lat.length;j++) {
@@ -43,10 +66,15 @@ export function streamlines(frame, shell) {
     const d=w.map((v,i)=>v-radial*p[i]), s=Math.hypot(...d);
     return s>threshold ? d.map(v=>v/s) : null;
   }
-  function trace(seed, h) {
-    const points=[];
+  // With a separation, a line also stops where it returns to a bin it crossed at least `gap`
+  // steps earlier along itself: a closed orbit ends once it has closed, a spiral is cut.
+  const gap=bin ? Math.ceil(1.5*options.separation*DEG/step)+1 : 0;
+  let visits=null;
+  function trace(seed, h, id) {
+    const points=[], sign=h>0 ? 1 : -1;
     let p=seed;
-    const count=Math.min(96,Math.ceil(18*DEG/step));
+    const count=Math.min(maxSteps,Math.ceil(maxArc*DEG/step));
+    if (bin && sign<0) visits=new Map([[bin(...geographic(seed)),0]]);
     for (let s=0;s<count;s++) {
       const a=tangent(p);
       if (!a) break;
@@ -58,16 +86,27 @@ export function streamlines(frame, shell) {
       if (!d) break;
       const next=advance(p,h/6,a.map((v,i)=>v+2*b[i]+2*c[i]+d[i]));
       if (!tangent(next)) break;
-      points.push(geographic(next));
+      const g=geographic(next);
+      if (bin) {
+        const key=bin(...g), b=owner.get(key), at=sign*(s+1), seen=visits.get(key);
+        if (b!==undefined && b!==id) break;
+        if (seen!==undefined && Math.abs(at-seen)>=gap) break;
+        if (seen===undefined) visits.set(key,at);
+      }
+      points.push(g);
       p=next;
     }
     return points;
   }
-  const lines=[], golden=180*(3-Math.sqrt(5)), seeds=80;
+  const lines=[], golden=180*(3-Math.sqrt(5));
   for (let i=0;i<seeds;i++) {
     const lat=Math.asin(1-2*(i+0.5)/seeds)/DEG, lon=(i*golden)%360-180, seed=direction(lat,lon);
-    const line=[...trace(seed,-step).reverse(),[lat,lon],...trace(seed,step)];
-    if (line.length>=3) lines.push(line);
+    if (bin && owner.has(bin(lat,lon))) continue;
+    const line=[...trace(seed,-step,lines.length).reverse(),[lat,lon],...trace(seed,step,lines.length)];
+    if (line.length>=3) {
+      if (bin) for (const [y,x] of line) if (!owner.has(bin(y,x))) owner.set(bin(y,x),lines.length);
+      lines.push(line);
+    }
   }
   return lines;
 }

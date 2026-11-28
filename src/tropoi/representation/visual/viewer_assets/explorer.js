@@ -1,6 +1,7 @@
-import {fieldScale} from "./mesh.js";
+import {DEG, fieldScale} from "./mesh.js";
 import {numberText} from "./map.js";
 import {streamlines} from "./overlays.js";
+import {arrowStations, contourLevels, isolines, MAX_LEVELS, niceSpeed, niceStep, poleSnapped, quiverStations} from "./wind.js";
 
 // The explorer: the viewer's analytical workspace and its one flat plotting
 // surface. One quantity, four coordinates, one role each. The server says
@@ -15,7 +16,9 @@ import {streamlines} from "./overlays.js";
 // How a vertical axis is drawn (linear or logarithmic, upward or downward) is
 // a display choice made here: it changes no value and no request.
 
-const INK = "#22343a", GRID = "rgba(34,52,58,.18)", CURSOR = "#ff8c1a", LINE = "#106d6c", WIND = "rgba(20,30,34,.78)";
+const INK = "#22343a", GRID = "rgba(34,52,58,.18)", CURSOR = "#ff8c1a", LINE = "#106d6c", WIND = "#1a262a",
+  HALO = "rgba(255,255,255,.62)", WARN = "#9b2c1d",
+  QUIVER = "#7d1730";
 const COORDINATES = ["longitude", "latitude", "vertical", "time"];
 const ROLE_ORDER = ["x", "y", "fixed", "reduce", "none"];
 const NAMES = {longitude: "Longitude", latitude: "Latitude", vertical: "Vertical", time: "Time"};
@@ -125,58 +128,252 @@ function tickSet(axis, lo, hi) {
 const axisLabel = a => a.ticks === "time" ? a.label + " (days of 86 400 s)" :
   a.label + (a.units && !a.label.includes("(" + a.units) ? " (" + a.units + ")" : "") + (a.scale === "log" ? ", log" : "");
 
-/** Streamlines of a longitude × latitude result's wind companions, [[lat, lon], …] per line.
- * The globe's integrator (overlays.js) on the same samples: increasing latitudes,
- * periodic longitudes without the closing meridian, NaN where the field is masked. */
-export function windLines(plot) {
+/** The wind companions of a longitude × latitude result on a south → north, west → east
+ * mesh: u, v without the closing meridian (the integrator's layout), ψ with it (so contours
+ * close across the seam). Masked samples are NaN. */
+function windMesh(plot) {
   const lonOnX = plot.x.coordinate === "longitude";
   const lonAxis = lonOnX ? plot.x : plot.y, latAxis = lonOnX ? plot.y : plot.x;
-  let nlon = lonAxis.values.length;
-  if (nlon > 1 && Math.abs(lonAxis.values[nlon - 1] - lonAxis.values[0] - 360) < 1e-9) nlon--;   // closing meridian
-  const lat = latAxis.values.slice(), up = lat.length < 2 || lat[1] > lat[0];
-  if (!up) lat.reverse();
-  const nlat = lat.length, at = (component, j, i) => {
-    const jj = up ? j : nlat - 1 - j, value = lonOnX ? component[jj][i] : component[i][jj];
-    return value ?? NaN;
+  const nlonAll = lonAxis.values.length;
+  const closing = nlonAll > 1 && Math.abs(lonAxis.values[nlonAll - 1] - lonAxis.values[0] - 360) < 1e-9;
+  const nlon = closing ? nlonAll - 1 : nlonAll;
+  const up = latAxis.values.length < 2 || latAxis.values[1] > latAxis.values[0];
+  const lat = up ? latAxis.values.slice() : latAxis.values.slice().reverse(), nlat = lat.length;
+  const grid = (component, n, Kind) => {
+    if (!component) return null;
+    const out = new Kind(nlat * n);
+    for (let j = 0; j < nlat; j++) for (let i = 0; i < n; i++) {
+      const jj = up ? j : nlat - 1 - j, value = lonOnX ? component[jj][i] : component[i][jj];
+      out[j * n + i] = value ?? NaN;
+    }
+    return out;
   };
-  const u = new Float32Array(nlat * nlon), v = new Float32Array(nlat * nlon), speed = new Float32Array(nlat * nlon);
-  for (let j = 0; j < nlat; j++) for (let i = 0; i < nlon; i++) {
-    const k = j * nlon + i;
-    u[k] = at(plot.wind.u, j, i); v[k] = at(plot.wind.v, j, i);
-    speed[k] = Math.hypot(u[k], v[k]);              // NaN where either component is masked
-  }
-  return streamlines({lat: Float64Array.from(lat), lon: Float64Array.from(lonAxis.values.slice(0, nlon)),
-    values: speed, u, v}, false);
+  return {lonOnX, lat, lon: lonAxis.values.slice(0, nlon), lonAll: lonAxis.values.slice(), nlon, nlonAll, closing,
+    u: grid(plot.wind.u, nlon, Float32Array), v: grid(plot.wind.v, nlon, Float32Array),
+    psi: grid(plot.wind.psi, nlonAll, Float64Array)};
 }
 
-/** Draw wind streamlines on a field box: a polyline per line, broken at the periodic seam,
- * with one arrowhead at its middle pointing downstream. */
-function drawWind(ctx, plot, box, X, Y) {
-  const lonOnX = plot.x.coordinate === "longitude";
-  const point = (lat, lon) => {
+/** Streamlines of the full wind (u, v), [[lat, lon], …] per line: the globe's integrator
+ * (overlays.js) on the same samples; `options` as overlays.streamlines. */
+export function windLines(plot, options = {}) {
+  const m = windMesh(plot), speed = new Float32Array(m.u.length);
+  for (let k = 0; k < speed.length; k++) speed[k] = Math.hypot(m.u[k], m.v[k]);    // NaN where masked
+  return streamlines({lat: Float64Array.from(m.lat), lon: Float64Array.from(m.lon), values: speed, u: m.u, v: m.v},
+    false, options);
+}
+
+const lerp = (axis, f) => {
+  const i = Math.min(axis.length - 2, Math.max(0, Math.floor(f))), t = f - i;
+  return axis[i] + t * (axis[i + 1] - axis[i]);
+};
+
+/** ψ contours at every multiple of `interval` (m² s⁻¹): {interval, range, sets: [{level, lines:
+ * [{closed, points: [[lat, lon], …]}]}]}, each line oriented downstream (larger ψ on its right).
+ * `interval` null: the automatic step for about `count` intervals across the range of ψ shown.
+ * An interval giving more than MAX_LEVELS levels is coarsened to the nice step that fits;
+ * `requested` then keeps the interval asked for, so the key can say so. */
+export function psiContours(plot, interval = null, count = 20) {
+  const m = windMesh(plot), values = poleSnapped(m.psi, m.lat, m.nlonAll);
+  let lo = Infinity, hi = -Infinity;
+  for (const v of values) if (Number.isFinite(v)) { lo = Math.min(lo, v); hi = Math.max(hi, v); }
+  let step = interval > 0 ? interval : niceStep((hi - lo) / Math.min(count, MAX_LEVELS));
+  const requested = step;
+  while (step && Math.floor(hi / step) - Math.ceil(lo / step) + 1 > MAX_LEVELS) step = niceStep(Math.max(step * 1.01, (hi - lo) / MAX_LEVELS));
+  const sets = step ? isolines(values, m.nlonAll, m.lat.length, contourLevels(lo, hi, step), m.closing) : [];
+  return {interval: step, requested: requested !== step ? requested : null, range: [lo, hi], sets: sets.map(({level, lines}) => ({level, lines: lines.map(({points, closed}) =>
+    ({closed, points: points.map(([x, y]) => [lerp(m.lat, y), lerp(m.lonAll, x)])}))}))};
+}
+
+/** Which line representation a result draws: {mode: "psi" | "streamlines" | null, why}. */
+export function resolveWind(wind) {
+  const s = wind.settings, info = wind.info || {}, ke = info.kinetic_energy || {};
+  const psiOk = Boolean(info.psi?.available && wind.psi), share = ke.divergent_share;
+  if (s.lines === "psi") return psiOk ? {mode: "psi", why: "chosen"} : {mode: null, why: "unavailable"};
+  if (s.lines === "streamlines") return {mode: "streamlines", why: "chosen"};
+  if (s.lines !== "auto") return {mode: null, why: "none"};
+  if (!psiOk) return {mode: "streamlines", why: "no-psi"};
+  if (ke.non_divergent) return {mode: "psi", why: "non-divergent"};
+  if (share === null || share === undefined) return {mode: "streamlines", why: "rest"};
+  return share <= s.limit / 100 ? {mode: "psi", why: "below"} : {mode: "streamlines", why: "above"};
+}
+
+const percent = f => {
+  const p = 100 * f;
+  if (p === 0) return "0";
+  if (p >= 10) return p.toPrecision(3);
+  if (p >= 0.01) return p.toPrecision(3);         // three figures: a share near a limit must not round onto it
+  const [m, e] = p.toExponential(1).split("e");
+  return m + " × 10" + superscript(Number(e));
+};
+const sci = v => {
+  const e = Math.floor(Math.log10(Math.abs(v))), m = Number((v / 10 ** e).toPrecision(3));
+  return e >= -2 && e <= 3 ? numberText(v) : (m === 1 ? "" : numberText(m) + " × ") + "10" + superscript(e);
+};
+const RAMP = [[253, 219, 160], [244, 148, 78], [206, 70, 46], [128, 24, 42]];
+const ARROW_SPACING = 120;
+
+/** Everything the wind layer draws, in geographic coordinates, and its key text (no pixels). */
+export function windPlan(plot) {
+  const wind = plot.wind, s = wind.settings, ke = wind.info?.kinetic_energy || {};
+  const share = ke.divergent_share, mean = wind.timeMean ? "time-mean " : "";
+  const known = share !== null && share !== undefined;
+  const plan = {...resolveWind(wind), key: [], lines: [], closed: 0};
+  if (plan.mode === "psi") {
+    const c = psiContours(plot, s.interval, Math.round(20 * s.density));
+    plan.interval = c.interval; plan.requested = c.requested; plan.range = c.range; plan.levels = c.sets.length;
+    for (const set of c.sets) for (const line of set.lines) { plan.lines.push(line.points); if (line.closed) plan.closed++; }
+    const speed = niceSpeed(ke.rotational_max_speed), apart = c.interval / (speed * wind.info.psi.radius_m) / DEG;
+    plan.apart = apart; plan.referenceSpeed = speed;
+    plan.key.push({glyph: "line", text: `ψ contours every ${sci(c.interval)} m² s⁻¹: ` + (ke.non_divergent ?
+      `streamlines of the ${mean}wind (non-divergent flow: exact)` : `streamlines of the ${mean}rotational wind only`) +
+      ` · closer = faster: ${numberText(Number(apart.toPrecision(2)))}° apart at ${numberText(speed)} m s⁻¹ (max ` +
+      `${numberText(Number(ke.rotational_max_speed.toPrecision(3)))})`});
+    if (c.requested) plan.key.push({warn: true, text: `The interval ${sci(c.requested)} m² s⁻¹ would trace more than ` +
+      `${MAX_LEVELS} contours across this range of ψ; drawn every ${sci(c.interval)} m² s⁻¹ instead`});
+    if (!ke.non_divergent && known) {
+      const over = share > s.limit / 100;
+      plan.key.push({warn: over, text: over ? `Rotational part only: the divergent wind carries ${percent(share)} % of the ` +
+        `kinetic energy (above the ${percent(s.limit / 100)} % limit) and is NOT drawn; choose full-wind streamlines to see it` :
+        `Divergent wind not drawn: ${percent(share)} % of kinetic energy (${plan.why === "below" ? "automatic " : ""}limit ` +
+        `${percent(s.limit / 100)} %)`});
+    }
+  } else if (plan.mode === "streamlines") {
+    plan.lines = windLines(plot, {seeds: Math.round(900 * s.density), maxArc: 70, maxSteps: 400, separation: 5 / s.density});
+    const why = plan.why === "above" ? `; automatic: the divergent part exceeds the ${percent(s.limit / 100)} % limit` :
+      plan.why === "no-psi" ? "; ψ contours unavailable here: " + wind.info?.psi?.reason : "";
+    plan.key.push({glyph: "line", text: `Streamlines of the ${mean}full wind (rotational + divergent` +
+      (known ? `; divergent part ${percent(share)} % of kinetic energy` : "") +
+      `), arrows downstream; not trajectories, and their spacing does not encode speed${why}`});
+  } else if (plan.why === "unavailable") {
+    plan.key.push({warn: true, text: "ψ contours unavailable: " + (wind.info?.psi?.reason || "no streamfunction for this result")});
+  }
+  if (s.arrows) {
+    const m = windMesh(plot);
+    plan.quiver = quiverStations(m.lat, m.lon, m.u, m.v, s.spacing);
+    plan.vmax = plan.quiver.reduce((a, p) => Math.max(a, Math.hypot(p.u, p.v)), 0);
+    plan.referenceArrow = niceSpeed(plan.vmax);
+    const vmax = numberText(Number(plan.vmax.toPrecision(3)));
+    // The key arrow's speed is final only once drawWind knows the pixel scale (quiverReference).
+    const text = reference => (s.length === "unit" ? `Red arrows: direction of the ${mean}wind, equal length (max ${vmax} m s⁻¹)` :
+      `Red arrows: ${mean}wind, length ∝ speed; the key arrow is ${numberText(reference)} m s⁻¹`) +
+      ` · native mesh nodes about ${numberText(s.spacing)}° apart, poles omitted` +
+      (s.colour ? ` · colour: speed from 0 (pale) to ${vmax} m s⁻¹ (dark)` : "");
+    plan.key.push({glyph: "quiver", text: text(plan.referenceArrow), retext: s.length === "unit" ? null : text});
+  }
+  return plan;
+}
+
+function stroke(ctx, path, width, colour = WIND) {
+  ctx.lineJoin = "round"; ctx.lineCap = "round";
+  ctx.strokeStyle = HALO; ctx.lineWidth = width + 2.2; path(); ctx.stroke();
+  ctx.strokeStyle = colour; ctx.lineWidth = width; path(); ctx.stroke();
+}
+function arrowHead(ctx, x, y, dx, dy, size, colour = WIND) {
+  const path = () => { ctx.beginPath(); ctx.moveTo(x + dx * size * 0.35, y + dy * size * 0.35);
+    ctx.lineTo(x - dx * size * 0.65 + dy * size * 0.42, y - dy * size * 0.65 - dx * size * 0.42);
+    ctx.lineTo(x - dx * size * 0.65 - dy * size * 0.42, y - dy * size * 0.65 + dx * size * 0.42); ctx.closePath(); };
+  ctx.strokeStyle = HALO; ctx.lineWidth = 1.6; path(); ctx.stroke();
+  ctx.fillStyle = colour; path(); ctx.fill();
+}
+
+/** The on-screen unit direction of the wind (u, v) at latitude p.lat: the map's image of the
+ * vector, whose eastward part spans 1/cos φ more degrees of longitude. `lonPx`, `latPx`: signed
+ * pixels per degree of longitude and of latitude along their screen axes. */
+export function quiverDirection(p, lonPx, latPx, lonOnX) {
+  const e = p.u / Math.cos(p.lat * DEG) * lonPx, n = p.v * latPx;
+  const dx = lonOnX ? e : n, dy = lonOnX ? n : e, norm = Math.hypot(dx, dy);
+  return [dx / norm, dy / norm];
+}
+
+/** Draw a wind plan on a field box; returns counts and the quiver's pixel scale. */
+function drawWind(ctx, plot, plan, box, X, Y) {
+  const s = plot.wind.settings, lonOnX = plot.x.coordinate === "longitude";
+  const pixel = (lat, lon) => {
     const east = ((lon % 360) + 360) % 360;
     return lonOnX ? [X(unit(plot.x, east)), Y(unit(plot.y, lat)), east] : [X(unit(plot.x, lat)), Y(unit(plot.y, east)), east];
   };
+  const jump = Math.max(box.w, box.h) / 2, out = {mode: plan.mode, lines: plan.lines.length, closed: plan.closed,
+    interval: plan.interval, requested: plan.requested ?? null, arrows: 0, quiver: 0};
   ctx.save(); ctx.beginPath(); ctx.rect(box.x, box.y, box.w, box.h); ctx.clip();
-  ctx.strokeStyle = WIND; ctx.fillStyle = WIND; ctx.lineWidth = 1;
-  const lines = windLines(plot);
-  for (const line of lines) {
-    const pts = line.map(([lat, lon]) => point(lat, lon));
-    ctx.beginPath();
-    pts.forEach(([x, y, east], k) => {
-      if (k === 0 || Math.abs(east - pts[k - 1][2]) > 180) ctx.moveTo(x, y); else ctx.lineTo(x, y);
-    });
-    ctx.stroke();
-    const m = Math.floor(pts.length / 2), [x, y, east] = pts[m], [px, py, peast] = pts[m - 1];
-    const dx = x - px, dy = y - py, len = Math.hypot(dx, dy);
-    if (len > 0 && Math.abs(east - peast) <= 180) {
-      const a = dx / len, b = dy / len;
-      ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x - 6 * a + 2.6 * b, y - 6 * b - 2.6 * a);
-      ctx.lineTo(x - 6 * a - 2.6 * b, y - 6 * b + 2.6 * a); ctx.closePath(); ctx.fill();
+  const heads = [];
+  for (const line of plan.lines) {
+    const pts = line.map(([lat, lon]) => pixel(lat, lon));
+    stroke(ctx, () => {
+      ctx.beginPath();
+      pts.forEach(([x, y, east], k) => {
+        if (k === 0 || Math.abs(east - pts[k - 1][2]) > 180) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+      });
+    }, 1.15);
+    heads.push(...arrowStations(pts.map(([x, y]) => [x, y]), plan.mode === "psi" ? 1.25 * ARROW_SPACING : ARROW_SPACING, jump));
+  }
+  for (const [x, y, dx, dy] of heads) arrowHead(ctx, x, y, dx, dy, plan.mode === "psi" ? 8 : 7);
+  out.arrows = heads.length;
+  if (plan.quiver) {
+    // Pixels per degree of longitude and of latitude, with their signs on screen.
+    const lonPx = lonOnX ? X(1) - X(0) : Y(1) - Y(0), latPx = lonOnX ? Y(1) - Y(0) : X(1) - X(0);
+    const room = s.spacing * Math.min(Math.abs(lonPx), Math.abs(latPx));
+    const scale = plan.vmax > 0 ? room / plan.vmax : 0;
+    for (const p of plan.quiver) {
+      const speed = Math.hypot(p.u, p.v);
+      if (!(speed > 0)) continue;
+      const [dx, dy] = quiverDirection(p, lonPx, latPx, lonOnX);
+      const length = s.length === "unit" ? 0.7 * room : speed * scale;
+      const [x0, y0] = pixel(p.lat, p.lon), x1 = x0 + dx * length, y1 = y0 + dy * length;
+      let colour = QUIVER;
+      if (s.colour) {
+        const q = Math.min(1, speed / plan.vmax) * (RAMP.length - 1), a = Math.min(Math.floor(q), RAMP.length - 2);
+        colour = `rgb(${RAMP[a].map((v, i) => Math.round(v + (q - a) * (RAMP[a + 1][i] - v)))})`;
+      }
+      stroke(ctx, () => { ctx.beginPath(); ctx.moveTo(x0, y0); ctx.lineTo(x1, y1); }, 1.1, colour);
+      arrowHead(ctx, x1, y1, dx, dy, Math.min(7, 1.2 + length * 0.4), colour);
+      out.quiver++;
     }
+    const reference = s.length === "unit" ? plan.referenceArrow : quiverReference(plan.vmax, scale);
+    out.quiverScale = {vmax: plan.vmax, reference, pixelsPerMs: scale,
+      keyPixels: s.length === "unit" ? Math.min(KEY_ARROW, 0.7 * room) : reference * scale};
   }
   ctx.restore();
-  return lines.length;
+  return out;
+}
+
+/** The longest key arrow, in pixels: it must fit beside the key text. */
+const KEY_ARROW = 64;
+
+/** The key arrow's speed: the plotted scale's nice speed whose arrow fits in KEY_ARROW pixels.
+ * The key arrow is drawn at the same pixels per m s⁻¹ as the plotted arrows, so its label
+ * changes with it rather than the arrow being shortened alone. */
+export function quiverReference(vmax, pixelsPerMs) {
+  if (!(pixelsPerMs > 0)) return niceSpeed(vmax);
+  return niceSpeed(Math.min(vmax, KEY_ARROW / pixelsPerMs));
+}
+
+/** Wrapped key rows: [{glyph, warn, lines}] and their height. A row whose text depends on the
+ * drawn scale (`retext`) reserves one extra line, since its final text is wrapped again. */
+function windKeyLayout(ctx, plan, width) {
+  const rows = plan.key.map(row => {
+    ctx.font = (row.warn ? "600 " : "") + "11px system-ui";
+    return {...row, width: width - (row.glyph ? 76 : 0), lines: wrapped(ctx, row.text, width - (row.glyph ? 76 : 0))};
+  });
+  return {rows, height: rows.reduce((h, r) => h + 15 * (r.lines.length + (r.retext ? 1 : 0)) + 5, 0)};
+}
+
+function drawWindKey(ctx, layout, drawn, box, top) {
+  let y = top;
+  for (const row of layout.rows) {
+    const x = box.x;
+    if (row.glyph === "line") {
+      stroke(ctx, () => { ctx.beginPath(); ctx.moveTo(x, y - 4); ctx.lineTo(x + 30, y - 4); }, 1.15);
+      arrowHead(ctx, x + 20, y - 4, 1, 0, 8);
+    } else if (row.glyph === "quiver") {
+      const l = drawn.quiverScale?.keyPixels || 30;
+      stroke(ctx, () => { ctx.beginPath(); ctx.moveTo(x, y - 4); ctx.lineTo(x + l, y - 4); }, 1.1, QUIVER);
+      arrowHead(ctx, x + l, y - 4, 1, 0, Math.min(7, 1.2 + l * 0.4), QUIVER);
+    }
+    ctx.font = (row.warn ? "600 " : "") + "11px system-ui"; ctx.fillStyle = row.warn ? WARN : INK; ctx.textAlign = "left";
+    const lines = row.retext && drawn.quiverScale ? wrapped(ctx, row.retext(drawn.quiverScale.reference), row.width) : row.lines;
+    lines.forEach((line, k) => ctx.fillText(line, x + (row.glyph ? 76 : 0), y + 15 * k));
+    y += 15 * lines.length + 5;
+  }
 }
 
 /** A two-dimensional result: cells between edges, an optional surface strip. */
@@ -190,7 +387,9 @@ function drawField(canvas, plot, width, ratio) {
   const all = plot.surface ? Float32Array.from([...flat, ...plot.surface]) : flat;
   const scale = fieldScale({values: all}, {scale: plot.diverging ? "diverging" : "sequential", range: plot.range});
   const plotHeight = Math.round(Math.min(440, Math.max(220, width * 0.42)));
-  const height = headerHeight(ctx, plot.title, width) + plotHeight + strip + 132;
+  const windPlanned = plot.wind ? windPlan(plot) : null;
+  const keyLayout = windPlanned ? windKeyLayout(ctx, windPlanned, width - 74 - 24) : null;
+  const height = headerHeight(ctx, plot.title, width) + plotHeight + strip + 132 + (keyLayout ? keyLayout.height : 0);
   canvas.width = Math.round(width * ratio); canvas.height = Math.round(height * ratio);
   ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
   const top = header(ctx, plot.title, width);
@@ -225,7 +424,7 @@ function drawField(canvas, plot, width, ratio) {
     ctx.fillStyle = INK; ctx.font = "10px system-ui"; ctx.textAlign = "right";
     ctx.fillText("skin", box.x - 6, box.y - 5);
   }
-  const winds = plot.wind ? drawWind(ctx, plot, box, X, Y) : null;
+  const winds = windPlanned ? drawWind(ctx, plot, windPlanned, box, X, Y) : null;
   ctx.strokeStyle = GRID; ctx.lineWidth = 1; ctx.font = "11px system-ui"; ctx.fillStyle = INK; ctx.beginPath();
   const yt = tickSet(ay, y0, y1), xt = tickSet(ax, x0, x1);
   for (const t of yt.ticks) {
@@ -258,16 +457,7 @@ function drawField(canvas, plot, width, ratio) {
   }
   ctx.strokeStyle = INK; ctx.lineWidth = 1; ctx.strokeRect(box.x, box.y, box.w, box.h);
   colorbar(ctx, scale, {...box, y: box.y}, plot.range ? plot.label + " · fixed colour range; values beyond it take the end colours" : plot.label);
-  if (plot.wind) {
-    // The line key, on its own row under the colour bar's values.
-    const y = box.y + box.h + 84;
-    ctx.strokeStyle = WIND; ctx.fillStyle = WIND; ctx.lineWidth = 1;
-    ctx.beginPath(); ctx.moveTo(box.x, y - 4); ctx.lineTo(box.x + 22, y - 4); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(box.x + 22, y - 4); ctx.lineTo(box.x + 16, y - 6.6); ctx.lineTo(box.x + 16, y - 1.4); ctx.closePath(); ctx.fill();
-    ctx.font = "11px system-ui"; ctx.fillStyle = INK; ctx.textAlign = "left";
-    ctx.fillText(plot.wind.label[0].toUpperCase() + plot.wind.label.slice(1) + " (arrow: downstream; not trajectories)",
-      box.x + 30, y, box.w - 30);
-  }
+  if (keyLayout) drawWindKey(ctx, keyLayout, winds, box, box.y + box.h + 84);
   return {kind: "field", box, width, height, xe, ye, X, Y, x0, x1, y0, y1, rows, cols, up, strip, range: scale.range, winds};
 }
 
@@ -416,7 +606,11 @@ export class Explorer {
     c["quantity-search"].oninput = () => this.fillQuantities(c["quantity-search"].value);
     c.preset.onchange = () => { if (c.preset.value) { this.applyPreset(c.preset.value); this.update(); } };
     c.snap.onchange = () => this.update();
-    c.wind.onchange = () => this.update();
+    // Wind display settings redraw what is on hand; only turning the layer on or off asks the server.
+    // Typed numbers (limit, interval, spacing) apply when committed, not at each keystroke: a
+    // half-typed interval such as "1" would otherwise be traced at once.
+    for (const id of ["wind-lines", "wind-limit", "wind-interval", "wind-density", "wind-arrows", "wind-spacing", "wind-length", "wind-colour"]) c[id].onchange = () => this.windChanged();
+    for (const id of ["wind-density"]) c[id].oninput = () => this.windChanged();
     c["range-mode"].onchange = () => {
       if (c["range-mode"].value === "fixed" && this.layout?.range) {
         if (c["range-min"].value === "") c["range-min"].value = String(Number(this.layout.range[0].toPrecision(6)));
@@ -708,10 +902,31 @@ export class Explorer {
     c["snap-wrap"].hidden = !(fixedHorizontal && this.links.manifest.geometry?.grid === "latlon" &&
       this.explorer.horizontal?.kind === "spectral");
     const reason = this.windUnavailable();
-    c.wind.disabled = Boolean(reason);
-    c["wind-wrap"].title = reason || this.quantity.layers.wind.definition;
-    c["wind-reason"].textContent = reason ? "Wind streamlines unavailable: " + reason : "";
+    for (const id of ["wind-lines", "wind-limit", "wind-interval", "wind-density", "wind-arrows", "wind-spacing", "wind-length", "wind-colour"]) c[id].disabled = Boolean(reason);
+    c["wind-fieldset"].title = reason || this.quantity.layers.wind.definition;
+    c["wind-reason"].textContent = reason ? "The wind layer is unavailable: " + reason : "";
     c["wind-reason"].hidden = !reason;
+  }
+
+  /** The wind layer's display settings (no request depends on them). */
+  windSettings() {
+    const c = this.c, number = (el, fallback) => Number.isFinite(el.valueAsNumber) ? el.valueAsNumber : fallback;
+    return {lines: c["wind-lines"].value, limit: Math.max(0, number(c["wind-limit"], 1)),
+      interval: c["wind-interval"].valueAsNumber > 0 ? c["wind-interval"].valueAsNumber : null,
+      density: number(c["wind-density"], 1), arrows: c["wind-arrows"].checked,
+      spacing: Math.min(45, Math.max(2, number(c["wind-spacing"], 10))), length: c["wind-length"].value,
+      colour: c["wind-colour"].checked};
+  }
+
+  windWanted() {
+    const s = this.windSettings();
+    return s.lines !== "none" || s.arrows;
+  }
+
+  windChanged() {
+    const {selection} = this.selection();
+    if (selection && JSON.stringify(selection) === this.loaded && this.data) this.draw();
+    else this.update();
   }
 
   /** Why the current roles cannot carry the wind layer, or "" (the server applies the same rule). */
@@ -844,7 +1059,7 @@ export class Explorer {
       return {error: "No vertical representation can be an axis here."};
     // Snapping to a native node is offered only on Gaussian grids; elsewhere the point is exact.
     const sel = {quantity: this.c.quantity.value, options: {snap: !this.c["snap-wrap"].hidden && this.c.snap.checked}};
-    if (this.c.wind.checked && !this.windUnavailable()) sel.options.wind = true;
+    if (this.windWanted() && !this.windUnavailable()) sel.options.wind = true;
     for (const name of ["longitude", "latitude"]) {
       const r = this.rows[name], role = roles[name];
       sel[name] = {role};
@@ -1162,9 +1377,9 @@ export class Explorer {
     }
     const lon = ((this.cursor?.lon % 360) + 360) % 360;
     const at = a => a.coordinate === "latitude" ? this.cursor?.lat : a.coordinate === "longitude" ? lon : NaN;
-    const w = d.companions?.wind_u && d.companions?.wind_v;
-    const wind = w ? {u: d.companions.wind_u.values, v: d.companions.wind_v.values,
-      label: d.roles.time === "reduce" ? "streamlines of the time-mean wind" : "wind streamlines"} : null;
+    const w = d.companions?.wind_u && d.companions?.wind_v && this.windWanted();
+    const wind = w ? {u: d.companions.wind_u.values, v: d.companions.wind_v.values, psi: d.companions.psi?.values,
+      info: d.wind, timeMean: d.roles.time === "reduce", settings: this.windSettings()} : null;
     return {kind: "field", x: this.displayAxis(d.x), y: this.displayAxis(d.y), values: d.values, surface: d.surface,
       title, label, diverging, cursor: at(d.x), cursorY: at(d.y), range: this.fixedRange(), wind,
       selected: d.y.coordinate === "vertical" && d.y.representation === "sigma" && atmosphere ? this.selectedLevel() : null};

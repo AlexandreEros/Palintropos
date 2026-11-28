@@ -1843,6 +1843,14 @@
         "module"
       ],
       "source": "tropoi.representation.visual.viewer_atmosphere",
+      "target": "tropoi.representation.diagnostics.spectral"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.representation.visual.viewer_atmosphere",
       "target": "tropoi.representation.visual.selection"
     },
     {
@@ -1860,6 +1868,14 @@
       ],
       "source": "tropoi.representation.visual.viewer_atmosphere",
       "target": "tropoi.spatial.grids.quadrature"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.representation.visual.viewer_atmosphere",
+      "target": "tropoi.spatial.laplacian"
     },
     {
       "kind": "imports",

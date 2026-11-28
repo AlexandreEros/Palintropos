@@ -77,6 +77,7 @@ flowchart LR
     p_tropoi_orepresentation_odiagnostics -->|1| n_tropoi_ospatial_olaplacian
     p_tropoi_orepresentation_odiagnostics -->|1| n_tropoi_ospatial_osigma__coordinate
     p_tropoi_orepresentation_odiagnostics -->|1| n_tropoi_ospatial_otruncation
+    p_tropoi_orepresentation_ovisual -->|1| n_tropoi_ospatial_olaplacian
     p_tropoi_orepresentation_ovisual -->|2| n_tropoi_ospatial_oplanet
     p_tropoi_orepresentation_ovisual -->|2| n_tropoi_ospatial_osigma__coordinate
     p_tropoi_orepresentation_ovisual -.->|1| n_tropoi_ospatial_otruncation

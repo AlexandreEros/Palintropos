@@ -157,10 +157,12 @@ PER_SAMPLE = ("Its native-level positions differ from column to column and from 
 #: horizontal wind on the result's own surface, at its own saved time or
 #: averaged over its own saved states. A layer is evaluated with the quantity
 #: (one pass over the states, as companions), so it shares every role.
-WIND_LAYER = ("Instantaneous streamlines of the horizontal wind (u, v) on the same surface as the field: "
-              "curves everywhere tangent to the wind of one saved state, or of the time-mean wind over "
-              "the same saved states as the field. They are not trajectories, and their spacing does "
-              "not encode speed")
+WIND_LAYER = ("The horizontal wind v = r̂ × ∇ψ + ∇χ on the same surface as the field, of one "
+              "saved state or the time mean over the same saved states: ψ contours at a uniform interval "
+              "(streamlines of the rotational wind; of the whole wind when it is non-divergent), whose "
+              "spacing Δn ≈ Δψ/|v_rot| encodes speed; streamlines of the full wind, curves "
+              "tangent to (u, v) that are not trajectories and whose spacing does not encode speed; "
+              "and arrows at native mesh nodes")
 
 
 class SelectionError(ValueError):

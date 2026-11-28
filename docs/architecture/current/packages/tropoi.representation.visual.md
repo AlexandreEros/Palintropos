@@ -33,7 +33,7 @@ Index: [all packages](../index.md) · parent [`tropoi.representation`](tropoi.re
 | `tropoi.representation.visual.swe` | code | – | `build_swe_snapshot_timeline`, `build_swe_snapshot_timelines`, `build_swe_snapshot_timelines_from_data`, `build_swe_summary_spec`, `render_swe_snapshots`, `render_swe_summary` |
 | `tropoi.representation.visual.terrain` | code | `TerrainPreview` | `build_terrain_preview`, `default_exaggeration`, `display_resolution_deg`, `globe_payload`, `plot_terrain`, `write_globe_html`, `write_globe_page` |
 | `tropoi.representation.visual.timeline` | code | `FigureFrame`, `FigureTimeline` | `build_timeline_overview`, `render_figure_timeline`, `render_snapshot_product`, `resolve_figure_normalizations`, `select_representative_frame_indices` |
-| `tropoi.representation.visual.viewer_atmosphere` | code | – | `density`, `describe`, `finish`, `plan`, `post`, `samples` |
+| `tropoi.representation.visual.viewer_atmosphere` | code | – | `density`, `describe`, `finish`, `helmholtz`, `plan`, `post`, `samples` |
 | `tropoi.representation.visual.viewer_columns` | code | `ColumnArchiveProvider` | `describe` |
 | `tropoi.representation.visual.viewer_fields` | code | `FrameProvider` | – |
 | `tropoi.representation.visual.viewer_server` | code | `ViewerServer`, `ViewerSession`, `_Handler` | `encode_frame`, `provider_for`, `serve` |
@@ -210,7 +210,8 @@ flowchart LR
     n_tropoi_orepresentation_ovisual_osnapshot -.->|1| p_tropoi_otemporal
     n_tropoi_orepresentation_ovisual_oswe -.->|1| p_tropoi_otemporal_otendencies
     n_tropoi_orepresentation_ovisual_oterrain -->|1| p_tropoi_ospatial_otransforms
-    n_tropoi_orepresentation_ovisual_oviewer__atmosphere -->|4| p_tropoi_orepresentation_odiagnostics
+    n_tropoi_orepresentation_ovisual_oviewer__atmosphere -->|5| p_tropoi_orepresentation_odiagnostics
+    n_tropoi_orepresentation_ovisual_oviewer__atmosphere -->|1| p_tropoi_ospatial
     n_tropoi_orepresentation_ovisual_oviewer__atmosphere -->|1| p_tropoi_ospatial_ogrids
     n_tropoi_orepresentation_ovisual_oviewer__atmosphere -->|1| p_tropoi_ospatial_otransforms
     n_tropoi_orepresentation_ovisual_oviewer__columns -->|1| p_tropoi_orepresentation_oarchive
