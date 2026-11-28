@@ -67,9 +67,15 @@ Every archive is opened through one description of its scalar quantities
 (the manifest's `explorer` member). Each quantity records its name, symbol,
 units, definition, source fields, how it is evaluated, its horizontal
 support (a global field, a diagnostic point collection or none), its
-vertical representations and native levels, and its own time axis. The
-description also lists the products it supports and the reasons for the ones
-it does not. Quantities need not share a mesh or a cadence.
+vertical representations and native levels, and its own time axis.
+Quantities need not share a mesh or a cadence.
+
+Capability is described **per coordinate**, never per plot type:
+`quantities[q].coordinates[c]` lists the roles coordinate `c` accepts, the
+reductions it defines and, for the vertical coordinate, the representations
+it can be fixed at (`fixed`), plotted along (`axis`), or plotted along only
+for a single column at a single time (`per_sample`). A role a coordinate
+does not accept carries its reason (`unavailable`).
 
 In the **Explorer** panel, pick a quantity and give each coordinate
 (longitude, latitude, vertical, time) a role:
@@ -77,29 +83,64 @@ In the **Explorer** panel, pick a quantity and give each coordinate
 - fixed at a value or one saved time;
 - reduced by a mean.
 
-A coordinate the quantity lacks has the role *not a coordinate*. Two
-plotting axes give a map or a section, one a line, and none a value. Presets
-set the roles of the usual products. A longitude × latitude selection is
-drawn on selection A's globe and map, which are the same product. Playback
-(Play, the time slider) is a sequence of fixed selections at the actual
-saved times. Combinations that are not offered are refused with their
-reason, never approximated.
+A coordinate the quantity lacks has the role *not a coordinate*. The result
+follows from the roles alone: two plotting axes give a two-dimensional field,
+one a line, none a single value. Longitude × latitude is one such
+assignment; it is drawn in the explorer like any other field, and *Show on
+the globe* hands a single-state, single-surface one to selection A. Presets
+(`explorer.presets`) only fill in roles: they enable nothing, and every
+assignment they produce can be made by hand. Playback (Play, the time
+slider) is a sequence of fixed selections at the actual saved times. Roles a
+coordinate does not accept are disabled in the page, with their reason, and
+refused by the server, never approximated.
 
 One geographic cursor links the views. Clicking the map or globe moves it,
 and the map and globe draw the meridian and parallel that the sections
 follow. By default the explorer follows selection A's saved time. Clicking a
 level in a plot or in the column table selects it on the map. Clicking a
-section moves the cursor.
+field moves the cursor along the horizontal coordinates it shows.
 
-| Product | Roles | Atmospheric archives | Columnar (airless) archives |
-| --- | --- | --- | --- |
-| Map | lon X, lat Y, vertical and time fixed | Exact band-limited synthesis on a 2° display mesh, then the declared vertical interpolation | The archived value of each native column at one native level; the map and its readout show cells, the globe interpolates between cell centres |
-| Meridional / zonal section | lat or lon X, vertical Y, the other fixed | Exact synthesis on native full levels, 2° horizontal spacing, drawn on nominal σ | The native row of archived columns nearest the request; cells between their archived faces |
-| Zonal mean | lat X, vertical Y, lon mean, time fixed or mean | Gauss–Legendre latitudes, plain mean over the native longitudes (shared with the Held–Suarez `SectionAccumulator`); also ψ below | Not offered |
-| Column profile | vertical Y, lat and lon fixed | Exact synthesis at the point, or at the nearest native Gaussian node (default) | The archived column whose centre is nearest, at its cell centres on the nonuniform mesh |
-| Time series | time X, lat, lon and the vertical fixed | The column at each saved state of the range (at most 400) | Every archived sample of the level's own record |
-| Time × vertical | time X, vertical Y, lat and lon fixed | Same, drawn on nominal σ | Every archived cell sample; the skin strip uses the surface samples taken at the same steps |
-| Recorded series | time X | Series recorded by the run, at their own cadence | |
+**Sample sets.** Each role maps a coordinate to the points at which the
+quantity is evaluated (`selection.evaluate`; the providers own the sets):
+
+| Role | Atmospheric archives | Columnar (airless) archives |
+| --- | --- | --- |
+| X or Y (longitude, latitude) | The 2° display mesh (longitudes 0…360 with the closing meridian), exact band-limited synthesis | Every archived row or meridian |
+| X or Y when the other horizontal coordinate is reduced | The native Gaussian nodes, where the mean is a quadrature | (as above) |
+| Fixed (longitude, latitude) | The point, exact synthesis; or the nearest native Gaussian node when *Snap* is on | The nearest archived row or meridian; the nearest column on the sphere when both are fixed |
+| Reduce (longitude, latitude) | The native Gaussian state grid | Every archived row or meridian |
+| X or Y (vertical) | Native full levels, drawn on nominal σ; p, Z or Z − Zₛ only for a single column at a single time (their level positions move with the column and the state) | Native cell centres; the skin as its own row |
+| Fixed (vertical) | A native level, or a σ, p, Z or Z − Zₛ surface interpolated linearly in ln σ (masked, never extrapolated) | A native level only |
+| X, Y or Reduce (time) | Every saved state from first to last (at most 400) | Every archived sample of the level's own record (at most 20 000 for one column, 400 otherwise) |
+
+The numerical definition of a value depends only on these sets: the same
+role assignment gives the same numbers whatever preset or path produced it.
+
+**Reductions** (`mean`; each payload states its rule in `coordinates`):
+
+| Coordinate | Rule |
+| --- | --- |
+| Time | Equal-weight mean of every saved sample from first to last inclusive (1/N each), not weighted by the intervals between samples; the cadence and its regularity are reported |
+| Longitude | Plain mean over the equally spaced native longitudes (atmosphere: exact for a band-limited field; columns: a row's cells have equal areas) |
+| Latitude | Area-weighted: Gauss–Legendre weights (∝ cos φ dφ) on the native Gaussian latitudes; the recorded column area weights of a columnar archive |
+| Longitude and latitude | The area mean (the product of the two) |
+| Vertical | Not defined in this release: a mean over levels needs a mass (Δp) or thickness weighting rule |
+
+A masked sample makes every mean that includes it masked; no mean is taken
+over a subset of the requested samples. On native σ levels a mean is the mean
+of each level's values; its p and Z are the means of that level's p_k and
+Z_k, not a mean on a surface of constant p or Z. A diagnostic point
+collection is not a global field: its horizontal coordinates can only be
+fixed, and it has no area weights. ψ is defined from the longitude mean
+[pₛ v], so its longitude role is always the mean; over time, ψ is formed from
+the time mean of [pₛ v].
+
+**Display.** How a vertical axis is drawn is a display choice, separate from
+the physical coordinate and from the interpolation space: linear or
+logarithmic (σ and p default to logarithmic, heights and depths to linear),
+increasing upward or downward. Changing it sends no request. Native levels are
+drawn as bands between the model's own σ interfaces (or the archived cell
+faces), whatever the scale.
 
 ψ(φ, σ_{k+½}) = 2πa cos φ / g · Σ_{j≤k} [pₛ v_j] Δσ_j is integrated from
 ψ = 0 at σ = 0. [pₛ v] is formed for each state before the longitude mean
