@@ -372,8 +372,9 @@ export class Explorer {
 
   /** The analytical configuration (roles, statistics, vertical settings) as text: carried across archives. */
   configText() {
+    // Saved times travel in seconds: syncTime maps them onto the destination's cadence (at or before).
     return JSON.stringify({requested: this.requested, ops: this.ops, vaxis: this.vaxis, vfixed: this.vfixed,
-      display: this.display});
+      display: this.display, times: this.times});
   }
 
   applyConfig(text) {
@@ -390,6 +391,7 @@ export class Explorer {
       if (Number.isInteger(v.level)) this.vfixed.level = v.level;
       for (const [k, value] of Object.entries(v.values || {})) if (k in this.vfixed.values) this.vfixed.values[k] = String(value);
     }
+    for (const k of ["index", "first", "last"]) if (Number.isFinite(config.times?.[k])) this.times[k] = config.times[k];
     if (config.display) {
       for (const k of ["scale", "direction"]) if (typeof config.display[k] === "string") {
         this.display[k] = config.display[k];
@@ -806,10 +808,16 @@ export class Explorer {
     const q = this.quantity, key = this.c.quantity.value, name = q.presentation.name, notes = [];
     if (!onGlobe(q)) return {error: `${name} has no longitude × latitude field at one saved time: the globe shows ` +
       "one saved state on one surface. The Explorer shows it."};
-    const values = this.axisValues();
-    const index = values.length ? Number(this.rows.time.index.value) : 0;
+    // The selection's saved time in seconds, resolved on the globe surface's own time axis (an airless
+    // skin may be sampled on another cadence than the profiles the Explorer plots).
+    const values = this.axisValues(), surface = this.links.manifest.time_axes[this.globeAxis()]?.values || [];
+    const seconds = this.times.index ?? values[Number(this.rows.time.index.value)];
+    const index = surface.length && Number.isFinite(seconds) ? atOrBefore(surface, seconds) : 0;
     const sel = {quantity: key, longitude: {role: "x"}, latitude: {role: "y"}, time: {role: "fixed", index},
       vertical: {role: "none"}};
+    if (surface.length && Number.isFinite(seconds) && surface[index] !== seconds)
+      notes.push(`Time: the globe's surface is saved on its own cadence; it shows ${surface[index]} s, the sample ` +
+        `at or before the selection's ${seconds} s.`);
     if (q.vertical) {
       const caps = q.coordinates.vertical, rep = this.vfixed.representation;
       if (!caps.fixed.includes(rep)) return {error: `The globe's surface (${q.vertical.representations[rep]?.label || rep}) ` +
@@ -831,13 +839,37 @@ export class Explorer {
     return {selection: sel, notes};
   }
 
-  /** The globe moved the saved time (playback, slider): the selection's fixed time. */
-  setTime(index) {
+  /** Time axis of the globe's surface: a native (or substrate) level's own, else the quantity's. */
+  globeAxis() {
+    const q = this.quantity;
+    if (q.vertical && this.discrete(this.vfixed.representation)) {
+      const level = this.level();
+      if (level?.time_axis) return level.time_axis;
+    }
+    return q.time_axis;
+  }
+
+  /** A globe moved the saved time (playback, slider) to ``seconds``: the selection's fixed time.
+   * The seconds are kept as requested, so the globe follows its own cadence even where the
+   * Explorer's axis is coarser; the Explorer shows its sample at or before them. */
+  setTime(seconds) {
     const values = this.axisValues();
-    if (!values.length) return;
-    index = Math.max(0, Math.min(values.length - 1, index));
-    this.times.index = values[index];
-    this.rows.time.index.value = String(index);
+    if (!values.length || !Number.isFinite(seconds)) return;
+    this.times.index = seconds;
+    this.rows.time.index.value = String(atOrBefore(values, seconds));
+    return this.update();
+  }
+
+  /** A comparison globe moved the surface (Link level): the selection's fixed surface, when compatible. */
+  setSurface(representation, {level = null, value = null} = {}) {
+    const q = this.quantity;
+    if (!q.vertical || !q.coordinates.vertical.fixed.includes(representation)) return;
+    if (this.discrete(representation)) {
+      if (!q.vertical.levels.some(l => l.index === level)) return;
+      this.vfixed.level = level;
+    } else if (Number.isFinite(value)) this.vfixed.values[representation] = String(value);
+    else return;
+    this.vfixed.representation = representation;
     return this.update();
   }
 

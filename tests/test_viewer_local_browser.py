@@ -56,6 +56,13 @@ def test_ben_to_shallow_water_and_bve_in_same_application():
                 page.eval('document.getElementById("compare").click()')
                 # Two globes (the Explorer's and an independent comparison); no flat map under either.
                 until(page, 'document.querySelectorAll(\'[data-id="surface"] canvas\').length === 2')
+                # Each globe shows its own live colour scale: label and the drawn range's endpoints.
+                until(page, "viewer.panels.every(p => p.view.scene)")
+                legends = page.eval("""viewer.panels.map(p => { const v = p.view;
+                    return [v.legend.hidden, v.legendLabel.textContent, v.legendMin.textContent,
+                            v.legendMax.textContent, v.scene.scale.range]; })""")
+                for hidden, label, low, high, extent in legends:
+                    assert not hidden and label and low and high and extent is not None
                 for number, field in [(1, "phi"), (2, "zeta")]:
                     page.eval(f'''(() => {{const el=document.getElementById("runs");
                      el.selectedIndex={number}; el.dispatchEvent(new Event("change"));}})()''')

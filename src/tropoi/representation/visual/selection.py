@@ -465,8 +465,10 @@ def evaluate(provider, sel):
     reduction = None
     if time_role == "reduce":
         values_ = (provider.manifest["time_axes"].get(sel["time"]["axis"]) or {}).get("values") or []
-        weights = (time_weights([values_[i] for i in indices]) if sel["time"]["op"] == "mean"
-                   and values_ and len(values_) > indices[-1] else None)
+        # Cell weights whatever the quantity's operator: mean-reduced companions (p, Z) use them
+        # under Min/Max too, so an interval's mean positions do not depend on the operator.
+        weights = (time_weights([values_[i] for i in indices])
+                   if values_ and len(values_) > indices[-1] else None)
         reduction = _TimeReduction(sel["time"]["op"], weights,
                                    [k for k in plan.get("companions") or {} if _same(plan, k)])
     for t, values, companions in provider.samples(sel, plan, indices):
@@ -562,6 +564,9 @@ def _time_description(manifest, sel, seconds, weights=None):
             out["weighting"] = "equal (regular cadence)" if weights is None else "cell weights (irregular cadence)"
             if weights is not None:
                 out["weights_seconds"] = [float(w) for w in weights]
+        elif weights is not None:
+            out["companion_weighting"] = "cell weights (irregular cadence) for mean-reduced companions"
+            out["weights_seconds"] = [float(w) for w in weights]
     return out
 
 

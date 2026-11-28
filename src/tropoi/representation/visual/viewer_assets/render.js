@@ -31,7 +31,8 @@ function checkFrame(frame,options) {
 /** The globe: one saved state on one surface. All lengths are in metres;
  * latitude and longitude are degrees. Mask zero denotes valid data. draw()
  * accepts options.range [min,max] for comparable panels. png() returns a Blob
- * of the globe as drawn, with its title, selection and colour scale. The flat
+ * of the globe as drawn, with its title, selection and colour scale, which is
+ * also shown live beneath the globe (drawLegend). The flat
  * longitude × latitude projection is the Explorer's: there is no second map.
  */
 export class SurfaceView {
@@ -49,7 +50,19 @@ export class SurfaceView {
     toolbar.append(reset,this.description);
     this.readout=make("div","surface-readout");
     this.readout.style.minHeight="1.5em";
-    this.root.append(this.canvas,toolbar,this.readout);
+    // The live colour scale of the field as drawn: its quantity, units and numerical endpoints.
+    this.legend=make("div","surface-legend");
+    this.legend.style.cssText="display:grid;grid-template-columns:auto 1fr auto;gap:0.2em 0.5em;align-items:center;font-size:0.85em;margin:0.3em 0";
+    this.legendLabel=make("span","surface-legend-label");
+    this.legendLabel.style.gridColumn="1 / -1";
+    this.legendMin=make("span","surface-legend-min");
+    this.legendBar=make("div","surface-legend-bar");
+    this.legendBar.style.cssText="height:10px";
+    this.legendBar.setAttribute("aria-hidden","true");
+    this.legendMax=make("span","surface-legend-max");
+    this.legend.append(this.legendLabel,this.legendMin,this.legendBar,this.legendMax);
+    this.legend.hidden=true;
+    this.root.append(this.canvas,toolbar,this.legend,this.readout);
     container.appendChild(this.root);
     this.globe=new Globe(this.canvas);
     this.listeners=new AbortController();
@@ -87,6 +100,24 @@ export class SurfaceView {
       "Geometric day/night shading darkens the globe only; colours, map and readouts keep model values" :
       "Neutral display lighting";
     this.readout.textContent="";
+    this.drawLegend();
+  }
+  drawLegend() {
+    const {options,scale}=this.scene;
+    this.legendLabel.textContent=[options.label||options.field,options.units].filter(Boolean).join(" · ");
+    const shown=Boolean(scale.range);
+    this.legendMin.hidden=this.legendMax.hidden=this.legendBar.hidden=!shown;
+    if (shown) {
+      // The scale's own colour table, sampled at 33 evenly spaced stops.
+      const stops=Array.from({length:33},(_,i)=>{ const [r,g,b]=scale.lut[Math.round(255*i/32)];
+        return "rgb("+r+","+g+","+b+") "+(100*i/32).toFixed(2)+"%"; });
+      this.legendBar.style.background="linear-gradient(to right,"+stops.join(",")+")";
+      this.legendMin.textContent=numberText(scale.range[0]);
+      this.legendMax.textContent=numberText(scale.range[1]);
+      this.legend.setAttribute("aria-label","Colour scale "+this.legendLabel.textContent+" from "+
+        this.legendMin.textContent+" to "+this.legendMax.textContent);
+    }
+    this.legend.hidden=false;
   }
   /** Turn the globe to face a point (degrees). */
   face(lat,lon) {
