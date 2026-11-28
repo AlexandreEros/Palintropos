@@ -207,6 +207,16 @@ def test_w5_rotational_contours_match_the_readme_figure(browser):
             assert json.loads(page.eval("viewer.explorer.loaded"))["options"]["wind"] is True
             _set(page, "wind-interval", 1e7)
             until(page, f"{LAYOUT}?.interval === 1e7")
+            # A half-typed interval cannot trace millions of levels: it is coarsened, and the key says so.
+            _set(page, "wind-interval", 1)
+            until(page, f"{LAYOUT}?.interval > 1")
+            w = page.eval(LAYOUT)
+            assert w["requested"] == 1 and 0 < w["lines"] and (w["interval"] > 0), w
+            # The key arrow keeps the plotted scale: its length is its speed times the same pixels per m/s.
+            _set(page, "wind-spacing", 45)
+            until(page, f"{LAYOUT}?.quiverScale && {LAYOUT}.quiverScale.keyPixels <= 64 && " + EXPLORED)
+            scale = page.eval(f"{LAYOUT}.quiverScale")
+            assert abs(scale["keyPixels"] - scale["reference"] * scale["pixelsPerMs"]) < 1e-9, scale
             assert not page.exceptions, page.exceptions
     finally:
         server.shutdown()

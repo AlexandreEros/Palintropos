@@ -1,7 +1,7 @@
 import {DEG, fieldScale} from "./mesh.js";
 import {numberText} from "./map.js";
 import {streamlines} from "./overlays.js";
-import {arrowStations, contourLevels, isolines, niceSpeed, niceStep, poleSnapped, quiverStations} from "./wind.js";
+import {arrowStations, contourLevels, isolines, MAX_LEVELS, niceSpeed, niceStep, poleSnapped, quiverStations} from "./wind.js";
 
 // The explorer: the viewer's analytical workspace and its one flat plotting
 // surface. One quantity, four coordinates, one role each. The server says
@@ -169,14 +169,18 @@ const lerp = (axis, f) => {
 
 /** ψ contours at every multiple of `interval` (m² s⁻¹): {interval, range, sets: [{level, lines:
  * [{closed, points: [[lat, lon], …]}]}]}, each line oriented downstream (larger ψ on its right).
- * `interval` null: the automatic step for about `count` intervals across the range of ψ shown. */
+ * `interval` null: the automatic step for about `count` intervals across the range of ψ shown.
+ * An interval giving more than MAX_LEVELS levels is coarsened to the nice step that fits;
+ * `requested` then keeps the interval asked for, so the key can say so. */
 export function psiContours(plot, interval = null, count = 20) {
   const m = windMesh(plot), values = poleSnapped(m.psi, m.lat, m.nlonAll);
   let lo = Infinity, hi = -Infinity;
   for (const v of values) if (Number.isFinite(v)) { lo = Math.min(lo, v); hi = Math.max(hi, v); }
-  const step = interval > 0 ? interval : niceStep((hi - lo) / count);
+  let step = interval > 0 ? interval : niceStep((hi - lo) / Math.min(count, MAX_LEVELS));
+  const requested = step;
+  while (step && Math.floor(hi / step) - Math.ceil(lo / step) + 1 > MAX_LEVELS) step = niceStep(Math.max(step * 1.01, (hi - lo) / MAX_LEVELS));
   const sets = step ? isolines(values, m.nlonAll, m.lat.length, contourLevels(lo, hi, step), m.closing) : [];
-  return {interval: step, range: [lo, hi], sets: sets.map(({level, lines}) => ({level, lines: lines.map(({points, closed}) =>
+  return {interval: step, requested: requested !== step ? requested : null, range: [lo, hi], sets: sets.map(({level, lines}) => ({level, lines: lines.map(({points, closed}) =>
     ({closed, points: points.map(([x, y]) => [lerp(m.lat, y), lerp(m.lonAll, x)])}))}))};
 }
 
@@ -216,7 +220,7 @@ export function windPlan(plot) {
   const plan = {...resolveWind(wind), key: [], lines: [], closed: 0};
   if (plan.mode === "psi") {
     const c = psiContours(plot, s.interval, Math.round(20 * s.density));
-    plan.interval = c.interval; plan.range = c.range; plan.levels = c.sets.length;
+    plan.interval = c.interval; plan.requested = c.requested; plan.range = c.range; plan.levels = c.sets.length;
     for (const set of c.sets) for (const line of set.lines) { plan.lines.push(line.points); if (line.closed) plan.closed++; }
     const speed = niceSpeed(ke.rotational_max_speed), apart = c.interval / (speed * wind.info.psi.radius_m) / DEG;
     plan.apart = apart; plan.referenceSpeed = speed;
@@ -224,6 +228,8 @@ export function windPlan(plot) {
       `streamlines of the ${mean}wind (non-divergent flow: exact)` : `streamlines of the ${mean}rotational wind only`) +
       ` · closer = faster: ${numberText(Number(apart.toPrecision(2)))}° apart at ${numberText(speed)} m s⁻¹ (max ` +
       `${numberText(Number(ke.rotational_max_speed.toPrecision(3)))})`});
+    if (c.requested) plan.key.push({warn: true, text: `The interval ${sci(c.requested)} m² s⁻¹ would trace more than ` +
+      `${MAX_LEVELS} contours across this range of ψ; drawn every ${sci(c.interval)} m² s⁻¹ instead`});
     if (!ke.non_divergent && known) {
       const over = share > s.limit / 100;
       plan.key.push({warn: over, text: over ? `Rotational part only: the divergent wind carries ${percent(share)} % of the ` +
@@ -247,10 +253,12 @@ export function windPlan(plot) {
     plan.vmax = plan.quiver.reduce((a, p) => Math.max(a, Math.hypot(p.u, p.v)), 0);
     plan.referenceArrow = niceSpeed(plan.vmax);
     const vmax = numberText(Number(plan.vmax.toPrecision(3)));
-    plan.key.push({glyph: "quiver", text: (s.length === "unit" ? `Red arrows: direction of the ${mean}wind, equal length (max ${vmax} m s⁻¹)` :
-      `Red arrows: ${mean}wind, length ∝ speed; the key arrow is ${numberText(plan.referenceArrow)} m s⁻¹`) +
+    // The key arrow's speed is final only once drawWind knows the pixel scale (quiverReference).
+    const text = reference => (s.length === "unit" ? `Red arrows: direction of the ${mean}wind, equal length (max ${vmax} m s⁻¹)` :
+      `Red arrows: ${mean}wind, length ∝ speed; the key arrow is ${numberText(reference)} m s⁻¹`) +
       ` · native mesh nodes about ${numberText(s.spacing)}° apart, poles omitted` +
-      (s.colour ? ` · colour: speed from 0 (pale) to ${vmax} m s⁻¹ (dark)` : "")});
+      (s.colour ? ` · colour: speed from 0 (pale) to ${vmax} m s⁻¹ (dark)` : "");
+    plan.key.push({glyph: "quiver", text: text(plan.referenceArrow), retext: s.length === "unit" ? null : text});
   }
   return plan;
 }
@@ -285,7 +293,7 @@ function drawWind(ctx, plot, plan, box, X, Y) {
     return lonOnX ? [X(unit(plot.x, east)), Y(unit(plot.y, lat)), east] : [X(unit(plot.x, lat)), Y(unit(plot.y, east)), east];
   };
   const jump = Math.max(box.w, box.h) / 2, out = {mode: plan.mode, lines: plan.lines.length, closed: plan.closed,
-    interval: plan.interval, arrows: 0, quiver: 0};
+    interval: plan.interval, requested: plan.requested ?? null, arrows: 0, quiver: 0};
   ctx.save(); ctx.beginPath(); ctx.rect(box.x, box.y, box.w, box.h); ctx.clip();
   const heads = [];
   for (const line of plan.lines) {
@@ -320,20 +328,33 @@ function drawWind(ctx, plot, plan, box, X, Y) {
       arrowHead(ctx, x1, y1, dx, dy, Math.min(7, 1.2 + length * 0.4), colour);
       out.quiver++;
     }
-    out.quiverScale = {vmax: plan.vmax, reference: plan.referenceArrow, pixelsPerMs: scale,
-      keyPixels: s.length === "unit" ? 0.7 * room : plan.referenceArrow * scale};
+    const reference = s.length === "unit" ? plan.referenceArrow : quiverReference(plan.vmax, scale);
+    out.quiverScale = {vmax: plan.vmax, reference, pixelsPerMs: scale,
+      keyPixels: s.length === "unit" ? Math.min(KEY_ARROW, 0.7 * room) : reference * scale};
   }
   ctx.restore();
   return out;
 }
 
-/** Wrapped key rows: [{glyph, warn, lines}] and their height. */
+/** The longest key arrow, in pixels: it must fit beside the key text. */
+const KEY_ARROW = 64;
+
+/** The key arrow's speed: the plotted scale's nice speed whose arrow fits in KEY_ARROW pixels.
+ * The key arrow is drawn at the same pixels per m s⁻¹ as the plotted arrows, so its label
+ * changes with it rather than the arrow being shortened alone. */
+export function quiverReference(vmax, pixelsPerMs) {
+  if (!(pixelsPerMs > 0)) return niceSpeed(vmax);
+  return niceSpeed(Math.min(vmax, KEY_ARROW / pixelsPerMs));
+}
+
+/** Wrapped key rows: [{glyph, warn, lines}] and their height. A row whose text depends on the
+ * drawn scale (`retext`) reserves one extra line, since its final text is wrapped again. */
 function windKeyLayout(ctx, plan, width) {
   const rows = plan.key.map(row => {
     ctx.font = (row.warn ? "600 " : "") + "11px system-ui";
-    return {...row, lines: wrapped(ctx, row.text, width - (row.glyph ? 76 : 0))};
+    return {...row, width: width - (row.glyph ? 76 : 0), lines: wrapped(ctx, row.text, width - (row.glyph ? 76 : 0))};
   });
-  return {rows, height: rows.reduce((h, r) => h + 15 * r.lines.length + 5, 0)};
+  return {rows, height: rows.reduce((h, r) => h + 15 * (r.lines.length + (r.retext ? 1 : 0)) + 5, 0)};
 }
 
 function drawWindKey(ctx, layout, drawn, box, top) {
@@ -344,13 +365,14 @@ function drawWindKey(ctx, layout, drawn, box, top) {
       stroke(ctx, () => { ctx.beginPath(); ctx.moveTo(x, y - 4); ctx.lineTo(x + 30, y - 4); }, 1.15);
       arrowHead(ctx, x + 20, y - 4, 1, 0, 8);
     } else if (row.glyph === "quiver") {
-      const l = Math.min(64, drawn.quiverScale?.keyPixels || 30);
+      const l = drawn.quiverScale?.keyPixels || 30;
       stroke(ctx, () => { ctx.beginPath(); ctx.moveTo(x, y - 4); ctx.lineTo(x + l, y - 4); }, 1.1, QUIVER);
       arrowHead(ctx, x + l, y - 4, 1, 0, Math.min(7, 1.2 + l * 0.4), QUIVER);
     }
     ctx.font = (row.warn ? "600 " : "") + "11px system-ui"; ctx.fillStyle = row.warn ? WARN : INK; ctx.textAlign = "left";
-    row.lines.forEach((line, k) => ctx.fillText(line, x + (row.glyph ? 76 : 0), y + 15 * k));
-    y += 15 * row.lines.length + 5;
+    const lines = row.retext && drawn.quiverScale ? wrapped(ctx, row.retext(drawn.quiverScale.reference), row.width) : row.lines;
+    lines.forEach((line, k) => ctx.fillText(line, x + (row.glyph ? 76 : 0), y + 15 * k));
+    y += 15 * lines.length + 5;
   }
 }
 
@@ -585,7 +607,10 @@ export class Explorer {
     c.preset.onchange = () => { if (c.preset.value) { this.applyPreset(c.preset.value); this.update(); } };
     c.snap.onchange = () => this.update();
     // Wind display settings redraw what is on hand; only turning the layer on or off asks the server.
-    for (const id of ["wind-lines", "wind-limit", "wind-interval", "wind-density", "wind-arrows", "wind-spacing", "wind-length", "wind-colour"]) c[id].onchange = c[id].oninput = () => this.windChanged();
+    // Typed numbers (limit, interval, spacing) apply when committed, not at each keystroke: a
+    // half-typed interval such as "1" would otherwise be traced at once.
+    for (const id of ["wind-lines", "wind-limit", "wind-interval", "wind-density", "wind-arrows", "wind-spacing", "wind-length", "wind-colour"]) c[id].onchange = () => this.windChanged();
+    for (const id of ["wind-density"]) c[id].oninput = () => this.windChanged();
     c["range-mode"].onchange = () => {
       if (c["range-mode"].value === "fixed" && this.layout?.range) {
         if (c["range-min"].value === "") c["range-min"].value = String(Number(this.layout.range[0].toPrecision(6)));

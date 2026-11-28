@@ -27,9 +27,15 @@ export function niceSpeed(vmax) {
   return Number(Math.max(...[1, 2, 4, 5].map(f => f * step).filter(s => s <= vmax)).toPrecision(3));
 }
 
-/** Every multiple of `interval` inside [lo, hi] (the StreamfunctionLayer rule; 0 is a level). */
-export function contourLevels(lo, hi, interval) {
+/** The most ψ levels one result traces: beyond this the lines merge into a solid fill, and each
+ * level is a marching-squares pass over the whole mesh. */
+export const MAX_LEVELS = 200;
+
+/** Every multiple of `interval` inside [lo, hi] (the StreamfunctionLayer rule; 0 is a level).
+ * More than `max` levels returns [] without allocating them. */
+export function contourLevels(lo, hi, interval, max = MAX_LEVELS) {
   if (!(interval > 0) || !(hi >= lo)) return [];
+  if (Math.floor(hi / interval) - Math.ceil(lo / interval) + 1 > max) return [];
   const out = [];
   for (let k = Math.ceil(lo / interval); k <= Math.floor(hi / interval); k++) out.push(k * interval);
   return out;
