@@ -2019,6 +2019,14 @@
         "module"
       ],
       "source": "tropoi.representation.visual.viewer_server",
+      "target": "tropoi.representation.visual.quantities"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.representation.visual.viewer_server",
       "target": "tropoi.representation.visual.selection"
     },
     {

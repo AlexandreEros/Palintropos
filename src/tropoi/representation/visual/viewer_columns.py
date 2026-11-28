@@ -28,7 +28,8 @@ import numpy as np
 
 from tropoi.representation.archive.airless import SURFACE_PLANES, AirlessArchive
 from tropoi.representation.visual.selection import (
-    MAX_SAMPLES, MAX_STATES, SelectionError, axis, latitude_axis, level_time_axis, longitude_axis)
+    MAX_SAMPLES, MAX_STATES, TIME_MEAN, SelectionError, axis, latitude_axis, level_time_axis, longitude_axis,
+    reductions)
 
 SKIN = ("The surface temperature is the diagnosed, massless skin of each column (depth 0). "
         "It is its own native level, not the top cell, and it is drawn apart from the cells.")
@@ -39,7 +40,7 @@ NO_CELL_MEAN = ("a mean over substrate cells needs a thickness weighting rule, w
                 "does not define")
 MEAN = dict(longitude="plain mean over the archived meridians of a row (cells of equal area)",
             latitude="mean over the archived rows weighted by the recorded column area weights",
-            time="equal-weight mean over the saved samples first..last inclusive")
+            time=TIME_MEAN)
 
 
 class ColumnArchiveProvider:
@@ -178,7 +179,9 @@ class ColumnArchiveProvider:
         out["read"] = (family, list(range(1, self.archive.layers + 1)) if family == "every_step" else None)
         out["axes"]["vertical"] = self._vertical_axis(quantity, v["representation"])
         out["cell_axis"] = cell_axis
-        out["companions"]["skin"] = dict(label="Diagnosed skin Tₛ (depth 0)", units="K", surface=True)
+        # The skin is the quantity itself at depth 0: it takes the quantity's statistic.
+        out["companions"]["skin"] = dict(label="Diagnosed skin Tₛ (depth 0)", units="K", surface=True,
+                                         statistic="quantity")
         coordinates["vertical"] = dict(role=v["role"], representation=v["representation"],
                                        sampling="native cell centres; the skin is shown as its own level")
         out["notes"].append(SKIN)
@@ -247,7 +250,8 @@ class ColumnArchiveProvider:
         profile = v["role"] in ("x", "y") and all(sel[c]["role"] in ("fixed", "reduce")
                                                    for c in ("longitude", "latitude", "time"))
         if profile:
-            mean = " (mean)" if any(sel[c]["role"] == "reduce" for c in ("longitude", "latitude", "time")) else ""
+            reduced = [c for c in ("longitude", "latitude", "time") if sel[c]["role"] == "reduce"]
+            mean = (" (" + ", ".join(f"{c} {sel[c]['op']}" for c in reduced) + ")") if reduced else ""
             skin = comp.get("skin", {}).get("values")
             depth = self.archive.centres
             payload["markers"] = [] if skin is None else [dict(
@@ -317,15 +321,16 @@ def describe(archive: AirlessArchive) -> tuple[dict, dict]:
         weights = archive.weights is not None
         horizontal = dict(roles=["x", "y", "fixed"] + (["reduce"] if weights else []),
                           unavailable={} if weights else dict(reduce=NO_WEIGHTS))
-        horizontal_caps = {c: dict(horizontal, **({"reduce": {"mean": MEAN[c]}} if weights else {}))
+        horizontal_caps = {c: dict(horizontal, **({"reduce": reductions(MEAN[c])} if weights else {}))
                            for c in ("longitude", "latitude")}
     else:
         horizontal_caps = {c: dict(roles=["fixed"], unavailable=dict(x=POINTS, y=POINTS, reduce=POINTS))
                            for c in ("longitude", "latitude")}
-    time = dict(roles=["x", "y", "fixed", "reduce"], reduce={"mean": MEAN["time"]})
+    time = dict(roles=["x", "y", "fixed", "reduce"], reduce=reductions(MEAN["time"]))
     vertical_reps = ["depth", "height_above_surface"]
     quantities = dict(temperature=dict(
         presentation=dict(name="Temperature", symbol="T", units="K", role="prognostic", origin="stored",
+                          group="Thermodynamics",
                           definition="Substrate temperature at the native cell centres, and the "
                                      "diagnosed skin temperature at depth 0."),
         sources=["profiles (cell centres)" if not every else "every_step", "surface plane 0 (skin)"],
@@ -348,7 +353,7 @@ def describe(archive: AirlessArchive) -> tuple[dict, dict]:
         if "surface_samples" not in axes:
             break
         quantities[key] = dict(
-            presentation=dict(name=name, symbol=symbol, units="W m⁻²", role="diagnostic",
+            presentation=dict(name=name, symbol=symbol, units="W m⁻²", role="diagnostic", group="Surface",
                               origin="recorded", definition=definition),
             sources=[f"surface plane {SURFACE_PLANES.index(key)}"], plane=key,
             evaluation="archived values; no interpolation", horizontal="global" if global_ else "points",

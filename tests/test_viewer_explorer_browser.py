@@ -2,6 +2,8 @@
 
 Ported from the Vertical-structure panel's tests: the same archives and the
 same scientific assertions, now made through the four-coordinate explorer.
+The Explorer is the page's analytical workspace and owns the selection; the
+globe (selection A) draws its quantity at its saved time and fixed surface.
 """
 import json
 import threading
@@ -29,12 +31,18 @@ def explore(page, key, value):
               "el.dispatchEvent(new Event('change',{bubbles:true}));})()")
 
 
-def click_map(page, lat, lon):
-    """Dispatch a real click on the 2D map at a geographic position."""
-    page.eval(f"""(() => {{const view = viewer.panels[0].view, L = view.layout, r = view.map.getBoundingClientRect();
-        const x = L.box.x + L.box.w * ({lon} + 180) / 360, y = L.box.y + L.box.h * (90 - {lat}) / 180;
-        view.map.dispatchEvent(new MouseEvent('click', {{clientX: r.left + x * r.width / L.width,
+def click_field(page, lat, lon):
+    """Dispatch a real click on the Explorer's longitude × latitude field at a geographic position."""
+    page.eval(f"""(() => {{const s = viewer.explorer, L = s.layout, r = s.c.plot.getBoundingClientRect();
+        const x = L.X({lon}), y = L.Y({lat});
+        s.c.plot.dispatchEvent(new MouseEvent('click', {{clientX: r.left + x * r.width / L.width,
             clientY: r.top + y * r.height / L.height, bubbles: true}}));}})()""")
+
+
+def explorer_level(page, k):
+    """Choose a native level as the Explorer's fixed surface (the globe follows)."""
+    page.eval(f"""(() => {{const el = document.querySelector('[aria-label="Native level"]'); el.value = "{k}";
+        el.dispatchEvent(new Event('change', {{bubbles: true}}));}})()""")
 
 
 @pytest.fixture
@@ -59,23 +67,17 @@ def test_day30_nightside_surface_temperature(browser):
     server, thread = serve([A])
     try:
         with OfflinePage(browser, width=1400, height=1800, loopback_port=server.server_port) as page:
-            page.call("Page.navigate", url=server.url + "?time=29&preset=profile")
+            page.call("Page.navigate", url=server.url + "?time=29&preset=map")
             until(page, READY)
-            set_control(page, "field", "surface_temperature")
-            until(page, READY)
-            # The cursor starts at the substellar point; a map click moves it to the antistellar point.
+            # The slab is a surface quantity: the map roles apply unchanged (no vertical coordinate).
+            explore(page, "quantity", "surface_temperature")
+            until(page, f"{LOADED}?.quantity === 'surface_temperature' && " + READY)
+            assert page.eval("viewer.panels[0].key") == "surface_temperature"      # the globe follows
+            # The cursor starts at the substellar point; a click on the field moves it to the antistellar point.
             assert page.eval("viewer.cursor.lon") == 0
-            click_map(page, 0, 179)
+            click_field(page, 0, 180)                    # the field cell centred on 180°E
             until(page, "Math.abs(viewer.cursor.lat) < 2 && Math.abs(viewer.cursor.lon - 180) < 2 && " + READY)
-            data = page.eval("viewer.explorer.data")
-            slab = np.load(A / "states/surface-d00030.npy").reshape(32, 64)
-            lat, lon = data["coordinates"]["latitude"]["value"], data["coordinates"]["longitude"]["value"]
-            i = int(np.abs(np.degrees(np.arcsin(np.polynomial.legendre.leggauss(32)[0][::-1])) - lat).argmin())
-            surface = [m for m in data["markers"] if m["kind"] == "surface"][0]
-            assert surface["value"] == slab[i, round(lon / 5.625) % 64]
-            notes = page.eval("document.querySelector('[data-e=notes]').innerText")
-            assert "not a surface temperature" in notes and "Slab surface temperature" in notes
-            # The automatic range spans the dayside; a fixed range resolves the nightside.
+            # The automatic range spans the dayside; a fixed range resolves the nightside (the globe's range).
             set_control(page, "range-mode", "fixed")
             low, high = (float(page.eval(f"document.querySelector('[data-id=range-{k}]').value")) for k in ("min", "max"))
             assert high - low > 100 and low > 240
@@ -84,6 +86,18 @@ def test_day30_nightside_surface_temperature(browser):
             until(page, "viewer.panels[0].view.range[0] === 241 && viewer.panels[0].view.range[1] === 264")
             set_control(page, "light", "star", "input")
             until(page, "document.querySelector('.surface-light').textContent.includes('keep model values')")
+            # Back to temperature: the profile at the cursor carries the slab marker.
+            explore(page, "quantity", "temperature")
+            explore(page, "preset", "profile")
+            until(page, f"{LOADED}?.vertical.role === 'y' && " + READY)
+            data = page.eval("viewer.explorer.data")
+            slab = np.load(A / "states/surface-d00030.npy").reshape(32, 64)
+            lat, lon = data["coordinates"]["latitude"]["value"], data["coordinates"]["longitude"]["value"]
+            i = int(np.abs(np.degrees(np.arcsin(np.polynomial.legendre.leggauss(32)[0][::-1])) - lat).argmin())
+            surface = [m for m in data["markers"] if m["kind"] == "surface"][0]
+            assert surface["value"] == slab[i, round(lon / 5.625) % 64]
+            notes = page.eval("document.querySelector('[data-e=notes]').innerText")
+            assert "not a surface temperature" in notes and "Slab surface temperature" in notes
             assert not page.exceptions, page.exceptions
     finally:
         server.shutdown()
@@ -99,7 +113,7 @@ def test_cold_event_column_section_and_level_link(browser):
             assert page.eval("document.querySelector('[data-id=time-label]').textContent").startswith("Day 85 ")
             row = page.eval("document.querySelector('[data-e=table]').tBodies[0].rows[1].innerText").split("\t")
             assert row[0] == "2" and abs(float(row[5]) - 123.28) < 0.01 and 5 < float(row[2]) < 5.3
-            # Clicking the level in the column selects it on the map.
+            # Clicking the level in the column makes it the fixed surface: the globe draws it.
             page.eval("document.querySelector('[data-e=table]').tBodies[0].rows[1].click()")
             until(page, "document.querySelector('[data-id=level]').value === '1' && " + READY)
             assert page.eval("viewer.panels[0].view.range[0]") > 122.0
@@ -250,8 +264,10 @@ def test_section_fixed_colour_range_persists_by_quantity_and_exports(browser):
             explore(page, "preset", "zonal_mean")
             until(page, f"{LOADED}?.longitude.role === 'reduce' && " + READY)
             explore(page, "quantity", "mass_streamfunction")
-            until(page, f"{LOADED}?.quantity === 'mass_streamfunction' && " + READY)
+            until(page, f"{LOADED}?.quantity === 'mass_streamfunction' && " + EXPLORED)
             assert section_state(page)["spec"] is None
+            # ψ has no longitude × latitude field: the globe says so instead of drawing something else.
+            assert "has no longitude × latitude field" in page.eval("viewer.panels[0].controls.status.textContent")
             explore(page, "quantity", "temperature")
             until(page, f"{LOADED}?.quantity === 'temperature' && " + READY)
             explore(page, "preset", "profile")
@@ -354,12 +370,17 @@ def test_flat_gravity_free_and_geodesic_capsules_open(browser, tmp_path):
             coordinates = page.eval("[...document.querySelector('[data-id=coordinate]').options].map(o => o.value)")
             assert coordinates == ["native"]
             assert page.eval("document.querySelector('[data-id=opacity-wrap]').hidden")
-            set_control(page, "level", 0)
-            until(page, 'document.querySelector(\'[data-id="png"]\')?.disabled === false')
+            explore(page, "preset", "map")
+            explorer_level(page, 0)
+            until(page, "document.querySelector('[data-id=level]').value === '0' && " + READY)
             assert not page.exceptions, page.exceptions
             page.eval('(() => {const el=document.getElementById("runs"); el.selectedIndex=1;'
                       'el.dispatchEvent(new Event("change"));})()')
             until(page, 'location.pathname.endsWith("/1/") && ' + READY)
+            # The configuration travelled with the archive: the map roles and level are kept.
+            assert page.eval(f"{LOADED}.longitude.role") == "x" and page.eval(f"{LOADED}.vertical.value") == 0
+            explore(page, "preset", "profile")
+            until(page, f"{LOADED}?.latitude.role === 'fixed' && " + READY)
             assert page.eval("document.querySelector('[data-e=snap-wrap]').hidden")
             assert page.eval(f"{LOADED}.options.snap") is False
             assert (page.eval("viewer.explorer.data.coordinates.latitude.sampling") ==
@@ -399,20 +420,20 @@ def test_airless_archive_in_the_same_application(browser, tmp_path):
             assert page.eval("viewer.explorer.spec.kind") == "field"
             assert page.eval("viewer.explorer.layout.strip") > 0           # the skin strip, apart from the cells
             # Longitude × latitude is an ordinary two-dimensional result of the explorer; the page
-            # settles after one request, and nothing is pushed to selection A unless asked.
+            # settles after its requests (the field, and the globe's frame of the same selection).
             page.eval("""(() => {const f0 = window.fetch; window.selects = 0;
                 window.fetch = (u, o) => { if (String(u).includes("select")) selects++; return f0(u, o); };})()""")
             explore(page, "preset", "map")
             until(page, f"{LOADED}?.longitude.role === 'x' && {LOADED}?.latitude.role === 'y' && " + EXPLORED)
             assert page.eval("viewer.explorer.spec.kind") == "field"
             page.eval("new Promise(resolve => setTimeout(resolve, 1500))")
-            assert page.eval("selects") <= 2
+            assert page.eval("selects") <= 3
             # The same roles with a time mean: the mean map, in the same view.
             explore(page, "preset", "time_mean_map")
             until(page, f"{LOADED}?.time.role === 'reduce' && " + EXPLORED)
             assert page.eval("viewer.explorer.data.description").endswith("time mean")
-            # A level chosen in selection A afterwards stays chosen.
-            set_control(page, "level", 3)
+            # A level chosen in the Explorer stays chosen, and the globe draws it.
+            explorer_level(page, 3)
             until(page, READY.split(" && ")[0])
             page.eval("new Promise(resolve => setTimeout(resolve, 800))")
             assert page.eval("document.querySelector('[data-id=level]').value") == "3"

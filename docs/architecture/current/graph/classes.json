@@ -3270,6 +3270,31 @@
       "qualname": "SelectionError"
     },
     {
+      "decorators": [],
+      "external_bases": [],
+      "id": "tropoi.representation.visual.selection._TimeReduction",
+      "members": [
+        {
+          "kind": "method",
+          "name": "__init__"
+        },
+        {
+          "kind": "method",
+          "name": "_accumulate"
+        },
+        {
+          "kind": "method",
+          "name": "add"
+        },
+        {
+          "kind": "method",
+          "name": "result"
+        }
+      ],
+      "module": "tropoi.representation.visual.selection",
+      "qualname": "_TimeReduction"
+    },
+    {
       "decorators": [
         "dataclass(frozen=True)"
       ],

@@ -15,27 +15,22 @@
       <label id="run-picker" hidden>Archive<select id="runs"></select></label>
     </div>
     <p id="notice" role="status" hidden></p>
-    <div id="toolbar" class="toolbar" hidden>
-      <button id="compare" aria-pressed="false">Compare selections</button>
-      <div id="links" class="toggles" hidden>
-        <label><input id="link-time" type="checkbox" checked> Link saved time</label>
-        <label id="link-level-label"><input id="link-level" type="checkbox"> Link level</label>
-        <label><input id="link-color" type="checkbox" checked> Share compatible colour scales</label>
-      </div>
-    </div>
-    <div id="views"></div>
     <section id="explorer" class="panel" hidden>
-      <div class="panel-heading"><h2>Explorer</h2><span><button data-e="globe" hidden>Show on the globe</button>
-        <button data-e="png" disabled>Save PNG</button></span></div>
+      <div class="panel-heading"><h2>Explorer</h2><span class="subtitle">The analytical workspace: one selection,
+        four coordinates. The globe below draws the same quantity, saved time and surface.</span>
+        <button data-e="png" disabled>Save PNG</button></div>
       <div class="panel-layout">
         <div class="controls">
-          <label>Quantity<select data-e="quantity"></select></label>
-          <div class="record"><span data-e="classification"></span><p data-e="definition"></p></div>
+          <label>Quantity<input data-e="quantity-search" type="search" placeholder="Search name, symbol, unit or group"
+            aria-label="Search quantities"><select data-e="quantity" aria-label="Quantity"></select></label>
+          <div class="record"><span data-e="classification"></span><p data-e="definition"></p>
+            <p data-e="dependencies" class="dependencies"></p></div>
           <label>Preset<select data-e="preset"></select></label>
           <fieldset data-e="coords" class="coords"></fieldset>
           <p class="hint">Give each coordinate a role. Two plotting axes give a field, one a line, none a single value.
             A preset only fills in the roles. Roles a coordinate does not accept are disabled, with the reason.
-            Click the map, globe or a plot to move the linked cursor.</p>
+            Changing the quantity keeps the roles, values, statistics and interval.
+            Click a field, the globe or a plot to move the linked cursor.</p>
           <p data-e="product" class="product"></p>
           <label data-e="snap-wrap" class="check"><input data-e="snap" type="checkbox" checked> Snap to native grid node</label>
           <fieldset data-e="range-fieldset"><legend>Colours</legend>
@@ -48,10 +43,11 @@
             </div>
             <p class="hint">Kept for each quantity across saved times. Independent of the map.</p>
           </fieldset>
-          <label class="check"><input data-e="link-level" type="checkbox" checked> A clicked level selects it on the map</label>
+          <label class="check"><input data-e="link-level" type="checkbox" checked> A clicked level becomes the globe's surface</label>
         </div>
         <div class="visual">
           <p data-e="status" class="status" role="status"></p>
+          <div data-e="incompatible" class="incompatible-box" role="alert" hidden></div>
           <canvas data-e="plot" class="structure-plot" aria-label="Explorer plot. Hover for values; click to move the cursor or select a level."></canvas>
           <div data-e="readout" class="surface-readout" aria-live="polite"></div>
           <div data-e="notes" class="notes"></div>
@@ -59,10 +55,20 @@
         </div>
       </div>
     </section>
+    <div id="toolbar" class="toolbar" hidden>
+      <button id="compare" aria-pressed="false">Compare selections</button>
+      <div id="links" class="toggles" hidden>
+        <label><input id="link-time" type="checkbox" checked> Link saved time</label>
+        <label id="link-level-label"><input id="link-level" type="checkbox"> Link level</label>
+        <label><input id="link-color" type="checkbox" checked> Share compatible colour scales</label>
+      </div>
+    </div>
+    <div id="views"></div>
   </main>
   <template id="panel">
     <section class="panel">
       <div class="panel-heading"><h2></h2><button data-id="png" disabled>Save PNG</button></div>
+      <p data-id="link" class="link-note" hidden></p>
       <div class="panel-layout">
         <div class="controls">
           <label>Quantity<select data-id="field"></select></label>

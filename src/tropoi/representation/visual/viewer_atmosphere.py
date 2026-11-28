@@ -38,7 +38,7 @@ from tropoi.representation.diagnostics.pe_levels import LEVEL_FIELDS, reconstruc
 from tropoi.representation.diagnostics.pe_structure import mass_streamfunction
 from tropoi.representation.diagnostics.pe_surfaces import pressure_surface
 from tropoi.representation.visual.selection import (
-    MAX_STATES, SelectionError, axis, latitude_axis, longitude_axis)
+    MAX_STATES, TIME_MEAN, SelectionError, axis, latitude_axis, longitude_axis, reductions)
 from tropoi.spatial.grids.quadrature import gauss_latitude_nodes
 from tropoi.spatial.transforms.host_synthesis import synthesize_latlon, synthesize_wind_latlon
 
@@ -63,7 +63,7 @@ INTERPOLATION = {
                             "target Φ₀ = g (h + Zₛ) per column",
 }
 PSI = dict(name="Meridional mass streamfunction", symbol="ψ", units="kg s⁻¹", role="diagnostic",
-           origin="derived", definition=(
+           origin="derived", group="Dynamics", definition=(
                "ψ(φ, σ_{k+½}) = 2πa cos φ / g · Σ_{j≤k} [pₛ v_j] Δσ_j, integrated downward from ψ = 0 at "
                "σ = 0; positive for northward mass transport above the interface."))
 CONVENTIONS = dict(
@@ -74,7 +74,7 @@ CONVENTIONS = dict(
 LOWEST_AIR = "Air temperature at the lowest full level, not a surface temperature"
 SLAB = "Slab surface temperature Tₛ, a stored grid-point prognostic"
 #: Quantities a native-level reconstruction provides along a vertical axis.
-AXIS_FIELDS = (*LEVEL_FIELDS, "wind_speed")
+AXIS_FIELDS = (*LEVEL_FIELDS, "wind_speed", "density")
 NO_VERTICAL_MEAN = ("a vertical mean needs a mass (Δp) weighting rule, which this release does not "
                     "define")
 NO_QUADRATURE = ("this archive's native grid is not a Gaussian latitude–longitude grid, so no "
@@ -82,7 +82,8 @@ NO_QUADRATURE = ("this archive's native grid is not a Gaussian latitude–longit
 MEAN = dict(
     longitude="plain mean over the equally spaced longitudes of the native Gaussian grid",
     latitude="area-weighted mean over the native Gauss–Legendre latitudes (Gauss weights, ∝ cos φ dφ)",
-    time="equal-weight mean over the saved states first..last inclusive")
+    time=TIME_MEAN)
+NATIVE_LEVELS = "the native full levels of the column"
 
 
 def _excluded(representation, field):
@@ -101,7 +102,7 @@ def _horizontal_caps(quadrature):
     roles = ["x", "y", "fixed"] + (["reduce"] if quadrature else [])
     out = dict(roles=roles)
     if quadrature:
-        return {c: dict(out, reduce={"mean": MEAN[c]}) for c in ("longitude", "latitude")}
+        return {c: dict(out, reduce=reductions(MEAN[c])) for c in ("longitude", "latitude")}
     return {c: dict(out, unavailable=dict(reduce=NO_QUADRATURE)) for c in ("longitude", "latitude")}
 
 
@@ -116,7 +117,7 @@ def describe(manifest) -> dict:
     levels = [dict(index=k, label=f"{k + 1} · σ = {float(s):.6g}", sigma=float(s))
               for k, s in enumerate(full)]
     spectral = manifest["source"].get("solver") in ("bve", "swe", "pe")
-    time = dict(roles=["x", "y", "fixed", "reduce"], reduce={"mean": MEAN["time"]})
+    time = dict(roles=["x", "y", "fixed", "reduce"], reduce=reductions(MEAN["time"]))
     no_axis = "this archive has no native-level column evaluator" if "structure" not in ops else None
     quantities = {}
     for key in ops.get("map", []):
@@ -134,12 +135,14 @@ def describe(manifest) -> dict:
             on_axis = "structure" in ops and key in AXIS_FIELDS
             per_sample = [r for r in ("geopotential_height", "height_above_surface", "pressure")
                           if (r != "height_above_surface" or "height_above_surface" in ops)] if on_axis else []
-            vertical = dict(roles=["fixed"] + (["x", "y"] if on_axis else []), fixed=fixed,
+            # Min/Max over the native levels need no weights; the mean needs an approved rule.
+            vertical = dict(roles=["fixed"] + (["x", "y", "reduce"] if on_axis else []), fixed=fixed,
                             axis=["sigma"] if on_axis else [], per_sample=per_sample,
-                            unavailable=dict(reduce=NO_VERTICAL_MEAN))
+                            reduce=reductions() if on_axis else {},
+                            reduce_unavailable=dict(mean=NO_VERTICAL_MEAN), unavailable={})
             if not on_axis:
-                vertical["unavailable"].update(x=no_axis or "not reconstructed on native levels",
-                                               y=no_axis or "not reconstructed on native levels")
+                reason = no_axis or "not reconstructed on native levels"
+                vertical["unavailable"].update(x=reason, y=reason, reduce=reason)
             coordinates["vertical"] = vertical
             q["vertical"] = dict(domain="atmosphere", levels=levels,
                                  representations={r: REPRESENTATIONS[r] for r in REPRESENTATIONS})
@@ -158,6 +161,7 @@ def describe(manifest) -> dict:
                                   for k, s in enumerate(interfaces)]),
             coordinates=dict(
                 longitude=dict(roles=["reduce"], reduce={"mean": MEAN["longitude"]},
+                               reduce_unavailable=dict(min=only_mean, max=only_mean),
                                unavailable=dict(x=only_mean, y=only_mean, fixed=only_mean)),
                 latitude=dict(roles=["x", "y"], unavailable=dict(
                     fixed="ψ is offered as a latitude × σ field", reduce="ψ is offered as a latitude × σ field")),
@@ -165,6 +169,8 @@ def describe(manifest) -> dict:
                     fixed="ψ is offered as a latitude × σ field", reduce=NO_VERTICAL_MEAN)),
                 time=dict(roles=["fixed", "reduce"], reduce={"mean": MEAN["time"] + "; ψ is formed from the "
                                                                              "time mean of [pₛ v]"},
+                          reduce_unavailable=dict(min="ψ is formed from the time mean of [pₛ v]",
+                                                  max="ψ is formed from the time mean of [pₛ v]"),
                           unavailable=dict(x="ψ histories are not offered in this release",
                                            y="ψ histories are not offered in this release"))))
     for key, product in manifest["diagnostics"].items():
@@ -281,6 +287,12 @@ def _vertical_plan(provider, sel, quantity, out):
                                        label=REPRESENTATIONS[rep]["label"], interpolation=INTERPOLATION[rep])
         return
     context = provider._structure_context()
+    if v["role"] == "reduce":
+        coordinates["vertical"] = dict(role="reduce", op=v["op"], representation="native",
+                                       nodes=f"{len(context.full_levels)} native full levels",
+                                       domain=NATIVE_LEVELS)
+        out["vertical"] = dict(heights=context.gravity is not None)
+        return
     coordinates["vertical"] = dict(role=v["role"], representation=rep, sampling="native full levels")
     heights = context.gravity is not None
     if rep == "sigma":
@@ -300,9 +312,11 @@ def _vertical_plan(provider, sel, quantity, out):
     single_column = sel["longitude"]["role"] in ("fixed", "reduce") and sel["latitude"]["role"] in ("fixed", "reduce")
     if single_column and sel["time"]["role"] in ("fixed", "reduce"):
         for name, (label, units) in dict(temperature=("T", "K"), u=("u", "m s⁻¹"), v=("v", "m s⁻¹")).items():
-            out["companions"].setdefault(name, dict(label=label, units=units))
+            # Values of the column, tabulated under the quantity's statistic: they take it (F-1).
+            out["companions"].setdefault(name, dict(label=label, units=units, statistic="quantity"))
         if sel["quantity"] == "temperature" and "surface_temperature" in provider.manifest["fields"]:
-            out["companions"]["surface_temperature"] = dict(label="Tₛ (slab)", units="K", surface=True)
+            out["companions"]["surface_temperature"] = dict(label="Tₛ (slab)", units="K", surface=True,
+                                                            statistic="quantity")
     out["vertical"] = dict(heights=heights)
 
 
@@ -326,7 +340,17 @@ def _wind(values):
     return np.hypot(values["u"], values["v"])
 
 
-def _field(values, key):
+def density(pressure, temperature, gas_constant):
+    """ρ = p/(R T): ideal gas, p and T at the same samples, R the run's recorded constant."""
+    if not gas_constant:
+        raise SelectionError("Air density needs the gas constant the run records; this run records none")
+    with np.errstate(divide="ignore", invalid="ignore"):       # masked samples carry no valid T
+        return np.asarray(pressure, dtype=float) / (float(gas_constant) * np.asarray(temperature, dtype=float))
+
+
+def _field(values, key, gas_constant=None):
+    if key == "density":
+        return density(values["pressure"], values["temperature"], gas_constant)
     return _wind(values) if key in ("wind", "wind_speed") else values[key]
 
 
@@ -381,14 +405,16 @@ def _fixed_surface(provider, frame, key, lat, lon, rep, value):
         levels = reconstruct_levels(frame, context, lat, lon, [int(value)],
                                     vorticity_divergence=key in ("zeta", "delta"), heights=heights)
         values = {name: arr[0] for name, arr in levels.values.items()}
-        return _field(values, key)
+        return _field(values, key, context.r_dry)
     if rep != "sigma" and key in ("zeta", "delta"):
         raise SelectionError("Vorticity and divergence require a native or sigma surface")
     surface = pressure_surface(frame, context, lat, lon, (rep, value))
     values = dict(surface.values)
     if rep in ("geopotential_height", "height_above_surface") and key == "geopotential":
         values["geopotential"] = values["geopotential_height"] * context.gravity
-    out = np.array(_field(values, key), dtype=float)
+    if rep == "pressure" and "pressure" not in values:
+        values["pressure"] = np.full(surface.mask.shape, float(value))      # the surface's own p
+    out = np.array(_field(values, key, context.r_dry), dtype=float)
     out[surface.mask != 0] = np.nan
     return out
 
@@ -426,7 +452,7 @@ def samples(provider, sel, plan_, indices):
                 companions[name] = flip(_surface(provider, index, name, lat, lon)[None])
             else:
                 companions[name] = flip(levels[name])
-        yield times[index], flip(_field(levels.values, key)), companions
+        yield times[index], flip(_field(levels.values, key, provider._context.r_dry)), companions
 
 
 def _psi_sample(provider, index, lat, lon, flip):
@@ -466,7 +492,9 @@ def finish(provider, sel, plan_, payload):
                                                for c in ("longitude", "latitude", "time"))
     if profile and "temperature" in comp:
         reduced = [c for c in ("longitude", "latitude", "time") if sel[c]["role"] == "reduce"]
-        mean = " (mean)" if reduced else ""
+        # The quantity's statistic(s); level positions (p, Z) are always means (selection module docs).
+        mean = (" (" + ", ".join(f"{c} {sel[c]['op']}" for c in reduced) + ")") if reduced else ""
+        position = " (mean)" if reduced else ""
         sigma = list(provider._context.full_levels)
         z = comp.get("geopotential_height", {}).get("values")
         zs = comp.get("surface_height", {}).get("values")
@@ -475,13 +503,13 @@ def finish(provider, sel, plan_, payload):
             rows.append([k + 1, s, comp["pressure"]["values"][k], None if z is None else z[k],
                          None if z is None else z[k] - zs, comp["temperature"]["values"][k],
                          comp["u"]["values"][k], comp["v"]["values"][k]])
-        payload["table"] = dict(columns=["Level", "σ", f"p (Pa){mean}", f"Z (m){mean}", f"Z − Zₛ (m){mean}",
+        payload["table"] = dict(columns=["Level", "σ", f"p (Pa){position}", f"Z (m){position}", f"Z − Zₛ (m){position}",
                                          f"T (K){mean}", f"u (m s⁻¹){mean}", f"v (m s⁻¹){mean}"], rows=rows)
         payload["notes"] += [LOWEST_AIR + ".", *CONVENTIONS.values()]
         if reduced:
-            payload["notes"].append("Means are taken on native σ levels: each row is the mean of the level's "
-                                    "values over " + " and ".join(reduced) + ", and its p and Z are the means "
-                                    "of that level's p_k and Z_k, not a mean on a surface of constant p or Z.")
+            payload["notes"].append("Reductions are taken on native σ levels: each row is the statistic of the "
+                                    "level's values over " + " and ".join(reduced) + ", and its p and Z are the "
+                                    "means of that level's p_k and Z_k, not values on a surface of constant p or Z.")
         payload["markers"] = []
         if sel["quantity"] == "temperature":
             y = payload[v["role"]]["values"]

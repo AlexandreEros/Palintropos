@@ -66,6 +66,9 @@ flowchart LR
         n_tropoi_orepresentation_ovisual_oquantities_oquantity["quantity()"]
         n_tropoi_orepresentation_ovisual_oquantities_oviewer__presentation["viewer#95;presentation()"]
     end
+    subgraph g_tropoi_orepresentation_ovisual_oselection["representation.visual.selection"]
+        n_tropoi_orepresentation_ovisual_oselection_oreductions["reductions()"]
+    end
     subgraph g_tropoi_orepresentation_ovisual_oviewer__columns["representation.visual.viewer#95;columns"]
         n_tropoi_orepresentation_ovisual_oviewer__columns_odescribe["describe()"]
     end
@@ -156,6 +159,7 @@ flowchart LR
     n_tropoi_orepresentation_oarchive_oviewer__manifest_oviewer__manifest --> n_tropoi_orepresentation_ovisual_oquantities_oviewer__presentation
     n_tropoi_orepresentation_oarchive_oviewer__manifest_oviewer__manifest --> n_tropoi_ospatial_oenvironment_oPlanetaryParameters_ofrom__earth__like
     n_tropoi_orepresentation_ovisual_oquantities_oquantity -->|instantiate| n_tropoi_orepresentation_ovisual_oquantities_oQuantityUnavailableError
+    n_tropoi_orepresentation_ovisual_oviewer__columns_odescribe --> n_tropoi_orepresentation_ovisual_oselection_oreductions
     n_tropoi_ospatial_ogrids_oquadrature_ogauss__latitudes --> n_tropoi_ospatial_ogrids_oquadrature_ogauss__latitude__nodes
     n_tropoi_otemporal_osimulation_oSimulation -->|#95;#95;init#95;#95;| n_tropoi_otemporal_osimulation_oSimulation_o____init____
     classDef root stroke-width:3px

@@ -83,6 +83,14 @@ output { font-size: .9rem }
 .levels tbody tr:hover { background: #eef5f1 }
 .levels tr.selected { background: #ffe8cf }
 #explorer { margin-top: .85rem }
+#explorer .subtitle { flex: 1 1 20rem; font-size: .85rem; color: #4a6364 }
+[data-e="quantity-search"] { display: block; width: 100%; margin-top: .25rem; padding: .35rem .5rem; border: 1px solid #a8b7b5; border-radius: .35rem; background: #fffefa; font-weight: 400 }
+.dependencies { font-size: .8rem; color: #4a6364 }
+.coords .coord.incompatible { outline: 2px solid #b4442c; outline-offset: 3px; border-radius: .3rem; background: #fbefe9 }
+.incompatible-box { border: 2px solid #b4442c; background: #fbefe9; color: #6b2a1c; border-radius: .4rem; padding: .75rem .9rem; margin: .4rem 0; font-size: .88rem; line-height: 1.45 }
+.incompatible-box ul { margin: .4rem 0 .6rem 1.1rem; padding: 0 }
+.incompatible-box button { border-color: #b4442c }
+.link-note { padding: .5rem 1rem; font-size: .84rem; color: #2d5a57; background: #eef5f1; border-bottom: 1px solid #d4dcd3 }
 .coords .coord { display: flex; flex-direction: column; gap: .3rem; margin-top: .5rem }
 .coords .coord select, .coords .coord input { width: 100%; min-width: 0; max-width: 100% }
 .coords .coord .pair { margin-top: 0 }

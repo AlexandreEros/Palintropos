@@ -1,7 +1,7 @@
 import {Globe,homeCamera} from "./globe.js";
-import {DEG,clamp,fieldScale,interpolate,sampleAt,surfaceLayers,usable} from "./mesh.js";
+import {DEG,clamp,fieldScale,interpolate,surfaceLayers,usable} from "./mesh.js";
 import {globeLines,streamlines} from "./overlays.js";
-import {drawMap,numberText} from "./map.js";
+import {numberText} from "./map.js";
 
 function make(tag,className,text) {
   const element=document.createElement(tag);
@@ -28,10 +28,12 @@ function checkFrame(frame,options) {
   if (!(options.radius>0) || !Number.isFinite(options.radius)) throw new Error("Planet radius must be positive.");
 }
 
-/** A linked globe and unshaded geographic field map. All lengths are in
- * metres; latitude and longitude are degrees. Mask zero denotes valid data.
- * draw() accepts options.range [min,max] for comparable panels. png() returns
- * a Blob containing the selected map, units, normalization and timestamps.
+/** The globe: one saved state on one surface. All lengths are in metres;
+ * latitude and longitude are degrees. Mask zero denotes valid data. draw()
+ * accepts options.range [min,max] for comparable panels. png() returns a Blob
+ * of the globe as drawn, with its title, selection and colour scale, which is
+ * also shown live beneath the globe (drawLegend). The flat
+ * longitude × latitude projection is the Explorer's: there is no second map.
  */
 export class SurfaceView {
   constructor(container) {
@@ -40,9 +42,6 @@ export class SurfaceView {
     this.canvas.setAttribute("aria-label","Globe. Drag or use the arrow keys to rotate. Scroll or use plus and minus to zoom. Click to select a location.");
     this.canvas.tabIndex=0;
     this.canvas.style.cssText="width:100%;height:clamp(220px,32vw,415px);display:block;touch-action:none;background:#141d24";
-    this.map=make("canvas","map-canvas");
-    this.map.style.cssText="width:100%;height:auto;display:block";
-    this.map.setAttribute("aria-label","Latitude and longitude map with field colour scale. Click a location to select it for the column and sections and to centre the globe.");
     const toolbar=make("div","surface-camera");
     const reset=make("button","reset-camera","Reset camera");
     reset.type="button";
@@ -51,19 +50,26 @@ export class SurfaceView {
     toolbar.append(reset,this.description);
     this.readout=make("div","surface-readout");
     this.readout.style.minHeight="1.5em";
-    this.root.append(this.canvas,toolbar,this.readout,this.map);
+    // The live colour scale of the field as drawn: its quantity, units and numerical endpoints.
+    this.legend=make("div","surface-legend");
+    this.legend.style.cssText="display:grid;grid-template-columns:auto 1fr auto;gap:0.2em 0.5em;align-items:center;font-size:0.85em;margin:0.3em 0";
+    this.legendLabel=make("span","surface-legend-label");
+    this.legendLabel.style.gridColumn="1 / -1";
+    this.legendMin=make("span","surface-legend-min");
+    this.legendBar=make("div","surface-legend-bar");
+    this.legendBar.style.cssText="height:10px";
+    this.legendBar.setAttribute("aria-hidden","true");
+    this.legendMax=make("span","surface-legend-max");
+    this.legend.append(this.legendLabel,this.legendMin,this.legendBar,this.legendMax);
+    this.legend.hidden=true;
+    this.root.append(this.canvas,toolbar,this.legend,this.readout);
     container.appendChild(this.root);
     this.globe=new Globe(this.canvas);
     this.listeners=new AbortController();
     this.home=homeCamera();
     this.on(reset,"click",()=>{ this.globe.camera={...this.home}; this.schedule(); });
     this.installInteraction();
-    this.observer=new ResizeObserver(()=>{
-      if (!this.scene) return;
-      this.schedule();
-      const width=this.root.clientWidth;
-      if (width && width!==this.mapWidth) this.paintMap();
-    });
+    this.observer=new ResizeObserver(()=>{ if (this.scene) this.schedule(); });
     this.observer.observe(this.root); this.observer.observe(this.canvas);
   }
   on(element,type,handler,more={}) {
@@ -72,10 +78,6 @@ export class SurfaceView {
   schedule() {
     if (this.animation) return;
     this.animation=requestAnimationFrame(()=>{ this.animation=0; this.globe.render(); });
-  }
-  paintMap() {
-    this.mapWidth=this.root.clientWidth || 600;
-    this.layout=drawMap(this.map,this.scene,this.mapWidth,Math.min(devicePixelRatio,2));
   }
   draw(frame,opts={}) {
     const options={radius:1,exaggeration:1,opacity:0.75,shell:false,cursor:this.cursor,...opts};
@@ -98,7 +100,28 @@ export class SurfaceView {
       "Geometric day/night shading darkens the globe only; colours, map and readouts keep model values" :
       "Neutral display lighting";
     this.readout.textContent="";
-    this.paintMap();
+    this.drawLegend();
+  }
+  drawLegend() {
+    const {options,scale}=this.scene;
+    this.legendLabel.textContent=[options.label||options.field,options.units].filter(Boolean).join(" · ");
+    const shown=Boolean(scale.range);
+    this.legendMin.hidden=this.legendMax.hidden=this.legendBar.hidden=!shown;
+    if (shown) {
+      // The scale's own colour table, sampled at 33 evenly spaced stops.
+      const stops=Array.from({length:33},(_,i)=>{ const [r,g,b]=scale.lut[Math.round(255*i/32)];
+        return "rgb("+r+","+g+","+b+") "+(100*i/32).toFixed(2)+"%"; });
+      this.legendBar.style.background="linear-gradient(to right,"+stops.join(",")+")";
+      this.legendMin.textContent=numberText(scale.range[0]);
+      this.legendMax.textContent=numberText(scale.range[1]);
+      this.legend.setAttribute("aria-label","Colour scale "+this.legendLabel.textContent+" from "+
+        this.legendMin.textContent+" to "+this.legendMax.textContent);
+    }
+    this.legend.hidden=false;
+  }
+  /** Turn the globe to face a point (degrees). */
+  face(lat,lon) {
+    this.globe.camera.pitch=clamp(lat,-90,90)*DEG; this.globe.camera.yaw=-lon*DEG; this.schedule();
   }
   /** Mark the linked geographic cursor (degrees) on the globe and map. */
   setCursor(cursor) {
@@ -107,7 +130,6 @@ export class SurfaceView {
     this.scene.options.cursor=cursor;
     this.scene.lines=globeLines(this.scene.frame,this.scene.options,this.scene.winds);
     this.globe.setScene(this.scene);
-    this.paintMap();
   }
   installInteraction() {
     const c=this.canvas, globe=this.globe;
@@ -149,22 +171,6 @@ export class SurfaceView {
       if (e.key==="ArrowDown") camera.pitch=clamp(camera.pitch-5*DEG,-Math.PI/2,Math.PI/2);
       this.schedule();
     });
-    const locate=e=>{
-      if (!this.layout) return null;
-      const r=this.map.getBoundingClientRect(),{box,width,height}=this.layout;
-      const fx=((e.clientX-r.left)*width/r.width-box.x)/box.w,fy=((e.clientY-r.top)*height/r.height-box.y)/box.h;
-      if (fx<0 || fx>1 || fy<0 || fy>1) return null;
-      const lat=90-180*fy,lon=fx*360-180;
-      return {lat,lon,t:sampleAt(this.scene.frame,lat,lon)};
-    };
-    this.on(this.map,"pointermove",e=>this.show(locate(e)));
-    this.on(this.map,"pointerleave",()=>this.show(null));
-    this.on(this.map,"click",e=>{
-      const p=locate(e);
-      if (!p) return;
-      globe.camera.pitch=p.lat*DEG; globe.camera.yaw=-p.lon*DEG; this.schedule();
-      this.onSelect?.({lat:p.lat,lon:p.lon});
-    });
   }
   show(hit) {
     if (!hit || !this.scene) { this.readout.textContent=""; return; }
@@ -190,8 +196,27 @@ export class SurfaceView {
   }
   png() {
     if (!this.scene) return Promise.reject(new Error("No field selected."));
-    const canvas=make("canvas","");
-    drawMap(canvas,this.scene,1000,1.5);
+    // Render now and copy in the same task: the WebGL drawing buffer is not preserved.
+    this.globe.render();
+    const {options,scale}=this.scene, src=this.canvas, w=Math.max(1000,src.width), gh=Math.round(src.height*w/src.width);
+    const lines=[String(options.title||""), typeof options.selection==="string" ? options.selection : ""].filter(Boolean);
+    const canvas=make("canvas",""), ctx=canvas.getContext("2d");
+    canvas.width=w; canvas.height=gh+lines.length*22+86;
+    ctx.fillStyle="#f6f5ef"; ctx.fillRect(0,0,canvas.width,canvas.height);
+    ctx.fillStyle="#242f32"; ctx.textAlign="left";
+    lines.forEach((line,i)=>{ ctx.font=i ? "14px system-ui" : "600 16px system-ui"; ctx.fillText(line,14,22+22*i,w-28); });
+    const top=lines.length*22+12;
+    ctx.drawImage(src,0,top,w,gh);
+    const y=top+gh+34, x0=20, bw=w-40;
+    ctx.font="600 13px system-ui"; ctx.fillText([options.label||options.field,options.units].filter(Boolean).join(" · "),x0,y-8,bw);
+    if (scale.range) {
+      for (let x=0;x<bw;x++) {
+        const [r,g,b]=scale.lut[Math.round(255*clamp(x/(bw-1),0,1))];
+        ctx.fillStyle="rgb("+r+","+g+","+b+")"; ctx.fillRect(x0+x,y,1.1,10);
+      }
+      ctx.fillStyle="#263437"; ctx.font="12px system-ui";
+      ctx.fillText(numberText(scale.range[0]),x0,y+26); ctx.textAlign="right"; ctx.fillText(numberText(scale.range[1]),x0+bw,y+26);
+    }
     return new Promise((resolve,reject)=>canvas.toBlob(blob=>blob ? resolve(blob) : reject(new Error("PNG encoding failed.")),"image/png"));
   }
   destroy() {

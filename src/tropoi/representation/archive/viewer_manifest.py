@@ -12,6 +12,10 @@ from tropoi.representation.archive.viewer_diagnostics import diagnostics
 from tropoi.representation.visual.quantities import viewer_presentation
 
 
+#: Stored level prognostics of a dry, fixed-composition primitive-equation state.
+DRY_PROGNOSTICS = ("zeta", "delta", "temperature")
+
+
 def _derived_fields(fields, physics, geometry, resources):
     """Advertise only recipes whose scientific inputs can be resolved."""
     from tropoi.representation.visual.quantities import quantity
@@ -50,6 +54,14 @@ def _derived_fields(fields, physics, geometry, resources):
                 inputs.append("terrain")
             add_viewer_field("geopotential", inputs, "m^2 s^-2", levels=True)
             add_viewer_field("geopotential_height", ["geopotential", "physics.gravity"], "m", levels=True)
+        # ρ = p/(R T) with the gas constant the run records for its atmosphere. Offered only for a
+        # fixed-composition gas: any stored level field besides the dry prognostics could be a
+        # moisture or composition tracer, for which one recorded R is not the mixture constant.
+        tracers = [k for k, f in fields.items() if f.get("levels") and f.get("kind") != "derived"
+                   and k not in DRY_PROGNOSTICS]
+        if physics.get(gas_constant) and not tracers:
+            add_viewer_field("density", ["temperature", "pressure", "physics." + gas_constant], "kg m^-3",
+                             levels=True)
 
 
 def _operations(fields, vertical, physics, diagnostics):
@@ -69,7 +81,7 @@ def _operations(fields, vertical, physics, diagnostics):
         if "ln_ps" in names:
             reconstructed = [key for key in levels if key in
                              {"temperature", "u", "v", "wind", "wind_speed",
-                              "geopotential_height", "geopotential", "pressure"}]
+                              "geopotential_height", "geopotential", "pressure", "density"}]
             ops["pressure"] = reconstructed
             if physics.get("gravity") and (physics.get("r_dry") or physics.get("gas_constant")):
                 ops["geopotential_height"] = reconstructed

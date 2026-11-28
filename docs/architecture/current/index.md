@@ -18,7 +18,7 @@ Explore dependencies, call sites, possible dispatch, runtime observations and pr
 | [`tropoi.representation`](packages/tropoi.representation.md) | 2 | 0 | 1 | `README.md` |
 | [`tropoi.representation.archive`](packages/tropoi.representation.archive.md) | 14 | 21 | 31 | `README.md` |
 | [`tropoi.representation.diagnostics`](packages/tropoi.representation.diagnostics.md) | 9 | 20 | 28 | `README.md` |
-| [`tropoi.representation.visual`](packages/tropoi.representation.visual.md) | 31 | 64 | 107 | `ATMOSPHERE_VIEW.md`, `HELD_SUAREZ_CLIMATE.md`, `README.md`, `sky_view.html`, `terrain_globe.html` |
+| [`tropoi.representation.visual`](packages/tropoi.representation.visual.md) | 31 | 65 | 110 | `ATMOSPHERE_VIEW.md`, `HELD_SUAREZ_CLIMATE.md`, `README.md`, `sky_view.html`, `terrain_globe.html` |
 | [`tropoi.run`](packages/tropoi.run.md) | 3 | 1 | 5 | `README.md` |
 | [`tropoi.run.airless`](packages/tropoi.run.airless.md) | 4 | 2 | 17 | – |
 | [`tropoi.run.bve`](packages/tropoi.run.bve.md) | 6 | 2 | 3 | `README.md` |
@@ -74,8 +74,8 @@ Explore dependencies, call sites, possible dispatch, runtime observations and pr
 
 * Packages: 30 discovered, 30 with a page.
 * Import module records: 200 discovered (including namespace placeholders), 200 listed on a package page.
-* Classes: 250 discovered, 250 drawn on a package page (23 in [the inheritance overview](class-inheritance.mmd)).
-* Both containment views cover 23 directories, 117 Python files, 250 class definitions, leaving out files and directories that define no class.
+* Classes: 251 discovered, 251 drawn on a package page (23 in [the inheritance overview](class-inheritance.mmd)).
+* Both containment views cover 23 directories, 117 Python files, 251 class definitions, leaving out files and directories that define no class.
 * CLI handlers: 13 discovered, each with a call graph.
 * Public Python entry-point candidates: 42; 17 are roots of declared paths, 25 excluded with a reason.
 

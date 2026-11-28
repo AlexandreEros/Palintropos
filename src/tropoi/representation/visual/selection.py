@@ -6,8 +6,9 @@ latitude, a vertical coordinate and time. A selection gives each coordinate a
 
 * ``x`` or ``y``: a plotting axis;
 * ``fixed``: held at one value (``value``; for time, a saved ``index``);
-* ``reduce``: reduced by a statistic over its whole sampled domain or, for
-  time, over the saved samples ``first..last`` (``op``; only ``mean``);
+* ``reduce``: reduced by a statistic (``op``: ``mean``, ``min`` or ``max``)
+  over its whole sampled domain or, for time, over the saved samples
+  ``first..last``;
 * ``none``: the quantity has no such coordinate (a surface field has no
   vertical coordinate; a recorded global series has no horizontal ones).
 
@@ -38,24 +39,43 @@ the quantity on their tensor product, one saved sample at a time; this module
 reduces and arranges the result. The numerical definition of a value
 therefore depends on the sample set of each coordinate, never on a plot type.
 
-**Reduction semantics** (``mean``; the payload states each in
-``coordinates[name]``):
+**Reduction semantics** (the payload states each in ``coordinates[name]``).
+Every reduction acts on the *native samples* the provider evaluates for it
+(saved states; native grid nodes; native levels), never on display-mesh or
+interpolated values. Operators:
 
-* time: the equal-weight mean of every saved sample from ``first`` to
-  ``last`` inclusive, ``1/N`` each, not weighted by the intervals between
-  samples (the cadence and its regularity are reported);
-* longitude: the plain mean over the equally spaced longitudes of the
-  archive's native grid (exact quadrature of a band-limited field);
-* latitude: the area-weighted mean over the native latitudes: Gauss–Legendre
-  weights of a Gaussian grid (``∝ cos φ dφ``), or the recorded cell area
-  weights of a columnar archive;
-* longitude and latitude together: the area mean (the product of the two);
-* vertical: not defined in this release (a vertical mean needs a mass or
-  thickness weighting rule that has not been specified).
+* ``mean``
+  - time: the time-weighted mean of the saved samples ``first..last``
+    inclusive with *cell weights*: each sample stands for the interval around
+    it, ``wᵢ = (tᵢ₊₁ − tᵢ₋₁)/2`` with the ends mirrored (``w₀ = t₁ − t₀``,
+    ``w_N = t_N − t_{N−1}``). For a regular cadence every weight is equal and
+    the mean is the plain ``1/N`` mean (computed as such, bit for bit);
+  - longitude: the plain mean over the equally spaced longitudes of the
+    archive's native grid (exact quadrature of a band-limited field);
+  - latitude: the area-weighted mean over the native latitudes:
+    Gauss–Legendre weights of a Gaussian grid (``∝ cos φ dφ``), or the
+    recorded cell area weights of a columnar archive;
+  - longitude and latitude together: the area mean (the product of the two);
+  - vertical: not defined in this release (a vertical mean needs a mass or
+    thickness weighting rule that has not been approved).
+* ``min`` / ``max``: the extremum over the same native samples, unweighted.
+  It is the extremum of the *sampled* values, not of the continuous field
+  between samples.
 
-A sample that is masked (a surface below the terrain, outside the sampled
-levels) makes every mean that includes it masked: no mean is formed over a
-subset of the requested samples.
+Masks. A masked sample (a surface below the terrain, outside the sampled
+levels) makes every *mean* that includes it masked: no mean is formed over a
+subset of the requested samples. ``min``/``max`` take the extremum over the
+valid samples only and are masked only where every sample is masked; the
+payload counts the masked samples they excluded.
+
+Order. Reductions over different coordinates need not commute when their
+operators differ (the time maximum of a zonal mean is not the zonal mean of a
+time maximum). They are applied in one fixed order: longitude, latitude,
+vertical (within each saved sample), then time. The payload states it.
+
+Companions (level positions p_k, Z_k and the like that accompany a vertical
+axis) are always reduced with the mean over the same samples: they locate
+the rows, whatever statistic the quantity takes.
 """
 from __future__ import annotations
 
@@ -64,12 +84,29 @@ import math
 
 import numpy as np
 
-__all__ = ["COORDINATES", "PRESETS", "ROLES", "SelectionError", "parse_selection", "evaluate",
-           "describe_roles", "axis", "time_samples"]
+__all__ = ["COORDINATES", "PRESETS", "ROLES", "OPERATORS", "SelectionError", "parse_selection", "evaluate",
+           "describe_roles", "axis", "time_samples", "time_weights", "reductions"]
 
 COORDINATES = ("longitude", "latitude", "vertical", "time")
 ROLES = ("x", "y", "fixed", "reduce", "none")
 AXES = ("x", "y")
+#: Reduction operators. Their per-coordinate rules come from the provider.
+OPERATORS = ("mean", "min", "max")
+#: Order in which reductions are applied (see the module documentation).
+REDUCTION_ORDER = ("longitude", "latitude", "vertical", "time")
+EXTREMUM = ("{op} over the same native samples, unweighted; masked samples are excluded and the "
+            "result is masked only where every sample is masked")
+TIME_MEAN = ("time-weighted mean over the saved samples first..last inclusive, each weighted by the "
+             "interval it stands for, (t_{i+1} - t_{i-1})/2 with the ends mirrored; equal weights "
+             "(the plain 1/N mean) for a regular cadence")
+
+
+def reductions(mean_rule=None, *, extrema=True):
+    """A coordinate's ``reduce`` capability: ``{op: rule}`` for the operators it defines."""
+    out = {} if mean_rule is None else {"mean": mean_rule}
+    if extrema:
+        out.update(min=EXTREMUM.format(op="minimum"), max=EXTREMUM.format(op="maximum"))
+    return out
 
 #: Named role assignments: convenience only. A quantity lacking a vertical
 #: coordinate takes "none" where a preset says "fixed"; nothing else adapts.
@@ -232,6 +269,8 @@ def parse_selection(manifest: dict, text: str) -> dict:
                                      f"choose {', '.join(allowed)}")
         else:
             entry["op"] = _reduction(quantity, "vertical", vertical)
+            # A vertical reduction acts on the native levels, whatever representation was shown.
+            entry["representation"] = "native"
     out["vertical"] = entry
     axis_id = quantity.get("time_axis")
     if entry["role"] == "fixed":
@@ -257,8 +296,11 @@ def parse_selection(manifest: dict, text: str) -> dict:
 
 def _reduction(quantity, coordinate, part):
     op = part.get("op", "mean")
-    if op not in quantity["coordinates"][coordinate].get("reduce", {}):
-        raise SelectionError(f"The reduction {op!r} over {coordinate} is not available")
+    caps = quantity["coordinates"][coordinate]
+    if op not in caps.get("reduce", {}):
+        reason = (caps.get("reduce_unavailable") or {}).get(op)
+        raise SelectionError(f"The reduction {op!r} over {coordinate} is not available" +
+                             (f": {reason}" if reason else ""))
     return op
 
 
@@ -309,9 +351,23 @@ def time_samples(sel):
     return list(range(time["first"], time["last"] + 1))
 
 
-def _reduce(array, weights, axis):
-    """Mean along ``axis``: the plain mean for equal weights (the arithmetic of
-    the zonal-mean accumulator), else the normalized weighted sum."""
+def _reduce(array, weights, axis, op="mean", masked=None):
+    """``op`` along ``axis`` (kept, length 1).
+
+    ``mean``: the plain mean for equal weights (the arithmetic of the
+    zonal-mean accumulator), else the normalized weighted sum; NaN (masked)
+    propagates. ``min``/``max``: the extremum of the valid samples, NaN only
+    where all are masked; ``masked`` (a one-element list) counts the masked
+    samples excluded."""
+    if op in ("min", "max"):
+        invalid = np.isnan(array)
+        if masked is not None:
+            masked[0] += int(invalid.sum())
+        fill = np.inf if op == "min" else -np.inf
+        out = (np.where(invalid, fill, array).min if op == "min" else np.where(invalid, fill, array).max)(
+            axis=axis, keepdims=True)
+        out[np.isinf(out) & invalid.all(axis=axis, keepdims=True)] = np.nan
+        return out
     if weights is None:
         return array.mean(axis=axis, keepdims=True)
     w = np.asarray(weights, dtype=float)
@@ -320,13 +376,73 @@ def _reduce(array, weights, axis):
     return (array * w.reshape(shape)).sum(axis=axis, keepdims=True) / w.sum()
 
 
-def _horizontal(array, plan):
-    """Apply the longitude then the latitude reduction to ``(..., nlat, nlon)``."""
-    if plan["longitude"]["role"] == "reduce":
-        array = _reduce(array, plan["longitude"].get("weights"), -1)
-    if plan["latitude"]["role"] == "reduce":
-        array = _reduce(array, plan["latitude"].get("weights"), -2)
+def _spatial(array, plan, sel, counts=None, same=False):
+    """Reduce one saved sample ``(nvertical, nlat, nlon)``: longitude, latitude,
+    then vertical (:data:`REDUCTION_ORDER`). ``counts`` is None for companions,
+    which take the mean whatever the quantity's operator unless ``same`` (a
+    companion that is a value of the quantity, such as a skin temperature)."""
+    for c, axis_ in (("longitude", -1), ("latitude", -2), ("vertical", -3)):
+        part = sel[c]
+        if part["role"] != "reduce":
+            continue
+        op = part["op"] if counts is not None or same else "mean"
+        array = _reduce(array, (plan.get(c) or {}).get("weights"), axis_, op,
+                        None if counts is None else counts[c])
     return array
+
+
+def _same(plan, name):
+    """A companion that is a value of the quantity itself takes the quantity's statistic."""
+    return (plan.get("companions") or {}).get(name, {}).get("statistic") == "quantity"
+
+
+def time_weights(seconds):
+    """Cell weights of saved times: ``wᵢ = (tᵢ₊₁ − tᵢ₋₁)/2``, ends mirrored.
+
+    ``None`` when every weight is equal (a regular cadence, one or two
+    samples): the mean is then the plain ``1/N`` mean."""
+    t = np.asarray(seconds, dtype=float)
+    if t.size < 3:
+        return None
+    w = np.empty_like(t)
+    w[1:-1] = (t[2:] - t[:-2]) / 2
+    w[0], w[-1] = t[1] - t[0], t[-1] - t[-2]
+    return None if np.all(w == w[0]) else w
+
+
+class _TimeReduction:
+    """Accumulates one reduction over saved samples in bounded memory."""
+
+    def __init__(self, op, weights, same=()):
+        self.op, self.weights, self.masked, self.n = op, weights, [0], 0
+        self.value, self.companions, self.same = None, {}, set(same)
+
+    def _accumulate(self, total, values, op, w):
+        if total is None:
+            total = np.zeros_like(values) if op == "mean" else np.full_like(values, np.nan)
+        if op == "mean":
+            return total + (values if self.weights is None else w * values)
+        return (np.fmin if op == "min" else np.fmax)(total, values)
+
+    def add(self, values, companions):
+        w = 1.0 if self.weights is None else self.weights[self.n]
+        self.n += 1
+        if self.op != "mean":
+            self.masked[0] += int(np.isnan(values).sum())
+        if self.value is None and self.op == "mean":
+            self.value = np.zeros_like(values)
+            self.value += values if self.weights is None else w * values      # the original arithmetic
+        else:
+            self.value = self._accumulate(self.value, values, self.op, w)
+        for k, a in companions.items():
+            op = self.op if k in self.same else "mean"
+            self.companions[k] = self._accumulate(self.companions.get(k), a, op, w)
+
+    def result(self):
+        total = self.n if self.weights is None else float(np.sum(self.weights))
+        value = self.value / total if self.op == "mean" else self.value
+        return value[None], {k: (a if k in self.same and self.op != "mean" else a / total)[None]
+                             for k, a in self.companions.items()}
 
 
 def evaluate(provider, sel):
@@ -344,26 +460,30 @@ def evaluate(provider, sel):
         raise SelectionError(f"Select at most {limit} saved samples for this selection "
                              f"({len(indices)} requested)")
     time_role = sel["time"]["role"]
-    total, companions_total, stacked, stacked_companions = None, None, [], []
-    seconds = []
+    counts = {c: [0] for c in COORDINATES}
+    seconds, stacked, stacked_companions = [], [], []
+    reduction = None
+    if time_role == "reduce":
+        values_ = (provider.manifest["time_axes"].get(sel["time"]["axis"]) or {}).get("values") or []
+        # Cell weights whatever the quantity's operator: mean-reduced companions (p, Z) use them
+        # under Min/Max too, so an interval's mean positions do not depend on the operator.
+        weights = (time_weights([values_[i] for i in indices])
+                   if values_ and len(values_) > indices[-1] else None)
+        reduction = _TimeReduction(sel["time"]["op"], weights,
+                                   [k for k in plan.get("companions") or {} if _same(plan, k)])
     for t, values, companions in provider.samples(sel, plan, indices):
-        values = _horizontal(np.asarray(values, dtype=float), plan)
-        companions = {k: _horizontal(np.asarray(a, dtype=float), plan) for k, a in companions.items()}
+        values = _spatial(np.asarray(values, dtype=float), plan, sel, counts)
+        companions = {k: _spatial(np.asarray(a, dtype=float), plan, sel, same=_same(plan, k))
+                      for k, a in companions.items()}
         seconds.append(t)
-        if time_role == "reduce":
-            if total is None:
-                total = np.zeros_like(values)
-                companions_total = {k: np.zeros_like(a) for k, a in companions.items()}
-            total += values
-            for k, a in companions.items():
-                companions_total[k] += a
+        if reduction is not None:
+            reduction.add(values, companions)
         else:
             stacked.append(values)
             stacked_companions.append(companions)
-    if time_role == "reduce":
-        n = len(indices)
-        cube = (total / n)[None]
-        companion_cubes = {k: (a / n)[None] for k, a in companions_total.items()}
+    if reduction is not None:
+        cube, companion_cubes = reduction.result()
+        counts["time"] = reduction.masked
     else:
         cube = np.stack(stacked)
         companion_cubes = {k: np.stack([c[k] for c in stacked_companions]) for k in stacked_companions[0]}
@@ -377,7 +497,20 @@ def evaluate(provider, sel):
                    description=describe_roles(sel), coordinates=plan["coordinates"],
                    sampling=plan.get("sampling", ""), notes=list(plan.get("notes", [])))
     if time_role in ("reduce", *AXES):
-        payload["coordinates"]["time"] = _time_description(provider.manifest, sel, seconds)
+        payload["coordinates"]["time"] = _time_description(provider.manifest, sel, seconds,
+                                                           reduction.weights if reduction else None)
+    reduced = [c for c in REDUCTION_ORDER if sel[c]["role"] == "reduce"]
+    for c in reduced:
+        entry = payload["coordinates"].setdefault(c, dict(role="reduce"))
+        entry.setdefault("op", sel[c]["op"])
+        if sel[c]["op"] != "mean":
+            entry["rule"] = EXTREMUM.format(op="minimum" if sel[c]["op"] == "min" else "maximum")
+            entry["masked_excluded"] = counts[c][0]
+    if len(reduced) > 1:
+        payload["reduction_order"] = reduced
+        if len({sel[c]["op"] for c in reduced}) > 1:
+            payload["notes"].append("Reductions applied in the order " + " → ".join(
+                f"{c} {sel[c]['op']}" for c in reduced) + "; with different operators the order matters.")
     for a, c in (("x", x), ("y", y)):
         if c is not None:
             payload[a] = plan["axes"][c] if c != "time" else time_axis(seconds, label=plan.get("time_label",
@@ -414,19 +547,26 @@ def _plain(array):
         [float(v) if math.isfinite(v) else None for v in np.asarray(array, dtype=float)]
 
 
-def _time_description(manifest, sel, seconds):
+def _time_description(manifest, sel, seconds, weights=None):
     time = sel["time"]
     values = np.asarray(seconds, dtype=float)
     steps = np.diff(values)
     intervals = {str(float(s)): int(n) for s, n in zip(*np.unique(steps, return_counts=True))}
     out = dict(role=time["role"], axis=time["axis"], first=time["first"], last=time["last"],
                count=len(seconds), intervals_seconds=intervals,
+               first_seconds=float(values[0]), last_seconds=float(values[-1]),
                cadence="single sample" if len(seconds) == 1 else
                        "regular" if len(intervals) == 1 else "irregular")
     if time["role"] == "reduce":
-        out.update(op=time["op"], rule=("equal-weight mean of every saved sample from the first to the last "
-                                        "selection inclusive (1/N each), not weighted by the intervals "
-                                        "between samples"))
+        out["op"] = time["op"]
+        if time["op"] == "mean":
+            out["rule"] = TIME_MEAN
+            out["weighting"] = "equal (regular cadence)" if weights is None else "cell weights (irregular cadence)"
+            if weights is not None:
+                out["weights_seconds"] = [float(w) for w in weights]
+        elif weights is not None:
+            out["companion_weighting"] = "cell weights (irregular cadence) for mean-reduced companions"
+            out["weights_seconds"] = [float(w) for w in weights]
     return out
 
 
