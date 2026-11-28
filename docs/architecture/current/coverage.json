@@ -112,7 +112,7 @@
     }
   },
   "discovered": {
-    "classes": 245,
+    "classes": 250,
     "cli_handlers": {
       "cli-capsule-command": "tropoi.cli.capsule._command",
       "cli-gen": "tropoi.cli.main._cmd_gen",
@@ -121,6 +121,7 @@
       "cli-list-scenarios": "tropoi.cli.main._cmd_list_scenarios",
       "cli-plot": "tropoi.cli.main._cmd_plot",
       "cli-recompile": "tropoi.cli.main._cmd_recompile",
+      "cli-run-airless": "tropoi.cli.main._cmd_run_airless",
       "cli-run-bve": "tropoi.cli.main._cmd_run_bve",
       "cli-run-pe": "tropoi.cli.main._cmd_run_pe",
       "cli-run-swe": "tropoi.cli.main._cmd_run_swe",
@@ -264,16 +265,16 @@
         "tropoi.temporal.hooks.rk4_real_axis_limit"
       ]
     },
-    "functions": 1971,
-    "modules": 196,
+    "functions": 2040,
+    "modules": 200,
     "packages": 30
   },
   "limits": {
     "call_sites": {
-      "builtin": 4497,
-      "external": 2917,
-      "internal": 3423,
-      "unresolved": 4619
+      "builtin": 4708,
+      "external": 3002,
+      "internal": 3562,
+      "unresolved": 4785
     },
     "dynamic_import_sites": {
       "tropoi.representation.archive.writer": 1
@@ -496,6 +497,18 @@
           "tropoi.cli.main._cmd_recompile"
         ]
       },
+      "cli-run-airless": {
+        "packages": [
+          "tropoi.cli",
+          "tropoi.run",
+          "tropoi.run.airless",
+          "tropoi.run.held_suarez",
+          "tropoi.temporal"
+        ],
+        "roots": [
+          "tropoi.cli.main._cmd_run_airless"
+        ]
+      },
       "cli-run-bve": {
         "packages": [
           "tropoi.cli",
@@ -649,14 +662,14 @@
         ]
       }
     },
-    "classes": 245,
-    "classes_in_inheritance_overview": 21,
+    "classes": 250,
+    "classes_in_inheritance_overview": 23,
     "containment": {
-      "class": 245,
-      "module": 114,
+      "class": 250,
+      "module": 117,
       "package": 23
     },
-    "modules": 196,
+    "modules": 200,
     "package_pages": 30
   },
   "rules": {

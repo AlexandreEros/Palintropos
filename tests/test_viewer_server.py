@@ -32,11 +32,16 @@ def fetch(url, **headers):
         return response.read()
 
 
+def select(base, **selection):
+    from urllib.parse import urlencode
+    return base + "select?" + urlencode({"q": json.dumps(selection)})
+
+
 def frame(url):
     data = fetch(url)
     size, = struct.unpack_from("<I", data)
     directory = json.loads(data[4:4+size])
-    return {key: np.frombuffer(data, dtype="u1" if key == "mask" else "<f4",
+    return {key: np.frombuffer(data, dtype="u1" if key in ("mask", "cells") else "<f4",
                                count=count, offset=4+size+offset)
             for key, (offset, count) in directory.items()}
 
@@ -49,20 +54,27 @@ def test_local_session_routes(live):
         with pytest.raises(HTTPError) as exc:
             fetch(live.url + "manifest", **headers)
         assert exc.value.code == code
-    for path in ["config.json", "../../config.json"]:
+    for path in ["config.json", "../../config.json", "frame", "structure", "diagnostic"]:
         with pytest.raises(HTTPError) as exc:
             fetch(live.url + path)
         assert exc.value.code == 404
 
 
+def surface(coord, value):
+    return dict(role="fixed", representation=coord, value=value)
+
+
 @pytest.mark.parametrize("index,field,coord,value", [
-    (0,"temperature","native",39), (1,"phi","native",0), (2,"zeta","native",0),
-    (3,"temperature","pressure",300), (5,"ln_ps","native",0), (6,"temperature","sigma",0.5)])
+    (0,"temperature","native",39), (1,"phi",None,0), (2,"zeta",None,0),
+    (3,"temperature","pressure",300), (5,"ln_ps",None,0), (6,"temperature","sigma",0.5),
+    (0,"temperature","height_above_surface",2000)])
 def test_final_saved_frame_on_wire(live, index, field, coord, value):
     base = live.url.removesuffix("0/") + f"{index}/"
     manifest = json.loads(fetch(base+"manifest"))
     times = manifest["time_axes"]["snapshots"]["values"]
-    url = base+f"frame?time={len(times)-1}&field={field}&coordinate={coord}&value={value}"
+    vertical = surface(coord, value) if coord else dict(role="none")
+    url = select(base, quantity=field, longitude=dict(role="x"), latitude=dict(role="y"),
+                 vertical=vertical, time=dict(role="fixed", index=len(times)-1))
     arrays = frame(url)
     n = arrays["lat"].size * arrays["lon"].size
     assert arrays["values"].size == arrays["height"].size == arrays["terrain"].size == n
@@ -70,44 +82,72 @@ def test_final_saved_frame_on_wire(live, index, field, coord, value):
     assert np.any(valid) and np.isfinite(arrays["values"][valid]).all()
     if index == 0:
         assert times[-1] == 30*86400 and 100 < np.median(arrays["values"][valid]) < 400
-        assert manifest["star"]["positions"][-1] == dict(latitude=0, longitude=0)
+        assert manifest["star"]["axes"]["snapshots"][-1] == dict(latitude=0, longitude=0)
+    if coord == "height_above_surface":
+        # Z - Zs = 2 km everywhere it is sampled: the layer is lifted by the terrain.
+        np.testing.assert_allclose(arrays["height"][valid] - arrays["terrain"][valid], 2000, atol=0.01)
     if index == 1:
         assert arrays["terrain"].max() > 1000
         assert (arrays["height"][valid] > arrays["terrain"][valid]).all()
     assert live.session.bytes_used <= live.session.cache_bytes
 
 
-def test_core_diagnostic_and_invalid_request(live):
+def test_recorded_series_and_invalid_requests(live):
     base = live.url.removesuffix("0/") + "4/"
-    series = json.loads(fetch(base + "diagnostic?field=mean_T"))
-    assert series["units"] == "K" and len(series["x"]) == len(series["y"]) > 1
-    with pytest.raises(HTTPError) as exc:
-        fetch(live.url + "frame?time=4320&field=temperature")
-    assert exc.value.code == 400
-
-
-def test_structure_routes_on_ben2_and_statistics_core(live):
-    manifest = json.loads(fetch(live.url + "manifest"))
-    assert "mass_streamfunction" in manifest["operations"]["structure"]
-    last = len(manifest["time_axes"]["snapshots"]["values"]) - 1
-    column = json.loads(fetch(live.url + f"structure?kind=column&time={last}&lat=-19.4&lon=-79"))
-    assert column["sampling"] == "native Gaussian grid node" and column["longitude"] == 281.25
-    assert len(column["temperature"]) == len(column["sigma"]) == 40
-    # Slab Tₛ and the lowest-level air temperature are separate quantities.
-    assert column["surface_temperature"]["value"] != column["lowest_air"]["value"]
-    assert column["lowest_air"]["level"] == 39
-    section = json.loads(fetch(live.url + f"structure?kind=zonal&time={last}&at=0"))
-    assert len(section["points"]) == 181 and len(section["u"]) == 40 and len(section["u"][0]) == 181
-    np.testing.assert_allclose(np.array(section["u"])[:, 0], np.array(section["u"])[:, -1], atol=1e-9)
-    mean = json.loads(fetch(live.url + f"structure?kind=zonal_mean&first={last-1}&last={last}"))
-    assert mean["sample"]["count"] == 2 and len(mean["streamfunction"]) == 41
-    assert np.all(np.array(mean["streamfunction"][0]) == 0)
-    assert live.session.bytes_used <= live.session.cache_bytes
-    core = live.url.removesuffix("0/") + "4/"
-    for url in [core + "structure?kind=column&time=0&lat=0&lon=0",
-                live.url + "structure?kind=zonal_mean&first=3&last=2",
-                live.url + "structure?kind=column&time=0&lat=nan&lon=0",
-                live.url + "structure?kind=meridional&time=0&at=0&at=1"]:
+    series = json.loads(fetch(select(base, quantity="series:mean_T", time=dict(role="x"))))
+    assert series["presentation"]["units"] == "K" and len(series["x"]["values"]) == len(series["values"]) > 1
+    sel = dict(quantity="temperature", longitude=dict(role="x"), latitude=dict(role="y"),
+               vertical=surface("native", 0), time=dict(role="fixed", index=4320))
+    bad = [select(live.url, **sel),                                          # outside the saved axis
+           select(live.url, **dict(sel, time=dict(role="fixed", index=0), vertical=surface("native", 0),
+                                    latitude=dict(role="x"))),               # no plot for these roles
+           select(live.url, **dict(sel, quantity="pressure", time=dict(role="fixed", index=0),
+                                    vertical=surface("pressure", 50000))),   # p on an isobar: not offered
+           select(live.url, **dict(sel, quantity="wind")),                   # a vector
+           live.url + "select?q=%7B%7D&q=%7B%7D",                            # repeated parameter
+           live.url + "select?field=temperature",                            # only q is accepted
+           live.url + "select?q=" + "x" * 5000]                              # too long
+    for url in bad:
         with pytest.raises(HTTPError) as exc:
             fetch(url)
+        assert exc.value.code == 400
+
+
+def test_structure_selections_on_ben2_and_statistics_core(live):
+    manifest = json.loads(fetch(live.url + "manifest"))
+    quantities = manifest["explorer"]["quantities"]
+    assert "zonal_mean" in quantities["mass_streamfunction"]["products"]
+    last = len(manifest["time_axes"]["snapshots"]["values"]) - 1
+    fixed = lambda v: dict(role="fixed", value=v)
+    column = json.loads(fetch(select(live.url, quantity="temperature", longitude=fixed(-79), latitude=fixed(-19.4),
+                                     vertical=dict(role="y", representation="geopotential_height"),
+                                     time=dict(role="fixed", index=last))))
+    assert column["sampling"] == "native Gaussian grid node" and column["location"]["longitude"] == 281.25
+    assert len(column["values"]) == len(column["y"]["values"]) == 40
+    # Slab Tₛ and the lowest-level air temperature are separate quantities.
+    surface_t = [m for m in column["markers"] if m["kind"] == "surface"][0]
+    lowest = [m for m in column["markers"] if m["kind"] == "level"][0]
+    assert surface_t["value"] != lowest["value"] and lowest["value"] == column["values"][39]
+    section = json.loads(fetch(select(live.url, quantity="u", longitude=dict(role="x"), latitude=fixed(0),
+                                      vertical=dict(role="y", representation="sigma"),
+                                      time=dict(role="fixed", index=last))))
+    assert len(section["x"]["values"]) == 181 and len(section["values"]) == 40 and len(section["values"][0]) == 181
+    np.testing.assert_allclose(np.array(section["values"])[:, 0], np.array(section["values"])[:, -1], atol=1e-9)
+    mean = json.loads(fetch(select(live.url, quantity="mass_streamfunction", latitude=dict(role="x"),
+                                   longitude=dict(role="reduce", op="mean"),
+                                   vertical=dict(role="y", representation="sigma"),
+                                   time=dict(role="reduce", op="mean", first=last-1, last=last))))
+    assert mean["sample"]["count"] == 2 and len(mean["values"]) == 41
+    assert np.all(np.array(mean["values"][0]) == 0)
+    assert live.session.bytes_used <= live.session.cache_bytes
+    core = live.url.removesuffix("0/") + "4/"
+    for base, sel in [(core, dict(quantity="temperature", longitude=fixed(0), latitude=fixed(0),
+                                  vertical=dict(role="y", representation="sigma"), time=dict(role="fixed", index=0))),
+                      (live.url, dict(quantity="temperature", latitude=dict(role="x"), longitude=dict(role="reduce"),
+                                      vertical=dict(role="y", representation="sigma"),
+                                      time=dict(role="reduce", first=3, last=2))),
+                      (live.url, dict(quantity="temperature", longitude=fixed(0), latitude=fixed(float("nan")),
+                                      vertical=dict(role="y", representation="sigma"), time=dict(role="fixed", index=0)))]:
+        with pytest.raises(HTTPError) as exc:
+            fetch(select(base, **sel))
         assert exc.value.code == 400

@@ -8,6 +8,11 @@ flowchart LR
         n_tropoi_ocli_omain_o__inspect__snapshot["#95;inspect#95;snapshot()"]
         n_tropoi_ocli_omain_o__resolve__inspect__target["#95;resolve#95;inspect#95;target()"]
     end
+    subgraph g_tropoi_orepresentation_oarchive_oairless["representation.archive.airless"]
+        n_tropoi_orepresentation_oarchive_oairless_oAirlessArchive{{"AirlessArchive"}}
+        n_tropoi_orepresentation_oarchive_oairless_oAirlessArchive_o____init____["AirlessArchive.#95;#95;init#95;#95;()"]
+        n_tropoi_orepresentation_oarchive_oairless_ois__airless__archive["is#95;airless#95;archive()"]
+    end
     subgraph g_tropoi_orepresentation_oarchive_oavailability["representation.archive.availability"]
         n_tropoi_orepresentation_oarchive_oavailability_ostatistics__only__description["statistics#95;only#95;description()"]
     end
@@ -51,6 +56,7 @@ flowchart LR
         n_tropoi_orepresentation_oarchive_oviewer__diagnostics_odiagnostics["diagnostics()"]
     end
     subgraph g_tropoi_orepresentation_oarchive_oviewer__manifest["representation.archive.viewer#95;manifest"]
+        n_tropoi_orepresentation_oarchive_oviewer__manifest_o__columns__manifest["#95;columns#95;manifest()"]
         n_tropoi_orepresentation_oarchive_oviewer__manifest_o__derived__fields["#95;derived#95;fields()"]
         n_tropoi_orepresentation_oarchive_oviewer__manifest_o__operations["#95;operations()"]
         n_tropoi_orepresentation_oarchive_oviewer__manifest_oviewer__manifest["viewer#95;manifest()"]
@@ -59,6 +65,9 @@ flowchart LR
         n_tropoi_orepresentation_ovisual_oquantities_oQuantityUnavailableError{{"QuantityUnavailableError"}}
         n_tropoi_orepresentation_ovisual_oquantities_oquantity["quantity()"]
         n_tropoi_orepresentation_ovisual_oquantities_oviewer__presentation["viewer#95;presentation()"]
+    end
+    subgraph g_tropoi_orepresentation_ovisual_oviewer__columns["representation.visual.viewer#95;columns"]
+        n_tropoi_orepresentation_ovisual_oviewer__columns_odescribe["describe()"]
     end
     subgraph g_tropoi_ospatial_oenvironment["spatial.environment"]
         n_tropoi_ospatial_oenvironment_oPlanetaryParameters_ofrom__earth__like["PlanetaryParameters.from#95;earth#95;like()"]
@@ -87,6 +96,9 @@ flowchart LR
     n_tropoi_ocli_omain_o__describe__state__fields --> n_tropoi_orepresentation_oarchive_oschema_ostate__schema__for
     n_tropoi_ocli_omain_o__inspect__snapshot --> n_tropoi_ocli_omain_o__error
     n_tropoi_ocli_omain_o__inspect__snapshot --> n_tropoi_orepresentation_oarchive_ocapsule_oopen__simulation
+    n_tropoi_orepresentation_oarchive_oairless_oAirlessArchive -->|#95;#95;init#95;#95;| n_tropoi_orepresentation_oarchive_oairless_oAirlessArchive_o____init____
+    n_tropoi_orepresentation_oarchive_oairless_oAirlessArchive_o____init____ --> n_tropoi_orepresentation_oarchive_olocal__resource_oresource
+    n_tropoi_orepresentation_oarchive_oairless_ois__airless__archive --> n_tropoi_orepresentation_oarchive_olocal__resource_oresource
     n_tropoi_orepresentation_oarchive_ocapsule_oCapsuleStorage -->|#95;#95;init#95;#95;| n_tropoi_orepresentation_oarchive_ocapsule_oCapsuleStorage_o____init____
     n_tropoi_orepresentation_oarchive_ocapsule_oCapsuleStorage_o____init____ -->|instantiate| n_tropoi_orepresentation_oarchive_oschema_oSchemaError
     n_tropoi_orepresentation_oarchive_ocapsule_oCapsuleStorage_o____init____ --> n_tropoi_orepresentation_oarchive_oschema_oStateSchema_ofrom__manifest__dict
@@ -128,12 +140,17 @@ flowchart LR
     n_tropoi_orepresentation_oarchive_oschema_ostate__schema__for --> n_tropoi_orepresentation_oarchive_oschema_o__swe__fields
     n_tropoi_orepresentation_oarchive_oviewer__diagnostics_odiagnostics --> n_tropoi_orepresentation_oarchive_olocal__resource_oresource
     n_tropoi_orepresentation_oarchive_oviewer__diagnostics_odiagnostics --> n_tropoi_ospatial_ogrids_oquadrature_ogauss__latitudes
+    n_tropoi_orepresentation_oarchive_oviewer__manifest_o__columns__manifest -->|instantiate| n_tropoi_orepresentation_oarchive_oairless_oAirlessArchive
+    n_tropoi_orepresentation_oarchive_oviewer__manifest_o__columns__manifest --> n_tropoi_orepresentation_oarchive_olocal__resource_oresource
+    n_tropoi_orepresentation_oarchive_oviewer__manifest_o__columns__manifest --> n_tropoi_orepresentation_ovisual_oviewer__columns_odescribe
     n_tropoi_orepresentation_oarchive_oviewer__manifest_o__derived__fields --> n_tropoi_orepresentation_ovisual_oquantities_oquantity
     n_tropoi_orepresentation_oarchive_oviewer__manifest_o__derived__fields --> n_tropoi_orepresentation_ovisual_oquantities_oviewer__presentation
+    n_tropoi_orepresentation_oarchive_oviewer__manifest_oviewer__manifest --> n_tropoi_orepresentation_oarchive_oairless_ois__airless__archive
     n_tropoi_orepresentation_oarchive_oviewer__manifest_oviewer__manifest --> n_tropoi_orepresentation_oarchive_ocapsule_oopen__storage
     n_tropoi_orepresentation_oarchive_oviewer__manifest_oviewer__manifest --> n_tropoi_orepresentation_oarchive_olocal__resource_oresource
     n_tropoi_orepresentation_oarchive_oviewer__manifest_oviewer__manifest --> n_tropoi_orepresentation_oarchive_oschema_oStateSchema_ofrom__manifest__dict
     n_tropoi_orepresentation_oarchive_oviewer__manifest_oviewer__manifest --> n_tropoi_orepresentation_oarchive_oviewer__diagnostics_odiagnostics
+    n_tropoi_orepresentation_oarchive_oviewer__manifest_oviewer__manifest --> n_tropoi_orepresentation_oarchive_oviewer__manifest_o__columns__manifest
     n_tropoi_orepresentation_oarchive_oviewer__manifest_oviewer__manifest --> n_tropoi_orepresentation_oarchive_oviewer__manifest_o__derived__fields
     n_tropoi_orepresentation_oarchive_oviewer__manifest_oviewer__manifest --> n_tropoi_orepresentation_oarchive_oviewer__manifest_o__operations
     n_tropoi_orepresentation_oarchive_oviewer__manifest_oviewer__manifest --> n_tropoi_orepresentation_ovisual_oquantities_oviewer__presentation
@@ -144,6 +161,7 @@ flowchart LR
     classDef root stroke-width:3px
     classDef truncated stroke-dasharray:4 3
     class n_tropoi_ocli_omain_o__cmd__inspect root
+    class n_tropoi_orepresentation_oarchive_oairless_oAirlessArchive_o____init____ truncated
     class n_tropoi_orepresentation_oarchive_ocapsule_oCapsuleStorage_o____init____ truncated
     class n_tropoi_orepresentation_oarchive_oheld__suarez_oHeldSuarezStorage_o____init____ truncated
     class n_tropoi_orepresentation_oarchive_oradiative_oRadiativeStorage_o____init____ truncated

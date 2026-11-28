@@ -246,6 +246,7 @@ classDiagram
 
 * [`calls/cli-inspect.mmd`](../calls/cli-inspect.mmd)
 * [`calls/cli-plot.mmd`](../calls/cli-plot.mmd)
+* [`calls/cli-run-airless.mmd`](../calls/cli-run-airless.mmd)
 * [`calls/cli-run-bve.mmd`](../calls/cli-run-bve.mmd)
 * [`calls/cli-run-pe.mmd`](../calls/cli-run-pe.mmd)
 * [`calls/cli-run-swe.mmd`](../calls/cli-run-swe.mmd)

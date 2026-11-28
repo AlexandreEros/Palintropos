@@ -9,7 +9,7 @@ Index: [all packages](../index.md) · parent [`tropoi.run`](tropoi.run.md)
 | Module | Category | Classes | Public functions |
 |---|---|---|---|
 | `tropoi.run.airless` | empty | – | – |
-| `tropoi.run.airless.__main__` | code | – | `main` |
+| `tropoi.run.airless.__main__` | code | – | `add_arguments`, `execute`, `main` |
 | `tropoi.run.airless.config` | code | `AirlessConfig` | `config_from_document`, `load_config_document`, `mercury_hayne_analogue`, `mercury_vpw99`, `strata_from_dicts`, `vpw99_strata` |
 | `tropoi.run.airless.experiment` | code | `AirlessRun` | `accumulate`, `accumulate_reference`, `aitken`, `build_columns`, `build_substrate`, `load_tier2`, `run_block`, `transient_steps` |
 
@@ -27,6 +27,7 @@ flowchart LR
         n_tropoi_orun_oairless_oconfig["run.airless.config"]
         n_tropoi_orun_oairless_oexperiment["run.airless.experiment"]
     end
+    p_tropoi_ocli["package cli"]
     p_tropoi_ophysics["package physics"]
     p_tropoi_orun["package run"]
     p_tropoi_orun_oheld__suarez["package run.held#95;suarez"]
@@ -36,6 +37,7 @@ flowchart LR
     n_tropoi_orun_oairless_o____main____ --> n_tropoi_orun_oairless_oconfig
     n_tropoi_orun_oairless_o____main____ -.-> n_tropoi_orun_oairless_oexperiment
     n_tropoi_orun_oairless_oexperiment --> n_tropoi_orun_oairless_oconfig
+    p_tropoi_ocli -.->|1| n_tropoi_orun_oairless_o____main____
     n_tropoi_orun_oairless_o____main____ -.->|1| p_tropoi_orun
     n_tropoi_orun_oairless_oconfig -->|2| p_tropoi_ophysics
     n_tropoi_orun_oairless_oexperiment -->|2| p_tropoi_ophysics
@@ -45,6 +47,7 @@ flowchart LR
     n_tropoi_orun_oairless_oexperiment -->|1| p_tropoi_ospatial_ogrids
     n_tropoi_orun_oairless_oexperiment -->|1| p_tropoi_otemporal
     classDef other fill:none,stroke-dasharray:3 3
+    class p_tropoi_ocli other
     class p_tropoi_ophysics other
     class p_tropoi_orun other
     class p_tropoi_orun_oheld__suarez other
@@ -88,3 +91,4 @@ classDiagram
 ## Entry paths through this package
 
 * [`calls/airless-mercury.mmd`](../calls/airless-mercury.mmd)
+* [`calls/cli-run-airless.mmd`](../calls/cli-run-airless.mmd)

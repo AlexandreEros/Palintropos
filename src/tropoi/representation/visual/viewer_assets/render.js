@@ -9,6 +9,14 @@ function make(tag,className,text) {
   if (text) element.textContent=text;
   return element;
 }
+// The node (cell centre) nearest a point: rows by latitude, columns periodic in longitude.
+function nearestNode(frame,lat,lon) {
+  let j=0, i=0, best=Infinity;
+  frame.lat.forEach((y,k)=>{ const d=Math.abs(y-lat); if (d<best) { best=d; j=k; } });
+  best=Infinity;
+  frame.lon.forEach((x,k)=>{ const d=Math.abs(((x-lon)%360+540)%360-180); if (d<best) { best=d; i=k; } });
+  return j*frame.lon.length+i;
+}
 function checkFrame(frame,options) {
   const n=frame.lat.length*frame.lon.length;
   if (frame.lat.length<2 || frame.lon.length<3 || frame.values.length!==n)
@@ -162,12 +170,16 @@ export class SurfaceView {
     if (!hit || !this.scene) { this.readout.textContent=""; return; }
     const {frame,options}=this.scene,{lat,lon,t}=hit;
     const parts=[Math.abs(lat).toFixed(2)+"°"+(lat<0?"S":"N")+", "+Math.abs(lon).toFixed(2)+"°"+(lon<0?"W":"E")];
-    if (!t) parts.push("Outside sampled latitudes");
+    if (!t && !frame.cells) parts.push("Outside sampled latitudes");
     else {
-      const invalid=t.slice(0,3).filter(k=>!usable(frame,options.shell,k));
+      const invalid=frame.cells ? [] : t.slice(0,3).filter(k=>!usable(frame,options.shell,k));
       if (invalid.length) {
         const code=frame.mask?.[invalid[0]] || 0;
         parts.push(options.maskLabels?.[code] || (code ? "Masked (code "+code+")" : "No valid sample"));
+      } else if (!hit.terrain && frame.cells) {
+        const k=nearestNode(frame,lat,lon);
+        parts.push((options.label || options.field || "Field")+" "+numberText(frame.values[k])+" "+(options.units||"")+
+          " · archived cell at "+numberText(frame.lat[Math.floor(k/frame.lon.length)])+"°, "+numberText(frame.lon[k%frame.lon.length])+"°E");
       } else if (!hit.terrain) parts.push((options.label || options.field || "Field")+" "+numberText(interpolate(frame.values,t))+" "+(options.units||""));
       if (options.shell) {
         parts.push("terrain "+numberText(interpolate(frame.terrain,t))+" m");

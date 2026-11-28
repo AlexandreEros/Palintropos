@@ -35,6 +35,7 @@ flowchart LR
     end
     p_tropoi_orepresentation_oarchive["package representation.archive"]
     p_tropoi_orepresentation_ovisual["package representation.visual"]
+    p_tropoi_orun_oairless["package run.airless"]
     p_tropoi_orun_obve["package run.bve"]
     p_tropoi_orun_ocustom["package run.custom"]
     p_tropoi_orun_ope["package run.pe"]
@@ -52,6 +53,7 @@ flowchart LR
     n_tropoi_ocli_ogenerate__planet -.->|2| p_tropoi_ospatial_oterrain
     n_tropoi_ocli_omain -.->|4| p_tropoi_orepresentation_oarchive
     n_tropoi_ocli_omain -.->|6| p_tropoi_orepresentation_ovisual
+    n_tropoi_ocli_omain -.->|1| p_tropoi_orun_oairless
     n_tropoi_ocli_omain -->|3| p_tropoi_orun_obve
     n_tropoi_ocli_omain -.->|1| p_tropoi_orun_ocustom
     n_tropoi_ocli_omain -.->|2| p_tropoi_orun_ope
@@ -63,6 +65,7 @@ flowchart LR
     classDef other fill:none,stroke-dasharray:3 3
     class p_tropoi_orepresentation_oarchive other
     class p_tropoi_orepresentation_ovisual other
+    class p_tropoi_orun_oairless other
     class p_tropoi_orun_obve other
     class p_tropoi_orun_ocustom other
     class p_tropoi_orun_ope other
@@ -85,6 +88,7 @@ No classes.
 * [`calls/cli-list-scenarios.mmd`](../calls/cli-list-scenarios.mmd)
 * [`calls/cli-plot.mmd`](../calls/cli-plot.mmd)
 * [`calls/cli-recompile.mmd`](../calls/cli-recompile.mmd)
+* [`calls/cli-run-airless.mmd`](../calls/cli-run-airless.mmd)
 * [`calls/cli-run-bve.mmd`](../calls/cli-run-bve.mmd)
 * [`calls/cli-run-pe.mmd`](../calls/cli-run-pe.mmd)
 * [`calls/cli-run-swe.mmd`](../calls/cli-run-swe.mmd)

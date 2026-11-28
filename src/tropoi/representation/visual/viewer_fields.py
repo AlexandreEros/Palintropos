@@ -59,8 +59,9 @@ class FrameProvider:
     """Evaluate exact saved-time indices. The caller owns the shared result cache.
 
     PE native values are zero-based full-level indices (0 = top). Pressure
-    (Pa) and geopotential height (m) use hydrostatic full-level positions;
-    sigma uses nominal positions. Surface-only fields use the native coordinate.
+    (Pa), geopotential height (m) and geopotential height above the local
+    surface (m, ``Z - Z_s``) use hydrostatic full-level positions; sigma
+    uses nominal positions. Surface-only fields use the native coordinate.
     """
 
     def __init__(self, root, manifest, *, backend="cpu"):
@@ -90,6 +91,11 @@ class FrameProvider:
                 self.backend_reason = str(err)
         elif backend == "cuda":
             self.backend_reason = "The atmospheric column evaluator uses NumPy."
+
+    def select(self, selection):
+        """Evaluate a parsed viewer selection (``viewer_atmosphere.select``)."""
+        from tropoi.representation.visual.viewer_atmosphere import select
+        return select(self, selection)
 
     def _scalar(self, coeffs):
         if self._gpu is not None:
@@ -224,7 +230,7 @@ class FrameProvider:
                 fields["geopotential_height"] = self.terrain
             mask = None
         else:
-            if coordinate not in ("pressure", "sigma", "geopotential_height"):
+            if coordinate not in ("pressure", "sigma", "geopotential_height", "height_above_surface"):
                 raise ValueError(f"Unsupported coordinate {coordinate!r}")
             if coordinate != "sigma" and field in ("zeta", "delta"):
                 raise ValueError("Vorticity and divergence require a native or sigma surface")
@@ -232,7 +238,7 @@ class FrameProvider:
             fields, mask = surface.values, surface.mask
             if coordinate == "pressure" and field == "pressure":
                 fields["pressure"] = np.full(self.shape, value, dtype=float)
-            if coordinate == "geopotential_height" and field == "geopotential":
+            if coordinate in ("geopotential_height", "height_above_surface") and field == "geopotential":
                 fields["geopotential"] = fields["geopotential_height"] * self._context.gravity
         u, v = fields["u"], fields["v"]
         values = np.hypot(u, v) if field in ("wind", "wind_speed") else fields[field]

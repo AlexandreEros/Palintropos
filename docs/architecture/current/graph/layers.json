@@ -12,8 +12,8 @@
     {
       "direction": "down",
       "kind": "imports",
-      "module_edges": 9,
-      "package_edges": 4,
+      "module_edges": 10,
+      "package_edges": 5,
       "source": "cli",
       "target": "run",
       "type_checking_only_package_edges": 0
@@ -138,7 +138,7 @@
       "depth": 2,
       "id": "representation",
       "internal_package_edges": 4,
-      "modules": 49,
+      "modules": 53,
       "packages": 4
     },
     {

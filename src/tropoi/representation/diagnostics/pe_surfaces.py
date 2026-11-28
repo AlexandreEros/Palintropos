@@ -43,6 +43,13 @@ only reads saved states. Rules for pressure surfaces:
   ``Phi_k`` does not decrease downward, raises ``ValueError``. A saved
   state with no valid node raises :class:`SurfaceUnavailableError`.
 
+Surfaces of constant geopotential height above the local surface
+(``("height_above_surface", h)``, metres) use the same inversion with the
+target ``Phi0 = g (h + h_s)`` at each column, ``h_s`` the column's terrain
+height: a geopotential height relative to the lower boundary, not a
+geometric altitude. ``h < 0`` is below the terrain everywhere (code 1), and
+``0 <= h`` below the lowest full level is code 3. Nothing is extrapolated.
+
 Rules for geopotential-height surfaces (``("geopotential_height", Z0)``,
 metres, any sign: the datum is that of the terrain and of the native
 reconstruction, ``Phi = g Z`` with the model's own constant ``g``; no other
@@ -123,6 +130,7 @@ from tropoi.representation.diagnostics.pe_levels import (LevelFields,
 __all__ = [
     "GeopotentialHeightSurface",
     "HEIGHT_MASK_LABELS",
+    "HeightAboveSurface",
     "HEIGHT_SURFACE_FIELDS",
     "MASK_ABOVE_TOP_LEVEL",
     "MASK_BELOW_BOTTOM_LEVEL",
@@ -288,6 +296,20 @@ class GeopotentialHeightSurface:
 
 
 @dataclass(frozen=True)
+class HeightAboveSurface(GeopotentialHeightSurface):
+    """Constant geopotential height ``h = Z - h_s`` above the local surface (m).
+
+    The target varies by column, ``Phi0 = g (h + h_s)``; it is geopotential
+    height, not geometric altitude."""
+
+    kind = "height_above_surface"
+
+    @property
+    def label(self) -> str:
+        return GeopotentialHeightSurface.label.fget(self) + " above the surface"
+
+
+@dataclass(frozen=True)
 class SigmaSurface:
     """A constant-sigma surface ``p / p_s = sigma0``, ``0 < sigma0 <= 1``."""
 
@@ -336,6 +358,8 @@ def parse_surface(spec
         return PressureSurface(value)
     if kind == "geopotential_height":
         return GeopotentialHeightSurface(value)
+    if kind == "height_above_surface":
+        return HeightAboveSurface(value)
     if kind == "sigma":
         return SigmaSurface(value)
     raise ValueError(f"unknown surface coordinate {kind!r}; use {_SPEC_HELP}")
@@ -456,7 +480,8 @@ def interpolate_geopotential(sigma_full, geopotential, columns: dict,
     ``sigma_full`` are the K level positions (strictly increasing in (0,
     1]); ``geopotential`` is ``(K, *shape)`` (``Phi_k``, top first);
     ``columns[name]`` are ``(K, *shape)`` stacks interpolated with the same
-    bracket and weight; ``phi_target`` is ``Phi0 = g Z0``; ``phi_surface``
+    bracket and weight; ``phi_target`` is ``Phi0 = g Z0``, one value or one
+    per node (``shape``); ``phi_surface``
     has ``shape`` (``Phi_s = g h_s``). Returns ``(values, mask, bracket)``
     as :func:`interpolate_log_sigma`, ``values`` also holding
     ``log_sigma`` (``ln sigma*``). Raises ``ValueError`` on invalid column
@@ -469,15 +494,20 @@ def interpolate_geopotential(sigma_full, geopotential, columns: dict,
             and np.all(sig <= 1.0) and np.all(np.diff(sig) > 0.0)):
         raise ValueError(f"full-level sigmas must be strictly increasing in "
                          f"(0, 1], got {sig}")
-    phi0 = float(phi_target)
-    if not math.isfinite(phi0):
-        raise ValueError(f"target geopotential must be finite, got {phi0}")
     phi = np.asarray(geopotential, dtype=np.float64)
     k_count = sig.size
     if phi.ndim < 1 or phi.shape[0] != k_count:
         raise ValueError(f"geopotential has shape {phi.shape}; expected "
                          f"({k_count}, ...)")
     shape = phi.shape[1:]
+    if np.ndim(phi_target) == 0:
+        phi0 = float(phi_target)
+        if not math.isfinite(phi0):
+            raise ValueError(f"target geopotential must be finite, got {phi0}")
+    else:
+        phi0 = np.broadcast_to(np.asarray(phi_target, dtype=np.float64), shape)
+        if not np.all(np.isfinite(phi0)):
+            raise ValueError("target geopotential must be finite")
     phi_s = np.broadcast_to(np.asarray(phi_surface, dtype=np.float64), shape)
     if not (np.all(np.isfinite(phi)) and np.all(np.isfinite(phi_s))):
         raise ValueError("column geopotential is not finite")
@@ -690,7 +720,7 @@ def interpolate_columns(columns: PressureColumns, surface, *,
     reference.
     """
     target = parse_surface(surface)
-    if target.kind == "geopotential_height":
+    if target.kind in ("geopotential_height", "height_above_surface"):
         return _height_fields(columns, target, time_label)
     if target.kind == "sigma":
         return _sigma_fields(columns, target, time_label)
@@ -722,9 +752,10 @@ def _height_fields(columns: PressureColumns, target, time_label
     stacks = {"temperature": columns.temperature}
     if columns.winds:
         stacks["u"], stacks["v"] = columns.u, columns.v
+    relative = target.kind == "height_above_surface"
+    phi0 = g * target.height_m + phi_s if relative else g * target.height_m
     values, mask, bracket = interpolate_geopotential(
-        columns.level_positions, columns.geopotential, stacks,
-        g * target.height_m, phi_s)
+        columns.level_positions, columns.geopotential, stacks, phi0, phi_s)
     if not np.any(mask == MASK_VALID):
         lo, hi = columns.sampled_height_range()
         h = phi_s / g
@@ -737,7 +768,8 @@ def _height_fields(columns: PressureColumns, target, time_label
     sigma_target = np.exp(values["log_sigma"])
     values["pressure"] = p_s * sigma_target
     values["pressure"][mask == MASK_BELOW_SURFACE] = 0.0
-    values["geopotential_height"] = np.full(mask.shape, target.height_m)
+    values["geopotential_height"] = (target.height_m + phi_s / g if relative
+                                     else np.full(mask.shape, target.height_m))
     return SurfaceFields(surface=target, level_sigma=columns.level_sigma,
                          level_positions=columns.level_positions,
                          lat_deg=columns.lat_deg, lon_deg=columns.lon_deg,

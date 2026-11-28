@@ -82,5 +82,8 @@ output { font-size: .9rem }
 .levels tbody tr { cursor: pointer }
 .levels tbody tr:hover { background: #eef5f1 }
 .levels tr.selected { background: #ffe8cf }
-#structure { margin-top: .85rem }
+#explorer { margin-top: .85rem }
+.coords .coord { display: flex; flex-direction: column; gap: .3rem; margin-top: .5rem }
+.coords .coord > select, .coords .coord > input { width: 100% }
+.product { font-size: .85rem; font-weight: 650; color: #2d6660 }
 @media(max-width: 720px) { .levels { font-size: .72rem } .levels th, .levels td { padding: .15rem .25rem } }

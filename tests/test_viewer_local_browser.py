@@ -66,7 +66,7 @@ def test_ben_to_shallow_water_and_bve_in_same_application():
                         assert page.eval("""(async () => {
                             const {loadFrame} = await import('./data.js');
                             const {fieldScale,surfaceLayers} = await import('./mesh.js');
-                            const get = field => loadFrame({time:3,field,coordinate:'native',value:0});
+                            const get = quantity => loadFrame({quantity,longitude:{role:'x'},latitude:{role:'y'},vertical:{role:'none'},time:{role:'fixed',index:3}});
                             const [phi,speed] = await Promise.all([get('phi'),get('wind_speed')]);
                             const options = {shell:true, radius:6371220, exaggeration:75};
                             const mesh = (f,key) => surfaceLayers(f,options,fieldScale(f,{...options,field:key}));
@@ -81,7 +81,8 @@ def test_ben_to_shallow_water_and_bve_in_same_application():
                                    fluid.colors.some((v,k) => v!==recoloured.colors[k]);
                         })()""")
                 page.eval('document.getElementById("runs").selectedIndex=3;document.getElementById("runs").dispatchEvent(new Event("change"))')
-                until(page, 'location.pathname.endsWith("/3/") && document.getElementById("series-png")?.disabled === false')
+                until(page, 'location.pathname.endsWith("/3/") && window.viewer?.explorer?.data?.product === "recorded_series" && '
+                      'document.querySelector(\'[data-e="png"]\')?.disabled === false')
                 assert not page.exceptions, page.exceptions
                 assert all(url.startswith("http://"+server.authority+"/") or url.startswith(("data:", "blob:"))
                            for url in page.requests), page.requests

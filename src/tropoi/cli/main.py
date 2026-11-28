@@ -1288,6 +1288,12 @@ examples:
 """
 
 
+def _cmd_run_airless(args) -> int:
+    from tropoi.run.airless.__main__ import execute
+    args.command = "show-config" if args.show_config else "run"
+    return execute(args, args._parser)
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="tropoi",
@@ -1302,8 +1308,9 @@ def build_parser() -> argparse.ArgumentParser:
     # tropoi run <solver>
     run_parser = commands.add_parser(
         "run", help="Run a solver.",
-        description="Run a solver: the barotropic vorticity equation (bve) "
-                    "or the rotating shallow-water equations (swe).")
+        description="Run a solver: the barotropic vorticity equation (bve), "
+                    "the rotating shallow-water equations (swe), the dry primitive "
+                    "equations (pe) or airless conductive columns (airless).")
     solvers = run_parser.add_subparsers(dest="solver", metavar="SOLVER",
                                         required=True)
     bve_parser = solvers.add_parser(
@@ -1335,6 +1342,18 @@ def build_parser() -> argparse.ArgumentParser:
         formatter_class=argparse.RawDescriptionHelpFormatter)
     add_pe_arguments(pe_parser)
     pe_parser.set_defaults(_handler=_cmd_run_pe, _parser=pe_parser)
+
+    airless_parser = solvers.add_parser(
+        "airless", help="Airless body: independent conductive substrate columns.",
+        description="Run an airless-body thermal experiment: independent conductive "
+                    "columns under orbital illumination, until periodic or for a finite "
+                    "transient (--steps or --duration). The same as "
+                    "`python -m tropoi.run.airless run`.")
+    from tropoi.run.airless.__main__ import add_arguments as add_airless_arguments
+    add_airless_arguments(airless_parser)
+    airless_parser.add_argument("--show-config", action="store_true",
+                                help="print the configuration and run plan, and run nothing")
+    airless_parser.set_defaults(_handler=_cmd_run_airless, _parser=airless_parser)
 
     # tropoi list <topic>
     list_parser = commands.add_parser(

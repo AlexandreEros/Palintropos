@@ -8,6 +8,9 @@ flowchart LR
     subgraph g_tropoi_orepresentation_oarchive_oviewer__manifest["representation.archive.viewer#95;manifest"]
         n_tropoi_orepresentation_oarchive_oviewer__manifest_oviewer__manifest["viewer#95;manifest()"]
     end
+    subgraph g_tropoi_orepresentation_ovisual_oviewer__atmosphere["representation.visual.viewer#95;atmosphere"]
+        n_tropoi_orepresentation_ovisual_oviewer__atmosphere_odescribe["describe()"]
+    end
     subgraph g_tropoi_orepresentation_ovisual_oviewer__server["representation.visual.viewer#95;server"]
         n_tropoi_orepresentation_ovisual_oviewer__server_oViewerServer{{"ViewerServer"}}
         n_tropoi_orepresentation_ovisual_oviewer__server_oViewerServer_o____init____["ViewerServer.#95;#95;init#95;#95;()"]
@@ -21,6 +24,7 @@ flowchart LR
     n_tropoi_orepresentation_ovisual_oviewer__server_oViewerServer -->|#95;#95;init#95;#95;| n_tropoi_orepresentation_ovisual_oviewer__server_oViewerServer_o____init____
     n_tropoi_orepresentation_ovisual_oviewer__server_oViewerSession -->|#95;#95;init#95;#95;| n_tropoi_orepresentation_ovisual_oviewer__server_oViewerSession_o____init____
     n_tropoi_orepresentation_ovisual_oviewer__server_oViewerSession_o____init____ --> n_tropoi_orepresentation_oarchive_oviewer__manifest_oviewer__manifest
+    n_tropoi_orepresentation_ovisual_oviewer__server_oViewerSession_o____init____ --> n_tropoi_orepresentation_ovisual_oviewer__atmosphere_odescribe
     n_tropoi_orepresentation_ovisual_oviewer__server_oViewerSession_o____init____ --> n_tropoi_orepresentation_ovisual_oviewer__server_o__star
     n_tropoi_orepresentation_ovisual_oviewer__server_oserve -->|instantiate| n_tropoi_orepresentation_ovisual_oviewer__server_oViewerServer
     n_tropoi_orepresentation_ovisual_oviewer__server_oserve -->|instantiate| n_tropoi_orepresentation_ovisual_oviewer__server_oViewerSession
@@ -28,4 +32,5 @@ flowchart LR
     classDef truncated stroke-dasharray:4 3
     class n_tropoi_ocli_omain_o__cmd__view root
     class n_tropoi_orepresentation_oarchive_oviewer__manifest_oviewer__manifest truncated
+    class n_tropoi_orepresentation_ovisual_oviewer__atmosphere_odescribe truncated
     class n_tropoi_orepresentation_ovisual_oviewer__server_o__star truncated

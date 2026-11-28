@@ -16,7 +16,9 @@ from urllib.parse import parse_qs, urlsplit
 import numpy as np
 
 from tropoi.representation.archive.local_resource import resource
+from tropoi.representation.archive.airless import READER as AIRLESS_READER
 from tropoi.representation.archive.viewer_manifest import viewer_manifest
+from tropoi.representation.visual.selection import PRODUCTS, parse_selection, time_axis
 
 
 def _json(value):
@@ -28,10 +30,10 @@ def encode_frame(arrays):
     header = {}
     blocks = []
     offset = 0
-    for name in ("lat", "lon", "values", "terrain", "height", "u", "v", "mask"):
+    for name in ("lat", "lon", "values", "terrain", "height", "u", "v", "mask", "cells"):
         if name not in arrays:
             continue
-        data = np.asarray(arrays[name], dtype="u1" if name == "mask" else "<f4")
+        data = np.asarray(arrays[name], dtype="u1" if name in ("mask", "cells") else "<f4")
         block = data.tobytes(order="C")
         header[name] = [offset, data.size]
         offset += len(block)
@@ -56,25 +58,34 @@ def _star(manifest):
     if physics.get("enabled") is False or kind not in ("orbital", "tidally_locked",
                                                         "instantaneous"):
         return None
-    times = manifest["time_axes"]["snapshots"]["values"]
     from tropoi.physics.insolation import illumination_from_spec
     if kind == "orbital":
         geometry = illumination_from_spec(spec)
-        positions = []
-        for t in times:
+
+        def point(t):
             lat, lon = geometry.subsolar_point(t)
-            positions.append(dict(latitude=math.degrees(lat), longitude=math.degrees(lon)))
+            return dict(latitude=math.degrees(lat), longitude=math.degrees(lon))
     elif kind == "tidally_locked":
-        point = dict(latitude=0, longitude=math.degrees(spec.get("substellar_longitude", 0)))
-        positions = [point] * len(times)
+        fixed = dict(latitude=0, longitude=math.degrees(spec.get("substellar_longitude", 0)))
+
+        def point(t):
+            return fixed
     else:
         legacy = {k: v for k, v in spec.items() if k not in ("kind", "solar_day")}
         legacy.setdefault("period", 365.25 * 86400.0)
         geometry = illumination_from_spec(legacy)   # no spin: declination only
         solar_day = spec.get("solar_day", 86400)
-        positions = [dict(latitude=math.degrees(geometry.declination(t)),
-                          longitude=(-360 * t / solar_day + 180) % 360 - 180) for t in times]
-    return dict(positions=positions, source="configured insolation geometry")
+
+        def point(t):
+            return dict(latitude=math.degrees(geometry.declination(t)),
+                        longitude=(-360 * t / solar_day + 180) % 360 - 180)
+    # One position per saved sample of every time axis that maps can use.
+    axes = {name: [point(t) for t in axis["values"]] for name, axis in manifest["time_axes"].items()
+            if name in _MAP_AXES and "values" in axis}
+    return dict(axes=axes, source="configured insolation geometry")
+
+
+_MAP_AXES = ("snapshots", "surface_samples", "profile_samples", "every_step")
 
 
 class ViewerSession:
@@ -104,6 +115,11 @@ class ViewerSession:
                 del manifest["diagnostics"]["timeseries"]
                 manifest["operations"]["series"] = [
                     k for k, d in manifest["diagnostics"].items() if d["kind"] == "series"]
+            if "explorer" not in manifest:
+                from tropoi.representation.visual.viewer_atmosphere import describe
+                manifest["explorer"] = describe(manifest)
+            manifest["explorer"]["products"] = {k: dict(label=v["label"], roles=v["roles"])
+                                                for k, v in PRODUCTS.items()}
             self.manifests.append(manifest)
         self.backend = backend
         self.cache_bytes = cache_bytes
@@ -112,51 +128,44 @@ class ViewerSession:
         self.lock = threading.Lock()
         self.providers = {}
 
-    def frame(self, run, query):
-        manifest = self.manifests[run]
-        field = query["field"]
-        fields = manifest["fields"]
-        if field not in fields or field == "wind":
-            raise ValueError("Select an available scalar field")
-        time = int(query["time"])
-        if not 0 <= time < len(manifest["time_axes"]["snapshots"]["values"]):
-            raise ValueError("Snapshot outside saved time axis")
-        coordinate = query.get("coordinate", "native")
-        value = float(query.get("value", 0))
-        if not math.isfinite(value):
-            raise ValueError("Surface value must be finite")
-        if coordinate != "native" and field not in manifest["operations"].get(coordinate, []):
-            raise ValueError("Coordinate is unavailable for this quantity")
-        if coordinate not in ("native", "pressure", "sigma", "geopotential_height"):
-            raise ValueError("Unknown surface coordinate")
-        if coordinate == "native" and fields[field].get("levels"):
-            levels = manifest["axes"]["vertical"]["full_levels"]
-            if not value.is_integer() or not 0 <= value < len(levels):
-                raise ValueError("Native level outside saved axis")
-        key = (run, time, field, coordinate, value)
-        return self._cached(run, key, lambda provider: encode_frame(
-            provider.slice(time, field, coordinate, value)))
+    def select(self, run, text):
+        """Evaluate one selection (``selection.parse_selection``).
 
-    def _cached(self, run, key, evaluate):
+        Returns ``(bytes, mime)``: a binary frame for a map, JSON otherwise."""
+        manifest = self.manifests[run]
+        selection = parse_selection(manifest, text)
+        key = ("select", run, json.dumps(selection, sort_keys=True))
+        if selection["product"] == "recorded_series":
+            data = self._cached(run, key, lambda provider: _json(self.recorded(run, selection["quantity"])),
+                                locked=False)
+            return data, "application/json"
+        frame = selection["product"] == "map"
+
+        def evaluate(provider):
+            kind, result = provider.select(selection)
+            return encode_frame(result) if kind == "frame" else _json(result)
+
+        # Maps keep the lock: the optional CUDA synthesis object is not thread-safe.
+        data = self._cached(run, key, evaluate, locked=frame)
+        return data, "application/octet-stream" if frame else "application/json"
+
+    def _cached(self, run, key, evaluate, locked):
         """One byte-bounded LRU cache serves every view.
 
-        Providers only read their archive, so evaluation runs outside the lock:
-        a long zonal mean does not block map requests. Frame evaluation keeps
-        the lock, because the optional CUDA synthesis object is not thread-safe.
+        Providers only read their archive, so evaluation runs outside the lock
+        (a long zonal mean does not block map requests) unless ``locked``.
         """
-        from tropoi.representation.visual.viewer_fields import FrameProvider
-
         with self.lock:
             if key in self.cache:
                 self.cache.move_to_end(key)
                 return self.cache[key]
             provider = self.providers.get(run)
             if provider is None:
-                provider = self.providers[run] = FrameProvider(self.roots[run], self.manifests[run],
-                                                               backend=self.backend)
-            if key[0] != "structure":
+                provider = self.providers[run] = provider_for(self.roots[run], self.manifests[run],
+                                                              backend=self.backend)
+            if locked:
                 data = evaluate(provider)
-        if key[0] == "structure":
+        if not locked:
             data = evaluate(provider)
         with self.lock:
             if key not in self.cache:
@@ -167,42 +176,19 @@ class ViewerSession:
                     self.bytes_used += len(data)
             return data
 
-    def structure(self, run, query):
-        """Column, section or zonal reduction as JSON (see FrameProvider)."""
-        kind = query.get("kind")
-        operation = {"column": "column", "meridional": "meridional_section", "zonal": "zonal_section",
-                     "zonal_mean": "zonal_mean"}.get(kind)
-        if operation not in self.manifests[run]["operations"].get("structure", []):
-            raise ValueError("This archive does not offer that vertical-structure product")
-
-        def number(name):
-            value = float(query[name])
-            if not math.isfinite(value):
-                raise ValueError("Coordinates must be finite")
-            return value
-
-        if kind == "column":
-            args = (int(query["time"]), number("lat"), number("lon"), query.get("snap", "1") == "1")
-            evaluate = lambda provider: _json(provider.column(*args))
-        elif kind == "zonal_mean":
-            # One reduction yields [u], [v], [T] and the mass streamfunction.
-            args = (int(query["first"]), int(query["last"]))
-            evaluate = lambda provider: _json(provider.zonal_mean(*args))
-        else:
-            args = (int(query["time"]), kind, number("at"))
-            evaluate = lambda provider: _json(provider.section(*args))
-        return self._cached(run, ("structure", run, kind, args), evaluate)
-
-    def diagnostic(self, run, field):
-        product = self.manifests[run]["diagnostics"].get(field)
+    def recorded(self, run, quantity):
+        """A recorded series, at its own cadence, as a selection payload."""
+        manifest = self.manifests[run]
+        field = manifest["explorer"]["quantities"][quantity]["recorded"]
+        product = manifest["diagnostics"].get(field)
         if not product or product["kind"] != "series":
             raise ValueError("Select an available recorded series")
         path = resource(self.roots[run], product["path"])
         if "member" in product:
             series = json.loads(path.read_text(encoding="utf-8"))
-            x = series["day"][product["start_index"]:]
+            x = [86400.0 * day for day in series["day"][product["start_index"]:]]
             y = series[product["member"]]
-            return dict(x=x, y=y, x_label="Simulation day", units=product.get("units"), label=field)
+            return _series(quantity, product, x, y)
         # An archive CSV can carry several step diagnostics with their own units.
         column = product.get("column")
         if column is None:
@@ -210,8 +196,25 @@ class ViewerSession:
         with path.open(encoding="utf-8", newline="") as stream:
             points = [(float(row["time_s"]), float(row[column])) for row in csv.DictReader(stream)
                       if row[column] and math.isfinite(float(row[column]))]
-        return dict(x=[p[0] for p in points], y=[p[1] for p in points],
-                    x_label="Simulation time (s)", units=product["presentation"].get("units"), label=column)
+        return _series(quantity, product, [p[0] for p in points], [p[1] for p in points])
+
+
+def _series(quantity, product, x, y):
+    if len(x) != len(y):
+        raise ValueError("Recorded time and value counts disagree")
+    return dict(product="recorded_series", quantity=quantity, presentation=product["presentation"],
+                x=time_axis(x, label="Recorded time"),
+                y=dict(label=product["presentation"]["name"], units=product["presentation"].get("units")),
+                values=y, sampling=f"recorded in {product['path']} at the run's own cadence", notes=[])
+
+
+def provider_for(root, manifest, *, backend="cpu"):
+    """The evaluator of an archive, chosen by the reader that described it."""
+    if manifest["source"].get("reader") == AIRLESS_READER:
+        from tropoi.representation.visual.viewer_columns import ColumnArchiveProvider
+        return ColumnArchiveProvider(root, manifest, backend=backend)
+    from tropoi.representation.visual.viewer_fields import FrameProvider
+    return FrameProvider(root, manifest, backend=backend)
 
 
 class ViewerServer(ThreadingHTTPServer):
@@ -252,23 +255,21 @@ class _Handler(BaseHTTPRequestHandler):
             if not 0 <= run < len(session.roots):
                 raise ValueError("Unknown capsule")
             entry = parts[3] or "index.html"
-            query = parse_qs(url.query, strict_parsing=True, max_num_fields=6)
+            # The page carries its own state (time, cursor, preset); a selection
+            # request carries exactly one parameter, q.
+            query = parse_qs(url.query, strict_parsing=True, max_num_fields=6) if url.query else {}
             if any(len(values) != 1 for values in query.values()):
-                raise ValueError("Repeated selection parameter")
-            query = {k: values[0] for k, values in query.items()}
+                raise ValueError("Repeated query parameter")
+            if entry == "select" and set(query) != {"q"}:
+                raise ValueError("The only query parameter of a selection is q")
             mime = "application/json"
             if entry == "manifest":
                 data = _json(session.manifests[run])
             elif entry == "runs":
                 data = _json(dict(current=run, runs=[dict(id=i, label=p.name,
                     url=f"/{server.token}/{i}/") for i, p in enumerate(session.roots)]))
-            elif entry == "frame":
-                data = session.frame(run, query)
-                mime = "application/octet-stream"
-            elif entry == "structure":
-                data = session.structure(run, query)
-            elif entry == "diagnostic":
-                data = _json(session.diagnostic(run, query["field"]))
+            elif entry == "select":
+                data, mime = session.select(run, query["q"][0])
             elif entry in server.assets:
                 data = server.assets[entry]
                 mime = {".js": "text/javascript", ".html": "text/html", ".css": "text/css"}[Path(entry).suffix]

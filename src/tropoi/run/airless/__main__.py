@@ -1,5 +1,5 @@
 """``python -m tropoi.run.airless {show-config,run} (--preset NAME [...] | --config FILE)
-[--steps N | --duration SECONDS]``.
+[--steps N | --duration SECONDS]``, also ``tropoi run airless [--show-config] ...``.
 
 Runs execute on CUDA (CuPy); there is no CPU fallback. CPU execution is for
 verification: the hidden ``--device cpu`` or
@@ -47,9 +47,8 @@ def _config(args):
     return PRESETS[args.preset](**kw)
 
 
-def main(argv=None) -> int:
-    ap = argparse.ArgumentParser(prog="python -m tropoi.run.airless")
-    ap.add_argument("command", choices=("show-config", "run"))
+def add_arguments(ap):
+    """The options shared by ``python -m tropoi.run.airless`` and ``tropoi run airless``."""
     source = ap.add_mutually_exclusive_group(required=True)
     source.add_argument("--preset", choices=sorted(PRESETS))
     source.add_argument("--config", metavar="FILE",
@@ -82,7 +81,17 @@ def main(argv=None) -> int:
     ap.add_argument("--device", choices=("cuda", "cpu"), help=argparse.SUPPRESS)
     ap.add_argument("--max-wall-s", type=float)
     ap.add_argument("--allow-dirty", action="store_true")
-    args = ap.parse_args(argv)
+
+
+def main(argv=None) -> int:
+    ap = argparse.ArgumentParser(prog="python -m tropoi.run.airless")
+    ap.add_argument("command", choices=("show-config", "run"))
+    add_arguments(ap)
+    return execute(ap.parse_args(argv), ap)
+
+
+def execute(args, ap) -> int:
+    """Show or run the configured experiment (``args.command``)."""
     source_info = None
     if args.config is not None:
         if not args.config.strip():
