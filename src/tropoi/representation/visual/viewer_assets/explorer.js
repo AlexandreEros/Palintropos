@@ -652,7 +652,8 @@ export class Explorer {
 
   get rangeKey() {
     const d = this.data;
-    return d && d.axes.x && d.axes.y ? d.quantity + "|" + d.axes.x + "|" + d.axes.y : null;
+    // One colour range per quantity, shared by every two-dimensional result of it.
+    return d && d.axes.x && d.axes.y ? d.quantity : null;
   }
 
   storeRange() {
