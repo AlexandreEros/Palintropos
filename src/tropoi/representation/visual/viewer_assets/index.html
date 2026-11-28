@@ -33,8 +33,28 @@
             Click a field, the globe or a plot to move the linked cursor.</p>
           <p data-e="product" class="product"></p>
           <label data-e="snap-wrap" class="check"><input data-e="snap" type="checkbox" checked> Snap to native grid node</label>
-          <label data-e="wind-wrap" class="check"><input data-e="wind" type="checkbox"> Wind streamlines</label>
-          <p data-e="wind-reason" class="hint" hidden></p>
+          <fieldset data-e="wind-fieldset"><legend>Horizontal wind</legend>
+            <label>Lines<select data-e="wind-lines">
+              <option value="none">None</option>
+              <option value="auto">Automatic: ψ contours if the divergent wind is negligible, else full-wind streamlines</option>
+              <option value="psi">ψ contours (streamlines of the rotational wind)</option>
+              <option value="streamlines">Streamlines of the full wind (rotational + divergent)</option></select></label>
+            <div class="pair">
+              <label>Divergent-energy limit (%)<input data-e="wind-limit" type="number" min="0" max="100" step="any" value="1"></label>
+              <label>ψ interval (m² s⁻¹)<input data-e="wind-interval" type="number" min="0" step="any" placeholder="automatic"></label>
+            </div>
+            <label>Line density<input data-e="wind-density" type="range" min="0.5" max="3" step="0.25" value="1"></label>
+            <label class="check"><input data-e="wind-arrows" type="checkbox"> Arrows (quiver)</label>
+            <div class="pair">
+              <label>Arrow spacing (°)<input data-e="wind-spacing" type="number" min="2" max="45" step="any" value="10"></label>
+              <label>Arrow length<select data-e="wind-length"><option value="speed">∝ speed</option>
+                <option value="unit">Equal (direction)</option></select></label>
+            </div>
+            <label class="check"><input data-e="wind-colour" type="checkbox"> Colour arrows by speed</label>
+            <p data-e="wind-reason" class="hint" hidden></p>
+            <p class="hint">ψ contours are drawn at a uniform interval, so their spacing Δn ≈ Δψ/|v_rot|: closer lines
+              mean faster rotational flow. Streamlines follow the full wind. Display settings send no request.</p>
+          </fieldset>
           <fieldset data-e="range-fieldset"><legend>Colours</legend>
             <label>Colour range<select data-e="range-mode">
               <option value="auto">Automatic (all plotted values)</option>

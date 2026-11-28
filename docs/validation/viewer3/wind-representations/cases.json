@@ -1,0 +1,642 @@
+[
+ {
+  "description": "Longitude × latitude · time fixed",
+  "quantity": "free_surface_height",
+  "coordinates": {
+   "latitude": {
+    "role": "y",
+    "sampling": "exact band-limited synthesis on the 2° display mesh"
+   },
+   "longitude": {
+    "role": "x",
+    "sampling": "exact band-limited synthesis on the 2° display mesh"
+   },
+   "vertical": {
+    "role": "none"
+   },
+   "time": {
+    "role": "fixed",
+    "axis": "snapshots",
+    "index": 3,
+    "seconds": 1296000
+   }
+  },
+  "settings": {
+   "lines": "auto",
+   "limit": 1,
+   "interval": null,
+   "density": 1,
+   "arrows": false,
+   "spacing": 10,
+   "length": "speed",
+   "colour": false
+  },
+  "drawn": {
+   "mode": "psi",
+   "lines": 11,
+   "closed": 11,
+   "interval": 20000000,
+   "arrows": 56,
+   "quiver": 0
+  },
+  "wind": {
+   "definition": "The horizontal wind v = r̂ × ∇ψ + ∇χ on the same surface as the field, of one saved state or the time mean over the same saved states: ψ contours at a uniform interval (streamlines of the rotational wind; of the whole wind when it is non-divergent), whose spacing Δn ≈ Δψ/|v_rot| encodes speed; streamlines of the full wind, curves tangent to (u, v) that are not trajectories and whose spacing does not encode speed; and arrows at native mesh nodes",
+   "components": [
+    "wind_u",
+    "wind_v"
+   ],
+   "psi": {
+    "available": true,
+    "convention": "ψ = ∇⁻²ζ on the sphere: ψ_lm = −a² ζ_lm / (l(l+1)), with the l = 0 coefficient (the mean, which carries no velocity) set to 0; v_rot = r̂ × ∇ψ, so the rotational wind keeps larger ψ on its right; units m² s⁻¹",
+    "radius_m": 6371220,
+    "time_mean": false,
+    "source": "the saved state's coefficients"
+   },
+   "kinetic_energy": {
+    "rotational_energy": 75839918962865136,
+    "divergent_energy": 54119252389155.945,
+    "divergent_share": 0.0007130896400012388,
+    "rotational_rms_speed": 17.243935681757353,
+    "divergent_rms_speed": 0.4606418147107493,
+    "rotational_max_speed": 40.501472354973394,
+    "at_rest": false,
+    "non_divergent": false,
+    "rule": "E_rot = ½∫|∇ψ|² dA and E_div = ½∫|∇χ|² dA over the sphere, from the ζ and δ coefficients of the surface shown (area-weighted, not mass-weighted: the Helmholtz parts are orthogonal only under the uniform area measure, so only then do their energies add). Share = E_div / (E_rot + E_div)"
+   }
+  },
+  "title": [
+   "20260730T011700Z_williamson5_rot23p93h_r4_l63_dt120h_45406d82_668e6c9a · Longitude × latitude · time fixed",
+   "20260730T011700Z_williamson5_rot23p93h_r4_l63_dt120h_45406d82_668e6c9a",
+   "Day 15 · 1296000 s · one saved sample",
+   "latitude exact band-limited synthesis on the 2° display mesh; longitude exact band-limited synthesis on the 2° display mesh"
+  ],
+  "name": "01-w5-day15-auto-psi-contours",
+  "archive": "docs/runs/20260730T011700Z_williamson5_rot23p93h_r4_l63_dt120h_45406d82_668e6c9a",
+  "query": "preset=map&time=3",
+  "exceptions": []
+ },
+ {
+  "description": "Longitude × latitude · time fixed",
+  "quantity": "free_surface_height",
+  "coordinates": {
+   "latitude": {
+    "role": "y",
+    "sampling": "exact band-limited synthesis on the 2° display mesh"
+   },
+   "longitude": {
+    "role": "x",
+    "sampling": "exact band-limited synthesis on the 2° display mesh"
+   },
+   "vertical": {
+    "role": "none"
+   },
+   "time": {
+    "role": "fixed",
+    "axis": "snapshots",
+    "index": 3,
+    "seconds": 1296000
+   }
+  },
+  "settings": {
+   "lines": "psi",
+   "limit": 1,
+   "interval": null,
+   "density": 1,
+   "arrows": true,
+   "spacing": 12,
+   "length": "speed",
+   "colour": true
+  },
+  "drawn": {
+   "mode": "psi",
+   "lines": 11,
+   "closed": 11,
+   "interval": 20000000,
+   "arrows": 56,
+   "quiver": 284,
+   "quiverScale": {
+    "vmax": 36.235662451100644,
+    "reference": 20,
+    "pixelsPerMs": 0.6181755343987012,
+    "keyPixels": 12.363510687974024
+   }
+  },
+  "wind": {
+   "definition": "The horizontal wind v = r̂ × ∇ψ + ∇χ on the same surface as the field, of one saved state or the time mean over the same saved states: ψ contours at a uniform interval (streamlines of the rotational wind; of the whole wind when it is non-divergent), whose spacing Δn ≈ Δψ/|v_rot| encodes speed; streamlines of the full wind, curves tangent to (u, v) that are not trajectories and whose spacing does not encode speed; and arrows at native mesh nodes",
+   "components": [
+    "wind_u",
+    "wind_v"
+   ],
+   "psi": {
+    "available": true,
+    "convention": "ψ = ∇⁻²ζ on the sphere: ψ_lm = −a² ζ_lm / (l(l+1)), with the l = 0 coefficient (the mean, which carries no velocity) set to 0; v_rot = r̂ × ∇ψ, so the rotational wind keeps larger ψ on its right; units m² s⁻¹",
+    "radius_m": 6371220,
+    "time_mean": false,
+    "source": "the saved state's coefficients"
+   },
+   "kinetic_energy": {
+    "rotational_energy": 75839918962865136,
+    "divergent_energy": 54119252389155.945,
+    "divergent_share": 0.0007130896400012388,
+    "rotational_rms_speed": 17.243935681757353,
+    "divergent_rms_speed": 0.4606418147107493,
+    "rotational_max_speed": 40.501472354973394,
+    "at_rest": false,
+    "non_divergent": false,
+    "rule": "E_rot = ½∫|∇ψ|² dA and E_div = ½∫|∇χ|² dA over the sphere, from the ζ and δ coefficients of the surface shown (area-weighted, not mass-weighted: the Helmholtz parts are orthogonal only under the uniform area measure, so only then do their energies add). Share = E_div / (E_rot + E_div)"
+   }
+  },
+  "title": [
+   "20260730T011700Z_williamson5_rot23p93h_r4_l63_dt120h_45406d82_668e6c9a · Longitude × latitude · time fixed",
+   "20260730T011700Z_williamson5_rot23p93h_r4_l63_dt120h_45406d82_668e6c9a",
+   "Day 15 · 1296000 s · one saved sample",
+   "latitude exact band-limited synthesis on the 2° display mesh; longitude exact band-limited synthesis on the 2° display mesh"
+  ],
+  "name": "02-w5-day15-psi-contours-and-arrows",
+  "archive": "docs/runs/20260730T011700Z_williamson5_rot23p93h_r4_l63_dt120h_45406d82_668e6c9a",
+  "query": "preset=map&time=3",
+  "exceptions": []
+ },
+ {
+  "description": "Longitude × latitude · time fixed",
+  "quantity": "free_surface_height",
+  "coordinates": {
+   "latitude": {
+    "role": "y",
+    "sampling": "exact band-limited synthesis on the 2° display mesh"
+   },
+   "longitude": {
+    "role": "x",
+    "sampling": "exact band-limited synthesis on the 2° display mesh"
+   },
+   "vertical": {
+    "role": "none"
+   },
+   "time": {
+    "role": "fixed",
+    "axis": "snapshots",
+    "index": 3,
+    "seconds": 1296000
+   }
+  },
+  "settings": {
+   "lines": "streamlines",
+   "limit": 1,
+   "interval": null,
+   "density": 1,
+   "arrows": false,
+   "spacing": 10,
+   "length": "speed",
+   "colour": false
+  },
+  "drawn": {
+   "mode": "streamlines",
+   "lines": 239,
+   "closed": 0,
+   "arrows": 150,
+   "quiver": 0
+  },
+  "wind": {
+   "definition": "The horizontal wind v = r̂ × ∇ψ + ∇χ on the same surface as the field, of one saved state or the time mean over the same saved states: ψ contours at a uniform interval (streamlines of the rotational wind; of the whole wind when it is non-divergent), whose spacing Δn ≈ Δψ/|v_rot| encodes speed; streamlines of the full wind, curves tangent to (u, v) that are not trajectories and whose spacing does not encode speed; and arrows at native mesh nodes",
+   "components": [
+    "wind_u",
+    "wind_v"
+   ],
+   "psi": {
+    "available": true,
+    "convention": "ψ = ∇⁻²ζ on the sphere: ψ_lm = −a² ζ_lm / (l(l+1)), with the l = 0 coefficient (the mean, which carries no velocity) set to 0; v_rot = r̂ × ∇ψ, so the rotational wind keeps larger ψ on its right; units m² s⁻¹",
+    "radius_m": 6371220,
+    "time_mean": false,
+    "source": "the saved state's coefficients"
+   },
+   "kinetic_energy": {
+    "rotational_energy": 75839918962865136,
+    "divergent_energy": 54119252389155.945,
+    "divergent_share": 0.0007130896400012388,
+    "rotational_rms_speed": 17.243935681757353,
+    "divergent_rms_speed": 0.4606418147107493,
+    "rotational_max_speed": 40.501472354973394,
+    "at_rest": false,
+    "non_divergent": false,
+    "rule": "E_rot = ½∫|∇ψ|² dA and E_div = ½∫|∇χ|² dA over the sphere, from the ζ and δ coefficients of the surface shown (area-weighted, not mass-weighted: the Helmholtz parts are orthogonal only under the uniform area measure, so only then do their energies add). Share = E_div / (E_rot + E_div)"
+   }
+  },
+  "title": [
+   "20260730T011700Z_williamson5_rot23p93h_r4_l63_dt120h_45406d82_668e6c9a · Longitude × latitude · time fixed",
+   "20260730T011700Z_williamson5_rot23p93h_r4_l63_dt120h_45406d82_668e6c9a",
+   "Day 15 · 1296000 s · one saved sample",
+   "latitude exact band-limited synthesis on the 2° display mesh; longitude exact band-limited synthesis on the 2° display mesh"
+  ],
+  "name": "03-w5-day15-full-wind-streamlines",
+  "archive": "docs/runs/20260730T011700Z_williamson5_rot23p93h_r4_l63_dt120h_45406d82_668e6c9a",
+  "query": "preset=map&time=3",
+  "exceptions": []
+ },
+ {
+  "description": "Longitude × latitude · time fixed",
+  "quantity": "free_surface_height",
+  "coordinates": {
+   "latitude": {
+    "role": "y",
+    "sampling": "exact band-limited synthesis on the 2° display mesh"
+   },
+   "longitude": {
+    "role": "x",
+    "sampling": "exact band-limited synthesis on the 2° display mesh"
+   },
+   "vertical": {
+    "role": "none"
+   },
+   "time": {
+    "role": "fixed",
+    "axis": "snapshots",
+    "index": 3,
+    "seconds": 1296000
+   }
+  },
+  "settings": {
+   "lines": "none",
+   "limit": 1,
+   "interval": null,
+   "density": 1,
+   "arrows": true,
+   "spacing": 10,
+   "length": "unit",
+   "colour": false
+  },
+  "drawn": {
+   "mode": null,
+   "lines": 0,
+   "closed": 0,
+   "arrows": 0,
+   "quiver": 412,
+   "quiverScale": {
+    "vmax": 38.61707882097463,
+    "reference": 20,
+    "pixelsPerMs": 0.4833785267188065,
+    "keyPixels": 13.06666666666672
+   }
+  },
+  "wind": {
+   "definition": "The horizontal wind v = r̂ × ∇ψ + ∇χ on the same surface as the field, of one saved state or the time mean over the same saved states: ψ contours at a uniform interval (streamlines of the rotational wind; of the whole wind when it is non-divergent), whose spacing Δn ≈ Δψ/|v_rot| encodes speed; streamlines of the full wind, curves tangent to (u, v) that are not trajectories and whose spacing does not encode speed; and arrows at native mesh nodes",
+   "components": [
+    "wind_u",
+    "wind_v"
+   ],
+   "psi": {
+    "available": true,
+    "convention": "ψ = ∇⁻²ζ on the sphere: ψ_lm = −a² ζ_lm / (l(l+1)), with the l = 0 coefficient (the mean, which carries no velocity) set to 0; v_rot = r̂ × ∇ψ, so the rotational wind keeps larger ψ on its right; units m² s⁻¹",
+    "radius_m": 6371220,
+    "time_mean": false,
+    "source": "the saved state's coefficients"
+   },
+   "kinetic_energy": {
+    "rotational_energy": 75839918962865136,
+    "divergent_energy": 54119252389155.945,
+    "divergent_share": 0.0007130896400012388,
+    "rotational_rms_speed": 17.243935681757353,
+    "divergent_rms_speed": 0.4606418147107493,
+    "rotational_max_speed": 40.501472354973394,
+    "at_rest": false,
+    "non_divergent": false,
+    "rule": "E_rot = ½∫|∇ψ|² dA and E_div = ½∫|∇χ|² dA over the sphere, from the ζ and δ coefficients of the surface shown (area-weighted, not mass-weighted: the Helmholtz parts are orthogonal only under the uniform area measure, so only then do their energies add). Share = E_div / (E_rot + E_div)"
+   }
+  },
+  "title": [
+   "20260730T011700Z_williamson5_rot23p93h_r4_l63_dt120h_45406d82_668e6c9a · Longitude × latitude · time fixed",
+   "20260730T011700Z_williamson5_rot23p93h_r4_l63_dt120h_45406d82_668e6c9a",
+   "Day 15 · 1296000 s · one saved sample",
+   "latitude exact band-limited synthesis on the 2° display mesh; longitude exact band-limited synthesis on the 2° display mesh"
+  ],
+  "name": "04-w5-day15-arrows-only-equal-length",
+  "archive": "docs/runs/20260730T011700Z_williamson5_rot23p93h_r4_l63_dt120h_45406d82_668e6c9a",
+  "query": "preset=map&time=3",
+  "exceptions": []
+ },
+ {
+  "description": "Longitude × latitude · vertical fixed · time fixed",
+  "quantity": "temperature",
+  "coordinates": {
+   "latitude": {
+    "role": "y",
+    "sampling": "exact band-limited synthesis on the 2° display mesh"
+   },
+   "longitude": {
+    "role": "x",
+    "sampling": "exact band-limited synthesis on the 2° display mesh"
+   },
+   "vertical": {
+    "role": "fixed",
+    "representation": "native",
+    "value": 4,
+    "label": "Native full level",
+    "interpolation": null
+   },
+   "time": {
+    "role": "fixed",
+    "axis": "snapshots",
+    "index": 119,
+    "seconds": 103680000
+   }
+  },
+  "settings": {
+   "lines": "auto",
+   "limit": 1,
+   "interval": null,
+   "density": 1,
+   "arrows": false,
+   "spacing": 10,
+   "length": "speed",
+   "colour": false
+  },
+  "drawn": {
+   "mode": "streamlines",
+   "lines": 313,
+   "closed": 0,
+   "arrows": 131,
+   "quiver": 0
+  },
+  "wind": {
+   "definition": "The horizontal wind v = r̂ × ∇ψ + ∇χ on the same surface as the field, of one saved state or the time mean over the same saved states: ψ contours at a uniform interval (streamlines of the rotational wind; of the whole wind when it is non-divergent), whose spacing Δn ≈ Δψ/|v_rot| encodes speed; streamlines of the full wind, curves tangent to (u, v) that are not trajectories and whose spacing does not encode speed; and arrows at native mesh nodes",
+   "components": [
+    "wind_u",
+    "wind_v"
+   ],
+   "psi": {
+    "available": true,
+    "convention": "ψ = ∇⁻²ζ on the sphere: ψ_lm = −a² ζ_lm / (l(l+1)), with the l = 0 coefficient (the mean, which carries no velocity) set to 0; v_rot = r̂ × ∇ψ, so the rotational wind keeps larger ψ on its right; units m² s⁻¹",
+    "radius_m": 6371000,
+    "time_mean": false,
+    "source": "the saved state's coefficients"
+   },
+   "kinetic_energy": {
+    "rotational_energy": 151189043780772608,
+    "divergent_energy": 1556946707504409.5,
+    "divergent_share": 0.010193044691565258,
+    "rotational_rms_speed": 24.347962314113303,
+    "divergent_rms_speed": 2.470809909425608,
+    "rotational_max_speed": 80.0255843425728,
+    "at_rest": false,
+    "non_divergent": false,
+    "rule": "E_rot = ½∫|∇ψ|² dA and E_div = ½∫|∇χ|² dA over the sphere, from the ζ and δ coefficients of the surface shown (area-weighted, not mass-weighted: the Helmholtz parts are orthogonal only under the uniform area measure, so only then do their energies add). Share = E_div / (E_rot + E_div)"
+   }
+  },
+  "title": [
+   "hs-T42L20-prod-002 · Longitude × latitude · vertical fixed · time fixed",
+   "hs-T42L20-prod-002 · config d1fa645db120",
+   "Native full level = 4 · Day 1200 · 103680000 s · one saved sample",
+   "latitude exact band-limited synthesis on the 2° display mesh; longitude exact band-limited synthesis on the 2° display mesh"
+  ],
+  "name": "05-hs-day1200-level5-auto",
+  "archive": "runs/hs-T42L20-prod-002",
+  "query": "preset=map&time=119",
+  "exceptions": []
+ },
+ {
+  "description": "Longitude × latitude · vertical fixed · time fixed",
+  "quantity": "temperature",
+  "coordinates": {
+   "latitude": {
+    "role": "y",
+    "sampling": "exact band-limited synthesis on the 2° display mesh"
+   },
+   "longitude": {
+    "role": "x",
+    "sampling": "exact band-limited synthesis on the 2° display mesh"
+   },
+   "vertical": {
+    "role": "fixed",
+    "representation": "native",
+    "value": 4,
+    "label": "Native full level",
+    "interpolation": null
+   },
+   "time": {
+    "role": "fixed",
+    "axis": "snapshots",
+    "index": 119,
+    "seconds": 103680000
+   }
+  },
+  "settings": {
+   "lines": "psi",
+   "limit": 1,
+   "interval": null,
+   "density": 1,
+   "arrows": false,
+   "spacing": 10,
+   "length": "speed",
+   "colour": false
+  },
+  "drawn": {
+   "mode": "psi",
+   "lines": 21,
+   "closed": 21,
+   "interval": 20000000,
+   "arrows": 75,
+   "quiver": 0
+  },
+  "wind": {
+   "definition": "The horizontal wind v = r̂ × ∇ψ + ∇χ on the same surface as the field, of one saved state or the time mean over the same saved states: ψ contours at a uniform interval (streamlines of the rotational wind; of the whole wind when it is non-divergent), whose spacing Δn ≈ Δψ/|v_rot| encodes speed; streamlines of the full wind, curves tangent to (u, v) that are not trajectories and whose spacing does not encode speed; and arrows at native mesh nodes",
+   "components": [
+    "wind_u",
+    "wind_v"
+   ],
+   "psi": {
+    "available": true,
+    "convention": "ψ = ∇⁻²ζ on the sphere: ψ_lm = −a² ζ_lm / (l(l+1)), with the l = 0 coefficient (the mean, which carries no velocity) set to 0; v_rot = r̂ × ∇ψ, so the rotational wind keeps larger ψ on its right; units m² s⁻¹",
+    "radius_m": 6371000,
+    "time_mean": false,
+    "source": "the saved state's coefficients"
+   },
+   "kinetic_energy": {
+    "rotational_energy": 151189043780772608,
+    "divergent_energy": 1556946707504409.5,
+    "divergent_share": 0.010193044691565258,
+    "rotational_rms_speed": 24.347962314113303,
+    "divergent_rms_speed": 2.470809909425608,
+    "rotational_max_speed": 80.0255843425728,
+    "at_rest": false,
+    "non_divergent": false,
+    "rule": "E_rot = ½∫|∇ψ|² dA and E_div = ½∫|∇χ|² dA over the sphere, from the ζ and δ coefficients of the surface shown (area-weighted, not mass-weighted: the Helmholtz parts are orthogonal only under the uniform area measure, so only then do their energies add). Share = E_div / (E_rot + E_div)"
+   }
+  },
+  "title": [
+   "hs-T42L20-prod-002 · Longitude × latitude · vertical fixed · time fixed",
+   "hs-T42L20-prod-002 · config d1fa645db120",
+   "Native full level = 4 · Day 1200 · 103680000 s · one saved sample",
+   "latitude exact band-limited synthesis on the 2° display mesh; longitude exact band-limited synthesis on the 2° display mesh"
+  ],
+  "name": "06-hs-day1200-level5-psi-contours-forced",
+  "archive": "runs/hs-T42L20-prod-002",
+  "query": "preset=map&time=119",
+  "exceptions": []
+ },
+ {
+  "description": "Longitude × latitude · vertical fixed · time mean",
+  "quantity": "temperature",
+  "coordinates": {
+   "latitude": {
+    "role": "y",
+    "sampling": "exact band-limited synthesis on the 2° display mesh"
+   },
+   "longitude": {
+    "role": "x",
+    "sampling": "exact band-limited synthesis on the 2° display mesh"
+   },
+   "vertical": {
+    "role": "fixed",
+    "representation": "native",
+    "value": 4,
+    "label": "Native full level",
+    "interpolation": null
+   },
+   "time": {
+    "role": "reduce",
+    "axis": "snapshots",
+    "first": 100,
+    "last": 119,
+    "count": 20,
+    "intervals_seconds": {
+     "864000.0": 19
+    },
+    "first_seconds": 87264000,
+    "last_seconds": 103680000,
+    "cadence": "regular",
+    "op": "mean",
+    "rule": "time-weighted mean over the saved samples first..last inclusive, each weighted by the interval it stands for, (t_{i+1} - t_{i-1})/2 with the ends mirrored; equal weights (the plain 1/N mean) for a regular cadence",
+    "weighting": "equal (regular cadence)"
+   }
+  },
+  "settings": {
+   "lines": "auto",
+   "limit": 1,
+   "interval": null,
+   "density": 1,
+   "arrows": true,
+   "spacing": 10,
+   "length": "speed",
+   "colour": false
+  },
+  "drawn": {
+   "mode": "psi",
+   "lines": 13,
+   "closed": 13,
+   "interval": 20000000,
+   "arrows": 65,
+   "quiver": 412,
+   "quiverScale": {
+    "vmax": 39.770738420798835,
+    "reference": 20,
+    "pixelsPerMs": 0.4693568037173951,
+    "keyPixels": 9.387136074347902
+   }
+  },
+  "wind": {
+   "definition": "The horizontal wind v = r̂ × ∇ψ + ∇χ on the same surface as the field, of one saved state or the time mean over the same saved states: ψ contours at a uniform interval (streamlines of the rotational wind; of the whole wind when it is non-divergent), whose spacing Δn ≈ Δψ/|v_rot| encodes speed; streamlines of the full wind, curves tangent to (u, v) that are not trajectories and whose spacing does not encode speed; and arrows at native mesh nodes",
+   "components": [
+    "wind_u",
+    "wind_v"
+   ],
+   "psi": {
+    "available": true,
+    "convention": "ψ = ∇⁻²ζ on the sphere: ψ_lm = −a² ζ_lm / (l(l+1)), with the l = 0 coefficient (the mean, which carries no velocity) set to 0; v_rot = r̂ × ∇ψ, so the rotational wind keeps larger ψ on its right; units m² s⁻¹",
+    "radius_m": 6371000,
+    "time_mean": true,
+    "source": "the time-weighted mean of the saved states' coefficients"
+   },
+   "kinetic_energy": {
+    "rotational_energy": 76591060715695040,
+    "divergent_energy": 149677540269953.62,
+    "divergent_share": 0.0019504313311491934,
+    "rotational_rms_speed": 17.329718285342246,
+    "divergent_rms_speed": 0.7660917394998678,
+    "rotational_max_speed": 41.862120099397195,
+    "at_rest": false,
+    "non_divergent": false,
+    "rule": "E_rot = ½∫|∇ψ|² dA and E_div = ½∫|∇χ|² dA over the sphere, from the ζ and δ coefficients of the surface shown (area-weighted, not mass-weighted: the Helmholtz parts are orthogonal only under the uniform area measure, so only then do their energies add). Share = E_div / (E_rot + E_div)"
+   }
+  },
+  "title": [
+   "hs-T42L20-prod-002 · Longitude × latitude · vertical fixed · time mean",
+   "hs-T42L20-prod-002 · config d1fa645db120",
+   "Native full level = 4 · time mean of 20 saved samples, day 1010 to day 1200 (regular cadence; equal (regular cadence))",
+   "latitude exact band-limited synthesis on the 2° display mesh; longitude exact band-limited synthesis on the 2° display mesh"
+  ],
+  "name": "07-hs-days1010-1200-mean-level5-psi-and-arrows",
+  "archive": "runs/hs-T42L20-prod-002",
+  "query": "preset=time_mean_map",
+  "exceptions": []
+ },
+ {
+  "description": "Longitude × latitude · vertical fixed · time fixed",
+  "quantity": "temperature",
+  "coordinates": {
+   "latitude": {
+    "role": "y",
+    "sampling": "exact band-limited synthesis on the 2° display mesh"
+   },
+   "longitude": {
+    "role": "x",
+    "sampling": "exact band-limited synthesis on the 2° display mesh"
+   },
+   "vertical": {
+    "role": "fixed",
+    "representation": "pressure",
+    "value": 50000,
+    "label": "Pressure p",
+    "interpolation": "linear in ln σ (= ln p in a column) between the bracketing native full levels at their hydrostatic positions"
+   },
+   "time": {
+    "role": "fixed",
+    "axis": "snapshots",
+    "index": 119,
+    "seconds": 103680000
+   }
+  },
+  "settings": {
+   "lines": "auto",
+   "limit": 1,
+   "interval": null,
+   "density": 1,
+   "arrows": true,
+   "spacing": 10,
+   "length": "speed",
+   "colour": false
+  },
+  "drawn": {
+   "mode": "streamlines",
+   "lines": 303,
+   "closed": 0,
+   "arrows": 125,
+   "quiver": 412,
+   "quiverScale": {
+    "vmax": 55.34726817388607,
+    "reference": 50,
+    "pixelsPerMs": 0.33726446277386535,
+    "keyPixels": 16.863223138693268
+   }
+  },
+  "wind": {
+   "definition": "The horizontal wind v = r̂ × ∇ψ + ∇χ on the same surface as the field, of one saved state or the time mean over the same saved states: ψ contours at a uniform interval (streamlines of the rotational wind; of the whole wind when it is non-divergent), whose spacing Δn ≈ Δψ/|v_rot| encodes speed; streamlines of the full wind, curves tangent to (u, v) that are not trajectories and whose spacing does not encode speed; and arrows at native mesh nodes",
+   "components": [
+    "wind_u",
+    "wind_v"
+   ],
+   "psi": {
+    "available": false,
+    "reason": "on a surface of constant pressure or height the interpolation weight varies along the surface, so the interpolated wind has no streamfunction from the levels' ζ; use a native level or a σ surface"
+   }
+  },
+  "title": [
+   "hs-T42L20-prod-002 · Longitude × latitude · vertical fixed · time fixed",
+   "hs-T42L20-prod-002 · config d1fa645db120",
+   "Pressure p = 50000 (linear in ln σ (= ln p in a column) between the bracketing native full levels at their hydrostatic positions) · Day 1200 · 103680000 s · one saved sample",
+   "latitude exact band-limited synthesis on the 2° display mesh; longitude exact band-limited synthesis on the 2° display mesh"
+  ],
+  "name": "08-hs-day1200-500hPa-auto-no-psi",
+  "archive": "runs/hs-T42L20-prod-002",
+  "query": "preset=map&time=119",
+  "exceptions": []
+ }
+]

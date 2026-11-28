@@ -36,9 +36,12 @@ import numpy as np
 from tropoi.representation.diagnostics.held_suarez_sections import state_grid
 from tropoi.representation.diagnostics.pe_levels import LEVEL_FIELDS, reconstruct_levels
 from tropoi.representation.diagnostics.pe_structure import mass_streamfunction
-from tropoi.representation.diagnostics.pe_surfaces import pressure_surface
+from tropoi.representation.diagnostics.pe_surfaces import interpolate_log_sigma, pressure_surface
+from tropoi.representation.diagnostics.spectral import kinetic_energy_modes
 from tropoi.representation.visual.selection import (
-    MAX_STATES, TIME_MEAN, WIND_LAYER, SelectionError, axis, latitude_axis, longitude_axis, reductions)
+    MAX_STATES, TIME_MEAN, WIND_LAYER, SelectionError, _arrange, axis, latitude_axis, longitude_axis,
+    reductions, time_weights)
+from tropoi.spatial.laplacian import invert_laplacian, laplacian_eigenvalues
 from tropoi.spatial.grids.quadrature import gauss_latitude_nodes
 from tropoi.spatial.transforms.host_synthesis import synthesize_latlon, synthesize_wind_latlon
 
@@ -87,6 +90,20 @@ NATIVE_LEVELS = "the native full levels of the column"
 #: The wind companions of a result that carries the wind layer.
 WIND_COMPANIONS = dict(wind_u=dict(label="u", units="m s⁻¹", layer="wind"),
                        wind_v=dict(label="v", units="m s⁻¹", layer="wind"))
+#: Below this area-rms speed a wind is at rest: its roundoff has no meaningful split
+#: (the figure path's ``evaluate.REST_SPEED_MS``).
+REST_SPEED_MS = 1.0e-9
+PSI_CONVENTION = (
+    "ψ = ∇⁻²ζ on the sphere: ψ_lm = −a² ζ_lm / (l(l+1)), with the l = 0 coefficient (the mean, "
+    "which carries no velocity) set to 0; v_rot = r̂ × ∇ψ, so the rotational wind keeps larger ψ "
+    "on its right; units m² s⁻¹")
+KE_SPLIT = (
+    "E_rot = ½∫|∇ψ|² dA and E_div = ½∫|∇χ|² dA over the sphere, from the ζ and δ coefficients of the "
+    "surface shown (area-weighted, not mass-weighted: the Helmholtz parts are orthogonal only under "
+    "the uniform area measure, so only then do their energies add). Share = E_div / (E_rot + E_div)")
+PSI_P_SURFACE = ("on a surface of constant pressure or height the interpolation weight varies along the "
+                 "surface, so the interpolated wind has no streamfunction from the levels' ζ; use a native "
+                 "level or a σ surface")
 
 
 def _wind_capability(manifest, field):
@@ -97,7 +114,9 @@ def _wind_capability(manifest, field):
     if solver == "pe" and not field.get("levels"):
         return dict(available=False, reason="it has no vertical level, and the wind has one per level: "
                                             "show a quantity on a fixed level to draw the wind there")
-    return dict(available=True, styles=["streamlines"], definition=WIND_LAYER)
+    psi = (["native", "sigma"] if solver == "pe" else ["none"])
+    return dict(available=True, styles=["psi_contours", "streamlines", "quiver"], definition=WIND_LAYER,
+                psi_surfaces=psi, psi_unavailable=PSI_P_SURFACE if solver == "pe" else None)
 
 
 def _excluded(representation, field):
@@ -467,11 +486,17 @@ def samples(provider, sel, plan_, indices):
     times = provider.manifest["time_axes"]["snapshots"]["values"]
     v = sel["vertical"]
     flip = (lambda a: a[..., ::-1, :]) if plan_["reverse_latitude"] else (lambda a: a)
+    # The engine's own time weights (selection.time_weights), so the wind's spectral mean is
+    # the same mean as the field's.
+    w = time_weights([times[i] for i in indices]) if sel["time"]["role"] == "reduce" else None
+    weights = {} if w is None else dict(zip(indices, w))
     for index in indices:
         if key == "mass_streamfunction":
             yield times[index], *_psi_sample(provider, index, lat, lon, flip)
             continue
         wind = sel["options"].get("wind", False)
+        if wind:
+            _accumulate_helmholtz(provider, sel, plan_, index, weights.get(index, 1.0))
         if v["role"] == "none":
             companions = {}
             if wind:
@@ -502,6 +527,94 @@ def samples(provider, sel, plan_, indices):
         yield times[index], flip(_field(levels.values, key, provider._context.r_dry)), companions
 
 
+def _surface_coefficients(provider, sel, index):
+    """(ζ_lm, δ_lm or None, radius) of the wind on the selection's surface, or a reason string."""
+    frame = provider._read("state", index)
+    if provider.solver in ("bve", "swe"):
+        return (frame[0], frame[1], provider.radius) if provider.solver == "swe" else (frame, None, provider.radius)
+    context, v = provider._context, sel["vertical"]
+    k_count = context.nlev
+    if v["representation"] == "native":
+        k = int(v["value"])
+        return frame[k], frame[k_count + k], context.radius_m
+    if v["representation"] == "sigma":
+        # The same weight at every node (pe_surfaces: constant-σ rules), so the surface's ζ and δ are
+        # this combination of the levels' coefficients. Weights: the interpolant applied to unit columns.
+        values, mask, _ = interpolate_log_sigma(context.full_levels, {"w": np.eye(k_count)},
+                                                np.full(k_count, float(v["value"])))
+        if (mask != 0).any():
+            return "the σ surface lies outside the native full levels"
+        w = values["w"]
+        return (np.tensordot(w, frame[:k_count], axes=1), np.tensordot(w, frame[k_count:2 * k_count], axes=1),
+                context.radius_m)
+    return PSI_P_SURFACE
+
+
+def _accumulate_helmholtz(provider, sel, plan_, index, weight):
+    """Add one state's ζ, δ coefficients (time-weighted) to ``plan_["helmholtz"]``."""
+    acc = plan_.setdefault("helmholtz", dict(zeta=None, delta=None, total=0.0, reason=None, radius=None))
+    if acc["reason"]:
+        return
+    got = _surface_coefficients(provider, sel, index)
+    if isinstance(got, str):
+        acc["reason"] = got
+        return
+    zeta, delta, radius = got
+    acc["radius"] = float(radius)
+    w = float(weight)
+    acc["zeta"] = w * np.asarray(zeta) if acc["zeta"] is None else acc["zeta"] + w * np.asarray(zeta)
+    if delta is not None:
+        acc["delta"] = w * np.asarray(delta) if acc["delta"] is None else acc["delta"] + w * np.asarray(delta)
+    acc["total"] += w
+
+
+def helmholtz(zeta, delta, radius, lat, lon):
+    """ψ on the mesh, the energy split and the rotational wind's peak speed (module constants).
+
+    ``zeta``/``delta`` are (l, m) coefficients of one surface (``delta`` None: non-divergent)."""
+    zeta = np.asarray(zeta)
+    l_max = zeta.shape[0] - 1
+    psi_lm = invert_laplacian(zeta, laplacian_eigenvalues(l_max, radius))
+    psi = synthesize_latlon(psi_lm, lat, lon)
+    rotational = float(kinetic_energy_modes(zeta, radius=radius).sum())
+    divergent = 0.0 if delta is None else float(kinetic_energy_modes(delta, radius=radius).sum())
+    total, area = rotational + divergent, 4.0 * np.pi * radius ** 2
+    rest = bool(np.sqrt(2.0 * total / area) < REST_SPEED_MS)
+    u, v = synthesize_wind_latlon(zeta, np.zeros_like(zeta), radius, lat, lon)
+    return psi, dict(
+        rotational_energy=rotational, divergent_energy=divergent,
+        divergent_share=None if rest else divergent / total,
+        rotational_rms_speed=float(np.sqrt(2.0 * rotational / area)),
+        divergent_rms_speed=float(np.sqrt(2.0 * divergent / area)),
+        rotational_max_speed=float(np.hypot(u, v).max()), at_rest=rest, non_divergent=delta is None)
+
+
+def _wind_finish(provider, sel, plan_, payload):
+    """ψ and the kinetic-energy split of the wind drawn, from the mean coefficients."""
+    acc = plan_.get("helmholtz") or {}
+    out = dict(definition=WIND_LAYER, components=["wind_u", "wind_v"])
+    if acc.get("reason") or acc.get("zeta") is None:
+        out["psi"] = dict(available=False, reason=acc.get("reason") or "no saved state")
+        payload["wind"] = out
+        return
+    lat, lon = plan_["latitude"]["points"], plan_["longitude"]["points"]
+    zeta = acc["zeta"] / acc["total"]
+    delta = None if acc["delta"] is None else acc["delta"] / acc["total"]
+    psi, energy = helmholtz(zeta, delta, acc["radius"], lat, lon)
+    cube = psi[None, None]
+    if plan_["reverse_latitude"]:
+        cube = cube[..., ::-1, :]
+    payload["companions"]["psi"] = dict(label="ψ (rotational)", units="m² s⁻¹", layer="wind",
+                                        values=_arrange(cube, dict(time=0, vertical=1, latitude=2, longitude=3),
+                                                        sel["axes"]["x"], sel["axes"]["y"]))
+    out["psi"] = dict(available=True, convention=PSI_CONVENTION, radius_m=acc["radius"],
+                      time_mean=sel["time"]["role"] == "reduce",
+                      source="the time-weighted mean of the saved states' coefficients"
+                      if sel["time"]["role"] == "reduce" else "the saved state's coefficients")
+    out["kinetic_energy"] = dict(energy, rule=KE_SPLIT)
+    payload["wind"] = out
+
+
 def _psi_sample(provider, index, lat, lon, flip):
     """[pₛ v] of one state, longitude mean formed on the grid: ``(nlev, nlat, 1)``."""
     levels = reconstruct_levels(provider._read("state", index), provider._context, lat, lon, None,
@@ -525,6 +638,8 @@ def post(provider, sel, plan_, cube):
 
 def finish(provider, sel, plan_, payload):
     """Axes whose positions come from the sample, single-column tables and markers."""
+    if sel["options"].get("wind"):
+        _wind_finish(provider, sel, plan_, payload)
     comp = payload.get("companions") or {}
     v = sel["vertical"]
     if v["role"] in ("x", "y") and plan_["axes"].get("vertical") is None:

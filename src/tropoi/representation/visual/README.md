@@ -219,22 +219,82 @@ increasing upward or downward. Changing it sends no request. Native levels are
 drawn as bands between the model's own σ interfaces (or the archived cell
 faces), whatever the scale.
 
-**Wind layer.** A longitude × latitude result can carry *Wind streamlines*
-(`options.wind` in the selection; each quantity's `layers.wind` says whether
-it can, and why not). The layer is evaluated with the field, as the
-companions `wind_u` and `wind_v`: the same sample mesh, the same fixed
-surface (masked where the field is masked), and the same saved time or the
-same time mean, so it changes no value of the field. The lines are traced in
-the page by the globe's integrator (`overlays.js`: Fibonacci seeds, RK4 on the
-sphere, periodic in longitude, never through a masked cell) and drawn with a
-downstream arrowhead. They are instantaneous streamlines of one saved wind, or
-streamlines of the time-mean wind; not trajectories, and their spacing does not
-encode speed. The layer needs both horizontal coordinates as axes and the
-field's own surface (a fixed vertical coordinate, or none for single-layer
-cores); a time minimum or maximum, a vertical reduction and quantities without
-a level in a layered atmosphere are refused with that reason. This restores
-the flat-map streamlines that the globe panel's map drew before the Explorer
-became the only flat plotting surface.
+**Horizontal wind.** A longitude × latitude result can carry the horizontal
+wind v = r̂ × ∇ψ + ∇χ (`options.wind` in the selection; each quantity's
+`layers.wind` says whether it can, and why not). The wind is evaluated with
+the field, in the same pass: the companions `wind_u` and `wind_v` on the same
+sample mesh and fixed surface (masked where the field is masked), at the same
+saved time or as the same time mean, so the field's values do not change.
+The server also returns ψ (companion `psi`) and the kinetic-energy split
+(`payload.wind`). Three representations can be told apart in the figure and
+in its key:
+
+- **ψ contours**, the preferred representation of rotational circulation:
+  - ψ = ∇⁻²ζ comes from the surface's own ζ coefficients, using the existing
+    inversion: ψ_lm = −a² ζ_lm / (l(l+1)), with l = 0 set to 0.
+  - Contours are drawn at every multiple of a uniform interval Δψ. By default
+    the interval is the smallest of 1, 2, 2.5, 5 × 10ᵏ that is at least
+    range/(20 × density), the rule of the README figures; it can also be set
+    in m² s⁻¹.
+  - Their spacing is Δn ≈ Δψ/|v_rot|, and the key gives it as "X° apart at
+    S m s⁻¹" with Δn = Δψ/(S a).
+  - Each contour is oriented with larger ψ on its right, so its arrows point
+    along v_rot. The orientation comes from marching squares, not from a
+    gradient estimate.
+  - Contours join across the 0°/360° seam (the closing meridian is identified
+    with 0°), so a loop around the planet closes.
+  - Pole rows are replaced by their mean for contouring, because ψ has one
+    value at a pole.
+  - Saddle cells are resolved by the cell mean.
+  - A level equal to an extremum at a node collapses to a stagnation point and
+    is not drawn.
+  - In BVE these contours are the streamlines. In SWE and PE they are the
+    streamlines of the rotational wind only, and the key says so.
+  - ψ is offered on native levels and σ surfaces. On a σ surface the
+    interpolation weight is the same everywhere, so its ζ is the vorticity of
+    the interpolated wind. ψ is not offered on surfaces of constant pressure or
+    height, where the weight varies along the surface; the reason is given.
+- **Streamlines of the full wind**:
+  - They are traced by the globe's integrator (`overlays.js`: RK4 on the
+    sphere, periodic in longitude, never through a masked cell). In the
+    Explorer the integrator uses more seeds, longer lines and a minimum
+    separation; with the defaults the globe's lines are unchanged.
+  - They are tangent to (u, v), with downstream arrows. They are not
+    trajectories, and their spacing does not encode speed.
+- **Arrows (quiver)**:
+  - Arrows sit at native mesh nodes about a chosen spacing apart. The
+    longitude stride widens as 1/cos φ, and pole rows are omitted because east
+    and north are undefined there.
+  - Each arrow points along the map's image of (u, v).
+  - Its length is proportional to speed, with a key arrow at a round speed, or
+    equal (direction only). Arrows can be coloured by speed.
+  - They can be combined with either kind of line.
+
+**Kinetic-energy split.**
+- E_rot and E_div are computed from the ζ and δ coefficients of the surface
+  shown (`diagnostics.spectral.kinetic_energy_modes`, the function behind the
+  README figures). They are area-weighted.
+- The Helmholtz parts are orthogonal only under the uniform area measure on
+  the sphere. Under a pₛ (mass) weight a cross term appears, and the two shares
+  would no longer add up.
+- For a time mean, ψ and the split are those of the time-mean coefficients,
+  with the engine's own time weights.
+- *Automatic* lines draw ψ contours when E_div/(E_rot + E_div) is at most the
+  limit (1 % by default, adjustable) or the flow is non-divergent. Otherwise
+  they draw full-wind streamlines. The key gives the share either way.
+- ψ contours chosen by hand when the share is above the limit carry a warning
+  in the key: the divergent wind is not drawn.
+
+Display settings send no request. The layer needs both horizontal coordinates
+as axes and the field's own surface: a fixed vertical coordinate, or none for
+single-layer cores. The following are refused, with the reason:
+- a time minimum or maximum;
+- a vertical reduction;
+- quantities without a level in a layered atmosphere.
+
+Evidence: [docs/validation/viewer3/wind-representations](../../../../docs/validation/viewer3/wind-representations/README.md).
+This restores the flat-map streamlines that the globe panel's map drew before
+the Explorer became the only flat plotting surface.
 
 *Provisional decisions (adopted from the 2026-11-28 visualization assessment,
 to be confirmed at review):* D-9, one streamline definition per renderer:
