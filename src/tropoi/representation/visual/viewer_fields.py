@@ -260,6 +260,14 @@ class FrameProvider:
             if coordinate in ("geopotential_height", "height_above_surface") and field == "geopotential":
                 fields["geopotential"] = fields["geopotential_height"] * self._context.gravity
         u, v = fields["u"], fields["v"]
+        if field == "density":
+            from tropoi.representation.visual.viewer_atmosphere import density
+            pressure = fields.get("pressure")
+            if pressure is None:                         # a surface of constant p carries its own p
+                pressure = np.full(self.shape, value, dtype=float)
+            # Masked samples (p = 0 below the terrain) stay masked; avoid 0/0 there.
+            temperature = np.where(mask != 0, 1.0, fields["temperature"]) if mask is not None else fields["temperature"]
+            fields = dict(fields, density=density(pressure, temperature, self._context.r_dry))
         values = np.hypot(u, v) if field in ("wind", "wind_speed") else fields[field]
         return self._result(values, fields["geopotential_height"], mask, (u, v))
 

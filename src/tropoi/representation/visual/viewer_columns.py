@@ -327,6 +327,7 @@ def describe(archive: AirlessArchive) -> tuple[dict, dict]:
     vertical_reps = ["depth", "height_above_surface"]
     quantities = dict(temperature=dict(
         presentation=dict(name="Temperature", symbol="T", units="K", role="prognostic", origin="stored",
+                          group="Thermodynamics",
                           definition="Substrate temperature at the native cell centres, and the "
                                      "diagnosed skin temperature at depth 0."),
         sources=["profiles (cell centres)" if not every else "every_step", "surface plane 0 (skin)"],
@@ -349,7 +350,7 @@ def describe(archive: AirlessArchive) -> tuple[dict, dict]:
         if "surface_samples" not in axes:
             break
         quantities[key] = dict(
-            presentation=dict(name=name, symbol=symbol, units="W m⁻²", role="diagnostic",
+            presentation=dict(name=name, symbol=symbol, units="W m⁻²", role="diagnostic", group="Surface",
                               origin="recorded", definition=definition),
             sources=[f"surface plane {SURFACE_PLANES.index(key)}"], plane=key,
             evaluation="archived values; no interpolation", horizontal="global" if global_ else "points",

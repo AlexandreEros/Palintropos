@@ -27,6 +27,12 @@ KINDS = ("prognostic", "derived", "static", "recorded")
 SHAPES = ("scalar", "vector", "number", "series")
 
 
+#: Catalogue groups of the viewer's quantity selector, in display order.
+GROUPS = ("Thermodynamics", "Velocity and wind", "Dynamics", "Geopotential and geometry", "Surface",
+          "Archived diagnostics and time series")
+ARCHIVED = GROUPS[-1]
+
+
 @dataclass(frozen=True)
 class _Presentation:
     name: str
@@ -35,45 +41,51 @@ class _Presentation:
     role: str
     origin: str
     definition: str
+    group: str = ""
 
 
 # Public archive IDs remain usable for requests. These describe the values a
 # person sees after host synthesis and any declared pointwise conversion.
 _VIEWER_FIELDS = {
     "zeta": _Presentation("Relative vorticity", "ζ", "s⁻¹", "prognostic", "stored",
-        "Vertical component of the curl of horizontal velocity, positive for local counterclockwise rotation viewed from above."),
+        "Vertical component of the curl of horizontal velocity, positive for local counterclockwise rotation viewed from above.", "Dynamics"),
     "delta": _Presentation("Horizontal divergence", "δ", "s⁻¹", "prognostic", "stored",
-        "Horizontal divergence of velocity. Positive values indicate spreading flow."),
+        "Horizontal divergence of velocity. Positive values indicate spreading flow.", "Dynamics"),
     "temperature": _Presentation("Air temperature", "T", "K", "prognostic", "stored",
-        "Absolute air temperature on the selected atmospheric level or surface."),
+        "Absolute air temperature on the selected atmospheric level or surface.", "Thermodynamics"),
     "pressure": _Presentation("Air pressure", "p", "Pa", "diagnostic", "derived",
-        "Local air pressure at the selected atmospheric surface. On a native level p = σ pₛ."),
+        "Local air pressure at the selected atmospheric surface. On a native level p = σ pₛ.", "Thermodynamics"),
+    "density": _Presentation("Air density", "ρ", "kg m⁻³", "diagnostic", "derived",
+        "Mass density of the air from the ideal-gas law, ρ = p/(R T), with p and T evaluated at the same place, "
+        "surface and saved time, and R the gas constant the run records for its atmosphere (the mixture constant "
+        "of a fixed-composition gas; no moisture or variable composition). On a native level p = σ pₛ.",
+        "Thermodynamics"),
     "geopotential": _Presentation("Atmospheric geopotential", "Φ", "m² s⁻²", "diagnostic", "derived",
-        "Hydrostatic geopotential relative to the model datum, including the lower-boundary geopotential."),
+        "Hydrostatic geopotential relative to the model datum, including the lower-boundary geopotential.", "Geopotential and geometry"),
     "geopotential_height": _Presentation("Geopotential height", "Z", "m", "diagnostic", "derived",
-        "Z = Φ/g, the hydrostatic geopotential divided by model gravity, relative to the model height datum."),
+        "Z = Φ/g, the hydrostatic geopotential divided by model gravity, relative to the model height datum.", "Geopotential and geometry"),
     "ln_ps": _Presentation("Surface pressure", "pₛ", "Pa", "prognostic", "stored",
-        "Pressure at the lower atmospheric boundary. The stored prognostic is ln(pₛ/Pa). The map shows its pointwise exponential in pascals."),
+        "Pressure at the lower atmospheric boundary. The stored prognostic is ln(pₛ/Pa). The map shows its pointwise exponential in pascals.", "Surface"),
     "surface_temperature": _Presentation("Slab surface temperature", "Tₛ", "K", "prognostic", "stored",
-        "Temperature of the surface slab at its saved snapshot time."),
+        "Temperature of the surface slab at its saved snapshot time.", "Surface"),
     "phi": _Presentation("Layer-thickness geopotential anomaly", "φ", "m² s⁻²", "prognostic", "stored",
-        "φ = g(h − h₀), with h the fluid thickness and h₀ the reference depth."),
+        "φ = g(h − h₀), with h the fluid thickness and h₀ the reference depth.", "Geopotential and geometry"),
     "layer_depth": _Presentation("Layer thickness", "h", "m", "diagnostic", "derived",
-        "h = h₀ + φ/g, the depth of fluid above the terrain."),
+        "h = h₀ + φ/g, the depth of fluid above the terrain.", "Geopotential and geometry"),
     "terrain": _Presentation("Terrain height", "hₛ", "m", "static", "derived",
-        "Band-limited lower-boundary elevation relative to the model height datum."),
+        "Band-limited lower-boundary elevation relative to the model height datum.", "Geopotential and geometry"),
     "free_surface_height": _Presentation("Free-surface geopotential height", "H", "m", "diagnostic", "derived",
-        "H = h + hₛ, the geopotential height of the upper fluid surface. Under constant gravity H also gives its geometric elevation above the reference equipotential."),
+        "H = h + hₛ, the geopotential height of the upper fluid surface. Under constant gravity H also gives its geometric elevation above the reference equipotential.", "Geopotential and geometry"),
     "free_surface_geopotential": _Presentation("Free-surface geopotential", "Φ_free", "m² s⁻²", "diagnostic", "derived",
-        "Φ_free = gH = g(h + hₛ), the total geopotential at the free surface."),
+        "Φ_free = gH = g(h + hₛ), the total geopotential at the free surface.", "Geopotential and geometry"),
     "wind": _Presentation("Horizontal wind", "(u, v)", "m s⁻¹", "diagnostic", "derived",
-        "Horizontal velocity in the local eastward and northward basis."),
+        "Horizontal velocity in the local eastward and northward basis.", "Velocity and wind"),
     "wind_speed": _Presentation("Wind speed", "|V|", "m s⁻¹", "diagnostic", "derived",
-        "Magnitude of horizontal velocity, √(u² + v²)."),
+        "Magnitude of horizontal velocity, √(u² + v²).", "Velocity and wind"),
     "u": _Presentation("Eastward wind", "u", "m s⁻¹", "diagnostic", "derived",
-        "Eastward component of horizontal velocity. Westward flow has negative values."),
+        "Eastward component of horizontal velocity. Westward flow has negative values.", "Velocity and wind"),
     "v": _Presentation("Northward wind", "v", "m s⁻¹", "diagnostic", "derived",
-        "Northward component of horizontal velocity. Southward flow has negative values."),
+        "Northward component of horizontal velocity. Southward flow has negative values.", "Velocity and wind"),
 }
 
 _SERIES_NAMES = {
@@ -97,11 +109,12 @@ def viewer_presentation(identifier: str, metadata: dict, *, recorded=False) -> d
         member = metadata.get("member", identifier)
         name = _SERIES_NAMES.get(member, member.replace("_", " ").capitalize())
         return dict(name=name, symbol="", units=metadata.get("units"), role="diagnostic",
-                    origin="recorded", definition=f"{name} recorded in {metadata['path']} ({member}).")
+                    origin="recorded", definition=f"{name} recorded in {metadata['path']} ({member}).",
+                    group=ARCHIVED)
     entry = _VIEWER_FIELDS.get(identifier)
     if entry is None:
         return dict(name=identifier, symbol="", units=metadata.get("units"), role="unspecified",
-                    origin="stored", definition=metadata.get("meaning", ""))
+                    origin="stored", definition=metadata.get("meaning", ""), group="")
     result = asdict(entry)
     if identifier == "terrain" and "resources.terrain" in metadata.get("inputs", []):
         result["origin"] = "stored"

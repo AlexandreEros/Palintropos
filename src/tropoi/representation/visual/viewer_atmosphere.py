@@ -63,7 +63,7 @@ INTERPOLATION = {
                             "target Φ₀ = g (h + Zₛ) per column",
 }
 PSI = dict(name="Meridional mass streamfunction", symbol="ψ", units="kg s⁻¹", role="diagnostic",
-           origin="derived", definition=(
+           origin="derived", group="Dynamics", definition=(
                "ψ(φ, σ_{k+½}) = 2πa cos φ / g · Σ_{j≤k} [pₛ v_j] Δσ_j, integrated downward from ψ = 0 at "
                "σ = 0; positive for northward mass transport above the interface."))
 CONVENTIONS = dict(
@@ -74,7 +74,7 @@ CONVENTIONS = dict(
 LOWEST_AIR = "Air temperature at the lowest full level, not a surface temperature"
 SLAB = "Slab surface temperature Tₛ, a stored grid-point prognostic"
 #: Quantities a native-level reconstruction provides along a vertical axis.
-AXIS_FIELDS = (*LEVEL_FIELDS, "wind_speed")
+AXIS_FIELDS = (*LEVEL_FIELDS, "wind_speed", "density")
 NO_VERTICAL_MEAN = ("a vertical mean needs a mass (Δp) weighting rule, which this release does not "
                     "define")
 NO_QUADRATURE = ("this archive's native grid is not a Gaussian latitude–longitude grid, so no "
@@ -338,7 +338,17 @@ def _wind(values):
     return np.hypot(values["u"], values["v"])
 
 
-def _field(values, key):
+def density(pressure, temperature, gas_constant):
+    """ρ = p/(R T): ideal gas, p and T at the same samples, R the run's recorded constant."""
+    if not gas_constant:
+        raise SelectionError("Air density needs the gas constant the run records; this run records none")
+    with np.errstate(divide="ignore", invalid="ignore"):       # masked samples carry no valid T
+        return np.asarray(pressure, dtype=float) / (float(gas_constant) * np.asarray(temperature, dtype=float))
+
+
+def _field(values, key, gas_constant=None):
+    if key == "density":
+        return density(values["pressure"], values["temperature"], gas_constant)
     return _wind(values) if key in ("wind", "wind_speed") else values[key]
 
 
@@ -393,14 +403,16 @@ def _fixed_surface(provider, frame, key, lat, lon, rep, value):
         levels = reconstruct_levels(frame, context, lat, lon, [int(value)],
                                     vorticity_divergence=key in ("zeta", "delta"), heights=heights)
         values = {name: arr[0] for name, arr in levels.values.items()}
-        return _field(values, key)
+        return _field(values, key, context.r_dry)
     if rep != "sigma" and key in ("zeta", "delta"):
         raise SelectionError("Vorticity and divergence require a native or sigma surface")
     surface = pressure_surface(frame, context, lat, lon, (rep, value))
     values = dict(surface.values)
     if rep in ("geopotential_height", "height_above_surface") and key == "geopotential":
         values["geopotential"] = values["geopotential_height"] * context.gravity
-    out = np.array(_field(values, key), dtype=float)
+    if rep == "pressure" and "pressure" not in values:
+        values["pressure"] = np.full(surface.mask.shape, float(value))      # the surface's own p
+    out = np.array(_field(values, key, context.r_dry), dtype=float)
     out[surface.mask != 0] = np.nan
     return out
 
@@ -438,7 +450,7 @@ def samples(provider, sel, plan_, indices):
                 companions[name] = flip(_surface(provider, index, name, lat, lon)[None])
             else:
                 companions[name] = flip(levels[name])
-        yield times[index], flip(_field(levels.values, key)), companions
+        yield times[index], flip(_field(levels.values, key, provider._context.r_dry)), companions
 
 
 def _psi_sample(provider, index, lat, lon, flip):

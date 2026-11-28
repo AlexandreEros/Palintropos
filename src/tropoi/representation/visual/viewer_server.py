@@ -18,6 +18,7 @@ import numpy as np
 from tropoi.representation.archive.local_resource import resource
 from tropoi.representation.archive.airless import READER as AIRLESS_READER
 from tropoi.representation.archive.viewer_manifest import viewer_manifest
+from tropoi.representation.visual.quantities import ARCHIVED
 from tropoi.representation.visual.selection import (
     PRESETS, SelectionError, evaluate, parse_selection, time_axis)
 
@@ -112,7 +113,8 @@ class ViewerSession:
                     manifest["diagnostics"]["steps." + column] = dict(
                         path=step_series["path"], kind="series", time_axis="steps", column=column,
                         presentation=dict(name=name, symbol="", units=definition.get("units"),
-                                          definition=name, role="diagnostic", origin="recorded"))
+                                          definition=name, role="diagnostic", origin="recorded",
+                                          group=ARCHIVED))
                 del manifest["diagnostics"]["timeseries"]
                 manifest["operations"]["series"] = [
                     k for k, d in manifest["diagnostics"].items() if d["kind"] == "series"]
