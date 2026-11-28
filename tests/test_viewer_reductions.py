@@ -293,6 +293,15 @@ def test_minimum_profile_labels_its_statistic_and_keeps_position_means(hs):
     assert d["table"]["columns"][5] == "T (K) (time min)" and d["table"]["columns"][2] == "p (Pa) (mean)"
     assert d["markers"][0]["label"].startswith("Lowest full level air T (time min) = ")
     assert d["markers"][0]["value"] == d["values"][-1]
+    # The tabulated T is the plotted minimum, not a time mean (F-1); u and v are minima too.
+    rows = np.array(d["table"]["rows"], dtype=float)
+    np.testing.assert_array_equal(rows[:, 5], d["values"])
+    base = dict(longitude=dict(role="fixed", value=10.0), latitude=dict(role="fixed", value=-30.0),
+                vertical=dict(role="y", representation="sigma"))
+    u = [select(session, quantity="u", **base, time=dict(role="fixed", index=i))["values"] for i in range(60, 64)]
+    np.testing.assert_array_equal(rows[:, 6], np.min(u, axis=0))
+    mean = select(session, quantity="temperature", **base, time=dict(role="reduce", op="mean", first=60, last=63))
+    np.testing.assert_array_equal(np.array(mean["table"]["rows"], dtype=float)[:, 2], rows[:, 2])   # p: means
 
 
 def test_value_companion_takes_the_quantity_statistic():

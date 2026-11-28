@@ -312,7 +312,8 @@ def _vertical_plan(provider, sel, quantity, out):
     single_column = sel["longitude"]["role"] in ("fixed", "reduce") and sel["latitude"]["role"] in ("fixed", "reduce")
     if single_column and sel["time"]["role"] in ("fixed", "reduce"):
         for name, (label, units) in dict(temperature=("T", "K"), u=("u", "m s⁻¹"), v=("v", "m s⁻¹")).items():
-            out["companions"].setdefault(name, dict(label=label, units=units))
+            # Values of the column, tabulated under the quantity's statistic: they take it (F-1).
+            out["companions"].setdefault(name, dict(label=label, units=units, statistic="quantity"))
         if sel["quantity"] == "temperature" and "surface_temperature" in provider.manifest["fields"]:
             out["companions"]["surface_temperature"] = dict(label="Tₛ (slab)", units="K", surface=True,
                                                             statistic="quantity")
