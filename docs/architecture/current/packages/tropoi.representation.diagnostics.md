@@ -51,10 +51,10 @@ flowchart LR
     n_tropoi_orepresentation_odiagnostics_ope__structure --> n_tropoi_orepresentation_odiagnostics_ope__levels
     n_tropoi_orepresentation_odiagnostics_ope__surfaces --> n_tropoi_orepresentation_odiagnostics_ope__levels
     n_tropoi_orepresentation_odiagnostics_oswe --> n_tropoi_orepresentation_odiagnostics_obve
-    p_tropoi_orepresentation_ovisual -->|2| n_tropoi_orepresentation_odiagnostics_oheld__suarez__sections
-    p_tropoi_orepresentation_ovisual -->|3| n_tropoi_orepresentation_odiagnostics_ope__levels
-    p_tropoi_orepresentation_ovisual -->|1| n_tropoi_orepresentation_odiagnostics_ope__structure
-    p_tropoi_orepresentation_ovisual -->|2| n_tropoi_orepresentation_odiagnostics_ope__surfaces
+    p_tropoi_orepresentation_ovisual -->|3| n_tropoi_orepresentation_odiagnostics_oheld__suarez__sections
+    p_tropoi_orepresentation_ovisual -->|4| n_tropoi_orepresentation_odiagnostics_ope__levels
+    p_tropoi_orepresentation_ovisual -->|2| n_tropoi_orepresentation_odiagnostics_ope__structure
+    p_tropoi_orepresentation_ovisual -->|3| n_tropoi_orepresentation_odiagnostics_ope__surfaces
     p_tropoi_orepresentation_ovisual -.->|2| n_tropoi_orepresentation_odiagnostics_ospectral
     p_tropoi_orepresentation_ovisual -.->|1| n_tropoi_orepresentation_odiagnostics_oswe
     p_tropoi_orun_obve -->|1| n_tropoi_orepresentation_odiagnostics_obve

@@ -3745,23 +3745,11 @@
         },
         {
           "kind": "method",
-          "name": "_cells"
-        },
-        {
-          "kind": "method",
           "name": "_cells_axis"
         },
         {
           "kind": "method",
-          "name": "_column"
-        },
-        {
-          "kind": "method",
-          "name": "_column_index"
-        },
-        {
-          "kind": "method",
-          "name": "_flux"
+          "name": "_family"
         },
         {
           "kind": "method",
@@ -3769,47 +3757,11 @@
         },
         {
           "kind": "method",
-          "name": "_map"
+          "name": "_read"
         },
         {
           "kind": "method",
-          "name": "_meridional_section"
-        },
-        {
-          "kind": "method",
-          "name": "_payload"
-        },
-        {
-          "kind": "method",
-          "name": "_range"
-        },
-        {
-          "kind": "method",
-          "name": "_read_level"
-        },
-        {
-          "kind": "method",
-          "name": "_section"
-        },
-        {
-          "kind": "method",
-          "name": "_skin"
-        },
-        {
-          "kind": "method",
-          "name": "_skin_at"
-        },
-        {
-          "kind": "method",
-          "name": "_time"
-        },
-        {
-          "kind": "method",
-          "name": "_time_section"
-        },
-        {
-          "kind": "method",
-          "name": "_time_series"
+          "name": "_skin_index"
         },
         {
           "kind": "method",
@@ -3817,11 +3769,23 @@
         },
         {
           "kind": "method",
-          "name": "_zonal_section"
+          "name": "_vertical_plan"
         },
         {
           "kind": "method",
-          "name": "select"
+          "name": "finish"
+        },
+        {
+          "kind": "method",
+          "name": "frame"
+        },
+        {
+          "kind": "method",
+          "name": "plan"
+        },
+        {
+          "kind": "method",
+          "name": "samples"
         }
       ],
       "module": "tropoi.representation.visual.viewer_columns",
@@ -3885,16 +3849,32 @@
           "name": "column"
         },
         {
+          "kind": "method",
+          "name": "finish"
+        },
+        {
+          "kind": "method",
+          "name": "frame"
+        },
+        {
+          "kind": "method",
+          "name": "plan"
+        },
+        {
+          "kind": "method",
+          "name": "post"
+        },
+        {
           "kind": "property",
           "name": "radius"
         },
         {
           "kind": "method",
-          "name": "section"
+          "name": "samples"
         },
         {
           "kind": "method",
-          "name": "select"
+          "name": "section"
         },
         {
           "kind": "method",

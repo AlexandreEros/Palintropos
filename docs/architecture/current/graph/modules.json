@@ -1811,7 +1811,63 @@
         "module"
       ],
       "source": "tropoi.representation.visual.viewer_atmosphere",
+      "target": "tropoi.representation.diagnostics.held_suarez_sections"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.representation.visual.viewer_atmosphere",
+      "target": "tropoi.representation.diagnostics.pe_levels"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.representation.visual.viewer_atmosphere",
+      "target": "tropoi.representation.diagnostics.pe_structure"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.representation.visual.viewer_atmosphere",
+      "target": "tropoi.representation.diagnostics.pe_surfaces"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.representation.visual.viewer_atmosphere",
       "target": "tropoi.representation.visual.selection"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "function"
+      ],
+      "source": "tropoi.representation.visual.viewer_atmosphere",
+      "target": "tropoi.representation.visual.viewer_fields"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.representation.visual.viewer_atmosphere",
+      "target": "tropoi.spatial.grids.quadrature"
+    },
+    {
+      "kind": "imports",
+      "scopes": [
+        "module"
+      ],
+      "source": "tropoi.representation.visual.viewer_atmosphere",
+      "target": "tropoi.spatial.transforms.host_synthesis"
     },
     {
       "kind": "imports",
@@ -5373,7 +5429,9 @@
         "json",
         "math"
       ],
-      "third_party_imports": []
+      "third_party_imports": [
+        "numpy"
+      ]
     },
     {
       "category": "code",
@@ -5509,7 +5567,9 @@
       "stdlib_imports": [
         "__future__"
       ],
-      "third_party_imports": []
+      "third_party_imports": [
+        "numpy"
+      ]
     },
     {
       "category": "code",

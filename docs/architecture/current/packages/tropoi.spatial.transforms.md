@@ -43,7 +43,7 @@ flowchart LR
     n_tropoi_ospatial_otransforms_ooptimized__geodesic__sh --> n_tropoi_ospatial_otransforms_ofast__geodesic__sh
     p_tropoi_orepresentation_odiagnostics -->|2| n_tropoi_ospatial_otransforms_ohost__synthesis
     p_tropoi_orepresentation_ovisual -.->|1| n_tropoi_ospatial_otransforms_ofast__geodesic__sh
-    p_tropoi_orepresentation_ovisual -->|3| n_tropoi_ospatial_otransforms_ohost__synthesis
+    p_tropoi_orepresentation_ovisual -->|4| n_tropoi_ospatial_otransforms_ohost__synthesis
     p_tropoi_orepresentation_ovisual -.->|1| n_tropoi_ospatial_otransforms_oseparable__gauss__sh
     p_tropoi_ospatial -->|2| n_tropoi_ospatial_otransforms_ooptimized__geodesic__sh
     p_tropoi_ospatial_ogrids -->|1| n_tropoi_ospatial_otransforms_ofast__geodesic__sh
