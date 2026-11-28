@@ -482,6 +482,7 @@ def finish(provider, sel, plan_, payload):
             payload["notes"].append("Means are taken on native σ levels: each row is the mean of the level's "
                                     "values over " + " and ".join(reduced) + ", and its p and Z are the means "
                                     "of that level's p_k and Z_k, not a mean on a surface of constant p or Z.")
+        payload["markers"] = []
         if sel["quantity"] == "temperature":
             y = payload[v["role"]]["values"]
             markers = [dict(label=f"Lowest full level air T{mean} = {payload['values'][-1]:.6g} K "

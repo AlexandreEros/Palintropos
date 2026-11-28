@@ -65,7 +65,7 @@ import math
 import numpy as np
 
 __all__ = ["COORDINATES", "PRESETS", "ROLES", "SelectionError", "parse_selection", "evaluate",
-           "describe_roles", "axis", "level_edges", "time_samples"]
+           "describe_roles", "axis", "time_samples"]
 
 COORDINATES = ("longitude", "latitude", "vertical", "time")
 ROLES = ("x", "y", "fixed", "reduce", "none")
@@ -433,24 +433,6 @@ def _time_description(manifest, sel, seconds):
 # ----------------------------------------------------------------------
 # Axes
 # ----------------------------------------------------------------------
-
-def level_edges(centres, scale="log"):
-    """Band edges between level centres: midpoints in ``log10`` or in the
-    value itself. A top centre of 0 (σ at the top interface) is replaced by
-    the geometric continuation ``c1^2 / c2``; the last edge never passes
-    σ = 1. Used only where no native interfaces exist."""
-    c = [float(v) for v in centres]
-    if scale == "log":
-        if c[0] <= 0:
-            c[0] = c[1] * c[1] / c[2]
-        logs = [math.log10(v) for v in c]
-        edges = [logs[0] - (logs[1] - logs[0]) / 2]
-        edges += [(a + b) / 2 for a, b in zip(logs, logs[1:])]
-        edges.append(min(0.0, logs[-1] + (logs[-1] - logs[-2]) / 2))
-        return [10 ** e for e in edges]
-    edges = [c[0] - (c[1] - c[0]) / 2] + [(a + b) / 2 for a, b in zip(c, c[1:])]
-    return edges + [c[-1] + (c[-1] - c[-2]) / 2]
-
 
 def axis(coordinate, representation, label, units, values, *, edges=None, scale="linear",
          downward=False, ticks=None, rows=None, limits=None, interpolation=None):

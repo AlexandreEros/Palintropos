@@ -241,8 +241,8 @@ class ColumnArchiveProvider:
 
     def finish(self, sel, plan, payload):
         comp = payload.get("companions") or {}
-        if "skin" in comp:
-            payload["surface"] = comp["skin"]["values"]
+        if "skin" in comp and payload["axes"]["x"] and payload["axes"]["y"]:
+            payload["surface"] = comp["skin"]["values"]          # the skin strip of a field; a marker on a line
         v = sel["vertical"]
         profile = v["role"] in ("x", "y") and all(sel[c]["role"] in ("fixed", "reduce")
                                                    for c in ("longitude", "latitude", "time"))

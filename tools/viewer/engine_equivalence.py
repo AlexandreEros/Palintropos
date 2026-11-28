@@ -176,7 +176,11 @@ def compare(kind, old, new_bytes):
     if "markers" in old:
         checks["markers"] = ([(m["value"], m["position"]) for m in old["markers"]],
                              [(m["value"], m["position"]) for m in new["markers"]])
-    if old.get("surface") is not None or new.get("surface") is not None:
+    if isinstance(old.get("surface"), dict):              # an atmospheric column's pₛ and Zₛ
+        checks["surface"] = ([old["surface"]["pressure"], old["surface"]["height"]],
+                             [new["companions"]["surface_pressure"]["values"],
+                              new["companions"]["surface_height"]["values"]])
+    elif old.get("surface") is not None or new.get("surface") is not None:
         checks["skin"] = (old.get("surface"), new.get("surface"))
     for name, companion in (old.get("companions") or {}).items():
         checks["companion " + name] = (companion["values"], new["companions"][name]["values"])
@@ -191,8 +195,9 @@ def compare(kind, old, new_bytes):
         checks["time"] = (t["seconds"], new["coordinates"]["time"]["seconds"])
     if "sample" in old:
         s, n = old["sample"], new["coordinates"]["time"]
-        checks["sample"] = ([s["count"], s["intervals_seconds"], s["cadence"].replace("state", "sample")],
-                            [n["count"], n["intervals_seconds"], n["cadence"]])
+        new_sample = ([1, {}, "single sample"] if n["role"] == "fixed" else
+                      [n["count"], n["intervals_seconds"], n["cadence"]])
+        checks["sample"] = ([s["count"], s["intervals_seconds"], s["cadence"].replace("state", "sample")], new_sample)
     bad = [name for name, (a, b) in checks.items() if a != b]
     return not bad, ("exactly equal: " + ", ".join(checks)) if not bad else "differ: " + ", ".join(bad)
 
@@ -218,7 +223,10 @@ def main(argv=None):
             data, _ = session.select(run, text)
             same, detail = compare(kind, before, data)
         except Exception as err:
-            same, detail = False, f"new implementation raised {type(err).__name__}: {err}"
+            refused = isinstance(before, dict) and "error" in before
+            same = refused                       # both refuse: no value exists to differ
+            detail = (("both refuse; old " + before["error"] + "; new ") if refused else
+                      "new implementation raised ") + f"{type(err).__name__}: {err}"
         failures += not same
         rows.append(dict(archive=pathlib.Path(roots[run]).name, kind=kind, selection=json.loads(text),
                          equal=same, detail=detail))
