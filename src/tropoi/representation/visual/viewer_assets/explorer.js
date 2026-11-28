@@ -822,8 +822,8 @@ export class Explorer {
       if (!Number.isFinite(value)) return {error: "Enter a valid vertical value for the globe's surface."};
       sel.vertical = {role: "fixed", representation: rep, value};
       if (this.effective("vertical") !== "fixed") notes.push("Surface: the Explorer's fixed-surface setting (the " +
-        "Explorer itself plots the vertical coordinate " + (this.effective("vertical") === "reduce" ? "reduced" : "as an axis") +
-        "; click a level in its plot to move the globe).");
+        "Explorer itself " + (this.effective("vertical") === "reduce" ? "reduces the vertical coordinate" :
+          "plots the vertical coordinate along an axis; click a level in its plot to move the globe") + ").");
     }
     const role = this.effective("time");
     if (role !== "fixed") notes.push("Time: the globe shows one saved state; the Explorer " +

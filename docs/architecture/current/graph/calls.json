@@ -5986,14 +5986,19 @@
       "target": "tropoi.representation.visual.matplotlib_renderer.MatplotlibRenderer"
     },
     {
-      "kind": "call",
-      "source": "tropoi.representation.visual.selection._arrange",
-      "target": "tropoi.representation.visual.selection._plain"
+      "kind": "constructor",
+      "source": "tropoi.representation.visual.selection._TimeReduction",
+      "target": "tropoi.representation.visual.selection._TimeReduction.__init__"
+    },
+    {
+      "kind": "self",
+      "source": "tropoi.representation.visual.selection._TimeReduction.add",
+      "target": "tropoi.representation.visual.selection._TimeReduction._accumulate"
     },
     {
       "kind": "call",
-      "source": "tropoi.representation.visual.selection._horizontal",
-      "target": "tropoi.representation.visual.selection._reduce"
+      "source": "tropoi.representation.visual.selection._arrange",
+      "target": "tropoi.representation.visual.selection._plain"
     },
     {
       "kind": "instantiate",
@@ -6021,9 +6026,19 @@
       "target": "tropoi.representation.visual.selection.SelectionError"
     },
     {
+      "kind": "call",
+      "source": "tropoi.representation.visual.selection._spatial",
+      "target": "tropoi.representation.visual.selection._reduce"
+    },
+    {
       "kind": "instantiate",
       "source": "tropoi.representation.visual.selection.evaluate",
       "target": "tropoi.representation.visual.selection.SelectionError"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.representation.visual.selection.evaluate",
+      "target": "tropoi.representation.visual.selection._TimeReduction"
     },
     {
       "kind": "call",
@@ -6033,7 +6048,12 @@
     {
       "kind": "call",
       "source": "tropoi.representation.visual.selection.evaluate",
-      "target": "tropoi.representation.visual.selection._horizontal"
+      "target": "tropoi.representation.visual.selection._same"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.selection.evaluate",
+      "target": "tropoi.representation.visual.selection._spatial"
     },
     {
       "kind": "call",
@@ -6054,6 +6074,11 @@
       "kind": "call",
       "source": "tropoi.representation.visual.selection.evaluate",
       "target": "tropoi.representation.visual.selection.time_samples"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.selection.evaluate",
+      "target": "tropoi.representation.visual.selection.time_weights"
     },
     {
       "kind": "call",
@@ -6952,6 +6977,11 @@
     },
     {
       "kind": "call",
+      "source": "tropoi.representation.visual.viewer_atmosphere._field",
+      "target": "tropoi.representation.visual.viewer_atmosphere.density"
+    },
+    {
+      "kind": "call",
       "source": "tropoi.representation.visual.viewer_atmosphere._fixed_surface",
       "target": "tropoi.representation.diagnostics.pe_levels.reconstruct_levels"
     },
@@ -6969,6 +6999,11 @@
       "kind": "call",
       "source": "tropoi.representation.visual.viewer_atmosphere._fixed_surface",
       "target": "tropoi.representation.visual.viewer_atmosphere._field"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.viewer_atmosphere._horizontal_caps",
+      "target": "tropoi.representation.visual.selection.reductions"
     },
     {
       "kind": "call",
@@ -7029,6 +7064,16 @@
       "kind": "call",
       "source": "tropoi.representation.visual.viewer_atmosphere._vertical_plan",
       "target": "tropoi.representation.visual.viewer_atmosphere._sigma_axis"
+    },
+    {
+      "kind": "instantiate",
+      "source": "tropoi.representation.visual.viewer_atmosphere.density",
+      "target": "tropoi.representation.visual.selection.SelectionError"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.viewer_atmosphere.describe",
+      "target": "tropoi.representation.visual.selection.reductions"
     },
     {
       "kind": "call",
@@ -7201,6 +7246,11 @@
       "target": "tropoi.representation.visual.viewer_columns.ColumnArchiveProvider._skin_index"
     },
     {
+      "kind": "call",
+      "source": "tropoi.representation.visual.viewer_columns.describe",
+      "target": "tropoi.representation.visual.selection.reductions"
+    },
+    {
       "kind": "constructor",
       "source": "tropoi.representation.visual.viewer_fields.FrameProvider",
       "target": "tropoi.representation.visual.viewer_fields.FrameProvider.__init__"
@@ -7244,6 +7294,11 @@
       "kind": "call",
       "source": "tropoi.representation.visual.viewer_fields.FrameProvider._pe_slice",
       "target": "tropoi.representation.diagnostics.pe_surfaces.pressure_surface"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.viewer_fields.FrameProvider._pe_slice",
+      "target": "tropoi.representation.visual.viewer_atmosphere.density"
     },
     {
       "kind": "self",
@@ -20940,17 +20995,45 @@
       "type": "class"
     },
     {
+      "id": "tropoi.representation.visual.selection._TimeReduction",
+      "kind": "class",
+      "module": "tropoi.representation.visual.selection",
+      "qualname": "_TimeReduction",
+      "type": "class"
+    },
+    {
+      "id": "tropoi.representation.visual.selection._TimeReduction.__init__",
+      "kind": "method",
+      "module": "tropoi.representation.visual.selection",
+      "qualname": "_TimeReduction.__init__",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.selection._TimeReduction._accumulate",
+      "kind": "method",
+      "module": "tropoi.representation.visual.selection",
+      "qualname": "_TimeReduction._accumulate",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.selection._TimeReduction.add",
+      "kind": "method",
+      "module": "tropoi.representation.visual.selection",
+      "qualname": "_TimeReduction.add",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.selection._TimeReduction.result",
+      "kind": "method",
+      "module": "tropoi.representation.visual.selection",
+      "qualname": "_TimeReduction.result",
+      "type": "function"
+    },
+    {
       "id": "tropoi.representation.visual.selection._arrange",
       "kind": "function",
       "module": "tropoi.representation.visual.selection",
       "qualname": "_arrange",
-      "type": "function"
-    },
-    {
-      "id": "tropoi.representation.visual.selection._horizontal",
-      "kind": "function",
-      "module": "tropoi.representation.visual.selection",
-      "qualname": "_horizontal",
       "type": "function"
     },
     {
@@ -21000,6 +21083,20 @@
       "kind": "function",
       "module": "tropoi.representation.visual.selection",
       "qualname": "_refuse_role",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.selection._same",
+      "kind": "function",
+      "module": "tropoi.representation.visual.selection",
+      "qualname": "_same",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.selection._spatial",
+      "kind": "function",
+      "module": "tropoi.representation.visual.selection",
+      "qualname": "_spatial",
       "type": "function"
     },
     {
@@ -21059,6 +21156,13 @@
       "type": "function"
     },
     {
+      "id": "tropoi.representation.visual.selection.reductions",
+      "kind": "function",
+      "module": "tropoi.representation.visual.selection",
+      "qualname": "reductions",
+      "type": "function"
+    },
+    {
       "id": "tropoi.representation.visual.selection.time_axis",
       "kind": "function",
       "module": "tropoi.representation.visual.selection",
@@ -21070,6 +21174,13 @@
       "kind": "function",
       "module": "tropoi.representation.visual.selection",
       "qualname": "time_samples",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.selection.time_weights",
+      "kind": "function",
+      "module": "tropoi.representation.visual.selection",
+      "qualname": "time_weights",
       "type": "function"
     },
     {
@@ -22218,6 +22329,13 @@
       "kind": "function",
       "module": "tropoi.representation.visual.viewer_atmosphere",
       "qualname": "_wind",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.viewer_atmosphere.density",
+      "kind": "function",
+      "module": "tropoi.representation.visual.viewer_atmosphere",
+      "qualname": "density",
       "type": "function"
     },
     {
