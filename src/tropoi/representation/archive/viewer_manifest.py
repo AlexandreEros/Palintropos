@@ -115,7 +115,7 @@ def _columns_manifest(root):
                     skin="diagnosed massless skin at depth 0")
     output = dict(schema="palintropos.viewer/1.0", source=source, resources={}, fields={},
                   axes=dict(substrate=vertical), geometry=geometry, physics=physics, diagnostics={},
-                  time_axes=axes, operations={}, unavailable=dict(explorer["unavailable"]),
+                  time_axes=axes, operations={}, unavailable={},
                   explorer=explorer)
     return output
 
@@ -251,7 +251,7 @@ def viewer_manifest(directory):
         # Zonal reductions use Gauss–Legendre latitudes and equally spaced longitudes.
         output["operations"]["structure"] = [op for op in structure if op not in
                                              ("zonal_mean", "mass_streamfunction")]
-        output["unavailable"]["zonal_mean"] = "The state grid has no Gaussian latitude–longitude quadrature"
+        output["unavailable"]["horizontal_means"] = "The state grid has no Gaussian latitude–longitude quadrature"
     if isinstance(storage, RadiativeStorage) and storage.run_config.get("surface") is not None:
         missing = sorted(set(storage.states) - storage.surfaces.keys())
         if missing:
