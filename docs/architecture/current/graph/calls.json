@@ -6032,6 +6032,11 @@
     },
     {
       "kind": "instantiate",
+      "source": "tropoi.representation.visual.selection._wind_layer",
+      "target": "tropoi.representation.visual.selection.SelectionError"
+    },
+    {
+      "kind": "instantiate",
       "source": "tropoi.representation.visual.selection.evaluate",
       "target": "tropoi.representation.visual.selection.SelectionError"
     },
@@ -6119,6 +6124,11 @@
       "kind": "call",
       "source": "tropoi.representation.visual.selection.parse_selection",
       "target": "tropoi.representation.visual.selection._refuse_role"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.selection.parse_selection",
+      "target": "tropoi.representation.visual.selection._wind_layer"
     },
     {
       "kind": "call",
@@ -7062,6 +7072,11 @@
     },
     {
       "kind": "call",
+      "source": "tropoi.representation.visual.viewer_atmosphere._surface_wind",
+      "target": "tropoi.spatial.transforms.host_synthesis.synthesize_wind_latlon"
+    },
+    {
+      "kind": "call",
       "source": "tropoi.representation.visual.viewer_atmosphere._vertical_plan",
       "target": "tropoi.representation.visual.viewer_atmosphere._sigma_axis"
     },
@@ -7089,6 +7104,11 @@
       "kind": "call",
       "source": "tropoi.representation.visual.viewer_atmosphere.describe",
       "target": "tropoi.representation.visual.viewer_atmosphere._quadrature"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.viewer_atmosphere.describe",
+      "target": "tropoi.representation.visual.viewer_atmosphere._wind_capability"
     },
     {
       "kind": "call",
@@ -7154,6 +7174,11 @@
       "kind": "call",
       "source": "tropoi.representation.visual.viewer_atmosphere.samples",
       "target": "tropoi.representation.visual.viewer_atmosphere._surface"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.viewer_atmosphere.samples",
+      "target": "tropoi.representation.visual.viewer_atmosphere._surface_wind"
     },
     {
       "kind": "constructor",
@@ -21107,6 +21132,13 @@
       "type": "function"
     },
     {
+      "id": "tropoi.representation.visual.selection._wind_layer",
+      "kind": "function",
+      "module": "tropoi.representation.visual.selection",
+      "qualname": "_wind_layer",
+      "type": "function"
+    },
+    {
       "id": "tropoi.representation.visual.selection.axis",
       "kind": "function",
       "module": "tropoi.representation.visual.selection",
@@ -22318,6 +22350,13 @@
       "type": "function"
     },
     {
+      "id": "tropoi.representation.visual.viewer_atmosphere._surface_wind",
+      "kind": "function",
+      "module": "tropoi.representation.visual.viewer_atmosphere",
+      "qualname": "_surface_wind",
+      "type": "function"
+    },
+    {
       "id": "tropoi.representation.visual.viewer_atmosphere._vertical_plan",
       "kind": "function",
       "module": "tropoi.representation.visual.viewer_atmosphere",
@@ -22329,6 +22368,13 @@
       "kind": "function",
       "module": "tropoi.representation.visual.viewer_atmosphere",
       "qualname": "_wind",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.viewer_atmosphere._wind_capability",
+      "kind": "function",
+      "module": "tropoi.representation.visual.viewer_atmosphere",
+      "qualname": "_wind_capability",
       "type": "function"
     },
     {
