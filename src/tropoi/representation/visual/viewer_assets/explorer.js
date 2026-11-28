@@ -1,5 +1,6 @@
 import {fieldScale} from "./mesh.js";
 import {numberText} from "./map.js";
+import {streamlines} from "./overlays.js";
 
 // The explorer: the viewer's analytical workspace and its one flat plotting
 // surface. One quantity, four coordinates, one role each. The server says
@@ -14,7 +15,7 @@ import {numberText} from "./map.js";
 // How a vertical axis is drawn (linear or logarithmic, upward or downward) is
 // a display choice made here: it changes no value and no request.
 
-const INK = "#22343a", GRID = "rgba(34,52,58,.18)", CURSOR = "#ff8c1a", LINE = "#106d6c";
+const INK = "#22343a", GRID = "rgba(34,52,58,.18)", CURSOR = "#ff8c1a", LINE = "#106d6c", WIND = "rgba(20,30,34,.78)";
 const COORDINATES = ["longitude", "latitude", "vertical", "time"];
 const ROLE_ORDER = ["x", "y", "fixed", "reduce", "none"];
 const NAMES = {longitude: "Longitude", latitude: "Latitude", vertical: "Vertical", time: "Time"};
@@ -124,6 +125,60 @@ function tickSet(axis, lo, hi) {
 const axisLabel = a => a.ticks === "time" ? a.label + " (days of 86 400 s)" :
   a.label + (a.units && !a.label.includes("(" + a.units) ? " (" + a.units + ")" : "") + (a.scale === "log" ? ", log" : "");
 
+/** Streamlines of a longitude × latitude result's wind companions, [[lat, lon], …] per line.
+ * The globe's integrator (overlays.js) on the same samples: increasing latitudes,
+ * periodic longitudes without the closing meridian, NaN where the field is masked. */
+export function windLines(plot) {
+  const lonOnX = plot.x.coordinate === "longitude";
+  const lonAxis = lonOnX ? plot.x : plot.y, latAxis = lonOnX ? plot.y : plot.x;
+  let nlon = lonAxis.values.length;
+  if (nlon > 1 && Math.abs(lonAxis.values[nlon - 1] - lonAxis.values[0] - 360) < 1e-9) nlon--;   // closing meridian
+  const lat = latAxis.values.slice(), up = lat.length < 2 || lat[1] > lat[0];
+  if (!up) lat.reverse();
+  const nlat = lat.length, at = (component, j, i) => {
+    const jj = up ? j : nlat - 1 - j, value = lonOnX ? component[jj][i] : component[i][jj];
+    return value ?? NaN;
+  };
+  const u = new Float32Array(nlat * nlon), v = new Float32Array(nlat * nlon), speed = new Float32Array(nlat * nlon);
+  for (let j = 0; j < nlat; j++) for (let i = 0; i < nlon; i++) {
+    const k = j * nlon + i;
+    u[k] = at(plot.wind.u, j, i); v[k] = at(plot.wind.v, j, i);
+    speed[k] = Math.hypot(u[k], v[k]);              // NaN where either component is masked
+  }
+  return streamlines({lat: Float64Array.from(lat), lon: Float64Array.from(lonAxis.values.slice(0, nlon)),
+    values: speed, u, v}, false);
+}
+
+/** Draw wind streamlines on a field box: a polyline per line, broken at the periodic seam,
+ * with one arrowhead at its middle pointing downstream. */
+function drawWind(ctx, plot, box, X, Y) {
+  const lonOnX = plot.x.coordinate === "longitude";
+  const point = (lat, lon) => {
+    const east = ((lon % 360) + 360) % 360;
+    return lonOnX ? [X(unit(plot.x, east)), Y(unit(plot.y, lat)), east] : [X(unit(plot.x, lat)), Y(unit(plot.y, east)), east];
+  };
+  ctx.save(); ctx.beginPath(); ctx.rect(box.x, box.y, box.w, box.h); ctx.clip();
+  ctx.strokeStyle = WIND; ctx.fillStyle = WIND; ctx.lineWidth = 1;
+  const lines = windLines(plot);
+  for (const line of lines) {
+    const pts = line.map(([lat, lon]) => point(lat, lon));
+    ctx.beginPath();
+    pts.forEach(([x, y, east], k) => {
+      if (k === 0 || Math.abs(east - pts[k - 1][2]) > 180) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+    });
+    ctx.stroke();
+    const m = Math.floor(pts.length / 2), [x, y, east] = pts[m], [px, py, peast] = pts[m - 1];
+    const dx = x - px, dy = y - py, len = Math.hypot(dx, dy);
+    if (len > 0 && Math.abs(east - peast) <= 180) {
+      const a = dx / len, b = dy / len;
+      ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x - 6 * a + 2.6 * b, y - 6 * b - 2.6 * a);
+      ctx.lineTo(x - 6 * a - 2.6 * b, y - 6 * b + 2.6 * a); ctx.closePath(); ctx.fill();
+    }
+  }
+  ctx.restore();
+  return lines.length;
+}
+
 /** A two-dimensional result: cells between edges, an optional surface strip. */
 function drawField(canvas, plot, width, ratio) {
   const ctx = canvas.getContext("2d");
@@ -170,6 +225,7 @@ function drawField(canvas, plot, width, ratio) {
     ctx.fillStyle = INK; ctx.font = "10px system-ui"; ctx.textAlign = "right";
     ctx.fillText("skin", box.x - 6, box.y - 5);
   }
+  const winds = plot.wind ? drawWind(ctx, plot, box, X, Y) : null;
   ctx.strokeStyle = GRID; ctx.lineWidth = 1; ctx.font = "11px system-ui"; ctx.fillStyle = INK; ctx.beginPath();
   const yt = tickSet(ay, y0, y1), xt = tickSet(ax, x0, x1);
   for (const t of yt.ticks) {
@@ -202,7 +258,17 @@ function drawField(canvas, plot, width, ratio) {
   }
   ctx.strokeStyle = INK; ctx.lineWidth = 1; ctx.strokeRect(box.x, box.y, box.w, box.h);
   colorbar(ctx, scale, {...box, y: box.y}, plot.range ? plot.label + " · fixed colour range; values beyond it take the end colours" : plot.label);
-  return {kind: "field", box, width, height, xe, ye, X, Y, x0, x1, y0, y1, rows, cols, up, strip, range: scale.range};
+  if (plot.wind) {
+    // The line key, on its own row under the colour bar's values.
+    const y = box.y + box.h + 84;
+    ctx.strokeStyle = WIND; ctx.fillStyle = WIND; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(box.x, y - 4); ctx.lineTo(box.x + 22, y - 4); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(box.x + 22, y - 4); ctx.lineTo(box.x + 16, y - 6.6); ctx.lineTo(box.x + 16, y - 1.4); ctx.closePath(); ctx.fill();
+    ctx.font = "11px system-ui"; ctx.fillStyle = INK; ctx.textAlign = "left";
+    ctx.fillText(plot.wind.label[0].toUpperCase() + plot.wind.label.slice(1) + " (arrow: downstream; not trajectories)",
+      box.x + 30, y, box.w - 30);
+  }
+  return {kind: "field", box, width, height, xe, ye, X, Y, x0, x1, y0, y1, rows, cols, up, strip, range: scale.range, winds};
 }
 
 /** A line: values against one coordinate, horizontal (time) or vertical (profile). */
@@ -350,6 +416,7 @@ export class Explorer {
     c["quantity-search"].oninput = () => this.fillQuantities(c["quantity-search"].value);
     c.preset.onchange = () => { if (c.preset.value) { this.applyPreset(c.preset.value); this.update(); } };
     c.snap.onchange = () => this.update();
+    c.wind.onchange = () => this.update();
     c["range-mode"].onchange = () => {
       if (c["range-mode"].value === "fixed" && this.layout?.range) {
         if (c["range-min"].value === "") c["range-min"].value = String(Number(this.layout.range[0].toPrecision(6)));
@@ -640,6 +707,23 @@ export class Explorer {
     const fixedHorizontal = ["longitude", "latitude"].some(n => roles[n] === "fixed");
     c["snap-wrap"].hidden = !(fixedHorizontal && this.links.manifest.geometry?.grid === "latlon" &&
       this.explorer.horizontal?.kind === "spectral");
+    const reason = this.windUnavailable();
+    c.wind.disabled = Boolean(reason);
+    c["wind-wrap"].title = reason || this.quantity.layers.wind.definition;
+    c["wind-reason"].textContent = reason ? "Wind streamlines unavailable: " + reason : "";
+    c["wind-reason"].hidden = !reason;
+  }
+
+  /** Why the current roles cannot carry the wind layer, or "" (the server applies the same rule). */
+  windUnavailable() {
+    const layer = this.quantity.layers?.wind, roles = this.roles();
+    if (!layer?.available) return (layer?.reason || "this archive has no horizontal wind") + ".";
+    if (!(["x", "y"].includes(roles.longitude) && ["x", "y"].includes(roles.latitude)))
+      return "they are drawn on a longitude × latitude result.";
+    if (!["fixed", "none"].includes(roles.vertical)) return "the wind needs the field's own surface: fix the vertical coordinate.";
+    if (roles.time === "reduce" && this.ops.time !== "mean")
+      return "they are drawn of one saved wind or of the time-mean wind, not of a time " + OP_NAMES[this.ops.time].toLowerCase() + ".";
+    return "";
   }
 
   /** The preset whose roles are the current ones, or null. A label only. */
@@ -760,6 +844,7 @@ export class Explorer {
       return {error: "No vertical representation can be an axis here."};
     // Snapping to a native node is offered only on Gaussian grids; elsewhere the point is exact.
     const sel = {quantity: this.c.quantity.value, options: {snap: !this.c["snap-wrap"].hidden && this.c.snap.checked}};
+    if (this.c.wind.checked && !this.windUnavailable()) sel.options.wind = true;
     for (const name of ["longitude", "latitude"]) {
       const r = this.rows[name], role = roles[name];
       sel[name] = {role};
@@ -1077,8 +1162,11 @@ export class Explorer {
     }
     const lon = ((this.cursor?.lon % 360) + 360) % 360;
     const at = a => a.coordinate === "latitude" ? this.cursor?.lat : a.coordinate === "longitude" ? lon : NaN;
+    const w = d.companions?.wind_u && d.companions?.wind_v;
+    const wind = w ? {u: d.companions.wind_u.values, v: d.companions.wind_v.values,
+      label: d.roles.time === "reduce" ? "streamlines of the time-mean wind" : "wind streamlines"} : null;
     return {kind: "field", x: this.displayAxis(d.x), y: this.displayAxis(d.y), values: d.values, surface: d.surface,
-      title, label, diverging, cursor: at(d.x), cursorY: at(d.y), range: this.fixedRange(),
+      title, label, diverging, cursor: at(d.x), cursorY: at(d.y), range: this.fixedRange(), wind,
       selected: d.y.coordinate === "vertical" && d.y.representation === "sigma" && atmosphere ? this.selectedLevel() : null};
   }
 

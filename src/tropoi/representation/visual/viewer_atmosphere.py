@@ -38,7 +38,7 @@ from tropoi.representation.diagnostics.pe_levels import LEVEL_FIELDS, reconstruc
 from tropoi.representation.diagnostics.pe_structure import mass_streamfunction
 from tropoi.representation.diagnostics.pe_surfaces import pressure_surface
 from tropoi.representation.visual.selection import (
-    MAX_STATES, TIME_MEAN, SelectionError, axis, latitude_axis, longitude_axis, reductions)
+    MAX_STATES, TIME_MEAN, WIND_LAYER, SelectionError, axis, latitude_axis, longitude_axis, reductions)
 from tropoi.spatial.grids.quadrature import gauss_latitude_nodes
 from tropoi.spatial.transforms.host_synthesis import synthesize_latlon, synthesize_wind_latlon
 
@@ -84,6 +84,20 @@ MEAN = dict(
     latitude="area-weighted mean over the native Gauss–Legendre latitudes (Gauss weights, ∝ cos φ dφ)",
     time=TIME_MEAN)
 NATIVE_LEVELS = "the native full levels of the column"
+#: The wind companions of a result that carries the wind layer.
+WIND_COMPANIONS = dict(wind_u=dict(label="u", units="m s⁻¹", layer="wind"),
+                       wind_v=dict(label="v", units="m s⁻¹", layer="wind"))
+
+
+def _wind_capability(manifest, field):
+    """Whether a longitude × latitude result of a quantity can carry the wind layer, and why not."""
+    solver, fields = manifest["source"].get("solver"), manifest["fields"]
+    if solver not in ("pe", "bve", "swe") or "u" not in fields or "v" not in fields:
+        return dict(available=False, reason="this archive has no horizontal wind")
+    if solver == "pe" and not field.get("levels"):
+        return dict(available=False, reason="it has no vertical level, and the wind has one per level: "
+                                            "show a quantity on a fixed level to draw the wind there")
+    return dict(available=True, styles=["streamlines"], definition=WIND_LAYER)
 
 
 def _excluded(representation, field):
@@ -150,11 +164,13 @@ def describe(manifest) -> dict:
             coordinates["vertical"] = dict(roles=["none"])
             q["vertical"] = None
         q["coordinates"] = coordinates
+        q["layers"] = dict(wind=_wind_capability(manifest, field))
         quantities[key] = q
     if "zonal_mean" in structure and quadrature:
         only_mean = "ψ is defined from the longitude mean [pₛ v]"
         quantities["mass_streamfunction"] = dict(
             presentation=PSI, sources=["v", "ln_ps"], horizontal="global", time_axis="snapshots",
+            layers=dict(wind=dict(available=False, reason="ψ is a latitude × σ field")),
             evaluation="native Gaussian grid; [pₛ v] formed per state before the longitude mean",
             vertical=dict(domain="atmosphere", representations={"sigma": REPRESENTATIONS["sigma"]},
                           levels=[dict(index=k, label=f"interface {k} · σ = {float(s):.6g}", sigma=float(s))
@@ -254,6 +270,9 @@ def plan(provider, sel):
         _psi_plan(provider, sel, out)
     else:
         _vertical_plan(provider, sel, quantity, out)
+    if sel["options"].get("wind"):
+        out["companions"].update(WIND_COMPANIONS)
+        out["notes"].append("Wind layer: " + WIND_LAYER + ".")
     t = sel["time"]
     if t["role"] == "fixed":
         coordinates["time"] = dict(role="fixed", axis="snapshots", index=t["index"],
@@ -395,8 +414,21 @@ def _surface(provider, index, key, lat, lon):
     return values[key]
 
 
-def _fixed_surface(provider, frame, key, lat, lon, rep, value):
-    """The quantity on one fixed vertical surface: ``(nlat, nlon)``, NaN where masked."""
+def _surface_wind(provider, index, lat, lon):
+    """(u, v) of a single-layer (BVE, SWE) state, one synthesis: ``(nlat, nlon)`` each."""
+    frame = provider._read("state", index)
+    swe = provider.solver == "swe"
+    zeta = frame[0] if swe else frame
+    delta = frame[1] if swe else np.zeros_like(zeta)
+    return synthesize_wind_latlon(zeta, delta, provider.radius, lat, lon)
+
+
+def _fixed_surface(provider, frame, key, lat, lon, rep, value, wind=False):
+    """The quantity on one fixed vertical surface: ``(nlat, nlon)``, NaN where masked.
+
+    ``wind``: return ``(values, {"wind_u": u, "wind_v": v})``, the winds on
+    the same surface from the same evaluation (the kernels reconstruct them
+    in any case), masked where the quantity's surface is masked."""
     context = provider._context
     if rep == "native":
         if int(value) != value or not 0 <= value < context.nlev:
@@ -405,7 +437,10 @@ def _fixed_surface(provider, frame, key, lat, lon, rep, value):
         levels = reconstruct_levels(frame, context, lat, lon, [int(value)],
                                     vorticity_divergence=key in ("zeta", "delta"), heights=heights)
         values = {name: arr[0] for name, arr in levels.values.items()}
-        return _field(values, key, context.r_dry)
+        out = _field(values, key, context.r_dry)
+        if not wind:
+            return out
+        return out, dict(wind_u=np.array(values["u"], dtype=float), wind_v=np.array(values["v"], dtype=float))
     if rep != "sigma" and key in ("zeta", "delta"):
         raise SelectionError("Vorticity and divergence require a native or sigma surface")
     surface = pressure_surface(frame, context, lat, lon, (rep, value))
@@ -416,7 +451,13 @@ def _fixed_surface(provider, frame, key, lat, lon, rep, value):
         values["pressure"] = np.full(surface.mask.shape, float(value))      # the surface's own p
     out = np.array(_field(values, key, context.r_dry), dtype=float)
     out[surface.mask != 0] = np.nan
-    return out
+    if not wind:
+        return out
+    winds = {}
+    for name, component in (("wind_u", "u"), ("wind_v", "v")):
+        winds[name] = np.array(values[component], dtype=float)
+        winds[name][surface.mask != 0] = np.nan
+    return out, winds
 
 
 def samples(provider, sel, plan_, indices):
@@ -430,13 +471,19 @@ def samples(provider, sel, plan_, indices):
         if key == "mass_streamfunction":
             yield times[index], *_psi_sample(provider, index, lat, lon, flip)
             continue
+        wind = sel["options"].get("wind", False)
         if v["role"] == "none":
-            yield times[index], flip(_surface(provider, index, key, lat, lon)[None]), {}
+            companions = {}
+            if wind:
+                u, v_ = _surface_wind(provider, index, lat, lon)
+                companions = dict(wind_u=flip(u[None]), wind_v=flip(v_[None]))
+            yield times[index], flip(_surface(provider, index, key, lat, lon)[None]), companions
             continue
         frame = provider._read("state", index)
         if v["role"] == "fixed":
-            yield times[index], flip(_fixed_surface(provider, frame, key, lat, lon,
-                                                    v["representation"], v["value"])[None]), {}
+            result = _fixed_surface(provider, frame, key, lat, lon, v["representation"], v["value"], wind=wind)
+            values, winds = result if wind else (result, {})
+            yield times[index], flip(values[None]), {k: flip(a[None]) for k, a in winds.items()}
             continue
         heights = plan_["vertical"]["heights"]
         levels = reconstruct_levels(frame, provider._context, lat, lon, None,

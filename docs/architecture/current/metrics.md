@@ -215,9 +215,9 @@ Module-level import edges involved: 2.
 
 ## Call graph
 
-* Nodes (functions, methods, classes): 2315
-* Edges by kind: `call` 1623, `constructor` 76, `instantiate` 589, `override` 6, `self` 433, `super` 4
-* Call sites by resolution outcome: builtin 4790, external 3049, internal 3607, unresolved 4857
+* Nodes (functions, methods, classes): 2318
+* Edges by kind: `call` 1627, `constructor` 76, `instantiate` 590, `override` 6, `self` 433, `super` 4
+* Call sites by resolution outcome: builtin 4798, external 3053, internal 3616, unresolved 4874
 
 | Scoped graph | Roots | Depth | Nodes | Edges | Truncated nodes | Reachable (unbounded) |
 |---|---|---|---|---|---|---|
@@ -234,7 +234,7 @@ Module-level import edges involved: 2.
 | `calls/cli-run-pe.mmd` | `tropoi.cli.main._cmd_run_pe` | 4 | 57 | 66 | 19 | 183 |
 | `calls/cli-run-swe.mmd` | `tropoi.cli.main._cmd_run_swe` | 4 | 83 | 120 | 15 | 223 |
 | `calls/cli-terrain-run-prepare.mmd` | `tropoi.cli.terrain.run_prepare` | 4 | 46 | 63 | 4 | 101 |
-| `calls/cli-view.mmd` | `tropoi.cli.main._cmd_view` | 4 | 10 | 9 | 3 | 87 |
+| `calls/cli-view.mmd` | `tropoi.cli.main._cmd_view` | 4 | 10 | 9 | 3 | 88 |
 | `calls/custom-initial-states.mmd` | `tropoi.run.custom.execute.run_initial_state`, `tropoi.run.custom.presets.initial_state_from_preset`, `tropoi.run.custom.prepare.prepare_bve_state`, `tropoi.run.custom.prepare.prepare_swe_state` | 4 | 135 | 212 | 12 | 257 |
 | `calls/sky-hypothetical.mmd` | `tropoi.representation.visual.sky.write_sky_page`, `tropoi.representation.visual.sky.standalone_page` | 4 | 15 | 17 | 1 | 16 |
 | `calls/sky-numpy-reference.mmd` | `tropoi.representation.visual.sky.radiance_table`, `tropoi.representation.visual.sky.star_path_column`, `tropoi.representation.visual.sky.optical_depth_diagnostic`, `tropoi.physics.column.thin_atmosphere_mass_kg`, `tropoi.physics.column.thin_atmosphere_surface_pressure_pa`, `tropoi.physics.rayleigh.composition_cross_section` | 4 | 11 | 8 | 0 | 11 |

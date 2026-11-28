@@ -219,6 +219,31 @@ increasing upward or downward. Changing it sends no request. Native levels are
 drawn as bands between the model's own σ interfaces (or the archived cell
 faces), whatever the scale.
 
+**Wind layer.** A longitude × latitude result can carry *Wind streamlines*
+(`options.wind` in the selection; each quantity's `layers.wind` says whether
+it can, and why not). The layer is evaluated with the field, as the
+companions `wind_u` and `wind_v`: the same sample mesh, the same fixed
+surface (masked where the field is masked), and the same saved time or the
+same time mean, so it changes no value of the field. The lines are traced in
+the page by the globe's integrator (`overlays.js`: Fibonacci seeds, RK4 on the
+sphere, periodic in longitude, never through a masked cell) and drawn with a
+downstream arrowhead. They are instantaneous streamlines of one saved wind, or
+streamlines of the time-mean wind; not trajectories, and their spacing does not
+encode speed. The layer needs both horizontal coordinates as axes and the
+field's own surface (a fixed vertical coordinate, or none for single-layer
+cores); a time minimum or maximum, a vertical reduction and quantities without
+a level in a layered atmosphere are refused with that reason. This restores
+the flat-map streamlines that the globe panel's map drew before the Explorer
+became the only flat plotting surface.
+
+*Provisional decisions (adopted from the 2026-11-28 visualization assessment,
+to be confirmed at review):* D-9, one streamline definition per renderer:
+the page reuses the globe's integrator, and a later Python figure path must be
+checked against it with the same seeds; D-10, streamlines of the time-mean
+wind are offered and labelled as such, while streamlines in the latitude–σ
+plane are not offered (the mass streamfunction ψ is the mass-consistent picture
+there); D-8, this work is based on the workspace-consolidation branch.
+
 ψ(φ, σ_{k+½}) = 2πa cos φ / g · Σ_{j≤k} [pₛ v_j] Δσ_j is integrated from
 ψ = 0 at σ = 0. [pₛ v] is formed for each state before the longitude mean
 and is never replaced by [pₛ][v]. Units are kg s⁻¹, positive for northward
