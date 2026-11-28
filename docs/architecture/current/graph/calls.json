@@ -6982,6 +6982,11 @@
     },
     {
       "kind": "call",
+      "source": "tropoi.representation.visual.viewer_atmosphere._accumulate_helmholtz",
+      "target": "tropoi.representation.visual.viewer_atmosphere._surface_coefficients"
+    },
+    {
+      "kind": "call",
       "source": "tropoi.representation.visual.viewer_atmosphere._field",
       "target": "tropoi.representation.visual.viewer_atmosphere._wind"
     },
@@ -7072,6 +7077,11 @@
     },
     {
       "kind": "call",
+      "source": "tropoi.representation.visual.viewer_atmosphere._surface_coefficients",
+      "target": "tropoi.representation.diagnostics.pe_surfaces.interpolate_log_sigma"
+    },
+    {
+      "kind": "call",
       "source": "tropoi.representation.visual.viewer_atmosphere._surface_wind",
       "target": "tropoi.spatial.transforms.host_synthesis.synthesize_wind_latlon"
     },
@@ -7079,6 +7089,16 @@
       "kind": "call",
       "source": "tropoi.representation.visual.viewer_atmosphere._vertical_plan",
       "target": "tropoi.representation.visual.viewer_atmosphere._sigma_axis"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.viewer_atmosphere._wind_finish",
+      "target": "tropoi.representation.visual.selection._arrange"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.viewer_atmosphere._wind_finish",
+      "target": "tropoi.representation.visual.viewer_atmosphere.helmholtz"
     },
     {
       "kind": "instantiate",
@@ -7114,6 +7134,36 @@
       "kind": "call",
       "source": "tropoi.representation.visual.viewer_atmosphere.finish",
       "target": "tropoi.representation.visual.selection.axis"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.viewer_atmosphere.finish",
+      "target": "tropoi.representation.visual.viewer_atmosphere._wind_finish"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.viewer_atmosphere.helmholtz",
+      "target": "tropoi.representation.diagnostics.spectral.kinetic_energy_modes"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.viewer_atmosphere.helmholtz",
+      "target": "tropoi.spatial.laplacian.invert_laplacian"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.viewer_atmosphere.helmholtz",
+      "target": "tropoi.spatial.laplacian.laplacian_eigenvalues"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.viewer_atmosphere.helmholtz",
+      "target": "tropoi.spatial.transforms.host_synthesis.synthesize_latlon"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.viewer_atmosphere.helmholtz",
+      "target": "tropoi.spatial.transforms.host_synthesis.synthesize_wind_latlon"
     },
     {
       "kind": "call",
@@ -7154,6 +7204,16 @@
       "kind": "call",
       "source": "tropoi.representation.visual.viewer_atmosphere.samples",
       "target": "tropoi.representation.diagnostics.pe_levels.reconstruct_levels"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.viewer_atmosphere.samples",
+      "target": "tropoi.representation.visual.selection.time_weights"
+    },
+    {
+      "kind": "call",
+      "source": "tropoi.representation.visual.viewer_atmosphere.samples",
+      "target": "tropoi.representation.visual.viewer_atmosphere._accumulate_helmholtz"
     },
     {
       "kind": "call",
@@ -22266,6 +22326,13 @@
       "type": "function"
     },
     {
+      "id": "tropoi.representation.visual.viewer_atmosphere._accumulate_helmholtz",
+      "kind": "function",
+      "module": "tropoi.representation.visual.viewer_atmosphere",
+      "qualname": "_accumulate_helmholtz",
+      "type": "function"
+    },
+    {
       "id": "tropoi.representation.visual.viewer_atmosphere._excluded",
       "kind": "function",
       "module": "tropoi.representation.visual.viewer_atmosphere",
@@ -22350,6 +22417,13 @@
       "type": "function"
     },
     {
+      "id": "tropoi.representation.visual.viewer_atmosphere._surface_coefficients",
+      "kind": "function",
+      "module": "tropoi.representation.visual.viewer_atmosphere",
+      "qualname": "_surface_coefficients",
+      "type": "function"
+    },
+    {
       "id": "tropoi.representation.visual.viewer_atmosphere._surface_wind",
       "kind": "function",
       "module": "tropoi.representation.visual.viewer_atmosphere",
@@ -22378,6 +22452,13 @@
       "type": "function"
     },
     {
+      "id": "tropoi.representation.visual.viewer_atmosphere._wind_finish",
+      "kind": "function",
+      "module": "tropoi.representation.visual.viewer_atmosphere",
+      "qualname": "_wind_finish",
+      "type": "function"
+    },
+    {
       "id": "tropoi.representation.visual.viewer_atmosphere.density",
       "kind": "function",
       "module": "tropoi.representation.visual.viewer_atmosphere",
@@ -22396,6 +22477,13 @@
       "kind": "function",
       "module": "tropoi.representation.visual.viewer_atmosphere",
       "qualname": "finish",
+      "type": "function"
+    },
+    {
+      "id": "tropoi.representation.visual.viewer_atmosphere.helmholtz",
+      "kind": "function",
+      "module": "tropoi.representation.visual.viewer_atmosphere",
+      "qualname": "helmholtz",
       "type": "function"
     },
     {

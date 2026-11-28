@@ -156,15 +156,15 @@
     },
     {
       "kind": "imports",
-      "module_edges": 15,
-      "runtime_module_edges": 15,
+      "module_edges": 16,
+      "runtime_module_edges": 16,
       "source": "tropoi.representation.visual",
       "target": "tropoi.representation.diagnostics"
     },
     {
       "kind": "imports",
-      "module_edges": 6,
-      "runtime_module_edges": 6,
+      "module_edges": 7,
+      "runtime_module_edges": 7,
       "source": "tropoi.representation.visual",
       "target": "tropoi.spatial"
     },
