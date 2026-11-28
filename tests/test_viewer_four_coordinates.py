@@ -221,10 +221,17 @@ def test_columnar_time_mean_map_and_area_weighted_profile(airless):
     n = len(session.manifests[0]["time_axes"]["profile_samples"]["values"])
     mean = evaluate(session, **base, time=dict(role="reduce", first=0, last=n - 1))
     fields = [array(evaluate(session, **base, time=dict(role="fixed", index=t))["values"]) for t in range(n)]
-    total = np.zeros_like(fields[0])
-    for f in fields:
-        total += f
-    np.testing.assert_array_equal(array(mean["values"]), total / n)
+    # The approved time mean: cell weights; the plain 1/N mean, bit for bit, when the cadence is regular.
+    weights = model.time_weights(session.manifests[0]["time_axes"]["profile_samples"]["values"])
+    if weights is None:
+        total = np.zeros_like(fields[0])
+        for f in fields:
+            total += f
+        np.testing.assert_array_equal(array(mean["values"]), total / n)
+    else:
+        expected = sum(w * f for w, f in zip(weights, fields)) / weights.sum()
+        np.testing.assert_allclose(array(mean["values"]), expected, rtol=1e-14)
+        assert mean["coordinates"]["time"]["cadence"] == "irregular"
     profile = evaluate(session, quantity="temperature", longitude=dict(role="reduce"), latitude=dict(role="reduce"),
                        vertical=dict(role="y", representation="depth"), time=dict(role="fixed", index=n - 1))
     lats, lons, index = a.layout

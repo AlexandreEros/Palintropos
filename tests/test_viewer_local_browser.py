@@ -54,13 +54,15 @@ def test_ben_to_shallow_water_and_bve_in_same_application():
                 assert kind == "image/png" and width >= 1000 and height >= 500
                 assert "temperature" in filename and "2592000" in filename
                 page.eval('document.getElementById("compare").click()')
-                until(page, 'document.querySelectorAll(\'[data-id="surface"] canvas\').length >= 4')
+                # Two globes (the Explorer's and an independent comparison); no flat map under either.
+                until(page, 'document.querySelectorAll(\'[data-id="surface"] canvas\').length === 2')
                 for number, field in [(1, "phi"), (2, "zeta")]:
                     page.eval(f'''(() => {{const el=document.getElementById("runs");
                      el.selectedIndex={number}; el.dispatchEvent(new Event("change"));}})()''')
                     until(page, f'location.pathname.endsWith("/{number}/") && ' + ready)
-                    set_control(page, "field", field)
-                    until(page, ready)
+                    page.eval(f"""(() => {{const el = document.querySelector('[data-e="quantity"]'); el.value = "{field}";
+                        el.dispatchEvent(new Event('change', {{bubbles: true}}));}})()""")
+                    until(page, ready + f' && viewer.panels[0].key === "{field}"')
                     assert page.eval('document.querySelector(\'[data-id="vertical"]\').hidden')
                     if field == "phi":
                         assert page.eval("""(async () => {
@@ -81,7 +83,12 @@ def test_ben_to_shallow_water_and_bve_in_same_application():
                                    fluid.colors.some((v,k) => v!==recoloured.colors[k]);
                         })()""")
                 page.eval('document.getElementById("runs").selectedIndex=3;document.getElementById("runs").dispatchEvent(new Event("change"))')
-                until(page, 'location.pathname.endsWith("/3/") && window.viewer?.explorer?.data?.description === "Recorded series" && '
+                # The carried configuration (a profile) cannot be answered by a recorded series: it is kept
+                # and explained, and adapting it is an explicit step.
+                until(page, 'location.pathname.endsWith("/3/") && '
+                      '!document.querySelector(\'[data-e="incompatible"]\')?.hidden')
+                page.eval('document.querySelector(\'[data-e="adapt"]\').click()')
+                until(page, 'window.viewer?.explorer?.data?.description === "Recorded series" && '
                       'document.querySelector(\'[data-e="png"]\')?.disabled === false')
                 assert not page.exceptions, page.exceptions
                 assert all(url.startswith("http://"+server.authority+"/") or url.startswith(("data:", "blob:"))

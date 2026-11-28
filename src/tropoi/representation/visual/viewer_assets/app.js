@@ -1,11 +1,14 @@
 import {loadFrame} from "./data.js";
 import {SurfaceView} from "./render.js";
-import {Explorer, dayText} from "./explorer.js";
+import {Explorer, dayText, onGlobe} from "./explorer.js";
 
 // The viewer opens any archive through its explorer description: quantities,
 // what each of their coordinates accepts, native levels and time axes. The
-// globe panels draw one saved state on one surface; the explorer draws any
-// role assignment, longitude × latitude included.
+// Explorer is the analytical workspace and owns the selection; it draws every
+// role assignment, longitude × latitude included, on the one flat plotting
+// surface. The globe (selection A) draws the Explorer's quantity at its saved
+// time on its fixed surface. A comparison globe (selection B) is independent
+// by design.
 
 const byId = id => document.getElementById(id);
 const panels = [];
@@ -18,19 +21,7 @@ function setCursor(point) {
   if (!point || !Number.isFinite(point.lat) || !Number.isFinite(point.lon)) return;
   cursor = {lat: Math.max(-90, Math.min(90, point.lat)), lon: ((point.lon % 360) + 360) % 360};
   for (const panel of panels) panel.view.setCursor(cursor);
-  explorer?.setCursor(cursor);
-}
-
-// A level chosen in a profile or section becomes selection A's native level.
-function selectLevel(k) {
-  const panel = panels[0];
-  const levels = panel?.quantity.vertical?.levels;
-  if (!levels || !Number.isInteger(k) || !levels.some(l => l.index === k)) return;
-  if (![...panel.controls.coordinate.options].some(o => o.value === "native")) return;
-  panel.controls.coordinate.value = "native";
-  panel.updateCoordinate();
-  panel.controls.level.value = String(k);
-  panel.changeLevel();
+  return explorer?.setCursor(cursor);
 }
 
 async function json(path, signal) {
@@ -79,6 +70,11 @@ function sampleAtOrBefore(axis, seconds) {
 function sync(source, dimension) {
   if (panels.length !== 2 || !byId("link-" + dimension).checked) return;
   const target = panels.find(panel => panel !== source);
+  if (target.linked) {
+    // Selection A is the Explorer's: move the Explorer, which moves the globe.
+    if (dimension === "time") return explorer.setTime(sampleAtOrBefore(explorer.timeAxis(), source.seconds));
+    return;
+  }
   if (dimension === "time") {
     target.controls.time.value = String(sampleAtOrBefore(target.axis, source.seconds));
   } else {
@@ -105,23 +101,26 @@ function scaleTogether() {
   for (const panel of panels) if (panel.frame) panel.draw(range);
 }
 
-// The globe draws one saved state on one surface: quantities whose longitude
-// and latitude can be axes, at a fixed time and a fixed (or no) vertical coordinate.
-const onGlobe = q => {
-  const c = q.coordinates;
-  return c.longitude.roles.includes("x") && c.latitude.roles.includes("y") && c.time.roles.includes("fixed") &&
-    (c.vertical.roles.includes("fixed") || c.vertical.roles.includes("none"));
-};
+// The globe draws one saved state on one surface (``onGlobe``).
 const mapKeys = () => Object.keys(quantities).filter(k => onGlobe(quantities[k]));
 
 class Panel {
-  constructor(letter, initial) {
+  /** ``linked``: the globe of the Explorer's selection (its quantity, time and surface are the
+   * Explorer's; its own selectors are hidden). Otherwise an independent comparison globe. */
+  constructor(letter, initial, linked = false) {
     this.node = byId("panel").content.firstElementChild.cloneNode(true);
     byId("views").append(this.node);
-    this.node.querySelector("h2").textContent = "Selection " + letter;
+    this.linked = linked;
+    this.node.querySelector("h2").textContent = linked ? "Globe · selection A (the Explorer's)" :
+      "Comparison globe · selection " + letter + " (independent)";
     this.controls = Object.fromEntries([...this.node.querySelectorAll("[data-id]")]
       .map(element => [element.dataset.id, element]));
     const c = this.controls;
+    if (linked) {
+      c.field.closest("label").hidden = true;
+      c.vertical.hidden = true;
+      c.link.hidden = false;
+    }
     this.view = new SurfaceView(c.surface);
     this.view.onSelect = setCursor;
     this.view.cursor = cursor;
@@ -197,7 +196,7 @@ class Panel {
     const c = this.controls, q = this.quantity, p = q.presentation;
     c.classification.textContent = p.role + " · " + p.origin;
     c.definition.textContent = p.definition + (q.evaluation ? " Evaluation: " + q.evaluation + "." : "");
-    c.vertical.hidden = !q.vertical;
+    c.vertical.hidden = !q.vertical || this.linked;
     if (q.vertical) {
       const old = initial?.controls.coordinate.value || c.coordinate.value;
       const reps = q.coordinates.vertical.fixed;
@@ -263,8 +262,35 @@ class Panel {
   }
 
   async changeTime(index) {
-    this.controls.time.value = String(Math.max(0, Math.min(axisValues(this.axis).length - 1, index)));
+    index = Math.max(0, Math.min(axisValues(this.axis).length - 1, index));
+    this.controls.time.value = String(index);
+    if (this.linked) {
+      // The saved time is the Explorer's: it moves, and the globe follows it.
+      await explorer.setTime(index);
+      await Promise.all([sync(this, "time"), this.loading]);
+      return;
+    }
     await Promise.all([sync(this, "time"), this.load()]);
+  }
+
+  /** Draw the Explorer's selection (``Explorer.globeSelection``) when it changed. */
+  applyLinked(link) {
+    const c = this.controls;
+    if (link.error) {
+      this.request?.abort();
+      this.linkKey = null; this.frame = this.extent = null;
+      c.surface.hidden = true; c.png.disabled = true;
+      c.link.textContent = "Linked to the Explorer.";
+      this.status(link.error);
+      return this.loading = Promise.resolve();
+    }
+    const key = JSON.stringify(link.selection);
+    const q = quantities[link.selection.quantity].presentation;
+    c.link.textContent = "Linked to the Explorer: " + q.name + (q.symbol ? " (" + q.symbol + ")" : "") + ". " +
+      link.notes.join(" ");
+    if (key === this.linkKey) return this.loading;
+    this.linkKey = key;
+    return this.loading = this.show(link.selection);
   }
 
   async play() {
@@ -317,7 +343,7 @@ class Panel {
     return sel;
   }
 
-  /** Show a longitude × latitude selection made in the explorer. */
+  /** Show a longitude × latitude selection made in the Explorer. */
   show(selection) {
     const c = this.controls;
     if (!(selection.quantity in quantities) || !onGlobe(quantities[selection.quantity])) return;
@@ -389,7 +415,6 @@ class Panel {
       this.status(frame.cells ? "Native cells: the flat map and its readout show each archived cell's value; " +
         "the globe interpolates between cell centres." : "");
       c.png.disabled = false;
-      if (this === panels[0]) explorer?.follow();
     } catch (error) {
       if (!request.signal.aborted && this.request === request) {
         this.frame = null;
@@ -483,6 +508,8 @@ async function openArchive() {
       if (!run) return;
       // Carry the geographic cursor; saved times differ per archive.
       const keep = cursor ? {lat: cursor.lat, lon: cursor.lon} : {};
+      // The analytical configuration travels too: the question is kept, the archive changes.
+      if (explorer) keep.config = explorer.configText();
       location.assign(run.url + "?" + new URLSearchParams(keep));
     };
   }
@@ -495,30 +522,30 @@ async function openArchive() {
     lon: Number(query.get("lon") ?? points?.[0]?.longitude ?? star?.longitude ?? center?.longitude ?? 0)};
   if (!Number.isFinite(cursor.lat) || !Number.isFinite(cursor.lon)) cursor = {lat: 0, lon: 0};
   let first = null;
+  const explorable = Object.keys(quantities).length > 0;
+  if (explorable) {
+    explorer = new Explorer(byId("explorer"), {
+      manifest, runName, timeText, onCursor: setCursor,
+      onSelection: () => first?.applyLinked(explorer.globeSelection()),
+    });
+    const requested = new URLSearchParams(location.search).get("time");
+    const values = explorer.axisValues();
+    if (/^[0-9]+$/.test(requested ?? "") && Number(requested) < values.length) explorer.times.index = values[Number(requested)];
+  }
   if (mapKeys().length) {
     byId("toolbar").hidden = false;
-    first = new Panel("A");
+    first = new Panel("A", undefined, Boolean(explorer));
     panels.push(first);
     byId("compare").onclick = compare;
     byId("link-color").onchange = scaleTogether;
     byId("link-time").onchange = () => sync(first, "time");
     byId("link-level").onchange = () => sync(first, "level");
   }
-  const explorable = Object.keys(quantities).length > 0;
-  if (explorable) {
-    explorer = new Explorer(byId("explorer"), {
-      manifest, runName, timeText,
-      getMap: () => first && {quantity: first.key, axis: first.axis, time: Number(first.controls.time.value)},
-      showMap: selection => first?.show(selection),
-      getLevel: () => first?.quantity.vertical?.domain === "atmosphere" && first.coordinate === "native" ?
-        Number(first.controls.level.value) : null,
-      onCursor: setCursor, onLevel: selectLevel,
-    });
-  }
-  setCursor(cursor);
   // Inspection handle for acceptance tests and the browser console.
   window.viewer = {panels, get explorer() { return explorer; }, get cursor() { return cursor; }};
-  if (first) await first.load();
+  setCursor(cursor);
+  if (first && !explorer) await first.load();
+  else if (first) await first.loading;
   const reasons = Object.values(manifest.unavailable).filter(v => typeof v === "string");
   if (!first && !explorable) {
     byId("notice").hidden = false;

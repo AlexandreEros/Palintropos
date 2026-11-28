@@ -312,3 +312,16 @@ def test_value_companion_takes_the_quantity_statistic():
     assert d["companions"]["skin"]["values"] == 4.0                                # max of 0..4, not the mean
     pos = (np.array([100.0 * t for t in TIMES])).mean()                            # positions: the plain mean
     assert d["companions"]["pos"]["values"] == pytest.approx([pos] * NV, rel=1e-15)
+
+
+def test_archived_mean_ps_equals_the_area_mean_at_saved_states(hs):
+    """series:mean_ps (daily Gauss-area mean of pₛ) equals the engine's longitude and latitude mean of pₛ
+    at the saved states. Kept: its cadence is daily, the saved states every 10 days."""
+    session, provider = hs
+    series = _series("mean_ps")
+    for index in (0, 119):
+        day = provider.manifest["time_axes"]["snapshots"]["values"][index] / 86400
+        d = select(session, quantity="ln_ps", longitude=dict(role="reduce", op="mean"),
+                   latitude=dict(role="reduce", op="mean"), vertical=dict(role="none"),
+                   time=dict(role="fixed", index=index))
+        assert abs(d["values"] - series[day]) <= 1e-9 * series[day]

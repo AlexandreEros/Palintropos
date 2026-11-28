@@ -1,12 +1,14 @@
 import {fieldScale} from "./mesh.js";
 import {numberText} from "./map.js";
 
-// The explorer: one quantity, four coordinates, one role each. The server
-// says what each coordinate of each quantity accepts (manifest.explorer,
+// The explorer: the viewer's analytical workspace and its one flat plotting
+// surface. One quantity, four coordinates, one role each. The server says
+// what each coordinate of each quantity accepts (manifest.explorer,
 // quantities[q].coordinates) and evaluates any valid assignment; this view
 // builds selections and draws results. The dimensions of a result follow from
 // the roles (two axes: a field; one: a line; none: a value), never from a plot
-// type. Presets (manifest.explorer.presets) only fill in roles.
+// type. Presets (manifest.explorer.presets) only fill in roles. Reductions take
+// a statistic (mean, minimum, maximum) per coordinate.
 // Native levels and cells are drawn as bands between the edges the server
 // sends, so nothing is drawn between levels that the archive does not hold.
 // How a vertical axis is drawn (linear or logarithmic, upward or downward) is
@@ -16,8 +18,10 @@ const INK = "#22343a", GRID = "rgba(34,52,58,.18)", CURSOR = "#ff8c1a", LINE = "
 const COORDINATES = ["longitude", "latitude", "vertical", "time"];
 const ROLE_ORDER = ["x", "y", "fixed", "reduce", "none"];
 const NAMES = {longitude: "Longitude", latitude: "Latitude", vertical: "Vertical", time: "Time"};
-const ROLE_NAMES = {x: "Horizontal axis (X)", y: "Vertical axis (Y)", fixed: "Fixed", reduce: "Mean (reduce)",
+const ROLE_NAMES = {x: "Horizontal axis (X)", y: "Vertical axis (Y)", fixed: "Fixed", reduce: "Reduce (statistic)",
   none: "Not a coordinate of this quantity"};
+const OPS = ["mean", "min", "max"];
+const OP_NAMES = {mean: "Mean", min: "Minimum", max: "Maximum"};
 const DIVERGING = /^(u|v|zeta|delta|phi|mass_streamfunction|conducted_flux)$/;
 
 const degrees = (value, positive, negative) => Math.abs(value).toFixed(2) + "°" + (value < 0 ? negative : positive);
@@ -186,10 +190,11 @@ function drawField(canvas, plot, width, ratio) {
     ctx.save(); ctx.translate(box.x + box.w + 84, box.y + box.h / 2); ctx.rotate(Math.PI / 2);
     ctx.fillText(ay.secondary.label, 0, 0); ctx.restore();
   }
-  if (Number.isFinite(plot.cursor)) {
-    ctx.strokeStyle = CURSOR; ctx.lineWidth = 1.5; ctx.setLineDash([5, 4]); ctx.beginPath();
-    ctx.moveTo(X(plot.cursor), box.y); ctx.lineTo(X(plot.cursor), box.y + box.h); ctx.stroke(); ctx.setLineDash([]);
-  }
+  // The linked geographic cursor: a line per geographic axis (a crosshair on a longitude × latitude field).
+  ctx.strokeStyle = CURSOR; ctx.lineWidth = 1.5; ctx.setLineDash([5, 4]); ctx.beginPath();
+  if (Number.isFinite(plot.cursor)) { ctx.moveTo(X(plot.cursor), box.y); ctx.lineTo(X(plot.cursor), box.y + box.h); }
+  if (Number.isFinite(plot.cursorY)) { ctx.moveTo(box.x, Y(plot.cursorY)); ctx.lineTo(box.x + box.w, Y(plot.cursorY)); }
+  ctx.stroke(); ctx.setLineDash([]);
   if (Number.isInteger(plot.selected) && plot.selected < rows) {
     ctx.strokeStyle = INK; ctx.lineWidth = 1.2;
     const p = Y(ye[plot.selected]), q = Y(ye[plot.selected + 1]);
@@ -294,9 +299,34 @@ function option(value, text, disabled = false) {
   return o;
 }
 
+/** A quantity the globe can draw: one saved state on one longitude × latitude surface. */
+export const onGlobe = q => {
+  const c = q.coordinates;
+  return c.longitude.roles.includes("x") && c.latitude.roles.includes("y") && c.time.roles.includes("fixed") &&
+    (c.vertical.roles.includes("fixed") || c.vertical.roles.includes("none"));
+};
+
+const lacks = caps => caps.roles.length === 1 && caps.roles[0] === "none";
+const ROLE_TEXT = {x: "the horizontal axis", y: "the vertical axis", fixed: "fixed", reduce: "reduced", none: "absent"};
+const ORIGIN = {stored: "stored in the archive", derived: "derived from stored fields", recorded: "archived diagnostic"};
+
+/** The saved sample at or before ``seconds`` (the first otherwise). */
+function atOrBefore(values, seconds) {
+  const k = values.findIndex(s => s > seconds);
+  return k < 0 ? values.length - 1 : Math.max(0, k - 1);
+}
+
 export class Explorer {
-  /** links: manifest, runName, timeText(axis, index), getMap() → {quantity, axis, time}, showMap(selection),
-   * onCursor(c), onLevel(k), getLevel(). */
+  /** The analytical workspace and the owner of the selection.
+   *
+   * ``requested`` holds the roles the person chose, ``ops`` the statistic of
+   * each reduction, ``vfixed`` the fixed vertical surface and ``times`` the
+   * chosen saved times (as seconds). Changing the quantity changes none of
+   * them: a quantity that cannot answer the configured question shows why
+   * and offers an explicit adaptation. The globe draws the selection's
+   * quantity at its saved time and fixed surface (``globeSelection``).
+   *
+   * links: manifest, runName, timeText(axis, index), onCursor(c), onSelection(). */
   constructor(node, links) {
     this.node = node;
     this.links = links;
@@ -306,18 +336,18 @@ export class Explorer {
     this.ranges = new Map();
     this.rows = {};
     this.display = {scale: "auto", direction: "auto"};
-    const c = this.c, quantities = this.explorer.quantities;
-    const keys = Object.keys(quantities);
-    c.quantity.replaceChildren(...keys.map(k => option(k, this.quantityLabel(k))));
-    const linked = links.getMap()?.quantity;
-    c.quantity.value = keys.includes(linked) ? linked : keys.includes("temperature") ? "temperature" : keys[0];
+    this.requested = {longitude: "none", latitude: "none", vertical: "none", time: "none"};
+    this.ops = {longitude: "mean", latitude: "mean", vertical: "max", time: "mean"};
+    this.vfixed = {representation: "native", level: null,
+      values: {sigma: "0.5", pressure: "50000", geopotential_height: "1000", height_above_surface: "1000"}};
+    this.vaxis = "sigma";
+    this.times = {index: null, first: null, last: null};
+    const c = this.c, keys = Object.keys(this.explorer.quantities);
+    this.fillQuantities("");
+    c.quantity.value = keys.includes("temperature") ? "temperature" : keys[0];
     this.buildRows();
-    // A new quantity keeps the roles when it accepts every one of them.
-    c.quantity.onchange = () => {
-      const kept = this.adapt(this.roles());
-      if (this.valid(kept)) this.applyRoles(kept); else this.applyPreset(this.firstPreset());
-      this.update();
-    };
+    c.quantity.onchange = () => { this.update(); };
+    c["quantity-search"].oninput = () => this.fillQuantities(c["quantity-search"].value);
     c.preset.onchange = () => { if (c.preset.value) { this.applyPreset(c.preset.value); this.update(); } };
     c.snap.onchange = () => this.update();
     c["range-mode"].onchange = () => {
@@ -329,14 +359,44 @@ export class Explorer {
     };
     c["range-min"].onchange = c["range-max"].onchange = () => this.storeRange();
     c.png.onclick = () => this.png();
-    if (c.globe) c.globe.onclick = () => { const {selection} = this.selection(); if (selection) links.showMap(selection); };
     c.plot.addEventListener("pointermove", e => this.hover(e));
     c.plot.addEventListener("pointerleave", () => { c.readout.textContent = ""; });
     c.plot.addEventListener("click", e => this.click(e));
     new ResizeObserver(() => { if (this.data && this.node.clientWidth !== this.width) this.draw(); }).observe(node);
-    const requested = new URLSearchParams(location.search).get("preset");
-    this.applyPreset(requested && this.valid(this.presetRoles(requested)) ? requested : this.firstPreset());
+    const query = new URLSearchParams(location.search), requested = query.get("preset");
+    this.applyPreset(requested && this.valid(this.presets[requested]?.roles) ? requested : this.firstPreset());
+    // A configuration carried from another archive replaces the preset: the analytical question is kept.
+    if (query.get("config")) this.applyConfig(query.get("config"));
     node.hidden = false;
+  }
+
+  /** The analytical configuration (roles, statistics, vertical settings) as text: carried across archives. */
+  configText() {
+    return JSON.stringify({requested: this.requested, ops: this.ops, vaxis: this.vaxis, vfixed: this.vfixed,
+      display: this.display});
+  }
+
+  applyConfig(text) {
+    let config;
+    try { config = JSON.parse(text); } catch { return; }
+    if (!config || typeof config !== "object") return;
+    const roles = config.requested || {};
+    if (COORDINATES.every(c => ROLE_ORDER.includes(roles[c]))) this.requested = {...roles};
+    for (const c of COORDINATES) if (OPS.includes(config.ops?.[c])) this.ops[c] = config.ops[c];
+    if (typeof config.vaxis === "string") this.vaxis = config.vaxis;
+    const v = config.vfixed;
+    if (v && typeof v.representation === "string") {
+      this.vfixed.representation = v.representation;
+      if (Number.isInteger(v.level)) this.vfixed.level = v.level;
+      for (const [k, value] of Object.entries(v.values || {})) if (k in this.vfixed.values) this.vfixed.values[k] = String(value);
+    }
+    if (config.display) {
+      for (const k of ["scale", "direction"]) if (typeof config.display[k] === "string") {
+        this.display[k] = config.display[k];
+        this.rows.vertical[k].value = config.display[k];
+      }
+    }
+    this.syncRows();
   }
 
   get quantity() { return this.explorer.quantities[this.c.quantity.value]; }
@@ -346,29 +406,64 @@ export class Explorer {
     return [p.symbol ? p.name + " (" + p.symbol + ")" : p.name, p.units].filter(Boolean).join(" · ");
   }
 
-  /** Roles adapted to the quantity: a coordinate it lacks takes "none" where the roles say "fixed". */
-  adapt(roles) {
-    const caps = this.quantity.coordinates, out = {};
-    for (const c of COORDINATES) {
-      const lacks = caps[c].roles.length === 1 && caps[c].roles[0] === "none";
-      out[c] = lacks && ["fixed", "none"].includes(roles[c]) ? "none" : roles[c];
+  /** The quantity selector: grouped by the registry's catalogue group, sorted by name, filtered by text. */
+  fillQuantities(filter) {
+    const c = this.c, quantities = this.explorer.quantities, keep = c.quantity.value;
+    const words = filter.trim().toLowerCase().split(/\s+/).filter(Boolean);
+    const groups = new Map();
+    for (const key of Object.keys(quantities)) {
+      const p = quantities[key].presentation;
+      const text = [key, p.name, p.symbol, p.units, p.group].join(" ").toLowerCase();
+      if (words.length && !words.every(w => text.includes(w)) && key !== keep) continue;
+      const group = p.group || "Other";
+      if (!groups.has(group)) groups.set(group, []);
+      groups.get(group).push(key);
     }
-    return out;
+    const order = this.explorer.groups || [];
+    const names = [...groups.keys()].sort((a, b) => (order.indexOf(a) + 1 || 99) - (order.indexOf(b) + 1 || 99));
+    c.quantity.replaceChildren(...names.map(name => {
+      const group = document.createElement("optgroup");
+      group.label = name;
+      group.append(...groups.get(name).sort((a, b) => quantities[a].presentation.name.localeCompare(quantities[b].presentation.name))
+        .map(k => option(k, this.quantityLabel(k))));
+      return group;
+    }));
+    if (keep) c.quantity.value = keep;
   }
 
-  presetRoles(name) { return this.presets[name] ? this.adapt(this.presets[name].roles) : null; }
+  /** The role a coordinate takes for this quantity: a fixed vertical coordinate of a quantity
+   * without one is absent (nothing is fabricated; the setting is kept for 3-D quantities). */
+  effective(coordinate, quantity = this.quantity) {
+    const r = this.requested[coordinate], caps = quantity.coordinates[coordinate];
+    return coordinate === "vertical" && lacks(caps) && r === "fixed" ? "none" : r;
+  }
+
+  roles(quantity = this.quantity) {
+    return Object.fromEntries(COORDINATES.map(c => [c, this.effective(c, quantity)]));
+  }
 
   /** Every role accepted by its coordinate and each axis used once: the server's own checks. */
-  valid(roles) {
+  valid(roles, quantity = this.quantity) {
     if (!roles) return false;
-    const caps = this.quantity.coordinates;
-    if (!COORDINATES.every(c => caps[c].roles.includes(roles[c]))) return false;
-    return ["x", "y"].every(a => COORDINATES.filter(c => roles[c] === a).length <= 1);
+    const caps = quantity.coordinates;
+    const eff = c => c === "vertical" && lacks(caps[c]) && roles[c] === "fixed" ? "none" : roles[c];
+    if (!COORDINATES.every(c => caps[c].roles.includes(eff(c)))) return false;
+    return ["x", "y"].every(a => COORDINATES.filter(c => eff(c) === a).length <= 1);
   }
 
   firstPreset() {
     return ["profile", "time_series", "recorded_series", "meridional_section", "zonal_mean", "time_section", "map"]
-      .find(p => this.valid(this.presetRoles(p))) || Object.keys(this.presets).find(p => this.valid(this.presetRoles(p)));
+      .find(p => this.valid(this.presets[p]?.roles)) || Object.keys(this.presets).find(p => this.valid(this.presets[p].roles));
+  }
+
+  applyPreset(name) {
+    const preset = this.presets[name];
+    if (preset) {
+      this.requested = {...preset.roles};
+      // The presets' reductions are means (zonal mean, time mean): their labels say so.
+      for (const c of COORDINATES) if (preset.roles[c] === "reduce") this.ops[c] = "mean";
+    }
+    this.syncRows();
   }
 
   buildRows() {
@@ -384,6 +479,10 @@ export class Explorer {
       label.append(role);
       row.append(label);
       const parts = {row, role};
+      parts.op = document.createElement("select");
+      parts.op.setAttribute("aria-label", NAMES[name] + " statistic");
+      parts.op.onchange = () => { this.ops[name] = parts.op.value; this.update(); };
+      row.append(parts.op);
       if (name === "longitude" || name === "latitude") {
         parts.value = Object.assign(document.createElement("input"), {type: "number", step: "any"});
         parts.value.setAttribute("aria-label", NAMES[name] + " (degrees " + (name === "latitude" ? "north" : "east") + ")");
@@ -401,8 +500,13 @@ export class Explorer {
         parts.level.setAttribute("aria-label", "Native level");
         parts.value = Object.assign(document.createElement("input"), {type: "number", step: "any"});
         parts.value.setAttribute("aria-label", "Vertical value");
-        parts.representation.onchange = () => { this.syncVertical(); this.update(); };
-        parts.level.onchange = parts.value.onchange = () => this.update();
+        parts.representation.onchange = () => {
+          if (this.requested.vertical === "fixed") this.vfixed.representation = parts.representation.value;
+          else this.vaxis = parts.representation.value;
+          this.update();
+        };
+        parts.level.onchange = () => { this.vfixed.level = Number(parts.level.value); this.update(); };
+        parts.value.onchange = () => { this.vfixed.values[this.vfixed.representation] = parts.value.value; this.update(); };
         // How the vertical axis is drawn: display only, no request.
         parts.display = Object.assign(document.createElement("div"), {className: "pair"});
         parts.scale = document.createElement("select");
@@ -419,65 +523,53 @@ export class Explorer {
         parts.display.append(parts.scale, parts.direction);
         row.append(parts.representation, parts.level, parts.value, parts.display);
       } else {
-        parts.follow = Object.assign(document.createElement("label"), {className: "check"});
-        parts.followBox = Object.assign(document.createElement("input"), {type: "checkbox", checked: true});
-        parts.follow.append(parts.followBox, " Follow selection A");
         parts.index = document.createElement("select");
         parts.index.setAttribute("aria-label", "Saved time");
         parts.first = document.createElement("select");
         parts.first.setAttribute("aria-label", "First saved time");
         parts.last = document.createElement("select");
         parts.last.setAttribute("aria-label", "Last saved time");
-        parts.followBox.onchange = () => this.update();
-        parts.index.onchange = () => { parts.followBox.checked = false; this.update(); };
-        parts.first.onchange = parts.last.onchange = () => this.update();
-        row.append(parts.follow, parts.index, parts.first, parts.last);
+        for (const k of ["index", "first", "last"]) parts[k].onchange = () => {
+          this.times[k] = this.axisValues()[Number(parts[k].value)];
+          this.update();
+        };
+        parts.interval = Object.assign(document.createElement("p"), {className: "hint"});
+        row.append(parts.index, parts.first, parts.last, parts.interval);
       }
-      role.onchange = () => { this.syncRows(); this.update(); };
+      role.onchange = () => { this.requested[name] = role.value; this.update(); };
       box.append(row);
       this.rows[name] = parts;
     }
   }
 
-  /** Roles chosen in the rows. */
-  roles() { return Object.fromEntries(COORDINATES.map(n => [n, this.rows[n].role.value])); }
-
-  /** The preset whose roles are the current ones, or null. A label only. */
-  matchingPreset() {
-    const roles = this.roles();
-    return Object.keys(this.presets).find(p => {
-      const r = this.presetRoles(p);
-      return this.valid(r) && COORDINATES.every(c => r[c] === roles[c]);
-    }) || null;
-  }
-
-  applyPreset(name) { this.applyRoles(this.presetRoles(name) || {}); }
-
-  applyRoles(roles) {
-    for (const coordinate of COORDINATES) this.fillRoles(coordinate, roles[coordinate]);
-    this.syncRows();
-  }
-
-  /** Every role the coordinate accepts; the others listed disabled, with the reason. */
-  fillRoles(coordinate, role) {
+  /** Every role, the accepted ones enabled; the requested one shown even when this quantity refuses it. */
+  fillRoles(coordinate) {
     const caps = this.quantity.coordinates[coordinate], select = this.rows[coordinate].role;
-    const lacks = caps.roles.length === 1 && caps.roles[0] === "none";
-    const shown = lacks ? ["none"] : ROLE_ORDER.filter(r => r !== "none");
+    const requested = this.requested[coordinate], effective = this.effective(coordinate);
+    const shown = lacks(caps) ? ["none"] : ROLE_ORDER.filter(r => r !== "none");
+    if (!shown.includes(requested)) shown.push(requested);
+    const name = this.quantity.presentation.name;
     select.replaceChildren(...shown.map(r => {
-      const accepted = caps.roles.includes(r);
-      const text = coordinate === "time" && r === "fixed" ? "Fixed (one saved time)" : ROLE_NAMES[r];
-      const o = option(r, accepted ? text : text + " · unavailable", !accepted);
-      if (!accepted) o.title = caps.unavailable?.[r] || "Not offered for this quantity";
+      let text = coordinate === "time" && r === "fixed" ? "Fixed (one saved time)" : ROLE_NAMES[r];
+      let accepted = caps.roles.includes(r);
+      if (lacks(caps) && r === requested && effective === "none" && r !== "none") {
+        text += " · " + name + " has no vertical coordinate (kept for 3-D quantities)";
+        accepted = true;
+      } else if (!accepted) text += " · unavailable";
+      const o = option(r, text, !accepted);
+      if (!caps.roles.includes(r)) o.title = caps.unavailable?.[r] || (lacks(caps) ? name + " has no " + coordinate + " coordinate" :
+        "Not offered for this quantity");
       return o;
     }));
-    const fallback = ["fixed", "none"].find(r => caps.roles.includes(r)) || caps.roles[0];
-    select.value = caps.roles.includes(role) ? role : fallback;
+    select.value = requested;
   }
+
+  axisValues() { return this.links.manifest.time_axes[this.timeAxis()]?.values || []; }
 
   /** Time axis of the selection: a fixed level's own axis, else the quantity's. */
   timeAxis() {
-    const q = this.quantity, v = this.rows.vertical;
-    if (q.vertical && v.role.value === "fixed") {
+    const q = this.quantity;
+    if (q.vertical && this.effective("vertical") === "fixed" && this.vfixed.representation === "native") {
       const level = this.level();
       if (level?.time_axis) return level.time_axis;
     }
@@ -485,9 +577,9 @@ export class Explorer {
   }
 
   level() {
-    const q = this.quantity, v = this.rows.vertical;
+    const q = this.quantity;
     if (!q.vertical) return null;
-    return q.vertical.levels.find(l => String(l.index) === v.level.value) || null;
+    return q.vertical.levels.find(l => l.index === this.vfixed.level) || null;
   }
 
   discrete(rep) {
@@ -505,77 +597,153 @@ export class Explorer {
     const axes = ["x", "y"].map(a => COORDINATES.find(c => roles[c] === a)).filter(Boolean);
     const head = axes.map((c, i) => i ? c : NAMES[c]).join(" × ") || "Single value";
     const rest = COORDINATES.filter(c => ["reduce", "fixed"].includes(roles[c]))
-      .map(c => c + (roles[c] === "reduce" ? " mean" : " fixed"));
+      .map(c => c + (roles[c] === "reduce" ? " " + this.ops[c] : " fixed"));
     return [head, ...rest].join(" · ");
   }
 
   syncRows() {
-    const q = this.quantity, c = this.c;
-    c.classification.textContent = q.presentation.role + " · " + q.presentation.origin;
-    c.definition.textContent = q.presentation.definition + (q.evaluation ? " Evaluation: " + q.evaluation + "." : "");
-    for (const name of ["longitude", "latitude"]) {
-      const r = this.rows[name];
-      r.value.hidden = r.role.value !== "fixed";
+    const q = this.quantity, c = this.c, p = q.presentation;
+    c.classification.textContent = [p.role, ORIGIN[p.origin] || p.origin].filter(Boolean).join(" · ");
+    c.definition.textContent = p.definition + (q.evaluation ? " Evaluation: " + q.evaluation + "." : "");
+    c.dependencies.textContent = "Coordinates: " + COORDINATES.filter(n => !lacks(q.coordinates[n])).map(n =>
+      n === "vertical" && q.vertical ? "vertical (" + q.vertical.levels.length + " native " +
+        (q.vertical.domain === "substrate" ? "levels incl. the skin" : "levels") + ")" :
+      n === "time" ? "time (" + this.axisValues().length + " " + (this.links.manifest.time_axes[q.time_axis]?.label || "saved") +
+        " samples)" : n).join(", ") + ".";
+    for (const name of COORDINATES) {
+      this.fillRoles(name);
+      const r = this.rows[name], caps = q.coordinates[name], reducing = this.requested[name] === "reduce";
+      r.op.hidden = !reducing;
+      if (reducing) {
+        const ops = OPS.filter(op => op in (caps.reduce || {}) || op in (caps.reduce_unavailable || {}) || op === this.ops[name]);
+        r.op.replaceChildren(...ops.map(op => {
+          const ok = op in (caps.reduce || {});
+          const o = option(op, OP_NAMES[op] + (ok ? "" : " · unavailable"), !ok);
+          o.title = ok ? caps.reduce[op] : caps.reduce_unavailable?.[op] || "Not offered for this coordinate";
+          return o;
+        }));
+        r.op.value = this.ops[name];
+      }
     }
+    for (const name of ["longitude", "latitude"]) this.rows[name].value.hidden = this.requested[name] !== "fixed";
     this.syncVertical();
-    const t = this.rows.time, role = t.role.value;
-    const axis = this.links.manifest.time_axes[this.timeAxis()];
-    const values = axis?.values || [];
-    const fill = select => {
-      const old = select.value;
-      if (select.dataset.axis !== this.timeAxis()) {
-        select.replaceChildren(...values.map((s, i) => option(i, this.links.timeText(this.timeAxis(), i))));
-        select.dataset.axis = this.timeAxis();
-        // Atmospheric histories synthesize every saved state of the range: default to the last 60.
-        const span = this.explorer.horizontal?.kind === "spectral" ? 60 : values.length;
-        select.value = select === t.last ? String(values.length - 1) :
-          select === t.first ? String(Math.max(0, values.length - span)) : "0";
-      } else select.value = old;
-    };
-    [t.index, t.first, t.last].forEach(fill);
-    t.follow.hidden = role !== "fixed" || !this.links.getMap();
-    t.index.hidden = role !== "fixed";
-    t.first.hidden = t.last.hidden = !["x", "y", "reduce"].includes(role) || !values.length;
+    this.syncTime();
     const roles = this.roles(), preset = this.matchingPreset();
     c.preset.replaceChildren(option("", preset ? "Custom roles" : "Custom roles (no preset)"),
-      ...Object.entries(this.presets).map(([key, p]) => {
-        const ok = this.valid(this.presetRoles(key));
-        return option(key, p.label + (ok ? "" : " (not available for this quantity)"), !ok);
+      ...Object.entries(this.presets).map(([key, pr]) => {
+        const ok = this.valid(pr.roles);
+        return option(key, pr.label + (ok ? "" : " (not available for this quantity)"), !ok);
       }));
     c.preset.value = preset || "";
     const fixedHorizontal = ["longitude", "latitude"].some(n => roles[n] === "fixed");
     c["snap-wrap"].hidden = !(fixedHorizontal && this.links.manifest.geometry?.grid === "latlon" &&
       this.explorer.horizontal?.kind === "spectral");
-    if (c.globe) c.globe.hidden = !(this.links.getMap() && roles.longitude === "x" && roles.latitude === "y" &&
-      roles.time === "fixed" && ["fixed", "none"].includes(roles.vertical));
+  }
+
+  /** The preset whose roles are the current ones, or null. A label only. */
+  matchingPreset() {
+    const roles = this.roles();
+    return Object.keys(this.presets).find(p => {
+      const r = this.presets[p].roles;
+      return this.valid(r) && COORDINATES.every(c => (c === "vertical" && lacks(this.quantity.coordinates[c]) &&
+        r[c] === "fixed" ? "none" : r[c]) === roles[c] && (roles[c] !== "reduce" || this.ops[c] === "mean"));
+    }) || null;
+  }
+
+  syncTime() {
+    const t = this.rows.time, role = this.requested.time, values = this.axisValues();
+    const axis = this.timeAxis();
+    for (const k of ["index", "first", "last"]) {
+      const select = t[k];
+      if (select.dataset.axis !== axis) {
+        select.replaceChildren(...values.map((s, i) => option(i, this.links.timeText(axis, i))));
+        select.dataset.axis = axis;
+      }
+      // Atmospheric histories synthesize every saved state of the range: default to the last 60.
+      const span = this.explorer.horizontal?.kind === "spectral" ? 60 : values.length;
+      const fallback = k === "last" ? values.length - 1 : k === "first" ? Math.max(0, values.length - span) : 0;
+      if (values.length) select.value = String(this.times[k] == null ? fallback : atOrBefore(values, this.times[k]));
+    }
+    t.index.hidden = role !== "fixed";
+    t.first.hidden = t.last.hidden = !["x", "y", "reduce"].includes(role) || !values.length || this.quantity.recorded;
+    const [a, b] = [Number(t.first.value), Number(t.last.value)].sort((m, n) => m - n);
+    t.interval.hidden = t.first.hidden;
+    if (!t.first.hidden) t.interval.textContent = (b - a + 1) + " saved samples in the interval " +
+      (role === "reduce" ? "reduced by its " + OP_NAMES[this.ops.time].toLowerCase() : "plotted") + ".";
   }
 
   syncVertical() {
-    const q = this.quantity, v = this.rows.vertical, role = v.role.value;
-    const shown = Boolean(q.vertical) && role !== "none";
+    const q = this.quantity, v = this.rows.vertical, role = this.effective("vertical");
+    // A fixed surface always exists (the globe draws it): the lowest atmospheric level or the skin by default.
+    if (q.vertical && !q.vertical.levels.some(l => l.index === this.vfixed.level))
+      this.vfixed.level = q.vertical.levels[q.vertical.domain === "substrate" ? 0 : q.vertical.levels.length - 1].index;
+    const shown = Boolean(q.vertical) && ["fixed", "x", "y"].includes(role);
     v.representation.hidden = !shown;
     v.display.hidden = !shown || !["x", "y"].includes(role);
     if (!shown) { v.level.hidden = v.value.hidden = true; return; }
-    const caps = q.coordinates.vertical;
-    const reps = role === "fixed" ? caps.fixed :
-      ["x", "y"].includes(role) ? [...caps.axis, ...(this.singleSample() ? caps.per_sample || [] : [])] : [];
-    const old = v.representation.value;
-    v.representation.replaceChildren(...reps.map(r => option(r, q.vertical.representations[r].label)));
-    if (reps.includes(old)) v.representation.value = old;
-    const rep = v.representation.value, fixed = role === "fixed";
-    const discrete = this.discrete(rep);
+    const caps = q.coordinates.vertical, fixed = role === "fixed";
+    const allowed = fixed ? caps.fixed : [...caps.axis, ...(this.singleSample() ? caps.per_sample || [] : [])];
+    const want = fixed ? this.vfixed.representation : this.vaxis;
+    const reps = allowed.includes(want) || !(want in q.vertical.representations) ? allowed : [...allowed, want];
+    v.representation.replaceChildren(...reps.map(r => option(r, q.vertical.representations[r].label +
+      (allowed.includes(r) ? "" : " · unavailable here"), !allowed.includes(r))));
+    v.representation.value = reps.includes(want) ? want : (allowed[0] ?? "");
+    if (!fixed && !reps.includes(want) && allowed.length) this.vaxis = allowed[0];   // a name this quantity lacks
+    const rep = v.representation.value, discrete = this.discrete(rep);
     v.level.hidden = !fixed || !discrete;
     v.value.hidden = !fixed || discrete;
     if (fixed && discrete) {
-      const keep = v.level.value;
       v.level.replaceChildren(...q.vertical.levels.map(l => option(l.index,
         rep === "native" ? l.label : (q.vertical.representations[rep].label.split(" (")[0] + " = " +
           numberText(l[rep]) + " m" + (l.kind === "surface" ? " · diagnosed skin" : "")))));
-      const linked = this.links.getLevel?.();
-      v.level.value = q.vertical.levels.some(l => String(l.index) === keep) ? keep :
-        String(linked ?? q.vertical.levels[q.vertical.domain === "substrate" ? 0 : q.vertical.levels.length - 1].index);
+      v.level.value = String(this.vfixed.level);
     }
-    if (fixed && !discrete && v.value.value === "") v.value.value = rep === "sigma" ? "0.5" : rep === "pressure" ? "50000" : "1000";
+    if (fixed && !discrete) v.value.value = this.vfixed.values[rep] ?? "";
+  }
+
+  /** What stops this quantity from answering the configured question: [{coordinate, text, fix, label}]. */
+  issues() {
+    const q = this.quantity, name = q.presentation.name, out = [];
+    // Axes held by coordinates whose role this quantity accepts; an adaptation never takes one of them.
+    const taken = new Set(COORDINATES.filter(c => q.coordinates[c].roles.includes(this.effective(c)))
+      .map(c => this.effective(c)).filter(r => r === "x" || r === "y"));
+    for (const c of COORDINATES) {
+      const caps = q.coordinates[c], r = this.effective(c);
+      if (!caps.roles.includes(r)) {
+        const reason = caps.unavailable?.[r];
+        const target = lacks(caps) ? "none" : caps.roles.includes("fixed") ? "fixed" :
+          caps.roles.find(x => !taken.has(x)) || caps.roles[0];
+        if (target === "x" || target === "y") taken.add(target);
+        out.push({coordinate: c, text: lacks(caps) ? `${name} has no ${c} coordinate, so it cannot be ${ROLE_TEXT[r]}.` :
+          `The ${c} of ${name} cannot be ${ROLE_TEXT[r]}` + (reason ? ": " + reason + "." : "."),
+          label: `${NAMES[c]}: ${ROLE_NAMES[target].toLowerCase()}`, fix: () => { this.requested[c] = target; }});
+        continue;
+      }
+      if (r === "reduce" && !(this.ops[c] in (caps.reduce || {}))) {
+        const first = Object.keys(caps.reduce || {})[0];
+        out.push({coordinate: c, text: `The ${OP_NAMES[this.ops[c]].toLowerCase()} over ${c} is not available for ${name}` +
+          (caps.reduce_unavailable?.[this.ops[c]] ? ": " + caps.reduce_unavailable[this.ops[c]] + "." : "."),
+          label: `${NAMES[c]}: ${OP_NAMES[first].toLowerCase()}`, fix: () => { this.ops[c] = first; }});
+      }
+    }
+    const v = q.coordinates.vertical, role = this.effective("vertical");
+    // Representation checks only where the role itself is accepted (a refused role is reported above).
+    if (q.vertical && role === "fixed" && v.roles.includes("fixed") && v.fixed.length &&
+        !v.fixed.includes(this.vfixed.representation)) {
+      const rep = this.vfixed.representation, label = q.vertical.representations[rep]?.label || rep;
+      out.push({coordinate: "vertical", text: `${name} cannot be evaluated on a fixed ${label} surface here.`,
+        label: "Vertical: " + q.vertical.representations[v.fixed[0]].label, fix: () => { this.vfixed.representation = v.fixed[0]; }});
+    }
+    if (q.vertical && ["x", "y"].includes(role) && v.roles.includes(role)) {
+      const allowed = [...v.axis, ...(this.singleSample() ? v.per_sample || [] : [])];
+      if (!allowed.includes(this.vaxis) && allowed.length) {
+        const label = q.vertical.representations[this.vaxis]?.label || this.vaxis;
+        out.push({coordinate: "vertical", text: `${label} cannot be the vertical axis of this selection: its native-level ` +
+          "positions differ from sample to sample, so it is an axis only for a single column at a single saved time.",
+          label: "Vertical axis: " + q.vertical.representations[allowed[0]].label, fix: () => { this.vaxis = allowed[0]; }});
+      }
+    }
+    return out;
   }
 
   /** The selection the rows describe, or a reason why there is none. */
@@ -591,53 +759,101 @@ export class Explorer {
     // Snapping to a native node is offered only on Gaussian grids; elsewhere the point is exact.
     const sel = {quantity: this.c.quantity.value, options: {snap: !this.c["snap-wrap"].hidden && this.c.snap.checked}};
     for (const name of ["longitude", "latitude"]) {
-      const r = this.rows[name], role = r.role.value;
+      const r = this.rows[name], role = roles[name];
       sel[name] = {role};
       if (role === "fixed") {
         if (!r.value.validity.valid || r.value.value === "") return {error: "Enter a valid " + name + "."};
         sel[name].value = r.value.valueAsNumber;
       }
-      if (role === "reduce") sel[name].op = "mean";
+      if (role === "reduce") sel[name].op = this.ops[name];
     }
     const v = this.rows.vertical;
-    sel.vertical = {role: v.role.value};
-    if (q.vertical && v.role.value !== "none") {
-      const rep = v.representation.value;
-      sel.vertical.representation = rep;
-      if (v.role.value === "fixed") {
-        if (this.discrete(rep)) {
-          const level = this.level();
-          sel.vertical.value = rep === "native" ? level.index : level[rep];
-        } else {
-          if (!v.value.validity.valid || !Number.isFinite(v.value.valueAsNumber)) return {error: "Enter a valid vertical value."};
-          sel.vertical.value = v.value.valueAsNumber;
+    sel.vertical = {role: roles.vertical};
+    if (q.vertical && roles.vertical !== "none") {
+      if (roles.vertical === "reduce") sel.vertical.op = this.ops.vertical;
+      else {
+        const rep = v.representation.value;
+        sel.vertical.representation = rep;
+        if (roles.vertical === "fixed") {
+          if (this.discrete(rep)) {
+            const level = this.level();
+            sel.vertical.value = rep === "native" ? level.index : level[rep];
+          } else {
+            if (!v.value.validity.valid || !Number.isFinite(v.value.valueAsNumber)) return {error: "Enter a valid vertical value."};
+            sel.vertical.value = v.value.valueAsNumber;
+          }
         }
       }
-      if (v.role.value === "reduce") sel.vertical.op = "mean";
     }
-    const t = this.rows.time, role = t.role.value;
+    const t = this.rows.time, role = roles.time;
     sel.time = {role};
-    const map = this.links.getMap();
-    if (role === "fixed") {
-      let index = Number(t.index.value);
-      if (!t.follow.hidden && t.followBox.checked && map && map.axis === this.timeAxis()) {
-        index = map.time; t.index.value = String(index);
-      } else if (!t.follow.hidden && t.followBox.checked && map) {
-        // Different cadences: the latest sample of this axis not after selection A's time.
-        const values = this.links.manifest.time_axes[this.timeAxis()].values;
-        const target = this.links.manifest.time_axes[map.axis].values[map.time];
-        let k = values.findIndex(s => s > target);
-        index = k < 0 ? values.length - 1 : Math.max(0, k - 1);
-        t.index.value = String(index);
-      }
-      sel.time.index = index;
-    } else if (["x", "y", "reduce"].includes(role) && !q.recorded) {
+    if (role === "fixed") sel.time.index = Number(t.index.value);
+    else if (["x", "y", "reduce"].includes(role) && !q.recorded) {
       let first = Number(t.first.value), last = Number(t.last.value);
       if (last < first) [first, last] = [last, first];
       sel.time.first = first; sel.time.last = last;
-      if (role === "reduce") sel.time.op = "mean";
+      if (role === "reduce") sel.time.op = this.ops.time;
     }
     return {selection: sel};
+  }
+
+  // ------------------------------------------------------------------
+  // The globe draws this selection's quantity, saved time and fixed surface
+  // ------------------------------------------------------------------
+
+  /** ``{selection, notes}`` for the globe, or ``{error}``. */
+  globeSelection() {
+    const q = this.quantity, key = this.c.quantity.value, name = q.presentation.name, notes = [];
+    if (!onGlobe(q)) return {error: `${name} has no longitude × latitude field at one saved time: the globe shows ` +
+      "one saved state on one surface. The Explorer shows it."};
+    const values = this.axisValues();
+    const index = values.length ? Number(this.rows.time.index.value) : 0;
+    const sel = {quantity: key, longitude: {role: "x"}, latitude: {role: "y"}, time: {role: "fixed", index},
+      vertical: {role: "none"}};
+    if (q.vertical) {
+      const caps = q.coordinates.vertical, rep = this.vfixed.representation;
+      if (!caps.fixed.includes(rep)) return {error: `The globe's surface (${q.vertical.representations[rep]?.label || rep}) ` +
+        `is not available for ${name}.`};
+      let value;
+      if (this.discrete(rep)) {
+        const level = this.level();
+        value = rep === "native" ? level?.index : level?.[rep];
+      } else value = Number(this.vfixed.values[rep]);
+      if (!Number.isFinite(value)) return {error: "Enter a valid vertical value for the globe's surface."};
+      sel.vertical = {role: "fixed", representation: rep, value};
+      if (this.effective("vertical") !== "fixed") notes.push("Surface: the Explorer's fixed-surface setting (the " +
+        "Explorer itself plots the vertical coordinate " + (this.effective("vertical") === "reduce" ? "reduced" : "as an axis") +
+        "; click a level in its plot to move the globe).");
+    }
+    const role = this.effective("time");
+    if (role !== "fixed") notes.push("Time: the globe shows one saved state; the Explorer " +
+      (role === "reduce" ? "reduces time over its interval" : "plots time along an axis") + ".");
+    return {selection: sel, notes};
+  }
+
+  /** The globe moved the saved time (playback, slider): the selection's fixed time. */
+  setTime(index) {
+    const values = this.axisValues();
+    if (!values.length) return;
+    index = Math.max(0, Math.min(values.length - 1, index));
+    this.times.index = values[index];
+    this.rows.time.index.value = String(index);
+    return this.update();
+  }
+
+  /** A native level chosen in a profile or section: the fixed surface of the selection. */
+  selectLevel(k) {
+    const q = this.quantity;
+    if (q.vertical?.domain !== "atmosphere" || !q.vertical.levels.some(l => l.index === k)) return;
+    if (!q.coordinates.vertical.fixed.includes("native")) return;
+    this.vfixed.representation = "native";
+    this.vfixed.level = k;
+    return this.update();
+  }
+
+  /** The selected native level (for highlighting), when the fixed surface is one. */
+  selectedLevel() {
+    return this.quantity.vertical?.domain === "atmosphere" && this.vfixed.representation === "native" ? this.vfixed.level : null;
   }
 
   setCursor(cursor) {
@@ -646,9 +862,6 @@ export class Explorer {
     this.rows.longitude.value.value = String(Number((((cursor.lon % 360) + 360) % 360).toFixed(4)));
     return this.update();
   }
-
-  /** Selection A changed: follow it. */
-  follow() { return this.update(); }
 
   get rangeKey() {
     const d = this.data;
@@ -687,14 +900,37 @@ export class Explorer {
     return Number.isFinite(lo) && Number.isFinite(hi) && hi > lo ? [lo, hi] : null;
   }
 
+  /** The configuration cannot be answered by this quantity: keep it, say why, offer the adaptation. */
+  showIssues(issues) {
+    const c = this.c, box = c.incompatible, name = this.quantity.presentation.name;
+    for (const n of COORDINATES) this.rows[n].row.classList.toggle("incompatible", issues.some(i => i.coordinate === n));
+    box.hidden = !issues.length;
+    if (!issues.length) return;
+    const head = Object.assign(document.createElement("strong"), {textContent: `${name} cannot answer this configuration`});
+    const keep = Object.assign(document.createElement("p"), {textContent: "Your coordinate roles, fixed values, " +
+      "statistics and interval are kept unchanged. Choose a quantity that has them, or adapt the configuration explicitly:"});
+    const list = document.createElement("ul");
+    list.append(...issues.map(i => Object.assign(document.createElement("li"), {textContent: i.text})));
+    const adapt = Object.assign(document.createElement("button"), {type: "button", textContent: "Adapt: " +
+      issues.map(i => i.label).join("; ")});
+    adapt.dataset.e = "adapt";
+    adapt.onclick = () => { for (const i of issues) i.fix(); this.update(); };
+    box.replaceChildren(head, keep, list, adapt);
+  }
+
   async update() {
     this.syncRows();
-    const {selection, error} = this.selection();
+    const issues = this.issues();
+    this.showIssues(issues);
     const c = this.c;
     c.product.textContent = this.describe();
+    this.links.onSelection?.();
+    const {selection, error} = issues.length ? {error: "Not available for this quantity: the configuration is kept; see why below."} :
+      this.selection();
     if (error) {
       this.abort?.abort(); this.pending = null; this.data = null; this.loaded = null;
       c.plot.hidden = true; c.table.hidden = true; c.notes.replaceChildren(); c.png.disabled = true;
+      c.readout.textContent = "";
       this.status(error, true);
       return;
     }
@@ -745,8 +981,12 @@ export class Explorer {
     if (t.role === "fixed") return this.links.timeText(t.axis, t.index) + " · one saved sample";
     const values = this.links.manifest.time_axes[t.axis]?.values;
     const span = values ? dayText(values[t.first]) + " to " + dayText(values[t.last]) : "";
-    if (t.role === "reduce") return t.count === 1 ? "mean of a single saved sample" :
-      `equal-weight mean of ${t.count} saved samples, ${span} (${t.cadence} cadence)`;
+    if (t.role === "reduce") {
+      if (t.op !== "mean") return `${OP_NAMES[t.op].toLowerCase()} over ${t.count} saved samples, ${span}` +
+        (t.masked_excluded ? ` (${t.masked_excluded} masked samples excluded)` : "");
+      return t.count === 1 ? "mean of a single saved sample" :
+        `time mean of ${t.count} saved samples, ${span} (${t.cadence} cadence; ${t.weighting})`;
+    }
     return [`${t.count} saved samples`, span].filter(Boolean).join(", ");
   }
 
@@ -761,11 +1001,12 @@ export class Explorer {
       if (lon?.role === "fixed") parts.push("at " + numberText(lon.value) + "°E · " + lon.sampling);
     }
     for (const [name, part] of [["longitude", lon], ["latitude", lat]]) {
-      if (part?.role === "reduce") parts.push(name + " mean: " + part.rule + " (" + part.nodes + ")");
+      if (part?.role === "reduce") parts.push(name + " " + OP_NAMES[part.op].toLowerCase() + " (" + part.nodes + ")");
     }
     const v = k.vertical;
     if (v?.role === "fixed") parts.push((v.level || v.label + " = " + numberText(v.value)) +
       (v.interpolation ? " (" + v.interpolation + ")" : ""));
+    if (v?.role === "reduce") parts.push("vertical " + OP_NAMES[v.op].toLowerCase() + " over " + v.nodes);
     return parts.join(" · ");
   }
 
@@ -777,6 +1018,13 @@ export class Explorer {
     const scale = this.display.scale === "auto" || (this.display.scale === "log" && !positive) ? a.scale : this.display.scale;
     const downward = this.display.direction === "auto" ? a.downward : this.display.direction === "down";
     return {...a, scale: scale === "log" && !positive ? "linear" : scale, downward};
+  }
+
+  symbol() {
+    const p = this.data.presentation, s = p.symbol || p.name;
+    const ops = COORDINATES.filter(c => this.data.roles?.[c] === "reduce").map(c => this.data.coordinates?.[c]?.op || "mean");
+    if (!ops.length) return s;
+    return ops.every(o => o === "mean") ? "[" + s + "]" : ops.map(o => o).join("·") + " " + s;
   }
 
   plotSpec() {
@@ -793,13 +1041,13 @@ export class Explorer {
       return {kind: "line", orientation: a === "y" ? "profile" : "series", coordinate, values: d.values,
         markers: d.markers, title, valueLabel: label, diverging,
         surfaceLine: coordinate.coordinate === "vertical" && this.quantity.vertical?.domain === "substrate",
-        selected: coordinate.coordinate === "vertical" && atmosphere ? this.links.getLevel?.() : null};
+        selected: coordinate.coordinate === "vertical" && atmosphere ? this.selectedLevel() : null};
     }
-    const cursor = d.x.coordinate === "latitude" ? this.cursor?.lat :
-      d.x.coordinate === "longitude" ? ((this.cursor?.lon % 360) + 360) % 360 : NaN;
+    const lon = ((this.cursor?.lon % 360) + 360) % 360;
+    const at = a => a.coordinate === "latitude" ? this.cursor?.lat : a.coordinate === "longitude" ? lon : NaN;
     return {kind: "field", x: this.displayAxis(d.x), y: this.displayAxis(d.y), values: d.values, surface: d.surface,
-      title, label, diverging, cursor, range: this.fixedRange(),
-      selected: d.y.coordinate === "vertical" && d.y.representation === "sigma" && atmosphere ? this.links.getLevel?.() : null};
+      title, label, diverging, cursor: at(d.x), cursorY: at(d.y), range: this.fixedRange(),
+      selected: d.y.coordinate === "vertical" && d.y.representation === "sigma" && atmosphere ? this.selectedLevel() : null};
   }
 
   draw() {
@@ -837,11 +1085,12 @@ export class Explorer {
         " plotted values lie below it and " + above + " above it, drawn at the end colours.");
     }
     for (const [name, part] of Object.entries(d.coordinates || {})) {
-      if (part.role === "reduce" && part.rule) rows.push(NAMES[name] + " mean: " + part.rule + ".");
+      if (part.role === "reduce" && part.rule) rows.push(NAMES[name] + " " + OP_NAMES[part.op || "mean"].toLowerCase() + ": " +
+        part.rule + "." + (part.masked_excluded ? " " + part.masked_excluded + " masked samples were excluded." : ""));
     }
     const masked = JSON.stringify(d.values).includes("null");
     if (masked) rows.push("Blank cells are masked: the surface is below the terrain or outside the sampled levels " +
-      "at that place, or at one of the saved samples of a mean.");
+      "at that place, or at one of the saved samples of a mean (minimum and maximum use the valid samples only).");
     c.notes.replaceChildren(...rows.map(text => Object.assign(document.createElement("p"), {textContent: text})));
     if (d.table) {
       const head = c.table.tHead.rows[0], body = c.table.tBodies[0];
@@ -851,8 +1100,8 @@ export class Explorer {
         for (const v of values) row.append(Object.assign(document.createElement("td"),
           {textContent: typeof v === "number" ? numberText(v) : v ?? ""}));
         if (this.quantity.vertical?.domain === "atmosphere") {
-          if (k === this.links.getLevel?.()) row.className = "selected";
-          row.onclick = () => this.links.onLevel(k);
+          if (k === this.selectedLevel()) row.className = "selected";
+          row.onclick = () => this.selectLevel(k);
         }
         return row;
       }));
@@ -900,9 +1149,7 @@ export class Explorer {
     if (this.pending || !this.data) return;
     const hit = this.locate(e), d = this.data, c = this.c;
     if (!hit) { c.readout.textContent = ""; return; }
-    const p = d.presentation, parts = [];
-    const reduced = Object.values(d.roles || {}).includes("reduce");
-    const symbol = reduced ? "[" + (p.symbol || p.name) + "]" : p.symbol || p.name;
+    const p = d.presentation, parts = [], symbol = this.symbol();
     if (this.layout.kind === "line") {
       const k = hit.index;
       parts.push(this.coordText(this.spec.coordinate, k), symbol + " " + numberText(d.values[k]) + " " + p.units);
@@ -933,7 +1180,7 @@ export class Explorer {
     const d = this.data, atmosphere = this.quantity.vertical?.domain === "atmosphere" && d.quantity !== "mass_streamfunction";
     if (this.layout.kind === "field") {
       if (Number.isInteger(hit.row) && d.y.coordinate === "vertical" && atmosphere && this.c["link-level"].checked)
-        this.links.onLevel(hit.row);
+        this.selectLevel(hit.row);
       const at = {};
       for (const [a, k] of [["x", hit.column], ["y", hit.row]]) {
         if (!Number.isInteger(k)) continue;
@@ -942,7 +1189,7 @@ export class Explorer {
       }
       if ("lat" in at || "lon" in at) this.links.onCursor({lat: at.lat ?? this.cursor?.lat ?? 0, lon: at.lon ?? this.cursor?.lon ?? 0});
     } else if (this.spec.coordinate.coordinate === "vertical" && atmosphere && this.c["link-level"].checked) {
-      this.links.onLevel(hit.index);
+      this.selectLevel(hit.index);
     }
   }
 

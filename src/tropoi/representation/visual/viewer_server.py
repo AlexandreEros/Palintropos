@@ -18,7 +18,7 @@ import numpy as np
 from tropoi.representation.archive.local_resource import resource
 from tropoi.representation.archive.airless import READER as AIRLESS_READER
 from tropoi.representation.archive.viewer_manifest import viewer_manifest
-from tropoi.representation.visual.quantities import ARCHIVED
+from tropoi.representation.visual.quantities import ARCHIVED, GROUPS
 from tropoi.representation.visual.selection import (
     PRESETS, SelectionError, evaluate, parse_selection, time_axis)
 
@@ -123,6 +123,8 @@ class ViewerSession:
                 manifest["explorer"] = describe(manifest)
             # Named role assignments for the page's convenience; capability is per coordinate.
             manifest["explorer"]["presets"] = PRESETS
+            # The quantity selector's groups, in the registry's order.
+            manifest["explorer"]["groups"] = list(GROUPS)
             self.manifests.append(manifest)
         self.backend = backend
         self.cache_bytes = cache_bytes

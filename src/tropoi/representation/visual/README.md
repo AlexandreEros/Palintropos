@@ -47,8 +47,22 @@ an automatically assigned loopback port. Use `--no-browser` to print the
 private session URL, and Ctrl+C to close the service. All scripts, styles and
 scientific data are local. Each map request reconstructs one saved-time slice
 on a 2° display mesh. A shared 32 MiB response cache supports revisiting
-recent selections. PNG export captures the labelled 2D map with its selection
-and colour scale. The self-contained HTML exporters remain separately available.
+recent selections. The Explorer's *Save PNG* exports its plot (any result,
+longitude × latitude included) with its selection and colour scale; the
+globe's exports the globe as drawn, with its title and colour scale. The
+self-contained HTML exporters remain separately available.
+
+**Page layout.** The Explorer is the primary, analytical workspace and the
+page's only flat plotting surface: longitude × latitude maps, sections,
+profiles and histories are all its results. The 3D globe below it is a
+complementary view of the same selection: it draws the Explorer's quantity at
+the Explorer's saved time on the Explorer's fixed vertical surface (when the
+Explorer plots or reduces the vertical coordinate, its fixed-surface setting is
+kept and clicking a level in a section or profile moves it; when it reduces or
+plots time, the globe shows the one saved time the transport selects, and says
+so). The globe's Previous/Play/Next move the Explorer's saved time. *Compare
+selections* adds a second globe that is independent by design. There is no
+second analytical renderer.
 
 For SWE, the lower mesh follows terrain and the translucent upper mesh follows
 the fluid surface. Both use the displayed vertical exaggeration. With slab
@@ -57,9 +71,9 @@ datum as terrain. Cells touching an invalid thickness are masked. A field change
 sets the colours on that shell. PE uses its native or vertically interpolated
 geopotential height, with masks at the terrain and sampling limits.
 
-Each map has an automatic colour range (all valid samples) or a fixed minimum
-and maximum. Geometric day/night shading darkens only the globe; the flat map,
-legend and readouts always show model values.
+Each globe has an automatic colour range (all valid samples) or a fixed minimum
+and maximum. Geometric day/night shading darkens only the globe; its legend and
+readouts always show model values.
 
 ### Explorer: four coordinates, one role each
 
@@ -77,28 +91,47 @@ it can be fixed at (`fixed`), plotted along (`axis`), or plotted along only
 for a single column at a single time (`per_sample`). A role a coordinate
 does not accept carries its reason (`unavailable`).
 
-In the **Explorer** panel, pick a quantity and give each coordinate
+In the **Explorer**, pick a quantity and give each coordinate
 (longitude, latitude, vertical, time) a role:
 - horizontal axis (X) or vertical axis (Y);
 - fixed at a value or one saved time;
-- reduced by a mean.
+- reduced by a statistic: Mean, Minimum or Maximum (chosen per coordinate).
+
+**Quantity selector.** Quantities are grouped by the registry's catalogue group
+(`presentation.group`: thermodynamics; velocity and wind; dynamics;
+geopotential and geometry; surface; archived diagnostics and time series),
+sorted by name and searchable by name, symbol, unit or group. The card under
+the selector gives the name, symbol, unit, definition, whether the quantity is
+stored, derived or an archived diagnostic, and its actual coordinates (native
+levels, saved samples). The grouping comes from the registry
+(`representation.visual.quantities`), not from the page.
+
+**Changing the quantity keeps the analytical question.** Roles, fixed values,
+statistics, the time interval, the vertical representation and the axis
+display are kept. A surface quantity under a fixed vertical coordinate simply
+has none (the setting is kept for 3-D quantities, and the role selector says
+so). If the new quantity cannot answer the configuration (a coordinate it
+lacks used as an axis or reduced, a statistic it does not define, a
+representation it does not offer), the Explorer keeps the configuration, marks
+the coordinates concerned, explains why, and offers an explicit *Adapt*
+button; nothing is reset, re-preset or broadcast silently. The configuration
+also travels with the archive selector.
 
 A coordinate the quantity lacks has the role *not a coordinate*. The result
 follows from the roles alone: two plotting axes give a two-dimensional field,
 one a line, none a single value. Longitude × latitude is one such
-assignment; it is drawn in the explorer like any other field, and *Show on
-the globe* hands a single-state, single-surface one to selection A. Presets
+assignment; it is drawn in the explorer like any other field. Presets
 (`explorer.presets`) only fill in roles: they enable nothing, and every
 assignment they produce can be made by hand. Playback (Play, the time
 slider) is a sequence of fixed selections at the actual saved times. Roles a
 coordinate does not accept are disabled in the page, with their reason, and
 refused by the server, never approximated.
 
-One geographic cursor links the views. Clicking the map or globe moves it,
-and the map and globe draw the meridian and parallel that the sections
-follow. By default the explorer follows selection A's saved time. Clicking a
-level in a plot or in the column table selects it on the map. Clicking a
-field moves the cursor along the horizontal coordinates it shows.
+One geographic cursor links the views. Clicking the globe or a field moves
+it; the globe draws the meridian and parallel that the sections follow and a
+longitude × latitude field draws both as a crosshair. Clicking a level in a
+plot or in the column table makes it the fixed surface (the globe draws it).
+Clicking a field moves the cursor along the horizontal coordinates it shows.
 
 **Sample sets.** Each role maps a coordinate to the points at which the
 quantity is evaluated (`selection.evaluate`; the providers own the sets):
@@ -116,20 +149,64 @@ quantity is evaluated (`selection.evaluate`; the providers own the sets):
 The numerical definition of a value depends only on these sets: the same
 role assignment gives the same numbers whatever preset or path produced it.
 
-**Reductions** (`mean`; each payload states its rule in `coordinates`):
+**Reductions** (`mean`, `min`, `max`; each payload states its rule in
+`coordinates`). Every reduction acts on the native samples the provider
+evaluates for it (saved states, native grid nodes, native levels), never on
+display-mesh or interpolated values. The rules below were approved by the
+owner for this phase (2026-11-27).
 
-| Coordinate | Rule |
-| --- | --- |
-| Time | Equal-weight mean of every saved sample from first to last inclusive (1/N each), not weighted by the intervals between samples; the cadence and its regularity are reported |
-| Longitude | Plain mean over the equally spaced native longitudes (atmosphere: exact for a band-limited field; columns: a row's cells have equal areas) |
-| Latitude | Area-weighted: Gauss–Legendre weights (∝ cos φ dφ) on the native Gaussian latitudes; the recorded column area weights of a columnar archive |
-| Longitude and latitude | The area mean (the product of the two) |
-| Vertical | Not defined in this release: a mean over levels needs a mass (Δp) or thickness weighting rule |
+| Coordinate | Mean | Minimum / Maximum |
+| --- | --- | --- |
+| Time (interval first…last, chosen by the user) | Time-weighted with *cell weights*: each saved sample stands for the interval around it, wᵢ = (tᵢ₊₁ − tᵢ₋₁)/2, ends mirrored (w₀ = t₁ − t₀). For a regular cadence all weights are equal and the plain 1/N mean is computed, bit for bit; the payload reports the cadence, the weighting and, when irregular, the weights | Extremum over the saved samples of the interval |
+| Longitude | Plain mean over the equally spaced native longitudes (atmosphere: exact for a band-limited field; columns: a row's cells have equal areas) | Extremum over the native longitudes |
+| Latitude | Area-weighted: Gauss–Legendre weights (∝ cos φ dφ) on the native Gaussian latitudes; the recorded column area weights of a columnar archive | Extremum over the native latitudes (unweighted) |
+| Longitude and latitude | The area mean (the product of the two) | Extremum over the native grid |
+| Vertical | Not defined (refused with its reason): a mean over levels needs a mass (pₛΔσ) or thickness weighting rule that has not been approved | Extremum over the native full levels (atmosphere); not offered over substrate cells |
 
-A masked sample makes every mean that includes it masked; no mean is taken
-over a subset of the requested samples. On native σ levels a mean is the mean
-of each level's values; its p and Z are the means of that level's p_k and
-Z_k, not a mean on a surface of constant p or Z. A diagnostic point
+Masks: a masked sample makes every mean that includes it masked (no mean is
+taken over a subset of the requested samples). Minimum and maximum use the
+valid samples only and are masked only where every sample is masked; the
+payload counts the masked samples they excluded. Minimum and maximum are the
+extrema of the sampled values, not of the continuous field between samples
+(or between saved states). Reductions over different coordinates are applied
+in one stated order: longitude, latitude, vertical (within each saved state),
+then time; with different statistics the order matters and the notes say so.
+On native σ levels each row is the statistic of the level's values; its p and
+Z (and every companion that locates rows) are the means of that level's p_k
+and Z_k, not values on a surface of constant p or Z. A companion that is a
+value of the quantity (the airless skin, the slab Tₛ marker) takes the
+quantity's statistic. These *statistics* are unrelated to the colour range's
+minimum and maximum.
+
+**Air density** ρ = p/(R T) is an ordinary derived quantity (thermodynamics
+group, kg m⁻³). p and T are evaluated at the same samples (place, surface,
+saved state) and ρ is formed from them before any reduction (so a time mean
+of ρ is the mean of ρ, not p̄/(R T̄)). On a native level p = σ_k pₛ (the
+nominal full-level pressure the viewer shows); on a surface of constant p,
+the surface's p; elsewhere the interpolated p. R is the gas constant the run
+records for its atmosphere (`r_dry` or `gas_constant`; Held–Suarez 286.857,
+the Mars CO₂ run 191.8 J kg⁻¹ K⁻¹), the mixture constant of a
+fixed-composition gas. ρ is advertised only when such a constant is recorded
+and no stored level field other than the dry prognostics (ζ, δ, T) exists: a
+moisture or composition tracer would make one R the wrong mixture constant.
+No default value is ever assumed.
+
+**Archived statistical series (audit).** The Held–Suarez archive records
+daily series in `series.json`. They were compared with the general reductions
+(`tests/test_viewer_reductions.py`):
+
+| Series | Definition in the run | Relation to the engine | Kept? |
+| --- | --- | --- | --- |
+| `t_max`, `t_min` | max/min of T over the native state grid at every level, daily | Equal to the engine's longitude, latitude and vertical maximum/minimum at the saved states (to 1e-9 relative) | Kept: daily cadence, while the engine sees the 10-day saved states only |
+| `mean_T` | Gauss-area mean of Σ_k Δσ_k T_k, daily | Equal to Δσ weights applied to the engine's area-mean σ profile; the engine itself defines no vertical mean (refused) | Kept: a distinct (Δσ-weighted, daily) diagnostic |
+| `mean_ps` | Gauss-area mean of pₛ, daily | Equal to the engine's longitude and latitude mean of pₛ at the saved states (to 1e-9 relative) | Kept: daily cadence |
+| `mean_lnps`, `ke`, `max_abs_u`, `comp_mode` | Daily global diagnostics of the run | Not a single general reduction of a viewer quantity (ln pₛ is shown as pₛ; ke needs the Δσ vertical mean; max |u| combines max u and −min u; comp_mode is not a field statistic) | Kept |
+
+The PE runner's `diagnostics/timeseries.csv` extrema (`t_min`, `t_max`) are
+taken over every model sampling, including the product-space transform grid,
+so they are not the extrema of the saved states on the state grid; they are
+kept. No archived series was removed: none is equivalent in domain, cadence
+and definition to a general reduction. A diagnostic point
 collection is not a global field: its horizontal coordinates can only be
 fixed, and it has no area weights. ψ is defined from the longitude mean
 [pₛ v], so its longitude role is always the mean; over time, ψ is formed from
@@ -207,8 +284,8 @@ which take the end colours. A maximum that does not exceed the minimum falls
 back to the automatic range.
 
 Zonal means and ψ can average every saved state between a first and a last
-selection, with equal weights. The plot states the count and the actual
-cadence. The lowest full level is an air temperature at σ_{K−1}. The column
+selection (cell weights, equal for a regular cadence). The plot states the
+count, the actual cadence and the weighting. The lowest full level is an air temperature at σ_{K−1}. The column
 always shows it separately from the slab surface temperature. Pressure is
 p_k = σ_k pₛ at the nominal level, and Z_k is the absolute Simmons–Burridge
 geopotential over g at the hydrostatic level position. Every plot names its
