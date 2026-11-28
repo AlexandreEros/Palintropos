@@ -27381,7 +27381,7 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ],
 [
 [
-568,
+570,
 11,
 "_plain(array)",
 [
@@ -27428,7 +27428,7 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ],
 [
 [
-576,
+578,
 12,
 "_plain(a)",
 [
@@ -27532,7 +27532,7 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ],
 [
 [
-502,
+504,
 20,
 "_TimeReduction(sel['time']['op'], weights, [k for k in plan.get('companions') or {} if _same(plan, k)])",
 [
@@ -27553,7 +27553,7 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ],
 [
 [
-548,
+550,
 24,
 "_arrange(cube, order, x, y)",
 [
@@ -27576,7 +27576,7 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ]
 ],
 [
-550,
+552,
 46,
 "_arrange(a, order, x, y, not plan['companions'][k].get('surface'))",
 [
@@ -27605,7 +27605,7 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ],
 [
 [
-503,
+505,
 79,
 "_same(plan, k)",
 [
@@ -27620,7 +27620,7 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ]
 ],
 [
-506,
+508,
 78,
 "_same(plan, k)",
 [
@@ -27637,7 +27637,7 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ],
 [
 [
-505,
+507,
 17,
 "_spatial(np.asarray(values, dtype=float), plan, sel, counts)",
 [
@@ -27660,7 +27660,7 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ]
 ],
 [
-506,
+508,
 25,
 "_spatial(np.asarray(a, dtype=float), plan, sel, same=_same(plan, k))",
 [
@@ -27685,7 +27685,7 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ],
 [
 [
-530,
+532,
 41,
 "_time_description(provider.manifest, sel, seconds, reduction.weights if reduction else None)",
 [
@@ -27710,7 +27710,7 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ],
 [
 [
-527,
+529,
 31,
 "describe_roles(sel)",
 [
@@ -27723,7 +27723,7 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ],
 [
 [
-546,
+548,
 61,
 "time_axis(seconds, label=plan.get('time_label', 'Saved time'))",
 [
@@ -27753,7 +27753,7 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ],
 [
 [
-500,
+502,
 19,
 "time_weights([values_[i] for i in indices])",
 [
@@ -27766,7 +27766,7 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ],
 [
 [
-631,
+636,
 11,
 "axis('latitude', 'geocentric', label, '°N', values, edges=edges, ticks='latitude', limits=[-90, 90])",
 [
@@ -27828,7 +27828,7 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ],
 [
 [
-636,
+641,
 11,
 "axis('longitude', 'geocentric', label, '°E', values, edges=edges, ticks='longitude', limits=[0, 360])",
 [
@@ -28139,7 +28139,7 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ],
 [
 [
-641,
+646,
 11,
 "axis('time', 'elapsed', label, 's', values, ticks='time')",
 [
@@ -101119,67 +101119,68 @@ null,
 "493":"                             f\"({len(indices)} requested)\")",
 "494":"    time_role = sel[\"time\"][\"role\"]",
 "495":"    counts = {c: [0] for c in COORDINATES}",
-"498":"    if time_role == \"reduce\":",
 "499":"        values_ = (provider.manifest[\"time_axes\"].get(sel[\"time\"][\"axis\"]) or {}).get(\"values\") or []",
-"500":"        weights = (time_weights([values_[i] for i in indices]) if sel[\"time\"][\"op\"] == \"mean\"",
-"501":"                   and values_ and len(values_) \u003e indices[-1] else None)",
-"502":"        reduction = _TimeReduction(sel[\"time\"][\"op\"], weights,",
-"503":"                                   [k for k in plan.get(\"companions\") or {} if _same(plan, k)])",
-"504":"    for t, values, companions in provider.samples(sel, plan, indices):",
-"505":"        values = _spatial(np.asarray(values, dtype=float), plan, sel, counts)",
-"506":"        companions = {k: _spatial(np.asarray(a, dtype=float), plan, sel, same=_same(plan, k))",
-"507":"                      for k, a in companions.items()}",
-"508":"        seconds.append(t)",
-"525":"    payload = dict(quantity=sel[\"quantity\"], presentation=plan[\"presentation\"],",
-"526":"                   roles={c: sel[c][\"role\"] for c in COORDINATES}, axes=dict(x=x, y=y),",
-"527":"                   description=describe_roles(sel), coordinates=plan[\"coordinates\"],",
-"528":"                   sampling=plan.get(\"sampling\", \"\"), notes=list(plan.get(\"notes\", [])))",
-"529":"    if time_role in (\"reduce\", *AXES):",
-"530":"        payload[\"coordinates\"][\"time\"] = _time_description(provider.manifest, sel, seconds,",
-"531":"                                                           reduction.weights if reduction else None)",
-"532":"    reduced = [c for c in REDUCTION_ORDER if sel[c][\"role\"] == \"reduce\"]",
-"533":"    for c in reduced:",
-"544":"    for a, c in ((\"x\", x), (\"y\", y)):",
-"545":"        if c is not None:",
-"546":"            payload[a] = plan[\"axes\"][c] if c != \"time\" else time_axis(seconds, label=plan.get(\"time_label\",",
-"547":"                                                                                                \"Saved time\"))",
-"548":"    payload[\"values\"] = _arrange(cube, order, x, y)",
-"549":"    payload[\"companions\"] = {",
-"550":"        k: dict(plan[\"companions\"][k], values=_arrange(a, order, x, y, not plan[\"companions\"][k].get(\"surface\")))",
-"551":"        for k, a in companion_cubes.items()} or None",
-"552":"    if hasattr(provider, \"finish\"):",
-"557":"def _arrange(cube, order, x, y, vertical=True):",
-"558":"    \"\"\"The plotted array: ``[y][x]`` for two axes, a list for one, a number",
-"566":"    if len(keep) == 2 and order[keep[0]] \u003e order[keep[1]]:",
-"567":"        array = array.T",
-"568":"    return _plain(array)",
-"569":"",
-"570":"",
-"571":"def _plain(array):",
-"572":"    \"\"\"JSON-safe values: NaN (masked) becomes null.\"\"\"",
-"574":"        v = float(array)",
-"575":"        return v if math.isfinite(v) else None",
-"576":"    return [_plain(a) for a in array] if np.ndim(array) \u003e 1 else \\",
-"577":"        [float(v) if math.isfinite(v) else None for v in np.asarray(array, dtype=float)]",
-"578":"",
-"580":"def _time_description(manifest, sel, seconds, weights=None):",
-"581":"    time = sel[\"time\"]",
-"604":"def axis(coordinate, representation, label, units, values, *, edges=None, scale=\"linear\",",
-"605":"         downward=False, ticks=None, rows=None, limits=None, interpolation=None):",
-"606":"    \"\"\"A plotting axis: centres, optional cell edges and how to draw it by default.",
-"629":"",
-"630":"def latitude_axis(values, edges=None, label=\"Latitude\"):",
-"631":"    return axis(\"latitude\", \"geocentric\", label, \"°N\", values, edges=edges, ticks=\"latitude\",",
-"632":"                limits=[-90, 90])",
-"633":"",
+"500":"        # Cell weights whatever the quantity's operator: mean-reduced companions (p, Z) use them",
+"501":"        # under Min/Max too, so an interval's mean positions do not depend on the operator.",
+"502":"        weights = (time_weights([values_[i] for i in indices])",
+"503":"                   if values_ and len(values_) \u003e indices[-1] else None)",
+"504":"        reduction = _TimeReduction(sel[\"time\"][\"op\"], weights,",
+"505":"                                   [k for k in plan.get(\"companions\") or {} if _same(plan, k)])",
+"506":"    for t, values, companions in provider.samples(sel, plan, indices):",
+"507":"        values = _spatial(np.asarray(values, dtype=float), plan, sel, counts)",
+"508":"        companions = {k: _spatial(np.asarray(a, dtype=float), plan, sel, same=_same(plan, k))",
+"509":"                      for k, a in companions.items()}",
+"510":"        seconds.append(t)",
+"527":"    payload = dict(quantity=sel[\"quantity\"], presentation=plan[\"presentation\"],",
+"528":"                   roles={c: sel[c][\"role\"] for c in COORDINATES}, axes=dict(x=x, y=y),",
+"529":"                   description=describe_roles(sel), coordinates=plan[\"coordinates\"],",
+"530":"                   sampling=plan.get(\"sampling\", \"\"), notes=list(plan.get(\"notes\", [])))",
+"531":"    if time_role in (\"reduce\", *AXES):",
+"532":"        payload[\"coordinates\"][\"time\"] = _time_description(provider.manifest, sel, seconds,",
+"533":"                                                           reduction.weights if reduction else None)",
+"534":"    reduced = [c for c in REDUCTION_ORDER if sel[c][\"role\"] == \"reduce\"]",
+"535":"    for c in reduced:",
+"546":"    for a, c in ((\"x\", x), (\"y\", y)):",
+"547":"        if c is not None:",
+"548":"            payload[a] = plan[\"axes\"][c] if c != \"time\" else time_axis(seconds, label=plan.get(\"time_label\",",
+"549":"                                                                                                \"Saved time\"))",
+"550":"    payload[\"values\"] = _arrange(cube, order, x, y)",
+"551":"    payload[\"companions\"] = {",
+"552":"        k: dict(plan[\"companions\"][k], values=_arrange(a, order, x, y, not plan[\"companions\"][k].get(\"surface\")))",
+"553":"        for k, a in companion_cubes.items()} or None",
+"554":"    if hasattr(provider, \"finish\"):",
+"559":"def _arrange(cube, order, x, y, vertical=True):",
+"560":"    \"\"\"The plotted array: ``[y][x]`` for two axes, a list for one, a number",
+"568":"    if len(keep) == 2 and order[keep[0]] \u003e order[keep[1]]:",
+"569":"        array = array.T",
+"570":"    return _plain(array)",
+"571":"",
+"572":"",
+"573":"def _plain(array):",
+"574":"    \"\"\"JSON-safe values: NaN (masked) becomes null.\"\"\"",
+"576":"        v = float(array)",
+"577":"        return v if math.isfinite(v) else None",
+"578":"    return [_plain(a) for a in array] if np.ndim(array) \u003e 1 else \\",
+"579":"        [float(v) if math.isfinite(v) else None for v in np.asarray(array, dtype=float)]",
+"580":"",
+"582":"def _time_description(manifest, sel, seconds, weights=None):",
+"583":"    time = sel[\"time\"]",
+"609":"def axis(coordinate, representation, label, units, values, *, edges=None, scale=\"linear\",",
+"610":"         downward=False, ticks=None, rows=None, limits=None, interpolation=None):",
+"611":"    \"\"\"A plotting axis: centres, optional cell edges and how to draw it by default.",
 "634":"",
-"635":"def longitude_axis(values, edges=None, label=\"Longitude (east)\"):",
-"636":"    return axis(\"longitude\", \"geocentric\", label, \"°E\", values, edges=edges, ticks=\"longitude\",",
-"637":"                limits=[0, 360])",
+"635":"def latitude_axis(values, edges=None, label=\"Latitude\"):",
+"636":"    return axis(\"latitude\", \"geocentric\", label, \"°N\", values, edges=edges, ticks=\"latitude\",",
+"637":"                limits=[-90, 90])",
 "638":"",
 "639":"",
-"640":"def time_axis(values, label=\"Saved time\"):",
-"641":"    return axis(\"time\", \"elapsed\", label, \"s\", values, ticks=\"time\")"
+"640":"def longitude_axis(values, edges=None, label=\"Longitude (east)\"):",
+"641":"    return axis(\"longitude\", \"geocentric\", label, \"°E\", values, edges=edges, ticks=\"longitude\",",
+"642":"                limits=[0, 360])",
+"643":"",
+"644":"",
+"645":"def time_axis(values, label=\"Saved time\"):",
+"646":"    return axis(\"time\", \"elapsed\", label, \"s\", values, ticks=\"time\")"
 },
 "tropoi/representation/visual/sky.py":{
 "122":"@dataclass(frozen=True)",
@@ -113025,7 +113026,7 @@ null,
 }
 },
 "meta":{
-"base_commit":"52814f24154250e118b0c83b2e8bdce012e0dc1f",
+"base_commit":"b38c11db9ca086cb03e774671646846fe0cbda43",
 "call_depth":4,
 "command":"python -m tools.architecture.generate",
 "dynamic_import_sites":{
@@ -113069,8 +113070,8 @@ null,
 "max_sites":8,
 "package":"tropoi",
 "source_commit":null,
-"source_sha256":"883188920a0ebb95339e01a45eff5b95c37ea62544e0b80a7989f6054a494c69",
-"source_status":"clean",
+"source_sha256":"bc32f7ffe5a1d7e36b2bb172b9dd40dc79805abbd066511167f085557c302656",
+"source_status":"dirty",
 "title":"current",
 "tool_version":"2.3.0",
 "traversed":[
@@ -120115,7 +120116,7 @@ null,
 [
 "function",
 1125,
-557,
+559,
 843
 ],
 [
@@ -120139,7 +120140,7 @@ null,
 [
 "function",
 1125,
-571,
+573,
 843
 ],
 [
@@ -120175,7 +120176,7 @@ null,
 [
 "function",
 1125,
-580,
+582,
 843
 ],
 [
@@ -120187,7 +120188,7 @@ null,
 [
 "function",
 1125,
-604,
+609,
 843
 ],
 [
@@ -120205,7 +120206,7 @@ null,
 [
 "function",
 1125,
-630,
+635,
 843
 ],
 [
@@ -120217,7 +120218,7 @@ null,
 [
 "function",
 1125,
-635,
+640,
 843
 ],
 [
@@ -120235,7 +120236,7 @@ null,
 [
 "function",
 1125,
-640,
+645,
 843
 ],
 [
@@ -138304,7 +138305,7 @@ null,
 null,
 "The plotted array: ``[y][x]`` for two axes, a list for one, a number for none. ``vertical=False`` arranges a companion that has no vertical dimension (a surface value under a vertical axis) along its other axes.",
 [],
-568
+570
 ],
 "1133":[
 "_index",
@@ -138394,7 +138395,7 @@ null
 null,
 "JSON-safe values: NaN (masked) becomes null.",
 [],
-577
+579
 ],
 "1137":[
 "_reduce",
@@ -138595,7 +138596,7 @@ null,
 null,
 "",
 [],
-597
+602
 ],
 "1143":[
 "_wind_layer",
@@ -138697,7 +138698,7 @@ null,
 null,
 "A plotting axis: centres, optional cell edges and how to draw it by default.",
 [],
-627
+632
 ],
 "1145":[
 "describe_roles",
@@ -138739,7 +138740,7 @@ null
 null,
 "Evaluate a parsed selection on ``provider``; the JSON payload.",
 [],
-554
+556
 ],
 "1147":[
 "latitude_axis",
@@ -138766,7 +138767,7 @@ null,
 null,
 "",
 [],
-632
+637
 ],
 "1148":[
 "level_time_axis",
@@ -138814,7 +138815,7 @@ null,
 null,
 "",
 [],
-637
+642
 ],
 "115":[
 "describe",
@@ -138892,7 +138893,7 @@ null,
 null,
 "",
 [],
-641
+646
 ],
 "1153":[
 "time_samples",
@@ -309493,7 +309494,7 @@ null
 ],
 "1142":[
 {
-"builtin":11,
+"builtin":12,
 "external":3
 },
 []

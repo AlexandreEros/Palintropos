@@ -319,7 +319,8 @@ def test_value_companion_takes_the_quantity_statistic():
     d = run(Skin(), longitude=dict(role="reduce", op="mean"), latitude=dict(role="reduce", op="mean"),
             vertical=dict(role="y", representation="native"), time=dict(role="reduce", op="max", first=0, last=4))
     assert d["companions"]["skin"]["values"] == 4.0                                # max of 0..4, not the mean
-    pos = (np.array([100.0 * t for t in TIMES])).mean()                            # positions: the plain mean
+    w = time_weights(TIMES)                                                        # positions: the cell-weighted mean
+    pos = float(np.sum(w * np.array([100.0 * t for t in TIMES])) / np.sum(w))
     assert d["companions"]["pos"]["values"] == pytest.approx([pos] * NV, rel=1e-15)
 
 
@@ -334,3 +335,15 @@ def test_archived_mean_ps_equals_the_area_mean_at_saved_states(hs):
                    latitude=dict(role="reduce", op="mean"), vertical=dict(role="none"),
                    time=dict(role="fixed", index=index))
         assert abs(d["values"] - series[day]) <= 1e-9 * series[day]
+
+
+@pytest.mark.parametrize("op", ["min", "max"])
+def test_mean_companions_are_cell_weighted_under_extrema(op):
+    """Positions take the same cell-weighted mean whatever the quantity's operator."""
+    sel = lonlat(vertical=dict(role="fixed", representation="native", value=0))
+    weighted = run(Synthetic(), **sel, time=dict(role="reduce", op=op, first=0, last=4))
+    mean = run(Synthetic(), **sel, time=dict(role="reduce", op="mean", first=0, last=4))
+    pos = np.array(weighted["companions"]["pos"]["values"], dtype=float)
+    np.testing.assert_array_equal(pos, np.array(mean["companions"]["pos"]["values"], dtype=float))
+    np.testing.assert_allclose(pos, 800000.0 / 135.0, rtol=1e-15)
+    assert weighted["coordinates"]["time"]["weights_seconds"] == [10.0, 15.0, 15.0, 35.0, 60.0]

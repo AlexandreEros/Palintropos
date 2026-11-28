@@ -282,6 +282,7 @@ Status values:
   - Sample mean 1/N always: biased towards densely saved periods.
   - Trapezoid on [t_first, t_last]: the integral mean over exactly the selected span, but a regular cadence would no longer reproduce 1/N, which breaks bit-identity with existing results.
 - **Evidence:** `test_time_cell_weights`, `test_irregular_time_mean_is_cell_weighted`, `test_selected_interval_only`, the airless cell-weighted expectation, and the HS equal-weight path in `test_spatially_averaged_profile`.
+- **Defect F-2 (found by the Codex review of PR #89, fixed after `1f3e848`):** under a time Min or Max, the weights were not computed, so mean-reduced companions (p, Z positions) took the equal-weight 1/N mean while the same interval under Mean took cell weights. On the synthetic irregular provider the position was 3600 under Max against 5925.93 cell-weighted. `test_value_companion_takes_the_quantity_statistic` had asserted the 1/N value; it now asserts the cell-weighted mean, and `test_mean_companions_are_cell_weighted_under_extrema` asserts that Min, Max and Mean give identical positions. Regular cadences (including HS) are unaffected: their weights are `None` either way. The payload records `companion_weighting` and `weights_seconds` under extrema.
 
 ### D1b. Represented time interval: provisional
 - **Current behaviour:** the mean represents [t_first − ½Δ_first, t_last + ½Δ_last]. The UI says "first … last".
@@ -473,6 +474,7 @@ Nothing from #88 was removed or weakened. That includes the equivalence gate, th
   - Not diagnosed. Possible causes include request cancellation on rapid re-selection, or the single-threaded server refusing a connection under load. Neither has been tested.
 - **Phone width in real Chrome:** the maximised window would not resize. Only the 390 px CDP test covers it.
 - **F-1:** found during this review and fixed in `ee745b3`. The browser was not re-checked after the fix; only the Python suites were.
+- **Codex review of `1f3e848` (five findings, all fixed in one commit):** F-2 above; the globe now resolves the selection's saved seconds on its own surface's time axis (airless skin vs profile cadence); saved times travel in seconds across archives; Link level from a comparison globe moves the Explorer's fixed surface; each globe shows a live colour scale. The globe time mapping is an airless-only path and, like the rest of the airless page, has not been exercised in a browser.
 - **Earlier WSL runs:** the WSL worktree had silently stayed at `a2abc33`, because leftover snapshot files blocked its checkout. The Python source at `a2abc33` and `e0c8376` is byte-identical, which the architecture content hashes confirm, so those results stand for `e0c8376`. The run at `ee745b3` was on the correct commit: 112 passed, 5 skipped.
 - **D6b quadrature accuracy for nonlinear quantities:** not measured.
 - **Environment limits:**
