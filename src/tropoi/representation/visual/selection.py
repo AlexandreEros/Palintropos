@@ -153,8 +153,35 @@ PER_SAMPLE = ("Its native-level positions differ from column to column and from 
               "surface of constant p or Z")
 
 
+#: The wind layer of a longitude × latitude result: streamlines of the
+#: horizontal wind on the result's own surface, at its own saved time or
+#: averaged over its own saved states. A layer is evaluated with the quantity
+#: (one pass over the states, as companions), so it shares every role.
+WIND_LAYER = ("Instantaneous streamlines of the horizontal wind (u, v) on the same surface as the field: "
+              "curves everywhere tangent to the wind of one saved state, or of the time-mean wind over "
+              "the same saved states as the field. They are not trajectories, and their spacing does "
+              "not encode speed")
+
+
 class SelectionError(ValueError):
     """The selection is malformed or not supported for this quantity."""
+
+
+def _wind_layer(quantity, out):
+    """Refuse a wind layer the result cannot carry, with the reason."""
+    layer = (quantity.get("layers") or {}).get("wind")
+    if not layer or not layer.get("available"):
+        reason = (layer or {}).get("reason") or "this archive has no horizontal wind"
+        raise SelectionError("No wind layer for " + quantity["presentation"]["name"] + ": " + reason)
+    if {out["axes"]["x"], out["axes"]["y"]} != {"longitude", "latitude"}:
+        raise SelectionError("A wind layer is drawn on a longitude × latitude result")
+    if out["vertical"]["role"] not in ("fixed", "none"):
+        raise SelectionError("A wind layer needs the field's own vertical surface: fix the vertical "
+                             "coordinate")
+    time = out["time"]
+    if time["role"] == "reduce" and time.get("op") != "mean":
+        raise SelectionError("Streamlines are drawn of one saved wind or of the time-mean wind; a time "
+                             f"{time['op']}imum has no wind")
 
 
 def _number(raw, name):
@@ -232,10 +259,11 @@ def parse_selection(manifest: dict, text: str) -> dict:
             raise SelectionError(f"Only one coordinate can be the {ROLE_TEXT[a]}: " + " and ".join(along))
         axes[a] = along[0] if along else None
     options = raw.get("options") or {}
-    if not isinstance(options, dict) or set(options) - {"snap", "format"}:
-        raise SelectionError("Options must be an object with snap and format only")
+    if not isinstance(options, dict) or set(options) - {"snap", "format", "wind"}:
+        raise SelectionError("Options must be an object with snap, format and wind only")
     out = dict(quantity=name, axes=axes, options=dict(snap=bool(options.get("snap", True)),
-                                                      format=options.get("format", "json")))
+                                                      format=options.get("format", "json"),
+                                                      wind=options.get("wind") is True))
     if out["options"]["format"] not in ("json", "frame"):
         raise SelectionError("The format must be json or frame")
     for c in ("longitude", "latitude"):
@@ -279,6 +307,8 @@ def parse_selection(manifest: dict, text: str) -> dict:
     entry = dict(role=time["role"], axis=axis_id)
     if quantity.get("recorded"):          # the whole record, at its own cadence
         out["time"] = entry
+        if out["options"]["wind"]:
+            _wind_layer(quantity, out)
         return out
     count = len((manifest["time_axes"].get(axis_id) or {}).get("values", []))
     if time["role"] == "fixed":
@@ -291,6 +321,8 @@ def parse_selection(manifest: dict, text: str) -> dict:
         if time["role"] == "reduce":
             entry["op"] = _reduction(quantity, "time", time)
     out["time"] = entry
+    if out["options"]["wind"]:
+        _wind_layer(quantity, out)
     return out
 
 
