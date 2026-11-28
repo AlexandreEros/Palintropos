@@ -31324,7 +31324,7 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ],
 [
 [
-353,
+354,
 11,
 "_wind(values)",
 [
@@ -31337,7 +31337,7 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ],
 [
 [
-352,
+353,
 15,
 "density(values['pressure'], values['temperature'], gas_constant)",
 [
@@ -31358,7 +31358,7 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ],
 [
 [
-404,
+405,
 17,
 "reconstruct_levels(frame, context, lat, lon, [int(value)], vorticity_divergence=key in ('zeta', 'delta'), heights=heights)",
 [
@@ -31395,7 +31395,7 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ],
 [
 [
-410,
+411,
 14,
 "pressure_surface(frame, context, lat, lon, (rep, value))",
 [
@@ -31424,13 +31424,13 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ],
 [
 [
-402,
+403,
 18,
 "SelectionError('Native level must be a zero-based full-level index')",
 []
 ],
 [
-409,
+410,
 14,
 "SelectionError('Vorticity and divergence require a native or sigma surface')",
 []
@@ -31438,7 +31438,7 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ],
 [
 [
-407,
+408,
 15,
 "_field(values, key, context.r_dry)",
 [
@@ -31457,7 +31457,7 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ]
 ],
 [
-416,
+417,
 19,
 "_field(values, key, context.r_dry)",
 [
@@ -31521,7 +31521,7 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ],
 [
 [
-327,
+328,
 30,
 "_sigma_axis(provider, interfaces, [interfaces[0], *context.full_levels, interfaces[-1]], 'Nominal σ at layer interfaces')",
 [
@@ -31546,7 +31546,7 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ],
 [
 [
-459,
+460,
 13,
 "reconstruct_levels(provider._read('state', index), provider._context, lat, lon, None, vorticity_divergence=False)",
 [
@@ -31661,25 +31661,25 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ],
 [
 [
-363,
+364,
 18,
 "SelectionError(f'No slab snapshot at the saved state {index} (t = {times[index]} s); the slab is saved at its own times')",
 []
 ],
 [
-373,
+374,
 14,
 "SelectionError(f'{key} has native levels: give the vertical coordinate a role')",
 []
 ],
 [
-375,
+376,
 14,
 "SelectionError('Run has no evaluator for this selection')",
 []
 ],
 [
-387,
+388,
 14,
 "SelectionError(f'Unavailable field {key!r}')",
 []
@@ -31687,7 +31687,7 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ],
 [
 [
-365,
+366,
 15,
 "_slab_map(provider._read('slab', slab_times.index(times[index])), provider.geometry, lat, lon)",
 [
@@ -31712,7 +31712,7 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ],
 [
 [
-368,
+369,
 65,
 "synthesize_latlon(lm, lat, lon)",
 [
@@ -31731,7 +31731,7 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ]
 ],
 [
-372,
+373,
 26,
 "synthesize_latlon(frame[-1], lat, lon)",
 [
@@ -31750,7 +31750,7 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ]
 ],
 [
-383,
+384,
 15,
 "synthesize_latlon(zeta if key == 'zeta' else delta, lat, lon)",
 [
@@ -31769,7 +31769,7 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ]
 ],
 [
-385,
+386,
 20,
 "synthesize_latlon(provider._terrain_lm, lat, lon)",
 [
@@ -31788,7 +31788,7 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ]
 ],
 [
-389,
+390,
 10,
 "synthesize_latlon(frame[2], lat, lon)",
 [
@@ -31809,7 +31809,7 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ],
 [
 [
-380,
+381,
 15,
 "synthesize_wind_latlon(zeta, delta, provider.radius, lat, lon)",
 [
@@ -31863,7 +31863,7 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ],
 [
 [
-345,
+346,
 14,
 "SelectionError('Air density needs the gas constant the run records; this run records none')",
 []
@@ -31933,7 +31933,7 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ],
 [
 [
-487,
+488,
 29,
 "axis('vertical', rep, REPRESENTATIONS[rep]['label'], REPRESENTATIONS[rep]['units'], positions, scale='log' if rep == 'pressure' else 'linear', downward=rep == 'pressure')",
 [
@@ -32110,7 +32110,7 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ],
 [
 [
-471,
+472,
 10,
 "mass_streamfunction(cube[0, :, :, 0], context.sigma_interfaces, lat, context.radius_m, context.gravity)",
 [
@@ -32139,7 +32139,7 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ],
 [
 [
-441,
+442,
 17,
 "reconstruct_levels(frame, provider._context, lat, lon, None, vorticity_divergence=key in ('zeta', 'delta'), heights=heights)",
 [
@@ -32176,7 +32176,7 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ],
 [
 [
-454,
+455,
 33,
 "_field(levels.values, key, provider._context.r_dry)",
 [
@@ -32197,7 +32197,7 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ],
 [
 [
-437,
+438,
 37,
 "_fixed_surface(provider, frame, key, lat, lon, v['representation'], v['value'])",
 [
@@ -32234,7 +32234,7 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ],
 [
 [
-430,
+431,
 33,
 "_psi_sample(provider, index, lat, lon, flip)",
 [
@@ -32263,7 +32263,7 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ],
 [
 [
-433,
+434,
 37,
 "_surface(provider, index, key, lat, lon)",
 [
@@ -32290,7 +32290,7 @@ svg text{font:11px system-ui,sans-serif;fill:var(--text)}svg .nb rect{fill:#1826
 ]
 ],
 [
-451,
+452,
 40,
 "_surface(provider, index, name, lat, lon)",
 [
@@ -85002,7 +85002,7 @@ null,
 ],
 [
 [
-360,
+361,
 "function",
 [
 "_slab_map"
@@ -102396,149 +102396,149 @@ null,
 "301":"    else:",
 "302":"        # Positions move with the column: filled from the evaluated sample in finish().",
 "314":"        for name, (label, units) in dict(temperature=(\"T\", \"K\"), u=(\"u\", \"m s⁻¹\"), v=(\"v\", \"m s⁻¹\")).items():",
-"315":"            out[\"companions\"].setdefault(name, dict(label=label, units=units))",
-"322":"def _psi_plan(provider, sel, out):",
-"323":"    context = provider._structure_context()",
-"325":"    out[\"coordinates\"][\"vertical\"] = dict(role=sel[\"vertical\"][\"role\"], representation=\"sigma\",",
-"326":"                                          sampling=\"layer interfaces\")",
-"327":"    out[\"axes\"][\"vertical\"] = _sigma_axis(provider, interfaces, [interfaces[0], *context.full_levels, interfaces[-1]],",
-"328":"                                          \"Nominal σ at layer interfaces\")",
-"329":"    out[\"companions\"] = {}",
-"330":"    out[\"notes\"].append(\"ψ is formed from the time mean of [pₛ v] over the selected states; the bottom \"",
-"338":"def _wind(values):",
-"339":"    return np.hypot(values[\"u\"], values[\"v\"])",
-"342":"def density(pressure, temperature, gas_constant):",
-"343":"    \"\"\"ρ = p/(R T): ideal gas, p and T at the same samples, R the run's recorded constant.\"\"\"",
-"344":"    if not gas_constant:",
-"345":"        raise SelectionError(\"Air density needs the gas constant the run records; this run records none\")",
-"346":"    with np.errstate(divide=\"ignore\", invalid=\"ignore\"):       # masked samples carry no valid T",
-"347":"        return np.asarray(pressure, dtype=float) / (float(gas_constant) * np.asarray(temperature, dtype=float))",
+"316":"            out[\"companions\"].setdefault(name, dict(label=label, units=units, statistic=\"quantity\"))",
+"323":"def _psi_plan(provider, sel, out):",
+"324":"    context = provider._structure_context()",
+"326":"    out[\"coordinates\"][\"vertical\"] = dict(role=sel[\"vertical\"][\"role\"], representation=\"sigma\",",
+"327":"                                          sampling=\"layer interfaces\")",
+"328":"    out[\"axes\"][\"vertical\"] = _sigma_axis(provider, interfaces, [interfaces[0], *context.full_levels, interfaces[-1]],",
+"329":"                                          \"Nominal σ at layer interfaces\")",
+"330":"    out[\"companions\"] = {}",
+"331":"    out[\"notes\"].append(\"ψ is formed from the time mean of [pₛ v] over the selected states; the bottom \"",
+"339":"def _wind(values):",
+"340":"    return np.hypot(values[\"u\"], values[\"v\"])",
+"343":"def density(pressure, temperature, gas_constant):",
+"344":"    \"\"\"ρ = p/(R T): ideal gas, p and T at the same samples, R the run's recorded constant.\"\"\"",
+"345":"    if not gas_constant:",
+"346":"        raise SelectionError(\"Air density needs the gas constant the run records; this run records none\")",
+"347":"    with np.errstate(divide=\"ignore\", invalid=\"ignore\"):       # masked samples carry no valid T",
+"348":"        return np.asarray(pressure, dtype=float) / (float(gas_constant) * np.asarray(temperature, dtype=float))",
 "35":"",
-"350":"def _field(values, key, gas_constant=None):",
-"351":"    if key == \"density\":",
-"352":"        return density(values[\"pressure\"], values[\"temperature\"], gas_constant)",
-"353":"    return _wind(values) if key in (\"wind\", \"wind_speed\") else values[key]",
-"354":"",
+"351":"def _field(values, key, gas_constant=None):",
+"352":"    if key == \"density\":",
+"353":"        return density(values[\"pressure\"], values[\"temperature\"], gas_constant)",
+"354":"    return _wind(values) if key in (\"wind\", \"wind_speed\") else values[key]",
 "355":"",
-"356":"def _surface(provider, index, key, lat, lon):",
-"357":"    \"\"\"A field without vertical coordinate at saved state ``index``: ``(nlat, nlon)``.\"\"\"",
-"359":"    if key == \"surface_temperature\":",
+"356":"",
+"357":"def _surface(provider, index, key, lat, lon):",
+"358":"    \"\"\"A field without vertical coordinate at saved state ``index``: ``(nlat, nlon)``.\"\"\"",
 "36":"from tropoi.representation.diagnostics.held_suarez_sections import state_grid",
-"360":"        from tropoi.representation.visual.viewer_fields import _slab_map",
-"361":"        slab_times = provider.manifest[\"time_axes\"][\"slab\"][\"values\"]",
-"362":"        if times[index] not in slab_times:",
-"363":"            raise SelectionError(\"No slab snapshot at the saved state \"",
-"364":"                                 f\"{index} (t = {times[index]} s); the slab is saved at its own times\")",
-"365":"        return _slab_map(provider._read(\"slab\", slab_times.index(times[index])), provider.geometry, lat, lon)",
-"366":"    if provider.solver == \"pe\" and key == \"terrain\":",
-"367":"        lm = provider._terrain_lm",
-"368":"        return np.zeros((lat.size, lon.size)) if lm is None else synthesize_latlon(lm, lat, lon)",
-"369":"    frame = provider._read(\"state\", index)",
+"360":"    if key == \"surface_temperature\":",
+"361":"        from tropoi.representation.visual.viewer_fields import _slab_map",
+"362":"        slab_times = provider.manifest[\"time_axes\"][\"slab\"][\"values\"]",
+"363":"        if times[index] not in slab_times:",
+"364":"            raise SelectionError(\"No slab snapshot at the saved state \"",
+"365":"                                 f\"{index} (t = {times[index]} s); the slab is saved at its own times\")",
+"366":"        return _slab_map(provider._read(\"slab\", slab_times.index(times[index])), provider.geometry, lat, lon)",
+"367":"    if provider.solver == \"pe\" and key == \"terrain\":",
+"368":"        lm = provider._terrain_lm",
+"369":"        return np.zeros((lat.size, lon.size)) if lm is None else synthesize_latlon(lm, lat, lon)",
 "37":"from tropoi.representation.diagnostics.pe_levels import LEVEL_FIELDS, reconstruct_levels",
-"370":"    if provider.solver == \"pe\":",
-"371":"        if key == \"ln_ps\":",
-"372":"            return np.exp(synthesize_latlon(frame[-1], lat, lon))",
-"373":"        raise SelectionError(f\"{key} has native levels: give the vertical coordinate a role\")",
-"374":"    if provider.solver not in (\"bve\", \"swe\"):",
-"375":"        raise SelectionError(\"Run has no evaluator for this selection\")",
-"376":"    swe = provider.solver == \"swe\"",
-"377":"    zeta = frame[0] if swe else frame",
-"378":"    delta = frame[1] if swe else np.zeros_like(zeta)",
-"379":"    if key in (\"u\", \"v\", \"wind\", \"wind_speed\"):",
+"370":"    frame = provider._read(\"state\", index)",
+"371":"    if provider.solver == \"pe\":",
+"372":"        if key == \"ln_ps\":",
+"373":"            return np.exp(synthesize_latlon(frame[-1], lat, lon))",
+"374":"        raise SelectionError(f\"{key} has native levels: give the vertical coordinate a role\")",
+"375":"    if provider.solver not in (\"bve\", \"swe\"):",
+"376":"        raise SelectionError(\"Run has no evaluator for this selection\")",
+"377":"    swe = provider.solver == \"swe\"",
+"378":"    zeta = frame[0] if swe else frame",
+"379":"    delta = frame[1] if swe else np.zeros_like(zeta)",
 "38":"from tropoi.representation.diagnostics.pe_structure import mass_streamfunction",
-"380":"        u, v = synthesize_wind_latlon(zeta, delta, provider.radius, lat, lon)",
-"381":"        return np.hypot(u, v) if key in (\"wind\", \"wind_speed\") else (u if key == \"u\" else v)",
-"382":"    if key in (\"zeta\", \"delta\"):",
-"383":"        return synthesize_latlon(zeta if key == \"zeta\" else delta, lat, lon)",
-"384":"    terrain = (np.zeros((lat.size, lon.size)) if provider._terrain_lm is None",
-"385":"               else synthesize_latlon(provider._terrain_lm, lat, lon))",
-"386":"    if not swe:",
-"387":"        raise SelectionError(f\"Unavailable field {key!r}\")",
-"388":"    gravity = provider.physics[\"gravity\"]",
-"389":"    phi = synthesize_latlon(frame[2], lat, lon)",
+"380":"    if key in (\"u\", \"v\", \"wind\", \"wind_speed\"):",
+"381":"        u, v = synthesize_wind_latlon(zeta, delta, provider.radius, lat, lon)",
+"382":"        return np.hypot(u, v) if key in (\"wind\", \"wind_speed\") else (u if key == \"u\" else v)",
+"383":"    if key in (\"zeta\", \"delta\"):",
+"384":"        return synthesize_latlon(zeta if key == \"zeta\" else delta, lat, lon)",
+"385":"    terrain = (np.zeros((lat.size, lon.size)) if provider._terrain_lm is None",
+"386":"               else synthesize_latlon(provider._terrain_lm, lat, lon))",
+"387":"    if not swe:",
+"388":"        raise SelectionError(f\"Unavailable field {key!r}\")",
+"389":"    gravity = provider.physics[\"gravity\"]",
 "39":"from tropoi.representation.diagnostics.pe_surfaces import pressure_surface",
-"390":"    thickness = provider.physics[\"mean_depth_m\"] + phi / gravity",
-"391":"    height = terrain + thickness",
-"397":"def _fixed_surface(provider, frame, key, lat, lon, rep, value):",
-"398":"    \"\"\"The quantity on one fixed vertical surface: ``(nlat, nlon)``, NaN where masked.\"\"\"",
+"390":"    phi = synthesize_latlon(frame[2], lat, lon)",
+"391":"    thickness = provider.physics[\"mean_depth_m\"] + phi / gravity",
+"392":"    height = terrain + thickness",
+"398":"def _fixed_surface(provider, frame, key, lat, lon, rep, value):",
+"399":"    \"\"\"The quantity on one fixed vertical surface: ``(nlat, nlon)``, NaN where masked.\"\"\"",
 "40":"from tropoi.representation.visual.selection import (",
-"400":"    if rep == \"native\":",
-"401":"        if int(value) != value or not 0 \u003c= value \u003c context.nlev:",
-"402":"            raise SelectionError(\"Native level must be a zero-based full-level index\")",
-"403":"        heights = context.gravity is not None",
-"404":"        levels = reconstruct_levels(frame, context, lat, lon, [int(value)],",
-"405":"                                    vorticity_divergence=key in (\"zeta\", \"delta\"), heights=heights)",
-"406":"        values = {name: arr[0] for name, arr in levels.values.items()}",
-"407":"        return _field(values, key, context.r_dry)",
-"408":"    if rep != \"sigma\" and key in (\"zeta\", \"delta\"):",
-"409":"        raise SelectionError(\"Vorticity and divergence require a native or sigma surface\")",
+"401":"    if rep == \"native\":",
+"402":"        if int(value) != value or not 0 \u003c= value \u003c context.nlev:",
+"403":"            raise SelectionError(\"Native level must be a zero-based full-level index\")",
+"404":"        heights = context.gravity is not None",
+"405":"        levels = reconstruct_levels(frame, context, lat, lon, [int(value)],",
+"406":"                                    vorticity_divergence=key in (\"zeta\", \"delta\"), heights=heights)",
+"407":"        values = {name: arr[0] for name, arr in levels.values.items()}",
+"408":"        return _field(values, key, context.r_dry)",
+"409":"    if rep != \"sigma\" and key in (\"zeta\", \"delta\"):",
 "41":"    MAX_STATES, TIME_MEAN, SelectionError, axis, latitude_axis, longitude_axis, reductions)",
-"410":"    surface = pressure_surface(frame, context, lat, lon, (rep, value))",
-"411":"    values = dict(surface.values)",
-"412":"    if rep in (\"geopotential_height\", \"height_above_surface\") and key == \"geopotential\":",
-"414":"    if rep == \"pressure\" and \"pressure\" not in values:",
-"415":"        values[\"pressure\"] = np.full(surface.mask.shape, float(value))      # the surface's own p",
-"416":"    out = np.array(_field(values, key, context.r_dry), dtype=float)",
-"417":"    out[surface.mask != 0] = np.nan",
-"418":"    return out",
+"410":"        raise SelectionError(\"Vorticity and divergence require a native or sigma surface\")",
+"411":"    surface = pressure_surface(frame, context, lat, lon, (rep, value))",
+"412":"    values = dict(surface.values)",
+"413":"    if rep in (\"geopotential_height\", \"height_above_surface\") and key == \"geopotential\":",
+"415":"    if rep == \"pressure\" and \"pressure\" not in values:",
+"416":"        values[\"pressure\"] = np.full(surface.mask.shape, float(value))      # the surface's own p",
+"417":"    out = np.array(_field(values, key, context.r_dry), dtype=float)",
+"418":"    out[surface.mask != 0] = np.nan",
+"419":"    return out",
 "42":"from tropoi.spatial.grids.quadrature import gauss_latitude_nodes",
-"421":"def samples(provider, sel, plan_, indices):",
-"422":"    \"\"\"Yield ``(seconds, values (nv, nlat, nlon), companions)`` per saved state.\"\"\"",
-"428":"    for index in indices:",
-"429":"        if key == \"mass_streamfunction\":",
+"422":"def samples(provider, sel, plan_, indices):",
+"423":"    \"\"\"Yield ``(seconds, values (nv, nlat, nlon), companions)`` per saved state.\"\"\"",
+"429":"    for index in indices:",
 "43":"from tropoi.spatial.transforms.host_synthesis import synthesize_latlon, synthesize_wind_latlon",
-"430":"            yield times[index], *_psi_sample(provider, index, lat, lon, flip)",
-"431":"            continue",
-"432":"        if v[\"role\"] == \"none\":",
-"433":"            yield times[index], flip(_surface(provider, index, key, lat, lon)[None]), {}",
-"434":"            continue",
-"435":"        frame = provider._read(\"state\", index)",
-"436":"        if v[\"role\"] == \"fixed\":",
-"437":"            yield times[index], flip(_fixed_surface(provider, frame, key, lat, lon,",
-"438":"                                                    v[\"representation\"], v[\"value\"])[None]), {}",
-"439":"            continue",
+"430":"        if key == \"mass_streamfunction\":",
+"431":"            yield times[index], *_psi_sample(provider, index, lat, lon, flip)",
+"432":"            continue",
+"433":"        if v[\"role\"] == \"none\":",
+"434":"            yield times[index], flip(_surface(provider, index, key, lat, lon)[None]), {}",
+"435":"            continue",
+"436":"        frame = provider._read(\"state\", index)",
+"437":"        if v[\"role\"] == \"fixed\":",
+"438":"            yield times[index], flip(_fixed_surface(provider, frame, key, lat, lon,",
+"439":"                                                    v[\"representation\"], v[\"value\"])[None]), {}",
 "44":"",
-"440":"        heights = plan_[\"vertical\"][\"heights\"]",
-"441":"        levels = reconstruct_levels(frame, provider._context, lat, lon, None,",
-"442":"                                    vorticity_divergence=key in (\"zeta\", \"delta\"), heights=heights)",
-"443":"        companions = {}",
-"444":"        for name in plan_[\"companions\"]:",
-"446":"                companions[name] = flip(levels.surface_pressure[None])",
-"449":"                                         else levels.surface_height)[None])",
-"450":"            elif name == \"surface_temperature\":",
-"451":"                companions[name] = flip(_surface(provider, index, name, lat, lon)[None])",
-"452":"            else:",
-"453":"                companions[name] = flip(levels[name])",
-"454":"        yield times[index], flip(_field(levels.values, key, provider._context.r_dry)), companions",
-"455":"",
+"440":"            continue",
+"441":"        heights = plan_[\"vertical\"][\"heights\"]",
+"442":"        levels = reconstruct_levels(frame, provider._context, lat, lon, None,",
+"443":"                                    vorticity_divergence=key in (\"zeta\", \"delta\"), heights=heights)",
+"444":"        companions = {}",
+"445":"        for name in plan_[\"companions\"]:",
+"447":"                companions[name] = flip(levels.surface_pressure[None])",
+"450":"                                         else levels.surface_height)[None])",
+"451":"            elif name == \"surface_temperature\":",
+"452":"                companions[name] = flip(_surface(provider, index, name, lat, lon)[None])",
+"453":"            else:",
+"454":"                companions[name] = flip(levels[name])",
+"455":"        yield times[index], flip(_field(levels.values, key, provider._context.r_dry)), companions",
 "456":"",
-"457":"def _psi_sample(provider, index, lat, lon, flip):",
-"458":"    \"\"\"[pₛ v] of one state, longitude mean formed on the grid: ``(nlev, nlat, 1)``.\"\"\"",
-"459":"    levels = reconstruct_levels(provider._read(\"state\", index), provider._context, lat, lon, None,",
-"460":"                                vorticity_divergence=False)",
-"461":"    ps_v = (levels.surface_pressure[None] * levels[\"v\"]).mean(axis=2)",
-"462":"    return flip(ps_v[..., None]), {}",
-"465":"def post(provider, sel, plan_, cube):",
-"466":"    \"\"\"ψ from the time-reduced [pₛ v]: ``(1, nlev + 1, nlat, 1)``.\"\"\"",
-"469":"    context = provider._context",
-"470":"    lat = plan_[\"latitude\"][\"points\"][::-1]",
-"471":"    psi = mass_streamfunction(cube[0, :, :, 0], context.sigma_interfaces, lat, context.radius_m, context.gravity)",
-"472":"    r = psi[-1]",
-"473":"    plan_[\"notes\"].append(f\"Bottom (σ = 1) whole-column flux: max |ψ| {float(np.abs(r).max()):.4g} kg s⁻¹, \"",
-"474":"                          f\"against max |ψ| {float(np.abs(psi).max()):.4g} kg s⁻¹ in the section.\")",
-"478":"def finish(provider, sel, plan_, payload):",
-"479":"    \"\"\"Axes whose positions come from the sample, single-column tables and markers.\"\"\"",
-"480":"    comp = payload.get(\"companions\") or {}",
-"482":"    if v[\"role\"] in (\"x\", \"y\") and plan_[\"axes\"].get(\"vertical\") is None:",
-"485":"        if rep == \"height_above_surface\":",
-"486":"            positions = [z - comp[\"surface_height\"][\"values\"] for z in positions]",
-"487":"        payload[v[\"role\"]] = axis(\"vertical\", rep, REPRESENTATIONS[rep][\"label\"], REPRESENTATIONS[rep][\"units\"],",
-"488":"                                  positions, scale=\"log\" if rep == \"pressure\" else \"linear\",",
-"489":"                                  downward=rep == \"pressure\")",
-"490":"    profile = v[\"role\"] in (\"x\", \"y\") and all(sel[c][\"role\"] in (\"fixed\", \"reduce\")",
-"491":"                                               for c in (\"longitude\", \"latitude\", \"time\"))",
-"498":"        z = comp.get(\"geopotential_height\", {}).get(\"values\")",
-"499":"        zs = comp.get(\"surface_height\", {}).get(\"values\")",
+"457":"",
+"458":"def _psi_sample(provider, index, lat, lon, flip):",
+"459":"    \"\"\"[pₛ v] of one state, longitude mean formed on the grid: ``(nlev, nlat, 1)``.\"\"\"",
+"460":"    levels = reconstruct_levels(provider._read(\"state\", index), provider._context, lat, lon, None,",
+"461":"                                vorticity_divergence=False)",
+"462":"    ps_v = (levels.surface_pressure[None] * levels[\"v\"]).mean(axis=2)",
+"463":"    return flip(ps_v[..., None]), {}",
+"466":"def post(provider, sel, plan_, cube):",
+"467":"    \"\"\"ψ from the time-reduced [pₛ v]: ``(1, nlev + 1, nlat, 1)``.\"\"\"",
+"470":"    context = provider._context",
+"471":"    lat = plan_[\"latitude\"][\"points\"][::-1]",
+"472":"    psi = mass_streamfunction(cube[0, :, :, 0], context.sigma_interfaces, lat, context.radius_m, context.gravity)",
+"473":"    r = psi[-1]",
+"474":"    plan_[\"notes\"].append(f\"Bottom (σ = 1) whole-column flux: max |ψ| {float(np.abs(r).max()):.4g} kg s⁻¹, \"",
+"475":"                          f\"against max |ψ| {float(np.abs(psi).max()):.4g} kg s⁻¹ in the section.\")",
+"479":"def finish(provider, sel, plan_, payload):",
+"480":"    \"\"\"Axes whose positions come from the sample, single-column tables and markers.\"\"\"",
+"481":"    comp = payload.get(\"companions\") or {}",
+"483":"    if v[\"role\"] in (\"x\", \"y\") and plan_[\"axes\"].get(\"vertical\") is None:",
+"486":"        if rep == \"height_above_surface\":",
+"487":"            positions = [z - comp[\"surface_height\"][\"values\"] for z in positions]",
+"488":"        payload[v[\"role\"]] = axis(\"vertical\", rep, REPRESENTATIONS[rep][\"label\"], REPRESENTATIONS[rep][\"units\"],",
+"489":"                                  positions, scale=\"log\" if rep == \"pressure\" else \"linear\",",
+"490":"                                  downward=rep == \"pressure\")",
+"491":"    profile = v[\"role\"] in (\"x\", \"y\") and all(sel[c][\"role\"] in (\"fixed\", \"reduce\")",
+"492":"                                               for c in (\"longitude\", \"latitude\", \"time\"))",
+"499":"        z = comp.get(\"geopotential_height\", {}).get(\"values\")",
+"500":"        zs = comp.get(\"surface_height\", {}).get(\"values\")",
 "89":"def _excluded(representation, field):",
 "90":"    \"\"\"A surface of constant p shows p; of constant Z shows Z: not offered.\"\"\"",
 "96":"def _quadrature(manifest):",
@@ -112802,7 +112802,7 @@ null,
 }
 },
 "meta":{
-"base_commit":"a2abc332cdb20de89044c9d252ec9af777121614",
+"base_commit":"ee745b3ea6db8e46487017b15ddd4eb04ef7cab9",
 "call_depth":4,
 "command":"python -m tools.architecture.generate",
 "dynamic_import_sites":{
@@ -112846,7 +112846,7 @@ null,
 "max_sites":8,
 "package":"tropoi",
 "source_commit":null,
-"source_sha256":"3a28144212d97bc442f59774fc8ddc5025140b7f75883a3499a66c4ca9131cd4",
+"source_sha256":"4f0ab28a3a8f07af5617ae3b4d4a73c541a2819d7b8298e6e4073f8c1e1ad1c0",
 "source_status":"clean",
 "title":"current",
 "tool_version":"2.3.0",
@@ -121002,13 +121002,13 @@ null,
 [
 "function",
 1311,
-350,
+351,
 843
 ],
 [
 "function",
 1311,
-397,
+398,
 843
 ],
 [
@@ -121026,13 +121026,13 @@ null,
 [
 "function",
 1311,
-322,
+323,
 843
 ],
 [
 "function",
 1311,
-457,
+458,
 843
 ],
 [
@@ -121062,7 +121062,7 @@ null,
 [
 "function",
 1311,
-356,
+357,
 843
 ],
 [
@@ -121074,13 +121074,13 @@ null,
 [
 "function",
 1311,
-338,
+339,
 843
 ],
 [
 "function",
 1311,
-342,
+343,
 843
 ],
 [
@@ -121092,7 +121092,7 @@ null,
 [
 "function",
 1311,
-478,
+479,
 843
 ],
 [
@@ -121104,13 +121104,13 @@ null,
 [
 "function",
 1311,
-465,
+466,
 843
 ],
 [
 "function",
 1311,
-421,
+422,
 843
 ],
 [
@@ -142231,7 +142231,7 @@ null,
 null,
 "",
 [],
-353
+354
 ],
 "1314":[
 "_fixed_surface",
@@ -142282,7 +142282,7 @@ null
 null,
 "The quantity on one fixed vertical surface: ``(nlat, nlon)``, NaN where masked.",
 [],
-418
+419
 ],
 "1315":[
 "_horizontal_caps",
@@ -142339,7 +142339,7 @@ null
 null,
 "",
 [],
-331
+332
 ],
 "1318":[
 "_psi_sample",
@@ -142378,7 +142378,7 @@ null
 null,
 "[pₛ v] of one state, longitude mean formed on the grid: ``(nlev, nlat, 1)``.",
 [],
-462
+463
 ],
 "1319":[
 "_quadrature",
@@ -142528,7 +142528,7 @@ null
 null,
 "A field without vertical coordinate at saved state ``index``: ``(nlat, nlon)``.",
 [],
-394
+395
 ],
 "1324":[
 "_vertical_plan",
@@ -142561,7 +142561,7 @@ null
 null,
 "",
 [],
-319
+320
 ],
 "1325":[
 "_wind",
@@ -142576,7 +142576,7 @@ null
 null,
 "",
 [],
-339
+340
 ],
 "1326":[
 "density",
@@ -142603,7 +142603,7 @@ null
 null,
 "ρ = p/(R T): ideal gas, p and T at the same samples, R the run's recorded constant.",
 [],
-347
+348
 ],
 "1327":[
 "describe",
@@ -142651,7 +142651,7 @@ null
 null,
 "Axes whose positions come from the sample, single-column tables and markers.",
 [],
-528
+529
 ],
 "1329":[
 "plan",
@@ -142713,7 +142713,7 @@ null
 null,
 "ψ from the time-reduced [pₛ v]: ``(1, nlev + 1, nlat, 1)``.",
 [],
-475
+476
 ],
 "1331":[
 "samples",
@@ -142746,7 +142746,7 @@ null
 null,
 "Yield ``(seconds, values (nv, nlat, nlon), companions)`` per saved state.",
 [],
-454
+455
 ],
 "1333":[
 "ColumnArchiveProvider",
@@ -310959,7 +310959,7 @@ null
 },
 [
 [
-406,
+407,
 "unresolved",
 "levels.values.items"
 ]
@@ -310978,12 +310978,12 @@ null
 },
 [
 [
-323,
+324,
 "unresolved",
 "provider._structure_context"
 ],
 [
-330,
+331,
 "unresolved",
 "out['notes'].append"
 ]
@@ -310995,17 +310995,17 @@ null
 },
 [
 [
-459,
+460,
 "unresolved",
 "provider._read"
 ],
 [
-461,
+462,
 "unresolved",
 "(levels.surface_pressure[None] * levels['v']).mean"
 ],
 [
-462,
+463,
 "unresolved",
 "flip"
 ]
@@ -311089,17 +311089,17 @@ null
 },
 [
 [
-365,
+366,
 "unresolved",
 "provider._read"
 ],
 [
-365,
+366,
 "unresolved",
 "slab_times.index"
 ],
 [
-369,
+370,
 "unresolved",
 "provider._read"
 ]
@@ -311122,7 +311122,7 @@ null
 "dict(temperature=('T', 'K'), u=('u', 'm s⁻¹'), v=('v', 'm s⁻¹')).items"
 ],
 [
-315,
+316,
 "unresolved",
 "out['companions'].setdefault"
 ]
@@ -311176,22 +311176,22 @@ null
 },
 [
 [
-480,
+481,
 "unresolved",
 "payload.get"
 ],
 [
-482,
+483,
 "unresolved",
 "plan_['axes'].get"
 ],
 [
-498,
+499,
 "unresolved",
 "comp.get('geopotential_height', {}).get"
 ],
 [
-499,
+500,
 "unresolved",
 "comp.get('surface_height', {}).get"
 ]
@@ -311234,17 +311234,17 @@ null
 },
 [
 [
-473,
+474,
 "unresolved",
 "plan_['notes'].append"
 ],
 [
-473,
+474,
 "unresolved",
 "np.abs(r).max"
 ],
 [
-474,
+475,
 "unresolved",
 "np.abs(psi).max"
 ]
@@ -311257,22 +311257,22 @@ null
 },
 [
 [
-435,
+436,
 "unresolved",
 "provider._read"
 ],
 [
-446,
+447,
 "unresolved",
 "flip"
 ],
 [
-454,
+455,
 "unresolved",
 "flip"
 ],
 [
-433,
+434,
 "unresolved",
 "flip"
 ]

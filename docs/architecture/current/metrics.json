@@ -1309,7 +1309,7 @@
     "package": "tropoi",
     "src": "src",
     "working_tree": {
-      "base_commit": "a2abc332cdb20de89044c9d252ec9af777121614",
+      "base_commit": "ee745b3ea6db8e46487017b15ddd4eb04ef7cab9",
       "generator": {
         "changes": [],
         "files": {
@@ -1430,7 +1430,7 @@
           "src/tropoi/representation/visual/terrain_globe.html": "786cc4074b4d81f0d1aefe78aaa933d36be8d03517a9e2dbd0e9a0d1009a7fbf",
           "src/tropoi/representation/visual/timeline.py": "daf63d0946317b3930cae59770a3c264e43018420d631db55cd82fe6c786d83e",
           "src/tropoi/representation/visual/viewer_assets/index.html": "e51458bdeca72d0bbd5ace8b5a50d7f5ee03a7918495bda120d38fc63d066c1a",
-          "src/tropoi/representation/visual/viewer_atmosphere.py": "6ffba1feba4ccd47205cf620779ca28e408a8d18c7a96f0a8840833cc4fc2c24",
+          "src/tropoi/representation/visual/viewer_atmosphere.py": "7040e157992374485b5f775ae4d6b40e2b49b66e999e01ebe218a0356b9af011",
           "src/tropoi/representation/visual/viewer_columns.py": "e6bfca66e3c83a718781c822036158e275897c3a422c3db2929810418c0fe76c",
           "src/tropoi/representation/visual/viewer_fields.py": "f945abc3bfeae6acfe3b9cd6e07a2ce22925f2a17e8c5628fc205d62011244dd",
           "src/tropoi/representation/visual/viewer_server.py": "563468cb745aa0697f9ea1127331c6f64f70de1aaba006f840181dbb5acff1db",
@@ -1548,7 +1548,7 @@
           "src/tropoi/temporal/tendencies/primitive_equations.py": "848c6fe9406a7c1c465c0aa9459760b01c542164c8cc9395797a3c4a60793e52",
           "src/tropoi/temporal/tendencies/shallow_water.py": "7ae521f2378824e89f88bc467fc99321d1ef4224b037c865137e076a601da3c8"
         },
-        "sha256": "3a28144212d97bc442f59774fc8ddc5025140b7f75883a3499a66c4ca9131cd4",
+        "sha256": "4f0ab28a3a8f07af5617ae3b4d4a73c541a2819d7b8298e6e4073f8c1e1ad1c0",
         "status": "clean"
       }
     }

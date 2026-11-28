@@ -151,7 +151,7 @@ What works:
 - Cause: in `viewer_atmosphere._vertical_plan`, the T/u/v companions are not flagged `statistic="quantity"`, so they take the mean.
 - The existing test checks only the header text.
 - The plotted curve and the lowest-level marker are correct.
-- **Not fixed here**, per the instruction not to start a new implementation phase. The fix and its test are a one-line flag plus one assertion.
+- **Fixed in `ee745b3`** (approved by the owner on 2026-11-28): T, u and v now take the quantity's statistic. p and Z stay level-position means. The test now asserts the tabulated T equals the plotted minimum, that u is the minimum over the saved states, and that p is unchanged from the mean profile.
 
 Smaller ambiguities:
 - The span text understates the time interval (D1b).
@@ -269,7 +269,7 @@ Status values:
 | D10b | Derived quantities on surfaces | provisional |
 | D11 | Per-sample coordinates and reduced positions | provisional |
 | D12 | Display transforms | direction approved |
-| D13 | Profile-table statistics | defect F-1 |
+| D13 | Profile-table statistics | defect F-1, fixed in `ee745b3` |
 | D14 | Reduction order | provisional |
 | D15 | Archived series | direction approved |
 
@@ -424,10 +424,9 @@ Status values:
   - Linear σ is drawn increasing downward. Verified in Chrome, screenshot 05.
 - **Open:** none beyond the defaults themselves.
 
-### D13. Profile-table statistics: defect F-1
+### D13. Profile-table statistics: defect F-1, fixed in `ee745b3`
 - See §1.8.
-- **Recommendation:** flag the T, u and v companions `statistic="quantity"`, and add a value assertion to `test_minimum_profile_labels_its_statistic_and_keeps_position_means`.
-- **Awaiting approval** to implement.
+- **Fix:** the T, u and v companions are flagged `statistic="quantity"`, and `test_minimum_profile_labels_its_statistic_and_keeps_position_means` now asserts the values, not only the header.
 
 ### D14. Reduction order: provisional
 - **Current behaviour:** fixed order: longitude → latitude → vertical → time.
@@ -460,7 +459,7 @@ Nothing from #88 was removed or weakened. That includes the equivalence gate, th
 | Windows Python 3.12.12 (viewer suite) | pass |
 | Windows Chrome via CDP (browser suite) | 8 / 8 pass; airless browser test deselected |
 | WSL Python (viewer suite, incl. airless native library) | 112 passed, 5 skipped (Ben-2 archives not present in WSL) |
-| Architecture snapshot (WSL `arch312`) | regenerated; `--check` up to date |
+| Architecture snapshot (WSL `arch312`) | regenerated; `--check` up to date (regenerated again at `ee745b3` for the F-1 edit) |
 | Real Chrome, manual | the flows of screenshots 01–06, plus search, Min profile, PNG export |
 
 ### 4.3 Not verified, and why
@@ -473,7 +472,8 @@ Nothing from #88 was removed or weakened. That includes the equivalence gate, th
   - Seen once in real Chrome during a burst of eight rapid configuration changes against the local server. It did not reproduce on retry.
   - Not diagnosed. Possible causes include request cancellation on rapid re-selection, or the single-threaded server refusing a connection under load. Neither has been tested.
 - **Phone width in real Chrome:** the maximised window would not resize. Only the 390 px CDP test covers it.
-- **F-1:** found during this review. No existing test fails on it.
+- **F-1:** found during this review and fixed in `ee745b3`. The browser was not re-checked after the fix; only the Python suites were.
+- **Earlier WSL runs:** the WSL worktree had silently stayed at `a2abc33`, because leftover snapshot files blocked its checkout. The Python source at `a2abc33` and `e0c8376` is byte-identical, which the architecture content hashes confirm, so those results stand for `e0c8376`. The run at `ee745b3` was on the correct commit: 112 passed, 5 skipped.
 - **D6b quadrature accuracy for nonlinear quantities:** not measured.
 - **Environment limits:**
   - Windows and WSL worktrees are separate checkouts of the same commit; the WSL tree fetches from the main clone.
@@ -496,7 +496,7 @@ PR #89 against `feature/viewer3-four-coordinate-engine`.
 
 ### 4.5 Remaining verification work (proposed, not started)
 
-1. Fix and test F-1, if approved.
+1. Re-check the time-Min profile table in real Chrome after the F-1 fix.
 2. Find a host with both the native library and a browser for the airless page. Options: a WSL Chromium install, or loading the airless data through a Windows server backed by WSL-computed results.
 3. Reproduce or rule out the transient fetch failure with a scripted burst test.
 4. Test phone width in real Chrome on a resizable window or a device.
