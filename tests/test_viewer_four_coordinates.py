@@ -230,4 +230,7 @@ def test_columnar_time_mean_map_and_area_weighted_profile(airless):
     w = a.weights[index[:, 0]]
     np.testing.assert_allclose(profile["values"], cells.mean(axis=2) @ w / w.sum(), rtol=1e-14)
     assert "area weights" in profile["coordinates"]["latitude"]["rule"]
-    assert profile["surface"] is not None                # the skin, as its own level
+    assert "surface" not in profile                      # a skin strip belongs to 2-D results only
+    skin = [m for m in profile["markers"] if m["kind"] == "surface"]
+    assert len(skin) == 1 and skin[0]["position"] == 0.0  # the skin, as its own level at depth 0
+    assert profile["table"]["rows"][0][0] == "skin"
