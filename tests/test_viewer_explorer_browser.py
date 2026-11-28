@@ -59,7 +59,7 @@ def test_day30_nightside_surface_temperature(browser):
     server, thread = serve([A])
     try:
         with OfflinePage(browser, width=1400, height=1800, loopback_port=server.server_port) as page:
-            page.call("Page.navigate", url=server.url + "?time=29&product=column")
+            page.call("Page.navigate", url=server.url + "?time=29&preset=profile")
             until(page, READY)
             set_control(page, "field", "surface_temperature")
             until(page, READY)
@@ -69,7 +69,7 @@ def test_day30_nightside_surface_temperature(browser):
             until(page, "Math.abs(viewer.cursor.lat) < 2 && Math.abs(viewer.cursor.lon - 180) < 2 && " + READY)
             data = page.eval("viewer.explorer.data")
             slab = np.load(A / "states/surface-d00030.npy").reshape(32, 64)
-            lat, lon = data["location"]["latitude"], data["location"]["longitude"]
+            lat, lon = data["coordinates"]["latitude"]["value"], data["coordinates"]["longitude"]["value"]
             i = int(np.abs(np.degrees(np.arcsin(np.polynomial.legendre.leggauss(32)[0][::-1])) - lat).argmin())
             surface = [m for m in data["markers"] if m["kind"] == "surface"][0]
             assert surface["value"] == slab[i, round(lon / 5.625) % 64]
@@ -94,7 +94,7 @@ def test_cold_event_column_section_and_level_link(browser):
     server, thread = serve([BEXT])
     try:
         with OfflinePage(browser, width=1400, height=1800, loopback_port=server.server_port) as page:
-            page.call("Page.navigate", url=server.url + "?time=54&lat=-19.4&lon=281&product=column")
+            page.call("Page.navigate", url=server.url + "?time=54&lat=-19.4&lon=281&preset=profile")
             until(page, READY)
             assert page.eval("document.querySelector('[data-id=time-label]').textContent").startswith("Day 85 ")
             row = page.eval("document.querySelector('[data-e=table]').tBodies[0].rows[1].innerText").split("\t")
@@ -125,7 +125,7 @@ def test_equatorial_jets_days_30_to_120_across_two_directories(browser):
     ext = json.loads((ROOT / "runs/diagnostics/sponge/results-ext/ext.json").read_text())
     try:
         with OfflinePage(browser, width=1400, height=1800, loopback_port=server.server_port) as page:
-            page.call("Page.navigate", url=server.url + "?time=29&lat=0&lon=0&product=zonal_mean")
+            page.call("Page.navigate", url=server.url + "?time=29&lat=0&lon=0&preset=zonal_mean")
             until(page, READY)
             peaks = {}
             for run, days in ((0, (30,)), (1, (60, 90, 120))):
@@ -160,7 +160,7 @@ def test_phone_width_has_no_horizontal_scroll(browser):
     server, thread = serve([A])
     try:
         with OfflinePage(browser, width=390, height=900, loopback_port=server.server_port) as page:
-            page.call("Page.navigate", url=server.url + "?time=29&product=column")
+            page.call("Page.navigate", url=server.url + "?time=29&preset=profile")
             until(page, READY)
             assert page.eval("document.documentElement.scrollWidth <= window.innerWidth")
     finally:
@@ -204,7 +204,7 @@ def test_section_fixed_colour_range_persists_by_quantity_and_exports(browser):
     server, thread = serve([A])
     try:
         with OfflinePage(browser, width=1400, height=1800, loopback_port=server.server_port) as page:
-            page.call("Page.navigate", url=server.url + "?time=29&lat=-40&lon=90&product=meridional_section")
+            page.call("Page.navigate", url=server.url + "?time=29&lat=-40&lon=90&preset=meridional_section")
             until(page, READY)
             explore(page, "quantity", "temperature")
             until(page, READY)
@@ -254,7 +254,7 @@ def test_section_fixed_colour_range_persists_by_quantity_and_exports(browser):
             assert section_state(page)["spec"] is None
             explore(page, "quantity", "temperature")
             until(page, f"{LOADED}?.quantity === 'temperature' && " + READY)
-            explore(page, "preset", "column")
+            explore(page, "preset", "profile")
             until(page, f"{LOADED}?.vertical.role === 'y' && {LOADED}?.latitude.role === 'fixed' && " + READY)
             assert section_state(page)["hidden"]
             explore(page, "preset", "meridional_section")
@@ -276,7 +276,7 @@ def test_section_fixed_colour_range_persists_by_quantity_and_exports(browser):
             explore(page, "range-mode", "auto")
             automatic = export_top_colour_rows(page)
             assert fixed["width"] == automatic["width"] == 1650
-            assert fixed["name"].endswith("-meridional_section-temperature-t20.png")
+            assert "Latitude" in fixed["name"] and fixed["name"].endswith("-temperature-t20.png")
             assert fixed["rows"] > 500 > 100 > automatic["rows"]
             assert not page.exceptions, page.exceptions
     finally:
@@ -290,7 +290,7 @@ def test_pending_request_never_draws_stale_data(browser):
     server, thread = serve([MARS])
     try:
         with OfflinePage(browser, width=1400, height=1800, loopback_port=server.server_port) as page:
-            page.call("Page.navigate", url=server.url + "?time=8&product=column")
+            page.call("Page.navigate", url=server.url + "?time=8&preset=profile")
             until(page, READY)
             assert page.eval("viewer.explorer.spec.kind") == "line"
             # Hold zonal-mean responses (the longitude is reduced) until released.
@@ -315,12 +315,12 @@ def test_pending_request_never_draws_stale_data(browser):
                              " lat: viewer.explorer.data.x.values.length})")
             assert spec["quantity"] == "u" and spec["label"].startswith("Eastward wind") and spec["lat"] == 34
             # Returning to the loaded column while a new mean is pending shows the column at once.
-            explore(page, "preset", "column")
+            explore(page, "preset", "profile")
             until(page, READY + " && viewer.explorer.spec.kind === 'line'")
             # A mean requested and abandoned before it arrives never replaces the column on hand.
             explore(page, "preset", "zonal_mean")
             until(page, "held.length === 1")
-            explore(page, "preset", "column")
+            explore(page, "preset", "profile")
             until(page, READY + " && viewer.explorer.spec.kind === 'line'")
             page.eval("held.shift()()")
             page.eval("new Promise(resolve => setTimeout(resolve, 400))")
@@ -345,7 +345,12 @@ def test_flat_gravity_free_and_geodesic_capsules_open(browser, tmp_path):
             page.call("Page.navigate", url=server.url + "?time=8")
             until(page, 'document.querySelector(\'[data-id="png"]\')?.disabled === false')
             assert page.eval("document.querySelector('[data-id=field]').value") == "temperature"
-            assert page.eval("document.getElementById('explorer').hidden")
+            # Without gravity there is no native-level column evaluator: the explorer is offered,
+            # and its vertical coordinate can be fixed but not an axis (disabled, with the reason).
+            assert not page.eval("document.getElementById('explorer').hidden")
+            vertical = page.eval("""[...document.querySelector('[aria-label="Vertical role"]').options]
+                .map(o => [o.value, o.disabled])""")
+            assert ["y", True] in vertical and ["fixed", False] in vertical
             coordinates = page.eval("[...document.querySelector('[data-id=coordinate]').options].map(o => o.value)")
             assert coordinates == ["native"]
             assert page.eval("document.querySelector('[data-id=opacity-wrap]').hidden")
@@ -357,9 +362,16 @@ def test_flat_gravity_free_and_geodesic_capsules_open(browser, tmp_path):
             until(page, 'location.pathname.endsWith("/1/") && ' + READY)
             assert page.eval("document.querySelector('[data-e=snap-wrap]').hidden")
             assert page.eval(f"{LOADED}.options.snap") is False
-            assert page.eval("viewer.explorer.data.sampling") == "exact band-limited synthesis at the requested point"
-            products = page.eval("[...viewer.explorer.c.preset.options].filter(o => o.value && !o.disabled).map(o => o.value)")
-            assert products == ["map", "meridional_section", "zonal_section", "column", "time_series", "time_section"]
+            assert (page.eval("viewer.explorer.data.coordinates.latitude.sampling") ==
+                    "exact band-limited synthesis at the requested point")
+            # A geodesic grid has no Gaussian quadrature: every preset with a horizontal mean is
+            # unavailable, and only those.
+            presets = page.eval("[...viewer.explorer.c.preset.options].filter(o => o.value && !o.disabled).map(o => o.value)")
+            assert presets == ["map", "time_mean_map", "meridional_section", "zonal_section", "profile",
+                               "time_mean_profile", "time_series", "time_section", "hovmoller"]
+            reduce = page.eval("""[...document.querySelector('[aria-label="Longitude role"]').options]
+                .find(o => o.value === 'reduce')""" + "?.title")
+            assert "quadrature" in reduce
             assert not page.exceptions, page.exceptions
     finally:
         server.shutdown()
@@ -379,27 +391,39 @@ def test_airless_archive_in_the_same_application(browser, tmp_path):
             assert "diagnosed skin" in page.eval("document.querySelector('[data-id=level]').selectedOptions[0].text")
             assert "Native cells" in page.eval("document.querySelector('[data-id=status]').textContent")
             data = page.eval("viewer.explorer.data")
-            assert data["product"] == "column" and data["y"]["representation"] in ("depth", "height_above_surface")
+            assert data["axes"] == dict(x=None, y="vertical")
+            assert data["y"]["representation"] in ("depth", "height_above_surface")
             assert [m["kind"] for m in data["markers"]] == ["surface"]
             explore(page, "preset", "time_section")
             until(page, f"{LOADED}?.time.role === 'x' && " + EXPLORED)
             assert page.eval("viewer.explorer.spec.kind") == "field"
             assert page.eval("viewer.explorer.layout.strip") > 0           # the skin strip, apart from the cells
-            # The map preset is sent to selection A once; the page then settles.
+            # Longitude × latitude is an ordinary two-dimensional result of the explorer; the page
+            # settles after one request, and nothing is pushed to selection A unless asked.
             page.eval("""(() => {const f0 = window.fetch; window.selects = 0;
                 window.fetch = (u, o) => { if (String(u).includes("select")) selects++; return f0(u, o); };})()""")
             explore(page, "preset", "map")
-            until(page, "document.querySelector('[data-e=status]').textContent.includes('globe')")
+            until(page, f"{LOADED}?.longitude.role === 'x' && {LOADED}?.latitude.role === 'y' && " + EXPLORED)
+            assert page.eval("viewer.explorer.spec.kind") == "field"
             page.eval("new Promise(resolve => setTimeout(resolve, 1500))")
             assert page.eval("selects") <= 2
+            # The same roles with a time mean: the mean map, in the same view.
+            explore(page, "preset", "time_mean_map")
+            until(page, f"{LOADED}?.time.role === 'reduce' && " + EXPLORED)
+            assert page.eval("viewer.explorer.data.description").endswith("time mean")
             # A level chosen in selection A afterwards stays chosen.
             set_control(page, "level", 3)
             until(page, READY.split(" && ")[0])
             page.eval("new Promise(resolve => setTimeout(resolve, 800))")
             assert page.eval("document.querySelector('[data-id=level]').value") == "3"
-            for preset, message in (("zonal_mean", "not available"),):
-                explore(page, "preset", preset)
-                until(page, f"document.querySelector('[data-e=status]').textContent.includes({json.dumps(message)})")
+            # The archive records column area weights: longitude means are offered as for any field.
+            explore(page, "preset", "zonal_mean")
+            until(page, f"{LOADED}?.longitude.role === 'reduce' && " + EXPLORED)
+            assert page.eval("viewer.explorer.spec.kind") == "field"
+            # A vertical mean is not defined: the role is disabled and says why.
+            reason = page.eval("""[...document.querySelector('[aria-label="Vertical role"]').options]
+                .find(o => o.value === 'reduce').title""")
+            assert "thickness weighting" in reason
             assert not page.exceptions, page.exceptions
     finally:
         server.shutdown()

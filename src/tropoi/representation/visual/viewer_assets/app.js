@@ -3,8 +3,9 @@ import {SurfaceView} from "./render.js";
 import {Explorer, dayText} from "./explorer.js";
 
 // The viewer opens any archive through its explorer description: quantities,
-// their coordinates, native levels, time axes and supported products. Map
-// panels are the longitude × latitude product; the explorer covers the rest.
+// what each of their coordinates accepts, native levels and time axes. The
+// globe panels draw one saved state on one surface; the explorer draws any
+// role assignment, longitude × latitude included.
 
 const byId = id => document.getElementById(id);
 const panels = [];
@@ -104,7 +105,14 @@ function scaleTogether() {
   for (const panel of panels) if (panel.frame) panel.draw(range);
 }
 
-const mapKeys = () => Object.keys(quantities).filter(k => "map" in quantities[k].products);
+// The globe draws one saved state on one surface: quantities whose longitude
+// and latitude can be axes, at a fixed time and a fixed (or no) vertical coordinate.
+const onGlobe = q => {
+  const c = q.coordinates;
+  return c.longitude.roles.includes("x") && c.latitude.roles.includes("y") && c.time.roles.includes("fixed") &&
+    (c.vertical.roles.includes("fixed") || c.vertical.roles.includes("none"));
+};
+const mapKeys = () => Object.keys(quantities).filter(k => onGlobe(quantities[k]));
 
 class Panel {
   constructor(letter, initial) {
@@ -192,7 +200,7 @@ class Panel {
     c.vertical.hidden = !q.vertical;
     if (q.vertical) {
       const old = initial?.controls.coordinate.value || c.coordinate.value;
-      const reps = q.products.map.vertical;
+      const reps = q.coordinates.vertical.fixed;
       options(c.coordinate, reps.map(r => [r, q.vertical.representations[r].label]));
       if (reps.includes(old)) c.coordinate.value = old;
       const keep = initial?.controls.level.value || c.level.value;
@@ -312,7 +320,7 @@ class Panel {
   /** Show a longitude × latitude selection made in the explorer. */
   show(selection) {
     const c = this.controls;
-    if (!(selection.quantity in quantities) || !("map" in quantities[selection.quantity].products)) return;
+    if (!(selection.quantity in quantities) || !onGlobe(quantities[selection.quantity])) return;
     if (c.field.value !== selection.quantity) { c.field.value = selection.quantity; this.updateField(); }
     const v = selection.vertical;
     if (v.role === "fixed" && [...c.coordinate.options].some(o => o.value === v.representation)) {
@@ -496,7 +504,7 @@ async function openArchive() {
     byId("link-time").onchange = () => sync(first, "time");
     byId("link-level").onchange = () => sync(first, "level");
   }
-  const explorable = Object.values(quantities).some(q => Object.keys(q.products).some(p => p !== "map"));
+  const explorable = Object.keys(quantities).length > 0;
   if (explorable) {
     explorer = new Explorer(byId("explorer"), {
       manifest, runName, timeText,
