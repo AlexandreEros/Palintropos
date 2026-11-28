@@ -72,8 +72,10 @@ function sync(source, dimension) {
   const target = panels.find(panel => panel !== source);
   if (target.linked) {
     // Selection A is the Explorer's: move the Explorer, which moves the globe.
-    if (dimension === "time") return explorer.setTime(sampleAtOrBefore(explorer.timeAxis(), source.seconds));
-    return;
+    if (dimension === "time") return explorer.setTime(source.seconds);
+    if (!source.quantity.vertical) return;
+    return explorer.setSurface(source.coordinate, source.discrete ? {level: source.level?.index} :
+      {value: source.controls.value.valueAsNumber});
   }
   if (dimension === "time") {
     target.controls.time.value = String(sampleAtOrBefore(target.axis, source.seconds));
@@ -266,7 +268,7 @@ class Panel {
     this.controls.time.value = String(index);
     if (this.linked) {
       // The saved time is the Explorer's: it moves, and the globe follows it.
-      await explorer.setTime(index);
+      await explorer.setTime(axisValues(this.axis)[index]);
       await Promise.all([sync(this, "time"), this.loading]);
       return;
     }
